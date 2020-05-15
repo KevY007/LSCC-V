@@ -1,0 +1,8 @@
+body {
+    background-color: transparent;
+}
+
+.grey-card {    
+    background-color: rgba(0, 0, 0, 0.212);
+    /*opacity: .4;*/
+}

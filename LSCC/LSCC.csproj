@@ -1,0 +1,73 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <AssemblyName>LSCC</AssemblyName>
+    <Version>0.0</Version>
+    <AssemblyVersion>0.0.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
+    <PackageId>LSCC</PackageId>
+    <Authors>KevY</Authors>
+    <Company>LSCC</Company>
+    <Product>Los Santos Copchase</Product>
+    <Description>Los Santos Copchase for GTA5 (RageMP)</Description>
+    <Copyright>Los Santos Copchase</Copyright>
+    <NeutralLanguage>en</NeutralLanguage>
+    <RootNamespace>LSCC</RootNamespace>
+    <Configurations>Debug;Release;Debug_KevY</Configurations>
+    <SignAssembly>false</SignAssembly>
+    <PackageIcon>lscc.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Client Resources\cs_packages\**" />
+    <EmbeddedResource Remove="Client Resources\cs_packages\**" />
+    <None Remove="Client Resources\cs_packages\**" />
+    <None Include="lscc.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="meta.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="meta.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CryptSharpOfficial" Version="2.1.0" />
+    <PackageReference Include="gtanetwork.api" Version="0.3.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.3" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.1" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql.Design" Version="1.1.2" />
+    <PackageReference Include="System.Data.Common" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Client Resources\index.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="rmdir &quot;C:\RAGEMP\server-files\bridge\resources\LSCC&quot;&#xD;&#xA;mkdir &quot;C:\RAGEMP\server-files\bridge\resources\LSCC&quot;&#xD;&#xA;del &quot;C:\RAGEMP\server-files\bridge\resources\LSCC\*.*&quot; /Q&#xD;&#xA;xcopy &quot;$(OutDir)*&quot; &quot;C:\RAGEMP\server-files\bridge\resources\LSCC&quot; /Y&#xD;&#xA;echo n|xcopy &quot;$(OutDir)*.dll&quot; &quot;C:\RAGEMP\server-files\bridge\runtime\&quot; /-Y&#xD;&#xA;xcopy &quot;$(OutDir)System.Diagnostics.DiagnosticSource.dll&quot; &quot;C:\RAGEMP\server-files\bridge\runtime\&quot; /Y&#xD;&#xA;xcopy &quot;$(OutDir)System.Collections.Immutable.dll&quot; &quot;C:\RAGEMP\server-files\bridge\runtime\&quot; /Y&#xD;&#xA;rmdir &quot;C:\RAGEMP\server-files\client_packages\&quot; /S /Q&#xD;&#xA;mkdir &quot;C:\RAGEMP\server-files\client_packages\&quot;&#xD;&#xA;xcopy /E &quot;Client Resources\*&quot; &quot;C:\RAGEMP\server-files\client_packages\&quot; /Y" />
+  </Target>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="rmdir &quot;C:\RAGEMP\server-files\bridge\resources\LSCC&quot;&#xD;&#xA;mkdir &quot;C:\RAGEMP\server-files\bridge\resources\LSCC&quot;&#xD;&#xA;del &quot;C:\RAGEMP\server-files\bridge\resources\LSCC\*.*&quot; /Q" />
+  </Target>
+
+</Project>
