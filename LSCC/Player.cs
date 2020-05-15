@@ -12,12 +12,14 @@ namespace LSCC
     static class Player
     {
         public static Random rand = new Random();
+
         public static void ResetPlayerData(Client player)
         {
             player.ResetData("AccountHandle");
             player.SetData("AccountHandle", null);
             player.SetData("CharacterHandle", null);
             player.SetData("LoggedIn", false);
+            player.SetData("AutoJoin", false);
         }
 
         public static void SetDiscordStatus(Client player, string status)
@@ -65,28 +67,42 @@ namespace LSCC
                 ContextFactory.Instance.SaveChanges();
             }
         }
+        public static Account GetAccount(Client player)
+        {
+            if (LoggedIn(player))
+            {
+                Account playerAcc = player.GetData("AccountHandle");
+                return playerAcc;
+            }
+
+            return null;
+        }
         public static void Spawn(Client player)
         {
             if (!LoggedIn(player)) return;
-
-            NAPI.Notification.SendNotificationToPlayer(player, $"You have spawned in.", false);
 
             player.StopSpectating();
 
             Vector3 SpawnArea = Settings.RandomSpawns[rand.Next(Settings.RandomSpawns.Length)];
 
-            NAPI.Player.SpawnPlayer(player, new Vector3(SpawnArea.X, SpawnArea.Y, SpawnArea.Z));
-
             player.TriggerEvent("TogglePlayerChat", true);
-            player.TriggerEvent("SetPlayerFrozen", false);
-            player.Freeze(false);
 
-            NAPI.Entity.SetEntityInvincible(player, false);
-            NAPI.Entity.SetEntityTransparency(player, 255);
 
             player.TriggerEvent("DestroyPlayerCamera");
 
-            SetDiscordStatus(player, $"Playing as {player.Name}");
+            SetDiscordStatus(player, $"In lobby as {player.Name}");
+
+            player.SetData("AutoJoin", true);
+            NAPI.Notification.SendNotificationToPlayer(player, $"You have spawned in.", false);
+            NAPI.Notification.SendNotificationToPlayer(player, $"~g~Autojoin has been enabled.", false);
+
+            NAPI.Player.SpawnPlayer(player, new Vector3(SpawnArea.X, SpawnArea.Y, SpawnArea.Z));
+            NAPI.Entity.SetEntityInvincible(player, false);
+            NAPI.Entity.SetEntityTransparency(player, 255);
+            player.TriggerEvent("SetPlayerFrozen", false);
+            player.Freeze(false);
+            NAPI.Player.SetPlayerNametagColor(player, 255, 255, 255);
+            NAPI.Entity.SetEntityDimension(player, 1);
         }
         public static void SendMessageToAllAdmins(string message)
         {
