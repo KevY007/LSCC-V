@@ -56,6 +56,15 @@ namespace LSCC
             NAPI.Util.ConsoleOutput($"[Accounts]: {ContextFactory.Instance.Accounts.Count()}");
             NAPI.Util.ConsoleOutput("[>===========|Los Santos Copchase|===========<]");
 
+            NAPI.Task.Run(() =>
+            {
+                TimeUpdate();
+            }, delayTime: 15000);
+        }
+
+        public void TimeUpdate()
+        {
+            NAPI.Util.ConsoleOutput("TimeUpdate called.");
         }
 
         public void OnPlayerLogin(Client player, Account acc)
