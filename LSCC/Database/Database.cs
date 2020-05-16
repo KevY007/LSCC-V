@@ -1,9 +1,28 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
 namespace LSCC
 {
+    public class MapSpawns
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public int mapID { get; set; }
+
+        public float spawnX { get; set; }
+        public float spawnY { get; set; }
+        public float spawnZ { get; set; }
+        public float spawnA { get; set; }
+    }
+    public class Maps
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public string mapName { get; set; }
+    }
+
     public class MainDatabase : DbContext
     {
         // Base constructor
@@ -14,6 +33,8 @@ namespace LSCC
 
         // Account model class created somewhere else
         public DbSet<Account> Accounts { get; set; }
+        public DbSet<Maps> Maps { get; set; }
+        public DbSet<MapSpawns> MapSpawns { get; set; }
     }
 
     public class ContextFactory : IDesignTimeDbContextFactory<MainDatabase>

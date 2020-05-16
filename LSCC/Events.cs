@@ -61,7 +61,7 @@ namespace LSCC.Events
             NAPI.Notification.SendNotificationToPlayer(player, $"~r~You died!", false);
             NAPI.Task.Run(() =>
             {
-                Vector3 SpawnArea = Settings.RandomSpawns[rand.Next(Settings.RandomSpawns.Length)];
+                Vector3 SpawnArea = Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)];
                 NAPI.Player.SpawnPlayer(player, SpawnArea);
             }, delayTime: 4000);
         }
@@ -94,6 +94,8 @@ namespace LSCC.Events
                 Player.LoginBrowserSetup(player);
                 return;
             }
+
+            if(player.GetData("InGame") == false) player.Dimension = 1;
         }
     }
 }

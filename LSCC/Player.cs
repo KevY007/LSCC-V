@@ -20,6 +20,8 @@ namespace LSCC
             player.SetData("CharacterHandle", null);
             player.SetData("LoggedIn", false);
             player.SetData("AutoJoin", false);
+            player.SetData("InGame", false);
+            player.SetData("Team", -1);
         }
 
         public static void SetDiscordStatus(Client player, string status)
@@ -83,16 +85,17 @@ namespace LSCC
 
             player.StopSpectating();
 
-            Vector3 SpawnArea = Settings.RandomSpawns[rand.Next(Settings.RandomSpawns.Length)];
+            Vector3 SpawnArea = Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)];
 
             player.TriggerEvent("TogglePlayerChat", true);
-
 
             player.TriggerEvent("DestroyPlayerCamera");
 
             SetDiscordStatus(player, $"In lobby as {player.Name}");
 
             player.SetData("AutoJoin", true);
+            player.SetData("InGame", false);
+            player.SetData("Team", -1);
             NAPI.Notification.SendNotificationToPlayer(player, $"You have spawned in.", false);
             NAPI.Notification.SendNotificationToPlayer(player, $"~g~Autojoin has been enabled.", false);
 

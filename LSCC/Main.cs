@@ -19,6 +19,9 @@ public static class Settings
     public const string MySQL_Password = "perkovicMatko3035";
     public const string MySQL_Database = "lsccv";
 
+    // Global Variables
+    public static bool GameRunning { get; set; }
+
     // Locations
     public const float LoginCameraX = -550;
     public const float LoginCameraY = -210;
@@ -28,7 +31,7 @@ public static class Settings
     public const float LoginCameraRz = -30;
     public const float LoginCameraViewAngle = 60;
 
-    public static Vector3[] RandomSpawns = new Vector3[]
+    public static Vector3[] LobbySpawns = new Vector3[]
     {
         new Vector3(-592f, -98f, 43f)
     };
@@ -56,6 +59,8 @@ namespace LSCC
             NAPI.Util.ConsoleOutput($"[Accounts]: {ContextFactory.Instance.Accounts.Count()}");
             NAPI.Util.ConsoleOutput("[>===========|Los Santos Copchase|===========<]");
 
+            Settings.GameRunning = false;
+
             NAPI.Task.Run(() =>
             {
                 TimeUpdate();
@@ -64,7 +69,17 @@ namespace LSCC
 
         public void TimeUpdate()
         {
+            if(!Settings.GameRunning)
+            {
+                Settings.GameRunning = true;
+                NAPI.Util.ConsoleOutput("Game Running forced to true (TBA // GAME START + MAPS SYS)");
+            }
             NAPI.Util.ConsoleOutput("TimeUpdate called.");
+
+            NAPI.Task.Run(() =>
+            {
+                TimeUpdate();
+            }, delayTime: 15000);
         }
 
         public void OnPlayerLogin(Client player, Account acc)
@@ -77,7 +92,7 @@ namespace LSCC
 
             player.Name = acc.Username;
             player.TriggerEvent("destroyBrowser");
-
+            
             Player.Spawn(player);
         }
         public void OnPlayerRegister(Client player, Account acc)
