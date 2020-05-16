@@ -40,7 +40,6 @@ E:\Github\LSCC-V\LSCC\bin\Release\netcoreapp2.2\System.Diagnostics.DiagnosticSou
 E:\Github\LSCC-V\LSCC\bin\Release\netcoreapp2.2\System.Runtime.CompilerServices.Unsafe.dll
 E:\Github\LSCC-V\LSCC\bin\Release\netcoreapp2.2\System.Text.Encodings.Web.dll
 E:\Github\LSCC-V\LSCC\bin\Release\netcoreapp2.2\System.Text.Json.dll
-E:\Github\LSCC-V\LSCC\obj\Release\netcoreapp2.2\LSCC.csprojAssemblyReference.cache
 E:\Github\LSCC-V\LSCC\obj\Release\netcoreapp2.2\LSCC.csproj.CoreCompileInputs.cache
 E:\Github\LSCC-V\LSCC\obj\Release\netcoreapp2.2\LSCC.AssemblyInfoInputs.cache
 E:\Github\LSCC-V\LSCC\obj\Release\netcoreapp2.2\LSCC.AssemblyInfo.cs
@@ -48,3 +47,4 @@ E:\Github\LSCC-V\LSCC\obj\Release\netcoreapp2.2\LSCC.csproj.CopyComplete
 E:\Github\LSCC-V\LSCC\obj\Release\netcoreapp2.2\LSCC.dll
 E:\Github\LSCC-V\LSCC\obj\Release\netcoreapp2.2\LSCC.pdb
 E:\Github\LSCC-V\LSCC\obj\Release\netcoreapp2.2\LSCC.genruntimeconfig.cache
+E:\Github\LSCC-V\LSCC\obj\Release\netcoreapp2.2\LSCC.csprojAssemblyReference.cache

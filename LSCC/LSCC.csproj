@@ -20,6 +20,10 @@
     <PackageIcon>lscc.png</PackageIcon>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="Client Resources\cs_packages\**" />
     <EmbeddedResource Remove="Client Resources\cs_packages\**" />
@@ -67,7 +71,7 @@
   </Target>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="rmdir &quot;C:\RAGEMP\server-files\bridge\resources\LSCC&quot;&#xD;&#xA;mkdir &quot;C:\RAGEMP\server-files\bridge\resources\LSCC&quot;&#xD;&#xA;del &quot;C:\RAGEMP\server-files\bridge\resources\LSCC\*.*&quot; /Q" />
+    <Exec Command="rd /s /q &quot;C:\RAGEMP\server-files\bridge\resources\LSCC&quot;&#xD;&#xA;mkdir &quot;C:\RAGEMP\server-files\bridge\resources\LSCC&quot;&#xD;&#xA;del &quot;C:\RAGEMP\server-files\bridge\resources\LSCC\*.*&quot; /Q" />
   </Target>
 
 </Project>

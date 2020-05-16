@@ -1,15 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Pomelo.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql;
-using Pomelo.EntityFrameworkCore.MySql.Design;
 using System.Reflection;
-using GTANetworkAPI;
-using System.Diagnostics;
-using System.Data.Common;
 
 namespace LSCC
 {
