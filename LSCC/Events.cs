@@ -6,8 +6,6 @@ namespace LSCC.Events
 {
     class Events : Script
     {
-        Random rand = new Random();
-
         [ServerEvent(Event.PlayerConnected)]
         public void OnPlayerConnected(Client player)
         {
@@ -26,6 +24,8 @@ namespace LSCC.Events
             {
                 Player.LoginBrowserSetup(player);
             }, delayTime: 2500);
+
+            player.TriggerEvent("InitChaseTimer");
         }
 
         [ServerEvent(Event.PlayerDisconnected)]
@@ -66,8 +66,48 @@ namespace LSCC.Events
 
             NAPI.Notification.SendNotificationToPlayer(player, $"~r~You died!", false);
 
+            if (!killer.IsNull)
+            {
+                NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name}, reason: {reason}.");
+            }
+            else
+            {
+                NAPI.Util.ConsoleOutput($"[Death] {player.Name} has died, reason: {reason}.");
+            }
+
+            if (Settings.GameRunning == 1)
+            {
+                if(Settings.Fugitives.Contains(player))
+                {
+                    if (!killer.IsNull)
+                    {
+                        NAPI.Notification.SendNotificationToAll($"Fugitive ~r~<C>{player.Name}</C> ~w~has been taken out by ~b~<C>{killer.Name}</C>~w~.");
+                    }
+                    else
+                    {
+                        NAPI.Notification.SendNotificationToAll($"Fugitive ~r~<C>{player.Name}</C> ~w~has died.");
+                    }
+
+                    Settings.Fugitives.Remove(player);
+                }
+                if (Settings.Cops.Contains(player))
+                {
+                    if (!killer.IsNull)
+                    {
+                        NAPI.Notification.SendNotificationToAll($"Cop ~b~<C>{player.Name}</C> ~w~has been taken out by ~r~<C>{killer.Name}</C>~w~.");
+                    }
+                    else
+                    {
+                        NAPI.Notification.SendNotificationToAll($"Cop ~b~<C>{player.Name}</C> ~w~has died.");
+                    }
+
+                    Settings.Cops.Remove(player);
+                }
+            }
+
             NAPI.Task.Run(() =>
             {
+                Random rand = new Random();
                 Vector3 SpawnArea = Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)];
                 NAPI.Player.SpawnPlayer(player, SpawnArea);
 
@@ -103,7 +143,12 @@ namespace LSCC.Events
                 return;
             }
 
+            Blip pBlip = player.GetData("Blip");
+            if (pBlip != null || !pBlip.IsNull) pBlip.Delete();
+            player.SetData("Blip", null);
+
             player.Dimension = 1;
+            player.NametagColor = new Color(255, 255, 255);
         }
     }
 }

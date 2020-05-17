@@ -30,6 +30,16 @@ namespace LSCC
         {
             player.TriggerEvent("SetDiscordStatus", "Los Santos Copchase", status);
         }
+        public static void ToggleCollisions(Client player, bool toggle)
+        {
+            if(toggle) player.TriggerEvent("EnableCollisions");
+            else player.TriggerEvent("DisableCollisions");
+        }
+        public static void Freeze(Client player, bool toggle)
+        {
+            player.TriggerEvent("SetPlayerFrozen", toggle);
+        }
+
         public static bool LoggedIn(Client player)
         {
             if (player.HasData("AccountHandle") && player.GetData("AccountHandle") != null && player.GetData("LoggedIn") == true)
@@ -41,14 +51,13 @@ namespace LSCC
 
         public static void LoginCameraSetup(Client player)
         {
-            player.Spectate();
             NAPI.Entity.SetEntityTransparency(player, 0);
-            NAPI.Entity.SetEntityInvincible(player, true);
+
             player.TriggerEvent("TogglePlayerChat", false);
-            player.TriggerEvent("SetPlayerFrozen", true);
+            Player.Freeze(player, true);
             player.Position = new Vector3(Settings.LoginCameraX, Settings.LoginCameraY, Settings.LoginCameraZ);
             player.Dimension = 666;
-            player.Freeze(true);
+ 
             player.TriggerEvent("DestroyPlayerCamera");
             player.TriggerEvent("CreatePlayerCamera", Settings.LoginCameraX, Settings.LoginCameraY, Settings.LoginCameraZ, Settings.LoginCameraRx, Settings.LoginCameraRy, Settings.LoginCameraRz, Settings.LoginCameraViewAngle);
         }
@@ -63,11 +72,6 @@ namespace LSCC
         {
             if (LoggedIn(player))
             {
-                Account playerAcc = player.GetData("AccountHandle");
-                if (player.HasData("CharacterHandle") && player.GetData("CharacterHandle") != null)
-                {
-                    
-                }
                 ContextFactory.Instance.SaveChanges();
             }
         }
@@ -87,8 +91,6 @@ namespace LSCC
 
             if(!Settings.LoggedInPlayers.Contains(player)) Settings.LoggedInPlayers.Add(player);
 
-            player.StopSpectating();
-
             Vector3 SpawnArea = Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)];
 
             player.TriggerEvent("TogglePlayerChat", true);
@@ -102,14 +104,18 @@ namespace LSCC
 
             player.SetData("AutoJoin", true);
 
-            Settings.Cops.Remove(player);
-            Settings.Fugitives.Remove(player);
+            if (Settings.GameRunning == 1)
+            {
+                Settings.Cops.Remove(player);
+                Settings.Fugitives.Remove(player);
+            }
+
             NAPI.Player.SpawnPlayer(player, new Vector3(SpawnArea.X, SpawnArea.Y, SpawnArea.Z));
-            NAPI.Entity.SetEntityInvincible(player, false);
+
             NAPI.Entity.SetEntityTransparency(player, 255);
-            player.TriggerEvent("SetPlayerFrozen", false);
-            player.Freeze(false);
-            NAPI.Player.SetPlayerNametagColor(player, 255, 255, 255);
+
+            Player.Freeze(player, false);
+            player.NametagColor = new Color(255, 255, 255);
             player.Dimension = 1;
 
         }

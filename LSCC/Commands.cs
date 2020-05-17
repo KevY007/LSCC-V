@@ -8,10 +8,47 @@ namespace LSCC
 {
     class Commands : Script
     {
-        Random rand = new Random();
+        [Command("game", GreedyArg = true)]
+        public void cmd_game(Client player, string action)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+
+            if (Player.GetAccount(player).Admin < 2)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                return;
+            }
+
+            if (action.CompareTo("stop") == 0)
+            {
+                if (!Main.StopGame(0))
+                {
+                    player.SendChatMessage("~r~Failed to stop game! Is there even a copchase running?");
+                }
+                else NAPI.Chat.SendChatMessageToAll($"~r~[AdmCmd] ~w~{player.Name} has forcefully stopped the copchase.");
+            }
+            else if (action.CompareTo("start") == 0)
+            {
+                if (!Main.StartGame())
+                {
+                    player.SendChatMessage("~r~Failed to start game! Is one already running?");
+                }
+                else NAPI.Chat.SendChatMessageToAll($"~r~[AdmCmd] ~w~{player.Name} has forcefully started the copchase.");
+            }
+            else if (action.CompareTo("autostart") == 0)
+            {
+                Settings.GameAutoStart = !Settings.GameAutoStart;
+                if (Settings.GameAutoStart) NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~g~has enabled copchases.");
+                else NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~w~has disabled copchases.");
+            }
+            else player.SendChatMessage("Invalid option, possible options: 'start', 'stop', 'autostart'");
+
+            return;
+        }
 
         [Command("aveh")]
-        public void cmd_car(Client player, string carname)
+        public void cmd_aveh(Client player, string carname)
         {
             if (!Player.LoggedIn(player))
                 return;
@@ -22,7 +59,37 @@ namespace LSCC
                 return;
             }
 
-            player.SetIntoVehicle(NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(64), rand.Next(64), player.SocialClubName, 255, false, true, player.Dimension), -1);
+            Random rand = new Random();
+
+            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(64), rand.Next(64), player.SocialClubName, 255, false, true, player.Dimension);
+            player.SetIntoVehicle(aVehicle, -1);
+            Settings.AdminVehicles.Add(aVehicle);
+            return;
+        }
+
+        [Command("removeavehs")]
+        public void cmd_removeavehs(Client player)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+
+            if (Player.GetAccount(player).Admin < 1)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                return;
+            }
+
+            for (int i = Settings.AdminVehicles.Count - 1; i >= 0; i--)
+            {
+                if (!Settings.AdminVehicles[i].IsNull && Settings.AdminVehicles[i] != null)
+                {
+                    Settings.AdminVehicles[i].Delete();
+                    Settings.AdminVehicles.RemoveAt(i);
+                }
+            }
+
+            Settings.AdminVehicles.Clear();
+            return;
         }
 
         [Command("autojoin")]
@@ -61,7 +128,11 @@ namespace LSCC
 
             if(Player.GetAccount(player).Admin >= 1)
             {
-                player.SendChatMessage("[Admin Lv 1]: /a /aveh");
+                player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs");
+            }
+            if (Player.GetAccount(player).Admin >= 2)
+            {
+                player.SendChatMessage("[Admin Lv 2]: /game");
             }
             if (Player.GetAccount(player).Admin >= 5)
             {
