@@ -19,7 +19,7 @@ namespace LSCC
             player.SetData("AccountHandle", null);
             player.SetData("CharacterHandle", null);
             player.SetData("LoggedIn", false);
-            player.SetData("AutoJoin", false);
+            player.SetData("AutoJoin", true);
 
             Settings.LoggedInPlayers.Remove(player);
             Settings.Cops.Remove(player);

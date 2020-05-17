@@ -21,7 +21,8 @@ namespace LSCC
     {
         [Key]
         public int SQL_ID { get; set; }
-        public string mapName { get; set; }
+        public string Name { get; set; }
+        public bool Enabled { get; set; }
     }
 
     public class MainDatabase : DbContext

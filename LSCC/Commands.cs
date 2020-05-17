@@ -11,7 +11,7 @@ namespace LSCC
         Random rand = new Random();
 
         [Command("aveh")]
-        public void Cmd_car(Client player, string carname)
+        public void cmd_car(Client player, string carname)
         {
             if (!Player.LoggedIn(player))
                 return;
@@ -26,7 +26,7 @@ namespace LSCC
         }
 
         [Command("autojoin")]
-        public void Cmd_autojoin(Client player)
+        public void cmd_autojoin(Client player)
         {
             if (!Player.LoggedIn(player))
                 return;
@@ -44,14 +44,14 @@ namespace LSCC
         }
 
         [Command("pos")]
-        public void Cmd_poslog(Client player)
+        public void cmd_poslog(Client player)
         {
             NAPI.Notification.SendNotificationToPlayer(player, $"X: {player.Position.X} - Y: {player.Position.Y} - Z: {player.Position.Z}");
             NAPI.Util.ConsoleOutput($"{player.Name} Position log: X: {player.Position.X} - Y: {player.Position.Y} - Z: {player.Position.Z}");
         }
 
         [Command("cmds", Alias = "help")]
-        public void Cmd_help(Client player)
+        public void cmd_help(Client player)
         {
             if (!Player.LoggedIn(player)) return;
 
@@ -63,14 +63,138 @@ namespace LSCC
             {
                 player.SendChatMessage("[Admin Lv 1]: /a /aveh");
             }
+            if (Player.GetAccount(player).Admin >= 5)
+            {
+                player.SendChatMessage("[Admin Lv 5]: /maps /deletemap /createmap /addmapspawn");
+            }
             if (Player.GetAccount(player).Admin >= 6)
             {
                 player.SendChatMessage("[Admin Lv 6]: /triggerevent /cameraset /setadmin");
             }
         }
 
+        [Command("maps")]
+        public void cmd_maps(Client player)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+
+            if (Player.GetAccount(player).Admin < 5)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not a level 5 admin.");
+                return;
+            }
+
+            foreach(Map map in ContextFactory.Instance.Maps)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, $"~y~{map.Name} | ID: [{map.SQL_ID}] | Enabled: [{map.Enabled}] | Spawns: [{ContextFactory.Instance.MapSpawns.Count(a=> a.mapID == map.SQL_ID)}]");
+            }
+            return;
+        }
+
+        [Command("addmapspawn")]
+        public void cmd_mapspawnadd(Client player, int mapid, int teamid)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+
+            if (Player.GetAccount(player).Admin < 5)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not a level 5 admin.");
+                return;
+            }
+
+            Map map = ContextFactory.Instance.Maps.FirstOrDefault(a => a.SQL_ID == mapid);
+            if (map == null) { NAPI.Chat.SendChatMessageToPlayer(player, "~r~No map with this ID exists."); return; }
+
+            float[] currentLoc = new float[4];
+            if(player.IsInVehicle == true)
+            {
+                currentLoc[0] = player.Vehicle.Position.X;
+                currentLoc[1] = player.Vehicle.Position.Y;
+                currentLoc[2] = player.Vehicle.Position.Z;
+                currentLoc[3] = player.Vehicle.Heading;
+            }
+            else
+            {
+                currentLoc[0] = player.Position.X;
+                currentLoc[1] = player.Position.Y;
+                currentLoc[2] = player.Position.Z;
+                currentLoc[3] = player.Heading;
+            }
+
+            var _new = new MapSpawn
+            {
+                mapID = map.SQL_ID,
+                spawnTeam = teamid,
+                spawnX = currentLoc[0],
+                spawnY = currentLoc[1],
+                spawnZ = currentLoc[2],
+                spawnA = currentLoc[3]
+            };
+
+            ContextFactory.Instance.MapSpawns.Add(_new);
+
+            ContextFactory.Instance.SaveChanges();
+
+            NAPI.Chat.SendChatMessageToPlayer(player, $"~y~{map.Name} | Added a spawn (ID: {_new.SQL_ID}) over here for team [{teamid}]");
+            
+            return;
+        }
+
+        [Command("deletemap")]
+        public void cmd_delmap(Client player, string mapname)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+
+            if (Player.GetAccount(player).Admin < 5)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not a level 5 admin.");
+                return;
+            }
+
+            Map map = ContextFactory.Instance.Maps.FirstOrDefault(a => a.Name == mapname);
+            if(map == null) { NAPI.Chat.SendChatMessageToPlayer(player, "~r~No map with this name exists."); return; }
+
+
+            ContextFactory.Instance.MapSpawns.RemoveRange(ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID));
+            ContextFactory.Instance.Maps.Remove(map);
+
+            ContextFactory.Instance.SaveChanges();
+
+            NAPI.Chat.SendChatMessageToPlayer(player, $"~g~Map {mapname} has been deleted from the server.");
+            return;
+        }
+
+        [Command("createmap")]
+        public void cmd_createmap(Client player, string mapname)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+
+            if (Player.GetAccount(player).Admin < 5)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not a level 5 admin.");
+                return;
+            }
+
+            var _new = new Map
+            {
+                Name = mapname,
+                Enabled = true
+            };
+
+            ContextFactory.Instance.Maps.Add(_new);
+
+            ContextFactory.Instance.SaveChanges();
+
+            NAPI.Chat.SendChatMessageToPlayer(player, $"~g~Map {mapname} with ID {_new.SQL_ID} has been added to the server.");
+            return;
+        }
+
         [Command("triggerevent")]
-        public void Cmd_triggerevent(Client player, string eventt)
+        public void cmd_triggerevent(Client player, string eventt)
         {
             if (!Player.LoggedIn(player))
                 return;
@@ -85,7 +209,7 @@ namespace LSCC
         }
 
         [Command("cameraset")]
-        public void Cmd_cameraset(Client player, int x, int y, int z, int rx, int ry, int rz, int viewangle)
+        public void cmd_cameraset(Client player, int x, int y, int z, int rx, int ry, int rz, int viewangle)
         {
             if (!Player.LoggedIn(player))
                 return;
@@ -101,7 +225,7 @@ namespace LSCC
         }
 
         [Command("setadmin")]
-        public void Cmd_setadmin(Client player, Client target, int level)
+        public void cmd_setadmin(Client player, Client target, int level)
         {
             if (!Player.LoggedIn(player))
                 return;
@@ -136,7 +260,7 @@ namespace LSCC
         }
 
         [Command("amiadmin")]
-        public void Cmd_amiadmin(Client player)
+        public void cmd_amiadmin(Client player)
         {
             if (!Player.LoggedIn(player))
                 return;
@@ -146,7 +270,7 @@ namespace LSCC
         }
 
         [Command("adminchat", Alias = "a", GreedyArg = true)]
-        public void Cmd_adminchat(Client player, string text)
+        public void cmd_adminchat(Client player, string text)
         {
             if (!Player.LoggedIn(player))
                 return;
@@ -161,7 +285,7 @@ namespace LSCC
         }
 
         [Command("ooc", Alias = "o", GreedyArg = true)]
-        public void Cmd_ooc(Client player, string text)
+        public void cmd_ooc(Client player, string text)
         {
             if (!Player.LoggedIn(player))
                 return;

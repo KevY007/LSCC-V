@@ -109,7 +109,7 @@ namespace LSCC
                 StartGame();
             }
         }
-
+        fix blip(re-attach every 2-3 seconds), game stop system etc
         public void TimeUpdate()
         {
             if(Settings.GameRunning == 0)
@@ -117,13 +117,13 @@ namespace LSCC
                 int pCount = 0;
                 foreach(Client player in Settings.LoggedInPlayers)
                 {
-                    if(player.GetData("AutoJoin") == true)
+                    if (player.GetData("AutoJoin") == true)
                     {
                         pCount++;
                     }
                 }
 
-                if (pCount > 2)
+                if (pCount >= 2)
                 {
                     Settings.GameRunning = 2;
 
@@ -225,13 +225,17 @@ namespace LSCC
 
             if(ContextFactory.Instance.Maps.Count() < 1) { NAPI.Util.ConsoleOutput("[StartGame] Server has no maps added, failed to start"); return; }
 
-            Map map = ContextFactory.Instance.Maps.OrderBy(c => Guid.NewGuid()).FirstOrDefault();
+            List<Map> mapList = ContextFactory.Instance.Maps.Where(a => a.Enabled == true).ToList();
 
-            NAPI.Util.ConsoleOutput($"[StartGame] Selected Map [{map.mapName}] | Total Spawns: [{ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID).Count()}]");
+            if(mapList.Count < 1) { NAPI.Util.ConsoleOutput("[StartGame] Server has maps but none of them were enabled! Failed to start."); return; }
+
+            Map map = mapList.OrderBy(c => Guid.NewGuid()).FirstOrDefault();
+
+            NAPI.Util.ConsoleOutput($"[StartGame] Selected Map [{map.Name}] | Total Spawns: [{ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID).Count()}]");
 
 
-            if (ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 2).Count() < 1) { NAPI.Util.ConsoleOutput($"[StartGame] Map {map.mapName} has no fugitive spawns! Abort."); return; }
-            if (ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 1).Count() < 1) { NAPI.Util.ConsoleOutput($"[StartGame] Map {map.mapName} has no cop spawns! Abort."); return; }
+            if (ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 2).Count() < 1) { NAPI.Util.ConsoleOutput($"[StartGame] Map {map.Name} has no fugitive spawns! Abort."); return; }
+            if (ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 1).Count() < 1) { NAPI.Util.ConsoleOutput($"[StartGame] Map {map.Name} has no cop spawns! Abort."); return; }
 
 
             List<MapSpawn> Spawns = ContextFactory.Instance.MapSpawns.Where(x => x.mapID == map.SQL_ID).ToList();
@@ -424,8 +428,8 @@ namespace LSCC
                 player.SetData("Blip", pBlip);
             }
 
-            NAPI.Util.ConsoleOutput($"[StartGame] Game has been started with {Settings.Cops.Count} cops & {Settings.Fugitives.Count} fugitives on map {map.mapName}.");
-            NAPI.Chat.SendChatMessageToAll($"~w~Game has been started with ~b~{Settings.Cops.Count} cops ~w~& ~r~{Settings.Fugitives.Count} fugitives ~w~on map ~y~{map.mapName}~w~.");
+            NAPI.Util.ConsoleOutput($"[StartGame] Game has been started with {Settings.Cops.Count} cops & {Settings.Fugitives.Count} fugitives on map {map.Name}.");
+            NAPI.Chat.SendChatMessageToAll($"~w~Game has been started with ~b~{Settings.Cops.Count} cops ~w~& ~r~{Settings.Fugitives.Count} fugitives ~w~on map ~y~{map.Name}~w~.");
 
             Settings.GameRunning = 1;
             Settings.FugitiveShowCounter = 4;
