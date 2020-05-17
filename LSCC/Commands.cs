@@ -106,6 +106,8 @@ namespace LSCC
 
             Map map = ContextFactory.Instance.Maps.FirstOrDefault(a => a.SQL_ID == mapid);
             if (map == null) { NAPI.Chat.SendChatMessageToPlayer(player, "~r~No map with this ID exists."); return; }
+			
+			if(teamid > 1) { NAPI.Chat.SendChatMessageToPlayer(player, "~r~Valid TeamID's are 0 (fugitive) or 1 (cop)."); return; }
 
             float[] currentLoc = new float[4];
             if(player.IsInVehicle == true)

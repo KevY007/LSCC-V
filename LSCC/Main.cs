@@ -234,7 +234,7 @@ namespace LSCC
             NAPI.Util.ConsoleOutput($"[StartGame] Selected Map [{map.Name}] | Total Spawns: [{ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID).Count()}]");
 
 
-            if (ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 2).Count() < 1) { NAPI.Util.ConsoleOutput($"[StartGame] Map {map.Name} has no fugitive spawns! Abort."); return; }
+            if (ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 0).Count() < 1) { NAPI.Util.ConsoleOutput($"[StartGame] Map {map.Name} has no fugitive spawns! Abort."); return; }
             if (ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 1).Count() < 1) { NAPI.Util.ConsoleOutput($"[StartGame] Map {map.Name} has no cop spawns! Abort."); return; }
 
 
@@ -347,7 +347,7 @@ namespace LSCC
 
             foreach (Client player in Settings.Fugitives)
             {
-                foreach (MapSpawn spawn in Spawns.Where(a => a.spawnTeam == 2))
+                foreach (MapSpawn spawn in Spawns.Where(a => a.spawnTeam == 0))
                 {
                     if (!UsedSpawns.Contains(spawn.SQL_ID))
                     {
@@ -359,7 +359,7 @@ namespace LSCC
                 if (spawnLoc == null)
                 {
                     pCount++;
-                    spawnLoc = Spawns.Last(a => a.spawnTeam == 2);
+                    spawnLoc = Spawns.Last(a => a.spawnTeam == 0);
                     spawnLoc.spawnZ += (pCount * 5); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
                 }
 
