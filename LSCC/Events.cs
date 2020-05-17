@@ -34,8 +34,13 @@ namespace LSCC.Events
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has left the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
             if (Player.LoggedIn(player))
             {
+                Blip pBlip = player.GetData("Blip");
+                pBlip.Delete();
+                player.ResetData("Blip");
+
                 Player.Save(player);
             }
+
             switch (type)
             {
                 case DisconnectionType.Left:
@@ -50,6 +55,7 @@ namespace LSCC.Events
                     NAPI.Chat.SendChatMessageToAll("~b~" + player.Name + "~w~ has been kicked for " + reason);
                     break;
             }
+
             Player.ResetPlayerData(player);
         }
 
@@ -59,10 +65,12 @@ namespace LSCC.Events
             if (!Player.LoggedIn(player)) return;
 
             NAPI.Notification.SendNotificationToPlayer(player, $"~r~You died!", false);
+
             NAPI.Task.Run(() =>
             {
                 Vector3 SpawnArea = Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)];
                 NAPI.Player.SpawnPlayer(player, SpawnArea);
+
             }, delayTime: 4000);
         }
 
@@ -95,7 +103,7 @@ namespace LSCC.Events
                 return;
             }
 
-            if(player.GetData("InGame") == false) player.Dimension = 1;
+            player.Dimension = 1;
         }
     }
 }

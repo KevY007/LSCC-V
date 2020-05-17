@@ -20,8 +20,10 @@ namespace LSCC
             player.SetData("CharacterHandle", null);
             player.SetData("LoggedIn", false);
             player.SetData("AutoJoin", false);
-            player.SetData("InGame", false);
-            player.SetData("Team", -1);
+
+            Settings.LoggedInPlayers.Remove(player);
+            Settings.Cops.Remove(player);
+            Settings.Fugitives.Remove(player);
         }
 
         public static void SetDiscordStatus(Client player, string status)
@@ -83,6 +85,8 @@ namespace LSCC
         {
             if (!LoggedIn(player)) return;
 
+            if(!Settings.LoggedInPlayers.Contains(player)) Settings.LoggedInPlayers.Add(player);
+
             player.StopSpectating();
 
             Vector3 SpawnArea = Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)];
@@ -93,19 +97,21 @@ namespace LSCC
 
             SetDiscordStatus(player, $"In lobby as {player.Name}");
 
-            player.SetData("AutoJoin", true);
-            player.SetData("InGame", false);
-            player.SetData("Team", -1);
-            NAPI.Notification.SendNotificationToPlayer(player, $"You have spawned in.", false);
-            NAPI.Notification.SendNotificationToPlayer(player, $"~g~Autojoin has been enabled.", false);
+            
+            if(player.GetData("AutoJoin") == false) NAPI.Notification.SendNotificationToPlayer(player, $"~g~Autojoin has been enabled.", false);
 
+            player.SetData("AutoJoin", true);
+
+            Settings.Cops.Remove(player);
+            Settings.Fugitives.Remove(player);
             NAPI.Player.SpawnPlayer(player, new Vector3(SpawnArea.X, SpawnArea.Y, SpawnArea.Z));
             NAPI.Entity.SetEntityInvincible(player, false);
             NAPI.Entity.SetEntityTransparency(player, 255);
             player.TriggerEvent("SetPlayerFrozen", false);
             player.Freeze(false);
             NAPI.Player.SetPlayerNametagColor(player, 255, 255, 255);
-            NAPI.Entity.SetEntityDimension(player, 1);
+            player.Dimension = 1;
+
         }
         public static void SendMessageToAllAdmins(string message)
         {

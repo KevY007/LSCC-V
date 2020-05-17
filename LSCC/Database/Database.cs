@@ -5,18 +5,19 @@ using System.Reflection;
 
 namespace LSCC
 {
-    public class MapSpawns
+    public class MapSpawn
     {
         [Key]
         public int SQL_ID { get; set; }
         public int mapID { get; set; }
 
+        public int spawnTeam { get; set; }
         public float spawnX { get; set; }
         public float spawnY { get; set; }
         public float spawnZ { get; set; }
         public float spawnA { get; set; }
     }
-    public class Maps
+    public class Map
     {
         [Key]
         public int SQL_ID { get; set; }
@@ -33,8 +34,8 @@ namespace LSCC
 
         // Account model class created somewhere else
         public DbSet<Account> Accounts { get; set; }
-        public DbSet<Maps> Maps { get; set; }
-        public DbSet<MapSpawns> MapSpawns { get; set; }
+        public DbSet<Map> Maps { get; set; }
+        public DbSet<MapSpawn> MapSpawns { get; set; }
     }
 
     public class ContextFactory : IDesignTimeDbContextFactory<MainDatabase>

@@ -25,6 +25,24 @@ namespace LSCC
             player.SetIntoVehicle(NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(64), rand.Next(64), player.SocialClubName, 255, false, true, player.Dimension), -1);
         }
 
+        [Command("autojoin")]
+        public void Cmd_autojoin(Client player)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+
+            if (player.GetData("AutoJoin") == true)
+            {
+                player.SendNotification("~r~AutoJoin has been turned off.", false);
+                player.SetData("AutoJoin", false);
+            }
+            else
+            {
+                player.SendNotification("~w~AutoJoin has been turned on.", false);
+                player.SetData("AutoJoin", true);
+            }
+        }
+
         [Command("pos")]
         public void Cmd_poslog(Client player)
         {
@@ -38,7 +56,7 @@ namespace LSCC
             if (!Player.LoggedIn(player)) return;
 
             player.SendChatMessage("[Los Santos Copchase V BETA Commands]:"); 
-            player.SendChatMessage("[General]: /ooc"); 
+            player.SendChatMessage("[General]: /ooc /autojoin"); 
             player.SendChatMessage("[Debug]: /pos");
 
             if(Player.GetAccount(player).Admin >= 1)
