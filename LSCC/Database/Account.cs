@@ -12,6 +12,7 @@ using System.Reflection;
 using CryptSharp;
 using LSCC;
 using System.Security.Cryptography;
+using GTANetworkAPI;
 
 namespace LSCC
 {

@@ -1,5 +1,4 @@
-﻿require('./Player/Bar.js');
-require('./Player/Player.js');
+﻿require('./Player/Player.js');
 require('./camerasManager.js');
 require('./cefBrowser.js');
 

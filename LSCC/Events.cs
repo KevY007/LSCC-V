@@ -14,6 +14,7 @@ namespace LSCC.Events
             NAPI.Notification.SendNotificationToPlayer(player, "~g~Welcome to ~w~Los Santos Copchase!");
             player.SetData("LastCryptAttempt", Environment.TickCount);
             Player.ResetPlayerData(player);
+            player.Freeze(true);
 
             NAPI.Task.Run(() =>
             {
@@ -34,9 +35,12 @@ namespace LSCC.Events
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has left the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
             if (Player.LoggedIn(player))
             {
-                Blip pBlip = player.GetData("Blip");
-                pBlip.Delete();
-                player.ResetData("Blip");
+                if (player.HasData("Blip"))
+                {
+                    Blip pBlip = player.GetData("Blip");
+                    pBlip.Delete();
+                    player.ResetData("Blip");
+                }
 
                 Player.Save(player);
             }
@@ -105,6 +109,8 @@ namespace LSCC.Events
                 }
             }
 
+            player.RemoveAllWeapons();
+
             NAPI.Task.Run(() =>
             {
                 Random rand = new Random();
@@ -126,9 +132,11 @@ namespace LSCC.Events
             string chatStr = $"{player.Name.Replace("_", " ")} says: {message}";
             foreach (Client i in NAPI.Pools.GetAllPlayers())
             {
-                if (i.Dimension == player.Dimension && i.Position.DistanceTo(player.Position) < 35.0)
+                if (i.Dimension == player.Dimension)
                 {
-                    i.SendChatMessage(chatStr);
+                    if (i.Position.DistanceTo(player.Position) <= 5.0) i.SendChatMessage($"~s~{chatStr}");
+                    if (i.Position.DistanceTo(player.Position) > 5.0 && i.Position.DistanceTo(player.Position) <= 10.0) i.SendChatMessage($"~c~{chatStr}");
+                    if (i.Position.DistanceTo(player.Position) > 10.0 && i.Position.DistanceTo(player.Position) <= 20.0) i.SendChatMessage($"~m~{chatStr}");
                 }
             }
         }
@@ -143,9 +151,14 @@ namespace LSCC.Events
                 return;
             }
 
-            Blip pBlip = player.GetData("Blip");
-            if (pBlip != null || !pBlip.IsNull) pBlip.Delete();
-            player.SetData("Blip", null);
+            if (player.HasData("Blip"))
+            {
+                Blip pBlip = player.GetData("Blip");
+                pBlip.Delete();
+                player.ResetData("Blip");
+            }
+
+            Player.SetDiscordStatus(player, $"In lobby as {player.Name}");
 
             player.Dimension = 1;
             player.NametagColor = new Color(255, 255, 255);

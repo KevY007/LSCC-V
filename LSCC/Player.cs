@@ -30,11 +30,6 @@ namespace LSCC
         {
             player.TriggerEvent("SetDiscordStatus", "Los Santos Copchase", status);
         }
-        public static void ToggleCollisions(Client player, bool toggle)
-        {
-            if(toggle) player.TriggerEvent("EnableCollisions");
-            else player.TriggerEvent("DisableCollisions");
-        }
         public static void Freeze(Client player, bool toggle)
         {
             player.TriggerEvent("SetPlayerFrozen", toggle);
@@ -96,9 +91,6 @@ namespace LSCC
             player.TriggerEvent("TogglePlayerChat", true);
 
             player.TriggerEvent("DestroyPlayerCamera");
-
-            SetDiscordStatus(player, $"In lobby as {player.Name}");
-
             
             if(player.GetData("AutoJoin") == false) NAPI.Notification.SendNotificationToPlayer(player, $"~g~Autojoin has been enabled.", false);
 

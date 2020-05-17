@@ -25,7 +25,6 @@ public static class Settings
     // Global Variables (changing accordingly)
     public static int GameRunning { get; set; }
     public static int FugitiveShowCounter { get; set; }
-    public static int CollisionCounter { get; set; }
     public static int GameProgress { get; set; }
     public static bool GameAutoStart { get; set; }
     public static List<Client> LoggedInPlayers { get; set; }
@@ -76,7 +75,6 @@ namespace LSCC
             Settings.GameVehicles = new List<Vehicle>();
             Settings.AdminVehicles = new List<Vehicle>();
             Settings.FugitiveShowCounter = 0;
-            Settings.CollisionCounter = 0;
             Settings.GameProgress = 0;
             Settings.GameAutoStart = true;
 
@@ -390,16 +388,18 @@ namespace LSCC
                         break;
                 }
 
-                player.MovePosition(new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ).Around(15), 0);
+                player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ).Around(15);
                 Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ), spawnLoc.spawnA, 0, 1, player.Name, 255, false, true, 0);
                 player.SetIntoVehicle(pVehicle, -1);
+                Settings.GameVehicles.Add(pVehicle);
+                pVehicle.Invincible = false;
 
-                Player.ToggleCollisions(player, false);
+                player.GiveWeapon(WeaponHash.CarbineRifle, 100);
 
-
-                NAPI.Notification.SendNotificationToPlayer(player, $"~w~Collisions enable in 60 seconds.", true);
+                Player.SetDiscordStatus(player, $"Cop in copchase as {player.Name}");
             }
 
+            spawnLoc = null;
             foreach (Client player in Settings.Fugitives)
             {
                 foreach (MapSpawn spawn in Spawns.Where(a => a.spawnTeam == 0))
@@ -463,22 +463,29 @@ namespace LSCC
                         break;
                 }
 
-                player.MovePosition(new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ).Around(15), 0);
+                player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ).Around(15);
                 Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ), spawnLoc.spawnA, 0, 1, player.Name, 255, false, true, 0);
                 player.SetIntoVehicle(pVehicle, -1);
+                Settings.GameVehicles.Add(pVehicle);
+                pVehicle.Invincible = false;
 
-                Player.ToggleCollisions(player, false);
+                player.GiveWeapon(WeaponHash.AssaultRifle, 100);
 
 
-                Blip pBlip = player.GetData("Blip");
-                if (pBlip == null || pBlip.IsNull) pBlip = NAPI.Blip.CreateBlip(new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ), 0);
+                if (player.HasData("Blip"))
+                {
+                    Blip tBlip = player.GetData("Blip");
+                    tBlip.Delete();
+                    player.ResetData("Blip");
+                }
 
+                Blip pBlip = NAPI.Blip.CreateBlip(new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ), 0);
                 pBlip.Transparency = 255;
                 pBlip.Color = 75;
 
                 player.SetData("Blip", pBlip);
 
-                NAPI.Notification.SendNotificationToPlayer(player, $"~w~Collisions enable in 60 seconds.", true);
+                Player.SetDiscordStatus(player, $"Fugitive in copchase as {player.Name}");
             }
 
             NAPI.Util.ConsoleOutput($"[StartGame] Game has been started with {Settings.Cops.Count} cops & {Settings.Fugitives.Count} fugitives on map {map.Name}.");
@@ -486,7 +493,6 @@ namespace LSCC
 
             Settings.GameRunning = 1;
             Settings.FugitiveShowCounter = 60;
-            Settings.CollisionCounter = 60;
             Settings.GameProgress = 0;
 
             foreach(Client p in Settings.LoggedInPlayers)
@@ -508,35 +514,20 @@ namespace LSCC
             {
                 Settings.GameProgress++;
 
-                if(Settings.CollisionCounter > 0)
-                {
-                    Settings.CollisionCounter--;
-
-                    foreach (Client player in Settings.LoggedInPlayers)
-                    {
-                        if (!Settings.Cops.Contains(player) && !Settings.Fugitives.Contains(player)) continue;
-
-                        if (Settings.CollisionCounter > 0)
-                        {
-                            NAPI.Notification.SendNotificationToPlayer(player, $"~w~Collisions enable in {Settings.CollisionCounter} seconds.", true);
-                        }
-                        else
-                        {
-                            NAPI.Notification.SendNotificationToPlayer(player, $"~r~Collisions enabled!", true);
-                            Player.ToggleCollisions(player, true);
-                        }
-                    }
-                }
                 Settings.FugitiveShowCounter++;
 
                 if (Settings.FugitiveShowCounter >= 60 && Settings.FugitiveShowCounter < 90)
                 {
                     foreach (Client fugi in Settings.Fugitives)
                     {
-                        Blip pBlip = fugi.GetData("Blip");
-                        if (pBlip != null || !pBlip.IsNull) pBlip.Delete();
+                        if (fugi.HasData("Blip"))
+                        {
+                            Blip tBlip = fugi.GetData("Blip");
+                            tBlip.Delete();
+                            fugi.ResetData("Blip");
+                        }
 
-                        pBlip = NAPI.Blip.CreateBlip(fugi.Position, 0);
+                        Blip pBlip = NAPI.Blip.CreateBlip(fugi.Position, 0);
 
                         pBlip.Transparency = 255;
                         pBlip.Color = 75;
@@ -551,9 +542,12 @@ namespace LSCC
                     Settings.FugitiveShowCounter = 0;
                     foreach (Client fugi in Settings.Fugitives)
                     {
-                        Blip pBlip = fugi.GetData("Blip");
-                        if (pBlip != null || !pBlip.IsNull) pBlip.Delete();
-                        fugi.SetData("pBlip", null);
+                        if (fugi.HasData("Blip"))
+                        {
+                            Blip tBlip = fugi.GetData("Blip");
+                            tBlip.Delete();
+                            fugi.ResetData("Blip");
+                        }
 
                         fugi.SendNotification("~g~You are no longer visible on the radar.", true);
                     }
@@ -571,10 +565,6 @@ namespace LSCC
         {
             Player.SetDiscordStatus(player, $"Logging in as {acc.Username}");
             NAPI.Util.ConsoleOutput($"[Login] {player.Name} has logged in as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
-
-            Blip pBlip = NAPI.Blip.CreateBlip(new Vector3(0.0, 0.0, -200.0), 0);
-            pBlip.Transparency = 100;
-            player.SetData("Blip", pBlip);
 
             player.SetData("LoggedIn", true);
             player.SetData("AccountHandle", acc);

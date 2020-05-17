@@ -1,6 +1,6 @@
 ﻿let camera = null;
 const player = mp.players.local;
-const timerBarLib = require("timerbars");
+const timerBarLib = require("./Player/Bar.js");
 
 let chaseProgBar = null;
 let chaseProgText = null;
@@ -76,6 +76,12 @@ mp.events.add(
             if(chaseInterval != null) clearInterval(chaseInterval);
 
             chaseInterval = setInterval(updateChaseTimer, 1000);
+
+            mp.vehicles.forEach(
+                (vehicle) => {
+                    vehicle.setInvincible(false);
+                }
+            );
         },
 
         "HideChaseTimer": () => {
@@ -85,9 +91,13 @@ mp.events.add(
             chaseInterval = null;
         },
 
+        "playerEnterVehicle": (vehicle, seat) => {
+            vehicle.setInvincible(false);
+        },
+
         "InitChaseTimer": () => {
 
-            if(chaseProgBar != null)
+            if(chaseProgBar == null)
             {
                 chaseProgBar = new timerBarLib.TimerBar("PROGRESS", true);
                 chaseProgBar.pbarFgColor = [64, 115, 222, 255];
@@ -96,7 +106,7 @@ mp.events.add(
                 chaseProgBar.visible = false;
             }
 
-            if(chaseProgText != null)
+            if(chaseProgText == null)
             {
                 chaseProgText = new timerBarLib.TimerBar("TIME LEFT");
                 chaseProgText.text = "10:00";
@@ -106,24 +116,8 @@ mp.events.add(
 
         "DestroyPlayerCamera": () => destroyCam(),
 
-        "EnableCollisions": () => {
-            mp.players.forEach(player => {
-                mp.players.local.vehicle.setNoCollision(player.vehicle.handle, true);
-                player.vehicle.setAlpha(255);
-                player.setAlpha(255);
-            });
-        },
-
-        "DisableCollisions": () => {
-            mp.players.forEach(player => {
-                mp.players.local.vehicle.setNoCollision(player.vehicle.handle, false);
-                player.vehicle.setAlpha(102);
-                player.setAlpha(255);
-            });
-        },
-
         "SetPlayerFrozen": (status) => {
-            mp.players.local.freezePosition(status);
+            player.freezePosition(status);
         },
 
         "CreatePlayerCamera": (x, y, z, rx, ry, rz, viewangle) => {

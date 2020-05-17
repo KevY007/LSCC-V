@@ -67,6 +67,44 @@ namespace LSCC
             return;
         }
 
+        [Command("goto")]
+        public void cmd_goto(Client player, Client target)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+
+            if (Player.GetAccount(player).Admin < 1)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                return;
+            }
+
+            player.Position = target.Position.Around(3.0f);
+            player.Dimension = target.Dimension;
+
+            Player.SendMessageToAllAdmins($"~r~[AdmCmd] {player.Name} has teleported to {target.Name}.");
+            return;
+        }
+
+        [Command("bring", Alias = "gethere")]
+        public void cmd_bring(Client player, Client target)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+
+            if (Player.GetAccount(player).Admin < 1)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                return;
+            }
+
+            target.Position = player.Position.Around(3.0f);
+            target.Dimension = player.Dimension;
+
+            Player.SendMessageToAllAdmins($"~r~[AdmCmd] {player.Name} has summoned {target.Name}.");
+            return;
+        }
+
         [Command("removeavehs")]
         public void cmd_removeavehs(Client player)
         {
@@ -89,6 +127,7 @@ namespace LSCC
             }
 
             Settings.AdminVehicles.Clear();
+            Player.SendMessageToAllAdmins($"~r~[AdmCmd] {player.Name} removed all spawned admin vehicles.");
             return;
         }
 
@@ -123,12 +162,12 @@ namespace LSCC
             if (!Player.LoggedIn(player)) return;
 
             player.SendChatMessage("[Los Santos Copchase V BETA Commands]:"); 
-            player.SendChatMessage("[General]: /ooc /autojoin"); 
+            player.SendChatMessage("[General]: /ooc /autojoin /b");
             player.SendChatMessage("[Debug]: /pos");
 
             if(Player.GetAccount(player).Admin >= 1)
             {
-                player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs");
+                player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto");
             }
             if (Player.GetAccount(player).Admin >= 2)
             {
@@ -355,6 +394,24 @@ namespace LSCC
             }
 
             Player.SendMessageToAllAdmins($"~r~[ADMIN] {player.Name}:  {text}");
+        }
+
+        [Command("looc", Alias = "b", GreedyArg = true)]
+        public void cmd_b(Client player, string text)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+
+            string chatStr = $"(( (LOCAL OOC) {player.Name.Replace("_", " ")} : {text} ))";
+            foreach (Client i in NAPI.Pools.GetAllPlayers())
+            {
+                if (i.Dimension == player.Dimension)
+                {
+                    if(i.Position.DistanceTo(player.Position) <= 10.0) i.SendChatMessage($"~s~{chatStr}");
+                    if(i.Position.DistanceTo(player.Position) > 10.0 && i.Position.DistanceTo(player.Position) <= 20.0) i.SendChatMessage($"~c~{chatStr}");
+                    if(i.Position.DistanceTo(player.Position) > 20.0 && i.Position.DistanceTo(player.Position) <= 40.0) i.SendChatMessage($"~m~{chatStr}");
+                }
+            }
         }
 
         [Command("ooc", Alias = "o", GreedyArg = true)]
