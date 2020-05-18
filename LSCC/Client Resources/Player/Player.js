@@ -4,6 +4,8 @@ const timerBarLib = require("./Player/Bar.js");
 
 let chaseProgBar = null;
 let chaseProgText = null;
+let collisionText = null;
+let collisionTime = 0;
 let chaseInterval = null;
 let chaseTimeCur = 0;
 let chaseTimeMax = 600;
@@ -60,28 +62,64 @@ function updateChaseTimer()
             chaseInterval = null;
         }
     }
+
+    if(collisionText != null)
+    {
+        if(collisionTime > 0)
+        {
+            collisionTime--;
+            chaseProgText.text = TimeFormat(collisionTime);
+
+            chaseProgText.visible = true;
+
+            if(collisionTime == 10)
+            {
+                mp.game.audio.playSoundFrontend(1, "10s", "MP_MISSION_COUNTDOWN_SOUNDSET", true);
+            }
+
+            mp.vehicles.forEach(vtarg => {
+
+                if(player.vehicle) 
+                {
+                    player.vehicle.setNoCollision(vtarg.handle, true);
+                    player.vehicle.setInvincible(false);
+                }
+                vtarg.setAlpha(102);
+                vtarg.setInvincible(false);
+            });
+        }
+        else
+        {
+            mp.vehicles.forEach(vtarg => {
+
+                if(player.vehicle) 
+                {
+                    player.vehicle.setNoCollision(vtarg.handle, false);
+                    player.vehicle.setInvincible(false);
+                }
+                vtarg.setAlpha(255);
+                vtarg.setInvincible(false);
+            });
+
+            collisionText.visible = false;
+        }
+    }
     return;
 }
 
 
 mp.events.add(
     {
-        "StartChaseTimer": (iTimeCur, iTimeMax) => {
+        "StartChaseTimer": (iTimeCur, iTimeMax, collisionDuration) => {
 
             chaseTimeCur = iTimeCur - 1;
             chaseTimeMax = iTimeMax;
-
+            collisionTime = collisionDuration;
             updateChaseTimer();
             
             if(chaseInterval != null) clearInterval(chaseInterval);
 
             chaseInterval = setInterval(updateChaseTimer, 1000);
-
-            mp.vehicles.forEach(
-                (vehicle) => {
-                    vehicle.setInvincible(false);
-                }
-            );
         },
 
         "HideChaseTimer": () => {
@@ -89,6 +127,7 @@ mp.events.add(
             chaseProgText.visible = false;
             clearInterval(chaseInterval);
             chaseInterval = null;
+            collisionText.visible = false;
         },
 
         "playerEnterVehicle": (vehicle, seat) => {
@@ -111,6 +150,13 @@ mp.events.add(
                 chaseProgText = new timerBarLib.TimerBar("TIME LEFT");
                 chaseProgText.text = "10:00";
                 chaseProgText.visible = false;
+            }
+
+            if(collisionText == null)
+            {
+                collisionText = new timerBarLib.TimerBar("COLLISIONS ENABLE");
+                collisionText.text = "0:30";
+                collisionText.visible = false;
             }
         },
 

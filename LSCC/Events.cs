@@ -160,6 +160,8 @@ namespace LSCC.Events
 
             Player.SetDiscordStatus(player, $"In lobby as {player.Name}");
 
+            player.RemoveAllWeapons();
+
             player.Dimension = 1;
             player.NametagColor = new Color(255, 255, 255);
         }
