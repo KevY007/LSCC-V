@@ -1,6 +1,7 @@
 ﻿require('./Player/Player.js');
 require('./camerasManager.js');
 require('./cefBrowser.js');
+require('./nametags.js');
 
 mp.events.add('loginInformationToServer', (username, password) => {
 

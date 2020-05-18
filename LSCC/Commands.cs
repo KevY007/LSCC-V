@@ -105,6 +105,38 @@ namespace LSCC
             return;
         }
 
+        [Command("sethp")]
+        public void cmd_sethp(Client player, Client target, int health)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+
+            if (Player.GetAccount(player).Admin < 1)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                return;
+            }
+
+            target.Health = health;
+            return;
+        }
+
+        [Command("setar")]
+        public void cmd_setar(Client player, Client target, int armour)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+
+            if (Player.GetAccount(player).Admin < 1)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                return;
+            }
+
+            target.Armor = armour;
+            return;
+        }
+
         [Command("removeavehs")]
         public void cmd_removeavehs(Client player)
         {
@@ -167,7 +199,7 @@ namespace LSCC
 
             if(Player.GetAccount(player).Admin >= 1)
             {
-                player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto");
+                player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /sethp /setar");
             }
             if (Player.GetAccount(player).Admin >= 2)
             {

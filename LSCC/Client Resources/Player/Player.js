@@ -106,6 +106,11 @@ mp.events.add(
                         target.setNoCollision(target2.handle, false);
                         target2.setNoCollision(target.handle, false);
 
+                        target.setCanBeDamaged(true);
+                        target2.setCanBeDamaged(true);
+                        target.setCanBreak(true);
+                        target2.setCanBreak(true);
+
                         target2.setInvincible(true);
                         target.setInvincible(true);
 
@@ -124,6 +129,17 @@ mp.events.add(
             else
             {
                 player.setInvincible(false);
+            }
+        },
+
+        "CanFallOutOfCar": (toggle) => {
+            if(toggle)
+            {
+                player.canKnockOffVehicle(true);
+            }
+            else
+            {
+                player.canKnockOffVehicle(false);
             }
         },
 

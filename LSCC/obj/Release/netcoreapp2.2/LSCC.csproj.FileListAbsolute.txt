@@ -38,3 +38,4 @@ E:\Github\LSCC-V\LSCC\obj\Release\netcoreapp2.2\LSCC.csproj.CopyComplete
 E:\Github\LSCC-V\LSCC\obj\Release\netcoreapp2.2\LSCC.dll
 E:\Github\LSCC-V\LSCC\obj\Release\netcoreapp2.2\LSCC.pdb
 E:\Github\LSCC-V\LSCC\obj\Release\netcoreapp2.2\LSCC.genruntimeconfig.cache
+E:\Github\LSCC-V\LSCC\obj\Release\netcoreapp2.2\LSCC.csprojAssemblyReference.cache

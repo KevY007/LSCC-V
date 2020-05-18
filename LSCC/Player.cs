@@ -34,6 +34,14 @@ namespace LSCC
         {
             player.TriggerEvent("SetPlayerFrozen", toggle);
         }
+        public static void SetColor(Client player, Color col, int armour = 0)
+        {
+            player.NametagColor = col;
+            foreach(Client p in NAPI.Pools.GetAllPlayers())
+            {
+                p.TriggerEvent("playerNametagSet", player, col.Red, col.Green, col.Blue, col.Alpha, armour);
+            }
+        }
 
         public static bool LoggedIn(Client player)
         {
@@ -107,7 +115,7 @@ namespace LSCC
             NAPI.Entity.SetEntityTransparency(player, 255);
 
             Player.Freeze(player, false);
-            player.NametagColor = new Color(255, 255, 255);
+            Player.SetColor(player, new Color(255, 255, 255, 255));
             player.Dimension = 1;
 
         }

@@ -347,34 +347,15 @@ namespace LSCC
                 if (spawnLoc == null)
                 {
                     pCount++;
-                    spawnLoc = Spawns.Last(a=> a.spawnTeam == 1);
+                    spawnLoc = Spawns.FirstOrDefault(a=> a.spawnTeam == 1);
                     spawnLoc.spawnZ += (pCount * 5); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
                 }
 
-                player.Dimension = 0;
-                player.Health = 100;
-                player.Armor = 60;
-                player.NametagColor = new Color(0, 0, 255, 255);
-
-                switch (random.Next(0, 3))
-                {
-                    case 0:
-                        player.SetSkin(0x5E3DA4A4);
-                        break;
-                    case 1:
-                        player.SetSkin(0xFBF98469);
-                        break;
-                    case 2:
-                        player.SetSkin(0x9AB35F63);
-                        break;
-                    case 3:
-                        player.SetSkin(0x1AE8BB58);
-                        break;
-                }
+                Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
 
                 string carName = "police";
 
-                switch(random.Next(0, 5))
+                switch (random.Next(0, 5))
                 {
                     case 0:
                         carName = "police";
@@ -396,16 +377,45 @@ namespace LSCC
                         break;
                 }
 
-                player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ).Around(15);
-                Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ), spawnLoc.spawnA, 0, 1, player.Name, 255, false, true, 0);
+
+                Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, 0, 1, player.Name, 255, false, true, 0);
+
 
                 Settings.GameVehicles.Add(pVehicle);
+
+                player.Dimension = 0;
+                player.Position = vecSpawn.Around(15);
+                Player.Freeze(player, true);
+                
+                player.Health = 100;
+                player.Armor = 60;
+                Player.SetColor(player, new Color(141, 141, 255, 255), player.Armor);
+
+                switch (random.Next(0, 3))
+                {
+                    case 0:
+                        player.SetSkin(0x5E3DA4A4);
+                        break;
+                    case 1:
+                        player.SetSkin(0xFBF98469);
+                        break;
+                    case 2:
+                        player.SetSkin(0x9AB35F63);
+                        break;
+                    case 3:
+                        player.SetSkin(0x1AE8BB58);
+                        break;
+                }
 
 
                 NAPI.Task.Run(() =>
                 {
                     player.SetIntoVehicle(pVehicle, -1);
-                }, delayTime: 1000);
+                    Player.Freeze(player, false);
+
+                    player.TriggerEvent("ToggleChaseCollisions", false);
+
+                }, delayTime: 2000);
 
 
                 player.GiveWeapon(WeaponHash.CarbineRifle, 100);
@@ -413,6 +423,8 @@ namespace LSCC
                 Player.SetDiscordStatus(player, $"Playing cop as {player.Name}");
 
                 player.TriggerEvent("SetActorInvulnerable", false);
+                player.TriggerEvent("CanFallOutOfCar", true);
+                player.TriggerEvent("showHPBars", 1); // Always show HP Bars.
             }
 
             spawnLoc = null;
@@ -430,30 +442,10 @@ namespace LSCC
                 if (spawnLoc == null)
                 {
                     pCount++;
-                    spawnLoc = Spawns.Last(a => a.spawnTeam == 0);
+                    spawnLoc = Spawns.FirstOrDefault(a => a.spawnTeam == 0);
                     spawnLoc.spawnZ += (pCount * 5); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
                 }
-
-                player.Dimension = 0;
-                player.Health = 100;
-                player.Armor = 0;
-                player.NametagColor = new Color(255, 0, 0);
-
-                switch (random.Next(0, 3))
-                {
-                    case 0:
-                        player.SetSkin(0xA70B4A92);
-                        break;
-                    case 1:
-                        player.SetSkin(0x76284640);
-                        break;
-                    case 2:
-                        player.SetSkin(0x3FB5C3D3);
-                        break;
-                    case 3:
-                        player.SetSkin(0x04430687);
-                        break;
-                }
+                Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
 
                 string carName = "sultan";
 
@@ -479,17 +471,43 @@ namespace LSCC
                         break;
                 }
 
-                player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ).Around(15);
+                Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, random.Next(64), random.Next(64), player.Name, 255, false, true, 0);
 
-                Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ), spawnLoc.spawnA, 0, 1, player.Name, 255, false, true, 0);
 
                 Settings.GameVehicles.Add(pVehicle);
 
+                player.Dimension = 0;
+                player.Position = vecSpawn.Around(15);
+                Player.Freeze(player, true);
+
+                player.Health = 100;
+                player.Armor = 0;
+                Player.SetColor(player, new Color(232, 64, 64, 255), player.Armor);
+
+                switch (random.Next(0, 3))
+                {
+                    case 0:
+                        player.SetSkin(0xA70B4A92);
+                        break;
+                    case 1:
+                        player.SetSkin(0x76284640);
+                        break;
+                    case 2:
+                        player.SetSkin(0x3FB5C3D3);
+                        break;
+                    case 3:
+                        player.SetSkin(0x04430687);
+                        break;
+                }
 
                 NAPI.Task.Run(() =>
                 {
                     player.SetIntoVehicle(pVehicle, -1);
-                }, delayTime: 1000);
+                    Player.Freeze(player, false);
+
+                    player.TriggerEvent("ToggleChaseCollisions", false);
+
+                }, delayTime: 2000);
 
 
                 player.GiveWeapon(WeaponHash.AssaultRifle, 100);
@@ -511,6 +529,8 @@ namespace LSCC
                 Player.SetDiscordStatus(player, $"Playing fugitive as {player.Name}");
 
                 player.TriggerEvent("SetActorInvulnerable", false);
+                player.TriggerEvent("CanFallOutOfCar", true);
+                player.TriggerEvent("showHPBars", 1); // Always show HP Bars.
             }
 
             NAPI.Util.ConsoleOutput($"[StartGame] Game has been started with {Settings.Cops.Count} cops & {Settings.Fugitives.Count} fugitives on map {map.Name}.");
@@ -525,20 +545,6 @@ namespace LSCC
             {
                 p.TriggerEvent("StartChaseTimer", 0, Settings.GameRunTime, Settings.CollisionCounter);
             }
-
-
-            NAPI.Task.Run(() =>
-            {
-                foreach (Client p in Settings.Cops)
-                {
-                    p.TriggerEvent("ToggleChaseCollisions", false);
-                }
-                foreach (Client p in Settings.Fugitives)
-                {
-                    p.TriggerEvent("ToggleChaseCollisions", false);
-                }
-
-            }, delayTime: 1250);
             
             NAPI.Task.Run(() =>
             {

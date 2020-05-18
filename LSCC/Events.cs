@@ -164,7 +164,9 @@ namespace LSCC.Events
 
             player.Dimension = 1;
             player.TriggerEvent("SetActorInvulnerable", true);
-            player.NametagColor = new Color(255, 255, 255);
+            player.TriggerEvent("CanFallOutOfCar", false);
+            player.TriggerEvent("showHPBars", 0); // Never show HP Bars.
+            Player.SetColor(player, new Color(255, 255, 255, 255));
         }
     }
 }
