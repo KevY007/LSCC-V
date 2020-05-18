@@ -193,11 +193,11 @@ namespace LSCC
         {
             if (!Player.LoggedIn(player)) return;
 
-            player.SendChatMessage("[Los Santos Copchase V BETA Commands]:"); 
+            player.SendChatMessage("[Los Santos Copchase V BETA Commands]:");
             player.SendChatMessage("[General]: /ooc /autojoin /b");
             player.SendChatMessage("[Debug]: /pos");
 
-            if(Player.GetAccount(player).Admin >= 1)
+            if (Player.GetAccount(player).Admin >= 1)
             {
                 player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /sethp /setar");
             }
@@ -227,9 +227,9 @@ namespace LSCC
                 return;
             }
 
-            foreach(Map map in ContextFactory.Instance.Maps)
+            foreach (Map map in ContextFactory.Instance.Maps)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, $"~y~{map.Name} | ID: [{map.SQL_ID}] | Enabled: [{map.Enabled}] | Spawns: [{ContextFactory.Instance.MapSpawns.Count(a=> a.mapID == map.SQL_ID)}]");
+                NAPI.Chat.SendChatMessageToPlayer(player, $"~y~{map.Name} | ID: [{map.SQL_ID}] | Enabled: [{map.Enabled}] | Spawns: [{ContextFactory.Instance.MapSpawns.Count(a => a.mapID == map.SQL_ID)}]");
             }
             return;
         }
@@ -248,11 +248,11 @@ namespace LSCC
 
             Map map = ContextFactory.Instance.Maps.FirstOrDefault(a => a.SQL_ID == mapid);
             if (map == null) { NAPI.Chat.SendChatMessageToPlayer(player, "~r~No map with this ID exists."); return; }
-			
-			if(teamid > 1) { NAPI.Chat.SendChatMessageToPlayer(player, "~r~Valid TeamID's are 0 (fugitive) or 1 (cop)."); return; }
+
+            if (teamid > 1) { NAPI.Chat.SendChatMessageToPlayer(player, "~r~Valid TeamID's are 0 (fugitive) or 1 (cop)."); return; }
 
             float[] currentLoc = new float[4];
-            if(player.IsInVehicle == true)
+            if (player.IsInVehicle == true)
             {
                 currentLoc[0] = player.Vehicle.Position.X;
                 currentLoc[1] = player.Vehicle.Position.Y;
@@ -282,7 +282,7 @@ namespace LSCC
             ContextFactory.Instance.SaveChanges();
 
             NAPI.Chat.SendChatMessageToPlayer(player, $"~y~{map.Name} | Added a spawn (ID: {_new.SQL_ID}) over here for team [{teamid}]");
-            
+
             return;
         }
 
@@ -299,7 +299,7 @@ namespace LSCC
             }
 
             Map map = ContextFactory.Instance.Maps.FirstOrDefault(a => a.Name == mapname);
-            if(map == null) { NAPI.Chat.SendChatMessageToPlayer(player, "~r~No map with this name exists."); return; }
+            if (map == null) { NAPI.Chat.SendChatMessageToPlayer(player, "~r~No map with this name exists."); return; }
 
 
             ContextFactory.Instance.MapSpawns.RemoveRange(ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID));
@@ -348,7 +348,7 @@ namespace LSCC
                 NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not a level 6 admin.");
                 return;
             }
-                            
+
             player.TriggerEvent(eventt);
         }
 
@@ -382,7 +382,7 @@ namespace LSCC
 
             if (!Player.LoggedIn(target)) { NAPI.Chat.SendChatMessageToPlayer(player, "~r~Target not logged in."); return; }
 
-      
+
             Account t_acc = target.GetData("AccountHandle");
 
             if (level < 0 || level > 6)
@@ -439,9 +439,9 @@ namespace LSCC
             {
                 if (i.Dimension == player.Dimension)
                 {
-                    if(i.Position.DistanceTo(player.Position) <= 10.0) i.SendChatMessage($"~s~{chatStr}");
-                    if(i.Position.DistanceTo(player.Position) > 10.0 && i.Position.DistanceTo(player.Position) <= 20.0) i.SendChatMessage($"~c~{chatStr}");
-                    if(i.Position.DistanceTo(player.Position) > 20.0 && i.Position.DistanceTo(player.Position) <= 40.0) i.SendChatMessage($"~m~{chatStr}");
+                    if (i.Position.DistanceTo(player.Position) <= 10.0) i.SendChatMessage($"~s~{chatStr}");
+                    if (i.Position.DistanceTo(player.Position) > 10.0 && i.Position.DistanceTo(player.Position) <= 20.0) i.SendChatMessage($"~c~{chatStr}");
+                    if (i.Position.DistanceTo(player.Position) > 20.0 && i.Position.DistanceTo(player.Position) <= 40.0) i.SendChatMessage($"~m~{chatStr}");
                 }
             }
         }
@@ -461,5 +461,140 @@ namespace LSCC
                 NAPI.Chat.SendChatMessageToAll($"~w~(( [OOC] ~r~{player.Name}~w~: {text} ~w~))");
             }
         }
+        [Command("pm", GreedyArg = true)]
+        public void cmd_pm(Client player, Client target, string text)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+
+            else
+            {
+                NAPI.Chat.SendChatMessageToPlayer(target, $"~y~(( PM recieved from {player.Name}: {text} ))");
+                NAPI.Chat.SendChatMessageToPlayer(player, $"~y~(( PM sent to {target.Name}: {text} ))");
+            }
+
+        }
+        [Command("freeze", GreedyArg = true)]
+        public void cmd_freeze(Client player, Client target)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+            if (Player.GetAccount(player).Admin < 1)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                return;
+            }
+            else
+            {
+                Player.Freeze(target, true);
+                NAPI.Chat.SendChatMessageToPlayer(target, $"~r~ YOU HAVE BEEN FROZEN BY ~w~{player}");
+                NAPI.Chat.SendChatMessageToPlayer(player, $"~r~ You have frozen ~w~{target}");
+            }
+        }
+        [Command("unfreeze", GreedyArg = true)]
+        public void cmd_unfreeze(Client player, Client target)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+            if (Player.GetAccount(player).Admin < 1)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                return;
+            }
+            else
+            {
+                Player.Freeze(target, false);
+                NAPI.Chat.SendChatMessageToPlayer(target, $"~r~ YOU HAVE BEEN UNFROZEN BY ~w~{player}");
+                NAPI.Chat.SendChatMessageToPlayer(player, $"~r~ You have unfrozen ~w~{target}");
+            }
+        }
+        [Command("kick", GreedyArg = true)]
+        public void cmd_kick(Client player, Client target, string text)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+            if (Player.GetAccount(player).Admin < 1)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                return;
+            }
+            else
+            {
+                target.Kick($"You have been kicked for the reason: {text}");
+                NAPI.Chat.SendChatMessageToAll($"~r~[ADMCMD]~w~{target}~r~ has been kicked from the server for the reason:~w~ {text}~r~ by admin: {player}");
+            }
+
+        }
+        [Command("me", GreedyArg = true)]
+        public void cmd_me(Client player, string text)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+            else
+            {
+                var msg = "* " + player.Name + " " + text;
+                var playersAround = NAPI.Player.GetPlayersInRadiusOfPlayer(30, player);
+
+                foreach (var players in playersAround)
+                {
+                    NAPI.Chat.SendChatMessageToPlayer(players, msg);
+                }
+            }
+        }
+        [Command("do", GreedyArg = true)]
+        public void cmd_do(Client player, string text)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+            else
+            {
+                var msg = "* " + text + $"(({player}))";
+                var playersAround = NAPI.Player.GetPlayersInRadiusOfPlayer(30, player);
+
+                foreach (var players in playersAround)
+                {
+                    NAPI.Chat.SendChatMessageToPlayer(players, msg);
+                }
+            }
+        }
+        [Command("slap", GreedyArg = true)]
+        public void cmd_slap(Client player, Client target, string text)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+            if (Player.GetAccount(player).Admin < 1)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                return;
+            }
+            else
+            {
+                if (target.IsInVehicle == true)
+                {
+                    target.WarpOutOfVehicle();
+                    float[] currentLoc = new float[3];
+                    currentLoc[0] = target.Position.X;
+                    currentLoc[1] = target.Position.Y;
+                    currentLoc[2] = target.Position.Z;
+
+                    target.Position.Z = currentLoc[2] + 5;
+                    NAPI.Chat.SendChatMessageToPlayer(target, $"~r~[ADMCMD] YOU HAVE BEEN SLAPPED BY ADMIN: ~w~{player}");
+                    NAPI.Chat.SendChatMessageToPlayer(player, $"~r~[ADMCMD] You have slapped player: ~w~{target}");
+                }
+                else
+                {
+                    float[] currentLoc = new float[3];
+                    currentLoc[0] = target.Position.X;
+                    currentLoc[1] = target.Position.Y;
+                    currentLoc[2] = target.Position.Z;
+
+                    target.Position.Z = currentLoc[2] + 5;
+                    NAPI.Chat.SendChatMessageToPlayer(target, $"~r~[ADMCMD] YOU HAVE BEEN SLAPPED BY ADMIN: ~w~{player}");
+                    NAPI.Chat.SendChatMessageToPlayer(player, $"~r~[ADMCMD] You have slapped player: ~w~{target}");
+                }
+            }
+        }
     }
 }
+
+// Added /me, /do, /freeze, /unfreeze, /kick, /slap and /pm commands (Simba - 19/05/2020)
