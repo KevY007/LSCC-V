@@ -28,6 +28,7 @@ public static class Settings
     public static int CollisionCounter { get; set; }
     public static int GameProgress { get; set; }
     public static bool GameAutoStart { get; set; }
+    public static int LastAutoStartMsg { get; set; }
     public static List<Client> LoggedInPlayers { get; set; }
     public static List<Client> Cops { get; set; }
     public static List<Client> Fugitives { get; set; }
@@ -79,6 +80,7 @@ namespace LSCC
             Settings.CollisionCounter = 0;
             Settings.GameProgress = 0;
             Settings.GameAutoStart = true;
+            Settings.LastAutoStartMsg = 0;
 
             NAPI.Task.Run(() =>
             {
@@ -88,7 +90,7 @@ namespace LSCC
 
         public void GameStartCountdown(int time)
         {
-            time -= 3;
+            time -= 2;
 
             foreach (Client player in Settings.LoggedInPlayers)
             {
@@ -110,7 +112,7 @@ namespace LSCC
                 NAPI.Task.Run(() =>
                 {
                     GameStartCountdown(time);
-                }, delayTime: 3000);
+                }, delayTime: 2000);
             }
             else
             {
@@ -143,6 +145,7 @@ namespace LSCC
                             {
                                 Player.Spawn(player);
                                 NAPI.Notification.SendNotificationToPlayer(player, $"~w~Game is starting in ~g~10 seconds~w~.", true);
+
                                 NAPI.Util.ConsoleOutput("[TimeUpdate] Game starting in 10 seconds...");
                             }
                         }
@@ -150,21 +153,24 @@ namespace LSCC
                         NAPI.Task.Run(() =>
                         {
                             GameStartCountdown(10);
-                        }, delayTime: 3000);
+                        }, delayTime: 2000);
                     }
                     else
                     {
-                        NAPI.Chat.SendChatMessageToAll("~y~[GAME] ~w~Game is not starting as there's not enough players to start a match. (2+)");
-                        NAPI.Util.ConsoleOutput("[TimeUpdate] Failed to start game, not enough players.");
+                        if (Environment.TickCount - Settings.LastAutoStartMsg >= 90000)
+                        {
+                            NAPI.Chat.SendChatMessageToAll("~y~[GAME] ~w~Game is not starting as there's not enough players to start a match. (2+)");
+                            Settings.LastAutoStartMsg = Environment.TickCount;
+                        }
                     }
                 }
             }
             else if(Settings.GameRunning == 1)
             {
-                if(Settings.GameProgress >= Settings.GameRunTime)
+                /*if(Settings.GameProgress >= Settings.GameRunTime)
                 {
                     StopGame(1);
-                }
+                }  -- Already used in GameProgress() update.*/
 
                 if(Settings.Cops.Count < 1)
                 {
@@ -392,17 +398,21 @@ namespace LSCC
 
                 player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ).Around(15);
                 Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ), spawnLoc.spawnA, 0, 1, player.Name, 255, false, true, 0);
-                
+
+                Settings.GameVehicles.Add(pVehicle);
+
+
                 NAPI.Task.Run(() =>
                 {
                     player.SetIntoVehicle(pVehicle, -1);
                 }, delayTime: 1000);
 
-                Settings.GameVehicles.Add(pVehicle);
 
                 player.GiveWeapon(WeaponHash.CarbineRifle, 100);
 
                 Player.SetDiscordStatus(player, $"Playing cop as {player.Name}");
+
+                player.TriggerEvent("SetActorInvulnerable", false);
             }
 
             spawnLoc = null;
@@ -470,14 +480,17 @@ namespace LSCC
                 }
 
                 player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ).Around(15);
+
                 Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ), spawnLoc.spawnA, 0, 1, player.Name, 255, false, true, 0);
+
+                Settings.GameVehicles.Add(pVehicle);
+
 
                 NAPI.Task.Run(() =>
                 {
                     player.SetIntoVehicle(pVehicle, -1);
                 }, delayTime: 1000);
 
-                Settings.GameVehicles.Add(pVehicle);
 
                 player.GiveWeapon(WeaponHash.AssaultRifle, 100);
 
@@ -496,10 +509,12 @@ namespace LSCC
                 player.SetData("Blip", pBlip);
 
                 Player.SetDiscordStatus(player, $"Playing fugitive as {player.Name}");
+
+                player.TriggerEvent("SetActorInvulnerable", false);
             }
 
             NAPI.Util.ConsoleOutput($"[StartGame] Game has been started with {Settings.Cops.Count} cops & {Settings.Fugitives.Count} fugitives on map {map.Name}.");
-            NAPI.Chat.SendChatMessageToAll($"~w~Game has been started with ~b~{Settings.Cops.Count} cops ~w~& ~r~{Settings.Fugitives.Count} fugitives ~w~on map ~y~{map.Name}~w~.");
+            NAPI.Chat.SendChatMessageToAll($"~w~[GAME] Copchase started with ~b~{Settings.Cops.Count} cops ~w~& ~r~{Settings.Fugitives.Count} fugitives ~w~on map ~y~{map.Name}~w~.");
 
             Settings.GameRunning = 1;
             Settings.FugitiveShowCounter = 60;
@@ -511,6 +526,20 @@ namespace LSCC
                 p.TriggerEvent("StartChaseTimer", 0, Settings.GameRunTime, Settings.CollisionCounter);
             }
 
+
+            NAPI.Task.Run(() =>
+            {
+                foreach (Client p in Settings.Cops)
+                {
+                    p.TriggerEvent("ToggleChaseCollisions", false);
+                }
+                foreach (Client p in Settings.Fugitives)
+                {
+                    p.TriggerEvent("ToggleChaseCollisions", false);
+                }
+
+            }, delayTime: 1250);
+            
             NAPI.Task.Run(() =>
             {
                 GameUpdate();
@@ -525,6 +554,12 @@ namespace LSCC
             {
                 Settings.GameProgress++;
 
+                if (Settings.GameProgress >= Settings.GameRunTime)
+                {
+                    StopGame(1);
+                    return;
+                }
+
                 Settings.FugitiveShowCounter++;
 
                 if (Settings.CollisionCounter > 0)
@@ -537,6 +572,7 @@ namespace LSCC
 
                         if (Settings.CollisionCounter < 1)
                         {
+                            player.TriggerEvent("ToggleChaseCollisions", true);
                             NAPI.Notification.SendNotificationToPlayer(player, $"~r~Collisions enabled!", true);
                         }
                     }

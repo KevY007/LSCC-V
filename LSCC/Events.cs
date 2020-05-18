@@ -163,6 +163,7 @@ namespace LSCC.Events
             player.RemoveAllWeapons();
 
             player.Dimension = 1;
+            player.TriggerEvent("SetActorInvulnerable", true);
             player.NametagColor = new Color(255, 255, 255);
         }
     }

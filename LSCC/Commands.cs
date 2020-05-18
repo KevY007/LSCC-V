@@ -254,7 +254,7 @@ namespace LSCC
             return;
         }
 
-        [Command("deletemap")]
+        [Command("deletemap", GreedyArg = true)]
         public void cmd_delmap(Client player, string mapname)
         {
             if (!Player.LoggedIn(player))
@@ -279,7 +279,7 @@ namespace LSCC
             return;
         }
 
-        [Command("createmap")]
+        [Command("createmap", GreedyArg = true)]
         public void cmd_createmap(Client player, string mapname)
         {
             if (!Player.LoggedIn(player))

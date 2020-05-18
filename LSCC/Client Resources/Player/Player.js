@@ -68,39 +68,12 @@ function updateChaseTimer()
         if(collisionTime > 0)
         {
             collisionTime--;
-            chaseProgText.text = TimeFormat(collisionTime);
+            collisionText.text = TimeFormat(collisionTime);
 
-            chaseProgText.visible = true;
-
-            if(collisionTime == 10)
-            {
-                mp.game.audio.playSoundFrontend(1, "10s", "MP_MISSION_COUNTDOWN_SOUNDSET", true);
-            }
-
-            mp.vehicles.forEach(vtarg => {
-
-                if(player.vehicle) 
-                {
-                    player.vehicle.setNoCollision(vtarg.handle, true);
-                    player.vehicle.setInvincible(false);
-                }
-                vtarg.setAlpha(102);
-                vtarg.setInvincible(false);
-            });
+            collisionText.visible = true;
         }
         else
         {
-            mp.vehicles.forEach(vtarg => {
-
-                if(player.vehicle) 
-                {
-                    player.vehicle.setNoCollision(vtarg.handle, false);
-                    player.vehicle.setInvincible(false);
-                }
-                vtarg.setAlpha(255);
-                vtarg.setInvincible(false);
-            });
-
             collisionText.visible = false;
         }
     }
@@ -110,6 +83,50 @@ function updateChaseTimer()
 
 mp.events.add(
     {
+        "ToggleChaseCollisions": (toggle) => {
+            if(toggle)
+            {
+                mp.vehicles.forEach(target => {
+                    mp.vehicles.forEach(target2 => {
+                        target.setNoCollision(target2.handle, true);
+                        target2.setNoCollision(target.handle, true);
+
+                        target2.setInvincible(false);
+                        target.setInvincible(false);
+
+                        target.setAlpha(255);
+                        target2.setAlpha(255);
+                    });
+                });
+            }
+            else
+            {
+                mp.vehicles.forEach(target => {
+                    mp.vehicles.forEach(target2 => {
+                        target.setNoCollision(target2.handle, false);
+                        target2.setNoCollision(target.handle, false);
+
+                        target2.setInvincible(true);
+                        target.setInvincible(true);
+
+                        target.setAlpha(102);
+                        target2.setAlpha(102);
+                    });
+                });
+            }
+        },
+
+        "SetActorInvulnerable": (toggle) => {
+            if(toggle)
+            {
+                player.setInvincible(true);
+            }
+            else
+            {
+                player.setInvincible(false);
+            }
+        },
+
         "StartChaseTimer": (iTimeCur, iTimeMax, collisionDuration) => {
 
             chaseTimeCur = iTimeCur - 1;
@@ -125,9 +142,9 @@ mp.events.add(
         "HideChaseTimer": () => {
             chaseProgBar.visible = false;
             chaseProgText.visible = false;
+            collisionText.visible = false;
             clearInterval(chaseInterval);
             chaseInterval = null;
-            collisionText.visible = false;
         },
 
         "playerEnterVehicle": (vehicle, seat) => {
@@ -145,18 +162,18 @@ mp.events.add(
                 chaseProgBar.visible = false;
             }
 
-            if(chaseProgText == null)
-            {
-                chaseProgText = new timerBarLib.TimerBar("TIME LEFT");
-                chaseProgText.text = "10:00";
-                chaseProgText.visible = false;
-            }
-
             if(collisionText == null)
             {
                 collisionText = new timerBarLib.TimerBar("COLLISIONS ENABLE");
                 collisionText.text = "0:30";
                 collisionText.visible = false;
+            }
+
+            if(chaseProgText == null)
+            {
+                chaseProgText = new timerBarLib.TimerBar("TIME LEFT");
+                chaseProgText.text = "10:00";
+                chaseProgText.visible = false;
             }
         },
 

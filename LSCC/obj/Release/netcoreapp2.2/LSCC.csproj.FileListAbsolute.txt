@@ -31,7 +31,6 @@ E:\Github\LSCC-V\LSCC\bin\Release\netcoreapp2.2\Pomelo.JsonObject.dll
 E:\Github\LSCC-V\LSCC\bin\Release\netcoreapp2.2\Remotion.Linq.dll
 E:\Github\LSCC-V\LSCC\bin\Release\netcoreapp2.2\System.Interactive.Async.dll
 E:\Github\LSCC-V\LSCC\bin\Release\netcoreapp2.2\System.Runtime.CompilerServices.Unsafe.dll
-E:\Github\LSCC-V\LSCC\obj\Release\netcoreapp2.2\LSCC.csprojAssemblyReference.cache
 E:\Github\LSCC-V\LSCC\obj\Release\netcoreapp2.2\LSCC.csproj.CoreCompileInputs.cache
 E:\Github\LSCC-V\LSCC\obj\Release\netcoreapp2.2\LSCC.AssemblyInfoInputs.cache
 E:\Github\LSCC-V\LSCC\obj\Release\netcoreapp2.2\LSCC.AssemblyInfo.cs
