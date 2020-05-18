@@ -5,3 +5,15 @@ LSCC/obj/Release/netcoreapp2.0/LSCC.pdb
 .vs/LSCC/v16/.suo
 LSCC/bin/Release/netcoreapp2.0/LSCC.pdb
 .vs/LSCC/DesignTimeBuild/.dtbcache.v2
+*.v2
+LSCC/obj/LSCC.csproj.nuget.dgspec.json
+LSCC/obj/LSCC.csproj.nuget.g.props
+LSCC/obj/project.assets.json
+LSCC/obj/Release/netcoreapp2.2/LSCC.assets.cache
+LSCC/obj/Release/netcoreapp2.2/LSCC.csproj.FileListAbsolute.txt
+LSCC/obj/Release/netcoreapp2.2/LSCC.csproj.FileListAbsolute.txt
+LSCC/obj/Release/netcoreapp2.2/LSCC.assets.cache
+LSCC/obj/project.assets.json
+LSCC/obj/LSCC.csproj.nuget.g.props
+LSCC/obj/LSCC.csproj.nuget.dgspec.json
+.vs/LSCC/DesignTimeBuild/.dtbcache.v2
