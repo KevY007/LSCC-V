@@ -18,8 +18,8 @@ public static class Settings
 
     // MySQL Settings
     public const string MySQL_Host = "localhost";
-    public const string MySQL_User = "lsccv";
-    public const string MySQL_Password = "perkovicMatko3035";
+    public const string MySQL_User = "root";
+    public const string MySQL_Password = "";
     public const string MySQL_Database = "lsccv";
 
     // Global Variables (changing accordingly)
