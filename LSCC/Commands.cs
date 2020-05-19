@@ -584,5 +584,32 @@ namespace LSCC
                 Player.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {target.Name} has been slapped by {player.Name}.");
             }
         }
+        [Command("spec", GreedyArg = true)]
+        public void cmd_spec(Client player, Client target, string text)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+            if (Player.GetAccount(player).Admin < 1)
+                return;
+            else
+            {
+                player.Spectate(target);
+                NAPI.Chat.SendChatMessageToPlayer(player, $"!{{#FF6347}}[AdmCmd] You are now spectating: {{#FFFFFF}}{target.Name}");
+            }
+        }
+        [Command("specoff", GreedyArg = true)]
+        public void cmd_specoff(Client player)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+            if (Player.GetAccount(player).Admin < 1)
+                return;
+            else
+            {
+                player.StopSpectating();
+            }
+
+        }
+       
     }
 }
