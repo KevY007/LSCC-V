@@ -47,11 +47,11 @@ namespace LSCC.Events
                 switch (type)
                 {
                     case DisconnectionType.Left:
-                        NAPI.Chat.SendChatMessageToAll("!{#4343FA}[PART] !{FFFFFF}" + player.Name + " has left the server. !{#4343FA}(Leaving)");
+                        NAPI.Chat.SendChatMessageToAll("!{#4343FA}[PART] !{#FFFFFF}" + player.Name + " has left the server. !{#4343FA}(Leaving)");
                         break;
 
                     case DisconnectionType.Timeout:
-                        NAPI.Chat.SendChatMessageToAll("!{#4343FA}[PART] !{FFFFFF}" + player.Name + " has left the server. !{#4343FA}(Timed Out)");
+                        NAPI.Chat.SendChatMessageToAll("!{#4343FA}[PART] !{#FFFFFF}" + player.Name + " has left the server. !{#4343FA}(Timed Out)");
                         break;
                 }
 
