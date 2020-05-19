@@ -27,6 +27,7 @@ public static class Settings
     public static int FugitiveShowCounter { get; set; }
     public static int CollisionCounter { get; set; }
     public static int GameProgress { get; set; }
+    public static int FugitivePercent { get; set; }
     public static bool GameAutoStart { get; set; }
     public static int LastAutoStartMsg { get; set; }
     public static List<Client> LoggedInPlayers { get; set; }
@@ -81,7 +82,8 @@ namespace LSCC
             Settings.GameProgress = 0;
             Settings.GameAutoStart = true;
             Settings.LastAutoStartMsg = 0;
-
+            Settings.FugitivePercent = 30;
+          
             NAPI.Task.Run(() =>
             {
                 TimeUpdate();
@@ -276,13 +278,15 @@ namespace LSCC
 
             if (pCount < 2) { NAPI.Util.ConsoleOutput("[StartGame] Total players less than two, failed to start"); return false; }
 
-            double perc = (double)pCount * ((double)30 / (double)100);
+            double perc = (double)pCount * ((double)Settings.FugitivePercent / (double)100);
 
             int fugitives = (int)Math.Round(perc);
 
             if (fugitives < 1) { NAPI.Util.ConsoleOutput("[StartGame] Fugitives count is zero, failed to start"); return false; }
 
-            if(ContextFactory.Instance.Maps.Count() < 1) { NAPI.Util.ConsoleOutput("[StartGame] Server has no maps added, failed to start"); return false; }
+            if (fugitives == pCount) fugitives--; // There will ALWAYS be AT LEAST one COP.
+
+            if (ContextFactory.Instance.Maps.Count() < 1) { NAPI.Util.ConsoleOutput("[StartGame] Server has no maps added, failed to start"); return false; }
 
             List<Map> mapList = ContextFactory.Instance.Maps.Where(a => a.Enabled == true).ToList();
 
@@ -299,6 +303,7 @@ namespace LSCC
 
             List<MapSpawn> Spawns = ContextFactory.Instance.MapSpawns.Where(x => x.mapID == map.SQL_ID).ToList();
             List<int> UsedSpawns = new List<int>();
+            List<Client> PutInsideCar = new List<Client>();
             
             Random random = new Random();
 
@@ -322,6 +327,7 @@ namespace LSCC
                     return false;
                 }
             }
+            fugitives = Settings.Fugitives.Count;
 
             foreach (Client player in Settings.LoggedInPlayers)
             {
@@ -331,10 +337,13 @@ namespace LSCC
                 }
             }
 
+            List<Tuple<Client, Vehicle, int>> playerVehicle = new List<Tuple<Client, Vehicle, int>>();
+
             MapSpawn spawnLoc = null;
             pCount = 0;
             foreach(Client player in Settings.Cops)
             {
+                spawnLoc = null;
                 foreach(MapSpawn spawn in Spawns.Where(a=> a.spawnTeam == 1))
                 {
                     if (!UsedSpawns.Contains(spawn.SQL_ID))
@@ -378,7 +387,7 @@ namespace LSCC
                 }
 
 
-                Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, 0, 1, player.Name, 255, false, true, 0);
+                Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, 0, 1, "SIMBA", 255, false, true, 0);
 
 
                 Settings.GameVehicles.Add(pVehicle);
@@ -407,15 +416,8 @@ namespace LSCC
                         break;
                 }
 
-
-                NAPI.Task.Run(() =>
-                {
-                    player.SetIntoVehicle(pVehicle, -1);
-                    Player.Freeze(player, false);
-
-                    player.TriggerEvent("ToggleChaseCollisions", false);
-
-                }, delayTime: 2000);
+                PutInsideCar.Add(player);
+                playerVehicle.Add(new Tuple<Client, Vehicle, int>(player, pVehicle, -1));
 
 
                 player.GiveWeapon(WeaponHash.CarbineRifle, 100);
@@ -428,8 +430,83 @@ namespace LSCC
             }
 
             spawnLoc = null;
+
+
             foreach (Client player in Settings.Fugitives)
             {
+                spawnLoc = Spawns.FirstOrDefault(a => a.spawnTeam == 0);
+
+                Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
+
+                player.Dimension = 0;
+                player.Position = vecSpawn.Around(15);
+                Player.Freeze(player, true);
+
+                player.Health = 100;
+                player.Armor = 0;
+                Player.SetColor(player, new Color(232, 64, 64, 255), player.Armor);
+
+                switch (random.Next(0, 3))
+                {
+                    case 0:
+                        player.SetSkin(0xA70B4A92);
+                        break;
+                    case 1:
+                        player.SetSkin(0x76284640);
+                        break;
+                    case 2:
+                        player.SetSkin(0x3FB5C3D3);
+                        break;
+                    case 3:
+                        player.SetSkin(0x04430687);
+                        break;
+                }
+
+                player.GiveWeapon(WeaponHash.AssaultRifle, 100);
+
+
+                if (player.HasData("Blip"))
+                {
+                    Blip tBlip = player.GetData("Blip");
+                    tBlip.Delete();
+                    player.ResetData("Blip");
+                }
+
+                Blip pBlip = NAPI.Blip.CreateBlip(new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ), 0);
+                pBlip.Transparency = 255;
+                pBlip.Color = 75;
+
+                player.SetData("Blip", pBlip);
+
+                Player.SetDiscordStatus(player, $"Playing fugitive as {player.Name}");
+
+                player.TriggerEvent("SetActorInvulnerable", false);
+                player.TriggerEvent("CanFallOutOfCar", true);
+                player.TriggerEvent("showHPBars", 1); // Always show HP Bars.
+            }
+
+            spawnLoc = null;
+            List<Client> iteratedAlready = new List<Client>();
+            fugitives = Settings.Fugitives.Count;
+            while (fugitives > 0)
+            {
+                _tempPlayer = Settings.Fugitives[random.Next(Settings.Fugitives.Count)];
+
+                if (PutInsideCar.Contains(_tempPlayer))
+                {
+                    if (!iteratedAlready.Contains(_tempPlayer))
+                    {
+                        iteratedAlready.Add(_tempPlayer);
+                        fugitives--;
+                    }
+                    continue;
+                }
+
+                fugitives--;
+                PutInsideCar.Add(_tempPlayer);
+                iteratedAlready.Add(_tempPlayer);
+
+                spawnLoc = null;
                 foreach (MapSpawn spawn in Spawns.Where(a => a.spawnTeam == 0))
                 {
                     if (!UsedSpawns.Contains(spawn.SQL_ID))
@@ -445,6 +522,7 @@ namespace LSCC
                     spawnLoc = Spawns.FirstOrDefault(a => a.spawnTeam == 0);
                     spawnLoc.spawnZ += (pCount * 5); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
                 }
+
                 Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
 
                 string carName = "sultan";
@@ -471,85 +549,62 @@ namespace LSCC
                         break;
                 }
 
-                Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, random.Next(64), random.Next(64), player.Name, 255, false, true, 0);
-
+                Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, random.Next(64), random.Next(64), "KEVY", 255, false, true, 0);
 
                 Settings.GameVehicles.Add(pVehicle);
 
-                player.Dimension = 0;
-                player.Position = vecSpawn.Around(15);
-                Player.Freeze(player, true);
+                playerVehicle.Add(new Tuple<Client, Vehicle, int>(_tempPlayer, pVehicle, -1));
 
-                player.Health = 100;
-                player.Armor = 0;
-                Player.SetColor(player, new Color(232, 64, 64, 255), player.Armor);
-
-                switch (random.Next(0, 3))
+                int seat = 1;
+                while (seat < pVehicle.MaxOccupants)
                 {
-                    case 0:
-                        player.SetSkin(0xA70B4A92);
-                        break;
-                    case 1:
-                        player.SetSkin(0x76284640);
-                        break;
-                    case 2:
-                        player.SetSkin(0x3FB5C3D3);
-                        break;
-                    case 3:
-                        player.SetSkin(0x04430687);
-                        break;
+                    Client _tempPlayer2 = Settings.Fugitives[random.Next(Settings.Fugitives.Count)];
+
+                    if (PutInsideCar.Contains(_tempPlayer2)) continue;
+
+                    PutInsideCar.Add(_tempPlayer2);
+                    iteratedAlready.Add(_tempPlayer2);
+                    fugitives--;
+
+                    playerVehicle.Add(new Tuple<Client, Vehicle, int>(_tempPlayer2, pVehicle, -1 + seat));
+
+                    seat++;
+                }
+            }
+
+            NAPI.Task.Run(() =>
+            {
+                foreach (Tuple<Client, Vehicle, int> data in playerVehicle)
+                {
+                    if (data.Item1.IsNull || data.Item1 == null || data.Item2.IsNull || data.Item2 == null) continue;
+
+                    data.Item1.SetIntoVehicle(data.Item2, data.Item3);
+                    Player.Freeze(data.Item1, false);
+
+                    data.Item1.TriggerEvent("ToggleChaseCollisions", false);
+                }
+
+                NAPI.Chat.SendChatMessageToAll($"[GAME] Copchase started with !{{#8D8DFF}}{Settings.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{Settings.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{map.Name}!{{#FFFFFF}}.");
+                NAPI.Util.ConsoleOutput($"[StartGame] Game has been started with {Settings.Cops.Count} cops & {Settings.Fugitives.Count} fugitives on map {map.Name}.");
+
+                Settings.FugitiveShowCounter = 60;
+                Settings.GameProgress = 0;
+                Settings.CollisionCounter = 30;
+
+                foreach (Client p in Settings.LoggedInPlayers)
+                {
+                    p.TriggerEvent("StartChaseTimer", 0, Settings.GameRunTime, Settings.CollisionCounter);
                 }
 
                 NAPI.Task.Run(() =>
                 {
-                    player.SetIntoVehicle(pVehicle, -1);
-                    Player.Freeze(player, false);
+                    GameUpdate();
+                }, delayTime: 1000);
 
-                    player.TriggerEvent("ToggleChaseCollisions", false);
+            }, delayTime: 1500);
 
-                }, delayTime: 2000);
-
-
-                player.GiveWeapon(WeaponHash.AssaultRifle, 100);
-
-
-                if (player.HasData("Blip"))
-                {
-                    Blip tBlip = player.GetData("Blip");
-                    tBlip.Delete();
-                    player.ResetData("Blip");
-                }
-
-                Blip pBlip = NAPI.Blip.CreateBlip(new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ), 0);
-                pBlip.Transparency = 255;
-                pBlip.Color = 75;
-
-                player.SetData("Blip", pBlip);
-
-                Player.SetDiscordStatus(player, $"Playing fugitive as {player.Name}");
-
-                player.TriggerEvent("SetActorInvulnerable", false);
-                player.TriggerEvent("CanFallOutOfCar", true);
-                player.TriggerEvent("showHPBars", 1); // Always show HP Bars.
-            }
-
-            NAPI.Util.ConsoleOutput($"[StartGame] Game has been started with {Settings.Cops.Count} cops & {Settings.Fugitives.Count} fugitives on map {map.Name}.");
-            NAPI.Chat.SendChatMessageToAll($"[GAME] Copchase started with !{{#8D8DFF}}{Settings.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{Settings.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{map.Name}!{{#FFFFFF}}.");
-
-            Settings.GameRunning = 1;
-            Settings.FugitiveShowCounter = 60;
-            Settings.GameProgress = 0;
-            Settings.CollisionCounter = 30;
-
-            foreach(Client p in Settings.LoggedInPlayers)
-            {
-                p.TriggerEvent("StartChaseTimer", 0, Settings.GameRunTime, Settings.CollisionCounter);
-            }
             
-            NAPI.Task.Run(() =>
-            {
-                GameUpdate();
-            }, delayTime: 1000);
+            Settings.GameRunning = 1;
 
             return true;
         }

@@ -42,7 +42,18 @@ namespace LSCC
                 if (Settings.GameAutoStart) NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~g~has enabled copchases.");
                 else NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~w~has disabled copchases.");
             }
-            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'start', 'stop', 'autostart'");
+            else if (action.CompareTo("teambalance") == 0)
+            {
+                string[] args = action.Split(' ');
+                if (args.Count() > 0)
+                {
+                    Settings.FugitivePercent = Int32.Parse(args[0]);
+
+                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set copchase fugitive percentage to {Settings.FugitivePercent}%.");
+                }
+                else player.SendChatMessage("!{#999999}Proper usage: /game teambalance <percentage of fugitives>");
+            }
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'start', 'stop', 'autostart', 'teambalance'");
 
             return;
         }
