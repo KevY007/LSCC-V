@@ -65,6 +65,36 @@ namespace LSCC
             return;
         }
 
+        [Command("tog", GreedyArg = true)]
+        public void cmd_tog(Client player, string action)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+
+            if (action.StartsWith("hud", StringComparison.OrdinalIgnoreCase))
+            {
+                bool state = player.GetData("HudState");
+                player.SetData("HudState", !state);
+                player.TriggerEvent("ToggleHud", !state);
+               
+                player.SendChatMessage("Toggled HUD.");
+            }
+            else if (action.StartsWith("pm", StringComparison.OrdinalIgnoreCase))
+            {
+                bool state = player.GetData("PMState");
+                state = !state;
+                player.SetData("PMState", state);
+                if(state)
+                {
+                    player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have enabled your PMs.");
+                }
+                else player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have disabled your PMs.");
+            }
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'hud', 'pm'");
+
+            return;
+        }
+
         [Command("aveh")]
         public void cmd_aveh(Client player, string carname)
         {
@@ -244,7 +274,7 @@ namespace LSCC
             if (!Player.LoggedIn(player)) return;
 
             player.SendChatMessage("[Los Santos Copchase V BETA Commands]:");
-            player.SendChatMessage("[General]: /ooc /autojoin /b /pm");
+            player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog");
             player.SendChatMessage("[Roleplay]: /me /do");
             player.SendChatMessage("[Debug]: /pos");
 
@@ -509,12 +539,16 @@ namespace LSCC
             if (!Player.LoggedIn(player))
                 return;
 
-            else
-            {
-                NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#FFFF00}}(( PM received from {player.Name}: {text} ))");
-                NAPI.Chat.SendChatMessageToPlayer(player, $"!{{#FFFF00}}(( PM sent to {target.Name}: {text} ))");
+            if (target.GetData("PMState") == false || player.GetData("PMState") == false) 
+            { 
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your or the target's PM's are toggled OFF."); 
+                return; 
             }
 
+
+            NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#FFFF00}}(( PM received from {player.Name}: {text} ))");
+            NAPI.Chat.SendChatMessageToPlayer(player, $"!{{#FFFF00}}(( PM sent to {target.Name}: {text} ))");
+            return;
         }
         [Command("freeze", GreedyArg = true)]
         public void cmd_freeze(Client player, Client target)

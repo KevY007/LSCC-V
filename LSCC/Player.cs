@@ -20,6 +20,9 @@ namespace LSCC
             player.SetData("CharacterHandle", null);
             player.SetData("LoggedIn", false);
             player.SetData("AutoJoin", true);
+            player.SetData("HudState", false);
+            player.SetData("PMState", true);
+            player.TriggerEvent("ToggleHud", false);
 
             Settings.LoggedInPlayers.Remove(player);
             Settings.Cops.Remove(player);
@@ -109,6 +112,10 @@ namespace LSCC
                 Settings.Cops.Remove(player);
                 Settings.Fugitives.Remove(player);
             }
+
+
+            player.SetData("HudState", true);
+            player.TriggerEvent("ToggleHud", true);
 
             NAPI.Player.SpawnPlayer(player, new Vector3(SpawnArea.X, SpawnArea.Y, SpawnArea.Z));
 

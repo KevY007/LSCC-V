@@ -12,28 +12,6 @@ mp.keys.bind(0x4E, true, function() {
     mp.voiceChat.muted = false;
 });
 
-mp.events.add('render', () => {
-    if(!mp.voiceChat.muted)
-    {
-        mp.game.graphics.drawText("Voice: Speaking", [0.22, 0.83], { 
-            font: 4, 
-            color: [63, 135, 240, 255], 
-            scale: [0.5, 0.5], 
-            outline: true
-          });
-    }
-    else
-    {
-        mp.game.graphics.drawText("Voice: Idle (Hold N)", [0.22, 0.83], { 
-            font: 4, 
-            color: [63, 135, 240, 255], 
-            scale: [0.5, 0.5], 
-            outline: true
-          });
-    }
-});
-
-
 let g_voiceMgr =
 {
 	listeners: [],

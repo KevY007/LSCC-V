@@ -282,7 +282,10 @@ namespace LSCC.Events
                 Salt = salt,
                 Username = username,
                 Admin = 0,
-                HWID = player.Serial
+                HWID = player.Serial,
+                Level = 1,
+                XP = 1,
+                DonatorLevel = 0
             };
             AccountManager.Add(_new);
             OnPlayerRegister(player, _new);

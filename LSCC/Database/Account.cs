@@ -27,6 +27,8 @@ namespace LSCC
         public string Salt { get; set; }
         public string HWID { get; set; }
         public int Admin { get; set; }
+        public int Level { get; set; }
+        public int XP { get; set; }
         public int DonatorLevel { get; set; }
     }
 
