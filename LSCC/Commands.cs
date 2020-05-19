@@ -16,7 +16,7 @@ namespace LSCC
 
             if (Player.GetAccount(player).Admin < 2)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
                 return;
             }
 
@@ -24,17 +24,17 @@ namespace LSCC
             {
                 if (!Main.StopGame(0))
                 {
-                    player.SendChatMessage("~r~Failed to stop game! Is there even a copchase running?");
+                    player.SendChatMessage("!{#FF0000}Failed to stop game! Is there even a copchase running?");
                 }
-                else NAPI.Chat.SendChatMessageToAll($"~r~[AdmCmd] ~w~{player.Name} has forcefully stopped the copchase.");
+                else NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has forcefully stopped the copchase.");
             }
             else if (action.CompareTo("start") == 0)
             {
                 if (!Main.StartGame())
                 {
-                    player.SendChatMessage("~r~Failed to start game! Is one already running?");
+                    player.SendChatMessage("!{#FF0000}Failed to start game! Is one already running?");
                 }
-                else NAPI.Chat.SendChatMessageToAll($"~r~[AdmCmd] ~w~{player.Name} has forcefully started the copchase.");
+                else NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has forcefully started the copchase.");
             }
             else if (action.CompareTo("autostart") == 0)
             {
@@ -42,7 +42,7 @@ namespace LSCC
                 if (Settings.GameAutoStart) NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~g~has enabled copchases.");
                 else NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~w~has disabled copchases.");
             }
-            else player.SendChatMessage("Invalid option, possible options: 'start', 'stop', 'autostart'");
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'start', 'stop', 'autostart'");
 
             return;
         }
@@ -55,7 +55,7 @@ namespace LSCC
 
             if (Player.GetAccount(player).Admin < 1)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
                 return;
             }
 
@@ -75,14 +75,21 @@ namespace LSCC
 
             if (Player.GetAccount(player).Admin < 1)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
                 return;
             }
 
-            player.Position = target.Position.Around(3.0f);
+            if (player.IsInVehicle)
+            {
+                player.Vehicle.Position = target.Position.Around(5.0f);
+            }
+            else
+            {
+                player.Position = target.Position.Around(3.0f);
+            }
             player.Dimension = target.Dimension;
 
-            Player.SendMessageToAllAdmins($"~r~[AdmCmd] {player.Name} has teleported to {target.Name}.");
+            Player.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has teleported to {target.Name}.");
             return;
         }
 
@@ -94,14 +101,22 @@ namespace LSCC
 
             if (Player.GetAccount(player).Admin < 1)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
                 return;
             }
 
-            target.Position = player.Position.Around(3.0f);
+            if (target.IsInVehicle)
+            {
+                target.Vehicle.Position = player.Position.Around(5.0f);
+                target.Vehicle.Dimension = player.Dimension;
+            }
+            else
+            {
+                target.Position = player.Position.Around(3.0f);
+            }
             target.Dimension = player.Dimension;
 
-            Player.SendMessageToAllAdmins($"~r~[AdmCmd] {player.Name} has summoned {target.Name}.");
+            Player.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has summoned {target.Name}.");
             return;
         }
 
@@ -113,7 +128,7 @@ namespace LSCC
 
             if (Player.GetAccount(player).Admin < 1)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
                 return;
             }
 
@@ -129,7 +144,7 @@ namespace LSCC
 
             if (Player.GetAccount(player).Admin < 1)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
                 return;
             }
 
@@ -145,7 +160,7 @@ namespace LSCC
 
             if (Player.GetAccount(player).Admin < 1)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
                 return;
             }
 
@@ -159,7 +174,7 @@ namespace LSCC
             }
 
             Settings.AdminVehicles.Clear();
-            Player.SendMessageToAllAdmins($"~r~[AdmCmd] {player.Name} removed all spawned admin vehicles.");
+            Player.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} removed all spawned admin vehicles.");
             return;
         }
 
@@ -184,7 +199,7 @@ namespace LSCC
         [Command("pos")]
         public void cmd_poslog(Client player)
         {
-            NAPI.Notification.SendNotificationToPlayer(player, $"X: {player.Position.X} - Y: {player.Position.Y} - Z: {player.Position.Z}");
+            player.SendChatMessage($"X: {player.Position.X} - Y: {player.Position.Y} - Z: {player.Position.Z}");
             NAPI.Util.ConsoleOutput($"{player.Name} Position log: X: {player.Position.X} - Y: {player.Position.Y} - Z: {player.Position.Z}");
         }
 
@@ -194,12 +209,14 @@ namespace LSCC
             if (!Player.LoggedIn(player)) return;
 
             player.SendChatMessage("[Los Santos Copchase V BETA Commands]:");
-            player.SendChatMessage("[General]: /ooc /autojoin /b");
+            player.SendChatMessage("[General]: /ooc /autojoin /b /pm");
+            player.SendChatMessage("[Roleplay]: /me /do");
             player.SendChatMessage("[Debug]: /pos");
 
             if (Player.GetAccount(player).Admin >= 1)
             {
                 player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /sethp /setar");
+                player.SendChatMessage("[Admin Lv 1]: /freeze /unfreeze /kick /slap");
             }
             if (Player.GetAccount(player).Admin >= 2)
             {
@@ -223,13 +240,13 @@ namespace LSCC
 
             if (Player.GetAccount(player).Admin < 5)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not a level 5 admin.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
                 return;
             }
 
             foreach (Map map in ContextFactory.Instance.Maps)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, $"~y~{map.Name} | ID: [{map.SQL_ID}] | Enabled: [{map.Enabled}] | Spawns: [{ContextFactory.Instance.MapSpawns.Count(a => a.mapID == map.SQL_ID)}]");
+                NAPI.Chat.SendChatMessageToPlayer(player, $"!{{#DAA520}}{map.Name} | ID: [{map.SQL_ID}] | Enabled: [{map.Enabled}] | Spawns: [{ContextFactory.Instance.MapSpawns.Count(a => a.mapID == map.SQL_ID)}]");
             }
             return;
         }
@@ -242,14 +259,14 @@ namespace LSCC
 
             if (Player.GetAccount(player).Admin < 5)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not a level 5 admin.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not a level 5 admin.");
                 return;
             }
 
             Map map = ContextFactory.Instance.Maps.FirstOrDefault(a => a.SQL_ID == mapid);
-            if (map == null) { NAPI.Chat.SendChatMessageToPlayer(player, "~r~No map with this ID exists."); return; }
+            if (map == null) { NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}No map with this ID exists."); return; }
 
-            if (teamid > 1) { NAPI.Chat.SendChatMessageToPlayer(player, "~r~Valid TeamID's are 0 (fugitive) or 1 (cop)."); return; }
+            if (teamid > 1) { NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}Valid TeamID's are 0 (fugitive) or 1 (cop)."); return; }
 
             float[] currentLoc = new float[4];
             if (player.IsInVehicle == true)
@@ -281,7 +298,7 @@ namespace LSCC
 
             ContextFactory.Instance.SaveChanges();
 
-            NAPI.Chat.SendChatMessageToPlayer(player, $"~y~{map.Name} | Added a spawn (ID: {_new.SQL_ID}) over here for team [{teamid}]");
+            NAPI.Chat.SendChatMessageToPlayer(player, $"!{{#DAA520}}{map.Name} | Added a spawn (ID: {_new.SQL_ID}) over here for team [{teamid}]");
 
             return;
         }
@@ -294,12 +311,12 @@ namespace LSCC
 
             if (Player.GetAccount(player).Admin < 5)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not a level 5 admin.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
                 return;
             }
 
             Map map = ContextFactory.Instance.Maps.FirstOrDefault(a => a.Name == mapname);
-            if (map == null) { NAPI.Chat.SendChatMessageToPlayer(player, "~r~No map with this name exists."); return; }
+            if (map == null) { NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}No map with this name exists."); return; }
 
 
             ContextFactory.Instance.MapSpawns.RemoveRange(ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID));
@@ -307,7 +324,7 @@ namespace LSCC
 
             ContextFactory.Instance.SaveChanges();
 
-            NAPI.Chat.SendChatMessageToPlayer(player, $"~g~Map {mapname} has been deleted from the server.");
+            NAPI.Chat.SendChatMessageToPlayer(player, $"!{{#00FF33}}Map {mapname} has been deleted from the server.");
             return;
         }
 
@@ -319,7 +336,7 @@ namespace LSCC
 
             if (Player.GetAccount(player).Admin < 5)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not a level 5 admin.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not a level 5 admin.");
                 return;
             }
 
@@ -333,7 +350,7 @@ namespace LSCC
 
             ContextFactory.Instance.SaveChanges();
 
-            NAPI.Chat.SendChatMessageToPlayer(player, $"~g~Map {mapname} with ID {_new.SQL_ID} has been added to the server.");
+            NAPI.Chat.SendChatMessageToPlayer(player, $"!{{#00FF33}}Map {mapname} with ID {_new.SQL_ID} has been added to the server.");
             return;
         }
 
@@ -345,7 +362,7 @@ namespace LSCC
 
             if (Player.GetAccount(player).Admin < 6)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not a level 6 admin.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
                 return;
             }
 
@@ -360,7 +377,7 @@ namespace LSCC
 
             if (Player.GetAccount(player).Admin < 6)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not a level 6 admin.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
                 return;
             }
 
@@ -376,41 +393,31 @@ namespace LSCC
 
             if (Player.GetAccount(player).Admin < 6)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not a level 6 admin.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
                 return;
             }
 
-            if (!Player.LoggedIn(target)) { NAPI.Chat.SendChatMessageToPlayer(player, "~r~Target not logged in."); return; }
+            if (!Player.LoggedIn(target)) { NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}Target not logged in."); return; }
 
 
             Account t_acc = target.GetData("AccountHandle");
 
             if (level < 0 || level > 6)
             {
-                player.SendChatMessage("~r~Error: You cannot preceed level 0 or exceed level 6.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed level 6.");
                 return;
             }
 
             if (String.Compare(player.Name, target.Name) == 0 && t_acc.Admin > Player.GetAccount(player).Admin)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: Target has higher admin level than you.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}Target has higher admin level than you.");
                 return;
             }
 
             t_acc.Admin = level;
-            NAPI.Chat.SendChatMessageToPlayer(player, $"~g~You have set {target.Name}'s admin level to {level}");
-            NAPI.Chat.SendChatMessageToPlayer(target, $"~g~{player.Name} has set your admin level to {level}");
+            NAPI.Chat.SendChatMessageToPlayer(player, $"!{{#00FF33}}You have set {target.Name}'s admin level to {level}");
+            NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#00FF33}}{player.Name} has set your admin level to {level}");
             Player.Save(target);
-        }
-
-        [Command("amiadmin")]
-        public void cmd_amiadmin(Client player)
-        {
-            if (!Player.LoggedIn(player))
-                return;
-
-            Account acc = player.GetData("AccountHandle");
-            player.SendChatMessage($"Your admin level is: {acc.Admin}");
         }
 
         [Command("adminchat", Alias = "a", GreedyArg = true)]
@@ -421,11 +428,11 @@ namespace LSCC
 
             if (Player.GetAccount(player).Admin < 1)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
                 return;
             }
 
-            Player.SendMessageToAllAdmins($"~r~[ADMIN] {player.Name}:  {text}");
+            Player.SendMessageToAllAdmins($"!{{#FF6347}}[A] {player.Name}:  {text}");
         }
 
         [Command("looc", Alias = "b", GreedyArg = true)]
@@ -439,9 +446,9 @@ namespace LSCC
             {
                 if (i.Dimension == player.Dimension)
                 {
-                    if (i.Position.DistanceTo(player.Position) <= 10.0) i.SendChatMessage($"~s~{chatStr}");
-                    if (i.Position.DistanceTo(player.Position) > 10.0 && i.Position.DistanceTo(player.Position) <= 20.0) i.SendChatMessage($"~c~{chatStr}");
-                    if (i.Position.DistanceTo(player.Position) > 20.0 && i.Position.DistanceTo(player.Position) <= 40.0) i.SendChatMessage($"~m~{chatStr}");
+                    if (i.Position.DistanceTo(player.Position) <= 10.0) i.SendChatMessage($"!{{#D4D4D4}}{chatStr}");
+                    if (i.Position.DistanceTo(player.Position) > 10.0 && i.Position.DistanceTo(player.Position) <= 20.0) i.SendChatMessage($"!{{#B5B5B5}}{chatStr}");
+                    if (i.Position.DistanceTo(player.Position) > 20.0 && i.Position.DistanceTo(player.Position) <= 40.0) i.SendChatMessage($"!{{#999999}}{chatStr}");
                 }
             }
         }
@@ -454,11 +461,11 @@ namespace LSCC
 
             if (Player.GetAccount(player).Admin < 1)
             {
-                NAPI.Chat.SendChatMessageToAll($"~w~(( [OOC] {player.Name}: {text} ~w~))");
+                NAPI.Chat.SendChatMessageToAll($"(( [OOC] {player.Name}: {text} ))");
             }
             else
             {
-                NAPI.Chat.SendChatMessageToAll($"~w~(( [OOC] ~r~{player.Name}~w~: {text} ~w~))");
+                NAPI.Chat.SendChatMessageToAll($"(( [OOC] !{{#FF6347}}{player.Name}!{{#FFFFFF}}: {text} ))");
             }
         }
         [Command("pm", GreedyArg = true)]
@@ -469,8 +476,8 @@ namespace LSCC
 
             else
             {
-                NAPI.Chat.SendChatMessageToPlayer(target, $"~y~(( PM recieved from {player.Name}: {text} ))");
-                NAPI.Chat.SendChatMessageToPlayer(player, $"~y~(( PM sent to {target.Name}: {text} ))");
+                NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#FFFF00}}(( PM received from {player.Name}: {text} ))");
+                NAPI.Chat.SendChatMessageToPlayer(player, $"!{{#FFFF00}}(( PM sent to {target.Name}: {text} ))");
             }
 
         }
@@ -481,14 +488,14 @@ namespace LSCC
                 return;
             if (Player.GetAccount(player).Admin < 1)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
                 return;
             }
             else
             {
                 Player.Freeze(target, true);
-                NAPI.Chat.SendChatMessageToPlayer(target, $"~r~ YOU HAVE BEEN FROZEN BY ~w~{player}");
-                NAPI.Chat.SendChatMessageToPlayer(player, $"~r~ You have frozen ~w~{target}");
+                NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#FF6347}}[AdmCmd] YOU HAVE BEEN FROZEN BY !{{#FF0000}}{player.Name}");
+                Player.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen {target.Name}.");
             }
         }
         [Command("unfreeze", GreedyArg = true)]
@@ -498,30 +505,33 @@ namespace LSCC
                 return;
             if (Player.GetAccount(player).Admin < 1)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
                 return;
             }
             else
             {
                 Player.Freeze(target, false);
-                NAPI.Chat.SendChatMessageToPlayer(target, $"~r~ YOU HAVE BEEN UNFROZEN BY ~w~{player}");
-                NAPI.Chat.SendChatMessageToPlayer(player, $"~r~ You have unfrozen ~w~{target}");
+                NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#FF6347}}[AdmCmd] You have been unfrozen by !{{#FF0000}}{player.Name}");
+                Player.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen {target.Name}.");
             }
         }
         [Command("kick", GreedyArg = true)]
-        public void cmd_kick(Client player, Client target, string text)
+        public void cmd_kick(Client player, Client target, string reason)
         {
             if (!Player.LoggedIn(player))
                 return;
             if (Player.GetAccount(player).Admin < 1)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
                 return;
             }
             else
             {
-                target.Kick($"You have been kicked for the reason: {text}");
-                NAPI.Chat.SendChatMessageToAll($"~r~[ADMCMD]~w~{target}~r~ has been kicked from the server for the reason:~w~ {text}~r~ by admin: {player}");
+                NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{target.Name} has been kicked by {player.Name} for {reason}.");
+
+                target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+
+                target.Kick($"You have been kicked for the reason: {reason}");
             }
 
         }
@@ -532,8 +542,8 @@ namespace LSCC
                 return;
             else
             {
-                var msg = "* " + player.Name + " " + text;
-                var playersAround = NAPI.Player.GetPlayersInRadiusOfPlayer(30, player);
+                var msg = "!{#C3A3DB}* " + player.Name + " " + text;
+                var playersAround = NAPI.Player.GetPlayersInRadiusOfPlayer(40, player);
 
                 foreach (var players in playersAround)
                 {
@@ -548,8 +558,8 @@ namespace LSCC
                 return;
             else
             {
-                var msg = "* " + text + $"(({player}))";
-                var playersAround = NAPI.Player.GetPlayersInRadiusOfPlayer(30, player);
+                var msg = "!{#C3A3DB}* " + text + $" (( {player.Name} ))";
+                var playersAround = NAPI.Player.GetPlayersInRadiusOfPlayer(40, player);
 
                 foreach (var players in playersAround)
                 {
@@ -558,43 +568,21 @@ namespace LSCC
             }
         }
         [Command("slap", GreedyArg = true)]
-        public void cmd_slap(Client player, Client target, string text)
+        public void cmd_slap(Client player, Client target)
         {
             if (!Player.LoggedIn(player))
                 return;
             if (Player.GetAccount(player).Admin < 1)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, "~r~Error: You are not an admin.");
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
                 return;
             }
             else
             {
-                if (target.IsInVehicle == true)
-                {
-                    target.WarpOutOfVehicle();
-                    float[] currentLoc = new float[3];
-                    currentLoc[0] = target.Position.X;
-                    currentLoc[1] = target.Position.Y;
-                    currentLoc[2] = target.Position.Z;
+                target.Position = new Vector3(target.Position.X, target.Position.Y, target.Position.Z + 5f);
 
-                    target.Position.Z = currentLoc[2] + 5;
-                    NAPI.Chat.SendChatMessageToPlayer(target, $"~r~[ADMCMD] YOU HAVE BEEN SLAPPED BY ADMIN: ~w~{player}");
-                    NAPI.Chat.SendChatMessageToPlayer(player, $"~r~[ADMCMD] You have slapped player: ~w~{target}");
-                }
-                else
-                {
-                    float[] currentLoc = new float[3];
-                    currentLoc[0] = target.Position.X;
-                    currentLoc[1] = target.Position.Y;
-                    currentLoc[2] = target.Position.Z;
-
-                    target.Position.Z = currentLoc[2] + 5;
-                    NAPI.Chat.SendChatMessageToPlayer(target, $"~r~[ADMCMD] YOU HAVE BEEN SLAPPED BY ADMIN: ~w~{player}");
-                    NAPI.Chat.SendChatMessageToPlayer(player, $"~r~[ADMCMD] You have slapped player: ~w~{target}");
-                }
+                Player.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {target.Name} has been slapped by {player.Name}.");
             }
         }
     }
 }
-
-// Added /me, /do, /freeze, /unfreeze, /kick, /slap and /pm commands (Simba - 19/05/2020)

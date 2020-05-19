@@ -9,7 +9,7 @@ namespace LSCC.Events
         [ServerEvent(Event.PlayerConnected)]
         public void OnPlayerConnected(Client player)
         {
-            Player.SetDiscordStatus(player, "Connecting to the server");
+            Player.SetDiscordStatus(player, "Connecting to the server...");
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has joined the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
             NAPI.Notification.SendNotificationToPlayer(player, "~g~Welcome to ~w~Los Santos Copchase!");
             player.SetData("LastCryptAttempt", Environment.TickCount);
@@ -42,22 +42,18 @@ namespace LSCC.Events
                     player.ResetData("Blip");
                 }
 
+                switch (type)
+                {
+                    case DisconnectionType.Left:
+                        NAPI.Chat.SendChatMessageToAll("!{4343FA}[PART] !{FFFFFF}" + player.Name + " has left the server. !{4343FA}(Leaving)");
+                        break;
+
+                    case DisconnectionType.Timeout:
+                        NAPI.Chat.SendChatMessageToAll("!{4343FA}[PART] !{FFFFFF}" + player.Name + " has left the server. !{4343FA}(Timed Out)");
+                        break;
+                }
+
                 Player.Save(player);
-            }
-
-            switch (type)
-            {
-                case DisconnectionType.Left:
-                    NAPI.Chat.SendChatMessageToAll("~b~" + player.Name + "~w~ has quit the server.");
-                    break;
-
-                case DisconnectionType.Timeout:
-                    NAPI.Chat.SendChatMessageToAll("~b~" + player.Name + "~w~ has timed out.");
-                    break;
-
-                case DisconnectionType.Kicked:
-                    NAPI.Chat.SendChatMessageToAll("~b~" + player.Name + "~w~ has been kicked for " + reason);
-                    break;
             }
 
             Player.ResetPlayerData(player);
@@ -125,7 +121,7 @@ namespace LSCC.Events
         {
             if (!Player.LoggedIn(player))
             {
-                player.SendChatMessage("~r~You must be logged in to chat!");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You must be logged in to chat!");
                 return;
             }
 
@@ -134,9 +130,9 @@ namespace LSCC.Events
             {
                 if (i.Dimension == player.Dimension)
                 {
-                    if (i.Position.DistanceTo(player.Position) <= 5.0) i.SendChatMessage($"~s~{chatStr}");
-                    if (i.Position.DistanceTo(player.Position) > 5.0 && i.Position.DistanceTo(player.Position) <= 10.0) i.SendChatMessage($"~c~{chatStr}");
-                    if (i.Position.DistanceTo(player.Position) > 10.0 && i.Position.DistanceTo(player.Position) <= 20.0) i.SendChatMessage($"~m~{chatStr}");
+                    if (i.Position.DistanceTo(player.Position) <= 10.0) i.SendChatMessage($"!{{#D4D4D4}}{chatStr}");
+                    if (i.Position.DistanceTo(player.Position) > 10.0 && i.Position.DistanceTo(player.Position) <= 15.0) i.SendChatMessage($"!{{#B5B5B5}}{chatStr}");
+                    if (i.Position.DistanceTo(player.Position) > 15.0 && i.Position.DistanceTo(player.Position) <= 20.0) i.SendChatMessage($"!{{#999999}}{chatStr}");
                 }
             }
         }

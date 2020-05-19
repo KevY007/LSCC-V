@@ -60,7 +60,7 @@ namespace LSCC
             NAPI.Server.SetAutoRespawnAfterDeath(false);
             NAPI.Server.SetAutoSpawnOnConnect(false);
             NAPI.Server.SetGlobalServerChat(false);
-            NAPI.Server.SetCommandErrorMessage("~r~[Error] ~w~This command is invalid, refer to /help for a list.");
+            NAPI.Server.SetCommandErrorMessage("!{#FF6347}[!] !{#FFFFFF}This command is invalid, refer to /help for a list.");
 
             ContextFactory.Instance.Database.EnsureCreated();
 
@@ -98,7 +98,7 @@ namespace LSCC
                 {
                     if (time > 0)
                     {
-                        NAPI.Notification.SendNotificationToPlayer(player, $"~w~Game is starting in ~g~{time} seconds~w~.", true);
+                        NAPI.Notification.SendNotificationToPlayer(player, $"Game is starting in ~g~{time} seconds~w~.", true);
                     }
                     else
                     {
@@ -159,7 +159,7 @@ namespace LSCC
                     {
                         if (Environment.TickCount - Settings.LastAutoStartMsg >= 90000)
                         {
-                            NAPI.Chat.SendChatMessageToAll("~y~[GAME] ~w~Game is not starting as there's not enough players to start a match. (2+)");
+                            NAPI.Chat.SendChatMessageToAll("!{#FFFF00}[GAME] !{#FFFFFF}Game will not start unless there are 2+ players to start a match.");
                             Settings.LastAutoStartMsg = Environment.TickCount;
                         }
                     }
@@ -195,10 +195,10 @@ namespace LSCC
             switch(reason)
             {
                 case 0:
-                    NAPI.Chat.SendChatMessageToAll("~w~[GAME] ~r~The game has been stopped by an administrator.");
+                    NAPI.Chat.SendChatMessageToAll("[GAME] !{#FF0000}The game has been stopped by an administrator.");
                     break;
                 case 1:
-                    NAPI.Chat.SendChatMessageToAll("~w~[GAME] The fugitives managed to escape from the cops.");
+                    NAPI.Chat.SendChatMessageToAll("[GAME] !{#DAA520}The fugitives managed to escape from the cops.");
                     
                     foreach (Client i in Settings.Fugitives)
                     {
@@ -206,7 +206,7 @@ namespace LSCC
                     }
                     break;
                 case 2:
-                    NAPI.Chat.SendChatMessageToAll("~w~[GAME] All law enforcement units have been taken out by the fugitives.");
+                    NAPI.Chat.SendChatMessageToAll("[GAME] !{#DAA520}All law enforcement units have been taken out by the fugitives.");
 
                     foreach (Client i in Settings.Fugitives)
                     {
@@ -214,7 +214,7 @@ namespace LSCC
                     }
                     break;
                 case 3:
-                    NAPI.Chat.SendChatMessageToAll("~w~[GAME] The situation has been successfully handled by the police.");
+                    NAPI.Chat.SendChatMessageToAll("[GAME] !{#DAA520}The situation has been successfully handled by the police.");
 
                     foreach (Client i in Settings.Cops) 
                     {
@@ -534,7 +534,7 @@ namespace LSCC
             }
 
             NAPI.Util.ConsoleOutput($"[StartGame] Game has been started with {Settings.Cops.Count} cops & {Settings.Fugitives.Count} fugitives on map {map.Name}.");
-            NAPI.Chat.SendChatMessageToAll($"~w~[GAME] Copchase started with ~b~{Settings.Cops.Count} cops ~w~& ~r~{Settings.Fugitives.Count} fugitives ~w~on map ~y~{map.Name}~w~.");
+            NAPI.Chat.SendChatMessageToAll($"[GAME] Copchase started with !{{#8D8DFF}}{Settings.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{Settings.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{map.Name}!{{#FFFFFF}}.");
 
             Settings.GameRunning = 1;
             Settings.FugitiveShowCounter = 60;
@@ -663,7 +663,7 @@ namespace LSCC
             if (Environment.TickCount - player.GetData("LastCryptAttempt") < 1000)
             {
                 NAPI.Notification.SendNotificationToPlayer(player, "~r~Please wait some time between each register attempt!", true);
-                player.SendChatMessage("~r~Please wait some time between each register attempt!");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please wait some time between each register attempt!");
                 return;
             }
             player.SetData("LastCryptAttempt", Environment.TickCount);
@@ -701,54 +701,46 @@ namespace LSCC
             NAPI.Util.ConsoleOutput($"[Register Attempt] Username {username}");
             if(Environment.TickCount - player.GetData("LastCryptAttempt") < 1000)
             {
-                NAPI.Notification.SendNotificationToPlayer(player, "~r~Please wait some time between each register attempt!", true);
-                player.SendChatMessage("~r~Please wait some time between each register attempt!");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please wait some time between each register attempt!");
                 return;
             }
             if(!allcorrect || !rules)
             {
-                NAPI.Notification.SendNotificationToPlayer(player, "~r~You must agree to the rules and ensure all information is correct!", true);
-                player.SendChatMessage("~r~You must agree to the rules and ensure all information is correct!");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You must agree to the rules and ensure all information is correct!");
                 return;
             }
             if(password.Length < 5)
             {
-                NAPI.Notification.SendNotificationToPlayer(player, "~r~Your password is too small!", true);
-                player.SendChatMessage("~r~Your password is too small!");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your password is too small!");
                 return;
             }
             if (username.Contains("@") || username.Length < 4)
-            { 
-                NAPI.Notification.SendNotificationToPlayer(player, "~r~Your username is too small or it cannot contain the character '@'", true);
-                player.SendChatMessage("~r~Your username is too small or it cannot contain the character '@'");
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your username is too small or it cannot contain the character '@'");
                 return;
             }
             Regex exp = new Regex(@"^[a-zA-Z0-9]*$");
             Match match = exp.Match(username);
             if (!match.Success)
             {
-                NAPI.Notification.SendNotificationToPlayer(player, "~r~Your username can only contain alphabets or numbers!", true);
-                player.SendChatMessage("~r~Your username can only contain alphabets or numbers!");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your username can only contain alphabets or numbers!");
                 return;
             }
             if (!email.Contains("@") || email.Length < 5)
             {
-                NAPI.Notification.SendNotificationToPlayer(player, "~r~Your username cannot contain the character '@'", true);
-                player.SendChatMessage("~r~Your username cannot contain the character '@'");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your username cannot contain the character '@'");
                 return;
             }
             Account acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username == username);
             if (acc != null)
             {
-                NAPI.Notification.SendNotificationToPlayer(player, "~r~An account with this name already exists!", true);
-                player.SendChatMessage("~r~An account with this name already exists!");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}An account with this name already exists!");
                 return;
             }
             acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Email == email);
             if (acc != null)
             {
-                NAPI.Notification.SendNotificationToPlayer(player, "~r~An account with this email already exists!", true);
-                player.SendChatMessage("~r~An account with this email already exists!");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}An account with this email already exists!");
                 return;
             }
             player.SetData("LastCryptAttempt", Environment.TickCount);

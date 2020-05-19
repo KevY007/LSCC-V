@@ -1,4 +1,5 @@
-﻿require('./Player/Player.js');
+﻿require("./chat/index.js");
+require('./Player/Player.js');
 require('./camerasManager.js');
 require('./cefBrowser.js');
 require('./nametags.js');
