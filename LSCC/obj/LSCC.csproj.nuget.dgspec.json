@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "E:\\Github\\LSCC-V\\LSCC\\LSCC.csproj": {}
+    "C:\\Users\\rande\\Documents\\GitHub\\LSCC-V\\LSCC\\LSCC.csproj": {}
   },
   "projects": {
-    "E:\\Github\\LSCC-V\\LSCC\\LSCC.csproj": {
+    "C:\\Users\\rande\\Documents\\GitHub\\LSCC-V\\LSCC\\LSCC.csproj": {
       "version": "0.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Github\\LSCC-V\\LSCC\\LSCC.csproj",
+        "projectUniqueName": "C:\\Users\\rande\\Documents\\GitHub\\LSCC-V\\LSCC\\LSCC.csproj",
         "projectName": "LSCC",
-        "projectPath": "E:\\Github\\LSCC-V\\LSCC\\LSCC.csproj",
-        "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "E:\\Github\\LSCC-V\\LSCC\\obj\\",
+        "projectPath": "C:\\Users\\rande\\Documents\\GitHub\\LSCC-V\\LSCC\\LSCC.csproj",
+        "packagesPath": "C:\\Users\\rande\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\rande\\Documents\\GitHub\\LSCC-V\\LSCC\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\rande\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
