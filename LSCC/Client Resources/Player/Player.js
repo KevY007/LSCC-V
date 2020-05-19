@@ -203,10 +203,6 @@ mp.events.add(
             createCam(x, y, z, rx, ry, rz, viewangle);
         },
 
-        "TogglePlayerChat": (toggle) => {
-            mp.gui.chat.activate(toggle);
-        },
-
         "SetDiscordStatus": (serverName, status) => {
             mp.discord.update(serverName, status);
         },

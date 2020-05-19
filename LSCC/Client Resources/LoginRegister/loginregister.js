@@ -1,13 +1,27 @@
+var passElement = document.getElementById("passwordText");
+
+passElement.addEventListener("keyup", function(e) {
+
+  if (e.keyCode === 13) 
+  {
+
+    e.preventDefault();
+
+    if(document.getElementById("loginButton")) document.getElementById("loginButton").click();
+    else if(document.getElementById("registerButton")) document.getElementById("registerButton").click();
+  }
+});
+
 $('#loginButton').click(() => {
 
-    mp.trigger('loginInformationToServer', $('#loginEmailText').val(), $('#loginPasswordText').val());
-    document.getElementById("loginPasswordText").value = "";
-    document.getElementById("loginEmailText").value = "";
+    mp.trigger('loginInformationToServer', $('#emailText').val(), $('#passwordText').val());
+    document.getElementById("passwordText").value = "";
+    document.getElementById("emailText").value = "";
 });
 
 $('#registerButton').click(() => {
-    mp.trigger('registerInformationToServer', $('#registerEmailText').val(), $('#registerUsernameText').val(), $('#registerPasswordText').val(), $('#allcorrect').prop("checked"), $('#rules').prop("checked"));
-    document.getElementById("registerEmailText").value = "";
-    document.getElementById("registerUsernameText").value = "";
-    document.getElementById("registerPasswordText").value = "";
+    mp.trigger('registerInformationToServer', $('#emailText').val(), $('#usernameText').val(), $('#passwordText').val(), $('#allcorrect').prop("checked"), $('#rules').prop("checked"));
+    document.getElementById("emailText").value = "";
+    document.getElementById("usernameText").value = "";
+    document.getElementById("passwordText").value = "";
 });
