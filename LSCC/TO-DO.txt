@@ -1,3 +1,1 @@
 ﻿FORMAT: ADDED BY - ITEM.
-
-KevY - Add seating system for fugitives together till max number of seat, if no more then spawn more cars.

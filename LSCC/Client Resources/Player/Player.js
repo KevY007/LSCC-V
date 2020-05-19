@@ -1,4 +1,7 @@
-﻿let camera = null;
+﻿require("./Player/Nametags.js");
+require("./Player/Voice.js");
+
+let camera = null;
 const player = mp.players.local;
 const timerBarLib = require("./Player/Bar.js");
 
