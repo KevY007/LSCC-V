@@ -20,7 +20,7 @@ namespace LSCC
                 return;
             }
 
-            if (action.CompareTo("stop") == 0)
+            if (action.StartsWith("stop", StringComparison.OrdinalIgnoreCase))
             {
                 if (!Main.StopGame(0))
                 {
@@ -28,7 +28,7 @@ namespace LSCC
                 }
                 else NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has forcefully stopped the copchase.");
             }
-            else if (action.CompareTo("start") == 0)
+            else if (action.StartsWith("start", StringComparison.OrdinalIgnoreCase))
             {
                 if (!Main.StartGame())
                 {
@@ -36,20 +36,27 @@ namespace LSCC
                 }
                 else NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has forcefully started the copchase.");
             }
-            else if (action.CompareTo("autostart") == 0)
+            else if (action.StartsWith("autostart", StringComparison.OrdinalIgnoreCase))
             {
                 Settings.GameAutoStart = !Settings.GameAutoStart;
                 if (Settings.GameAutoStart) NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~g~has enabled copchases.");
                 else NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~w~has disabled copchases.");
             }
-            else if (action.CompareTo("teambalance") == 0)
+            else if (action.StartsWith("teambalance", StringComparison.OrdinalIgnoreCase))
             {
                 string[] args = action.Split(' ');
-                if (args.Count() > 0)
+                if (args.Count() > 1)
                 {
-                    Settings.FugitivePercent = Int32.Parse(args[0]);
+                    int value = 0;
+                    if (!Int32.TryParse(args[1], out value) || value < 1 || value > 99) 
+                    { 
+                        player.SendChatMessage("!{#999999}Team balance must be in numbers between 1-99!"); 
+                        return; 
+                    }
 
-                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set copchase fugitive percentage to {Settings.FugitivePercent}%.");
+                    Settings.FugitivePercent = value;
+
+                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set fugitives percentage to {Settings.FugitivePercent}%.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /game teambalance <percentage of fugitives>");
             }
