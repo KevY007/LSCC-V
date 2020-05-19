@@ -154,6 +154,23 @@ namespace LSCC
             return;
         }
 
+        [Command("setinv", Alias = "setinvulnerable")]
+        public void cmd_setinv(Client player, Client target, int status)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+
+            if (Player.GetAccount(player).Admin < 1)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                return;
+            }
+
+            player.TriggerEvent("SetActorInvulnerable", status > 0 ? true : false);
+            NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You have toggled " + target.Name + "'s invulnerability.");
+            return;
+        }
+
         [Command("setar")]
         public void cmd_setar(Client player, Client target, int armour)
         {
@@ -233,8 +250,8 @@ namespace LSCC
 
             if (Player.GetAccount(player).Admin >= 1)
             {
-                player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /sethp /setar");
-                player.SendChatMessage("[Admin Lv 1]: /freeze /unfreeze /kick /slap");
+                player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /sethp /setar /spec");
+                player.SendChatMessage("[Admin Lv 1]: /freeze /unfreeze /kick /slap /setinv(ulnerable) /specoff");
             }
             if (Player.GetAccount(player).Admin >= 2)
             {
@@ -603,7 +620,7 @@ namespace LSCC
             }
         }
         [Command("spec", GreedyArg = true)]
-        public void cmd_spec(Client player, Client target, string text)
+        public void cmd_spec(Client player, Client target)
         {
             if (!Player.LoggedIn(player))
                 return;
@@ -611,8 +628,16 @@ namespace LSCC
                 return;
             else
             {
+                player.Dimension = target.Dimension;
+
+                player.TriggerEvent("DestroyPlayerCamera");
+                player.TriggerEvent("CreatePlayerCamera", target.Position.X, target.Position.Y, target.Position.Z, 0, 0, 0, 90);
+                
+                player.TriggerEvent("SpectatePlayerCamera", target);
+                player.TriggerEvent("SetPlayerFrozen", true);
+
                 player.Spectate(target);
-                NAPI.Chat.SendChatMessageToPlayer(player, $"!{{#FF6347}}[AdmCmd] You are now spectating: {{#FFFFFF}}{target.Name}");
+                NAPI.Chat.SendChatMessageToPlayer(player, $"!{{#FF6347}}[AdmCmd] You are now spectating: !{{#FFFFFF}}{target.Name}");
             }
         }
         [Command("specoff", GreedyArg = true)]
@@ -624,6 +649,9 @@ namespace LSCC
                 return;
             else
             {
+                player.TriggerEvent("DestroyPlayerCamera");
+                player.TriggerEvent("SetPlayerFrozen", false);
+
                 player.StopSpectating();
             }
 

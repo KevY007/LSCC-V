@@ -314,6 +314,8 @@ namespace LSCC
             {
                 _tempPlayer = Settings.LoggedInPlayers[random.Next(Settings.LoggedInPlayers.Count)];
 
+                if (_tempPlayer.GetData("AutoJoin") == false) continue;
+
                 if (!Settings.Fugitives.Contains(_tempPlayer))
                 {
                     fugitives--;
@@ -331,6 +333,8 @@ namespace LSCC
 
             foreach (Client player in Settings.LoggedInPlayers)
             {
+                if (player.GetData("AutoJoin") == false) continue;
+
                 if (!Settings.Fugitives.Contains(player))
                 {
                     Settings.Cops.Add(player);
@@ -387,7 +391,7 @@ namespace LSCC
                 }
 
 
-                Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, 0, 1, "SIMBA", 255, false, true, 0);
+                Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, 0, 111, "SIMBA", 255, false, true, 0);
 
 
                 Settings.GameVehicles.Add(pVehicle);
@@ -418,9 +422,6 @@ namespace LSCC
 
                 PutInsideCar.Add(player);
                 playerVehicle.Add(new Tuple<Client, Vehicle, int>(player, pVehicle, -1));
-
-
-                player.GiveWeapon(WeaponHash.CarbineRifle, 100);
 
                 Player.SetDiscordStatus(player, $"Playing cop as {player.Name}");
 
@@ -462,8 +463,6 @@ namespace LSCC
                         break;
                 }
 
-                player.GiveWeapon(WeaponHash.AssaultRifle, 100);
-
 
                 if (player.HasData("Blip"))
                 {
@@ -488,6 +487,7 @@ namespace LSCC
             spawnLoc = null;
             List<Client> iteratedAlready = new List<Client>();
             fugitives = Settings.Fugitives.Count;
+
             while (fugitives > 0)
             {
                 _tempPlayer = Settings.Fugitives[random.Next(Settings.Fugitives.Count)];
@@ -499,6 +499,7 @@ namespace LSCC
                         iteratedAlready.Add(_tempPlayer);
                         fugitives--;
                     }
+
                     continue;
                 }
 
@@ -539,12 +540,9 @@ namespace LSCC
                         carName = "ingot";
                         break;
                     case 3:
-                        carName = "­dilettante";
-                        break;
-                    case 4:
                         carName = "oracle";
                         break;
-                    case 5:
+                    case 4:
                         carName = "oracle2";
                         break;
                 }
@@ -558,6 +556,8 @@ namespace LSCC
                 int seat = 1;
                 while (seat < pVehicle.MaxOccupants)
                 {
+                    if (fugitives == 0) break;
+
                     Client _tempPlayer2 = Settings.Fugitives[random.Next(Settings.Fugitives.Count)];
 
                     if (PutInsideCar.Contains(_tempPlayer2)) continue;
@@ -565,6 +565,7 @@ namespace LSCC
                     PutInsideCar.Add(_tempPlayer2);
                     iteratedAlready.Add(_tempPlayer2);
                     fugitives--;
+
 
                     playerVehicle.Add(new Tuple<Client, Vehicle, int>(_tempPlayer2, pVehicle, -1 + seat));
 
@@ -582,6 +583,18 @@ namespace LSCC
                     Player.Freeze(data.Item1, false);
 
                     data.Item1.TriggerEvent("ToggleChaseCollisions", false);
+
+                    if(Settings.Cops.Contains(data.Item1))
+                    {
+                        data.Item1.GiveWeapon(WeaponHash.CarbineRifle, 100);
+                        data.Item1.GiveWeapon(WeaponHash.CombatPistol, 100);
+                    }
+                    else if(Settings.Fugitives.Contains(data.Item1))
+                    {
+
+                        data.Item1.GiveWeapon(WeaponHash.AssaultRifle, 100);
+                        data.Item1.GiveWeapon(WeaponHash.CombatPistol, 100);
+                    }
                 }
 
                 NAPI.Chat.SendChatMessageToAll($"[GAME] Copchase started with !{{#8D8DFF}}{Settings.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{Settings.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{map.Name}!{{#FFFFFF}}.");
@@ -601,7 +614,7 @@ namespace LSCC
                     GameUpdate();
                 }, delayTime: 1000);
 
-            }, delayTime: 1500);
+            }, delayTime: 3000);
 
             
             Settings.GameRunning = 1;

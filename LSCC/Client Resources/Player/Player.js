@@ -1,7 +1,4 @@
-﻿require("./Player/Nametags.js");
-require("./Player/Voice.js");
-
-let camera = null;
+﻿let camera = null;
 const player = mp.players.local;
 const timerBarLib = require("./Player/Bar.js");
 
@@ -96,9 +93,6 @@ mp.events.add(
 
                         target2.setInvincible(false);
                         target.setInvincible(false);
-
-                        target.setAlpha(255);
-                        target2.setAlpha(255);
                     });
                 });
             }
@@ -116,9 +110,6 @@ mp.events.add(
 
                         target2.setInvincible(true);
                         target.setInvincible(true);
-
-                        target.setAlpha(102);
-                        target2.setAlpha(102);
                     });
                 });
             }
@@ -200,6 +191,20 @@ mp.events.add(
 
         "SetPlayerFrozen": (status) => {
             player.freezePosition(status);
+
+            if(player.vehicle)
+            {
+                player.vehicle.freezePosition(status);
+            }
+        },
+
+        "SpectatePlayerCamera": (target) => {
+            if (!camera) return;
+
+            camera.attachTo(target.handle, 0, 0, 2.0, false);
+            mp.game.cam.renderScriptCams(true, false, 0, true, false);
+
+            camera.setActive(true);
         },
 
         "CreatePlayerCamera": (x, y, z, rx, ry, rz, viewangle) => {

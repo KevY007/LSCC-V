@@ -1,0 +1,11 @@
+{
+	"maxplayers" : 69,
+	"name" : "Los Santos Copchase: V", 
+	"gamemode" : "copchase", 
+	"stream-distance" : 500.0,
+	"announce" : false,
+	"csharp" : "enabled",
+	"port": 22005,
+	"language": "en",
+	"voice-chat": true
+}

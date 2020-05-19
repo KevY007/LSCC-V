@@ -1,8 +1,11 @@
 ﻿require("./chat/index.js");
+
 require('./Player/Player.js');
+require("./Player/Nametags.js");
+require("./Player/Voice.js");
+
 require('./camerasManager.js');
 require('./cefBrowser.js');
-require('./nametags.js');
 
 mp.events.add('loginInformationToServer', (username, password) => {
 
