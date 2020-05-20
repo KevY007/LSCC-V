@@ -3,6 +3,7 @@ using System;
 using LSCC;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace LSCC.Events
 {
@@ -29,6 +30,16 @@ namespace LSCC.Events
             }, delayTime: 2500);
 
             player.TriggerEvent("InitChaseTimer");
+        }
+
+        [RemoteEvent("OnScriptedKeyPress")]
+        public void OnScriptedKeyPress(Client player, int keyId)
+        {
+            if(keyId == 0x5A)
+            {
+                if(Settings.Cops.Contains(player)) LSCC.Commands.cmd_gps(player);
+            }
+            return;
         }
 
         [ServerEvent(Event.PlayerDisconnected)]
@@ -220,6 +231,12 @@ namespace LSCC.Events
         {
             if(!target.IsNull && target != null)
             {
+                if (target.HasData("BlockList"))
+                {
+                    List<string> blockList = target.GetData("BlockList");
+                    if (blockList.Contains(player.Name) && blockList.Count > 0) return;
+                }
+
                 player.EnableVoiceTo(target);
             }
         }

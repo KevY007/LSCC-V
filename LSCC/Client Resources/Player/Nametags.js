@@ -35,7 +35,7 @@ mp.events.add('render', (nametags) => {
 	
     nametags.forEach(nametag => {
         let [player, x, y, distance] = nametag;
-		
+        
         if(distance <= maxDistance) {	   
             let scale = (distance / maxDistance);
             if(scale < 0.6) scale = 0.6;

@@ -5,10 +5,17 @@ ADD SCOREBOARD/ONLINE LIST + ADD OTHER COPCHASE FEATURES, PROBABLY REDUCE TIME?
 OTHER FEATURES FROM LSCC SAMP AND GUNS SYSTEM FINALLY AND WEAPON DAMAGES? IDK
 SPEEDOMETER
 
-/skin, basic copchase commands, taser beanbag, /ban system, toy system if possible, cops /gps, player board/list, car spawning ontop of each other for cop (firs tand 2nd), nametag thru wall, fix spec, add basic guns like shotgun, levels/score system, text scaling for zone area in hud, collision bugged (reapply in 2 secs to spawn), /givegun, /FIX /FLIP, remove driveby as driver
-
-remove the sitting in vehicle script, activateso n chat etc
+/skin, 
+basic copchase commands, 
+taser beanbag, /ban system, 
+toy system if possible, 
+player board/list,
+nametag thru wall, 
+fix spec, 
+add basic guns like shotgun, 
+levels/score system, 
+text scaling for zone area in hud, 
+collision bugged (reapply in 2 secs to spawn), 
+/givegun, /FIX /FLIP, remove driveby as driver
 
 anti teamkill/team damage.
-
-ADD VOICEBLOCK COMMAND, YOU CAN BLOCK VOICE CHAT FROM SOME PLAYERS, ON VOICECHAT EVENTS DONT ENABLE VOICE FOR A PLAYER IF HE'S BLOCKED

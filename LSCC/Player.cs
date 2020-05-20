@@ -23,6 +23,8 @@ namespace LSCC
             player.SetData("HudState", false);
             player.SetData("PMState", true);
             player.TriggerEvent("ToggleHud", false);
+            player.SetData("GPS", false);
+            player.ResetData("BlockList");
 
             Settings.LoggedInPlayers.Remove(player);
             Settings.Cops.Remove(player);

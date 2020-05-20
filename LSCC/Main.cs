@@ -354,6 +354,7 @@ namespace LSCC
                     {
                         spawnLoc = spawn;
                         UsedSpawns.Add(spawn.SQL_ID);
+                        break;
                     }
                 }
 
@@ -361,7 +362,8 @@ namespace LSCC
                 {
                     pCount++;
                     spawnLoc = Spawns.FirstOrDefault(a=> a.spawnTeam == 1);
-                    spawnLoc.spawnZ += (pCount * 5); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
+                    spawnLoc.spawnZ += (pCount * 3); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
+                    spawnLoc.spawnX += (pCount * 2);
                 }
 
                 Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
@@ -422,6 +424,8 @@ namespace LSCC
 
                 PutInsideCar.Add(player);
                 playerVehicle.Add(new Tuple<Client, Vehicle, int>(player, pVehicle, -1));
+
+                player.SetData("GPS", false);
 
                 Player.SetDiscordStatus(player, $"Playing cop as {player.Name}");
 
@@ -597,7 +601,6 @@ namespace LSCC
                 }
 
                 NAPI.Chat.SendChatMessageToAll($"[GAME] Copchase started with !{{#8D8DFF}}{Settings.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{Settings.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{map.Name}!{{#FFFFFF}}.");
-                NAPI.Util.ConsoleOutput($"[StartGame] Game has been started with {Settings.Cops.Count} cops & {Settings.Fugitives.Count} fugitives on map {map.Name}.");
 
                 Settings.FugitiveShowCounter = 60;
                 Settings.GameProgress = 0;
@@ -613,10 +616,21 @@ namespace LSCC
                     GameUpdate();
                 }, delayTime: 1000);
 
+                NAPI.Task.Run(() =>
+                {
+                    foreach (Tuple<Client, Vehicle, int> data in playerVehicle)
+                    {
+                        if (data.Item1.IsNull || data.Item1 == null) continue;
+                        data.Item1.TriggerEvent("ToggleChaseCollisions", false);
+                    } // Toggle Collisions OFF again. smh they dont activate sometimes.
+
+                }, delayTime: 2000);
+
             }, delayTime: 3000);
 
             
             Settings.GameRunning = 1;
+            NAPI.Util.ConsoleOutput($"[StartGame] Game has been started with {Settings.Cops.Count} cops & {Settings.Fugitives.Count} fugitives on map {map.Name}.");
 
             return true;
         }
@@ -651,6 +665,25 @@ namespace LSCC
                     }
                 }
 
+                foreach (Client cop in Settings.Cops)
+                {
+                    if (cop.HasData("Blip"))
+                    {
+                        Blip tBlip = cop.GetData("Blip");
+                        cop.Delete();
+                        cop.ResetData("Blip");
+                    }
+
+                    if (cop.GetData("GPS") == false) continue;
+
+                    Blip pBlip = NAPI.Blip.CreateBlip(cop.Position, 0);
+
+                    pBlip.Transparency = 192;
+                    pBlip.Color = 3;
+
+                    cop.SetData("Blip", pBlip);
+                }
+
                 if (Settings.FugitiveShowCounter >= 60 && Settings.FugitiveShowCounter < 90)
                 {
                     foreach (Client fugi in Settings.Fugitives)
@@ -664,14 +697,15 @@ namespace LSCC
 
                         Blip pBlip = NAPI.Blip.CreateBlip(fugi.Position, 0);
 
-                        pBlip.Transparency = 255;
-                        pBlip.Color = 75;
+                        pBlip.Transparency = 238;
+                        pBlip.Color = 1;
 
                         fugi.SetData("Blip", pBlip);
 
                         if(Settings.FugitiveShowCounter == 60) fugi.SendNotification("~r~You are now visible on the radar.", true);
                     }
                 }
+
                 if (Settings.FugitiveShowCounter >= 90)
                 {
                     Settings.FugitiveShowCounter = 0;

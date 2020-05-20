@@ -115,6 +115,26 @@ namespace LSCC
             return;
         }
 
+        [Command("gps", Alias = "bk")]
+        public static void cmd_gps(Client player)
+        {
+            if (!Player.LoggedIn(player))
+                return;
+
+            if (Settings.GameRunning != 1 || !Settings.Cops.Contains(player))
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not a cop.");
+                return;
+            }
+
+            bool state = player.GetData("GPS");
+            state = !state;
+            player.SetData("GPS", state);
+
+            player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have " + (state == true ? "enabled" : "disabled") + " your emergency GPS beacon.");
+            return;
+        }
+
         [Command("goto")]
         public void cmd_goto(Client player, Client target)
         {
@@ -268,6 +288,32 @@ namespace LSCC
             NAPI.Util.ConsoleOutput($"{player.Name} Position log: X: {player.Position.X} - Y: {player.Position.Y} - Z: {player.Position.Z}");
         }
 
+        [Command("voiceblock", GreedyArg = true)]
+        public void cmd_vblock(Client player, Client target)
+        {
+            List<string> blockList = new List<string>();
+            if (player.HasData("BlockList"))
+            {
+                blockList = player.GetData("BlockList");
+            }
+
+            if(!blockList.Contains(target.Name) || blockList.Count < 1)
+            {
+                blockList.Add(target.Name);
+                player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have muted {target.Name} on voice chat, use this command again to unmute them.");
+            }
+            else
+            {
+                blockList.Remove(target.Name);
+                player.SendChatMessage($"!{{#FF6347}}[#] !{{#FFFFFF}}You have unmuted {target.Name} on voice chat, use this command again to unmute them.");
+            }
+
+            player.SetData("BlockList", blockList);
+            
+
+            return;
+        }
+
         [Command("cmds", Alias = "help")]
         public void cmd_help(Client player)
         {
@@ -275,6 +321,8 @@ namespace LSCC
 
             player.SendChatMessage("[Los Santos Copchase V BETA Commands]:");
             player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog");
+            player.SendChatMessage("[Voice]: Hold N to speak, /voiceblock");
+            player.SendChatMessage("[Cop]: /gps (Key Z)");
             player.SendChatMessage("[Roleplay]: /me /do");
             player.SendChatMessage("[Debug]: /pos");
 
