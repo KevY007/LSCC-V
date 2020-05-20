@@ -6,3 +6,5 @@ OTHER FEATURES FROM LSCC SAMP AND GUNS SYSTEM FINALLY AND WEAPON DAMAGES? IDK
 SPEEDOMETER
 
 /skin, basic copchase commands, taser beanbag, /ban system, toy system if possible, cops /gps, player board/list, car spawning ontop of each other for cop (firs tand 2nd), nametag thru wall, fix spec, add basic guns like shotgun, levels/score system, text scaling for zone area in hud, collision bugged (reapply in 2 secs to spawn), /givegun, /FIX /FLIP, remove driveby as driver
+
+remove the sitting in vehicle script, activateso n chat etc
