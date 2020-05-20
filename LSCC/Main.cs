@@ -479,8 +479,6 @@ namespace LSCC
 
                 Player.SetDiscordStatus(player, $"Playing fugitive as {player.Name}");
 
-                player.TriggerEvent("ShowMugshotBoard", player.Name, "WANTED | ROBBERY", "Chuck's Space Blanket", "Possibly Armed", Player.GetAccount(player).Level);
-
                 player.TriggerEvent("SetActorInvulnerable", false);
                 player.TriggerEvent("CanFallOutOfCar", true);
                 player.TriggerEvent("showHPBars", 1); // Always show HP Bars.
@@ -593,8 +591,6 @@ namespace LSCC
                     }
                     else if(Settings.Fugitives.Contains(data.Item1))
                     {
-                        data.Item1.TriggerEvent("HideMugshotBoard");
-
                         data.Item1.GiveWeapon(WeaponHash.AssaultRifle, 100);
                         data.Item1.GiveWeapon(WeaponHash.CombatPistol, 100);
                     }
