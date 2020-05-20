@@ -10,3 +10,5 @@ SPEEDOMETER
 remove the sitting in vehicle script, activateso n chat etc
 
 anti teamkill/team damage.
+
+ADD VOICEBLOCK COMMAND, YOU CAN BLOCK VOICE CHAT FROM SOME PLAYERS, ON VOICECHAT EVENTS DONT ENABLE VOICE FOR A PLAYER IF HE'S BLOCKED
