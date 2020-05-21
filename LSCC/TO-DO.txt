@@ -21,3 +21,5 @@ collision bugged (reapply in 2 secs to spawn),
 anti teamkill/team damage.
 
 CONVERT TO 1.0 RAGEMP BETA
+
+NO SCROLL/DISABLE SCROLL UNLESS CHAT ACTIVE IN CHAT CEF
