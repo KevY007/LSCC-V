@@ -7,7 +7,7 @@ require("./Player/HUD.js");
 
 require('./camerasManager.js');
 require('./cefBrowser.js');
-
+require("./rappel/index.js");
 
 mp.events.add('loginInformationToServer', (username, password) => {
 
