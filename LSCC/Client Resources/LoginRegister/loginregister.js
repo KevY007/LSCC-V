@@ -1,5 +1,7 @@
 var passElement = document.getElementById("passwordText");
 
+mp.events.call("TogglePlayerChat", false);
+
 passElement.addEventListener("keyup", function(e) {
 
   if (e.keyCode === 13) 

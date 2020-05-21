@@ -9,19 +9,19 @@ using LSCC;
 
 namespace LSCC
 {
-    static class Player
+    static class EPlayer
     {
         public static Random rand = new Random();
 
-        public static void ResetPlayerData(Client player)
+        public static void ResetPlayerData(Player player)
         {
             player.ResetData("AccountHandle");
-            player.SetData("AccountHandle", null);
-            player.SetData("CharacterHandle", null);
+            player.ResetData("LoggedIn");
             player.SetData("LoggedIn", false);
             player.SetData("AutoJoin", true);
             player.SetData("HudState", false);
             player.SetData("PMState", true);
+            player.SetSharedData("Team", -1);
             player.TriggerEvent("ToggleHud", false);
             player.SetData("GPS", false);
             player.ResetData("BlockList");
@@ -31,38 +31,37 @@ namespace LSCC
             Settings.Fugitives.Remove(player);
         }
 
-        public static void SetDiscordStatus(Client player, string status)
+        public static void SetDiscordStatus(Player player, string status)
         {
             player.TriggerEvent("SetDiscordStatus", "Los Santos Copchase", status);
         }
-        public static void Freeze(Client player, bool toggle)
+        public static void Freeze(Player player, bool toggle)
         {
             player.TriggerEvent("SetPlayerFrozen", toggle);
         }
-        public static void SetColor(Client player, Color col, int armour = 0)
+        public static void SetColor(Player player, Color col, int armour = 0)
         {
-            player.NametagColor = col;
-            foreach(Client p in NAPI.Pools.GetAllPlayers())
+            foreach(Player p in RAGE.Entities.Players.All)
             {
                 p.TriggerEvent("playerNametagSet", player, col.Red, col.Green, col.Blue, col.Alpha, armour);
             }
         }
 
-        public static bool LoggedIn(Client player)
+        public static bool LoggedIn(Player player)
         {
-            if (player.HasData("AccountHandle") && player.GetData("AccountHandle") != null && player.GetData("LoggedIn") == true)
+            if (player.HasData("AccountHandle") && player.GetData<Account>("AccountHandle") != null && player.HasData("LoggedIn") && player.GetData<bool>("LoggedIn") == true)
             {
                 return true;
             }
             return false;
         }
 
-        public static void LoginCameraSetup(Client player)
+        public static void LoginCameraSetup(Player player)
         {
             NAPI.Entity.SetEntityTransparency(player, 0);
 
             player.TriggerEvent("TogglePlayerChat", false);
-            Player.Freeze(player, true);
+            EPlayer.Freeze(player, true);
             player.Position = new Vector3(Settings.LoginCameraX, Settings.LoginCameraY, Settings.LoginCameraZ);
             player.Dimension = 666;
  
@@ -70,30 +69,30 @@ namespace LSCC
             player.TriggerEvent("CreatePlayerCamera", Settings.LoginCameraX, Settings.LoginCameraY, Settings.LoginCameraZ, Settings.LoginCameraRx, Settings.LoginCameraRy, Settings.LoginCameraRz, Settings.LoginCameraViewAngle);
         }
 
-        public static void LoginBrowserSetup(Client player)
+        public static void LoginBrowserSetup(Player player)
         {
             SetDiscordStatus(player, "On login screen");
             ResetPlayerData(player);
             player.TriggerEvent("showBrowser", "package://LoginRegister/login.html");
         }
-        public static void Save(Client player)
+        public static void Save(Player player)
         {
             if (LoggedIn(player))
             {
                 ContextFactory.Instance.SaveChanges();
             }
         }
-        public static Account GetAccount(Client player)
+        public static Account GetAccount(Player player)
         {
             if (LoggedIn(player))
             {
-                Account playerAcc = player.GetData("AccountHandle");
+                Account playerAcc = player.GetData<Account>("AccountHandle");
                 return playerAcc;
             }
 
             return null;
         }
-        public static void Spawn(Client player)
+        public static void Spawn(Player player)
         {
             if (!LoggedIn(player)) return;
 
@@ -101,11 +100,11 @@ namespace LSCC
 
             Vector3 SpawnArea = Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)];
 
+            player.TriggerEvent("DestroyPlayerCamera");
             player.TriggerEvent("TogglePlayerChat", true);
 
-            player.TriggerEvent("DestroyPlayerCamera");
-            
-            if(player.GetData("AutoJoin") == false) NAPI.Notification.SendNotificationToPlayer(player, $"~g~Autojoin has been enabled.", false);
+
+            if (player.GetData<bool>("AutoJoin") == false) NAPI.Notification.SendNotificationToPlayer(player, $"~g~Autojoin has been enabled.", false);
 
             player.SetData("AutoJoin", true);
 
@@ -113,6 +112,7 @@ namespace LSCC
             {
                 Settings.Cops.Remove(player);
                 Settings.Fugitives.Remove(player);
+                player.SetSharedData("Team", -1);
             }
 
 
@@ -123,8 +123,8 @@ namespace LSCC
 
             NAPI.Entity.SetEntityTransparency(player, 255);
 
-            Player.Freeze(player, false);
-            Player.SetColor(player, new Color(255, 255, 255, 255));
+            EPlayer.Freeze(player, false);
+            EPlayer.SetColor(player, new Color(255, 255, 255, 255));
             player.Dimension = 1;
 
         }
@@ -132,11 +132,11 @@ namespace LSCC
         {
             Account acc;
 
-            foreach (Client i in NAPI.Pools.GetAllPlayers())
+            foreach (Player i in RAGE.Entities.Players.All)
             {
-                if (Player.LoggedIn(i))
+                if (EPlayer.LoggedIn(i))
                 {
-                    acc = i.GetData("AccountHandle");
+                    acc = i.GetData<Account>("AccountHandle");
                     if (acc.Admin > 0) i.SendChatMessage(message);
                 }
             }

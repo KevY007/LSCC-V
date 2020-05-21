@@ -20,7 +20,8 @@ function enableChatInput(enable)
 	
     if (enable != (chat.input != null))
 	{
-        mp.invoke("focus", enable);
+		mp.invoke("focus", enable);
+		mp.invoke("setTypingInChatState", enable);
 
         if (enable)
 		{
@@ -96,6 +97,10 @@ var chatAPI =
 	
 	show: (toggle) =>
 	{
+		if (toggle == false
+			&& (chat.input != null))
+			enableChatInput(false);
+
 		if(toggle)
 			$("#chat").show();
 		else
@@ -105,6 +110,13 @@ var chatAPI =
 	}
 };
 
+let api = {"chat:push": chatAPI.push, "chat:clear": chatAPI.clear, "chat:activate": chatAPI.activate, "chat:show": chatAPI.show}; 
+
+for(let fn in api)
+{
+	mp.events.add(fn, api[fn]);
+}
+
 $(document).ready(function()
 {
 	chat.container = $("#chat ul#chat_messages");
@@ -112,14 +124,13 @@ $(document).ready(function()
     $(".ui_element").show();
     chatAPI.push("!{#A9C4E4}Connected to Los Santos Copchase.");
 
-    $("body").keyup(function(event)
+    $("body").keydown(function(event)
 	{
         if (event.which == 84 && chat.input == null
 			&& chat.active == true)
 		{
-			chat.currentIndex = 0;
             enableChatInput(true);
-			event.preventDefault();
+            event.preventDefault();
         } else if (event.which == 38) {
 			if (chat.historyMsgs.length === 0)
 				return;

@@ -30,9 +30,9 @@ public static class Settings
     public static int FugitivePercent { get; set; }
     public static bool GameAutoStart { get; set; }
     public static int LastAutoStartMsg { get; set; }
-    public static List<Client> LoggedInPlayers { get; set; }
-    public static List<Client> Cops { get; set; }
-    public static List<Client> Fugitives { get; set; }
+    public static List<Player> LoggedInPlayers { get; set; }
+    public static List<Player> Cops { get; set; }
+    public static List<Player> Fugitives { get; set; }
     public static List<Vehicle> GameVehicles { get; set; }
     public static List<Vehicle> AdminVehicles { get; set; }
 
@@ -72,9 +72,9 @@ namespace LSCC
             NAPI.Util.ConsoleOutput("[>===========|Los Santos Copchase|===========<]");
 
             Settings.GameRunning = 0;
-            Settings.LoggedInPlayers = new List<Client>();
-            Settings.Cops = new List<Client>();
-            Settings.Fugitives = new List<Client>();
+            Settings.LoggedInPlayers = new List<Player>();
+            Settings.Cops = new List<Player>();
+            Settings.Fugitives = new List<Player>();
             Settings.GameVehicles = new List<Vehicle>();
             Settings.AdminVehicles = new List<Vehicle>();
             Settings.FugitiveShowCounter = 0;
@@ -94,9 +94,9 @@ namespace LSCC
         {
             time -= 2;
 
-            foreach (Client player in Settings.LoggedInPlayers)
+            foreach (Player player in Settings.LoggedInPlayers)
             {
-                if (player.GetData("AutoJoin") == true)
+                if (player.GetData<bool>("AutoJoin") == true)
                 {
                     if (time > 0)
                     {
@@ -129,9 +129,9 @@ namespace LSCC
                 if (Settings.GameAutoStart)
                 {
                     int pCount = 0;
-                    foreach (Client player in Settings.LoggedInPlayers)
+                    foreach (Player player in Settings.LoggedInPlayers)
                     {
-                        if (player.GetData("AutoJoin") == true)
+                        if (player.GetData<bool>("AutoJoin") == true)
                         {
                             pCount++;
                         }
@@ -141,11 +141,11 @@ namespace LSCC
                     {
                         Settings.GameRunning = 2;
 
-                        foreach (Client player in Settings.LoggedInPlayers)
+                        foreach (Player player in Settings.LoggedInPlayers)
                         {
-                            if (player.GetData("AutoJoin") == true)
+                            if (player.GetData<bool>("AutoJoin") == true)
                             {
-                                Player.Spawn(player);
+                                EPlayer.Spawn(player);
                                 NAPI.Notification.SendNotificationToPlayer(player, $"~w~Game is starting in ~g~10 seconds~w~.", true);
 
                                 NAPI.Util.ConsoleOutput("[TimeUpdate] Game starting in 10 seconds...");
@@ -202,7 +202,7 @@ namespace LSCC
                 case 1:
                     NAPI.Chat.SendChatMessageToAll("[GAME] !{#DAA520}The fugitives managed to escape from the cops.");
                     
-                    foreach (Client i in Settings.Fugitives)
+                    foreach (Player i in Settings.Fugitives)
                     {
                         // Reward
                     }
@@ -210,7 +210,7 @@ namespace LSCC
                 case 2:
                     NAPI.Chat.SendChatMessageToAll("[GAME] !{#DAA520}All law enforcement units have been taken out by the fugitives.");
 
-                    foreach (Client i in Settings.Fugitives)
+                    foreach (Player i in Settings.Fugitives)
                     {
                         // Reward
                     }
@@ -218,7 +218,7 @@ namespace LSCC
                 case 3:
                     NAPI.Chat.SendChatMessageToAll("[GAME] !{#DAA520}The situation has been successfully handled by the police.");
 
-                    foreach (Client i in Settings.Cops) 
+                    foreach (Player i in Settings.Cops) 
                     {
                         // Reward
                     }
@@ -227,18 +227,18 @@ namespace LSCC
 
             Settings.GameRunning = 0;
 
-            foreach(Client i in Settings.LoggedInPlayers)
+            foreach(Player i in Settings.LoggedInPlayers)
             {
                 i.TriggerEvent("HideChaseTimer");
                 if(Settings.Cops.Contains(i))
                 {
                     Settings.Cops.Remove(i);
-                    Player.Spawn(i);
+                    EPlayer.Spawn(i);
                 }
                 if (Settings.Fugitives.Contains(i))
                 {
                     Settings.Fugitives.Remove(i);
-                    Player.Spawn(i);
+                    EPlayer.Spawn(i);
                 }
             }
 
@@ -268,9 +268,9 @@ namespace LSCC
             Settings.Cops.Clear();
             Settings.Fugitives.Clear();
 
-            foreach (Client player in Settings.LoggedInPlayers)
+            foreach (Player player in Settings.LoggedInPlayers)
             {
-                if (player.GetData("AutoJoin") == true)
+                if (player.GetData<bool>("AutoJoin") == true)
                 {
                     pCount++;
                 }
@@ -303,18 +303,18 @@ namespace LSCC
 
             List<MapSpawn> Spawns = ContextFactory.Instance.MapSpawns.Where(x => x.mapID == map.SQL_ID).ToList();
             List<int> UsedSpawns = new List<int>();
-            List<Client> PutInsideCar = new List<Client>();
+            List<Player> PutInsideCar = new List<Player>();
             
             Random random = new Random();
 
             pCount = 0;
-            Client _tempPlayer;
+            Player _tempPlayer;
             
             while (fugitives > 0)
             {
                 _tempPlayer = Settings.LoggedInPlayers[random.Next(Settings.LoggedInPlayers.Count)];
 
-                if (_tempPlayer.GetData("AutoJoin") == false) continue;
+                if (_tempPlayer.GetData<bool>("AutoJoin") == false) continue;
 
                 if (!Settings.Fugitives.Contains(_tempPlayer))
                 {
@@ -331,9 +331,9 @@ namespace LSCC
             }
             fugitives = Settings.Fugitives.Count;
 
-            foreach (Client player in Settings.LoggedInPlayers)
+            foreach (Player player in Settings.LoggedInPlayers)
             {
-                if (player.GetData("AutoJoin") == false) continue;
+                if (player.GetData<bool>("AutoJoin") == false) continue;
 
                 if (!Settings.Fugitives.Contains(player))
                 {
@@ -341,11 +341,11 @@ namespace LSCC
                 }
             }
 
-            List<Tuple<Client, Vehicle, int>> playerVehicle = new List<Tuple<Client, Vehicle, int>>();
+            List<Tuple<Player, Vehicle, int>> playerVehicle = new List<Tuple<Player, Vehicle, int>>();
 
             MapSpawn spawnLoc = null;
             pCount = 0;
-            foreach(Client player in Settings.Cops)
+            foreach(Player player in Settings.Cops)
             {
                 spawnLoc = null;
                 foreach(MapSpawn spawn in Spawns.Where(a=> a.spawnTeam == 1))
@@ -395,16 +395,16 @@ namespace LSCC
 
                 Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, 0, 111, "SIMBA", 255, false, true, 0);
 
-
+                pVehicle.SetSharedData("Team", 1);
                 Settings.GameVehicles.Add(pVehicle);
 
                 player.Dimension = 0;
                 player.Position = vecSpawn.Around(15);
-                Player.Freeze(player, true);
+                EPlayer.Freeze(player, true);
                 
                 player.Health = 100;
                 player.Armor = 60;
-                Player.SetColor(player, new Color(141, 141, 255, 255), player.Armor);
+                EPlayer.SetColor(player, new Color(141, 141, 255, 255), player.Armor);
 
                 switch (random.Next(0, 3))
                 {
@@ -423,21 +423,23 @@ namespace LSCC
                 }
 
                 PutInsideCar.Add(player);
-                playerVehicle.Add(new Tuple<Client, Vehicle, int>(player, pVehicle, -1));
+                playerVehicle.Add(new Tuple<Player, Vehicle, int>(player, pVehicle, 0));
 
                 player.SetData("GPS", false);
 
-                Player.SetDiscordStatus(player, $"Playing cop as {player.Name}");
+                EPlayer.SetDiscordStatus(player, $"Playing cop as {player.Name}");
 
                 player.TriggerEvent("SetActorInvulnerable", false);
                 player.TriggerEvent("CanFallOutOfCar", true);
                 player.TriggerEvent("showHPBars", 1); // Always show HP Bars.
+
+                player.SetSharedData("Team", 1);
             }
 
             spawnLoc = null;
 
 
-            foreach (Client player in Settings.Fugitives)
+            foreach (Player player in Settings.Fugitives)
             {
                 spawnLoc = Spawns.FirstOrDefault(a => a.spawnTeam == 0);
 
@@ -445,11 +447,11 @@ namespace LSCC
 
                 player.Dimension = 0;
                 player.Position = vecSpawn.Around(15);
-                Player.Freeze(player, true);
+                EPlayer.Freeze(player, true);
 
                 player.Health = 100;
                 player.Armor = 0;
-                Player.SetColor(player, new Color(232, 64, 64, 255), player.Armor);
+                EPlayer.SetColor(player, new Color(232, 64, 64, 255), player.Armor);
 
                 switch (random.Next(0, 3))
                 {
@@ -470,7 +472,7 @@ namespace LSCC
 
                 if (player.HasData("Blip"))
                 {
-                    Blip tBlip = player.GetData("Blip");
+                    Blip tBlip = player.GetData<Blip>("Blip");
                     tBlip.Delete();
                     player.ResetData("Blip");
                 }
@@ -481,15 +483,17 @@ namespace LSCC
 
                 player.SetData("Blip", pBlip);
 
-                Player.SetDiscordStatus(player, $"Playing fugitive as {player.Name}");
+                EPlayer.SetDiscordStatus(player, $"Playing fugitive as {player.Name}");
 
                 player.TriggerEvent("SetActorInvulnerable", false);
                 player.TriggerEvent("CanFallOutOfCar", true);
                 player.TriggerEvent("showHPBars", 1); // Always show HP Bars.
+
+                player.SetSharedData("Team", 0);
             }
 
             spawnLoc = null;
-            List<Client> iteratedAlready = new List<Client>();
+            List<Player> iteratedAlready = new List<Player>();
             fugitives = Settings.Fugitives.Count;
 
             while (fugitives > 0)
@@ -552,17 +556,17 @@ namespace LSCC
                 }
 
                 Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, random.Next(64), random.Next(64), "KEVY", 255, false, true, 0);
-
+                pVehicle.SetSharedData("Team", 0);
                 Settings.GameVehicles.Add(pVehicle);
 
-                playerVehicle.Add(new Tuple<Client, Vehicle, int>(_tempPlayer, pVehicle, -1));
+                playerVehicle.Add(new Tuple<Player, Vehicle, int>(_tempPlayer, pVehicle, 0));
 
                 int seat = 1;
                 while (seat < pVehicle.MaxOccupants)
                 {
                     if (fugitives == 0) break;
 
-                    Client _tempPlayer2 = Settings.Fugitives[random.Next(Settings.Fugitives.Count)];
+                    Player _tempPlayer2 = Settings.Fugitives[random.Next(Settings.Fugitives.Count)];
 
                     if (PutInsideCar.Contains(_tempPlayer2)) continue;
 
@@ -571,7 +575,7 @@ namespace LSCC
                     fugitives--;
 
 
-                    playerVehicle.Add(new Tuple<Client, Vehicle, int>(_tempPlayer2, pVehicle, -1 + seat));
+                    playerVehicle.Add(new Tuple<Player, Vehicle, int>(_tempPlayer2, pVehicle, 0 + seat));
 
                     seat++;
                 }
@@ -579,24 +583,24 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                foreach (Tuple<Client, Vehicle, int> data in playerVehicle)
+                foreach (Tuple<Player, Vehicle, int> data in playerVehicle)
                 {
                     if (data.Item1.IsNull || data.Item1 == null || data.Item2.IsNull || data.Item2 == null) continue;
 
                     data.Item1.SetIntoVehicle(data.Item2, data.Item3);
-                    Player.Freeze(data.Item1, false);
+                    EPlayer.Freeze(data.Item1, false);
 
                     data.Item1.TriggerEvent("ToggleChaseCollisions", false);
 
                     if(Settings.Cops.Contains(data.Item1))
                     {
-                        data.Item1.GiveWeapon(WeaponHash.CarbineRifle, 100);
-                        data.Item1.GiveWeapon(WeaponHash.CombatPistol, 100);
+                        data.Item1.GiveWeapon(WeaponHash.Carbinerifle, 100);
+                        data.Item1.GiveWeapon(WeaponHash.Combatpistol, 100);
                     }
                     else if(Settings.Fugitives.Contains(data.Item1))
                     {
-                        data.Item1.GiveWeapon(WeaponHash.AssaultRifle, 100);
-                        data.Item1.GiveWeapon(WeaponHash.CombatPistol, 100);
+                        data.Item1.GiveWeapon(WeaponHash.Assaultrifle, 100);
+                        data.Item1.GiveWeapon(WeaponHash.Combatpistol, 100);
                     }
                 }
 
@@ -606,7 +610,7 @@ namespace LSCC
                 Settings.GameProgress = 0;
                 Settings.CollisionCounter = 30;
 
-                foreach (Client p in Settings.LoggedInPlayers)
+                foreach (Player p in Settings.LoggedInPlayers)
                 {
                     p.TriggerEvent("StartChaseTimer", 0, Settings.GameRunTime, Settings.CollisionCounter);
                 }
@@ -618,7 +622,7 @@ namespace LSCC
 
                 NAPI.Task.Run(() =>
                 {
-                    foreach (Tuple<Client, Vehicle, int> data in playerVehicle)
+                    foreach (Tuple<Player, Vehicle, int> data in playerVehicle)
                     {
                         if (data.Item1.IsNull || data.Item1 == null) continue;
                         data.Item1.TriggerEvent("ToggleChaseCollisions", false);
@@ -653,7 +657,7 @@ namespace LSCC
                 {
                     Settings.CollisionCounter--;
 
-                    foreach (Client player in Settings.LoggedInPlayers)
+                    foreach (Player player in Settings.LoggedInPlayers)
                     {
                         if (!Settings.Cops.Contains(player) && !Settings.Fugitives.Contains(player)) continue;
 
@@ -665,16 +669,16 @@ namespace LSCC
                     }
                 }
 
-                foreach (Client cop in Settings.Cops)
+                foreach (Player cop in Settings.Cops)
                 {
                     if (cop.HasData("Blip"))
                     {
-                        Blip tBlip = cop.GetData("Blip");
+                        Blip tBlip = cop.GetData<Blip>("Blip");
                         cop.Delete();
                         cop.ResetData("Blip");
                     }
 
-                    if (cop.GetData("GPS") == false) continue;
+                    if (cop.GetData<bool>("GPS") == false) continue;
 
                     Blip pBlip = NAPI.Blip.CreateBlip(cop.Position, 0);
 
@@ -686,11 +690,11 @@ namespace LSCC
 
                 if (Settings.FugitiveShowCounter >= 60 && Settings.FugitiveShowCounter < 90)
                 {
-                    foreach (Client fugi in Settings.Fugitives)
+                    foreach (Player fugi in Settings.Fugitives)
                     {
                         if (fugi.HasData("Blip"))
                         {
-                            Blip tBlip = fugi.GetData("Blip");
+                            Blip tBlip = fugi.GetData<Blip>("Blip");
                             tBlip.Delete();
                             fugi.ResetData("Blip");
                         }
@@ -709,11 +713,11 @@ namespace LSCC
                 if (Settings.FugitiveShowCounter >= 90)
                 {
                     Settings.FugitiveShowCounter = 0;
-                    foreach (Client fugi in Settings.Fugitives)
+                    foreach (Player fugi in Settings.Fugitives)
                     {
                         if (fugi.HasData("Blip"))
                         {
-                            Blip tBlip = fugi.GetData("Blip");
+                            Blip tBlip = fugi.GetData<Blip>("Blip");
                             tBlip.Delete();
                             fugi.ResetData("Blip");
                         }

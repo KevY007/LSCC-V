@@ -89,7 +89,7 @@ mp.events.add("render", () => {
         
         drawText(mp.voiceChat.muted ? "Voice: Standby" : "Voice: Speaking", [minimap.rightX + 0.0085, minimap.bottomY - 0.095], 4, [63, 135, 240, 255], 0.50);
         drawText(streetName, [minimap.rightX + 0.0085, minimap.bottomY - 0.065], 4, [255, 255, 255, 255], 0.425);
-        drawText(zoneName, [minimap.rightX + 0.0085, minimap.bottomY - 0.035], 4, [255, 255, 255, 255], 0.50);
+        drawText(zoneName, [minimap.rightX + 0.0085, minimap.bottomY - 0.035], 4, [255, 255, 255, 255], 0.45);
 
         
     }

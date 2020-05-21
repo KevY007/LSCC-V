@@ -10,30 +10,32 @@ namespace LSCC.Events
     class Events : Script
     {
         [ServerEvent(Event.PlayerConnected)]
-        public void OnPlayerConnected(Client player)
+        public void OnPlayerConnected(Player player)
         {
-            Player.SetDiscordStatus(player, "Connecting to the server...");
+            player.TriggerEvent("InitiateCustomChat");
+
+            EPlayer.SetDiscordStatus(player, "Connecting to the server...");
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has joined the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
             NAPI.Notification.SendNotificationToPlayer(player, "~g~Welcome to ~w~Los Santos Copchase!");
             player.SetData("LastCryptAttempt", Environment.TickCount);
-            Player.ResetPlayerData(player);
-            player.Freeze(true);
+            EPlayer.ResetPlayerData(player);
+            EPlayer.Freeze(player, true);
 
             NAPI.Task.Run(() =>
             {
-                Player.LoginCameraSetup(player);
+                EPlayer.LoginCameraSetup(player);
             }, delayTime: 1000);
 
             NAPI.Task.Run(() =>
             {
-                Player.LoginBrowserSetup(player);
+                EPlayer.LoginBrowserSetup(player);
             }, delayTime: 2500);
 
             player.TriggerEvent("InitChaseTimer");
         }
 
         [RemoteEvent("OnScriptedKeyPress")]
-        public void OnScriptedKeyPress(Client player, int keyId)
+        public void OnScriptedKeyPress(Player player, int keyId)
         {
             if(keyId == 0x5A)
             {
@@ -43,14 +45,14 @@ namespace LSCC.Events
         }
 
         [ServerEvent(Event.PlayerDisconnected)]
-        public void OnPlayerDisconnected(Client player, DisconnectionType type, string reason)
+        public void OnPlayerDisconnected(Player player, DisconnectionType type, string reason)
         {
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has left the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
-            if (Player.LoggedIn(player))
+            if (EPlayer.LoggedIn(player))
             {
                 if (player.HasData("Blip"))
                 {
-                    Blip pBlip = player.GetData("Blip");
+                    Blip pBlip = player.GetData<Blip>("Blip");
                     pBlip.Delete();
                     player.ResetData("Blip");
                 }
@@ -66,16 +68,16 @@ namespace LSCC.Events
                         break;
                 }
 
-                Player.Save(player);
+                EPlayer.Save(player);
             }
 
-            Player.ResetPlayerData(player);
+            EPlayer.ResetPlayerData(player);
         }
 
         [ServerEvent(Event.PlayerDeath)]
-        public void OnPlayerDeath(Client player, Client killer, uint reason)
+        public void OnPlayerDeath(Player player, Player killer, uint reason)
         {
-            if (!Player.LoggedIn(player)) return;
+            if (!EPlayer.LoggedIn(player)) return;
 
             NAPI.Notification.SendNotificationToPlayer(player, $"~r~You died!", false);
 
@@ -130,16 +132,16 @@ namespace LSCC.Events
         }
 
         [ServerEvent(Event.ChatMessage)]
-        public void OnPlayerText(Client player, string message)
+        public void OnPlayerText(Player player, string message)
         {
-            if (!Player.LoggedIn(player))
+            if (!EPlayer.LoggedIn(player))
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You must be logged in to chat!");
                 return;
             }
 
             string chatStr = $"{player.Name.Replace("_", " ")} says: {message}";
-            foreach (Client i in NAPI.Pools.GetAllPlayers())
+            foreach (Player i in RAGE.Entities.Players.All)
             {
                 if (i.Dimension == player.Dimension)
                 {
@@ -150,9 +152,9 @@ namespace LSCC.Events
             }
         }
 
-        public void OnPlayerLogin(Client player, Account acc)
+        public void OnPlayerLogin(Player player, Account acc)
         {
-            Player.SetDiscordStatus(player, $"Logging in as {acc.Username}");
+            EPlayer.SetDiscordStatus(player, $"Logging in as {acc.Username}");
             NAPI.Util.ConsoleOutput($"[Login] {player.Name} has logged in as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
             player.SetData("LoggedIn", true);
@@ -161,11 +163,11 @@ namespace LSCC.Events
             player.Name = acc.Username;
             player.TriggerEvent("destroyBrowser");
 
-            Player.Spawn(player);
+            EPlayer.Spawn(player);
         }
-        public void OnPlayerRegister(Client player, Account acc)
+        public void OnPlayerRegister(Player player, Account acc)
         {
-            Player.SetDiscordStatus(player, $"Registering as {acc.Username}");
+            EPlayer.SetDiscordStatus(player, $"Registering as {acc.Username}");
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has registered as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
             player.SetData("LoggedIn", true);
@@ -174,14 +176,14 @@ namespace LSCC.Events
             player.Name = acc.Username;
             player.TriggerEvent("destroyBrowser");
 
-            Player.Spawn(player);
+            EPlayer.Spawn(player);
         }
 
         [RemoteEvent("OnPlayerLoginAttempt")]
-        public void OnPlayerLoginAttempt(Client player, string username, string password)
+        public void OnPlayerLoginAttempt(Player player, string username, string password)
         {
             NAPI.Util.ConsoleOutput($"[Login Attempt] Username {username}");
-            if (Environment.TickCount - player.GetData("LastCryptAttempt") < 1000)
+            if (Environment.TickCount - player.GetData<int>("LastCryptAttempt") < 1000)
             {
                 NAPI.Notification.SendNotificationToPlayer(player, "~r~Please wait some time between each register attempt!", true);
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please wait some time between each register attempt!");
@@ -218,7 +220,7 @@ namespace LSCC.Events
 
 
         [RemoteEvent("RemoveVoiceListener")]
-        public void RemoveVoiceListener(Client player, Client target)
+        public void RemoveVoiceListener(Player player, Player target)
         {
             if (!target.IsNull && target != null)
             {
@@ -227,13 +229,13 @@ namespace LSCC.Events
         }
 
         [RemoteEvent("AddVoiceListener")]
-        public void AddVoiceListener(Client player, Client target)
+        public void AddVoiceListener(Player player, Player target)
         {
             if(!target.IsNull && target != null)
             {
                 if (target.HasData("BlockList"))
                 {
-                    List<string> blockList = target.GetData("BlockList");
+                    List<string> blockList = target.GetData<List<string>>("BlockList");
                     if (blockList.Contains(player.Name) && blockList.Count > 0) return;
                 }
 
@@ -242,10 +244,10 @@ namespace LSCC.Events
         }
 
         [RemoteEvent("OnPlayerRegisterAttempt")]
-        public void OnPlayerRegisterAttempt(Client player, string email, string username, string password, bool allcorrect, bool rules)
+        public void OnPlayerRegisterAttempt(Player player, string email, string username, string password, bool allcorrect, bool rules)
         {
             NAPI.Util.ConsoleOutput($"[Register Attempt] Username {username}");
-            if (Environment.TickCount - player.GetData("LastCryptAttempt") < 1000)
+            if (Environment.TickCount - player.GetData<int>("LastCryptAttempt") < 1000)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please wait some time between each register attempt!");
                 return;
@@ -309,23 +311,23 @@ namespace LSCC.Events
         }
 
         [ServerEvent(Event.PlayerSpawn)]
-        public void OnPlayerSpawn(Client player)
+        public void OnPlayerSpawn(Player player)
         {
-            if (!Player.LoggedIn(player))
+            if (!EPlayer.LoggedIn(player))
             {
-                Player.LoginCameraSetup(player);
-                Player.LoginBrowserSetup(player);
+                EPlayer.LoginCameraSetup(player);
+                EPlayer.LoginBrowserSetup(player);
                 return;
             }
 
             if (player.HasData("Blip"))
             {
-                Blip pBlip = player.GetData("Blip");
+                Blip pBlip = player.GetData<Blip>("Blip");
                 pBlip.Delete();
                 player.ResetData("Blip");
             }
 
-            Player.SetDiscordStatus(player, $"In lobby as {player.Name}");
+            EPlayer.SetDiscordStatus(player, $"In lobby as {player.Name}");
 
             player.RemoveAllWeapons();
 
@@ -333,7 +335,7 @@ namespace LSCC.Events
             player.TriggerEvent("SetActorInvulnerable", true);
             player.TriggerEvent("CanFallOutOfCar", false);
             player.TriggerEvent("showHPBars", 0); // Never show HP Bars.
-            Player.SetColor(player, new Color(255, 255, 255, 255));
+            EPlayer.SetColor(player, new Color(255, 255, 255, 255));
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿let camera = null;
+﻿"use strict"
+
+
+let camera = null;
 const player = mp.players.local;
 const timerBarLib = require("./Player/Bar.js");
 
@@ -84,9 +87,21 @@ function updateChaseTimer()
     return;
 }
 
+function OnEntityGiveEntityDamage(sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage)
+{
+    
+}
+
+function OnPlayerWeaponShot(targetPosition, targetEntity)
+{
+   
+}
 
 mp.events.add(
     {
+        "OutgoingDamage": OnEntityGiveEntityDamage,
+        "playerWeaponShot": OnPlayerWeaponShot,
+
         "ToggleChaseCollisions": (toggle) => {
             if(toggle)
             {

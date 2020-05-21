@@ -8,6 +8,7 @@ require("./Player/HUD.js");
 require('./camerasManager.js');
 require('./cefBrowser.js');
 
+
 mp.events.add('loginInformationToServer', (username, password) => {
 
     mp.events.callRemote('OnPlayerLoginAttempt', username, password);
