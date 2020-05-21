@@ -116,7 +116,11 @@ namespace LSCC
        
             Settings.AdminVehicles.Add(aVehicle);
 
-            player.SetIntoVehicle(aVehicle, 0);
+            NAPI.Task.Run(() =>
+            {
+                if(!aVehicle.IsNull) player.SetIntoVehicle(aVehicle, 0);
+            }, 1000);
+
             return;
         }
 

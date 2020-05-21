@@ -15,14 +15,6 @@ const MAX_MSG_HISTORY = 12;
 function toggleScroll(enable) { 
 
 	// to-do; fix this
-	if(enable)
-	{
-		document.body.classList.remove("stop-scrolling"); 
-	}
-	else
-	{
-		document.body.classList.add("stop-scrolling"); 
-	}
 } 
 
 function enableChatInput(enable)
