@@ -111,11 +111,12 @@ namespace LSCC
             Random rand = new Random();
 
             Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(64), rand.Next(64), player.SocialClubName, 255, false, true, player.Dimension);
-            player.SetIntoVehicle(aVehicle, 0);
 
             aVehicle.SetSharedData("Team", -1);
        
             Settings.AdminVehicles.Add(aVehicle);
+
+            player.SetIntoVehicle(aVehicle, 0);
             return;
         }
 

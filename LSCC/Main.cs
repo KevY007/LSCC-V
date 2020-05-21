@@ -302,8 +302,10 @@ namespace LSCC
 
 
             List<MapSpawn> Spawns = ContextFactory.Instance.MapSpawns.Where(x => x.mapID == map.SQL_ID).ToList();
-            List<int> UsedSpawns = new List<int>();
-            List<Player> PutInsideCar = new List<Player>();
+            List<int> UsedSpawns = new List<int>(Spawns.Count + 1);
+            List<Player> PutInsideCar = new List<Player>(Settings.LoggedInPlayers.Count);
+
+            UsedSpawns.Add(-1);
             
             Random random = new Random();
 
@@ -350,7 +352,7 @@ namespace LSCC
                 spawnLoc = null;
                 foreach(MapSpawn spawn in Spawns.Where(a=> a.spawnTeam == 1))
                 {
-                    if (!UsedSpawns.Contains(spawn.SQL_ID))
+                    if (!UsedSpawns.Contains(spawn.SQL_ID) || UsedSpawns.Count() < 1)
                     {
                         spawnLoc = spawn;
                         UsedSpawns.Add(spawn.SQL_ID);
