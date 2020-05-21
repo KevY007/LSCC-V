@@ -19,7 +19,3 @@ collision bugged (reapply in 2 secs to spawn),
 /givegun, /FIX /FLIP, remove driveby as driver
 
 anti teamkill/team damage.
-
-CONVERT TO 1.0 RAGEMP BETA
-
-NO SCROLL/DISABLE SCROLL UNLESS CHAT ACTIVE IN CHAT CEF

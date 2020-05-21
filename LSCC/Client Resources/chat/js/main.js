@@ -12,8 +12,31 @@ let chat =
 
 const MAX_MSG_HISTORY = 12;
 
+function toggleScroll(enable) { 
+
+	if(enable)
+	{
+		window.onscroll = function() {}; 
+	}
+	else
+	{
+		// Get the current page scroll position 
+		scrollTop = window.pageYOffset || document.documentElement.scrollTop; 
+		scrollLeft = window.pageXOffset || document.documentElement.scrollLeft, 
+	
+		// if any scroll is attempted, set this to the previous value 
+		window.onscroll = function() 
+		{ 
+			window.scrollTo(scrollLeft, scrollTop); 
+		}; 
+	}
+} 
+
 function enableChatInput(enable)
 {
+	if(!chat.active && enable == true) toggleScroll(false);
+	else toggleScroll(enable);
+
 	if(chat.active == false
 		&& enable == true)
 		return;
