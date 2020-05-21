@@ -14,33 +14,27 @@ const MAX_MSG_HISTORY = 12;
 
 function toggleScroll(enable) { 
 
+	// to-do; fix this
 	if(enable)
 	{
-		window.onscroll = function() {}; 
+		document.body.classList.remove("stop-scrolling"); 
 	}
 	else
 	{
-		// Get the current page scroll position 
-		scrollTop = window.pageYOffset || document.documentElement.scrollTop; 
-		scrollLeft = window.pageXOffset || document.documentElement.scrollLeft, 
-	
-		// if any scroll is attempted, set this to the previous value 
-		window.onscroll = function() 
-		{ 
-			window.scrollTo(scrollLeft, scrollTop); 
-		}; 
+		document.body.classList.add("stop-scrolling"); 
 	}
 } 
 
 function enableChatInput(enable)
 {
-	if(!chat.active && enable == true) toggleScroll(false);
-	else toggleScroll(enable);
-
 	if(chat.active == false
 		&& enable == true)
+	{
+		toggleScroll(false);
 		return;
+	}
 	
+	toggleScroll(enable);
     if (enable != (chat.input != null))
 	{
 		mp.invoke("focus", enable);
@@ -145,7 +139,8 @@ $(document).ready(function()
 	chat.container = $("#chat ul#chat_messages");
 	
     $(".ui_element").show();
-    chatAPI.push("!{#A9C4E4}Connected to Los Santos Copchase.");
+	chatAPI.push("!{#A9C4E4}Connected to Los Santos Copchase.");
+	toggleScroll(false);
 
     $("body").keydown(function(event)
 	{
@@ -217,6 +212,7 @@ $(document).ready(function()
                 }
             }
 
+			toggleScroll(false);
             enableChatInput(false);
         }
     });

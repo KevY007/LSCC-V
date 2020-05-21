@@ -71,6 +71,9 @@ namespace LSCC
 
         public static void LoginBrowserSetup(Player player)
         {
+            player.TriggerEvent("InitiateCustomChat");
+            player.TriggerEvent("TogglePlayerChat", false);
+
             SetDiscordStatus(player, "On login screen");
             ResetPlayerData(player);
             player.TriggerEvent("showBrowser", "package://LoginRegister/login.html");

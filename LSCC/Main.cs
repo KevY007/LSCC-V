@@ -676,7 +676,7 @@ namespace LSCC
                     if (cop.HasData("Blip"))
                     {
                         Blip tBlip = cop.GetData<Blip>("Blip");
-                        cop.Delete();
+                        tBlip.Delete();
                         cop.ResetData("Blip");
                     }
 
