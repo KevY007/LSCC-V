@@ -1,6 +1,7 @@
 const Use3d = true;
 const UseAutoVolume = false;
 const MaxRange = 50.0;
+let forceOff = false;
 mp.voiceChat.muted = true;
 
 
@@ -9,7 +10,8 @@ mp.keys.bind(0x4E, false, function() {
 });
 
 mp.keys.bind(0x4E, true, function() {
-    mp.voiceChat.muted = false;
+	if(!forceOff && 
+		!(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false)) mp.voiceChat.muted = false;
 });
 
 let g_voiceMgr =
@@ -60,6 +62,11 @@ mp.events.add("playerQuit", (player) =>
 	{
 		g_voiceMgr.remove(player, false);
 	}
+});
+
+mp.events.add("onOpenChatbox", (toggle) =>
+{
+	forceOff = toggle;
 });
 
 setInterval(() =>

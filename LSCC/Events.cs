@@ -47,7 +47,7 @@ namespace LSCC.Events
             NAPI.Task.Run(() =>
             {
                 EPlayer.LoginBrowserSetup(player);
-            }, delayTime: 2500);
+            }, delayTime: 1500);
 
             player.TriggerEvent("InitChaseTimer");
         }
@@ -57,7 +57,7 @@ namespace LSCC.Events
         {
             if(keyId == 0x5A)
             {
-                LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetData<int>("InLobby"));
+                LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
                 if(lobby != null)
                 {
                     if(lobby.Cops.Contains(player)) LSCC.Commands.cmd_gps(player);
@@ -118,7 +118,7 @@ namespace LSCC.Events
                 NAPI.Util.ConsoleOutput($"[Death] {player.Name} has died, reason: {(reasonStr == null ? "N/A" : reasonStr)}.");
             }
 
-            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetData<int>("InLobby"));
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
             if (lobby != null)
             {
                 if (lobby.gameStatus == 1)
@@ -127,7 +127,7 @@ namespace LSCC.Events
                     {
                         foreach (Player ay in Settings.LoggedInPlayers)
                         {
-                            if (ay.GetData<int>("InLobby") == lobby.lobbyId)
+                            if (ay.GetSharedData<int>("InLobby") == lobby.lobbyId)
                             {
 
                                 if (killer != null && !killer.IsNull)
@@ -166,7 +166,7 @@ namespace LSCC.Events
                     {
                         foreach (Player ay in Settings.LoggedInPlayers)
                         {
-                            if (ay.GetData<int>("InLobby") == lobby.lobbyId)
+                            if (ay.GetSharedData<int>("InLobby") == lobby.lobbyId)
                             {
                                 if (killer != null && !killer.IsNull)
                                 {
@@ -239,9 +239,6 @@ namespace LSCC.Events
             EPlayer.SetDiscordStatus(player, $"Logging in as {acc.Username}");
             NAPI.Util.ConsoleOutput($"[Login] {player.Name} has logged in as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
-            player.SetData("LoggedIn", true);
-            player.SetData("AccountHandle", acc);
-
 
             BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.AccountSQLID == acc.SQL_ID);
 
@@ -264,6 +261,9 @@ namespace LSCC.Events
 
             player.Name = acc.Username;
             player.TriggerEvent("destroyBrowser");
+            player.SetData("LoggedIn", true);
+            player.SetData("AccountHandle", acc);
+            player.SetSharedData("pLogged", true);
 
             EPlayer.Spawn(player);
         }
@@ -274,6 +274,7 @@ namespace LSCC.Events
 
             player.SetData("LoggedIn", true);
             player.SetData("AccountHandle", acc);
+            player.SetSharedData("pLogged", true);
 
             player.Name = acc.Username;
             player.TriggerEvent("destroyBrowser");
@@ -352,7 +353,7 @@ namespace LSCC.Events
         }
 
         [RemoteEvent("OnPlayerRegisterAttempt")]
-        public void OnPlayerRegisterAttempt(Player player, string email, string username, string password, bool allcorrect, bool rules)
+        public void OnPlayerRegisterAttempt(Player player, string email, string username, string password, string confirmpass)
         {
             NAPI.Util.ConsoleOutput($"[Register Attempt] Username {username}");
             if (Environment.TickCount - player.GetData<int>("LastCryptAttempt") < 1000)
@@ -360,9 +361,9 @@ namespace LSCC.Events
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please wait some time between each register attempt!");
                 return;
             }
-            if (!allcorrect || !rules)
+            if (!password.Equals(confirmpass))
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You must agree to the rules and ensure all information is correct!");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Passwords do not match!");
                 return;
             }
             if (password.Length < 5)
@@ -428,6 +429,9 @@ namespace LSCC.Events
                 return;
             }
 
+            player.SetSharedData("Level", EPlayer.GetAccount(player).Level);
+            player.SetSharedData("Ping", player.Ping);
+
             if (player.HasData("Blip"))
             {
                 Blip pBlip = player.GetData<Blip>("Blip");
@@ -435,19 +439,19 @@ namespace LSCC.Events
                 player.ResetData("Blip");
             }
 
-            EPlayer.SetDiscordStatus(player, $"In lobby {player.GetData<int>("InLobby")} as {player.Name}");
+            EPlayer.SetDiscordStatus(player, $"In lobby {player.GetSharedData<int>("InLobby")} as {player.Name}");
 
             player.RemoveAllWeapons();
 
-            player.Dimension = 100 + Convert.ToUInt32(player.GetData<int>("InLobby"));
+            player.Dimension = 100 + Convert.ToUInt32(player.GetSharedData<int>("InLobby"));
             player.TriggerEvent("SetActorInvulnerable", true);
             player.TriggerEvent("CanFallOutOfCar", false);
             player.TriggerEvent("showHPBars", 0); // Never show HP Bars.
             EPlayer.SetColor(player, new Color(255, 255, 255, 255));
 
-            if(player.GetData<int>("InLobby") > -1)
+            if(player.GetSharedData<int>("InLobby") > -1)
             {
-                LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetData<int>("InLobby"));
+                LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
                 if (lobby != null)
                 {
                     if (lobby.gameStatus == 1)

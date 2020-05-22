@@ -1,0 +1,35 @@
+* {
+	user-select: none;
+}
+
+.card-header {
+	font-size: 120%;
+	text-align: center;
+	margin-bottom: -20px;
+	color: #FFFFFF;
+	-webkit-text-stroke: 0.5px black
+}
+
+body {
+	background: rgba(0, 0, 0, 0);
+}
+
+.card-custom {
+	color: #BEBEBE;
+	background: rgba(0, 0, 0, 0.8);
+}
+
+.table-custom {
+	color: #BEBEBE;
+	background: rgba(0, 0, 0, 0.4);
+}
+
+.my-custom-scrollbar {
+	position: relative;
+	height: 450px;
+	overflow: auto;
+}
+
+.table-wrapper-scroll-y {
+	display: block;
+}

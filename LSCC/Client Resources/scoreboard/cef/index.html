@@ -1,0 +1,104 @@
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="card mx-auto card-custom mt-5 mb-5" style="max-width: 40rem;">
+            <div class="card-header" id="servername">
+                Los Santos Copchase
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                    <table class="table table-dark table-borderless table-custom" id="plswork">
+                        <thead>
+                            <tr>
+                                <th scope="col">Lobby#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Level</th>
+                                <th scope="col">Ping</th>
+                            </tr>
+                        </thead>
+                        <tbody id="playershere">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--<button onclick="createUser('Turac', '500', '50')">Add user</button>
+    <button onclick="removeUser('Turac')">Remove user</button>
+    <button onclick="updateUser('999', 'Turac', '76', '6000')">Update User</button>
+
+    <script>
+        function createUser(name, level, ping) {
+            //var playerCont = document.createElement("div");
+            var trfirst = document.createElement("tr");
+            var thLID = document.createElement("th");
+            var tdName = document.createElement("td");
+            var tdLevel = document.createElement("td");
+            var tdPing = document.createElement("td");
+            trfirst.setAttribute("id", name);
+
+            var LID = document.createTextNode('1');
+            var Name = document.createTextNode(name);
+            var Level = document.createTextNode(level);
+            var Ping = document.createTextNode(ping);
+
+            thLID.appendChild(LID);
+            tdName.appendChild(Name);
+            tdLevel.appendChild(Level);
+            tdPing.appendChild(Ping);
+
+            trfirst.appendChild(thLID);
+            trfirst.appendChild(tdName);
+            trfirst.appendChild(tdLevel);
+            trfirst.appendChild(tdPing);
+
+            document.getElementById("playershere").appendChild(trfirst);
+        };
+
+        function removeUser(userRemove) {
+            if (document.getElementById(userRemove) !== null) {
+                var elmnt = document.getElementById(userRemove);
+                elmnt.remove();
+
+            } else {
+                console.log('No user by that name!')
+            }
+        };
+
+        function updateUser(userLID, userName, userLevel, userPing) {
+            if (document.getElementById(userName) !== null) {
+                var userElement = document.getElementById(userName);
+                var editThLID = userElement.getElementsByTagName('th')[0];
+                var editTdLevel = userElement.getElementsByTagName('td')[1];
+                var editTdPing = userElement.getElementsByTagName('td')[2];
+                editThLID.innerHTML = userLID;
+                editTdLevel.innerHTML = userLevel;
+                editTdPing.innerHTML = userPing;
+            } else {
+                console.log('No user by that name!')
+            }
+        }
+    </script>-->
+
+    <!-- JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous">
+    </script>
+
+    <script src="script.js"></script>
+
+</body>

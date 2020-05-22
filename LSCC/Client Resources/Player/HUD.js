@@ -70,27 +70,31 @@ setInterval(() => {
 
 mp.events.add('ToggleHud', (toggle) => {
     showHud = toggle;
+    mp.game.ui.displayHud(toggle);
 });
 
 mp.events.add("render", () => {
-    if (streetName && zoneName && showHud) {
+    if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
+    {
+        if (streetName && zoneName && showHud) {
 
-        let vehicle = mp.players.local.vehicle;
-        if (vehicle) 
-        {
-            mp.game.graphics.drawRect(minimap.rightX + 0.055, minimap.topY + 0.110, 0.10, 0.13, 0, 0, 0, 150);
+            let vehicle = mp.players.local.vehicle;
+            if (vehicle) 
+            {
+                mp.game.graphics.drawRect(minimap.rightX + 0.055, minimap.topY + 0.110, 0.10, 0.13, 0, 0, 0, 150);
 
-            drawText(`${(vehicle.getSpeed() * 3.6).toFixed(0)} KM/H`, [minimap.rightX + 0.0085, minimap.bottomY - 0.130], 4, [204, 204, 204, 255], 0.7);
+                drawText(`${(vehicle.getSpeed() * 3.6).toFixed(0)} KM/H`, [minimap.rightX + 0.0085, minimap.bottomY - 0.130], 4, [204, 204, 204, 255], 0.7);
+            }
+            else
+            {
+                mp.game.graphics.drawRect(minimap.rightX + 0.055, minimap.topY + 0.125, 0.10, 0.10, 0, 0, 0, 150);
+            }
+            
+            drawText(mp.voiceChat.muted ? "Voice: Standby" : "Voice: Speaking", [minimap.rightX + 0.0085, minimap.bottomY - 0.095], 4, [63, 135, 240, 255], 0.50);
+            drawText(streetName, [minimap.rightX + 0.0085, minimap.bottomY - 0.065], 4, [255, 255, 255, 255], 0.425);
+            drawText(zoneName, [minimap.rightX + 0.0085, minimap.bottomY - 0.035], 4, [255, 255, 255, 255], 0.45);
+
+            
         }
-        else
-        {
-            mp.game.graphics.drawRect(minimap.rightX + 0.055, minimap.topY + 0.125, 0.10, 0.10, 0, 0, 0, 150);
-        }
-        
-        drawText(mp.voiceChat.muted ? "Voice: Standby" : "Voice: Speaking", [minimap.rightX + 0.0085, minimap.bottomY - 0.095], 4, [63, 135, 240, 255], 0.50);
-        drawText(streetName, [minimap.rightX + 0.0085, minimap.bottomY - 0.065], 4, [255, 255, 255, 255], 0.425);
-        drawText(zoneName, [minimap.rightX + 0.0085, minimap.bottomY - 0.035], 4, [255, 255, 255, 255], 0.45);
-
-        
     }
 });

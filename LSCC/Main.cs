@@ -65,11 +65,11 @@ public static class Settings
     // Locations
     public const float LoginCameraX = -550;
     public const float LoginCameraY = -210;
-    public const float LoginCameraZ = 90;
-    public const float LoginCameraRx = -30;
+    public const float LoginCameraZ = 1200;
+    public const float LoginCameraRx = -50;
     public const float LoginCameraRy = 0;
-    public const float LoginCameraRz = -30;
-    public const float LoginCameraViewAngle = 60;
+    public const float LoginCameraRz = 0;
+    public const float LoginCameraViewAngle = 50;
 
     public static Vector3[] LobbySpawns = new Vector3[]
     {
@@ -377,7 +377,7 @@ namespace LSCC
             {
                 foreach (Player player in Settings.LoggedInPlayers)
                 {
-                    if (player.GetData<int>("InLobby") == lobbyid && player.GetData<bool>("AutoJoin") == true)
+                    if (player.GetSharedData<int>("InLobby") == lobbyid && player.GetData<bool>("AutoJoin") == true)
                     {
                         if (time > 0)
                         {
@@ -417,7 +417,7 @@ namespace LSCC
                             int pCount = 0;
                             foreach (Player player in Settings.LoggedInPlayers)
                             {
-                                if (player.GetData<int>("InLobby") == lobby.lobbyId && player.GetData<bool>("AutoJoin") == true)
+                                if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetData<bool>("AutoJoin") == true)
                                 {
                                     pCount++;
                                 }
@@ -429,7 +429,7 @@ namespace LSCC
 
                                 foreach (Player player in Settings.LoggedInPlayers)
                                 {
-                                    if (player.GetData<int>("InLobby") == lobby.lobbyId && player.GetData<bool>("AutoJoin") == true)
+                                    if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetData<bool>("AutoJoin") == true)
                                     {
                                         EPlayer.Spawn(player);
                                         NAPI.Notification.SendNotificationToPlayer(player, $"~w~Game is starting in ~g~10 seconds~w~.", true);
@@ -516,7 +516,7 @@ namespace LSCC
 
                 foreach (Player i in Settings.LoggedInPlayers)
                 {
-                    if (i.GetData<int>("InLobby") != lobby.lobbyId) continue;
+                    if (i.GetSharedData<int>("InLobby") != lobby.lobbyId) continue;
 
                     i.TriggerEvent("HideChaseTimer");
                     if (lobby.Cops.Contains(i))
@@ -564,7 +564,7 @@ namespace LSCC
 
                 foreach (Player player in Settings.LoggedInPlayers)
                 {
-                    if (player.GetData<int>("InLobby") == lobbyid && player.GetData<bool>("AutoJoin") == true)
+                    if (player.GetSharedData<int>("InLobby") == lobbyid && player.GetData<bool>("AutoJoin") == true)
                     {
                         pCount++;
                     }
@@ -598,7 +598,7 @@ namespace LSCC
                 List<MapSpawn> Spawns = ContextFactory.Instance.MapSpawns.Where(x => x.mapID == map.SQL_ID).ToList();
                 List<int> UsedSpawns = new List<int>(Spawns.Count + 1);
 
-                List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetData<int>("InLobby") == lobbyid).ToList();
+                List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid).ToList();
 
                 List<Player> PutInsideCar = new List<Player>(lobbyPlayers.Count());
 
@@ -911,7 +911,9 @@ namespace LSCC
 
                     foreach (Player p in Settings.LoggedInPlayers)
                     {
-                        if (p.GetData<int>("InLobby") == lobbyid)
+                        p.SetSharedData("Ping", p.Ping);
+
+                        if (p.GetSharedData<int>("InLobby") == lobbyid)
                         {
                             p.TriggerEvent("StartChaseTimer", 0, Settings.GameRunTime, lobby.CollisionCounter);
                         }
@@ -956,7 +958,7 @@ namespace LSCC
                 {
                     lobby.CollisionCounter--;
 
-                    foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetData<int>("InLobby") == lobby.lobbyId))
+                    foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
                     {
                         if (!lobby.Cops.Contains(player) && !lobby.Fugitives.Contains(player)) continue;
 

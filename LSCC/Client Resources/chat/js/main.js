@@ -27,6 +27,7 @@ function enableChatInput(enable)
 	}
 	
 	toggleScroll(enable);
+	mp.events.call("onOpenChatbox", enable);
     if (enable != (chat.input != null))
 	{
 		mp.invoke("focus", enable);

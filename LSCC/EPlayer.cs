@@ -18,6 +18,7 @@ namespace LSCC
             player.ResetData("AccountHandle");
             player.ResetData("LoggedIn");
             player.SetData("LoggedIn", false);
+            player.SetSharedData("pLogged", false);
             player.SetData("AutoJoin", true);
             player.SetData("HudState", false);
             player.SetData("PMState", true);
@@ -25,7 +26,12 @@ namespace LSCC
             player.TriggerEvent("ToggleHud", false);
             player.SetData("GPS", false);
             player.ResetData("BlockList");
-            player.SetData("InLobby", -1);
+            player.SetSharedData("InLobby", -1);
+            player.SetSharedData("Color_R", 255);
+            player.SetSharedData("Color_G", 255);
+            player.SetSharedData("Color_B", 255);
+            player.SetSharedData("Ping", player.Ping);
+            player.SetSharedData("Level", 1);
 
             Settings.LoggedInPlayers.Remove(player);
 
@@ -47,6 +53,7 @@ namespace LSCC
 
         public static void SetDiscordStatus(Player player, string status)
         {
+            player.SetSharedData("Ping", player.Ping);
             player.TriggerEvent("SetDiscordStatus", "Los Santos Copchase", status);
         }
         public static void Freeze(Player player, bool toggle)
@@ -55,7 +62,10 @@ namespace LSCC
         }
         public static void SetColor(Player player, Color col, int armour = 0)
         {
-            foreach(Player p in RAGE.Entities.Players.All)
+            player.SetSharedData("Color_R", col.Red);
+            player.SetSharedData("Color_G", col.Green);
+            player.SetSharedData("Color_B", col.Blue);
+            foreach (Player p in RAGE.Entities.Players.All)
             {
                 p.TriggerEvent("playerNametagSet", player, col.Red, col.Green, col.Blue, col.Alpha, armour);
             }
@@ -63,6 +73,7 @@ namespace LSCC
 
         public static bool LoggedIn(Player player)
         {
+            player.SetSharedData("Ping", player.Ping);
             if (player.HasData("AccountHandle") && player.GetData<Account>("AccountHandle") != null && player.HasData("LoggedIn") && player.GetData<bool>("LoggedIn") == true)
             {
                 return true;
@@ -123,12 +134,12 @@ namespace LSCC
 
             if (player.GetData<bool>("AutoJoin") == false) NAPI.Notification.SendNotificationToPlayer(player, $"~g~Autojoin has been enabled.", false);
 
-            if (player.GetData<int>("InLobby") == -1)
+            if (player.GetSharedData<int>("InLobby") == -1)
             {
                 int LobbyToBeIn = Settings.MaxLobbies;
                 foreach (LobbyData lobby in Settings.Lobbies)
                 {
-                    if (Settings.LoggedInPlayers.Count(a => a.GetData<int>("InLobby") == lobby.lobbyId) >= Settings.MaxPlayersInLobby)
+                    if (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId) >= Settings.MaxPlayersInLobby)
                     {
                         continue;
                     }
@@ -137,9 +148,9 @@ namespace LSCC
                     break;
                 }
 
-                player.SetData("InLobby", LobbyToBeIn);
+                player.SetSharedData("InLobby", LobbyToBeIn);
 
-                foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetData<int>("InLobby") == LobbyToBeIn))
+                foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == LobbyToBeIn))
                 {
                     targ.SendChatMessage($"[Lobby {LobbyToBeIn}] {player.Name} has joined this lobby.");
                 }
@@ -180,7 +191,7 @@ namespace LSCC
         {
             foreach (Player player in Settings.LoggedInPlayers)
             {
-                if (player.GetData<int>("InLobby") == lobbyid && player.GetData<bool>("AutoJoin") == true)
+                if (player.GetSharedData<int>("InLobby") == lobbyid && player.GetData<bool>("AutoJoin") == true)
                 {
                     player.SendChatMessage(message);
                 }

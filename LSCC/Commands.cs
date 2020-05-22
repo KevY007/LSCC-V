@@ -221,7 +221,7 @@ namespace LSCC
                 return;
 
             bool isACop = false;
-            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetData<int>("InLobby"));
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
             if (lobby != null)
             {
                 if (lobby.Cops.Contains(player) && lobby.gameStatus == 1)
@@ -410,8 +410,18 @@ namespace LSCC
         [Command("pos")]
         public void cmd_poslog(Player player)
         {
-            player.SendChatMessage($"X: {player.Position.X} - Y: {player.Position.Y} - Z: {player.Position.Z}");
-            NAPI.Util.ConsoleOutput($"{player.Name} Position log: X: {player.Position.X} - Y: {player.Position.Y} - Z: {player.Position.Z}");
+            if (!player.IsInVehicle)
+            {
+                player.SendChatMessage($"X: {player.Position.X} - Y: {player.Position.Y} - Z: {player.Position.Z}");
+                player.SendChatMessage($"Heading: {player.Heading}");
+                NAPI.Util.ConsoleOutput($"{player.Name} Position log: X: {player.Position.X} - Y: {player.Position.Y} - Z: {player.Position.Z}");
+            }
+            else
+            {
+                player.SendChatMessage($"vX: {player.Vehicle.Position.X} - vY: {player.Vehicle.Position.Y} - vZ: {player.Vehicle.Position.Z}");
+                player.SendChatMessage($"vHeading: {player.Vehicle.Heading}");
+                NAPI.Util.ConsoleOutput($"{player.Name} Position log: X: {player.Vehicle.Position.X} - Y: {player.Vehicle.Position.Y} - Z: {player.Vehicle.Position.Z}");
+            }
         }
 
         [Command("voiceblock", GreedyArg = true)]
@@ -460,7 +470,7 @@ namespace LSCC
                 return;
 
 
-            player.SendChatMessage($"!{{#FFFF00}}You are in lobby {player.GetData<int>("InLobby")}, /switchlobby to change to another lobby.");
+            player.SendChatMessage($"!{{#FFFF00}}You are in lobby {player.GetSharedData<int>("InLobby")}, /switchlobby to change to another lobby.");
 
             player.SendChatMessage("Current Lobby Players:");
             RAGE.Entities.Players.All.ForEach((Player ePlayer) =>
@@ -481,7 +491,7 @@ namespace LSCC
             foreach (LobbyData lobby in lobbyList)
             {
                 player.SendChatMessage($"!{{#DAA520}}Lobby {lobby.lobbyId} | Players: " +
-                    $"{Settings.LoggedInPlayers.Count(a => a.GetData<int>("InLobby") == lobby.lobbyId)} | Status: {Main.ConvertGameStatus(lobby.gameStatus)}");
+                    $"{Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId)} | Status: {Main.ConvertGameStatus(lobby.gameStatus)}");
             }
 
             return;
@@ -514,13 +524,13 @@ namespace LSCC
                 return;
             }
 
-            if(Settings.LoggedInPlayers.Count(a => a.GetData<int>("InLobby") == lobbyid) >= Settings.MaxPlayersInLobby)
+            if(Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobbyid) >= Settings.MaxPlayersInLobby)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That lobby is full!");
                 return;
             }
 
-            LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetData<int>("InLobby"));
+            LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
             if(elobby != null)
             {
                 if(elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
@@ -530,8 +540,8 @@ namespace LSCC
                 }
             }
 
-            player.SetData<int>("InLobby", lobbyid);
-            foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetData<int>("InLobby") == lobbyid))
+            player.SetSharedData("InLobby", lobbyid);
+            foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid))
             {
                 targ.SendChatMessage($"[Lobby {lobbyid}] {player.Name} has joined this lobby.");
             }
@@ -551,7 +561,7 @@ namespace LSCC
             player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies");
             player.SendChatMessage("[Voice]: /voiceblock");
-            player.SendChatMessage("[Keys]: Voice (N) | GPS (Z)");
+            player.SendChatMessage("[Keys]: Voice (N) | GPS (Z) | Scoreboard (O)");
             player.SendChatMessage("[Cop]: /gps");
             player.SendChatMessage("[Roleplay]: /me /do");
             player.SendChatMessage("[Debug]: /pos");
@@ -1131,7 +1141,7 @@ namespace LSCC
                 player.Dimension = target.Dimension;
 
                 player.TriggerEvent("DestroyPlayerCamera");
-                player.TriggerEvent("CreatePlayerCamera", target.Position.X, target.Position.Y, target.Position.Z, 0, 0, 0, 90);
+                player.TriggerEvent("CreatePlayerCamera", target.Position.X, target.Position.Y, target.Position.Z, 30, 0, 0, 40);
                 
                 player.TriggerEvent("SpectatePlayerCamera", target);
                 player.TriggerEvent("SetPlayerFrozen", true);

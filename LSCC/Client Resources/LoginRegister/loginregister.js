@@ -17,13 +17,13 @@ passElement.addEventListener("keyup", function(e) {
 $('#loginButton').click(() => {
 
     mp.trigger('loginInformationToServer', $('#emailText').val(), $('#passwordText').val());
-    document.getElementById("passwordText").value = "";
     document.getElementById("emailText").value = "";
 });
 
 $('#registerButton').click(() => {
-    mp.trigger('registerInformationToServer', $('#emailText').val(), $('#usernameText').val(), $('#passwordText').val(), $('#allcorrect').prop("checked"), $('#rules').prop("checked"));
+
+
+    mp.trigger('registerInformationToServer', $('#emailText').val(), $('#usernameText').val(), $('#passwordText').val(), $('#passwordTextConfirm').val());
     document.getElementById("emailText").value = "";
     document.getElementById("usernameText").value = "";
-    document.getElementById("passwordText").value = "";
 });
