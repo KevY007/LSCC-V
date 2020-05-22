@@ -8,6 +8,43 @@ namespace LSCC
 {
     class Commands : Script
     {
+        [Command("serveroptions", GreedyArg = true)]
+        public void cmd_serveroptions(Player player, string action)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                return;
+            }
+
+            if (action.StartsWith("maxinlobby", StringComparison.OrdinalIgnoreCase))
+            {
+                string[] args = action.Split(' ');
+                if (args.Count() > 1)
+                {
+                    int value = 0;
+                    if (!Int32.TryParse(args[1], out value) || value < 1 || value > 999)
+                    {
+                        player.SendChatMessage($"!{{#999999}}Max players in a lobby should be between 1-999!");
+                        return;
+                    }
+
+                    Settings.MaxPlayersInLobby = value;
+
+                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has changed max players in a lobby to {value}.");
+                }
+                else player.SendChatMessage("!{#999999}Proper usage: /serveroptions maxinlobby <amount>");
+            }
+      
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'maxinlobby'");
+
+            return;
+        }
+
+
         [Command("game", GreedyArg = true)]
         public void cmd_game(Player player, string action)
         {
@@ -22,43 +59,96 @@ namespace LSCC
 
             if (action.StartsWith("stop", StringComparison.OrdinalIgnoreCase))
             {
-                if (!Main.StopGame(0))
+                string[] args = action.Split(' ');
+                if (args.Count() > 1)
                 {
-                    player.SendChatMessage("!{#FF0000}Failed to stop game! Is there even a copchase running?");
+                    int value = 0;
+                    if (!Int32.TryParse(args[1], out value) || value < 1 || value > 99)
+                    {
+                        player.SendChatMessage($"!{{#999999}}Lobby ID must be between 1-{Settings.MaxLobbies}!");
+                        return;
+                    }
+
+                    if (!Main.StopGame(value, 0))
+                    {
+                        player.SendChatMessage("!{#FF0000}Failed to stop game! Is there even a copchase running?");
+                    }
+                    else NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has forcefully stopped the copchase in lobby {value}.");
                 }
-                else NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has forcefully stopped the copchase.");
+                else player.SendChatMessage("!{#999999}Proper usage: /game stop <lobby id>");
             }
             else if (action.StartsWith("start", StringComparison.OrdinalIgnoreCase))
-            {
-                if (!Main.StartGame())
-                {
-                    player.SendChatMessage("!{#FF0000}Failed to start game! Is one already running?");
-                }
-                else NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has forcefully started the copchase.");
-            }
-            else if (action.StartsWith("autostart", StringComparison.OrdinalIgnoreCase))
-            {
-                Settings.GameAutoStart = !Settings.GameAutoStart;
-                if (Settings.GameAutoStart) NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~g~has enabled copchases.");
-                else NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~w~has disabled copchases.");
-            }
-            else if (action.StartsWith("teambalance", StringComparison.OrdinalIgnoreCase))
             {
                 string[] args = action.Split(' ');
                 if (args.Count() > 1)
                 {
                     int value = 0;
-                    if (!Int32.TryParse(args[1], out value) || value < 1 || value > 99) 
+                    if (!Int32.TryParse(args[1], out value) || value < 1 || value > 99)
+                    {
+                        player.SendChatMessage($"!{{#999999}}Lobby ID must be between 1-{Settings.MaxLobbies}!");
+                        return;
+                    }
+
+                    if (!Main.StartGame(value))
+                    {
+                        player.SendChatMessage("!{#FF0000}Failed to start game! Is there enough players or a game running already?");
+                    }
+                    else NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has forcefully started the copchase in lobby {value}.");
+                }
+                else player.SendChatMessage("!{#999999}Proper usage: /game start <lobby id>");
+            }
+            else if (action.StartsWith("autostart", StringComparison.OrdinalIgnoreCase))
+            {
+                string[] args = action.Split(' ');
+                if (args.Count() > 1)
+                {
+                    int value = 0;
+                    if (!Int32.TryParse(args[1], out value) || value < 1 || value > 99)
+                    {
+                        player.SendChatMessage($"!{{#999999}}Lobby ID must be between 1-{Settings.MaxLobbies}!");
+                        return;
+                    }
+                    LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == value);
+                    if (lobby != null)
+                    {
+                        lobby.GameAutoStart = !lobby.GameAutoStart;
+                        if (lobby.GameAutoStart) NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~g~has enabled copchases.");
+                        else NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~w~has disabled copchases.");
+                    }
+                    else NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}The lobby id is invalid or doesn't exist.");
+                }
+                else player.SendChatMessage("!{#999999}Proper usage: /game autostart <lobby id>");
+            }
+            else if (action.StartsWith("teambalance", StringComparison.OrdinalIgnoreCase))
+            {
+                string[] args = action.Split(' ');
+                if (args.Count() > 2)
+                {
+                    int value = 0;
+                    int lobbyid = 0;
+                    if (!Int32.TryParse(args[1], out lobbyid) || lobbyid < 1 || lobbyid > Settings.MaxLobbies)
+                    {
+                        player.SendChatMessage("!{#999999}Lobby ID must be in numbers between 1-" + Settings.MaxLobbies + "!");
+                        return;
+                    }
+                    if (!Int32.TryParse(args[2], out value) || value < 1 || value > 99) 
                     { 
                         player.SendChatMessage("!{#999999}Team balance must be in numbers between 1-99!"); 
                         return; 
                     }
 
-                    Settings.FugitivePercent = value;
+                    LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == lobbyid);
+                    if ((lobby != null) == false)
+                    {
+                        player.SendChatMessage("!{#999999}Lobby ID is invalid!");
+                        return;
+                    }
 
-                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set fugitives percentage to {Settings.FugitivePercent}%.");
+                    lobby.FugitivePercent = value;
+
+                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set lobby {lobby.lobbyId}'s fugitives percentage to {lobby.FugitivePercent}%.");
                 }
-                else player.SendChatMessage("!{#999999}Proper usage: /game teambalance <percentage of fugitives>");
+                else player.SendChatMessage("!{#999999}Proper usage: /game teambalance <lobby id> <percentage of fugitives>");
             }
             else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'start', 'stop', 'autostart', 'teambalance'");
 
@@ -130,7 +220,17 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (Settings.GameRunning != 1 || !Settings.Cops.Contains(player))
+            bool isACop = false;
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetData<int>("InLobby"));
+            if (lobby != null)
+            {
+                if (lobby.Cops.Contains(player) && lobby.gameStatus == 1)
+                {
+                    isACop = true;
+                }
+            }
+
+            if (!isACop)
             {
                 NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not a cop.");
                 return;
@@ -299,25 +399,127 @@ namespace LSCC
         [Command("voiceblock", GreedyArg = true)]
         public void cmd_vblock(Player player, Player target)
         {
-            List<string> blockList = new List<string>();
+            List<Player> blockList = new List<Player>();
             if (player.HasData("BlockList"))
             {
-                blockList = player.GetData<List<string>>("BlockList");
+                blockList = player.GetData<List<Player>>("BlockList");
             }
 
-            if(!blockList.Contains(target.Name) || blockList.Count < 1)
+            if(!blockList.Contains(target) || blockList.Count < 1)
             {
-                blockList.Add(target.Name);
+                blockList.Add(target);
                 player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have muted {target.Name} on voice chat, use this command again to unmute them.");
             }
             else
             {
-                blockList.Remove(target.Name);
-                player.SendChatMessage($"!{{#FF6347}}[#] !{{#FFFFFF}}You have unmuted {target.Name} on voice chat, use this command again to unmute them.");
+                blockList.Remove(target);
+                player.SendChatMessage($"!{{#FF6347}}[#] !{{#FFFFFF}}You have unmuted {target.Name} on voice chat.");
             }
 
             player.SetData("BlockList", blockList);
             
+
+            return;
+        }
+
+        [Command("lobby")]
+        public void cmd_lobby(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+
+            player.SendChatMessage($"!{{#FFFF00}}Sending you to the lobby...");
+            EPlayer.Spawn(player);
+
+            return;
+        }
+
+        [Command("mylobby")]
+        public void cmd_mylobby(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+
+            player.SendChatMessage($"!{{#FFFF00}}You are in lobby {player.GetData<int>("InLobby")}, /switchlobby to change to another lobby.");
+
+            player.SendChatMessage("Current Lobby Players:");
+            RAGE.Entities.Players.All.ForEach((Player ePlayer) =>
+            {
+                player.SendChatMessage($"!{{#999999}}{ePlayer.Name}");
+            });
+
+            return;
+        }
+
+        [Command("lobbies")]
+        public void cmd_lobbies(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            List<LobbyData> lobbyList = Settings.Lobbies.ToList();
+            foreach (LobbyData lobby in lobbyList)
+            {
+                player.SendChatMessage($"!{{#DAA520}}Lobby {lobby.lobbyId} | Players: " +
+                    $"{Settings.LoggedInPlayers.Count(a => a.GetData<int>("InLobby") == lobby.lobbyId)} | Status: {Main.ConvertGameStatus(lobby.gameStatus)}");
+            }
+
+            return;
+        }
+
+        [Command("switchlobby", Alias = "swl")]
+        public void cmd_switchlobby(Player player, int lobbyid)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (!player.HasData("LastLobbySwitch"))
+            {
+                player.SetData<int>("LastLobbySwitch", Environment.TickCount);
+            }
+            else
+            {
+                if (Environment.TickCount - player.GetData<int>("LastLobbySwitch") < 1000)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot switch lobbies that fast.");
+                    return;
+                }
+            }
+           
+
+            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == lobbyid);
+            if ((lobby != null) == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid lobby id!");
+                return;
+            }
+
+            if(Settings.LoggedInPlayers.Count(a => a.GetData<int>("InLobby") == lobbyid) >= Settings.MaxPlayersInLobby)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That lobby is full!");
+                return;
+            }
+
+            LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetData<int>("InLobby"));
+            if(elobby != null)
+            {
+                if(elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot switch lobbies in an ongoing game!");
+                    return;
+                }
+            }
+
+            player.SetData<int>("InLobby", lobbyid);
+            foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetData<int>("InLobby") == lobbyid))
+            {
+                targ.SendChatMessage($"[Lobby {lobbyid}] {player.Name} has joined this lobby.");
+            }
+
+            Random rand = new Random();
+            NAPI.Player.SpawnPlayer(player, Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)]);
 
             return;
         }
@@ -329,19 +531,196 @@ namespace LSCC
 
             player.SendChatMessage("[Los Santos Copchase V BETA Commands]:");
             player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog");
-            player.SendChatMessage("[Voice]: Hold N to speak, /voiceblock");
-            player.SendChatMessage("[Cop]: /gps (Key Z)");
+            player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies");
+            player.SendChatMessage("[Voice]: /voiceblock");
+            player.SendChatMessage("[Keys]: Voice (N) | GPS (Z)");
+            player.SendChatMessage("[Cop]: /gps");
             player.SendChatMessage("[Roleplay]: /me /do");
             player.SendChatMessage("[Debug]: /pos");
+
+            if (EPlayer.GetAccount(player).Admin >= 1) player.SendChatMessage("!{#FF6347}For admin commands, visit /acmds.");
+            return;
+        }
+
+        [Command("bancheck", GreedyArg = true)]
+        public void cmd_bancheck(Player player, string sqlorname)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                return;
+            }
+
+            int sqlid = -1;
+            string[] args = sqlorname.Split(' ');
+            if (args.Count() > 0)
+            {
+                if (!Int32.TryParse(args[0], out sqlid))
+                {
+                    sqlid = -1;
+                }
+            }
+
+            BanData ban = null;
+            
+            if(sqlid != -1) ban = ContextFactory.Instance.Bans.ToList().Find(a => a.SQL_ID == sqlid);
+            else
+            {
+                Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.CompareTo(sqlorname) == 0);
+                if(tpAcc != null)
+                {
+                    ban = ContextFactory.Instance.Bans.ToList().Find(a => a.AccountSQLID == tpAcc.SQL_ID);
+                }
+            }
+
+            if((ban != null) == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no ban with that ID or Name.");
+                return;
+            }
+
+            string username = "Unregistered Ban";
+            if (ban.AccountSQLID != -1)
+            {
+                Account pAcc = ContextFactory.Instance.Accounts.ToList().Find(acc => acc.SQL_ID == ban.AccountSQLID);
+                if (pAcc != null)
+                {
+                    username = pAcc.Username;
+                }
+            }
+
+            player.SendChatMessage($"!{{#FF6347}}Ban ID: {ban.SQL_ID} | Ban By: {ban.Admin}");
+            player.SendChatMessage($"!{{#FF6347}}Reason: {ban.Reason} | DateTime: {ban.DateTime}");
+            player.SendChatMessage($"!{{#FF6347}}Player: {username} | SQLID: {ban.AccountSQLID}");
+            player.SendChatMessage($"!{{#FF6347}}IP: {ban.IP}");
+            player.SendChatMessage($"!{{#FF6347}}HWID: {ban.HWID}");
+            player.SendChatMessage($"!{{#FF6347}}Rockstar ID: {ban.RockstarID}");
+            return;
+        }
+
+        [Command("unban", GreedyArg = true)]
+        public void cmd_unban(Player player, string sqlorname)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 2)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                return;
+            }
+
+            int sqlid = -1;
+            string[] args = sqlorname.Split(' ');
+            if (args.Count() > 0)
+            {
+                if (!Int32.TryParse(args[0], out sqlid))
+                {
+                    sqlid = -1;
+                }
+            }
+
+            BanData ban = null;
+
+            if (sqlid != -1) ban = ContextFactory.Instance.Bans.ToList().Find(a => a.SQL_ID == sqlid);
+            else
+            {
+                Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.CompareTo(sqlorname) == 0);
+                if (tpAcc != null)
+                {
+                    ban = ContextFactory.Instance.Bans.ToList().Find(a => a.AccountSQLID == tpAcc.SQL_ID);
+                }
+            }
+
+            if ((ban != null) == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no ban with that ID or Name.");
+                return;
+            }
+
+            string username = "Unregistered Ban";
+            if (ban.AccountSQLID != -1)
+            {
+                Account pAcc = ContextFactory.Instance.Accounts.ToList().Find(acc => acc.SQL_ID == ban.AccountSQLID);
+                if (pAcc != null)
+                {
+                    username = pAcc.Username;
+                }
+            }
+
+            ContextFactory.Instance.Bans.Remove(ban);
+            ContextFactory.Instance.SaveChanges();
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has unbanned {username}.");
+            return;
+        }
+
+        [Command("ban")]
+        public void cmd_ban(Player player, Player target, string reason)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 2)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                return;
+            }
+
+            var _new = new BanData
+            {
+                IP = target.Address,
+                RockstarID = target.SocialClubId,
+                Reason = reason,
+                Admin = player.Name,
+                DateTime = DateTime.Now.ToString(),
+                AccountSQLID = EPlayer.LoggedIn(target) ? EPlayer.GetAccount(target).SQL_ID : -1,
+                HWID = target.Serial
+            };
+            ContextFactory.Instance.Bans.Add(_new);
+
+            ContextFactory.Instance.SaveChanges();
+
+            EPlayer.SetDiscordStatus(target, "Gazing at the 'BANNED' screen.");
+
+            RAGE.Entities.Players.All.ForEach((Player p) =>
+            {
+                p.SendChatMessage($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has banned {target.Name} for: {reason}");
+            });
+
+            target.SendChatMessage($"!{{#FF6347}}[BANNED] You have been banned from this server, Ban ID: {_new.SQL_ID}");
+
+            player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+
+            NAPI.Task.Run(() =>
+            {
+                player.Kick("Banned.");
+            }, 350);
+
+           
+            return;
+        }
+
+        [Command("acmds", Alias = "ahelp")]
+        public void cmd_ahelp(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
 
             if (EPlayer.GetAccount(player).Admin >= 1)
             {
                 player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /sethp /setar /spec");
                 player.SendChatMessage("[Admin Lv 1]: /freeze /unfreeze /kick /slap /setinv(ulnerable) /specoff");
+                player.SendChatMessage("[Admin Lv 1]: /bancheck");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
-                player.SendChatMessage("[Admin Lv 2]: /game");
+                player.SendChatMessage("[Admin Lv 2]: /game /ban /unban");
+            }
+            if (EPlayer.GetAccount(player).Admin >= 4)
+            {
+                player.SendChatMessage("[Admin Lv 4]: /serveroptions");
             }
             if (EPlayer.GetAccount(player).Admin >= 5)
             {
@@ -351,6 +730,7 @@ namespace LSCC
             {
                 player.SendChatMessage("[Admin Lv 6]: /triggerevent /cameraset /setadmin");
             }
+            return;
         }
 
         [Command("maps")]

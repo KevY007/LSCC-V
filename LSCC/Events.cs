@@ -12,6 +12,26 @@ namespace LSCC.Events
         [ServerEvent(Event.PlayerConnected)]
         public void OnPlayerConnected(Player player)
         {
+            BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.HWID.CompareTo(player.Serial) == 0 || ban.IP.CompareTo(player.Address) == 0 ||
+                ban.RockstarID == player.SocialClubId);
+
+            if (ban != null)
+            {
+                EPlayer.SetDiscordStatus(player, "Gazing at the 'BANNED' screen.");
+
+                player.SendChatMessage($"!{{#FF6347}}[BANNED] You are not allowed to play on this server, Ban ID: {ban.SQL_ID}");
+
+                player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+
+                NAPI.Task.Run(() =>
+                {
+                    player.Kick("Banned.");
+                }, 350);
+
+                return;
+            }
+
+
             EPlayer.SetDiscordStatus(player, "Connecting to the server...");
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has joined the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
             NAPI.Notification.SendNotificationToPlayer(player, "~g~Welcome to ~w~Los Santos Copchase!");
@@ -37,7 +57,11 @@ namespace LSCC.Events
         {
             if(keyId == 0x5A)
             {
-                if(Settings.Cops.Contains(player)) LSCC.Commands.cmd_gps(player);
+                LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetData<int>("InLobby"));
+                if(lobby != null)
+                {
+                    if(lobby.Cops.Contains(player)) LSCC.Commands.cmd_gps(player);
+                }
             }
             return;
         }
@@ -79,7 +103,7 @@ namespace LSCC.Events
 
             NAPI.Notification.SendNotificationToPlayer(player, $"~r~You died!", false);
 
-            if (!killer.IsNull)
+            if (killer != null && !killer.IsNull)
             {
                 NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name}, reason: {reason}.");
             }
@@ -88,33 +112,50 @@ namespace LSCC.Events
                 NAPI.Util.ConsoleOutput($"[Death] {player.Name} has died, reason: {reason}.");
             }
 
-            if (Settings.GameRunning == 1)
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetData<int>("InLobby"));
+            if (lobby != null)
             {
-                if(Settings.Fugitives.Contains(player))
+                if (lobby.gameStatus == 1)
                 {
-                    if (!killer.IsNull)
+                    if (lobby.Fugitives.Contains(player))
                     {
-                        NAPI.Notification.SendNotificationToAll($"Fugitive ~r~<C>{player.Name}</C> ~w~has been taken out by ~b~<C>{killer.Name}</C>~w~.");
-                    }
-                    else
-                    {
-                        NAPI.Notification.SendNotificationToAll($"Fugitive ~r~<C>{player.Name}</C> ~w~has died.");
+                        foreach (Player ay in Settings.LoggedInPlayers)
+                        {
+                            if (ay.GetData<int>("InLobby") == lobby.lobbyId)
+                            {
+                                if (killer != null && !killer.IsNull)
+                                {
+                                    NAPI.Notification.SendNotificationToPlayer(ay, $"Fugitive ~r~<C>{player.Name}</C> ~w~has been taken out by ~b~<C>{killer.Name}</C>~w~.");
+                                }
+                                else
+                                {
+                                    NAPI.Notification.SendNotificationToPlayer(ay, $"Fugitive ~r~<C>{player.Name}</C> ~w~has died.");
+                                }
+                            }
+                        }
+
+                        lobby.Fugitives.Remove(player);
                     }
 
-                    Settings.Fugitives.Remove(player);
-                }
-                if (Settings.Cops.Contains(player))
-                {
-                    if (!killer.IsNull)
+                    if (lobby.Cops.Contains(player))
                     {
-                        NAPI.Notification.SendNotificationToAll($"Cop ~b~<C>{player.Name}</C> ~w~has been taken out by ~r~<C>{killer.Name}</C>~w~.");
-                    }
-                    else
-                    {
-                        NAPI.Notification.SendNotificationToAll($"Cop ~b~<C>{player.Name}</C> ~w~has died.");
-                    }
+                        foreach (Player ay in Settings.LoggedInPlayers)
+                        {
+                            if (ay.GetData<int>("InLobby") == lobby.lobbyId)
+                            {
+                                if (killer != null && !killer.IsNull)
+                                {
+                                    NAPI.Notification.SendNotificationToPlayer(ay, $"Cop ~r~<C>{player.Name}</C> ~w~has been taken out by ~b~<C>{killer.Name}</C>~w~.");
+                                }
+                                else
+                                {
+                                    NAPI.Notification.SendNotificationToPlayer(ay, $"Cop ~r~<C>{player.Name}</C> ~w~has died.");
+                                }
+                            }
+                        }
 
-                    Settings.Cops.Remove(player);
+                        lobby.Cops.Remove(player);
+                    }
                 }
             }
 
@@ -157,6 +198,26 @@ namespace LSCC.Events
 
             player.SetData("LoggedIn", true);
             player.SetData("AccountHandle", acc);
+
+
+            BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.AccountSQLID == acc.SQL_ID);
+
+            if (ban != null)
+            {
+                EPlayer.SetDiscordStatus(player, "Gazing at the 'BANNED' screen.");
+
+                player.SendChatMessage($"!{{#FF6347}}[BANNED] You are not allowed to play on this server, Ban ID: {ban.SQL_ID}");
+                player.SendChatMessage("!{#A9C4E4}KevY is surprised how you made it this far though.");
+
+                player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+
+                NAPI.Task.Run(() =>
+                {
+                    player.Kick("Banned.");
+                }, 350);
+
+                return;
+            }
 
             player.Name = acc.Username;
             player.TriggerEvent("destroyBrowser");
@@ -220,7 +281,7 @@ namespace LSCC.Events
         [RemoteEvent("RemoveVoiceListener")]
         public void RemoveVoiceListener(Player player, Player target)
         {
-            if (!target.IsNull && target != null)
+            if (target != null && !target.IsNull)
             {
                 player.DisableVoiceTo(target);
             }
@@ -229,12 +290,18 @@ namespace LSCC.Events
         [RemoteEvent("AddVoiceListener")]
         public void AddVoiceListener(Player player, Player target)
         {
-            if(!target.IsNull && target != null)
+            if(target != null && !target.IsNull)
             {
                 if (target.HasData("BlockList"))
                 {
-                    List<string> blockList = target.GetData<List<string>>("BlockList");
-                    if (blockList.Contains(player.Name) && blockList.Count > 0) return;
+                    List<Player> blockList = target.GetData<List<Player>>("BlockList");
+                    if (blockList.Contains(player) && blockList.Count > 0) return;
+                }
+
+                if (player.HasData("BlockList"))
+                {
+                    List<Player> blockList = player.GetData<List<Player>>("BlockList");
+                    if (blockList.Contains(target) && blockList.Count > 0) return;
                 }
 
                 player.EnableVoiceTo(target);
@@ -325,15 +392,27 @@ namespace LSCC.Events
                 player.ResetData("Blip");
             }
 
-            EPlayer.SetDiscordStatus(player, $"In lobby as {player.Name}");
+            EPlayer.SetDiscordStatus(player, $"In lobby {player.GetData<int>("InLobby")} as {player.Name}");
 
             player.RemoveAllWeapons();
 
-            player.Dimension = 1;
+            player.Dimension = 100 + Convert.ToUInt32(player.GetData<int>("InLobby"));
             player.TriggerEvent("SetActorInvulnerable", true);
             player.TriggerEvent("CanFallOutOfCar", false);
             player.TriggerEvent("showHPBars", 0); // Never show HP Bars.
             EPlayer.SetColor(player, new Color(255, 255, 255, 255));
+
+            if(player.GetData<int>("InLobby") > -1)
+            {
+                LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetData<int>("InLobby"));
+                if (lobby != null)
+                {
+                    if (lobby.gameStatus == 1)
+                    {
+                        player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, lobby.CollisionCounter);
+                    }
+                }
+            }
         }
     }
 }

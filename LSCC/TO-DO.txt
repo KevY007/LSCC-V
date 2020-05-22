@@ -21,3 +21,4 @@ collision bugged (reapply in 2 secs to spawn),
 
 anti teamkill/team damage.
 
+HAS SHOT TAG OR SOMETHING LIKE THAT, NO GUNS BEFORE 30 SECONDS INTO ROUND AND NO DRIVEBY AS DRIVER

@@ -25,6 +25,19 @@ namespace LSCC
         public bool Enabled { get; set; }
     }
 
+    public class BanData
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public int AccountSQLID { get; set; }
+        public ulong RockstarID { get; set; }
+        public string IP { get; set; }
+        public string HWID { get; set; }
+        public string Reason { get; set; }
+        public string Admin { get; set; }
+        public string DateTime { get; set; }
+    }
+
     public class MainDatabase : DbContext
     {
         // Base constructor
@@ -37,6 +50,7 @@ namespace LSCC
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Map> Maps { get; set; }
         public DbSet<MapSpawn> MapSpawns { get; set; }
+        public DbSet<BanData> Bans { get; set; }
     }
 
     public class ContextFactory : IDesignTimeDbContextFactory<MainDatabase>
