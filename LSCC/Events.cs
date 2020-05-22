@@ -273,7 +273,7 @@ namespace LSCC.Events
                     }
                 }
             }
-            NAPI.Notification.SendNotificationToPlayer(player, "~r~Invalid password/username!", true);
+            NAPI.Notification.SendNotificationToPlayer(player, "~r~Invalid credentials or unable to log in!", true);
 
         }
 

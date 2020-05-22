@@ -54,6 +54,11 @@ namespace LSCC
         }
         public static bool Login(Account _target, string password, bool _crypted = false)
         {
+            foreach(Player player in Settings.LoggedInPlayers)
+            {
+                if (EPlayer.GetAccount(player).SQL_ID == _target.SQL_ID) return false; // Return FALSE if another PLAYER is online from SAME ACC.
+            }
+
             string crypted = password;
             if (!_crypted) crypted = Crypt(password, _target.Salt);
             if(MatchPass(crypted, _target.Password))
