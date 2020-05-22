@@ -345,6 +345,24 @@ namespace LSCC
             return;
         }
 
+        [Command("givegun")]
+        public void cmd_givegun(Player player, Player target, int ammo, string gunname)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 3)
+            {
+                NAPI.Chat.SendChatMessageToPlayer(player, "!{#FF6347}[!] !{#FFFFFF}You are not a level 2 admin.");
+                return;
+            }
+
+            target.GiveWeapon((WeaponHash)NAPI.Util.GetHashKey(gunname), ammo);
+
+            player.SendChatMessage("Attempted to give the weapon.");
+            return;
+        }
+
         [Command("removeavehs")]
         public void cmd_removeavehs(Player player)
         {
@@ -717,6 +735,10 @@ namespace LSCC
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
                 player.SendChatMessage("[Admin Lv 2]: /game /ban /unban");
+            }
+            if (EPlayer.GetAccount(player).Admin >= 3)
+            {
+                player.SendChatMessage("[Admin Lv 3]: /givegun");
             }
             if (EPlayer.GetAccount(player).Admin >= 4)
             {
