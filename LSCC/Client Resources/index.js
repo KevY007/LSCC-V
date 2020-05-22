@@ -4,6 +4,7 @@ require('./Player/Player.js');
 require("./Player/Nametags.js");
 require("./Player/Voice.js");
 require("./Player/HUD.js");
+require("./Player/KillList.js");
 
 require('./camerasManager.js');
 require('./cefBrowser.js');

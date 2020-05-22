@@ -103,13 +103,19 @@ namespace LSCC.Events
 
             NAPI.Notification.SendNotificationToPlayer(player, $"~r~You died!", false);
 
+            string reasonStr;
+            if(!Main.WeaponReasons.TryGetValue(1936677264, out reasonStr))
+            {
+                reasonStr = null;
+            }
+
             if (killer != null && !killer.IsNull)
             {
-                NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name}, reason: {reason}.");
+                NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
             }
             else
             {
-                NAPI.Util.ConsoleOutput($"[Death] {player.Name} has died, reason: {reason}.");
+                NAPI.Util.ConsoleOutput($"[Death] {player.Name} has died, reason: {(reasonStr == null ? "N/A" : reasonStr)}.");
             }
 
             LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetData<int>("InLobby"));
@@ -123,13 +129,32 @@ namespace LSCC.Events
                         {
                             if (ay.GetData<int>("InLobby") == lobby.lobbyId)
                             {
+
                                 if (killer != null && !killer.IsNull)
                                 {
                                     NAPI.Notification.SendNotificationToPlayer(ay, $"Fugitive ~r~<C>{player.Name}</C> ~w~has been taken out by ~b~<C>{killer.Name}</C>~w~.");
+
+                                    if (reasonStr == null)
+                                    {
+                                        ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name}");
+                                    }
+                                    else
+                                    {
+                                        ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}");
+                                    }
                                 }
                                 else
                                 {
                                     NAPI.Notification.SendNotificationToPlayer(ay, $"Fugitive ~r~<C>{player.Name}</C> ~w~has died.");
+
+                                    if (reasonStr == null)
+                                    {
+                                        ay.TriggerEvent("pushToKillFeed", $"{player.Name} died");
+                                    }
+                                    else
+                                    {
+                                        ay.TriggerEvent("pushToKillFeed", $"{player.Name} died of {reasonStr}");
+                                    }
                                 }
                             }
                         }
@@ -146,10 +171,28 @@ namespace LSCC.Events
                                 if (killer != null && !killer.IsNull)
                                 {
                                     NAPI.Notification.SendNotificationToPlayer(ay, $"Cop ~r~<C>{player.Name}</C> ~w~has been taken out by ~b~<C>{killer.Name}</C>~w~.");
+                                    
+                                    if (reasonStr == null)
+                                    {
+                                        ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name}");
+                                    }
+                                    else
+                                    {
+                                        ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}");
+                                    }
                                 }
                                 else
                                 {
                                     NAPI.Notification.SendNotificationToPlayer(ay, $"Cop ~r~<C>{player.Name}</C> ~w~has died.");
+
+                                    if (reasonStr == null)
+                                    {
+                                        ay.TriggerEvent("pushToKillFeed", $"{player.Name} died");
+                                    }
+                                    else
+                                    {
+                                        ay.TriggerEvent("pushToKillFeed", $"{player.Name} died of {reasonStr}");
+                                    }
                                 }
                             }
                         }
