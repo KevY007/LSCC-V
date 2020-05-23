@@ -6,7 +6,7 @@ OTHER FEATURES FROM LSCC SAMP AND GUNS SYSTEM FINALLY AND WEAPON DAMAGES? IDK
 
 /skin, 
 basic copchase commands, 
-taser beanbag, /ban system, 
+taser beanbag
 toy system if possible, 
 fix spec, 
 add basic guns like shotgun, 
