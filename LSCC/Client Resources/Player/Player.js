@@ -25,20 +25,6 @@ function calcDist(v1, v2) {
 
 mp.game.controls.useDefaultVehicleEntering = true;
 
-function playerEnterVehicleHandler(player, vehicle, seat) {
-    if(player === mp.players.local)
-    {
-        if(seat == 0 || seat == -1) mp.players.local.CanDoDriveBy(false);
-        else mp.players.local.setCanDoDriveBy(true);
-    }
-}
-
-mp.events.add("playerEnterVehicle", playerEnterVehicleHandler);
-
-mp.events.add("playerLeaveVehicle", (vehicle, seat) => {
-    mp.players.local.setCanDoDriveBy(true);
-})
-
 mp.keys.bind(
     71,
     false,

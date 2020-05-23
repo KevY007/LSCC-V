@@ -14,4 +14,6 @@ add basic guns like shotgun,
 
 anti teamkill/team damage.
 
+DISABLE DRIVER DRIVEBY
+
 HAS SHOT TAG OR SOMETHING LIKE THAT
