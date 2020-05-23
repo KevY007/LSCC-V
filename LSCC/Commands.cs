@@ -798,7 +798,7 @@ namespace LSCC
 
             EPlayer.GrantXP(target, xp);
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has given {target.Name} {xp} xp.");
-            target.SendChatMessage($"!{{#FF6347]}[AdmCmd] {player.Name} has given you {xp} xp.");
+            target.SendChatMessage($"!{{#FF6347]}}[AdmCmd] {player.Name} has given you {xp} xp.");
             return;
         }
 
