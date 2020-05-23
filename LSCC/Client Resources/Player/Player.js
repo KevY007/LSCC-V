@@ -36,7 +36,7 @@ function playerEnterVehicleHandler(player, vehicle, seat) {
 mp.events.add("playerEnterVehicle", playerEnterVehicleHandler);
 
 mp.events.add("playerLeaveVehicle", (vehicle, seat) => {
-    mp.game.player.setPlayerCanDoDriveBy(true);
+    mp.players.local.setPlayerCanDoDriveBy(true);
 })
 
 mp.keys.bind(
