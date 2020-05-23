@@ -918,7 +918,7 @@ namespace LSCC
                             data.Item1.TriggerEvent("ToggleChaseCollisions", false);
                         } // Toggle Collisions OFF again. smh they dont activate sometimes.
 
-                    }, delayTime: 2000);
+                    }, delayTime: 3000);
 
                 }, delayTime: 3000);
 
@@ -949,21 +949,25 @@ namespace LSCC
                 {
                     lobby.CollisionCounter--;
 
-                    foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                    if (lobby.CollisionCounter < 1)
                     {
-                        if (!lobby.Cops.Contains(player) && !lobby.Fugitives.Contains(player)) continue;
+                        foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                        {
+                            if (!lobby.Cops.Contains(player) && !lobby.Fugitives.Contains(player)) continue;
 
-                        player.TriggerEvent("ToggleChaseCollisions", true);
-                        NAPI.Notification.SendNotificationToPlayer(player, $"~r~Collisions enabled and weapons deployed!", true);
-                        if (lobby.Cops.Contains(player))
-                        {
-                            player.GiveWeapon(WeaponHash.Carbinerifle, 120);
-                            player.GiveWeapon(WeaponHash.Pistol50, 20);
-                        }
-                        else if (lobby.Fugitives.Contains(player))
-                        {
-                            player.GiveWeapon(WeaponHash.Assaultrifle, 60);
-                            player.GiveWeapon(WeaponHash.Pistol, 32);
+                            player.TriggerEvent("ToggleChaseCollisions", true);
+                            NAPI.Notification.SendNotificationToPlayer(player, $"~r~Collisions enabled and weapons deployed!", true);
+
+                            if (lobby.Cops.Contains(player))
+                            {
+                                player.GiveWeapon(WeaponHash.Carbinerifle, 120);
+                                player.GiveWeapon(WeaponHash.Pistol50, 20);
+                            }
+                            else if (lobby.Fugitives.Contains(player))
+                            {
+                                player.GiveWeapon(WeaponHash.Assaultrifle, 60);
+                                player.GiveWeapon(WeaponHash.Pistol, 32);
+                            }
                         }
                     }
                 }
