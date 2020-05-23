@@ -10,7 +10,7 @@ taser beanbag, /ban system,
 toy system if possible, 
 fix spec, 
 add basic guns like shotgun, 
-/FIX /FLIP, remove driveby as driver
+/FIX /FLIP
 
 anti teamkill/team damage.
 
