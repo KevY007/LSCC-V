@@ -714,6 +714,12 @@ namespace LSCC
                 return;
             }
 
+            if (EPlayer.GetAccount(player).Admin < EPlayer.GetAccount(target).Admin)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is more higher admin level than you!");
+                return;
+            }
+
             var _new = new BanData
             {
                 IP = target.Address,
