@@ -26,9 +26,9 @@ function calcDist(v1, v2) {
 mp.game.controls.useDefaultVehicleEntering = true;
 
 function playerEnterVehicleHandler(player, vehicle, seat) {
-    if(player == mp.players.local)
+    if(player === mp.players.local)
     {
-        if(seat == 0 || seat == -1) mp.game.player.setPlayerCanDoDriveBy(false);
+        if(seat == 0 || seat == -1) mp.players.local.CanDoDriveBy(false);
         else mp.players.local.setCanDoDriveBy(true);
     }
 }
@@ -36,7 +36,7 @@ function playerEnterVehicleHandler(player, vehicle, seat) {
 mp.events.add("playerEnterVehicle", playerEnterVehicleHandler);
 
 mp.events.add("playerLeaveVehicle", (vehicle, seat) => {
-    mp.players.local.setPlayerCanDoDriveBy(true);
+    mp.players.local.setCanDoDriveBy(true);
 })
 
 mp.keys.bind(
