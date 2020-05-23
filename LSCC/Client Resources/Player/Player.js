@@ -23,8 +23,6 @@ function calcDist(v1, v2) {
     );
 }
 
-mp.game.controls.useDefaultVehicleEntering = true;
-
 mp.keys.bind(
     71,
     false,
