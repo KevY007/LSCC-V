@@ -103,6 +103,34 @@ namespace LSCC
             ResetPlayerData(player);
             player.TriggerEvent("showBrowser", "package://LoginRegister/login.html");
         }
+        public static int GetMaxLevelXP(int level)
+        {
+            return (level * 8);
+        }
+        public static bool CheckXPLevelUp(int level, int xp)
+        {
+            if (xp == 0) return false;
+
+            return (xp >= GetMaxLevelXP(level) ? true : false);
+        }
+        public static void GrantXP(Player player, int xp)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Account acc = EPlayer.GetAccount(player); 
+            acc.XP += xp;
+            
+            while(CheckXPLevelUp(acc.Level, acc.XP) == true)
+            {
+                acc.XP -= GetMaxLevelXP(acc.Level);
+                acc.Level++;
+                RAGE.Entities.Players.All.ForEach((Player pl) =>
+                {
+                    pl.SendChatMessage($"!{{#00BA03}}[LEVEL UP] {player.Name} has levelled up to {acc.Level}!");
+                });
+                player.SendNotification($"~w~You have levelled up to ~g~{acc.Level}~w~!");
+            }
+        }
         public static void Save(Player player)
         {
             if (LoggedIn(player))

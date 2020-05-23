@@ -891,16 +891,7 @@ namespace LSCC
 
                         data.Item1.TriggerEvent("ToggleChaseCollisions", false);
 
-                        if (lobby.Cops.Contains(data.Item1))
-                        {
-                            data.Item1.GiveWeapon(WeaponHash.Carbinerifle, 100);
-                            data.Item1.GiveWeapon(WeaponHash.Combatpistol, 100);
-                        }
-                        else if (lobby.Fugitives.Contains(data.Item1))
-                        {
-                            data.Item1.GiveWeapon(WeaponHash.Assaultrifle, 100);
-                            data.Item1.GiveWeapon(WeaponHash.Combatpistol, 100);
-                        }
+                        data.Item1.SendNotification($"~g~Weapons will be given after collisions enable.");
                     }
 
                     NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] Copchase started with !{{#8D8DFF}}{lobby.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{lobby.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{map.Name}!{{#FFFFFF}}.");
@@ -962,10 +953,17 @@ namespace LSCC
                     {
                         if (!lobby.Cops.Contains(player) && !lobby.Fugitives.Contains(player)) continue;
 
-                        if (lobby.CollisionCounter < 1)
+                        player.TriggerEvent("ToggleChaseCollisions", true);
+                        NAPI.Notification.SendNotificationToPlayer(player, $"~r~Collisions enabled and weapons deployed!", true);
+                        if (lobby.Cops.Contains(player))
                         {
-                            player.TriggerEvent("ToggleChaseCollisions", true);
-                            NAPI.Notification.SendNotificationToPlayer(player, $"~r~Collisions enabled!", true);
+                            player.GiveWeapon(WeaponHash.Carbinerifle, 120);
+                            player.GiveWeapon(WeaponHash.Pistol50, 20);
+                        }
+                        else if (lobby.Fugitives.Contains(player))
+                        {
+                            player.GiveWeapon(WeaponHash.Assaultrifle, 60);
+                            player.GiveWeapon(WeaponHash.Pistol, 32);
                         }
                     }
                 }

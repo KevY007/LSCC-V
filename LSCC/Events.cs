@@ -112,6 +112,11 @@ namespace LSCC.Events
             if (killer != null && !killer.IsNull)
             {
                 NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
+
+                if (killer.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && player.GetSharedData<int>("Team") != -1)
+                {
+                    EPlayer.GrantXP(killer, 1);
+                }
             }
             else
             {
@@ -129,10 +134,9 @@ namespace LSCC.Events
                         {
                             if (ay.GetSharedData<int>("InLobby") == lobby.lobbyId)
                             {
-
                                 if (killer != null && !killer.IsNull)
                                 {
-                                    NAPI.Notification.SendNotificationToPlayer(ay, $"Fugitive ~r~<C>{player.Name}</C> ~w~has been taken out by ~b~<C>{killer.Name}</C>~w~.");
+                                    ay.SendNotification($"Fugitive ~r~<C>{player.Name}</C> ~w~has been taken out by ~b~<C>{killer.Name}</C>~w~.");
 
                                     if (reasonStr == null)
                                     {

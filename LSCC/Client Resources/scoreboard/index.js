@@ -22,10 +22,13 @@ mp.keys.bind(0x4F, false, function () {
         browser = null;
         clearInterval(updater);
         updater = null;
-        return
+        mp.gui.cursor.show(false, false);
+        return;
     }
 
     browser = mp.browsers.new("package://scoreboard/cef/index.html");
+
+    mp.gui.cursor.show(true, true);
 
     mp.players.forEach(
         (player) => {

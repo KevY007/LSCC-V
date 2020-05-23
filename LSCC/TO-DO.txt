@@ -1,24 +1,17 @@
 ﻿FORMAT: ADDED BY - ITEM.
 
-USE SCRIPT TO ALLOW MULTIPLE LOBBY SYSTEM
 
-ADD SCOREBOARD/ONLINE LIST + ADD OTHER COPCHASE FEATURES, PROBABLY REDUCE TIME?
+ADD OTHER COPCHASE FEATURES, PROBABLY REDUCE TIME?
 OTHER FEATURES FROM LSCC SAMP AND GUNS SYSTEM FINALLY AND WEAPON DAMAGES? IDK
-SPEEDOMETER
 
 /skin, 
 basic copchase commands, 
 taser beanbag, /ban system, 
 toy system if possible, 
-player board/list,
-nametag thru wall, 
 fix spec, 
 add basic guns like shotgun, 
-levels/score system, 
-text scaling for zone area in hud, 
-collision bugged (reapply in 2 secs to spawn), 
-/givegun, /FIX /FLIP, remove driveby as driver
+/FIX /FLIP, remove driveby as driver
 
 anti teamkill/team damage.
 
-HAS SHOT TAG OR SOMETHING LIKE THAT, NO GUNS BEFORE 30 SECONDS INTO ROUND AND NO DRIVEBY AS DRIVER
+HAS SHOT TAG OR SOMETHING LIKE THAT
