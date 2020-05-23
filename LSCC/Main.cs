@@ -7,7 +7,6 @@ using System.Linq;
 using LSCC;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using LSCC.Events;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
 public class LobbyData
@@ -24,14 +23,18 @@ public class LobbyData
     public int FugitivePercent { get; set; }
     public bool GameAutoStart { get; set; }
     public int LastAutoStartMsg { get; set; }
+    public bool Enabled { get; set; }
+    public bool PlayerCreated { get; set; }
+    public string Password { get; set; }
 
-    public LobbyData(int id)
+    public LobbyData()
     {
         Cops = new List<Player>();
         Fugitives = new List<Player>();
         Vehicles = new List<Vehicle>();
 
-        lobbyId = id;
+        lobbyId = Settings.NextLobbyID;
+        Settings.NextLobbyID++;
         gameStatus = 0;
         FugitiveShowCounter = 0;
         CollisionCounter = 0;
@@ -39,6 +42,11 @@ public class LobbyData
         GameAutoStart = true;
         LastAutoStartMsg = 0;
         FugitivePercent = 30;
+        Enabled = true;
+        PlayerCreated = false;
+        Password = "";
+
+        Settings.Lobbies.Add(this);
     }
 };
 
@@ -47,7 +55,7 @@ public static class Settings
     // Static Settings / Const
     public const string Version = "0.1a";
     public const int GameRunTime = 600; // Game Running Time in Seconds before STOP
-    public const int MaxLobbies = 5;
+    public const int MaxLobbies = 5; // Default/starting lobby num.
     public const int DefaultMaxInLobby = 35;
 
     // MySQL Settings
@@ -60,6 +68,7 @@ public static class Settings
     public static List<LobbyData> Lobbies { get; set; }
     public static List<Player> LoggedInPlayers { get; set; }
     public static List<Vehicle> AdminVehicles { get; set; }
+    public static int NextLobbyID { get; set; }
     public static int MaxPlayersInLobby { get; set; }
 
     // Locations
@@ -75,13 +84,15 @@ public static class Settings
     {
         new Vector3(-592f, -98f, 43f)
     };
+
+    public static Vector3 VectorJail = new Vector3(-127.18, -991.12, 39.259);
 }
 
 namespace LSCC
 {
     public class Main : Script
     {
-        public static Dictionary<uint, string> WeaponReasons = new Dictionary<uint, string>()
+        public static IDictionary<uint, string> WeaponReasons = new Dictionary<uint, string>()
         {
             {2460120199, "Antique Cavalry Dagger"},
 	        {2508868239, "Baseball Bat"},
@@ -350,11 +361,11 @@ namespace LSCC
             Settings.AdminVehicles = new List<Vehicle>();
 
             Settings.MaxPlayersInLobby = Settings.DefaultMaxInLobby;
+            Settings.NextLobbyID = 1;
 
             for(int i = 0; i < Settings.MaxLobbies; i++)
             {
-                LobbyData eLobbyData = new LobbyData(i + 1);
-                Settings.Lobbies.Add(eLobbyData);
+                LobbyData eLobbyData = new LobbyData();
             }
           
             NAPI.Task.Run(() =>
@@ -412,46 +423,61 @@ namespace LSCC
                 {
                     if (lobby.gameStatus == 0)
                     {
-                        if (lobby.GameAutoStart)
+                        if (lobby.Enabled)
                         {
-                            int pCount = 0;
-                            foreach (Player player in Settings.LoggedInPlayers)
+                            if (lobby.GameAutoStart)
                             {
-                                if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetData<bool>("AutoJoin") == true)
-                                {
-                                    pCount++;
-                                }
-                            }
-
-                            if (pCount >= 2)
-                            {
-                                lobby.gameStatus = 2;
-
+                                int pCount = 0;
                                 foreach (Player player in Settings.LoggedInPlayers)
                                 {
                                     if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetData<bool>("AutoJoin") == true)
                                     {
-                                        EPlayer.Spawn(player);
-                                        NAPI.Notification.SendNotificationToPlayer(player, $"~w~Game is starting in ~g~10 seconds~w~.", true);
-
-                                        NAPI.Util.ConsoleOutput("[TimeUpdate] Game starting in 10 seconds...");
+                                        pCount++;
                                     }
                                 }
 
-                                NAPI.Task.Run(() =>
+                                if (pCount >= 2)
                                 {
-                                    GameStartCountdown(10, lobby.lobbyId);
-                                }, delayTime: 2000);
-                            }
-                            else
-                            {
-                                if (Environment.TickCount - lobby.LastAutoStartMsg >= 90000)
-                                {
+                                    lobby.gameStatus = 2;
+
                                     foreach (Player player in Settings.LoggedInPlayers)
                                     {
-                                        EPlayer.SendMessageInLobby(lobby.lobbyId, "!{#FFFF00}[GAME] !{#FFFFFF}Game will not start unless there are 2+ players to start a match.");
+                                        if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetData<bool>("AutoJoin") == true)
+                                        {
+                                            EPlayer.Spawn(player);
+                                            NAPI.Notification.SendNotificationToPlayer(player, $"~w~Game is starting in ~g~10 seconds~w~.", true);
+
+                                            NAPI.Util.ConsoleOutput("[TimeUpdate] Game starting in 10 seconds...");
+                                        }
                                     }
-                                    lobby.LastAutoStartMsg = Environment.TickCount;
+
+                                    NAPI.Task.Run(() =>
+                                    {
+                                        GameStartCountdown(10, lobby.lobbyId);
+                                    }, delayTime: 2000);
+                                }
+                                else
+                                {
+                                    if (Environment.TickCount - lobby.LastAutoStartMsg >= 90000)
+                                    {
+                                        foreach (Player player in Settings.LoggedInPlayers)
+                                        {
+                                            EPlayer.SendMessageInLobby(lobby.lobbyId, "!{#FFFF00}[GAME] !{#FFFFFF}Game will not start unless there are 2+ players to start a match.");
+                                        }
+                                        lobby.LastAutoStartMsg = Environment.TickCount;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            foreach (Player player in Settings.LoggedInPlayers)
+                            {
+                                if (player.GetSharedData<int>("InLobby") == lobby.lobbyId)
+                                {
+                                    player.SetSharedData("InLobby", -1);
+                                    player.SendChatMessage("!{#FF0000}This lobby is disabled, resetting you to any other lobby.");
+                                    EPlayer.Spawn(player);
                                 }
                             }
                         }
@@ -551,7 +577,7 @@ namespace LSCC
 
         public static bool StartGame(int lobbyid)
         {
-            LobbyData lobby = Settings.Lobbies.Find(l => l.lobbyId == lobbyid);
+            LobbyData lobby = Settings.Lobbies.Find(l => l.lobbyId == lobbyid && l.Enabled == true);
             if (lobby != null && lobby.gameStatus != 1)
             {
                 if (lobby.gameStatus == 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Copchase is already running, failed to start"); return false; }
@@ -776,7 +802,7 @@ namespace LSCC
                         player.ResetData("Blip");
                     }
 
-                    Blip pBlip = NAPI.Blip.CreateBlip(new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ), player.Dimension);
+                    Blip pBlip = NAPI.Blip.CreateBlip(new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ), Convert.ToUInt32(lobbyid));
                     pBlip.Transparency = 255;
                     pBlip.Color = 75;
 
@@ -983,7 +1009,7 @@ namespace LSCC
 
                     if (cop.GetData<bool>("GPS") == false) continue;
 
-                    Blip pBlip = NAPI.Blip.CreateBlip(cop.Position, lobby.lobbyId);
+                    Blip pBlip = NAPI.Blip.CreateBlip(cop.Position, Convert.ToUInt32(lobby.lobbyId));
 
                     pBlip.Transparency = 192;
                     pBlip.Color = 3;
@@ -1002,7 +1028,7 @@ namespace LSCC
                             fugi.ResetData("Blip");
                         }
 
-                        Blip pBlip = NAPI.Blip.CreateBlip(fugi.Position, lobby.lobbyId);
+                        Blip pBlip = NAPI.Blip.CreateBlip(fugi.Position, Convert.ToUInt32(lobby.lobbyId));
 
                         pBlip.Transparency = 238;
                         pBlip.Color = 1;

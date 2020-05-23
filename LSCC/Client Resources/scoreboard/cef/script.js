@@ -26,9 +26,9 @@ function createUser(lid, name, level, ping, color_r, color_g, color_b) {
 	trfirst.appendChild(tdLevel);
 	trfirst.appendChild(tdPing);
 
-	if(color_r != 255 && color_g != 255 && color_b != 255) Name.style.color = rgb(color_r, color_g, color_b);
-
 	document.getElementById("playershere").appendChild(trfirst);
+	
+	updateUser(lid, name, level, ping, color_r, color_g, color_b);
 };
 
 function removeUser(userRemove) {
@@ -44,7 +44,7 @@ function removeUser(userRemove) {
 function updateServerName(name) {
 	if (document.getElementById("servername") !== null) {
 		var element = document.getElementById("servername");
-		element.innerHTML = name;
+		if(element.innerHTML != name) element.innerHTML = name;
 	} else {
 		console.log('Failed to update server name.')
 	}
@@ -60,7 +60,7 @@ function updateUser(userLID, userName, userLevel, userPing, color_r, color_g, co
 		editTdLevel.innerHTML = userLevel;
 		editTdPing.innerHTML = userPing;
 
-		if(color_r != 255 && color_g != 255 && color_b != 255) userElement.style.color = rgb(color_r, color_g, color_b);
+		if(userElement && userElement.style) userElement.style.color = rgb(color_r, color_g, color_b);
 	} else {
 		console.log('No user by that name!')
 	}

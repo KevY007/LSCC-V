@@ -26,10 +26,13 @@ namespace LSCC
         public string Password { get; set; }
         public string Salt { get; set; }
         public string HWID { get; set; }
+        public ulong RockstarID { get; set; }
         public int Admin { get; set; }
         public int Level { get; set; }
         public int XP { get; set; }
         public int DonatorLevel { get; set; }
+        public int JailTime { get; set; }
+        public string JailReason { get; set; }
     }
 
     public static class AccountManager
@@ -56,7 +59,7 @@ namespace LSCC
         {
             foreach(Player player in Settings.LoggedInPlayers)
             {
-                if (EPlayer.GetAccount(player).SQL_ID == _target.SQL_ID) return false; // Return FALSE if another PLAYER is online from SAME ACC.
+                if (EPlayer.GetAccount(player) != null && EPlayer.GetAccount(player).SQL_ID == _target.SQL_ID) return false; // Return FALSE if another PLAYER is online from SAME ACC.
             }
 
             string crypted = password;

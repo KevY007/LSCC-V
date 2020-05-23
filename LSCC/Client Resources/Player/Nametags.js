@@ -32,6 +32,8 @@ mp.events.add('showHPBars', (status) => {
 mp.events.add('render', (nametags) => {
     const graphics = mp.game.graphics;
     const screenRes = graphics.getScreenResolution(0, 0);
+
+    if(mp.players.local.getVariable("pLogged") == false) return;
 	
     nametags.forEach(nametag => {
         let [player, x, y, distance] = nametag;
@@ -45,7 +47,18 @@ mp.events.add('render', (nametags) => {
             var armour = player.getArmour() / 100;
 			
             y -= scale * (0.005 * (screenRes.y / 1080));
-            
+
+            if(player.getVariable("Team") == 0 && player.getVariable("HasShot") == true)
+            {
+                mp.game.graphics.drawText("(( THIS PLAYER HAS SHOT ))", [x, y - 0.06],
+                {
+                    font: 0,
+                    color: [237, 212, 52, 255],
+                    scale: [0.4, 0.4],
+                    outline: true
+                });
+            }
+                
             if(player.col)
             {
                 mp.game.graphics.drawText(player.name.replace('_', ' '), [x, y],

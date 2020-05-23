@@ -63,9 +63,9 @@ namespace LSCC
                 if (args.Count() > 1)
                 {
                     int value = 0;
-                    if (!Int32.TryParse(args[1], out value) || value < 1 || value > 99)
+                    if (!Int32.TryParse(args[1], out value) || value < 1 || value > Settings.Lobbies.Count)
                     {
-                        player.SendChatMessage($"!{{#999999}}Lobby ID must be between 1-{Settings.MaxLobbies}!");
+                        player.SendChatMessage($"!{{#999999}}Lobby ID must be between 1-{Settings.Lobbies.Count}!");
                         return;
                     }
 
@@ -85,7 +85,7 @@ namespace LSCC
                     int value = 0;
                     if (!Int32.TryParse(args[1], out value) || value < 1 || value > 99)
                     {
-                        player.SendChatMessage($"!{{#999999}}Lobby ID must be between 1-{Settings.MaxLobbies}!");
+                        player.SendChatMessage($"!{{#999999}}Lobby ID must be between 1-{Settings.Lobbies.Count}!");
                         return;
                     }
 
@@ -105,15 +105,15 @@ namespace LSCC
                     int value = 0;
                     if (!Int32.TryParse(args[1], out value) || value < 1 || value > 99)
                     {
-                        player.SendChatMessage($"!{{#999999}}Lobby ID must be between 1-{Settings.MaxLobbies}!");
+                        player.SendChatMessage($"!{{#999999}}Lobby ID must be between 1-{Settings.Lobbies.Count}!");
                         return;
                     }
                     LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == value);
                     if (lobby != null)
                     {
                         lobby.GameAutoStart = !lobby.GameAutoStart;
-                        if (lobby.GameAutoStart) NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~g~has enabled copchases.");
-                        else NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~w~has disabled copchases.");
+                        if (lobby.GameAutoStart) NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~g~has enabled copchases for lobby {lobby.lobbyId}.");
+                        else NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~w~has disabled copchases for lobby {lobby.lobbyId}.");
                     }
                     else NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}The lobby id is invalid or doesn't exist.");
                 }
@@ -126,9 +126,9 @@ namespace LSCC
                 {
                     int value = 0;
                     int lobbyid = 0;
-                    if (!Int32.TryParse(args[1], out lobbyid) || lobbyid < 1 || lobbyid > Settings.MaxLobbies)
+                    if (!Int32.TryParse(args[1], out lobbyid) || lobbyid < 1 || lobbyid > Settings.Lobbies.Count)
                     {
-                        player.SendChatMessage("!{#999999}Lobby ID must be in numbers between 1-" + Settings.MaxLobbies + "!");
+                        player.SendChatMessage("!{#999999}Lobby ID must be in numbers between 1-" + Settings.Lobbies.Count + "!");
                         return;
                     }
                     if (!Int32.TryParse(args[2], out value) || value < 1 || value > 99) 
@@ -395,6 +395,13 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player))
                 return;
 
+            if(EPlayer.GetAccount(player).JailTime > 0)
+            {
+                player.SetData("AutoJoin", false);
+                player.SendChatMessage("You are in jail!");
+                return;
+            }
+
             if (player.GetData<bool>("AutoJoin") == true)
             {
                 player.SendNotification("~r~AutoJoin has been turned off.", false);
@@ -444,20 +451,20 @@ namespace LSCC
         [Command("voiceblock", GreedyArg = true)]
         public void cmd_vblock(Player player, Player target)
         {
-            List<Player> blockList = new List<Player>();
+            List<ushort> blockList = new List<ushort>();
             if (player.HasData("BlockList"))
             {
-                blockList = player.GetData<List<Player>>("BlockList");
+                blockList = player.GetData<List<ushort>>("BlockList");
             }
 
-            if(!blockList.Contains(target) || blockList.Count < 1)
+            if(!blockList.Contains(target.Id))
             {
-                blockList.Add(target);
+                blockList.Add(target.Id);
                 player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have muted {target.Name} on voice chat, use this command again to unmute them.");
             }
             else
             {
-                blockList.Remove(target);
+                blockList.Remove(target.Id);
                 player.SendChatMessage($"!{{#FF6347}}[#] !{{#FFFFFF}}You have unmuted {target.Name} on voice chat.");
             }
 
@@ -505,20 +512,41 @@ namespace LSCC
                 return;
 
             List<LobbyData> lobbyList = Settings.Lobbies.ToList();
+            string enabledStr = "";
             foreach (LobbyData lobby in lobbyList)
             {
-                player.SendChatMessage($"!{{#DAA520}}Lobby {lobby.lobbyId} | Players: " +
+                if (lobby.Enabled)
+                {
+                    if (lobby.Password.Length > 1 && lobby.PlayerCreated)
+                    {
+                        enabledStr = "!{#FF6347}PASSWORD/LOCKED";
+                    }
+                    else enabledStr = "!{#00FF33}ENABLED";
+                }
+                else
+                {
+                    enabledStr = "!{#FF0000}DISABLED";
+                }
+
+                player.SendChatMessage($">> !{{#DAA520}}Lobby {lobby.lobbyId} | {enabledStr} " +
+                    $"!{{#DAA520}}| Players: " +
                     $"{Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId)} | Status: {Main.ConvertGameStatus(lobby.gameStatus)}");
             }
 
             return;
         }
 
-        [Command("switchlobby", Alias = "swl")]
-        public void cmd_switchlobby(Player player, int lobbyid)
+        [Command("switchlobby", Alias = "swl", GreedyArg = true)]
+        public void cmd_switchlobby(Player player, string args)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
+
+            if (player.GetData<int>("JailTime") > 0)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are in jail!");
+                return;
+            }
 
             if (!player.HasData("LastLobbySwitch"))
             {
@@ -532,13 +560,52 @@ namespace LSCC
                     return;
                 }
             }
-           
+
+            int lobbyid = 0;
+            string password = "";
+
+            string[] split = args.Split(' ');
+            if (split.Count() > 0)
+            {
+                if (!Int32.TryParse(split[0], out lobbyid) || lobbyid < 1 || lobbyid > Settings.Lobbies.Count)
+                {
+                    player.SendChatMessage($"!{{#999999}}Lobby ID must be between 1-{Settings.Lobbies.Count}!");
+                    return;
+                }
+            }
+
+            if (split.Count() > 1)
+            {
+                password = split[1];
+            }
+
 
             LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == lobbyid);
             if ((lobby != null) == false)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid lobby id!");
                 return;
+            }
+
+            if (!lobby.Enabled)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Lobby is disabled!");
+                return;
+            }
+
+            if (lobby.Password.Length > 1)
+            {
+                if(password.Length < 1)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This lobby has a password, join with /swl (lobby id) (password).");
+                    return;
+                }
+
+                if(!password.Equals(lobby.Password))
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid password for the lobby!");
+                    return;
+                }
             }
 
             if(Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobbyid) >= Settings.MaxPlayersInLobby)
@@ -582,6 +649,11 @@ namespace LSCC
             player.SendChatMessage("[Cop]: /gps");
             player.SendChatMessage("[Roleplay]: /me /do");
             player.SendChatMessage("[Debug]: /pos");
+
+            if(EPlayer.GetAccount(player).DonatorLevel >= 2)
+            {
+                player.SendChatMessage("[Donator Lv. 2] /createlobby /deletelobby /setlobbypassword /setlobbyfugitivepercent");
+            }
 
             if (EPlayer.GetAccount(player).Admin >= 1) player.SendChatMessage("!{#FF6347}For admin commands, visit /acmds.");
             return;
@@ -754,6 +826,148 @@ namespace LSCC
             return;
         }
 
+        [Command("createlobby", Alias = "clobby")]
+        public void cmd_createlobby(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Account acc = EPlayer.GetAccount(player);
+
+            if(acc.Admin < 2 && acc.DonatorLevel < 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This command is reserved to donator level 2 and admin level 2+");
+                return;
+            }
+
+            LobbyData newLobby = new LobbyData();
+            newLobby.PlayerCreated = true;
+
+            NAPI.Util.ConsoleOutput($"{player.Name} created lobby ID {newLobby.lobbyId}");
+            player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have created a new lobby with ID " + newLobby.lobbyId + ", /setlobbypassword to lock it.");
+
+            return;
+        }
+
+        [Command("deletelobby", Alias = "dlobby")]
+        public void cmd_deletelobby(Player player, int lobbyid)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Account acc = EPlayer.GetAccount(player);
+
+            if (acc.Admin < 2 && acc.DonatorLevel < 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This command is reserved to donator level 2 and admin level 2+");
+                return;
+            }
+
+            LobbyData newLobby = Settings.Lobbies.Find(a => a.lobbyId == lobbyid && a.PlayerCreated == true);
+
+            if(newLobby == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That lobby ID is invalid or that lobby cannot be deleted."); return; }
+
+            Settings.Lobbies.Remove(newLobby);
+            newLobby.Enabled = false;
+
+            NAPI.Util.ConsoleOutput($"{player.Name} deleted lobby ID {lobbyid}");
+            player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have deleted lobby ID " + lobbyid);
+
+            return;
+        }
+
+        [Command("setlobbypassword", Alias = "setlobbypass", GreedyArg = true)]
+        public void cmd_setlobbypassword(Player player, int lobbyid, string password)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Account acc = EPlayer.GetAccount(player);
+
+            if (acc.Admin < 2 && acc.DonatorLevel < 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This command is reserved to donator level 2 and admin level 2+");
+                return;
+            }
+
+            LobbyData newLobby = Settings.Lobbies.Find(a => a.lobbyId == lobbyid && a.PlayerCreated == true);
+
+            if (newLobby == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That lobby ID is invalid or that lobby cannot be edited."); return; }
+
+            newLobby.Password = password;
+
+            NAPI.Util.ConsoleOutput($"{player.Name} set lobby ID {newLobby.lobbyId} password to {newLobby.Password}");
+            player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have set password for lobby ID " + lobbyid + " to " + newLobby.Password);
+
+            return;
+        }
+
+        [Command("setlobbyfugitivepercent", Alias = "setlobbyfugiperc")]
+        public void cmd_setlobbyfugitivepercent(Player player, int lobbyid, int percent)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Account acc = EPlayer.GetAccount(player);
+
+            if (acc.Admin < 2 && acc.DonatorLevel < 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This command is reserved to donator level 2 and admin level 2+");
+                return;
+            }
+
+            LobbyData newLobby = Settings.Lobbies.Find(a => a.lobbyId == lobbyid && a.PlayerCreated == true);
+
+            if (newLobby == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That lobby ID is invalid or that lobby cannot be edited."); return; }
+
+            if(percent < 1 || percent > 99) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go below 1 or above 99 percent!"); return; }
+
+            newLobby.FugitivePercent = percent;
+
+            NAPI.Util.ConsoleOutput($"{player.Name} set lobby ID {newLobby.lobbyId} percentage to {newLobby.FugitivePercent}");
+            player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have set fugitive percentage for lobby ID " + lobbyid + " to " + newLobby.FugitivePercent);
+
+            return;
+        }
+
+        [Command("togglelobby", Alias = "toglobby")]
+        public void cmd_toglobby(Player player, int lobbyid)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Account acc = EPlayer.GetAccount(player);
+
+            if (acc.Admin < 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                return;
+            }
+
+            LobbyData newLobby = Settings.Lobbies.Find(a => a.lobbyId == lobbyid);
+
+            if (newLobby == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That lobby ID is invalid."); return; }
+
+           
+            if(newLobby.Enabled)
+            {
+                if(Settings.Lobbies.Count(a => a.Enabled == true) <= 1)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot disable any more lobbies! Use /game autostart if you want to disable copchases.");
+                    return;
+                }
+
+                newLobby.Enabled = false;
+
+                NAPI.Util.ConsoleOutput($"{player.Name} disabled lobby ID {newLobby.lobbyId}.");
+                player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have disabled lobby ID " + lobbyid + ".");
+            }
+            else
+            {
+                newLobby.Enabled = true;
+
+                NAPI.Util.ConsoleOutput($"{player.Name} enabled lobby ID {newLobby.lobbyId}.");
+                player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have enabled lobby ID " + lobbyid + ".");
+            }
+
+            return;
+        }
+
         [Command("acmds", Alias = "ahelp")]
         public void cmd_ahelp(Player player)
         {
@@ -763,11 +977,12 @@ namespace LSCC
             {
                 player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /sethp /setar /spec");
                 player.SendChatMessage("[Admin Lv 1]: /freeze /unfreeze /kick /slap /setinv(ulnerable) /specoff");
-                player.SendChatMessage("[Admin Lv 1]: /bancheck");
+                player.SendChatMessage("[Admin Lv 1]: /bancheck /jail /unjail");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
-                player.SendChatMessage("[Admin Lv 2]: /game /ban /unban");
+                player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword");
+                player.SendChatMessage("[Admin Lv 2]: /togglelobby");
             }
             if (EPlayer.GetAccount(player).Admin >= 3)
             {
@@ -1058,6 +1273,8 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player))
                 return;
 
+            if (!EPlayer.LoggedIn(target)) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target not logged in."); return; }
+
             if (target.GetData<bool>("PMState") == false || player.GetData<bool>("PMState") == false) 
             { 
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your or the target's PM's are toggled OFF."); 
@@ -1065,7 +1282,7 @@ namespace LSCC
             }
 
 
-            NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#FFFF00}}(( PM received from {player.Name}: {text} ))");
+            target.SendChatMessage($"!{{#FFFF00}}(( PM received from {player.Name}: {text} ))");
             player.SendChatMessage($"!{{#FFFF00}}(( PM sent to {target.Name}: {text} ))");
             return;
         }
@@ -1108,6 +1325,7 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player))
                 return;
+
             if (EPlayer.GetAccount(player).Admin < 1)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
@@ -1115,7 +1333,10 @@ namespace LSCC
             }
             else
             {
-                NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{target.Name} has been kicked by {player.Name} for {reason}.");
+                RAGE.Entities.Players.All.ForEach((Player playa) =>
+                {
+                    playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{target.Name} has been kicked by {player.Name} for {reason}.");
+                });
 
                 target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
@@ -1123,6 +1344,60 @@ namespace LSCC
             }
 
         }
+
+        [Command("jail", GreedyArg = true)]
+        public void cmd_jail(Player player, Player target, int mins, string reason)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (!EPlayer.LoggedIn(target)) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target not logged in."); return; }
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                return;
+            }
+            else
+            {
+                RAGE.Entities.Players.All.ForEach((Player playa) =>
+                {
+                    playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has jailed {target.Name} for {mins} minutes, reason: {reason}.");
+                });
+
+                EPlayer.Jail(target, mins, reason);
+            }
+
+        }
+
+        [Command("unjail", GreedyArg = true)]
+        public void cmd_unjail(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (!EPlayer.LoggedIn(target)) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target not logged in."); return; }
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                return;
+            }
+            else
+            {
+                Account acc = EPlayer.GetAccount(target);
+                if(acc.JailTime == 0) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not jailed."); return; }
+
+                acc.JailTime = 0;
+                target.SetSharedData("JailTime", 0);
+                EPlayer.Freeze(player, false);
+
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has unjailed {target.Name}.");
+                EPlayer.Spawn(target);
+            }
+
+        }
+
         [Command("me", GreedyArg = true)]
         public void cmd_me(Player player, string text)
         {

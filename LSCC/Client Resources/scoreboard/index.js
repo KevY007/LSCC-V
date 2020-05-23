@@ -2,6 +2,7 @@ let browser = null;
 let updater = null;
 let forceOff = false;
 let serverName = "Los Santos Copchase";
+let tablistLen = 0;
 
 mp.events.add("onOpenChatbox", (toggle) =>
 {
@@ -22,13 +23,24 @@ mp.keys.bind(0x4F, false, function () {
         browser = null;
         clearInterval(updater);
         updater = null;
-        mp.gui.cursor.show(false, false);
+        if(tablistLen >= 9)
+        {
+            mp.gui.cursor.show(false, false);
+            mp.events.call("TogglePlayerChat", true);
+        }
         return;
+    }
+
+    tablistLen = mp.players.length;
+
+    if(tablistLen >= 9)
+    {
+        mp.gui.cursor.show(true, true);
+        mp.events.call("TogglePlayerChat", false);
     }
 
     browser = mp.browsers.new("package://scoreboard/cef/index.html");
 
-    mp.gui.cursor.show(false, true);
 
     mp.players.forEach(
         (player) => {
@@ -41,22 +53,25 @@ mp.keys.bind(0x4F, false, function () {
         }
     );
 
-    browser.execute('updateServerName("' + serverName + '")');
+    if(serverName != "Los Santos Copchase") 
+    {
+        browser.execute('updateServerName("' + serverName + '")');
+    }
 
     updater = setInterval(function()
     { 
         mp.players.forEach(
             (player) => {
                 let lobbystr = "N/A";
-                if(player.getVariable("pLogged") === undefined || player.getVariable("pLogged") == false) lobbystr = "LOGIN";
-                if(player.getVariable("InLobby") !== undefined && player.getVariable("InLobby") != -1) lobbystr = player.getVariable("InLobby").toString();
+                if(player.getVariable("pLogged") === undefined || player.getVariable("pLogged") == false || player.getVariable("InLobby") === undefined) lobbystr = "LOGIN";
+                else if(player.getVariable("InLobby") == -2) lobbystr = "JAIL";
+                else if(player.getVariable("InLobby") == -3) lobbystr = "DM";
+                else if(player.getVariable("InLobby") == -4) lobbystr = "DERBY";
+                else if(player.getVariable("InLobby") != -1) lobbystr = player.getVariable("InLobby").toString();
                 
                 browser.execute('updateUser("' + lobbystr + '", "' + player.name + '", "' + player.getVariable("Level") + '", "' + player.getVariable("Ping") +
                 '", ' + player.getVariable("Color_R") + ', ' + player.getVariable("Color_G") + ', ' + player.getVariable("Color_B") + ')');
             }
         );
-
-        browser.execute('updateServerName("' + serverName + '")');
-        
     }, 1000);
 })

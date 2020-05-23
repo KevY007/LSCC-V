@@ -8,9 +8,17 @@ let chaseProgBar = null;
 let chaseProgText = null;
 let collisionText = null;
 let collisionTime = 0;
-let chaseInterval = null;
+let chaseRunning = false;
 let chaseTimeCur = 0;
 let chaseTimeMax = 600;
+let chatStatus = false;
+
+let secondUpdater = null;
+
+mp.events.add("onOpenChatbox", (toggle) =>
+{
+	chatStatus = toggle;
+});
 
 function calcDist(v1, v2) {
     return mp.game.system.vdist(
@@ -27,7 +35,7 @@ mp.keys.bind(
     71,
     false,
     () => {
-        if (mp.players.local.vehicle === null) {
+        if (mp.players.local.vehicle === null && chatStatus == false) {
             let playerPos = mp.players.local.position;
             let vehHandle = mp.game.vehicle.getClosestVehicle(playerPos.x, playerPos.y, playerPos.z, 30, 0, 70);
             let vehicle = mp.vehicles.atHandle(vehHandle);
@@ -60,7 +68,10 @@ mp.keys.bind(
 );
 
 mp.keys.bind(0x5A, false, function() {
-    mp.events.callRemote("OnScriptedKeyPress", 0x5A);
+    if(chatStatus == false)
+    {
+        mp.events.callRemote("OnScriptedKeyPress", 0x5A);
+    }
 });
 
 function createCam(x, y, z, rx, ry, rz, viewangle) {
@@ -94,60 +105,108 @@ function TimeFormat(time)
     return ret;
 }
 
-function updateChaseTimer()
+function SecondTimer()
 {
-    if(chaseProgBar != null && chaseProgText != null)
+    if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
     {
-        chaseTimeCur += 1;
-
-        chaseProgBar.progress = chaseTimeCur / chaseTimeMax;
-        chaseProgText.text = TimeFormat(chaseTimeMax - chaseTimeCur);
-
-        chaseProgText.visible = true;
-        chaseProgBar.visible = true;
-
-        if(chaseTimeCur >= chaseTimeMax)
+        
+        if(chaseProgBar != null && chaseProgText != null && chaseRunning == true)
         {
-            chaseProgText.visible = false;
-            chaseProgBar.visible = false;
+            chaseTimeCur += 1;
 
-            clearInterval(chaseInterval);
-            chaseInterval = null;
+            chaseProgBar.progress = chaseTimeCur / chaseTimeMax;
+            chaseProgText.text = TimeFormat(chaseTimeMax - chaseTimeCur);
+
+            chaseProgText.visible = true;
+            chaseProgBar.visible = true;
+
+            if(chaseTimeCur >= chaseTimeMax)
+            {
+                chaseProgText.visible = false;
+                chaseProgBar.visible = false;
+                chaseRunning = false;
+            }
         }
-    }
 
-    if(collisionText != null)
-    {
-        if(collisionTime > 0)
+        if(collisionText != null && chaseRunning == true)
         {
-            collisionTime--;
-            collisionText.text = TimeFormat(collisionTime);
+            if(collisionTime > 0)
+            {
+                collisionTime--;
+                collisionText.text = TimeFormat(collisionTime);
 
-            collisionText.visible = true;
+                collisionText.visible = true;
+            }
+            else
+            {
+                collisionText.visible = false;
+            }
         }
-        else
+
+        if(mp.players.local.getVariable("JailTime") >= 1)
         {
-            collisionText.visible = false;
+            if(currentJailTime > 0) currentJailTime--;
+            lastJailUpdate--;
+
+            if(lastJailUpdate <= 0 || currentJailTime <= 0)
+            {
+                mp.events.callRemote("RequestJailUpdate", currentJailTime);
+                lastJailUpdate = 20;
+            }
         }
     }
     return;
 }
 
-function OnEntityGiveEntityDamage(sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage)
-{
-    
-}
+secondUpdater = setInterval(SecondTimer, 1000);
 
 function OnPlayerWeaponShot(targetPosition, targetEntity)
 {
-   
+    if(targetEntity !== null && targetEntity !== undefined)
+    {
+        if(typeof targetEntity.getVariable === 'function')
+        {
+            if(targetEntity.getVariable("Team") !== undefined && targetEntity.getVariable("HasShot") !== undefined && 
+                targetEntity.getVariable("Team") != -1) // Cops have HasShot too, cars don't, this gives us a 100% PLAYER entity handle.
+            {
+                if(player.getVariable("Team") == targetEntity.getVariable("Team"))
+                {
+                    mp.events.callRemote("PlayerShotAtWrongPlayer", 0);
+                }
+                if(player.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
+                {
+                    mp.events.callRemote("PlayerShotAtWrongPlayer", 1);
+                }
+            }
+        }
+    }
+    if(mp.players.local.getVariable("HasShot") == false && player.getVariable("Team") == 0)
+    {
+        mp.events.callRemote("GivePlayerShotTag");
+    }
 }
+
+function OnPlayerEnterVehicle(vehicle, seat) {
+    if(seat == -1)
+    {
+        mp.game.invoke(0x6E8834B52EC20C77, mp.players.local, false); // Disable driveby as DRIVER, (invoked SetPlayerCanDoDriveby) (doesnt work yet)
+    }
+    else
+    {
+        mp.game.invoke(0x6E8834B52EC20C77, mp.players.local, true);
+    }
+ }
+
+ mp.events.add("playerEnterVehicle", OnPlayerEnterVehicle);
+ mp.events.add("playerWeaponShot", OnPlayerWeaponShot);
+ 
 
 mp.events.add(
     {
-        "OutgoingDamage": OnEntityGiveEntityDamage,
-        "playerWeaponShot": OnPlayerWeaponShot,
-
+        "SetJailCounter": (time) => {
+            currentJailTime = time;
+            lastJailUpdate = 10;
+        },
         "ToggleChaseCollisions": (toggle) => {
             if(toggle)
             {
@@ -207,19 +266,15 @@ mp.events.add(
             chaseTimeCur = iTimeCur - 1;
             chaseTimeMax = iTimeMax;
             collisionTime = collisionDuration;
+            chaseRunning = true;
             updateChaseTimer();
-            
-            if(chaseInterval != null) clearInterval(chaseInterval);
-
-            chaseInterval = setInterval(updateChaseTimer, 1000);
         },
 
         "HideChaseTimer": () => {
             chaseProgBar.visible = false;
             chaseProgText.visible = false;
             collisionText.visible = false;
-            clearInterval(chaseInterval);
-            chaseInterval = null;
+            chaseRunning = false;
         },
 
         "playerEnterVehicle": (vehicle, seat) => {

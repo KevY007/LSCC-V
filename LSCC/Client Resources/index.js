@@ -1,4 +1,7 @@
-﻿require("./chat/index.js");
+﻿let currentJailTime = 0;
+let lastJailUpdate = 10;
+
+require("./chat/index.js");
 
 require('./Player/Player.js');
 require("./Player/Nametags.js");

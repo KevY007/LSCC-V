@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml;
 using GTANetworkAPI;
 using LSCC;
 
@@ -16,11 +17,13 @@ namespace LSCC
         public static void ResetPlayerData(Player player)
         {
             player.ResetData("AccountHandle");
-            player.ResetData("LoggedIn");
             player.SetData("LoggedIn", false);
+            player.SetData("TeamShotWarning", 0);
+            player.SetData("InnocentShotWarning", 0);
             player.SetSharedData("pLogged", false);
             player.SetData("AutoJoin", true);
-            player.SetData("HudState", false);
+            player.SetData("HUDState", true);
+            player.SetSharedData("HasShot", false);
             player.SetData("PMState", true);
             player.SetSharedData("Team", -1);
             player.TriggerEvent("ToggleHud", false);
@@ -32,23 +35,32 @@ namespace LSCC
             player.SetSharedData("Color_B", 255);
             player.SetSharedData("Ping", player.Ping);
             player.SetSharedData("Level", 1);
+            player.SetSharedData("JailTime", 0);
 
-            Settings.LoggedInPlayers.Remove(player);
-
-            foreach(LobbyData lobby in Settings.Lobbies)
-            { 
-                if (lobby.gameStatus == 1)
-                {
-                    if (lobby.Fugitives.Contains(player))
-                    {
-                        lobby.Fugitives.Remove(player);
-                    }
-                    else if (lobby.Cops.Contains(player))
-                    {
-                        lobby.Cops.Remove(player);
-                    }
-                }
+            foreach (LobbyData il in Settings.Lobbies)
+            {
+                il.Cops.Remove(player);
+                il.Fugitives.Remove(player);
             }
+            Settings.LoggedInPlayers.Remove(player);
+        }
+
+        public static void Jail(Player player, int minutes, string reason)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Account Acc = EPlayer.GetAccount(player);
+            Acc.JailReason = reason;
+            Acc.JailTime = minutes * 60;
+            player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been jailed for {minutes} minutes, reason: {reason}.");
+            foreach (LobbyData il in Settings.Lobbies)
+            {
+                il.Cops.Remove(player);
+                il.Fugitives.Remove(player);
+            }
+            player.SetSharedData("JailTime", Acc.JailTime);
+            player.TriggerEvent("SetJailCounter", Acc.JailTime);
+            NAPI.Player.SpawnPlayer(player, Settings.VectorJail);
         }
 
         public static void SetDiscordStatus(Player player, string status)
@@ -119,7 +131,19 @@ namespace LSCC
 
             Account acc = EPlayer.GetAccount(player); 
             acc.XP += xp;
-            
+               
+            if(acc.XP < 0)
+            {
+                acc.Level--;
+
+                acc.XP += GetMaxLevelXP(acc.Level);
+                RAGE.Entities.Players.All.ForEach((Player pl) =>
+                {
+                    pl.SendChatMessage($"!{{#00BA03}}[LEVEL DOWN] {player.Name} has levelled down to {acc.Level}!");
+                });
+                player.SendNotification($"~w~You have levelled down to ~r~{acc.Level}~w~!");
+            }
+
             while(CheckXPLevelUp(acc.Level, acc.XP) == true)
             {
                 acc.XP -= GetMaxLevelXP(acc.Level);
@@ -130,6 +154,8 @@ namespace LSCC
                 });
                 player.SendNotification($"~w~You have levelled up to ~g~{acc.Level}~w~!");
             }
+
+            player.SetSharedData("Level", acc.Level);
         }
         public static void Save(Player player)
         {
@@ -162,7 +188,7 @@ namespace LSCC
 
             if (player.GetData<bool>("AutoJoin") == false) NAPI.Notification.SendNotificationToPlayer(player, $"~g~Autojoin has been enabled.", false);
 
-            if (player.GetSharedData<int>("InLobby") == -1)
+            if (player.GetSharedData<int>("InLobby") <= -1)
             {
                 int LobbyToBeIn = Settings.MaxLobbies;
                 foreach (LobbyData lobby in Settings.Lobbies)
@@ -171,6 +197,7 @@ namespace LSCC
                     {
                         continue;
                     }
+                    if ((lobby.PlayerCreated && lobby.Password.Length > 1) || !lobby.Enabled) continue;
 
                     LobbyToBeIn = lobby.lobbyId;
                     break;

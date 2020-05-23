@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
-namespace LSCC.Events
+namespace LSCC
 {
     class Events : Script
     {
@@ -30,6 +30,16 @@ namespace LSCC.Events
 
                 return;
             }
+
+            foreach (Player pl in RAGE.Entities.Players.All)
+            {
+                if (player.HasData("BlockList"))
+                {
+                    List<ushort> blockList = pl.GetData<List<ushort>>("BlockList");
+                    blockList.Remove(player.Id);
+                }
+            }
+                
 
 
             EPlayer.SetDiscordStatus(player, "Connecting to the server...");
@@ -104,23 +114,82 @@ namespace LSCC.Events
             NAPI.Notification.SendNotificationToPlayer(player, $"~r~You died!", false);
 
             string reasonStr;
-            if(!Main.WeaponReasons.TryGetValue(1936677264, out reasonStr))
+            if(!Main.WeaponReasons.TryGetValue(reason, out reasonStr))
             {
                 reasonStr = null;
             }
 
-            if (killer != null && !killer.IsNull)
+            if (killer != null && !killer.IsNull && killer != player)
             {
                 NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
 
                 if (killer.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && player.GetSharedData<int>("Team") != -1)
                 {
                     EPlayer.GrantXP(killer, 1);
+
+                    if (player.GetSharedData<int>("Team") == 0 && killer.GetSharedData<int>("Team") == 1 && player.GetSharedData<bool>("HasShot") == false)
+                    {
+                        EPlayer.GrantXP(killer, -3);
+                        RAGE.Entities.Players.All.ForEach((Player ey) =>
+                        {
+                            ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by 3 for killing a fugitive that hasn't shot.");
+                        });
+
+                        int warnings = 0;
+                        if (player.HasData("InnocentShotWarning")) warnings = player.GetData<int>("InnocentShotWarning");
+
+                        warnings += 5;
+                        player.SetData<int>("InnocentShotWarning", warnings);
+                        killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Repeated attacking of fugitive's that haven't shot will result in a jail.");
+                        player.SetData("UnfairKillSpawn", true);
+
+                        NAPI.Task.Run(() =>
+                        {
+                            NAPI.Player.SpawnPlayer(player, player.Position);
+
+                            player.Armor = 0;
+                            player.Health = 100;
+                            player.SendChatMessage($"!{{FF6347}}[!] !{{#FFFFFF}}You have been put back in the game as you were killed unfairly.");
+
+                        }, delayTime: 1000);
+
+                        return;
+                    }
+                }
+
+
+                if(player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("Team") == killer.GetSharedData<int>("Team"))
+                {
+                    EPlayer.GrantXP(killer, -2);
+                    RAGE.Entities.Players.All.ForEach((Player ey) =>
+                    {
+                        ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by 2 for team killing.");
+                    });
+
+                    int warnings = 0;
+                    if (player.HasData("TeamShotWarning")) warnings = player.GetData<int>("TeamShotWarning");
+
+                    warnings += 5;
+                    player.SetData<int>("TeamShotWarning", warnings);
+                    killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Repeated team killing will result in a jail.");
+                    player.SetData("UnfairKillSpawn", true);
+
+                    NAPI.Task.Run(() =>
+                    {
+                        NAPI.Player.SpawnPlayer(player, player.Position);
+
+                        player.Armor = 0;
+                        player.Health = 100;
+                        player.SendChatMessage($"!{{FF6347}}[!] !{{#FFFFFF}}You have been put back in the game as you were killed unfairly.");
+
+                    }, delayTime: 1000);
+
+                    return;
                 }
             }
             else
             {
-                NAPI.Util.ConsoleOutput($"[Death] {player.Name} has died, reason: {(reasonStr == null ? "N/A" : reasonStr)}.");
+                NAPI.Util.ConsoleOutput($"[Death] {player.Name} has died of {(reasonStr == null ? "N/A" : reasonStr)}.");
             }
 
             LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
@@ -134,7 +203,7 @@ namespace LSCC.Events
                         {
                             if (ay.GetSharedData<int>("InLobby") == lobby.lobbyId)
                             {
-                                if (killer != null && !killer.IsNull)
+                                if (killer != null && !killer.IsNull && killer != player)
                                 {
                                     ay.SendNotification($"Fugitive ~r~<C>{player.Name}</C> ~w~has been taken out by ~b~<C>{killer.Name}</C>~w~.");
 
@@ -172,7 +241,7 @@ namespace LSCC.Events
                         {
                             if (ay.GetSharedData<int>("InLobby") == lobby.lobbyId)
                             {
-                                if (killer != null && !killer.IsNull)
+                                if (killer != null && !killer.IsNull && player != killer)
                                 {
                                     NAPI.Notification.SendNotificationToPlayer(ay, $"Cop ~r~<C>{player.Name}</C> ~w~has been taken out by ~b~<C>{killer.Name}</C>~w~.");
                                     
@@ -217,6 +286,18 @@ namespace LSCC.Events
             }, delayTime: 4000);
         }
 
+        [ServerEvent(Event.VehicleDeath)]
+        public void OnVehicleDeath(Vehicle veh)
+        {
+            foreach(LobbyData il in Settings.Lobbies)
+            {
+                il.Vehicles.Remove(veh);
+            }
+            Settings.AdminVehicles.Remove(veh);
+
+            veh.Delete();
+        }
+
         [ServerEvent(Event.ChatMessage)]
         public void OnPlayerText(Player player, string message)
         {
@@ -238,7 +319,7 @@ namespace LSCC.Events
             }
         }
 
-        public void OnPlayerLogin(Player player, Account acc)
+        public static void OnPlayerLogin(Player player, Account acc)
         {
             EPlayer.SetDiscordStatus(player, $"Logging in as {acc.Username}");
             NAPI.Util.ConsoleOutput($"[Login] {player.Name} has logged in as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
@@ -271,7 +352,7 @@ namespace LSCC.Events
 
             EPlayer.Spawn(player);
         }
-        public void OnPlayerRegister(Player player, Account acc)
+        public static void OnPlayerRegister(Player player, Account acc)
         {
             EPlayer.SetDiscordStatus(player, $"Registering as {acc.Username}");
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has registered as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
@@ -287,13 +368,13 @@ namespace LSCC.Events
         }
 
         [RemoteEvent("OnPlayerLoginAttempt")]
-        public void OnPlayerLoginAttempt(Player player, string username, string password)
+        public static void OnPlayerLoginAttempt(Player player, string username, string password)
         {
             NAPI.Util.ConsoleOutput($"[Login Attempt] Username {username}");
             if (Environment.TickCount - player.GetData<int>("LastCryptAttempt") < 1000)
             {
-                NAPI.Notification.SendNotificationToPlayer(player, "~r~Please wait some time between each register attempt!", true);
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please wait some time between each register attempt!");
+                player.SendNotification("~r~Please wait some time between each login attempt!", true);
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please wait some time between each login attempt!");
                 return;
             }
             player.SetData("LastCryptAttempt", Environment.TickCount);
@@ -321,7 +402,8 @@ namespace LSCC.Events
                     }
                 }
             }
-            NAPI.Notification.SendNotificationToPlayer(player, "~r~Invalid credentials or unable to log in!", true);
+            player.SendNotification("~r~Invalid credentials or unable to log in!", true);
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid credentials or unable to log in!");
 
         }
 
@@ -335,6 +417,71 @@ namespace LSCC.Events
             }
         }
 
+        [RemoteEvent("GivePlayerShotTag")]
+        public void PlayerRequestShotTag(Player player)
+        {
+            if(player.GetSharedData<int>("Team") == 0)
+            {
+                player.SetSharedData("HasShot", true);
+                player.SendNotification("~r~You have now shot, opposite team can now safely shoot you.");
+            }
+        }
+
+        [RemoteEvent("PlayerShotAtWrongPlayer")]
+        public void PlayerShootWrongPlayer(Player player, int caseid)
+        {
+            if(caseid == 0)
+            {
+                int warnings = 0;
+                if (player.HasData("TeamShotWarning")) warnings = player.GetData<int>("TeamShotWarning");
+
+                warnings++;
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Do not shoot at teammates, repeatedly doing this will result in punishment!");
+
+                if(warnings >= 5)
+                {
+                    player.Health = 0;
+                    EPlayer.GrantXP(player, -1);
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have lost 1XP due to team attacking.");
+                }
+                if(warnings >= 10)
+                {
+                    RAGE.Entities.Players.All.ForEach((Player i) =>
+                    {
+                        i.SendChatMessage($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}HoeHunter has jailed {player.Name} for 5 minutes due to team-killing.");
+                    });
+                    EPlayer.Jail(player, 5, "Team Killing (HoeHunter)");
+                    warnings = 0;
+                }
+                player.SetData("TeamShotWarning", warnings);
+            }
+            else if (caseid == 1)
+            {
+                int warnings = 0;
+                if (player.HasData("InnocentShotWarning")) warnings = player.GetData<int>("InnocentShotWarning");
+
+                warnings++;
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Do not shoot at fugitives that haven't shot, repeatedly doing this will result in punishment!");
+
+                if (warnings >= 5)
+                {
+                    player.Health = 0;
+                    EPlayer.GrantXP(player, -1);
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have lost 1XP due to shooting at a fugitive without shot tag.");
+                }
+                if (warnings >= 10)
+                {
+                    RAGE.Entities.Players.All.ForEach((Player i) =>
+                    {
+                        i.SendChatMessage($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}HoeHunter has jailed {player.Name} for 5 minutes due to shooting at fugitives that haven't shot.");
+                    });
+                    EPlayer.Jail(player, 5, "Shooting at fugitives that haven't shot yet (HoeHunter)");
+                    warnings = 0;
+                }
+                player.SetData("InnocentShotWarning", warnings);
+            }
+        }
+
         [RemoteEvent("AddVoiceListener")]
         public void AddVoiceListener(Player player, Player target)
         {
@@ -342,14 +489,22 @@ namespace LSCC.Events
             {
                 if (target.HasData("BlockList"))
                 {
-                    List<Player> blockList = target.GetData<List<Player>>("BlockList");
-                    if (blockList.Contains(player) && blockList.Count > 0) return;
+                    List<ushort> blockList = target.GetData<List<ushort>>("BlockList");
+                    if (blockList.Contains(player.Id))
+                    {
+                        player.DisableVoiceTo(target);
+                        return;
+                    }
                 }
 
                 if (player.HasData("BlockList"))
                 {
-                    List<Player> blockList = player.GetData<List<Player>>("BlockList");
-                    if (blockList.Contains(target) && blockList.Count > 0) return;
+                    List<ushort> blockList = player.GetData<List<ushort>>("BlockList");
+                    if (blockList.Contains(target.Id))
+                    {
+                        target.DisableVoiceTo(player);
+                        return;
+                    }
                 }
 
                 player.EnableVoiceTo(target);
@@ -357,7 +512,7 @@ namespace LSCC.Events
         }
 
         [RemoteEvent("OnPlayerRegisterAttempt")]
-        public void OnPlayerRegisterAttempt(Player player, string email, string username, string password, string confirmpass)
+        public static void OnPlayerRegisterAttempt(Player player, string email, string username, string password, string confirmpass)
         {
             NAPI.Util.ConsoleOutput($"[Register Attempt] Username {username}");
             if (Environment.TickCount - player.GetData<int>("LastCryptAttempt") < 1000)
@@ -404,6 +559,13 @@ namespace LSCC.Events
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}An account with this email already exists!");
                 return;
             }
+
+            if (ContextFactory.Instance.Accounts.Count(a => a.HWID.Equals(player.Serial) || a.RockstarID == player.SocialClubId) >= 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can only have TWO accounts per computer or rockstar ID!");
+                return;
+            }
+
             player.SetData("LastCryptAttempt", Environment.TickCount);
             string salt = AccountManager.GenSalt();
             string newPass = AccountManager.Crypt(password, salt);
@@ -417,10 +579,31 @@ namespace LSCC.Events
                 HWID = player.Serial,
                 Level = 1,
                 XP = 1,
-                DonatorLevel = 0
+                DonatorLevel = 0,
+                RockstarID = player.SocialClubId
             };
             AccountManager.Add(_new);
             OnPlayerRegister(player, _new);
+        }
+
+        [RemoteEvent("RequestJailUpdate")]
+        public void OnPlayerRequestJailUpdate(Player player, int currentTime)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Account acc = EPlayer.GetAccount(player);
+            acc.JailTime = currentTime;
+
+            player.SetSharedData("JailTime", acc.JailTime);
+
+            if (currentTime == 0)
+            {
+                EPlayer.Freeze(player, false);
+                EPlayer.Spawn(player);
+                ContextFactory.Instance.SaveChanges();
+                player.SendChatMessage("!{#00FF33}You have been unjailed as you have served your time.");
+            }
+            return;
         }
 
         [ServerEvent(Event.PlayerSpawn)]
@@ -435,6 +618,7 @@ namespace LSCC.Events
 
             player.SetSharedData("Level", EPlayer.GetAccount(player).Level);
             player.SetSharedData("Ping", player.Ping);
+            player.SetSharedData("HasShot", false);
 
             if (player.HasData("Blip"))
             {
@@ -443,18 +627,48 @@ namespace LSCC.Events
                 player.ResetData("Blip");
             }
 
-            EPlayer.SetDiscordStatus(player, $"In lobby {player.GetSharedData<int>("InLobby")} as {player.Name}");
-
-            player.RemoveAllWeapons();
-
-            player.Dimension = 100 + Convert.ToUInt32(player.GetSharedData<int>("InLobby"));
             player.TriggerEvent("SetActorInvulnerable", true);
             player.TriggerEvent("CanFallOutOfCar", false);
             player.TriggerEvent("showHPBars", 0); // Never show HP Bars.
+
             EPlayer.SetColor(player, new Color(255, 255, 255, 255));
 
-            if(player.GetSharedData<int>("InLobby") > -1)
+            if (EPlayer.GetAccount(player).JailTime > 0)
             {
+                EPlayer.SetDiscordStatus(player, $"Serving jail time as {player.Name}");
+
+                Account acc = EPlayer.GetAccount(player);
+
+                player.SetData("AutoJoin", false);
+                player.SetSharedData("InLobby", -2);
+                player.SetSharedData("JailTime", acc.JailTime);
+                EPlayer.SetColor(player, new Color(168, 128, 8, 255));
+                player.Position = Settings.VectorJail;
+                player.Dimension = 200 + Convert.ToUInt32(player.Id);
+                EPlayer.Freeze(player, true);
+                player.SendChatMessage($"!{{#FF6347}}[JAILED] !{{#FFFFFF}}You are in jail for {acc.JailTime} seconds, reason: {acc.JailReason}.");
+
+                return;
+            }
+
+            player.TriggerEvent("ToggleHud", player.GetData<bool>("HUDState"));
+
+
+            if (player.HasData("UnfairKillSpawn"))
+            {
+                player.ResetData("UnfairKillSpawn");
+                return;
+            }
+
+            if (player.GetSharedData<int>("InLobby") > -1)
+            {
+                EPlayer.SetDiscordStatus(player, $"In lobby {player.GetSharedData<int>("InLobby")} as {player.Name}");
+
+                player.RemoveAllWeapons();
+
+                player.Dimension = 100 + Convert.ToUInt32(player.GetSharedData<int>("InLobby"));
+
+                        
                 LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
                 if (lobby != null)
                 {
