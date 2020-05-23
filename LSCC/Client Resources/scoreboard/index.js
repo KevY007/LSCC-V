@@ -28,7 +28,7 @@ mp.keys.bind(0x4F, false, function () {
 
     browser = mp.browsers.new("package://scoreboard/cef/index.html");
 
-    mp.gui.cursor.show(true, true);
+    mp.gui.cursor.show(false, true);
 
     mp.players.forEach(
         (player) => {
