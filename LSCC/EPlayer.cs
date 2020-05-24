@@ -24,6 +24,7 @@ namespace LSCC
             player.SetData("AutoJoin", true);
             player.SetData("HUDState", true);
             player.SetSharedData("HasShot", false);
+            player.SetSharedData("VisibleBlip", false);
             player.SetData("PMState", true);
             player.SetSharedData("Team", -1);
             player.TriggerEvent("ToggleHud", false);

@@ -82,12 +82,7 @@ namespace LSCC
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has left the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
             if (EPlayer.LoggedIn(player))
             {
-                if (player.HasData("Blip"))
-                {
-                    Blip pBlip = player.GetData<Blip>("Blip");
-                    pBlip.Delete();
-                    player.ResetData("Blip");
-                }
+                player.SetSharedData("VisibleBlip", false);
 
                 switch (type)
                 {
@@ -620,12 +615,7 @@ namespace LSCC
             player.SetSharedData("Ping", player.Ping);
             player.SetSharedData("HasShot", false);
 
-            if (player.HasData("Blip"))
-            {
-                Blip pBlip = player.GetData<Blip>("Blip");
-                pBlip.Delete();
-                player.ResetData("Blip");
-            }
+            player.SetSharedData("VisibleBlip", false);
 
             player.TriggerEvent("SetActorInvulnerable", true);
             player.TriggerEvent("CanFallOutOfCar", false);

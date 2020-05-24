@@ -505,6 +505,12 @@ namespace LSCC
             return;
         }
 
+        [Command("updaterate")] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
+        public void cmd_updaterate(Player player)
+        {
+            return;
+        }
+
         [Command("lobbies")]
         public void cmd_lobbies(Player player)
         {
@@ -648,7 +654,7 @@ namespace LSCC
             player.SendChatMessage("[Keys]: Voice (N) | GPS (Z) | Scoreboard (O)");
             player.SendChatMessage("[Cop]: /gps");
             player.SendChatMessage("[Roleplay]: /me /do");
-            player.SendChatMessage("[Debug]: /pos");
+            player.SendChatMessage("[Debug]: /pos /updaterate (changes the blip updating interval)");
 
             if(EPlayer.GetAccount(player).DonatorLevel >= 2)
             {

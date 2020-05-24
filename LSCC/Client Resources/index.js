@@ -1,6 +1,7 @@
 ﻿let currentJailTime = 0;
 let lastJailUpdate = 10;
 
+require('mp-commands');
 require("./chat/index.js");
 
 require('./Player/Player.js');

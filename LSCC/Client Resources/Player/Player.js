@@ -13,7 +13,11 @@ let chaseTimeCur = 0;
 let chaseTimeMax = 600;
 let chatStatus = false;
 
-let secondUpdater = null;
+let secondCounter = 0;
+let updateRate = 500;
+let updateInterval = null;
+
+let playerBlips = [];
 
 mp.events.add("onOpenChatbox", (toggle) =>
 {
@@ -105,60 +109,122 @@ function TimeFormat(time)
     return ret;
 }
 
-function SecondTimer()
+function UpdateTimer()
 {
-    if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
+    secondCounter++;
+    if(secondCounter >= Math.round(1000 / updateRate))
     {
-        
-        if(chaseProgBar != null && chaseProgText != null && chaseRunning == true)
+        secondCounter = 0;
+        if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
         {
-            chaseTimeCur += 1;
-
-            chaseProgBar.progress = chaseTimeCur / chaseTimeMax;
-            chaseProgText.text = TimeFormat(chaseTimeMax - chaseTimeCur);
-
-            chaseProgText.visible = true;
-            chaseProgBar.visible = true;
-
-            if(chaseTimeCur >= chaseTimeMax)
+            if(chaseProgBar != null && chaseProgText != null && chaseRunning == true)
             {
-                chaseProgText.visible = false;
-                chaseProgBar.visible = false;
-                chaseRunning = false;
+                chaseTimeCur += 1;
+
+                chaseProgBar.progress = chaseTimeCur / chaseTimeMax;
+                chaseProgText.text = TimeFormat(chaseTimeMax - chaseTimeCur);
+
+                chaseProgText.visible = true;
+                chaseProgBar.visible = true;
+
+                if(chaseTimeCur >= chaseTimeMax)
+                {
+                    chaseProgText.visible = false;
+                    chaseProgBar.visible = false;
+                    chaseRunning = false;
+                }
             }
-        }
 
-        if(collisionText != null && chaseRunning == true)
-        {
-            if(collisionTime > 0)
+            if(collisionText != null && chaseRunning == true)
             {
-                collisionTime--;
-                collisionText.text = TimeFormat(collisionTime);
+                if(collisionTime > 0)
+                {
+                    collisionTime--;
+                    collisionText.text = TimeFormat(collisionTime);
 
-                collisionText.visible = true;
+                    collisionText.visible = true;
+                }
+                else
+                {
+                    collisionText.visible = false;
+                }
             }
-            else
+
+            if(mp.players.local.getVariable("JailTime") >= 1)
             {
-                collisionText.visible = false;
+                if(currentJailTime > 0) currentJailTime--;
+                lastJailUpdate--;
+
+                if(lastJailUpdate <= 0 || currentJailTime <= 0)
+                {
+                    mp.events.callRemote("RequestJailUpdate", currentJailTime);
+                    lastJailUpdate = 20;
+                }
             }
-        }
-
-        if(mp.players.local.getVariable("JailTime") >= 1)
-        {
-            if(currentJailTime > 0) currentJailTime--;
-            lastJailUpdate--;
-
-            if(lastJailUpdate <= 0 || currentJailTime <= 0)
-            {
-                mp.events.callRemote("RequestJailUpdate", currentJailTime);
-                lastJailUpdate = 20;
+            else {
+                if(currentJailTime > 0) currentJailTime = 0;
             }
         }
     }
+
+    for (let i = 0; i < mp.blips.length; i++)
+    {
+        var index = playerBlips.indexOf(mp.blips.at(i).id);
+        if(index != -1)
+        {
+            mp.blips.at(i).destroy();
+        }
+    }
+
+    mp.players.forEach(target => {
+
+        if(target.dimension == mp.players.local.dimension && target.getVariable("VisibleBlip") !== undefined && target.getVariable("VisibleBlip") == true)
+        {
+            var blipColor = 45;
+            
+            if(target.getVariable("Team") == 0) blipColor = 75;
+            else if(target.getVariable("Team") == 1) blipColor = 3;
+
+            var targetBlip = mp.blips.new(1, target.position,
+            {
+                name: target.name,
+                color: blipColor,
+                shortRange: false,
+                dimension: mp.players.local.dimension,
+            });
+
+            playerBlips.push(targetBlip.id);
+        }
+    });
     return;
 }
 
-secondUpdater = setInterval(SecondTimer, 1000);
+updateInterval = setInterval(UpdateTimer, updateRate);
+
+mp.events.addCommand("updaterate", function (rate) {
+    rate = Number(rate);
+
+    if (!Number.isInteger(rate)) {
+        mp.gui.chat.push("Invalid rate (must be in numbers & milliseconds)");
+        return;
+    }
+
+    if (rate < 10 || rate > 1000) {
+        mp.gui.chat.push("Invalid rate, must be milliseconds between 10-1000");
+        return;
+    }
+
+    if(updateInterval != null)
+    {
+        clearInterval(updateInterval);
+        updateInterval = null;
+    }
+
+    updateRate = rate;
+
+    updateInterval = setInterval(UpdateTimer, updateRate);
+    mp.gui.chat.push("Updates now happen " + Math.round(1000 / updateRate) + " times a second.");
+});
 
 function OnPlayerWeaponShot(targetPosition, targetEntity)
 {

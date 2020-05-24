@@ -794,25 +794,13 @@ namespace LSCC
                             break;
                     }
 
-
-                    if (player.HasData("Blip"))
-                    {
-                        Blip tBlip = player.GetData<Blip>("Blip");
-                        tBlip.Delete();
-                        player.ResetData("Blip");
-                    }
-
-                    Blip pBlip = NAPI.Blip.CreateBlip(new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ), Convert.ToUInt32(lobbyid));
-                    pBlip.Transparency = 255;
-                    pBlip.Color = 75;
-
-                    player.SetData("Blip", pBlip);
-
                     EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Playing fugitive as {player.Name}");
 
                     player.TriggerEvent("SetActorInvulnerable", false);
                     player.TriggerEvent("CanFallOutOfCar", true);
                     player.TriggerEvent("showHPBars", 1); // Always show HP Bars.
+
+                    player.SetSharedData("VisibleBlip", true);
 
                     player.SetSharedData("Team", 0);
                 }
@@ -1000,42 +988,16 @@ namespace LSCC
 
                 foreach (Player cop in lobby.Cops)
                 {
-                    if (cop.HasData("Blip"))
-                    {
-                        Blip tBlip = cop.GetData<Blip>("Blip");
-                        tBlip.Delete();
-                        cop.ResetData("Blip");
-                    }
-
-                    if (cop.GetData<bool>("GPS") == false) continue;
-
-                    Blip pBlip = NAPI.Blip.CreateBlip(cop.Position, Convert.ToUInt32(lobby.lobbyId));
-
-                    pBlip.Transparency = 192;
-                    pBlip.Color = 3;
-
-                    cop.SetData("Blip", pBlip);
+                    cop.SetSharedData("VisibleBlip", cop.GetData<bool>("GPS"));
                 }
 
                 if (lobby.FugitiveShowCounter >= 60 && lobby.FugitiveShowCounter < 90)
                 {
                     foreach (Player fugi in lobby.Fugitives)
                     {
-                        if (fugi.HasData("Blip"))
-                        {
-                            Blip tBlip = fugi.GetData<Blip>("Blip");
-                            tBlip.Delete();
-                            fugi.ResetData("Blip");
-                        }
+                        fugi.SetSharedData("VisibleBlip", true);
 
-                        Blip pBlip = NAPI.Blip.CreateBlip(fugi.Position, Convert.ToUInt32(lobby.lobbyId));
-
-                        pBlip.Transparency = 238;
-                        pBlip.Color = 1;
-
-                        fugi.SetData("Blip", pBlip);
-
-                        if(lobby.FugitiveShowCounter == 60) fugi.SendNotification("~r~You are now visible on the radar.", true);
+                        if (lobby.FugitiveShowCounter == 60) fugi.SendNotification("~r~You are now visible on the radar.", true);
                     }
                 }
 
@@ -1044,12 +1006,7 @@ namespace LSCC
                     lobby.FugitiveShowCounter = 0;
                     foreach (Player fugi in lobby.Fugitives)
                     {
-                        if (fugi.HasData("Blip"))
-                        {
-                            Blip tBlip = fugi.GetData<Blip>("Blip");
-                            tBlip.Delete();
-                            fugi.ResetData("Blip");
-                        }
+                        fugi.SetSharedData("VisibleBlip", false);
 
                         fugi.SendNotification("~g~You are no longer visible on the radar.", true);
                     }
