@@ -565,8 +565,15 @@ namespace LSCC
                 }
             }
 
+            if(!player.HasData("ForcedData"))
+            {
+                // Do lobby checks here so /sendtolobby ignores all of them.
+            }
+
             freeroamVehs.Clear();
             player.SetData("FreeroamVehicles", freeroamVehs);
+            player.SetSharedData("InDM", -1);
+            player.ResetData("ForcedData");
 
             player.SetSharedData("InLobby", -1);
             player.SendChatMessage($"!{{#FFFF00}}[!] Sending you to !{{#FF6347}}LOBBY.");
@@ -858,7 +865,8 @@ namespace LSCC
                 return;
             }
 
-            EPlayer.Spawn(target);
+            player.SetData("ForcedLobby", true);
+            cmd_lobby(target);
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has sent {target.Name} to lobby.");
         }
 
