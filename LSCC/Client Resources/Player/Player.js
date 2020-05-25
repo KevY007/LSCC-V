@@ -167,12 +167,29 @@ function UpdateTimer()
         }
     }
 
+    var blipsToDel = [];
+    mp.blips.forEach(blipId =>
+    {
+        blipsToDel.push(blipId);
+    });
+
+    blipsToDel.forEach(blip =>
+    {
+        if(typeof blip.destroy === 'function')
+        {
+            blip.destroy();
+        }
+    });
+
     for (let i = 0; i < mp.blips.length; i++)
     {
-        var index = playerBlips.indexOf(mp.blips.at(i).id);
-        if(index != -1)
+        if(mp.blips.at(i).id !== undefined)
         {
-            mp.blips.at(i).destroy();
+            var index = playerBlips.indexOf(mp.blips.at(i).id);
+            if(index != -1)
+            {
+                mp.blips.at(i).destroy();
+            }
         }
     }
 

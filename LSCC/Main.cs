@@ -1014,7 +1014,14 @@ namespace LSCC
 
                 foreach (Player cop in lobby.Cops)
                 {
-                    cop.SetSharedData("VisibleBlip", cop.GetData<bool>("GPS"));
+                    if (cop.GetData<bool>("GPS") == false)
+                    {
+                        cop.SetSharedData("VisibleBlip", false);
+                    }
+                    else
+                    {
+                        cop.SetSharedData("VisibleBlip", true);
+                    }
                 }
 
                 if (lobby.FugitiveShowCounter >= 60 && lobby.FugitiveShowCounter < 90)
