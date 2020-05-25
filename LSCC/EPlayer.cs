@@ -76,6 +76,40 @@ namespace LSCC
         public static void Freeze(Player player, bool toggle)
         {
             player.TriggerEvent("SetPlayerFrozen", toggle);
+
+            if (toggle)
+            {
+                List<Tuple<WeaponHash, int>> wepData = new List<Tuple<WeaponHash, int>>();
+
+                if (player.HasData("FreezeWeapons"))
+                {
+                    wepData = player.GetData<List<Tuple<WeaponHash, int>>>("FreezeWeapons");
+                }
+
+                player.Weapons.ToList().ForEach(wep =>
+                {
+                    int ammo = player.GetWeaponAmmo(wep);
+                    wepData.Add(new Tuple<WeaponHash, int>(wep, ammo));
+                });
+
+                player.SetData("FreezeWeapons", wepData);
+
+                player.RemoveAllWeapons();
+            }
+            else
+            {
+                if (player.HasData("FreezeWeapons"))
+                {
+                    List<Tuple<WeaponHash, int>> wepData = player.GetData<List<Tuple<WeaponHash, int>>>("FreezeWeapons");
+
+                    wepData.ForEach(wepTuple =>
+                    {
+                        player.GiveWeapon(wepTuple.Item1, wepTuple.Item2);
+                    });
+
+                    player.ResetData("FreezeWeapons");
+                }
+            }
         }
         public static void SetColor(Player player, Color col, int armour = 0)
         {

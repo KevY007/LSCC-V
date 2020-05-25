@@ -120,6 +120,8 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
+            player.ResetData("FreezeWeapons");
+
             NAPI.Notification.SendNotificationToPlayer(player, $"~r~You died!", false);
 
             string reasonStr;
@@ -450,6 +452,16 @@ namespace LSCC
         [RemoteEvent("PlayerShotAtWrongPlayer")]
         public void PlayerShootWrongPlayer(Player player, int caseid)
         {
+            EPlayer.Freeze(player, true);
+
+            NAPI.Task.Run(() => 
+            {
+                if (!player.IsNull && player != null && player.IsInstanceAlive)
+                {
+                    EPlayer.Freeze(player, false);
+                }
+            }, 2000);
+
             if(caseid == 0)
             {
                 int warnings = 0;
@@ -635,6 +647,8 @@ namespace LSCC
                 EPlayer.LoginBrowserSetup(player);
                 return;
             }
+
+            player.ResetData("FreezeWeapons");
 
             player.SetSharedData("Level", EPlayer.GetAccount(player).Level);
             player.SetSharedData("Ping", player.Ping);
