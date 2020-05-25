@@ -16,4 +16,4 @@ anti teamkill/team damage.
 
 DISABLE DRIVER DRIVEBY
 
-FREEROAM, DM, DERBY
+DERBY

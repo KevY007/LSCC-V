@@ -84,6 +84,20 @@ namespace LSCC
             {
                 player.SetSharedData("VisibleBlip", false);
 
+                List<Vehicle> freeroamVehs = new List<Vehicle>();
+                freeroamVehs = player.GetData<List<Vehicle>>("FreeroamVehicles");
+
+                for (int i = freeroamVehs.Count - 1; i >= 0; i--)
+                {
+                    if (!freeroamVehs[i].IsNull && freeroamVehs[i] != null)
+                    {
+                        freeroamVehs[i].Delete();
+                        freeroamVehs.RemoveAt(i);
+                    }
+                }
+
+                freeroamVehs.Clear();
+
                 switch (type)
                 {
                     case DisconnectionType.Left:
@@ -117,6 +131,23 @@ namespace LSCC
             if (killer != null && !killer.IsNull && killer != player)
             {
                 NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
+
+                if (killer.GetSharedData<int>("InLobby") > -1 && killer.GetSharedData<int>("InDM") > -1)
+                {
+                    int arenaID = killer.GetSharedData<int>("InDM");
+
+                    foreach(Player indm in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == killer.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == arenaID))
+                    {
+                        if (reasonStr == null)
+                        {
+                            indm.TriggerEvent("pushToKillFeed", $"[DM] {killer.Name} killed {player.Name}");
+                        }
+                        else
+                        {
+                            indm.TriggerEvent("pushToKillFeed", $"[DM] {killer.Name} killed {player.Name} with {reasonStr}");
+                        }
+                    }
+                }
 
                 if (killer.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && player.GetSharedData<int>("Team") != -1)
                 {
@@ -194,35 +225,32 @@ namespace LSCC
                 {
                     if (lobby.Fugitives.Contains(player))
                     {
-                        foreach (Player ay in Settings.LoggedInPlayers)
+                        foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
                         {
-                            if (ay.GetSharedData<int>("InLobby") == lobby.lobbyId)
+                            if (killer != null && !killer.IsNull && killer != player)
                             {
-                                if (killer != null && !killer.IsNull && killer != player)
-                                {
-                                    ay.SendNotification($"Fugitive ~r~<C>{player.Name}</C> ~w~has been taken out by ~b~<C>{killer.Name}</C>~w~.");
+                                ay.SendNotification($"Fugitive ~r~<C>{player.Name}</C> ~w~has been taken out by ~b~<C>{killer.Name}</C>~w~.");
 
-                                    if (reasonStr == null)
-                                    {
-                                        ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name}");
-                                    }
-                                    else
-                                    {
-                                        ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}");
-                                    }
+                                if (reasonStr == null)
+                                {
+                                    ay.TriggerEvent("pushToKillFeed", $"[CC] {killer.Name} killed {player.Name}");
                                 }
                                 else
                                 {
-                                    NAPI.Notification.SendNotificationToPlayer(ay, $"Fugitive ~r~<C>{player.Name}</C> ~w~has died.");
+                                    ay.TriggerEvent("pushToKillFeed", $"[CC] {killer.Name} killed {player.Name} with {reasonStr}");
+                                }
+                            }
+                            else
+                            {
+                                ay.SendNotification($"Fugitive ~r~<C>{player.Name}</C> ~w~has died.");
 
-                                    if (reasonStr == null)
-                                    {
-                                        ay.TriggerEvent("pushToKillFeed", $"{player.Name} died");
-                                    }
-                                    else
-                                    {
-                                        ay.TriggerEvent("pushToKillFeed", $"{player.Name} died of {reasonStr}");
-                                    }
+                                if (reasonStr == null)
+                                {
+                                    ay.TriggerEvent("pushToKillFeed", $"[CC] {player.Name} died");
+                                }
+                                else
+                                {
+                                    ay.TriggerEvent("pushToKillFeed", $"[CC] {player.Name} died of {reasonStr}");
                                 }
                             }
                         }
@@ -232,35 +260,32 @@ namespace LSCC
 
                     if (lobby.Cops.Contains(player))
                     {
-                        foreach (Player ay in Settings.LoggedInPlayers)
+                        foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
                         {
-                            if (ay.GetSharedData<int>("InLobby") == lobby.lobbyId)
+                            if (killer != null && !killer.IsNull && player != killer)
                             {
-                                if (killer != null && !killer.IsNull && player != killer)
-                                {
-                                    NAPI.Notification.SendNotificationToPlayer(ay, $"Cop ~r~<C>{player.Name}</C> ~w~has been taken out by ~b~<C>{killer.Name}</C>~w~.");
+                                ay.SendNotification($"Cop ~b~<C>{player.Name}</C> ~w~has been taken out by ~r~<C>{killer.Name}</C>~w~.");
                                     
-                                    if (reasonStr == null)
-                                    {
-                                        ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name}");
-                                    }
-                                    else
-                                    {
-                                        ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}");
-                                    }
+                                if (reasonStr == null)
+                                {
+                                    ay.TriggerEvent("pushToKillFeed", $"[CC] {killer.Name} killed {player.Name}");
                                 }
                                 else
                                 {
-                                    NAPI.Notification.SendNotificationToPlayer(ay, $"Cop ~r~<C>{player.Name}</C> ~w~has died.");
+                                    ay.TriggerEvent("pushToKillFeed", $"[CC] {killer.Name} killed {player.Name} with {reasonStr}");
+                                }
+                            }
+                            else
+                            {
+                                ay.SendNotification($"Cop ~r~<C>{player.Name}</C> ~w~has died.");
 
-                                    if (reasonStr == null)
-                                    {
-                                        ay.TriggerEvent("pushToKillFeed", $"{player.Name} died");
-                                    }
-                                    else
-                                    {
-                                        ay.TriggerEvent("pushToKillFeed", $"{player.Name} died of {reasonStr}");
-                                    }
+                                if (reasonStr == null)
+                                {
+                                    ay.TriggerEvent("pushToKillFeed", $"{player.Name} died");
+                                }
+                                else
+                                {
+                                    ay.TriggerEvent("pushToKillFeed", $"{player.Name} died of {reasonStr}");
                                 }
                             }
                         }
@@ -602,7 +627,7 @@ namespace LSCC
         }
 
         [ServerEvent(Event.PlayerSpawn)]
-        public void OnPlayerSpawn(Player player)
+        public static void OnPlayerSpawn(Player player)
         {
             if (!EPlayer.LoggedIn(player))
             {
@@ -633,7 +658,8 @@ namespace LSCC
                 player.SetSharedData("InLobby", -2);
                 player.SetSharedData("JailTime", acc.JailTime);
                 EPlayer.SetColor(player, new Color(168, 128, 8, 255));
-                player.Position = Settings.VectorJail;
+                player.Position = (Vector3)Settings.VectorJail[0];
+                player.Heading = (float)Settings.VectorJail[1];
                 player.Dimension = 200 + Convert.ToUInt32(player.Id);
                 EPlayer.Freeze(player, true);
                 player.SendChatMessage($"!{{#FF6347}}[JAILED] !{{#FFFFFF}}You are in jail for {acc.JailTime} seconds, reason: {acc.JailReason}.");
@@ -650,14 +676,30 @@ namespace LSCC
                 return;
             }
 
-            if (player.GetSharedData<int>("InLobby") > -1)
+            if (player.GetSharedData<int>("InLobby") == -3) // Freeroam
+            {
+                player.Position = new Vector3(1061.547f, -720.113f, 56.786f);
+                player.Heading = 130.497f;
+                EPlayer.SetDiscordStatus(player, $"In freeroam as {player.Name}");
+
+                EPlayer.SetColor(player, new Color(102, 232, 217), 0);
+
+                player.TriggerEvent("SetActorInvulnerable", true);
+
+                player.SetSharedData("VisibleBlip", true);
+
+                player.RemoveAllWeapons();
+
+                player.Dimension = 256;
+            }
+
+            if (player.GetSharedData<int>("InLobby") > -1) // Copchase Lobby
             {
                 EPlayer.SetDiscordStatus(player, $"In lobby {player.GetSharedData<int>("InLobby")} as {player.Name}");
 
                 player.RemoveAllWeapons();
 
                 player.Dimension = 100 + Convert.ToUInt32(player.GetSharedData<int>("InLobby"));
-
                         
                 LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
                 if (lobby != null)
@@ -666,6 +708,36 @@ namespace LSCC
                     {
                         player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, lobby.CollisionCounter);
                     }
+                }
+
+                int arenaID = player.GetSharedData<int>("InDM");
+                if (arenaID > -1)
+                {
+                    Random rand = new Random();
+
+                    int spawnID = rand.Next(Settings.DMSpawns[arenaID].GetLength(0));
+                    Vector3 dmSpawn = (Vector3)Settings.DMSpawns[arenaID][spawnID, 0];
+                    player.Position = dmSpawn;
+                    player.Heading = (float)Settings.DMSpawns[arenaID][spawnID, 1];
+
+                    player.Health = 100;
+                    player.Armor = 100;
+
+                    player.TriggerEvent("SetActorInvulnerable", false);
+                    player.SetSharedData("VisibleBlip", true);
+                    player.TriggerEvent("showHPBars", 1); // Show if AIMing
+
+                    player.RemoveAllWeapons();
+
+                    player.Dimension = (uint)arenaID + 356 + Convert.ToUInt32(player.GetSharedData<int>("InLobby"));
+
+                    EPlayer.SetDiscordStatus(player, $"In DM {Settings.DMNames[arenaID]} (lobby {player.GetSharedData<int>("InLobby")}) as {player.Name}");
+                    EPlayer.SetColor(player, new Color(179, 179, 179), 100);
+
+                    player.GiveWeapon(WeaponHash.Revolver_mk2, 1000);
+                    player.GiveWeapon(WeaponHash.Pumpshotgun, 1000);
+                    player.GiveWeapon(WeaponHash.Smg_mk2, 1000);
+                    player.GiveWeapon(WeaponHash.Assaultrifle_mk2, 1000);
                 }
             }
         }

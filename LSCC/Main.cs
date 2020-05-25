@@ -82,10 +82,36 @@ public static class Settings
 
     public static Vector3[] LobbySpawns = new Vector3[]
     {
-        new Vector3(-592f, -98f, 43f)
+        new Vector3(464.8465f, -995.0156f, 24.914879f), 
+        new Vector3(450.13f, -987.06f, 26.67f),
+        new Vector3(439.86f, -995.12f, 30.68f),
+        new Vector3(443.308f, -986.31f, 30.689f),
+        new Vector3(441.24f, -978.24f, 30.68f)
     };
 
-    public static Vector3 VectorJail = new Vector3(-127.18, -991.12, 39.259);
+    public static object[] VectorJail = { new Vector3(459.55798f, -998.202f, 24.914848f), -75.06f };
+
+    public static string[] DMNames = new string[]
+    {
+        "Life Invader Office"
+    };
+
+    public static object[][,] DMSpawns = new object[][,]
+    {
+        new object[,] { // Life Invader Office
+            { new Vector3(-1042.9781f, -237.05504f, 37.96496f), 112.122505f },
+            { new Vector3(-1065.8978f, -246.8463f, 39.733177f), 2.7907195f },
+            { new Vector3(-1087.0682f, -250.7736f, 37.76329f), -84.64264f },
+            { new Vector3(-1071.687f, -240.58011f, 42.271416f), 158.59511f },
+            { new Vector3(-1081.3223f, -254.02095f, 44.023148f), -37.803333f },
+            { new Vector3(-1063.2289f, -248.76646f, 44.02106f), -19.056158f },
+            { new Vector3(-1055.6722f, -239.3023f, 44.021183f), 124.46403f },
+            { new Vector3(-1049.8112f, -242.46056f, 44.021015f), 80.71298f },
+            { new Vector3(-1056.6835f, -246.28284f, 44.02107f), 60.64799f },
+            { new Vector3(-1078.404f, -244.99226f, 44.021255f), -105.56132f },
+            { new Vector3(-1059.8085f, -238.40387f, 39.733192f), -145.55379f },
+        },
+    };
 }
 
 namespace LSCC

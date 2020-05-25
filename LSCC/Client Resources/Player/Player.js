@@ -181,16 +181,22 @@ function UpdateTimer()
         if(target.dimension == mp.players.local.dimension && target.getVariable("VisibleBlip") !== undefined && target.getVariable("VisibleBlip") == true)
         {
             var blipColor = 45;
+            var blipId = 1;
             
             if(target.getVariable("Team") == 0) blipColor = 75;
             else if(target.getVariable("Team") == 1) blipColor = 3;
 
-            var targetBlip = mp.blips.new(1, target.position,
+            if(target.getVariable("InLobby") == -3) blipColor = 15;
+            if(target.getVariable("InDM") != -1) blipColor = 39;
+
+            if(target.isInAnyVehicle(false)) blipId = 724;
+
+            var targetBlip = mp.blips.new(blipId, target.position,
             {
                 name: target.name,
                 color: blipColor,
                 shortRange: false,
-                dimension: mp.players.local.dimension,
+                dimension: mp.players.local.dimension
             });
 
             playerBlips.push(targetBlip.id);

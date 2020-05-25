@@ -31,12 +31,16 @@ namespace LSCC
             player.SetData("GPS", false);
             player.ResetData("BlockList");
             player.SetSharedData("InLobby", -1);
+            player.SetSharedData("InDM", -1);
             player.SetSharedData("Color_R", 255);
             player.SetSharedData("Color_G", 255);
             player.SetSharedData("Color_B", 255);
             player.SetSharedData("Ping", player.Ping);
             player.SetSharedData("Level", 1);
             player.SetSharedData("JailTime", 0);
+
+            List<Vehicle> temp_FreeroamVeh = new List<Vehicle>();
+            player.SetData("FreeroamVehicles", temp_FreeroamVeh);
 
             foreach (LobbyData il in Settings.Lobbies)
             {
@@ -61,7 +65,7 @@ namespace LSCC
             }
             player.SetSharedData("JailTime", Acc.JailTime);
             player.TriggerEvent("SetJailCounter", Acc.JailTime);
-            NAPI.Player.SpawnPlayer(player, Settings.VectorJail);
+            NAPI.Player.SpawnPlayer(player, (Vector3)Settings.VectorJail[0], (float)Settings.VectorJail[1]);
         }
 
         public static void SetDiscordStatus(Player player, string status)
@@ -189,8 +193,9 @@ namespace LSCC
 
             if (player.GetData<bool>("AutoJoin") == false) NAPI.Notification.SendNotificationToPlayer(player, $"~g~Autojoin has been enabled.", false);
 
-            if (player.GetSharedData<int>("InLobby") <= -1)
+            if (player.GetSharedData<int>("InLobby") == -1)
             {
+                player.SetSharedData("InDM", -1);
                 int LobbyToBeIn = Settings.MaxLobbies;
                 foreach (LobbyData lobby in Settings.Lobbies)
                 {

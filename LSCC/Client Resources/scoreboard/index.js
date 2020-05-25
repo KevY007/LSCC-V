@@ -14,6 +14,22 @@ mp.events.add("updateSBServerName", (eUpdatedName) =>
 	serverName = eUpdatedName;
 });
 
+function updatePlayer(player)
+{
+    let lobbystr = "N/A";
+    if(player.getVariable("pLogged") === undefined || player.getVariable("pLogged") == false || player.getVariable("InLobby") === undefined) lobbystr = "LOGIN";
+    else if(player.getVariable("InLobby") == -2) lobbystr = "JAIL";
+    else if(player.getVariable("InLobby") == -3) lobbystr = "FREEROAM";
+    else if(player.getVariable("InLobby") == -4) lobbystr = "DERBY";
+    else if(player.getVariable("InLobby") > -1) lobbystr = player.getVariable("InLobby").toString();
+    if(player.getVariable("InDM") != -1) lobbystr = player.getVariable("InLobby").toString() + "/DM";
+    
+    browser.execute('updateUser("' + lobbystr + '", "' + player.name + '", "' + player.getVariable("Level") + '", "' + player.getVariable("Ping") +
+    '", ' + player.getVariable("Color_R") + ', ' + player.getVariable("Color_G") + ', ' + player.getVariable("Color_B") + ')');
+
+    return;
+}
+
 mp.keys.bind(0x4F, false, function () {
 
     if(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false || forceOff == true) return;
@@ -44,12 +60,9 @@ mp.keys.bind(0x4F, false, function () {
 
     mp.players.forEach(
         (player) => {
-            let lobbystr = "N/A";
-            if(player.getVariable("pLogged") === undefined || player.getVariable("pLogged") == false) lobbystr = "LOGIN";
-            if(player.getVariable("InLobby") !== undefined && player.getVariable("InLobby") != -1) lobbystr = player.getVariable("InLobby").toString();
-                
-            browser.execute('createUser("' + lobbystr + '", "' + player.name + '", "' + player.getVariable("Level") + '", "' + player.getVariable("Ping") +
-             '", ' + player.getVariable("Color_R") + ', ' + player.getVariable("Color_G") + ', ' + player.getVariable("Color_B") + ')');
+            browser.execute('createUser("N/A", "' + player.name + '", "N/A", "N/A", ' + player.getVariable("Color_R") + ', ' + player.getVariable("Color_G") + ', ' + player.getVariable("Color_B") + ')');
+
+             updatePlayer(player);
         }
     );
 
@@ -62,15 +75,7 @@ mp.keys.bind(0x4F, false, function () {
     { 
         mp.players.forEach(
             (player) => {
-                let lobbystr = "N/A";
-                if(player.getVariable("pLogged") === undefined || player.getVariable("pLogged") == false || player.getVariable("InLobby") === undefined) lobbystr = "LOGIN";
-                else if(player.getVariable("InLobby") == -2) lobbystr = "JAIL";
-                else if(player.getVariable("InLobby") == -3) lobbystr = "DM";
-                else if(player.getVariable("InLobby") == -4) lobbystr = "DERBY";
-                else if(player.getVariable("InLobby") != -1) lobbystr = player.getVariable("InLobby").toString();
-                
-                browser.execute('updateUser("' + lobbystr + '", "' + player.name + '", "' + player.getVariable("Level") + '", "' + player.getVariable("Ping") +
-                '", ' + player.getVariable("Color_R") + ', ' + player.getVariable("Color_G") + ', ' + player.getVariable("Color_B") + ')');
+                updatePlayer(player);
             }
         );
     }, 1000);

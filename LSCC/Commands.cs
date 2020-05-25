@@ -186,7 +186,7 @@ namespace LSCC
             return;
         }
 
-        [Command("aveh")]
+        [Command("aveh", Alias = "av")]
         public void cmd_aveh(Player player, string carname)
         {
             if (!EPlayer.LoggedIn(player))
@@ -209,6 +209,49 @@ namespace LSCC
             NAPI.Task.Run(() =>
             {
                 if(!aVehicle.IsNull) player.SetIntoVehicle(aVehicle, 0);
+            }, 1000);
+
+            return;
+        }
+
+        [Command("veh", Alias = "v")]
+        public void cmd_veh(Player player, string carname)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension != 256)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                return;
+            }
+
+            List<Vehicle> freeroamVehs = new List<Vehicle>();
+            freeroamVehs = player.GetData<List<Vehicle>>("FreeroamVehicles");
+
+            if(freeroamVehs.Count >= 10)
+            {
+                Vehicle veh = freeroamVehs.First();
+                freeroamVehs.Remove(veh);
+                veh.Delete();
+                player.SendNotification("~r~You had too many freeroam vehicles, removed the least recent.");
+            }
+
+            Random rand = new Random();
+
+            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(64), rand.Next(64), player.SocialClubName, 255, false, true, player.Dimension);
+
+            aVehicle.SetSharedData("Team", -1);
+
+            freeroamVehs.Add(aVehicle);
+
+            player.SetData("FreeroamVehicles", freeroamVehs);
+
+            player.SendChatMessage("!{#FF6347}>> !{#FFFFFF}You have spawned a " + carname + " at your current location.");
+
+            NAPI.Task.Run(() =>
+            {
+                if (!aVehicle.IsNull) player.SetIntoVehicle(aVehicle, 0);
             }, 1000);
 
             return;
@@ -363,6 +406,36 @@ namespace LSCC
             return;
         }
 
+        [Command("fix")]
+        public void cmd_fix(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 1 admin.");
+                return;
+            }
+
+            if(!target.IsInVehicle) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not in any vehicle!"); return; }
+
+            target.Vehicle.Repair();
+            RAGE.Entities.Players.All.ForEach((Player p) =>
+            {
+                p.SendChatMessage($"!{{#FF6347}}[AdmCmd] {player.Name} has repaired {target.Name}'s vehicle.");
+            });
+
+            return;
+        }
+
+        [Command("flip")]
+        public void cmd_flip(Player player)
+        {
+            player.SendChatMessage("In GTA V you can literally unflip by yourself, dumbo.");
+            return;
+        }
+
         [Command("removeavehs")]
         public void cmd_removeavehs(Player player)
         {
@@ -438,13 +511,13 @@ namespace LSCC
             {
                 player.SendChatMessage($"X: {player.Position.X} - Y: {player.Position.Y} - Z: {player.Position.Z}");
                 player.SendChatMessage($"Heading: {player.Heading}");
-                NAPI.Util.ConsoleOutput($"{player.Name} Position log: X: {player.Position.X} - Y: {player.Position.Y} - Z: {player.Position.Z}");
+                NAPI.Util.ConsoleOutput($"{player.Name} Position log: {{ new Vector3({player.Position.X}f, {player.Position.Y}f, {player.Position.Z}f), {player.Heading}f }},");
             }
             else
             {
                 player.SendChatMessage($"vX: {player.Vehicle.Position.X} - vY: {player.Vehicle.Position.Y} - vZ: {player.Vehicle.Position.Z}");
                 player.SendChatMessage($"vHeading: {player.Vehicle.Heading}");
-                NAPI.Util.ConsoleOutput($"{player.Name} Position log: X: {player.Vehicle.Position.X} - Y: {player.Vehicle.Position.Y} - Z: {player.Vehicle.Position.Z}");
+                NAPI.Util.ConsoleOutput($"{player.Name} Position log: {{ new Vector3({player.Vehicle.Position.X}f, {player.Vehicle.Position.Y}f, {player.Vehicle.Position.Z}f), {player.Vehicle.Heading}f }},");
             }
         }
 
@@ -480,8 +553,23 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player))
                 return;
 
+            List<Vehicle> freeroamVehs = new List<Vehicle>();
+            freeroamVehs = player.GetData<List<Vehicle>>("FreeroamVehicles");
 
-            player.SendChatMessage($"!{{#FFFF00}}Sending you to the lobby...");
+            for (int i = freeroamVehs.Count - 1; i >= 0; i--)
+            {
+                if (!freeroamVehs[i].IsNull && freeroamVehs[i] != null)
+                {
+                    freeroamVehs[i].Delete();
+                    freeroamVehs.RemoveAt(i);
+                }
+            }
+
+            freeroamVehs.Clear();
+            player.SetData("FreeroamVehicles", freeroamVehs);
+
+            player.SetSharedData("InLobby", -1);
+            player.SendChatMessage($"!{{#FFFF00}}[!] Sending you to !{{#FF6347}}LOBBY.");
             EPlayer.Spawn(player);
 
             return;
@@ -505,7 +593,7 @@ namespace LSCC
             return;
         }
 
-        [Command("updaterate")] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
+        [Command("updaterate", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
         public void cmd_updaterate(Player player)
         {
             return;
@@ -642,23 +730,157 @@ namespace LSCC
             return;
         }
 
+        [Command("dmarenas")]
+        public void cmd_dmarenas(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+
+            for (int i = 0; i < Settings.DMNames.Length; i++)
+            {
+                if (player.GetSharedData<int>("InLobby") <= -1)
+                {
+                    player.SendChatMessage($">> !{{#DAA520}}Arena {i} | !{{#FF6347}}{Settings.DMNames[i]} " +
+                           $"!{{#DAA520}}| Players: N/A (No lobby)");
+                }
+                else
+                {
+                    player.SendChatMessage($">> !{{#DAA520}}Arena {i} | !{{#FF6347}}{Settings.DMNames[i]} " +
+                       $"!{{#DAA520}}| Players: " +
+                       $"{Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == i)}");
+                }
+            }
+
+
+            return;
+        }
+
+        [Command("dm")]
+        public void cmd_dm(Player player, int arena)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).JailTime > 0) return;
+
+            if(arena < 0 || arena >= Settings.DMNames.Length)
+            {
+                player.SendChatMessage("!{#FF6347}Invalid DM arena ID! /dmarenas to see all the arenas.");
+                return;
+            }
+
+            if (player.GetSharedData<int>("InLobby") <= -1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in any lobby!");
+                return;
+            }
+
+            LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (elobby == null) return;
+
+            if (elobby.gameStatus == 2)
+            { 
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into DM while the match is starting!");
+                return;
+            }
+            
+
+            player.SetSharedData("InDM", arena);
+
+            EPlayer.Spawn(player);
+            player.SendChatMessage($"[!] !{{#FFFF00}}Sending you to !{{#FF6347}}DM: {Settings.DMNames[arena]}.");
+
+            return;
+        }
+
+        [Command("freeroam")]
+        public void cmd_freeroam(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).JailTime > 0) return;
+
+            if (player.GetSharedData<int>("InLobby") > -1)
+            {
+                LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+                if (elobby == null) return;
+
+                if (elobby.gameStatus == 2)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into freeroam while the match is starting!");
+                    return;
+                }
+            }
+
+            player.SetSharedData("InLobby", -3); 
+            EPlayer.Spawn(player);
+            player.SendChatMessage($"!{{#FFFF00}}[!] Sending you to !{{#FF6347}}FREEROAM");
+
+
+
+            return;
+        }
+
+        [Command("gotopos", Alias = "gpos")]
+        public void cmd_gotopos(Player player, float x, float y, float z)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if(EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                return;
+            }
+
+            player.Position = new Vector3(x, y, z);
+        }
+
+        [Command("setdimension", Alias = "setvw")]
+        public void cmd_setdimension(Player player, Player target, uint vw)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (EPlayer.GetAccount(player).Admin < 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                return;
+            }
+
+            target.Dimension = vw;
+            player.SendChatMessage($"!{{#FF6347}}[AdmCmd] {target.Name}'s dimension/world has been set to {vw}.");
+        }
+
+        [Command("sendtolobby", Alias = "stl")]
+        public void cmd_sendtolobby(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                return;
+            }
+
+            EPlayer.Spawn(target);
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has sent {target.Name} to lobby.");
+        }
+
         [Command("cmds", Alias = "help")]
         public void cmd_help(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            player.SendChatMessage("[Los Santos Copchase V BETA Commands]:");
+            player.SendChatMessage("!{#0079DB}[Los Santos Copchase V !{#2BA3FF}BETA Commands]:");
             player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /stats");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies");
-            player.SendChatMessage("[Voice]: /voiceblock");
-            player.SendChatMessage("[Keys]: Voice (N) | GPS (Z) | Scoreboard (O)");
-            player.SendChatMessage("[Cop]: /gps");
-            player.SendChatMessage("[Roleplay]: /me /do");
-            player.SendChatMessage("[Debug]: /pos /updaterate (changes the blip updating interval)");
+            player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock");
+            player.SendChatMessage("!{#5FBCAC}[Keys]: Voice (N) | GPS (Z) | Scoreboard (O)");
+            player.SendChatMessage("!{#61A9FA}[Cop]: /gps");
+            player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do");
+            player.SendChatMessage("!{#28E0DA}[Freeroam]: /freeroam /veh");
+            player.SendChatMessage("!{#B3B3B3}[DM]: /dm /dmarenas");
+            player.SendChatMessage("!{#A5A8A8}[Debug]: /pos /updaterate (changes the blip updating interval)");
 
-            if(EPlayer.GetAccount(player).DonatorLevel >= 2)
+            if (EPlayer.GetAccount(player).DonatorLevel >= 2)
             {
-                player.SendChatMessage("[Donator Lv. 2] /createlobby /deletelobby /setlobbypassword /setlobbyfugitivepercent");
+                player.SendChatMessage("!{#F7EB05}[Donator Lv. 2] /createlobby /deletelobby /setlobbypassword /setlobbyfugitivepercent");
             }
 
             if (EPlayer.GetAccount(player).Admin >= 1) player.SendChatMessage("!{#FF6347}For admin commands, visit /acmds.");
@@ -845,6 +1067,12 @@ namespace LSCC
                 return;
             }
 
+            if(Settings.Lobbies.Count >= Settings.MaxLobbies + 20)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The server has reached maximum lobbies limit!");
+                return;
+            }
+
             LobbyData newLobby = new LobbyData();
             newLobby.PlayerCreated = true;
 
@@ -983,16 +1211,16 @@ namespace LSCC
             {
                 player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /sethp /setar /spec");
                 player.SendChatMessage("[Admin Lv 1]: /freeze /unfreeze /kick /slap /setinv(ulnerable) /specoff");
-                player.SendChatMessage("[Admin Lv 1]: /bancheck /jail /unjail");
+                player.SendChatMessage("[Admin Lv 1]: /bancheck /jail /unjail /fix /sendtolobby");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
                 player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword");
-                player.SendChatMessage("[Admin Lv 2]: /togglelobby");
+                player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension");
             }
             if (EPlayer.GetAccount(player).Admin >= 3)
             {
-                player.SendChatMessage("[Admin Lv 3]: /givegun");
+                player.SendChatMessage("[Admin Lv 3]: /givegun /gotopos");
             }
             if (EPlayer.GetAccount(player).Admin >= 4)
             {
