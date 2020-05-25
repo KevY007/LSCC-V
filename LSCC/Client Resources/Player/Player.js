@@ -339,7 +339,6 @@ mp.events.add(
             chaseTimeMax = iTimeMax;
             collisionTime = collisionDuration;
             chaseRunning = true;
-            updateChaseTimer();
         },
 
         "HideChaseTimer": () => {
