@@ -86,10 +86,15 @@ namespace LSCC
                     wepData = player.GetData<List<Tuple<WeaponHash, int>>>("FreezeWeapons");
                 }
 
-                player.Weapons.ToList().ForEach(wep =>
+                var weapons = Enum.GetValues(typeof(WeaponHash)).Cast<WeaponHash>();
+
+                weapons.ToList().ForEach(wep =>
                 {
                     int ammo = player.GetWeaponAmmo(wep);
-                    wepData.Add(new Tuple<WeaponHash, int>(wep, ammo));
+                    if (ammo > 0)
+                    {
+                        wepData.Add(new Tuple<WeaponHash, int>(wep, ammo));
+                    }
                 });
 
                 player.SetData("FreezeWeapons", wepData);

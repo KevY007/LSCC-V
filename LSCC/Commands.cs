@@ -389,7 +389,7 @@ namespace LSCC
         }
 
         [Command("givegun")]
-        public void cmd_givegun(Player player, Player target, int ammo, string gunname)
+        public void cmd_givegun(Player player, Player target, int ammo, WeaponHash wephash)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -400,7 +400,7 @@ namespace LSCC
                 return;
             }
 
-            target.GiveWeapon((WeaponHash)NAPI.Util.GetHashKey(gunname), ammo);
+            target.GiveWeapon(wephash, ammo);
 
             player.SendChatMessage("Attempted to give the weapon.");
             return;
