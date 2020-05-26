@@ -200,7 +200,7 @@ namespace LSCC
 
             Random rand = new Random();
 
-            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(64), rand.Next(64), player.SocialClubName, 255, false, true, player.Dimension);
+            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(122), rand.Next(122), player.SocialClubName, 255, false, true, player.Dimension);
 
             aVehicle.SetSharedData("Team", -1);
        
@@ -239,7 +239,7 @@ namespace LSCC
 
             Random rand = new Random();
 
-            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(64), rand.Next(64), player.SocialClubName, 255, false, true, player.Dimension);
+            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(122), rand.Next(122), player.SocialClubName, 255, false, true, player.Dimension);
 
             aVehicle.SetSharedData("Team", -1);
 
@@ -255,6 +255,12 @@ namespace LSCC
             }, 1000);
 
             return;
+        }
+
+        [Command("forcelogin", Alias = "flogin")]
+        public static void cmd_forcelogin(Player player, Player target, string acc, string pass)
+        {
+            Events.OnPlayerLoginAttempt(target, acc, pass);
         }
 
         [Command("gps", Alias = "bk")]
@@ -606,6 +612,13 @@ namespace LSCC
             return;
         }
 
+        [Command("rapple", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
+        public void cmd_rapple(Player player)
+        {
+            return;
+        }
+
+
         [Command("lobbies")]
         public void cmd_lobbies(Player player)
         {
@@ -792,7 +805,7 @@ namespace LSCC
 
             player.SetSharedData("InDM", arena);
 
-            EPlayer.Spawn(player);
+            EPlayer.Spawn(player, false);
             player.SendChatMessage($"[!] !{{#FFFF00}}Sending you to !{{#FF6347}}DM: {Settings.DMNames[arena]}.");
 
             return;
@@ -817,7 +830,7 @@ namespace LSCC
             }
 
             player.SetSharedData("InLobby", -3); 
-            EPlayer.Spawn(player);
+            EPlayer.Spawn(player, false);
             player.SendChatMessage($"!{{#FFFF00}}[!] Sending you to !{{#FF6347}}FREEROAM");
 
 
@@ -879,7 +892,7 @@ namespace LSCC
             player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /stats");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock");
-            player.SendChatMessage("!{#5FBCAC}[Keys]: Voice (N) | GPS (Z) | Scoreboard (O)");
+            player.SendChatMessage("!{#5FBCAC}[Keys]: Voice (N) | GPS (Z) | Scoreboard (O) | Rapple (X)");
             player.SendChatMessage("!{#61A9FA}[Cop]: /gps");
             player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do");
             player.SendChatMessage("!{#28E0DA}[Freeroam]: /freeroam /veh");
@@ -1051,11 +1064,11 @@ namespace LSCC
 
             target.SendChatMessage($"!{{#FF6347}}[BANNED] You have been banned from this server, Ban ID: {_new.SQL_ID}");
 
-            player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+            target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
             NAPI.Task.Run(() =>
             {
-                player.Kick("Banned.");
+                target.Kick("Banned.");
             }, 350);
 
            
@@ -1641,7 +1654,7 @@ namespace LSCC
         }
 
         [Command("me", GreedyArg = true)]
-        public void cmd_me(Player player, string text)
+        public static void cmd_me(Player player, string text)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -1657,7 +1670,7 @@ namespace LSCC
             }
         }
         [Command("do", GreedyArg = true)]
-        public void cmd_do(Player player, string text)
+        public static void cmd_do(Player player, string text)
         {
             if (!EPlayer.LoggedIn(player))
                 return;

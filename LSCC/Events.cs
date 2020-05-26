@@ -429,6 +429,18 @@ namespace LSCC
 
         }
 
+        [RemoteEvent("UpdateStreamData")]
+        public void OnPlayerUpdateStreamData(Player player)
+        {
+            if (player.IsInVehicle) player.SetSharedData("UnstreamedState", 1);
+            else player.SetSharedData("UnstreamedState", 0);
+
+            player.SetSharedData("UnstreamedX", player.Position.X);
+            player.SetSharedData("UnstreamedY", player.Position.Y);
+            player.SetSharedData("UnstreamedZ", player.Position.Z);
+            return;
+        }
+
 
         [RemoteEvent("RemoveVoiceListener")]
         public void RemoveVoiceListener(Player player, Player target)
@@ -445,25 +457,27 @@ namespace LSCC
             if(player.GetSharedData<int>("Team") == 0)
             {
                 player.SetSharedData("HasShot", true);
-                player.SendNotification("~r~You have now shot, opposite team can now safely shoot you.");
+                player.SendNotification("~r~You have now shot, opposite team can now safely shoot you and detect you.");
+                player.SetSharedData("VisibileBlip", true);
             }
         }
 
         [RemoteEvent("PlayerShotAtWrongPlayer")]
         public void PlayerShootWrongPlayer(Player player, int caseid)
         {
-            EPlayer.Freeze(player, true);
-
-            NAPI.Task.Run(() => 
-            {
-                if (!player.IsNull && player != null && player.IsInstanceAlive)
-                {
-                    EPlayer.Freeze(player, false);
-                }
-            }, 2000);
 
             if(caseid == 0)
             {
+                EPlayer.Freeze(player, true);
+
+                NAPI.Task.Run(() =>
+                {
+                    if (!player.IsNull && player != null && player.IsInstanceAlive)
+                    {
+                        EPlayer.Freeze(player, false);
+                    }
+                }, 2500);
+
                 int warnings = 0;
                 if (player.HasData("TeamShotWarning")) warnings = player.GetData<int>("TeamShotWarning");
 
@@ -487,8 +501,18 @@ namespace LSCC
                 }
                 player.SetData("TeamShotWarning", warnings);
             }
-            else if (caseid == 1)
+            else if (caseid == 1 && player.CurrentWeapon != WeaponHash.Stungun)
             {
+                EPlayer.Freeze(player, true);
+
+                NAPI.Task.Run(() =>
+                {
+                    if (!player.IsNull && player != null && player.IsInstanceAlive)
+                    {
+                        EPlayer.Freeze(player, false);
+                    }
+                }, 2000);
+
                 int warnings = 0;
                 if (player.HasData("InnocentShotWarning")) warnings = player.GetData<int>("InnocentShotWarning");
 
@@ -638,6 +662,24 @@ namespace LSCC
             return;
         }
 
+        [RemoteEvent("OnPlayerShotPlayer")] // wont trigger incar btw 
+        public void OnPlayerShootPlayer(Player player, Vector3 targetPosition, Player target)
+        {
+            if(player.CurrentWeapon == WeaponHash.Stungun)
+            {
+                if(target.GetSharedData<bool>("HasShot") != true)
+                {
+                    int time = 30000;
+                    target.TriggerEvent("setToRagdoll", time, time * 2, 0, false, false, false);
+                    Commands.cmd_do(target, $"{target.Name} has been tased and has been rendered immobile.");
+                }
+                else
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot tase a player that has shot.");
+                }
+            }
+        }
+
         [ServerEvent(Event.PlayerSpawn)]
         public static void OnPlayerSpawn(Player player)
         {
@@ -653,14 +695,6 @@ namespace LSCC
             player.SetSharedData("Level", EPlayer.GetAccount(player).Level);
             player.SetSharedData("Ping", player.Ping);
             player.SetSharedData("HasShot", false);
-
-            player.SetSharedData("VisibleBlip", false);
-
-            player.TriggerEvent("SetActorInvulnerable", true);
-            player.TriggerEvent("CanFallOutOfCar", false);
-            player.TriggerEvent("showHPBars", 0); // Never show HP Bars.
-
-            EPlayer.SetColor(player, new Color(255, 255, 255, 255));
 
             if (EPlayer.GetAccount(player).JailTime > 0)
             {
@@ -681,8 +715,6 @@ namespace LSCC
                 return;
             }
 
-            player.TriggerEvent("ToggleHud", player.GetData<bool>("HUDState"));
-
 
             if (player.HasData("UnfairKillSpawn"))
             {
@@ -690,6 +722,20 @@ namespace LSCC
                 return;
             }
 
+
+            player.SetSharedData("VisibleBlip", false);
+
+            player.TriggerEvent("SetActorInvulnerable", true);
+            player.TriggerEvent("CanFallOutOfCar", false);
+            player.TriggerEvent("showHPBars", 0); // Never show HP Bars.
+
+            EPlayer.SetColor(player, new Color(255, 255, 255, 255));
+
+            
+            player.TriggerEvent("ToggleHud", player.GetData<bool>("HUDState"));
+
+
+            
             if (player.GetSharedData<int>("InLobby") == -3) // Freeroam
             {
                 player.Position = new Vector3(1061.547f, -720.113f, 56.786f);

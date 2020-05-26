@@ -117,6 +117,8 @@ function UpdateTimer()
         secondCounter = 0;
         if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
         {
+            mp.events.callRemote("UpdateStreamData");
+
             if(chaseProgBar != null && chaseProgText != null && chaseRunning == true)
             {
                 chaseTimeCur += 1;
@@ -208,7 +210,17 @@ function UpdateTimer()
 
             if(target.isInAnyVehicle(false)) blipId = 724;
 
-            var targetBlip = mp.blips.new(blipId, target.position,
+            let position = target.position;
+            if(position.x == 0 && position.z == 0 && position.z == 0)
+            {
+                position.x = target.getVariable("UnstreamedX");
+                position.y = target.getVariable("UnstreamedY");
+                position.z = target.getVariable("UnstreamedZ");
+
+                if(target.getVariable("UnstreamedState") == 1) blipId = 724;
+            }
+
+            var targetBlip = mp.blips.new(blipId, position,
             {
                 name: target.name,
                 color: blipColor,
@@ -255,16 +267,22 @@ function OnPlayerWeaponShot(targetPosition, targetEntity)
     {
         if(typeof targetEntity.getVariable === 'function')
         {
-            if(targetEntity.getVariable("Team") !== undefined && targetEntity.getVariable("HasShot") !== undefined && 
-                targetEntity.getVariable("Team") != -1) // Cops have HasShot too, cars don't, this gives us a 100% PLAYER entity handle.
+            if(targetEntity.getVariable("Team") !== undefined && targetEntity.getVariable("HasShot") !== undefined) // Cops have HasShot too, cars don't, this gives us a 100% PLAYER entity handle.
             {
-                if(player.getVariable("Team") == targetEntity.getVariable("Team"))
+                if(targetEntity.isInAnyVehicle(false) == false)
                 {
-                    mp.events.callRemote("PlayerShotAtWrongPlayer", 0);
+                    mp.events.callRemote("OnPlayerShotPlayer", targetPosition, targetEntity);
                 }
-                if(player.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
+                if(targetEntity.getVariable("Team") != -1)
                 {
-                    mp.events.callRemote("PlayerShotAtWrongPlayer", 1);
+                    if(player.getVariable("Team") == targetEntity.getVariable("Team"))
+                    {
+                        mp.events.callRemote("PlayerShotAtWrongPlayer", 0);
+                    }
+                    if(player.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
+                    {
+                        mp.events.callRemote("PlayerShotAtWrongPlayer", 1);
+                    }
                 }
             }
         }
@@ -275,7 +293,8 @@ function OnPlayerWeaponShot(targetPosition, targetEntity)
     }
 }
 
-function OnPlayerEnterVehicle(vehicle, seat) {
+function OnPlayerEnterVehicle(vehicle, seat) 
+{
     if(seat == -1)
     {
         mp.game.invoke(0x6E8834B52EC20C77, mp.players.local, false); // Disable driveby as DRIVER, (invoked SetPlayerCanDoDriveby) (doesnt work yet)
@@ -284,14 +303,26 @@ function OnPlayerEnterVehicle(vehicle, seat) {
     {
         mp.game.invoke(0x6E8834B52EC20C77, mp.players.local, true);
     }
- }
+}
 
- mp.events.add("playerEnterVehicle", OnPlayerEnterVehicle);
- mp.events.add("playerWeaponShot", OnPlayerWeaponShot);
+mp.events.add("playerEnterVehicle", OnPlayerEnterVehicle);
+mp.events.add("playerWeaponShot", OnPlayerWeaponShot);
+
+mp.events.add("SetCopCarHandling", (vehicle) => {
+
+    let speed = (280 / 3.6);
+
+    vehicle.setHandling("FINITIALDRIVEFORCE", 10.0);
+    vehicle.setHandling("FTRACTIONCURVEMAX", 5.0);
+    vehicle.setMaxSpeed(speed);
+});
  
 
 mp.events.add(
     {
+        "setToRagdoll": (time1, time2, ragdollType, p4, p5, p6) => {
+            player.setToRagdoll(time1, time2, ragdollType, p4, p5, p6);
+        },
         "SetJailCounter": (time) => {
             currentJailTime = time;
             lastJailUpdate = 10;

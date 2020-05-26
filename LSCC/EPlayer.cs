@@ -38,6 +38,10 @@ namespace LSCC
             player.SetSharedData("Ping", player.Ping);
             player.SetSharedData("Level", 1);
             player.SetSharedData("JailTime", 0);
+            player.SetSharedData("UnstreamedState", 0);
+            player.SetSharedData("UnstreamedX", 0.0f);
+            player.SetSharedData("UnstreamedY", 0.0f);
+            player.SetSharedData("UnstreamedZ", 0.0f);
 
             List<Vehicle> temp_FreeroamVeh = new List<Vehicle>();
             player.SetData("FreeroamVehicles", temp_FreeroamVeh);
@@ -178,14 +182,17 @@ namespace LSCC
                
             if(acc.XP < 0)
             {
-                acc.Level--;
-
-                acc.XP += GetMaxLevelXP(acc.Level);
-                RAGE.Entities.Players.All.ForEach((Player pl) =>
+                if (acc.Level > 0)
                 {
-                    pl.SendChatMessage($"!{{#00BA03}}[LEVEL DOWN] {player.Name} has levelled down to {acc.Level}!");
-                });
-                player.SendNotification($"~w~You have levelled down to ~r~{acc.Level}~w~!");
+                    acc.Level--;
+
+                    acc.XP += GetMaxLevelXP(acc.Level);
+                    RAGE.Entities.Players.All.ForEach((Player pl) =>
+                    {
+                        pl.SendChatMessage($"!{{#00BA03}}[LEVEL DOWN] {player.Name} has levelled down to {acc.Level}!");
+                    });
+                    player.SendNotification($"~w~You have levelled down to ~r~{acc.Level}~w~!");
+                }
             }
 
             while(CheckXPLevelUp(acc.Level, acc.XP) == true)
@@ -218,7 +225,7 @@ namespace LSCC
 
             return null;
         }
-        public static void Spawn(Player player)
+        public static void Spawn(Player player, bool forceAutojoin = true)
         {
             if (!LoggedIn(player)) return;
 
@@ -230,7 +237,11 @@ namespace LSCC
             player.TriggerEvent("TogglePlayerChat", true);
 
 
-            if (player.GetData<bool>("AutoJoin") == false) NAPI.Notification.SendNotificationToPlayer(player, $"~g~Autojoin has been enabled.", false);
+            if (forceAutojoin && player.GetData<bool>("AutoJoin") == false)
+            {
+                NAPI.Notification.SendNotificationToPlayer(player, $"~g~Autojoin has been enabled.", false);
+                player.SetData("AutoJoin", true);
+            }
 
             if (player.GetSharedData<int>("InLobby") == -1)
             {
@@ -256,7 +267,7 @@ namespace LSCC
                 }
             }
 
-            player.SetData("AutoJoin", true);
+            
 
             foreach (LobbyData lobby in Settings.Lobbies)
             {

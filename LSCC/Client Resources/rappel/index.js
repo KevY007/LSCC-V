@@ -3,33 +3,39 @@ const maxSpeed = 20.0;
 const minHeight = 15.0;
 const maxHeight = 85.0;
 const maxAngle = 15.0;
+let chatStatus = false;
 
-
-function rappelPlayer(warningLevel = 1)
+mp.events.add("onOpenChatbox", (toggle) =>
 {
+	chatStatus = toggle;
+});
+
+function rappelPlayer(warningLevel)
+{
+    if(warningLevel === undefined) warningLevel = 1;
+
     const vehicle = localPlayer.vehicle;
     if (!vehicle) {
         return;
     }
 
     if (!mp.game.invoke("0x4E417C547182C84D", vehicle.handle)) {
-        if(warningLevel == 0) mp.gui.chat.push("You cannot rappel from this vehicle.");
+        if(warningLevel == 1) mp.gui.chat.push("You cannot rappel from this vehicle.");
         return;
     }
 
     if (vehicle.getSpeed() > maxSpeed) {
-        mp.gui.chat.push("The vehicle is too fast for rappelling.");
+        if(warningLevel == 1) mp.gui.chat.push("The vehicle is too fast for rappelling.");
         return;
     }
 
     if (vehicle.getPedInSeat(-1) === localPlayer.handle || vehicle.getPedInSeat(0) === localPlayer.handle) {
-        mp.gui.chat.push("You cannot rappel from your seat.");
+        if(warningLevel == 1) mp.gui.chat.push("You cannot rappel from your seat.");
         return;
     }
 
     const taskStatus = localPlayer.getScriptTaskStatus(-275944640);
     if (taskStatus === 0 || taskStatus === 1) {
-        mp.gui.chat.push("You are already rappelling.");
         return;
     }
 
@@ -49,7 +55,10 @@ function rappelPlayer(warningLevel = 1)
 }
 
 mp.keys.bind(0x58, false, function() {
-    rappelPlayer(0);
+    if(!chatStatus)
+    {
+        rappelPlayer(0);
+    }
 });
 
 mp.events.add("playerCommand", (command) => {

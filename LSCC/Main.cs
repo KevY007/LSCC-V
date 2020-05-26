@@ -470,9 +470,11 @@ namespace LSCC
                                     {
                                         if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetData<bool>("AutoJoin") == true)
                                         {
+                                            player.SetSharedData("InDM", -1);
+
                                             EPlayer.Spawn(player);
                                             NAPI.Notification.SendNotificationToPlayer(player, $"~w~Game is starting in ~g~10 seconds~w~.", true);
-
+                                            
                                             NAPI.Util.ConsoleOutput("[TimeUpdate] Game starting in 10 seconds...");
                                         }
                                     }
@@ -618,6 +620,8 @@ namespace LSCC
                 {
                     if (player.GetSharedData<int>("InLobby") == lobbyid && player.GetData<bool>("AutoJoin") == true)
                     {
+                        player.SetSharedData("InDM", -1);
+
                         pCount++;
                     }
                 }
@@ -720,20 +724,25 @@ namespace LSCC
                     Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
 
                     string carName = "police";
+                    int col1 = 0;
 
                     switch (random.Next(0, 5))
                     {
                         case 0:
                             carName = "police";
+                            col1 = 111;
                             break;
                         case 1:
                             carName = "police4";
+                            col1 = 8;
                             break;
                         case 2:
                             carName = "police3";
+                            col1 = 111;
                             break;
                         case 3:
                             carName = "police2";
+                            col1 = 111;
                             break;
                         case 4:
                             carName = "fbi";
@@ -744,14 +753,13 @@ namespace LSCC
                     }
 
 
-                    Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, 0, 111, "SIMBA", 255, false, true, Convert.ToUInt32(lobbyid));
+                    Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, col1, 111, "SIMBA", 255, false, true, Convert.ToUInt32(lobbyid));
 
                     pVehicle.SetSharedData("Team", 1);
                     lobby.Vehicles.Add(pVehicle);
 
                     player.Dimension = Convert.ToUInt32(lobbyid);
                     player.Position = vecSpawn.Around(15);
-                    EPlayer.Freeze(player, true);
 
                     player.Health = 100;
                     player.Armor = 60;
@@ -773,12 +781,18 @@ namespace LSCC
                             break;
                     }
 
+                    player.SetIntoVehicle(pVehicle, 0);
+                    
+                    EPlayer.Freeze(player, true);
+
                     PutInsideCar.Add(player);
                     playerVehicle.Add(new Tuple<Player, Vehicle, int>(player, pVehicle, 0));
 
                     player.SetData("GPS", false);
 
                     EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Playing cop as {player.Name}");
+
+                    foreach(Player cop in lobby.Cops) cop.TriggerEvent("SetCopCarHandling", pVehicle);
 
                     player.TriggerEvent("SetActorInvulnerable", false);
                     player.TriggerEvent("CanFallOutOfCar", true);
@@ -894,9 +908,13 @@ namespace LSCC
                             break;
                     }
 
-                    Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, random.Next(64), random.Next(64), "KEVY", 255, false, true, Convert.ToUInt32(lobbyid));
+                    Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, random.Next(122), random.Next(122), "KEVY", 255, false, true, Convert.ToUInt32(lobbyid));
                     pVehicle.SetSharedData("Team", 0);
                     lobby.Vehicles.Add(pVehicle);
+
+                    _tempPlayer.SetIntoVehicle(pVehicle, 0);
+
+                    EPlayer.Freeze(_tempPlayer, true);
 
                     playerVehicle.Add(new Tuple<Player, Vehicle, int>(_tempPlayer, pVehicle, 0));
 
@@ -913,7 +931,9 @@ namespace LSCC
                         iteratedAlready.Add(_tempPlayer2);
                         fugitives--;
 
+                        _tempPlayer2.SetIntoVehicle(pVehicle, 0 + seat);
 
+                        EPlayer.Freeze(_tempPlayer2, true);
                         playerVehicle.Add(new Tuple<Player, Vehicle, int>(_tempPlayer2, pVehicle, 0 + seat));
 
                         seat++;
@@ -977,6 +997,16 @@ namespace LSCC
             {
                 lobby.GameProgress++;
 
+                if (lobby.GameProgress == (60 / 100 * Settings.GameRunTime))
+                {
+                    foreach (Player fugitive in lobby.Fugitives)
+                    {
+                        fugitive.SetSharedData("HasShot", true);
+                        lobby.FugitiveShowCounter = 29; // Set them to VISIBLE
+                    }
+                    EPlayer.SendMessageInLobby(lobby.lobbyId, "!{#FF6347}[GAME] !{#FFFFFF}60% of the game has elapsed, all fugitives have shot tag now.");
+                }
+
                 if (lobby.GameProgress >= Settings.GameRunTime)
                 {
                     StopGame(lobby.lobbyId, 1);
@@ -1001,12 +1031,14 @@ namespace LSCC
                             if (lobby.Cops.Contains(player))
                             {
                                 player.GiveWeapon(WeaponHash.Carbinerifle, 120);
-                                player.GiveWeapon(WeaponHash.Pistol50, 20);
+                                player.GiveWeapon(WeaponHash.Pistol, 100);
+                                player.GiveWeapon(WeaponHash.Stungun, 1);
+                                player.SendChatMessage("!{#FF6347}[TASER] !{#FFFFFF}You have been equipped with a stungun, shoot at a fugitive that hasn't shot to tase them.");
                             }
                             else if (lobby.Fugitives.Contains(player))
                             {
-                                player.GiveWeapon(WeaponHash.Assaultrifle, 60);
-                                player.GiveWeapon(WeaponHash.Pistol, 32);
+                                player.GiveWeapon(WeaponHash.Assaultrifle, 120);
+                                player.GiveWeapon(WeaponHash.Pistol, 100);
                             }
                         }
                     }
@@ -1024,17 +1056,17 @@ namespace LSCC
                     }
                 }
 
-                if (lobby.FugitiveShowCounter >= 60 && lobby.FugitiveShowCounter < 90)
+                if (lobby.FugitiveShowCounter >= 30 && lobby.FugitiveShowCounter < 120)
                 {
                     foreach (Player fugi in lobby.Fugitives)
                     {
                         fugi.SetSharedData("VisibleBlip", true);
 
-                        if (lobby.FugitiveShowCounter == 60) fugi.SendNotification("~r~You are now visible on the radar.", true);
+                        if (lobby.FugitiveShowCounter == 30) fugi.SendNotification("~r~You are now visible on the radar.", true);
                     }
                 }
 
-                if (lobby.FugitiveShowCounter >= 90)
+                if (lobby.FugitiveShowCounter >= 120)
                 {
                     lobby.FugitiveShowCounter = 0;
                     foreach (Player fugi in lobby.Fugitives)
