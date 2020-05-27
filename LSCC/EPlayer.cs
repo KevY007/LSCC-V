@@ -10,8 +10,160 @@ using LSCC;
 
 namespace LSCC
 {
+    public class ParentData
+    {
+        public byte Father { get; set; }
+        public byte Mother { get; set; }
+        public float Similarity { get; set; }
+        public float SkinSimilarity { get; set; }
+
+        public ParentData()
+        {
+            this.Father = 0;
+            this.Mother = 0;
+
+            this.Similarity = 1.0f;
+            this.SkinSimilarity = 1.0f;
+        }
+    }
+    public class HairData
+    {
+        public byte Hair { get; set; }
+        public byte Color { get; set; }
+        public byte HighlightColor { get; set; }
+
+        public HairData()
+        {
+            this.Hair = 0;
+            this.Color = 0;
+            this.HighlightColor = 0;
+        }
+    }
+    public class AppearanceData
+    {
+        public byte Value { get; set; }
+        public float Opacity { get; set; }
+
+        public AppearanceData()
+        {
+            this.Value = 255;
+            this.Opacity = 1.0f;
+        }
+    }
+    public class CharacterData
+    {
+        public byte Gender { get; set; }
+        public ParentData Parents { get; set; }
+        public float[] Features { get; set; }
+        public AppearanceData[] Appearance { get; set; }
+        public HairData Hair { get; set; }
+        public byte EyebrowColor { get; set; }
+        public byte BeardColor { get; set; }
+        public byte EyeColor { get; set; }
+        public byte BlushColor { get; set; }
+        public byte LipstickColor { get; set; }
+        public byte ChestHairColor { get; set; }
+
+        public CharacterData()
+        {
+            this.Gender = 0;
+            this.Parents = new ParentData();
+            this.Features = new float[20];
+            this.Appearance = new AppearanceData[10];
+
+            for (int i = 0; i < 20; i++)
+            {
+                this.Features[i] = 0.0f;
+            }
+
+            for (int i = 0; i < 10; i++)
+            {
+                this.Appearance[i] = new AppearanceData();
+            }
+
+            this.Hair = new HairData();
+
+            this.EyebrowColor = 0;
+            this.BeardColor = 0;
+            this.EyeColor = 0;
+            this.BlushColor = 0;
+            this.LipstickColor = 0;
+            this.ChestHairColor = 0;
+        }
+    }
+
     static class EPlayer
     {
+        public static byte ColForOverlay(CharacterData character, int index)
+        {
+            byte color = 0;
+
+            switch (index)
+            {
+                case 1:
+                    color = character.BeardColor;
+                    break;
+
+                case 2:
+                    color = character.EyebrowColor;
+                    break;
+
+                case 5:
+                    color = character.BlushColor;
+                    break;
+
+                case 8:
+                    color = character.LipstickColor;
+                    break;
+
+                case 10:
+                    color = character.ChestHairColor;
+                    break;
+            }
+
+            return color;
+        }
+
+        public static void ApplyCharacter(Player player, CharacterData playerChar)
+        {
+            if(playerChar == null)
+            {
+                playerChar = new CharacterData();
+            }
+
+            HeadBlend a;
+
+            a.ShapeFirst = playerChar.Parents.Father;
+            a.ShapeSecond = playerChar.Parents.Mother;
+            a.ShapeThird = 0;
+
+            a.SkinFirst = playerChar.Parents.Father;
+            a.SkinSecond = playerChar.Parents.Mother;
+            a.SkinThird = 0;
+
+            a.SkinMix = playerChar.Parents.SkinSimilarity;
+            a.ShapeMix = playerChar.Parents.Similarity;
+            a.ThirdMix = 0;
+
+            Dictionary<int, HeadOverlay> headOverlays = new Dictionary<int, HeadOverlay>();
+            for (byte i = 0; i < 10; i++)
+            {
+                HeadOverlay b;
+                b.Color = ColForOverlay(playerChar, i);
+                b.Index = playerChar.Appearance[i].Value;
+                b.Opacity = playerChar.Appearance[i].Opacity;
+                
+                b.SecondaryColor = 0;
+                headOverlays.Add(i, b);
+            }
+
+            player.SetCustomization(playerChar.Gender == 0 ? true : false, a, playerChar.EyeColor, playerChar.Hair.Color, playerChar.Hair.HighlightColor, playerChar.Features, 
+                headOverlays, new Decoration[1]);
+
+
+            player.SetClothes(2, playerChar.Hair.Hair, 0);
+        }
+
         public static Random rand = new Random();
 
         public static void ResetPlayerData(Player player)
@@ -32,6 +184,7 @@ namespace LSCC
             player.ResetData("BlockList");
             player.SetSharedData("InLobby", -1);
             player.SetSharedData("InDM", -1);
+            player.SetSharedData("IsTyping", false);
             player.SetSharedData("Color_R", 255);
             player.SetSharedData("Color_G", 255);
             player.SetSharedData("Color_B", 255);

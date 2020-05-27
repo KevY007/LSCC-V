@@ -33,6 +33,7 @@ namespace LSCC
         public int DonatorLevel { get; set; }
         public int JailTime { get; set; }
         public string JailReason { get; set; }
+        public string Character { get; set; }
     }
 
     public static class AccountManager

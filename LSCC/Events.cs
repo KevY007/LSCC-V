@@ -4,9 +4,11 @@ using LSCC;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace LSCC
 {
+
     class Events : Script
     {
         [ServerEvent(Event.PlayerConnected)]
@@ -372,8 +374,132 @@ namespace LSCC
             player.SetData("AccountHandle", acc);
             player.SetSharedData("pLogged", true);
 
+            CharacterData ConvChar = new CharacterData();
+
+            try
+            {
+                if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata- sending to creation."));
+
+                ConvChar = NAPI.Util.FromJson<CharacterData>(acc.Character);
+            }
+            catch
+            {
+                player.TriggerEvent("DestroyPlayerCamera");
+                player.SetSharedData("InLobby", -5);
+                player.TriggerEvent("TogglePlayerChat", true);
+
+                player.SendChatMessage("!{#FF6347}[INFO] !{#FFFFFF}Switch gender between Male and Female if the preview does not show.");
+                player.SetData("Creator_Using", true);
+
+                player.Dimension = (uint)player.Id + 699;
+
+                ConvChar = new CharacterData();
+                player.TriggerEvent("toggleCreator", true, NAPI.Util.ToJson(ConvChar));
+
+                EPlayer.ApplyCharacter(player, ConvChar);
+
+                player.Position = new Vector3(402.8664, -996.4108, -99.00027);
+                player.Heading = -185.0f;
+
+                NAPI.Task.Run(() =>
+                {
+                    player.TriggerEvent("creator_Change");
+
+                    player.SetSkin(PedHash.FreemodeMale01);
+
+                    player.Position = new Vector3(402.8664, -996.4108, -99.00027);
+                    player.Heading = -185.0f;
+                }, 2000);
+
+                return;
+            }
+
+            EPlayer.ApplyCharacter(player, ConvChar);
+
             EPlayer.Spawn(player);
         }
+
+
+        [RemoteEvent("creator_GenderChange")]
+        public static void GenderChange(Player player, int gender)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (gender == 0) player.SetSkin(PedHash.FreemodeMale01);
+            else player.SetSkin(PedHash.FreemodeFemale01);
+
+            player.Position = new Vector3(402.8664, -996.4108, -99.00027);
+            player.Heading = -185.0f;
+        }
+
+        [RemoteEvent("creator_Save")]
+        public void CreatorSave(Player player, byte gender, string parentData, string featureData, string appearanceData, string hairAndColorData)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            CharacterData pChar = new CharacterData();
+            pChar.Gender = gender;
+            pChar.Parents = NAPI.Util.FromJson<ParentData>(parentData);
+            pChar.Features = NAPI.Util.FromJson<float[]>(featureData);
+            pChar.Appearance = NAPI.Util.FromJson<AppearanceData[]>(appearanceData);
+
+            byte[] hairAndCol = NAPI.Util.FromJson<byte[]>(hairAndColorData);
+            pChar.Hair.Hair = hairAndCol[0];
+            pChar.Hair.Color = hairAndCol[1];
+            pChar.Hair.HighlightColor = hairAndCol[2];
+            pChar.EyebrowColor = hairAndCol[3];
+            pChar.BeardColor = hairAndCol[4];
+            pChar.EyeColor = hairAndCol[5];
+            pChar.BlushColor = hairAndCol[6];
+            pChar.LipstickColor = hairAndCol[7];
+            pChar.ChestHairColor = hairAndCol[8];
+
+            EPlayer.GetAccount(player).Character = NAPI.Util.ToJson(pChar);
+            EPlayer.ApplyCharacter(player, pChar);
+
+            player.SetData("Creator_Using", false);
+            player.TriggerEvent("toggleCreator", false);
+
+            EPlayer.Save(player);
+
+            EPlayer.Spawn(player);
+        }
+        [RemoteEvent("creator_Leave")]
+        public void CreatorLeave(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            CharacterData ConvChar = new CharacterData();
+            string PlayerChar = EPlayer.GetAccount(player).Character;
+
+            try
+            {
+                if (PlayerChar == null || PlayerChar.Length < 10) throw (new System.Exception("Invalid characterdata- sending to creation."));
+                ConvChar = NAPI.Util.FromJson<CharacterData>(PlayerChar);
+
+                EPlayer.ApplyCharacter(player, ConvChar);
+            }
+            catch
+            {
+                CharacterData charp = new CharacterData();
+                EPlayer.GetAccount(player).Character = "{}";
+                EPlayer.ApplyCharacter(player, charp); // Give them the default CHAR.
+            }
+
+            player.SetData("Creator_Using", false);
+            player.TriggerEvent("toggleCreator", false);
+
+            EPlayer.Spawn(player);
+        }
+        
+        [RemoteEvent("UpdateChatState")]
+        public void OnRequestUpdateChatState(Player player, bool toggle)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            player.SetSharedData("IsTyping", toggle);
+        }
+
         public static void OnPlayerRegister(Player player, Account acc)
         {
             EPlayer.SetDiscordStatus(player, $"Registering as {acc.Username}");
@@ -386,7 +512,33 @@ namespace LSCC
             player.Name = acc.Username;
             player.TriggerEvent("destroyBrowser");
 
-            EPlayer.Spawn(player);
+            player.TriggerEvent("DestroyPlayerCamera");
+            player.TriggerEvent("TogglePlayerChat", true);
+            player.SetSharedData("InLobby", -5);
+
+            player.SetData("Creator_Using", true);
+
+            player.Dimension = (uint)player.Id + 699;
+
+            CharacterData defaultChar = new CharacterData();
+            player.TriggerEvent("toggleCreator", true, NAPI.Util.ToJson(defaultChar));
+            player.SendChatMessage("!{#FF6347}[INFO] !{#FFFFFF}Switch gender between Male and Female if the preview does not show.");
+            EPlayer.ApplyCharacter(player, defaultChar);
+
+            player.Position = new Vector3(402.8664, -996.4108, -99.00027);
+            player.Heading = -185.0f;
+
+            NAPI.Task.Run(() =>
+            {
+                player.TriggerEvent("creator_Change");
+
+                player.SetSkin(PedHash.FreemodeMale01);
+
+                player.Position = new Vector3(402.8664, -996.4108, -99.00027);
+                player.Heading = -185.0f;
+            }, 2000);
+
+            //EPlayer.Spawn(player);
         }
 
         [RemoteEvent("OnPlayerLoginAttempt")]
@@ -687,6 +839,12 @@ namespace LSCC
             {
                 EPlayer.LoginCameraSetup(player);
                 EPlayer.LoginBrowserSetup(player);
+                return;
+            }
+
+            if(player.HasData("Creator_Using") && player.GetData<bool>("Creator_Using") == true)
+            {
+                player.SetSharedData("InLobby", -5);
                 return;
             }
 

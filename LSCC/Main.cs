@@ -765,22 +765,6 @@ namespace LSCC
                     player.Armor = 60;
                     EPlayer.SetColor(player, new Color(141, 141, 255, 255), player.Armor);
 
-                    switch (random.Next(0, 3))
-                    {
-                        case 0:
-                            player.SetSkin(0x5E3DA4A4);
-                            break;
-                        case 1:
-                            player.SetSkin(0xFBF98469);
-                            break;
-                        case 2:
-                            player.SetSkin(0x9AB35F63);
-                            break;
-                        case 3:
-                            player.SetSkin(0x1AE8BB58);
-                            break;
-                    }
-
                     player.SetIntoVehicle(pVehicle, 0);
                     
                     EPlayer.Freeze(player, true);
@@ -791,8 +775,6 @@ namespace LSCC
                     player.SetData("GPS", false);
 
                     EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Playing cop as {player.Name}");
-
-                    foreach(Player cop in lobby.Cops) cop.TriggerEvent("SetCopCarHandling", pVehicle);
 
                     player.TriggerEvent("SetActorInvulnerable", false);
                     player.TriggerEvent("CanFallOutOfCar", true);
@@ -817,22 +799,6 @@ namespace LSCC
                     player.Health = 100;
                     player.Armor = 0;
                     EPlayer.SetColor(player, new Color(232, 64, 64, 255), player.Armor);
-
-                    switch (random.Next(0, 3))
-                    {
-                        case 0:
-                            player.SetSkin(0xA70B4A92);
-                            break;
-                        case 1:
-                            player.SetSkin(0x76284640);
-                            break;
-                        case 2:
-                            player.SetSkin(0x3FB5C3D3);
-                            break;
-                        case 3:
-                            player.SetSkin(0x04430687);
-                            break;
-                    }
 
                     EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Playing fugitive as {player.Name}");
 

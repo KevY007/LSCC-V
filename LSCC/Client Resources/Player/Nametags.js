@@ -50,11 +50,22 @@ mp.events.add('render', (nametags) => {
 
             if(player.getVariable("Team") == 0 && player.getVariable("HasShot") == true)
             {
-                mp.game.graphics.drawText("(( THIS PLAYER HAS SHOT ))", [x, y - 0.06],
+                mp.game.graphics.drawText("(( THIS PLAYER HAS SHOT ))", [x, y - 0.045],
                 {
                     font: 0,
                     color: [237, 212, 52, 255],
-                    scale: [0.4, 0.4],
+                    scale: [0.3, 0.3],
+                    outline: true
+                });
+            }
+
+            if(player.getVariable("IsTyping") == true)
+            {
+                mp.game.graphics.drawText("(...)", [x, y - 0.055],
+                {
+                    font: 0,
+                    color: [161, 161, 161, 192],
+                    scale: [0.3, 0.3],
                     outline: true
                 });
             }

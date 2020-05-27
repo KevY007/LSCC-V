@@ -19,9 +19,14 @@ let updateInterval = null;
 
 let playerBlips = [];
 
+let specCam = null;
+let specState = false;
+let specTarget = null;
+
 mp.events.add("onOpenChatbox", (toggle) =>
 {
-	chatStatus = toggle;
+    chatStatus = toggle;
+    mp.events.callRemote("UpdateChatState", toggle);
 });
 
 function calcDist(v1, v2) {
@@ -83,6 +88,24 @@ function createCam(x, y, z, rx, ry, rz, viewangle) {
     camera.setActive(true);
     mp.game.cam.renderScriptCams(true, true, 20000000000000000000000000, false, false);
 }
+
+mp.events.add("render", () => {
+    if (specState == true && specCam != null && specTarget != null) {
+
+        if (mp.players.exists(specTarget)) 
+        {
+            spectateCamera.detach();
+            spectateCamera.attachTo(specTarget.handle, 0, (specInvert ? 5 : -5), 1, true);
+            spectateCamera.setRot(0, 0, spectateTarget.getHeading(), 2);
+        }
+        else 
+        {
+            specCam.setActive(false); 
+            specState = false;
+            mp.events.callLocal("StopSpectating");
+        }
+    }
+});
 
 function destroyCam() {
     if (!camera) return;
@@ -307,19 +330,47 @@ function OnPlayerEnterVehicle(vehicle, seat)
 
 mp.events.add("playerEnterVehicle", OnPlayerEnterVehicle);
 mp.events.add("playerWeaponShot", OnPlayerWeaponShot);
-
-mp.events.add("SetCopCarHandling", (vehicle) => {
-
-    let speed = (280 / 3.6);
-
-    vehicle.setHandling("FINITIALDRIVEFORCE", 10.0);
-    vehicle.setHandling("FTRACTIONCURVEMAX", 5.0);
-    vehicle.setMaxSpeed(speed);
-});
  
 
 mp.events.add(
     {
+        "SpectatePlayer": (target) => {
+
+            if(specCam != null)
+            {
+                specCam.setActive(false);
+                specCam.destroy();
+                specCam = null;
+            }
+
+            specTarget = target;
+    
+            mp.game.cam.renderScriptCams(false, false, 0, true, false);
+
+            specCam = mp.cameras.new('default', target.position, new mp.Vector3(0, 0, target.getHeading()), 75);
+            specCam.attachTo(target.handle, 0, 5, 1, true);
+            specCam.setActive(true);
+
+            mp.game.cam.renderScriptCams(true, false, 0, true, false);
+    
+            specState = true;
+        },
+    
+        "StopSpectating": () => {
+    
+            specTarget = null;
+            specState = false;
+    
+            mp.game.cam.renderScriptCams(false, false, 0, true, false);
+
+            if(specCam != null)
+            {
+                specCam.setActive(false);
+                specCam.destroy();
+                specCam = null;
+            }
+        },
+
         "setToRagdoll": (time1, time2, ragdollType, p4, p5, p6) => {
             player.setToRagdoll(time1, time2, ragdollType, p4, p5, p6);
         },
@@ -435,15 +486,6 @@ mp.events.add(
             {
                 player.vehicle.freezePosition(status);
             }
-        },
-
-        "SpectatePlayerCamera": (target) => {
-            if (!camera) return;
-
-            camera.attachTo(target.handle, 0, 0, 2.0, false);
-            mp.game.cam.renderScriptCams(true, false, 0, true, false);
-
-            camera.setActive(true);
         },
 
         "CreatePlayerCamera": (x, y, z, rx, ry, rz, viewangle) => {

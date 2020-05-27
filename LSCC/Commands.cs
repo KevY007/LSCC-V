@@ -474,7 +474,9 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if(EPlayer.GetAccount(player).JailTime > 0)
+            if (player.GetSharedData<int>("InLobby") == -5) return;
+
+            if (EPlayer.GetAccount(player).JailTime > 0)
             {
                 player.SetData("AutoJoin", false);
                 player.SendChatMessage("You are in jail!");
@@ -558,6 +560,8 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player))
                 return;
+
+            if (player.GetSharedData<int>("InLobby") == -5) return;
 
             List<Vehicle> freeroamVehs = new List<Vehicle>();
             freeroamVehs = player.GetData<List<Vehicle>>("FreeroamVehicles");
@@ -655,6 +659,8 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player))
                 return;
+
+            if (player.GetSharedData<int>("InLobby") == -5) return;
 
             if (player.GetData<int>("JailTime") > 0)
             {
@@ -1711,12 +1717,13 @@ namespace LSCC
                 return;
             else
             {
-                player.Dimension = target.Dimension;
+                player.SetData("Spec_Dimension", player.Dimension);
+                player.SetData("Spec_Pos", player.Position);
 
-                player.TriggerEvent("DestroyPlayerCamera");
-                player.TriggerEvent("CreatePlayerCamera", target.Position.X, target.Position.Y, target.Position.Z, 30, 0, 0, 40);
-                
-                player.TriggerEvent("SpectatePlayerCamera", target);
+                player.Dimension = target.Dimension;
+                player.Position = target.Position.Around(200.0f);
+
+                player.TriggerEvent("SpectatePlayer", target);
                 player.TriggerEvent("SetPlayerFrozen", true);
 
                 player.SendChatMessage($"!{{#FF6347}}[AdmCmd] You are now spectating: !{{#FFFFFF}}{target.Name}");
@@ -1731,8 +1738,14 @@ namespace LSCC
                 return;
             else
             {
-                player.TriggerEvent("DestroyPlayerCamera");
+                player.TriggerEvent("StopSpectating");
                 player.TriggerEvent("SetPlayerFrozen", false);
+
+                if(player.HasData("Spec_Pos"))
+                {
+                    player.Dimension = player.GetData<uint>("Spec_Dimension");
+                    player.Position = player.GetData<Vector3>("Spec_Pos");
+                }
             }
 
         }
