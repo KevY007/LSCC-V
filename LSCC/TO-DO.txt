@@ -2,15 +2,10 @@
 
 
 ADD OTHER COPCHASE FEATURES, PROBABLY REDUCE TIME?
-OTHER FEATURES FROM LSCC SAMP AND GUNS SYSTEM FINALLY AND WEAPON DAMAGES? IDK
+OTHER FEATURES FROM LSCC SAMP AND GUNS SYSTEM FINALLY
 
-/skin, 
 basic copchase commands, 
-taser beanbag
-toy system if possible, 
-fix spec, 
 add basic guns like shotgun, 
-/FIX /FLIP
 
 anti teamkill/team damage.
 
