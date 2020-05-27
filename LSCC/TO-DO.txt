@@ -7,8 +7,6 @@ OTHER FEATURES FROM LSCC SAMP AND GUNS SYSTEM FINALLY
 basic copchase commands, 
 add basic guns like shotgun, 
 
-anti teamkill/team damage.
-
 DISABLE DRIVER DRIVEBY
 
 DERBY
