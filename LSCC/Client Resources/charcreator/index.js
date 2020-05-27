@@ -1,4 +1,3 @@
-// shitcode will be better in the future
 const NativeUI = require("nativeui");
 const Data = require("charcreator/data");
 
@@ -203,7 +202,7 @@ let lipstickColors = [];
 for (let i = 0; i < Data.maxLipstickColor; i++) lipstickColors.push(i.toString());
 
 // CREATOR MAIN
-let creatorMainMenu = new Menu("Creator", "", new Point(50, 50));
+let creatorMainMenu = new Menu("Customization", "", new Point(50, 50));
 let genderItem = new UIMenuListItem("Gender", "~r~Changing this will reset your customization.", new ItemsCollection(["N/A", "Male", "Female"]));
 creatorMainMenu.AddItem(genderItem);
 creatorMainMenu.AddItem(new UIMenuItem("Parents", "Your character's parents."));

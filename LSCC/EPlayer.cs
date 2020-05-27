@@ -50,6 +50,43 @@ namespace LSCC
             this.Opacity = 1.0f;
         }
     }
+    public class AccClothData
+    {
+        public int Drawable;
+        public int Texture;
+
+        public AccClothData()
+        {
+            this.Drawable = 0;
+            this.Texture = -1;
+        }
+    }
+
+    public class ClothingData
+    {
+        public AccClothData[] Clothes { get; set; }
+        public int Hat { get; set; }
+        public int HatTxt { get; set; }
+        public int Glasses { get; set; }
+        public int GlassesTxt { get; set; }
+
+        public ClothingData()
+        {
+            this.Clothes = new AccClothData[12];
+
+            for (int i = 0; i < 12; i++)
+            {
+                this.Clothes[i] = new AccClothData();
+            }
+
+            Hat = -1;
+            HatTxt = -1;
+            Glasses = -1;
+            GlassesTxt = -1;
+        }
+    }
+   
+
     public class CharacterData
     {
         public byte Gender { get; set; }
@@ -63,6 +100,7 @@ namespace LSCC
         public byte BlushColor { get; set; }
         public byte LipstickColor { get; set; }
         public byte ChestHairColor { get; set; }
+        public ClothingData[] Clothing { get; set; }
 
         public CharacterData()
         {
@@ -70,6 +108,10 @@ namespace LSCC
             this.Parents = new ParentData();
             this.Features = new float[20];
             this.Appearance = new AppearanceData[10];
+            this.Clothing = new ClothingData[2];
+            
+            this.Clothing[0] = new ClothingData(); // Fugitive
+            this.Clothing[1] = new ClothingData(); // Cop
 
             for (int i = 0; i < 20; i++)
             {
@@ -124,26 +166,38 @@ namespace LSCC
             return color;
         }
 
-        public static void ApplyCharacter(Player player, CharacterData playerChar)
+        public static void ApplyCharacter(Player player, CharacterData playerChar, int teamID = 1)
         {
             if(playerChar == null)
             {
                 playerChar = new CharacterData();
+                NAPI.Util.ConsoleOutput($"{player.Name} has no char, applying default");
             }
+
+            player.SetSkin(PedHash.Jesus01);
+
+            player.ClearAccessory(0);
+            player.ClearAccessory(1);
+            player.ClearAccessory(2);
+
+            player.ClearDecorations();
+            
+            if(playerChar.Gender == 0) player.SetSkin(PedHash.FreemodeMale01);
+            else player.SetSkin(PedHash.FreemodeFemale01);
 
             HeadBlend a;
 
-            a.ShapeFirst = playerChar.Parents.Father;
-            a.ShapeSecond = playerChar.Parents.Mother;
+            a.ShapeFirst = playerChar.Parents.Mother;
+            a.ShapeSecond = playerChar.Parents.Father;
             a.ShapeThird = 0;
 
-            a.SkinFirst = playerChar.Parents.Father;
-            a.SkinSecond = playerChar.Parents.Mother;
+            a.SkinFirst = playerChar.Parents.Mother;
+            a.SkinSecond = playerChar.Parents.Father;
             a.SkinThird = 0;
 
             a.SkinMix = playerChar.Parents.SkinSimilarity;
             a.ShapeMix = playerChar.Parents.Similarity;
-            a.ThirdMix = 0;
+            a.ThirdMix = 0.0f;
 
             Dictionary<int, HeadOverlay> headOverlays = new Dictionary<int, HeadOverlay>();
             for (byte i = 0; i < 10; i++)
@@ -157,11 +211,72 @@ namespace LSCC
                 headOverlays.Add(i, b);
             }
 
-            player.SetCustomization(playerChar.Gender == 0 ? true : false, a, playerChar.EyeColor, playerChar.Hair.Color, playerChar.Hair.HighlightColor, playerChar.Features, 
-                headOverlays, new Decoration[1]);
+            player.SetCustomization(playerChar.Gender == 0, a, playerChar.EyeColor, playerChar.Hair.Color, playerChar.Hair.HighlightColor, playerChar.Features, 
+                headOverlays, new Decoration[0]);
 
 
+            var clothDictionary = new Dictionary<int, ComponentVariation>();
+
+            for (int i = 0; i < 12; i++)
+            {
+                if (playerChar.Clothing[teamID].Clothes[i].Texture != -1)
+                {
+                    clothDictionary.Add(i, new ComponentVariation { Drawable = playerChar.Clothing[teamID].Clothes[i].Drawable, 
+                        Texture = playerChar.Clothing[teamID].Clothes[i].Texture });
+                }
+            }
+            
+            player.SetClothes(clothDictionary);
             player.SetClothes(2, playerChar.Hair.Hair, 0);
+
+
+            if (playerChar.Clothing[teamID].Hat != -1 && playerChar.Clothing[teamID].HatTxt != -1)
+            { 
+                player.SetAccessories(0, playerChar.Clothing[teamID].Hat, playerChar.Clothing[teamID].HatTxt);
+            }
+            if (playerChar.Clothing[teamID].Glasses != -1 && playerChar.Clothing[teamID].GlassesTxt != -1)
+            {
+                player.SetAccessories(1, playerChar.Clothing[teamID].Glasses, playerChar.Clothing[teamID].GlassesTxt);
+            }
+        }
+
+        public static void ShowCharCreator(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            foreach (LobbyData il in Settings.Lobbies)
+            {
+                il.Cops.Remove(player);
+                il.Fugitives.Remove(player);
+            }
+
+            player.SetSharedData("Team", -1);
+            player.SetSharedData("InLobby", -5);
+
+            player.SetData("Creator_Using", true);
+
+            player.Dimension = (uint)player.Id + 699;
+
+            player.SendChatMessage("!{#FF6347}[INFO] !{#FFFFFF}Switch gender between Male and Female if the preview does not show.");
+
+            CharacterData defaultChar = new CharacterData();
+            EPlayer.ApplyCharacter(player, defaultChar);
+
+            player.Position = new Vector3(402.8664, -996.4108, -99.00027);
+            player.Heading = -185.0f;
+
+            NAPI.Task.Run(() =>
+            {
+                player.TriggerEvent("toggleCreator", true, NAPI.Util.ToJson(defaultChar));
+
+                player.SetSkin(PedHash.FreemodeMale01);
+                player.TriggerEvent("creator_Change");
+
+                player.Position = new Vector3(402.8664, -996.4108, -99.00027);
+                player.Heading = -185.0f;
+            }, 2000);
+
+            return;
         }
 
         public static Random rand = new Random();
@@ -181,6 +296,8 @@ namespace LSCC
             player.SetSharedData("Team", -1);
             player.TriggerEvent("ToggleHud", false);
             player.SetData("GPS", false);
+            player.SetData("EditingClothing", -1);
+            player.SetData("Creator_Using", false);
             player.ResetData("BlockList");
             player.SetSharedData("InLobby", -1);
             player.SetSharedData("InDM", -1);
@@ -384,6 +501,16 @@ namespace LSCC
 
             if(!Settings.LoggedInPlayers.Contains(player)) Settings.LoggedInPlayers.Add(player);
 
+            CharacterData ConvChar = new CharacterData();
+
+            try
+            {
+                ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+               
+                EPlayer.ApplyCharacter(player, ConvChar, EPlayer.GetAccount(player).LobbyClothing);
+            }
+            catch { }
+
             Vector3 SpawnArea = Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)];
 
             player.TriggerEvent("DestroyPlayerCamera");
@@ -396,7 +523,7 @@ namespace LSCC
                 player.SetData("AutoJoin", true);
             }
 
-            if (player.GetSharedData<int>("InLobby") == -1)
+            if (player.GetSharedData<int>("InLobby") == -1 || player.GetSharedData<int>("InLobby") == -5 && player.GetData<bool>("Creator_Using") == false)
             {
                 player.SetSharedData("InDM", -1);
                 int LobbyToBeIn = Settings.MaxLobbies;

@@ -10,6 +10,7 @@ require("./Player/Nametags.js");
 require("./Player/Voice.js");
 require("./Player/HUD.js");
 require("./Player/KillList.js");
+require("./charcreator/clotheditor.js")
 require("./charcreator/index.js");
 
 require('./camerasManager.js');

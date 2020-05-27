@@ -895,7 +895,7 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player)) return;
 
             player.SendChatMessage("!{#0079DB}[Los Santos Copchase V !{#2BA3FF}BETA Commands]:");
-            player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /stats");
+            player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /stats /char(acter)");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock");
             player.SendChatMessage("!{#5FBCAC}[Keys]: Voice (N) | GPS (Z) | Scoreboard (O) | Rapple (X)");
@@ -1708,6 +1708,131 @@ namespace LSCC
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {target.Name} has been slapped by {player.Name}.");
             }
         }
+
+        [Command("char", GreedyArg = true, Alias = "character")]
+        public void cmd_char(Player player, string action)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (player.GetSharedData<int>("Team") != -1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase!");
+                return;
+            }
+
+            if (action.StartsWith("reset", StringComparison.OrdinalIgnoreCase) && !action.StartsWith("resetclothing", StringComparison.OrdinalIgnoreCase))
+            {
+                player.SendChatMessage("!{#999999}You have reset your character, sending you to the creator.");
+                EPlayer.GetAccount(player).Character = "{}";
+                EPlayer.ShowCharCreator(player);
+            }
+            else if (action.StartsWith("clothing", StringComparison.OrdinalIgnoreCase))
+            {
+                string[] args = action.Split(' ');
+                if (args.Count() > 1)
+                {
+                    if (args[1].StartsWith("cop", StringComparison.OrdinalIgnoreCase))
+                    {
+                        CharacterData ConvChar = new CharacterData();
+
+                        try
+                        {
+                            ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+
+                            EPlayer.ApplyCharacter(player, ConvChar, 1);
+                        }
+                        catch { return; }
+
+                        player.SetData("EditingClothing", 1);
+                        player.TriggerEvent("ShowClothesMenu");
+                    }
+                    else if (args[1].StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
+                    {
+                        CharacterData ConvChar = new CharacterData();
+
+                        try
+                        {
+                            ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+
+                            EPlayer.ApplyCharacter(player, ConvChar, 0);
+                        }
+                        catch { return; }
+
+                        player.SetData("EditingClothing", 0);
+                        player.TriggerEvent("ShowClothesMenu");
+                    }
+                    else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid team, clothings can only be set for 'fugitive' or 'cop' team.");
+                }
+                else player.SendChatMessage("!{#999999}Proper usage: /char clothing (team), teams: cop OR fugitive");
+            }
+            else if (action.StartsWith("resetclothing", StringComparison.OrdinalIgnoreCase))
+            {
+                string[] args = action.Split(' ');
+                if (args.Count() > 1)
+                {
+                    if (args[1].StartsWith("cop", StringComparison.OrdinalIgnoreCase))
+                    {
+                        CharacterData charData = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+                        charData.Clothing[1] = new ClothingData();
+                        EPlayer.GetAccount(player).Character = NAPI.Util.ToJson(charData);
+
+                        EPlayer.Spawn(player, false);
+
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Reset your clothing for cop team.");
+                    }
+                    else if (args[1].StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
+                    {
+                        CharacterData charData = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+                        charData.Clothing[0] = new ClothingData();
+                        EPlayer.GetAccount(player).Character = NAPI.Util.ToJson(charData);
+
+                        EPlayer.Spawn(player, false);
+
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Reset your clothing for fugitive team.");
+                    }
+                    else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid team, clothings can only be set for 'fugitive' or 'cop' team.");
+                }
+                else player.SendChatMessage("!{#999999}Proper usage: /char resetclothing (team), teams: cop OR fugitive");
+            }
+            else if (action.StartsWith("lobbyteam", StringComparison.OrdinalIgnoreCase))
+            {
+                string[] args = action.Split(' ');
+                if (args.Count() > 1)
+                {
+                    if (args[1].StartsWith("cop", StringComparison.OrdinalIgnoreCase))
+                    {
+                        EPlayer.GetAccount(player).LobbyClothing = 1;
+
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You will now spawn with cop clothing in lobby.");
+                    }
+                    else if (args[1].StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
+                    {
+                        EPlayer.GetAccount(player).LobbyClothing = 0;
+
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You will now spawn with fugitive clothing in lobby.");
+                    }
+                    else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid team, clothings can only be set for 'fugitive' or 'cop' team.");
+
+                    CharacterData ConvChar = new CharacterData();
+
+                    try
+                    {
+                        ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+
+                        EPlayer.ApplyCharacter(player, ConvChar, EPlayer.GetAccount(player).LobbyClothing);
+                    }
+                    catch { return; }
+                }
+                else player.SendChatMessage("!{#999999}Proper usage: /char lobbyteam (team), teams: cop OR fugitive");
+            }
+
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'reset', 'clothing', 'resetclothing', 'lobbyteam'");
+
+            return;
+        }
+
+
         [Command("spec", GreedyArg = true)]
         public void cmd_spec(Player player, Player target)
         {
@@ -1729,6 +1854,8 @@ namespace LSCC
                 player.SendChatMessage($"!{{#FF6347}}[AdmCmd] You are now spectating: !{{#FFFFFF}}{target.Name}");
             }
         }
+
+
         [Command("specoff", GreedyArg = true)]
         public void cmd_specoff(Player player)
         {

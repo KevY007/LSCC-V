@@ -33,6 +33,7 @@ namespace LSCC
         public int DonatorLevel { get; set; }
         public int JailTime { get; set; }
         public string JailReason { get; set; }
+        public int LobbyClothing { get; set; }
         public string Character { get; set; }
     }
 

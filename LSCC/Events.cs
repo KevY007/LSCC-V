@@ -385,36 +385,14 @@ namespace LSCC
             catch
             {
                 player.TriggerEvent("DestroyPlayerCamera");
-                player.SetSharedData("InLobby", -5);
                 player.TriggerEvent("TogglePlayerChat", true);
 
-                player.SendChatMessage("!{#FF6347}[INFO] !{#FFFFFF}Switch gender between Male and Female if the preview does not show.");
-                player.SetData("Creator_Using", true);
-
-                player.Dimension = (uint)player.Id + 699;
-
-                ConvChar = new CharacterData();
-                player.TriggerEvent("toggleCreator", true, NAPI.Util.ToJson(ConvChar));
-
-                EPlayer.ApplyCharacter(player, ConvChar);
-
-                player.Position = new Vector3(402.8664, -996.4108, -99.00027);
-                player.Heading = -185.0f;
-
-                NAPI.Task.Run(() =>
-                {
-                    player.TriggerEvent("creator_Change");
-
-                    player.SetSkin(PedHash.FreemodeMale01);
-
-                    player.Position = new Vector3(402.8664, -996.4108, -99.00027);
-                    player.Heading = -185.0f;
-                }, 2000);
+                EPlayer.ShowCharCreator(player);
 
                 return;
             }
 
-            EPlayer.ApplyCharacter(player, ConvChar);
+            EPlayer.ApplyCharacter(player, ConvChar, acc.LobbyClothing);
 
             EPlayer.Spawn(player);
         }
@@ -439,8 +417,24 @@ namespace LSCC
 
             CharacterData pChar = new CharacterData();
             pChar.Gender = gender;
-            pChar.Parents = NAPI.Util.FromJson<ParentData>(parentData);
-            pChar.Features = NAPI.Util.FromJson<float[]>(featureData);
+            ParentData tParentData = NAPI.Util.FromJson<ParentData>(parentData);
+
+            pChar.Parents.Father = tParentData.Father;
+            pChar.Parents.Mother = tParentData.Mother;
+            pChar.Parents.Similarity = tParentData.Similarity;
+            pChar.Parents.SkinSimilarity = tParentData.SkinSimilarity;
+
+            float[] features = NAPI.Util.FromJson<float[]>(featureData);
+
+            for (int i = 0; i < 20; i++)
+            {
+                try
+                {
+                    pChar.Features[i] = features[i];
+                }
+                catch { }
+            }
+
             pChar.Appearance = NAPI.Util.FromJson<AppearanceData[]>(appearanceData);
 
             byte[] hairAndCol = NAPI.Util.FromJson<byte[]>(hairAndColorData);
@@ -464,6 +458,7 @@ namespace LSCC
 
             EPlayer.Spawn(player);
         }
+
         [RemoteEvent("creator_Leave")]
         public void CreatorLeave(Player player)
         {
@@ -491,7 +486,83 @@ namespace LSCC
 
             EPlayer.Spawn(player);
         }
-        
+
+        [RemoteEvent("RequestSetClothes")]
+        public void OnRequestSetClothes(Player player, int slot, int drawable, int texture)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (player.GetData<int>("EditingClothing") != -1)
+            {
+                Account acc = EPlayer.GetAccount(player);
+                try
+                {
+                    if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata- edit clothes."));
+
+                    CharacterData charData = NAPI.Util.FromJson<CharacterData>(acc.Character);
+
+                    charData.Clothing[player.GetData<int>("EditingClothing")].Clothes[slot].Drawable = drawable;
+                    charData.Clothing[player.GetData<int>("EditingClothing")].Clothes[slot].Texture = texture;
+
+                    acc.Character = NAPI.Util.ToJson(charData);
+                }
+                catch { }
+            }
+
+            player.SetClothes(slot, drawable, texture);
+            
+        }
+
+        [RemoteEvent("RequestSetGlasses")]
+        public void OnRequestSetGlasses(Player player, int drawable, int texture)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (player.GetData<int>("EditingClothing") != -1)
+            {
+                Account acc = EPlayer.GetAccount(player);
+                try
+                {
+                    if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata- edit props."));
+
+                    CharacterData charData = NAPI.Util.FromJson<CharacterData>(acc.Character);
+
+                    charData.Clothing[player.GetData<int>("EditingClothing")].Glasses = drawable;
+                    charData.Clothing[player.GetData<int>("EditingClothing")].GlassesTxt = texture;
+
+                    acc.Character = NAPI.Util.ToJson(charData);
+                }
+                catch { }
+            }
+
+            player.SetAccessories(1, drawable, texture);
+        }
+
+        [RemoteEvent("RequestSetHat")]
+        public void OnRequestSetHat(Player player, int drawable, int texture)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (player.GetData<int>("EditingClothing") != -1)
+            {
+                Account acc = EPlayer.GetAccount(player);
+                try
+                {
+                    if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata- edit props."));
+
+                    CharacterData charData = NAPI.Util.FromJson<CharacterData>(acc.Character);
+
+                    charData.Clothing[player.GetData<int>("EditingClothing")].Hat = drawable;
+                    charData.Clothing[player.GetData<int>("EditingClothing")].HatTxt = texture;
+
+                    acc.Character = NAPI.Util.ToJson(charData);
+                }
+                catch { }
+            }
+
+            player.SetAccessories(0, drawable, texture);
+        }
+
         [RemoteEvent("UpdateChatState")]
         public void OnRequestUpdateChatState(Player player, bool toggle)
         {
@@ -514,29 +585,8 @@ namespace LSCC
 
             player.TriggerEvent("DestroyPlayerCamera");
             player.TriggerEvent("TogglePlayerChat", true);
-            player.SetSharedData("InLobby", -5);
 
-            player.SetData("Creator_Using", true);
-
-            player.Dimension = (uint)player.Id + 699;
-
-            CharacterData defaultChar = new CharacterData();
-            player.TriggerEvent("toggleCreator", true, NAPI.Util.ToJson(defaultChar));
-            player.SendChatMessage("!{#FF6347}[INFO] !{#FFFFFF}Switch gender between Male and Female if the preview does not show.");
-            EPlayer.ApplyCharacter(player, defaultChar);
-
-            player.Position = new Vector3(402.8664, -996.4108, -99.00027);
-            player.Heading = -185.0f;
-
-            NAPI.Task.Run(() =>
-            {
-                player.TriggerEvent("creator_Change");
-
-                player.SetSkin(PedHash.FreemodeMale01);
-
-                player.Position = new Vector3(402.8664, -996.4108, -99.00027);
-                player.Heading = -185.0f;
-            }, 2000);
+            EPlayer.ShowCharCreator(player);
 
             //EPlayer.Spawn(player);
         }
@@ -788,7 +838,8 @@ namespace LSCC
                 Level = 1,
                 XP = 1,
                 DonatorLevel = 0,
-                RockstarID = player.SocialClubId
+                RockstarID = player.SocialClubId,
+                LobbyClothing = 1
             };
             AccountManager.Add(_new);
             OnPlayerRegister(player, _new);

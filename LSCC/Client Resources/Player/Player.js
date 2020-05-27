@@ -94,9 +94,9 @@ mp.events.add("render", () => {
 
         if (mp.players.exists(specTarget)) 
         {
-            spectateCamera.detach();
-            spectateCamera.attachTo(specTarget.handle, 0, (specInvert ? 5 : -5), 1, true);
-            spectateCamera.setRot(0, 0, spectateTarget.getHeading(), 2);
+            specCam.detach();
+            specCam.attachTo(specTarget.handle, 0, -5, 1, true);
+            specCam.setRot(0, 0, specTarget.getHeading(), 2);
         }
         else 
         {
@@ -347,8 +347,8 @@ mp.events.add(
     
             mp.game.cam.renderScriptCams(false, false, 0, true, false);
 
-            specCam = mp.cameras.new('default', target.position, new mp.Vector3(0, 0, target.getHeading()), 75);
-            specCam.attachTo(target.handle, 0, 5, 1, true);
+            specCam = mp.cameras.new('default', target.position, new mp.Vector3(0, 0, target.getHeading()), target.isInAnyVehicle(false) ? 80 : 60);
+            specCam.attachTo(target.handle, 0, target.isInAnyVehicle(false) ? -7 : -5, target.isInAnyVehicle(false) ? 2 : 1, true);
             specCam.setActive(true);
 
             mp.game.cam.renderScriptCams(true, false, 0, true, false);
@@ -357,7 +357,7 @@ mp.events.add(
         },
     
         "StopSpectating": () => {
-    
+
             specTarget = null;
             specState = false;
     
