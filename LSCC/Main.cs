@@ -93,7 +93,8 @@ public static class Settings
 
     public static string[] DMNames = new string[]
     {
-        "Life Invader Office"
+        "Life Invader Office",
+        "Warehouse"
     };
 
     public static object[][,] DMSpawns = new object[][,]
@@ -111,6 +112,29 @@ public static class Settings
             { new Vector3(-1078.404f, -244.99226f, 44.021255f), -105.56132f },
             { new Vector3(-1059.8085f, -238.40387f, 39.733192f), -145.55379f },
         },
+        new object[,] { // Warehouse 
+            { new Vector3(1026.7279f, -3100.3984f, -38.999912f), 74.94901f },
+            { new Vector3(1018.37555f, -3093.7153f, -38.999912f), 92.48154f },
+            { new Vector3(1000.2626f, -3091.4524f, -38.999866f), -122.95632f },
+            { new Vector3(995.9403f, -3105.2683f, -38.999886f), -129.19583f },
+            { new Vector3(993.27515f, -3097.609f, -38.99586f), -87.74806f },
+            { new Vector3(1009.0142f, -3105.6724f, -38.999836f), -94.19384f },
+            { new Vector3(1014.16077f, -3111.6494f, -38.999855f), -16.558058f },
+            { new Vector3(1023.80054f, -3101.6365f, -38.999866f), 91.27259f },
+        },
+    };
+
+    public static object[,] DerbySpawns = new object[,]
+    {
+        { new Vector3(1031.4274f, -2783.5588f, 25.524384f), 82.23843f },
+        { new Vector3(1076.4479f, -2792.8005f, 30.372116f), 78.82261f },
+        { new Vector3(1073.2196f, -2818.6135f, 30.385042f), -10.16382f },
+        { new Vector3(998.7151f, -2762.3574f, 25.53724f), -145.90819f },
+        { new Vector3(1079.4952f, -2772.7634f, 35.47695f), 75.29132f },
+        { new Vector3(1045.5419f, -2770.936f, 35.457653f), 167.2812f },
+        { new Vector3(1042.0118f, -2784.4053f, 35.48625f), 165.60005f },
+        { new Vector3(1037.2496f, -2806.0051f, 35.456944f), 89.941635f },
+        { new Vector3(1000.0169f, -2783.8958f, 25.304863f), -64.50512f }
     };
 }
 

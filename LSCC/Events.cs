@@ -84,6 +84,13 @@ namespace LSCC
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has left the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
             if (EPlayer.LoggedIn(player))
             {
+                if (player.HasData("DerbyVehicle"))
+                {
+                    player.GetData<Vehicle>("DerbyVehicle").Delete();
+
+                    player.ResetData("DerbyVehicle");
+                }
+
                 player.SetSharedData("VisibleBlip", false);
 
                 List<Vehicle> freeroamVehs = new List<Vehicle>();
@@ -132,6 +139,14 @@ namespace LSCC
                 reasonStr = null;
             }
 
+            if (player.GetSharedData<int>("InLobby") == -4)
+            {
+                foreach (Player indm in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
+                {
+                    indm.TriggerEvent("pushToKillFeed", $"DERBY> {player.Name} fell down");
+                }
+            }
+
             if (killer != null && !killer.IsNull && killer != player)
             {
                 NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
@@ -144,11 +159,11 @@ namespace LSCC
                     {
                         if (reasonStr == null)
                         {
-                            indm.TriggerEvent("pushToKillFeed", $"[DM] {killer.Name} killed {player.Name}");
+                            indm.TriggerEvent("pushToKillFeed", $"DM> {killer.Name} killed {player.Name}");
                         }
                         else
                         {
-                            indm.TriggerEvent("pushToKillFeed", $"[DM] {killer.Name} killed {player.Name} with {reasonStr}");
+                            indm.TriggerEvent("pushToKillFeed", $"DM> {killer.Name} killed {player.Name} with {reasonStr}");
                         }
                     }
                 }
@@ -237,11 +252,11 @@ namespace LSCC
 
                                 if (reasonStr == null)
                                 {
-                                    ay.TriggerEvent("pushToKillFeed", $"[CC] {killer.Name} killed {player.Name}");
+                                    ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name}");
                                 }
                                 else
                                 {
-                                    ay.TriggerEvent("pushToKillFeed", $"[CC] {killer.Name} killed {player.Name} with {reasonStr}");
+                                    ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}");
                                 }
                             }
                             else
@@ -250,11 +265,11 @@ namespace LSCC
 
                                 if (reasonStr == null)
                                 {
-                                    ay.TriggerEvent("pushToKillFeed", $"[CC] {player.Name} died");
+                                    ay.TriggerEvent("pushToKillFeed", $"{player.Name} died");
                                 }
                                 else
                                 {
-                                    ay.TriggerEvent("pushToKillFeed", $"[CC] {player.Name} died of {reasonStr}");
+                                    ay.TriggerEvent("pushToKillFeed", $"{player.Name} died of {reasonStr}");
                                 }
                             }
                         }
@@ -272,11 +287,11 @@ namespace LSCC
                                     
                                 if (reasonStr == null)
                                 {
-                                    ay.TriggerEvent("pushToKillFeed", $"[CC] {killer.Name} killed {player.Name}");
+                                    ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name}");
                                 }
                                 else
                                 {
-                                    ay.TriggerEvent("pushToKillFeed", $"[CC] {killer.Name} killed {player.Name} with {reasonStr}");
+                                    ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}");
                                 }
                             }
                             else
@@ -642,6 +657,14 @@ namespace LSCC
             player.SetSharedData("UnstreamedX", player.Position.X);
             player.SetSharedData("UnstreamedY", player.Position.Y);
             player.SetSharedData("UnstreamedZ", player.Position.Z);
+
+            if (EPlayer.LoggedIn(player) && player.GetSharedData<int>("InLobby") == -4)
+            {
+                if(player.Position.Z <= 15.0f && player.IsInstanceAlive && player.Health > 10)
+                {
+                    player.Health = 0;
+                }
+            }
             return;
         }
 
@@ -962,6 +985,51 @@ namespace LSCC
                 player.RemoveAllWeapons();
 
                 player.Dimension = 256;
+            }
+
+            if (player.GetSharedData<int>("InLobby") == -4) // Derby
+            {
+                Random rand = new Random();
+                int spawnID = rand.Next(Settings.DerbySpawns.GetLength(0));
+
+                if (player.HasData("DerbyVehicle"))
+                {
+                    player.GetData<Vehicle>("DerbyVehicle").Delete();
+
+                    player.ResetData("DerbyVehicle");
+                }
+
+                Vector3 PlayerSpawn = (Vector3)Settings.DerbySpawns[spawnID, 0];
+                PlayerSpawn.Z += 30.0f;
+                player.Position = PlayerSpawn;
+                player.Heading = (float)Settings.DerbySpawns[spawnID, 1];
+                player.Dimension = 500;
+
+
+                EPlayer.SetDiscordStatus(player, $"In derby as {player.Name}");
+
+                EPlayer.SetColor(player, new Color(250, 191, 62), 0);
+
+                player.TriggerEvent("SetActorInvulnerable", true);
+
+                player.SetSharedData("VisibleBlip", true);
+
+                player.RemoveAllWeapons();
+
+
+                NAPI.Task.Run(() =>
+                {
+                    Vehicle derbyVeh = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey("brioso"), (Vector3)Settings.DerbySpawns[spawnID, 0], (float)Settings.DerbySpawns[spawnID, 1], rand.Next(255), rand.Next(255), "DERBY", 255, false, true, 500);
+                    player.SetData("DerbyVehicle", derbyVeh);
+
+                    player.SetIntoVehicle(derbyVeh, 0);
+
+                    NAPI.Task.Run(() =>
+                    {
+                        player.SetIntoVehicle(derbyVeh, 0);
+                    }, 750);
+
+                }, 350);
             }
 
             if (player.GetSharedData<int>("InLobby") > -1) // Copchase Lobby

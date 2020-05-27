@@ -563,6 +563,13 @@ namespace LSCC
 
             if (player.GetSharedData<int>("InLobby") == -5) return;
 
+            if (player.HasData("DerbyVehicle"))
+            {
+                player.GetData<Vehicle>("DerbyVehicle").Delete();
+
+                player.ResetData("DerbyVehicle");
+            }
+
             List<Vehicle> freeroamVehs = new List<Vehicle>();
             freeroamVehs = player.GetData<List<Vehicle>>("FreeroamVehicles");
 
@@ -835,9 +842,45 @@ namespace LSCC
                 }
             }
 
+            player.SetSharedData("InDM", -1);
             player.SetSharedData("InLobby", -3); 
             EPlayer.Spawn(player, false);
             player.SendChatMessage($"!{{#FFFF00}}[!] Sending you to !{{#FF6347}}FREEROAM");
+
+
+
+            return;
+        }
+
+        [Command("derby")]
+        public void cmd_derby(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).JailTime > 0) return;
+
+            if (player.GetSharedData<int>("InLobby") > -1)
+            {
+                LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+                if (elobby == null) return;
+
+                if (elobby.gameStatus == 2)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into derby while the match is starting!");
+                    return;
+                }
+            }
+
+            if (player.HasData("DerbyVehicle"))
+            {
+                player.GetData<Vehicle>("DerbyVehicle").Delete();
+
+                player.ResetData("DerbyVehicle");
+            }
+
+            player.SetSharedData("InDM", -1);
+            player.SetSharedData("InLobby", -4);
+            EPlayer.Spawn(player, false);
+            player.SendChatMessage($"!{{#FFFF00}}[!] Sending you to !{{#FF6347}}DERBY");
 
 
 
@@ -901,8 +944,7 @@ namespace LSCC
             player.SendChatMessage("!{#5FBCAC}[Keys]: Voice (N) | GPS (Z) | Scoreboard (O) | Rapple (X)");
             player.SendChatMessage("!{#61A9FA}[Cop]: /gps");
             player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do");
-            player.SendChatMessage("!{#28E0DA}[Freeroam]: /freeroam /veh");
-            player.SendChatMessage("!{#B3B3B3}[DM]: /dm /dmarenas");
+            player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /freeroam /veh /dm /dmarenas /derby");
             player.SendChatMessage("!{#A5A8A8}[Debug]: /pos /updaterate (changes the blip updating interval)");
 
             if (EPlayer.GetAccount(player).DonatorLevel >= 2)
