@@ -457,6 +457,8 @@ namespace LSCC
             EPlayer.Save(player);
 
             EPlayer.Spawn(player);
+			
+			player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can edit your character's clothing with /char clothing.");
         }
 
         [RemoteEvent("creator_Leave")]
