@@ -756,7 +756,18 @@ namespace LSCC
                     Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, col1, 111, "SIMBA", 255, false, true, Convert.ToUInt32(lobbyid));
 
                     pVehicle.SetSharedData("Team", 1);
+
                     lobby.Vehicles.Add(pVehicle);
+
+                    CharacterData ConvChar = new CharacterData();
+
+                    try
+                    {
+                        ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+
+                        EPlayer.ApplyCharacter(player, ConvChar, 1);
+                    }
+                    catch { }
 
                     player.Dimension = Convert.ToUInt32(lobbyid);
                     player.Position = vecSpawn.Around(15);
@@ -791,6 +802,16 @@ namespace LSCC
                     spawnLoc = Spawns.FirstOrDefault(a => a.spawnTeam == 0);
 
                     Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
+
+                    CharacterData ConvChar = new CharacterData();
+
+                    try
+                    {
+                        ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+
+                        EPlayer.ApplyCharacter(player, ConvChar, 0);
+                    }
+                    catch { }
 
                     player.Dimension = Convert.ToUInt32(lobbyid);
                     player.Position = vecSpawn.Around(15);
