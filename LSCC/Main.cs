@@ -8,6 +8,7 @@ using LSCC;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using CryptSharp.Utility;
 
 public class LobbyData
 {
@@ -26,12 +27,21 @@ public class LobbyData
     public bool Enabled { get; set; }
     public bool PlayerCreated { get; set; }
     public string Password { get; set; }
+    public int[] Time { get; set; }
+    public int Weather { get; set; }
 
     public LobbyData()
     {
         Cops = new List<Player>();
         Fugitives = new List<Player>();
         Vehicles = new List<Vehicle>();
+
+        Time = new int[3];
+        Time[0] = new Random().Next(0, 23);
+        Time[1] = new Random().Next(0, 59);
+        Time[2] = new Random().Next(0, 59);
+
+        Weather = new Random().Next(0, 9);
 
         lobbyId = Settings.NextLobbyID;
         Settings.NextLobbyID++;
@@ -54,7 +64,7 @@ public static class Settings
 {
     // Static Settings / Const
     public const string Version = "0.1a";
-    public const int GameRunTime = 600; // Game Running Time in Seconds before STOP
+    public const int GameRunTime = 390; // Game Running Time in Seconds before STOP
     public const int MaxLobbies = 5; // Default/starting lobby num.
     public const int DefaultMaxInLobby = 35;
 
@@ -70,6 +80,9 @@ public static class Settings
     public static List<Vehicle> AdminVehicles { get; set; }
     public static int NextLobbyID { get; set; }
     public static int MaxPlayersInLobby { get; set; }
+    public static int[] Time { get; set; }
+    public static int DerbyTimeLeft { get; set; }
+    public static int LastDerbyTick { get; set; }
 
     // Locations
     public const float LoginCameraX = -550;
@@ -372,6 +385,48 @@ namespace LSCC
 	        {1150790720, "Vehicle Volatol Dual MG"},
 	        {1741783703, "Vehicle Water Cannon"}
         };
+
+        public static string WeatherToForecast(int weatherid)
+        {
+            string weatherString = $"To be added. {weatherid}";
+            switch (weatherid)
+            {
+                case 0:
+                    weatherString = "The weather is reported to soon be sunny and the atmosphere feels warm.";
+                    break;
+                case 1:
+                    weatherString = "The weather is reported to be clear.";
+                    break;
+                case 2:
+                    weatherString = "The atmosphere is cloudy and cold, high chances of rain.";
+                    break;
+                case 3:
+                    weatherString = "There are chances for a smoggy weather according to reports.";
+                    break;
+                case 4:
+                    weatherString = "The weather is reported to be foggy.";
+                    break;
+                case 5:
+                    weatherString = "A huge overcast has been reported over the sky.";
+                    break;
+                case 6:
+                    weatherString = "The sky gets darker, cloudy and starts raining, it is advised to drive safe and slow.";
+                    break;
+                case 7:
+                    weatherString = "Thunder has been detected, it is advised to stay indoors.";
+                    break;
+                case 8:
+                    weatherString = "The clouds are clearing and the sky gets clearer.";
+                    break;
+                case 9:
+                    weatherString = "The sky is bright and clear, small chances of rain.";
+                    break;
+                default:
+                    weatherString = "The atmosphere is clear.";
+                    break;
+            }
+            return weatherString;
+        }
         public static string ConvertGameStatus(int status)
         {
             string ret = "Waiting";
@@ -412,6 +467,9 @@ namespace LSCC
 
             Settings.MaxPlayersInLobby = Settings.DefaultMaxInLobby;
             Settings.NextLobbyID = 1;
+
+            NAPI.World.SetTime(12, 0, 0);
+            NAPI.World.SetWeather(Weather.CLOUDS);
 
             for(int i = 0; i < Settings.MaxLobbies; i++)
             {
@@ -471,6 +529,46 @@ namespace LSCC
             {
                 if (lobby != null)
                 {
+                    lobby.Time[2] += 30; // Twice as fast as in real life.
+                    if (lobby.Time[2] >= 60)
+                    {
+                        lobby.Time[2] = 0;
+                        lobby.Time[1]++;
+
+                        if (lobby.Time[1] >= 60)
+                        {
+                            lobby.Time[1] = 0;
+                            lobby.Time[0]++;
+
+                            lobby.Weather = new Random().Next(0, 9); // Change weather every hour or so.
+
+                            if (lobby.Time[0] >= 24)
+                            {
+                                lobby.Time[0] = 0;
+                            }
+
+                            string weatherString = WeatherToForecast(lobby.Weather);
+
+                            foreach (Player player in Settings.LoggedInPlayers)
+                            {
+                                if (player.GetSharedData<int>("InLobby") == lobby.lobbyId)
+                                {
+                                    player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
+
+                                    player.SendChatMessage("!{#A8FFAB}[WEATHER FORECAST] " + weatherString);
+                                }
+                            }
+                        }
+
+                        foreach (Player player in Settings.LoggedInPlayers)
+                        {
+                            if (player.GetSharedData<int>("InLobby") == lobby.lobbyId)
+                            {
+                                player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
+                            }
+                        }
+                    }
+
                     if (lobby.gameStatus == 0)
                     {
                         if (lobby.Enabled)
@@ -554,6 +652,44 @@ namespace LSCC
             }, delayTime: 15000);
         }
 
+        public static void CheckDerbyWinner()
+        {
+            int derbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count();
+            if (Settings.DerbyTimeLeft <= 0 && derbyPlayers >= 2)
+            {
+                Player winner = null;
+                int lastBigTime = 0;
+                int winXP = derbyPlayers / 2;
+
+                foreach(Player player in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
+                {
+                    if(player.GetSharedData<int>("DerbyTime") > lastBigTime)
+                    {
+                        lastBigTime = player.GetSharedData<int>("DerbyTime");
+                        winner = player;
+                    }
+                }
+
+                foreach (Player player in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
+                {
+                    player.Health = 0;
+                    if (winner == null)
+                    {
+                        player.SendChatMessage("!{#E6DD3C}[DERBY] !{#FFFFFF}There was no winner in the derby match! Starting a new round.");
+                    }
+                    else
+                    {
+                        player.SendChatMessage("!{#E6DD3C}[DERBY] " + winner.Name + " won the derby and has gained " + winXP + "XP.");
+                    }
+                }
+
+                if (winner != null) EPlayer.GrantXP(winner, winXP);
+
+                Settings.DerbyTimeLeft = 180;
+                Settings.LastDerbyTick = Environment.TickCount + 3000;
+            }
+            return;
+        }
         public static bool StopGame(int lobbyid, int reason)
         {
             LobbyData lobby = Settings.Lobbies.Find(l => l.lobbyId == lobbyid);
@@ -570,6 +706,7 @@ namespace LSCC
                         foreach (Player i in lobby.Fugitives)
                         {
                             // Reward
+                            EPlayer.GrantXP(i, 5);
                         }
                         break;
                     case 2:
@@ -578,6 +715,7 @@ namespace LSCC
                         foreach (Player i in lobby.Fugitives)
                         {
                             // Reward
+                            EPlayer.GrantXP(i, 3);
                         }
                         break;
                     case 3:
@@ -586,6 +724,7 @@ namespace LSCC
                         foreach (Player i in lobby.Cops)
                         {
                             // Reward
+                            EPlayer.GrantXP(i, 4);
                         }
                         break;
                 }
@@ -1004,7 +1143,18 @@ namespace LSCC
 
         public static void GameUpdate()
         {
-            foreach(LobbyData lobby in Settings.Lobbies.Where(l => l.gameStatus == 1))
+            if (Environment.TickCount - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
+            {
+                Settings.DerbyTimeLeft--;
+                Settings.LastDerbyTick = Environment.TickCount;
+
+                if (Settings.DerbyTimeLeft <= 0)
+                {
+                    Main.CheckDerbyWinner();
+                }
+            }
+
+            foreach (LobbyData lobby in Settings.Lobbies.Where(l => l.gameStatus == 1))
             {
                 lobby.GameProgress++;
 

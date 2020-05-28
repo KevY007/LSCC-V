@@ -10,11 +10,16 @@ let collisionText = null;
 let collisionTime = 0;
 let chaseRunning = false;
 let chaseTimeCur = 0;
-let chaseTimeMax = 600;
+let chaseTimeMax = 390;
 let chatStatus = false;
 
+let derbyText = null;
+let derbyTimeText = null;
+let derbyTimeCur = 0;
+let derbyCounting = false;
+
 let secondCounter = 0;
-let updateRate = 500;
+let updateRate = 200;
 let updateInterval = null;
 
 let playerBlips = [];
@@ -142,6 +147,41 @@ function UpdateTimer()
         {
             mp.events.callRemote("UpdateStreamData");
 
+            if(mp.players.local.getVariable("InLobby") == -4)
+            {
+                derbyText.text = "N/A";
+
+                derbyText.visible = true;
+                derbyTimeText.visible = true;
+
+                derbyTimeText.text = TimeFormat(derbyTimeCur);
+                if(derbyCounting)
+                {
+                    mp.events.callRemote("DerbyIncreaseCount");
+                    derbyTimeCur--;
+                }
+
+                var TimeNow = 0;
+
+                mp.players.forEach(target => {
+
+                    if(target.getVariable("pLogged") !== undefined && target.getVariable("InLobby") == -4)
+                    {
+                        if(target.getVariable("DerbyTime") > TimeNow)
+                        {
+                            TimeNow = target.getVariable("DerbyTime");
+
+                            derbyText.text = target.name;
+                        }
+                    }
+                });
+            }
+            else
+            {
+                derbyText.visible = false;
+                derbyTimeText.visible = false;
+            }
+
             if(chaseProgBar != null && chaseProgText != null && chaseRunning == true)
             {
                 chaseTimeCur += 1;
@@ -229,6 +269,7 @@ function UpdateTimer()
             else if(target.getVariable("Team") == 1) blipColor = 3;
 
             if(target.getVariable("InLobby") == -3) blipColor = 15;
+            if(target.getVariable("InLobby") == -4) blipColor = 73;
             if(target.getVariable("InDM") != -1) blipColor = 39;
 
             if(target.isInAnyVehicle(false)) blipId = 724;
@@ -334,6 +375,49 @@ mp.events.add("playerWeaponShot", OnPlayerWeaponShot);
 
 mp.events.add(
     {
+        "SetDerbyCounting": (status, time) => {
+            derbyTimeCur = time;
+            derbyCounting = status;
+        },
+        "SetTimeWeather": (hour, minute, second, weather) => {
+            mp.game.time.setClockTime(hour, minute, second);
+
+            switch(weather) {
+                case 0:
+                    mp.game.gameplay.setWeatherTypeNow('EXTRASUNNY');
+                    break;
+                case 1:
+                    mp.game.gameplay.setWeatherTypeNow('CLEAR');
+                    break;
+                case 2:
+                    mp.game.gameplay.setWeatherTypeNow('CLOUDS');
+                    break;
+                case 3:
+                    mp.game.gameplay.setWeatherTypeNow('SMOG');
+                    break;
+                case 4:
+                    mp.game.gameplay.setWeatherTypeNow('FOGGY');
+                    break;
+                case 5:
+                    mp.game.gameplay.setWeatherTypeNow('OVERCAST');
+                    break;
+                case 6:
+                    mp.game.gameplay.setWeatherTypeNow('RAIN');
+                    break;
+                case 7:
+                    mp.game.gameplay.setWeatherTypeNow('THUNDER');
+                    break;
+                case 8:
+                    mp.game.gameplay.setWeatherTypeNow('CLEARING');
+                    break;
+                case 9:
+                    mp.game.gameplay.setWeatherTypeNow('SNOWLIGHT');
+                    break;
+                default:
+                    mp.game.gameplay.setWeatherTypeNow('CLOUDS');
+                    break;
+            }
+        },
         "SpectatePlayer": (target) => {
 
             if(specCam != null)
@@ -465,15 +549,31 @@ mp.events.add(
             if(collisionText == null)
             {
                 collisionText = new timerBarLib.TimerBar("COLLISIONS ENABLE");
-                collisionText.text = "0:30";
+                collisionText.text = "99:99";
                 collisionText.visible = false;
             }
 
             if(chaseProgText == null)
             {
                 chaseProgText = new timerBarLib.TimerBar("TIME LEFT");
-                chaseProgText.text = "10:00";
+                chaseProgText.text = "99:99";
                 chaseProgText.visible = false;
+            }
+
+            if(derbyTimeText == null)
+            {
+                derbyTimeText = new timerBarLib.TimerBar("WINNER IN");
+                derbyTimeText.text = "99:99";
+                derbyTimeText.visible = false;
+            }
+
+            if(derbyText == null)
+            {
+                derbyText = new timerBarLib.TimerBar("MOST TIME:", false);
+                derbyText.text = "N/A";
+                derbyText.textColor = 109; // HUD_COLOUR_GOLD
+                derbyText.usePlayerStyle = true;
+                derbyText.visible = false;
             }
         },
 

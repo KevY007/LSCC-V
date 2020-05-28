@@ -290,6 +290,8 @@ namespace LSCC
             player.SetSharedData("pLogged", false);
             player.SetData("AutoJoin", true);
             player.SetData("HUDState", true);
+            player.SetSharedData("DerbyTime", 0);
+            player.SetData("DerbySpawnTick", 0);
             player.SetSharedData("HasShot", false);
             player.SetSharedData("VisibleBlip", false);
             player.SetData("PMState", true);

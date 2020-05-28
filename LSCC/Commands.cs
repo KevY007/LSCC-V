@@ -44,6 +44,31 @@ namespace LSCC
             return;
         }
 
+        [Command("time", Alias = "weather")]
+        public void cmd_timeweather(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if(player.GetSharedData<int>("InLobby") < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You must be in a lobby to use this command!");
+                return;
+            }
+
+            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+            if ((lobby != null) == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You must be in a lobby to use this command.");
+                return;
+            }
+
+            player.SendChatMessage($"!{{#A8FFAB}}Time In Lobby: (H:M:S) !{{#FFFFFF}}{lobby.Time[0]}:{lobby.Time[1]}:{lobby.Time[2]}");
+            player.SendChatMessage("!{#A8FFAB}Weather Forecast: !{#FFFFFF}" + Main.WeatherToForecast(lobby.Weather));
+
+            return;
+
+        }
+
 
         [Command("game", GreedyArg = true)]
         public void cmd_game(Player player, string action)
@@ -938,8 +963,9 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player)) return;
 
             player.SendChatMessage("!{#0079DB}[Los Santos Copchase V !{#2BA3FF}BETA Commands]:");
-            player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /stats /char(acter)");
-            player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies");
+            player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog");
+            player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
+            player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock");
             player.SendChatMessage("!{#5FBCAC}[Keys]: Voice (N) | GPS (Z) | Scoreboard (O) | Rapple (X)");
             player.SendChatMessage("!{#61A9FA}[Cop]: /gps");
@@ -1751,6 +1777,21 @@ namespace LSCC
             }
         }
 
+        [Command("clothing", GreedyArg = true)]
+        public void cmd_clothing(Player player, string team)
+        {
+            string parameters = "clothing " + team;
+
+            if(team.Contains("reset"))
+            {
+                player.SendChatMessage("!{#FF6347}Please use /char help or /char resetclothing because you're at the wrong place.");
+                return;
+            }
+
+            cmd_char(player, parameters);
+            return;
+        }
+
         [Command("char", GreedyArg = true, Alias = "character")]
         public void cmd_char(Player player, string action)
         {
@@ -1768,6 +1809,13 @@ namespace LSCC
                 player.SendChatMessage("!{#999999}You have reset your character, sending you to the creator.");
                 EPlayer.GetAccount(player).Character = "{}";
                 EPlayer.ShowCharCreator(player);
+            }
+            else if (action.StartsWith("help", StringComparison.OrdinalIgnoreCase))
+            {
+                player.SendChatMessage("!{#FF6347}[Option] !{#999999}reset !{#FFFFFF}- Resets your character and sends you back to creation.");
+                player.SendChatMessage("!{#FF6347}[Option] !{#999999}clothing !{#FFFFFF}- Sets clothing for a team, fugitive or cop.");
+                player.SendChatMessage("!{#FF6347}[Option] !{#999999}resetclothing !{#FFFFFF}- Resets the clothing for a team.");
+                player.SendChatMessage("!{#FF6347}[Option] !{#999999}lobbyteam !{#FFFFFF}- Sets the clothing of which team that appears on lobby, derby dm etc.");
             }
             else if (action.StartsWith("clothing", StringComparison.OrdinalIgnoreCase))
             {
@@ -1869,7 +1917,7 @@ namespace LSCC
                 else player.SendChatMessage("!{#999999}Proper usage: /char lobbyteam (team), teams: cop OR fugitive");
             }
 
-            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'reset', 'clothing', 'resetclothing', 'lobbyteam'");
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'help', 'reset', 'clothing', 'resetclothing', 'lobbyteam'");
 
             return;
         }

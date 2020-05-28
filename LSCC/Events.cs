@@ -139,7 +139,7 @@ namespace LSCC
                 reasonStr = null;
             }
 
-            if (player.GetSharedData<int>("InLobby") == -4)
+            if (player.GetSharedData<int>("InLobby") == -4 && Settings.DerbyTimeLeft > 0 && Settings.DerbyTimeLeft != 180)
             {
                 foreach (Player indm in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
                 {
@@ -166,6 +166,8 @@ namespace LSCC
                             indm.TriggerEvent("pushToKillFeed", $"DM> {killer.Name} killed {player.Name} with {reasonStr}");
                         }
                     }
+
+                    EPlayer.GrantXP(killer, 1);
                 }
 
                 if (killer.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && player.GetSharedData<int>("Team") != -1)
@@ -244,6 +246,8 @@ namespace LSCC
                 {
                     if (lobby.Fugitives.Contains(player))
                     {
+                        if (killer != null && killer.GetSharedData<int>("Team") == 1) EPlayer.GrantXP(killer, 2);
+
                         foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
                         {
                             if (killer != null && !killer.IsNull && killer != player)
@@ -279,6 +283,8 @@ namespace LSCC
 
                     if (lobby.Cops.Contains(player))
                     {
+                        if (killer != null && killer.GetSharedData<int>("Team") == 0) EPlayer.GrantXP(killer, 2);
+
                         foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
                         {
                             if (killer != null && !killer.IsNull && player != killer)
@@ -509,9 +515,16 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
+            Account acc = EPlayer.GetAccount(player);
+
+            if (slot == 1 || slot == 7 && acc.DonatorLevel < 1)
+            {
+                player.SendNotification("~r~Only donators can use this itemgroup (masks, accessories).");
+                return;
+            }
+
             if (player.GetData<int>("EditingClothing") != -1)
             {
-                Account acc = EPlayer.GetAccount(player);
                 try
                 {
                     if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata- edit clothes."));
@@ -663,6 +676,15 @@ namespace LSCC
                 if(player.Position.Z <= 15.0f && player.IsInstanceAlive && player.Health > 10)
                 {
                     player.Health = 0;
+                }
+
+                if (Environment.TickCount - player.GetData<int>("DerbySpawnTick") > 2000)
+                {
+                    if (player.IsInstanceAlive && player.Health > 10 && !player.IsInVehicle)
+                    {
+                        player.Health = 0;
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please do not get out of your vehicle in derby!");
+                    }
                 }
             }
             return;
@@ -908,9 +930,41 @@ namespace LSCC
             }
         }
 
+        [RemoteEvent("DerbyIncreaseCount")]
+        public static void OnIncreaseDerbyCount(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (player.GetSharedData<int>("InLobby") != -4) return;
+
+            player.SetSharedData("DerbyTime", player.GetSharedData<int>("DerbyTime") + 1);
+
+            if (Environment.TickCount - player.GetData<int>("DerbySpawnTick") > 2000)
+            {
+                if(player.IsInstanceAlive && player.Health > 10 && !player.IsInVehicle)
+                {
+                    player.Health = 0;
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please do not get out of your vehicle in derby!");
+                }
+            }
+
+            if(Environment.TickCount - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
+            {
+                Settings.DerbyTimeLeft--;
+                Settings.LastDerbyTick = Environment.TickCount;
+
+                if(Settings.DerbyTimeLeft <= 0)
+                {
+                    Main.CheckDerbyWinner();
+                }
+            }
+            return;
+        }
+
         [ServerEvent(Event.PlayerSpawn)]
         public static void OnPlayerSpawn(Player player)
         {
+            player.TriggerEvent("SetTimeWeather", 12, 0, 0, -1);
+
             if (!EPlayer.LoggedIn(player))
             {
                 EPlayer.LoginCameraSetup(player);
@@ -924,7 +978,10 @@ namespace LSCC
                 return;
             }
 
+
             player.ResetData("FreezeWeapons");
+
+            player.SetSharedData("DerbyTime", 0);
 
             player.SetSharedData("Level", EPlayer.GetAccount(player).Level);
             player.SetSharedData("Ping", player.Ping);
@@ -989,6 +1046,8 @@ namespace LSCC
 
             if (player.GetSharedData<int>("InLobby") == -4) // Derby
             {
+                player.SetData("DerbySpawnTick", Environment.TickCount);
+
                 Random rand = new Random();
                 int spawnID = rand.Next(Settings.DerbySpawns.GetLength(0));
 
@@ -1008,13 +1067,27 @@ namespace LSCC
 
                 EPlayer.SetDiscordStatus(player, $"In derby as {player.Name}");
 
-                EPlayer.SetColor(player, new Color(250, 191, 62), 0);
-
                 player.TriggerEvent("SetActorInvulnerable", true);
 
                 player.SetSharedData("VisibleBlip", true);
 
                 player.RemoveAllWeapons();
+
+                player.TriggerEvent("SetDerbyCounting", false, Settings.DerbyTimeLeft);
+
+                if (Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
+                {
+                    foreach (Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
+                    {
+                        p.TriggerEvent("SetDerbyCounting", true, Settings.DerbyTimeLeft);
+                    }
+                }
+                else
+                {
+                    player.SendNotification("~r~Derby time will not be counted unless there are enough players.");
+                    Settings.DerbyTimeLeft = 180;
+                    Settings.LastDerbyTick = Environment.TickCount;
+                }
 
 
                 NAPI.Task.Run(() =>
@@ -1027,6 +1100,7 @@ namespace LSCC
                     NAPI.Task.Run(() =>
                     {
                         player.SetIntoVehicle(derbyVeh, 0);
+                        EPlayer.SetColor(player, new Color(250, 191, 62), 0);
                     }, 750);
 
                 }, 350);
@@ -1043,6 +1117,8 @@ namespace LSCC
                 LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
                 if (lobby != null)
                 {
+                    player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
+
                     if (lobby.gameStatus == 1)
                     {
                         player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, lobby.CollisionCounter);
