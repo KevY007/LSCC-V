@@ -819,7 +819,13 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player)) return;
             if (EPlayer.GetAccount(player).JailTime > 0) return;
 
-            if(arena < 0 || arena >= Settings.DMNames.Length)
+            if (player.GetSharedData<int>("Team") != -1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase!");
+                return;
+            }
+
+            if (arena < 0 || arena >= Settings.DMNames.Length)
             {
                 player.SendChatMessage("!{#FF6347}Invalid DM arena ID! /dmarenas to see all the arenas.");
                 return;
@@ -855,6 +861,12 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player)) return;
             if (EPlayer.GetAccount(player).JailTime > 0) return;
 
+            if (player.GetSharedData<int>("Team") != -1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase!");
+                return;
+            }
+
             if (player.GetSharedData<int>("InLobby") > -1)
             {
                 LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
@@ -883,6 +895,12 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player)) return;
             if (EPlayer.GetAccount(player).JailTime > 0) return;
 
+            if (player.GetSharedData<int>("Team") != -1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase!");
+                return;
+            }
+
             if (player.GetSharedData<int>("InLobby") > -1)
             {
                 LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
@@ -902,13 +920,81 @@ namespace LSCC
                 player.ResetData("DerbyVehicle");
             }
 
+            player.SetData("DerbySpawnTick", Environment.TickCount + 2000);
             player.SetSharedData("InDM", -1);
             player.SetSharedData("InLobby", -4);
-            EPlayer.Spawn(player, false);
+
+
             player.SendChatMessage($"!{{#FFFF00}}[!] Sending you to !{{#FF6347}}DERBY");
+            NAPI.Player.SpawnPlayer(player, ((Vector3)Settings.DerbySpawns[0, 0]).Around(30.0f));
 
+            return;
+        }
 
+        [Command("setweather", Alias = "sweather")]
+        public void cmd_setweather(Player player, int weatherid)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
 
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                return;
+            }
+
+            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+
+            if (lobby == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in a copchase lobby."); return; }
+
+            if(weatherid < 0 || weatherid > 9) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid weather ID! Possible ID's are between 0-9."); return; }
+
+            lobby.Weather = weatherid;
+            string weatherString = Main.WeatherToForecast(lobby.Weather);
+
+            foreach (Player eplayer in Settings.LoggedInPlayers)
+            {
+                if (eplayer.GetSharedData<int>("InLobby") == lobby.lobbyId)
+                {
+                    eplayer.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
+
+                    eplayer.SendChatMessage("!{#FF6347}AdmCmd: An admin has changed the current lobby weather: !{#A8FFAB} " + weatherString);
+                }
+            }
+
+            EPlayer.SendMessageToAllAdmins("!{#FF6347}AdmCmd: " + player.Name + " has changed weather in lobby " + lobby.lobbyId);
+            return;
+        }
+
+        [Command("settime", Alias = "stime")]
+        public void cmd_settime(Player player, int hour)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                return;
+            }
+
+            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+
+            if (lobby == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in a copchase lobby."); return; }
+
+            if (hour < 0 || hour > 23) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid hour! Possible hours are between 0-23."); return; }
+
+            lobby.Time[0] = hour;
+
+            foreach (Player eplayer in Settings.LoggedInPlayers)
+            {
+                if (eplayer.GetSharedData<int>("InLobby") == lobby.lobbyId)
+                {
+                    eplayer.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
+
+                    eplayer.SendChatMessage("!{#FF6347}AdmCmd: An admin has changed the current lobbies hour to " + lobby.Time[0]);
+                }
+            }
+
+            EPlayer.SendMessageToAllAdmins("!{#FF6347}AdmCmd: " + player.Name + " has changed time in lobby " + lobby.lobbyId);
             return;
         }
 
@@ -966,8 +1052,8 @@ namespace LSCC
             player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats");
-            player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock");
-            player.SendChatMessage("!{#5FBCAC}[Keys]: Voice (N) | GPS (Z) | Scoreboard (O) | Rapple (X)");
+            player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock (Switch Modes with N+1)");
+            player.SendChatMessage("!{#5FBCAC}[Keys]: Voice: N | GPS: Z | Scoreboard: O | Rapple: X | Switch Voice Mode: N+1");
             player.SendChatMessage("!{#61A9FA}[Cop]: /gps");
             player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do");
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /freeroam /veh /dm /dmarenas /derby");
@@ -1304,9 +1390,9 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin >= 1)
             {
-                player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /sethp /setar /spec");
+                player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /set(hp/ar) /spec");
                 player.SendChatMessage("[Admin Lv 1]: /freeze /unfreeze /kick /slap /setinv(ulnerable) /specoff");
-                player.SendChatMessage("[Admin Lv 1]: /bancheck /jail /unjail /fix /sendtolobby");
+                player.SendChatMessage("[Admin Lv 1]: /bancheck /jail /unjail /fix /sendtolobby /set(time/weather)");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
@@ -1936,10 +2022,17 @@ namespace LSCC
                 player.SetData("Spec_Pos", player.Position);
 
                 player.Dimension = target.Dimension;
-                player.Position = target.Position.Around(200.0f);
+                Vector3 pos = target.Position;
+                pos.Z -= 35.0f;
+                player.Position = pos;
 
-                player.TriggerEvent("SpectatePlayer", target);
-                player.TriggerEvent("SetPlayerFrozen", true);
+                NAPI.Task.Run(() =>
+                {
+                    player.TriggerEvent("SpectatePlayer", target);
+                    player.TriggerEvent("SetPlayerFrozen", true);
+
+                }, 1000);
+                
 
                 player.SendChatMessage($"!{{#FF6347}}[AdmCmd] You are now spectating: !{{#FFFFFF}}{target.Name}");
             }
@@ -1962,6 +2055,8 @@ namespace LSCC
                 {
                     player.Dimension = player.GetData<uint>("Spec_Dimension");
                     player.Position = player.GetData<Vector3>("Spec_Pos");
+
+                    player.ResetData("Spec_Pos");
                 }
             }
 

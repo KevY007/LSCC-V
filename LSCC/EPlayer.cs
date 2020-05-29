@@ -293,6 +293,7 @@ namespace LSCC
             player.SetSharedData("DerbyTime", 0);
             player.SetData("DerbySpawnTick", 0);
             player.SetSharedData("HasShot", false);
+            player.SetSharedData("VoiceMode", 0);
             player.SetSharedData("VisibleBlip", false);
             player.SetData("PMState", true);
             player.SetSharedData("Team", -1);

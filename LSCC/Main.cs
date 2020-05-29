@@ -865,26 +865,41 @@ namespace LSCC
                 pCount = 0;
                 foreach (Player player in lobby.Cops)
                 {
-                    spawnLoc = null;
-                    foreach (MapSpawn spawn in Spawns.Where(a => a.spawnTeam == 1))
-                    {
-                        if (!UsedSpawns.Contains(spawn.SQL_ID) || UsedSpawns.Count() < 1)
-                        {
-                            spawnLoc = spawn;
-                            UsedSpawns.Add(spawn.SQL_ID);
-                            break;
-                        }
-                    }
+                    spawnLoc = Spawns.First(a => a.spawnTeam == 1 && !UsedSpawns.Contains(a.SQL_ID));
 
-                    if (spawnLoc == null)
+                    if((spawnLoc == null) == false)
+                    {
+                        UsedSpawns.Add(spawnLoc.SQL_ID);                          
+                    }
+                    else
                     {
                         pCount++;
-                        spawnLoc = Spawns.FirstOrDefault(a => a.spawnTeam == 1);
+                        spawnLoc = new MapSpawn();
+
+                        spawnLoc = Spawns.First(a => a.spawnTeam == 1);
+                        
                         spawnLoc.spawnZ += (pCount * 3); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
                         spawnLoc.spawnX += (pCount * 2);
                     }
 
                     Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
+
+                    CharacterData ConvChar = new CharacterData();
+
+                    try
+                    {
+                        ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+
+                        EPlayer.ApplyCharacter(player, ConvChar, 1);
+                    }
+                    catch { }
+
+                    player.Dimension = Convert.ToUInt32(lobbyid);
+                    player.Position = vecSpawn.Around(15);
+
+                    player.Health = 100;
+                    player.Armor = 60;
+                    EPlayer.SetColor(player, new Color(141, 141, 255, 255), player.Armor);
 
                     string carName = "police";
                     int col1 = 0;
@@ -916,31 +931,19 @@ namespace LSCC
                     }
 
 
-                    Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, col1, 111, "SIMBA", 255, false, true, Convert.ToUInt32(lobbyid));
+                    Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, col1, 111, player.Name, 255, false, true, Convert.ToUInt32(lobbyid));
 
                     pVehicle.SetSharedData("Team", 1);
 
                     lobby.Vehicles.Add(pVehicle);
 
-                    CharacterData ConvChar = new CharacterData();
-
-                    try
-                    {
-                        ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-
-                        EPlayer.ApplyCharacter(player, ConvChar, 1);
-                    }
-                    catch { }
-
-                    player.Dimension = Convert.ToUInt32(lobbyid);
-                    player.Position = vecSpawn.Around(15);
-
-                    player.Health = 100;
-                    player.Armor = 60;
-                    EPlayer.SetColor(player, new Color(141, 141, 255, 255), player.Armor);
-
                     player.SetIntoVehicle(pVehicle, 0);
-                    
+
+                    NAPI.Task.Run(() =>
+                    {
+                        pVehicle.Position = vecSpawn;
+                    }, 1000);
+
                     EPlayer.Freeze(player, true);
 
                     PutInsideCar.Add(player);
@@ -958,11 +961,13 @@ namespace LSCC
                 }
 
                 spawnLoc = null;
-
+                pCount = 0;
 
                 foreach (Player player in lobby.Fugitives)
                 {
-                    spawnLoc = Spawns.FirstOrDefault(a => a.spawnTeam == 0);
+                    spawnLoc = new MapSpawn();
+
+                    spawnLoc = Spawns.First(a => a.spawnTeam == 0);
 
                     Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
 
@@ -1018,21 +1023,21 @@ namespace LSCC
                     PutInsideCar.Add(_tempPlayer);
                     iteratedAlready.Add(_tempPlayer);
 
-                    spawnLoc = null;
-                    foreach (MapSpawn spawn in Spawns.Where(a => a.spawnTeam == 0))
-                    {
-                        if (!UsedSpawns.Contains(spawn.SQL_ID))
-                        {
-                            spawnLoc = spawn;
-                            UsedSpawns.Add(spawn.SQL_ID);
-                        }
-                    }
+                    spawnLoc = Spawns.First(a => a.spawnTeam == 0 && !UsedSpawns.Contains(a.SQL_ID));
 
-                    if (spawnLoc == null)
+                    if ((spawnLoc == null) == false)
+                    {
+                        UsedSpawns.Add(spawnLoc.SQL_ID);
+                    }
+                    else
                     {
                         pCount++;
-                        spawnLoc = Spawns.FirstOrDefault(a => a.spawnTeam == 0);
-                        spawnLoc.spawnZ += (pCount * 5); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
+                        spawnLoc = new MapSpawn();
+
+                        spawnLoc = Spawns.First(a => a.spawnTeam == 0);
+
+                        spawnLoc.spawnZ += (pCount * 3); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
+                        spawnLoc.spawnX += (pCount * 2);
                     }
 
                     Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
@@ -1063,6 +1068,11 @@ namespace LSCC
                     lobby.Vehicles.Add(pVehicle);
 
                     _tempPlayer.SetIntoVehicle(pVehicle, 0);
+
+                    NAPI.Task.Run(() =>
+                    {
+                        pVehicle.Position = vecSpawn;
+                    }, 1000);
 
                     EPlayer.Freeze(_tempPlayer, true);
 
@@ -1119,18 +1129,17 @@ namespace LSCC
                             p.TriggerEvent("StartChaseTimer", 0, Settings.GameRunTime, lobby.CollisionCounter);
                         }
                     }
-
-                    NAPI.Task.Run(() =>
-                    {
-                        foreach (Tuple<Player, Vehicle, int> data in playerVehicle)
-                        {
-                            if (data.Item1.IsNull || data.Item1 == null) continue;
-                            data.Item1.TriggerEvent("ToggleChaseCollisions", false);
-                        } // Toggle Collisions OFF again. smh they dont activate sometimes.
-
-                    }, delayTime: 3000);
-
                 }, delayTime: 3000);
+
+                NAPI.Task.Run(() =>
+                {
+                    foreach (Tuple<Player, Vehicle, int> data in playerVehicle)
+                    {
+                        if (data.Item1.IsNull || data.Item1 == null) continue;
+                        data.Item1.TriggerEvent("ToggleChaseCollisions", false);
+                    } // Toggle Collisions OFF again. smh they dont activate sometimes.
+
+                }, delayTime: 10000);
 
 
                 lobby.gameStatus = 1;

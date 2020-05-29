@@ -27,6 +27,7 @@ let playerBlips = [];
 let specCam = null;
 let specState = false;
 let specTarget = null;
+mp.voiceChat.muted = true;
 
 mp.events.add("onOpenChatbox", (toggle) =>
 {
@@ -84,9 +85,24 @@ mp.keys.bind(
 mp.keys.bind(0x5A, false, function() {
     if(chatStatus == false)
     {
-        mp.events.callRemote("OnScriptedKeyPress", 0x5A);
+        mp.events.callRemote("OnScriptedKeyPress", 0x5A, true);
     }
 });
+
+
+mp.keys.bind(0x4E, false, function() {
+	mp.events.callRemote("OnScriptedKeyPress", 0x4E, false);
+    mp.voiceChat.muted = true;
+});
+
+mp.keys.bind(0x31, true, function() {
+	if(!chatStatus && mp.voiceChat.muted == false && 
+		!(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false)) 
+	{
+		mp.events.callRemote("OnScriptedKeyPress", 0x31, true);
+	}
+});
+
 
 function createCam(x, y, z, rx, ry, rz, viewangle) {
     camera = mp.cameras.new("Cam", { x, y, z }, { x: rx, y: ry, z: rz }, viewangle);
@@ -146,6 +162,23 @@ function UpdateTimer()
         if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
         {
             mp.events.callRemote("UpdateStreamData");
+
+            if (specState == true && specCam != null && specTarget != null) {
+
+                if (mp.players.exists(specTarget)) 
+                {
+                    var targetPos = new mp.Vector3(specTarget.position.x, specTarget.position.y, specTarget.position.z);
+                    targetPos.z -= 35;
+
+                    mp.players.local.position = targetPos;
+                }
+                else 
+                {
+                    specCam.setActive(false); 
+                    specState = false;
+                    mp.events.callLocal("StopSpectating");
+                }
+            }
 
             if(mp.players.local.getVariable("InLobby") == -4)
             {
@@ -260,39 +293,67 @@ function UpdateTimer()
 
     mp.players.forEach(target => {
 
-        if(target.dimension == mp.players.local.dimension && target.getVariable("VisibleBlip") !== undefined && target.getVariable("VisibleBlip") == true)
+        if(target.dimension == mp.players.local.dimension && target != mp.players.local)
         {
-            var blipColor = 45;
-            var blipId = 1;
-            
-            if(target.getVariable("Team") == 0) blipColor = 75;
-            else if(target.getVariable("Team") == 1) blipColor = 3;
-
-            if(target.getVariable("InLobby") == -3) blipColor = 15;
-            if(target.getVariable("InLobby") == -4) blipColor = 73;
-            if(target.getVariable("InDM") != -1) blipColor = 39;
-
-            if(target.isInAnyVehicle(false)) blipId = 724;
-
-            let position = target.position;
-            if(position.x == 0 && position.z == 0 && position.z == 0)
+            if(target.handle !== 0)
             {
-                position.x = target.getVariable("UnstreamedX");
-                position.y = target.getVariable("UnstreamedY");
-                position.z = target.getVariable("UnstreamedZ");
+                if(!target.voice3d) target.voice3d = true;
 
-                if(target.getVariable("UnstreamedState") == 1) blipId = 724;
+                const playerPos = target.position;
+                var localPos = mp.players.local.position;
+                let dist = mp.game.system.vdist(playerPos.x, playerPos.y, playerPos.z, localPos.x, localPos.y, localPos.z);
+                
+                if(dist > MaxRange)
+                {
+                    if(target.getVariable("VoiceMode") == 1)
+                    {
+                        target.voiceVolume = 0.4;
+                    }
+                    else
+                    {
+                        target.voiceVolume = 0.0;
+                    }
+                }
+                else
+                {
+                    target.voiceVolume = 1 - (dist / MaxRange);
+                }
             }
 
-            var targetBlip = mp.blips.new(blipId, position,
+            if (target.getVariable("VisibleBlip") !== undefined && target.getVariable("VisibleBlip") == true)
             {
-                name: target.name,
-                color: blipColor,
-                shortRange: false,
-                dimension: mp.players.local.dimension
-            });
+                var blipColor = 45;
+                var blipId = 1;
+                
+                if(target.getVariable("Team") == 0) blipColor = 75;
+                else if(target.getVariable("Team") == 1) blipColor = 3;
 
-            playerBlips.push(targetBlip.id);
+                if(target.getVariable("InLobby") == -3) blipColor = 15;
+                if(target.getVariable("InLobby") == -4) blipColor = 73;
+                if(target.getVariable("InDM") != -1) blipColor = 39;
+
+                if(target.isInAnyVehicle(false)) blipId = 724;
+
+                var position = target.position;
+                if(position.x == 0 && position.z == 0 && position.z == 0)
+                {
+                    position.x = target.getVariable("UnstreamedX");
+                    position.y = target.getVariable("UnstreamedY");
+                    position.z = target.getVariable("UnstreamedZ");
+
+                    if(target.getVariable("UnstreamedState") == 1) blipId = 724;
+                }
+
+                var targetBlip = mp.blips.new(blipId, position,
+                {
+                    name: target.name,
+                    color: blipColor,
+                    shortRange: false,
+                    dimension: mp.players.local.dimension
+                });
+
+                playerBlips.push(targetBlip.id);
+            }
         }
     });
     return;
@@ -569,7 +630,7 @@ mp.events.add(
 
             if(derbyText == null)
             {
-                derbyText = new timerBarLib.TimerBar("MOST TIME:", false);
+                derbyText = new timerBarLib.TimerBar(" ", false);
                 derbyText.text = "N/A";
                 derbyText.textColor = 109; // HUD_COLOUR_GOLD
                 derbyText.usePlayerStyle = true;

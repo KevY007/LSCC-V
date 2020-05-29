@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Reflection.Metadata.Ecma335;
 
 namespace LSCC
 {
@@ -65,7 +66,7 @@ namespace LSCC
         }
 
         [RemoteEvent("OnScriptedKeyPress")]
-        public void OnScriptedKeyPress(Player player, int keyId)
+        public void OnScriptedKeyPress(Player player, int keyId, bool keyState) // keyState == true? Down
         {
             if(keyId == 0x5A)
             {
@@ -73,6 +74,88 @@ namespace LSCC
                 if(lobby != null)
                 {
                     if(lobby.Cops.Contains(player)) LSCC.Commands.cmd_gps(player);
+                }
+            }
+
+            if(keyId == 0x31)
+            {
+                int voiceMode = player.GetSharedData<int>("VoiceMode");
+                voiceMode++;
+
+                if (voiceMode >= 3) voiceMode = 0;
+
+                switch(voiceMode)
+                {
+                    case 0:
+                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Nearby (50m)");
+                        break;
+                    case 1:
+                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Team Chat");
+                        break;
+                    case 2:
+                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Disabled");
+                        break;
+                }
+
+                player.SetSharedData("VoiceMode", voiceMode);
+            }
+
+            if(keyId == 0x4E)
+            {
+                if(keyState)
+                {
+                    // add listeners
+
+                    List<Player> listeners = new List<Player>();
+                    if(player.GetSharedData<int>("VoiceMode") == 0)
+                    {
+                        listeners.AddRange(RAGE.Entities.Players.All.Where(t => t.Dimension == player.Dimension &&
+                            Vector3.Distance(t.Position, player.Position) <= 50.0));
+                    }
+                    else if(player.GetSharedData<int>("VoiceMode") == 1)
+                    {
+                        LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+
+                        if (lobby != null)
+                        {
+                            if (lobby.Cops.Contains(player))
+                            {
+                                listeners.AddRange(lobby.Cops);
+                            }
+                            else if(lobby.Fugitives.Contains(player))
+                            {
+                                listeners.AddRange(lobby.Fugitives);
+                            }
+                        }
+                    }
+                    else if (player.GetSharedData<int>("VoiceMode") == 2)
+                    {
+                        // Disabled voice. Nah, no listeners for you.
+                    }
+
+                    foreach (Player t in listeners)
+                    {
+                        if (t.HasData("BlockList"))
+                        {
+                            List<ushort> blockList = t.GetData<List<ushort>>("BlockList");
+                            if (blockList.Contains(player.Id))
+                            {
+                                continue;
+                            }
+                        }
+
+                        if (t.GetSharedData<int>("VoiceMode") == 2) continue;
+
+                        player.EnableVoiceTo(t);
+                    }
+                }
+                else
+                {
+                    // remove all listeners
+                    foreach (Player t in RAGE.Entities.Players.All)
+                    {
+                        player.DisableVoiceTo(t);
+                    }
                 }
             }
             return;
@@ -326,9 +409,11 @@ namespace LSCC
             {
                 Random rand = new Random();
                 Vector3 SpawnArea = Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)];
+                if (player.GetSharedData<int>("InLobby") == -4) SpawnArea = ((Vector3)Settings.DerbySpawns[0, 0]).Around(30.0f);
+     
                 NAPI.Player.SpawnPlayer(player, SpawnArea);
 
-            }, delayTime: 4000);
+            }, delayTime: 3000);
         }
 
         [ServerEvent(Event.VehicleDeath)]
@@ -787,35 +872,6 @@ namespace LSCC
             }
         }
 
-        [RemoteEvent("AddVoiceListener")]
-        public void AddVoiceListener(Player player, Player target)
-        {
-            if(target != null && !target.IsNull)
-            {
-                if (target.HasData("BlockList"))
-                {
-                    List<ushort> blockList = target.GetData<List<ushort>>("BlockList");
-                    if (blockList.Contains(player.Id))
-                    {
-                        player.DisableVoiceTo(target);
-                        return;
-                    }
-                }
-
-                if (player.HasData("BlockList"))
-                {
-                    List<ushort> blockList = player.GetData<List<ushort>>("BlockList");
-                    if (blockList.Contains(target.Id))
-                    {
-                        target.DisableVoiceTo(player);
-                        return;
-                    }
-                }
-
-                player.EnableVoiceTo(target);
-            }
-        }
-
         [RemoteEvent("OnPlayerRegisterAttempt")]
         public static void OnPlayerRegisterAttempt(Player player, string email, string username, string password, string confirmpass)
         {
@@ -963,6 +1019,7 @@ namespace LSCC
         [ServerEvent(Event.PlayerSpawn)]
         public static void OnPlayerSpawn(Player player)
         {
+            player.TriggerEvent("HideChaseTimer");
             player.TriggerEvent("SetTimeWeather", 12, 0, 0, -1);
 
             if (!EPlayer.LoggedIn(player))
