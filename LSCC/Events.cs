@@ -66,7 +66,7 @@ namespace LSCC
         }
 
         [RemoteEvent("OnScriptedKeyPress")]
-        public void OnScriptedKeyPress(Player player, int keyId, bool keyState) // keyState == true? Down
+        public static void OnScriptedKeyPress(Player player, int keyId, bool keyState) // keyState == true? Down
         {
             if(keyId == 0x5A)
             {
@@ -77,7 +77,7 @@ namespace LSCC
                 }
             }
 
-            if(keyId == 0x31)
+            if(keyId == 0x09)
             {
                 int voiceMode = player.GetSharedData<int>("VoiceMode");
                 voiceMode++;

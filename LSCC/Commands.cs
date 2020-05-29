@@ -554,6 +554,13 @@ namespace LSCC
             }
         }
 
+        [Command("voicemode")]
+        public void cmd_voicemode(Player player)
+        {
+            Events.OnScriptedKeyPress(player, 0x09, true);
+            return;
+        }
+
         [Command("voiceblock", GreedyArg = true)]
         public void cmd_vblock(Player player, Player target)
         {
@@ -1052,8 +1059,8 @@ namespace LSCC
             player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats");
-            player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock (Switch Modes with N+1)");
-            player.SendChatMessage("!{#5FBCAC}[Keys]: Voice: N | GPS: Z | Scoreboard: O | Rapple: X | Switch Voice Mode: N+1");
+            player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode");
+            player.SendChatMessage("!{#5FBCAC}[Keys]: Voice: N | GPS: Z | Scoreboard: O | Rapple: X | Switch Voice Mode: N+TAB");
             player.SendChatMessage("!{#61A9FA}[Cop]: /gps");
             player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do");
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /freeroam /veh /dm /dmarenas /derby");

@@ -95,11 +95,11 @@ mp.keys.bind(0x4E, false, function() {
     mp.voiceChat.muted = true;
 });
 
-mp.keys.bind(0x31, true, function() {
+mp.keys.bind(0x09, true, function() {
 	if(!chatStatus && mp.voiceChat.muted == false && 
 		!(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false)) 
 	{
-		mp.events.callRemote("OnScriptedKeyPress", 0x31, true);
+		mp.events.callRemote("OnScriptedKeyPress", 0x09, true);
 	}
 });
 
