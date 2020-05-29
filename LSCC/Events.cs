@@ -1182,7 +1182,6 @@ namespace LSCC
 
                 player.Dimension = 100 + Convert.ToUInt32(player.GetSharedData<int>("InLobby"));
                         
-                LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
                 if (lobby != null)
                 {
                     player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
