@@ -4,6 +4,9 @@ const height = 0.0065;
 const border = 0.001;
 const defaultcolor = [255,255,255,255];
 
+let timerValue = Date.now();
+let timerCount = 0;
+
 let showHPStatus = 0;
 
 mp.nametags.enabled = false;
@@ -33,6 +36,13 @@ mp.events.add('render', (nametags) => {
     const graphics = mp.game.graphics;
     const screenRes = graphics.getScreenResolution(0, 0);
 
+    if(Date.now() - timerValue >= 1000)
+    {
+        timerValue = 0;
+        timerCount++;
+        if(timerCount >= 3) timerCount = 0;
+    }
+
     if(mp.players.local.getVariable("pLogged") == false) return;
 	
     nametags.forEach(nametag => {
@@ -59,13 +69,18 @@ mp.events.add('render', (nametags) => {
                 });
             }
 
-            if(player.getVariable("IsTyping") == true)
+            if(player.getVariable("IsTyping") == true || player.isVoiceActive == true)
             {
-                mp.game.graphics.drawText("(...)", [x, y - 0.055],
+                var typingStr = "...";
+                if(timerCount == 0) typingStr = ".";
+                else if(timerCount == 1) typingStr = "..";
+                else if(timerCount == 2) typingStr = "...";
+
+                mp.game.graphics.drawText(typingStr, [x, y - 0.055],
                 {
                     font: 0,
-                    color: [161, 161, 161, 192],
-                    scale: [0.3, 0.3],
+                    color: [211, 240, 48, 192],
+                    scale: [0.335, 0.335],
                     outline: true
                 });
             }

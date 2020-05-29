@@ -111,8 +111,19 @@ mp.events.add("render", () => {
                 {
                     mp.game.graphics.drawRect(minimap.rightX + 0.055, minimap.topY + 0.125, 0.10, 0.10, 0, 0, 0, 150);
                 }
+
+                let voiceString = "Voice: Disabled";
                 
-                drawText(mp.voiceChat.muted ? "Voice: Standby" : "Voice: Speaking", [minimap.rightX + 0.0085, minimap.bottomY - 0.095], 4, [63, 135, 240, 255], 0.50);
+                if(mp.players.local.getVariable("VoiceMode") == 0)
+                {
+                    voiceString = mp.voiceChat.muted ? "Voice: Standby" : "Voice: Speaking";
+                }
+                else if(mp.players.local.getVariable("VoiceMode") == 1)
+                {
+                    voiceString = mp.voiceChat.muted ? "Voice: Standby (Team)" : "Voice: Speaking (Team)";
+                }
+                
+                drawText(voiceString, [minimap.rightX + 0.0085, minimap.bottomY - 0.095], 4, [63, 135, 240, 255], 0.50);
                 drawText(streetName, [minimap.rightX + 0.0085, minimap.bottomY - 0.065], 4, [255, 255, 255, 255], 0.425);
                 drawText(zoneName, [minimap.rightX + 0.0085, minimap.bottomY - 0.035], 4, [255, 255, 255, 255], 0.45);
 

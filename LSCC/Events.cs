@@ -38,8 +38,8 @@ namespace LSCC
             {
                 if (player.HasData("BlockList"))
                 {
-                    List<ushort> blockList = pl.GetData<List<ushort>>("BlockList");
-                    blockList.Remove(player.Id);
+                    List<Player> blockList = pl.GetData<List<Player>>("BlockList");
+                    blockList.Remove(player);
                 }
             }
                 
@@ -133,12 +133,14 @@ namespace LSCC
                         // Disabled voice. Nah, no listeners for you.
                     }
 
+                    listeners.RemoveAll(p => p.Id == player.Id); // Remove ALL instances of local player.
+
                     foreach (Player t in listeners)
                     {
                         if (t.HasData("BlockList"))
                         {
-                            List<ushort> blockList = t.GetData<List<ushort>>("BlockList");
-                            if (blockList.Contains(player.Id))
+                            List<Player> blockList = t.GetData<List<Player>>("BlockList");
+                            if (blockList.Contains(player))
                             {
                                 continue;
                             }
@@ -1019,6 +1021,15 @@ namespace LSCC
         [ServerEvent(Event.PlayerSpawn)]
         public static void OnPlayerSpawn(Player player)
         {
+            player.SetSharedData("Team", -1);
+
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (lobby != null)
+            {
+                if (lobby.Cops.Contains(player)) player.SetSharedData("Team", 1);
+                else if (lobby.Fugitives.Contains(player)) player.SetSharedData("Team", 0);
+            }
+
             player.TriggerEvent("HideChaseTimer");
             player.TriggerEvent("SetTimeWeather", 12, 0, 0, -1);
 

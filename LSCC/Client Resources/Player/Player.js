@@ -28,6 +28,7 @@ let specCam = null;
 let specState = false;
 let specTarget = null;
 mp.voiceChat.muted = true;
+let MaxVoiceRange = 50;
 
 mp.events.add("onOpenChatbox", (toggle) =>
 {
@@ -93,6 +94,15 @@ mp.keys.bind(0x5A, false, function() {
 mp.keys.bind(0x4E, false, function() {
 	mp.events.callRemote("OnScriptedKeyPress", 0x4E, false);
     mp.voiceChat.muted = true;
+});
+
+mp.keys.bind(0x4E, true, function() {
+	if(!chatStatus && 
+		!(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false)) 
+	{
+		mp.voiceChat.muted = false;
+		mp.events.callRemote("OnScriptedKeyPress", 0x4E, true);
+	}
 });
 
 mp.keys.bind(0x09, true, function() {
@@ -303,7 +313,7 @@ function UpdateTimer()
                 var localPos = mp.players.local.position;
                 let dist = mp.game.system.vdist(playerPos.x, playerPos.y, playerPos.z, localPos.x, localPos.y, localPos.z);
                 
-                if(dist > MaxRange)
+                if(dist > MaxVoiceRange)
                 {
                     if(target.getVariable("VoiceMode") == 1)
                     {
@@ -316,7 +326,7 @@ function UpdateTimer()
                 }
                 else
                 {
-                    target.voiceVolume = 1 - (dist / MaxRange);
+                    target.voiceVolume = 1 - (dist / MaxVoiceRange);
                 }
             }
 

@@ -564,25 +564,24 @@ namespace LSCC
         [Command("voiceblock", GreedyArg = true)]
         public void cmd_vblock(Player player, Player target)
         {
-            List<ushort> blockList = new List<ushort>();
+            List<Player> blockList = new List<Player>();
             if (player.HasData("BlockList"))
             {
-                blockList = player.GetData<List<ushort>>("BlockList");
+                blockList.AddRange(player.GetData<List<Player>>("BlockList"));
             }
 
-            if(!blockList.Contains(target.Id))
+            if(!blockList.Contains(target))
             {
-                blockList.Add(target.Id);
+                blockList.Add(target);
                 player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have muted {target.Name} on voice chat, use this command again to unmute them.");
             }
             else
             {
-                blockList.Remove(target.Id);
+                blockList.Remove(target);
                 player.SendChatMessage($"!{{#FF6347}}[#] !{{#FFFFFF}}You have unmuted {target.Name} on voice chat.");
             }
 
             player.SetData("BlockList", blockList);
-            
 
             return;
         }
