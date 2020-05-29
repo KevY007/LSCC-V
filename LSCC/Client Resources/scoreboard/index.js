@@ -23,7 +23,6 @@ function updatePlayer(player)
     else if(player.getVariable("InLobby") == -4) lobbystr = "DERBY";
     else if(player.getVariable("InLobby") == -5) lobbystr = "CHAREDIT";
     else if(player.getVariable("InLobby") > -1) lobbystr = player.getVariable("InLobby").toString();
-    if(player.getVariable("InDM") != -1) lobbystr = player.getVariable("InLobby").toString() + "/DM";
     
     browser.execute('updateUser("' + lobbystr + '", "' + player.name + '", "' + player.getVariable("Level") + '", "' + player.getVariable("Ping") +
     '", ' + player.getVariable("Color_R") + ', ' + player.getVariable("Color_G") + ', ' + player.getVariable("Color_B") + ')');

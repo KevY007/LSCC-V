@@ -38,7 +38,7 @@ mp.events.add('render', (nametags) => {
 
     if(Date.now() - timerValue >= 1000)
     {
-        timerValue = 0;
+        timerValue = Date.now();
         timerCount++;
         if(timerCount >= 3) timerCount = 0;
     }
