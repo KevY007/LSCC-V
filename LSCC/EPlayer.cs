@@ -174,15 +174,29 @@ namespace LSCC
                 NAPI.Util.ConsoleOutput($"{player.Name} has no char, applying default");
             }
 
-            player.SetSkin(PedHash.Jesus01);
+            player.SetAccessories(0, 0, 0);
+            player.SetAccessories(1, 0, 0);
+            player.SetAccessories(2, 0, 0);
+
+            for (int i = 0; i < 12; i++)
+            {
+                Decoration deco;
+                deco.Collection = 0;
+                deco.Overlay = 0;
+
+                player.SetDecoration(deco);
+            }
+           
 
             player.ClearAccessory(0);
             player.ClearAccessory(1);
             player.ClearAccessory(2);
 
             player.ClearDecorations();
-            
-            if(playerChar.Gender == 0) player.SetSkin(PedHash.FreemodeMale01);
+
+            player.TriggerEvent("char_ResetItems");
+
+            if (playerChar.Gender == 0) player.SetSkin(PedHash.FreemodeMale01);
             else player.SetSkin(PedHash.FreemodeFemale01);
 
             HeadBlend a;
@@ -286,6 +300,7 @@ namespace LSCC
             player.ResetData("AccountHandle");
             player.SetData("LoggedIn", false);
             player.SetData("TeamShotWarning", 0);
+            player.SetData("UnfairKillSpawn", false);
             player.SetData("InnocentShotWarning", 0);
             player.SetSharedData("pLogged", false);
             player.SetData("AutoJoin", true);

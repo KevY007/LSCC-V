@@ -911,7 +911,7 @@ namespace LSCC
                             col1 = 111;
                             break;
                         case 1:
-                            carName = "police4";
+                            carName = "polbufac2";
                             col1 = 8;
                             break;
                         case 2:
@@ -919,14 +919,11 @@ namespace LSCC
                             col1 = 111;
                             break;
                         case 3:
-                            carName = "police2";
+                            carName = "polbufac";
                             col1 = 111;
                             break;
                         case 4:
-                            carName = "fbi";
-                            break;
-                        case 5:
-                            carName = "sheriff";
+                            carName = "fbibufac";
                             break;
                     }
 

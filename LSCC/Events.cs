@@ -268,22 +268,32 @@ namespace LSCC
                         });
 
                         int warnings = 0;
-                        if (player.HasData("InnocentShotWarning")) warnings = player.GetData<int>("InnocentShotWarning");
+                        if (killer.HasData("InnocentShotWarning")) warnings = killer.GetData<int>("InnocentShotWarning");
 
                         warnings += 5;
-                        player.SetData<int>("InnocentShotWarning", warnings);
+                        killer.SetData<int>("InnocentShotWarning", warnings);
                         killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Repeated attacking of fugitive's that haven't shot will result in a jail.");
+                        
                         player.SetData("UnfairKillSpawn", true);
 
-                        NAPI.Task.Run(() =>
+                        Vehicle pVeh = null;
+                        int seat = 0;
+                        if(player.IsInVehicle)
                         {
-                            NAPI.Player.SpawnPlayer(player, player.Position);
+                            pVeh = player.Vehicle;
+                            seat = player.VehicleSeat;
+                        }
 
-                            player.Armor = 0;
-                            player.Health = 100;
-                            player.SendChatMessage($"!{{FF6347}}[!] !{{#FFFFFF}}You have been put back in the game as you were killed unfairly.");
+                        NAPI.Player.SpawnPlayer(player, player.Position);
 
-                        }, delayTime: 1000);
+                        player.Armor = 0;
+                        player.Health = 100;
+                        player.SendChatMessage($"!{{FF6347}}[!] !{{#FFFFFF}}You have been put back in the game as you were killed unfairly.");
+
+                        if(pVeh != null)
+                        {
+                            player.SetIntoVehicle(pVeh, seat);
+                        }
 
                         return;
                     }
@@ -299,22 +309,33 @@ namespace LSCC
                     });
 
                     int warnings = 0;
-                    if (player.HasData("TeamShotWarning")) warnings = player.GetData<int>("TeamShotWarning");
+                    if (killer.HasData("TeamShotWarning")) warnings = killer.GetData<int>("TeamShotWarning");
 
                     warnings += 5;
-                    player.SetData<int>("TeamShotWarning", warnings);
+                    killer.SetData<int>("TeamShotWarning", warnings);
+
                     killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Repeated team killing will result in a jail.");
+
                     player.SetData("UnfairKillSpawn", true);
 
-                    NAPI.Task.Run(() =>
+                    Vehicle pVeh = null;
+                    int seat = 0;
+                    if (player.IsInVehicle)
                     {
-                        NAPI.Player.SpawnPlayer(player, player.Position);
+                        pVeh = player.Vehicle;
+                        seat = player.VehicleSeat;
+                    }
 
-                        player.Armor = 0;
-                        player.Health = 100;
-                        player.SendChatMessage($"!{{FF6347}}[!] !{{#FFFFFF}}You have been put back in the game as you were killed unfairly.");
+                    NAPI.Player.SpawnPlayer(player, player.Position);
 
-                    }, delayTime: 1000);
+                    player.Armor = 0;
+                    player.Health = 100;
+                    player.SendChatMessage($"!{{FF6347}}[!] !{{#FFFFFF}}You have been put back in the game as you were killed unfairly.");
+
+                    if (pVeh != null)
+                    {
+                        player.SetIntoVehicle(pVeh, seat);
+                    }
 
                     return;
                 }
@@ -1077,9 +1098,9 @@ namespace LSCC
             }
 
 
-            if (player.HasData("UnfairKillSpawn"))
+            if (player.GetData<bool>("UnfairKillSpawn") == true)
             {
-                player.ResetData("UnfairKillSpawn");
+                player.SetData("UnfairKillSpawn", false);
                 return;
             }
 

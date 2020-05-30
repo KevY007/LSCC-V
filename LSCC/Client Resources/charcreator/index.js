@@ -225,6 +225,10 @@ cancelItem.BackColor = new Color(213, 0, 0);
 cancelItem.HighlightedBackColor = new Color(229, 57, 53);
 creatorMainMenu.AddItem(cancelItem);
 
+mp.events.add("char_ResetItems", () => {
+    localPlayer.setDefaultComponentVariation();
+});
+
 mp.events.add("creator_Change", () => {
     localPlayer.clearTasksImmediately();
     applyCreatorOutfit();
