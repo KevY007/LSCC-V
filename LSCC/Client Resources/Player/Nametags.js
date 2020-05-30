@@ -11,6 +11,51 @@ let showHPStatus = 0;
 
 mp.nametags.enabled = false;
 
+function isPlayerInLOS(target) {
+    if(target === undefined) return false;
+
+    const camera = mp.cameras.new("gameplay");
+
+    if(camera === undefined)
+    {
+        camera = mp.cameras.new("default");
+        if(camera === undefined)
+        {
+            return false;
+        }
+    }
+
+    let position = camera.getCoord();
+
+    let targetPos = target.getBoneCoords(12844, 0.0, 0, 0.25);
+
+    let result = mp.raycasting.testPointToPoint(position, targetPos, [1, 16]); // now test point to point
+    
+    if(result === undefined)
+    {
+        return true;
+    }
+    else if(result !== undefined)
+    {
+        if(result.entity !== undefined) // Entity is not undefined and might be ped or veh.
+        {
+            if(typeof result.entity.isAPed === 'function' && result.entity.isAPed())
+            {
+                return true;
+            }
+            if(typeof result.entity.isAVehicle === 'function' && result.entity.isAVehicle())
+            {
+                return true;
+            }
+        }
+        else if(result.entity === undefined) // There's no entity, can be a object or building anything.
+        {
+            return false;
+        }
+    }
+    return false;
+}
+
 mp.events.add('playerNametagSet', (target, r, g, b, a, armour) => {
     target.col = true;
     target.col_r = r;
@@ -48,10 +93,11 @@ mp.events.add('render', (nametags) => {
     nametags.forEach(nametag => {
         let [player, x, y, distance] = nametag;
         
-        if(distance <= maxDistance) {	   
+        if(distance <= maxDistance && isPlayerInLOS(player) == true) {	   
+
             let scale = (distance / maxDistance);
             if(scale < 0.6) scale = 0.6;
-			
+
             var health = player.getHealth() / 100;
 		   
             var armour = player.getArmour() / 100;
@@ -79,7 +125,7 @@ mp.events.add('render', (nametags) => {
                 mp.game.graphics.drawText(typingStr, [x, y - 0.055],
                 {
                     font: 0,
-                    color: [211, 240, 48, 192],
+                    color: [228, 240, 48, 228],
                     scale: [0.335, 0.335],
                     outline: true
                 });

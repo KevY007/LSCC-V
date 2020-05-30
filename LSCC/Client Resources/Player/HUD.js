@@ -10,6 +10,7 @@ let streetName = null;
 let zoneName = null;
 let minimap = {};
 let showHud = true;
+let lastSpeed = 0;
 
 // https://github.com/glitchdetector/fivem-minimap-anchor
 function getMinimapAnchor() {
@@ -94,7 +95,7 @@ mp.events.add("render", () => {
     {
         if (currentJailTime >= 1)
         {
-            drawText(`~y~Jailed: ~w~${TimeFormat(currentJailTime)}`, [minimap.rightX + 0.0385, minimap.bottomY - 0.130], 4, [204, 204, 204, 255], 1.3);
+            drawText(`~y~JAILED: ~w~${TimeFormat(currentJailTime)}`, [minimap.rightX + 0.0385, minimap.bottomY - 0.130], 4, [204, 204, 204, 255], 1.3);
         }
         else
         {
@@ -103,29 +104,34 @@ mp.events.add("render", () => {
                 let vehicle = mp.players.local.vehicle;
                 if (vehicle) 
                 {
-                    mp.game.graphics.drawRect(minimap.rightX + 0.055, minimap.topY + 0.110, 0.10, 0.13, 0, 0, 0, 150);
+                    mp.game.graphics.drawRect(minimap.rightX + 0.0875, minimap.topY + 0.110, 0.1625, 0.13, 0, 0, 0, 150);
 
-                    drawText(`${(vehicle.getSpeed() * 3.6).toFixed(0)} KM/H`, [minimap.rightX + 0.0085, minimap.bottomY - 0.130], 4, [204, 204, 204, 255], 0.7);
+                    if((vehicle.getSpeed() * 3.6).toFixed(0) % 2 == 0 || (vehicle.getSpeed() * 3.6).toFixed(0) == 0)
+                    {
+                        lastSpeed = (vehicle.getSpeed() * 3.6).toFixed(0);
+                    }
+
+                    drawText(`~y~${lastSpeed} ~w~KM/H`, [minimap.rightX + 0.0085, minimap.bottomY - 0.130], 4, [204, 204, 204, 255], 0.7);
                 }
                 else
                 {
-                    mp.game.graphics.drawRect(minimap.rightX + 0.055, minimap.topY + 0.125, 0.10, 0.10, 0, 0, 0, 150);
+                    mp.game.graphics.drawRect(minimap.rightX + 0.0875, minimap.topY + 0.125, 0.1625, 0.10, 0, 0, 0, 150);
                 }
 
-                let voiceString = "Voice: Disabled";
+                let voiceString = "Voice: ~r~Disabled";
                 
                 if(mp.players.local.getVariable("VoiceMode") == 0)
                 {
-                    voiceString = mp.voiceChat.muted ? "Voice: Standby" : "Voice: Speaking";
+                    voiceString = mp.voiceChat.muted ? "Voice: ~w~Standby" : "Voice: ~g~Speaking";
                 }
                 else if(mp.players.local.getVariable("VoiceMode") == 1)
                 {
-                    voiceString = mp.voiceChat.muted ? "Voice: Standby (Team)" : "Voice: Speaking (Team)";
+                    voiceString = mp.voiceChat.muted ? "Voice: ~w~Standby (Team)" : "Voice: ~g~Speaking (Team)";
                 }
                 
                 drawText(voiceString, [minimap.rightX + 0.0085, minimap.bottomY - 0.095], 4, [63, 135, 240, 255], 0.50);
-                drawText(streetName, [minimap.rightX + 0.0085, minimap.bottomY - 0.065], 4, [255, 255, 255, 255], 0.425);
-                drawText(zoneName, [minimap.rightX + 0.0085, minimap.bottomY - 0.035], 4, [255, 255, 255, 255], 0.45);
+                drawText(streetName, [minimap.rightX + 0.0085, minimap.bottomY - 0.065], 4, [204, 204, 204, 255], 0.465);
+                drawText(zoneName, [minimap.rightX + 0.0085, minimap.bottomY - 0.035], 4, [255, 255, 255, 255], 0.48);
 
                 
             }

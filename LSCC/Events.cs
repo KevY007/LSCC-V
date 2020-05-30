@@ -955,12 +955,14 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
+            if (player.GetSharedData<int>("JailTime") <= 0) return;
+
             Account acc = EPlayer.GetAccount(player);
             acc.JailTime = currentTime;
 
             player.SetSharedData("JailTime", acc.JailTime);
 
-            if (currentTime == 0)
+            if (currentTime <= 0)
             {
                 EPlayer.Freeze(player, false);
                 EPlayer.Spawn(player);
