@@ -11,3 +11,5 @@ COPS CARS TOO SLOW, AND ADD CUSTOM COP CARS TOO (MAYBE?) https://www.gta5-mods.c
 add /cuff an arrest etc
 
 DRIVEBY WIH STUNGUN COUNTS AS SHOOTIN SOME1 WO TAG ??? (CAN'T FIX SEEMS LIKE)
+
+ADD "VISIBLE" indicator on hud
