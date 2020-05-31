@@ -422,16 +422,17 @@ function OnPlayerWeaponShot(targetPosition, targetEntity)
                 if(targetEntity.isInAnyVehicle(false) == false)
                 {
                     mp.events.callRemote("OnPlayerShotPlayer", targetPosition, targetEntity);
-                }
-                if(targetEntity.getVariable("Team") != -1)
-                {
-                    if(player.getVariable("Team") == targetEntity.getVariable("Team"))
+
+                    if(targetEntity.getVariable("Team") != -1)
                     {
-                        mp.events.callRemote("PlayerShotAtWrongPlayer", 0);
-                    }
-                    if(player.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
-                    {
-                        mp.events.callRemote("PlayerShotAtWrongPlayer", 1);
+                        if(player.getVariable("Team") == targetEntity.getVariable("Team"))
+                        {
+                            mp.events.callRemote("PlayerShotAtWrongPlayer", 0);
+                        }
+                        if(player.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
+                        {
+                            mp.events.callRemote("PlayerShotAtWrongPlayer", 1);
+                        }
                     }
                 }
             }

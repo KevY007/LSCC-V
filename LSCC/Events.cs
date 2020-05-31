@@ -825,8 +825,7 @@ namespace LSCC
         [RemoteEvent("PlayerShotAtWrongPlayer")]
         public void PlayerShootWrongPlayer(Player player, int caseid)
         {
-
-            if(caseid == 0)
+            if (caseid == 0)
             {
                 EPlayer.Freeze(player, true);
 
