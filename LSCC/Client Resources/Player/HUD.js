@@ -185,6 +185,11 @@ mp.events.add("render", () => {
                     voiceString = mp.voiceChat.muted ? "Voice: ~w~Standby (Team)" : "Voice: ~g~Speaking (Team)";
                 }
 
+                if(currentMuteTime >= 1)
+                {
+                    voiceString = `~r~Muted for ${TimeFormat(currentMuteTime)}`;
+                }
+
                 drawText(voiceString, [minimap.rightX + 0.0085, minimap.bottomY - 0.095], 4, [63, 135, 240, 255], 0.50);
                 drawText(streetName, [minimap.rightX + 0.0085, minimap.bottomY - 0.065], 4, [204, 204, 204, 255], 0.465);
                 drawText(zoneName, [minimap.rightX + 0.0085, minimap.bottomY - 0.035], 4, [255, 255, 255, 255], 0.48);

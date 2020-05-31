@@ -263,14 +263,29 @@ function UpdateTimer()
                 if(currentJailTime > 0) currentJailTime--;
                 lastJailUpdate--;
 
-                if(lastJailUpdate <= 0 || currentJailTime <= 0)
+                if(lastJailUpdate <= 0)
                 {
-                    mp.events.callRemote("RequestJailUpdate", currentJailTime);
+                    mp.events.callRemote("RequestCounterUpdate", currentJailTime, 0);
                     lastJailUpdate = 20;
                 }
             }
             else {
                 if(currentJailTime > 0) currentJailTime = 0;
+            }
+
+            if(mp.players.local.getVariable("MuteTime") >= 1)
+            {
+                if(currentMuteTime > 0) currentMuteTime--;
+                lastMuteUpdate--;
+
+                if(lastMuteUpdate <= 0)
+                {
+                    mp.events.callRemote("RequestCounterUpdate", currentMuteTime, 1);
+                    lastMuteUpdate = 20;
+                }
+            }
+            else {
+                if(currentMuteTime > 0) currentMuteTime = 0;
             }
         }
     }
@@ -446,6 +461,31 @@ mp.events.add("playerWeaponShot", OnPlayerWeaponShot);
 
 mp.events.add(
     {
+        "SetHandcuffs": (status) => {
+            if(status == true)
+            {
+                mp.players.local.clearTasksImmediately();
+                mp.players.local.setEnableHandcuffs(true);
+            }
+            else
+            {
+                mp.players.local.stopAnimation();
+                mp.players.local.setEnableHandcuffs(false);
+                mp.players.local.clearTasks();
+            }
+        },
+        "SetHandsup": (status) =>
+        {
+            if(status == true)
+            {
+                mp.players.local.taskHandsUp(-1, mp.players.local.handle, 0, false);
+            }
+            else
+            {
+                mp.players.local.stopAnimation();
+                mp.players.local.clearTasks();
+            }
+        },
         "SetDerbyCounting": (status, time) => {
             derbyTimeCur = time;
             derbyCounting = status;
@@ -527,11 +567,16 @@ mp.events.add(
         },
 
         "setToRagdoll": (time1, time2, ragdollType, p4, p5, p6) => {
+            player.clearTasksImmediately();
             player.setToRagdoll(time1, time2, ragdollType, p4, p5, p6);
         },
         "SetJailCounter": (time) => {
             currentJailTime = time;
             lastJailUpdate = 10;
+        },
+        "SetMuteCounter": (time) => {
+            currentMuteTime = time;
+            lastMuteUpdate = 10;
         },
         "ToggleChaseCollisions": (toggle) => {
             if(toggle)

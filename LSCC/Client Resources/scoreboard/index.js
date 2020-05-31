@@ -21,7 +21,7 @@ function updatePlayer(player)
     else if(player.getVariable("InLobby") == -2) lobbystr = "JAIL";
     else if(player.getVariable("InLobby") == -3) lobbystr = "FREEROAM";
     else if(player.getVariable("InLobby") == -4) lobbystr = "DERBY";
-    else if(player.getVariable("InLobby") == -5) lobbystr = "CHAREDIT";
+    else if(player.getVariable("InLobby") == -5) lobbystr = "CUSTOMIZER";
     else if(player.getVariable("InLobby") > -1) lobbystr = player.getVariable("InLobby").toString();
     
     browser.execute('updateUser("' + lobbystr + '", "' + player.name + '", "' + player.getVariable("Level") + '", "' + player.getVariable("Ping") +

@@ -104,6 +104,12 @@ namespace LSCC
             {
                 if(keyState)
                 {
+                    if (EPlayer.GetAccount(player).MuteTime > 0)
+                    {
+                        player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                        return;
+                    }
+
                     // add listeners
 
                     List<Player> listeners = new List<Player>();
@@ -210,19 +216,18 @@ namespace LSCC
         }
 
         [ServerEvent(Event.PlayerDeath)]
-        public void OnPlayerDeath(Player player, Player killer, uint reason)
+        public static void OnPlayerDeath(Player player, Player killer, uint reason)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
             player.ResetData("FreezeWeapons");
-
-            NAPI.Notification.SendNotificationToPlayer(player, $"~r~You died!", false);
 
             string reasonStr;
             if(!Main.WeaponReasons.TryGetValue(reason, out reasonStr))
             {
                 reasonStr = null;
             }
+            if (reason == 696988) reasonStr = "handcuffs";
 
             if (player.GetSharedData<int>("InLobby") == -4 && Settings.DerbyTimeLeft > 0 && Settings.DerbyTimeLeft != 180)
             {
@@ -259,7 +264,7 @@ namespace LSCC
                 {
                     EPlayer.GrantXP(killer, 1);
 
-                    if (player.GetSharedData<int>("Team") == 0 && killer.GetSharedData<int>("Team") == 1 && player.GetSharedData<bool>("HasShot") == false)
+                    if (reason != 696988 && player.GetSharedData<int>("Team") == 0 && killer.GetSharedData<int>("Team") == 1 && player.GetSharedData<bool>("HasShot") == false)
                     {
                         EPlayer.GrantXP(killer, -3);
                         RAGE.Entities.Players.All.ForEach((Player ey) =>
@@ -300,7 +305,7 @@ namespace LSCC
                 }
 
 
-                if(player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("Team") == killer.GetSharedData<int>("Team"))
+                if(reason != 696988 && player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("Team") == killer.GetSharedData<int>("Team"))
                 {
                     EPlayer.GrantXP(killer, -2);
                     RAGE.Entities.Players.All.ForEach((Player ey) =>
@@ -358,15 +363,17 @@ namespace LSCC
                         {
                             if (killer != null && !killer.IsNull && killer != player)
                             {
-                                ay.SendNotification($"Fugitive ~r~<C>{player.Name}</C> ~w~has been taken out by ~b~<C>{killer.Name}</C>~w~.");
-
                                 if (reasonStr == null)
                                 {
                                     ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name}");
                                 }
                                 else
                                 {
-                                    ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}");
+                                    if(reason == 696988)
+                                    {
+                                        ay.TriggerEvent("pushToKillFeed", $"{killer.Name} has apprehended {player.Name}.");
+                                    }
+                                    else ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}");
                                 }
                             }
                             else
@@ -457,6 +464,12 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player))
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You must be logged in to chat!");
+                return;
+            }
+
+            if (EPlayer.GetAccount(player).MuteTime > 0)
+            {
+                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
                 return;
             }
 
@@ -798,16 +811,6 @@ namespace LSCC
             return;
         }
 
-
-        [RemoteEvent("RemoveVoiceListener")]
-        public void RemoveVoiceListener(Player player, Player target)
-        {
-            if (target != null && !target.IsNull)
-            {
-                player.DisableVoiceTo(target);
-            }
-        }
-
         [RemoteEvent("GivePlayerShotTag")]
         public void PlayerRequestShotTag(Player player)
         {
@@ -971,24 +974,42 @@ namespace LSCC
             OnPlayerRegister(player, _new);
         }
 
-        [RemoteEvent("RequestJailUpdate")]
-        public void OnPlayerRequestJailUpdate(Player player, int currentTime)
+        [RemoteEvent("RequestCounterUpdate")]
+        public void OnPlayerRequestCounterUpdate(Player player, int currentTime, int type)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            if (player.GetSharedData<int>("JailTime") <= 0) return;
-
-            Account acc = EPlayer.GetAccount(player);
-            acc.JailTime = currentTime;
-
-            player.SetSharedData("JailTime", acc.JailTime);
-
-            if (currentTime <= 0)
+            if (type == 0)
             {
-                EPlayer.Freeze(player, false);
-                EPlayer.Spawn(player);
-                ContextFactory.Instance.SaveChanges();
-                player.SendChatMessage("!{#00FF33}You have been unjailed as you have served your time.");
+                if (player.GetSharedData<int>("JailTime") <= 0) return;
+
+                Account acc = EPlayer.GetAccount(player);
+                acc.JailTime = currentTime;
+
+                player.SetSharedData("JailTime", acc.JailTime);
+
+                if (currentTime <= 0)
+                {
+                    EPlayer.Freeze(player, false);
+                    EPlayer.Spawn(player);
+                    ContextFactory.Instance.SaveChanges();
+                    player.SendChatMessage("!{#00FF33}You have been unjailed as you have served your time.");
+                }
+            }
+            else if(type == 1)
+            {
+                if (player.GetSharedData<int>("MuteTime") <= 0) return;
+
+                Account acc = EPlayer.GetAccount(player);
+                acc.MuteTime = currentTime;
+
+                player.SetSharedData("MuteTime", acc.MuteTime);
+
+                if (currentTime <= 0)
+                {
+                    ContextFactory.Instance.SaveChanges();
+                    player.SendChatMessage("!{#00FF33}You have been unmuted as you have served your time.");
+                }
             }
             return;
         }
@@ -1044,6 +1065,18 @@ namespace LSCC
         [ServerEvent(Event.PlayerSpawn)]
         public static void OnPlayerSpawn(Player player)
         {
+            if (player.HasData("Handsup"))
+            {
+                player.TriggerEvent("SetHandsup", false);
+                player.ResetData("Handsup");
+            }
+
+            if(player.HasData("Cuffed"))
+            {
+                player.TriggerEvent("SetHandcuffs", false);
+                player.ResetData("Cuffed");
+            }
+
             player.SetSharedData("Team", -1);
 
             LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));

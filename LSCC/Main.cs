@@ -855,6 +855,7 @@ namespace LSCC
 
                     if (!lobby.Fugitives.Contains(player))
                     {
+                        player.ResetData("CuffingTarget");
                         lobby.Cops.Add(player);
                     }
                 }
@@ -993,7 +994,8 @@ namespace LSCC
                     player.TriggerEvent("showHPBars", 1); // Always show HP Bars.
 
                     player.SetSharedData("VisibleBlip", true);
-
+                    player.ResetData("Handsup");
+                    player.ResetData("Cuffed");
                     player.SetSharedData("Team", 0);
                 }
 

@@ -1,6 +1,9 @@
 ﻿let currentJailTime = 0;
 let lastJailUpdate = 10;
 
+let currentMuteTime = 0;
+let lastMuteUpdate = 10;
+
 require('mp-commands');
 require("./nativeui/index.js");
 require("./chat/index.js");

@@ -326,6 +326,7 @@ namespace LSCC
             player.SetSharedData("Ping", player.Ping);
             player.SetSharedData("Level", 1);
             player.SetSharedData("JailTime", 0);
+            player.SetSharedData("MuteTime", 0);
             player.SetSharedData("UnstreamedState", 0);
             player.SetSharedData("UnstreamedX", 0.0f);
             player.SetSharedData("UnstreamedY", 0.0f);
@@ -408,6 +409,25 @@ namespace LSCC
                 }
             }
         }
+
+        public static void Action(Player player, string text)
+        {
+            var msg = "!{#C3A3DB}* " + player.Name + " " + text;
+           
+            foreach (Player playa in NAPI.Player.GetPlayersInRadiusOfPlayer(40, player))
+            {
+                playa.SendChatMessage(msg);
+            }
+        }
+
+        public static void Handcuff(Player player, bool toggle)
+        {
+            player.TriggerEvent("SetHandcuffs", toggle);
+            player.SetData("Cuffed", true);
+
+            if(toggle) player.PlayAnimation("mp_arresting", "idle", 0);
+        }
+
         public static void SetColor(Player player, Color col, int armour = 0)
         {
             player.SetSharedData("Color_R", col.Red);

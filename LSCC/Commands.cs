@@ -419,6 +419,92 @@ namespace LSCC
             return;
         }
 
+        [Command("handsup")]
+        public void cmd_handsup(Player player)
+        {
+            if (player.HasData("Handsup"))
+            {
+                player.TriggerEvent("SetHandsup", false);
+            }
+            else
+            {
+                player.TriggerEvent("SetHandsup", true);
+            }
+            return;
+        }
+
+        [Command("cuff")]
+        public void cmd_cuff(Player player, Player target)
+        {
+            bool isACop = false;
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (lobby != null)
+            {
+                if (lobby.Cops.Contains(player) && lobby.gameStatus == 1 && lobby.Fugitives.Contains(target) && !target.HasData("Cuffed"))
+                {
+                    isACop = true;
+                }
+            }
+
+            if (!isACop)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a cop or the target cannot be cuffed!");
+                return;
+            }
+
+            if (player.Position.DistanceTo(target.Position) > 3.0) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near that player!"); return; }
+
+            try
+            {
+                foreach (Player cop in lobby.Cops)
+                {
+                    if (cop.HasData("CuffingTarget") && cop.GetData<Player>("CuffingTarget") == target)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The target is already being cuffed by someone!");
+                        return;
+                    }
+                }
+            }
+            catch { }
+
+            EPlayer.Action(player, $"attempts to grapple {target.Name} as they reach for their cuffs.");
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are now cuffing the target, stay close to them for 3 seconds to complete the operation.");
+
+            NAPI.Task.Run(() =>
+            {
+                if(target == null || !target.IsInstanceAlive || player == null || !player.IsInstanceAlive)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, target or you are no longer alive.");
+                    return;
+                }
+
+                LobbyData lobbye = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedData<int>("InLobby"));
+                if (lobbye != null)
+                {
+                    if (lobbye.Cops.Contains(player) && lobbye.gameStatus == 1 && lobbye.Fugitives.Contains(target) && !target.HasData("Cuffed"))
+                    {
+                        isACop = true;
+                    }
+                }
+
+                if (!isACop)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, you cannot cuff that target anymore.");
+                    return;
+                }
+
+                if (player.Position.DistanceTo(target.Position) > 3.0) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near the target!"); return; }
+
+                EPlayer.GrantXP(player, 5);
+                EPlayer.Action(player, $"has grabbed ahold of {target.Name} and slapped the handcuffs on their wrists.");
+                EPlayer.Handcuff(target, true);
+
+                Events.OnPlayerDeath(target, player, 696988); // Reason 696988 = handcuffs.
+
+            }, 3000);
+            return;
+        }
+
         [Command("givegun", GreedyArg = true)]
         public void cmd_givegun(Player player, Player target, int ammo, string wep)
         {
@@ -1100,8 +1186,8 @@ namespace LSCC
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode");
             player.SendChatMessage("!{#5FBCAC}[Keys]: Voice: N | GPS: Z | Scoreboard: O | Rapple: X | Switch Voice Mode: N+TAB");
-            player.SendChatMessage("!{#61A9FA}[Cop]: /gps");
-            player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do");
+            player.SendChatMessage("!{#61A9FA}[Cop]: /gps /cuff");
+            player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup");
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /freeroam /veh /dm /dmarenas /derby");
             player.SendChatMessage("!{#A5A8A8}[Debug]: /pos /updaterate (changes the blip updating interval)");
 
@@ -1439,6 +1525,7 @@ namespace LSCC
                 player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /set(hp/ar) /spec");
                 player.SendChatMessage("[Admin Lv 1]: /freeze /unfreeze /kick /slap /setinv(ulnerable) /specoff");
                 player.SendChatMessage("[Admin Lv 1]: /bancheck /jail /unjail /fix /sendtolobby /set(time/weather)");
+                player.SendChatMessage("[Admin Lv 1]: /mute /unmute");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
@@ -1719,6 +1806,12 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player))
                 return;
 
+            if (EPlayer.GetAccount(player).MuteTime > 0)
+            {
+                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                return;
+            }
+
             if (EPlayer.GetAccount(player).Admin < 1)
             {
                 NAPI.Chat.SendChatMessageToAll($"(( [OOC] {player.Name}: {text} ))");
@@ -1733,6 +1826,12 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player))
                 return;
+
+            if (EPlayer.GetAccount(player).MuteTime > 0)
+            {
+                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                return;
+            }
 
             if (!EPlayer.LoggedIn(target)) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target not logged in."); return; }
 
@@ -1859,20 +1958,76 @@ namespace LSCC
 
         }
 
+        [Command("mute", GreedyArg = true)]
+        public void cmd_mute(Player player, Player target, int mins, string reason)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (!EPlayer.LoggedIn(target)) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target not logged in."); return; }
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                return;
+            }
+            else
+            {
+                RAGE.Entities.Players.All.ForEach((Player playa) =>
+                {
+                    playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has muted {target.Name} for {mins} minutes, reason: {reason}.");
+                });
+
+                Account Acc = EPlayer.GetAccount(target);
+                Acc.MuteReason = reason;
+                Acc.MuteTime = mins * 60;
+                player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been muted for {mins} minutes, reason: {reason}.");
+
+                player.SetSharedData("MuteTime", Acc.MuteTime);
+                player.TriggerEvent("SetMuteCounter", Acc.MuteTime);
+            }
+
+        }
+
+        [Command("unmute", GreedyArg = true)]
+        public void cmd_unmute(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (!EPlayer.LoggedIn(target)) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target not logged in."); return; }
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                return;
+            }
+            else
+            {
+                Account acc = EPlayer.GetAccount(target);
+                if (acc.MuteTime == 0) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not muted."); return; }
+
+                acc.MuteTime = 0;
+                target.SetSharedData("MuteTime", 0);
+
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has unmuted {target.Name}.");
+            }
+
+        }
+
         [Command("me", GreedyArg = true)]
         public static void cmd_me(Player player, string text)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
+
+            if (EPlayer.GetAccount(player).MuteTime > 0)
+            {
+                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+            }
             else
             {
-                var msg = "!{#C3A3DB}* " + player.Name + " " + text;
-                var playersAround = NAPI.Player.GetPlayersInRadiusOfPlayer(40, player);
-
-                foreach (var players in playersAround)
-                {
-                    NAPI.Chat.SendChatMessageToPlayer(players, msg);
-                }
+                EPlayer.Action(player, text);
             }
         }
         [Command("do", GreedyArg = true)]
@@ -1880,6 +2035,11 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player))
                 return;
+
+            if (EPlayer.GetAccount(player).MuteTime > 0)
+            {
+                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+            }
             else
             {
                 var msg = "!{#C3A3DB}* " + text + $" (( {player.Name} ))";
