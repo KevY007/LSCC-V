@@ -419,21 +419,61 @@ namespace LSCC
             return;
         }
 
-        [Command("givegun")]
-        public void cmd_givegun(Player player, Player target, int ammo, WeaponHash wephash)
+        [Command("givegun", GreedyArg = true)]
+        public void cmd_givegun(Player player, Player target, int ammo, string wep)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 2 admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 3 admin.");
                 return;
             }
 
-            target.GiveWeapon(wephash, ammo);
 
-            player.SendChatMessage("Attempted to give the weapon.");
+            UInt64 wephash = 0;
+            bool found = false;
+            string wepname = "";
+
+            if (!UInt64.TryParse(wep, out wephash))
+            {
+                wephash = 0;
+            }
+
+            foreach (KeyValuePair<uint, string> i in Main.WeaponReasons)
+            {
+                if (wephash != 0)
+                {
+                    if (i.Key == wephash)
+                    {
+                        found = true;
+                        wepname = i.Value;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (i.Value.Contains(wep, StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        found = true;
+                        wephash = i.Key;
+                        wepname = i.Value;
+                        break;
+                    }
+                }
+            }
+
+            
+            if(found == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid weapon! Try using hashes or exact names.");
+                return;
+            }
+
+            target.GiveWeapon((WeaponHash)wephash, ammo);
+
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have given a " + wepname + " with " + ammo + " ammo to the target.");
             return;
         }
 
@@ -1911,17 +1951,31 @@ namespace LSCC
             }
             else if (action.StartsWith("clothing", StringComparison.OrdinalIgnoreCase))
             {
+                CharacterData ConvChar = new CharacterData();
+
+                try
+                {
+                    ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+                }
+                catch
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have a character created! (/char reset)");
+                    return;
+                }
+
+                if(EPlayer.GetAccount(player).Character.Length < 10 || EPlayer.GetAccount(player).Character == null)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have a character created! (/char reset)");
+                    return;
+                }
+
                 string[] args = action.Split(' ');
                 if (args.Count() > 1)
                 {
                     if (args[1].StartsWith("cop", StringComparison.OrdinalIgnoreCase))
                     {
-                        CharacterData ConvChar = new CharacterData();
-
                         try
                         {
-                            ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-
                             EPlayer.ApplyCharacter(player, ConvChar, 1);
                         }
                         catch { return; }
@@ -1931,12 +1985,8 @@ namespace LSCC
                     }
                     else if (args[1].StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
                     {
-                        CharacterData ConvChar = new CharacterData();
-
                         try
                         {
-                            ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-
                             EPlayer.ApplyCharacter(player, ConvChar, 0);
                         }
                         catch { return; }
@@ -1950,6 +2000,24 @@ namespace LSCC
             }
             else if (action.StartsWith("resetclothing", StringComparison.OrdinalIgnoreCase))
             {
+                CharacterData ConvChar = new CharacterData();
+
+                try
+                {
+                    ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+                }
+                catch
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have a character created! (/char reset)");
+                    return;
+                }
+
+                if (EPlayer.GetAccount(player).Character.Length < 10 || EPlayer.GetAccount(player).Character == null)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have a character created! (/char reset)");
+                    return;
+                }
+
                 string[] args = action.Split(' ');
                 if (args.Count() > 1)
                 {
@@ -1979,6 +2047,24 @@ namespace LSCC
             }
             else if (action.StartsWith("lobbyteam", StringComparison.OrdinalIgnoreCase))
             {
+                CharacterData ConvChar = new CharacterData();
+
+                try
+                {
+                    ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+                }
+                catch
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have a character created! (/char reset)");
+                    return;
+                }
+
+                if (EPlayer.GetAccount(player).Character.Length < 10 || EPlayer.GetAccount(player).Character == null)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have a character created! (/char reset)");
+                    return;
+                }
+
                 string[] args = action.Split(' ');
                 if (args.Count() > 1)
                 {
@@ -1995,8 +2081,6 @@ namespace LSCC
                         player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You will now spawn with fugitive clothing in lobby.");
                     }
                     else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid team, clothings can only be set for 'fugitive' or 'cop' team.");
-
-                    CharacterData ConvChar = new CharacterData();
 
                     try
                     {

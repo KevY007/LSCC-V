@@ -12,6 +12,10 @@ let minimap = {};
 let showHud = true;
 let lastSpeed = 0;
 
+var visibleTick = Date.now();
+var visibleCount = 0;
+var visibleText = "KEVYISGAY";
+
 // https://github.com/glitchdetector/fivem-minimap-anchor
 function getMinimapAnchor() {
     let sfX = 1.0 / 20.0;
@@ -91,6 +95,20 @@ mp.events.add('ToggleHud', (toggle) => {
 });
 
 mp.events.add("render", () => {
+    if(Date.now() - visibleTick >= 1000)
+    {
+        visibleTick = Date.now();
+
+        visibleCount++;
+        visibleText = "~r~~h~BLIP VISIBLE~o~!";
+
+        if(visibleCount >= 2)
+        {
+            visibleCount = 0;
+            visibleText = "~r~~h~BLIP VISIBLE";
+        }
+    }
+
     if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
     {
         if (currentJailTime >= 1)
@@ -102,9 +120,29 @@ mp.events.add("render", () => {
             if (streetName && zoneName && showHud) {
 
                 let vehicle = mp.players.local.vehicle;
+                var pX = 0.0;
+                var pY = 0.0;
+                var sX = 0.0;
+                var sY = 0.0;
+                
                 if (vehicle) 
                 {
-                    mp.game.graphics.drawRect(minimap.rightX + 0.0875, minimap.topY + 0.110, 0.1625, 0.13, 0, 0, 0, 150);
+                    if(mp.players.local.getVariable("VisibleBlip") == true)
+                    {
+                        pX = minimap.rightX + 0.0875;
+                        pY = minimap.topY + 0.100;
+                        sX = 0.165;
+                        sY = 0.15;
+
+                        drawText(visibleText, [minimap.rightX + 0.0085, minimap.bottomY - 0.152], 0, [204, 204, 204, 255], 0.40);
+                    }
+                    else
+                    {
+                        pX = minimap.rightX + 0.0875;
+                        pY = minimap.topY + 0.110;
+                        sX = 0.165;
+                        sY = 0.13;
+                    }
 
                     if((vehicle.getSpeed() * 3.6).toFixed(0) % 2 == 0 || (vehicle.getSpeed() * 3.6).toFixed(0) == 0)
                     {
@@ -115,9 +153,27 @@ mp.events.add("render", () => {
                 }
                 else
                 {
-                    mp.game.graphics.drawRect(minimap.rightX + 0.0875, minimap.topY + 0.125, 0.1625, 0.10, 0, 0, 0, 150);
+                    if(mp.players.local.getVariable("VisibleBlip") == true)
+                    {
+                        pX = minimap.rightX + 0.0875;
+                        pY = minimap.topY + 0.120;
+                        sX = 0.1625;
+                        sY = 0.110;
+
+                        drawText(visibleText, [minimap.rightX + 0.0085, minimap.bottomY - 0.1125], 0, [204, 204, 204, 255], 0.35);
+                    }
+                    else
+                    {
+                        pX = minimap.rightX + 0.0875;
+                        pY = minimap.topY + 0.125;
+                        sX = 0.1625;
+                        sY = 0.10;
+                    }
                 }
 
+                mp.game.graphics.drawRect(pX, pY, sX, sY, 0, 0, 0, 150);
+
+                
                 let voiceString = "Voice: ~r~Disabled";
                 
                 if(mp.players.local.getVariable("VoiceMode") == 0)
@@ -128,12 +184,10 @@ mp.events.add("render", () => {
                 {
                     voiceString = mp.voiceChat.muted ? "Voice: ~w~Standby (Team)" : "Voice: ~g~Speaking (Team)";
                 }
-                
+
                 drawText(voiceString, [minimap.rightX + 0.0085, minimap.bottomY - 0.095], 4, [63, 135, 240, 255], 0.50);
                 drawText(streetName, [minimap.rightX + 0.0085, minimap.bottomY - 0.065], 4, [204, 204, 204, 255], 0.465);
                 drawText(zoneName, [minimap.rightX + 0.0085, minimap.bottomY - 0.035], 4, [255, 255, 255, 255], 0.48);
-
-                
             }
         }
     }
