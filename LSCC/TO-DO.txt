@@ -14,4 +14,6 @@ DRIVEBY WIH STUNGUN COUNTS AS SHOOTIN SOME1 WO TAG ??? (CAN'T FIX SEEMS LIKE)
 
 ADD "VISIBLE" indicator on hud
 
+FIX /GIVEGUN WEAPON HASH CONVERSION (try{} and string instead of weapon hash, try to convert string to weaponhash using try{})
+
 PLAYERS WITH INVALID CHAR USING CLOTHING !! FIX THAT ASAP
