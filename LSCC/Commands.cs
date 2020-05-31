@@ -784,7 +784,7 @@ namespace LSCC
             return;
         }
 
-        [Command("rapple", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
+        [Command("rappel", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
         public void cmd_rapple(Player player)
         {
             return;
