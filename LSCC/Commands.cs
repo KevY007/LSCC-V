@@ -422,13 +422,17 @@ namespace LSCC
         [Command("handsup")]
         public void cmd_handsup(Player player)
         {
+            if (player.HasData("Cuffed")) return;
+
             if (player.HasData("Handsup"))
             {
                 player.TriggerEvent("SetHandsup", false);
+                player.ResetData("Handsup");
             }
             else
             {
                 player.TriggerEvent("SetHandsup", true);
+                player.SetData("Handsup", true);
             }
             return;
         }
@@ -1181,7 +1185,7 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player)) return;
 
             player.SendChatMessage("!{#0079DB}[Los Santos Copchase V !{#2BA3FF}BETA Commands]:");
-            player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog");
+            player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /r(adio) /wt");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode");
@@ -1788,6 +1792,12 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player))
                 return;
 
+            if (EPlayer.GetAccount(player).MuteTime > 0)
+            {
+                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                return;
+            }
+
             string chatStr = $"(( (LOCAL OOC) {player.Name.Replace("_", " ")} : {text} ))";
             foreach (Player i in RAGE.Entities.Players.All)
             {
@@ -1798,6 +1808,58 @@ namespace LSCC
                     if (i.Position.DistanceTo(player.Position) > 20.0 && i.Position.DistanceTo(player.Position) <= 40.0) i.SendChatMessage($"!{{#999999}}{chatStr}");
                 }
             }
+        }
+
+        [Command("radio", Alias = "walkietalkie", GreedyArg = true)]
+        public void cmd_radio(Player player, string text)
+        {
+            cmd_r(player, text);
+            return;
+        }
+
+        [Command("r", Alias = "wt", GreedyArg = true)]
+        public static void cmd_r(Player player, string text)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).MuteTime > 0)
+            {
+                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                return;
+            }
+
+            bool isInCopchase = false;
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (lobby != null)
+            {
+                if ((lobby.Cops.Contains(player) || lobby.Fugitives.Contains(player)) && lobby.gameStatus == 1)
+                {
+                    isInCopchase = true;
+                }
+            }
+
+            if(!isInCopchase) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in the copchase."); return; }
+
+            if (lobby.Cops.Contains(player))
+            {
+                string chatStr = $"!{{#FFEC8B}}** [RADIO | FREQ: 911] {player.Name.Replace("_", " ")}: {text}";
+
+                foreach (Player i in lobby.Cops)
+                {
+                    i.SendChatMessage(chatStr);
+                }
+            }
+            else if (lobby.Fugitives.Contains(player))
+            {
+                string chatStr = $"!{{#FFEC8B}}** [WT | FREQ: {lobby.lobbyId + 8346}] {player.Name.Replace("_", " ")}: {text}";
+
+                foreach (Player i in lobby.Fugitives)
+                {
+                    i.SendChatMessage(chatStr);
+                }
+            }
+            return;
         }
 
         [Command("ooc", Alias = "o", GreedyArg = true)]

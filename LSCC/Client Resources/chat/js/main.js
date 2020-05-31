@@ -183,6 +183,7 @@ $(document).ready(function()
 		{
 			var value = chat.input.children("input").val();
 
+			chat.container.scrollTop(9999); // Bring the chat down ay
             if (value.length > 0) 
 			{
 				if (chat.historyMsgs.length >= MAX_MSG_HISTORY) {

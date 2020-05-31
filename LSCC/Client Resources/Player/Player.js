@@ -263,7 +263,7 @@ function UpdateTimer()
                 if(currentJailTime > 0) currentJailTime--;
                 lastJailUpdate--;
 
-                if(lastJailUpdate <= 0)
+                if(lastJailUpdate <= 0 || currentJailTime <= 0) // add current too so it unmutes/jails the second it hits 0. aka requests update
                 {
                     mp.events.callRemote("RequestCounterUpdate", currentJailTime, 0);
                     lastJailUpdate = 20;
@@ -278,7 +278,7 @@ function UpdateTimer()
                 if(currentMuteTime > 0) currentMuteTime--;
                 lastMuteUpdate--;
 
-                if(lastMuteUpdate <= 0)
+                if(lastMuteUpdate <= 0 || currentMuteTime <= 0)
                 {
                     mp.events.callRemote("RequestCounterUpdate", currentMuteTime, 1);
                     lastMuteUpdate = 20;
@@ -457,7 +457,23 @@ function OnPlayerEnterVehicle(vehicle, seat)
 
 mp.events.add("playerEnterVehicle", OnPlayerEnterVehicle);
 mp.events.add("playerWeaponShot", OnPlayerWeaponShot);
- 
+
+mp.events.add("play_anim", (entity, animDictionary, animName, animFlag) => {
+	mp.game.streaming.requestAnimDict(animDictionary);
+	new Promise(() => {
+	const timer = setInterval(() => {
+		if(mp.game.streaming.hasAnimDictLoaded(animDictionary)) {
+			clearInterval(timer);
+			resolve(entity, animDictionary, animName, animFlag);
+		}
+	}, 100);
+});
+});
+
+function resolve(entity, animDictionary, animName, animFlag)
+{
+	entity.taskPlayAnim(animDictionary, animName, 8.0, 0.0, -1, animFlag, 0.0, false, false, false);
+}
 
 mp.events.add(
     {
@@ -469,7 +485,6 @@ mp.events.add(
             }
             else
             {
-                mp.players.local.stopAnimation();
                 mp.players.local.setEnableHandcuffs(false);
                 mp.players.local.clearTasks();
             }
@@ -478,12 +493,17 @@ mp.events.add(
         {
             if(status == true)
             {
-                mp.players.local.taskHandsUp(-1, mp.players.local.handle, 0, false);
+                mp.events.callLocal("play_anim", mp.players.local, "ped", "handsup_base", 22);
             }
             else
             {
-                mp.players.local.stopAnimation();
-                mp.players.local.clearTasks();
+                mp.events.callLocal("play_anim", mp.players.local, "ped", "handsup_exit", 2);
+                mp.players.local.stopAnim("handsup", "ped", 8.0);
+
+                setTimeout(() => {
+                    mp.players.local.stopAnim("handsup_exit", "ped", 8.0);
+                    mp.players.local.clearTasksImmediately();
+                }, 500);
             }
         },
         "SetDerbyCounting": (status, time) => {
