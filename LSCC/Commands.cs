@@ -419,10 +419,33 @@ namespace LSCC
             return;
         }
 
+        [Command("stopanim", Alias = "sa")]
+        public void cmd_sa(Player player)
+        {
+            if(player.HasData("TasedTill") && Environment.TickCount < player.GetData<int>("TasedTill"))
+                { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this right now as you're tased."); return; }
+            
+
+            if (player.HasData("Cuffed"))
+                { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this while cuffed."); return; }
+
+            if (player.HasData("Handsup"))
+            {
+                player.TriggerEvent("SetHandsup", false);
+                player.ResetData("Handsup");
+            }
+            else
+            {
+                player.StopAnimation();
+                player.TriggerEvent("ClearAnimations");
+            }
+        }
+
         [Command("handsup")]
         public void cmd_handsup(Player player)
         {
-            if (player.HasData("Cuffed")) return;
+            if (player.HasData("Cuffed") || (player.HasData("TasedTill") && Environment.TickCount < player.GetData<int>("TasedTill"))) 
+                { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this right now."); return; }
 
             if (player.HasData("Handsup"))
             {
@@ -434,6 +457,7 @@ namespace LSCC
                 player.TriggerEvent("SetHandsup", true);
                 player.SetData("Handsup", true);
             }
+           
             return;
         }
 
@@ -1178,7 +1202,7 @@ namespace LSCC
             cmd_lobby(target);
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has sent {target.Name} to lobby.");
         }
-
+        
         [Command("cmds", Alias = "help")]
         public void cmd_help(Player player)
         {
@@ -1191,7 +1215,7 @@ namespace LSCC
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode");
             player.SendChatMessage("!{#5FBCAC}[Keys]: Voice: N | GPS: Z | Scoreboard: O | Rapple: X | Switch Voice Mode: N+TAB");
             player.SendChatMessage("!{#61A9FA}[Cop]: /gps /cuff");
-            player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup");
+            player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup /s(top)a(nim)");
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /freeroam /veh /dm /dmarenas /derby");
             player.SendChatMessage("!{#A5A8A8}[Debug]: /pos /updaterate (changes the blip updating interval)");
 

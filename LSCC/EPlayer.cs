@@ -272,6 +272,7 @@ namespace LSCC
             player.Dimension = (uint)player.Id + 699;
 
             player.SendChatMessage("!{#FF6347}[INFO] !{#FFFFFF}Switch gender between Male and Female if the preview does not show.");
+            player.SendChatMessage("!{#FF6347}[INFO] !{#FFFFFF}Use arrow/numpad to navigate and backspace to exit.");
 
             CharacterData defaultChar = new CharacterData();
             EPlayer.ApplyCharacter(player, defaultChar);
@@ -424,8 +425,7 @@ namespace LSCC
         {
             player.TriggerEvent("SetHandcuffs", toggle);
             player.SetData("Cuffed", true);
-
-            if(toggle) player.PlayAnimation("mp_arresting", "idle", 0);
+            if(!toggle) player.ResetData("Cuffed");
         }
 
         public static void SetColor(Player player, Color col, int armour = 0)

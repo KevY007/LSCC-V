@@ -476,18 +476,26 @@ function resolve(entity, animDictionary, animName, animFlag)
 	entity.taskPlayAnim(animDictionary, animName, 8.0, 0.0, -1, animFlag, 0.0, false, false, false);
 }
 
+mp.events.add("ClearAnimations", () => {
+    mp.players.local.clearTasks();
+});
+
 mp.events.add(
     {
         "SetHandcuffs": (status) => {
             if(status == true)
             {
                 mp.players.local.clearTasksImmediately();
+
                 mp.players.local.setEnableHandcuffs(true);
+
+                mp.events.callLocal("play_anim", mp.players.local, "mp_prison_break", "handcuffed", 32);
             }
             else
             {
                 mp.players.local.setEnableHandcuffs(false);
-                mp.players.local.clearTasks();
+
+                mp.players.local.clearTasksImmediately();
             }
         },
         "SetHandsup": (status) =>

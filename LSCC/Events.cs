@@ -1026,6 +1026,7 @@ namespace LSCC
                 {
                     int time = 30000;
                     target.TriggerEvent("setToRagdoll", time, time * 2, 0, false, false, false);
+                    target.SetData("TasedTill", Environment.TickCount + 30000);
                     Commands.cmd_do(target, $"{target.Name} has been tased and has been rendered immobile.");
                 }
                 else
@@ -1068,16 +1069,15 @@ namespace LSCC
         [ServerEvent(Event.PlayerSpawn)]
         public static void OnPlayerSpawn(Player player)
         {
-            if (player.HasData("Handsup"))
-            {
-                player.TriggerEvent("SetHandsup", false);
-                player.ResetData("Handsup");
-            }
-
             if(player.HasData("Cuffed"))
             {
                 player.TriggerEvent("SetHandcuffs", false);
                 player.ResetData("Cuffed");
+            }
+            if (player.HasData("Handsup"))
+            {
+                player.TriggerEvent("SetHandsup", false);
+                player.ResetData("Handsup");
             }
 
             player.SetSharedData("Team", -1);
