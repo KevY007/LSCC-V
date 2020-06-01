@@ -229,6 +229,11 @@ namespace LSCC
             }
             if (reason == 696988) reasonStr = "handcuffs";
 
+            if(reasonStr != null)
+            {
+                reasonStr.Replace(".", "");
+            }
+
             if (player.GetSharedData<int>("InLobby") == -4 && Settings.DerbyTimeLeft > 0 && Settings.DerbyTimeLeft != 180)
             {
                 foreach (Player indm in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
@@ -371,7 +376,7 @@ namespace LSCC
                                 {
                                     if(reason == 696988)
                                     {
-                                        ay.TriggerEvent("pushToKillFeed", $"{killer.Name} has apprehended {player.Name}.");
+                                        ay.TriggerEvent("pushToKillFeed", $"{killer.Name} has apprehended {player.Name}");
                                     }
                                     else ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}");
                                 }
