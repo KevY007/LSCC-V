@@ -835,7 +835,7 @@ namespace LSCC
                     {
                         EPlayer.Freeze(player, false);
                     }
-                }, 2500);
+                }, player.IsInVehicle == true ? 500 : 2500);
 
                 int warnings = 0;
                 if (player.HasData("TeamShotWarning")) warnings = player.GetData<int>("TeamShotWarning");
@@ -870,7 +870,7 @@ namespace LSCC
                     {
                         EPlayer.Freeze(player, false);
                     }
-                }, 2000);
+                }, player.IsInVehicle == true ? 500 : 2500);
 
                 int warnings = 0;
                 if (player.HasData("InnocentShotWarning")) warnings = player.GetData<int>("InnocentShotWarning");
