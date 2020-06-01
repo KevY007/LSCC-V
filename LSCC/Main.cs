@@ -790,352 +790,376 @@ namespace LSCC
 
                 if (fugitives == pCount) fugitives--; // There will ALWAYS be AT LEAST one COP.
 
-                if (ContextFactory.Instance.Maps.Count() < 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has no maps added, failed to start"); return false; }
-
-                List<Map> mapList = ContextFactory.Instance.Maps.Where(a => a.Enabled == true).ToList();
-
-                if (mapList.Count < 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has maps but none of them were enabled! Failed to start."); return false; }
-
-                Map map = mapList.OrderBy(c => Guid.NewGuid()).FirstOrDefault();
-
-                NAPI.Util.ConsoleOutput($"[Lobby " + lobbyid + $"] Selected Map [{map.Name}] | Total Spawns: [{ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID).Count()}]");
-
-
-                if (ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 0).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no fugitive spawns! Abort."); return false; }
-                if (ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 1).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no cop spawns! Abort."); return false; }
-
-
-                List<MapSpawn> Spawns = ContextFactory.Instance.MapSpawns.Where(x => x.mapID == map.SQL_ID).ToList();
-                List<int> UsedSpawns = new List<int>(Spawns.Count + 1);
-
-                List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid).ToList();
-
-                List<Player> PutInsideCar = new List<Player>(lobbyPlayers.Count());
-
-                UsedSpawns.Add(-1);
-
-                Random random = new Random();
-
-                pCount = 0;
-                Player _tempPlayer;
-
-                while (fugitives > 0)
+                try
                 {
-                    _tempPlayer = lobbyPlayers[random.Next(lobbyPlayers.Count)];
+                    int crashcheck = 0;
+                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
 
-                    if (_tempPlayer.GetData<bool>("AutoJoin") == false) continue;
+                    if (ContextFactory.Instance.Maps.Count() < 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has no maps added, failed to start"); return false; }
+                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    List<Map> mapList = ContextFactory.Instance.Maps.Where(a => a.Enabled == true).ToList();
+                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    if (mapList.Count < 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has maps but none of them were enabled! Failed to start."); return false; }
+                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    Map map = mapList.OrderBy(c => Guid.NewGuid()).FirstOrDefault();
+                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    NAPI.Util.ConsoleOutput($"[Lobby " + lobbyid + $"] Selected Map [{map.Name}] | Total Spawns: [{ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID).Count()}]");
+                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    if (ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 0).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no fugitive spawns! Abort."); return false; }
+                    if (ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 1).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no cop spawns! Abort."); return false; }
 
-                    if (!lobby.Fugitives.Contains(_tempPlayer))
+                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    List<MapSpawn> Spawns = ContextFactory.Instance.MapSpawns.Where(x => x.mapID == map.SQL_ID).ToList();
+                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    List<int> UsedSpawns = new List<int>(Spawns.Count + 1);
+                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid).ToList();
+                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    List<Player> PutInsideCar = new List<Player>(lobbyPlayers.Count());
+                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    UsedSpawns.Add(-1);
+                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    Random random = new Random();
+
+                    pCount = 0;
+                    Player _tempPlayer;
+                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    while (fugitives > 0)
                     {
-                        fugitives--;
-                        lobby.Fugitives.Add(_tempPlayer);
-                    }
-                    else pCount++;
+                        _tempPlayer = lobbyPlayers[random.Next(lobbyPlayers.Count)];
 
-                    if (pCount >= 100)
-                    {
-                        NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Stuck inside random iteration loop for selecting fugitive, aborting method.");
-                        return false;
-                    }
-                }
-                fugitives = lobby.Fugitives.Count;
+                        if (_tempPlayer.GetData<bool>("AutoJoin") == false) continue;
 
-                foreach (Player player in lobbyPlayers)
-                {
-                    if (player.GetData<bool>("AutoJoin") == false) continue;
-
-                    if (!lobby.Fugitives.Contains(player))
-                    {
-                        player.ResetData("CuffingTarget");
-                        lobby.Cops.Add(player);
-                    }
-                }
-
-                List<Tuple<Player, Vehicle, int>> playerVehicle = new List<Tuple<Player, Vehicle, int>>();
-
-                MapSpawn spawnLoc = null;
-                pCount = 0;
-                foreach (Player player in lobby.Cops)
-                {
-                    spawnLoc = Spawns.First(a => a.spawnTeam == 1 && !UsedSpawns.Contains(a.SQL_ID));
-
-                    if((spawnLoc == null) == false)
-                    {
-                        UsedSpawns.Add(spawnLoc.SQL_ID);                          
-                    }
-                    else
-                    {
-                        pCount++;
-                        spawnLoc = new MapSpawn();
-
-                        spawnLoc = Spawns.First(a => a.spawnTeam == 1);
-                        
-                        spawnLoc.spawnZ += (pCount * 3); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
-                        spawnLoc.spawnX += (pCount * 2);
-                    }
-
-                    Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
-
-                    CharacterData ConvChar = new CharacterData();
-
-                    try
-                    {
-                        ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-
-                        EPlayer.ApplyCharacter(player, ConvChar, 1);
-                    }
-                    catch { }
-
-                    player.Dimension = Convert.ToUInt32(lobbyid);
-                    player.Position = vecSpawn.Around(15);
-
-                    player.Health = 100;
-                    player.Armor = 60;
-                    EPlayer.SetColor(player, new Color(141, 141, 255, 255), player.Armor);
-
-                    string carName = "police";
-                    int col1 = 0;
-
-                    switch (random.Next(0, 5))
-                    {
-                        case 0:
-                            carName = "police";
-                            col1 = 111;
-                            break;
-                        case 1:
-                            carName = "polbufac2";
-                            col1 = 8;
-                            break;
-                        case 2:
-                            carName = "police3";
-                            col1 = 111;
-                            break;
-                        case 3:
-                            carName = "polbufac";
-                            col1 = 111;
-                            break;
-                        case 4:
-                            carName = "fbibufac";
-                            break;
-                    }
-
-
-                    Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, col1, 111, player.Name, 255, false, true, Convert.ToUInt32(lobbyid));
-
-                    pVehicle.SetSharedData("Team", 1);
-
-                    lobby.Vehicles.Add(pVehicle);
-
-                    player.SetIntoVehicle(pVehicle, 0);
-
-                    NAPI.Task.Run(() =>
-                    {
-                        pVehicle.Position = vecSpawn;
-                    }, 1000);
-
-                    EPlayer.Freeze(player, true);
-
-                    PutInsideCar.Add(player);
-                    playerVehicle.Add(new Tuple<Player, Vehicle, int>(player, pVehicle, 0));
-
-                    player.SetData("GPS", false);
-
-                    EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Playing cop as {player.Name}");
-
-                    player.TriggerEvent("SetActorInvulnerable", false);
-                    player.TriggerEvent("CanFallOutOfCar", true);
-                    player.TriggerEvent("showHPBars", 1); // Always show HP Bars.
-
-                    player.SetSharedData("Team", 1);
-                }
-
-                spawnLoc = null;
-                pCount = 0;
-
-                foreach (Player player in lobby.Fugitives)
-                {
-                    spawnLoc = new MapSpawn();
-
-                    spawnLoc = Spawns.First(a => a.spawnTeam == 0);
-
-                    Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
-
-                    CharacterData ConvChar = new CharacterData();
-
-                    try
-                    {
-                        ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-
-                        EPlayer.ApplyCharacter(player, ConvChar, 0);
-                    }
-                    catch { }
-
-                    player.Dimension = Convert.ToUInt32(lobbyid);
-                    player.Position = vecSpawn.Around(15);
-                    EPlayer.Freeze(player, true);
-
-                    player.Health = 100;
-                    player.Armor = 0;
-                    EPlayer.SetColor(player, new Color(232, 64, 64, 255), player.Armor);
-
-                    EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Playing fugitive as {player.Name}");
-
-                    player.TriggerEvent("SetActorInvulnerable", false);
-                    player.TriggerEvent("CanFallOutOfCar", true);
-                    player.TriggerEvent("showHPBars", 1); // Always show HP Bars.
-
-                    player.SetSharedData("VisibleBlip", true);
-                    player.ResetData("Handsup");
-                    player.ResetData("Cuffed");
-                    player.SetSharedData("Team", 0);
-                    player.SetSharedData("HasShot", false);
-                }
-
-                spawnLoc = null;
-                List<Player> iteratedAlready = new List<Player>();
-                fugitives = lobby.Fugitives.Count;
-
-                while (fugitives > 0)
-                {
-                    _tempPlayer = lobby.Fugitives[random.Next(lobby.Fugitives.Count)];
-
-                    if (PutInsideCar.Contains(_tempPlayer))
-                    {
-                        if (!iteratedAlready.Contains(_tempPlayer))
+                        if (!lobby.Fugitives.Contains(_tempPlayer))
                         {
-                            iteratedAlready.Add(_tempPlayer);
                             fugitives--;
+                            lobby.Fugitives.Add(_tempPlayer);
+                        }
+                        else pCount++;
+
+                        if (pCount >= 100)
+                        {
+                            NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Stuck inside random iteration loop for selecting fugitive, aborting method.");
+                            return false;
+                        }
+                    }
+                    fugitives = lobby.Fugitives.Count;
+                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    foreach (Player player in lobbyPlayers)
+                    {
+                        if (player.GetData<bool>("AutoJoin") == false) continue;
+
+                        if (!lobby.Fugitives.Contains(player))
+                        {
+                            player.ResetData("CuffingTarget");
+                            lobby.Cops.Add(player);
+                        }
+                    }
+                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    List<Tuple<Player, Vehicle, int>> playerVehicle = new List<Tuple<Player, Vehicle, int>>();
+                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    MapSpawn spawnLoc = null;
+                    pCount = 0;
+                    foreach (Player player in lobby.Cops)
+                    {
+                        foreach(MapSpawn tSpawn in Spawns.Where(a => a.spawnTeam == 1))
+                        {
+                            if(!UsedSpawns.Contains(tSpawn.SQL_ID))
+                            {
+                                spawnLoc = tSpawn;
+                                break;
+                            }
                         }
 
-                        continue;
+                        if ((spawnLoc == null) == false)
+                        {
+                            UsedSpawns.Add(spawnLoc.SQL_ID);
+                        }
+                        else
+                        {
+                            pCount++;
+                            spawnLoc = new MapSpawn();
+
+                            spawnLoc = Spawns.First(a => a.spawnTeam == 1);
+
+                            spawnLoc.spawnZ += (pCount * 3); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
+                            spawnLoc.spawnX += (pCount * 2);
+                        }
+
+                        Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
+
+                        CharacterData ConvChar = new CharacterData();
+
+                        try
+                        {
+                            ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+
+                            EPlayer.ApplyCharacter(player, ConvChar, 1);
+                        }
+                        catch { }
+
+                        player.Dimension = Convert.ToUInt32(lobbyid);
+                        player.Position = vecSpawn.Around(3);
+
+                        player.Health = 100;
+                        player.Armor = 60;
+                        EPlayer.SetColor(player, new Color(141, 141, 255, 255), player.Armor);
+
+                        string carName = "police";
+                        int col1 = 0;
+
+                        switch (random.Next(0, 5))
+                        {
+                            case 0:
+                                carName = "police";
+                                col1 = 111;
+                                break;
+                            case 1:
+                                carName = "polbufac2";
+                                col1 = 8;
+                                break;
+                            case 2:
+                                carName = "police3";
+                                col1 = 111;
+                                break;
+                            case 3:
+                                carName = "polbufac";
+                                col1 = 111;
+                                break;
+                            case 4:
+                                carName = "fbibufac";
+                                break;
+                        }
+
+
+                        Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, col1, 111, player.Name, 255, false, true, Convert.ToUInt32(lobbyid));
+
+                        pVehicle.SetSharedData("Team", 1);
+
+                        lobby.Vehicles.Add(pVehicle);
+
+                        player.SetIntoVehicle(pVehicle, 0);
+
+                        NAPI.Task.Run(() =>
+                        {
+                            pVehicle.Position = vecSpawn;
+                        }, 1000);
+
+                        EPlayer.Freeze(player, true);
+
+                        PutInsideCar.Add(player);
+                        playerVehicle.Add(new Tuple<Player, Vehicle, int>(player, pVehicle, 0));
+
+                        player.SetData("GPS", false);
+
+                        EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Playing cop as {player.Name}");
+
+                        player.TriggerEvent("SetActorInvulnerable", false);
+                        player.TriggerEvent("CanFallOutOfCar", true);
+                        player.TriggerEvent("showHPBars", 1); // Always show HP Bars.
+
+                        player.SetSharedData("Team", 1);
                     }
 
-                    fugitives--;
-                    PutInsideCar.Add(_tempPlayer);
-                    iteratedAlready.Add(_tempPlayer);
-
-                    spawnLoc = Spawns.First(a => a.spawnTeam == 0 && !UsedSpawns.Contains(a.SQL_ID));
-
-                    if ((spawnLoc == null) == false)
+                    spawnLoc = null;
+                    pCount = 0;
+                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    foreach (Player player in lobby.Fugitives)
                     {
-                        UsedSpawns.Add(spawnLoc.SQL_ID);
-                    }
-                    else
-                    {
-                        pCount++;
                         spawnLoc = new MapSpawn();
 
                         spawnLoc = Spawns.First(a => a.spawnTeam == 0);
 
-                        spawnLoc.spawnZ += (pCount * 3); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
-                        spawnLoc.spawnX += (pCount * 2);
+                        Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
+
+                        CharacterData ConvChar = new CharacterData();
+
+                        try
+                        {
+                            ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+
+                            EPlayer.ApplyCharacter(player, ConvChar, 0);
+                        }
+                        catch { }
+
+                        player.Dimension = Convert.ToUInt32(lobbyid);
+                        player.Position = vecSpawn.Around(3);
+                        EPlayer.Freeze(player, true);
+
+                        player.Health = 100;
+                        player.Armor = 0;
+                        EPlayer.SetColor(player, new Color(232, 64, 64, 255), player.Armor);
+
+                        EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Playing fugitive as {player.Name}");
+
+                        player.TriggerEvent("SetActorInvulnerable", false);
+                        player.TriggerEvent("CanFallOutOfCar", true);
+                        player.TriggerEvent("showHPBars", 1); // Always show HP Bars.
+
+                        player.SetSharedData("VisibleBlip", true);
+                        player.ResetData("Handsup");
+                        player.ResetData("Cuffed");
+                        player.SetSharedData("Team", 0);
+                        player.SetSharedData("HasShot", false);
                     }
 
-                    Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
+                    spawnLoc = null;
+                    List<Player> iteratedAlready = new List<Player>();
+                    fugitives = lobby.Fugitives.Count;
 
-                    string carName = "washington";
-
-                    switch (random.Next(0, 5))
+                    while (fugitives > 0)
                     {
-                        case 0:
-                            carName = "washington";
-                            break;
-                        case 1:
-                            carName = "kanjo";
-                            break;
-                        case 2:
-                            carName = "ingot";
-                            break;
-                        case 3:
-                            carName = "cognoscenti";
-                            break;
-                        case 4:
-                            carName = "oracle2";
-                            break;
+                        _tempPlayer = lobby.Fugitives[random.Next(lobby.Fugitives.Count)];
+
+                        if (PutInsideCar.Contains(_tempPlayer))
+                        {
+                            if (!iteratedAlready.Contains(_tempPlayer))
+                            {
+                                iteratedAlready.Add(_tempPlayer);
+                                fugitives--;
+                            }
+
+                            continue;
+                        }
+
+                        fugitives--;
+                        PutInsideCar.Add(_tempPlayer);
+                        iteratedAlready.Add(_tempPlayer);
+
+                        foreach (MapSpawn tSpawn in Spawns.Where(a => a.spawnTeam == 0))
+                        {
+                            if (!UsedSpawns.Contains(tSpawn.SQL_ID))
+                            {
+                                spawnLoc = tSpawn;
+                                break;
+                            }
+                        }
+
+                        if ((spawnLoc == null) == false)
+                        {
+                            UsedSpawns.Add(spawnLoc.SQL_ID);
+                        }
+                        else
+                        {
+                            pCount++;
+                            spawnLoc = new MapSpawn();
+
+                            spawnLoc = Spawns.First(a => a.spawnTeam == 0);
+
+                            spawnLoc.spawnZ += (pCount * 3); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
+                            spawnLoc.spawnX += (pCount * 2);
+                        }
+
+                        Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
+
+                        string carName = "washington";
+
+                        switch (random.Next(0, 5))
+                        {
+                            case 0:
+                                carName = "washington";
+                                break;
+                            case 1:
+                                carName = "kanjo";
+                                break;
+                            case 2:
+                                carName = "ingot";
+                                break;
+                            case 3:
+                                carName = "cognoscenti";
+                                break;
+                            case 4:
+                                carName = "oracle2";
+                                break;
+                        }
+
+                        Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, random.Next(122), random.Next(122), $"SA-{random.Next(1000, 9999)}", 255, false, true, Convert.ToUInt32(lobbyid));
+                        pVehicle.SetSharedData("Team", 0);
+                        lobby.Vehicles.Add(pVehicle);
+
+                        _tempPlayer.SetIntoVehicle(pVehicle, 0);
+
+                        NAPI.Task.Run(() =>
+                        {
+                            pVehicle.Position = vecSpawn;
+                        }, 1000);
+
+                        EPlayer.Freeze(_tempPlayer, true);
+
+                        playerVehicle.Add(new Tuple<Player, Vehicle, int>(_tempPlayer, pVehicle, 0));
+
+                        int seat = 1;
+                        while (seat < pVehicle.MaxOccupants)
+                        {
+                            if (fugitives == 0) break;
+
+                            Player _tempPlayer2 = lobby.Fugitives[random.Next(lobby.Fugitives.Count)];
+
+                            if (PutInsideCar.Contains(_tempPlayer2)) continue;
+
+                            PutInsideCar.Add(_tempPlayer2);
+                            iteratedAlready.Add(_tempPlayer2);
+                            fugitives--;
+
+                            _tempPlayer2.SetIntoVehicle(pVehicle, 0 + seat);
+
+                            EPlayer.Freeze(_tempPlayer2, true);
+                            playerVehicle.Add(new Tuple<Player, Vehicle, int>(_tempPlayer2, pVehicle, 0 + seat));
+
+                            seat++;
+                        }
                     }
-
-                    Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, random.Next(122), random.Next(122), $"SA-{random.Next(1000, 9999)}", 255, false, true, Convert.ToUInt32(lobbyid));
-                    pVehicle.SetSharedData("Team", 0);
-                    lobby.Vehicles.Add(pVehicle);
-
-                    _tempPlayer.SetIntoVehicle(pVehicle, 0);
 
                     NAPI.Task.Run(() =>
                     {
-                        pVehicle.Position = vecSpawn;
-                    }, 1000);
-
-                    EPlayer.Freeze(_tempPlayer, true);
-
-                    playerVehicle.Add(new Tuple<Player, Vehicle, int>(_tempPlayer, pVehicle, 0));
-
-                    int seat = 1;
-                    while (seat < pVehicle.MaxOccupants)
-                    {
-                        if (fugitives == 0) break;
-
-                        Player _tempPlayer2 = lobby.Fugitives[random.Next(lobby.Fugitives.Count)];
-
-                        if (PutInsideCar.Contains(_tempPlayer2)) continue;
-
-                        PutInsideCar.Add(_tempPlayer2);
-                        iteratedAlready.Add(_tempPlayer2);
-                        fugitives--;
-
-                        _tempPlayer2.SetIntoVehicle(pVehicle, 0 + seat);
-
-                        EPlayer.Freeze(_tempPlayer2, true);
-                        playerVehicle.Add(new Tuple<Player, Vehicle, int>(_tempPlayer2, pVehicle, 0 + seat));
-
-                        seat++;
-                    }
-                }
-
-                NAPI.Task.Run(() =>
-                {
-                    foreach (Tuple<Player, Vehicle, int> data in playerVehicle)
-                    {
-                        if (data.Item1.IsNull || data.Item1 == null || data.Item2.IsNull || data.Item2 == null) continue;
-
-                        data.Item1.SetIntoVehicle(data.Item2, data.Item3);
-                        EPlayer.Freeze(data.Item1, false);
-
-                        data.Item1.TriggerEvent("ToggleChaseCollisions", false);
-                        data.Item1.SetSharedData("HasShot", false);
-
-                        data.Item1.SendNotification($"~g~Weapons will be given after collisions enable.");
-                    }
-
-                    NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] Copchase started with !{{#8D8DFF}}{lobby.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{lobby.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{map.Name}!{{#FFFFFF}}.");
-
-                    lobby.FugitiveShowCounter = 60;
-                    lobby.GameProgress = 0;
-                    lobby.CollisionCounter = 30;
-
-                    foreach (Player p in Settings.LoggedInPlayers)
-                    {
-                        p.SetSharedData("Ping", p.Ping);
-
-                        if (p.GetSharedData<int>("InLobby") == lobbyid)
+                        foreach (Tuple<Player, Vehicle, int> data in playerVehicle)
                         {
-                            p.TriggerEvent("StartChaseTimer", 0, Settings.GameRunTime, lobby.CollisionCounter);
+                            if (data.Item1.IsNull || data.Item1 == null || data.Item2.IsNull || data.Item2 == null) continue;
+
+                            data.Item1.SetIntoVehicle(data.Item2, data.Item3);
+                            EPlayer.Freeze(data.Item1, false);
+
+                            data.Item1.TriggerEvent("ToggleChaseCollisions", false);
+                            data.Item1.SetSharedData("HasShot", false);
+
+                            data.Item1.SendNotification($"~g~Weapons will be given after collisions enable.");
                         }
-                    }
-                }, delayTime: 3000);
 
-                NAPI.Task.Run(() =>
-                {
-                    foreach (Tuple<Player, Vehicle, int> data in playerVehicle)
+                        NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] Copchase started with !{{#8D8DFF}}{lobby.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{lobby.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{map.Name}!{{#FFFFFF}}.");
+
+                        lobby.FugitiveShowCounter = 60;
+                        lobby.GameProgress = 0;
+                        lobby.CollisionCounter = 30;
+
+                        foreach (Player p in Settings.LoggedInPlayers)
+                        {
+                            p.SetSharedData("Ping", p.Ping);
+
+                            if (p.GetSharedData<int>("InLobby") == lobbyid)
+                            {
+                                p.TriggerEvent("StartChaseTimer", 0, Settings.GameRunTime, lobby.CollisionCounter);
+                            }
+                        }
+                    }, delayTime: 3000);
+
+                    NAPI.Task.Run(() =>
                     {
-                        if (data.Item1.IsNull || data.Item1 == null) continue;
-                        data.Item1.TriggerEvent("ToggleChaseCollisions", false);
-                    } // Toggle Collisions OFF again. smh they dont activate sometimes.
+                        foreach (Tuple<Player, Vehicle, int> data in playerVehicle)
+                        {
+                            if (data.Item1.IsNull || data.Item1 == null) continue;
+                            data.Item1.TriggerEvent("ToggleChaseCollisions", false);
+                        } // Toggle Collisions OFF again. smh they dont activate sometimes.
 
-                }, delayTime: 13000);
+                    }, delayTime: 13000);
 
 
-                lobby.gameStatus = 1;
-                NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Game has been started with {lobby.Cops.Count} cops & {lobby.Fugitives.Count} fugitives on map {map.Name}.");
+                    lobby.gameStatus = 1;
+                    NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Game has been started with {lobby.Cops.Count} cops & {lobby.Fugitives.Count} fugitives on map {map.Name}.");
+                }
+                catch {
+                    NAPI.Util.ConsoleOutput("Exception in startgame!");
+                    return false;
+                }
             }
             else return false;
 
