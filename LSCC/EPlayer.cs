@@ -620,7 +620,7 @@ namespace LSCC
         {
             foreach (Player player in Settings.LoggedInPlayers)
             {
-                if (player.GetSharedData<int>("InLobby") == lobbyid && player.GetData<bool>("AutoJoin") == true)
+                if (player.GetSharedData<int>("InLobby") == lobbyid)
                 {
                     player.SendChatMessage(message);
                 }

@@ -1166,14 +1166,21 @@ namespace LSCC
             {
                 lobby.GameProgress++;
 
-                if (lobby.GameProgress == (60 / 100 * Settings.GameRunTime))
+                if (lobby.GameProgress >= ((60 / 100) * Settings.GameRunTime))
                 {
                     foreach (Player fugitive in lobby.Fugitives)
                     {
-                        fugitive.SetSharedData("HasShot", true);
-                        lobby.FugitiveShowCounter = 29; // Set them to VISIBLE
+                        if (fugitive.GetSharedData<bool>("HasShot") == false)
+                        {
+                            fugitive.SetSharedData("HasShot", true);
+                            fugitive.SetSharedData("VisibleBlip", true);
+                            lobby.FugitiveShowCounter = 29; // Set them to VISIBLE
+                        }
                     }
-                    EPlayer.SendMessageInLobby(lobby.lobbyId, "!{#FF6347}[GAME] !{#FFFFFF}60% of the game has elapsed, all fugitives have shot tag now.");
+                    if (lobby.GameProgress == ((60 / 100) * Settings.GameRunTime))
+                    {
+                        EPlayer.SendMessageInLobby(lobby.lobbyId, "!{#FF6347}[GAME] !{#FFFFFF}60% of the game has elapsed, all fugitives have shot tag now.");
+                    }
                 }
 
                 if (lobby.GameProgress >= Settings.GameRunTime)
@@ -1200,6 +1207,7 @@ namespace LSCC
                             if (lobby.Cops.Contains(player))
                             {
                                 player.GiveWeapon(WeaponHash.Carbinerifle, 120);
+                                player.GiveWeapon(WeaponHash.Pumpshotgun, 20);
                                 player.GiveWeapon(WeaponHash.Pistol, 100);
                                 player.GiveWeapon(WeaponHash.Stungun, 1);
                                 player.SendChatMessage("!{#FF6347}[TASER] !{#FFFFFF}You have been equipped with a stungun, shoot at a fugitive that hasn't shot to tase them.");
@@ -1208,6 +1216,7 @@ namespace LSCC
                             {
                                 player.GiveWeapon(WeaponHash.Assaultrifle, 120);
                                 player.GiveWeapon(WeaponHash.Pistol, 100);
+                                player.GiveWeapon(WeaponHash.Pumpshotgun, 20);
                             }
                         }
                     }
