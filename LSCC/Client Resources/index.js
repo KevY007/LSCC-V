@@ -19,6 +19,7 @@ require('./camerasManager.js');
 require('./cefBrowser.js');
 require("./rappel/index.js");
 require("./scoreboard/index.js");
+require("./Player/Sync.js");
 
 mp.events.add('loginInformationToServer', (username, password) => {
 

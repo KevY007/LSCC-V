@@ -275,7 +275,7 @@ namespace LSCC
                         int warnings = 0;
                         if (killer.HasData("InnocentShotWarning")) warnings = killer.GetData<int>("InnocentShotWarning");
 
-                        warnings += 5;
+                        warnings += 3;
                         killer.SetData<int>("InnocentShotWarning", warnings);
                         killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Repeated attacking of fugitive's that haven't shot will result in a jail.");
                         
@@ -316,7 +316,7 @@ namespace LSCC
                     int warnings = 0;
                     if (killer.HasData("TeamShotWarning")) warnings = killer.GetData<int>("TeamShotWarning");
 
-                    warnings += 5;
+                    warnings += 3;
                     killer.SetData<int>("TeamShotWarning", warnings);
 
                     killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Repeated team killing will result in a jail.");
@@ -843,13 +843,13 @@ namespace LSCC
                 warnings++;
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Do not shoot at teammates, repeatedly doing this will result in punishment!");
 
-                if(warnings >= 5)
+                if(warnings >= 7)
                 {
                     player.Health = 0;
                     EPlayer.GrantXP(player, -1);
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have lost 1XP due to team attacking.");
                 }
-                if(warnings >= 10)
+                if(warnings >= 14)
                 {
                     RAGE.Entities.Players.All.ForEach((Player i) =>
                     {
@@ -874,17 +874,17 @@ namespace LSCC
 
                 int warnings = 0;
                 if (player.HasData("InnocentShotWarning")) warnings = player.GetData<int>("InnocentShotWarning");
-
+                
                 warnings++;
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Do not shoot at fugitives that haven't shot, repeatedly doing this will result in punishment!");
 
-                if (warnings >= 5)
+                if (warnings >= 7)
                 {
                     player.Health = 0;
                     EPlayer.GrantXP(player, -1);
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have lost 1XP due to shooting at a fugitive without shot tag.");
                 }
-                if (warnings >= 10)
+                if (warnings >= 14)
                 {
                     RAGE.Entities.Players.All.ForEach((Player i) =>
                     {

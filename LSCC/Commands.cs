@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
 namespace LSCC
@@ -40,6 +41,30 @@ namespace LSCC
             }
       
             else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'maxinlobby'");
+
+            return;
+        }
+
+        [Command("trunk", Alias = "boot")]
+        public void cmd_trunk(Player player)
+        {
+            if(!player.IsInVehicle || player.Vehicle == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in any vehicle!"); return; }
+
+            if (player.Vehicle.HasSharedData("Status_Trunk"))
+            {
+                if (player.Vehicle.GetSharedData<bool>("Status_Trunk") == false)
+                {
+                    player.Vehicle.SetSharedData("Status_Trunk", true);
+                }
+                else
+                {
+                    player.Vehicle.SetSharedData("Status_Trunk", false);
+                }
+            }
+            else
+            {
+                player.Vehicle.SetSharedData("Status_Trunk", true);
+            }
 
             return;
         }

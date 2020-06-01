@@ -1041,28 +1041,28 @@ namespace LSCC
 
                     Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
 
-                    string carName = "sultan";
+                    string carName = "washington";
 
                     switch (random.Next(0, 5))
                     {
                         case 0:
-                            carName = "sultan";
+                            carName = "washington";
                             break;
                         case 1:
-                            carName = "fugitive";
+                            carName = "kanjo";
                             break;
                         case 2:
                             carName = "ingot";
                             break;
                         case 3:
-                            carName = "oracle";
+                            carName = "cognoscenti";
                             break;
                         case 4:
                             carName = "oracle2";
                             break;
                     }
 
-                    Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, random.Next(122), random.Next(122), "KEVY", 255, false, true, Convert.ToUInt32(lobbyid));
+                    Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, random.Next(122), random.Next(122), $"SA-{random.Next(1000, 9999)}", 255, false, true, Convert.ToUInt32(lobbyid));
                     pVehicle.SetSharedData("Team", 0);
                     lobby.Vehicles.Add(pVehicle);
 
