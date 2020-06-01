@@ -475,16 +475,9 @@ namespace LSCC
             {
                 LobbyData eLobbyData = new LobbyData();
             }
-          
-            NAPI.Task.Run(() =>
-            {
-                TimeUpdate();
-            }, delayTime: 15000);
 
-            NAPI.Task.Run(() =>
-            {
-                GameUpdate();
-            }, delayTime: 1000);
+            TimeUpdate();
+            GameUpdate();
         }
 
         public void GameStartCountdown(int time, int lobbyid)
@@ -646,10 +639,7 @@ namespace LSCC
                 }
             }
 
-            NAPI.Task.Run(() =>
-            {
-                TimeUpdate();
-            }, delayTime: 15000);
+            NAPI.Task.Run(TimeUpdate, delayTime: 15000);
         }
 
         public static void CheckDerbyWinner()
@@ -778,6 +768,7 @@ namespace LSCC
 
                 lobby.Cops.Clear();
                 lobby.Fugitives.Clear();
+                lobby.GameProgress = 0;
 
                 foreach (Player player in Settings.LoggedInPlayers)
                 {
@@ -997,6 +988,7 @@ namespace LSCC
                     player.ResetData("Handsup");
                     player.ResetData("Cuffed");
                     player.SetSharedData("Team", 0);
+                    player.SetSharedData("HasShot", false);
                 }
 
                 spawnLoc = null;
@@ -1109,6 +1101,7 @@ namespace LSCC
                         EPlayer.Freeze(data.Item1, false);
 
                         data.Item1.TriggerEvent("ToggleChaseCollisions", false);
+                        data.Item1.SetSharedData("HasShot", false);
 
                         data.Item1.SendNotification($"~g~Weapons will be given after collisions enable.");
                     }
@@ -1138,7 +1131,7 @@ namespace LSCC
                         data.Item1.TriggerEvent("ToggleChaseCollisions", false);
                     } // Toggle Collisions OFF again. smh they dont activate sometimes.
 
-                }, delayTime: 10000);
+                }, delayTime: 13000);
 
 
                 lobby.gameStatus = 1;
@@ -1166,7 +1159,7 @@ namespace LSCC
             {
                 lobby.GameProgress++;
 
-                if (lobby.GameProgress >= ((60 / 100) * Settings.GameRunTime))
+                if (lobby.GameProgress >= Convert.ToInt32(0.6 * Settings.GameRunTime))
                 {
                     foreach (Player fugitive in lobby.Fugitives)
                     {
@@ -1175,9 +1168,11 @@ namespace LSCC
                             fugitive.SetSharedData("HasShot", true);
                             fugitive.SetSharedData("VisibleBlip", true);
                             lobby.FugitiveShowCounter = 29; // Set them to VISIBLE
+
+                            fugitive.SendChatMessage("!{#FF6347}You have the has shot tag now because the game has progress more than 60%!");
                         }
                     }
-                    if (lobby.GameProgress == ((60 / 100) * Settings.GameRunTime))
+                    if (lobby.GameProgress == Convert.ToInt32(0.6 * Settings.GameRunTime))
                     {
                         EPlayer.SendMessageInLobby(lobby.lobbyId, "!{#FF6347}[GAME] !{#FFFFFF}60% of the game has elapsed, all fugitives have shot tag now.");
                     }
@@ -1186,7 +1181,6 @@ namespace LSCC
                 if (lobby.GameProgress >= Settings.GameRunTime)
                 {
                     StopGame(lobby.lobbyId, 1);
-                    return;
                 }
 
                 lobby.FugitiveShowCounter++;
@@ -1256,10 +1250,7 @@ namespace LSCC
                 }
             }
 
-            NAPI.Task.Run(() =>
-            {
-                GameUpdate();
-            }, delayTime: 1000);
+            NAPI.Task.Run(GameUpdate, 1000);
 
             return;
         }
