@@ -349,7 +349,7 @@ function UpdateTimer()
             {
                 var blipColor = 45;
                 var blipId = 1;
-                
+
                 if(target.getVariable("Team") == 0) blipColor = 75;
                 else if(target.getVariable("Team") == 1) blipColor = 3;
 
@@ -459,7 +459,7 @@ function OnPlayerEnterVehicle(vehicle, seat)
 mp.events.add("playerEnterVehicle", OnPlayerEnterVehicle);
 mp.events.add("playerWeaponShot", OnPlayerWeaponShot);
 
-mp.events.add("play_anim", (entity, animDictionary, animName, animFlag) => {
+mp.events.add("entplayanim", (entity, animDictionary, animName, animFlag) => {
 	mp.game.streaming.requestAnimDict(animDictionary);
 	new Promise(() => {
 	const timer = setInterval(() => {
@@ -489,7 +489,7 @@ mp.events.add(
 
                 mp.players.local.setEnableHandcuffs(true);
 
-                mp.events.callLocal("play_anim", mp.players.local, "mp_prison_break", "handcuffed", 32);
+                mp.events.callRemote("play_anim", "mp_prison_break", "handcuffed", 32);
             }
             else
             {
@@ -502,11 +502,11 @@ mp.events.add(
         {
             if(status == true)
             {
-                mp.events.callLocal("play_anim", mp.players.local, "ped", "handsup_base", 22);
+                mp.events.callRemote("play_anim", "ped", "handsup_base", 22);
             }
             else
             {
-                mp.events.callLocal("play_anim", mp.players.local, "ped", "handsup_exit", 2);
+                mp.events.callRemote("play_anim", "ped", "handsup_exit", 2);
                 mp.players.local.stopAnim("handsup", "ped", 8.0);
 
                 setTimeout(() => {

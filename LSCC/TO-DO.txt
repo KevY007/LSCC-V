@@ -17,3 +17,5 @@ REMOVE BLIP ONE DAY AND TEST?
 COP CAR SELECTOR LATER
 
 Check LSCC discord.
+
+On spawning use MOvePosition to slowly move?!

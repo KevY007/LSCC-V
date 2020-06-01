@@ -1053,6 +1053,7 @@ namespace LSCC
                         Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
 
                         string carName = "washington";
+                        int overridemaxseats = 0; // For DLC cars that aren't registered in vehicledata.
 
                         switch (random.Next(0, 5))
                         {
@@ -1061,6 +1062,7 @@ namespace LSCC
                                 break;
                             case 1:
                                 carName = "kanjo";
+                                overridemaxseats = 2;
                                 break;
                             case 2:
                                 carName = "ingot";
@@ -1089,7 +1091,9 @@ namespace LSCC
                         playerVehicle.Add(new Tuple<Player, Vehicle, int>(_tempPlayer, pVehicle, 0));
 
                         int seat = 1;
-                        while (seat < pVehicle.MaxOccupants)
+                        int maxseats = pVehicle.MaxOccupants;
+                        if (overridemaxseats != 0) maxseats = overridemaxseats;
+                        while (seat < maxseats)
                         {
                             if (fugitives == 0) break;
 

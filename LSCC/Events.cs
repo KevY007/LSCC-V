@@ -6,10 +6,10 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace LSCC
 {
-
     class Events : Script
     {
         [ServerEvent(Event.PlayerConnected)]
@@ -63,6 +63,15 @@ namespace LSCC
             }, delayTime: 1500);
 
             player.TriggerEvent("InitChaseTimer");
+        }
+
+        [RemoteEvent("play_anim")]
+        public void RequestPlayAnimation(Player player, string animDict, string animName, int animFlags)
+        {
+            RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a.Position.DistanceTo(player.Position) < 200.0).ToList().ForEach((Player act) =>
+            {
+                act.TriggerEvent("entplayanim", player, animDict, animName, animFlags);
+            });
         }
 
         [RemoteEvent("OnScriptedKeyPress")]
@@ -781,6 +790,14 @@ namespace LSCC
             if (player.IsInVehicle) player.SetSharedData("UnstreamedState", 1);
             else player.SetSharedData("UnstreamedState", 0);
 
+            if (player.GetSharedData<int>("Team") == 0 && player.GetSharedData<int>("InLobby") > 0 && player.IsInVehicle && player.Vehicle.HasSharedData("Team"))
+            {
+                if (player.Vehicle.GetSharedData<int>("Team") == 1)
+                {
+                    player.SetSharedData("VisibleBlip", true);
+                }
+            }
+
             player.SetSharedData("UnstreamedX", player.Position.X);
             player.SetSharedData("UnstreamedY", player.Position.Y);
             player.SetSharedData("UnstreamedZ", player.Position.Z);
@@ -811,7 +828,7 @@ namespace LSCC
             {
                 player.SetSharedData("HasShot", true);
                 player.SendNotification("~r~You have now shot, opposite team can now safely shoot you and detect you.");
-                player.SetSharedData("VisibileBlip", true);
+                player.SetSharedData("VisibleBlip", true);
             }
         }
 
@@ -1082,9 +1099,6 @@ namespace LSCC
                 else if (lobby.Fugitives.Contains(player)) player.SetSharedData("Team", 0);
             }
 
-            player.TriggerEvent("HideChaseTimer");
-            player.TriggerEvent("SetTimeWeather", 12, 0, 0, -1);
-
             if (!EPlayer.LoggedIn(player))
             {
                 EPlayer.LoginCameraSetup(player);
@@ -1133,6 +1147,8 @@ namespace LSCC
                 return;
             }
 
+            player.TriggerEvent("HideChaseTimer");
+            player.TriggerEvent("SetTimeWeather", 12, 0, 0, -1);
 
             player.SetSharedData("VisibleBlip", false);
 
