@@ -554,6 +554,12 @@ namespace LSCC
             player.TriggerEvent("DestroyPlayerCamera");
             player.TriggerEvent("TogglePlayerChat", true);
 
+            if (player.HasData("DerbyVehicle"))
+            {
+                player.GetData<Vehicle>("DerbyVehicle").Delete();
+
+                player.ResetData("DerbyVehicle");
+            }
 
             if (forceAutojoin && player.GetData<bool>("AutoJoin") == false)
             {

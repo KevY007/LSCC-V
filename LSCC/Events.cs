@@ -446,18 +446,6 @@ namespace LSCC
             }, delayTime: 3000);
         }
 
-        [ServerEvent(Event.VehicleDeath)]
-        public void OnVehicleDeath(Vehicle veh)
-        {
-            foreach(LobbyData il in Settings.Lobbies)
-            {
-                il.Vehicles.Remove(veh);
-            }
-            Settings.AdminVehicles.Remove(veh);
-
-            veh.Delete();
-        }
-
         [ServerEvent(Event.ChatMessage)]
         public void OnPlayerText(Player player, string message)
         {
