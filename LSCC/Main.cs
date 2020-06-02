@@ -90,6 +90,7 @@ public static class Settings
 
     public static int LastCountUpdate { get; set; }
     public static int LastCountVal { get; set; }
+    public static int LastGameCountVal { get; set; }
 
     // Locations
     public const float LoginCameraX = -550;
@@ -476,6 +477,7 @@ namespace LSCC
             Settings.NextLobbyID = 1;
             Settings.LastCountUpdate = Environment.TickCount;
             Settings.LastCountVal = 0;
+            Settings.LastGameCountVal = 0;
 
             NAPI.World.SetTime(12, 0, 0);
             NAPI.World.SetWeather(Weather.CLOUDS);
@@ -529,27 +531,36 @@ namespace LSCC
 
         public void TimeUpdate()
         {
-            if(Environment.TickCount - Settings.LastCountUpdate >= 30000 && Settings.LastCountVal != RAGE.Entities.Players.Count && 
+            if(Environment.TickCount - Settings.LastCountUpdate >= 30000 && 
                 (int)Discord._client.ConnectionState == 2)
             {
                 Settings.LastCountUpdate = Environment.TickCount;
-                Settings.LastCountVal = RAGE.Entities.Players.Count;
 
-                foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
+                if (Settings.LastCountVal != RAGE.Entities.Players.Count)
                 {
-                    var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCCountID);
+                    Settings.LastCountVal = RAGE.Entities.Players.Count;
 
-                    if (botchan != null)
+                    foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
                     {
-                        botchan.ModifyAsync(vc => vc.Name = ($"Players Online: {RAGE.Entities.Players.Count}"));
+                        var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCCountID);
+
+                        if (botchan != null)
+                        {
+                            botchan.ModifyAsync(vc => vc.Name = ($"Players Online: {RAGE.Entities.Players.Count}"));
+                        }
                     }
+                }
 
-                    botchan = null;
-                    botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCGamesID);
-
-                    if (botchan != null)
+                if(Settings.LastGameCountVal != Settings.Lobbies.Where(l => l.gameStatus == 1).Count())
+                {
+                    foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
                     {
-                        botchan.ModifyAsync(vc => vc.Name = ($"Chases Running: {Settings.Lobbies.Where(l => l.gameStatus == 1).Count()}"));
+                        var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCGamesID);
+
+                        if (botchan != null)
+                        {
+                            botchan.ModifyAsync(vc => vc.Name = ($"Chases Running: {Settings.Lobbies.Where(l => l.gameStatus == 1).Count()}"));
+                        }
                     }
                 }
 
