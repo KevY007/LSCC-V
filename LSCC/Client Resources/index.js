@@ -5,14 +5,10 @@ let currentMuteTime = 0;
 let lastMuteUpdate = 10;
 let lastFunc = "Init";
 
-const fs = require("fs");
-
 function traceLastFunc(iStr)
 {
-    fs.writeFile('tlf_latest.txt', data, (err) => { 
-      
-        if (err) throw err; 
-    }) 
+    mp.storage.data.tlf_latest = iStr;
+    mp.storage.flush();
 }
 
 traceLastFunc("RequireInit");

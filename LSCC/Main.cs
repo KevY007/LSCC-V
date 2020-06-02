@@ -51,7 +51,7 @@ public class LobbyData
         GameProgress = 0;
         GameAutoStart = true;
         LastAutoStartMsg = 0;
-        FugitivePercent = 30;
+        FugitivePercent = 28;
         Enabled = true;
         PlayerCreated = false;
         Password = "";
@@ -782,9 +782,9 @@ namespace LSCC
 
                 if (pCount < 2) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Total players less than two, failed to start"); return false; }
 
-                double perc = (double)pCount * ((double)lobby.FugitivePercent / (double)100);
+                decimal perc = (decimal)pCount * ((decimal)lobby.FugitivePercent / (decimal)100);
 
-                int fugitives = (int)Math.Round(perc);
+                int fugitives = (int)Decimal.Round(perc);
 
                 if (fugitives < 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Fugitives count is zero, failed to start"); return false; }
 
@@ -1061,8 +1061,8 @@ namespace LSCC
                                 carName = "washington";
                                 break;
                             case 1:
-                                carName = "kanjo";
-                                overridemaxseats = 2;
+                                carName = "kuruma";
+                                overridemaxseats = 4;
                                 break;
                             case 2:
                                 carName = "ingot";

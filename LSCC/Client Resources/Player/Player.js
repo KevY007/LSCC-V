@@ -354,7 +354,11 @@ function UpdateTimer()
                 {
                     if(target.getVariable("VoiceMode") == 1)
                     {
-                        target.voiceVolume = 0.4;
+                        if(target.getVariable("Team") == mp.players.local.getVariable("Team"))
+                        {
+                            target.voiceVolume = 0.5;
+                        }
+                        else target.voiceVolume = 0.7;
                     }
                     else
                     {
@@ -382,7 +386,8 @@ function UpdateTimer()
                 if(target.isInAnyVehicle(false)) blipId = 724;
 
                 var position = target.position;
-                if(position.x == 0 && position.z == 0 && position.z == 0)
+                if((position.x == 0 && position.z == 0 && position.z == 0) || (target.handle !== 0) == false || target.handle === null || 
+                    target.handle === undefined)
                 {
                     position.x = target.getVariable("UnstreamedX");
                     position.y = target.getVariable("UnstreamedY");
