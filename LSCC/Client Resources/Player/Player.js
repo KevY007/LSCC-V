@@ -22,7 +22,7 @@ let secondCounter = 0;
 let updateRate = 200;
 let updateInterval = null;
 
-let playerBlips = [];
+//let playerBlips = [];
 
 let specCam = null;
 let specState = false;
@@ -308,6 +308,7 @@ function UpdateTimer()
             }
         }
     }
+    /*
     traceLastFunc(`[Players] Blips Stage1`);
     var blipsToDel = [];
     mp.blips.forEach(blipId =>
@@ -337,7 +338,7 @@ function UpdateTimer()
         }
     }
     traceLastFunc(`[Players] Blips Stage4`);
-
+*/
     mp.players.forEach(target => {
 
         if(target.dimension == mp.players.local.dimension && target != mp.players.local)
@@ -370,7 +371,7 @@ function UpdateTimer()
                     target.voiceVolume = 1 - (dist / MaxVoiceRange);
                 }
             }
-
+/*
             if (target.getVariable("VisibleBlip") !== undefined && target.getVariable("VisibleBlip") == true)
             {
                 var blipColor = 45;
@@ -405,11 +406,11 @@ function UpdateTimer()
                 });
 
                 playerBlips.push(targetBlip.id);
-            }
+            }*/
         }
     });
 
-    traceLastFunc(`[Players] Blips Completed`);
+    traceLastFunc(`[Players] Update Completed`);
 
     return;
 }
