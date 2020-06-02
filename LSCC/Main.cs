@@ -73,7 +73,7 @@ public static class Settings
     public const string MySQL_User = "lsccv";
     public const string MySQL_Password = "perkovicMatko3035";
     public const string MySQL_Database = "lsccv";
-    public const string DCBotToken = "NTkwNjYyMjk1NTgzOTgxNTc5.XtZOiQ._u1fgFRyLMnr2m3gzAtj69OPf8w";
+    public const string DCBotToken = "NjAyNTQ1Mzc0MDY1OTgzNTgw.XtaCEQ.clpqVL5c0X_38xkT-mYTr4_N9a4";
     public const ulong DCServerID = 713731146072064040;
     public const ulong DCCountID = 717405966123139104;
     public const ulong DCGamesID = 717408461083639870;
