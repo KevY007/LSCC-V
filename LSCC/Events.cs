@@ -96,7 +96,7 @@ namespace LSCC
                 switch(voiceMode)
                 {
                     case 0:
-                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Nearby (50m)");
+                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Nearby (30m) (70m with megaphone/cop car)");
                         break;
                     case 1:
                         player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Team Chat");
@@ -124,11 +124,20 @@ namespace LSCC
                     List<Player> listeners = new List<Player>();
                     if(player.GetSharedData<int>("VoiceMode") == 0)
                     {
+                        double dist = 30.0;
+                        if(player.IsInVehicle && player.Vehicle.HasSharedData("Team") && player.Vehicle.GetSharedData<int>("Team") == 1)
+                        {
+                            dist = 70.0;
+                        }
+
                         listeners.AddRange(RAGE.Entities.Players.All.Where(t => t.Dimension == player.Dimension &&
-                            Vector3.Distance(t.Position, player.Position) <= 50.0));
+                            Vector3.Distance(t.Position, player.Position) <= dist));
                     }
                     else if(player.GetSharedData<int>("VoiceMode") == 1)
                     {
+                        listeners.AddRange(RAGE.Entities.Players.All.Where(t => t.Dimension == player.Dimension &&
+                            Vector3.Distance(t.Position, player.Position) <= 15.0));
+
                         LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
 
                         if (lobby != null)

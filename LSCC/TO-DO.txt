@@ -19,3 +19,12 @@ COP CAR SELECTOR LATER
 Check LSCC discord.
 
 On spawning use MOvePosition to slowly move?!
+KevYToday at 4:15 AM
+or maybe cause I went out of blip streaming range
+and the server switched to unstreamed pos
+no idea.
+IT could be that.
+see if player entity is valid in blips?
+4 door new dlc fugitive cars?
+megaphone command and increased voice in copcar?
+reduce range normally?

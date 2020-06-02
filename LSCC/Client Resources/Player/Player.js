@@ -30,10 +30,13 @@ let specTarget = null;
 mp.voiceChat.muted = true;
 let MaxVoiceRange = 50;
 
+traceLastFunc("[Players] CreateVars");
+
 mp.events.add("onOpenChatbox", (toggle) =>
 {
     chatStatus = toggle;
     mp.events.callRemote("UpdateChatState", toggle);
+    traceLastFunc(`[Players] ChatBox Toggled ${toggle}`);
 });
 
 function calcDist(v1, v2) {
@@ -57,6 +60,8 @@ mp.keys.bind(
             let vehicle = mp.vehicles.atHandle(vehHandle);
 
             if (vehicle !== null) {
+                traceLastFunc(`[Players] Attempt passenger-enter on veh`);
+
                 let seat_pside_r = vehicle.getWorldPositionOfBone(vehicle.getBoneIndexByName("seat_pside_r"));
                 let seat_pside_f = vehicle.getWorldPositionOfBone(vehicle.getBoneIndexByName("seat_pside_f"));
                 let seat_dside_r = vehicle.getWorldPositionOfBone(vehicle.getBoneIndexByName("seat_dside_r"));
@@ -86,12 +91,16 @@ mp.keys.bind(
 mp.keys.bind(0x5A, false, function() {
     if(chatStatus == false)
     {
+        traceLastFunc(`[Players] Attempt tog GPS`);
+
         mp.events.callRemote("OnScriptedKeyPress", 0x5A, true);
     }
 });
 
 
 mp.keys.bind(0x4E, false, function() {
+    traceLastFunc(`[Players] Disable Voice`);
+
 	mp.events.callRemote("OnScriptedKeyPress", 0x4E, false);
     mp.voiceChat.muted = true;
 });
@@ -100,6 +109,8 @@ mp.keys.bind(0x4E, true, function() {
 	if(!chatStatus && 
 		!(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false)) 
 	{
+        traceLastFunc(`[Players] Enable Voice`);
+
 		mp.voiceChat.muted = false;
 		mp.events.callRemote("OnScriptedKeyPress", 0x4E, true);
 	}
@@ -115,6 +126,8 @@ mp.keys.bind(0x09, true, function() {
 
 
 function createCam(x, y, z, rx, ry, rz, viewangle) {
+    traceLastFunc(`[Players] Create Cam`);
+
     camera = mp.cameras.new("Cam", { x, y, z }, { x: rx, y: ry, z: rz }, viewangle);
     camera.setActive(true);
     mp.game.cam.renderScriptCams(true, true, 20000000000000000000000000, false, false);
@@ -131,6 +144,8 @@ mp.events.add("render", () => {
         }
         else 
         {
+            traceLastFunc(`[Players] Stop Spec (target handle)`);
+
             specCam.setActive(false); 
             specState = false;
             mp.events.callLocal("StopSpectating");
@@ -140,6 +155,8 @@ mp.events.add("render", () => {
 
 function destroyCam() {
     if (!camera) return;
+    traceLastFunc(`[Players] Disable Cam`);
+
     camera.setActive(false);
     mp.game.cam.renderScriptCams(false, true, 0, true, true);
     camera.destroy();
@@ -171,6 +188,8 @@ function UpdateTimer()
         secondCounter = 0;
         if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
         {
+            traceLastFunc(`[Players] Update Stream Data`);
+
             mp.events.callRemote("UpdateStreamData");
 
             if (specState == true && specCam != null && specTarget != null) {
@@ -289,12 +308,13 @@ function UpdateTimer()
             }
         }
     }
-
+    traceLastFunc(`[Players] Blips Stage1`);
     var blipsToDel = [];
     mp.blips.forEach(blipId =>
     {
         blipsToDel.push(blipId);
     });
+    traceLastFunc(`[Players] Blips Stage2`);
 
     blipsToDel.forEach(blip =>
     {
@@ -303,6 +323,7 @@ function UpdateTimer()
             blip.destroy();
         }
     });
+    traceLastFunc(`[Players] Blips Stage3`);
 
     for (let i = 0; i < mp.blips.length; i++)
     {
@@ -315,6 +336,7 @@ function UpdateTimer()
             }
         }
     }
+    traceLastFunc(`[Players] Blips Stage4`);
 
     mp.players.forEach(target => {
 
@@ -381,6 +403,9 @@ function UpdateTimer()
             }
         }
     });
+
+    traceLastFunc(`[Players] Blips Completed`);
+
     return;
 }
 
@@ -444,19 +469,6 @@ function OnPlayerWeaponShot(targetPosition, targetEntity)
     }
 }
 
-function OnPlayerEnterVehicle(vehicle, seat) 
-{
-    if(seat == -1)
-    {
-        mp.game.invoke(0x6E8834B52EC20C77, mp.players.local, false); // Disable driveby as DRIVER, (invoked SetPlayerCanDoDriveby) (doesnt work yet)
-    }
-    else
-    {
-        mp.game.invoke(0x6E8834B52EC20C77, mp.players.local, true);
-    }
-}
-
-mp.events.add("playerEnterVehicle", OnPlayerEnterVehicle);
 mp.events.add("playerWeaponShot", OnPlayerWeaponShot);
 
 mp.events.add("entplayanim", (entity, animDictionary, animName, animFlag) => {
@@ -632,8 +644,8 @@ mp.events.add(
                         target.setCanBreak(true);
                         target2.setCanBreak(true);
 
-                        target2.setInvincible(true);
-                        target.setInvincible(true);
+                        target2.setInvincible(false);
+                        target.setInvincible(false);
                     });
                 });
             }

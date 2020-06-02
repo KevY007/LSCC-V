@@ -3,7 +3,19 @@ let lastJailUpdate = 10;
 
 let currentMuteTime = 0;
 let lastMuteUpdate = 10;
+let lastFunc = "Init";
 
+const fs = require("fs");
+
+function traceLastFunc(iStr)
+{
+    fs.writeFile('tlf_latest.txt', data, (err) => { 
+      
+        if (err) throw err; 
+    }) 
+}
+
+traceLastFunc("RequireInit");
 require('mp-commands');
 require("./nativeui/index.js");
 require("./chat/index.js");
