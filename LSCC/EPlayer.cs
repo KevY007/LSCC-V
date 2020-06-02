@@ -622,7 +622,7 @@ namespace LSCC
 
         }
 
-        public static void SendMessageInLobby(int lobbyid, string message)
+        public static void SendMessageInLobby(int lobbyid, string message, bool spam = false)
         {
             foreach (Player player in Settings.LoggedInPlayers)
             {
@@ -631,6 +631,8 @@ namespace LSCC
                     player.SendChatMessage(message);
                 }
             }
+
+            if (!spam) Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) |** {message}");
         }
         
         public static void SendMessageToAllAdmins(string message)
@@ -645,6 +647,8 @@ namespace LSCC
                     if (acc.Admin > 0) i.SendChatMessage(message);
                 }
             }
+
+            Discord.SendTextChannel("staff-bot", $"**(ADM) |** {message}");
         }
     }
 }

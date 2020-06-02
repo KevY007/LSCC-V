@@ -68,11 +68,15 @@ public static class Settings
     public const int MaxLobbies = 5; // Default/starting lobby num.
     public const int DefaultMaxInLobby = 35;
 
-    // MySQL Settings
+    // Connection Settings
     public const string MySQL_Host = "localhost";
     public const string MySQL_User = "lsccv";
     public const string MySQL_Password = "perkovicMatko3035";
     public const string MySQL_Database = "lsccv";
+    public const string DCBotToken = "NTkwNjYyMjk1NTgzOTgxNTc5.XtZOiQ._u1fgFRyLMnr2m3gzAtj69OPf8w";
+    public const ulong DCServerID = 713731146072064040;
+    public const ulong DCCountID = 717405966123139104;
+    public const ulong DCGamesID = 717408461083639870;
 
     // Global Variables (changing accordingly)
     public static List<LobbyData> Lobbies { get; set; }
@@ -83,6 +87,9 @@ public static class Settings
     public static int[] Time { get; set; }
     public static int DerbyTimeLeft { get; set; }
     public static int LastDerbyTick { get; set; }
+
+    public static int LastCountUpdate { get; set; }
+    public static int LastCountVal { get; set; }
 
     // Locations
     public const float LoginCameraX = -550;
@@ -467,6 +474,8 @@ namespace LSCC
 
             Settings.MaxPlayersInLobby = Settings.DefaultMaxInLobby;
             Settings.NextLobbyID = 1;
+            Settings.LastCountUpdate = Environment.TickCount;
+            Settings.LastCountVal = 0;
 
             NAPI.World.SetTime(12, 0, 0);
             NAPI.World.SetWeather(Weather.CLOUDS);
@@ -478,6 +487,8 @@ namespace LSCC
 
             TimeUpdate();
             GameUpdate();
+
+            Discord.Main();
         }
 
         public void GameStartCountdown(int time, int lobbyid)
@@ -518,6 +529,32 @@ namespace LSCC
 
         public void TimeUpdate()
         {
+            if(Environment.TickCount - Settings.LastCountUpdate >= 30000 && Settings.LastCountVal != RAGE.Entities.Players.Count && 
+                (int)Discord._client.ConnectionState == 2)
+            {
+                Settings.LastCountUpdate = Environment.TickCount;
+                Settings.LastCountVal = RAGE.Entities.Players.Count;
+
+                foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
+                {
+                    var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCCountID);
+
+                    if (botchan != null)
+                    {
+                        botchan.ModifyAsync(vc => vc.Name = ($"Players Online: {RAGE.Entities.Players.Count}"));
+                    }
+
+                    botchan = null;
+                    botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCGamesID);
+
+                    if (botchan != null)
+                    {
+                        botchan.ModifyAsync(vc => vc.Name = ($"Chases Running: {Settings.Lobbies.Where(l => l.gameStatus == 1).Count()}"));
+                    }
+                }
+
+                NAPI.Util.ConsoleOutput("Updated the DISCORD counts.");
+            }
             foreach (LobbyData lobby in Settings.Lobbies)
             {
                 if (lobby != null)
@@ -605,7 +642,7 @@ namespace LSCC
                                     {
                                         foreach (Player player in Settings.LoggedInPlayers)
                                         {
-                                            EPlayer.SendMessageInLobby(lobby.lobbyId, "!{#FFFF00}[GAME] !{#FFFFFF}Game will not start unless there are 2+ players to start a match.");
+                                            EPlayer.SendMessageInLobby(lobby.lobbyId, "!{#FFFF00}[GAME] !{#FFFFFF}Game will not start unless there are 2+ players to start a match.", true);
                                         }
                                         lobby.LastAutoStartMsg = Environment.TickCount;
                                     }
@@ -670,6 +707,7 @@ namespace LSCC
                     else
                     {
                         player.SendChatMessage("!{#E6DD3C}[DERBY] " + winner.Name + " won the derby and has gained " + winXP + "XP.");
+                        Discord.SendTextChannel("staff-bot", $"**(Derby) | Winner: {winner.Name} | XP Gained: {winXP}**");
                     }
                 }
 
@@ -797,19 +835,19 @@ namespace LSCC
 
                     if (ContextFactory.Instance.Maps.Count() < 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has no maps added, failed to start"); return false; }
                     NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
-                    List<Map> mapList = ContextFactory.Instance.Maps.Where(a => a.Enabled == true).ToList();
+                    List<Map> mapList = ContextFactory.Instance.Maps.AsQueryable().Where(a => a.Enabled == true).ToList();
                     NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
                     if (mapList.Count < 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has maps but none of them were enabled! Failed to start."); return false; }
                     NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
                     Map map = mapList.OrderBy(c => Guid.NewGuid()).FirstOrDefault();
                     NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
-                    NAPI.Util.ConsoleOutput($"[Lobby " + lobbyid + $"] Selected Map [{map.Name}] | Total Spawns: [{ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID).Count()}]");
+                    NAPI.Util.ConsoleOutput($"[Lobby " + lobbyid + $"] Selected Map [{map.Name}] | Total Spawns: [{ContextFactory.Instance.MapSpawns.AsQueryable().Where(a => a.mapID == map.SQL_ID).Count()}]");
                     NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
-                    if (ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 0).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no fugitive spawns! Abort."); return false; }
-                    if (ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 1).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no cop spawns! Abort."); return false; }
+                    if (ContextFactory.Instance.MapSpawns.AsQueryable().Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 0).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no fugitive spawns! Abort."); return false; }
+                    if (ContextFactory.Instance.MapSpawns.AsQueryable().Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 1).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no cop spawns! Abort."); return false; }
 
                     NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
-                    List<MapSpawn> Spawns = ContextFactory.Instance.MapSpawns.Where(x => x.mapID == map.SQL_ID).ToList();
+                    List<MapSpawn> Spawns = ContextFactory.Instance.MapSpawns.AsQueryable().Where(x => x.mapID == map.SQL_ID).ToList();
                     NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
                     List<int> UsedSpawns = new List<int>(Spawns.Count + 1);
                     NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;

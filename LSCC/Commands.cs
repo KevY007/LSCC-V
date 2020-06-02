@@ -1239,7 +1239,7 @@ namespace LSCC
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode");
             player.SendChatMessage("!{#5FBCAC}[Keys]: Voice: N | GPS: Z | Scoreboard: O | Rapple: X | Switch Voice Mode: N+TAB");
-            player.SendChatMessage("!{#61A9FA}[Cop]: /gps /cuff");
+            player.SendChatMessage("!{#61A9FA}[Cop]: /gps /cuff /m(egaphone)");
             player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup /s(top)a(nim)");
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /freeroam /veh /dm /dmarenas /derby");
             player.SendChatMessage("!{#A5A8A8}[Debug]: /pos /updaterate (changes the blip updating interval)");
@@ -1711,7 +1711,7 @@ namespace LSCC
             if (map == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}No map with this name exists."); return; }
 
 
-            ContextFactory.Instance.MapSpawns.RemoveRange(ContextFactory.Instance.MapSpawns.Where(a => a.mapID == map.SQL_ID));
+            ContextFactory.Instance.MapSpawns.RemoveRange(ContextFactory.Instance.MapSpawns.AsQueryable().Where(a => a.mapID == map.SQL_ID));
             ContextFactory.Instance.Maps.Remove(map);
 
             ContextFactory.Instance.SaveChanges();
@@ -1859,6 +1859,31 @@ namespace LSCC
             }
         }
 
+        [Command("m", Alias = "megaphone", GreedyArg = true)]
+        public void cmd_m(Player player, string text)
+        {
+            bool isInCopchase = false;
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (lobby != null)
+            {
+                if (lobby.Cops.Contains(player) && lobby.gameStatus == 1)
+                {
+                    isInCopchase = true;
+                }
+            }
+
+            if (!isInCopchase) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in the copchase as a cop."); return; }
+
+           string chatStr = $"!{{#FFFF00}}** [MEGAPHONE] {player.Name.Replace("_", " ")}: {text}";
+
+            foreach (Player i in RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension 
+                && a.Position.DistanceTo(player.Position) < 150.0))
+            {
+                i.SendChatMessage(chatStr);
+            }
+            return;
+        }
+
         [Command("radio", Alias = "walkietalkie", GreedyArg = true)]
         public void cmd_radio(Player player, string text)
         {
@@ -1931,6 +1956,8 @@ namespace LSCC
             {
                 NAPI.Chat.SendChatMessageToAll($"(( [OOC] !{{#FF6347}}{player.Name}!{{#FFFFFF}}: {text} ))");
             }
+
+            Discord.SendTextChannel("staff-bot", $"**(OOC) | {player.Name}**: {text}");
         }
         [Command("pm", GreedyArg = true)]
         public void cmd_pm(Player player, Player target, string text)

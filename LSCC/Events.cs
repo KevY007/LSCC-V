@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices.ComTypes;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace LSCC
 {
@@ -17,6 +18,9 @@ namespace LSCC
         {
             BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.HWID.CompareTo(player.Serial) == 0 || ban.IP.CompareTo(player.Address) == 0 ||
                 ban.RockstarID == player.SocialClubId);
+
+
+            Discord.SendTextChannel("staff-bot", $"**{player.Name} has joined the server.** *(Total online: {RAGE.Entities.Players.Count})*");
 
             if (ban != null)
             {
@@ -231,6 +235,8 @@ namespace LSCC
             }
 
             EPlayer.ResetPlayerData(player);
+
+            Discord.SendTextChannel("staff-bot", $"**{player.Name} has left the server.** *(Total online: {RAGE.Entities.Players.Count})*");
         }
 
         [ServerEvent(Event.PlayerDeath)]
@@ -263,6 +269,7 @@ namespace LSCC
             if (killer != null && !killer.IsNull && killer != player)
             {
                 NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
+                Discord.SendTextChannel("staff-bot", $"**(Death) | Killer: {killer.Name} ({killer.GetSharedData<int>("Team")}), Victim: {player.Name} ({player.GetSharedData<int>("Team")}), Item: {(reasonStr == null ? "N/A" : reasonStr)}**");
 
                 if (killer.GetSharedData<int>("InLobby") > -1 && killer.GetSharedData<int>("InDM") > -1)
                 {
@@ -498,6 +505,8 @@ namespace LSCC
 
         public static void OnPlayerLogin(Player player, Account acc)
         {
+            Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in.*");
+
             EPlayer.SetDiscordStatus(player, $"Logging in as {acc.Username}");
             NAPI.Util.ConsoleOutput($"[Login] {player.Name} has logged in as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
@@ -735,6 +744,8 @@ namespace LSCC
 
         public static void OnPlayerRegister(Player player, Account acc)
         {
+            Discord.SendTextChannel("staff-bot", $"*{player.Name} has registered.*");
+
             EPlayer.SetDiscordStatus(player, $"Registering as {acc.Username}");
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has registered as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
