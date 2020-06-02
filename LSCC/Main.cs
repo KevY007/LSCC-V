@@ -547,6 +547,7 @@ namespace LSCC
                         if (botchan != null)
                         {
                             botchan.ModifyAsync(vc => vc.Name = ($"Players Online: {RAGE.Entities.Players.Count}"));
+                            Settings.LastCountVal = RAGE.Entities.Players.Count;
                         }
                     }
                 }
@@ -560,6 +561,7 @@ namespace LSCC
                         if (botchan != null)
                         {
                             botchan.ModifyAsync(vc => vc.Name = ($"Chases Running: {Settings.Lobbies.Where(l => l.gameStatus == 1).Count()}"));
+                            Settings.LastGameCountVal = Settings.Lobbies.Where(l => l.gameStatus == 1).Count();
                         }
                     }
                 }
