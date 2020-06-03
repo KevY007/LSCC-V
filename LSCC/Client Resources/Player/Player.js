@@ -11,7 +11,9 @@ let collisionTime = 0;
 let chaseRunning = false;
 let chaseTimeCur = 0;
 let chaseTimeMax = 390;
+
 let chatStatus = false;
+let chatState = true;
 
 let derbyText = null;
 let derbyTimeText = null;
@@ -49,6 +51,19 @@ function calcDist(v1, v2) {
         v2.z
     );
 }
+
+mp.keys.bind(
+    0x76,
+    false,
+    () => {
+        if(!chatStatus && 
+            !(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false)) 
+        {
+            chatState = !chatState;
+            mp.gui.chat.show(chatState);
+        }
+    }
+);
 
 mp.keys.bind(
     71,

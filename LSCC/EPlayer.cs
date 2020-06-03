@@ -294,6 +294,74 @@ namespace LSCC
             return;
         }
 
+        public static string GetAdminLevelName(int level, bool colored = false)
+        {
+            string name = "";
+            switch(level)
+            {
+                case 1:
+                    if (colored) name = "!{#EE9A4D}";
+                    name = name + "Moderator";
+                    break;
+                case 2:
+                    if (colored) name = "!{#298EFF}";
+                    name = name + "Trial Admin";
+                    break;
+                case 3:
+                    if (colored) name = "!{#00FF00}";
+                    name = name + "General Admin";
+                    break;
+                case 4:
+                    if (colored) name = "!{#FF0000}";
+                    name = name + "Senior Admin";
+                    break;
+                case 5:
+                    if (colored) name = "!{#990000}";
+                    name = name + "Lead Admin";
+                    break;
+                case 6:
+                    if (colored) name = "!{#AB0707}";
+                    name = name + "Management";
+                    break;
+                default:
+                    name = "Player";
+                    break;
+            }
+            return name;
+        }
+
+        public static string GetDonatorLevelName(int level, bool colored = false)
+        {
+            string name = "";
+            switch (level)
+            {
+                case 1:
+                    if (colored) name = "!{#CD7F32}";
+                    name = name + "Bronze Donator";
+                    break;
+                case 2:
+                    if (colored) name = "!{#C0C0C0}";
+                    name = name + "Silver Donator";
+                    break;
+                case 3:
+                    if (colored) name = "!{#FFD700}";
+                    name = name + "Gold Donator";
+                    break;
+                case 4:
+                    if (colored) name = "!{#9DB7C9}";
+                    name = name + "Platinum Donator";
+                    break;
+                case 5:
+                    if (colored) name = "!{#E0115F}";
+                    name = name + "Ruby Donator";
+                    break;
+                default:
+                    name = "Player";
+                    break;
+            }
+            return name;
+        }
+
         public static Random rand = new Random();
 
         public static void ResetPlayerData(Player player)

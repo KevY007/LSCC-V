@@ -527,7 +527,7 @@ namespace LSCC
 
         public void TimeUpdate()
         {
-            if(Environment.TickCount - Settings.LastCountUpdate >= 60000 && 
+            if(Environment.TickCount - Settings.LastCountUpdate >= 120000 && 
                 (int)Discord._client.ConnectionState == 2)
             {
                 Settings.LastCountUpdate = Environment.TickCount;

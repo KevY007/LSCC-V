@@ -1229,26 +1229,42 @@ namespace LSCC
             cmd_lobby(target);
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has sent {target.Name} to lobby.");
         }
-        
+
+        [Command("keys")]
+        public void cmd_keys(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            player.SendChatMessage("!{#FF6347} Key: Function.");
+            player.SendChatMessage("!{#FF6347} N: Push to talk voicechat.");
+            player.SendChatMessage("!{#FF6347} Z: Toggle GPS as a Cop.");
+            player.SendChatMessage("!{#FF6347} O: Toggle scoreboard, displays a scrollbar and mouse if needed.");
+            player.SendChatMessage("!{#FF6347} X: Rapple from a helicopter (not all helicopters, try maverick).");
+            player.SendChatMessage("!{#FF6347} Hold N and press TAB: Switch voice chat modes.");
+        }
+
         [Command("cmds", Alias = "help")]
         public void cmd_help(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
             player.SendChatMessage("!{#0079DB}[Los Santos Copchase V !{#2BA3FF}BETA Commands]:");
-            player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /r(adio) /wt");
+            player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /r(adio) /wt /keys /admins");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats");
-            player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode");
-            player.SendChatMessage("!{#5FBCAC}[Keys]: Voice: N | GPS: Z | Scoreboard: O | Rapple: X | Switch Voice Mode: N+TAB");
+            player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys for activation)");
             player.SendChatMessage("!{#61A9FA}[Cop]: /gps /cuff /m(egaphone)");
             player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup /s(top)a(nim)");
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /freeroam /veh /dm /dmarenas /derby");
             player.SendChatMessage("!{#A5A8A8}[Debug]: /pos /updaterate (changes the blip updating interval)");
 
+            if (EPlayer.GetAccount(player).DonatorLevel >= 1)
+            {
+                player.SendChatMessage("!{#F7EB05}[Bronze Donator] /d(onator)c(hat)");
+            }
             if (EPlayer.GetAccount(player).DonatorLevel >= 2)
             {
-                player.SendChatMessage("!{#F7EB05}[Donator Lv. 2] /createlobby /deletelobby /setlobbypassword /setlobbyfugitivepercent");
+                player.SendChatMessage("!{#F7EB05}[Silver Donator] /createlobby /deletelobby /setlobbypassword /setlobbyfugitivepercent");
             }
 
             if (EPlayer.GetAccount(player).Admin >= 1) player.SendChatMessage("!{#FF6347}For admin commands, visit /acmds.");
@@ -1597,7 +1613,7 @@ namespace LSCC
             }
             if (EPlayer.GetAccount(player).Admin >= 5)
             {
-                player.SendChatMessage("[Admin Lv 5]: /maps /deletemap /createmap /addmapspawn");
+                player.SendChatMessage("[Admin Lv 5]: /maps /deletemap /createmap /addmapspawn /setdonator");
             }
             if (EPlayer.GetAccount(player).Admin >= 6)
             {
@@ -1817,9 +1833,57 @@ namespace LSCC
             }
 
             t_acc.Admin = level;
-            player.SendChatMessage($"!{{#00FF33}}You have set {target.Name}'s admin level to {level}");
-            NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#00FF33}}{player.Name} has set your admin level to {level}");
+            player.SendChatMessage($"!{{#00FF33}}You have set {target.Name}'s admin level to {EPlayer.GetAdminLevelName(level, true)} ({level})");
+            NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#00FF33}}{player.Name} has set your admin level to {EPlayer.GetAdminLevelName(level, true)} ({level})");
             EPlayer.Save(target);
+        }
+
+        [Command("setdonator", Alias = "makedonator")]
+        public void cmd_setdonator(Player player, Player target, int level)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 5)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                return;
+            }
+
+            if (!EPlayer.LoggedIn(target)) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target not logged in."); return; }
+
+
+            Account t_acc = target.GetData<Account>("AccountHandle");
+
+            if (level < 0 || level > 5)
+            { // Bronze, Silver, Gold, Plat, Ruby
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed 5.");
+                return;
+            }
+
+            t_acc.DonatorLevel = level;
+            player.SendChatMessage($"!{{#00FF33}}You have set {target.Name}'s donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
+            NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#00FF33}}{player.Name} has set your donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
+            EPlayer.Save(target);
+        }
+
+        [Command("dc", Alias = "donatorchat", GreedyArg = true)]
+        public void cmd_donatorchat(Player player, string text)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).DonatorLevel < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                return;
+            }
+
+            foreach (Player p in Settings.LoggedInPlayers)
+            {
+                if(EPlayer.GetAccount(p).DonatorLevel > 0) player.SendChatMessage($"!{{#F7EB05}}[{EPlayer.GetDonatorLevelName(EPlayer.GetAccount(player).DonatorLevel, true)}!{{#F7EB05}}] {player.Name}: {text}");
+            }
+            return;
         }
 
         [Command("adminchat", Alias = "a", GreedyArg = true)]
@@ -1938,6 +2002,32 @@ namespace LSCC
             return;
         }
 
+        [Command("admins", Alias = "staff")]
+        public void cmd_admins(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if(EPlayer.GetAccount(player).Admin < 1 && EPlayer.GetAccount(player).Level < 10)
+            {
+                EPlayer.SendMessageToAllAdmins("!{#FF6347}[AdmWarn] " + player.Name + " used /admins and is under level 10.");
+            }
+
+            if(Settings.LoggedInPlayers.Count(b => EPlayer.LoggedIn(b) == true && EPlayer.GetAccount(b).Admin > 0) < 1)
+            {
+                player.SendChatMessage("!{#FF0000}No admins are online currently but don't do dumb moves, admins are always watching from discord.");
+                return;
+            }
+
+            player.SendChatMessage("!{#FF6347}Online Staff:");
+
+            foreach (Player adm in Settings.LoggedInPlayers.Where(b => EPlayer.LoggedIn(b) == true && EPlayer.GetAccount(b).Admin > 0))
+            {
+                player.SendChatMessage($"{EPlayer.GetAdminLevelName(EPlayer.GetAccount(adm).Admin, true)}: !{#FFFFFF}{adm.Name}");
+            }
+            return;
+        }
+
         [Command("ooc", Alias = "o", GreedyArg = true)]
         public void cmd_ooc(Player player, string text)
         {
@@ -1956,7 +2046,7 @@ namespace LSCC
             }
             else
             {
-                NAPI.Chat.SendChatMessageToAll($"(( [OOC] !{{#FF6347}}{player.Name}!{{#FFFFFF}}: {text} ))");
+                NAPI.Chat.SendChatMessageToAll($"(( [OOC] {EPlayer.GetAdminLevelName(EPlayer.GetAccount(player).Admin, true)}!{{#FFFFFF}} {player.Name}: {text} ))");
             }
 
             Discord.SendTextChannel("staff-bot", $"**(OOC) | {player.Name}**: {text}");

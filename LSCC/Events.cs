@@ -672,7 +672,7 @@ namespace LSCC
 
             Account acc = EPlayer.GetAccount(player);
 
-            if (slot == 1 || slot == 7 && acc.DonatorLevel < 1)
+            if ((slot == 1 || slot == 7) && acc.DonatorLevel < 1)
             {
                 player.SendNotification("~r~Only donators can use this itemgroup (masks, accessories).");
                 return;
