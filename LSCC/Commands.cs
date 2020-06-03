@@ -833,8 +833,14 @@ namespace LSCC
             return;
         }
 
+        [Command("fontsize", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
+        public void cmd_fontsize(Player player)
+        {
+            return;
+        }
+
         [Command("rappel", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
-        public void cmd_rapple(Player player)
+        public void cmd_rappel(Player player)
         {
             return;
         }
@@ -1241,6 +1247,7 @@ namespace LSCC
             player.SendChatMessage("!{#FF6347} O: Toggle scoreboard, displays a scrollbar and mouse if needed.");
             player.SendChatMessage("!{#FF6347} X: Rapple from a helicopter (not all helicopters, try maverick).");
             player.SendChatMessage("!{#FF6347} Hold N and press TAB: Switch voice chat modes.");
+            player.SendChatMessage("!{#FF6347} F7: Hide/show chat.");
         }
 
         [Command("cmds", Alias = "help")]
@@ -1249,7 +1256,7 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player)) return;
 
             player.SendChatMessage("!{#0079DB}[Los Santos Copchase V !{#2BA3FF}BETA Commands]:");
-            player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /r(adio) /wt /keys /admins");
+            player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /r(adio) /wt /keys /admins /fontsize");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys for activation)");

@@ -59,12 +59,12 @@ namespace LSCC
             NAPI.Task.Run(() =>
             {
                 EPlayer.LoginCameraSetup(player);
-            }, delayTime: 1000);
+            }, delayTime: 1);
 
             NAPI.Task.Run(() =>
             {
                 EPlayer.LoginBrowserSetup(player);
-            }, delayTime: 1500);
+            }, delayTime: 500);
 
             player.TriggerEvent("InitChaseTimer");
         }

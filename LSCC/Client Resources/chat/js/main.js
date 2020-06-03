@@ -7,7 +7,8 @@ let chat =
 	enabled: false,
 	active: true,
 	historyMsgs: [],
-	currentIndex: 0
+	currentIndex: 0,
+	loaded: false
 };
 
 const MAX_MSG_HISTORY = 12;
@@ -53,6 +54,7 @@ var chatAPI =
 {
 	push: (text_) =>
 	{
+		if(!chat.loaded) return;
 		let colorPositions = [];
 		let colors = [];
 		let chatElement = "<li>";
@@ -93,6 +95,7 @@ var chatAPI =
 	
 	clear: () =>
 	{
+		if(!chat.loaded) return;
 		chat.container.html("");
 	},
 	
@@ -130,6 +133,7 @@ for(let fn in api)
 $(document).ready(function()
 {
 	chat.container = $("#chat ul#chat_messages");
+	chat.loaded = true;
 	
     $(".ui_element").show();
 	chatAPI.push("!{#A9C4E4}Connected to Los Santos Copchase.");

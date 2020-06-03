@@ -203,6 +203,29 @@ function UpdateTimer()
         secondCounter = 0;
         if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
         {
+            traceLastFunc(`[Players] Update VoiceData`);
+
+            mp.players.forEachInStreamRange(target => {
+                if(target.dimension == mp.players.local.dimension && mp.players.exists(target) && target != mp.players.local && 
+                    target.handle !== 0)
+                {
+                    if(!target.voice3d) target.voice3d = true;
+    
+                    const playerPos = target.position;
+                    var localPos = mp.players.local.position;
+                    let dist = mp.game.system.vdist(playerPos.x, playerPos.y, playerPos.z, localPos.x, localPos.y, localPos.z);
+                    
+                    if(dist > MaxVoiceRange) {
+                        if(target.getVariable("VoiceMode") == 1) {
+                            if(target.getVariable("Team") == mp.players.local.getVariable("Team")) target.voiceVolume = 0.5;
+                            else target.voiceVolume = 0.7;
+                        }
+                        else target.voiceVolume = 0.0;
+                    }
+                    else target.voiceVolume = 1 - (dist / MaxVoiceRange);
+                }
+            });
+
             traceLastFunc(`[Players] Update Stream Data`);
 
             mp.events.callRemote("UpdateStreamData");
@@ -354,38 +377,6 @@ function UpdateTimer()
     }
     traceLastFunc(`[Players] Blips Stage4`);
 */
-    mp.players.forEach(target => {
-
-        if(target.dimension == mp.players.local.dimension && target != mp.players.local)
-        {
-            if(target.handle !== 0)
-            {
-                if(!target.voice3d) target.voice3d = true;
-
-                const playerPos = target.position;
-                var localPos = mp.players.local.position;
-                let dist = mp.game.system.vdist(playerPos.x, playerPos.y, playerPos.z, localPos.x, localPos.y, localPos.z);
-                
-                if(dist > MaxVoiceRange)
-                {
-                    if(target.getVariable("VoiceMode") == 1)
-                    {
-                        if(target.getVariable("Team") == mp.players.local.getVariable("Team"))
-                        {
-                            target.voiceVolume = 0.5;
-                        }
-                        else target.voiceVolume = 0.7;
-                    }
-                    else
-                    {
-                        target.voiceVolume = 0.0;
-                    }
-                }
-                else
-                {
-                    target.voiceVolume = 1 - (dist / MaxVoiceRange);
-                }
-            }
 /*
             if (target.getVariable("VisibleBlip") !== undefined && target.getVariable("VisibleBlip") == true)
             {
@@ -422,10 +413,7 @@ function UpdateTimer()
 
                 playerBlips.push(targetBlip.id);
             }*/
-        }
-    });
 
-    traceLastFunc(`[Players] Update Completed`);
 
     return;
 }
