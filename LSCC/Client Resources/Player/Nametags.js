@@ -164,7 +164,7 @@ mp.events.add('render', (nametags) => {
                 
                 if(armour > 0) 
                 {
-                    y2 -= 0.016;
+                    y2 -= 0.012;
                     graphics.drawRect(x, y2, width + border * 2, height + border * 2, 0, 0, 0, 200);
                     graphics.drawRect(x, y2, width, height, 143, 143, 143, 255);
                     graphics.drawRect(x - width / 2 * (1 - armour), y2, width * armour, height, 255, 255, 255, 200);

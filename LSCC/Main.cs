@@ -617,6 +617,8 @@ namespace LSCC
                                 {
                                     lobby.gameStatus = 2;
 
+                                    NAPI.Chat.SendChatMessageToAll($"[Lobby {lobby.lobbyId}] Copchase will start in 10 seconds... ({pCount} players currently)");
+
                                     foreach (Player player in Settings.LoggedInPlayers)
                                     {
                                         if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetData<bool>("AutoJoin") == true)
@@ -626,7 +628,7 @@ namespace LSCC
                                             EPlayer.Spawn(player);
                                             NAPI.Notification.SendNotificationToPlayer(player, $"~w~Game is starting in ~g~10 seconds~w~.", true);
                                             
-                                            NAPI.Util.ConsoleOutput("[TimeUpdate] Game starting in 10 seconds...");
+                                            NAPI.Util.ConsoleOutput($"[TimeUpdate] Game starting in 10 seconds in lobby {lobby.lobbyId}...");
                                         }
                                     }
 
@@ -970,6 +972,9 @@ namespace LSCC
 
                         pVehicle.SetSharedData("Team", 1);
 
+                        player.SetData("putVehicle", pVehicle);
+                        player.SetData("putVehicleSeat", 0);
+
                         lobby.Vehicles.Add(pVehicle);
 
                         NAPI.Task.Run(() =>
@@ -1116,6 +1121,8 @@ namespace LSCC
                         EPlayer.Freeze(_tempPlayer, true);
 
                         playerVehicle.Add(new Tuple<Player, Vehicle, int>(_tempPlayer, pVehicle, 0));
+                        _tempPlayer.SetData("putVehicle", pVehicle);
+                        _tempPlayer.SetData("putVehicleSeat", 0);
 
                         int seat = 1;
                         int maxseats = pVehicle.MaxOccupants;
@@ -1132,7 +1139,8 @@ namespace LSCC
                             iteratedAlready.Add(_tempPlayer2);
                             fugitives--;
 
-                            _tempPlayer2.SetIntoVehicle(pVehicle, 0 + seat);
+                            _tempPlayer2.SetData("putVehicle", pVehicle);
+                            _tempPlayer2.SetData("putVehicleSeat", seat);
 
                             EPlayer.Freeze(_tempPlayer2, true);
                             playerVehicle.Add(new Tuple<Player, Vehicle, int>(_tempPlayer2, pVehicle, 0 + seat));
@@ -1146,15 +1154,43 @@ namespace LSCC
                         foreach (Player player in lobby.Cops)
                         {
                             player.Dimension = Convert.ToUInt32(lobbyid);
-                            player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
                         }
                         foreach (Player player in lobby.Fugitives)
                         {
                             player.Dimension = Convert.ToUInt32(lobbyid);
-                            player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
                         }
 
                     }, 1000);
+
+                    NAPI.Task.Run(() =>
+                    {
+                        spawnLoc = new MapSpawn();
+
+                        spawnLoc = Spawns.First(a => a.spawnTeam == 1);
+                        foreach (Player player in lobby.Cops)
+                        {
+                            player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
+
+                            try
+                            {
+                                if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
+                            }
+                            catch { }
+                        }
+
+                        spawnLoc = Spawns.First(a => a.spawnTeam == 0);
+                        foreach (Player player in lobby.Fugitives)
+                        {
+                            player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
+
+                            try
+                            {
+                                if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
+                            }
+                            catch { }
+                        }
+
+                    }, 1700);
 
                     NAPI.Task.Run(() =>
                     {
