@@ -20,7 +20,7 @@ namespace LSCC
                 ban.RockstarID == player.SocialClubId);
 
 
-            Discord.SendTextChannel("staff-bot", $"**{player.Name} has joined the server.** *(Total online: {RAGE.Entities.Players.Count})*");
+            Discord.SendTextChannel("staff-bot", $"**{player.Name} has joined the server.** *(Total online: {RAGE.Entities.Players.Count-1})*");
 
             if (ban != null)
             {
@@ -236,7 +236,7 @@ namespace LSCC
 
             EPlayer.ResetPlayerData(player);
 
-            Discord.SendTextChannel("staff-bot", $"**{player.Name} has left the server.** *(Total online: {RAGE.Entities.Players.Count})*");
+            Discord.SendTextChannel("staff-bot", $"**{player.Name} has left the server.** *(Total online: {RAGE.Entities.Players.Count-1})*");
         }
 
         [ServerEvent(Event.PlayerDeath)]
@@ -247,6 +247,7 @@ namespace LSCC
             player.ResetData("FreezeWeapons");
 
             string reasonStr;
+            bool wasInGame = false;
             if(!Main.WeaponReasons.TryGetValue(reason, out reasonStr))
             {
                 reasonStr = null;
@@ -387,6 +388,8 @@ namespace LSCC
                 {
                     if (lobby.Fugitives.Contains(player))
                     {
+                        wasInGame = true;
+
                         if (killer != null && killer.GetSharedData<int>("Team") == 1) EPlayer.GrantXP(killer, 2);
 
                         foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
@@ -426,6 +429,8 @@ namespace LSCC
 
                     if (lobby.Cops.Contains(player))
                     {
+                        wasInGame = true;
+
                         if (killer != null && killer.GetSharedData<int>("Team") == 0) EPlayer.GrantXP(killer, 2);
 
                         foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
@@ -470,10 +475,19 @@ namespace LSCC
                 Random rand = new Random();
                 Vector3 SpawnArea = Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)];
                 if (player.GetSharedData<int>("InLobby") == -4) SpawnArea = ((Vector3)Settings.DerbySpawns[0, 0]).Around(30.0f);
+                if (player.GetSharedData<int>("InLobby") > -1 && lobby != null)
+                {
+                    int arenaID = player.GetSharedData<int>("InDM");
+                    if (arenaID > -1)
+                    {
+                        Vector3 dmSpawn = (Vector3)Settings.DMSpawns[arenaID][0, 0];
+                        SpawnArea = (Vector3)dmSpawn.Around(30.0f);
+                    }
+                }
      
                 NAPI.Player.SpawnPlayer(player, SpawnArea);
 
-            }, delayTime: 3000);
+            }, wasInGame == true ? 10000 : 3000);
         }
 
         [ServerEvent(Event.ChatMessage)]
@@ -505,7 +519,7 @@ namespace LSCC
 
         public static void OnPlayerLogin(Player player, Account acc)
         {
-            Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in.*");
+            Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in as {acc.Username}.*");
 
             EPlayer.SetDiscordStatus(player, $"Logging in as {acc.Username}");
             NAPI.Util.ConsoleOutput($"[Login] {player.Name} has logged in as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
@@ -1054,6 +1068,30 @@ namespace LSCC
             {
                 if(target.GetSharedData<bool>("HasShot") != true)
                 {
+                    LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+                    if (lobby != null)
+                    {
+                        if (lobby.Cops.Contains(player) && lobby.Cops.Contains(target))
+                        {
+                            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Do not tase your own teammates! You have been given a teamattack warning.");
+                            EPlayer.Freeze(player, true);
+
+                            NAPI.Task.Run(() =>
+                            {
+                                if (!player.IsNull && player != null && player.IsInstanceAlive)
+                                {
+                                    EPlayer.Freeze(player, false);
+                                }
+                            }, 1500);
+
+                            int warnings = 0;
+                            if (player.HasData("TeamShotWarning")) warnings = player.GetData<int>("TeamShotWarning");
+
+                            warnings++;
+                            return;
+                        }
+                    }
+
                     int time = 30000;
                     target.TriggerEvent("setToRagdoll", time, time * 2, 0, false, false, false);
                     target.SetData("TasedTill", Environment.TickCount + 30000);
@@ -1281,6 +1319,13 @@ namespace LSCC
                 }
 
                 int arenaID = player.GetSharedData<int>("InDM");
+                if (arenaID > -1 && lobby != null && lobby.gameStatus == 2)
+                {
+                    arenaID = -1;
+                    player.SetSharedData("InDM", -1);
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have been removed from DM as it's locked while copchase starts.");
+                }
+
                 if (arenaID > -1)
                 {
                     Random rand = new Random();

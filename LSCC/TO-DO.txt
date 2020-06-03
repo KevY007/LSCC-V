@@ -4,12 +4,7 @@
 ADD OTHER COPCHASE FEATURES, PROBABLY REDUCE TIME?
 OTHER FEATURES FROM LSCC SAMP AND GUNS SYSTEM FINALLY
 
-basic copchase commands, 
-add basic guns like shotgun, 
-
-COPS CARS TOO SLOW, AND ADD CUSTOM COP CARS TOO (MAYBE?) https://www.gta5-mods.com/users/POLICESCO
-
-DRIVEBY WIH STUNGUN COUNTS AS SHOOTIN SOME1 WO TAG ??? (CAN'T FIX SEEMS LIKE)
+basic copchase commands,  
 
 CRASH RIGHT WHEN BLIP WENT INVISIBLE, MAYBE ITS BLIPS?
 REMOVE BLIP ONE DAY AND TEST?
@@ -26,3 +21,5 @@ no idea.
 IT could be that.
 see if player entity is valid in blips?
 4 door new dlc fugitive cars?
+
+fontsize

@@ -89,8 +89,6 @@ public static class Settings
     public static int LastDerbyTick { get; set; }
 
     public static int LastCountUpdate { get; set; }
-    public static int LastCountVal { get; set; }
-    public static int LastGameCountVal { get; set; }
 
     // Locations
     public const float LoginCameraX = -550;
@@ -476,8 +474,6 @@ namespace LSCC
             Settings.MaxPlayersInLobby = Settings.DefaultMaxInLobby;
             Settings.NextLobbyID = 1;
             Settings.LastCountUpdate = Environment.TickCount;
-            Settings.LastCountVal = 0;
-            Settings.LastGameCountVal = 0;
 
             NAPI.World.SetTime(12, 0, 0);
             NAPI.World.SetWeather(Weather.CLOUDS);
@@ -531,38 +527,28 @@ namespace LSCC
 
         public void TimeUpdate()
         {
-            if(Environment.TickCount - Settings.LastCountUpdate >= 30000 && 
+            if(Environment.TickCount - Settings.LastCountUpdate >= 60000 && 
                 (int)Discord._client.ConnectionState == 2)
             {
                 Settings.LastCountUpdate = Environment.TickCount;
 
-                if (Settings.LastCountVal != RAGE.Entities.Players.Count)
+                foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
                 {
-                    Settings.LastCountVal = RAGE.Entities.Players.Count;
+                    var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCCountID);
 
-                    foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
+                    if (botchan != null)
                     {
-                        var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCCountID);
-
-                        if (botchan != null)
-                        {
-                            botchan.ModifyAsync(vc => vc.Name = ($"Players Online: {RAGE.Entities.Players.Count}"));
-                            Settings.LastCountVal = RAGE.Entities.Players.Count;
-                        }
+                        botchan.ModifyAsync(vc => vc.Name = ($"Players Online: {RAGE.Entities.Players.Count}"));
                     }
                 }
-
-                if(Settings.LastGameCountVal != Settings.Lobbies.Where(l => l.gameStatus == 1).Count())
+				
+                foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
                 {
-                    foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
-                    {
-                        var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCGamesID);
+                    var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCGamesID);
 
-                        if (botchan != null)
-                        {
-                            botchan.ModifyAsync(vc => vc.Name = ($"Chases Running: {Settings.Lobbies.Where(l => l.gameStatus == 1).Count()}"));
-                            Settings.LastGameCountVal = Settings.Lobbies.Where(l => l.gameStatus == 1).Count();
-                        }
+                    if (botchan != null)
+                    {
+                        botchan.ModifyAsync(vc => vc.Name = ($"Chases Running: {Settings.Lobbies.Where(l => l.gameStatus == 1).Count()}"));
                     }
                 }
 
@@ -933,7 +919,7 @@ namespace LSCC
 
                             spawnLoc = Spawns.First(a => a.spawnTeam == 1);
 
-                            spawnLoc.spawnZ += (pCount * 3); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
+                            spawnLoc.spawnZ += (pCount * 5); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
                             spawnLoc.spawnX += (pCount * 2);
                         }
 
@@ -948,9 +934,6 @@ namespace LSCC
                             EPlayer.ApplyCharacter(player, ConvChar, 1);
                         }
                         catch { }
-
-                        player.Dimension = Convert.ToUInt32(lobbyid);
-                        player.Position = vecSpawn.Around(3);
 
                         player.Health = 100;
                         player.Armor = 60;
@@ -988,8 +971,6 @@ namespace LSCC
                         pVehicle.SetSharedData("Team", 1);
 
                         lobby.Vehicles.Add(pVehicle);
-
-                        player.SetIntoVehicle(pVehicle, 0);
 
                         NAPI.Task.Run(() =>
                         {
@@ -1033,8 +1014,6 @@ namespace LSCC
                         }
                         catch { }
 
-                        player.Dimension = Convert.ToUInt32(lobbyid);
-                        player.Position = vecSpawn.Around(3);
                         EPlayer.Freeze(player, true);
 
                         player.Health = 100;
@@ -1097,7 +1076,7 @@ namespace LSCC
 
                             spawnLoc = Spawns.First(a => a.spawnTeam == 0);
 
-                            spawnLoc.spawnZ += (pCount * 3); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
+                            spawnLoc.spawnZ += (pCount * 5); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
                             spawnLoc.spawnX += (pCount * 2);
                         }
 
@@ -1112,8 +1091,7 @@ namespace LSCC
                                 carName = "washington";
                                 break;
                             case 1:
-                                carName = "kuruma";
-                                overridemaxseats = 4;
+                                carName = "asea";
                                 break;
                             case 2:
                                 carName = "ingot";
@@ -1129,8 +1107,6 @@ namespace LSCC
                         Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, random.Next(122), random.Next(122), $"SA-{random.Next(1000, 9999)}", 255, false, true, Convert.ToUInt32(lobbyid));
                         pVehicle.SetSharedData("Team", 0);
                         lobby.Vehicles.Add(pVehicle);
-
-                        _tempPlayer.SetIntoVehicle(pVehicle, 0);
 
                         NAPI.Task.Run(() =>
                         {
@@ -1167,6 +1143,21 @@ namespace LSCC
 
                     NAPI.Task.Run(() =>
                     {
+                        foreach (Player player in lobby.Cops)
+                        {
+                            player.Dimension = Convert.ToUInt32(lobbyid);
+                            player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
+                        }
+                        foreach (Player player in lobby.Fugitives)
+                        {
+                            player.Dimension = Convert.ToUInt32(lobbyid);
+                            player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
+                        }
+
+                    }, 1000);
+
+                    NAPI.Task.Run(() =>
+                    {
                         foreach (Tuple<Player, Vehicle, int> data in playerVehicle)
                         {
                             if (data.Item1.IsNull || data.Item1 == null || data.Item2.IsNull || data.Item2 == null) continue;
@@ -1195,17 +1186,20 @@ namespace LSCC
                                 p.TriggerEvent("StartChaseTimer", 0, Settings.GameRunTime, lobby.CollisionCounter);
                             }
                         }
-                    }, delayTime: 3000);
+                    }, delayTime: 2000);
 
                     NAPI.Task.Run(() =>
                     {
-                        foreach (Tuple<Player, Vehicle, int> data in playerVehicle)
+                        foreach (Player p in lobby.Cops)
                         {
-                            if (data.Item1.IsNull || data.Item1 == null) continue;
-                            data.Item1.TriggerEvent("ToggleChaseCollisions", false);
-                        } // Toggle Collisions OFF again. smh they dont activate sometimes.
+                            p.TriggerEvent("ToggleChaseCollisions", false);
+                        }
+                        foreach (Player p in lobby.Fugitives)
+                        {
+                            p.TriggerEvent("ToggleChaseCollisions", false);
+                        }
 
-                    }, delayTime: 13000);
+                    }, delayTime: 3000);
 
 
                     lobby.gameStatus = 1;

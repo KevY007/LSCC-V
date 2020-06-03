@@ -114,6 +114,44 @@ namespace LSCC
                     embed: embed)
                     .ConfigureAwait(false);
             }
+            if (context.Content.StartsWith("!o"))
+            {
+                string[] args = context.Content.Split("!o");
+                if (args.Count() > 0)
+                {
+                    NAPI.Chat.SendChatMessageToAll($"(( [DOOC] !{{#FF6347}}{context.Author.Username}!{{#FFFFFF}}: {args[0]} ))");
+                    context.Channel.SendMessageAsync($"**(DOOC) | {context.Author.Username}**: {args[0]}");
+                }
+                else context.Channel.SendMessageAsync("USAGE: !o (text)");
+            }
+            if (context.Content.StartsWith("!cmds"))
+            {
+                var builder = new EmbedBuilder()
+                    .WithTitle("**Command & Information**")
+                    .WithDescription("```\n```")
+                    .WithColor(255, 0, 0)
+                    .WithFooter(footer => {
+                        footer
+                            .WithText("List");
+                    })
+                    .WithAuthor(author => {
+                        author
+                            .WithName("Help")
+                            .WithIconUrl("https://i.imgur.com/nJPbaL7.png");
+                    });
+
+                
+                builder.AddField("cmds", "Displays list of all the commands");
+                builder.AddField("o", "Sends a message in OOC chat");
+                builder.AddField("players", "Gives a list of all the players online");
+
+                var embed = builder.Build();
+
+                context.Channel.SendMessageAsync(
+                    "Reporting...",
+                    embed: embed)
+                    .ConfigureAwait(false);
+            }
             return Task.CompletedTask;
         }
 

@@ -533,7 +533,7 @@ namespace LSCC
 
             return null;
         }
-        public static void Spawn(Player player, bool forceAutojoin = true)
+        public static void Spawn(Player player, bool forceAutojoin = true, Vector3 spawn = default(Vector3))
         {
             if (!LoggedIn(player)) return;
 
@@ -613,7 +613,13 @@ namespace LSCC
             player.SetData("HudState", true);
             player.TriggerEvent("ToggleHud", true);
 
-            NAPI.Player.SpawnPlayer(player, new Vector3(SpawnArea.X, SpawnArea.Y, SpawnArea.Z));
+            Vector3 VecSpawn = new Vector3(SpawnArea.X, SpawnArea.Y, SpawnArea.Z);
+            if(spawn != default(Vector3))
+            {
+                VecSpawn = spawn;
+            }
+
+            NAPI.Player.SpawnPlayer(player, VecSpawn);
 
             NAPI.Entity.SetEntityTransparency(player, 255);
 

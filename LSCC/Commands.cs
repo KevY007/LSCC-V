@@ -1034,7 +1034,9 @@ namespace LSCC
 
             player.SetSharedData("InDM", arena);
 
-            EPlayer.Spawn(player, false);
+            int spawnID = new Random().Next(Settings.DMSpawns[arena].GetLength(0));
+            Vector3 dmSpawn = (Vector3)Settings.DMSpawns[arena][spawnID, 0];
+            EPlayer.Spawn(player, false, dmSpawn);
             player.SendChatMessage($"[!] !{{#FFFF00}}Sending you to !{{#FF6347}}DM: {Settings.DMNames[arena]}.");
 
             return;
@@ -1066,7 +1068,7 @@ namespace LSCC
 
             player.SetSharedData("InDM", -1);
             player.SetSharedData("InLobby", -3); 
-            EPlayer.Spawn(player, false);
+            EPlayer.Spawn(player, false, new Vector3(1061.547f, -720.113f, 56.786f));
             player.SendChatMessage($"!{{#FFFF00}}[!] Sending you to !{{#FF6347}}FREEROAM");
 
 
@@ -1111,7 +1113,7 @@ namespace LSCC
 
 
             player.SendChatMessage($"!{{#FFFF00}}[!] Sending you to !{{#FF6347}}DERBY");
-            NAPI.Player.SpawnPlayer(player, ((Vector3)Settings.DerbySpawns[0, 0]).Around(30.0f));
+            EPlayer.Spawn(player, false, ((Vector3)Settings.DerbySpawns[0, 0]).Around(30.0f));
 
             return;
         }
