@@ -2109,7 +2109,7 @@ namespace LSCC
                 {
                     NAPI.Chat.SendChatMessageToAll($"(( [OOC] {player.Name}: {text} ))");
                 }
-                else NAPI.Chat.SendChatMessageToAll($"(( [OOC] {EPlayer.GetDonatorLevelName(EPlayer.GetAccount(player).DonatorLevel, true)}!{{#FFFFFF}}{player.Name}: {text} ))");
+                else NAPI.Chat.SendChatMessageToAll($"(( [OOC] {EPlayer.GetDonatorLevelName(EPlayer.GetAccount(player).DonatorLevel, true)}!{{#FFFFFF}} {player.Name}: {text} ))");
             }
             else
             {
