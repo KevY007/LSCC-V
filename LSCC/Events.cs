@@ -20,7 +20,7 @@ namespace LSCC
                 ban.RockstarID == player.SocialClubId);
 
 
-            Discord.SendTextChannel("staff-bot", $"**{player.Name} has joined the server.** *(Total online: {RAGE.Entities.Players.Count-1})*");
+            Discord.SendTextChannel("staff-bot", $"**{player.Name} has joined the server.** *(Total online: {RAGE.Entities.Players.Count})*");
 
             if (ban != null)
             {
