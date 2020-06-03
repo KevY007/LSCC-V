@@ -8,7 +8,6 @@ let lastFunc = "Init";
 function traceLastFunc(iStr)
 {
     mp.storage.data.tlf_latest = iStr;
-    mp.storage.flush();
 }
 
 traceLastFunc("RequireInit");

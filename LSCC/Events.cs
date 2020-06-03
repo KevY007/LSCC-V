@@ -69,8 +69,158 @@ namespace LSCC
             player.TriggerEvent("InitChaseTimer");
         }
 
+        public static bool IsWeaponSwitchAnim(WeaponHash a)
+        {
+            switch(a)
+            {
+                case WeaponHash.Advancedrifle: return true;
+                case WeaponHash.Appistol: return true;
+                case WeaponHash.Assaultrifle: return true;
+                case WeaponHash.Assaultrifle_mk2: return true;
+                case WeaponHash.Assaultshotgun: return true;
+                case WeaponHash.Assaultsmg: return true;
+                case WeaponHash.Autoshotgun: return true;
+                case WeaponHash.Ball: return true;
+                case WeaponHash.Bat: return true;
+                case WeaponHash.Battleaxe: return true;
+                case WeaponHash.Bottle: return true;
+                case WeaponHash.Bullpuprifle: return true;
+                case WeaponHash.Bullpuprifle_mk2: return true;
+                case WeaponHash.Bullpupshotgun: return true;
+                case WeaponHash.Carbinerifle: return true;
+                case WeaponHash.Carbinerifle_mk2: return true;
+                case WeaponHash.CeramicPistol: return true;
+                case WeaponHash.Combatmg: return true;
+                case WeaponHash.Combatmg_mk2: return true;
+                case WeaponHash.Combatpdw: return true;
+                case WeaponHash.Combatpistol: return true;
+                case WeaponHash.Compactlauncher: return true;
+                case WeaponHash.Compactrifle: return true;
+                case WeaponHash.Crowbar: return true;
+                case WeaponHash.Dagger: return true;
+                case WeaponHash.Dbshotgun: return true;
+                case WeaponHash.Doubleaction: return true;
+                case WeaponHash.Fireextinguisher: return true;
+                case WeaponHash.Firework: return true;
+                case WeaponHash.Flare: return true;
+                case WeaponHash.Flaregun: return true;
+                case WeaponHash.Flashlight: return true;
+                case WeaponHash.Golfclub: return true;
+                case WeaponHash.Grenade: return true;
+                case WeaponHash.Grenadelauncher: return true;
+                case WeaponHash.Grenadelauncher_smoke: return true;
+                case WeaponHash.Gusenberg: return true;
+                case WeaponHash.Hammer: return true;
+                case WeaponHash.Hatchet: return true;
+                case WeaponHash.HazardCan: return true;
+                case WeaponHash.Heavypistol: return true;
+                case WeaponHash.Heavyshotgun: return true;
+                case WeaponHash.Heavysniper: return true;
+                case WeaponHash.Heavysniper_mk2: return true;
+                case WeaponHash.Hominglauncher: return true;
+                case WeaponHash.Knife: return true;
+                case WeaponHash.Machete: return true;
+                case WeaponHash.Machinepistol: return true;
+                case WeaponHash.Marksmanpistol: return true;
+                case WeaponHash.Marksmanrifle: return true;
+                case WeaponHash.Marksmanrifle_mk2: return true;
+                case WeaponHash.Mg: return true;
+                case WeaponHash.Microsmg: return true;
+                case WeaponHash.Minigun: return true;
+                case WeaponHash.Minismg: return true;
+                case WeaponHash.Molotov: return true;
+                case WeaponHash.Musket: return true;
+                case WeaponHash.NavyRevolver: return true;
+                case WeaponHash.Nightstick: return true;
+                case WeaponHash.Pipebomb: return true;
+                case WeaponHash.Pistol: return true;
+                case WeaponHash.Pistol50: return true;
+                case WeaponHash.Pistol_mk2: return true;
+                case WeaponHash.Poolcue: return true;
+                case WeaponHash.Proximine: return true;
+                case WeaponHash.Pumpshotgun: return true;
+                case WeaponHash.Pumpshotgun_mk2: return true;
+                case WeaponHash.Railgun: return true;
+                case WeaponHash.Raycarbine: return true;
+                case WeaponHash.Rayminigun: return true;
+                case WeaponHash.Raypistol: return true;
+                case WeaponHash.Revolver: return true;
+                case WeaponHash.Revolver_mk2: return true;
+                case WeaponHash.Rpg: return true;
+                case WeaponHash.Sawnoffshotgun: return true;
+                case WeaponHash.Smg: return true;
+                case WeaponHash.Smg_mk2: return true;
+                case WeaponHash.Smokegrenade: return true;
+                case WeaponHash.Sniperrifle: return true;
+                case WeaponHash.Snowball: return true;
+                case WeaponHash.Snspistol: return true;
+                case WeaponHash.Snspistol_mk2: return true;
+                case WeaponHash.Specialcarbine: return true;
+                case WeaponHash.Specialcarbine_mk2: return true;
+                case WeaponHash.Stickybomb: return true;
+                case WeaponHash.Stone_hatchet: return true;
+                case WeaponHash.Stungun: return true;
+                case WeaponHash.Switchblade: return true;
+                case WeaponHash.Vintagepistol: return true;
+                case WeaponHash.Unarmed: return true;
+                case WeaponHash.Wrench: return true;
+            }
+            return false;
+        }
+
+        [ServerEvent(Event.PlayerWeaponSwitch)]
+        public void OnPlayerWeaponSwitch(Player player, WeaponHash oldWeapon, WeaponHash newWeapon)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (player.GetSharedData<int>("InDM") == -1 && !player.IsInVehicle)
+            {
+                if ((player.HasData("TasedTill") && player.GetData<int>("TasedTill") >= Environment.TickCount) || player.HasData("Cuffed")) return;
+
+                if (IsWeaponSwitchAnim(newWeapon))
+                {
+                    Events.RequestPlayAnimation(player, "reaction@intimidation@1h", "intro", 50);
+
+                    NAPI.Task.Run(() =>
+                    {
+                        Events.RequestClearAnimation(player);
+                    }, 1400);
+                }
+                if (newWeapon == WeaponHash.Unarmed)
+                {
+                    Events.RequestPlayAnimation(player, "reaction@intimidation@1h", "outro", 50);
+
+                    NAPI.Task.Run(() =>
+                    {
+                        Events.RequestClearAnimation(player);
+                    }, 1400);
+                }
+            }
+            return;
+        }
+
+        [RemoteEvent("clear_anim")]
+        public static void RequestClearAnimation(Player player)
+        {
+            RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a.Position.DistanceTo(player.Position) < 200.0).ToList().ForEach((Player act) =>
+            {
+                if (player.HasData("LastAnimDict"))
+                {
+                    act.TriggerEvent("entclearanim", player, player.GetData<string>("LastAnimDict"), player.GetData<string>("LastAnim"));
+                }
+                else act.TriggerEvent("entclearanim", player, "null", "null");
+            });
+        }
+
+        [RemoteEvent("UpdateLastAnim")]
+        public static void RequestUpdateLastAnim(Player player, string animDict, string animName)
+        {
+            player.SetData("LastAnimDict", animDict);
+            player.SetData("LastAnim", animName);
+        }
+
         [RemoteEvent("play_anim")]
-        public void RequestPlayAnimation(Player player, string animDict, string animName, int animFlags)
+        public static void RequestPlayAnimation(Player player, string animDict, string animName, int animFlags)
         {
             RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a.Position.DistanceTo(player.Position) < 200.0).ToList().ForEach((Player act) =>
             {
@@ -244,6 +394,7 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
+            player.ResetData("CuffingTarget");
             player.ResetData("FreezeWeapons");
 
             string reasonStr;
@@ -672,9 +823,9 @@ namespace LSCC
 
             Account acc = EPlayer.GetAccount(player);
 
-            if ((slot == 1 || slot == 7) && acc.DonatorLevel < 1)
+            if ((slot == 1) && acc.DonatorLevel < 1)
             {
-                player.SendNotification("~r~Only donators can use this itemgroup (masks, accessories).");
+                player.SendNotification("~r~Only donators can use this itemgroup (masks).");
                 return;
             }
 
@@ -1137,7 +1288,9 @@ namespace LSCC
         [ServerEvent(Event.PlayerSpawn)]
         public static void OnPlayerSpawn(Player player)
         {
-            if(player.HasData("Cuffed"))
+            player.ResetData("CuffingTarget");
+
+            if (player.HasData("Cuffed"))
             {
                 player.TriggerEvent("SetHandcuffs", false);
                 player.ResetData("Cuffed");

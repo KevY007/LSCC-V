@@ -247,6 +247,8 @@ function UpdateTimer()
                 }
             }
 
+            traceLastFunc(`[Players] Update Derby Data`);
+
             if(mp.players.local.getVariable("InLobby") == -4)
             {
                 derbyText.text = "N/A";
@@ -281,6 +283,8 @@ function UpdateTimer()
                 derbyText.visible = false;
                 derbyTimeText.visible = false;
             }
+
+            traceLastFunc(`[Players] Update Chase Data`);
 
             if(chaseProgBar != null && chaseProgText != null && chaseRunning == true)
             {
@@ -481,6 +485,10 @@ function OnPlayerWeaponShot(targetPosition, targetEntity)
 mp.events.add("playerWeaponShot", OnPlayerWeaponShot);
 
 mp.events.add("entplayanim", (entity, animDictionary, animName, animFlag) => {
+    if(entity.id == mp.players.local.id)
+    {
+        mp.events.callRemote("UpdateLastAnim", animDictionary, animName);
+    }
 	mp.game.streaming.requestAnimDict(animDictionary);
 	new Promise(() => {
 	const timer = setInterval(() => {
@@ -497,8 +505,13 @@ function resolve(entity, animDictionary, animName, animFlag)
 	entity.taskPlayAnim(animDictionary, animName, 8.0, 0.0, -1, animFlag, 0.0, false, false, false);
 }
 
-mp.events.add("ClearAnimations", () => {
-    mp.players.local.clearTasks();
+mp.events.add("entclearanim", (entity, animDictionary, animName) => {
+    
+    if(animDictionary != "null" || animDictionary != null)
+    {
+        entity.stopAnimTask(animDictionary, animName, 1.0);
+    }
+    entity.clearTasks();
 });
 
 mp.events.add(
@@ -523,11 +536,11 @@ mp.events.add(
         {
             if(status == true)
             {
-                mp.events.callRemote("play_anim", "ped", "handsup_base", 22);
+                mp.events.callRemote("play_anim", "ped", "handsup_base", 50);
             }
             else
             {
-                mp.events.callRemote("play_anim", "ped", "handsup_exit", 2);
+                mp.events.callRemote("play_anim", "ped", "handsup_exit", 50);
                 mp.players.local.stopAnim("handsup", "ped", 8.0);
 
                 setTimeout(() => {

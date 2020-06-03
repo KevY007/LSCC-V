@@ -994,7 +994,7 @@ namespace LSCC
                         player.TriggerEvent("SetActorInvulnerable", false);
                         player.TriggerEvent("CanFallOutOfCar", true);
                         player.TriggerEvent("showHPBars", 1); // Always show HP Bars.
-
+                        player.ResetData("CuffingTarget");
                         player.SetSharedData("Team", 1);
                     }
 
@@ -1035,6 +1035,7 @@ namespace LSCC
                         player.ResetData("Handsup");
                         player.ResetData("Cuffed");
                         player.SetSharedData("Team", 0);
+                        player.ResetData("CuffingTarget");
                         player.SetSharedData("HasShot", false);
                     }
 

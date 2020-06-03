@@ -449,10 +449,12 @@ namespace LSCC
         {
             if(player.HasData("TasedTill") && Environment.TickCount < player.GetData<int>("TasedTill"))
                 { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this right now as you're tased."); return; }
-            
 
             if (player.HasData("Cuffed"))
                 { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this while cuffed."); return; }
+
+            if (player.IsInVehicle) 
+                { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this inside of a vehicle!"); return; }
 
             if (player.HasData("Handsup"))
             {
@@ -462,7 +464,7 @@ namespace LSCC
             else
             {
                 player.StopAnimation();
-                player.TriggerEvent("ClearAnimations");
+                Events.RequestClearAnimation(player);
             }
         }
 
@@ -471,6 +473,9 @@ namespace LSCC
         {
             if (player.HasData("Cuffed") || (player.HasData("TasedTill") && Environment.TickCount < player.GetData<int>("TasedTill"))) 
                 { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this right now."); return; }
+
+            if (player.IsInVehicle)
+                { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this inside of a vehicle!"); return; }
 
             if (player.HasData("Handsup"))
             {
@@ -520,6 +525,7 @@ namespace LSCC
             }
             catch { }
 
+            player.SetData("CuffingTarget", target);
             EPlayer.Action(player, $"attempts to grapple {target.Name} as they reach for their cuffs.");
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are now cuffing the target, stay close to them for 3 seconds to complete the operation.");
 
@@ -528,6 +534,7 @@ namespace LSCC
                 if(target == null || !target.IsInstanceAlive || player == null || !player.IsInstanceAlive)
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, target or you are no longer alive.");
+                    player.ResetData("CuffingTarget");
                     return;
                 }
 
@@ -543,14 +550,32 @@ namespace LSCC
                 if (!isACop)
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, you cannot cuff that target anymore.");
+                    player.ResetData("CuffingTarget");
                     return;
                 }
 
-                if (player.Position.DistanceTo(target.Position) > 3.0) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near the target!"); return; }
+                if (player.Position.DistanceTo(target.Position) > 2.0) 
+                { 
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near the target!");
+                    player.ResetData("CuffingTarget");
+
+                    return; 
+                }
+
+                player.ResetData("CuffingTarget");
 
                 EPlayer.GrantXP(player, 5);
                 EPlayer.Action(player, $"has grabbed ahold of {target.Name} and slapped the handcuffs on their wrists.");
                 EPlayer.Handcuff(target, true);
+
+                Events.RequestPlayAnimation(player, "mp_arresting", "a_uncuff", 2);
+
+                NAPI.Task.Run(() =>
+                {
+                    Events.RequestClearAnimation(player);
+                }, 2000);
+
+                target.Heading = player.Heading;
 
                 Events.OnPlayerDeath(target, player, 696988); // Reason 696988 = handcuffs.
 
@@ -1271,6 +1296,16 @@ namespace LSCC
             return;
         }
 
+        [Command("dbgplayanim", Alias = "panim")]
+        public void cmd_playanim(Player player, string lib, string name, int flags)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 6) return;
+
+            Events.RequestPlayAnimation(player, lib, name, flags);
+            return;
+        }
+
         [Command("cmds", Alias = "help")]
         public void cmd_help(Player player)
         {
@@ -1645,7 +1680,7 @@ namespace LSCC
             }
             if (EPlayer.GetAccount(player).Admin >= 6)
             {
-                player.SendChatMessage("[Admin Lv 6]: /triggerevent /cameraset /setadmin");
+                player.SendChatMessage("[Admin Lv 6]: /triggerevent /cameraset /setadmin /dbgplayanim");
             }
             return;
         }
@@ -2070,7 +2105,11 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                NAPI.Chat.SendChatMessageToAll($"(( [OOC] {player.Name}: {text} ))");
+                if (EPlayer.GetAccount(player).DonatorLevel < 1)
+                {
+                    NAPI.Chat.SendChatMessageToAll($"(( [OOC] {player.Name}: {text} ))");
+                }
+                else NAPI.Chat.SendChatMessageToAll($"(( [OOC] {EPlayer.GetDonatorLevelName(EPlayer.GetAccount(player).DonatorLevel, true)}!{{#FFFFFF}}{player.Name}: {text} ))");
             }
             else
             {

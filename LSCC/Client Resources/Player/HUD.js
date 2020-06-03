@@ -95,6 +95,10 @@ mp.events.add('ToggleHud', (toggle) => {
 });
 
 mp.events.add("render", () => {
+    
+    mp.game.ui.hideHudComponentThisFrame(7); // area name
+    mp.game.ui.hideHudComponentThisFrame(9); // street name
+
     if(Date.now() - visibleTick >= 1000)
     {
         visibleTick = Date.now();
