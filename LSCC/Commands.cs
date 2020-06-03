@@ -1250,6 +1250,27 @@ namespace LSCC
             player.SendChatMessage("!{#FF6347} F7: Hide/show chat.");
         }
 
+        [Command("teleport", Alias = "tp", GreedyArg = true)]
+        public void cmd_teleport(Player player, string tp)
+        {
+            if(!EPlayer.LoggedIn(player) || player.GetSharedData<int>("InLobby") != -3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You must be in freeroam to use this command!");
+                return;
+            }
+
+            if (tp.Contains("chilliad"))
+            {
+                player.Position = new Vector3(501.52545f, 5604.5723f, 797.91016f);
+            }
+            else if (tp.Contains("airport") || tp.Contains("lsia"))
+            {
+                player.Position = new Vector3(-1405.521f, -3075.9614f, 14.492183f);
+            }
+            else player.SendChatMessage("!{#FF6347}Invalid TP! !{#FFFFFF}Possible tps: 'chilliad', 'airport'");
+            return;
+        }
+
         [Command("cmds", Alias = "help")]
         public void cmd_help(Player player)
         {
@@ -1262,7 +1283,7 @@ namespace LSCC
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys for activation)");
             player.SendChatMessage("!{#61A9FA}[Cop]: /gps /cuff /m(egaphone)");
             player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup /s(top)a(nim)");
-            player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /freeroam /veh /dm /dmarenas /derby");
+            player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /freeroam /veh /teleport /dm /dmarenas /derby");
             player.SendChatMessage("!{#A5A8A8}[Debug]: /pos /updaterate (changes the blip updating interval)");
 
             if (EPlayer.GetAccount(player).DonatorLevel >= 1)
