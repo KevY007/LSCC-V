@@ -116,8 +116,8 @@ namespace LSCC
             }
             if (context.Content.StartsWith("!o"))
             {
-                string[] args = context.Content.Split(" ", 1);
-                if (args.Count() >= 1)
+                string[] args = context.Content.Split(" ", 2);
+                if (args.Count() >= 2)
                 {
                     NAPI.Chat.SendChatMessageToAll($"(( [DOOC] !{{#FF6347}}{context.Author.Username}!{{#FFFFFF}}: {args[1]} ))");
                     context.Channel.SendMessageAsync($"**(DOOC) | {context.Author.Username}**: {args[1]}");
