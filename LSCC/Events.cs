@@ -1436,21 +1436,16 @@ namespace LSCC
                     Settings.LastDerbyTick = Environment.TickCount;
                 }
 
+                Vehicle derbyVeh = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey("brioso"), (Vector3)Settings.DerbySpawns[spawnID, 0], (float)Settings.DerbySpawns[spawnID, 1], rand.Next(255), rand.Next(255), "DERBY", 255, false, true, 500);
+                player.SetData("DerbyVehicle", derbyVeh);
+
+                player.SetIntoVehicle(derbyVeh, 0);
 
                 NAPI.Task.Run(() =>
                 {
-                    Vehicle derbyVeh = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey("brioso"), (Vector3)Settings.DerbySpawns[spawnID, 0], (float)Settings.DerbySpawns[spawnID, 1], rand.Next(255), rand.Next(255), "DERBY", 255, false, true, 500);
-                    player.SetData("DerbyVehicle", derbyVeh);
-
                     player.SetIntoVehicle(derbyVeh, 0);
-
-                    NAPI.Task.Run(() =>
-                    {
-                        player.SetIntoVehicle(derbyVeh, 0);
-                        EPlayer.SetColor(player, new Color(250, 191, 62), 0);
-                    }, 750);
-
-                }, 350);
+                    EPlayer.SetColor(player, new Color(250, 191, 62), 0);
+                }, 750);
             }
 
             if (player.GetSharedData<int>("InLobby") > -1) // Copchase Lobby

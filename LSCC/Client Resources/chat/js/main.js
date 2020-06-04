@@ -8,14 +8,23 @@ let chat =
 	active: true,
 	historyMsgs: [],
 	currentIndex: 0,
-	loaded: false
+	loaded: false,
+	scrollStyle: null
 };
 
 const MAX_MSG_HISTORY = 12;
 
 function toggleScroll(enable) { 
 
-	// to-do; fix this
+	if(enable) 
+	{
+		if(chat.scrollStyle !== null) document.querySelector('#chat ul#chat_messages').style = chat.scrollStyle;
+	}
+	else 
+	{
+		chat.scrollStyle = document.querySelector('#chat ul#chat_messages');
+		document.querySelector('#chat ul#chat_messages').style.overflow = 'hidden';
+	}
 } 
 
 function enableChatInput(enable)
@@ -137,6 +146,7 @@ $(document).ready(function()
 	
     $(".ui_element").show();
 	chatAPI.push("!{#A9C4E4}Connected to Los Santos Copchase.");
+
 	toggleScroll(false);
 
     $("body").keydown(function(event)
