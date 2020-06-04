@@ -1102,8 +1102,7 @@ namespace LSCC
                                 overridemaxseats = 4;
                                 break;
                             case 2:
-                                carName = "bmwe65";
-                                overridemaxseats = 4;
+                                carName = "asea";
                                 break;
                             case 3:
                                 carName = "cognoscenti";
