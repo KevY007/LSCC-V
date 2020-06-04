@@ -1098,10 +1098,12 @@ namespace LSCC
                                 carName = "washington";
                                 break;
                             case 1:
-                                carName = "asea";
+                                carName = "600sel";
+                                overridemaxseats = 4;
                                 break;
                             case 2:
-                                carName = "ingot";
+                                carName = "bmwe65";
+                                overridemaxseats = 4;
                                 break;
                             case 3:
                                 carName = "cognoscenti";
