@@ -722,7 +722,7 @@ namespace LSCC
                 }
             }
 
-            Discord.SendTextChannel("staff-bot", $"**(ADM) |** {message}");
+            Discord.SendTextChannel("staff-bot", $"```(ADM) |** {message}```");
         }
     }
 }

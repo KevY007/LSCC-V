@@ -284,7 +284,7 @@ function UpdateTimer()
                 derbyTimeText.visible = false;
             }
 
-            traceLastFunc(`[Players] Update Chase Data`);
+            traceLastFunc(`[Players] Update Chase Data1`);
 
             if(chaseProgBar != null && chaseProgText != null && chaseRunning == true)
             {
@@ -304,6 +304,8 @@ function UpdateTimer()
                 }
             }
 
+            traceLastFunc(`[Players] Update Chase Data2`);
+
             if(collisionText != null && chaseRunning == true)
             {
                 if(collisionTime > 0)
@@ -318,6 +320,8 @@ function UpdateTimer()
                     collisionText.visible = false;
                 }
             }
+
+            traceLastFunc(`[Players] Update Chase Data3`);
 
             if(mp.players.local.getVariable("JailTime") >= 1)
             {
@@ -348,6 +352,8 @@ function UpdateTimer()
             else {
                 if(currentMuteTime > 0) currentMuteTime = 0;
             }
+
+            traceLastFunc(`[Players] Update Chase Data Complete`);
         }
     }
     /*
