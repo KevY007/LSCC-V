@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using CryptSharp.Utility;
+using Microsoft.EntityFrameworkCore.Internal;
 
 public class LobbyData
 {
@@ -19,6 +20,7 @@ public class LobbyData
     public int lobbyId { get; set; }
     public int gameStatus { get; set; }
     public int FugitiveShowCounter { get; set; }
+    public int LastSeenCounter { get; set; }
     public int CollisionCounter { get; set; }
     public int GameProgress { get; set; }
     public int FugitivePercent { get; set; }
@@ -47,6 +49,7 @@ public class LobbyData
         Settings.NextLobbyID++;
         gameStatus = 0;
         FugitiveShowCounter = 0;
+        LastSeenCounter = 0;
         CollisionCounter = 0;
         GameProgress = 0;
         GameAutoStart = true;
@@ -1213,6 +1216,7 @@ namespace LSCC
                         NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] Copchase started with !{{#8D8DFF}}{lobby.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{lobby.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{map.Name}!{{#FFFFFF}}.");
 
                         lobby.FugitiveShowCounter = 60;
+                        lobby.LastSeenCounter = 0;
                         lobby.GameProgress = 0;
                         lobby.CollisionCounter = 30;
 
@@ -1296,6 +1300,16 @@ namespace LSCC
                 }
 
                 lobby.FugitiveShowCounter++;
+                lobby.LastSeenCounter++;
+
+                if(lobby.LastSeenCounter >= 20)
+                {
+                    if(lobby.Fugitives.Count() > 0)
+                    {
+                        lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)].TriggerEvent("SendLastSeen");
+                    }
+                    lobby.LastSeenCounter = 0;
+                }
 
                 if (lobby.CollisionCounter > 0)
                 {

@@ -137,7 +137,6 @@ mp.keys.bind(0x09, true, function() {
 	}
 });
 
-
 function createCam(x, y, z, rx, ry, rz, viewangle) {
     traceLastFunc(`[Players] Create Cam`);
 
@@ -145,6 +144,16 @@ function createCam(x, y, z, rx, ry, rz, viewangle) {
     camera.setActive(true);
     mp.game.cam.renderScriptCams(true, true, 20000000000000000000000000, false, false);
 }
+
+mp.events.add("SendLastSeen", () => {
+    const position = mp.players.local.position;
+    let getStreet = mp.game.pathfind.getStreetNameAtCoord(position.x, position.y, position.z, 0, 0);
+
+    zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(position.x, position.y, position.z));
+    streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
+
+    mp.events.callRemote("SentLastSeen", streetName, zoneName);
+});
 
 mp.events.add("render", () => {
     if (specState == true && specCam != null && specTarget != null) {
