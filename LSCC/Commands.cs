@@ -510,6 +510,7 @@ namespace LSCC
             NAPI.Util.ConsoleOutput($"(ADM) {player.Name} set {target.Name}'s hp to {health}");
 
             target.Health = health;
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has set {target.Name}'s HP to {health}.");
             return;
         }
 
@@ -547,6 +548,7 @@ namespace LSCC
             NAPI.Util.ConsoleOutput($"(ADM) {player.Name} set {target.Name}'s ar to {armour}");
 
             target.Armor = armour;
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has set {target.Name}'s AR to {armour}.");
             return;
         }
 
@@ -1484,6 +1486,43 @@ namespace LSCC
             return;
         }
 
+        [Command("report", GreedyArg = true)]
+        public void cmd_report(Player player, Player target, string description)
+        {
+            if(Settings.Requests.Count(r => r.Reported == target && r.Reporter == player) > 0)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have already reported this guy.");
+                return;
+            }
+
+            RequestData req = new RequestData(player, description, 0);
+            req.Reported = target;
+
+            Settings.Requests.Add(req);
+
+            EPlayer.SendMessageToAllAdmins($"!{{#DBCE40}}[REQUEST {req.RequestID}] {player.Name} reported {target.Name} for {description}. (/reports)");
+            player.SendChatMessage("!{#DBCE40}You have filed a report against " + target.Name + ", request ID: " + req.RequestID + ".");
+            return;
+        }
+
+        [Command("helpme", Alias = "ask", GreedyArg = true)]
+        public void cmd_helpme(Player player, string description)
+        {
+            if (Settings.Requests.Count(r => r.Reporter == player && r.RequestType == 1) > 0)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have already asked for assistance, you cannot pile up requests.");
+                return;
+            }
+
+            RequestData req = new RequestData(player, description, 1);
+
+            Settings.Requests.Add(req);
+
+            EPlayer.SendMessageToAllAdmins($"!{{#1E9913}}[REQUEST {req.RequestID}] {player.Name} asked for help: {description}. (/requests)");
+            player.SendChatMessage("!{#DBCE40}You have successfully sent a helpme request, request ID: " + req.RequestID + ".");
+            return;
+        }
+
         [Command("cmds", Alias = "help")]
         public void cmd_help(Player player)
         {
@@ -1491,6 +1530,7 @@ namespace LSCC
 
             player.SendChatMessage("!{#0079DB}[Los Santos Copchase V !{#2BA3FF}BETA Commands]:");
             player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /r(adio) /wt /keys /admins /fontsize");
+            player.SendChatMessage("[General]: /report /helpme");
             player.SendChatMessage("[Squad/Partner]: /squad /squadjoin /s(quad)c(hat) /squadaccept (Alt: /partner...)");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats");
@@ -1923,6 +1963,9 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin >= 1)
             {
+                player.SendChatMessage("!{#FF6347}[REPORTS/REQS]: /requests /a(ccept)r(equest) /d(eny)r(equest) ");
+                player.SendChatMessage("!{#FF6347}[REPORTS/REQS]: (Alt: /reports, e.g. /acceptreport.) (HELPME = REPORTS TOO)");
+
                 player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /set(hp/ar) /spec");
                 player.SendChatMessage("[Admin Lv 1]: /freeze /unfreeze /kick /slap /setinv(ulnerable) /specoff");
                 player.SendChatMessage("[Admin Lv 1]: /bancheck /jail /unjail /fix /sendtolobby /set(time/weather)");
@@ -2882,6 +2925,94 @@ namespace LSCC
 
             else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'help', 'reset', 'clothing', 'resetclothing', 'lobbyteam'");
 
+            return;
+        }
+
+        [Command("requests", Alias = "reports")]
+        public void cmd_requests(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+                return;
+
+            if (Settings.Requests.Count < 1) { player.SendChatMessage("!{#FF6347}There are no on-going requests."); return; }
+
+            foreach(RequestData req in Settings.Requests)
+            {
+                if(req.RequestType == 0)
+                {
+                    player.SendChatMessage($"!{{#FF6347}}[REQUEST {req.RequestID}] TYPE: REPORT | BY: {req.Reporter.Name} | REPORTED: {req.Reported.Name} | REASON: {req.Description}.");
+                }
+                else if (req.RequestType == 1)
+                {
+                    player.SendChatMessage($"!{{#1E9913}}[REQUEST {req.RequestID}] TYPE: QUESTION | BY: {req.Reporter.Name} | QUESTION: {req.Description}.");
+                }
+            }
+            return;
+        }
+
+        [Command("acceptreport", Alias = "ar")]
+        public void cmd_acceptreport(Player player, int requestid)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+                return;
+
+            if (Settings.Requests.Count(r => r.RequestID == requestid) < 1) { player.SendChatMessage("!{#FF6347}No request with that ID, see /requests."); return; }
+
+            RequestData req = Settings.Requests.First(a => a.RequestID == requestid);
+
+            if (req.RequestType == 0)
+            {
+                req.Reporter.SendChatMessage($"!{{#DBCE40}}[REQUEST {requestid}] {player.Name} has accepted your report on {req.Reported.Name}.");
+            }
+            else if (req.RequestType == 1)
+            {
+                req.Reporter.SendChatMessage($"!{{#1E9913}}[HELPME] {player.Name} has come to your assistance on the helpme: ");
+                req.Reporter.SendChatMessage($"!{{#A8A8A5}}Q: {req.Description}");
+            }
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#1E9913}}{player.Name} accepted {req.Reporter.Name}'s request ID {requestid}.");
+
+            Settings.Requests.RemoveAll(r => r.RequestID == requestid);
+            return;
+        }
+
+        [Command("acceptrequest")]
+        public void cmd_acceptrequest(Player player, int requestid)
+        {
+            cmd_acceptreport(player, requestid);
+            return;
+        }
+
+        [Command("denyreport", Alias = "dr", GreedyArg = true)]
+        public void cmd_denyreport(Player player, int requestid, string reason)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+                return;
+
+            if (Settings.Requests.Count(r => r.RequestID == requestid) < 1) { player.SendChatMessage("!{#FF6347}No request with that ID, see /requests."); return; }
+
+            RequestData req = Settings.Requests.First(a => a.RequestID == requestid);
+
+            req.Reporter.SendChatMessage($"!{{#FF6347}}[REQUEST {requestid}] {player.Name} has denied your request, for {reason}.");
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} denied {req.Reporter.Name}'s request ID {requestid} for {reason}.");
+
+            Settings.Requests.RemoveAll(r => r.RequestID == requestid);
+            return;
+        }
+
+        [Command("denyrequest")]
+        public void cmd_denyrequest(Player player, int requestid, string reason)
+        {
+            cmd_denyreport(player, requestid, reason);
             return;
         }
 

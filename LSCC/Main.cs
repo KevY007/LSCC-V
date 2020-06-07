@@ -63,6 +63,25 @@ public class LobbyData
     }
 };
 
+public class RequestData
+{
+    public int RequestID { get; set; }
+    public int RequestType { get; set; }
+    public string Description { get; set; }
+    public Player Reporter { get; set; }
+    public Player Reported { get; set; }
+
+    public RequestData(Player reporter, string description, int type)
+    {
+        RequestID = Settings.NextRequestID;
+        Settings.NextRequestID++;
+        Reporter = reporter;
+        Description = description;
+        RequestType = type;
+        Reported = reporter;
+    }
+};
+
 public static class Settings
 {
     // Static Settings / Const
@@ -90,7 +109,8 @@ public static class Settings
     public static int[] Time { get; set; }
     public static int DerbyTimeLeft { get; set; }
     public static int LastDerbyTick { get; set; }
-
+    public static List<RequestData> Requests { get; set; }
+    public static int NextRequestID { get; set; }
     public static int LastCountUpdate { get; set; }
 
     // Locations
@@ -472,11 +492,13 @@ namespace LSCC
 
            
             Settings.Lobbies = new List<LobbyData>();
+            Settings.Requests = new List<RequestData>();
             Settings.LoggedInPlayers = new List<Player>();
             Settings.AdminVehicles = new List<Vehicle>();
 
             Settings.MaxPlayersInLobby = Settings.DefaultMaxInLobby;
             Settings.NextLobbyID = 1;
+            Settings.NextRequestID = 1;
             Settings.LastCountUpdate = Environment.TickCount;
 
             NAPI.World.SetTime(12, 0, 0);

@@ -323,6 +323,8 @@ namespace LSCC
         {
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has left the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
+            Settings.Requests.RemoveAll(a => a.Reporter == player || a.Reported == player);
+
             if (EPlayer.LoggedIn(player))
             {
                 if (player.HasData("DerbyVehicle"))
