@@ -1800,6 +1800,17 @@ namespace LSCC
             return;
         }
 
+        [Command("saveserver")]
+        public void cmd_saveserver(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 4) return;
+
+            ContextFactory.Instance.SaveChanges();
+            player.SendChatMessage("!{#FF6347}[SERVER] You have saved all the data in the server.");
+            return;
+        }
+
         [Command("squadaccept", Alias = "partneraccept")]
         public void cmd_squadaccept(Player player, Player target)
         {
@@ -1896,7 +1907,7 @@ namespace LSCC
             }
             if (EPlayer.GetAccount(player).Admin >= 4)
             {
-                player.SendChatMessage("[Admin Lv 4]: /serveroptions /grantxp");
+                player.SendChatMessage("[Admin Lv 4]: /serveroptions /grantxp /saveserver");
             }
             if (EPlayer.GetAccount(player).Admin >= 5)
             {

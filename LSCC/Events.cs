@@ -173,29 +173,6 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            if (player.GetSharedData<int>("InDM") == -1 && !player.IsInVehicle)
-            {
-                if ((player.HasData("TasedTill") && player.GetData<int>("TasedTill") >= Environment.TickCount) || player.HasData("Cuffed")) return;
-
-                if (IsWeaponSwitchAnim(newWeapon))
-                {
-                    Events.RequestPlayAnimation(player, "reaction@intimidation@1h", "intro", 50);
-
-                    NAPI.Task.Run(() =>
-                    {
-                        Events.RequestClearAnimation(player);
-                    }, 1400);
-                }
-                if (newWeapon == WeaponHash.Unarmed)
-                {
-                    Events.RequestPlayAnimation(player, "reaction@intimidation@1h", "outro", 50);
-
-                    NAPI.Task.Run(() =>
-                    {
-                        Events.RequestClearAnimation(player);
-                    }, 1400);
-                }
-            }
             return;
         }
 
