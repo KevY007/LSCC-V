@@ -1463,6 +1463,7 @@ namespace LSCC
 
             player.SendChatMessage("!{#0079DB}[Los Santos Copchase V !{#2BA3FF}BETA Commands]:");
             player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /r(adio) /wt /keys /admins /fontsize");
+            player.SendChatMessage("[Squad/Partner]: /squad /squadjoin /s(quad)c(hat) /squadaccept (Alt: /partner...)");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys for activation)");
@@ -1797,6 +1798,79 @@ namespace LSCC
             }
 
             return;
+        }
+
+        [Command("squadaccept", Alias = "partneraccept")]
+        public void cmd_squadaccept(Player player, Player target)
+        {
+            if (target.HasData("AskedSquad") && target.GetData<Player>("AskedSquad") == player)
+            {
+                target.ResetData("AskedSquad");
+                target.SetData("PlayerSquad", player);
+
+                Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player).ToList().ForEach((Player member) =>
+                {
+                    member.SendChatMessage("!{#FFAC38}[Partners] !{#FFFFFF}" + target.Name + " has partnered with this squad. (/squadchat)");
+                });
+            }
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFF}Target has not requested to join your squad.");
+            return;
+        }
+
+        [Command("squadleave", Alias = "partnerleave")]
+        public void cmd_squadleave(Player player)
+        {
+            if (player.HasData("PlayerSquad"))
+            {
+                foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player.GetData<Player>("PlayerSquad")))
+                {
+                    mem.SendChatMessage("!{#FFAC38}[Partners] !{#FFFFFF}" + player.Name + " has left the squad.");
+                }
+            }
+
+            player.ResetData("PlayerSquad");
+            player.ResetData("AskedSquad");
+            return;
+        }
+
+        [Command("squadchat", Alias = "sc", GreedyArg = true)]
+        public void cmd_squadchat(Player player, string message)
+        {
+            if (player.HasData("PlayerSquad"))
+            {
+                foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player.GetData<Player>("PlayerSquad")))
+                {
+                    mem.SendChatMessage("!{#FFAC38}[Partners] !{#FFFFFF}" + player.Name + ": " + message);
+                }
+            }
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in a squad/partnership!");
+
+            return;
+        }
+
+        [Command("squad", Alias = "partner")]
+        public void cmd_squadjoin(Player player, Player target)
+        {
+            if(player.HasData("PlayerSquad"))
+            {
+                player.SendChatMessage("!{#FFAC38}[Partners] You are already in a squad! /squadleave to leave.");
+                return;
+            }
+
+            if(target.HasData("PlayerSquad"))
+            {
+                target = target.GetData<Player>("PlayerSquad");
+            }
+
+            player.SetData("AskedSquad", target);
+
+            Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == target).ToList().ForEach((Player member) =>
+            {
+                member.SendChatMessage("!{#FFAC38}[Partners] !{#FFFFFF}" + player.Name + " has requested to join this squad. Leader can /squadaccept to accept them.");
+            });
+
+            return;
+            
         }
 
         [Command("acmds", Alias = "ahelp")]

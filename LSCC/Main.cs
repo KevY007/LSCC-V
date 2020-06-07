@@ -917,7 +917,7 @@ namespace LSCC
 
                         if ((spawnLoc == null) == false)
                         {
-                            UsedSpawns.Add(spawnLoc.SQL_ID);
+                            if(!PutInsideCar.Contains(player)) UsedSpawns.Add(spawnLoc.SQL_ID);
                         }
                         else
                         {
@@ -946,51 +946,77 @@ namespace LSCC
                         player.Armor = 60;
                         EPlayer.SetColor(player, new Color(141, 141, 255, 255), player.Armor);
 
-                        string carName = "police";
-                        int col1 = 0;
-
-                        switch (random.Next(0, 5))
+                        if (!PutInsideCar.Contains(player))
                         {
-                            case 0:
-                                carName = "police";
-                                col1 = 111;
-                                break;
-                            case 1:
-                                carName = "polbufac2";
-                                col1 = 8;
-                                break;
-                            case 2:
-                                carName = "police3";
-                                col1 = 111;
-                                break;
-                            case 3:
-                                carName = "polbufac";
-                                col1 = 111;
-                                break;
-                            case 4:
-                                carName = "fbibufac";
-                                break;
+                            string carName = "police";
+                            int col1 = 0;
+                            int overridemaxseats = 0;
+
+                            switch (random.Next(0, 5))
+                            {
+                                case 0:
+                                    carName = "police";
+                                    col1 = 111;
+                                    break;
+                                case 1:
+                                    carName = "polbufac2";
+                                    overridemaxseats = 4;
+                                    col1 = 8;
+                                    break;
+                                case 2:
+                                    carName = "police3";
+                                    col1 = 111;
+                                    break;
+                                case 3:
+                                    carName = "polbufac";
+                                    overridemaxseats = 4;
+                                    col1 = 111;
+                                    break;
+                                case 4:
+                                    carName = "fbibufac";
+                                    overridemaxseats = 4;
+                                    break;
+                            }
+
+
+                            Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, col1, 111, player.Name, 255, false, true, Convert.ToUInt32(lobbyid));
+
+                            pVehicle.SetSharedData("Team", 1);
+
+                            player.SetData("putVehicle", pVehicle);
+                            player.SetData("putVehicleSeat", 0);
+
+                            lobby.Vehicles.Add(pVehicle);
+
+                            NAPI.Task.Run(() =>
+                            {
+                                pVehicle.Position = vecSpawn;
+                            }, 1000);
+
+                            playerVehicle.Add(new Tuple<Player, Vehicle, int>(player, pVehicle, 0));
+                            PutInsideCar.Add(player);
+
+                            int seat = 1;
+                            int maxseats = pVehicle.MaxOccupants;
+                            if (overridemaxseats != 0) maxseats = overridemaxseats;
+
+                            foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player && lobby.Cops.Contains(p)))
+                            {
+                                if (seat < maxseats)
+                                {
+                                    mem.SetData("putVehicle", pVehicle);
+                                    mem.SetData("putVehicleSeat", 0 + seat);
+
+                                    playerVehicle.Add(new Tuple<Player, Vehicle, int>(mem, pVehicle, 0 + seat));
+                                    PutInsideCar.Add(mem);
+                                    mem.SendChatMessage("!{#FFAC38}[Partners] You have been put inside " + player.Name + "'s vehicle.");
+
+                                    seat++;
+                                }
+                            }
                         }
 
-
-                        Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, col1, 111, player.Name, 255, false, true, Convert.ToUInt32(lobbyid));
-
-                        pVehicle.SetSharedData("Team", 1);
-
-                        player.SetData("putVehicle", pVehicle);
-                        player.SetData("putVehicleSeat", 0);
-
-                        lobby.Vehicles.Add(pVehicle);
-
-                        NAPI.Task.Run(() =>
-                        {
-                            pVehicle.Position = vecSpawn;
-                        }, 1000);
-
                         EPlayer.Freeze(player, true);
-
-                        PutInsideCar.Add(player);
-                        playerVehicle.Add(new Tuple<Player, Vehicle, int>(player, pVehicle, 0));
 
                         player.SetData("GPS", false);
 

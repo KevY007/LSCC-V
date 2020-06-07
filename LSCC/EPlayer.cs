@@ -384,6 +384,8 @@ namespace LSCC
             player.SetData("EditingClothing", -1);
             player.SetData("Creator_Using", false);
             player.ResetData("BlockList");
+            player.ResetData("AskedSquad");
+            player.ResetData("PlayerSquad");
             player.SetSharedData("InLobby", -1);
             player.SetSharedData("InDM", -1);
             player.SetSharedData("IsTyping", false);

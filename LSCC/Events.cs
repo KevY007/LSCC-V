@@ -345,6 +345,7 @@ namespace LSCC
         public void OnPlayerDisconnected(Player player, DisconnectionType type, string reason)
         {
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has left the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
+
             if (EPlayer.LoggedIn(player))
             {
                 if (player.HasData("DerbyVehicle"))
@@ -352,6 +353,17 @@ namespace LSCC
                     player.GetData<Vehicle>("DerbyVehicle").Delete();
 
                     player.ResetData("DerbyVehicle");
+                }
+
+                if (player.HasData("PlayerSquad"))
+                {
+                    player.ResetData("PlayerSquad");
+                }
+
+                foreach(Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player))
+                {
+                    mem.SendChatMessage("!{#FFAC38}[Partners] This squad has been disbanded as the leader left.");
+                    mem.ResetData("PlayerSquad");
                 }
 
                 player.SetSharedData("VisibleBlip", false);
