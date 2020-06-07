@@ -32,7 +32,10 @@ namespace LSCC
 
                 NAPI.Task.Run(() =>
                 {
-                    player.Kick("Banned.");
+                    if (player != default(Player))
+                    {
+                        player.Kick("Banned.");
+                    }
                 }, 350);
 
                 return;
@@ -63,7 +66,10 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                EPlayer.LoginBrowserSetup(player);
+                if (player != default(Player))
+                {
+                    EPlayer.LoginBrowserSetup(player);
+                }
             }, delayTime: 500);
 
             player.TriggerEvent("InitChaseTimer");
@@ -614,21 +620,24 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                Random rand = new Random();
-                Vector3 SpawnArea = Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)];
-                if (player.GetSharedData<int>("InLobby") == -4) SpawnArea = ((Vector3)Settings.DerbySpawns[0, 0]).Around(30.0f);
-                if (player.GetSharedData<int>("InLobby") > -1 && lobby != null)
+                if (player != default(Player))
                 {
-                    int arenaID = player.GetSharedData<int>("InDM");
-                    if (arenaID > -1)
+                    Random rand = new Random();
+                    Vector3 SpawnArea = Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)];
+                    if (player.GetSharedData<int>("InLobby") == -4) SpawnArea = ((Vector3)Settings.DerbySpawns[0, 0]).Around(30.0f);
+                    if (player.GetSharedData<int>("InLobby") > -1 && lobby != null)
                     {
-                        int spawnID = rand.Next(Settings.DMSpawns[arenaID].GetLength(0));
-                        Vector3 dmSpawn = (Vector3)Settings.DMSpawns[arenaID][spawnID, 0];
-                        SpawnArea = (Vector3)dmSpawn;
+                        int arenaID = player.GetSharedData<int>("InDM");
+                        if (arenaID > -1)
+                        {
+                            int spawnID = rand.Next(Settings.DMSpawns[arenaID].GetLength(0));
+                            Vector3 dmSpawn = (Vector3)Settings.DMSpawns[arenaID][spawnID, 0];
+                            SpawnArea = (Vector3)dmSpawn;
+                        }
                     }
+
+                    NAPI.Player.SpawnPlayer(player, SpawnArea);
                 }
-     
-                NAPI.Player.SpawnPlayer(player, SpawnArea);
 
             }, wasInGame == true ? 10000 : 3000);
         }
@@ -681,7 +690,7 @@ namespace LSCC
 
                 NAPI.Task.Run(() =>
                 {
-                    player.Kick("Banned.");
+                    if(player != default(Player)) player.Kick("Banned.");
                 }, 350);
 
                 return;
@@ -1049,9 +1058,12 @@ namespace LSCC
 
                 NAPI.Task.Run(() =>
                 {
-                    if (!player.IsNull && player != null && player.IsInstanceAlive)
+                    if (player != default(Player))
                     {
-                        EPlayer.Freeze(player, false);
+                        if (!player.IsNull && player != null && player.IsInstanceAlive)
+                        {
+                            EPlayer.Freeze(player, false);
+                        }
                     }
                 }, player.IsInVehicle == true ? 500 : 2500);
 
@@ -1084,9 +1096,12 @@ namespace LSCC
 
                 NAPI.Task.Run(() =>
                 {
-                    if (!player.IsNull && player != null && player.IsInstanceAlive)
+                    if (player != default(Player))
                     {
-                        EPlayer.Freeze(player, false);
+                        if (!player.IsNull && player != null && player.IsInstanceAlive)
+                        {
+                            EPlayer.Freeze(player, false);
+                        }
                     }
                 }, player.IsInVehicle == true ? 500 : 2500);
 
@@ -1252,9 +1267,12 @@ namespace LSCC
 
                             NAPI.Task.Run(() =>
                             {
-                                if (!player.IsNull && player != null && player.IsInstanceAlive)
+                                if (player != default(Player))
                                 {
-                                    EPlayer.Freeze(player, false);
+                                    if (!player.IsNull && player != null && player.IsInstanceAlive)
+                                    {
+                                        EPlayer.Freeze(player, false);
+                                    }
                                 }
                             }, 1500);
 
@@ -1485,8 +1503,11 @@ namespace LSCC
 
                 NAPI.Task.Run(() =>
                 {
-                    player.SetIntoVehicle(derbyVeh, 0);
-                    EPlayer.SetColor(player, new Color(250, 191, 62), 0);
+                    if (player != default(Player))
+                    {
+                        player.SetIntoVehicle(derbyVeh, 0);
+                        EPlayer.SetColor(player, new Color(250, 191, 62), 0);
+                    }
                 }, 750);
             }
 

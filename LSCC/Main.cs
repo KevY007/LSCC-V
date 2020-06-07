@@ -715,7 +715,8 @@ namespace LSCC
                 }
             }
 
-            NAPI.Task.Run(TimeUpdate, delayTime: 15000);
+            NAPI.Task.Run(TimeUpdate, 15000);
+            return;
         }
 
         public static void CheckDerbyWinner()
@@ -1279,7 +1280,7 @@ namespace LSCC
                     {
                         foreach (Tuple<Player, Vehicle, int> data in playerVehicle)
                         {
-                            if (data.Item1.IsNull || data.Item1 == null || data.Item2.IsNull || data.Item2 == null) continue;
+                            if (data.Item1.IsNull || data.Item1 == null || data.Item2.IsNull || data.Item2 == null || data.Item1 == default(Player)) continue;
 
                             try
                             {

@@ -262,7 +262,10 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                if(!aVehicle.IsNull) player.SetIntoVehicle(aVehicle, 0);
+                if (player != default(Player))
+                {
+                    if (!aVehicle.IsNull) player.SetIntoVehicle(aVehicle, 0);
+                }
             }, 1000);
 
             try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:aveh:{carname.Replace(":", "|")}"); } catch { }
@@ -306,7 +309,10 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                if (!aVehicle.IsNull) player.SetIntoVehicle(aVehicle, 0);
+                if (player != default(Player))
+                {
+                    if (!aVehicle.IsNull) player.SetIntoVehicle(aVehicle, 0);
+                }
             }, 1000);
 
             return;
@@ -641,56 +647,59 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                if(target == null || !target.IsInstanceAlive || player == null || !player.IsInstanceAlive)
+                if (player != default(Player) && target != default(Player))
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, target or you are no longer alive.");
-                    player.ResetData("CuffingTarget");
-                    return;
-                }
-
-                LobbyData lobbye = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedData<int>("InLobby"));
-                if (lobbye != null)
-                {
-                    if (lobbye.Cops.Contains(player) && lobbye.gameStatus == 1 && lobbye.Fugitives.Contains(target) && !target.HasData("Cuffed"))
+                    if (target == null || !target.IsInstanceAlive || player == null || !player.IsInstanceAlive)
                     {
-                        isACop = true;
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, target or you are no longer alive.");
+                        player.ResetData("CuffingTarget");
+                        return;
                     }
-                }
 
-                if (!isACop)
-                {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, you cannot cuff that target anymore.");
+                    LobbyData lobbye = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedData<int>("InLobby"));
+                    if (lobbye != null)
+                    {
+                        if (lobbye.Cops.Contains(player) && lobbye.gameStatus == 1 && lobbye.Fugitives.Contains(target) && !target.HasData("Cuffed"))
+                        {
+                            isACop = true;
+                        }
+                    }
+
+                    if (!isACop)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, you cannot cuff that target anymore.");
+                        player.ResetData("CuffingTarget");
+                        return;
+                    }
+
+                    if (player.Position.DistanceTo(target.Position) > 2.0)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near the target!");
+                        player.ResetData("CuffingTarget");
+
+                        return;
+                    }
+
                     player.ResetData("CuffingTarget");
-                    return;
+
+                    EPlayer.GrantXP(player, 5);
+                    EPlayer.Action(player, $"has grabbed ahold of {target.Name} and slapped the handcuffs on their wrists.");
+
+                    target.SetAccessories(7, 41, 0); // Handcuffs
+
+                    EPlayer.Handcuff(target, true);
+
+                    Events.RequestPlayAnimation(player, "mp_arresting", "a_uncuff", 2);
+
+                    NAPI.Task.Run(() =>
+                    {
+                        if(player != default(Player)) Events.RequestClearAnimation(player);
+                    }, 2000);
+
+                    target.Heading = player.Heading;
+
+                    Events.OnPlayerDeath(target, player, 696988); // Reason 696988 = handcuffs.
                 }
-
-                if (player.Position.DistanceTo(target.Position) > 2.0) 
-                { 
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near the target!");
-                    player.ResetData("CuffingTarget");
-
-                    return; 
-                }
-
-                player.ResetData("CuffingTarget");
-
-                EPlayer.GrantXP(player, 5);
-                EPlayer.Action(player, $"has grabbed ahold of {target.Name} and slapped the handcuffs on their wrists.");
-
-                target.SetAccessories(7, 41, 0); // Handcuffs
-
-                EPlayer.Handcuff(target, true);
-
-                Events.RequestPlayAnimation(player, "mp_arresting", "a_uncuff", 2);
-
-                NAPI.Task.Run(() =>
-                {
-                    Events.RequestClearAnimation(player);
-                }, 2000);
-
-                target.Heading = player.Heading;
-
-                Events.OnPlayerDeath(target, player, 696988); // Reason 696988 = handcuffs.
 
             }, 3000);
             return;
@@ -1717,7 +1726,10 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                target.Kick("Banned.");
+                if (target != default(Player))
+                {
+                    target.Kick("Banned.");
+                }
             }, 350);
 
            
@@ -3041,9 +3053,11 @@ namespace LSCC
 
                 NAPI.Task.Run(() =>
                 {
-                    player.TriggerEvent("SpectatePlayer", target);
-                    player.TriggerEvent("SetPlayerFrozen", true);
-
+                    if (target != default(Player))
+                    {
+                        player.TriggerEvent("SpectatePlayer", target);
+                        player.TriggerEvent("SetPlayerFrozen", true);
+                    }
                 }, 1000);
                 
 
