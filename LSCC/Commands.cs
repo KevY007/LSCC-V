@@ -21,7 +21,7 @@ namespace LSCC
                 return;
             }
 
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name}: /serveroptions {action}");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:serveroptions:{action.Replace(":", "|")}"); } catch { }
 
             if (action.StartsWith("maxinlobby", StringComparison.OrdinalIgnoreCase))
             {
@@ -109,7 +109,7 @@ namespace LSCC
                 return;
             }
 
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name}: /game {action}");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:game:{action.Replace(":", "|")}"); } catch { }
 
             if (action.StartsWith("stop", StringComparison.OrdinalIgnoreCase))
             {
@@ -265,6 +265,7 @@ namespace LSCC
                 if(!aVehicle.IsNull) player.SetIntoVehicle(aVehicle, 0);
             }, 1000);
 
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:aveh:{carname.Replace(":", "|")}"); } catch { }
             return;
         }
 
@@ -369,6 +370,7 @@ namespace LSCC
             player.Dimension = target.Dimension;
 
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has teleported to {target.Name}.");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:goto:{target.Name}"); } catch { }
             return;
         }
 
@@ -384,7 +386,7 @@ namespace LSCC
                 return;
             }
 
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} summoned {target.Name}");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:bring:{target.Name}"); } catch { }
 
             if (target.IsInVehicle)
             {
@@ -413,7 +415,7 @@ namespace LSCC
                 return;
             }
 
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} brought all players to them");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:bringall"); } catch { }
 
             foreach (Player target in RAGE.Entities.Players.All)
             {
@@ -437,7 +439,7 @@ namespace LSCC
                 return;
             }
 
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} froze all players");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:freezeall"); } catch { }
 
             foreach (Player target in RAGE.Entities.Players.All)
             {
@@ -460,7 +462,7 @@ namespace LSCC
                 return;
             }
 
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} unfreezed all players");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unfreezeall"); } catch { }
 
             foreach (Player target in RAGE.Entities.Players.All)
             {
@@ -483,7 +485,7 @@ namespace LSCC
                 return;
             }
 
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} set all players hp to {health} and ar to {armor}");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:sethpall:{health}:{armor}"); } catch { }
 
             foreach (Player target in RAGE.Entities.Players.All)
             {
@@ -507,7 +509,7 @@ namespace LSCC
                 return;
             }
 
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} set {target.Name}'s hp to {health}");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:sethp:{target.Name}:health"); } catch { }
 
             target.Health = health;
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has set {target.Name}'s HP to {health}.");
@@ -526,7 +528,7 @@ namespace LSCC
                 return;
             }
 
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} set {target.Name} inv: {status}");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setinv:{target.Name}:{status}"); } catch { }
 
             player.TriggerEvent("SetActorInvulnerable", status > 0 ? true : false);
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have toggled " + target.Name + "'s invulnerability.");
@@ -545,7 +547,7 @@ namespace LSCC
                 return;
             }
 
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} set {target.Name}'s ar to {armour}");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setar:{target.Name}:{armour}"); } catch { }
 
             target.Armor = armour;
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has set {target.Name}'s AR to {armour}.");
@@ -746,7 +748,7 @@ namespace LSCC
                 return;
             }
 
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} gave gun {wepname} to {target.Name}");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:givegun:{target.Name}:{wepname}:{ammo}"); } catch { }
 
             target.GiveWeapon((WeaponHash)wephash, ammo);
 
@@ -811,7 +813,7 @@ namespace LSCC
                 target.GiveWeapon((WeaponHash)wephash, ammo);
             }
 
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} gave gun {wepname} to all");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:givegunall:{wepname}:{ammo}"); } catch { }
 
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have given a " + wepname + " with " + ammo + " ammo to the all players.");
             return;
@@ -831,7 +833,7 @@ namespace LSCC
 
             if(!target.IsInVehicle) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not in any vehicle!"); return; }
 
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} fixed {target.Name}'s vehicle");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:fix:{target.Name}"); } catch { }
 
             target.Vehicle.Repair();
 
@@ -858,8 +860,6 @@ namespace LSCC
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
                 return;
             }
-
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} removed all admin vehicles");
 
             for (int i = Settings.AdminVehicles.Count - 1; i >= 0; i--)
             {
@@ -1434,7 +1434,7 @@ namespace LSCC
                 return;
             }
 
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} sent {target.Name} to lobby");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:sendtolobby:{target.Name}"); } catch { }
 
             player.SetData("ForcedLobby", true);
             cmd_lobby(target);
@@ -1662,7 +1662,7 @@ namespace LSCC
                 }
             }
 
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} removed ban on {username}");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unban:{username}"); } catch { }
 
             ContextFactory.Instance.Bans.Remove(ban);
             ContextFactory.Instance.SaveChanges();
@@ -1713,7 +1713,7 @@ namespace LSCC
 
             target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} banned {target.Name}");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ban:{target.Name}:{reason}"); } catch { }
 
             NAPI.Task.Run(() =>
             {
@@ -2009,7 +2009,7 @@ namespace LSCC
 
             if(!EPlayer.LoggedIn(target)) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not logged in."); return; }
 
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} granted {xp} XP to {target.Name}");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:grantxp:{target.Name}:{xp}"); } catch { }
 
             EPlayer.GrantXP(target, xp);
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has given {target.Name} {xp} xp.");
@@ -2207,7 +2207,7 @@ namespace LSCC
                 return;
             }
 
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} set {target.Name}'s admin to {level}");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setadmin:{target.Name}:{level}"); } catch { }
 
             t_acc.Admin = level;
             player.SendChatMessage($"!{{#00FF33}}You have set {target.Name}'s admin level to {EPlayer.GetAdminLevelName(level, true)} ({level})");
@@ -2238,7 +2238,7 @@ namespace LSCC
                 return;
             }
 
-            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} set {target.Name}'s donator to {level}");
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setdonator:{target.Name}:{level}"); } catch { }
 
             t_acc.DonatorLevel = level;
             player.SendChatMessage($"!{{#00FF33}}You have set {target.Name}'s donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
@@ -2474,7 +2474,7 @@ namespace LSCC
             {
                 target.RemoveAllWeapons();
 
-                NAPI.Util.ConsoleOutput($"(ADM) {player.Name} removed {target.Name}'s weapons");
+                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:removeguns:{target.Name}"); } catch { }
 
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has removed {target.Name}'s weapons.");
             }
@@ -2497,7 +2497,7 @@ namespace LSCC
                 {
                     target.RemoveAllWeapons();
                 }
-                NAPI.Util.ConsoleOutput($"(ADM) {player.Name} removed all players weapons");
+                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:removegunsfromall"); } catch { }
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has removed weapons from all players.");
             }
         }
@@ -2515,7 +2515,7 @@ namespace LSCC
             else
             {
                 EPlayer.Freeze(target, true);
-                NAPI.Util.ConsoleOutput($"(ADM) {player.Name} froze {target.Name}");
+                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:freeze:{target.Name}"); } catch { }
                 NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#FF6347}}[AdmCmd] YOU HAVE BEEN FROZEN BY !{{#FF0000}}{player.Name}");
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen {target.Name}.");
             }
@@ -2535,7 +2535,7 @@ namespace LSCC
             else
             {
                 EPlayer.Freeze(target, false);
-                NAPI.Util.ConsoleOutput($"(ADM) {player.Name} unfroze {target.Name}");
+                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unfreeze:{target.Name}"); } catch { }
                 NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#FF6347}}[AdmCmd] You have been unfrozen by !{{#FF0000}}{player.Name}");
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen {target.Name}.");
             }
@@ -2558,7 +2558,7 @@ namespace LSCC
                     playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{target.Name} has been kicked by {player.Name} for {reason}.");
                 });
 
-                NAPI.Util.ConsoleOutput($"(ADM) {player.Name} kicked {target.Name} for {reason}");
+                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:kick:{target.Name}:{reason.Replace(":", "|")}"); } catch { }
 
                 target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
@@ -2587,7 +2587,7 @@ namespace LSCC
                     playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has jailed {target.Name} for {mins} minutes, reason: {reason}.");
                 });
 
-                NAPI.Util.ConsoleOutput($"(ADM) {player.Name} jailed {target.Name} for {mins}mins for {reason}");
+                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:jail:{target.Name}:{mins}:{reason.Replace(":", "|")}"); } catch { }
 
                 EPlayer.Jail(target, mins, reason);
             }
@@ -2616,7 +2616,7 @@ namespace LSCC
                 target.SetSharedData("JailTime", 0);
                 EPlayer.Freeze(player, false);
 
-                NAPI.Util.ConsoleOutput($"(ADM) {player.Name} unjailed {target.Name}");
+                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unjail:{target.Name}"); } catch { }
 
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has unjailed {target.Name}.");
                 EPlayer.Spawn(target);
@@ -2649,7 +2649,7 @@ namespace LSCC
                 Acc.MuteTime = mins * 60;
                 player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been muted for {mins} minutes, reason: {reason}.");
 
-                NAPI.Util.ConsoleOutput($"(ADM) {player.Name} muted {target.Name} for {mins} mins for {reason}");
+                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:mute:{target.Name}:{mins}:{reason.Replace(":", "|")}"); } catch { }
 
                 player.SetSharedData("MuteTime", Acc.MuteTime);
                 player.TriggerEvent("SetMuteCounter", Acc.MuteTime);
@@ -2675,7 +2675,7 @@ namespace LSCC
                 Account acc = EPlayer.GetAccount(target);
                 if (acc.MuteTime == 0) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not muted."); return; }
 
-                NAPI.Util.ConsoleOutput($"(ADM) {player.Name} unmuted {target.Name}");
+                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unmute:{target.Name}"); } catch { }
 
                 acc.MuteTime = 0;
                 target.SetSharedData("MuteTime", 0);

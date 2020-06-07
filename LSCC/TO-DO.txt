@@ -10,5 +10,3 @@ COP CAR SELECTOR LATER
 Check LSCC discord.
 
 increase shot tag distance
-
-check improvement bugs (report sys and others)

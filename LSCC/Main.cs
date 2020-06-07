@@ -474,9 +474,21 @@ namespace LSCC
             return ret;
         }
 
+        public static void Log(string fileName, string msg)
+        {
+            var writer = new System.IO.StreamWriter($"logs\\{fileName}", true);
+
+            writer.WriteLine(msg);
+            writer.Flush();
+            writer.Close();
+            return;
+        }
+
         [ServerEvent(Event.ResourceStart)]
         public void OnResourceStart()
         {
+            System.IO.Directory.CreateDirectory("logs");
+
             NAPI.Server.SetAutoRespawnAfterDeath(false);
             NAPI.Server.SetAutoSpawnOnConnect(false);
             NAPI.Server.SetGlobalServerChat(false);
