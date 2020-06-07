@@ -903,7 +903,8 @@ namespace LSCC
                     NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
                     MapSpawn spawnLoc = null;
                     pCount = 0;
-                    foreach (Player player in lobby.Cops)
+                    
+                    foreach (Player player in lobby.Cops.OrderBy(x => new Random().Next()))
                     {
                         foreach(MapSpawn tSpawn in Spawns.Where(a => a.spawnTeam == 1))
                         {
@@ -1005,7 +1006,7 @@ namespace LSCC
                     spawnLoc = null;
                     pCount = 0;
                     NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
-                    foreach (Player player in lobby.Fugitives)
+                    foreach (Player player in lobby.Fugitives.OrderBy(x => new Random().Next()))
                     {
                         spawnLoc = new MapSpawn();
 

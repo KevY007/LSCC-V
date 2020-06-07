@@ -11,7 +11,5 @@ Check LSCC discord.
 
 increase shot tag distance
 
-INVOKE DISABLE PISTOL WHIPPING?
-
-remove guns from player cmd
 check improvement bugs (report sys and others)
+partner/squad

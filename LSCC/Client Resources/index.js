@@ -7,7 +7,7 @@ let lastFunc = "Init";
 
 function traceLastFunc(iStr)
 {
-    mp.storage.data.tlf_latest = iStr;
+    
 }
 
 traceLastFunc("RequireInit");
