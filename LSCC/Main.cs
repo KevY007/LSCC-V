@@ -556,7 +556,7 @@ namespace LSCC
                     }
                 }
 
-                NAPI.Util.ConsoleOutput("Updated the DISCORD counts.");
+                //NAPI.Util.ConsoleOutput("Updated the DISCORD counts.");
             }
             foreach (LobbyData lobby in Settings.Lobbies)
             {
