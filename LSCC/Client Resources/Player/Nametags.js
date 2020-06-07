@@ -151,7 +151,6 @@ mp.events.add('render', (nametags) => {
                 outline: true
                 });
             }
-            
 
             if(showHPStatus == 1 || (mp.game.player.isFreeAimingAtEntity(player.handle) && showHPStatus == 2))
             {
@@ -168,6 +167,14 @@ mp.events.add('render', (nametags) => {
                     graphics.drawRect(x, y2, width + border * 2, height + border * 2, 0, 0, 0, 200);
                     graphics.drawRect(x, y2, width, height, 143, 143, 143, 255);
                     graphics.drawRect(x - width / 2 * (1 - armour), y2, width * armour, height, 255, 255, 255, 200);
+                }
+            }
+
+            if(mp.game.player.isFreeAimingAtEntity(player.handle) && mp.players.local.weaponAmmo > 0)
+            {
+                if(mp.players.local.getVariable("HasShot") == false && player.getVariable("Team") == 0)
+                {
+                    mp.events.callRemote("GivePlayerShotTag");
                 }
             }
         }
