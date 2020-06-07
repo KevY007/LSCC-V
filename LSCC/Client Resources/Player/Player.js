@@ -196,6 +196,11 @@ function TimeFormat(time)
 function UpdateTimer()
 {
     secondCounter++;
+    if(secondCounter == Math.round(1000 / updateRate) || secondCounter == Math.round(500 / updateRate))
+    {
+        traceLastFunc(`[Players] Update Stream Data`);
+        mp.events.callRemote("UpdateStreamData");
+    }
     if(secondCounter >= Math.round(1000 / updateRate))
     {
         secondCounter = 0;
@@ -223,10 +228,6 @@ function UpdateTimer()
                     else target.voiceVolume = 1 - (dist / MaxVoiceRange);
                 }
             });
-
-            traceLastFunc(`[Players] Update Stream Data`);
-
-            mp.events.callRemote("UpdateStreamData");
 
             if (specState == true && specCam != null && specTarget != null) {
 

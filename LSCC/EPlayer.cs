@@ -441,12 +441,22 @@ namespace LSCC
                 byte blipColor = 45;
                 uint blipId = 1;
 
-                if (player.GetSharedData<int>("Team") == 0) blipColor = 75;
+                if (player.GetSharedData<int>("Team") == 0)
+                {
+                    blipColor = 75;
+
+                    if(player.GetSharedData<bool>("HasShot") == true)
+                    {
+                        blipColor = 76;
+                    }
+                }
                 else if (player.GetSharedData<int>("Team") == 1) blipColor = 3;
 
                 if (player.GetSharedData<int>("InLobby") == -3) blipColor = 15;
                 if (player.GetSharedData<int>("InLobby") == -4) blipColor = 73;
                 if (player.GetSharedData<int>("InDM") != -1) blipColor = 39;
+
+                if (player.IsInVehicle == true) blipId = 724;
 
                 player.SetData("Blip", NAPI.Blip.CreateBlip(blipId, player.IsInVehicle == true ? player.Vehicle.Position : player.Position, 1, blipColor, player.Name, 255, 0, false, 0, player.Dimension));
             }
