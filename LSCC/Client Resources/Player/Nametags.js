@@ -172,7 +172,7 @@ mp.events.add('render', (nametags) => {
 
             if(mp.game.player.isFreeAimingAtEntity(player.handle) && mp.players.local.weaponAmmo > 0)
             {
-                if(mp.players.local.getVariable("HasShot") == false && player.getVariable("Team") == 0)
+                if(mp.players.local.getVariable("HasShot") == false && mp.players.local.getVariable("Team") == 0 && player.getVariable("Team") == 1)
                 {
                     mp.events.callRemote("GivePlayerShotTag");
                 }
