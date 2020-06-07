@@ -1944,9 +1944,14 @@ namespace LSCC
             {
                 target = target.GetData<Player>("PlayerSquad");
             }
+            else
+            {
+                target.SetData("PlayerSquad", target);
+            }
 
             player.SetData("AskedSquad", target);
 
+            player.SendChatMessage("!{#FFAC38}You have requested to join " + target.Name + "'s squad.");
             Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == target).ToList().ForEach((Player member) =>
             {
                 member.SendChatMessage("!{#FFAC38}[Partners] !{#FFFFFF}" + player.Name + " has requested to join this squad. Leader can /squadaccept to accept them.");
