@@ -205,16 +205,16 @@ function TimeFormat(time)
 function UpdateTimer()
 {
     secondCounter++;
-    if(secondCounter == Math.round(1000 / updateRate) || secondCounter == Math.round(500 / updateRate))
-    {
-        traceLastFunc(`[Players] Update Stream Data`);
-        mp.events.callRemote("UpdateStreamData");
-    }
+
     if(secondCounter >= Math.round(1000 / updateRate))
     {
         secondCounter = 0;
+
         if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
         {
+            traceLastFunc(`[Players] Update Stream Data`);
+            mp.events.callRemote("UpdateStreamData");
+
             traceLastFunc(`[Players] Update VoiceData`);
 
             mp.players.forEachInStreamRange(target => {
