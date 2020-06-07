@@ -395,6 +395,92 @@ namespace LSCC
             return;
         }
 
+        [Command("bringall", Alias = "gethereall")]
+        public void cmd_bringall(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                return;
+            }
+
+            foreach (Player target in RAGE.Entities.Players.All)
+            {
+                target.Position = player.Position.Around(3.0f);
+                target.Dimension = player.Dimension;
+            }
+
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has summoned all the players.");
+            return;
+        }
+
+        [Command("freezeall")]
+        public void cmd_freezeall(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                return;
+            }
+
+            foreach (Player target in RAGE.Entities.Players.All)
+            {
+                EPlayer.Freeze(target, true);
+            }
+
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen all the players.");
+            return;
+        }
+
+        [Command("unfreezeall")]
+        public void cmd_unfreezeall(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                return;
+            }
+
+            foreach (Player target in RAGE.Entities.Players.All)
+            {
+                EPlayer.Freeze(target, false);
+            }
+
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has thawed all the players.");
+            return;
+        }
+
+        [Command("sethpall")]
+        public void cmd_sethpall(Player player, int health, int armor)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                return;
+            }
+
+            foreach (Player target in RAGE.Entities.Players.All)
+            {
+                target.Health = health;
+                target.Armor = armor;
+            }
+
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has changed all player's health & ar.");
+            return;
+        }
+
         [Command("sethp")]
         public void cmd_sethp(Player player, Player target, int health)
         {
@@ -566,6 +652,9 @@ namespace LSCC
 
                 EPlayer.GrantXP(player, 5);
                 EPlayer.Action(player, $"has grabbed ahold of {target.Name} and slapped the handcuffs on their wrists.");
+
+                target.SetAccessories(7, 41, 0); // Handcuffs
+
                 EPlayer.Handcuff(target, true);
 
                 Events.RequestPlayAnimation(player, "mp_arresting", "a_uncuff", 2);
@@ -638,6 +727,67 @@ namespace LSCC
             target.GiveWeapon((WeaponHash)wephash, ammo);
 
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have given a " + wepname + " with " + ammo + " ammo to the target.");
+            return;
+        }
+
+        [Command("givegunall", GreedyArg = true)]
+        public void cmd_givegunall(Player player, int ammo, string wep)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 3 admin.");
+                return;
+            }
+
+
+            UInt64 wephash = 0;
+            bool found = false;
+            string wepname = "";
+
+            if (!UInt64.TryParse(wep, out wephash))
+            {
+                wephash = 0;
+            }
+
+            foreach (KeyValuePair<uint, string> i in Main.WeaponReasons)
+            {
+                if (wephash != 0)
+                {
+                    if (i.Key == wephash)
+                    {
+                        found = true;
+                        wepname = i.Value;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (i.Value.Contains(wep, StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        found = true;
+                        wephash = i.Key;
+                        wepname = i.Value;
+                        break;
+                    }
+                }
+            }
+
+
+            if (found == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid weapon! Try using hashes or exact names.");
+                return;
+            }
+
+            foreach (Player target in Settings.LoggedInPlayers)
+            {
+                target.GiveWeapon((WeaponHash)wephash, ammo);
+            }
+
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have given a " + wepname + " with " + ammo + " ammo to the all players.");
             return;
         }
 
@@ -1664,11 +1814,11 @@ namespace LSCC
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
                 player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword");
-                player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension");
+                player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension /r(emove)guns");
             }
             if (EPlayer.GetAccount(player).Admin >= 3)
             {
-                player.SendChatMessage("[Admin Lv 3]: /givegun /gotopos");
+                player.SendChatMessage("[Admin Lv 3]: /givegun(all) /gotopos /bringall /sethpall /(un)freezeall /r(emove)g(uns)f(rom)a(ll)");
             }
             if (EPlayer.GetAccount(player).Admin >= 4)
             {
@@ -1944,7 +2094,7 @@ namespace LSCC
 
             foreach (Player p in Settings.LoggedInPlayers)
             {
-                if(EPlayer.GetAccount(p).DonatorLevel > 0) player.SendChatMessage($"!{{#F7EB05}}[{EPlayer.GetDonatorLevelName(EPlayer.GetAccount(player).DonatorLevel, true)}!{{#F7EB05}}] {player.Name}: {text}");
+                if(EPlayer.GetAccount(p).DonatorLevel > 0) p.SendChatMessage($"!{{#F7EB05}}[{EPlayer.GetDonatorLevelName(EPlayer.GetAccount(player).DonatorLevel, true)}!{{#F7EB05}}] {player.Name}: {text}");
             }
             return;
         }
@@ -2143,6 +2293,46 @@ namespace LSCC
             player.SendChatMessage($"!{{#FFFF00}}(( PM sent to {target.Name}: {text} ))");
             return;
         }
+
+        [Command("removeguns", GreedyArg = true, Alias = "rguns")]
+        public void cmd_removeguns(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+            if (EPlayer.GetAccount(player).Admin < 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                return;
+            }
+            else
+            {
+                target.RemoveAllWeapons();
+
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has removed {target.Name}'s weapons.");
+            }
+        }
+
+        [Command("removegunsfromall", GreedyArg = true, Alias = "rgfa")]
+        public void cmd_removegunsfromall(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                return;
+            }
+            else
+            {
+                foreach (Player target in RAGE.Entities.Players.All)
+                {
+                    target.RemoveAllWeapons();
+                }
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has removed weapons from all players.");
+            }
+        }
+
         [Command("freeze", GreedyArg = true)]
         public void cmd_freeze(Player player, Player target)
         {
@@ -2160,6 +2350,8 @@ namespace LSCC
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen {target.Name}.");
             }
         }
+
+
         [Command("unfreeze", GreedyArg = true)]
         public void cmd_unfreeze(Player player, Player target)
         {

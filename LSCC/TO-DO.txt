@@ -9,10 +9,9 @@ COP CAR SELECTOR LATER
 
 Check LSCC discord.
 
-accessory id 41 is handcuffs
 increase shot tag distance
 
 INVOKE DISABLE PISTOL WHIPPING?
 
-fix spawning for laggers,
- spawn again in player.ping + 1000
+remove guns from player cmd
+check improvement bugs (report sys and others)

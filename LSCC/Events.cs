@@ -1003,8 +1003,6 @@ namespace LSCC
                     }
                 }
             }
-            
-            EPlayer.UpdateBlip(player);
 
             return;
         }
@@ -1276,10 +1274,13 @@ namespace LSCC
                         }
                     }
 
-                    int time = 30000;
-                    target.TriggerEvent("setToRagdoll", time, time * 2, 0, false, false, false);
-                    target.SetData("TasedTill", Environment.TickCount + 30000);
-                    Commands.cmd_do(target, $"{target.Name} has been tased and has been rendered immobile.");
+                    if (target.HasData("TasedTill") && Environment.TickCount - (target.GetData<int>("TasedTill") - 30000) >= 2000)
+                    {
+                        int time = 30000;
+                        target.TriggerEvent("setToRagdoll", time, time * 2, 0, false, false, false);
+                        target.SetData("TasedTill", Environment.TickCount + 30000);
+                        Commands.cmd_do(player, $"{target.Name} has been tased and has been rendered immobile.");
+                    }
                 }
                 else
                 {
@@ -1326,6 +1327,22 @@ namespace LSCC
             if (player.HasData("Cuffed"))
             {
                 player.TriggerEvent("SetHandcuffs", false);
+
+                CharacterData ConvChar = new CharacterData();
+
+                Account acc = EPlayer.GetAccount(player);
+                try
+                {
+                    if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata- sending to creation."));
+
+                    ConvChar = NAPI.Util.FromJson<CharacterData>(acc.Character);
+                }
+                catch
+                {
+                    ConvChar = new CharacterData();
+                }
+
+                EPlayer.ApplyCharacter(player, ConvChar, acc.LobbyClothing);
                 player.ResetData("Cuffed");
             }
             if (player.HasData("Handsup"))

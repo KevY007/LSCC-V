@@ -1204,6 +1204,12 @@ namespace LSCC
                         {
                             if (data.Item1.IsNull || data.Item1 == null || data.Item2.IsNull || data.Item2 == null) continue;
 
+                            try
+                            {
+                                if (data.Item1.HasData("putVehicle")) data.Item1.SetIntoVehicle(data.Item1.GetData<Vehicle>("putVehicle"), data.Item1.GetData<int>("putVehicleSeat"));
+                            }
+                            catch { }
+
                             data.Item1.SetIntoVehicle(data.Item2, data.Item3);
                             EPlayer.Freeze(data.Item1, false);
 
@@ -1244,6 +1250,28 @@ namespace LSCC
 
                     }, delayTime: 3000);
 
+                    NAPI.Task.Run(() =>
+                    {
+                        foreach (Player player in lobby.Fugitives)
+                        {
+                            try
+                            {
+                                if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
+                            }
+                            catch { }
+                        }
+
+                        foreach (Player player in lobby.Cops)
+                        {
+                            try
+                            {
+                                if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
+                            }
+                            catch { }
+                        }
+
+                    }, delayTime: 5000);
+
 
                     lobby.gameStatus = 1;
                     NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Game has been started with {lobby.Cops.Count} cops & {lobby.Fugitives.Count} fugitives on map {map.Name}.");
@@ -1260,6 +1288,11 @@ namespace LSCC
 
         public static void GameUpdate()
         {
+            foreach(Player pl in Settings.LoggedInPlayers)
+            {
+                EPlayer.UpdateBlip(pl);
+            }
+
             if (Environment.TickCount - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
             {
                 Settings.DerbyTimeLeft--;

@@ -367,11 +367,9 @@ namespace LSCC
         public static void ResetPlayerData(Player player)
         {
             player.ResetData("AccountHandle");
-            player.SetData("LoggedIn", false);
             player.SetData("TeamShotWarning", 0);
             player.SetData("UnfairKillSpawn", false);
             player.SetData("InnocentShotWarning", 0);
-            player.SetSharedData("pLogged", false);
             player.SetData("AutoJoin", true);
             player.SetData("HUDState", true);
             player.SetSharedData("DerbyTime", 0);
@@ -412,6 +410,8 @@ namespace LSCC
 
             EPlayer.UpdateBlip(player);
             Settings.LoggedInPlayers.Remove(player);
+            player.SetSharedData("pLogged", false);
+            player.SetData("LoggedIn", false);
         }
 
         public static void Jail(Player player, int minutes, string reason)
