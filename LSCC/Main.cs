@@ -621,7 +621,7 @@ namespace LSCC
                                 {
                                     lobby.gameStatus = 2;
 
-                                    NAPI.Chat.SendChatMessageToAll($"[Lobby {lobby.lobbyId}] Copchase will start in 10 seconds... ({pCount} players currently)");
+                                    NAPI.Chat.SendChatMessageToAll($"!{{#FFFF00}}[Lobby {lobby.lobbyId}] !{{#FFFFFF}}Copchase will start in 10 seconds... ({pCount} players currently)");
 
                                     foreach (Player player in Settings.LoggedInPlayers)
                                     {
