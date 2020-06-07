@@ -622,8 +622,9 @@ namespace LSCC
                     int arenaID = player.GetSharedData<int>("InDM");
                     if (arenaID > -1)
                     {
-                        Vector3 dmSpawn = (Vector3)Settings.DMSpawns[arenaID][0, 0];
-                        SpawnArea = (Vector3)dmSpawn.Around(30.0f);
+                        int spawnID = rand.Next(Settings.DMSpawns[arenaID].GetLength(0));
+                        Vector3 dmSpawn = (Vector3)Settings.DMSpawns[arenaID][spawnID, 0];
+                        SpawnArea = (Vector3)dmSpawn;
                     }
                 }
      
