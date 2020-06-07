@@ -476,7 +476,7 @@ namespace LSCC
 
         public static void Log(string fileName, string msg)
         {
-            var writer = new System.IO.StreamWriter($"logs\\{fileName}", true);
+            var writer = new System.IO.StreamWriter($"logs/{fileName}", true);
 
             writer.WriteLine(msg);
             writer.Flush();
