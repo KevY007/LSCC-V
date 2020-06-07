@@ -21,6 +21,8 @@ namespace LSCC
                 return;
             }
 
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name}: /serveroptions {action}");
+
             if (action.StartsWith("maxinlobby", StringComparison.OrdinalIgnoreCase))
             {
                 string[] args = action.Split(' ');
@@ -106,6 +108,8 @@ namespace LSCC
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
                 return;
             }
+
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name}: /game {action}");
 
             if (action.StartsWith("stop", StringComparison.OrdinalIgnoreCase))
             {
@@ -380,6 +384,8 @@ namespace LSCC
                 return;
             }
 
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} summoned {target.Name}");
+
             if (target.IsInVehicle)
             {
                 target.Vehicle.Position = player.Position.Around(5.0f);
@@ -407,6 +413,8 @@ namespace LSCC
                 return;
             }
 
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} brought all players to them");
+
             foreach (Player target in RAGE.Entities.Players.All)
             {
                 target.Position = player.Position.Around(3.0f);
@@ -429,6 +437,8 @@ namespace LSCC
                 return;
             }
 
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} froze all players");
+
             foreach (Player target in RAGE.Entities.Players.All)
             {
                 EPlayer.Freeze(target, true);
@@ -450,6 +460,8 @@ namespace LSCC
                 return;
             }
 
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} unfreezed all players");
+
             foreach (Player target in RAGE.Entities.Players.All)
             {
                 EPlayer.Freeze(target, false);
@@ -470,6 +482,8 @@ namespace LSCC
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
                 return;
             }
+
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} set all players hp to {health} and ar to {armor}");
 
             foreach (Player target in RAGE.Entities.Players.All)
             {
@@ -493,6 +507,8 @@ namespace LSCC
                 return;
             }
 
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} set {target.Name}'s hp to {health}");
+
             target.Health = health;
             return;
         }
@@ -508,6 +524,8 @@ namespace LSCC
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
                 return;
             }
+
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} set {target.Name} inv: {status}");
 
             player.TriggerEvent("SetActorInvulnerable", status > 0 ? true : false);
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have toggled " + target.Name + "'s invulnerability.");
@@ -525,6 +543,8 @@ namespace LSCC
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
                 return;
             }
+
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} set {target.Name}'s ar to {armour}");
 
             target.Armor = armour;
             return;
@@ -724,6 +744,8 @@ namespace LSCC
                 return;
             }
 
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} gave gun {wepname} to {target.Name}");
+
             target.GiveWeapon((WeaponHash)wephash, ammo);
 
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have given a " + wepname + " with " + ammo + " ammo to the target.");
@@ -787,6 +809,8 @@ namespace LSCC
                 target.GiveWeapon((WeaponHash)wephash, ammo);
             }
 
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} gave gun {wepname} to all");
+
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have given a " + wepname + " with " + ammo + " ammo to the all players.");
             return;
         }
@@ -805,11 +829,11 @@ namespace LSCC
 
             if(!target.IsInVehicle) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not in any vehicle!"); return; }
 
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} fixed {target.Name}'s vehicle");
+
             target.Vehicle.Repair();
-            RAGE.Entities.Players.All.ForEach((Player p) =>
-            {
-                p.SendChatMessage($"!{{#FF6347}}[AdmCmd] {player.Name} has repaired {target.Name}'s vehicle.");
-            });
+
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has repaired {target.Name}'s vehicle.");
 
             return;
         }
@@ -832,6 +856,8 @@ namespace LSCC
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
                 return;
             }
+
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} removed all admin vehicles");
 
             for (int i = Settings.AdminVehicles.Count - 1; i >= 0; i--)
             {
@@ -1406,6 +1432,8 @@ namespace LSCC
                 return;
             }
 
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} sent {target.Name} to lobby");
+
             player.SetData("ForcedLobby", true);
             cmd_lobby(target);
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has sent {target.Name} to lobby.");
@@ -1594,6 +1622,8 @@ namespace LSCC
                 }
             }
 
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} removed ban on {username}");
+
             ContextFactory.Instance.Bans.Remove(ban);
             ContextFactory.Instance.SaveChanges();
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has unbanned {username}.");
@@ -1642,6 +1672,8 @@ namespace LSCC
             target.SendChatMessage($"!{{#FF6347}}[BANNED] You have been banned from this server, Ban ID: {_new.SQL_ID}");
 
             target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} banned {target.Name}");
 
             NAPI.Task.Run(() =>
             {
@@ -1934,6 +1966,8 @@ namespace LSCC
 
             if(!EPlayer.LoggedIn(target)) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not logged in."); return; }
 
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} granted {xp} XP to {target.Name}");
+
             EPlayer.GrantXP(target, xp);
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has given {target.Name} {xp} xp.");
             target.SendChatMessage($"!{{#FF6347]}}[AdmCmd] {player.Name} has given you {xp} xp.");
@@ -2130,6 +2164,8 @@ namespace LSCC
                 return;
             }
 
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} set {target.Name}'s admin to {level}");
+
             t_acc.Admin = level;
             player.SendChatMessage($"!{{#00FF33}}You have set {target.Name}'s admin level to {EPlayer.GetAdminLevelName(level, true)} ({level})");
             NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#00FF33}}{player.Name} has set your admin level to {EPlayer.GetAdminLevelName(level, true)} ({level})");
@@ -2158,6 +2194,8 @@ namespace LSCC
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed 5.");
                 return;
             }
+
+            NAPI.Util.ConsoleOutput($"(ADM) {player.Name} set {target.Name}'s donator to {level}");
 
             t_acc.DonatorLevel = level;
             player.SendChatMessage($"!{{#00FF33}}You have set {target.Name}'s donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
@@ -2393,6 +2431,8 @@ namespace LSCC
             {
                 target.RemoveAllWeapons();
 
+                NAPI.Util.ConsoleOutput($"(ADM) {player.Name} removed {target.Name}'s weapons");
+
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has removed {target.Name}'s weapons.");
             }
         }
@@ -2414,6 +2454,7 @@ namespace LSCC
                 {
                     target.RemoveAllWeapons();
                 }
+                NAPI.Util.ConsoleOutput($"(ADM) {player.Name} removed all players weapons");
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has removed weapons from all players.");
             }
         }
@@ -2431,6 +2472,7 @@ namespace LSCC
             else
             {
                 EPlayer.Freeze(target, true);
+                NAPI.Util.ConsoleOutput($"(ADM) {player.Name} froze {target.Name}");
                 NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#FF6347}}[AdmCmd] YOU HAVE BEEN FROZEN BY !{{#FF0000}}{player.Name}");
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen {target.Name}.");
             }
@@ -2450,6 +2492,7 @@ namespace LSCC
             else
             {
                 EPlayer.Freeze(target, false);
+                NAPI.Util.ConsoleOutput($"(ADM) {player.Name} unfroze {target.Name}");
                 NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#FF6347}}[AdmCmd] You have been unfrozen by !{{#FF0000}}{player.Name}");
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen {target.Name}.");
             }
@@ -2471,6 +2514,8 @@ namespace LSCC
                 {
                     playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{target.Name} has been kicked by {player.Name} for {reason}.");
                 });
+
+                NAPI.Util.ConsoleOutput($"(ADM) {player.Name} kicked {target.Name} for {reason}");
 
                 target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
@@ -2499,6 +2544,8 @@ namespace LSCC
                     playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has jailed {target.Name} for {mins} minutes, reason: {reason}.");
                 });
 
+                NAPI.Util.ConsoleOutput($"(ADM) {player.Name} jailed {target.Name} for {mins}mins for {reason}");
+
                 EPlayer.Jail(target, mins, reason);
             }
 
@@ -2525,6 +2572,8 @@ namespace LSCC
                 acc.JailTime = 0;
                 target.SetSharedData("JailTime", 0);
                 EPlayer.Freeze(player, false);
+
+                NAPI.Util.ConsoleOutput($"(ADM) {player.Name} unjailed {target.Name}");
 
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has unjailed {target.Name}.");
                 EPlayer.Spawn(target);
@@ -2557,6 +2606,8 @@ namespace LSCC
                 Acc.MuteTime = mins * 60;
                 player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been muted for {mins} minutes, reason: {reason}.");
 
+                NAPI.Util.ConsoleOutput($"(ADM) {player.Name} muted {target.Name} for {mins} mins for {reason}");
+
                 player.SetSharedData("MuteTime", Acc.MuteTime);
                 player.TriggerEvent("SetMuteCounter", Acc.MuteTime);
             }
@@ -2580,6 +2631,8 @@ namespace LSCC
             {
                 Account acc = EPlayer.GetAccount(target);
                 if (acc.MuteTime == 0) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not muted."); return; }
+
+                NAPI.Util.ConsoleOutput($"(ADM) {player.Name} unmuted {target.Name}");
 
                 acc.MuteTime = 0;
                 target.SetSharedData("MuteTime", 0);

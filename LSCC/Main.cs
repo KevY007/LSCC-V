@@ -833,40 +833,52 @@ namespace LSCC
 
                 if (fugitives == pCount) fugitives--; // There will ALWAYS be AT LEAST one COP.
 
+                int crashcheck = 0;
                 try
                 {
-                    int crashcheck = 0;
-                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    crashcheck++;
 
                     if (ContextFactory.Instance.Maps.Count() < 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has no maps added, failed to start"); return false; }
-                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    crashcheck++;
+
                     List<Map> mapList = ContextFactory.Instance.Maps.AsQueryable().Where(a => a.Enabled == true).ToList();
-                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    crashcheck++;
+
                     if (mapList.Count < 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has maps but none of them were enabled! Failed to start."); return false; }
-                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    crashcheck++;
+
                     Map map = mapList.OrderBy(c => Guid.NewGuid()).FirstOrDefault();
-                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    crashcheck++;
+
                     NAPI.Util.ConsoleOutput($"[Lobby " + lobbyid + $"] Selected Map [{map.Name}] | Total Spawns: [{ContextFactory.Instance.MapSpawns.AsQueryable().Where(a => a.mapID == map.SQL_ID).Count()}]");
-                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    crashcheck++;
+
                     if (ContextFactory.Instance.MapSpawns.AsQueryable().Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 0).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no fugitive spawns! Abort."); return false; }
                     if (ContextFactory.Instance.MapSpawns.AsQueryable().Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 1).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no cop spawns! Abort."); return false; }
 
-                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    crashcheck++;
+
                     List<MapSpawn> Spawns = ContextFactory.Instance.MapSpawns.AsQueryable().Where(x => x.mapID == map.SQL_ID).ToList();
-                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    crashcheck++;
+
                     List<int> UsedSpawns = new List<int>(Spawns.Count + 1);
-                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    crashcheck++;
+
                     List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid).ToList();
-                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    crashcheck++;
+
                     List<Player> PutInsideCar = new List<Player>(lobbyPlayers.Count());
-                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    crashcheck++;
+
                     UsedSpawns.Add(-1);
-                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    crashcheck++;
+
                     Random random = new Random();
 
                     pCount = 0;
                     Player _tempPlayer;
-                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    crashcheck++;
+
                     while (fugitives > 0)
                     {
                         _tempPlayer = lobbyPlayers[random.Next(lobbyPlayers.Count)];
@@ -887,7 +899,8 @@ namespace LSCC
                         }
                     }
                     fugitives = lobby.Fugitives.Count;
-                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    crashcheck++;
+
                     foreach (Player player in lobbyPlayers)
                     {
                         if (player.GetData<bool>("AutoJoin") == false) continue;
@@ -898,9 +911,11 @@ namespace LSCC
                             lobby.Cops.Add(player);
                         }
                     }
-                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    crashcheck++;
+
                     List<Tuple<Player, Vehicle, int>> playerVehicle = new List<Tuple<Player, Vehicle, int>>();
-                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    crashcheck++;
+
                     MapSpawn spawnLoc = null;
                     pCount = 0;
                     
@@ -1031,7 +1046,8 @@ namespace LSCC
 
                     spawnLoc = null;
                     pCount = 0;
-                    NAPI.Util.ConsoleOutput($"ctx {crashcheck}!"); crashcheck++;
+                    crashcheck++;
+
                     foreach (Player player in lobby.Fugitives.OrderBy(x => new Random().Next()))
                     {
                         spawnLoc = new MapSpawn();
@@ -1304,7 +1320,7 @@ namespace LSCC
                     NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Game has been started with {lobby.Cops.Count} cops & {lobby.Fugitives.Count} fugitives on map {map.Name}.");
                 }
                 catch {
-                    NAPI.Util.ConsoleOutput("Exception in startgame!");
+                    NAPI.Util.ConsoleOutput("Exception in startgame, ctx: " + crashcheck);
                     return false;
                 }
             }
