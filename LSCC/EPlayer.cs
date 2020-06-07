@@ -409,6 +409,8 @@ namespace LSCC
                 il.Cops.Remove(player);
                 il.Fugitives.Remove(player);
             }
+
+            EPlayer.UpdateBlip(player);
             Settings.LoggedInPlayers.Remove(player);
         }
 
@@ -428,6 +430,26 @@ namespace LSCC
             player.SetSharedData("JailTime", Acc.JailTime);
             player.TriggerEvent("SetJailCounter", Acc.JailTime);
             NAPI.Player.SpawnPlayer(player, (Vector3)Settings.VectorJail[0], (float)Settings.VectorJail[1]);
+        }
+
+        public static void UpdateBlip(Player player)
+        {
+            if (player.HasData("Blip")) player.GetData<Blip>("Blip").Delete();
+
+            if (player.HasSharedData("VisibleBlip") && player.GetSharedData<bool>("VisibleBlip") == true)
+            {
+                byte blipColor = 45;
+                uint blipId = 1;
+
+                if (player.GetSharedData<int>("Team") == 0) blipColor = 75;
+                else if (player.GetSharedData<int>("Team") == 1) blipColor = 3;
+
+                if (player.GetSharedData<int>("InLobby") == -3) blipColor = 15;
+                if (player.GetSharedData<int>("InLobby") == -4) blipColor = 73;
+                if (player.GetSharedData<int>("InDM") != -1) blipColor = 39;
+
+                player.SetData("Blip", NAPI.Blip.CreateBlip(blipId, player.IsInVehicle == true ? player.Vehicle.Position : player.Position, 1, blipColor, player.Name, 255, 0, false, 0, player.Dimension));
+            }
         }
 
         public static void SetDiscordStatus(Player player, string status)

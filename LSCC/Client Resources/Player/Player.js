@@ -24,8 +24,6 @@ let secondCounter = 0;
 let updateRate = 200;
 let updateInterval = null;
 
-//let playerBlips = [];
-
 let specCam = null;
 let specState = false;
 let specTarget = null;
@@ -356,74 +354,6 @@ function UpdateTimer()
             traceLastFunc(`[Players] Update Chase Data Complete`);
         }
     }
-    /*
-    traceLastFunc(`[Players] Blips Stage1`);
-    var blipsToDel = [];
-    mp.blips.forEach(blipId =>
-    {
-        blipsToDel.push(blipId);
-    });
-    traceLastFunc(`[Players] Blips Stage2`);
-
-    blipsToDel.forEach(blip =>
-    {
-        if(typeof blip.destroy === 'function')
-        {
-            blip.destroy();
-        }
-    });
-    traceLastFunc(`[Players] Blips Stage3`);
-
-    for (let i = 0; i < mp.blips.length; i++)
-    {
-        if(mp.blips.at(i).id !== undefined)
-        {
-            var index = playerBlips.indexOf(mp.blips.at(i).id);
-            if(index != -1)
-            {
-                mp.blips.at(i).destroy();
-            }
-        }
-    }
-    traceLastFunc(`[Players] Blips Stage4`);
-*/
-/*
-            if (target.getVariable("VisibleBlip") !== undefined && target.getVariable("VisibleBlip") == true)
-            {
-                var blipColor = 45;
-                var blipId = 1;
-
-                if(target.getVariable("Team") == 0) blipColor = 75;
-                else if(target.getVariable("Team") == 1) blipColor = 3;
-
-                if(target.getVariable("InLobby") == -3) blipColor = 15;
-                if(target.getVariable("InLobby") == -4) blipColor = 73;
-                if(target.getVariable("InDM") != -1) blipColor = 39;
-
-                if(target.isInAnyVehicle(false)) blipId = 724;
-
-                var position = target.position;
-                if((position.x == 0 && position.z == 0 && position.z == 0) || (target.handle !== 0) == false || target.handle === null || 
-                    target.handle === undefined)
-                {
-                    position.x = target.getVariable("UnstreamedX");
-                    position.y = target.getVariable("UnstreamedY");
-                    position.z = target.getVariable("UnstreamedZ");
-
-                    if(target.getVariable("UnstreamedState") == 1) blipId = 724;
-                }
-
-                var targetBlip = mp.blips.new(blipId, position,
-                {
-                    name: target.name,
-                    color: blipColor,
-                    shortRange: false,
-                    dimension: mp.players.local.dimension
-                });
-
-                playerBlips.push(targetBlip.id);
-            }*/
-
 
     return;
 }

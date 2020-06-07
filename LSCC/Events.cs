@@ -1003,6 +1003,9 @@ namespace LSCC
                     }
                 }
             }
+            
+            EPlayer.UpdateBlip(player);
+
             return;
         }
 

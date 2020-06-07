@@ -1319,7 +1319,7 @@ namespace LSCC
             player.SendChatMessage("!{#61A9FA}[Cop]: /gps /cuff /m(egaphone)");
             player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup /s(top)a(nim)");
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /freeroam /veh /teleport /dm /dmarenas /derby");
-            player.SendChatMessage("!{#A5A8A8}[Debug]: /pos /updaterate (changes the blip updating interval)");
+            player.SendChatMessage("!{#A5A8A8}[Debug]: /pos /updaterate");
 
             if (EPlayer.GetAccount(player).DonatorLevel >= 1)
             {
