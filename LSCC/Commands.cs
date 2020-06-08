@@ -1939,6 +1939,12 @@ namespace LSCC
                 {
                     mem.SendChatMessage("!{#FFAC38}[Partners] !{#FFFFFF}" + player.Name + " has left the squad.");
                 }
+
+                foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player))
+                {
+                    mem.SendChatMessage("!{#FFAC38}[Partners] Your squad has been disbanded.");
+                    mem.ResetData("PlayerSquad");
+                }
             }
 
             player.ResetData("PlayerSquad");
