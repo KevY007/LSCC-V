@@ -1921,6 +1921,8 @@ namespace LSCC
                 Player target = player.GetData<Player>("AskedBySquad");
                 player.ResetData("AskedBySquad");
 
+                target.SetData("PlayerSquad", player);
+
                 Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player).ToList().ForEach((Player member) =>
                 {
                     member.SendChatMessage("!{#FFAC38}[Partners] !{#FFFFFF}" + target.Name + " has partnered with this squad. (/squadchat)");
