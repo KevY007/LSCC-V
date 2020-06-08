@@ -3153,30 +3153,30 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player))
                 return;
+
             if (EPlayer.GetAccount(player).Admin < 1)
                 return;
-            else
+
+            player.SetData("Spec_Dimension", player.Dimension);
+            player.SetData("Spec_Pos", player.Position);
+
+            player.Dimension = target.Dimension;
+            Vector3 pos = target.Position;
+            pos.Z -= 35.0f;
+            player.Position = pos;
+
+            NAPI.Task.Run(() =>
             {
-                player.SetData("Spec_Dimension", player.Dimension);
-                player.SetData("Spec_Pos", player.Position);
-
-                player.Dimension = target.Dimension;
-                Vector3 pos = target.Position;
-                pos.Z -= 35.0f;
-                player.Position = pos;
-
-                NAPI.Task.Run(() =>
+                if (target != null)
                 {
-                    if (target != null)
-                    {
-                        player.TriggerEvent("SpectatePlayer", target);
-                        player.TriggerEvent("SetPlayerFrozen", true);
-                    }
-                }, 1000);
+                    player.TriggerEvent("SpectatePlayer", target);
+                    player.TriggerEvent("SetPlayerFrozen", true);
+                }
+            }, 1000);
                 
 
-                player.SendChatMessage($"!{{#FF6347}}[AdmCmd] You are now spectating: !{{#FFFFFF}}{target.Name}");
-            }
+            player.SendChatMessage($"!{{#FF6347}}[AdmCmd] You are now spectating: !{{#FFFFFF}}{target.Name}");
+            return;
         }
 
 
