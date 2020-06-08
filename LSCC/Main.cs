@@ -1050,7 +1050,7 @@ namespace LSCC
                             int maxseats = pVehicle.MaxOccupants;
                             if (overridemaxseats != 0) maxseats = overridemaxseats;
 
-                            foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player && lobby.Cops.Contains(p)))
+                            foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player && lobby.Cops.Contains(p) && p.Id != player.Id))
                             {
                                 if (seat < maxseats)
                                 {
