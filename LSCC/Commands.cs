@@ -350,6 +350,8 @@ namespace LSCC
 
             player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have " + (player.GetData<bool>("GPS") == true ? "enabled" : "disabled") + 
                 " your emergency GPS beacon.");
+
+            EPlayer.UpdateBlip(player);
             return;
         }
 
@@ -1539,8 +1541,9 @@ namespace LSCC
 
             player.SendChatMessage("!{#0079DB}[Los Santos Copchase V !{#2BA3FF}BETA Commands]:");
             player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /r(adio) /wt /keys /admins /fontsize");
-            player.SendChatMessage("[General]: /report /helpme");
-            player.SendChatMessage("[Squad/Partner]: /squad /squadjoin /s(quad)c(hat) /squadaccept (Alt: /partner...)");
+            player.SendChatMessage("[General]: /report /helpme /l(ow) /c(ar)w(hisper) /s(hout)");
+            player.SendChatMessage("[Squad/Partner]: /squad /squadjoin /s(quad)c(hat) /squadaccept");
+            player.SendChatMessage("[Squad/Partner]: /squadmembers  (Alt: /partner... e.g. /partners)");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys for activation)");
@@ -1895,13 +1898,28 @@ namespace LSCC
             return;
         }
 
-        [Command("squadaccept", Alias = "partneraccept")]
-        public void cmd_squadaccept(Player player, Player target)
+        [Command("squadmembers", Alias = "partners")]
+        public void cmd_squadmembers(Player player)
         {
-            if (target.HasData("AskedSquad") && target.GetData<Player>("AskedSquad") == player)
+            if (player.HasData("PlayerSquad"))
             {
-                target.ResetData("AskedSquad");
-                target.SetData("PlayerSquad", player);
+                foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player.GetData<Player>("PlayerSquad")))
+                {
+                    player.SendChatMessage("!{#FFAC38}Partner: " + mem.Name);
+                }
+            }
+            return;
+        }
+
+        [Command("squadaccept", Alias = "partneraccept")]
+        public void cmd_squadaccept(Player player)
+        {
+            if (player.HasData("AskedBySquad") && player.GetData<Player>("AskedBySquad") == player)
+            {
+                player.ResetData("AskedBySquad");
+                player.SetData("PlayerSquad", player);
+
+                Player target = player.GetData<Player>("AskedBySquad");
 
                 Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player).ToList().ForEach((Player member) =>
                 {
@@ -1924,7 +1942,7 @@ namespace LSCC
             }
 
             player.ResetData("PlayerSquad");
-            player.ResetData("AskedSquad");
+            player.ResetData("AskedBySquad");
             return;
         }
 
@@ -1961,7 +1979,7 @@ namespace LSCC
                 target.SetData("PlayerSquad", target);
             }
 
-            player.SetData("AskedSquad", target);
+            target.SetData("AskedBySquad", player);
 
             player.SendChatMessage("!{#FFAC38}You have requested to join " + target.Name + "'s squad.");
             Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == target).ToList().ForEach((Player member) =>
@@ -2309,7 +2327,7 @@ namespace LSCC
                 return;
             }
 
-            string chatStr = $"(( (LOCAL OOC) {player.Name.Replace("_", " ")} : {text} ))";
+            string chatStr = $"(( (LOCAL OOC) {player.Name.Replace("_", " ")}: {text} ))";
             foreach (Player i in RAGE.Entities.Players.All)
             {
                 if (i.Dimension == player.Dimension)
@@ -2321,9 +2339,91 @@ namespace LSCC
             }
         }
 
+        [Command("low", Alias = "l", GreedyArg = true)]
+        public void cmd_low(Player player, string text)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).MuteTime > 0)
+            {
+                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                return;
+            }
+
+            string chatStr = $"[LOW] {player.Name.Replace("_", " ")} says: {text}";
+            foreach (Player i in Settings.LoggedInPlayers)
+            {
+                if (i.Dimension == player.Dimension)
+                {
+                    if (i.Position.DistanceTo(player.Position) <= 5.0) i.SendChatMessage($"!{{#999999}}{chatStr}");
+                }
+            }
+        }
+
+        [Command("cw", Alias = "carwhisper", GreedyArg = true)]
+        public void cmd_cw(Player player, string text)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (!player.IsInVehicle)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in any vehicle.");
+                return;
+            }
+
+            if (EPlayer.GetAccount(player).MuteTime > 0)
+            {
+                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                return;
+            }
+
+            string chatStr = $"[CAR] {player.Name.Replace("_", " ")} says: {text}";
+            foreach (Player i in Settings.LoggedInPlayers.Where(a => a.IsInVehicle && a.Vehicle == player.Vehicle))
+            {
+                i.SendChatMessage($"!{{#FFFF00}}{chatStr}");
+            }
+            return;
+        }
+
+        [Command("s", Alias = "shout", GreedyArg = true)]
+        public void cmd_shout(Player player, string text)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).MuteTime > 0)
+            {
+                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                return;
+            }
+
+            string chatStr = $"{player.Name.Replace("_", " ")} shouts: {text}";
+            foreach (Player i in RAGE.Entities.Players.All)
+            {
+                if (i.Dimension == player.Dimension)
+                {
+                    if (i.Position.DistanceTo(player.Position) <= 20.0) i.SendChatMessage($"!{{#D4D4D4}}{chatStr}");
+                    if (i.Position.DistanceTo(player.Position) > 20.0 && i.Position.DistanceTo(player.Position) <= 30.0) i.SendChatMessage($"!{{#B5B5B5}}{chatStr}");
+                    if (i.Position.DistanceTo(player.Position) > 30.0 && i.Position.DistanceTo(player.Position) <= 50.0) i.SendChatMessage($"!{{#999999}}{chatStr}");
+                }
+            }
+            return;
+        }
+
         [Command("m", Alias = "megaphone", GreedyArg = true)]
         public void cmd_m(Player player, string text)
         {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).MuteTime > 0)
+            {
+                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                return;
+            }
+
             bool isInCopchase = false;
             LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
             if (lobby != null)
@@ -2335,6 +2435,12 @@ namespace LSCC
             }
 
             if (!isInCopchase) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in the copchase as a cop."); return; }
+
+            if(!player.IsInVehicle || (!player.Vehicle.HasSharedData("Team") || player.Vehicle.GetSharedData<int>("Team") != 1))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in a cop vehicle.");
+                return;
+            }
 
            string chatStr = $"!{{#FFFF00}}** [MEGAPHONE] {player.Name.Replace("_", " ")}: {text}";
 

@@ -1050,18 +1050,21 @@ namespace LSCC
                             int maxseats = pVehicle.MaxOccupants;
                             if (overridemaxseats != 0) maxseats = overridemaxseats;
 
-                            foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player && lobby.Cops.Contains(p) && p.Id != player.Id))
+                            if (player.HasData("PlayerSquad"))
                             {
-                                if (seat < maxseats)
+                                foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player.GetData<Player>("PlayerSquad") && lobby.Cops.Contains(p) && p.Id != player.Id))
                                 {
-                                    mem.SetData("putVehicle", pVehicle);
-                                    mem.SetData("putVehicleSeat", 0 + seat);
+                                    if (seat < maxseats)
+                                    {
+                                        mem.SetData("putVehicle", pVehicle);
+                                        mem.SetData("putVehicleSeat", 0 + seat);
 
-                                    playerVehicle.Add(new Tuple<Player, Vehicle, int>(mem, pVehicle, 0 + seat));
-                                    PutInsideCar.Add(mem);
-                                    mem.SendChatMessage("!{#FFAC38}[Partners] You have been put inside " + player.Name + "'s vehicle.");
+                                        playerVehicle.Add(new Tuple<Player, Vehicle, int>(mem, pVehicle, 0 + seat));
+                                        PutInsideCar.Add(mem);
+                                        mem.SendChatMessage("!{#FFAC38}[Partners] You have been put inside " + player.Name + "'s vehicle.");
 
-                                    seat++;
+                                        seat++;
+                                    }
                                 }
                             }
                         }
@@ -1253,7 +1256,7 @@ namespace LSCC
                         spawnLoc = Spawns.First(a => a.spawnTeam == 1);
                         foreach (Player player in lobby.Cops)
                         {
-                            player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
+                            player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ).Around(5f);
 
                             try
                             {
@@ -1265,7 +1268,7 @@ namespace LSCC
                         spawnLoc = Spawns.First(a => a.spawnTeam == 0);
                         foreach (Player player in lobby.Fugitives)
                         {
-                            player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
+                            player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ).Around(5f);
 
                             try
                             {
@@ -1334,6 +1337,7 @@ namespace LSCC
                         {
                             try
                             {
+                                player.TriggerEvent("ToggleChaseCollisions", false);
                                 if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
                             }
                             catch { }
@@ -1343,6 +1347,31 @@ namespace LSCC
                         {
                             try
                             {
+                                player.TriggerEvent("ToggleChaseCollisions", false);
+                                if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
+                            }
+                            catch { }
+                        }
+
+                    }, delayTime: 3000);
+
+                    NAPI.Task.Run(() =>
+                    {
+                        foreach (Player player in lobby.Fugitives)
+                        {
+                            try
+                            {
+                                player.TriggerEvent("ToggleChaseCollisions", false);
+                                if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
+                            }
+                            catch { }
+                        }
+
+                        foreach (Player player in lobby.Cops)
+                        {
+                            try
+                            {
+                                player.TriggerEvent("ToggleChaseCollisions", false);
                                 if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
                             }
                             catch { }

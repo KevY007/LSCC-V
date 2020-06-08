@@ -384,7 +384,7 @@ namespace LSCC
             player.SetData("EditingClothing", -1);
             player.SetData("Creator_Using", false);
             player.ResetData("BlockList");
-            player.ResetData("AskedSquad");
+            player.ResetData("AskedBySquad");
             player.ResetData("PlayerSquad");
             player.SetSharedData("InLobby", -1);
             player.SetSharedData("InDM", -1);
@@ -438,7 +438,8 @@ namespace LSCC
         {
             if (player.HasData("Blip")) player.GetData<Blip>("Blip").Delete();
 
-            if (player.HasSharedData("VisibleBlip") && player.GetSharedData<bool>("VisibleBlip") == true)
+            if ((player.HasSharedData("VisibleBlip") && player.GetSharedData<bool>("VisibleBlip") == true) || 
+                (player.HasData("Blip") && player.GetData<bool>("Blip") == true && player.GetSharedData<int>("Team") == 1))
             {
                 byte blipColor = 45;
                 uint blipId = 1;
@@ -452,7 +453,8 @@ namespace LSCC
                         blipColor = 76;
                     }
                 }
-                else if (player.GetSharedData<int>("Team") == 1) blipColor = 3;
+                
+                if (player.GetSharedData<int>("Team") == 1) blipColor = 3;
 
                 if (player.GetSharedData<int>("InLobby") == -3) blipColor = 15;
                 if (player.GetSharedData<int>("InLobby") == -4) blipColor = 73;
@@ -460,7 +462,7 @@ namespace LSCC
 
                 if (player.IsInVehicle == true) blipId = 724;
 
-                player.SetData("Blip", NAPI.Blip.CreateBlip(blipId, player.IsInVehicle == true ? player.Vehicle.Position : player.Position, 1, blipColor, player.Name, 255, 0, false, 0, player.Dimension));
+                player.SetData("Blip", (NAPI.Blip.CreateBlip(blipId, player.IsInVehicle == true ? player.Vehicle.Position : player.Position, 1f, blipColor, player.Name, 255, 0, false, 0, player.Dimension)));
             }
         }
 
