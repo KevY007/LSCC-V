@@ -32,7 +32,7 @@ namespace LSCC
 
                 NAPI.Task.Run(() =>
                 {
-                    if (player != default(Player))
+                    if (player != null)
                     {
                         player.Kick("Banned.");
                     }
@@ -66,7 +66,7 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                if (player != default(Player))
+                if (player != null)
                 {
                     EPlayer.LoginBrowserSetup(player);
                 }
@@ -620,7 +620,7 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                if (player != default(Player))
+                if (player != null)
                 {
                     Random rand = new Random();
                     Vector3 SpawnArea = Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)];
@@ -690,7 +690,7 @@ namespace LSCC
 
                 NAPI.Task.Run(() =>
                 {
-                    if(player != default(Player)) player.Kick("Banned.");
+                    if(player != null) player.Kick("Banned.");
                 }, 350);
 
                 return;
@@ -1058,7 +1058,7 @@ namespace LSCC
 
                 NAPI.Task.Run(() =>
                 {
-                    if (player != default(Player))
+                    if (player != null)
                     {
                         if (!player.IsNull && player != null && player.IsInstanceAlive)
                         {
@@ -1096,7 +1096,7 @@ namespace LSCC
 
                 NAPI.Task.Run(() =>
                 {
-                    if (player != default(Player))
+                    if (player != null)
                     {
                         if (!player.IsNull && player != null && player.IsInstanceAlive)
                         {
@@ -1267,7 +1267,7 @@ namespace LSCC
 
                             NAPI.Task.Run(() =>
                             {
-                                if (player != default(Player))
+                                if (player != null)
                                 {
                                     if (!player.IsNull && player != null && player.IsInstanceAlive)
                                     {
@@ -1503,7 +1503,7 @@ namespace LSCC
 
                 NAPI.Task.Run(() =>
                 {
-                    if (player != default(Player))
+                    if (player != null)
                     {
                         player.SetIntoVehicle(derbyVeh, 0);
                         EPlayer.SetColor(player, new Color(250, 191, 62), 0);

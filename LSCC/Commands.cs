@@ -262,7 +262,7 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                if (player != default(Player))
+                if (player != null)
                 {
                     if (!aVehicle.IsNull) player.SetIntoVehicle(aVehicle, 0);
                 }
@@ -309,7 +309,7 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                if (player != default(Player))
+                if (player != null)
                 {
                     if (!aVehicle.IsNull) player.SetIntoVehicle(aVehicle, 0);
                 }
@@ -649,7 +649,7 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                if (player != default(Player) && target != default(Player))
+                if (player != null && target != null)
                 {
                     if (target == null || !target.IsInstanceAlive || player == null || !player.IsInstanceAlive)
                     {
@@ -695,7 +695,7 @@ namespace LSCC
 
                     NAPI.Task.Run(() =>
                     {
-                        if(player != default(Player)) Events.RequestClearAnimation(player);
+                        if(player != null) Events.RequestClearAnimation(player);
                     }, 2000);
 
                     target.Heading = player.Heading;
@@ -1729,7 +1729,7 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                if (target != default(Player))
+                if (target != null)
                 {
                     target.Kick("Banned.");
                 }
@@ -3159,7 +3159,7 @@ namespace LSCC
 
                 NAPI.Task.Run(() =>
                 {
-                    if (target != default(Player))
+                    if (target != null)
                     {
                         player.TriggerEvent("SpectatePlayer", target);
                         player.TriggerEvent("SetPlayerFrozen", true);
