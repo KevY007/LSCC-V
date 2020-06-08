@@ -1718,7 +1718,7 @@ namespace LSCC
 
             RAGE.Entities.Players.All.ForEach((Player p) =>
             {
-                p.SendChatMessage($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has banned {target.Name} for: {reason}");
+                p.SendChatMessage($"!{{#FF6347}}[AdmCmd] {player.Name} has banned {target.Name} for: {reason}");
             });
 
             target.SendChatMessage($"!{{#FF6347}}[BANNED] You have been banned from this server, Ban ID: {_new.SQL_ID}");
@@ -2678,7 +2678,7 @@ namespace LSCC
             {
                 RAGE.Entities.Players.All.ForEach((Player playa) =>
                 {
-                    playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{target.Name} has been kicked by {player.Name} for {reason}.");
+                    playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] {target.Name} has been kicked by {player.Name} for {reason}.");
                 });
 
                 try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:kick:{target.Name}:{reason.Replace(":", "|")}"); } catch { }
@@ -2707,7 +2707,7 @@ namespace LSCC
             {
                 RAGE.Entities.Players.All.ForEach((Player playa) =>
                 {
-                    playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has jailed {target.Name} for {mins} minutes, reason: {reason}.");
+                    playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] {player.Name} has jailed {target.Name} for {mins} minutes, reason: {reason}.");
                 });
 
                 try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:jail:{target.Name}:{mins}:{reason.Replace(":", "|")}"); } catch { }
@@ -2764,7 +2764,7 @@ namespace LSCC
             {
                 RAGE.Entities.Players.All.ForEach((Player playa) =>
                 {
-                    playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has muted {target.Name} for {mins} minutes, reason: {reason}.");
+                    playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] {player.Name} has muted {target.Name} for {mins} minutes, reason: {reason}.");
                 });
 
                 Account Acc = EPlayer.GetAccount(target);
