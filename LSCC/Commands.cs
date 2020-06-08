@@ -1914,12 +1914,12 @@ namespace LSCC
         [Command("squadaccept", Alias = "partneraccept")]
         public void cmd_squadaccept(Player player)
         {
-            if (player.HasData("AskedBySquad") && player.GetData<Player>("AskedBySquad") == player)
+            if (player.HasData("AskedBySquad"))
             {
-                player.ResetData("AskedBySquad");
                 player.SetData("PlayerSquad", player);
 
                 Player target = player.GetData<Player>("AskedBySquad");
+                player.ResetData("AskedBySquad");
 
                 Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player).ToList().ForEach((Player member) =>
                 {

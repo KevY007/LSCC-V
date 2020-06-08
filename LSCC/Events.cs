@@ -331,6 +331,18 @@ namespace LSCC
 
             Settings.Requests.RemoveAll(a => a.Reporter == player || a.Reported == player);
 
+            try
+            {
+                Settings.LoggedInPlayers.ForEach((Player pl) =>
+                {
+                    if (pl.HasData("AskedBySquad") && pl.GetData<Player>("AskedBySquad") == player)
+                    {
+                        pl.ResetData("AskedBySquad");
+                    }
+                });
+            }
+            catch { }
+
             if (EPlayer.LoggedIn(player))
             {
                 if (player.HasData("DerbyVehicle"))

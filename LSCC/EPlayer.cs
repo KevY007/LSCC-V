@@ -439,7 +439,7 @@ namespace LSCC
             if (player.HasData("Blip")) player.GetData<Blip>("Blip").Delete();
 
             if ((player.HasSharedData("VisibleBlip") && player.GetSharedData<bool>("VisibleBlip") == true) || 
-                (player.HasData("Blip") && player.GetData<bool>("Blip") == true && player.GetSharedData<int>("Team") == 1))
+                (player.HasData("Blip") && player.GetData<bool>("GPS") == true && player.GetSharedData<int>("Team") == 1))
             {
                 byte blipColor = 45;
                 uint blipId = 1;
