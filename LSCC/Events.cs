@@ -1252,7 +1252,7 @@ namespace LSCC
                                 }
                             case "Police Cruiser (U)":
                                 {
-                                    EPlayer.GetAccount(player).CarCop = "police3";
+                                    EPlayer.GetAccount(player).CarCop = "police4";
                                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Unmarked Cruiser.");
                                     break;
                                 }
