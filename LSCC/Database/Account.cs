@@ -39,6 +39,7 @@ namespace LSCC
         public string Character { get; set; }
         public string LoadoutCop { get; set; }
         public string LoadoutFugitive { get; set; }
+        public string CarCop { get; set; }
     }
 
     public static class AccountManager

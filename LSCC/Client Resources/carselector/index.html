@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="style.css">
+
+    <title>KevY isn't GAY</title>
+</head>
+<body>
+<div class="card mx-auto fixed-bottom mb-4" style="max-width: 57.7rem; max-height: 52.3rem;">
+    <div class="card-header">
+        Vehicle Selection
+        <!--<button type="button" onclick="addCar('car1.png', 'Sultan', '22', 'mrs asdasdsad aasda sdas ')" class="btn btn-success">addCar</button> //Test addCar -->
+        <button type="button" onclick="mp.events.call('hideCarSelector')" class="close" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="card-body custom-card-body card-scrollbar">
+        <div class="row" id="carshere">
+        </div>
+    </div>
+    <div class="card-footer">
+    </div>
+</div>
+
+<!--<script>
+    function addCar(carImage, carName, levelReq, carDesc) {
+        //Main card
+        let card = document.createElement("div");
+        card.classList.add("card", "custom-car-body");
+        //Car Image
+        let imgElement = document.createElement("img");
+        imgElement.src = carImage;
+        imgElement.setAttribute("class", "card-img-top");
+        card.appendChild(imgElement);
+        //Card Body
+        let cardbody = document.createElement("div");
+        cardbody.setAttribute("class", "card-body");
+        card.appendChild(cardbody);
+        //Car Name & Level
+        //Name
+        let cardCarName = document.createElement("h5");
+        cardCarName.setAttribute("class", "card-title");
+        let cardCarNameText = document.createTextNode(carName + " ");
+        cardCarName.appendChild(cardCarNameText);
+        cardbody.appendChild(cardCarName);
+        //Level
+        let cardCarLevel = document.createElement("span");
+        cardCarLevel.classList.add("badge", "badge-secondary");
+        let cardCarLevelText = document.createTextNode(levelReq);
+        cardCarLevel.appendChild(cardCarLevelText);
+        cardCarName.appendChild(cardCarLevel);
+        //Card Description
+        let cardDesc = document.createElement("p");
+        cardDesc.setAttribute("class", "card-text");
+        let cardDescText =  document.createTextNode(carDesc);
+        cardDesc.appendChild(cardDescText);
+        cardbody.appendChild(cardDesc);
+        //Card Button
+        let cardButton = document.createElement("button");
+        cardButton.type = "button";
+        cardButton.classList.add("btn", "btn-primary");
+        let cardButtonText = document.createTextNode("SELECT");
+        cardButton.appendChild(cardButtonText);
+        cardbody.appendChild(cardButton);
+        //Card END
+
+        document.getElementById("carshere").appendChild(card);
+
+    }
+</script>-->
+
+<!-- Optional JavaScript -->
+<script src="script.js"></script>
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+</body>
+</html>

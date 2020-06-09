@@ -1535,6 +1535,57 @@ namespace LSCC
             return;
         }
 
+        [Command("car", GreedyArg = true)]
+        public void cmd_car(Player player, string action)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (action.StartsWith("help", StringComparison.OrdinalIgnoreCase))
+            {
+                player.SendChatMessage("!{#FF6347}[Option] !{#999999}select <cop> !{#FFFFFF}- Shows the car selection for cops.");
+            }
+            else if (action.StartsWith("select", StringComparison.OrdinalIgnoreCase))
+            {
+                string[] args = action.Split(' ');
+                if (args.Count() > 1)
+                {
+                    if (args[1].StartsWith("cop", StringComparison.OrdinalIgnoreCase))
+                    {
+                        CarSelectorData a = new CarSelectorData(
+                        new object[,]
+                        {
+                            { "Default", "images/default.png", 0, "Random starter vehicles" },
+                            { "Police Cruiser", "images/polc1.png", 0, "Default Cruiser" },
+                            { "Police Cruiser (U)", "images/polc2.png", 2, "Unmarked Variant" },
+                            { "Police Bike", "images/policeb.png", 3, "You don't wanna drive this" },
+                            { "Police Buffalo", "images/polbufac.png", 5, "Buffalo Police Cruiser" },
+                            { "Police Buffalo (U)", "images/polbufac2.png", 10, "Unmarked Variant" },
+                            { "FBI Buffalo", "images/fbibufac.png", 12, "FBI Variant of Buffalo" },
+                            { "FBI Granger", "images/fbi2.png", 12, "Space for 8 occupants" },
+                            { "Chopper", "images/polmav.png", 15, "Police Maverick, Air Support" },
+                            { "SWAT Truck", "images/riot.png", 30, "Heavily armored and spacious" },
+                        },
+                        EPlayer.GetAccount(player).Level);
+
+                        player.SetData("ViewingCarSelector", true);
+                        player.SetData("ViewingCarSelectorTeam", 1);
+                        player.TriggerEvent("showCarSelector", NAPI.Util.ToJson(a));
+                    }
+                    else
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid team, cars are only for 'cop' team.");
+                        return;
+                    }
+                }
+                else player.SendChatMessage("!{#999999}Proper usage: /car select (team), teams: cop");
+            }
+
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'help', 'select'");
+
+            return;
+        }
+
         [Command("cmds", Alias = "help")]
         public void cmd_help(Player player)
         {
@@ -2095,7 +2146,7 @@ namespace LSCC
             Map map = ContextFactory.Instance.Maps.FirstOrDefault(a => a.SQL_ID == mapid);
             if (map == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}No map with this ID exists."); return; }
 
-            if (teamid > 1) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Valid TeamID's are 0 (fugitive) or 1 (cop)."); return; }
+            if (teamid > 2) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Valid TeamID's are 0 (fugitive), 1 (cop) or 2 (cop maverick)."); return; }
 
             float[] currentLoc = new float[4];
             if (player.IsInVehicle == true)

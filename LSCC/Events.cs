@@ -1218,10 +1218,93 @@ namespace LSCC
                 RockstarID = player.SocialClubId,
                 LobbyClothing = 1,
                 LoadoutCop = "?",
-                LoadoutFugitive = "?"
+                LoadoutFugitive = "?",
+                CarCop = "?"
             };
             AccountManager.Add(_new);
             OnPlayerRegister(player, _new);
+        }
+
+        [RemoteEvent("OnCarSelectorSelect")]
+        public void OnSelectorSelectCar(Player player, string carname)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if(player.HasData("ViewingCarSelector") && player.GetData<bool>("ViewingCarSelector") == true)
+            { 
+                if(player.HasData("ViewingCarSelectorTeam"))
+                {
+                    if(player.GetData<int>("ViewingCarSelectorTeam") == 1)
+                    {
+                        switch(carname)
+                        {
+                            case "Default":
+                                {
+                                    EPlayer.GetAccount(player).CarCop = "?";
+                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Random/Default.");
+                                    break;
+                                }
+                            case "Police Cruiser":
+                                {
+                                    EPlayer.GetAccount(player).CarCop = "police";
+                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Police Cruiser.");
+                                    break;
+                                }
+                            case "Police Cruiser (U)":
+                                {
+                                    EPlayer.GetAccount(player).CarCop = "police3";
+                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Unmarked Cruiser.");
+                                    break;
+                                }
+                            case "Police Bike":
+                                {
+                                    EPlayer.GetAccount(player).CarCop = "policeb";
+                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Police Bike.");
+                                    break;
+                                }
+                            case "Police Buffalo":
+                                {
+                                    EPlayer.GetAccount(player).CarCop = "polbufac";
+                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Police Buffalo.");
+                                    break;
+                                }
+                            case "Police Buffalo (U)":
+                                {
+                                    EPlayer.GetAccount(player).CarCop = "polbufac2";
+                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Unmarked Police Buffalo.");
+                                    break;
+                                }
+                            case "FBI Buffalo":
+                                {
+                                    EPlayer.GetAccount(player).CarCop = "fbibufac";
+                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to FBI Buffalo.");
+                                    break;
+                                }
+                            case "FBI Granger":
+                                {
+                                    EPlayer.GetAccount(player).CarCop = "fbi2";
+                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to FBI Granger.");
+                                    break;
+                                }
+                            case "Chopper":
+                                {
+                                    EPlayer.GetAccount(player).CarCop = "polmav";
+                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Police Chopper.");
+                                    break;
+                                }
+                            case "SWAT Truck":
+                                {
+                                    EPlayer.GetAccount(player).CarCop = "riot";
+                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to SWAT Truck.");
+                                    break;
+                                }
+                        }
+                    }
+                }
+            }
+            player.ResetData("ViewingCarSelectorTeam");
+            player.ResetData("ViewingCarSelector");
+            return;
         }
 
         [RemoteEvent("RequestCounterUpdate")]

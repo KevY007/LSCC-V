@@ -146,7 +146,7 @@ public static class Settings
 
     public static Vector3[] LobbySpawns = new Vector3[]
     {
-        new Vector3(464.8465f, -995.0156f, 24.914879f), 
+        new Vector3(464.8465f, -995.0156f, 24.914879f),
         new Vector3(450.13f, -987.06f, 26.67f),
         new Vector3(439.86f, -995.12f, 30.68f),
         new Vector3(443.308f, -986.31f, 30.689f),
@@ -207,6 +207,26 @@ namespace LSCC
 {
     public class Main : Script
     {
+        public static int GetMaxSeats(string vehiclename)
+        {
+            int seats = NAPI.Vehicle.GetVehicleMaxOccupants((VehicleHash)NAPI.Util.GetHashKey(vehiclename));
+            if(seats == 0)
+            {
+                switch(vehiclename)
+                {
+                    case "polbufac2":
+                        seats = 4;
+                        break;
+                    case "polbufac":
+                        seats = 4;
+                        break;
+                    case "fbibufac":
+                        seats = 4;
+                        break;
+                }
+            }
+            return seats;
+        }
         public static IDictionary<uint, string> WeaponReasons = new Dictionary<uint, string>()
         {
             {2460120199, "Antique Cavalry Dagger"},
@@ -572,6 +592,13 @@ namespace LSCC
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Bullpupshotgun, 30));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Combatpdw, 125));
             new LoadoutData(0, "Rebel", 10, wepList);
+
+            wepList = new List<Tuple<WeaponHash, int>>();
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Knife, 1));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Revolver_mk2, 30));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Sniperrifle, 20));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Assaultrifle_mk2, 120));
+            new LoadoutData(0, "Assassin", 20, wepList);
 
 
 
@@ -1055,35 +1082,46 @@ namespace LSCC
                         if (!PutInsideCar.Contains(player))
                         {
                             string carName = "police";
-                            int col1 = 0;
-                            int overridemaxseats = 0;
 
-                            switch (random.Next(0, 5))
+                            int col1 = 0;
+
+                            if (EPlayer.GetAccount(player).CarCop.Length < 3)
                             {
-                                case 0:
-                                    carName = "police";
+                                switch (random.Next(0, 3))
+                                {
+                                    case 0:
+                                        carName = "police";
+                                        col1 = 111;
+                                        break;
+                                    case 1:
+                                        carName = "police3";
+                                        col1 = 8;
+                                        break;
+                                    case 2:
+                                        carName = "police4";
+                                        col1 = 111;
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                carName = EPlayer.GetAccount(player).CarCop;
+
+                                if(carName.StartsWith("police"))
+                                {
                                     col1 = 111;
-                                    break;
-                                case 1:
-                                    carName = "polbufac2";
-                                    overridemaxseats = 4;
-                                    col1 = 8;
-                                    break;
-                                case 2:
-                                    carName = "police3";
-                                    col1 = 111;
-                                    break;
-                                case 3:
-                                    carName = "polbufac";
-                                    overridemaxseats = 4;
-                                    col1 = 111;
-                                    break;
-                                case 4:
-                                    carName = "fbibufac";
-                                    overridemaxseats = 4;
-                                    break;
+                                }
                             }
 
+                            int overridemaxseats = GetMaxSeats(carName);
+
+                            if(carName.Equals("polvmav"))
+                            {
+                                if (Spawns.Count(sp => sp.spawnTeam == 2) >= 1)
+                                {
+                                    spawnLoc = Spawns.OrderBy(x => new Random().Next()).First(a => a.spawnTeam == 2);
+                                }
+                            }
 
                             Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, col1, 111, player.Name, 255, false, true, Convert.ToUInt32(lobbyid));
 

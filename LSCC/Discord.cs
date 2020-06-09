@@ -33,6 +33,7 @@ namespace LSCC
 
         public static Task SendTextChannel(string channel, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
+            if (_client == null) return Task.CompletedTask;
             if (_client.ConnectionState != ConnectionState.Connected) return Task.CompletedTask;
 
             if(text != null)
@@ -56,6 +57,9 @@ namespace LSCC
 
         public static Task MessageReceived(SocketMessage context)
         {
+            if (_client == null) return Task.CompletedTask;
+            if (_client.ConnectionState != ConnectionState.Connected) return Task.CompletedTask;
+
             if (context.Channel.Name != "staff-bot") return Task.CompletedTask;
 
             if(context.Content.StartsWith("!players"))

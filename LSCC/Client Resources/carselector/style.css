@@ -1,0 +1,40 @@
+* {
+    user-select: none !important;
+}
+
+body {
+    background: rgba(0, 0, 0, 0);
+}
+
+.custom-card-body {
+    margin: 0 !important;
+}
+
+.unlocked-border {
+    border: 3px solid rgba(0, 255, 0, 0.2);
+}
+
+.locked-border {
+    border: 3px solid rgba(255, 0, 0, 0.2);
+}
+
+.custom-car-body{
+    width: 18rem;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-bottom: 0px;
+}
+
+.pag-custom {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.card {
+    margin-bottom: 5px;
+}
+
+.card-scrollbar {
+    overflow-y : scroll;
+    height: 56rem;
+}

@@ -134,6 +134,35 @@ namespace LSCC
         }
     }
 
+    public class CarSelectorData
+    {
+        public string[] Cars { get; set; }
+        public string[] Images { get; set; }
+        public int[] Levels { get; set; }
+        public string[] Desc { get; set; }
+        public bool[] Locked { get; set; }
+
+        public CarSelectorData(object[,] carData, int level)
+        {
+            int numcars = carData.GetLength(0);
+
+            this.Cars = new string[numcars];
+            this.Images = new string[numcars];
+            this.Levels = new int[numcars];
+            this.Desc = new string[numcars];
+            this.Locked = new bool[numcars];
+
+            for(int i = 0; i < carData.GetLength(0); i++)
+            {
+                this.Cars[i] = (string)carData[i, 0];
+                this.Images[i] = (string)carData[i, 1];
+                this.Levels[i] = (int)carData[i, 2];
+                this.Desc[i] = (string)carData[i, 3];
+                this.Locked[i] = (level >= this.Levels[i] ? false : true);
+            }
+        }
+    }
+
     static class EPlayer
     {
         public static byte ColForOverlay(CharacterData character, int index)
@@ -374,6 +403,8 @@ namespace LSCC
             player.SetData("HUDState", true);
             player.SetSharedData("DerbyTime", 0);
             player.SetData("DerbySpawnTick", 0);
+            player.ResetData("ViewingCarSelectorTeam");
+            player.ResetData("ViewingCarSelector");
             player.SetSharedData("HasShot", false);
             player.SetSharedData("VoiceMode", 0);
             player.SetSharedData("VisibleBlip", false);
