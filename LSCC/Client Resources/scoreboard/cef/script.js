@@ -62,6 +62,7 @@ function updateUser(userLID, userName, userLevel, userPing, color_r, color_g, co
 
 		if(userElement && userElement.style) userElement.style.color = rgb(color_r, color_g, color_b);
 	} else {
-		console.log('No user by that name!')
+		//console.log('No user by that name!')
+		createUser(userLID, userName, userLevel, userPing, color_r, color_g, color_b);
 	}
 };

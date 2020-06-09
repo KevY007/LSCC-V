@@ -37,6 +37,8 @@ namespace LSCC
         public string MuteReason { get; set; }
         public int LobbyClothing { get; set; }
         public string Character { get; set; }
+        public string LoadoutCop { get; set; }
+        public string LoadoutFugitive { get; set; }
     }
 
     public static class AccountManager

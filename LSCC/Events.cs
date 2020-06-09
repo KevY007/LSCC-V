@@ -1216,7 +1216,9 @@ namespace LSCC
                 XP = 1,
                 DonatorLevel = 0,
                 RockstarID = player.SocialClubId,
-                LobbyClothing = 1
+                LobbyClothing = 1,
+                LoadoutCop = "?",
+                LoadoutFugitive = "?"
             };
             AccountManager.Add(_new);
             OnPlayerRegister(player, _new);

@@ -434,6 +434,85 @@ namespace LSCC
             NAPI.Player.SpawnPlayer(player, (Vector3)Settings.VectorJail[0], (float)Settings.VectorJail[1]);
         }
 
+        public static void GiveCopWeapons(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (EPlayer.GetAccount(player).LoadoutCop.Length > 3)
+            {
+                LoadoutData loadout = Settings.Loadouts.Find(a => a.Team == 1 && a.Name.Equals(EPlayer.GetAccount(player).LoadoutCop));
+
+                if ((loadout != null) == false)
+                {
+                    EPlayer.GetAccount(player).LoadoutCop = "?";
+                    GiveCopWeapons(player);
+                    return;
+                }
+
+                if (EPlayer.GetAccount(player).Level < loadout.LevelRequired)
+                {
+                    EPlayer.GetAccount(player).LoadoutCop = "?";
+                    GiveCopWeapons(player);
+                    return;
+                }
+
+                if (loadout.Weapons.Count() > 0)
+                {
+                    loadout.Weapons.ForEach((wepar) =>
+                    {
+                        player.GiveWeapon(wepar.Item1, wepar.Item2);
+                    });
+                }
+            }
+            else
+            {
+                player.GiveWeapon(WeaponHash.Pumpshotgun, 20);
+                player.GiveWeapon(WeaponHash.Pistol, 100);
+            }
+
+            player.GiveWeapon(WeaponHash.Stungun, 1);
+
+            player.SendChatMessage("!{#FF6347}[TASER] !{#FFFFFF}You have been equipped with a stungun, shoot at a fugitive that hasn't shot to tase them.");
+            return;
+        }
+        public static void GiveFugitiveWeapons(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (EPlayer.GetAccount(player).LoadoutFugitive.Length > 3)
+            {
+                LoadoutData loadout = Settings.Loadouts.Find(a => a.Team == 0 && a.Name.Equals(EPlayer.GetAccount(player).LoadoutFugitive));
+
+                if ((loadout != null) == false)
+                {
+                    EPlayer.GetAccount(player).LoadoutFugitive = "?";
+                    GiveCopWeapons(player);
+                    return;
+                }
+
+                if (EPlayer.GetAccount(player).Level < loadout.LevelRequired)
+                {
+                    EPlayer.GetAccount(player).LoadoutFugitive = "?";
+                    GiveFugitiveWeapons(player);
+                    return;
+                }
+
+                if (loadout.Weapons.Count() > 0)
+                {
+                    loadout.Weapons.ForEach((wepar) =>
+                    {
+                        player.GiveWeapon(wepar.Item1, wepar.Item2);
+                    });
+                }
+            }
+            else
+            {
+                player.GiveWeapon(WeaponHash.Pistol, 100);
+                player.GiveWeapon(WeaponHash.Pumpshotgun, 20);
+            }
+            return;
+        }
+
         public static void UpdateBlip(Player player)
         {
             if (player.HasData("Blip")) player.GetData<Blip>("Blip").Delete();

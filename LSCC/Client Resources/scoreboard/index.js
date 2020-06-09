@@ -25,10 +25,36 @@ function updatePlayer(player)
     else if(player.getVariable("InLobby") > -1) lobbystr = player.getVariable("InLobby").toString();
     
     browser.execute('updateUser("' + lobbystr + '", "' + player.name + '", "' + player.getVariable("Level") + '", "' + player.getVariable("Ping") +
-    '", ' + player.getVariable("Color_R") + ', ' + player.getVariable("Color_G") + ', ' + player.getVariable("Color_B") + ')');
+    '", ' + player.getVariable("Color_R") + ', ' + player.getVariable("Color_G") + ', ' + player.getVariable("Color_B") + ');');
 
     return;
 }
+
+mp.events.add('browserDomReady', (ebrowser) => {
+    if(browser != null && browser === ebrowser)
+    {
+        mp.players.forEach(
+            (player) => {
+                //browser.execute('createUser("N/A", "' + player.name + '", "N/A", "N/A", ' + player.getVariable("Color_R") + ', ' + player.getVariable("Color_G") + ', ' + player.getVariable("Color_B") + ')');
+                updatePlayer(player);
+            }
+        );
+    
+        if(serverName != "Los Santos Copchase") 
+        {
+            browser.execute('updateServerName("' + serverName + '");');
+        }
+    
+        updater = setInterval(function()
+        { 
+            mp.players.forEach(
+                (player) => {
+                    updatePlayer(player);
+                }
+            );
+        }, 1000);
+    }
+});
 
 mp.keys.bind(0x4F, false, function () {
 
@@ -37,7 +63,7 @@ mp.keys.bind(0x4F, false, function () {
     if (browser != null) {
         browser.destroy();
         browser = null;
-        clearInterval(updater);
+        if(updater != null) clearInterval(updater);
         updater = null;
         if(tablistLen >= 9)
         {
@@ -56,27 +82,4 @@ mp.keys.bind(0x4F, false, function () {
     }
 
     browser = mp.browsers.new("package://scoreboard/cef/index.html");
-
-
-    mp.players.forEach(
-        (player) => {
-            browser.execute('createUser("N/A", "' + player.name + '", "N/A", "N/A", ' + player.getVariable("Color_R") + ', ' + player.getVariable("Color_G") + ', ' + player.getVariable("Color_B") + ')');
-
-             updatePlayer(player);
-        }
-    );
-
-    if(serverName != "Los Santos Copchase") 
-    {
-        browser.execute('updateServerName("' + serverName + '")');
-    }
-
-    updater = setInterval(function()
-    { 
-        mp.players.forEach(
-            (player) => {
-                updatePlayer(player);
-            }
-        );
-    }, 1000);
 })

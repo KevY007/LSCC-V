@@ -82,6 +82,26 @@ public class RequestData
     }
 };
 
+public class LoadoutData
+{
+    public int Team { get; set; }
+    public string Name { get; set; }
+    public int LevelRequired { get; set; }
+    public List<Tuple<WeaponHash, int>> Weapons { get; set; }
+
+    public LoadoutData(int team, string name, int level, List<Tuple<WeaponHash, int>> weps)
+    {
+        this.Team = team;
+        this.Name = name;
+        this.LevelRequired = level;
+
+        this.Weapons = new List<Tuple<WeaponHash, int>>();
+        this.Weapons.AddRange(weps);
+
+        Settings.Loadouts.Add(this);
+    }
+};
+
 public static class Settings
 {
     // Static Settings / Const
@@ -112,6 +132,8 @@ public static class Settings
     public static List<RequestData> Requests { get; set; }
     public static int NextRequestID { get; set; }
     public static int LastCountUpdate { get; set; }
+    public static List<LoadoutData> Loadouts { get; set; }
+
 
     // Locations
     public const float LoginCameraX = -550;
@@ -507,6 +529,7 @@ namespace LSCC
             Settings.Requests = new List<RequestData>();
             Settings.LoggedInPlayers = new List<Player>();
             Settings.AdminVehicles = new List<Vehicle>();
+            Settings.Loadouts = new List<LoadoutData>();
 
             Settings.MaxPlayersInLobby = Settings.DefaultMaxInLobby;
             Settings.NextLobbyID = 1;
@@ -518,8 +541,41 @@ namespace LSCC
 
             for(int i = 0; i < Settings.MaxLobbies; i++)
             {
-                LobbyData eLobbyData = new LobbyData();
+                new LobbyData();
             }
+
+            /* DEFAULT LOADOUTS CREATION */
+
+            List<Tuple<WeaponHash, int>> wepList = new List<Tuple<WeaponHash, int>>();
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pistol, 40));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pumpshotgun, 20));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Bzgas, 1));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Carbinerifle, 80));
+            new LoadoutData(1, "Heavy", 5, wepList);
+
+            wepList = new List<Tuple<WeaponHash, int>>();
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Appistol, 60));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Heavyshotgun, 40));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Bzgas, 3));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Mg, 200));
+            new LoadoutData(1, "SWAT", 10, wepList);
+
+            wepList = new List<Tuple<WeaponHash, int>>();
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pistol, 40));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pumpshotgun, 15));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Assaultrifle, 80));
+            new LoadoutData(0, "Convicted", 5, wepList);
+
+            wepList = new List<Tuple<WeaponHash, int>>();
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Battleaxe, 1));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Appistol, 40));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Bullpupshotgun, 30));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Combatpdw, 125));
+            new LoadoutData(0, "Rebel", 10, wepList);
+
+
+
+            ///////////////////////////////////////////////////////////////////////////////
 
             TimeUpdate();
             GameUpdate();
@@ -1466,17 +1522,11 @@ namespace LSCC
 
                             if (lobby.Cops.Contains(player))
                             {
-                                player.GiveWeapon(WeaponHash.Carbinerifle, 120);
-                                player.GiveWeapon(WeaponHash.Pumpshotgun, 20);
-                                player.GiveWeapon(WeaponHash.Pistol, 100);
-                                player.GiveWeapon(WeaponHash.Stungun, 1);
-                                player.SendChatMessage("!{#FF6347}[TASER] !{#FFFFFF}You have been equipped with a stungun, shoot at a fugitive that hasn't shot to tase them.");
+                                EPlayer.GiveCopWeapons(player);
                             }
                             else if (lobby.Fugitives.Contains(player))
                             {
-                                player.GiveWeapon(WeaponHash.Assaultrifle, 120);
-                                player.GiveWeapon(WeaponHash.Pistol, 100);
-                                player.GiveWeapon(WeaponHash.Pumpshotgun, 20);
+                                EPlayer.GiveFugitiveWeapons(player);
                             }
                         }
                     }
