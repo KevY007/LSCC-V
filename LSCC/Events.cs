@@ -382,9 +382,21 @@ namespace LSCC
                         int warnings = 0;
                         if (killer.HasData("InnocentShotWarning")) warnings = killer.GetData<int>("InnocentShotWarning");
 
-                        warnings += 3;
+                        warnings += 5;
+                        if (warnings >= 14)
+                        {
+                            RAGE.Entities.Players.All.ForEach((Player i) =>
+                            {
+                                i.SendChatMessage($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}HoeHunter has jailed {killer.Name} for 5 minutes due to killing innocents.");
+                            });
+                            EPlayer.Jail(killer, 5, "Killing Innocents (HoeHunter)");
+                            warnings = 0;
+                        }
+
                         killer.SetData<int>("InnocentShotWarning", warnings);
                         killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Repeated attacking of fugitive's that haven't shot will result in a jail.");
+
+                        
 
                         player.SetData("UnfairKillSpawn", true);
 
@@ -423,7 +435,17 @@ namespace LSCC
                     int warnings = 0;
                     if (killer.HasData("TeamShotWarning")) warnings = killer.GetData<int>("TeamShotWarning");
 
-                    warnings += 3;
+                    warnings += 5;
+                    if (warnings >= 14)
+                    {
+                        RAGE.Entities.Players.All.ForEach((Player i) =>
+                        {
+                            i.SendChatMessage($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}HoeHunter has jailed {killer.Name} for 5 minutes due to killing teammates.");
+                        });
+                        EPlayer.Jail(killer, 5, "Killing Teammates (HoeHunter)");
+                        warnings = 0;
+                    }
+
                     killer.SetData<int>("TeamShotWarning", warnings);
 
                     killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Repeated team killing will result in a jail.");
