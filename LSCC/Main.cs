@@ -223,6 +223,9 @@ namespace LSCC
                     case "fbibufac":
                         seats = 4;
                         break;
+                    case "600sel":
+                        seats = 4;
+                        break;
                 }
             }
             return seats;
@@ -1266,7 +1269,6 @@ namespace LSCC
                         Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
 
                         string carName = "washington";
-                        int overridemaxseats = 0; // For DLC cars that aren't registered in vehicledata.
 
                         switch (random.Next(0, 5))
                         {
@@ -1275,7 +1277,6 @@ namespace LSCC
                                 break;
                             case 1:
                                 carName = "600sel";
-                                overridemaxseats = 4;
                                 break;
                             case 2:
                                 carName = "asea";
@@ -1304,6 +1305,9 @@ namespace LSCC
                         _tempPlayer.SetData("putVehicleSeat", 0);
 
                         int seat = 1;
+
+                        int overridemaxseats = GetMaxSeats(carName); // For DLC cars that aren't registered in vehicledata.
+
                         int maxseats = pVehicle.MaxOccupants;
                         if (overridemaxseats != 0) maxseats = overridemaxseats;
                         while (seat < maxseats)
