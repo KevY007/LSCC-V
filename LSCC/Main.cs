@@ -657,33 +657,37 @@ namespace LSCC
 
         public void TimeUpdate()
         {
-            if(Environment.TickCount - Settings.LastCountUpdate >= 120000 && 
-                (int)Discord._client.ConnectionState == 2)
+            NAPI.Task.Run(() =>
             {
-                Settings.LastCountUpdate = Environment.TickCount;
-
-                foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
+                if (Environment.TickCount - Settings.LastCountUpdate >= 120000 &&
+                    (int)Discord._client.ConnectionState == 2)
                 {
-                    var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCCountID);
+                    Settings.LastCountUpdate = Environment.TickCount;
 
-                    if (botchan != null)
+                    foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
                     {
-                        botchan.ModifyAsync(vc => vc.Name = ($"Players Online: {RAGE.Entities.Players.Count}"));
-                    }
-                }
-				
-                foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
-                {
-                    var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCGamesID);
+                        var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCCountID);
 
-                    if (botchan != null)
+                        if (botchan != null)
+                        {
+                            botchan.ModifyAsync(vc => vc.Name = ($"Players Online: {RAGE.Entities.Players.Count}"));
+                        }
+                    }
+
+                    foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
                     {
-                        botchan.ModifyAsync(vc => vc.Name = ($"Chases Running: {Settings.Lobbies.Where(l => l.gameStatus == 1).Count()}"));
-                    }
-                }
+                        var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCGamesID);
 
-                //NAPI.Util.ConsoleOutput("Updated the DISCORD counts.");
-            }
+                        if (botchan != null)
+                        {
+                            botchan.ModifyAsync(vc => vc.Name = ($"Chases Running: {Settings.Lobbies.Where(l => l.gameStatus == 1).Count()}"));
+                        }
+                    }
+
+                    //NAPI.Util.ConsoleOutput("Updated the DISCORD counts.");
+                }
+            }, 100);
+
             foreach (LobbyData lobby in Settings.Lobbies)
             {
                 if (lobby != null)
