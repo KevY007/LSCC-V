@@ -311,14 +311,20 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                player.TriggerEvent("toggleCreator", true, NAPI.Util.ToJson(defaultChar));
+                lock (player)
+                {
+                    if (player != null && player.Exists)
+                    {
+                        player.TriggerEvent("toggleCreator", true, NAPI.Util.ToJson(defaultChar));
 
-                player.SetSkin(PedHash.FreemodeMale01);
-                player.TriggerEvent("creator_Change");
+                        player.SetSkin(PedHash.FreemodeMale01);
+                        player.TriggerEvent("creator_Change");
 
-                player.Position = new Vector3(402.8664, -996.4108, -99.00027);
-                player.Heading = -185.0f;
-            }, 2000);
+                        player.Position = new Vector3(402.8664, -996.4108, -99.00027);
+                        player.Heading = -185.0f;
+                    }
+                }
+            }, 4000);
 
             return;
         }

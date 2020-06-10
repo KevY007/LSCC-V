@@ -405,7 +405,7 @@ function OnPlayerWeaponShot(targetPosition, targetEntity)
             {
                 if(targetEntity.isInAnyVehicle(false) == false)
                 {
-                    mp.events.callRemote("OnPlayerShotPlayer", targetPosition, targetEntity);
+                    mp.events.callRemote("OnPlayerShotPlayer", targetPosition, targetEntity, mp.players.local.weapon);
 
                     if(targetEntity.getVariable("Team") != -1)
                     {

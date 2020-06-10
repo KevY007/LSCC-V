@@ -622,15 +622,21 @@ namespace LSCC
             {
                 foreach (Player player in Settings.LoggedInPlayers)
                 {
-                    if (player.GetSharedData<int>("InLobby") == lobbyid && player.GetData<bool>("AutoJoin") == true)
+                    lock (player)
                     {
-                        if (time > 0)
+                        if (player != null && player.Exists)
                         {
-                            NAPI.Notification.SendNotificationToPlayer(player, $"Game is starting in ~g~{time} seconds~w~.", true);
-                        }
-                        else
-                        {
-                            NAPI.Notification.SendNotificationToPlayer(player, $"~y~Game is now starting.", true);
+                            if (player.GetSharedData<int>("InLobby") == lobbyid && player.GetData<bool>("AutoJoin") == true)
+                            {
+                                if (time > 0)
+                                {
+                                    NAPI.Notification.SendNotificationToPlayer(player, $"Game is starting in ~g~{time} seconds~w~.", true);
+                                }
+                                else
+                                {
+                                    NAPI.Notification.SendNotificationToPlayer(player, $"~y~Game is now starting.", true);
+                                }
+                            }
                         }
                     }
                 }
@@ -1135,7 +1141,10 @@ namespace LSCC
 
                             NAPI.Task.Run(() =>
                             {
-                                pVehicle.Position = vecSpawn;
+                                lock (pVehicle)
+                                {
+                                    if(pVehicle.Exists && pVehicle != null) pVehicle.Position = vecSpawn;
+                                }
                             }, 1000);
 
                             playerVehicle.Add(new Tuple<Player, Vehicle, int>(player, pVehicle, 0));
@@ -1295,7 +1304,10 @@ namespace LSCC
 
                         NAPI.Task.Run(() =>
                         {
-                            pVehicle.Position = vecSpawn;
+                            lock (pVehicle)
+                            {
+                                if(pVehicle != null && pVehicle.Exists) pVehicle.Position = vecSpawn;
+                            }
                         }, 1000);
 
                         EPlayer.Freeze(_tempPlayer, true);
@@ -1336,11 +1348,17 @@ namespace LSCC
                     {
                         foreach (Player player in lobby.Cops)
                         {
-                            player.Dimension = Convert.ToUInt32(lobbyid);
+                            lock (player)
+                            {
+                                if(player != null && player.Exists) player.Dimension = Convert.ToUInt32(lobbyid);
+                            }
                         }
                         foreach (Player player in lobby.Fugitives)
                         {
-                            player.Dimension = Convert.ToUInt32(lobbyid);
+                            lock (player)
+                            {
+                                if(player != null && player.Exists) player.Dimension = Convert.ToUInt32(lobbyid);
+                            }
                         }
 
                     }, 1000);
@@ -1352,13 +1370,19 @@ namespace LSCC
                         spawnLoc = Spawns.First(a => a.spawnTeam == 1);
                         foreach (Player player in lobby.Cops)
                         {
-                            player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ).Around(5f);
-
-                            try
+                            lock (player)
                             {
-                                if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
+                                if (player != null && player.Exists)
+                                {
+                                    player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ).Around(5f);
+
+                                    try
+                                    {
+                                        if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
+                                    }
+                                    catch { }
+                                }
                             }
-                            catch { }
                         }
 
                         spawnLoc = Spawns.First(a => a.spawnTeam == 0);
@@ -1381,19 +1405,22 @@ namespace LSCC
                         {
                             if (data.Item1.IsNull || data.Item1 == null || data.Item2.IsNull || data.Item2 == null || data.Item1 == default(Player)) continue;
 
-                            try
+                            if (data.Item1.Exists)
                             {
-                                if (data.Item1.HasData("putVehicle")) data.Item1.SetIntoVehicle(data.Item1.GetData<Vehicle>("putVehicle"), data.Item1.GetData<int>("putVehicleSeat"));
+                                try
+                                {
+                                    if (data.Item1.HasData("putVehicle")) data.Item1.SetIntoVehicle(data.Item1.GetData<Vehicle>("putVehicle"), data.Item1.GetData<int>("putVehicleSeat"));
+                                }
+                                catch { }
+
+                                data.Item1.SetIntoVehicle(data.Item2, data.Item3);
+                                EPlayer.Freeze(data.Item1, false);
+
+                                data.Item1.TriggerEvent("ToggleChaseCollisions", false);
+                                data.Item1.SetSharedData("HasShot", false);
+
+                                data.Item1.SendNotification($"~g~Weapons will be given after collisions enable.");
                             }
-                            catch { }
-
-                            data.Item1.SetIntoVehicle(data.Item2, data.Item3);
-                            EPlayer.Freeze(data.Item1, false);
-
-                            data.Item1.TriggerEvent("ToggleChaseCollisions", false);
-                            data.Item1.SetSharedData("HasShot", false);
-
-                            data.Item1.SendNotification($"~g~Weapons will be given after collisions enable.");
                         }
 
                         NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] Copchase started with !{{#8D8DFF}}{lobby.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{lobby.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{map.Name}!{{#FFFFFF}}.");
@@ -1418,11 +1445,17 @@ namespace LSCC
                     {
                         foreach (Player p in lobby.Cops)
                         {
-                            p.TriggerEvent("ToggleChaseCollisions", false);
+                            lock (p)
+                            {
+                                if(p != null && p.Exists) p.TriggerEvent("ToggleChaseCollisions", false);
+                            }
                         }
                         foreach (Player p in lobby.Fugitives)
                         {
-                            p.TriggerEvent("ToggleChaseCollisions", false);
+                            lock (p)
+                            {
+                                if(p != null && p.Exists) p.TriggerEvent("ToggleChaseCollisions", false);
+                            }
                         }
 
                     }, delayTime: 3000);
@@ -1431,22 +1464,35 @@ namespace LSCC
                     {
                         foreach (Player player in lobby.Fugitives)
                         {
-                            try
+                            lock (player)
                             {
-                                player.TriggerEvent("ToggleChaseCollisions", false);
-                                if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
+                                if (player != null && player.Exists)
+                                {
+                                    try
+                                    {
+                                        player.TriggerEvent("ToggleChaseCollisions", false);
+                                        if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
+                                    }
+                                    catch { }
+                                }
                             }
-                            catch { }
                         }
 
                         foreach (Player player in lobby.Cops)
                         {
-                            try
+                            lock (player)
                             {
-                                player.TriggerEvent("ToggleChaseCollisions", false);
-                                if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
+                                if (player != null && player.Exists)
+                                {
+
+                                    try
+                                    {
+                                        player.TriggerEvent("ToggleChaseCollisions", false);
+                                        if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
+                                    }
+                                    catch { }
+                                }
                             }
-                            catch { }
                         }
 
                     }, delayTime: 3000);
@@ -1455,22 +1501,35 @@ namespace LSCC
                     {
                         foreach (Player player in lobby.Fugitives)
                         {
-                            try
+                            lock (player)
                             {
-                                player.TriggerEvent("ToggleChaseCollisions", false);
-                                if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
+                                if (player != null && player.Exists)
+                                {
+                                    try
+                                    {
+                                        player.TriggerEvent("ToggleChaseCollisions", false);
+                                        if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
+                                    }
+                                    catch { }
+                                }
                             }
-                            catch { }
                         }
 
                         foreach (Player player in lobby.Cops)
                         {
-                            try
+
+                            lock (player)
                             {
-                                player.TriggerEvent("ToggleChaseCollisions", false);
-                                if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
+                                if (player != null && player.Exists)
+                                {
+                                    try
+                                    {
+                                        player.TriggerEvent("ToggleChaseCollisions", false);
+                                        if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
+                                    }
+                                    catch { }
+                                }
                             }
-                            catch { }
                         }
 
                     }, delayTime: 5000);

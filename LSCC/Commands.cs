@@ -263,9 +263,12 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                if (player != null)
+                lock (player)
                 {
-                    if (!aVehicle.IsNull) player.SetIntoVehicle(aVehicle, 0);
+                    if (player != null && player.Exists)
+                    {
+                        if (!aVehicle.IsNull && aVehicle.Exists) player.SetIntoVehicle(aVehicle, 0);
+                    }
                 }
             }, 1000);
 
@@ -310,9 +313,12 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                if (player != null)
+                lock (player)
                 {
-                    if (!aVehicle.IsNull) player.SetIntoVehicle(aVehicle, 0);
+                    if (player != null && player.Exists)
+                    {
+                        if (!aVehicle.IsNull && aVehicle.Exists) player.SetIntoVehicle(aVehicle, 0);
+                    }
                 }
             }, 1000);
 
@@ -650,58 +656,73 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                if (player != null && target != null)
+                lock (player)
                 {
-                    if (target == null || !target.IsInstanceAlive || player == null || !player.IsInstanceAlive)
+                    lock (target)
                     {
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, target or you are no longer alive.");
-                        player.ResetData("CuffingTarget");
-                        return;
-                    }
-
-                    LobbyData lobbye = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedData<int>("InLobby"));
-                    if (lobbye != null)
-                    {
-                        if (lobbye.Cops.Contains(player) && lobbye.gameStatus == 1 && lobbye.Fugitives.Contains(target) && !target.HasData("Cuffed"))
+                        if (player != null && player.Exists)
                         {
-                            isACop = true;
+                            if (player != null && target != null && target.Exists)
+                            {
+                                if (target == null || !target.IsInstanceAlive || player == null || !player.IsInstanceAlive)
+                                {
+                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, target or you are no longer alive.");
+                                    player.ResetData("CuffingTarget");
+                                    return;
+                                }
+
+                                LobbyData lobbye = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedData<int>("InLobby"));
+                                if (lobbye != null)
+                                {
+                                    if (lobbye.Cops.Contains(player) && lobbye.gameStatus == 1 && lobbye.Fugitives.Contains(target) && !target.HasData("Cuffed"))
+                                    {
+                                        isACop = true;
+                                    }
+                                }
+
+                                if (!isACop)
+                                {
+                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, you cannot cuff that target anymore.");
+                                    player.ResetData("CuffingTarget");
+                                    return;
+                                }
+
+                                if (player.Position.DistanceTo(target.Position) > 2.0)
+                                {
+                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near the target!");
+                                    player.ResetData("CuffingTarget");
+
+                                    return;
+                                }
+
+                                player.ResetData("CuffingTarget");
+
+                                EPlayer.GrantXP(player, 5);
+                                EPlayer.Action(player, $"has grabbed ahold of {target.Name} and slapped the handcuffs on their wrists.");
+
+                                target.SetAccessories(7, 41, 0); // Handcuffs
+
+                                EPlayer.Handcuff(target, true);
+
+                                Events.RequestPlayAnimation(player, "mp_arresting", "a_uncuff", 2);
+
+                                NAPI.Task.Run(() =>
+                                {
+                                    lock (player)
+                                    {
+                                        if (player != null && player.Exists)
+                                        {
+                                            Events.RequestClearAnimation(player);
+                                        }
+                                    }
+                                }, 2000);
+
+                                target.Heading = player.Heading;
+
+                                Events.OnPlayerDeath(target, player, 696988); // Reason 696988 = handcuffs.
+                            }
                         }
                     }
-
-                    if (!isACop)
-                    {
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, you cannot cuff that target anymore.");
-                        player.ResetData("CuffingTarget");
-                        return;
-                    }
-
-                    if (player.Position.DistanceTo(target.Position) > 2.0)
-                    {
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near the target!");
-                        player.ResetData("CuffingTarget");
-
-                        return;
-                    }
-
-                    player.ResetData("CuffingTarget");
-
-                    EPlayer.GrantXP(player, 5);
-                    EPlayer.Action(player, $"has grabbed ahold of {target.Name} and slapped the handcuffs on their wrists.");
-
-                    target.SetAccessories(7, 41, 0); // Handcuffs
-
-                    EPlayer.Handcuff(target, true);
-
-                    Events.RequestPlayAnimation(player, "mp_arresting", "a_uncuff", 2);
-
-                    NAPI.Task.Run(() =>
-                    {
-                        if(player != null) Events.RequestClearAnimation(player);
-                    }, 2000);
-
-                    target.Heading = player.Heading;
-
-                    Events.OnPlayerDeath(target, player, 696988); // Reason 696988 = handcuffs.
                 }
 
             }, 3000);
@@ -1781,9 +1802,12 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                if (target != null)
+                lock (target)
                 {
-                    target.Kick("Banned.");
+                    if (target != null && target.Exists)
+                    {
+                        target.Kick("Banned.");
+                    }
                 }
             }, 350);
 
@@ -3219,10 +3243,16 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                if (target != null)
+                lock (target)
                 {
-                    player.TriggerEvent("SpectatePlayer", target);
-                    player.TriggerEvent("SetPlayerFrozen", true);
+                    lock (player)
+                    {
+                        if (player != null && player.Exists && target != null && target.Exists)
+                        {
+                            player.TriggerEvent("SpectatePlayer", target);
+                            player.TriggerEvent("SetPlayerFrozen", true);
+                        }
+                    }
                 }
             }, 1000);
                 
