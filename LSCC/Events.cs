@@ -19,7 +19,6 @@ namespace LSCC
             BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.HWID.CompareTo(player.Serial) == 0 || ban.IP.CompareTo(player.Address) == 0 ||
                 ban.RockstarID == player.SocialClubId);
 
-
             Discord.SendTextChannel("staff-bot", $"**{player.Name} has joined the server.** *(Total online: {RAGE.Entities.Players.Count})*");
 
             if (ban != null)
@@ -32,11 +31,14 @@ namespace LSCC
 
                 NAPI.Task.Run(() =>
                 {
-                    lock (player)
+                    lock (Settings.LoggedInPlayers)
                     {
-                        if (player != null && player.Exists)
+                        lock (player)
                         {
-                            player.Kick("Banned.");
+                            if (player != null && player.Exists)
+                            {
+                                player.Kick("Banned.");
+                            }
                         }
                     }
                 }, 350);
@@ -225,17 +227,23 @@ namespace LSCC
         {
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has left the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
-            Settings.Requests.RemoveAll(a => a.Reporter == player || a.Reported == player);
+            lock (Settings.Requests)
+            {
+                Settings.Requests.RemoveAll(a => a.Reporter == player || a.Reported == player);
+            }
 
             try
             {
-                Settings.LoggedInPlayers.ForEach((Player pl) =>
+                lock (Settings.LoggedInPlayers)
                 {
-                    if (pl.HasData("AskedBySquad") && pl.GetData<Player>("AskedBySquad") == player)
+                    Settings.LoggedInPlayers.ForEach((Player pl) =>
                     {
-                        pl.ResetData("AskedBySquad");
-                    }
-                });
+                        if (pl.HasData("AskedBySquad") && pl.GetData<Player>("AskedBySquad") == player)
+                        {
+                            pl.ResetData("AskedBySquad");
+                        }
+                    });
+                }
             }
             catch { }
 
@@ -253,10 +261,13 @@ namespace LSCC
                     player.ResetData("PlayerSquad");
                 }
 
-                foreach(Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player))
+                lock (Settings.LoggedInPlayers)
                 {
-                    mem.SendChatMessage("!{#FFAC38}[Partners] This squad has been disbanded as the leader left.");
-                    mem.ResetData("PlayerSquad");
+                    foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player))
+                    {
+                        mem.SendChatMessage("!{#FFAC38}[Partners] This squad has been disbanded as the leader left.");
+                        mem.ResetData("PlayerSquad");
+                    }
                 }
 
                 player.SetSharedData("VisibleBlip", false);
@@ -282,7 +293,7 @@ namespace LSCC
                         break;
 
                     case DisconnectionType.Timeout:
-                        NAPI.Chat.SendChatMessageToAll("!{#4343FA}[PART] !{#FFFFFF}" + player.Name + " has left the server. !{#4343FA}(Timed Out)");
+                        NAPI.Chat.SendChatMessageToAll("!{#4343FA}[PART] !{#FFFFFF}" + player.Name + " has left the server. !{#4343FA}(Kicked/TimeOut)");
                         break;
                 }
 
@@ -317,9 +328,12 @@ namespace LSCC
 
             if (player.GetSharedData<int>("InLobby") == -4 && Settings.DerbyTimeLeft > 0 && Settings.DerbyTimeLeft != 180)
             {
-                foreach (Player indm in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
+                lock (Settings.LoggedInPlayers)
                 {
-                    indm.TriggerEvent("pushToKillFeed", $"DERBY> {player.Name} fell down");
+                    foreach (Player indm in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
+                    {
+                        indm.TriggerEvent("pushToKillFeed", $"DERBY> {player.Name} fell down");
+                    }
                 }
             }
 
@@ -332,15 +346,18 @@ namespace LSCC
                 {
                     int arenaID = killer.GetSharedData<int>("InDM");
 
-                    foreach(Player indm in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == killer.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == arenaID))
+                    lock (Settings.LoggedInPlayers)
                     {
-                        if (reasonStr == null)
+                        foreach (Player indm in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == killer.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == arenaID))
                         {
-                            indm.TriggerEvent("pushToKillFeed", $"DM> {killer.Name} killed {player.Name}");
-                        }
-                        else
-                        {
-                            indm.TriggerEvent("pushToKillFeed", $"DM> {killer.Name} killed {player.Name} with {reasonStr}");
+                            if (reasonStr == null)
+                            {
+                                indm.TriggerEvent("pushToKillFeed", $"DM> {killer.Name} killed {player.Name}");
+                            }
+                            else
+                            {
+                                indm.TriggerEvent("pushToKillFeed", $"DM> {killer.Name} killed {player.Name} with {reasonStr}");
+                            }
                         }
                     }
 
@@ -448,38 +465,40 @@ namespace LSCC
 
                         if (killer != null && killer.GetSharedData<int>("Team") == 1) EPlayer.GrantXP(killer, 2);
 
-                        foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                        lock (Settings.LoggedInPlayers)
                         {
-                            if (killer != null && !killer.IsNull && killer != player)
+                            foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
                             {
-                                if (reasonStr == null)
+                                if (killer != null && !killer.IsNull && killer != player)
                                 {
-                                    ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name}");
-                                }
-                                else
-                                {
-                                    if(reason == 696988)
+                                    if (reasonStr == null)
                                     {
-                                        ay.TriggerEvent("pushToKillFeed", $"{killer.Name} has apprehended {player.Name}");
+                                        ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name}");
                                     }
-                                    else ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}");
-                                }
-                            }
-                            else
-                            {
-                                ay.SendNotification($"Fugitive ~r~<C>{player.Name}</C> ~w~has died.");
-
-                                if (reasonStr == null)
-                                {
-                                    ay.TriggerEvent("pushToKillFeed", $"{player.Name} died");
+                                    else
+                                    {
+                                        if (reason == 696988)
+                                        {
+                                            ay.TriggerEvent("pushToKillFeed", $"{killer.Name} has apprehended {player.Name}");
+                                        }
+                                        else ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}");
+                                    }
                                 }
                                 else
                                 {
-                                    ay.TriggerEvent("pushToKillFeed", $"{player.Name} died of {reasonStr}");
+                                    ay.SendNotification($"Fugitive ~r~<C>{player.Name}</C> ~w~has died.");
+
+                                    if (reasonStr == null)
+                                    {
+                                        ay.TriggerEvent("pushToKillFeed", $"{player.Name} died");
+                                    }
+                                    else
+                                    {
+                                        ay.TriggerEvent("pushToKillFeed", $"{player.Name} died of {reasonStr}");
+                                    }
                                 }
                             }
                         }
-
                         lobby.Fugitives.Remove(player);
                     }
 
@@ -489,32 +508,35 @@ namespace LSCC
 
                         if (killer != null && killer.GetSharedData<int>("Team") == 0) EPlayer.GrantXP(killer, 2);
 
-                        foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                        lock (Settings.LoggedInPlayers)
                         {
-                            if (killer != null && !killer.IsNull && player != killer)
+                            foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
                             {
-                                ay.SendNotification($"Cop ~b~<C>{player.Name}</C> ~w~has been taken out by ~r~<C>{killer.Name}</C>~w~.");
-                                    
-                                if (reasonStr == null)
+                                if (killer != null && !killer.IsNull && player != killer)
                                 {
-                                    ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name}");
-                                }
-                                else
-                                {
-                                    ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}");
-                                }
-                            }
-                            else
-                            {
-                                ay.SendNotification($"Cop ~r~<C>{player.Name}</C> ~w~has died.");
+                                    ay.SendNotification($"Cop ~b~<C>{player.Name}</C> ~w~has been taken out by ~r~<C>{killer.Name}</C>~w~.");
 
-                                if (reasonStr == null)
-                                {
-                                    ay.TriggerEvent("pushToKillFeed", $"{player.Name} died");
+                                    if (reasonStr == null)
+                                    {
+                                        ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name}");
+                                    }
+                                    else
+                                    {
+                                        ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}");
+                                    }
                                 }
                                 else
                                 {
-                                    ay.TriggerEvent("pushToKillFeed", $"{player.Name} died of {reasonStr}");
+                                    ay.SendNotification($"Cop ~r~<C>{player.Name}</C> ~w~has died.");
+
+                                    if (reasonStr == null)
+                                    {
+                                        ay.TriggerEvent("pushToKillFeed", $"{player.Name} died");
+                                    }
+                                    else
+                                    {
+                                        ay.TriggerEvent("pushToKillFeed", $"{player.Name} died of {reasonStr}");
+                                    }
                                 }
                             }
                         }

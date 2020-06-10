@@ -401,56 +401,65 @@ namespace LSCC
 
         public static void ResetPlayerData(Player player)
         {
-            player.ResetData("AccountHandle");
-            player.SetData("TeamShotWarning", 0);
-            player.SetData("UnfairKillSpawn", false);
-            player.SetData("InnocentShotWarning", 0);
-            player.SetData("AutoJoin", true);
-            player.SetData("HUDState", true);
-            player.SetSharedData("DerbyTime", 0);
-            player.SetData("DerbySpawnTick", 0);
-            player.ResetData("ViewingCarSelectorTeam");
-            player.ResetData("ViewingCarSelector");
-            player.SetSharedData("HasShot", false);
-            player.SetSharedData("VoiceMode", 0);
-            player.SetSharedData("VisibleBlip", false);
-            player.SetData("PMState", true);
-            player.SetSharedData("Team", -1);
-            player.TriggerEvent("ToggleHud", false);
-            player.SetData("GPS", false);
-            player.SetData("EditingClothing", -1);
-            player.SetData("Creator_Using", false);
-            player.ResetData("BlockList");
-            player.ResetData("AskedBySquad");
-            player.ResetData("PlayerSquad");
-            player.SetSharedData("InLobby", -1);
-            player.SetSharedData("InDM", -1);
-            player.SetSharedData("IsTyping", false);
-            player.SetSharedData("Color_R", 255);
-            player.SetSharedData("Color_G", 255);
-            player.SetSharedData("Color_B", 255);
-            player.SetSharedData("Ping", player.Ping);
-            player.SetSharedData("Level", 1);
-            player.SetSharedData("JailTime", 0);
-            player.SetSharedData("MuteTime", 0);
-            player.SetSharedData("UnstreamedState", 0);
-            player.SetSharedData("UnstreamedX", 0.0f);
-            player.SetSharedData("UnstreamedY", 0.0f);
-            player.SetSharedData("UnstreamedZ", 0.0f);
-
-            List<Vehicle> temp_FreeroamVeh = new List<Vehicle>();
-            player.SetData("FreeroamVehicles", temp_FreeroamVeh);
-
-            foreach (LobbyData il in Settings.Lobbies)
+            lock (player)
             {
-                il.Cops.Remove(player);
-                il.Fugitives.Remove(player);
-            }
+                player.ResetData("AccountHandle");
+                player.SetData("TeamShotWarning", 0);
+                player.SetData("UnfairKillSpawn", false);
+                player.SetData("InnocentShotWarning", 0);
+                player.SetData("AutoJoin", true);
+                player.SetData("HUDState", true);
+                player.SetSharedData("DerbyTime", 0);
+                player.SetData("DerbySpawnTick", 0);
+                player.ResetData("ViewingCarSelectorTeam");
+                player.ResetData("ViewingCarSelector");
+                player.SetSharedData("HasShot", false);
+                player.SetSharedData("VoiceMode", 0);
+                player.SetSharedData("VisibleBlip", false);
+                player.SetData("PMState", true);
+                player.SetSharedData("Team", -1);
+                player.TriggerEvent("ToggleHud", false);
+                player.SetData("GPS", false);
+                player.SetData("EditingClothing", -1);
+                player.SetData("Creator_Using", false);
+                player.ResetData("BlockList");
+                player.ResetData("AskedBySquad");
+                player.ResetData("PlayerSquad");
+                player.SetSharedData("InLobby", -1);
+                player.SetSharedData("InDM", -1);
+                player.SetSharedData("IsTyping", false);
+                player.SetSharedData("Color_R", 255);
+                player.SetSharedData("Color_G", 255);
+                player.SetSharedData("Color_B", 255);
+                player.SetSharedData("Ping", player.Ping);
+                player.SetSharedData("Level", 1);
+                player.SetSharedData("JailTime", 0);
+                player.SetSharedData("MuteTime", 0);
+                player.SetSharedData("UnstreamedState", 0);
+                player.SetSharedData("UnstreamedX", 0.0f);
+                player.SetSharedData("UnstreamedY", 0.0f);
+                player.SetSharedData("UnstreamedZ", 0.0f);
 
-            EPlayer.UpdateBlip(player);
-            Settings.LoggedInPlayers.Remove(player);
-            player.SetSharedData("pLogged", false);
-            player.SetData("LoggedIn", false);
+                List<Vehicle> temp_FreeroamVeh = new List<Vehicle>();
+                player.SetData("FreeroamVehicles", temp_FreeroamVeh);
+
+                lock (Settings.Lobbies)
+                {
+                    foreach (LobbyData il in Settings.Lobbies)
+                    {
+                        il.Cops.Remove(player);
+                        il.Fugitives.Remove(player);
+                    }
+                }
+
+                lock (Settings.LoggedInPlayers)
+                {
+                    EPlayer.UpdateBlip(player);
+                    Settings.LoggedInPlayers.Remove(player);
+                    player.SetSharedData("pLogged", false);
+                    player.SetData("LoggedIn", false);
+                }
+            }
         }
 
         public static void Jail(Player player, int minutes, string reason)

@@ -625,24 +625,30 @@ namespace LSCC
         {
             time -= 2;
 
-            LobbyData lobby = Settings.Lobbies.Find(l => l.lobbyId == lobbyid);
-            if (lobby != null)
+            lock (Settings.Lobbies)
             {
-                foreach (Player player in Settings.LoggedInPlayers)
-                {
-                    lock (player)
+                LobbyData lobby = Settings.Lobbies.Find(l => l.lobbyId == lobbyid);
+                if (lobby != null)
+                { 
+                    lock (lobby)
                     {
-                        if (player != null && player.Exists)
+                        foreach (Player player in Settings.LoggedInPlayers)
                         {
-                            if (player.GetSharedData<int>("InLobby") == lobbyid && player.GetData<bool>("AutoJoin") == true)
+                            lock (player)
                             {
-                                if (time > 0)
+                                if (player != null && player.Exists)
                                 {
-                                    NAPI.Notification.SendNotificationToPlayer(player, $"Game is starting in ~g~{time} seconds~w~.", true);
-                                }
-                                else
-                                {
-                                    NAPI.Notification.SendNotificationToPlayer(player, $"~y~Game is now starting.", true);
+                                    if (player.GetSharedData<int>("InLobby") == lobbyid && player.GetData<bool>("AutoJoin") == true)
+                                    {
+                                        if (time > 0)
+                                        {
+                                            NAPI.Notification.SendNotificationToPlayer(player, $"Game is starting in ~g~{time} seconds~w~.", true);
+                                        }
+                                        else
+                                        {
+                                            NAPI.Notification.SendNotificationToPlayer(player, $"~y~Game is now starting.", true);
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -696,122 +702,143 @@ namespace LSCC
                 }
             }, 100);
 
-            foreach (LobbyData lobby in Settings.Lobbies)
+            lock (Settings.Lobbies)
             {
-                if (lobby != null)
+                foreach (LobbyData lobby in Settings.Lobbies)
                 {
-                    lobby.Time[2] += 30; // Twice as fast as in real life.
-                    if (lobby.Time[2] >= 60)
+                    lock (lobby)
                     {
-                        lobby.Time[2] = 0;
-                        lobby.Time[1]++;
-
-                        if (lobby.Time[1] >= 60)
+                        if (lobby != null)
                         {
-                            lobby.Time[1] = 0;
-                            lobby.Time[0]++;
-
-                            lobby.Weather = new Random().Next(0, 9); // Change weather every hour or so.
-
-                            if (lobby.Time[0] >= 24)
+                            lobby.Time[2] += 30; // Twice as fast as in real life.
+                            if (lobby.Time[2] >= 60)
                             {
-                                lobby.Time[0] = 0;
-                            }
+                                lobby.Time[2] = 0;
+                                lobby.Time[1]++;
 
-                            string weatherString = WeatherToForecast(lobby.Weather);
-
-                            foreach (Player player in Settings.LoggedInPlayers)
-                            {
-                                if (player.GetSharedData<int>("InLobby") == lobby.lobbyId)
+                                if (lobby.Time[1] >= 60)
                                 {
-                                    player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
+                                    lobby.Time[1] = 0;
+                                    lobby.Time[0]++;
 
-                                    player.SendChatMessage("!{#A8FFAB}[WEATHER FORECAST] " + weatherString);
-                                }
-                            }
-                        }
+                                    lobby.Weather = new Random().Next(0, 9); // Change weather every hour or so.
 
-                        foreach (Player player in Settings.LoggedInPlayers)
-                        {
-                            if (player.GetSharedData<int>("InLobby") == lobby.lobbyId)
-                            {
-                                player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
-                            }
-                        }
-                    }
-
-                    if (lobby.gameStatus == 0)
-                    {
-                        if (lobby.Enabled)
-                        {
-                            if (lobby.GameAutoStart)
-                            {
-                                int pCount = 0;
-                                foreach (Player player in Settings.LoggedInPlayers)
-                                {
-                                    if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetData<bool>("AutoJoin") == true)
+                                    if (lobby.Time[0] >= 24)
                                     {
-                                        pCount++;
+                                        lobby.Time[0] = 0;
                                     }
-                                }
 
-                                if (pCount >= 2)
-                                {
-                                    lobby.gameStatus = 2;
-
-                                    NAPI.Chat.SendChatMessageToAll($"!{{#FFFF00}}[Lobby {lobby.lobbyId}] !{{#FFFFFF}}Copchase will start in 10 seconds... ({pCount} players currently)");
+                                    string weatherString = WeatherToForecast(lobby.Weather);
 
                                     foreach (Player player in Settings.LoggedInPlayers)
                                     {
-                                        if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetData<bool>("AutoJoin") == true)
+                                        lock (player)
                                         {
-                                            player.SetSharedData("InDM", -1);
+                                            if (player.GetSharedData<int>("InLobby") == lobby.lobbyId)
+                                            {
+                                                player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
 
-                                            EPlayer.Spawn(player);
-                                            NAPI.Notification.SendNotificationToPlayer(player, $"~w~Game is starting in ~g~10 seconds~w~.", true);
-                                            
-                                            NAPI.Util.ConsoleOutput($"[TimeUpdate] Game starting in 10 seconds in lobby {lobby.lobbyId}...");
+                                                player.SendChatMessage("!{#A8FFAB}[WEATHER FORECAST] " + weatherString);
+                                            }
                                         }
                                     }
+                                }
 
-                                    NAPI.Task.Run(() =>
+                                foreach (Player player in Settings.LoggedInPlayers)
+                                {
+                                    lock (player)
                                     {
-                                        GameStartCountdown(10, lobby.lobbyId);
-                                    }, delayTime: 2000);
+                                        if (player.GetSharedData<int>("InLobby") == lobby.lobbyId)
+                                        {
+                                            player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (lobby.gameStatus == 0)
+                            {
+                                if (lobby.Enabled)
+                                {
+                                    if (lobby.GameAutoStart)
+                                    {
+                                        int pCount = 0;
+                                        foreach (Player player in Settings.LoggedInPlayers)
+                                        {
+                                            lock (player)
+                                            {
+                                                if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetData<bool>("AutoJoin") == true)
+                                                {
+                                                    pCount++;
+                                                }
+                                            }
+                                        }
+
+                                        if (pCount >= 2)
+                                        {
+                                            lobby.gameStatus = 2;
+
+                                            NAPI.Chat.SendChatMessageToAll($"!{{#FFFF00}}[Lobby {lobby.lobbyId}] !{{#FFFFFF}}Copchase will start in 10 seconds... ({pCount} players currently)");
+
+                                            foreach (Player player in Settings.LoggedInPlayers)
+                                            {
+                                                lock (player)
+                                                {
+                                                    if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetData<bool>("AutoJoin") == true)
+                                                    {
+                                                        player.SetSharedData("InDM", -1);
+
+                                                        EPlayer.Spawn(player);
+                                                        NAPI.Notification.SendNotificationToPlayer(player, $"~w~Game is starting in ~g~10 seconds~w~.", true);
+
+                                                        NAPI.Util.ConsoleOutput($"[TimeUpdate] Game starting in 10 seconds in lobby {lobby.lobbyId}...");
+                                                    }
+                                                }
+                                            }
+
+                                            NAPI.Task.Run(() =>
+                                            {
+                                                GameStartCountdown(10, lobby.lobbyId);
+                                            }, delayTime: 2000);
+                                        }
+                                        else
+                                        {
+                                            if (Environment.TickCount - lobby.LastAutoStartMsg >= 90000)
+                                            {
+                                                EPlayer.SendMessageInLobby(lobby.lobbyId, "!{#FFFF00}[GAME] !{#FFFFFF}Game will not start unless there are 2+ players to start a match.", true);
+
+                                                lobby.LastAutoStartMsg = Environment.TickCount;
+                                            }
+                                        }
+                                    }
                                 }
                                 else
                                 {
-                                    if (Environment.TickCount - lobby.LastAutoStartMsg >= 90000)
+                                    foreach (Player player in Settings.LoggedInPlayers)
                                     {
-                                        EPlayer.SendMessageInLobby(lobby.lobbyId, "!{#FFFF00}[GAME] !{#FFFFFF}Game will not start unless there are 2+ players to start a match.", true);
-
-                                        lobby.LastAutoStartMsg = Environment.TickCount;
+                                        lock (player)
+                                        {
+                                            if (player.GetSharedData<int>("InLobby") == lobby.lobbyId)
+                                            {
+                                                player.SetSharedData("InLobby", -1);
+                                                player.SendChatMessage("!{#FF0000}This lobby is disabled, resetting you to any other lobby.");
+                                                EPlayer.Spawn(player);
+                                            }
+                                        }
                                     }
                                 }
                             }
-                        }
-                        else
-                        {
-                            foreach (Player player in Settings.LoggedInPlayers)
+                            else if (lobby.gameStatus == 1)
                             {
-                                if (player.GetSharedData<int>("InLobby") == lobby.lobbyId)
+                                if (lobby.Cops.Count < 1)
                                 {
-                                    player.SetSharedData("InLobby", -1);
-                                    player.SendChatMessage("!{#FF0000}This lobby is disabled, resetting you to any other lobby.");
-                                    EPlayer.Spawn(player);
+                                    StopGame(lobby.lobbyId, 2);
+                                }
+                                else if (lobby.Fugitives.Count < 1)
+                                {
+                                    StopGame(lobby.lobbyId, 3);
                                 }
                             }
-                        }
-                    }
-                    else if (lobby.gameStatus == 1)
-                    {
-                        if (lobby.Cops.Count < 1)
-                        {
-                            StopGame(lobby.lobbyId, 2);
-                        }
-                        else if (lobby.Fugitives.Count < 1)
-                        {
-                            StopGame(lobby.lobbyId, 3);
                         }
                     }
                 }
@@ -1576,9 +1603,15 @@ namespace LSCC
 
         public static void GameUpdate()
         {
-            foreach(Player pl in Settings.LoggedInPlayers)
+            lock (Settings.LoggedInPlayers)
             {
-                EPlayer.UpdateBlip(pl);
+                foreach (Player pl in Settings.LoggedInPlayers)
+                {
+                    lock (pl)
+                    {
+                        EPlayer.UpdateBlip(pl);
+                    }
+                }
             }
 
             if (Environment.TickCount - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
@@ -1592,101 +1625,122 @@ namespace LSCC
                 }
             }
 
-            foreach (LobbyData lobby in Settings.Lobbies.Where(l => l.gameStatus == 1))
+            lock (Settings.Lobbies)
             {
-                lobby.GameProgress++;
-
-                if (lobby.GameProgress >= Convert.ToInt32(0.6 * Settings.GameRunTime))
+                foreach (LobbyData lobby in Settings.Lobbies.Where(l => l.gameStatus == 1))
                 {
-                    foreach (Player fugitive in lobby.Fugitives)
+                    lock (lobby)
                     {
-                        if (fugitive.GetSharedData<bool>("HasShot") == false)
+                        lobby.GameProgress++;
+
+                        if (lobby.GameProgress >= Convert.ToInt32(0.6 * Settings.GameRunTime))
                         {
-                            fugitive.SetSharedData("HasShot", true);
-                            fugitive.SetSharedData("VisibleBlip", true);
-                            lobby.FugitiveShowCounter = 29; // Set them to VISIBLE
-
-                            fugitive.SendChatMessage("!{#FF6347}You have the has shot tag now because the game has progress more than 60%!");
-                        }
-                    }
-                    if (lobby.GameProgress == Convert.ToInt32(0.6 * Settings.GameRunTime))
-                    {
-                        EPlayer.SendMessageInLobby(lobby.lobbyId, "!{#FF6347}[GAME] !{#FFFFFF}60% of the game has elapsed, all fugitives have shot tag now.");
-                    }
-                }
-
-                if (lobby.GameProgress >= Settings.GameRunTime)
-                {
-                    StopGame(lobby.lobbyId, 1);
-                }
-
-                lobby.FugitiveShowCounter++;
-                lobby.LastSeenCounter++;
-
-                if(lobby.LastSeenCounter >= 20)
-                {
-                    if(lobby.Fugitives.Count() > 0)
-                    {
-                        lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)].TriggerEvent("SendLastSeen");
-                    }
-                    lobby.LastSeenCounter = 0;
-                }
-
-                if (lobby.CollisionCounter > 0)
-                {
-                    lobby.CollisionCounter--;
-
-                    if (lobby.CollisionCounter < 1)
-                    {
-                        foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
-                        {
-                            if (!lobby.Cops.Contains(player) && !lobby.Fugitives.Contains(player)) continue;
-
-                            player.TriggerEvent("ToggleChaseCollisions", true);
-                            NAPI.Notification.SendNotificationToPlayer(player, $"~r~Collisions enabled and weapons deployed!", true);
-
-                            if (lobby.Cops.Contains(player))
+                            lock (lobby.Fugitives)
                             {
-                                EPlayer.GiveCopWeapons(player);
+                                foreach (Player fugitive in lobby.Fugitives)
+                                {
+                                    if (fugitive.GetSharedData<bool>("HasShot") == false)
+                                    {
+                                        fugitive.SetSharedData("HasShot", true);
+                                        fugitive.SetSharedData("VisibleBlip", true);
+                                        lobby.FugitiveShowCounter = 29; // Set them to VISIBLE
+
+                                        fugitive.SendChatMessage("!{#FF6347}You have the has shot tag now because the game has progress more than 60%!");
+                                    }
+                                }
                             }
-                            else if (lobby.Fugitives.Contains(player))
+                            if (lobby.GameProgress == Convert.ToInt32(0.6 * Settings.GameRunTime))
                             {
-                                EPlayer.GiveFugitiveWeapons(player);
+                                EPlayer.SendMessageInLobby(lobby.lobbyId, "!{#FF6347}[GAME] !{#FFFFFF}60% of the game has elapsed, all fugitives have shot tag now.");
                             }
                         }
                     }
-                }
 
-                foreach (Player cop in lobby.Cops)
-                {
-                    if (cop.GetData<bool>("GPS") == false)
+                    if (lobby.GameProgress >= Settings.GameRunTime)
                     {
-                        cop.SetSharedData("VisibleBlip", false);
+                        StopGame(lobby.lobbyId, 1);
                     }
-                    else
+
+                    lobby.FugitiveShowCounter++;
+                    lobby.LastSeenCounter++;
+
+                    if (lobby.LastSeenCounter >= 20)
                     {
-                        cop.SetSharedData("VisibleBlip", true);
+                        if (lobby.Fugitives.Count() > 0)
+                        {
+                            lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)].TriggerEvent("SendLastSeen");
+                        }
+                        lobby.LastSeenCounter = 0;
                     }
-                }
 
-                if (lobby.FugitiveShowCounter >= 30 && lobby.FugitiveShowCounter < 120)
-                {
-                    foreach (Player fugi in lobby.Fugitives)
+                    if (lobby.CollisionCounter > 0)
                     {
-                        fugi.SetSharedData("VisibleBlip", true);
+                        lobby.CollisionCounter--;
 
-                        if (lobby.FugitiveShowCounter == 30) fugi.SendNotification("~r~You are now visible on the radar.", true);
+                        if (lobby.CollisionCounter < 1)
+                        {
+                            lock (Settings.LoggedInPlayers)
+                            {
+                                foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                {
+                                    if (!lobby.Cops.Contains(player) && !lobby.Fugitives.Contains(player)) continue;
+
+                                    player.TriggerEvent("ToggleChaseCollisions", true);
+                                    NAPI.Notification.SendNotificationToPlayer(player, $"~r~Collisions enabled and weapons deployed!", true);
+
+                                    if (lobby.Cops.Contains(player))
+                                    {
+                                        EPlayer.GiveCopWeapons(player);
+                                    }
+                                    else if (lobby.Fugitives.Contains(player))
+                                    {
+                                        EPlayer.GiveFugitiveWeapons(player);
+                                    }
+                                }
+                            }
+                        }
                     }
-                }
 
-                if (lobby.FugitiveShowCounter >= 120)
-                {
-                    lobby.FugitiveShowCounter = 0;
-                    foreach (Player fugi in lobby.Fugitives)
+                    lock (lobby.Cops)
                     {
-                        fugi.SetSharedData("VisibleBlip", false);
+                        foreach (Player cop in lobby.Cops)
+                        {
+                            if (cop.GetData<bool>("GPS") == false)
+                            {
+                                cop.SetSharedData("VisibleBlip", false);
+                            }
+                            else
+                            {
+                                cop.SetSharedData("VisibleBlip", true);
+                            }
+                        }
+                    }
+                    if (lobby.FugitiveShowCounter >= 30 && lobby.FugitiveShowCounter < 120)
+                    {
+                        lock (lobby.Fugitives)
+                        {
+                            foreach (Player fugi in lobby.Fugitives)
+                            {
+                                fugi.SetSharedData("VisibleBlip", true);
 
-                        fugi.SendNotification("~g~You are no longer visible on the radar.", true);
+                                if (lobby.FugitiveShowCounter == 30) fugi.SendNotification("~r~You are now visible on the radar.", true);
+                            }
+                        }
+                    }
+
+                    if (lobby.FugitiveShowCounter >= 120)
+                    {
+                        lobby.FugitiveShowCounter = 0;
+
+                        lock (lobby.Fugitives)
+                        {
+                            foreach (Player fugi in lobby.Fugitives)
+                            {
+                                fugi.SetSharedData("VisibleBlip", false);
+
+                                fugi.SendNotification("~g~You are no longer visible on the radar.", true);
+                            }
+                        }
                     }
                 }
             }
