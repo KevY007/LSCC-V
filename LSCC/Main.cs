@@ -1134,7 +1134,7 @@ namespace LSCC
 
                             int overridemaxseats = GetMaxSeats(carName);
 
-                            if(carName.Equals("polvmav"))
+                            if(carName.Equals("polmav"))
                             {
                                 if (Spawns.Count(sp => sp.spawnTeam == 2) >= 1)
                                 {
@@ -1173,7 +1173,21 @@ namespace LSCC
                                     if (seat < maxseats)
                                     {
                                         mem.SetData("putVehicle", pVehicle);
-                                        mem.SetData("putVehicleSeat", 0 + seat);
+
+                                        if (carName.Equals("polmav"))
+                                        {
+                                            // 4 - seat
+                                            // 4-1, 3
+                                            // 4-2, 2
+                                            // 4-3, 1
+                                            mem.SetData("putVehicleSeat", maxseats - seat);
+                                        }
+                                        else
+                                        {
+                                            // 0 + 1, 2, 3
+
+                                            mem.SetData("putVehicleSeat", 0 + seat);
+                                        }
 
                                         playerVehicle.Add(new Tuple<Player, Vehicle, int>(mem, pVehicle, 0 + seat));
                                         PutInsideCar.Add(mem);
