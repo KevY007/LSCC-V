@@ -762,10 +762,8 @@ namespace LSCC
                                 {
                                     if (Environment.TickCount - lobby.LastAutoStartMsg >= 90000)
                                     {
-                                        foreach (Player player in Settings.LoggedInPlayers)
-                                        {
-                                            EPlayer.SendMessageInLobby(lobby.lobbyId, "!{#FFFF00}[GAME] !{#FFFFFF}Game will not start unless there are 2+ players to start a match.", true);
-                                        }
+                                        EPlayer.SendMessageInLobby(lobby.lobbyId, "!{#FFFF00}[GAME] !{#FFFFFF}Game will not start unless there are 2+ players to start a match.", true);
+
                                         lobby.LastAutoStartMsg = Environment.TickCount;
                                     }
                                 }

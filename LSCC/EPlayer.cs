@@ -517,7 +517,7 @@ namespace LSCC
                 if ((loadout != null) == false)
                 {
                     EPlayer.GetAccount(player).LoadoutFugitive = "?";
-                    GiveCopWeapons(player);
+                    GiveFugitiveWeapons(player);
                     return;
                 }
 
