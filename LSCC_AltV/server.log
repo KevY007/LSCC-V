@@ -1,0 +1,24 @@
+[20:22:46] alt:V Server, build #1181, branch release
+[20:22:46] Starting Los Santos Copchase: V [BETA] on 0.0.0.0:7788
+[20:22:46] coreclr-module: version found: 3.1.4
+[20:22:46] coreclr-module: greatest version: 3.1.4
+[20:22:46] Loading resource LSCC
+[20:22:47] [>===========|Los Santos Copchase|===========<]
+[20:22:47] [Version]: 0.1a
+[20:22:47] [Developers]: KevY
+[20:22:47] [Accounts]: 0
+[20:22:47] [>===========|Los Santos Copchase|===========<]
+[20:22:47] Loaded resource LSCC
+[20:22:47] Starting HTTP server on 0.0.0.0:7788
+[20:22:47] Server started
+[20:23:02] TimeUpdate
+[20:23:17] TimeUpdate
+[20:23:32] TimeUpdate
+[20:23:47] TimeUpdate
+[20:24:02] TimeUpdate
+[20:24:17] TimeUpdate
+[20:24:32] TimeUpdate
+[20:24:47] TimeUpdate
+[20:25:02] TimeUpdate
+[20:25:17] TimeUpdate
+[20:25:28] Stopping resource LSCC

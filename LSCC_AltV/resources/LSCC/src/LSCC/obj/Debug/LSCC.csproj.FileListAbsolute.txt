@@ -1,0 +1,13 @@
+E:\Github\LSCC-V\LSCC_AltV\resources\LSCC\src\LSCC\obj\Debug\LSCC.AssemblyInfoInputs.cache
+E:\Github\LSCC-V\LSCC_AltV\resources\LSCC\src\LSCC\obj\Debug\LSCC.AssemblyInfo.cs
+E:\Github\LSCC-V\LSCC_AltV\resources\LSCC\LSCC.deps.json
+E:\Github\LSCC-V\LSCC_AltV\resources\LSCC\LSCC.dll
+E:\Github\LSCC-V\LSCC_AltV\resources\LSCC\src\LSCC\obj\Debug\LSCC.csprojAssemblyReference.cache
+E:\Github\LSCC-V\LSCC_AltV\resources\LSCC\src\LSCC\obj\Debug\LSCC.csproj.CopyComplete
+E:\Github\LSCC-V\LSCC_AltV\resources\LSCC\src\LSCC\obj\Debug\LSCC.dll
+E:\Github\LSCC-V\LSCC_AltV\resources\LSCC\src\LSCC\obj\Debug\LSCC.pdb
+E:\Github\LSCC-V\LSCC_AltV\resources\LSCC\LSCC.pdb
+E:\Github\LSCC-V\LSCC_AltV\resources\LSCC\src\LSCC\obj\Debug\LSCC.genruntimeconfig.cache
+E:\Github\LSCC-V\LSCC_AltV\resources\LSCC\LSCC.runtimeconfig.json
+E:\Github\LSCC-V\LSCC_AltV\resources\LSCC\LSCC.runtimeconfig.dev.json
+E:\Github\LSCC-V\LSCC_AltV\resources\LSCC\src\LSCC\obj\Debug\LSCC.csproj.CoreCompileInputs.cache
