@@ -529,6 +529,14 @@ namespace LSCC
             return;
         }
 
+        [ServerEvent(Event.ResourceStop)]
+        public void OnResourceStop()
+        {
+            ContextFactory.Instance.SaveChanges();
+
+            NAPI.Util.ConsoleOutput("Server saving & exiting...");
+        }
+
         [ServerEvent(Event.ResourceStart)]
         public void OnResourceStart()
         {
