@@ -54,7 +54,7 @@ namespace LSCC
                     blockList.Remove(player);
                 }
             }
-                
+
 
 
             EPlayer.SetDiscordStatus(player, "Connecting to the server...");
@@ -66,7 +66,7 @@ namespace LSCC
 
             EPlayer.LoginCameraSetup(player);
 
-            
+
             EPlayer.LoginBrowserSetup(player);
 
             player.TriggerEvent("InitChaseTimer");
@@ -112,23 +112,23 @@ namespace LSCC
         [RemoteEvent("OnScriptedKeyPress")]
         public static void OnScriptedKeyPress(Player player, int keyId, bool keyState) // keyState == true? Down
         {
-            if(keyId == 0x5A)
+            if (keyId == 0x5A)
             {
                 LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
-                if(lobby != null)
+                if (lobby != null)
                 {
-                    if(lobby.Cops.Contains(player)) LSCC.Commands.cmd_gps(player);
+                    if (lobby.Cops.Contains(player)) LSCC.Commands.cmd_gps(player);
                 }
             }
 
-            if(keyId == 0x09)
+            if (keyId == 0x09)
             {
                 int voiceMode = player.GetSharedData<int>("VoiceMode");
                 voiceMode++;
 
                 if (voiceMode >= 3) voiceMode = 0;
 
-                switch(voiceMode)
+                switch (voiceMode)
                 {
                     case 0:
                         player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Nearby (30m) (70m with megaphone/cop car)");
@@ -144,9 +144,9 @@ namespace LSCC
                 player.SetSharedData("VoiceMode", voiceMode);
             }
 
-            if(keyId == 0x4E)
+            if (keyId == 0x4E)
             {
-                if(keyState)
+                if (keyState)
                 {
                     if (EPlayer.GetAccount(player).MuteTime > 0)
                     {
@@ -157,10 +157,10 @@ namespace LSCC
                     // add listeners
 
                     List<Player> listeners = new List<Player>();
-                    if(player.GetSharedData<int>("VoiceMode") == 0)
+                    if (player.GetSharedData<int>("VoiceMode") == 0)
                     {
                         double dist = 30.0;
-                        if(player.IsInVehicle && player.Vehicle.HasSharedData("Team") && player.Vehicle.GetSharedData<int>("Team") == 1)
+                        if (player.IsInVehicle && player.Vehicle.HasSharedData("Team") && player.Vehicle.GetSharedData<int>("Team") == 1)
                         {
                             dist = 70.0;
                         }
@@ -168,7 +168,7 @@ namespace LSCC
                         listeners.AddRange(RAGE.Entities.Players.All.Where(t => t.Dimension == player.Dimension &&
                             Vector3.Distance(t.Position, player.Position) <= dist));
                     }
-                    else if(player.GetSharedData<int>("VoiceMode") == 1)
+                    else if (player.GetSharedData<int>("VoiceMode") == 1)
                     {
                         listeners.AddRange(RAGE.Entities.Players.All.Where(t => t.Dimension == player.Dimension &&
                             Vector3.Distance(t.Position, player.Position) <= 15.0));
@@ -181,7 +181,7 @@ namespace LSCC
                             {
                                 listeners.AddRange(lobby.Cops);
                             }
-                            else if(lobby.Fugitives.Contains(player))
+                            else if (lobby.Fugitives.Contains(player))
                             {
                                 listeners.AddRange(lobby.Fugitives);
                             }
@@ -247,62 +247,65 @@ namespace LSCC
             }
             catch { }
 
-            if (EPlayer.LoggedIn(player))
+            lock (player)
             {
-                if (player.HasData("DerbyVehicle"))
+                if (EPlayer.LoggedIn(player))
                 {
-                    player.GetData<Vehicle>("DerbyVehicle").Delete();
-
-                    player.ResetData("DerbyVehicle");
-                }
-
-                if (player.HasData("PlayerSquad"))
-                {
-                    player.ResetData("PlayerSquad");
-                }
-
-                lock (Settings.LoggedInPlayers)
-                {
-                    foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player))
+                    if (player.HasData("DerbyVehicle"))
                     {
-                        mem.SendChatMessage("!{#FFAC38}[Partners] This squad has been disbanded as the leader left.");
-                        mem.ResetData("PlayerSquad");
+                        player.GetData<Vehicle>("DerbyVehicle").Delete();
+
+                        player.ResetData("DerbyVehicle");
                     }
-                }
 
-                player.SetSharedData("VisibleBlip", false);
-
-                List<Vehicle> freeroamVehs = new List<Vehicle>();
-                freeroamVehs = player.GetData<List<Vehicle>>("FreeroamVehicles");
-
-                for (int i = freeroamVehs.Count - 1; i >= 0; i--)
-                {
-                    if (!freeroamVehs[i].IsNull && freeroamVehs[i] != null)
+                    if (player.HasData("PlayerSquad"))
                     {
-                        freeroamVehs[i].Delete();
-                        freeroamVehs.RemoveAt(i);
+                        player.ResetData("PlayerSquad");
                     }
+
+                    lock (Settings.LoggedInPlayers)
+                    {
+                        foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player))
+                        {
+                            mem.SendChatMessage("!{#FFAC38}[Partners] This squad has been disbanded as the leader left.");
+                            mem.ResetData("PlayerSquad");
+                        }
+                    }
+
+                    player.SetSharedData("VisibleBlip", false);
+
+                    List<Vehicle> freeroamVehs = new List<Vehicle>();
+                    freeroamVehs = player.GetData<List<Vehicle>>("FreeroamVehicles");
+
+                    for (int i = freeroamVehs.Count - 1; i >= 0; i--)
+                    {
+                        if (!freeroamVehs[i].IsNull && freeroamVehs[i] != null)
+                        {
+                            freeroamVehs[i].Delete();
+                            freeroamVehs.RemoveAt(i);
+                        }
+                    }
+
+                    freeroamVehs.Clear();
+
+                    switch (type)
+                    {
+                        case DisconnectionType.Left:
+                            NAPI.Chat.SendChatMessageToAll("!{#4343FA}[PART] !{#FFFFFF}" + player.Name + " has left the server. !{#4343FA}(Leaving)");
+                            break;
+
+                        case DisconnectionType.Timeout:
+                            NAPI.Chat.SendChatMessageToAll("!{#4343FA}[PART] !{#FFFFFF}" + player.Name + " has left the server. !{#4343FA}(Kicked/TimeOut)");
+                            break;
+                    }
+
+                    EPlayer.Save(player);
                 }
 
-                freeroamVehs.Clear();
+                EPlayer.ResetPlayerData(player);
 
-                switch (type)
-                {
-                    case DisconnectionType.Left:
-                        NAPI.Chat.SendChatMessageToAll("!{#4343FA}[PART] !{#FFFFFF}" + player.Name + " has left the server. !{#4343FA}(Leaving)");
-                        break;
-
-                    case DisconnectionType.Timeout:
-                        NAPI.Chat.SendChatMessageToAll("!{#4343FA}[PART] !{#FFFFFF}" + player.Name + " has left the server. !{#4343FA}(Kicked/TimeOut)");
-                        break;
-                }
-
-                EPlayer.Save(player);
+                Discord.SendTextChannel("staff-bot", $"**{player.Name} has left the server.** *(Total online: {RAGE.Entities.Players.Count - 1})*");
             }
-
-            EPlayer.ResetPlayerData(player);
-
-            Discord.SendTextChannel("staff-bot", $"**{player.Name} has left the server.** *(Total online: {RAGE.Entities.Players.Count-1})*");
         }
 
         [ServerEvent(Event.PlayerDeath)]
@@ -315,13 +318,13 @@ namespace LSCC
 
             string reasonStr;
             bool wasInGame = false;
-            if(!Main.WeaponReasons.TryGetValue(reason, out reasonStr))
+            if (!Main.WeaponReasons.TryGetValue(reason, out reasonStr))
             {
                 reasonStr = null;
             }
             if (reason == 696988) reasonStr = "handcuffs";
 
-            if(reasonStr != null)
+            if (reasonStr != null)
             {
                 reasonStr.Replace(".", "");
             }
@@ -382,12 +385,12 @@ namespace LSCC
                         warnings += 3;
                         killer.SetData<int>("InnocentShotWarning", warnings);
                         killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Repeated attacking of fugitive's that haven't shot will result in a jail.");
-                        
+
                         player.SetData("UnfairKillSpawn", true);
 
                         Vehicle pVeh = null;
                         int seat = 0;
-                        if(player.IsInVehicle)
+                        if (player.IsInVehicle)
                         {
                             pVeh = player.Vehicle;
                             seat = player.VehicleSeat;
@@ -399,7 +402,7 @@ namespace LSCC
                         player.Health = 100;
                         player.SendChatMessage($"!{{FF6347}}[!] !{{#FFFFFF}}You have been put back in the game as you were killed unfairly.");
 
-                        if(pVeh != null)
+                        if (pVeh != null)
                         {
                             player.SetIntoVehicle(pVeh, seat);
                         }
@@ -409,7 +412,7 @@ namespace LSCC
                 }
 
 
-                if(reason != 696988 && player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("Team") == killer.GetSharedData<int>("Team"))
+                if (reason != 696988 && player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("Team") == killer.GetSharedData<int>("Team"))
                 {
                     EPlayer.GrantXP(killer, -2);
                     RAGE.Entities.Players.All.ForEach((Player ey) =>
@@ -427,23 +430,26 @@ namespace LSCC
 
                     player.SetData("UnfairKillSpawn", true);
 
-                    Vehicle pVeh = null;
-                    int seat = 0;
-                    if (player.IsInVehicle)
+                    lock (player)
                     {
-                        pVeh = player.Vehicle;
-                        seat = player.VehicleSeat;
-                    }
+                        Vehicle pVeh = null;
+                        int seat = 0;
+                        if (player.IsInVehicle)
+                        {
+                            pVeh = player.Vehicle;
+                            seat = player.VehicleSeat;
+                        }
 
-                    NAPI.Player.SpawnPlayer(player, player.Position);
+                        NAPI.Player.SpawnPlayer(player, player.Position);
 
-                    player.Armor = 0;
-                    player.Health = 100;
-                    player.SendChatMessage($"!{{FF6347}}[!] !{{#FFFFFF}}You have been put back in the game as you were killed unfairly.");
+                        player.Armor = 0;
+                        player.Health = 100;
+                        player.SendChatMessage($"!{{FF6347}}[!] !{{#FFFFFF}}You have been put back in the game as you were killed unfairly.");
 
-                    if (pVeh != null)
-                    {
-                        player.SetIntoVehicle(pVeh, seat);
+                        if (pVeh != null)
+                        {
+                            player.SetIntoVehicle(pVeh, seat);
+                        }
                     }
 
                     return;
@@ -718,8 +724,8 @@ namespace LSCC
             EPlayer.Save(player);
 
             EPlayer.Spawn(player);
-			
-			player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can edit your character's clothing with /char clothing.");
+
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can edit your character's clothing with /char clothing.");
         }
 
         [RemoteEvent("creator_Leave")]
@@ -780,7 +786,7 @@ namespace LSCC
             }
 
             player.SetClothes(slot, drawable, texture);
-            
+
         }
 
         [RemoteEvent("RequestSetGlasses")]
@@ -923,7 +929,7 @@ namespace LSCC
 
             if (EPlayer.LoggedIn(player) && player.GetSharedData<int>("InLobby") == -4)
             {
-                if(player.Position.Z <= 15.0f && player.IsInstanceAlive && player.Health > 10)
+                if (player.Position.Z <= 15.0f && player.IsInstanceAlive && player.Health > 10)
                 {
                     player.Health = 0;
                 }
@@ -974,7 +980,7 @@ namespace LSCC
         [RemoteEvent("GivePlayerShotTag")]
         public void PlayerRequestShotTag(Player player)
         {
-            if(player.GetSharedData<int>("Team") == 0)
+            if (player.GetSharedData<int>("Team") == 0)
             {
                 player.SetSharedData("HasShot", true);
                 player.SendNotification("~r~You have now shot, opposite team can now safely shoot you and detect you.");
@@ -1009,13 +1015,13 @@ namespace LSCC
                 warnings++;
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Do not shoot at teammates, repeatedly doing this will result in punishment!");
 
-                if(warnings >= 7)
+                if (warnings >= 7)
                 {
                     player.Health = 0;
                     EPlayer.GrantXP(player, -1);
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have lost 1XP due to team attacking.");
                 }
-                if(warnings >= 14)
+                if (warnings >= 14)
                 {
                     RAGE.Entities.Players.All.ForEach((Player i) =>
                     {
@@ -1046,7 +1052,7 @@ namespace LSCC
 
                 int warnings = 0;
                 if (player.HasData("InnocentShotWarning")) warnings = player.GetData<int>("InnocentShotWarning");
-                
+
                 warnings++;
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Do not shoot at fugitives that haven't shot, repeatedly doing this will result in punishment!");
 
@@ -1157,13 +1163,13 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            if(player.HasData("ViewingCarSelector") && player.GetData<bool>("ViewingCarSelector") == true)
-            { 
-                if(player.HasData("ViewingCarSelectorTeam"))
+            if (player.HasData("ViewingCarSelector") && player.GetData<bool>("ViewingCarSelector") == true)
+            {
+                if (player.HasData("ViewingCarSelectorTeam"))
                 {
-                    if(player.GetData<int>("ViewingCarSelectorTeam") == 1)
+                    if (player.GetData<int>("ViewingCarSelectorTeam") == 1)
                     {
-                        switch(carname)
+                        switch (carname)
                         {
                             case "Default":
                                 {
@@ -1256,7 +1262,7 @@ namespace LSCC
                     player.SendChatMessage("!{#00FF33}You have been unjailed as you have served your time.");
                 }
             }
-            else if(type == 1)
+            else if (type == 1)
             {
                 if (player.GetSharedData<int>("MuteTime") <= 0) return;
 
@@ -1277,9 +1283,9 @@ namespace LSCC
         [RemoteEvent("OnPlayerShotPlayer")] // wont trigger incar btw 
         public void OnPlayerShootPlayer(Player player, Vector3 targetPosition, Player target, uint weapon)
         {
-            if(weapon == (uint)WeaponHash.Stungun)
+            if (weapon == (uint)WeaponHash.Stungun)
             {
-                if(target.GetSharedData<bool>("HasShot") != true)
+                if (target.GetSharedData<bool>("HasShot") != true)
                 {
                     LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
                     if (lobby != null)
@@ -1336,19 +1342,19 @@ namespace LSCC
 
             if (Environment.TickCount - player.GetData<int>("DerbySpawnTick") > 2000)
             {
-                if(player.IsInstanceAlive && player.Health > 10 && !player.IsInVehicle)
+                if (player.IsInstanceAlive && player.Health > 10 && !player.IsInVehicle)
                 {
                     player.Health = 0;
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please do not get out of your vehicle in derby!");
                 }
             }
 
-            if(Environment.TickCount - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
+            if (Environment.TickCount - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
             {
                 Settings.DerbyTimeLeft--;
                 Settings.LastDerbyTick = Environment.TickCount;
 
-                if(Settings.DerbyTimeLeft <= 0)
+                if (Settings.DerbyTimeLeft <= 0)
                 {
                     Main.CheckDerbyWinner();
                 }
@@ -1359,241 +1365,244 @@ namespace LSCC
         [ServerEvent(Event.PlayerSpawn)]
         public static void OnPlayerSpawn(Player player)
         {
-            player.ResetData("CuffingTarget");
-
-            if (player.HasData("Cuffed"))
+            lock (player)
             {
-                player.TriggerEvent("SetHandcuffs", false);
+                player.ResetData("CuffingTarget");
 
-                CharacterData ConvChar = new CharacterData();
-
-                Account acc = EPlayer.GetAccount(player);
-                try
+                if (player.HasData("Cuffed"))
                 {
-                    if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata- sending to creation."));
+                    player.TriggerEvent("SetHandcuffs", false);
 
-                    ConvChar = NAPI.Util.FromJson<CharacterData>(acc.Character);
-                }
-                catch
-                {
-                    ConvChar = new CharacterData();
-                }
+                    CharacterData ConvChar = new CharacterData();
 
-                EPlayer.ApplyCharacter(player, ConvChar, acc.LobbyClothing);
-                player.ResetData("Cuffed");
-            }
-            if (player.HasData("Handsup"))
-            {
-                player.TriggerEvent("SetHandsup", false);
-                player.ResetData("Handsup");
-            }
-
-            player.SetSharedData("Team", -1);
-
-            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
-            if (lobby != null)
-            {
-                if (lobby.Cops.Contains(player)) player.SetSharedData("Team", 1);
-                else if (lobby.Fugitives.Contains(player)) player.SetSharedData("Team", 0);
-            }
-
-            if (!EPlayer.LoggedIn(player))
-            {
-                EPlayer.LoginCameraSetup(player);
-                EPlayer.LoginBrowserSetup(player);
-                return;
-            }
-
-            if(player.HasData("Creator_Using") && player.GetData<bool>("Creator_Using") == true)
-            {
-                player.SetSharedData("InLobby", -5);
-                return;
-            }
-
-
-            player.ResetData("FreezeWeapons");
-
-            player.SetSharedData("DerbyTime", 0);
-
-            player.SetSharedData("Level", EPlayer.GetAccount(player).Level);
-            player.SetSharedData("Ping", player.Ping);
-            player.SetSharedData("HasShot", false);
-
-            if (EPlayer.GetAccount(player).JailTime > 0)
-            {
-                EPlayer.SetDiscordStatus(player, $"Serving jail time as {player.Name}");
-
-                Account acc = EPlayer.GetAccount(player);
-
-                player.SetData("AutoJoin", false);
-                player.SetSharedData("InLobby", -2);
-                player.SetSharedData("JailTime", acc.JailTime);
-                EPlayer.SetColor(player, new Color(168, 128, 8, 255));
-                player.Position = (Vector3)Settings.VectorJail[0];
-                player.Heading = (float)Settings.VectorJail[1];
-                player.Dimension = 200 + Convert.ToUInt32(player.Id);
-                EPlayer.Freeze(player, true);
-                player.SendChatMessage($"!{{#FF6347}}[JAILED] !{{#FFFFFF}}You are in jail for {acc.JailTime} seconds, reason: {acc.JailReason}.");
-
-                return;
-            }
-
-
-            if (player.GetData<bool>("UnfairKillSpawn") == true)
-            {
-                player.SetData("UnfairKillSpawn", false);
-                return;
-            }
-
-            player.TriggerEvent("HideChaseTimer");
-            player.TriggerEvent("SetTimeWeather", 12, 0, 0, -1);
-
-            player.SetSharedData("VisibleBlip", false);
-
-            player.TriggerEvent("SetActorInvulnerable", true);
-            player.TriggerEvent("CanFallOutOfCar", false);
-            player.TriggerEvent("showHPBars", 0); // Never show HP Bars.
-
-            EPlayer.SetColor(player, new Color(255, 255, 255, 255));
-
-            
-            player.TriggerEvent("ToggleHud", player.GetData<bool>("HUDState"));
-
-
-            
-            if (player.GetSharedData<int>("InLobby") == -3) // Freeroam
-            {
-                player.Position = new Vector3(1061.547f, -720.113f, 56.786f);
-                player.Heading = 130.497f;
-                EPlayer.SetDiscordStatus(player, $"In freeroam as {player.Name}");
-
-                EPlayer.SetColor(player, new Color(102, 232, 217), 0);
-
-                player.TriggerEvent("SetActorInvulnerable", true);
-
-                player.SetSharedData("VisibleBlip", true);
-
-                player.RemoveAllWeapons();
-
-                player.Dimension = 256;
-            }
-
-            if (player.GetSharedData<int>("InLobby") == -4) // Derby
-            {
-                player.SetData("DerbySpawnTick", Environment.TickCount);
-
-                Random rand = new Random();
-                int spawnID = rand.Next(Settings.DerbySpawns.GetLength(0));
-
-                if (player.HasData("DerbyVehicle"))
-                {
-                    player.GetData<Vehicle>("DerbyVehicle").Delete();
-
-                    player.ResetData("DerbyVehicle");
-                }
-
-                Vector3 PlayerSpawn = (Vector3)Settings.DerbySpawns[spawnID, 0];
-                PlayerSpawn.Z += 30.0f;
-                player.Position = PlayerSpawn;
-                player.Heading = (float)Settings.DerbySpawns[spawnID, 1];
-                player.Dimension = 500;
-
-
-                EPlayer.SetDiscordStatus(player, $"In derby as {player.Name}");
-
-                player.TriggerEvent("SetActorInvulnerable", true);
-
-                player.SetSharedData("VisibleBlip", true);
-
-                player.RemoveAllWeapons();
-
-                player.TriggerEvent("SetDerbyCounting", false, Settings.DerbyTimeLeft);
-
-                if (Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
-                {
-                    foreach (Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
+                    Account acc = EPlayer.GetAccount(player);
+                    try
                     {
-                        p.TriggerEvent("SetDerbyCounting", true, Settings.DerbyTimeLeft);
+                        if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata- sending to creation."));
+
+                        ConvChar = NAPI.Util.FromJson<CharacterData>(acc.Character);
                     }
-                }
-                else
-                {
-                    player.SendNotification("~r~Derby time will not be counted unless there are enough players.");
-                    Settings.DerbyTimeLeft = 180;
-                    Settings.LastDerbyTick = Environment.TickCount;
-                }
-
-                Vehicle derbyVeh = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey("brioso"), (Vector3)Settings.DerbySpawns[spawnID, 0], (float)Settings.DerbySpawns[spawnID, 1], rand.Next(255), rand.Next(255), "DERBY", 255, false, true, 500);
-                player.SetData("DerbyVehicle", derbyVeh);
-
-                player.SetIntoVehicle(derbyVeh, 0);
-
-                NAPI.Task.Run(() =>
-                {
-                    lock (player)
+                    catch
                     {
-                        if (player != null && player.Exists)
-                        {
-                            player.SetIntoVehicle(derbyVeh, 0);
-                            EPlayer.SetColor(player, new Color(250, 191, 62), 0);
-                        }
+                        ConvChar = new CharacterData();
                     }
-                }, 750);
-            }
 
-            if (player.GetSharedData<int>("InLobby") > -1) // Copchase Lobby
-            {
-                EPlayer.SetDiscordStatus(player, $"In lobby {player.GetSharedData<int>("InLobby")} as {player.Name}");
+                    EPlayer.ApplyCharacter(player, ConvChar, acc.LobbyClothing);
+                    player.ResetData("Cuffed");
+                }
+                if (player.HasData("Handsup"))
+                {
+                    player.TriggerEvent("SetHandsup", false);
+                    player.ResetData("Handsup");
+                }
 
-                player.RemoveAllWeapons();
+                player.SetSharedData("Team", -1);
 
-                player.Dimension = 100 + Convert.ToUInt32(player.GetSharedData<int>("InLobby"));
-                        
+                LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
                 if (lobby != null)
                 {
-                    player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
-
-                    if (lobby.gameStatus == 1)
-                    {
-                        player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, lobby.CollisionCounter);
-                    }
+                    if (lobby.Cops.Contains(player)) player.SetSharedData("Team", 1);
+                    else if (lobby.Fugitives.Contains(player)) player.SetSharedData("Team", 0);
                 }
 
-                int arenaID = player.GetSharedData<int>("InDM");
-                if (arenaID > -1 && lobby != null && lobby.gameStatus == 2)
+                if (!EPlayer.LoggedIn(player))
                 {
-                    arenaID = -1;
-                    player.SetSharedData("InDM", -1);
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have been removed from DM as it's locked while copchase starts.");
+                    EPlayer.LoginCameraSetup(player);
+                    EPlayer.LoginBrowserSetup(player);
+                    return;
                 }
 
-                if (arenaID > -1)
+                if (player.HasData("Creator_Using") && player.GetData<bool>("Creator_Using") == true)
                 {
-                    Random rand = new Random();
+                    player.SetSharedData("InLobby", -5);
+                    return;
+                }
 
-                    int spawnID = rand.Next(Settings.DMSpawns[arenaID].GetLength(0));
-                    Vector3 dmSpawn = (Vector3)Settings.DMSpawns[arenaID][spawnID, 0];
-                    player.Position = dmSpawn;
-                    player.Heading = (float)Settings.DMSpawns[arenaID][spawnID, 1];
 
-                    player.Health = 100;
-                    player.Armor = 100;
+                player.ResetData("FreezeWeapons");
 
-                    player.TriggerEvent("SetActorInvulnerable", false);
+                player.SetSharedData("DerbyTime", 0);
+
+                player.SetSharedData("Level", EPlayer.GetAccount(player).Level);
+                player.SetSharedData("Ping", player.Ping);
+                player.SetSharedData("HasShot", false);
+
+                if (EPlayer.GetAccount(player).JailTime > 0)
+                {
+                    EPlayer.SetDiscordStatus(player, $"Serving jail time as {player.Name}");
+
+                    Account acc = EPlayer.GetAccount(player);
+
+                    player.SetData("AutoJoin", false);
+                    player.SetSharedData("InLobby", -2);
+                    player.SetSharedData("JailTime", acc.JailTime);
+                    EPlayer.SetColor(player, new Color(168, 128, 8, 255));
+                    player.Position = (Vector3)Settings.VectorJail[0];
+                    player.Heading = (float)Settings.VectorJail[1];
+                    player.Dimension = 200 + Convert.ToUInt32(player.Id);
+                    EPlayer.Freeze(player, true);
+                    player.SendChatMessage($"!{{#FF6347}}[JAILED] !{{#FFFFFF}}You are in jail for {acc.JailTime} seconds, reason: {acc.JailReason}.");
+
+                    return;
+                }
+
+
+                if (player.GetData<bool>("UnfairKillSpawn") == true)
+                {
+                    player.SetData("UnfairKillSpawn", false);
+                    return;
+                }
+
+                player.TriggerEvent("HideChaseTimer");
+                player.TriggerEvent("SetTimeWeather", 12, 0, 0, -1);
+
+                player.SetSharedData("VisibleBlip", false);
+
+                player.TriggerEvent("SetActorInvulnerable", true);
+                player.TriggerEvent("CanFallOutOfCar", false);
+                player.TriggerEvent("showHPBars", 0); // Never show HP Bars.
+
+                EPlayer.SetColor(player, new Color(255, 255, 255, 255));
+
+
+                player.TriggerEvent("ToggleHud", player.GetData<bool>("HUDState"));
+
+
+
+                if (player.GetSharedData<int>("InLobby") == -3) // Freeroam
+                {
+                    player.Position = new Vector3(1061.547f, -720.113f, 56.786f);
+                    player.Heading = 130.497f;
+                    EPlayer.SetDiscordStatus(player, $"In freeroam as {player.Name}");
+
+                    EPlayer.SetColor(player, new Color(102, 232, 217), 0);
+
+                    player.TriggerEvent("SetActorInvulnerable", true);
+
                     player.SetSharedData("VisibleBlip", true);
-                    player.TriggerEvent("showHPBars", 1); // Show if AIMing
 
                     player.RemoveAllWeapons();
 
-                    player.Dimension = (uint)arenaID + 356 + Convert.ToUInt32(player.GetSharedData<int>("InLobby"));
+                    player.Dimension = 256;
+                }
 
-                    EPlayer.SetDiscordStatus(player, $"In DM {Settings.DMNames[arenaID]} (lobby {player.GetSharedData<int>("InLobby")}) as {player.Name}");
-                    EPlayer.SetColor(player, new Color(179, 179, 179), 100);
+                if (player.GetSharedData<int>("InLobby") == -4) // Derby
+                {
+                    player.SetData("DerbySpawnTick", Environment.TickCount);
 
-                    player.GiveWeapon(WeaponHash.Revolver_mk2, 1000);
-                    player.GiveWeapon(WeaponHash.Pumpshotgun, 1000);
-                    player.GiveWeapon(WeaponHash.Smg_mk2, 1000);
-                    player.GiveWeapon(WeaponHash.Assaultrifle_mk2, 1000);
+                    Random rand = new Random();
+                    int spawnID = rand.Next(Settings.DerbySpawns.GetLength(0));
+
+                    if (player.HasData("DerbyVehicle"))
+                    {
+                        player.GetData<Vehicle>("DerbyVehicle").Delete();
+
+                        player.ResetData("DerbyVehicle");
+                    }
+
+                    Vector3 PlayerSpawn = (Vector3)Settings.DerbySpawns[spawnID, 0];
+                    PlayerSpawn.Z += 30.0f;
+                    player.Position = PlayerSpawn;
+                    player.Heading = (float)Settings.DerbySpawns[spawnID, 1];
+                    player.Dimension = 500;
+
+
+                    EPlayer.SetDiscordStatus(player, $"In derby as {player.Name}");
+
+                    player.TriggerEvent("SetActorInvulnerable", true);
+
+                    player.SetSharedData("VisibleBlip", true);
+
+                    player.RemoveAllWeapons();
+
+                    player.TriggerEvent("SetDerbyCounting", false, Settings.DerbyTimeLeft);
+
+                    if (Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
+                    {
+                        foreach (Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
+                        {
+                            p.TriggerEvent("SetDerbyCounting", true, Settings.DerbyTimeLeft);
+                        }
+                    }
+                    else
+                    {
+                        player.SendNotification("~r~Derby time will not be counted unless there are enough players.");
+                        Settings.DerbyTimeLeft = 180;
+                        Settings.LastDerbyTick = Environment.TickCount;
+                    }
+
+                    Vehicle derbyVeh = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey("brioso"), (Vector3)Settings.DerbySpawns[spawnID, 0], (float)Settings.DerbySpawns[spawnID, 1], rand.Next(255), rand.Next(255), "DERBY", 255, false, true, 500);
+                    player.SetData("DerbyVehicle", derbyVeh);
+
+                    player.SetIntoVehicle(derbyVeh, 0);
+
+                    NAPI.Task.Run(() =>
+                    {
+                        lock (player)
+                        {
+                            if (player != null && player.Exists)
+                            {
+                                player.SetIntoVehicle(derbyVeh, 0);
+                                EPlayer.SetColor(player, new Color(250, 191, 62), 0);
+                            }
+                        }
+                    }, 750);
+                }
+
+                if (player.GetSharedData<int>("InLobby") > -1) // Copchase Lobby
+                {
+                    EPlayer.SetDiscordStatus(player, $"In lobby {player.GetSharedData<int>("InLobby")} as {player.Name}");
+
+                    player.RemoveAllWeapons();
+
+                    player.Dimension = 100 + Convert.ToUInt32(player.GetSharedData<int>("InLobby"));
+
+                    if (lobby != null)
+                    {
+                        player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
+
+                        if (lobby.gameStatus == 1)
+                        {
+                            player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, lobby.CollisionCounter);
+                        }
+                    }
+
+                    int arenaID = player.GetSharedData<int>("InDM");
+                    if (arenaID > -1 && lobby != null && lobby.gameStatus == 2)
+                    {
+                        arenaID = -1;
+                        player.SetSharedData("InDM", -1);
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have been removed from DM as it's locked while copchase starts.");
+                    }
+
+                    if (arenaID > -1)
+                    {
+                        Random rand = new Random();
+
+                        int spawnID = rand.Next(Settings.DMSpawns[arenaID].GetLength(0));
+                        Vector3 dmSpawn = (Vector3)Settings.DMSpawns[arenaID][spawnID, 0];
+                        player.Position = dmSpawn;
+                        player.Heading = (float)Settings.DMSpawns[arenaID][spawnID, 1];
+
+                        player.Health = 100;
+                        player.Armor = 100;
+
+                        player.TriggerEvent("SetActorInvulnerable", false);
+                        player.SetSharedData("VisibleBlip", true);
+                        player.TriggerEvent("showHPBars", 1); // Show if AIMing
+
+                        player.RemoveAllWeapons();
+
+                        player.Dimension = (uint)arenaID + 356 + Convert.ToUInt32(player.GetSharedData<int>("InLobby"));
+
+                        EPlayer.SetDiscordStatus(player, $"In DM {Settings.DMNames[arenaID]} (lobby {player.GetSharedData<int>("InLobby")}) as {player.Name}");
+                        EPlayer.SetColor(player, new Color(179, 179, 179), 100);
+
+                        player.GiveWeapon(WeaponHash.Revolver_mk2, 1000);
+                        player.GiveWeapon(WeaponHash.Pumpshotgun, 1000);
+                        player.GiveWeapon(WeaponHash.Smg_mk2, 1000);
+                        player.GiveWeapon(WeaponHash.Assaultrifle_mk2, 1000);
+                    }
                 }
             }
         }

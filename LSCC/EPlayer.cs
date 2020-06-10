@@ -466,18 +466,28 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            Account Acc = EPlayer.GetAccount(player);
-            Acc.JailReason = reason;
-            Acc.JailTime = minutes * 60;
-            player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been jailed for {minutes} minutes, reason: {reason}.");
-            foreach (LobbyData il in Settings.Lobbies)
+            lock (player)
             {
-                il.Cops.Remove(player);
-                il.Fugitives.Remove(player);
+                Account Acc = EPlayer.GetAccount(player);
+                Acc.JailReason = reason;
+                Acc.JailTime = minutes * 60;
+                player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been jailed for {minutes} minutes, reason: {reason}.");
+
+                lock (Settings.Lobbies)
+                {
+                    foreach (LobbyData il in Settings.Lobbies)
+                    {
+                        lock (il)
+                        {
+                            lock(il.Cops) il.Cops.Remove(player);
+                            lock(il.Fugitives) il.Fugitives.Remove(player);
+                        }
+                    }
+                }
+                player.SetSharedData("JailTime", Acc.JailTime);
+                player.TriggerEvent("SetJailCounter", Acc.JailTime);
+                NAPI.Player.SpawnPlayer(player, (Vector3)Settings.VectorJail[0], (float)Settings.VectorJail[1]);
             }
-            player.SetSharedData("JailTime", Acc.JailTime);
-            player.TriggerEvent("SetJailCounter", Acc.JailTime);
-            NAPI.Player.SpawnPlayer(player, (Vector3)Settings.VectorJail[0], (float)Settings.VectorJail[1]);
         }
 
         public static void GiveCopWeapons(Player player)
