@@ -244,10 +244,19 @@ function UpdateTimer()
 
                 if (mp.players.exists(specTarget)) 
                 {
-                    var targetPos = new mp.Vector3(specTarget.position.x, specTarget.position.y, specTarget.position.z);
-                    targetPos.z -= 35;
+                    var position = specTarget.position;
 
-                    mp.players.local.position = targetPos;
+                    if(mp.game.system.vdist2(position.x, position.y, position.z, mp.players.local.position.x, mp.players.local.position.y, mp.players.local.position.z) >= 100 
+                    || (specTarget.handle !== 0) == false || specTarget.handle === null || 
+                        specTarget.handle === undefined)
+                    {
+                        position.x = target.getVariable("UnstreamedX");
+                        position.y = target.getVariable("UnstreamedY");
+                        position.z = target.getVariable("UnstreamedZ");
+                    }
+                    position.z -= 35;
+
+                    mp.players.local.position = position;
                 }
                 else 
                 {
