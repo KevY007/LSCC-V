@@ -371,7 +371,7 @@ function UpdateTimer()
 
     for (let i = 0; i < mp.blips.length; i++)
     {
-        if(mp.blips.at(i).id !== undefined)
+        if(mp.blips.at(i) !== undefined && mp.blips.at(i) != null && mp.blips.at(i).id !== undefined)
         {
             var index = playerBlips.indexOf(mp.blips.at(i).id);
             if(index != -1)
