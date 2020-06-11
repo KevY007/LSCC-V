@@ -1604,17 +1604,6 @@ namespace LSCC
 
         public static void GameUpdate()
         {
-            lock (Settings.LoggedInPlayers)
-            {
-                foreach (Player pl in Settings.LoggedInPlayers)
-                {
-                    lock (pl)
-                    {
-                        EPlayer.UpdateBlip(pl);
-                    }
-                }
-            }
-
             if (Environment.TickCount - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
             {
                 Settings.DerbyTimeLeft--;

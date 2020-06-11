@@ -30,6 +30,8 @@ let specTarget = null;
 mp.voiceChat.muted = true;
 let MaxVoiceRange = 50;
 
+let playerBlips = [];
+
 traceLastFunc("[Players] CreateVars");
 
 mp.events.add("onOpenChatbox", (toggle) =>
@@ -364,6 +366,64 @@ function UpdateTimer()
             traceLastFunc(`[Players] Update Chase Data Complete`);
         }
     }
+
+    traceLastFunc(`[Players] Blips Stage1`);
+
+    for (let i = 0; i < mp.blips.length; i++)
+    {
+        if(mp.blips.at(i).id !== undefined)
+        {
+            var index = playerBlips.indexOf(mp.blips.at(i).id);
+            if(index != -1)
+            {
+                mp.blips.at(i).destroy();
+            }
+        }
+    }
+    traceLastFunc(`[Players] Blips Stage2`);
+
+    mp.players.forEach(target => {
+
+        if(target.dimension == mp.players.local.dimension/* && target != mp.players.local*/)
+        {
+            if (target.getVariable("VisibleBlip") !== undefined && target.getVariable("VisibleBlip") == true)
+            {
+                var blipColor = 45;
+                var blipId = 1;
+                if(target.getVariable("Team") == 0) 
+                {
+                    blipColor = 75;
+                    if(target.getVariable("HasShot") == true) blipColor = 76;
+                }
+                else if(target.getVariable("Team") == 1) blipColor = 3;
+                if(target.getVariable("InLobby") == -3) blipColor = 15;
+                if(target.getVariable("InLobby") == -4) blipColor = 73;
+                if(target.getVariable("InDM") != -1) blipColor = 39;
+                if(target.isInAnyVehicle(false)) blipId = 724;
+                var position = target.position;
+                if(mp.game.system.vdist2(position.x, position.y, position.z, mp.players.local.position.x, mp.players.local.position.y, mp.players.local.position.z) >= 100 
+                || (target.handle !== 0) == false || target.handle === null || 
+                    target.handle === undefined)
+                {
+                    position.x = target.getVariable("UnstreamedX");
+                    position.y = target.getVariable("UnstreamedY");
+                    position.z = target.getVariable("UnstreamedZ");
+                    if(target.getVariable("UnstreamedState") == 1) blipId = 724;
+                }
+
+                var targetBlip = mp.blips.new(blipId, position,
+                {
+                    name: target.name,
+                    color: blipColor,
+                    shortRange: false,
+                    dimension: mp.players.local.dimension
+                });
+                playerBlips.push(targetBlip.id);
+            }
+        }
+    });
+
+    traceLastFunc(`[Players] Update Completed`);
 
     return;
 }

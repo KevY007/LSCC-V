@@ -354,11 +354,11 @@ namespace LSCC
             }
 
             player.SetData("GPS", !player.GetData<bool>("GPS"));
+            player.SetSharedData("VisibleBlip", player.GetData<bool>("GPS"));
 
             player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have " + (player.GetData<bool>("GPS") == true ? "enabled" : "disabled") + 
                 " your emergency GPS beacon.");
 
-            EPlayer.UpdateBlip(player);
             return;
         }
 

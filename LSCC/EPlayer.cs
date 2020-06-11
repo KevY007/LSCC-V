@@ -454,7 +454,6 @@ namespace LSCC
 
                 lock (Settings.LoggedInPlayers)
                 {
-                    EPlayer.UpdateBlip(player);
                     Settings.LoggedInPlayers.Remove(player);
                     player.SetSharedData("pLogged", false);
                     player.SetData("LoggedIn", false);
@@ -567,38 +566,6 @@ namespace LSCC
                 player.GiveWeapon(WeaponHash.Pumpshotgun, 20);
             }
             return;
-        }
-
-        public static void UpdateBlip(Player player)
-        {
-            if (player.HasData("Blip")) player.GetData<Blip>("Blip").Delete();
-
-            if ((player.HasSharedData("VisibleBlip") && player.GetSharedData<bool>("VisibleBlip") == true) || 
-                (player.HasData("GPS") && player.GetData<bool>("GPS") == true && player.GetSharedData<int>("Team") == 1))
-            {
-                byte blipColor = 45;
-                uint blipId = 1;
-
-                if (player.GetSharedData<int>("Team") == 0)
-                {
-                    blipColor = 75;
-
-                    if(player.GetSharedData<bool>("HasShot") == true)
-                    {
-                        blipColor = 76;
-                    }
-                }
-                
-                if (player.GetSharedData<int>("Team") == 1) blipColor = 3;
-
-                if (player.GetSharedData<int>("InLobby") == -3) blipColor = 15;
-                if (player.GetSharedData<int>("InLobby") == -4) blipColor = 73;
-                if (player.GetSharedData<int>("InDM") != -1) blipColor = 39;
-
-                if (player.IsInVehicle == true) blipId = 724;
-
-                player.SetData("Blip", (NAPI.Blip.CreateBlip(blipId, player.IsInVehicle == true ? player.Vehicle.Position : player.Position, 1f, blipColor, player.Name, 255, 0, false, 0, player.Dimension)));
-            }
         }
 
         public static void SetDiscordStatus(Player player, string status)
