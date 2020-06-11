@@ -1156,6 +1156,7 @@ namespace LSCC
                                 if(carName.StartsWith("police"))
                                 {
                                     col1 = 111;
+                                    if(carName.StartsWith("police3")) col1 = 8;
                                 }
                             }
 
