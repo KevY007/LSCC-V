@@ -1055,7 +1055,7 @@ namespace LSCC
             player.SendChatMessage($"!{{#FFFF00}}You are in lobby {player.GetSharedData<int>("InLobby")}, /switchlobby to change to another lobby.");
 
             player.SendChatMessage("Current Lobby Players:");
-            RAGE.Entities.Players.All.ForEach((Player ePlayer) =>
+            Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")).ToList().ForEach((Player ePlayer) =>
             {
                 player.SendChatMessage($"!{{#999999}}{ePlayer.Name}");
             });
