@@ -32,6 +32,9 @@ let MaxVoiceRange = 50;
 
 let playerBlips = [];
 
+var targetChecker = Date.now();
+var clickDisable = false;
+
 traceLastFunc("[Players] CreateVars");
 
 mp.events.add("onOpenChatbox", (toggle) =>
@@ -466,6 +469,42 @@ mp.events.addCommand("updaterate", function (rate) {
 
 mp.events.add('render', () => {
     mp.game.player.restoreStamina(100);
+
+    if(clickDisable) 
+    { 
+        mp.game.controls.disableControlAction(32, 257, true); 
+        mp.game.player.disableFiring(true);
+    }
+    else { mp.game.controls.enableControlAction(32, 257, true); }
+
+    if(Date.now() - targetChecker >= 200 && mp.players.local.weaponAmmo > 0)
+    {
+        targetChecker = Date.now();
+
+        var target = mp.game.player.getEntityIsFreeAimingAt();
+        clickDisable = false;
+        
+        if(target !== undefined)
+        {
+            if(typeof target.getVariable === 'function')
+            {
+                if(target.getVariable("Team") !== undefined) 
+                {
+                    if(target.getVariable("HasShot") !== undefined && mp.players.local.getVariable("Team") != -1) // every player has HasShot, cars don't, this gives us a 100% PLAYER entity handle.
+                    {
+                        if(mp.players.local.getVariable("Team") == target.getVariable("Team")) // Same Team
+                        {
+                            clickDisable = true;
+                        }
+                        if(mp.players.local.getVariable("Team") == 1 && target.getVariable("Team") == 0 && target.getVariable("HasShot") == false) // Tryna shoot a fugitive that hasn't shot.
+                        {
+                            clickDisable = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
 });
 
 
