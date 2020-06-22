@@ -464,9 +464,10 @@ mp.events.addCommand("updaterate", function (rate) {
     mp.gui.chat.push("Updates now happen " + Math.round(1000 / updateRate) + " times a second.");
 });
 
-mp.events.add("addComponentToPlayer", (player, weaponHash, componentHash) => {
-    mp.game.invoke("0xD966D51AA5B28BB9", player.handle, weaponHash >> 0, componentHash >> 0);
+mp.events.add('render', () => {
+    mp.game.player.restoreStamina(100);
 });
+
 
 function OnPlayerWeaponShot(targetPosition, targetEntity)
 {
@@ -486,12 +487,10 @@ function OnPlayerWeaponShot(targetPosition, targetEntity)
                         {
                             if(player.getVariable("Team") == targetEntity.getVariable("Team"))
                             {
-                                this.cancel();
                                 mp.events.callRemote("PlayerShotAtWrongPlayer", 0);
                             }
                             if(player.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
                             {
-                                this.cancel();
                                 mp.events.callRemote("PlayerShotAtWrongPlayer", 1);
                             }
                         }
@@ -503,7 +502,7 @@ function OnPlayerWeaponShot(targetPosition, targetEntity)
                     {
                         if(player.getVariable("Team") == targetEntity.getVariable("Team"))
                         {
-                            this.cancel();
+
                         }
                     }
                 }

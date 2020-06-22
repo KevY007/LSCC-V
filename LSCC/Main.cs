@@ -749,6 +749,12 @@ namespace LSCC
             NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Loading discord plugin.");
             Discord.Main();
 
+            int tick = Environment.TickCount + 5000;
+            while(tick > Environment.TickCount)
+            {
+
+            }
+
             NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Server startup proceeded:\n");
 
             NAPI.Util.ConsoleOutput("[>===========|Los Santos Copchase|===========<]");
