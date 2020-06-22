@@ -40,6 +40,7 @@ namespace LSCC
         public string LoadoutCop { get; set; }
         public string LoadoutFugitive { get; set; }
         public string CarCop { get; set; }
+        public string WeaponComponents { get; set; }
     }
 
     public static class AccountManager

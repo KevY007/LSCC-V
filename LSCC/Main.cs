@@ -10,6 +10,99 @@ using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using CryptSharp.Utility;
 using Microsoft.EntityFrameworkCore.Internal;
+using System.Net;
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System.Globalization;
+
+public partial class jWeaponData
+{
+    [JsonProperty("HashKey")]
+    public string HashKey { get; set; }
+
+    [JsonProperty("NameGXT")]
+    public string NameGxt { get; set; }
+
+    [JsonProperty("DescriptionGXT")]
+    public string DescriptionGxt { get; set; }
+
+    [JsonProperty("Name")]
+    public string Name { get; set; }
+
+    [JsonProperty("Description")]
+    public string Description { get; set; }
+
+    [JsonProperty("Group")]
+    public string Group { get; set; }
+
+    [JsonProperty("ModelHashKey")]
+    public string ModelHashKey { get; set; }
+
+    [JsonProperty("DefaultClipSize")]
+    public long DefaultClipSize { get; set; }
+
+    [JsonProperty("AmmoType", NullValueHandling = NullValueHandling.Ignore)]
+    public string AmmoType { get; set; }
+
+    [JsonProperty("Components")]
+    public Dictionary<ulong, Component> Components { get; set; }
+
+    [JsonProperty("Tints")]
+    public List<LiveryColor> Tints { get; set; }
+
+    [JsonProperty("LiveryColors")]
+    public List<LiveryColor> LiveryColors { get; set; }
+
+    [JsonProperty("DLC")]
+    public string Dlc { get; set; }
+
+    public static Dictionary<ulong, jWeaponData> FromJson(string json) => JsonConvert.DeserializeObject<Dictionary<ulong, jWeaponData>>(json, new JsonSerializerSettings
+    {
+        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+        DateParseHandling = DateParseHandling.None,
+        Converters =
+            {
+                new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
+            },
+    });
+}
+
+public partial class Component
+{
+    [JsonProperty("HashKey")]
+    public string HashKey { get; set; }
+
+    [JsonProperty("NameGXT")]
+    public string NameGxt { get; set; }
+
+    [JsonProperty("DescriptionGXT")]
+    public string DescriptionGxt { get; set; }
+
+    [JsonProperty("Name")]
+    public string Name { get; set; }
+
+    [JsonProperty("Description")]
+    public string Description { get; set; }
+
+    [JsonProperty("ModelHashKey")]
+    public string ModelHashKey { get; set; }
+
+    [JsonProperty("IsDefault")]
+    public bool IsDefault { get; set; }
+
+    [JsonProperty("AmmoType", NullValueHandling = NullValueHandling.Ignore)]
+    public string AmmoType { get; set; }
+}
+
+public partial class LiveryColor
+{
+    [JsonProperty("NameGXT")]
+    public string NameGxt { get; set; }
+
+    [JsonProperty("Name")]
+    public string Name { get; set; }
+}
 
 public class LobbyData
 {
@@ -133,6 +226,7 @@ public static class Settings
     public static int NextRequestID { get; set; }
     public static int LastCountUpdate { get; set; }
     public static List<LoadoutData> Loadouts { get; set; }
+    public static Dictionary<ulong, jWeaponData> WeaponData { get; set; }
 
 
     // Locations
@@ -521,7 +615,7 @@ namespace LSCC
 
         public static void Log(string fileName, string msg)
         {
-            var writer = new System.IO.StreamWriter($"logs/{fileName}", true);
+            var writer = new System.IO.StreamWriter($"lscc/logs/{fileName}", true);
 
             writer.WriteLine(msg);
             writer.Flush();
@@ -540,7 +634,39 @@ namespace LSCC
         [ServerEvent(Event.ResourceStart)]
         public void OnResourceStart()
         {
-            System.IO.Directory.CreateDirectory("logs");
+            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Ensuring LSCC folder..."); 
+            System.IO.Directory.CreateDirectory("lscc");
+
+            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Updating weapondata.json...");
+            try
+            {
+                using (var client = new WebClient())
+                {
+                    client.DownloadFile("https://gist.githubusercontent.com/root-cause/3f29d38179b12245a003fb4fff615335/raw/e107026d7a622d7c73530ed2360ba4604d19f46f/v1868%2520Weapon%2520Data.json", "lscc/weapondata.json.tmp");
+                }
+
+                try
+                {
+                    if (File.Exists("lscc/weapondata.json"))
+                    {
+                        File.Delete("lscc/weapondata.json");
+                    }
+                }
+                catch { NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Failed to clear old weapondata.json, permission problem?"); }
+
+                try
+                {
+                    File.Move("lscc/weapondata.json.tmp", "lscc/weapondata.json");
+                }
+                catch { NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Failed to update weapondata.json! (Complete final version, 'move' fail)"); }
+
+            }
+            catch { NAPI.Util.ConsoleOutput("(LSCC | STARTUP) [Warning] Failed to update weapondata.json (not critical, using old instead, note that server will crash without one.)"); }
+
+            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Ensuring logs folder..."); 
+            System.IO.Directory.CreateDirectory("lscc/logs");
+
+            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) ===== Heading towards final stage of startup =====");
 
             NAPI.Server.SetAutoRespawnAfterDeath(false);
             NAPI.Server.SetAutoSpawnOnConnect(false);
@@ -548,19 +674,15 @@ namespace LSCC
             NAPI.Server.SetCommandErrorMessage("!{#FF6347}[!] !{#FFFFFF}This command is invalid, refer to /help for a list.");
 
             ContextFactory.Instance.Database.EnsureCreated();
+            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Connected to database.");
 
-            NAPI.Util.ConsoleOutput("[>===========|Los Santos Copchase|===========<]");
-            NAPI.Util.ConsoleOutput("[Version]: " + Settings.Version);
-            NAPI.Util.ConsoleOutput("[Developers]: KevY");
-            NAPI.Util.ConsoleOutput($"[Accounts]: {ContextFactory.Instance.Accounts.Count()}");
-            NAPI.Util.ConsoleOutput("[>===========|Los Santos Copchase|===========<]");
-
-           
             Settings.Lobbies = new List<LobbyData>();
             Settings.Requests = new List<RequestData>();
             Settings.LoggedInPlayers = new List<Player>();
             Settings.AdminVehicles = new List<Vehicle>();
             Settings.Loadouts = new List<LoadoutData>();
+
+            Settings.WeaponData = new Dictionary<ulong, jWeaponData>();
 
             Settings.MaxPlayersInLobby = Settings.DefaultMaxInLobby;
             Settings.NextLobbyID = 1;
@@ -570,12 +692,25 @@ namespace LSCC
             NAPI.World.SetTime(12, 0, 0);
             NAPI.World.SetWeather(Weather.CLOUDS);
 
-            for(int i = 0; i < Settings.MaxLobbies; i++)
+            for (int i = 0; i < Settings.MaxLobbies; i++)
             {
                 new LobbyData();
             }
 
+            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Created and initialised settings & enums.");
+
+            try
+            {
+                foreach (KeyValuePair<ulong, jWeaponData> item in jWeaponData.FromJson(File.ReadAllText("lscc/weapondata.json")))
+                {
+                    Settings.WeaponData.Add(item.Key, item.Value);
+                }
+            }
+            catch { NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Unable to load in weapondata.json! Server will work but it can cause crashes due to component data."); }
+            NAPI.Util.ConsoleOutput($"(LSCC | STARTUP) Loading in weapondata.json... ({Settings.WeaponData.Count} weapons/entries)");
+
             /* DEFAULT LOADOUTS CREATION */
+            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Creating the loadouts...");
 
             List<Tuple<WeaponHash, int>> wepList = new List<Tuple<WeaponHash, int>>();
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pistol, 40));
@@ -611,6 +746,18 @@ namespace LSCC
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Assaultrifle_mk2, 120));
             new LoadoutData(0, "Assassin", 20, wepList);
 
+            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Loading discord plugin.");
+            Discord.Main();
+
+            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Server startup proceeded:\n");
+
+            NAPI.Util.ConsoleOutput("[>===========|Los Santos Copchase|===========<]");
+            NAPI.Util.ConsoleOutput("[Version]: " + Settings.Version);
+            NAPI.Util.ConsoleOutput("[Developers]: KevY");
+            NAPI.Util.ConsoleOutput($"[Accounts]: {ContextFactory.Instance.Accounts.Count()}");
+            NAPI.Util.ConsoleOutput("[>===========|Los Santos Copchase|===========<]");
+
+
 
 
             ///////////////////////////////////////////////////////////////////////////////
@@ -618,7 +765,6 @@ namespace LSCC
             TimeUpdate();
             GameUpdate();
 
-            Discord.Main();
         }
 
         public void GameStartCountdown(int time, int lobbyid)

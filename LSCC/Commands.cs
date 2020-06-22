@@ -764,12 +764,20 @@ namespace LSCC
                 }
                 else
                 {
-                    if (i.Value.Contains(wep, StringComparison.CurrentCultureIgnoreCase))
+                    if (!found)
+                    {
+                        if (i.Value.Contains(wep, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            found = true;
+                            wephash = i.Key;
+                            wepname = i.Value;
+                        }
+                    }
+                    if (i.Value.Equals(wep, StringComparison.CurrentCultureIgnoreCase)) // If it's really equal then override old found
                     {
                         found = true;
                         wephash = i.Key;
                         wepname = i.Value;
-                        break;
                     }
                 }
             }
@@ -3270,7 +3278,8 @@ namespace LSCC
             if (action.StartsWith("help", StringComparison.OrdinalIgnoreCase))
             {
                 player.SendChatMessage("!{#FF6347}[Option] !{#999999}list <cop/fugitive> !{#FFFFFF}- Shows all the loadouts for the specific team.");
-                player.SendChatMessage("!{#FF6347}[Option] !{#999999}select <cop/fugitive> <name> !{#FFFFFF}- Sets the specified loadout for a team, fugitive or cop. ('default' for starter loadout)");
+                player.SendChatMessage("!{#FF6347}[Option] !{#999999}<cop/fugitive> <name> !{#FFFFFF}- Sets the specified loadout for a team, fugitive or cop. ('default' for starter loadout)");
+                player.SendChatMessage("!{#FF6347}To select a loadout, execute the command like /loadout team loadoutname, for example: /loadout cop default");
             }
             else if (action.StartsWith("list", StringComparison.OrdinalIgnoreCase))
             {
@@ -3332,81 +3341,72 @@ namespace LSCC
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /loadout list (team), teams: cop OR fugitive");
             }
-            else if (action.StartsWith("select", StringComparison.OrdinalIgnoreCase))
+            else if (action.StartsWith("cop", StringComparison.OrdinalIgnoreCase))
             {
-                string[] args = action.Split(' ', 3);
+                string[] args = action.Split(' ', 2);
                 if (args.Count() > 1)
                 {
-                    if (args[1].StartsWith("cop", StringComparison.OrdinalIgnoreCase))
+                    if (args[1].StartsWith("default", StringComparison.OrdinalIgnoreCase))
                     {
-                        if (args.Count() > 2)
-                        {
-                            if(args[2].StartsWith("default", StringComparison.OrdinalIgnoreCase))
-                            {
-                                EPlayer.GetAccount(player).LoadoutCop = "?";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your loadout for team cop has been set to 'default'.");
-                                return;
-                            }
-                            LoadoutData loadout = Settings.Loadouts.Find(b => b.Team == 1 && b.Name.Equals(args[2], StringComparison.OrdinalIgnoreCase));
-                            
-                            if((loadout != null) == false)
-                            {
-                                player.SendChatMessage("!{#999999}Failed to find a loadout with the specified name. Are you sure that's a cop/valid loadout?");
-                                return;
-                            }
-
-                            if(loadout.LevelRequired > EPlayer.GetAccount(player).Level)
-                            {
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You don't have the required level (" + loadout.LevelRequired.ToString() + ") " + "for this loadout.");
-                                return;
-                            }
-
-                            EPlayer.GetAccount(player).LoadoutCop = loadout.Name;
-                            player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set your cop loadout to " + loadout.Name + ".");
-                        }
-                        else player.SendChatMessage("!{#999999}Proper usage: /loadout select cop (loadout name), for names: /loadout list");
-
-                    }
-                    else if (args[1].StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
-                    {
-                        if (args.Count() > 2)
-                        {
-                            if (args[2].StartsWith("default", StringComparison.OrdinalIgnoreCase))
-                            {
-                                EPlayer.GetAccount(player).LoadoutFugitive = "?";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your loadout for team fugitive has been set to 'default'.");
-                                return;
-                            }
-                            LoadoutData loadout = Settings.Loadouts.Find(b => b.Team == 0 && b.Name.Equals(args[2], StringComparison.OrdinalIgnoreCase));
-
-                            if ((loadout != null) == false)
-                            {
-                                player.SendChatMessage("!{#999999}Failed to find a loadout with the specified name. Are you sure that's a fugitive/valid loadout?");
-                                return;
-                            }
-
-                            if (loadout.LevelRequired > EPlayer.GetAccount(player).Level)
-                            {
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You don't have the required level (" + loadout.LevelRequired.ToString() + ") " + "for this loadout.");
-                                return;
-                            }
-
-                            EPlayer.GetAccount(player).LoadoutFugitive = loadout.Name;
-                            player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set your fugitive loadout to " + loadout.Name + ".");
-                        }
-                        else player.SendChatMessage("!{#999999}Proper usage: /loadout select fugitive (loadout name), for names: /loadout list");
-                    }
-                    else
-                    {
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid team, loadouts are only for 'fugitive' or 'cop' team.");
+                        EPlayer.GetAccount(player).LoadoutCop = "?";
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your loadout for team cop has been set to 'default'.");
                         return;
                     }
+                    LoadoutData loadout = Settings.Loadouts.Find(b => b.Team == 1 && b.Name.Equals(args[1], StringComparison.OrdinalIgnoreCase));
+
+                    if ((loadout != null) == false)
+                    {
+                        player.SendChatMessage("!{#999999}Failed to find a loadout with the specified name. Are you sure that's a cop/valid loadout?");
+                        return;
+                    }
+
+                    if (loadout.LevelRequired > EPlayer.GetAccount(player).Level)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You don't have the required level (" + loadout.LevelRequired.ToString() + ") " + "for this loadout.");
+                        return;
+                    }
+
+                    EPlayer.GetAccount(player).LoadoutCop = loadout.Name;
+                    player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set your cop loadout to " + loadout.Name + ".");
                 }
-                else player.SendChatMessage("!{#999999}Proper usage: /loadout select (team), teams: cop OR fugitive");
+                else player.SendChatMessage("!{#999999}Proper usage: /loadout cop (loadout name), for names: /loadout list");
+            }
+            else if (action.StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
+            {
+                string[] args = action.Split(' ', 2);
+                if (args.Count() > 1)
+                {
+                    if (args[1].StartsWith("default", StringComparison.OrdinalIgnoreCase))
+                    {
+                        EPlayer.GetAccount(player).LoadoutFugitive = "?";
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your loadout for team fugitive has been set to 'default'.");
+                        return;
+                    }
+                    LoadoutData loadout = Settings.Loadouts.Find(b => b.Team == 0 && b.Name.Equals(args[1], StringComparison.OrdinalIgnoreCase));
+
+                    if ((loadout != null) == false)
+                    {
+                        player.SendChatMessage("!{#999999}Failed to find a loadout with the specified name. Are you sure that's a fugitive/valid loadout?");
+                        return;
+                    }
+
+                    if (loadout.LevelRequired > EPlayer.GetAccount(player).Level)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You don't have the required level (" + loadout.LevelRequired.ToString() + ") " + "for this loadout.");
+                        return;
+                    }
+
+                    EPlayer.GetAccount(player).LoadoutFugitive = loadout.Name;
+                    player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set your fugitive loadout to " + loadout.Name + ".");
+                }
+                else player.SendChatMessage("!{#999999}Proper usage: /loadout fugitive (loadout name), for names: /loadout list");
             }
 
-            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'help', 'select', 'list'");
-
+            else
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'help', 'list', 'cop (loadout)', or 'fugitive (loadout)'");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please refer to /loadout help on how to select.");
+            }
             return;
         }
 

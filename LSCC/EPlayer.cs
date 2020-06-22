@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -7,6 +8,8 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using GTANetworkAPI;
 using LSCC;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace LSCC
 {
@@ -132,6 +135,27 @@ namespace LSCC
             this.LipstickColor = 0;
             this.ChestHairColor = 0;
         }
+    }
+
+    public partial class wComponentData
+    {
+        [JsonProperty("Components")]
+        public List<ulong> Components { get; set; }
+
+        public wComponentData()
+        {
+            Components = new List<ulong>();
+        }
+
+        public static Dictionary<ulong, wComponentData> FromJson(string json) => JsonConvert.DeserializeObject<Dictionary<ulong, wComponentData>>(json, new JsonSerializerSettings
+        {
+            MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+            DateParseHandling = DateParseHandling.None,
+            Converters =
+            {
+                new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
+            },
+        });
     }
 
     public class CarSelectorData
@@ -525,6 +549,40 @@ namespace LSCC
                 player.GiveWeapon(WeaponHash.Pistol, 100);
             }
 
+            if (EPlayer.GetAccount(player).WeaponComponents != null && EPlayer.GetAccount(player).WeaponComponents.Length > 3)
+            {
+                var weapons = Enum.GetValues(typeof(WeaponHash)).Cast<WeaponHash>();
+                weapons.ToList().ForEach(wep =>
+                {
+                    int ammo = player.GetWeaponAmmo(wep);
+                    if (ammo > 0)
+                    {
+                        wComponentData wepComps;
+
+                        wComponentData.FromJson(EPlayer.GetAccount(player).WeaponComponents).TryGetValue((ulong)wep, out wepComps);
+
+                        jWeaponData wepdat;
+                        if (Settings.WeaponData.TryGetValue((ulong)wep, out wepdat))
+                        {
+                            foreach (ulong compid in wepComps.Components)
+                            {
+                                Component comp;
+                                if (wepdat.Components.TryGetValue(compid, out comp))
+                                {
+                                    foreach (Player i in RAGE.Entities.Players.All)
+                                    {
+                                        if (i.Dimension == player.Dimension)
+                                        {
+                                            i.TriggerEvent("addComponentToPlayer", player, (ulong)wep, compid);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
             player.GiveWeapon(WeaponHash.Stungun, 1);
 
             player.SendChatMessage("!{#FF6347}[TASER] !{#FFFFFF}You have been equipped with a stungun, shoot at a fugitive that hasn't shot to tase them.");
@@ -564,6 +622,40 @@ namespace LSCC
             {
                 player.GiveWeapon(WeaponHash.Pistol, 100);
                 player.GiveWeapon(WeaponHash.Pumpshotgun, 20);
+            }
+
+            if (EPlayer.GetAccount(player).WeaponComponents != null && EPlayer.GetAccount(player).WeaponComponents.Length > 3)
+            {
+                var weapons = Enum.GetValues(typeof(WeaponHash)).Cast<WeaponHash>(); 
+                weapons.ToList().ForEach(wep =>
+                {
+                    int ammo = player.GetWeaponAmmo(wep);
+                    if (ammo > 0)
+                    {
+                        wComponentData wepComps;
+
+                        wComponentData.FromJson(EPlayer.GetAccount(player).WeaponComponents).TryGetValue((ulong)wep, out wepComps);
+
+                        jWeaponData wepdat;
+                        if (Settings.WeaponData.TryGetValue((ulong)wep, out wepdat))
+                        {
+                            foreach (ulong compid in wepComps.Components)
+                            {
+                                Component comp;
+                                if (wepdat.Components.TryGetValue(compid, out comp))
+                                {
+                                    foreach (Player i in RAGE.Entities.Players.All)
+                                    {
+                                        if (i.Dimension == player.Dimension)
+                                        {
+                                            i.TriggerEvent("addComponentToPlayer", player, (ulong)wep, compid);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
             }
             return;
         }
