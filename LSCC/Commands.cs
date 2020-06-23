@@ -751,7 +751,38 @@ namespace LSCC
                 wephash = 0;
             }
 
-            foreach (KeyValuePair<uint, string> i in Main.WeaponReasons)
+            foreach (KeyValuePair<ulong, jWeaponData> i in Settings.WeaponData)
+            {
+                if (wephash != 0)
+                {
+                    if (i.Key == wephash)
+                    {
+                        found = true;
+                        wepname = i.Value.Name;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (!found)
+                    {
+                        if (i.Value.Name.Contains(wep, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            found = true;
+                            wephash = i.Key;
+                            wepname = i.Value.Name;
+                        }
+                    }
+                    if (i.Value.Name.Equals(wep, StringComparison.CurrentCultureIgnoreCase)) // If it's really equal then override old found
+                    {
+                        found = true;
+                        wephash = i.Key;
+                        wepname = i.Value.Name;
+                    }
+                }
+            }
+
+            foreach (KeyValuePair<ulong, string> i in Main.WeaponReasons)
             {
                 if (wephash != 0)
                 {
@@ -819,7 +850,38 @@ namespace LSCC
                 wephash = 0;
             }
 
-            foreach (KeyValuePair<uint, string> i in Main.WeaponReasons)
+            foreach (KeyValuePair<ulong, jWeaponData> i in Settings.WeaponData)
+            {
+                if (wephash != 0)
+                {
+                    if (i.Key == wephash)
+                    {
+                        found = true;
+                        wepname = i.Value.Name;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (!found)
+                    {
+                        if (i.Value.Name.Contains(wep, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            found = true;
+                            wephash = i.Key;
+                            wepname = i.Value.Name;
+                        }
+                    }
+                    if (i.Value.Name.Equals(wep, StringComparison.CurrentCultureIgnoreCase)) // If it's really equal then override old found
+                    {
+                        found = true;
+                        wephash = i.Key;
+                        wepname = i.Value.Name;
+                    }
+                }
+            }
+
+            foreach (KeyValuePair<ulong, string> i in Main.WeaponReasons)
             {
                 if (wephash != 0)
                 {
@@ -3320,9 +3382,15 @@ namespace LSCC
 
                                 string wepname = "";
 
-                                foreach (KeyValuePair<uint, string> i in Main.WeaponReasons)
+                                jWeaponData wepDat = new jWeaponData();
+                                if(Settings.WeaponData.TryGetValue((ulong)weapon.Item1, out wepDat))
                                 {
-                                    if (i.Key == (uint)weapon.Item1)
+                                    wepname = wepDat.Name;
+                                }
+
+                                foreach (KeyValuePair<ulong, string> i in Main.WeaponReasons)
+                                {
+                                    if (i.Key == (ulong)weapon.Item1 && wepname.Length < 2)
                                     {
                                         wepname = i.Value;
                                         break;

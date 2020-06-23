@@ -324,7 +324,7 @@ namespace LSCC
             }
             return seats;
         }
-        public static IDictionary<uint, string> WeaponReasons = new Dictionary<uint, string>()
+        public static IDictionary<ulong, string> WeaponReasons = new Dictionary<ulong, string>()
         {
             {2460120199, "Antique Cavalry Dagger"},
 	        {2508868239, "Baseball Bat"},

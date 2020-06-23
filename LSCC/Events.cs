@@ -318,10 +318,21 @@ namespace LSCC
 
             string reasonStr;
             bool wasInGame = false;
-            if (!Main.WeaponReasons.TryGetValue(reason, out reasonStr))
+            jWeaponData wepDat = new jWeaponData();
+
+            if (Main.WeaponReasons.TryGetValue(reason, out reasonStr))
+            {
+                // oh its already set ^^
+            }
+            else if(Settings.WeaponData.TryGetValue((ulong)reason, out wepDat))
+            {
+                reasonStr = wepDat.Name;
+            }
+            else
             {
                 reasonStr = null;
             }
+
             if (reason == 696988) reasonStr = "handcuffs";
 
             if (reasonStr != null)
