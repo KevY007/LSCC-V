@@ -66,7 +66,7 @@ mp.events.add('browserDomReady', (ebrowser) => {
             return;
         }
 
-        mp.players.forEach(
+        mp.players.forEachFast(
             (player) => {
                 //browser.execute('createUser("N/A", "' + player.name + '", "N/A", "N/A", ' + player.getVariable("Color_R") + ', ' + player.getVariable("Color_G") + ', ' + player.getVariable("Color_B") + ')');
                 updatePlayer(player);
@@ -86,7 +86,7 @@ mp.events.add('browserDomReady', (ebrowser) => {
             }
             else if(browser != null && forceOff != true)
             {
-                mp.players.forEach(
+                mp.players.forEachFast(
                     (player) => {
                         updatePlayer(player);
                     }

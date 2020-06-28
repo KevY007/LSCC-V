@@ -222,12 +222,13 @@ function UpdateTimer()
 
             traceLastFunc(`[Players] Update VoiceData`);
 
-            mp.players.forEachInStreamRange(target => {
+            mp.players.forEachFast(target => {
+                target.voiceVolume = 0.0;
+                if(!target.voice3d) target.voice3d = true;
+
                 if(target.dimension == mp.players.local.dimension && mp.players.exists(target) && target != mp.players.local && 
                     target.handle !== 0)
                 {
-                    if(!target.voice3d) target.voice3d = true;
-    
                     const playerPos = target.position;
                     var localPos = mp.players.local.position;
                     let dist = mp.game.system.vdist(playerPos.x, playerPos.y, playerPos.z, localPos.x, localPos.y, localPos.z);
@@ -287,7 +288,7 @@ function UpdateTimer()
 
                 var TimeNow = 0;
 
-                mp.players.forEach(target => {
+                mp.players.forEachFast(target => {
 
                     if(target.getVariable("pLogged") !== undefined && target.getVariable("InLobby") == -4)
                     {
@@ -381,20 +382,19 @@ function UpdateTimer()
 
     traceLastFunc(`[Players] Blips Stage1`);
 
-    for (let i = 0; i < mp.blips.length; i++)
-    {
-        if(mp.blips.at(i) !== undefined && mp.blips.at(i) != null && mp.blips.at(i).id !== undefined)
+    mp.blips.forEach(eblip => {
+        var index = playerBlips.indexOf(eblip.id);
+        if(index != -1)
         {
-            var index = playerBlips.indexOf(mp.blips.at(i).id);
-            if(index != -1)
-            {
-                mp.blips.at(i).destroy();
-            }
+            eblip.destroy();
         }
-    }
+    });
+
+    playerBlips = [];
+
     traceLastFunc(`[Players] Blips Stage2`);
 
-    mp.players.forEach(target => {
+    mp.players.forEachFast(target => {
 
         if(target.dimension == mp.players.local.dimension/* && target != mp.players.local*/)
         {
@@ -716,8 +716,8 @@ mp.events.add(
         "ToggleChaseCollisions": (toggle) => {
             if(toggle)
             {
-                mp.vehicles.forEach(target => {
-                    mp.vehicles.forEach(target2 => {
+                mp.vehicles.forEachFast(target => {
+                    mp.vehicles.forEachFast(target2 => {
                         target.setNoCollision(target2.handle, true);
                         target2.setNoCollision(target.handle, true);
 
@@ -728,8 +728,8 @@ mp.events.add(
             }
             else
             {
-                mp.vehicles.forEach(target => {
-                    mp.vehicles.forEach(target2 => {
+                mp.vehicles.forEachFast(target => {
+                    mp.vehicles.forEachFast(target2 => {
                         target.setNoCollision(target2.handle, false);
                         target2.setNoCollision(target.handle, false);
 
