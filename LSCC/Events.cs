@@ -1264,6 +1264,18 @@ namespace LSCC
                                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to SWAT Truck.");
                                     break;
                                 }
+                            case "Charger '16 (U)":
+                                {
+                                    EPlayer.GetAccount(player).CarCop = "udchall1";
+                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Unmarked Dodge Charger 2016.");
+                                    break;
+                                }
+                            case "Charger '14 (U)":
+                                {
+                                    EPlayer.GetAccount(player).CarCop = "udchall2";
+                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Unmarked Dodge Charger 2014.");
+                                    break;
+                                }
                         }
                     }
                 }

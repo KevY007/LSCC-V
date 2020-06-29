@@ -1654,6 +1654,8 @@ namespace LSCC
                             { "Police Buffalo (U)", "images/polbufac2.png", 10, "Unmarked Variant" },
                             { "FBI Buffalo", "images/fbibufac.png", 12, "FBI Variant of Buffalo" },
                             { "FBI Granger", "images/fbi2.png", 12, "Space for 8 occupants" },
+                            { "Charger '14 (U)", "images/udchall2.png", 13, "Vroom..." },
+                            { "Charger '16 (U)", "images/udchall1.png", 14, "Newer vroom." },
                             { "Chopper", "images/polmav.png", 15, "Police Maverick, Air Support" },
                             { "SWAT Truck", "images/riot.png", 30, "Heavily armored and spacious" },
                         },
