@@ -70,6 +70,17 @@ namespace LSCC
             EPlayer.LoginBrowserSetup(player);
 
             player.TriggerEvent("InitChaseTimer");
+
+            NAPI.Task.Run(() =>
+            {
+                lock (player)
+                {
+                    if (player != null && player.Exists)
+                    {
+                        EPlayer.LoginCameraSetup(player);
+                    }
+                }
+            }, 2000);
         }
 
         [ServerEvent(Event.PlayerWeaponSwitch)]
