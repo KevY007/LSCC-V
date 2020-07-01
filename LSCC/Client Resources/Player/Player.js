@@ -477,14 +477,14 @@ mp.events.add('render', () => {
     }
     else { mp.game.controls.enableControlAction(32, 257, true); }
 
-    if(Date.now() - targetChecker >= 200 && mp.players.local.weaponAmmo > 0)
+    if(Date.now() - targetChecker >= 125)
     {
         targetChecker = Date.now();
 
         var target = mp.game.player.getEntityIsFreeAimingAt();
         clickDisable = false;
-        
-        if(target !== undefined)
+
+        if(mp.players.local.weaponAmmo > 0 && target !== undefined) 
         {
             if(typeof target.getVariable === 'function')
             {
@@ -498,7 +498,8 @@ mp.events.add('render', () => {
                         }
                         if(mp.players.local.getVariable("Team") == 1 && target.getVariable("Team") == 0 && target.getVariable("HasShot") == false) // Tryna shoot a fugitive that hasn't shot.
                         {
-                            clickDisable = true;
+                            if(mp.players.local.weapon != 911657153) clickDisable = true;
+                            // Weapon != StunGun
                         }
                     }
                 }

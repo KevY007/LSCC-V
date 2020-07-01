@@ -1295,12 +1295,12 @@ namespace LSCC
             {
                 if (player.GetSharedData<int>("InLobby") <= -1)
                 {
-                    player.SendChatMessage($">> !{{#DAA520}}Arena {i} | !{{#FF6347}}{Settings.DMNames[i]} " +
+                    player.SendChatMessage($">> !{{#DAA520}}Arena ID {i} | !{{#FF6347}}{Settings.DMNames[i]} " +
                            $"!{{#DAA520}}| Players: N/A (No lobby)");
                 }
                 else
                 {
-                    player.SendChatMessage($">> !{{#DAA520}}Arena {i} | !{{#FF6347}}{Settings.DMNames[i]} " +
+                    player.SendChatMessage($">> !{{#DAA520}}Arena ID {i} | !{{#FF6347}}{Settings.DMNames[i]} " +
                        $"!{{#DAA520}}| Players: " +
                        $"{Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == i)}");
                 }
@@ -1311,7 +1311,7 @@ namespace LSCC
         }
 
         [Command("dm")]
-        public void cmd_dm(Player player, int arena)
+        public void cmd_dm(Player player, int arenaid)
         {
             if (!EPlayer.LoggedIn(player)) return;
             if (EPlayer.GetAccount(player).JailTime > 0) return;
@@ -1322,7 +1322,7 @@ namespace LSCC
                 return;
             }
 
-            if (arena < 0 || arena >= Settings.DMNames.Length)
+            if (arenaid < 0 || arenaid >= Settings.DMNames.Length)
             {
                 player.SendChatMessage("!{#FF6347}Invalid DM arena ID! /dmarenas to see all the arenas.");
                 return;
@@ -1344,12 +1344,12 @@ namespace LSCC
             }
             
 
-            player.SetSharedData("InDM", arena);
+            player.SetSharedData("InDM", arenaid);
 
-            int spawnID = new Random().Next(Settings.DMSpawns[arena].GetLength(0));
-            Vector3 dmSpawn = (Vector3)Settings.DMSpawns[arena][spawnID, 0];
+            int spawnID = new Random().Next(Settings.DMSpawns[arenaid].GetLength(0));
+            Vector3 dmSpawn = (Vector3)Settings.DMSpawns[arenaid][spawnID, 0];
             EPlayer.Spawn(player, false, dmSpawn);
-            player.SendChatMessage($"[!] !{{#FFFF00}}Sending you to !{{#FF6347}}DM: {Settings.DMNames[arena]}.");
+            player.SendChatMessage($"[!] !{{#FFFF00}}Sending you to !{{#FF6347}}DM: {Settings.DMNames[arenaid]}.");
 
             return;
         }
@@ -1634,47 +1634,38 @@ namespace LSCC
 
             if (action.StartsWith("help", StringComparison.OrdinalIgnoreCase))
             {
-                player.SendChatMessage("!{#FF6347}[Option] !{#999999}select <cop> !{#FFFFFF}- Shows the car selection for cops.");
+                player.SendChatMessage("!{#FF6347}[Option] !{#999999}cop !{#FFFFFF}- Shows the car selection for cops.");
             }
-            else if (action.StartsWith("select", StringComparison.OrdinalIgnoreCase))
+            else if (action.StartsWith("cop", StringComparison.OrdinalIgnoreCase))
             {
-                string[] args = action.Split(' ');
-                if (args.Count() > 1)
+
+                CarSelectorData a = new CarSelectorData(
+                new object[,]
                 {
-                    if (args[1].StartsWith("cop", StringComparison.OrdinalIgnoreCase))
-                    {
-                        CarSelectorData a = new CarSelectorData(
-                        new object[,]
-                        {
-                            { "Default", "images/default.png", 0, "Random starter vehicles" },
-                            { "Police Cruiser", "images/polc1.png", 0, "Default Cruiser" },
-                            { "Police Cruiser (U)", "images/polc2.png", 2, "Unmarked Variant" },
-                            { "Police Bike", "images/policeb.png", 3, "You don't wanna drive this" },
-                            { "Police Buffalo", "images/polbufac.png", 5, "Buffalo Police Cruiser" },
-                            { "Police Buffalo (U)", "images/polbufac2.png", 10, "Unmarked Variant" },
-                            { "FBI Buffalo", "images/fbibufac.png", 12, "FBI Variant of Buffalo" },
-                            { "FBI Granger", "images/fbi2.png", 12, "Space for 8 occupants" },
-                            { "Charger '14 (U)", "images/udchall2.png", 13, "Vroom..." },
-                            { "Charger '16 (U)", "images/udchall1.png", 14, "Newer vroom." },
-                            { "Chopper", "images/polmav.png", 15, "Police Maverick, Air Support" },
-                            { "SWAT Truck", "images/riot.png", 30, "Heavily armored and spacious" },
-                        },
-                        EPlayer.GetAccount(player).Level);
+                    { "Default", "images/default.png", 0, "Random starter vehicles" },
+                    { "Police Cruiser", "images/polc1.png", 0, "Default Cruiser" },
+                    { "Police Cruiser (U)", "images/polc2.png", 2, "Unmarked Variant" },
+                    { "Police Bike", "images/policeb.png", 3, "You don't wanna drive this" },
+                    { "Police Buffalo", "images/polbufac.png", 5, "Buffalo Police Cruiser" },
+                    { "Police Buffalo (U)", "images/polbufac2.png", 10, "Unmarked Variant" },
+                    { "FBI Buffalo", "images/fbibufac.png", 12, "FBI Variant of Buffalo" },
+                    { "FBI Granger", "images/fbi2.png", 12, "Space for 8 occupants" },
+                    { "Charger '14 (U)", "images/udchall2.png", 13, "Vroom..." },
+                    { "Charger '16 (U)", "images/udchall1.png", 14, "Newer vroom." },
+                    { "Chopper", "images/polmav.png", 15, "Police Maverick, Air Support" },
+                    { "SWAT Truck", "images/riot.png", 30, "Heavily armored and spacious" },
+                },
+                EPlayer.GetAccount(player).Level);
 
-                        player.SetData("ViewingCarSelector", true);
-                        player.SetData("ViewingCarSelectorTeam", 1);
-                        player.TriggerEvent("showCarSelector", NAPI.Util.ToJson(a));
-                    }
-                    else
-                    {
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid team, cars are only for 'cop' team.");
-                        return;
-                    }
-                }
-                else player.SendChatMessage("!{#999999}Proper usage: /car select (team), teams: cop");
+                player.SetData("ViewingCarSelector", true);
+                player.SetData("ViewingCarSelectorTeam", 1);
+                player.TriggerEvent("showCarSelector", NAPI.Util.ToJson(a));
             }
-
-            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'help', 'select'");
+            else
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'help', 'cop'");
+                return;
+            }
 
             return;
         }
