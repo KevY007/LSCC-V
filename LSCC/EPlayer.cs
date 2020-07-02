@@ -503,6 +503,43 @@ namespace LSCC
             }
         }
 
+        public static void Warn(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            lock (player)
+            {
+                Account Acc = EPlayer.GetAccount(player);
+                Acc.Warns++;
+
+                if(Acc.Warns < 10)
+                {
+                    player.SendChatMessage("!{#FF6347}You have been warned, be careful next time. After 10 warns you will receive jailtime on every warn until 20 warns.");
+                }
+                else
+                {
+                    if (Acc.Warns >= 20)
+                    {
+                        player.SendChatMessage($"!{{#FF6347}}Mate, you've got like 20 warns, are you on a death route or what? I'm letting you go this time. - KevY");
+                        Acc.Warns = 0;
+                    }
+                    else
+                    {
+                        decimal jTime = (decimal)Acc.Warns / (decimal)2;
+
+                        int jailTime = (int)Decimal.Round(jTime);
+
+                        EPlayer.Jail(player, jailTime, $"Exceeding {Acc.Warns} warns.");
+
+                        RAGE.Entities.Players.All.ForEach((Player p) =>
+                        {
+                            p.SendChatMessage($"!{{#FF6347}}[AdmCmd] SERVER has jailed {player.Name} for {jailTime} mins, reason: Exceeding {Acc.Warns} warns.");
+                        });
+                    }
+                }
+            }
+        }
+
         public static void GiveCopWeapons(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return;

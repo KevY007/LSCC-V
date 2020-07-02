@@ -1161,7 +1161,7 @@ namespace LSCC
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your username cannot contain the character '@'");
                 return;
             }
-            Account acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username == username);
+            Account acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase) == true);
             if (acc != null)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}An account with this name already exists!");
@@ -1197,6 +1197,8 @@ namespace LSCC
                 JailReason = "N/A",
                 Level = 1,
                 XP = 1,
+                Warns = 0,
+                Suspended = false,
                 DonatorLevel = 0,
                 RockstarID = player.SocialClubId,
                 LobbyClothing = 1,

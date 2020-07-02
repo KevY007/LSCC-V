@@ -18,7 +18,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
 
@@ -106,7 +106,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
 
@@ -249,7 +249,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
 
@@ -422,7 +422,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
 
@@ -449,7 +449,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
 
@@ -478,7 +478,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
 
@@ -502,7 +502,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
 
@@ -525,7 +525,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
 
@@ -548,7 +548,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
 
@@ -572,7 +572,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
 
@@ -591,7 +591,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
 
@@ -610,7 +610,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
 
@@ -1012,7 +1012,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
 
@@ -1774,7 +1774,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
 
@@ -1825,6 +1825,36 @@ namespace LSCC
             return;
         }
 
+        [Command("unsuspend", GreedyArg = true)]
+        public void cmd_unsuspend(Player player, string name)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+         
+            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true && 
+            p.Suspended == true);
+
+            if ((tpAcc != null) == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no suspended account with that name.");
+                return;
+            }
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unsuspend:{tpAcc.Username}"); } catch { }
+
+            tpAcc.Suspended = false;
+            ContextFactory.Instance.SaveChanges();
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has unsuspended {tpAcc.Username}.");
+            return;
+        }
+
         [Command("unban", GreedyArg = true)]
         public void cmd_unban(Player player, string sqlorname)
         {
@@ -1833,7 +1863,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
 
@@ -1852,7 +1882,7 @@ namespace LSCC
             if (sqlid != -1) ban = ContextFactory.Instance.Bans.ToList().Find(a => a.SQL_ID == sqlid);
             else
             {
-                Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.CompareTo(sqlorname) == 0);
+                Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(sqlorname, StringComparison.OrdinalIgnoreCase) == true);
                 if (tpAcc != null)
                 {
                     ban = ContextFactory.Instance.Bans.ToList().Find(a => a.AccountSQLID == tpAcc.SQL_ID);
@@ -1891,7 +1921,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
 
@@ -1940,6 +1970,56 @@ namespace LSCC
             }, 350);
 
            
+            return;
+        }
+
+        [Command("suspend")]
+        public void cmd_suspend(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player) || !EPlayer.LoggedIn(target))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+            if (EPlayer.GetAccount(player).Admin < EPlayer.GetAccount(target).Admin)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is more higher admin level than you!");
+                return;
+            }
+
+            EPlayer.GetAccount(target).Suspended = true;
+
+            ContextFactory.Instance.SaveChanges();
+
+            EPlayer.SetDiscordStatus(target, "Suspened from LS-CC.");
+
+            RAGE.Entities.Players.All.ForEach((Player p) =>
+            {
+                p.SendChatMessage($"!{{#FF6347}}[AdmCmd] {player.Name} has suspended {target.Name}'s account.");
+            });
+
+            target.SendChatMessage($"!{{#FF6347}}[SUSPEND] Your account has been suspended and cannot be used anymore.");
+
+            target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:suspend:{target.Name}"); } catch { }
+
+            NAPI.Task.Run(() =>
+            {
+                lock (target)
+                {
+                    if (target != null && target.Exists)
+                    {
+                        target.Kick("Banned.");
+                    }
+                }
+            }, 350);
+
+
             return;
         }
 
@@ -2216,12 +2296,12 @@ namespace LSCC
                 player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /set(hp/ar) /spec");
                 player.SendChatMessage("[Admin Lv 1]: /freeze /unfreeze /kick /slap /setinv(ulnerable) /specoff");
                 player.SendChatMessage("[Admin Lv 1]: /bancheck /jail /unjail /fix /sendtolobby /set(time/weather)");
-                player.SendChatMessage("[Admin Lv 1]: /mute /unmute");
+                player.SendChatMessage("[Admin Lv 1]: /mute /unmute /warn /unwarn");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
                 player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword");
-                player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension /r(emove)guns");
+                player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension /r(emove)guns /suspend /unsuspend");
             }
             if (EPlayer.GetAccount(player).Admin >= 3)
             {
@@ -2520,7 +2600,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
 
@@ -2802,7 +2882,7 @@ namespace LSCC
                 return;
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
             else
@@ -2823,7 +2903,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
             else
@@ -2844,7 +2924,7 @@ namespace LSCC
                 return;
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
             else
@@ -2864,7 +2944,7 @@ namespace LSCC
                 return;
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
             else
@@ -2883,7 +2963,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
             else
@@ -2912,7 +2992,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
             else
@@ -2926,7 +3006,7 @@ namespace LSCC
 
                 EPlayer.Jail(target, mins, reason);
             }
-
+            return;
         }
 
         [Command("unjail", GreedyArg = true)]
@@ -2939,7 +3019,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
             else
@@ -2956,7 +3036,60 @@ namespace LSCC
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has unjailed {target.Name}.");
                 EPlayer.Spawn(target);
             }
+            return;
+        }
 
+        [Command("warn", GreedyArg = true)]
+        public void cmd_warn(Player player, Player target, string reason)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (!EPlayer.LoggedIn(target)) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target not logged in."); return; }
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+            else
+            {
+                RAGE.Entities.Players.All.ForEach((Player playa) =>
+                {
+                    playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] {player.Name} has warned {target.Name} for {reason}.");
+                });
+
+                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:warn:{target.Name}:{reason.Replace(":", "|")}"); } catch { }
+
+                EPlayer.Warn(target);
+            }
+            return;
+        }
+
+        [Command("unwarn", GreedyArg = true)]
+        public void cmd_unwarn(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (!EPlayer.LoggedIn(target)) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target not logged in."); return; }
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+            else
+            {
+                Account acc = EPlayer.GetAccount(target);
+                if (acc.Warns < 1) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has no warns at all."); return; }
+
+                acc.Warns--;
+                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unwarn:{target.Name}"); } catch { }
+
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has removed {target.Name}'s last warn.");
+            }
+            return;
         }
 
         [Command("mute", GreedyArg = true)]
@@ -2969,7 +3102,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
             else
@@ -3002,7 +3135,7 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
             else
@@ -3063,7 +3196,7 @@ namespace LSCC
                 return;
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not an admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
             else
