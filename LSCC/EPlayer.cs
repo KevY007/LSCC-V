@@ -423,6 +423,8 @@ namespace LSCC
                 player.SetData("HUDState", true);
                 player.SetSharedData("DerbyTime", 0);
                 player.SetData("DerbySpawnTick", 0);
+                player.SetData("FreeroamTime", 12);
+                player.SetData("FreeroamWeather", 0);
                 player.ResetData("ViewingCarSelectorTeam");
                 player.ResetData("ViewingCarSelector");
                 player.SetSharedData("HasShot", false);

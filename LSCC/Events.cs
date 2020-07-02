@@ -1545,6 +1545,8 @@ namespace LSCC
 
                     player.SetSharedData("VisibleBlip", true);
 
+                    player.TriggerEvent("SetTimeWeather", player.GetData<int>("FreeroamTime"), 0, 0, player.GetData<int>("FreeroamWeather"));
+
                     player.RemoveAllWeapons();
 
                     player.Dimension = 256;

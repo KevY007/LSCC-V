@@ -325,6 +325,58 @@ namespace LSCC
             return;
         }
 
+        [Command("mytime", Alias = "myt")]
+        public void cmd_mytime(Player player, int hour)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension != 256)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                return;
+            }
+
+            if (hour < 0 || hour > 23)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Hours are between 0-23.");
+                return;
+            }
+
+            player.SetData("FreeroamTime", hour);
+            player.SendChatMessage("!{#FF6347}>> !{#FFFFFF}You have set your time/hour to " + hour + ".");
+
+            player.TriggerEvent("SetTimeWeather", player.GetData<int>("FreeroamTime"), 0, 0, player.GetData<int>("FreeroamWeather"));
+
+            return;
+        }
+
+        [Command("myweather", Alias = "myw")]
+        public void cmd_myweather(Player player, int weatherid)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension != 256)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                return;
+            }
+
+            if(weatherid < 0 || weatherid > 9)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Weather ID's are between 0-9.");
+                return;
+            }
+
+            player.SetData("FreeroamWeather", weatherid);
+            player.SendChatMessage("!{#FF6347}>> !{#FFFFFF}You have set your weather to " + weatherid + ".");
+
+            player.TriggerEvent("SetTimeWeather", player.GetData<int>("FreeroamTime"), 0, 0, player.GetData<int>("FreeroamWeather"));
+
+            return;
+        }
+
         [Command("forcelogin", Alias = "flogin")]
         public static void cmd_forcelogin(Player player, Player target, string acc, string pass)
         {
@@ -1670,6 +1722,17 @@ namespace LSCC
             return;
         }
 
+        [Command("customvehlist")]
+        public void cmd_customvehlist(Player player)
+        {
+            player.SendChatMessage("Model 'udchall(1/2)' - Dodge Charger 2016 & 14 (udchall1 & udchall2)");
+            player.SendChatMessage("Model 'polbufac' - Police Buffalo (polbufac2 for Unmarked)");
+            player.SendChatMessage("Model 'fbibufac' - FIB Buffalo");
+            player.SendChatMessage("Model 'sherbufac' - Sheriff Buffalo (sherbufac2 for Unmaarked)");
+            player.SendChatMessage("Model 'hwaybufac' - Highway Buffalo (hwaybufac2 for Unmaarked)");
+            return;
+        }
+
         [Command("cmds", Alias = "help")]
         public void cmd_help(Player player)
         {
@@ -1685,7 +1748,9 @@ namespace LSCC
             player.SendChatMessage("!{#339BC4}[Cop!{#F24C27}chase]: !{#FFFFFF}/r(adio) /wt /loadout /car");
             player.SendChatMessage("!{#61A9FA}[Cop]: /gps /cuff /m(egaphone)");
             player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup /s(top)a(nim)");
-            player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /freeroam /veh /teleport /dm /dmarenas /derby");
+            player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /derby");
+            player.SendChatMessage("!{#28E0DA}[Mode: DM]: /dm /dmarena");
+            player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /freeroam /veh /customvehlist /teleport /mytime /myweather");
             player.SendChatMessage("!{#A5A8A8}[Debug]: /pos /updaterate");
 
             if (EPlayer.GetAccount(player).DonatorLevel >= 1)
