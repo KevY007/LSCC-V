@@ -8,3 +8,6 @@ admin records system
 
 Check out + Added server-side: NAPI.Task.WaitForMainThread(int delayTime = 0) (Task-based NAPI.Task.Run alternative, could be used with async/await)
 in 1.1 xperimental when it is released.
+reset time on death in derby
+check imrpovements
+jail 0 min = bug (dont allow 0 min jail
