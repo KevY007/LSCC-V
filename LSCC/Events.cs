@@ -61,6 +61,7 @@ namespace LSCC
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has joined the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
             NAPI.Notification.SendNotificationToPlayer(player, "~g~Welcome to ~w~Los Santos Copchase!");
             player.SetData("LastCryptAttempt", Environment.TickCount);
+
             EPlayer.ResetPlayerData(player);
             EPlayer.Freeze(player, true);
 
@@ -70,6 +71,8 @@ namespace LSCC
             EPlayer.LoginBrowserSetup(player);
 
             player.TriggerEvent("InitChaseTimer");
+
+            player.TriggerEvent("PlayThemeSong");
 
             NAPI.Task.Run(() =>
             {
@@ -654,6 +657,7 @@ namespace LSCC
 
         public static void OnPlayerLogin(Player player, Account acc)
         {
+            player.TriggerEvent("StopThemeSong");
             Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in as {acc.Username}.*");
 
             EPlayer.SetDiscordStatus(player, $"Logging in as {acc.Username}");
@@ -689,7 +693,7 @@ namespace LSCC
 
             try
             {
-                if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata- sending to creation."));
+                if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata-8 sending to creation."));
 
                 ConvChar = NAPI.Util.FromJson<CharacterData>(acc.Character);
             }
@@ -769,6 +773,8 @@ namespace LSCC
 
             EPlayer.Spawn(player);
 
+            player.TriggerEvent("StopThemeSong");
+
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can edit your character's clothing with /char clothing.");
         }
 
@@ -782,7 +788,7 @@ namespace LSCC
 
             try
             {
-                if (PlayerChar == null || PlayerChar.Length < 10) throw (new System.Exception("Invalid characterdata- sending to creation."));
+                if (PlayerChar == null || PlayerChar.Length < 10) throw (new System.Exception("Invalid characterdata-7 sending to creation."));
                 ConvChar = NAPI.Util.FromJson<CharacterData>(PlayerChar);
 
                 EPlayer.ApplyCharacter(player, ConvChar);
@@ -817,7 +823,7 @@ namespace LSCC
             {
                 try
                 {
-                    if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata- edit clothes."));
+                    if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata-6 edit clothes."));
 
                     CharacterData charData = NAPI.Util.FromJson<CharacterData>(acc.Character);
 
@@ -843,7 +849,7 @@ namespace LSCC
                 Account acc = EPlayer.GetAccount(player);
                 try
                 {
-                    if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata- edit props."));
+                    if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata-5 edit props."));
 
                     CharacterData charData = NAPI.Util.FromJson<CharacterData>(acc.Character);
 
@@ -868,7 +874,7 @@ namespace LSCC
                 Account acc = EPlayer.GetAccount(player);
                 try
                 {
-                    if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata- edit props."));
+                    if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata-4 edit props."));
 
                     CharacterData charData = NAPI.Util.FromJson<CharacterData>(acc.Character);
 
@@ -1196,7 +1202,9 @@ namespace LSCC
                 LobbyClothing = 1,
                 LoadoutCop = "?",
                 LoadoutFugitive = "?",
-                CarCop = "?"
+                CarCop = "?",
+                WeaponComponents = "{}",
+                Character = "{}",
             };
             AccountManager.Add(_new);
             OnPlayerRegister(player, _new);
@@ -1434,7 +1442,7 @@ namespace LSCC
                     Account acc = EPlayer.GetAccount(player);
                     try
                     {
-                        if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata- sending to creation."));
+                        if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata-9 sending to creation."));
 
                         ConvChar = NAPI.Util.FromJson<CharacterData>(acc.Character);
                     }

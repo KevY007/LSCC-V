@@ -35,6 +35,8 @@ let playerBlips = [];
 var targetChecker = Date.now();
 var clickDisable = false;
 
+var themeSoundID = 1;
+
 traceLastFunc("[Players] CreateVars");
 
 mp.events.add("onOpenChatbox", (toggle) =>
@@ -589,6 +591,13 @@ mp.events.add("entclearanim", (entity, animDictionary, animName) => {
 
 mp.events.add(
     {
+        "PlayThemeSong": () => {
+            themeSoundID = mp.game.audio.playSoundEx("http://51.89.22.60/uploads/goodbye_apparat.mp3", 0.035);
+        },
+        "StopThemeSong": () => {
+            mp.game.audio.stopSoundEx(themeSoundID);
+        },
+
         "SetHandcuffs": (status) => {
             if(status == true)
             {

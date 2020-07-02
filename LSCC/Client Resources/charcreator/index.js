@@ -94,7 +94,7 @@ function updateHairAndColors() {
 }
 
 function applyCreatorOutfit() {
-    if (currentGender == 0) {
+    /*if (currentGender == 0) {
         localPlayer.setDefaultComponentVariation();
         localPlayer.setComponentVariation(3, 15, 0, 2);
         localPlayer.setComponentVariation(4, 21, 0, 2);
@@ -108,7 +108,16 @@ function applyCreatorOutfit() {
         localPlayer.setComponentVariation(6, 35, 0, 2);
         localPlayer.setComponentVariation(8, 15, 0, 2);
         localPlayer.setComponentVariation(11, 15, 0, 2);
-    }
+    }*/
+
+    localPlayer.setComponentVariation(8, 15, 0, 0);
+    localPlayer.setComponentVariation(11, 15, 0, 0);
+    localPlayer.setComponentVariation(3, 15, 0, 0);
+    localPlayer.setComponentVariation(4, 14, 0, 0);
+    mp.events.callRemote('RequestSetClothes', 8, 15, 0);
+    mp.events.callRemote('RequestSetClothes', 11, 15, 0);
+    mp.events.callRemote('RequestSetClothes', 3, 15, 0);
+    mp.events.callRemote('RequestSetClothes', 4, 14, 0);
 }
 
 function fillHairMenu() {
@@ -139,8 +148,15 @@ function fillHairMenu() {
     chestHairColorItem = new UIMenuListItem("Chest Hair Color", "Your character's chest hair color.", new ItemsCollection(hairColors));
     creatorHairMenu.AddItem(chestHairColorItem);
 
-    creatorHairMenu.AddItem(new UIMenuItem("Randomize", "~r~Randomizes your hair & colors."));
-    creatorHairMenu.AddItem(new UIMenuItem("Reset", "~r~Resets your hair & colors."));
+    var item = new UIMenuItem("Randomize", "~r~Randomizes your hair & colors.");
+    item.HighlightedForeColor = new Color(153, 0, 0);
+    item.ForeColor = new Color(196, 14, 14);
+    creatorHairMenu.AddItem(item);
+
+    item = new UIMenuItem("Reset", "~r~Resets your hair & colors.");
+    item.HighlightedForeColor = new Color(153, 0, 0);
+    item.ForeColor = new Color(196, 14, 14);
+    creatorHairMenu.AddItem(item);
 }
 
 function resetParentsMenu(refresh = false) {
@@ -203,7 +219,8 @@ for (let i = 0; i < Data.maxLipstickColor; i++) lipstickColors.push(i.toString()
 
 // CREATOR MAIN
 let creatorMainMenu = new Menu("Customization", "", new Point(50, 50));
-let genderItem = new UIMenuListItem("Gender", "~r~Changing this will reset your customization.", new ItemsCollection(["N/A", "Male", "Female"]));
+creatorMainMenuExit = null;
+let genderItem = new UIMenuListItem("Gender", "~r~Changing this will reset your customization.", new ItemsCollection(["Male", "Female"]));
 creatorMainMenu.AddItem(genderItem);
 creatorMainMenu.AddItem(new UIMenuItem("Parents", "Your character's parents."));
 creatorMainMenu.AddItem(new UIMenuItem("Features", "Your character's facial features."));
@@ -216,55 +233,34 @@ let angleItem = new UIMenuListItem("Angle", "", new ItemsCollection(angles));
 creatorMainMenu.AddItem(angleItem);
 
 let saveItem = new UIMenuItem("Save", "Save all changes.");
-saveItem.BackColor = new Color(13, 71, 161);
-saveItem.HighlightedBackColor = new Color(25, 118, 210);
+saveItem.ForeColor = new Color(118, 207, 39);
 creatorMainMenu.AddItem(saveItem);
 
 let cancelItem = new UIMenuItem("Cancel", "Discard all changes.");
-cancelItem.BackColor = new Color(213, 0, 0);
-cancelItem.HighlightedBackColor = new Color(229, 57, 53);
+cancelItem.ForeColor = new Color(213, 0, 0);
+cancelItem.HighlightedForeColor = new Color(229, 57, 53);
 creatorMainMenu.AddItem(cancelItem);
 
 mp.events.add("char_ResetItems", () => {
     localPlayer.setDefaultComponentVariation();
 });
 
-mp.events.add("creator_Change", () => {
-    localPlayer.clearTasksImmediately();
-    applyCreatorOutfit();
-    angleItem.Index = 0;
-    resetParentsMenu(true);
-    resetFeaturesMenu(true);
-    resetAppearanceMenu(true);
-
-    creatorHairMenu.Clear();
-    fillHairMenu();
-    creatorHairMenu.RefreshIndex();
-
-    localPlayer.position = new mp.Vector3(402.8664, -996.4108, -99.00027);
-    localPlayer.heading = -185.0;
-});
-
 creatorMainMenu.ListChange.on((item, listIndex) => {
     if (item == genderItem) {
-        if(listIndex != 0)
-        {
-            currentGender = listIndex - 1;
-            mp.events.callRemote("creator_GenderChange", currentGender);
+        currentGender = listIndex;
+        mp.events.callRemote("creator_GenderChange", currentGender);
 
-            setTimeout(() => {
-                localPlayer.clearTasksImmediately();
-                applyCreatorOutfit();
-                angleItem.Index = 0;
-                resetParentsMenu(true);
-                resetFeaturesMenu(true);
-                resetAppearanceMenu(true);
+        localPlayer.clearTasksImmediately();
+        applyCreatorOutfit();
+        angleItem.Index = 0;
+        resetParentsMenu(true);
+        resetFeaturesMenu(true);
+        resetAppearanceMenu(true);
+        localPlayer.setAlpha(255);
 
-                creatorHairMenu.Clear();
-                fillHairMenu();
-                creatorHairMenu.RefreshIndex();
-            }, 200);
-        }
+        creatorHairMenu.Clear();
+        fillHairMenu();
+        creatorHairMenu.RefreshIndex();
     } else if (item == angleItem) {
         localPlayer.setHeading(parseFloat(angleItem.SelectedValue));
         localPlayer.clearTasksImmediately();
@@ -276,21 +272,49 @@ creatorMainMenu.ItemSelect.on((item, index) => {
         case 1:
             creatorMainMenu.Visible = false;
             creatorParentsMenu.Visible = true;
+
+            if(creatorParentsMenuExit == null)
+            {
+                creatorParentsMenuExit = new UIMenuItem("Exit", "Go back to last menu.");
+                creatorParentsMenuExit.ForeColor = new Color(127, 237, 28);
+                creatorParentsMenu.AddItem(creatorParentsMenuExit);
+            }
         break;
 
         case 2:
             creatorMainMenu.Visible = false;
             creatorFeaturesMenu.Visible = true;
+
+            if(creatorFeaturesMenuExit == null)
+            {
+                creatorFeaturesMenuExit = new UIMenuItem("Exit", "Go back to last menu.");
+                creatorFeaturesMenuExit.ForeColor = new Color(127, 237, 28);
+                creatorFeaturesMenu.AddItem(creatorFeaturesMenuExit);
+            }
         break;
 
         case 3:
             creatorMainMenu.Visible = false;
             creatorAppearanceMenu.Visible = true;
+
+            if(creatorAppearanceMenuExit == null)
+            {
+                creatorAppearanceMenuExit = new UIMenuItem("Exit", "Go back to last menu.");
+                creatorAppearanceMenuExit.ForeColor = new Color(127, 237, 28);
+                creatorAppearanceMenu.AddItem(creatorAppearanceMenuExit);
+            }
         break;
 
         case 4:
             creatorMainMenu.Visible = false;
             creatorHairMenu.Visible = true;
+
+            if(creatorHairMenuExit == null)
+            {
+                creatorHairMenuExit = new UIMenuItem("Exit", "Go back to last menu.");
+                creatorHairMenuExit.ForeColor = new Color(127, 237, 28);
+                creatorHairMenu.AddItem(creatorHairMenuExit);
+            }
         break;
 
         case 6:
@@ -338,9 +362,10 @@ creatorMenus.push(creatorMainMenu);
 
 // CREATOR PARENTS
 let similarities = [];
-for (let i = 0; i <= 100; i++) similarities.push(i + "%");
+for (let i = 0; i <= 100; i += 2) similarities.push(i + "%");
 
 let creatorParentsMenu = new Menu("Parents", "", new Point(50, 50));
+creatorParentsMenuExit = null;
 let fatherItem = new UIMenuListItem("Father", "Your character's father.", new ItemsCollection(Data.fatherNames));
 let motherItem = new UIMenuListItem("Mother", "Your character's mother.", new ItemsCollection(Data.motherNames));
 let similarityItem = new UIMenuListItem("Resemblance", "Similarity to parents.\n(lower = feminine, higher = masculine)", new ItemsCollection(similarities));
@@ -349,8 +374,15 @@ creatorParentsMenu.AddItem(fatherItem);
 creatorParentsMenu.AddItem(motherItem);
 creatorParentsMenu.AddItem(similarityItem);
 creatorParentsMenu.AddItem(skinSimilarityItem);
-creatorParentsMenu.AddItem(new UIMenuItem("Randomize", "~r~Randomizes your parents."));
-creatorParentsMenu.AddItem(new UIMenuItem("Reset", "~r~Resets your parents."));
+var ritem = new UIMenuItem("Randomize", "~r~Randomizes your parents.");
+ritem.HighlightedForeColor = new Color(153, 0, 0);
+ritem.ForeColor = new Color(196, 14, 14);
+creatorParentsMenu.AddItem(ritem);
+
+ritem = new UIMenuItem("Reset", "~r~Resets your parents.");
+ritem.HighlightedForeColor = new Color(153, 0, 0);
+ritem.ForeColor = new Color(196, 14, 14);
+creatorParentsMenu.AddItem(ritem);
 
 creatorParentsMenu.ItemSelect.on((item, index) => {
     switch (item.Text) {
@@ -364,6 +396,14 @@ creatorParentsMenu.ItemSelect.on((item, index) => {
 
         case "Reset":
             resetParentsMenu();
+        break;
+
+        case "Exit":
+            creatorParentsMenu.RemoveItem(creatorParentsMenuExit);
+            creatorParentsMenuExit = null;
+
+            creatorParentsMenu.Visible = false;
+            creatorMainMenu.Visible = true;
         break;
     }
 });
@@ -380,9 +420,10 @@ creatorMenus.push(creatorParentsMenu);
 // CREATOR FEATURES
 let featureItems = [];
 let features = [];
-for (let i = -1.0; i <= 1.01; i += 0.01) features.push(i.toFixed(2));
+for (let i = -1.0; i <= 1.01; i += 0.05) features.push(i.toFixed(2));
 
 let creatorFeaturesMenu = new Menu("Features", "", new Point(50, 50));
+creatorFeaturesMenuExit = null;
 
 for (let i = 0; i < Data.featureNames.length; i++) {
     let tempFeatureItem = new UIMenuListItem(Data.featureNames[i], "", new ItemsCollection(features));
@@ -391,8 +432,15 @@ for (let i = 0; i < Data.featureNames.length; i++) {
     creatorFeaturesMenu.AddItem(tempFeatureItem);
 }
 
-creatorFeaturesMenu.AddItem(new UIMenuItem("Randomize", "~r~Randomizes your features."));
-creatorFeaturesMenu.AddItem(new UIMenuItem("Reset", "~r~Resets your features."));
+var ritem = new UIMenuItem("Randomize", "~r~Randomizes your features.")
+ritem.HighlightedForeColor = new Color(153, 0, 0);
+ritem.ForeColor = new Color(196, 14, 14);
+
+creatorFeaturesMenu.AddItem(ritem);
+ritem = new UIMenuItem("Reset", "~r~Resets your features.");
+ritem.HighlightedForeColor = new Color(153, 0, 0);
+ritem.ForeColor = new Color(196, 14, 14);
+creatorFeaturesMenu.AddItem(ritem);
 
 creatorFeaturesMenu.ItemSelect.on((item, index) => {
     switch (item.Text) {
@@ -405,6 +453,14 @@ creatorFeaturesMenu.ItemSelect.on((item, index) => {
 
         case "Reset":
             resetFeaturesMenu();
+        break;
+
+        case "Exit":
+            creatorFeaturesMenu.RemoveItem(creatorFeaturesMenuExit);
+            creatorFeaturesMenuExit = null;
+
+            creatorFeaturesMenu.Visible = false;
+            creatorMainMenu.Visible = true;
         break;
     }
 });
@@ -422,9 +478,10 @@ creatorMenus.push(creatorFeaturesMenu);
 let appearanceItems = [];
 let appearanceOpacityItems = [];
 let opacities = [];
-for (let i = 0; i <= 100; i++) opacities.push(i + "%");
+for (let i = 0; i <= 100; i += 5) opacities.push(i + "%");
 
 let creatorAppearanceMenu = new Menu("Appearance", "", new Point(50, 50));
+creatorAppearanceMenuExit = null;
 
 for (let i = 0; i < Data.appearanceNames.length; i++) {
     let items = [];
@@ -440,8 +497,16 @@ for (let i = 0; i < Data.appearanceNames.length; i++) {
     creatorAppearanceMenu.AddItem(tempAppearanceOpacityItem);
 }
 
-creatorAppearanceMenu.AddItem(new UIMenuItem("Randomize", "~r~Randomizes your appearance."));
-creatorAppearanceMenu.AddItem(new UIMenuItem("Reset", "~r~Resets your appearance."));
+var ritem = new UIMenuItem("Randomize", "~r~Randomizes your appearance.");
+ritem.HighlightedForeColor = new Color(153, 0, 0);
+ritem.ForeColor = new Color(196, 14, 14);
+
+creatorAppearanceMenu.AddItem(ritem);
+
+ritem = new UIMenuItem("Reset", "~r~Resets your appearance.");
+ritem.HighlightedForeColor = new Color(153, 0, 0);
+ritem.ForeColor = new Color(196, 14, 14);
+creatorAppearanceMenu.AddItem(ritem);
 
 creatorAppearanceMenu.ItemSelect.on((item, index) => {
     switch (item.Text) {
@@ -455,6 +520,14 @@ creatorAppearanceMenu.ItemSelect.on((item, index) => {
 
         case "Reset":
             resetAppearanceMenu();
+        break;
+
+        case "Exit":
+            creatorAppearanceMenu.RemoveItem(creatorAppearanceMenuExit);
+            creatorAppearanceMenuExit = null;
+
+            creatorAppearanceMenu.Visible = false;
+            creatorMainMenu.Visible = true;
         break;
     }
 });
@@ -481,6 +554,7 @@ let lipstickColorItem;
 let chestHairColorItem;
 
 creatorHairMenu = new Menu("Hair & Colors", "", new Point(50, 50));
+creatorHairMenuExit = null;
 fillHairMenu();
 
 creatorHairMenu.ItemSelect.on((item, index) => {
@@ -500,6 +574,14 @@ creatorHairMenu.ItemSelect.on((item, index) => {
 
         case "Reset":
             resetHairAndColorsMenu();
+        break;
+
+        case "Exit":
+            creatorHairMenu.RemoveItem(creatorHairMenuExit);
+            creatorHairMenuExit = null;
+
+            creatorHairMenu.Visible = false;
+            creatorMainMenu.Visible = true;
         break;
     }
 });
@@ -614,6 +696,13 @@ mp.events.add("toggleCreator", (active, charData) => {
         localPlayer.freezePosition(true);
 
         mp.game.cam.renderScriptCams(true, false, 0, true, false);
+
+        localPlayer.model = 0x705E61F2;
+        localPlayer.position = new mp.Vector3(402.8664, -996.4108, -99.00027);
+        localPlayer.heading = -185.0;
+        localPlayer.setAlpha(255);
+
+        applyCreatorOutfit();
     } else {
         for (let i = 0; i < creatorMenus.length; i++) creatorMenus[i].Visible = false;
         mp.gui.chat.show(true);

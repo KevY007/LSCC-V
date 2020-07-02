@@ -28,6 +28,7 @@ require("./rappel/index.js");
 require("./scoreboard/index.js");
 require("./Player/Sync.js");
 require("./carselector/index.js");
+require("./Player/musicPlayer.js");
 
 mp.events.add('loginInformationToServer', (username, password) => {
 

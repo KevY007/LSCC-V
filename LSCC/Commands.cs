@@ -3038,13 +3038,26 @@ namespace LSCC
 
             if (action.StartsWith("reset", StringComparison.OrdinalIgnoreCase) && !action.StartsWith("resetclothing", StringComparison.OrdinalIgnoreCase))
             {
-                player.SendChatMessage("!{#999999}You have reset your character, sending you to the creator.");
                 EPlayer.GetAccount(player).Character = "{}";
                 EPlayer.ShowCharCreator(player);
+            }
+            else if (action.StartsWith("edit", StringComparison.OrdinalIgnoreCase))
+            {
+                CharacterData ConvChar = new CharacterData();
+
+                try
+                {
+                    ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+
+                    EPlayer.ShowCharCreator(player, ConvChar);
+                }
+                catch { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have a character to edit!"); }
+               
             }
             else if (action.StartsWith("help", StringComparison.OrdinalIgnoreCase))
             {
                 player.SendChatMessage("!{#FF6347}[Option] !{#999999}reset !{#FFFFFF}- Resets your character and sends you back to creation.");
+                player.SendChatMessage("!{#FF6347}[Option] !{#999999}edit !{#FFFFFF}- Allows you to edit your current character.");
                 player.SendChatMessage("!{#FF6347}[Option] !{#999999}clothing !{#FFFFFF}- Sets clothing for a team, fugitive or cop.");
                 player.SendChatMessage("!{#FF6347}[Option] !{#999999}resetclothing !{#FFFFFF}- Resets the clothing for a team.");
                 player.SendChatMessage("!{#FF6347}[Option] !{#999999}lobbyteam !{#FFFFFF}- Sets the clothing of which team that appears on lobby, derby dm etc.");
@@ -3063,7 +3076,7 @@ namespace LSCC
                     return;
                 }
 
-                if(EPlayer.GetAccount(player).Character.Length < 10 || EPlayer.GetAccount(player).Character == null)
+                if (EPlayer.GetAccount(player).Character.Length < 10 || EPlayer.GetAccount(player).Character == null)
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have a character created! (/char reset)");
                     return;

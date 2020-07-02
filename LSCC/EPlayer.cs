@@ -307,9 +307,13 @@ namespace LSCC
             }
         }
 
-        public static void ShowCharCreator(Player player)
+        public static void ShowCharCreator(Player player, CharacterData charData = null)
         {
             if (!EPlayer.LoggedIn(player)) return;
+
+            player.TriggerEvent("DestroyPlayerCamera");
+            player.SetData("Creator_Using", true);
+            player.SetSkin(PedHash.FreemodeMale01);
 
             foreach (LobbyData il in Settings.Lobbies)
             {
@@ -320,35 +324,19 @@ namespace LSCC
             player.SetSharedData("Team", -1);
             player.SetSharedData("InLobby", -5);
 
-            player.SetData("Creator_Using", true);
-
             player.Dimension = (uint)player.Id + 699;
 
-            player.SendChatMessage("!{#FF6347}[INFO] !{#FFFFFF}Switch gender between Male and Female if the preview does not show.");
-            player.SendChatMessage("!{#FF6347}[INFO] !{#FFFFFF}Use arrow/numpad to navigate and backspace to exit.");
-
             CharacterData defaultChar = new CharacterData();
+            if (charData != null) defaultChar = charData;
+
             EPlayer.ApplyCharacter(player, defaultChar);
 
             player.Position = new Vector3(402.8664, -996.4108, -99.00027);
             player.Heading = -185.0f;
 
-            NAPI.Task.Run(() =>
-            {
-                lock (player)
-                {
-                    if (player != null && player.Exists)
-                    {
-                        player.TriggerEvent("toggleCreator", true, NAPI.Util.ToJson(defaultChar));
+            player.TriggerEvent("toggleCreator", true, NAPI.Util.ToJson(defaultChar));
 
-                        player.SetSkin(PedHash.FreemodeMale01);
-                        player.TriggerEvent("creator_Change");
-
-                        player.Position = new Vector3(402.8664, -996.4108, -99.00027);
-                        player.Heading = -185.0f;
-                    }
-                }
-            }, 4000);
+            NAPI.Entity.SetEntityTransparency(player, 255);
 
             return;
         }

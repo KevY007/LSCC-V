@@ -637,32 +637,34 @@ namespace LSCC
             NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Ensuring LSCC folder..."); 
             System.IO.Directory.CreateDirectory("lscc");
 
-            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Updating weapondata.json...");
-            try
+            if (!File.Exists("lscc/weapondata.json"))
             {
-                using (var client = new WebClient())
-                {
-                    client.DownloadFile("https://gist.githubusercontent.com/root-cause/3f29d38179b12245a003fb4fff615335/raw/e107026d7a622d7c73530ed2360ba4604d19f46f/v1868%2520Weapon%2520Data.json", "lscc/weapondata.json.tmp");
-                }
-
+                NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Updating weapondata.json...");
                 try
                 {
-                    if (File.Exists("lscc/weapondata.json"))
+                    using (var client = new WebClient())
                     {
-                        File.Delete("lscc/weapondata.json");
+                        client.DownloadFile("https://gist.githubusercontent.com/root-cause/3f29d38179b12245a003fb4fff615335/raw/e107026d7a622d7c73530ed2360ba4604d19f46f/v1868%2520Weapon%2520Data.json", "lscc/weapondata.json.tmp");
                     }
-                }
-                catch { NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Failed to clear old weapondata.json, permission problem?"); }
 
-                try
-                {
-                    File.Move("lscc/weapondata.json.tmp", "lscc/weapondata.json");
-                }
-                catch { NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Failed to update weapondata.json! (Complete final version, 'move' fail)"); }
+                    try
+                    {
+                        if (File.Exists("lscc/weapondata.json"))
+                        {
+                            File.Delete("lscc/weapondata.json");
+                        }
+                    }
+                    catch { NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Failed to clear old weapondata.json, permission problem?"); }
 
+                    try
+                    {
+                        File.Move("lscc/weapondata.json.tmp", "lscc/weapondata.json");
+                    }
+                    catch { NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Failed to update weapondata.json! (Complete final version, 'move' fail)"); }
+
+                }
+                catch { NAPI.Util.ConsoleOutput("(LSCC | STARTUP) [Warning] Failed to update weapondata.json (not critical, using old instead, note that server will crash without one.)"); }
             }
-            catch { NAPI.Util.ConsoleOutput("(LSCC | STARTUP) [Warning] Failed to update weapondata.json (not critical, using old instead, note that server will crash without one.)"); }
-
             NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Ensuring logs folder..."); 
             System.IO.Directory.CreateDirectory("lscc/logs");
 
