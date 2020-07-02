@@ -4,8 +4,7 @@ Check LSCC discord.
 
 increase shot tag distance
 
-Add /warn'ing system, admin records system too?
-Disabling accounts system as well.
+admin records system
 
 Check out + Added server-side: NAPI.Task.WaitForMainThread(int delayTime = 0) (Task-based NAPI.Task.Run alternative, could be used with async/await)
 in 1.1 xperimental when it is released.
