@@ -60,6 +60,12 @@ namespace LSCC
             if (_client == null) return Task.CompletedTask;
             if (_client.ConnectionState != ConnectionState.Connected) return Task.CompletedTask;
 
+            if (context.Content.Equals("!up") || context.Content.Equals("!status"))
+            {
+                context.Channel.SendMessageAsync($":white_check_mark: Server is online with {RAGE.Entities.Players.Count} players.");
+                return Task.CompletedTask;
+            }
+
             if (context.Channel.Name != "staff-bot") return Task.CompletedTask;
 
             if(context.Content.StartsWith("!players"))
