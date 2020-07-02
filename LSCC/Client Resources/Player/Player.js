@@ -256,9 +256,9 @@ function UpdateTimer()
                     || (specTarget.handle !== 0) == false || specTarget.handle === null || 
                         specTarget.handle === undefined)
                     {
-                        position.x = target.getVariable("UnstreamedX");
-                        position.y = target.getVariable("UnstreamedY");
-                        position.z = target.getVariable("UnstreamedZ");
+                        position.x = specTarget.getVariable("UnstreamedX");
+                        position.y = specTarget.getVariable("UnstreamedY");
+                        position.z = specTarget.getVariable("UnstreamedZ");
                     }
                     position.z -= 35;
 
