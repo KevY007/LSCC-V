@@ -1198,7 +1198,7 @@ namespace LSCC
                 Level = 1,
                 XP = 1,
                 Warns = 0,
-                Suspended = false,
+                Suspended = 0,
                 DonatorLevel = 0,
                 RockstarID = player.SocialClubId,
                 LobbyClothing = 1,

@@ -1839,7 +1839,7 @@ namespace LSCC
 
          
             Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true && 
-            p.Suspended == true);
+            p.Suspended == 1);
 
             if ((tpAcc != null) == false)
             {
@@ -1849,7 +1849,7 @@ namespace LSCC
 
             try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unsuspend:{tpAcc.Username}"); } catch { }
 
-            tpAcc.Suspended = false;
+            tpAcc.Suspended = 0;
             ContextFactory.Instance.SaveChanges();
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has unsuspended {tpAcc.Username}.");
             return;
@@ -1991,7 +1991,7 @@ namespace LSCC
                 return;
             }
 
-            EPlayer.GetAccount(target).Suspended = true;
+            EPlayer.GetAccount(target).Suspended = 1;
 
             ContextFactory.Instance.SaveChanges();
 

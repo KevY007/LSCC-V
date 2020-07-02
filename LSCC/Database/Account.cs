@@ -36,7 +36,7 @@ namespace LSCC
         public int MuteTime { get; set; }
         public string MuteReason { get; set; }
         public int Warns { get; set; }
-        public bool Suspended { get; set; }
+        public int Suspended { get; set; }
         public int LobbyClothing { get; set; }
         public string Character { get; set; }
         public string LoadoutCop { get; set; }
@@ -72,7 +72,7 @@ namespace LSCC
                 if (EPlayer.GetAccount(player) != null && EPlayer.GetAccount(player).SQL_ID == _target.SQL_ID) return false; // Return FALSE if another PLAYER is online from SAME ACC.
             }
 
-            if (_target.Suspended == true && _target.Admin < 4) return false;
+            if (_target.Suspended == 1 && _target.Admin < 4) return false;
 
             string crypted = password;
             if (!_crypted) crypted = Crypt(password, _target.Salt);
