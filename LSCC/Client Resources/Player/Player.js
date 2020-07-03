@@ -415,9 +415,9 @@ function UpdateTimer()
                 if(target.getVariable("InDM") != -1) blipColor = 39;
                 if(target.isInAnyVehicle(false)) blipId = 724;
                 var position = target.position;
-                if(mp.game.system.vdist2(position.x, position.y, position.z, mp.players.local.position.x, mp.players.local.position.y, mp.players.local.position.z) >= 100 
+                if(mp.game.system.vdist2(position.x, position.y, position.z, mp.players.local.position.x, mp.players.local.position.y, mp.players.local.position.z) >= 100.0 
                 || (target.handle !== 0) == false || target.handle === null || 
-                    target.handle === undefined)
+                    target.handle === undefined || (target.position.x == 0.0 && target.position.z == 0.0))
                 {
                     position.x = target.getVariable("UnstreamedX");
                     position.y = target.getVariable("UnstreamedY");

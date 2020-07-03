@@ -2997,6 +2997,11 @@ namespace LSCC
             }
             else
             {
+                if(mins < 1)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Time cannot be below 1 minutes, /unjail instead.");
+                    return;
+                }
                 RAGE.Entities.Players.All.ForEach((Player playa) =>
                 {
                     playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] {player.Name} has jailed {target.Name} for {mins} minutes, reason: {reason}.");
