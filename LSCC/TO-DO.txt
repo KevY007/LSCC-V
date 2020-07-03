@@ -10,3 +10,7 @@ Check out + Added server-side: NAPI.Task.WaitForMainThread(int delayTime = 0) (T
 in 1.1 xperimental when it is released.
 reset time on death in derby
 check imrpovements
+
+use clientside to put player in vehicle as well on gmae start
+while(!incar)
+ put

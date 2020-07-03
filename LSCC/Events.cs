@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices.ComTypes;
 using Microsoft.Extensions.Logging.Abstractions;
+using System.Net.Mail;
 
 namespace LSCC
 {
@@ -1353,7 +1354,7 @@ namespace LSCC
             {
                 if (target.GetSharedData<bool>("HasShot") != true)
                 {
-                    LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+                    LobbyData lobby = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedData<int>("InLobby"));
                     if (lobby != null)
                     {
                         if (lobby.Cops.Contains(player) && lobby.Cops.Contains(target))

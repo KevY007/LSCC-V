@@ -449,6 +449,7 @@ namespace LSCC
                 player.SetSharedData("Level", 1);
                 player.SetSharedData("JailTime", 0);
                 player.SetSharedData("MuteTime", 0);
+                player.SetData("TasedTill", Environment.TickCount);
                 player.SetSharedData("UnstreamedState", 0);
                 player.SetSharedData("UnstreamedX", 0.0f);
                 player.SetSharedData("UnstreamedY", 0.0f);

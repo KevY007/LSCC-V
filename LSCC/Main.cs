@@ -320,6 +320,12 @@ namespace LSCC
                     case "600sel":
                         seats = 4;
                         break;
+                    case "udchall1":
+                        seats = 4;
+                        break;
+                    case "udchall2":
+                        seats = 4;
+                        break;
                 }
             }
             return seats;
@@ -1381,6 +1387,7 @@ namespace LSCC
                             }
                         }
 
+                        player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ - 50f).Around(5f);
                         EPlayer.Freeze(player, true);
 
                         player.SetData("GPS", false);
@@ -1416,6 +1423,7 @@ namespace LSCC
                         }
                         catch { }
 
+                        player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ - 50f).Around(5f);
                         EPlayer.Freeze(player, true);
 
                         player.Health = 100;
@@ -1518,6 +1526,7 @@ namespace LSCC
                             }
                         }, 1000);
 
+                        _tempPlayer.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ - 50f).Around(5f);
                         EPlayer.Freeze(_tempPlayer, true);
 
                         playerVehicle.Add(new Tuple<Player, Vehicle, int>(_tempPlayer, pVehicle, 0));
@@ -1545,6 +1554,7 @@ namespace LSCC
                             _tempPlayer2.SetData("putVehicle", pVehicle);
                             _tempPlayer2.SetData("putVehicleSeat", seat);
 
+                            _tempPlayer2.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ - 50f).Around(5f);
                             EPlayer.Freeze(_tempPlayer2, true);
                             playerVehicle.Add(new Tuple<Player, Vehicle, int>(_tempPlayer2, pVehicle, 0 + seat));
 
@@ -1569,7 +1579,7 @@ namespace LSCC
                             }
                         }
 
-                    }, 1000);
+                    }, 250);
 
                     NAPI.Task.Run(() =>
                     {
@@ -1878,7 +1888,7 @@ namespace LSCC
 
                         lock (lobby.Fugitives)
                         {
-                            foreach (Player fugi in lobby.Fugitives)
+                            foreach (Player fugi in lobby.Fugitives.Where(a => a.GetSharedData<bool>("HasShot") == false))
                             {
                                 fugi.SetSharedData("VisibleBlip", false);
 

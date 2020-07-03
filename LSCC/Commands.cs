@@ -1730,6 +1730,7 @@ namespace LSCC
             player.SendChatMessage("Model 'fbibufac' - FIB Buffalo");
             player.SendChatMessage("Model 'sherbufac' - Sheriff Buffalo (sherbufac2 for Unmaarked)");
             player.SendChatMessage("Model 'hwaybufac' - Highway Buffalo (hwaybufac2 for Unmaarked)");
+            player.SendChatMessage("Model '600sel' - Mercedes S600?");
             return;
         }
 
