@@ -11,6 +11,8 @@ in 1.1 xperimental when it is released.
 reset time on death in derby
 check imrpovements
 
+
+( for later if we still have issues >> << bottom.)
 use clientside to put player in vehicle as well on gmae start
 while(!incar)
  put
