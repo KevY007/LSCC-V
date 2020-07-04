@@ -529,11 +529,11 @@ function OnPlayerWeaponShot(targetPosition, targetEntity)
                         {
                             if(player.getVariable("Team") == targetEntity.getVariable("Team"))
                             {
-                                mp.events.callRemote("PlayerShotAtWrongPlayer", 0);
+                                mp.events.callRemote("PlayerShotAtWrongPlayer", 0, targetEntity);
                             }
                             if(player.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
                             {
-                                mp.events.callRemote("PlayerShotAtWrongPlayer", 1);
+                                mp.events.callRemote("PlayerShotAtWrongPlayer", 1, targetEntity);
                             }
                         }
                     }

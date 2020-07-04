@@ -415,7 +415,7 @@ namespace LSCC
                             {
                                 i.SendChatMessage($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}HoeHunter has jailed {killer.Name} for 5 minutes due to killing innocents.");
                             });
-                            EPlayer.Jail(killer, 5, "Killing Innocents (HoeHunter)");
+                            EPlayer.Jail(killer, 3, "Killing Innocents (HoeHunter)");
                             warnings = 0;
                         }
 
@@ -462,14 +462,23 @@ namespace LSCC
                     if (killer.HasData("TeamShotWarning")) warnings = killer.GetData<int>("TeamShotWarning");
 
                     warnings += 5;
-                    if (warnings >= 14)
+
+                    if (killer.IsInVehicle == true && killer.Vehicle.Model == NAPI.Util.GetHashKey("polmav"))
                     {
-                        RAGE.Entities.Players.All.ForEach((Player i) =>
+                        killer.Vehicle.Position = new Vector3(killer.Vehicle.Position.X, killer.Vehicle.Position.Y, killer.Vehicle.Position.Z + 20.0f);
+                        killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Please do not heliblade.");
+                    }
+                    else
+                    {
+                        if (warnings >= 14)
                         {
-                            i.SendChatMessage($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}HoeHunter has jailed {killer.Name} for 5 minutes due to killing teammates.");
-                        });
-                        EPlayer.Jail(killer, 5, "Killing Teammates (HoeHunter)");
-                        warnings = 0;
+                            RAGE.Entities.Players.All.ForEach((Player i) =>
+                            {
+                                i.SendChatMessage($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}HoeHunter has jailed {killer.Name} for 5 minutes due to killing teammates.");
+                            });
+                            EPlayer.Jail(killer, 3, "Killing Teammates (HoeHunter)");
+                            warnings = 0;
+                        }
                     }
 
                     killer.SetData<int>("TeamShotWarning", warnings);
@@ -1040,28 +1049,32 @@ namespace LSCC
         }
 
         [RemoteEvent("PlayerShotAtWrongPlayer")]
-        public void PlayerShootWrongPlayer(Player player, int caseid)
+        public void PlayerShootWrongPlayer(Player player, int caseid, Player target)
         {
             if (caseid == 0)
             {
-                EPlayer.Freeze(player, true);
-
-                NAPI.Task.Run(() =>
-                {
-                    lock (player)
-                    {
-                        if (player != null && player.Exists)
-                        {
-                            if (!player.IsNull && player != null && player.IsInstanceAlive)
-                            {
-                                EPlayer.Freeze(player, false);
-                            }
-                        }
-                    }
-                }, player.IsInVehicle == true ? 500 : 2500);
-
                 int warnings = 0;
                 if (player.HasData("TeamShotWarning")) warnings = player.GetData<int>("TeamShotWarning");
+
+                if (warnings >= 3)
+                {
+                    EPlayer.Freeze(player, true);
+
+                    NAPI.Task.Run(() =>
+                    {
+                        lock (player)
+                        {
+                            if (player != null && player.Exists)
+                            {
+                                if (!player.IsNull && player != null && player.IsInstanceAlive)
+                                {
+                                    EPlayer.Freeze(player, false);
+                                }
+                            }
+                        }
+                    }, player.IsInVehicle == true ? 500 : 2500);
+                }
+               
 
                 warnings++;
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Do not shoot at teammates, repeatedly doing this will result in punishment!");
@@ -1082,27 +1095,31 @@ namespace LSCC
                     warnings = 0;
                 }
                 player.SetData("TeamShotWarning", warnings);
+
+                target.Health = 100;
             }
             else if (caseid == 1 && player.CurrentWeapon != WeaponHash.Stungun)
             {
-                EPlayer.Freeze(player, true);
-
-                NAPI.Task.Run(() =>
-                {
-                    lock (player)
-                    {
-                        if (player != null && player.Exists)
-                        {
-                            if (!player.IsNull && player != null && player.IsInstanceAlive)
-                            {
-                                EPlayer.Freeze(player, false);
-                            }
-                        }
-                    }
-                }, player.IsInVehicle == true ? 500 : 2500);
-
                 int warnings = 0;
                 if (player.HasData("InnocentShotWarning")) warnings = player.GetData<int>("InnocentShotWarning");
+
+                if (warnings >= 3)
+                {
+                    EPlayer.Freeze(player, true);
+                    NAPI.Task.Run(() =>
+                    {
+                        lock (player)
+                        {
+                            if (player != null && player.Exists)
+                            {
+                                if (!player.IsNull && player != null && player.IsInstanceAlive)
+                                {
+                                    EPlayer.Freeze(player, false);
+                                }
+                            }
+                        }
+                    }, player.IsInVehicle == true ? 500 : 2500);
+                }
 
                 warnings++;
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Do not shoot at fugitives that haven't shot, repeatedly doing this will result in punishment!");
@@ -1123,6 +1140,8 @@ namespace LSCC
                     warnings = 0;
                 }
                 player.SetData("InnocentShotWarning", warnings);
+
+                target.Health = 100;
             }
         }
 
