@@ -1096,7 +1096,15 @@ namespace LSCC
                 }
                 player.SetData("TeamShotWarning", warnings);
 
-                target.Health = 100;
+
+                if ((target.GetSharedData<bool>("HasShot") == true && target.GetSharedData<int>("Team") == 0) == false)
+                {
+                    if (RAGE.Entities.Players.All.Count(a => a.Position.DistanceTo(target.Position) < 100.0f &&
+                     a.GetSharedData<bool>("HasShot") == true && a.GetSharedData<int>("Team") == 0 && a.Dimension == target.Dimension) == 0)
+                    { // No nearby "has shot" fugitive's to the target so they can't have healing advantage.
+                        target.Health = 100;
+                    }
+                }
             }
             else if (caseid == 1 && player.CurrentWeapon != WeaponHash.Stungun)
             {
