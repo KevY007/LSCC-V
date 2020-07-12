@@ -1392,7 +1392,7 @@ namespace LSCC
 
                         player.SetData("GPS", false);
 
-                        EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Playing cop as {player.Name}");
+                        EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Cop as {player.Name}");
 
                         player.TriggerEvent("SetActorInvulnerable", false);
                         player.TriggerEvent("CanFallOutOfCar", true);
@@ -1430,7 +1430,7 @@ namespace LSCC
                         player.Armor = 0;
                         EPlayer.SetColor(player, new Color(232, 64, 64, 255), player.Armor);
 
-                        EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Playing fugitive as {player.Name}");
+                        EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Fugitive as {player.Name}");
 
                         player.TriggerEvent("SetActorInvulnerable", false);
                         player.TriggerEvent("CanFallOutOfCar", true);

@@ -1523,7 +1523,7 @@ namespace LSCC
 
                 if (EPlayer.GetAccount(player).JailTime > 0)
                 {
-                    EPlayer.SetDiscordStatus(player, $"Serving jail time as {player.Name}");
+                    EPlayer.SetDiscordStatus(player, $"In jail as {player.Name}");
 
                     Account acc = EPlayer.GetAccount(player);
 
@@ -1567,7 +1567,7 @@ namespace LSCC
                 {
                     player.Position = new Vector3(1061.547f, -720.113f, 56.786f);
                     player.Heading = 130.497f;
-                    EPlayer.SetDiscordStatus(player, $"In freeroam as {player.Name}");
+                    EPlayer.SetDiscordStatus(player, $"Freeroam as {player.Name}");
 
                     EPlayer.SetColor(player, new Color(102, 232, 217), 0);
 
@@ -1603,7 +1603,7 @@ namespace LSCC
                     player.Dimension = 500;
 
 
-                    EPlayer.SetDiscordStatus(player, $"In derby as {player.Name}");
+                    EPlayer.SetDiscordStatus(player, $"Derby as {player.Name}");
 
                     player.TriggerEvent("SetActorInvulnerable", true);
 
@@ -1647,7 +1647,7 @@ namespace LSCC
 
                 if (player.GetSharedData<int>("InLobby") > -1) // Copchase Lobby
                 {
-                    EPlayer.SetDiscordStatus(player, $"In lobby {player.GetSharedData<int>("InLobby")} as {player.Name}");
+                    EPlayer.SetDiscordStatus(player, $"[Lobby {player.GetSharedData<int>("InLobby")}] Waiting as {player.Name}");
 
                     player.RemoveAllWeapons();
 
@@ -1691,7 +1691,7 @@ namespace LSCC
 
                         player.Dimension = (uint)arenaID + 356 + Convert.ToUInt32(player.GetSharedData<int>("InLobby"));
 
-                        EPlayer.SetDiscordStatus(player, $"In DM {Settings.DMNames[arenaID]} (lobby {player.GetSharedData<int>("InLobby")}) as {player.Name}");
+                        EPlayer.SetDiscordStatus(player, $"[Lobby {player.GetSharedData<int>("InLobby")}] DM '{Settings.DMNames[arenaID]}' as {player.Name}");
                         EPlayer.SetColor(player, new Color(179, 179, 179), 100);
 
                         player.GiveWeapon(WeaponHash.Revolver_mk2, 1000);

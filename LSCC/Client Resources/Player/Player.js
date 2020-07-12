@@ -559,6 +559,31 @@ function OnPlayerWeaponShot(targetPosition, targetEntity)
 
 mp.events.add("playerWeaponShot", OnPlayerWeaponShot);
 
+mp._events.add("OutgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneindex, damage) => {
+
+    if(targetPlayer !== null && targetPlayer !== undefined && sourceEntity !== null && sourceEntity !== undefined)
+    {
+        if(typeof targetPlayer.getVariable === 'function' && typeof sourceEntity.getVariable === 'function')
+        {
+            if(targetPlayer.getVariable("Team") !== undefined && sourceEntity.getVariable("Team") !== undefined && 
+                sourceEntity.getVariable("HasShot") !== undefined)
+            {
+                if(targetPlayer.getVariable("Team") != -1)
+                {
+                    if(sourceEntity.getVariable("Team") == targetPlayer.getVariable("Team"))
+                    {
+                        return true
+                    }
+                    if(sourceEntity.getVariable("Team") == 1 && targetPlayer.getVariable("Team") == 0 && targetPlayer.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
+                    {
+                        return true
+                    }
+                }
+            }
+        }
+    }
+});
+
 mp.events.add("entplayanim", (entity, animDictionary, animName, animFlag) => {
     if(entity.id == mp.players.local.id)
     {
