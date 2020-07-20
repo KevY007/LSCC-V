@@ -6,10 +6,7 @@ const Natives = {
     SET_TEXT_OUTLINE: "0x2513DFB0FB8400FE"
 };
 
-let streetName = null;
-let zoneName = null;
 let minimap = {};
-let showHud = true;
 let lastSpeed = 0;
 
 var visibleTick = Date.now();
@@ -90,8 +87,23 @@ setInterval(() => {
     }
 }, updateInterval);
 
+mp.keys.bind(
+    0x76,
+    false,
+    () => {
+        if(!chatStatus && 
+            !(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false)) 
+        {
+            mp.events.callLocal("ToggleHud", !showHud);
+        }
+    }
+);
+
 mp.events.add('ToggleHud', (toggle) => {
     showHud = toggle;
+
+    mp.gui.chat.show(showHud);
+    mp.game.ui.displayRadar(showHud);
 });
 
 mp.events.add("render", () => {

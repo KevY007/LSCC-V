@@ -1,6 +1,11 @@
 ﻿let currentJailTime = 0;
 let lastJailUpdate = 10;
 
+let chatStatus = false;
+let streetName = null;
+let zoneName = null;
+let showHud = true;
+
 let currentMuteTime = 0;
 let lastMuteUpdate = 10;
 let lastFunc = "Init";
@@ -29,6 +34,13 @@ require("./scoreboard/index.js");
 require("./Player/Sync.js");
 require("./carselector/index.js");
 require("./Player/musicPlayer.js");
+
+mp.events.add("onOpenChatbox", (toggle) =>
+{
+    chatStatus = toggle;
+    mp.events.callRemote("UpdateChatState", toggle);
+    traceLastFunc(`[Players] ChatBox Toggled ${toggle}`);
+});
 
 mp.events.add('loginInformationToServer', (username, password) => {
 

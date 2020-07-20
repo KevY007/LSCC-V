@@ -37,7 +37,7 @@ mp.events.add('browserDomReady', (ebrowser) => {
         mp.gui.cursor.show(true, true);
 
         for (let i = 0; i < carList.Cars.length; i++) {
-            carbrowser.execute(`addCar("` + carList.Images[i] + `", "` + carList.Cars[i] + `", "` + carList.Levels[i] + `", "` + carList.Desc[i] + `", ` + carList.Locked[i] + `);`);
+            carbrowser.execute(`addCar("` + carList.Images[i] + `", "` + carList.Cars[i] + `", "Lvl ` + carList.Levels[i] + `", "` + carList.Desc[i] + `", ` + carList.Locked[i] + `);`);
         }
     }
 });

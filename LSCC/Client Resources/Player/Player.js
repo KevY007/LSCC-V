@@ -12,9 +12,6 @@ let chaseRunning = false;
 let chaseTimeCur = 0;
 let chaseTimeMax = 390;
 
-let chatStatus = false;
-let chatState = true;
-
 let derbyText = null;
 let derbyTimeText = null;
 let derbyTimeCur = 0;
@@ -39,13 +36,6 @@ var themeSoundID = 1;
 
 traceLastFunc("[Players] CreateVars");
 
-mp.events.add("onOpenChatbox", (toggle) =>
-{
-    chatStatus = toggle;
-    mp.events.callRemote("UpdateChatState", toggle);
-    traceLastFunc(`[Players] ChatBox Toggled ${toggle}`);
-});
-
 function calcDist(v1, v2) {
     return mp.game.system.vdist(
         v1.x,
@@ -56,19 +46,6 @@ function calcDist(v1, v2) {
         v2.z
     );
 }
-
-mp.keys.bind(
-    0x76,
-    false,
-    () => {
-        if(!chatStatus && 
-            !(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false)) 
-        {
-            chatState = !chatState;
-            mp.gui.chat.show(chatState);
-        }
-    }
-);
 
 mp.keys.bind(
     71,
