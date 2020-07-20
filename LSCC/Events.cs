@@ -1559,7 +1559,7 @@ namespace LSCC
                 EPlayer.SetColor(player, new Color(255, 255, 255, 255));
 
 
-                player.TriggerEvent("ToggleHud", player.GetData<bool>("HUDState"));
+                player.TriggerEvent("ToggleHud", true);
 
 
 

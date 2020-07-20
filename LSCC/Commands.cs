@@ -218,14 +218,7 @@ namespace LSCC
 
             if (action.StartsWith("hud", StringComparison.OrdinalIgnoreCase))
             {
-                player.SetData("HUDState", !player.GetData<bool>("HUDState"));
-                if (player.GetData<bool>("HUDState") == true)
-                {
-                    player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have enabled your HUD.");
-                }
-                else player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have disabled your HUD.");
-
-                player.TriggerEvent("ToggleHud", player.GetData<bool>("HUDState"));
+                player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}Please press F7 to toggle HUD.");
             }
             else if (action.StartsWith("pm", StringComparison.OrdinalIgnoreCase))
             {

@@ -420,7 +420,6 @@ namespace LSCC
                 player.SetData("UnfairKillSpawn", false);
                 player.SetData("InnocentShotWarning", 0);
                 player.SetData("AutoJoin", true);
-                player.SetData("HUDState", true);
                 player.SetSharedData("DerbyTime", 0);
                 player.SetData("DerbySpawnTick", 0);
                 player.SetData("FreeroamTime", 12);
@@ -935,8 +934,6 @@ namespace LSCC
             }
             player.SetSharedData("Team", -1);
 
-
-            player.SetData("HudState", true);
             player.TriggerEvent("ToggleHud", true);
 
             Vector3 VecSpawn = new Vector3(SpawnArea.X, SpawnArea.Y, SpawnArea.Z);
