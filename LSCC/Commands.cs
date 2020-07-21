@@ -1184,6 +1184,12 @@ namespace LSCC
             return;
         }
 
+        [Command("lcmenu", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
+        public void cmd_lcmenu(Player player)
+        {
+            return;
+        }
+
         [Command("fontsize", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
         public void cmd_fontsize(Player player)
         {
@@ -1745,7 +1751,7 @@ namespace LSCC
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /derby");
             player.SendChatMessage("!{#28E0DA}[Mode: DM]: /dm /dmarena");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /freeroam /veh /customvehlist /teleport /mytime /myweather");
-            player.SendChatMessage("!{#A5A8A8}[Debug]: /pos /updaterate");
+            player.SendChatMessage("!{#A5A8A8}[Dbg/Test/Misc]: /pos /updaterate /lcmenu");
 
             if (EPlayer.GetAccount(player).DonatorLevel >= 1)
             {
