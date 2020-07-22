@@ -16,6 +16,22 @@ mp.events.addDataHandler('Status_Trunk', function (entity, value, oldValue)
     }
 });
 
+mp.events.addDataHandler('vMaxSpeed', function (entity, value, oldValue) 
+{
+    if (entity.type === 'vehicle') 
+    {
+        entity.setMaxSpeed(value);
+    }
+});
+
+mp.events.addDataHandler('vInitialDriveForce', function (entity, value, oldValue) 
+{
+    if (entity.type === 'vehicle') 
+    {
+        entity.setHandling("fInitialDriveForce", value);
+    }
+});
+
 mp.events.add('entityStreamIn', (entity) => {
     if (entity.type === 'vehicle') 
     {
@@ -33,6 +49,16 @@ mp.events.add('entityStreamIn', (entity) => {
                 entity.setDoorShut(6, true);
                 entity.setDoorShut(7, true);
             }
+        }
+
+        if(entity.getVariable("vMaxSpeed") !== undefined)
+        {
+            entity.setMaxSpeed(entity.getVariable("vMaxSpeed"));
+        }
+
+        if(entity.getVariable("vInitialDriveForce") !== undefined)
+        {
+            entity.setHandling("fInitialDriveForce", entity.getVariable("vInitialDriveForce"));
         }
     }
 });

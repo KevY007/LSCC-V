@@ -1518,6 +1518,8 @@ namespace LSCC
                         pVehicle.SetSharedData("Team", 0);
                         lobby.Vehicles.Add(pVehicle);
 
+                        pVehicle.SetSharedData("vMaxSpeed", 150 / 3.6); // KM/H max.
+
                         NAPI.Task.Run(() =>
                         {
                             lock (pVehicle)

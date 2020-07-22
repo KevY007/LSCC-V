@@ -1634,9 +1634,35 @@ namespace LSCC
         public void cmd_playanim(Player player, string lib, string name, int flags)
         {
             if (!EPlayer.LoggedIn(player)) return;
-            if (EPlayer.GetAccount(player).Admin < 6) return;
+            if (EPlayer.GetAccount(player).Admin < 4) return;
 
             Events.RequestPlayAnimation(player, lib, name, flags);
+            return;
+        }
+
+        [Command("dbgmaxspeed", Alias = "setmaxspeed")]
+        public void cmd_maxspeed(Player player, int speed)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 4) return;
+
+            if (!player.IsInVehicle) return;
+
+            player.Vehicle.SetSharedData("vMaxSpeed", speed / 3.6);
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Set your current vehicle's max speed to " + speed + " KM/H.");
+            return;
+        }
+
+        [Command("dbgdriveforce", Alias = "setdriveforce")]
+        public void cmd_driveforce(Player player, float force)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 4) return;
+
+            if (!player.IsInVehicle) return;
+
+            player.Vehicle.SetSharedData("vInitialDriveForce", force);
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Set your current vehicle's fInitialDriveForce to " + force + ".");
             return;
         }
 
@@ -2309,7 +2335,7 @@ namespace LSCC
             }
             if (EPlayer.GetAccount(player).Admin >= 4)
             {
-                player.SendChatMessage("[Admin Lv 4]: /serveroptions /grantxp /saveserver");
+                player.SendChatMessage("[Admin Lv 4]: /serveroptions /grantxp /saveserver /dbgplayanim /dbgmaxspeed /dbgdriveforce");
             }
             if (EPlayer.GetAccount(player).Admin >= 5)
             {
@@ -2317,7 +2343,7 @@ namespace LSCC
             }
             if (EPlayer.GetAccount(player).Admin >= 6)
             {
-                player.SendChatMessage("[Admin Lv 6]: /triggerevent /cameraset /setadmin /dbgplayanim");
+                player.SendChatMessage("[Admin Lv 6]: /triggerevent /cameraset /setadmin");
             }
             return;
         }
