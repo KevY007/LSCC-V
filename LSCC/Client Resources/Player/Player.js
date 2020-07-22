@@ -19,7 +19,6 @@ let derbyCounting = false;
 
 let secondCounter = 0;
 let updateRate = 200;
-let updateInterval = null;
 
 let specCam = null;
 let specState = false;
@@ -30,6 +29,7 @@ let MaxVoiceRange = 50;
 let playerBlips = [];
 
 var targetChecker = Date.now();
+var updateChecker = Date.now();
 var clickDisable = false;
 
 var themeSoundID = 1;
@@ -186,241 +186,6 @@ function TimeFormat(time)
     return ret;
 }
 
-function UpdateTimer()
-{
-    secondCounter++;
-
-    if(secondCounter >= Math.round(1000 / updateRate))
-    {
-        secondCounter = 0;
-
-        if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
-        {
-            traceLastFunc(`[Players] Update Stream Data`);
-            mp.events.callRemote("UpdateStreamData");
-
-            traceLastFunc(`[Players] Update VoiceData`);
-
-            mp.players.forEachFast(target => {
-                target.voiceVolume = 0.0;
-                if(!target.voice3d) target.voice3d = true;
-
-                if(target.dimension == mp.players.local.dimension && mp.players.exists(target) && target != mp.players.local && 
-                    target.handle !== 0)
-                {
-                    const playerPos = target.position;
-                    var localPos = mp.players.local.position;
-                    let dist = mp.game.system.vdist(playerPos.x, playerPos.y, playerPos.z, localPos.x, localPos.y, localPos.z);
-                    
-                    if(dist > MaxVoiceRange) {
-                        if(target.getVariable("VoiceMode") == 1) {
-                            if(target.getVariable("Team") == mp.players.local.getVariable("Team")) target.voiceVolume = 0.5;
-                            else target.voiceVolume = 0.7;
-                        }
-                        else target.voiceVolume = 0.0;
-                    }
-                    else target.voiceVolume = 1 - (dist / MaxVoiceRange);
-                }
-            });
-
-            if (specState == true && specCam != null && specTarget != null) {
-
-                if (mp.players.exists(specTarget)) 
-                {
-                    var position = specTarget.position;
-
-                    if(mp.game.system.vdist2(position.x, position.y, position.z, mp.players.local.position.x, mp.players.local.position.y, mp.players.local.position.z) >= 100 
-                    || (specTarget.handle !== 0) == false || specTarget.handle === null || 
-                        specTarget.handle === undefined)
-                    {
-                        position.x = specTarget.getVariable("UnstreamedX");
-                        position.y = specTarget.getVariable("UnstreamedY");
-                        position.z = specTarget.getVariable("UnstreamedZ");
-                    }
-                    position.z -= 35;
-
-                    mp.players.local.position = position;
-                }
-                else 
-                {
-                    specCam.setActive(false); 
-                    specState = false;
-                    mp.events.callLocal("StopSpectating");
-                }
-            }
-
-            traceLastFunc(`[Players] Update Derby Data`);
-
-            if(mp.players.local.getVariable("InLobby") == -4)
-            {
-                derbyText.text = "N/A";
-
-                derbyText.visible = true;
-                derbyTimeText.visible = true;
-
-                derbyTimeText.text = TimeFormat(derbyTimeCur);
-                if(derbyCounting)
-                {
-                    mp.events.callRemote("DerbyIncreaseCount");
-                    derbyTimeCur--;
-                }
-
-                var TimeNow = 0;
-
-                mp.players.forEachFast(target => {
-
-                    if(target.getVariable("pLogged") !== undefined && target.getVariable("InLobby") == -4)
-                    {
-                        if(target.getVariable("DerbyTime") > TimeNow)
-                        {
-                            TimeNow = target.getVariable("DerbyTime");
-
-                            derbyText.text = target.name;
-                        }
-                    }
-                });
-            }
-            else
-            {
-                derbyText.visible = false;
-                derbyTimeText.visible = false;
-            }
-
-            traceLastFunc(`[Players] Update Chase Data1`);
-
-            if(chaseProgBar != null && chaseProgText != null && chaseRunning == true)
-            {
-                chaseTimeCur += 1;
-
-                chaseProgBar.progress = chaseTimeCur / chaseTimeMax;
-                chaseProgText.text = TimeFormat(chaseTimeMax - chaseTimeCur);
-
-                chaseProgText.visible = true;
-                chaseProgBar.visible = true;
-
-                if(chaseTimeCur >= chaseTimeMax)
-                {
-                    chaseProgText.visible = false;
-                    chaseProgBar.visible = false;
-                    chaseRunning = false;
-                }
-            }
-
-            traceLastFunc(`[Players] Update Chase Data2`);
-
-            if(collisionText != null && chaseRunning == true)
-            {
-                if(collisionTime > 0)
-                {
-                    collisionTime--;
-                    collisionText.text = TimeFormat(collisionTime);
-
-                    collisionText.visible = true;
-                }
-                else
-                {
-                    collisionText.visible = false;
-                }
-            }
-
-            traceLastFunc(`[Players] Update Chase Data3`);
-
-            if(mp.players.local.getVariable("JailTime") >= 1)
-            {
-                if(currentJailTime > 0) currentJailTime--;
-                lastJailUpdate--;
-
-                if(lastJailUpdate <= 0 || currentJailTime <= 0) // add current too so it unmutes/jails the second it hits 0. aka requests update
-                {
-                    mp.events.callRemote("RequestCounterUpdate", currentJailTime, 0);
-                    lastJailUpdate = 20;
-                }
-            }
-            else {
-                if(currentJailTime > 0) currentJailTime = 0;
-            }
-
-            if(mp.players.local.getVariable("MuteTime") >= 1)
-            {
-                if(currentMuteTime > 0) currentMuteTime--;
-                lastMuteUpdate--;
-
-                if(lastMuteUpdate <= 0 || currentMuteTime <= 0)
-                {
-                    mp.events.callRemote("RequestCounterUpdate", currentMuteTime, 1);
-                    lastMuteUpdate = 20;
-                }
-            }
-            else {
-                if(currentMuteTime > 0) currentMuteTime = 0;
-            }
-
-            traceLastFunc(`[Players] Update Chase Data Complete`);
-        }
-    }
-
-    traceLastFunc(`[Players] Blips Stage1`);
-
-    mp.blips.forEach(eblip => {
-        var index = playerBlips.indexOf(eblip.id);
-        if(index != -1)
-        {
-            eblip.destroy();
-        }
-    });
-
-    playerBlips = [];
-
-    traceLastFunc(`[Players] Blips Stage2`);
-
-    mp.players.forEachFast(target => {
-
-        if(target.dimension == mp.players.local.dimension/* && target != mp.players.local*/)
-        {
-            if (target.getVariable("VisibleBlip") !== undefined && target.getVariable("VisibleBlip") == true)
-            {
-                var blipColor = 45;
-                var blipId = 1;
-                if(target.getVariable("Team") == 0) 
-                {
-                    blipColor = 75;
-                    if(target.getVariable("HasShot") == true) blipColor = 76;
-                }
-                else if(target.getVariable("Team") == 1) blipColor = 3;
-                if(target.getVariable("InLobby") == -3) blipColor = 15;
-                if(target.getVariable("InLobby") == -4) blipColor = 73;
-                if(target.getVariable("InDM") != -1) blipColor = 39;
-                if(target.isInAnyVehicle(false)) blipId = 724;
-                var position = target.position;
-                if(mp.game.system.vdist2(position.x, position.y, position.z, mp.players.local.position.x, mp.players.local.position.y, mp.players.local.position.z) >= 1000.0 
-                || (target.handle !== 0) == false || target.handle === null || 
-                    target.handle === undefined || (target.position.x == 0.0 && target.position.z == 0.0))
-                {
-                    position.x = target.getVariable("UnstreamedX");
-                    position.y = target.getVariable("UnstreamedY");
-                    position.z = target.getVariable("UnstreamedZ");
-                    if(target.getVariable("UnstreamedState") == 1) blipId = 724;
-                }
-
-                var targetBlip = mp.blips.new(blipId, position,
-                {
-                    name: target.name,
-                    color: blipColor,
-                    shortRange: false,
-                    dimension: mp.players.local.dimension
-                });
-                playerBlips.push(targetBlip.id);
-            }
-        }
-    });
-
-    traceLastFunc(`[Players] Update Completed`);
-
-    return;
-}
-
-updateInterval = setInterval(UpdateTimer, updateRate);
-
 mp.events.addCommand("updaterate", function (rate) {
     rate = Number(rate);
 
@@ -434,15 +199,8 @@ mp.events.addCommand("updaterate", function (rate) {
         return;
     }
 
-    if(updateInterval != null)
-    {
-        clearInterval(updateInterval);
-        updateInterval = null;
-    }
-
     updateRate = rate;
 
-    updateInterval = setInterval(UpdateTimer, updateRate);
     mp.gui.chat.push("Updates now happen " + Math.round(1000 / updateRate) + " times a second.");
 });
 
@@ -455,6 +213,239 @@ mp.events.add('render', () => {
         mp.game.player.disableFiring(true);
     }
     else { mp.game.controls.enableControlAction(32, 257, true); }
+
+    if(Date.now() - updateChecker >= updateRate)
+    {
+        updateChecker = Date.now();
+
+        secondCounter++;
+
+        if(secondCounter >= Math.round(1000 / updateRate))
+        {
+            secondCounter = 0;
+
+            if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
+            {
+                traceLastFunc(`[Players] Update Stream Data`);
+                mp.events.callRemote("UpdateStreamData");
+
+                traceLastFunc(`[Players] Update VoiceData`);
+
+                mp.players.forEachFast(target => {
+                    target.voiceVolume = 0.0;
+                    if(!target.voice3d) target.voice3d = true;
+
+                    if(target.dimension == mp.players.local.dimension && mp.players.exists(target) && target != mp.players.local && 
+                        target.handle !== 0)
+                    {
+                        const playerPos = target.position;
+                        var localPos = mp.players.local.position;
+                        let dist = mp.game.system.vdist(playerPos.x, playerPos.y, playerPos.z, localPos.x, localPos.y, localPos.z);
+                        
+                        if(dist > MaxVoiceRange) {
+                            if(target.getVariable("VoiceMode") == 1) {
+                                if(target.getVariable("Team") == mp.players.local.getVariable("Team")) target.voiceVolume = 0.5;
+                                else target.voiceVolume = 0.7;
+                            }
+                            else target.voiceVolume = 0.0;
+                        }
+                        else target.voiceVolume = 1 - (dist / MaxVoiceRange);
+                    }
+                });
+
+                if (specState == true && specCam != null && specTarget != null) {
+
+                    if (mp.players.exists(specTarget)) 
+                    {
+                        var position = specTarget.position;
+
+                        if(mp.game.system.vdist2(position.x, position.y, position.z, mp.players.local.position.x, mp.players.local.position.y, mp.players.local.position.z) >= 100 
+                        || (specTarget.handle !== 0) == false || specTarget.handle === null || 
+                            specTarget.handle === undefined)
+                        {
+                            position.x = specTarget.getVariable("UnstreamedX");
+                            position.y = specTarget.getVariable("UnstreamedY");
+                            position.z = specTarget.getVariable("UnstreamedZ");
+                        }
+                        position.z -= 35;
+
+                        mp.players.local.position = position;
+                    }
+                    else 
+                    {
+                        specCam.setActive(false); 
+                        specState = false;
+                        mp.events.callLocal("StopSpectating");
+                    }
+                }
+
+                traceLastFunc(`[Players] Update Derby Data`);
+
+                if(mp.players.local.getVariable("InLobby") == -4)
+                {
+                    derbyText.text = "N/A";
+
+                    derbyText.visible = true;
+                    derbyTimeText.visible = true;
+
+                    derbyTimeText.text = TimeFormat(derbyTimeCur);
+                    if(derbyCounting)
+                    {
+                        mp.events.callRemote("DerbyIncreaseCount");
+                        derbyTimeCur--;
+                    }
+
+                    var TimeNow = 0;
+
+                    mp.players.forEachFast(target => {
+
+                        if(target.getVariable("pLogged") !== undefined && target.getVariable("InLobby") == -4)
+                        {
+                            if(target.getVariable("DerbyTime") > TimeNow)
+                            {
+                                TimeNow = target.getVariable("DerbyTime");
+
+                                derbyText.text = target.name;
+                            }
+                        }
+                    });
+                }
+                else
+                {
+                    derbyText.visible = false;
+                    derbyTimeText.visible = false;
+                }
+
+                traceLastFunc(`[Players] Update Chase Data1`);
+
+                if(chaseProgBar != null && chaseProgText != null && chaseRunning == true)
+                {
+                    chaseTimeCur += 1;
+
+                    chaseProgBar.progress = chaseTimeCur / chaseTimeMax;
+                    chaseProgText.text = TimeFormat(chaseTimeMax - chaseTimeCur);
+
+                    chaseProgText.visible = true;
+                    chaseProgBar.visible = true;
+
+                    if(chaseTimeCur >= chaseTimeMax)
+                    {
+                        chaseProgText.visible = false;
+                        chaseProgBar.visible = false;
+                        chaseRunning = false;
+                    }
+                }
+
+                traceLastFunc(`[Players] Update Chase Data2`);
+
+                if(collisionText != null && chaseRunning == true)
+                {
+                    if(collisionTime > 0)
+                    {
+                        collisionTime--;
+                        collisionText.text = TimeFormat(collisionTime);
+
+                        collisionText.visible = true;
+                    }
+                    else
+                    {
+                        collisionText.visible = false;
+                    }
+                }
+
+                traceLastFunc(`[Players] Update Chase Data3`);
+
+                if(mp.players.local.getVariable("JailTime") >= 1)
+                {
+                    if(currentJailTime > 0) currentJailTime--;
+                    lastJailUpdate--;
+
+                    if(lastJailUpdate <= 0 || currentJailTime <= 0) // add current too so it unmutes/jails the second it hits 0. aka requests update
+                    {
+                        mp.events.callRemote("RequestCounterUpdate", currentJailTime, 0);
+                        lastJailUpdate = 20;
+                    }
+                }
+                else {
+                    if(currentJailTime > 0) currentJailTime = 0;
+                }
+
+                if(mp.players.local.getVariable("MuteTime") >= 1)
+                {
+                    if(currentMuteTime > 0) currentMuteTime--;
+                    lastMuteUpdate--;
+
+                    if(lastMuteUpdate <= 0 || currentMuteTime <= 0)
+                    {
+                        mp.events.callRemote("RequestCounterUpdate", currentMuteTime, 1);
+                        lastMuteUpdate = 20;
+                    }
+                }
+                else {
+                    if(currentMuteTime > 0) currentMuteTime = 0;
+                }
+
+                traceLastFunc(`[Players] Update Chase Data Complete`);
+            }
+        }
+
+        traceLastFunc(`[Players] Blips Stage1`);
+
+        mp.blips.forEach(eblip => {
+            var index = playerBlips.indexOf(eblip.id);
+            if(index != -1)
+            {
+                eblip.destroy();
+            }
+        });
+
+        playerBlips = [];
+
+        traceLastFunc(`[Players] Blips Stage2`);
+
+        mp.players.forEachFast(target => {
+
+            if(target.dimension == mp.players.local.dimension/* && target != mp.players.local*/)
+            {
+                if (target.getVariable("VisibleBlip") !== undefined && target.getVariable("VisibleBlip") == true)
+                {
+                    var blipColor = 45;
+                    var blipId = 1;
+                    if(target.getVariable("Team") == 0) 
+                    {
+                        blipColor = 75;
+                        if(target.getVariable("HasShot") == true) blipColor = 76;
+                    }
+                    else if(target.getVariable("Team") == 1) blipColor = 3;
+                    if(target.getVariable("InLobby") == -3) blipColor = 15;
+                    if(target.getVariable("InLobby") == -4) blipColor = 73;
+                    if(target.getVariable("InDM") != -1) blipColor = 39;
+                    if(target.isInAnyVehicle(false)) blipId = 724;
+                    var position = target.position;
+                    if(mp.game.system.vdist2(position.x, position.y, position.z, mp.players.local.position.x, mp.players.local.position.y, mp.players.local.position.z) >= 1000.0 
+                    || (target.handle !== 0) == false || target.handle === null || 
+                        target.handle === undefined || (target.position.x == 0.0 && target.position.z == 0.0))
+                    {
+                        position.x = target.getVariable("UnstreamedX");
+                        position.y = target.getVariable("UnstreamedY");
+                        position.z = target.getVariable("UnstreamedZ");
+                        if(target.getVariable("UnstreamedState") == 1) blipId = 724;
+                    }
+
+                    var targetBlip = mp.blips.new(blipId, position,
+                    {
+                        name: target.name,
+                        color: blipColor,
+                        shortRange: false,
+                        dimension: mp.players.local.dimension
+                    });
+                    playerBlips.push(targetBlip.id);
+                }
+            }
+        });
+
+        traceLastFunc(`[Players] Update Completed`);
+    }
 
     if(Date.now() - targetChecker >= 125)
     {
