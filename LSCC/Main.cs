@@ -323,7 +323,7 @@ namespace LSCC
                     case "udchall1":
                         seats = 4;
                         break;
-                    case "udchall2":
+                    case "lspdcara":
                         seats = 4;
                         break;
                 }

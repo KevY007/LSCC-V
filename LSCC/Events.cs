@@ -1319,10 +1319,10 @@ namespace LSCC
                                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Unmarked Dodge Charger 2016.");
                                     break;
                                 }
-                            case "Charger '14 (U)":
+                            case "Police Caracara":
                                 {
-                                    EPlayer.GetAccount(player).CarCop = "udchall2";
-                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Unmarked Dodge Charger 2014.");
+                                    EPlayer.GetAccount(player).CarCop = "lspdcara";
+                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Police Caracara.");
                                     break;
                                 }
                         }

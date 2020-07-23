@@ -1725,12 +1725,12 @@ namespace LSCC
                     { "Police Bike", "images/policeb.png", 3, "You don't wanna drive this" },
                     { "Police Buffalo", "images/polbufac.png", 5, "Buffalo Police Cruiser" },
                     { "Police Buffalo (U)", "images/polbufac2.png", 10, "Unmarked Variant" },
-                    { "FBI Buffalo", "images/fbibufac.png", 12, "FBI Variant of Buffalo" },
-                    { "FBI Granger", "images/fbi2.png", 12, "Space for 8 occupants" },
-                    { "Charger '14 (U)", "images/udchall2.png", 13, "Vroom..." },
-                    { "Charger '16 (U)", "images/udchall1.png", 14, "Newer vroom." },
-                    { "Chopper", "images/polmav.png", 15, "Police Maverick, Air Support" },
-                    { "SWAT Truck", "images/riot.png", 30, "Heavily armored and spacious" },
+                    { "Police Caracara", "images/lspdcara.png", 12, "It is what it is" },
+                    { "FBI Buffalo", "images/fbibufac.png", 13, "FBI Variant of Buffalo" },
+                    { "FBI Granger", "images/fbi2.png", 13, "Space for 8 occupants" },
+                    { "Charger '16 (U)", "images/udchall1.png", 15, "Vroom." },
+                    { "Chopper", "images/polmav.png", 20, "Police Maverick, Air Support" },
+                    { "SWAT Truck", "images/riot.png", 25, "Heavily armored and spacious" },
                 },
                 EPlayer.GetAccount(player).Level);
 
@@ -1750,7 +1750,8 @@ namespace LSCC
         [Command("customvehlist")]
         public void cmd_customvehlist(Player player)
         {
-            player.SendChatMessage("Model 'udchall(1/2)' - Dodge Charger 2016 & 14 (udchall1 & udchall2)");
+            player.SendChatMessage("Model 'udchall1' - Dodge Charger 2016");
+            player.SendChatMessage("Model 'lspdcara' - Police Caracara");
             player.SendChatMessage("Model 'polbufac' - Police Buffalo (polbufac2 for Unmarked)");
             player.SendChatMessage("Model 'fbibufac' - FIB Buffalo");
             player.SendChatMessage("Model 'sherbufac' - Sheriff Buffalo (sherbufac2 for Unmaarked)");
