@@ -15,6 +15,7 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Globalization;
+using System.Timers;
 
 public partial class jWeaponData
 {
@@ -227,6 +228,9 @@ public static class Settings
     public static int LastCountUpdate { get; set; }
     public static List<LoadoutData> Loadouts { get; set; }
     public static Dictionary<ulong, jWeaponData> WeaponData { get; set; }
+
+    public static System.Timers.Timer timer_Update { get; set; }
+    public static System.Timers.Timer timer_Game { get; set; }
 
 
     // Locations
@@ -776,9 +780,15 @@ namespace LSCC
 
             ///////////////////////////////////////////////////////////////////////////////
 
-            TimeUpdate();
-            GameUpdate();
+            Settings.timer_Update = new System.Timers.Timer();
+            Settings.timer_Update.Elapsed += new ElapsedEventHandler(TimeUpdate);
+            Settings.timer_Update.Interval = 15000;
+            Settings.timer_Update.Enabled = true;
 
+            Settings.timer_Game = new System.Timers.Timer();
+            Settings.timer_Game.Elapsed += new ElapsedEventHandler(GameUpdate);
+            Settings.timer_Game.Interval = 1000;
+            Settings.timer_Game.Enabled = true;
         }
 
         public void GameStartCountdown(int time, int lobbyid)
@@ -829,7 +839,7 @@ namespace LSCC
             }
         }
 
-        public void TimeUpdate()
+        public void TimeUpdate(object source, ElapsedEventArgs e)
         {
             NAPI.Task.Run(() =>
             {
@@ -1003,8 +1013,6 @@ namespace LSCC
                     }
                 }
             }
-
-            NAPI.Task.Run(TimeUpdate, 15000);
             return;
         }
 
@@ -1768,7 +1776,7 @@ namespace LSCC
             return true;
         }
 
-        public static void GameUpdate()
+        public static void GameUpdate(object source, ElapsedEventArgs e)
         {
             if (Environment.TickCount - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
             {
@@ -1900,9 +1908,6 @@ namespace LSCC
                     }
                 }
             }
-
-            NAPI.Task.Run(GameUpdate, 1000);
-
             return;
         }
     }

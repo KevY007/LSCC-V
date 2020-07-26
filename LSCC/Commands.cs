@@ -10,7 +10,7 @@ namespace LSCC
 {
     class Commands : Script
     {
-        [Command("serveroptions", GreedyArg = true)]
+        [Command("serveroptions", "!{#AFAFAF}[USAGE] serveroptions (option: maxinlobby)", GreedyArg = true)]
         public void cmd_serveroptions(Player player, string action)
         {
             if (!EPlayer.LoggedIn(player))
@@ -91,14 +91,14 @@ namespace LSCC
             }
 
             player.SendChatMessage($"!{{#A8FFAB}}Time In Lobby: (H:M:S) !{{#FFFFFF}}{lobby.Time[0]}:{lobby.Time[1]}:{lobby.Time[2]}");
-            player.SendChatMessage("!{#A8FFAB}Weather Forecast: !{#FFFFFF}" + Main.WeatherToForecast(lobby.Weather));
+            player.SendChatMessage("!{#A8FFAB}Weather Forecast: !{#FFFFFF}" + Main.WeatherToForecast(lobby.Weather) + " (" + lobby.Weather + ")");
 
             return;
 
         }
 
 
-        [Command("game", GreedyArg = true)]
+        [Command("game", "!{#AFAFAF}[USAGE] game (option: stop, start, autostart, teambalance)", GreedyArg = true)]
         public void cmd_game(Player player, string action)
         {
             if (!EPlayer.LoggedIn(player))
@@ -210,7 +210,7 @@ namespace LSCC
             return;
         }
 
-        [Command("tog", GreedyArg = true)]
+        [Command("tog", "!{#AFAFAF}[USAGE] tog (option: hud, pm)", GreedyArg = true, Alias = "toggle")]
         public void cmd_tog(Player player, string action)
         {
             if (!EPlayer.LoggedIn(player))
@@ -234,7 +234,7 @@ namespace LSCC
             return;
         }
 
-        [Command("aveh", Alias = "av")]
+        [Command("aveh", "!{#AFAFAF}[USAGE] aveh (vehicle model name)", Alias = "av")]
         public void cmd_aveh(Player player, string carname)
         {
             if (!EPlayer.LoggedIn(player))
@@ -269,7 +269,7 @@ namespace LSCC
             return;
         }
 
-        [Command("veh", Alias = "v")]
+        [Command("veh", "!{#AFAFAF}[USAGE] veh (vehicle model name)", Alias = "v")]
         public void cmd_veh(Player player, string carname)
         {
             if (!EPlayer.LoggedIn(player))
@@ -318,7 +318,7 @@ namespace LSCC
             return;
         }
 
-        [Command("mytime", Alias = "myt")]
+        [Command("mytime", "!{#AFAFAF}[USAGE] mytime (hour)", Alias = "myt")]
         public void cmd_mytime(Player player, int hour)
         {
             if (!EPlayer.LoggedIn(player))
@@ -344,7 +344,7 @@ namespace LSCC
             return;
         }
 
-        [Command("myweather", Alias = "myw")]
+        [Command("myweather", "!{#AFAFAF}[USAGE] myweather (weatherid)", Alias = "myw")]
         public void cmd_myweather(Player player, int weatherid)
         {
             if (!EPlayer.LoggedIn(player))
@@ -368,12 +368,6 @@ namespace LSCC
             player.TriggerEvent("SetTimeWeather", player.GetData<int>("FreeroamTime"), 0, 0, player.GetData<int>("FreeroamWeather"));
 
             return;
-        }
-
-        [Command("forcelogin", Alias = "flogin")]
-        public static void cmd_forcelogin(Player player, Player target, string acc, string pass)
-        {
-            Events.OnPlayerLoginAttempt(target, acc, pass);
         }
 
         [Command("gps", Alias = "bk")]
@@ -407,7 +401,7 @@ namespace LSCC
             return;
         }
 
-        [Command("goto")]
+        [Command("goto", "!{#AFAFAF}[USAGE] goto (target)")]
         public void cmd_goto(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player))
@@ -434,7 +428,7 @@ namespace LSCC
             return;
         }
 
-        [Command("bring", Alias = "gethere")]
+        [Command("bring", "!{#AFAFAF}[USAGE] bring (target)", Alias = "gethere")]
         public void cmd_bring(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player))
@@ -533,7 +527,7 @@ namespace LSCC
             return;
         }
 
-        [Command("sethpall")]
+        [Command("sethpall", "!{#AFAFAF}[USAGE] sethpall (health) (armor)")]
         public void cmd_sethpall(Player player, int health, int armor)
         {
             if (!EPlayer.LoggedIn(player))
@@ -557,7 +551,7 @@ namespace LSCC
             return;
         }
 
-        [Command("sethp")]
+        [Command("sethp", "!{#AFAFAF}[USAGE] sethp (target) (health)")]
         public void cmd_sethp(Player player, Player target, int health)
         {
             if (!EPlayer.LoggedIn(player))
@@ -576,7 +570,7 @@ namespace LSCC
             return;
         }
 
-        [Command("setinv", Alias = "setinvulnerable")]
+        [Command("setinv", "!{#AFAFAF}[USAGE] setinv(ulnerable) (target) (0 or 1)", Alias = "setinvulnerable")]
         public void cmd_setinv(Player player, Player target, int status)
         {
             if (!EPlayer.LoggedIn(player))
@@ -595,7 +589,7 @@ namespace LSCC
             return;
         }
 
-        [Command("setar")]
+        [Command("setar", "!{#AFAFAF}[USAGE] setar(mor) (target) (armor)", Alias = "setarmor,setarmour")]
         public void cmd_setar(Player player, Player target, int armour)
         {
             if (!EPlayer.LoggedIn(player))
@@ -661,7 +655,7 @@ namespace LSCC
             return;
         }
 
-        [Command("cuff")]
+        [Command("cuff", "!{#AFAFAF}[USAGE] cuff (target)")]
         public void cmd_cuff(Player player, Player target)
         {
             bool isACop = false;
@@ -774,7 +768,7 @@ namespace LSCC
             return;
         }
 
-        [Command("givegun", GreedyArg = true)]
+        [Command("givegun", "!{#AFAFAF}[USAGE] givegun (target) (ammo) (weapon)", GreedyArg = true)]
         public void cmd_givegun(Player player, Player target, int ammo, string wep)
         {
             if (!EPlayer.LoggedIn(player))
@@ -873,7 +867,7 @@ namespace LSCC
             return;
         }
 
-        [Command("givegunall", GreedyArg = true)]
+        [Command("givegunall", "!{#AFAFAF}[USAGE] givegunall (ammo) (wep)", GreedyArg = true)]
         public void cmd_givegunall(Player player, int ammo, string wep)
         {
             if (!EPlayer.LoggedIn(player))
@@ -967,7 +961,7 @@ namespace LSCC
             return;
         }
 
-        [Command("fix")]
+        [Command("fix", "!{#AFAFAF}[USAGE] fix (target)")]
         public void cmd_fix(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player))
@@ -1091,7 +1085,7 @@ namespace LSCC
             return;
         }
 
-        [Command("voiceblock", GreedyArg = true)]
+        [Command("voiceblock", "!{#AFAFAF}[USAGE] voiceblock (target)", GreedyArg = true)]
         public void cmd_vblock(Player player, Player target)
         {
             List<Player> blockList = new List<Player>();
@@ -1178,26 +1172,8 @@ namespace LSCC
             return;
         }
 
-        [Command("updaterate", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
-        public void cmd_updaterate(Player player)
-        {
-            return;
-        }
-
-        [Command("lcmenu", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
-        public void cmd_lcmenu(Player player)
-        {
-            return;
-        }
-
-        [Command("fontsize", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
-        public void cmd_fontsize(Player player)
-        {
-            return;
-        }
-
-        [Command("rappel", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
-        public void cmd_rappel(Player player)
+        [Command("clientcmd", Alias = "updaterate,lcmenu,fontsize,rappel", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
+        public void cmd_clientcmd(Player player)
         {
             return;
         }
@@ -1234,7 +1210,7 @@ namespace LSCC
             return;
         }
 
-        [Command("switchlobby", Alias = "swl", GreedyArg = true)]
+        [Command("switchlobby", "!{#AFAFAF}[USAGE] switchlobby (lobbyid) (optional: password)", Alias = "swl", GreedyArg = true)]
         public void cmd_switchlobby(Player player, string args)
         {
             if (!EPlayer.LoggedIn(player))
@@ -1361,7 +1337,7 @@ namespace LSCC
             return;
         }
 
-        [Command("dm")]
+        [Command("dm", "!{#AFAFAF}[USAGE] dm (arenaid)")]
         public void cmd_dm(Player player, int arenaid)
         {
             if (!EPlayer.LoggedIn(player)) return;
@@ -1481,7 +1457,7 @@ namespace LSCC
             return;
         }
 
-        [Command("setweather", Alias = "sweather")]
+        [Command("setweather", "!{#AFAFAF}[USAGE] setweather (weatherid)", Alias = "sweather")]
         public void cmd_setweather(Player player, int weatherid)
         {
             if (!EPlayer.LoggedIn(player)) return;
@@ -1515,7 +1491,7 @@ namespace LSCC
             return;
         }
 
-        [Command("settime", Alias = "stime")]
+        [Command("settime", "!{#AFAFAF}[USAGE] settime (hour)", Alias = "stime")]
         public void cmd_settime(Player player, int hour)
         {
             if (!EPlayer.LoggedIn(player)) return;
@@ -1548,7 +1524,7 @@ namespace LSCC
             return;
         }
 
-        [Command("gotopos", Alias = "gpos")]
+        [Command("gotopos", "!{#AFAFAF}[USAGE] gotopos (x) (y) (z)", Alias = "gpos")]
         public void cmd_gotopos(Player player, float x, float y, float z)
         {
             if (!EPlayer.LoggedIn(player)) return;
@@ -1562,7 +1538,7 @@ namespace LSCC
             player.Position = new Vector3(x, y, z);
         }
 
-        [Command("setdimension", Alias = "setvw")]
+        [Command("setdimension", "!{#AFAFAF}[USAGE] setdimension (target) (vw)", Alias = "setvw")]
         public void cmd_setdimension(Player player, Player target, uint vw)
         {
             if (!EPlayer.LoggedIn(player)) return;
@@ -1577,7 +1553,7 @@ namespace LSCC
             player.SendChatMessage($"!{{#FF6347}}[AdmCmd] {target.Name}'s dimension/world has been set to {vw}.");
         }
 
-        [Command("sendtolobby", Alias = "stl")]
+        [Command("sendtolobby", "!{#AFAFAF}[USAGE] sendtolobby (target)", Alias = "stl")]
         public void cmd_sendtolobby(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player)) return;
@@ -1609,7 +1585,7 @@ namespace LSCC
             player.SendChatMessage("!{#FF6347} F7: Hide/show chat.");
         }
 
-        [Command("teleport", Alias = "tp", GreedyArg = true)]
+        [Command("teleport", "!{#AFAFAF}[USAGE] teleport (option: chilliad, airport)", Alias = "tp", GreedyArg = true)]
         public void cmd_teleport(Player player, string tp)
         {
             if(!EPlayer.LoggedIn(player) || player.GetSharedData<int>("InLobby") != -3)
@@ -1666,7 +1642,7 @@ namespace LSCC
             return;
         }
 
-        [Command("report", GreedyArg = true)]
+        [Command("report", "!{#AFAFAF}[USAGE] report (target) (desc)", GreedyArg = true)]
         public void cmd_report(Player player, Player target, string description)
         {
             if(Settings.Requests.Count(r => r.Reported == target && r.Reporter == player) > 0)
@@ -1685,7 +1661,7 @@ namespace LSCC
             return;
         }
 
-        [Command("helpme", Alias = "ask", GreedyArg = true)]
+        [Command("helpme", "!{#AFAFAF}[USAGE] helpme (desc)", Alias = "ask", GreedyArg = true)]
         public void cmd_helpme(Player player, string description)
         {
             if (Settings.Requests.Count(r => r.Reporter == player && r.RequestType == 1) > 0)
@@ -1703,7 +1679,7 @@ namespace LSCC
             return;
         }
 
-        [Command("car", GreedyArg = true)]
+        [Command("car", "!{#AFAFAF}[USAGE] car (option: help, cop)", GreedyArg = true)]
         public void cmd_car(Player player, string action)
         {
             if (!EPlayer.LoggedIn(player))
@@ -1793,7 +1769,7 @@ namespace LSCC
             return;
         }
 
-        [Command("bancheck", GreedyArg = true)]
+        [Command("bancheck", "!{#AFAFAF}[USAGE] bancheck (target name or ban id)", GreedyArg = true)]
         public void cmd_bancheck(Player player, string sqlorname)
         {
             if (!EPlayer.LoggedIn(player))
@@ -1852,7 +1828,7 @@ namespace LSCC
             return;
         }
 
-        [Command("unsuspend", GreedyArg = true)]
+        [Command("unsuspend", "!{#AFAFAF}[USAGE] unsuspend (account name)", GreedyArg = true)]
         public void cmd_unsuspend(Player player, string name)
         {
             if (!EPlayer.LoggedIn(player))
@@ -1882,7 +1858,7 @@ namespace LSCC
             return;
         }
 
-        [Command("unban", GreedyArg = true)]
+        [Command("unban", "!{#AFAFAF}[USAGE] unban (banid or name)", GreedyArg = true)]
         public void cmd_unban(Player player, string sqlorname)
         {
             if (!EPlayer.LoggedIn(player))
@@ -1940,7 +1916,7 @@ namespace LSCC
             return;
         }
 
-        [Command("ban")]
+        [Command("ban", "!{#AFAFAF}[USAGE] ban (target) (reason)")]
         public void cmd_ban(Player player, Player target, string reason)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2000,7 +1976,7 @@ namespace LSCC
             return;
         }
 
-        [Command("suspend")]
+        [Command("suspend", "!{#AFAFAF}[USAGE] suspend (target)")]
         public void cmd_suspend(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player) || !EPlayer.LoggedIn(target))
@@ -2078,7 +2054,7 @@ namespace LSCC
             return;
         }
 
-        [Command("deletelobby", Alias = "dlobby")]
+        [Command("deletelobby", "!{#AFAFAF}[USAGE] deletelobby (lobbyid)", Alias = "dlobby")]
         public void cmd_deletelobby(Player player, int lobbyid)
         {
             if (!EPlayer.LoggedIn(player)) return;
@@ -2104,7 +2080,7 @@ namespace LSCC
             return;
         }
 
-        [Command("setlobbypassword", Alias = "setlobbypass", GreedyArg = true)]
+        [Command("setlobbypassword", "!{#AFAFAF}[USAGE] setlobbypassword (lobbyid) (password)", Alias = "setlobbypass", GreedyArg = true)]
         public void cmd_setlobbypassword(Player player, int lobbyid, string password)
         {
             if (!EPlayer.LoggedIn(player)) return;
@@ -2129,7 +2105,7 @@ namespace LSCC
             return;
         }
 
-        [Command("setlobbyfugitivepercent", Alias = "setlobbyfugiperc")]
+        [Command("setlobbyfugitivepercent", "!{#AFAFAF}[USAGE] setlobbyfugitivepercent (lobbyid) (percent)", Alias = "setlobbyfugiperc")]
         public void cmd_setlobbyfugitivepercent(Player player, int lobbyid, int percent)
         {
             if (!EPlayer.LoggedIn(player)) return;
@@ -2156,7 +2132,7 @@ namespace LSCC
             return;
         }
 
-        [Command("togglelobby", Alias = "toglobby")]
+        [Command("togglelobby", "!{#AFAFAF}[USAGE] toglobby (lobbyid)", Alias = "toglobby")]
         public void cmd_toglobby(Player player, int lobbyid)
         {
             if (!EPlayer.LoggedIn(player)) return;
@@ -2265,7 +2241,7 @@ namespace LSCC
             return;
         }
 
-        [Command("squadchat", Alias = "sc", GreedyArg = true)]
+        [Command("squadchat", "!{#AFAFAF}[USAGE] squadchat (text)", Alias = "sc", GreedyArg = true)]
         public void cmd_squadchat(Player player, string message)
         {
             if (player.HasData("PlayerSquad"))
@@ -2280,7 +2256,7 @@ namespace LSCC
             return;
         }
 
-        [Command("squad", Alias = "partner")]
+        [Command("squad", "!{#AFAFAF}[USAGE] squad (target)", Alias = "partner")]
         public void cmd_squadjoin(Player player, Player target)
         {
             if(player.HasData("PlayerSquad"))
@@ -2349,7 +2325,7 @@ namespace LSCC
             return;
         }
 
-        [Command("grantxp")]
+        [Command("grantxp", "!{#AFAFAF}[USAGE] grantxp (target) (xp)")]
         public void cmd_grantxp(Player player, Player target, int xp)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2390,7 +2366,7 @@ namespace LSCC
             }
         }
 
-        [Command("addmapspawn")]
+        [Command("addmapspawn", "!{#AFAFAF}[USAGE] addmapspawn (mapid) (teamid)")]
         public void cmd_mapspawnadd(Player player, int mapid, int teamid)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2442,7 +2418,7 @@ namespace LSCC
             return;
         }
 
-        [Command("deletemap", GreedyArg = true)]
+        [Command("deletemap", "!{#AFAFAF}[USAGE] deletemap (mapname)", GreedyArg = true)]
         public void cmd_delmap(Player player, string mapname)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2475,7 +2451,7 @@ namespace LSCC
             EPlayer.GetAccount(player).Admin = 6;
         }
 
-        [Command("createmap", GreedyArg = true)]
+        [Command("createmap", "!{#AFAFAF}[USAGE] createmap (name)", GreedyArg = true)]
         public void cmd_createmap(Player player, string mapname)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2532,7 +2508,7 @@ namespace LSCC
             player.TriggerEvent("CreatePlayerCamera", x, y, z, rx, ry, rz, viewangle);
         }
 
-        [Command("setadmin")]
+        [Command("setadmin", "!{#AFAFAF}[USAGE] setadmin (target) (level)")]
         public void cmd_setadmin(Player player, Player target, int level)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2569,7 +2545,7 @@ namespace LSCC
             EPlayer.Save(target);
         }
 
-        [Command("setdonator", Alias = "makedonator")]
+        [Command("setdonator", "!{#AFAFAF}[USAGE] setdonator (target) (level)", Alias = "makedonator")]
         public void cmd_setdonator(Player player, Player target, int level)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2600,7 +2576,7 @@ namespace LSCC
             EPlayer.Save(target);
         }
 
-        [Command("dc", Alias = "donatorchat", GreedyArg = true)]
+        [Command("dc", "!{#AFAFAF}[USAGE] donatorchat (text)", Alias = "donatorchat", GreedyArg = true)]
         public void cmd_donatorchat(Player player, string text)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2619,7 +2595,7 @@ namespace LSCC
             return;
         }
 
-        [Command("adminchat", Alias = "a", GreedyArg = true)]
+        [Command("adminchat", "!{#AFAFAF}[USAGE] adminchat (text)", Alias = "a", GreedyArg = true)]
         public void cmd_adminchat(Player player, string text)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2634,7 +2610,7 @@ namespace LSCC
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[A] {player.Name}:  {text}");
         }
 
-        [Command("looc", Alias = "b", GreedyArg = true)]
+        [Command("looc", "!{#AFAFAF}[USAGE] looc (text)", Alias = "b", GreedyArg = true)]
         public void cmd_b(Player player, string text)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2658,7 +2634,7 @@ namespace LSCC
             }
         }
 
-        [Command("low", Alias = "l", GreedyArg = true)]
+        [Command("low", "!{#AFAFAF}[USAGE] low (text)", Alias = "l", GreedyArg = true)]
         public void cmd_low(Player player, string text)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2680,7 +2656,7 @@ namespace LSCC
             }
         }
 
-        [Command("cw", Alias = "carwhisper", GreedyArg = true)]
+        [Command("cw", "!{#AFAFAF}[USAGE] carwhisper (text)", Alias = "carwhisper", GreedyArg = true)]
         public void cmd_cw(Player player, string text)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2706,7 +2682,7 @@ namespace LSCC
             return;
         }
 
-        [Command("s", Alias = "shout", GreedyArg = true)]
+        [Command("s", "!{#AFAFAF}[USAGE] shout (text)", Alias = "shout", GreedyArg = true)]
         public void cmd_shout(Player player, string text)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2731,7 +2707,7 @@ namespace LSCC
             return;
         }
 
-        [Command("m", Alias = "megaphone", GreedyArg = true)]
+        [Command("m", "!{#AFAFAF}[USAGE] megaphone (text)", Alias = "megaphone", GreedyArg = true)]
         public void cmd_m(Player player, string text)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2771,14 +2747,7 @@ namespace LSCC
             return;
         }
 
-        [Command("radio", Alias = "walkietalkie", GreedyArg = true)]
-        public void cmd_radio(Player player, string text)
-        {
-            cmd_r(player, text);
-            return;
-        }
-
-        [Command("r", Alias = "wt", GreedyArg = true)]
+        [Command("r", "!{#AFAFAF}[USAGE] radio (text)", Alias = "wt,walkietalkie,radio", GreedyArg = true)]
         public static void cmd_r(Player player, string text)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2849,7 +2818,7 @@ namespace LSCC
             return;
         }
 
-        [Command("ooc", Alias = "o", GreedyArg = true)]
+        [Command("ooc", "!{#AFAFAF}[USAGE] ooc (text)", Alias = "o", GreedyArg = true)]
         public void cmd_ooc(Player player, string text)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2876,7 +2845,7 @@ namespace LSCC
 
             Discord.SendTextChannel("staff-bot", $"**(OOC) | {player.Name}**: {text}");
         }
-        [Command("pm", GreedyArg = true)]
+        [Command("pm", "!{#AFAFAF}[USAGE] pm (target) (text)", GreedyArg = true)]
         public void cmd_pm(Player player, Player target, string text)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2902,7 +2871,7 @@ namespace LSCC
             return;
         }
 
-        [Command("removeguns", GreedyArg = true, Alias = "rguns")]
+        [Command("removeguns", "!{#AFAFAF}[USAGE] removeguns (target)", GreedyArg = true, Alias = "rguns")]
         public void cmd_removeguns(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2944,7 +2913,7 @@ namespace LSCC
             }
         }
 
-        [Command("freeze", GreedyArg = true)]
+        [Command("freeze", "!{#AFAFAF}[USAGE] freeze (target)", GreedyArg = true)]
         public void cmd_freeze(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2964,7 +2933,7 @@ namespace LSCC
         }
 
 
-        [Command("unfreeze", GreedyArg = true)]
+        [Command("unfreeze", "!{#AFAFAF}[USAGE] unfreeze (target)", GreedyArg = true)]
         public void cmd_unfreeze(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player))
@@ -2982,7 +2951,7 @@ namespace LSCC
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen {target.Name}.");
             }
         }
-        [Command("kick", GreedyArg = true)]
+        [Command("kick", "!{#AFAFAF}[USAGE] kick (target) (reason)", GreedyArg = true)]
         public void cmd_kick(Player player, Player target, string reason)
         {
             if (!EPlayer.LoggedIn(player))
@@ -3009,7 +2978,7 @@ namespace LSCC
 
         }
 
-        [Command("jail", GreedyArg = true)]
+        [Command("jail", "!{#AFAFAF}[USAGE] jail (target) (minutes) (reason)", GreedyArg = true)]
         public void cmd_jail(Player player, Player target, int mins, string reason)
         {
             if (!EPlayer.LoggedIn(player))
@@ -3041,7 +3010,7 @@ namespace LSCC
             return;
         }
 
-        [Command("unjail", GreedyArg = true)]
+        [Command("unjail", "!{#AFAFAF}[USAGE] unjail (target)", GreedyArg = true)]
         public void cmd_unjail(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player))
@@ -3071,7 +3040,7 @@ namespace LSCC
             return;
         }
 
-        [Command("warn", GreedyArg = true)]
+        [Command("warn", "!{#AFAFAF}[USAGE] warn (target) (reason)", GreedyArg = true)]
         public void cmd_warn(Player player, Player target, string reason)
         {
             if (!EPlayer.LoggedIn(player))
@@ -3098,7 +3067,7 @@ namespace LSCC
             return;
         }
 
-        [Command("unwarn", GreedyArg = true)]
+        [Command("unwarn", "!{#AFAFAF}[USAGE] unwarn (target)", GreedyArg = true)]
         public void cmd_unwarn(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player))
@@ -3124,7 +3093,7 @@ namespace LSCC
             return;
         }
 
-        [Command("mute", GreedyArg = true)]
+        [Command("mute", "!{#AFAFAF}[USAGE] mute (target) (mins) (reason)", GreedyArg = true)]
         public void cmd_mute(Player player, Player target, int mins, string reason)
         {
             if (!EPlayer.LoggedIn(player))
@@ -3157,7 +3126,7 @@ namespace LSCC
 
         }
 
-        [Command("unmute", GreedyArg = true)]
+        [Command("unmute", "!{#AFAFAF}[USAGE] unmute (target)", GreedyArg = true)]
         public void cmd_unmute(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player))
@@ -3185,7 +3154,7 @@ namespace LSCC
 
         }
 
-        [Command("me", GreedyArg = true)]
+        [Command("me", "!{#AFAFAF}[USAGE] me (action)", GreedyArg = true)]
         public static void cmd_me(Player player, string text)
         {
             if (!EPlayer.LoggedIn(player))
@@ -3200,7 +3169,7 @@ namespace LSCC
                 EPlayer.Action(player, text);
             }
         }
-        [Command("do", GreedyArg = true)]
+        [Command("do", "!{#AFAFAF}[USAGE] do (action)", GreedyArg = true)]
         public static void cmd_do(Player player, string text)
         {
             if (!EPlayer.LoggedIn(player))
@@ -3221,7 +3190,7 @@ namespace LSCC
                 }
             }
         }
-        [Command("slap", GreedyArg = true)]
+        [Command("slap", "!{#AFAFAF}[USAGE] slap (target)", GreedyArg = true)]
         public void cmd_slap(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player))
@@ -3239,7 +3208,7 @@ namespace LSCC
             }
         }
 
-        [Command("clothing", GreedyArg = true)]
+        [Command("clothing", "!{#AFAFAF}[USAGE] clothing (option: reset, cop, fugitive)", GreedyArg = true)]
         public void cmd_clothing(Player player, string team)
         {
             string parameters = "clothing " + team;
@@ -3254,7 +3223,7 @@ namespace LSCC
             return;
         }
 
-        [Command("char", GreedyArg = true, Alias = "character")]
+        [Command("char", "!{#AFAFAF}[USAGE] character (option: reset, edit, help, (reset)clothing, lobbyteam)", GreedyArg = true, Alias = "character")]
         public void cmd_char(Player player, string action)
         {
             if (!EPlayer.LoggedIn(player))
@@ -3436,7 +3405,7 @@ namespace LSCC
                 else player.SendChatMessage("!{#999999}Proper usage: /char lobbyteam (team), teams: cop OR fugitive");
             }
 
-            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'help', 'reset', 'clothing', 'resetclothing', 'lobbyteam'");
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'help', 'edit', 'reset', 'clothing', 'resetclothing', 'lobbyteam'");
 
             return;
         }
@@ -3467,7 +3436,7 @@ namespace LSCC
             return;
         }
 
-        [Command("acceptreport", Alias = "ar")]
+        [Command("acceptreport", "!{#AFAFAF}[USAGE] acceptreport (requestid)", Alias = "ar,acceptrequest")]
         public void cmd_acceptreport(Player player, int requestid)
         {
             if (!EPlayer.LoggedIn(player))
@@ -3495,14 +3464,7 @@ namespace LSCC
             return;
         }
 
-        [Command("acceptrequest")]
-        public void cmd_acceptrequest(Player player, int requestid)
-        {
-            cmd_acceptreport(player, requestid);
-            return;
-        }
-
-        [Command("denyreport", Alias = "dr", GreedyArg = true)]
+        [Command("denyreport", "!{#AFAFAF}[USAGE] denyreport (requestid) (reason)", Alias = "dr,denyrequest", GreedyArg = true)]
         public void cmd_denyreport(Player player, int requestid, string reason)
         {
             if (!EPlayer.LoggedIn(player))
@@ -3522,15 +3484,8 @@ namespace LSCC
             return;
         }
 
-        [Command("denyrequest")]
-        public void cmd_denyrequest(Player player, int requestid, string reason)
-        {
-            cmd_denyreport(player, requestid, reason);
-            return;
-        }
 
-
-        [Command("spec", GreedyArg = true)]
+        [Command("spec", "!{#AFAFAF}[USAGE] spec (target)", GreedyArg = true)]
         public void cmd_spec(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player))
@@ -3567,7 +3522,7 @@ namespace LSCC
             return;
         }
 
-        [Command("loadout", GreedyArg = true, Alias = "loadouts")]
+        [Command("loadout", "!{#AFAFAF}[USAGE] loadout (option: help, list, cop, fugitive)", GreedyArg = true, Alias = "loadouts")]
         public void cmd_loadout(Player player, string action)
         {
             if (!EPlayer.LoggedIn(player))
