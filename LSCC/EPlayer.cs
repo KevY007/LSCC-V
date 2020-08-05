@@ -239,7 +239,7 @@ namespace LSCC
 
                 player.SetDecoration(deco);
             }
-           
+            
 
             player.ClearAccessory(0);
             player.ClearAccessory(1);
@@ -247,7 +247,7 @@ namespace LSCC
 
             player.ClearDecorations();
 
-            player.TriggerEvent("char_ResetItems");
+            player.TriggerEvent("char_Reset");
 
             if (playerChar.Gender == 0) player.SetSkin(PedHash.FreemodeMale01);
             else player.SetSkin(PedHash.FreemodeFemale01);

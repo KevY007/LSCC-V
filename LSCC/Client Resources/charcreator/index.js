@@ -241,8 +241,11 @@ cancelItem.ForeColor = new Color(213, 0, 0);
 cancelItem.HighlightedForeColor = new Color(229, 57, 53);
 creatorMainMenu.AddItem(cancelItem);
 
-mp.events.add("char_ResetItems", () => {
+mp.events.add("char_Reset", () => {
     localPlayer.setDefaultComponentVariation();
+    localPlayer.model = 0x705E61F2;
+
+    applyCreatorOutfit();
 });
 
 creatorMainMenu.ListChange.on((item, listIndex) => {

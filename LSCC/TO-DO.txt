@@ -4,6 +4,8 @@ Check LSCC discord.
 
 increase shot tag distance
 
+BUSTED TYPE MODE IN A LOBBY? STAY CLOSE = BUSTTT NO WEAPONS
+
 admin records system
 
 Check out + Added server-side: NAPI.Task.WaitForMainThread(int delayTime = 0) (Task-based NAPI.Task.Run alternative, could be used with async/await)
@@ -16,3 +18,28 @@ check imrpovements
 use clientside to put player in vehicle as well on gmae start
 while(!incar)
  put
+
+
+
+FROM GTAW EVENTS_HANDLER.JS (COMPONENT)
+
+"get_weapons" : () => {
+		const localPlayer = mp.players.local;
+    localPlayer.getWeaponTypeInSlot = (weaponSlot) => mp.game.invoke('0xBBDDEBFD9564D52C', localPlayer.handle, weaponSlot);
+    localPlayer.getAmmoWeapon = (weaponhash) => mp.game.invoke('0x2406A9C8DA99D3F4', localPlayer.handle, weaponhash);
+    localPlayer.removeWeapon = (weaponhash) => mp.game.invoke('0xA48F593CC7A71FCC', localPlayer.handle, weaponhash);
+    localPlayer.setWeaponAmmo = (weaponhash, ammo) => mp.game.invoke('0xC8207C41C6D1E3CF', localPlayer.handle, weaponhash, ammo);
+    localPlayer.currentWeapon = mp.game.invoke('0x6678C142FAC881BA', localPlayer.handle);
+    localPlayer.giveWeaponComponent = (weaponhash, component) => mp.game.invoke('0xAD084726D7F23594', localPlayer.handle, weaponhash, component);
+    localPlayer.getWeaponClipSize = (weaponhash) => mp.game.invoke('0xADBCA3534D2F6BEB', weaponhash);
+    localPlayer.getAllWeapons = () => {
+        const weapons = [];
+        weaponSlots.forEach(weaponSlot => {
+            const weapon = localPlayer.getWeaponTypeInSlot(weaponSlot);
+            if (weapon !== 0 && weapon !== -1569615261) {
+                weapons[weapon] = { ammo: localPlayer.getAmmoWeapon(weapon) };
+            }
+        });
+		mp.events.callRemote('send_weaponlist', weapons);
+    };
+	},
