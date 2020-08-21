@@ -219,6 +219,69 @@ namespace LSCC
             return color;
         }
 
+        public static void _ApplyCharacter(Player player, CharacterData playerChar, int teamID)
+        {
+            if (playerChar.Gender == 0) player.SetSkin(PedHash.FreemodeMale01);
+            else player.SetSkin(PedHash.FreemodeFemale01);
+
+            HeadBlend a;
+
+            a.ShapeFirst = playerChar.Parents.Mother;
+            a.ShapeSecond = playerChar.Parents.Father;
+            a.ShapeThird = 0;
+
+            a.SkinFirst = playerChar.Parents.Mother;
+            a.SkinSecond = playerChar.Parents.Father;
+            a.SkinThird = 0;
+
+            a.SkinMix = playerChar.Parents.SkinSimilarity;
+            a.ShapeMix = playerChar.Parents.Similarity;
+            a.ThirdMix = 0.0f;
+
+            Dictionary<int, HeadOverlay> headOverlays = new Dictionary<int, HeadOverlay>();
+            for (byte i = 0; i < 10; i++)
+            {
+                HeadOverlay b;
+                b.Color = ColForOverlay(playerChar, i);
+                b.Index = playerChar.Appearance[i].Value;
+                b.Opacity = playerChar.Appearance[i].Opacity;
+
+                b.SecondaryColor = 0;
+                headOverlays.Add(i, b);
+            }
+
+            player.SetCustomization(playerChar.Gender == 0, a, playerChar.EyeColor, playerChar.Hair.Color, playerChar.Hair.HighlightColor, playerChar.Features,
+                headOverlays, new Decoration[0]);
+
+
+            var clothDictionary = new Dictionary<int, ComponentVariation>();
+
+            for (int i = 0; i < 12; i++)
+            {
+                if (playerChar.Clothing[teamID].Clothes[i].Texture != -1)
+                {
+                    clothDictionary.Add(i, new ComponentVariation
+                    {
+                        Drawable = playerChar.Clothing[teamID].Clothes[i].Drawable,
+                        Texture = playerChar.Clothing[teamID].Clothes[i].Texture
+                    });
+                }
+            }
+
+            player.SetClothes(clothDictionary);
+            player.SetClothes(2, playerChar.Hair.Hair, 0);
+
+
+            if (playerChar.Clothing[teamID].Hat != -1 && playerChar.Clothing[teamID].HatTxt != -1)
+            {
+                player.SetAccessories(0, playerChar.Clothing[teamID].Hat, playerChar.Clothing[teamID].HatTxt);
+            }
+            if (playerChar.Clothing[teamID].Glasses != -1 && playerChar.Clothing[teamID].GlassesTxt != -1)
+            {
+                player.SetAccessories(1, playerChar.Clothing[teamID].Glasses, playerChar.Clothing[teamID].GlassesTxt);
+            }
+        }
+
         public static void ApplyCharacter(Player player, CharacterData playerChar, int teamID = 1)
         {
             if(playerChar == null)
@@ -247,64 +310,16 @@ namespace LSCC
 
             player.ClearDecorations();
 
+            player.SetData("LastResetEchoEvent", 1);
+            player.SetData("ApplyChar", playerChar);
+            player.SetData("ApplyCharTeam", teamID);
+
+            player.SetClothes(8, 15, 0);
+            player.SetClothes(11, 15, 0);
+            player.SetClothes(3, 15, 0);
+            player.SetClothes(4, 14, 0);
+
             player.TriggerEvent("char_Reset");
-
-            if (playerChar.Gender == 0) player.SetSkin(PedHash.FreemodeMale01);
-            else player.SetSkin(PedHash.FreemodeFemale01);
-
-            HeadBlend a;
-
-            a.ShapeFirst = playerChar.Parents.Mother;
-            a.ShapeSecond = playerChar.Parents.Father;
-            a.ShapeThird = 0;
-
-            a.SkinFirst = playerChar.Parents.Mother;
-            a.SkinSecond = playerChar.Parents.Father;
-            a.SkinThird = 0;
-
-            a.SkinMix = playerChar.Parents.SkinSimilarity;
-            a.ShapeMix = playerChar.Parents.Similarity;
-            a.ThirdMix = 0.0f;
-
-            Dictionary<int, HeadOverlay> headOverlays = new Dictionary<int, HeadOverlay>();
-            for (byte i = 0; i < 10; i++)
-            {
-                HeadOverlay b;
-                b.Color = ColForOverlay(playerChar, i);
-                b.Index = playerChar.Appearance[i].Value;
-                b.Opacity = playerChar.Appearance[i].Opacity;
-                
-                b.SecondaryColor = 0;
-                headOverlays.Add(i, b);
-            }
-
-            player.SetCustomization(playerChar.Gender == 0, a, playerChar.EyeColor, playerChar.Hair.Color, playerChar.Hair.HighlightColor, playerChar.Features, 
-                headOverlays, new Decoration[0]);
-
-
-            var clothDictionary = new Dictionary<int, ComponentVariation>();
-
-            for (int i = 0; i < 12; i++)
-            {
-                if (playerChar.Clothing[teamID].Clothes[i].Texture != -1)
-                {
-                    clothDictionary.Add(i, new ComponentVariation { Drawable = playerChar.Clothing[teamID].Clothes[i].Drawable, 
-                        Texture = playerChar.Clothing[teamID].Clothes[i].Texture });
-                }
-            }
-            
-            player.SetClothes(clothDictionary);
-            player.SetClothes(2, playerChar.Hair.Hair, 0);
-
-
-            if (playerChar.Clothing[teamID].Hat != -1 && playerChar.Clothing[teamID].HatTxt != -1)
-            { 
-                player.SetAccessories(0, playerChar.Clothing[teamID].Hat, playerChar.Clothing[teamID].HatTxt);
-            }
-            if (playerChar.Clothing[teamID].Glasses != -1 && playerChar.Clothing[teamID].GlassesTxt != -1)
-            {
-                player.SetAccessories(1, playerChar.Clothing[teamID].Glasses, playerChar.Clothing[teamID].GlassesTxt);
-            }
         }
 
         public static void ShowCharCreator(Player player, CharacterData charData = null)

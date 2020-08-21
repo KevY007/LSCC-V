@@ -1240,6 +1240,17 @@ namespace LSCC
             OnPlayerRegister(player, _new);
         }
 
+        [RemoteEvent("char_ResetEcho")]
+        public void OnCharacterReset(Player player)
+        {
+            if (player.HasData("LastResetEchoEvent") && player.GetData<int>("LastResetEchoEvent") == 1)
+            {
+                EPlayer._ApplyCharacter(player, player.GetData<CharacterData>("ApplyChar"), player.GetData<int>("ApplyCharTeam"));
+            }
+
+            player.SetData("LastResetEchoEvent", 0);
+        }
+
         [RemoteEvent("OnCarSelectorSelect")]
         public void OnSelectorSelectCar(Player player, string carname)
         {

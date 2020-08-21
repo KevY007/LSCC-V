@@ -638,6 +638,14 @@ namespace LSCC
         {
             ContextFactory.Instance.SaveChanges();
 
+            RAGE.Entities.Players.All.ForEach((Player p) => {
+                p.SendChatMessage("!{#FFFFFF}(( !{#FF6347}Server is stopping... !{#FFFFFF}))");
+                p.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+
+                p.KickSilent();
+            }
+            );
+
             NAPI.Util.ConsoleOutput("Server saving & exiting...");
         }
 

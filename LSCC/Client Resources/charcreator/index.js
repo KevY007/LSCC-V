@@ -245,7 +245,12 @@ mp.events.add("char_Reset", () => {
     localPlayer.setDefaultComponentVariation();
     localPlayer.model = 0x705E61F2;
 
-    applyCreatorOutfit();
+    localPlayer.setComponentVariation(8, 15, 0, 0);
+    localPlayer.setComponentVariation(11, 15, 0, 0);
+    localPlayer.setComponentVariation(3, 15, 0, 0);
+    localPlayer.setComponentVariation(4, 14, 0, 0);
+
+    mp.events.callRemote("char_ResetEcho");
 });
 
 creatorMainMenu.ListChange.on((item, listIndex) => {
