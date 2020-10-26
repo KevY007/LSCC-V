@@ -199,7 +199,7 @@ public class LoadoutData
 public static class Settings
 {
     // Static Settings / Const
-    public const string Version = "0.1a";
+    public const string Version = "0.1b";
     public const int GameRunTime = 390; // Game Running Time in Seconds before STOP
     public const int MaxLobbies = 5; // Default/starting lobby num.
     public const int DefaultMaxInLobby = 35;
@@ -229,8 +229,8 @@ public static class Settings
     public static List<LoadoutData> Loadouts { get; set; }
     public static Dictionary<ulong, jWeaponData> WeaponData { get; set; }
 
-    public static System.Timers.Timer timer_Update { get; set; }
-    public static System.Timers.Timer timer_Game { get; set; }
+    public static int LastGameUpdate { get; set; }
+    public static int LastTimeUpdate { get; set; }
 
 
     // Locations
@@ -708,6 +708,8 @@ namespace LSCC
             Settings.NextLobbyID = 1;
             Settings.NextRequestID = 1;
             Settings.LastCountUpdate = Environment.TickCount;
+            Settings.LastTimeUpdate = 0;
+            Settings.LastGameUpdate = 0;
 
             NAPI.World.SetTime(12, 0, 0);
             NAPI.World.SetWeather(Weather.CLOUDS);
@@ -785,18 +787,24 @@ namespace LSCC
 
 
 
-
             ///////////////////////////////////////////////////////////////////////////////
+        }
 
-            Settings.timer_Update = new System.Timers.Timer();
-            Settings.timer_Update.Elapsed += new ElapsedEventHandler(TimeUpdate);
-            Settings.timer_Update.Interval = 15000;
-            Settings.timer_Update.Enabled = true;
-
-            Settings.timer_Game = new System.Timers.Timer();
-            Settings.timer_Game.Elapsed += new ElapsedEventHandler(GameUpdate);
-            Settings.timer_Game.Interval = 1000;
-            Settings.timer_Game.Enabled = true;
+        [ServerEvent(Event.Update)]
+        public void OnUpdate()
+        {
+            if (Environment.TickCount - Settings.LastTimeUpdate >= 15000)
+            {
+                TimeUpdate();
+                Settings.LastTimeUpdate = Environment.TickCount;
+                NAPI.Util.ConsoleOutput("Time Update called");
+            }
+            if (Environment.TickCount - Settings.LastGameUpdate >= 1000)
+            {
+                GameUpdate();
+                Settings.LastGameUpdate = Environment.TickCount;
+                NAPI.Util.ConsoleOutput("Game Update called");
+            }
         }
 
         public void GameStartCountdown(int time, int lobbyid)
@@ -847,39 +855,8 @@ namespace LSCC
             }
         }
 
-        public void TimeUpdate(object source, ElapsedEventArgs e)
+        public void TimeUpdate()
         {
-            NAPI.Task.Run(() =>
-            {
-                if (Environment.TickCount - Settings.LastCountUpdate >= 120000 &&
-                    (int)Discord._client.ConnectionState == 2)
-                {
-                    Settings.LastCountUpdate = Environment.TickCount;
-
-                    foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
-                    {
-                        var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCCountID);
-
-                        if (botchan != null)
-                        {
-                            botchan.ModifyAsync(vc => vc.Name = ($"Players Online: {RAGE.Entities.Players.Count}"));
-                        }
-                    }
-
-                    foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
-                    {
-                        var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCGamesID);
-
-                        if (botchan != null)
-                        {
-                            botchan.ModifyAsync(vc => vc.Name = ($"Chases Running: {Settings.Lobbies.Where(l => l.gameStatus == 1).Count()}"));
-                        }
-                    }
-
-                    //NAPI.Util.ConsoleOutput("Updated the DISCORD counts.");
-                }
-            }, 100);
-
             lock (Settings.Lobbies)
             {
                 foreach (LobbyData lobby in Settings.Lobbies)
@@ -1021,6 +998,37 @@ namespace LSCC
                     }
                 }
             }
+
+            System.Threading.Tasks.Task.Run(() =>
+            {
+                if (Environment.TickCount - Settings.LastCountUpdate >= 120000 &&
+                    (int)Discord._client.ConnectionState == 2)
+                {
+                    Settings.LastCountUpdate = Environment.TickCount;
+
+                    foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
+                    {
+                        var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCCountID);
+
+                        if (botchan != null)
+                        {
+                            botchan.ModifyAsync(vc => vc.Name = ($"Players Online: {RAGE.Entities.Players.Count}"));
+                        }
+                    }
+
+                    foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
+                    {
+                        var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCGamesID);
+
+                        if (botchan != null)
+                        {
+                            botchan.ModifyAsync(vc => vc.Name = ($"Chases Running: {Settings.Lobbies.Where(l => l.gameStatus == 1).Count()}"));
+                        }
+                    }
+
+                    //NAPI.Util.ConsoleOutput("Updated the DISCORD counts.");
+                }
+            });
             return;
         }
 
@@ -1784,7 +1792,7 @@ namespace LSCC
             return true;
         }
 
-        public static void GameUpdate(object source, ElapsedEventArgs e)
+        public static void GameUpdate()
         {
             if (Environment.TickCount - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
             {

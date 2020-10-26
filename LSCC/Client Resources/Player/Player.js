@@ -481,39 +481,27 @@ mp.events.add('render', () => {
 
 function OnPlayerWeaponShot(targetPosition, targetEntity)
 {
-    if(targetEntity !== null && targetEntity !== undefined)
+    if(targetEntity !== null && targetEntity !== undefined && targetEntity.type === 'player')
     {
-        if(typeof targetEntity.getVariable === 'function')
+        if(targetEntity.getVariable("Team") !== undefined && targetEntity.getVariable("HasShot") !== undefined)
         {
-            if(targetEntity.getVariable("Team") !== undefined) 
+            if(targetEntity.isInAnyVehicle(false) == false)
             {
-                if(targetEntity.getVariable("HasShot") !== undefined) // Cops have HasShot too, cars don't, this gives us a 100% PLAYER entity handle.
-                {
-                    if(targetEntity.isInAnyVehicle(false) == false)
-                    {
-                        mp.events.callRemote("OnPlayerShotPlayer", targetPosition, targetEntity, mp.players.local.weapon);
+                if(targetPosition === null || targetPosition === undefined) targetPosition = new mp.Vector3(0, 0, 0);
 
-                        if(targetEntity.getVariable("Team") != -1)
-                        {
-                            if(player.getVariable("Team") == targetEntity.getVariable("Team"))
-                            {
-                                mp.events.callRemote("PlayerShotAtWrongPlayer", 0, targetEntity);
-                            }
-                            if(player.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
-                            {
-                                mp.events.callRemote("PlayerShotAtWrongPlayer", 1, targetEntity);
-                            }
-                        }
-                    }
+                if(mp.players.local.weapon !== null || mp.players.local.weapon !== undefined) {
+                    mp.events.callRemote("OnPlayerShotPlayer", targetPosition, targetEntity, mp.players.local.weapon);
                 }
-                else // a car/object of same team.
-                {
-                    if(targetEntity.getVariable("Team") != -1)
-                    {
-                        if(player.getVariable("Team") == targetEntity.getVariable("Team"))
-                        {
 
-                        }
+                if(targetEntity.getVariable("Team") != -1)
+                {
+                    if(player.getVariable("Team") == targetEntity.getVariable("Team"))
+                    {
+                        mp.events.callRemote("PlayerShotAtWrongPlayer", 0, targetEntity);
+                    }
+                    if(player.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
+                    {
+                        mp.events.callRemote("PlayerShotAtWrongPlayer", 1, targetEntity);
                     }
                 }
             }
