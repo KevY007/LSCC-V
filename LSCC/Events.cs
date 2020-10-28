@@ -1386,8 +1386,9 @@ namespace LSCC
         }
 
         [RemoteEvent("OnPlayerShotPlayer")] // wont trigger incar btw 
-        public void OnPlayerShootPlayer(Player player, Vector3 targetPosition, Player target, uint weapon)
+        public void OnPlayerShootPlayer(Player player, float x, float y, float z, Player target, uint weapon)
         {
+            Vector3 targetPosition = new Vector3(x, y, z);
             if (weapon == (uint)WeaponHash.Stungun)
             {
                 if (target.GetSharedData<bool>("HasShot") != true)

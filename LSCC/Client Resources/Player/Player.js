@@ -487,11 +487,7 @@ function OnPlayerWeaponShot(targetPosition, targetEntity)
         {
             if(targetEntity.isInAnyVehicle(false) == false)
             {
-                if(targetPosition === null || targetPosition === undefined) targetPosition = new mp.Vector3(0, 0, 0);
-
-                if(mp.players.local.weapon !== null || mp.players.local.weapon !== undefined) {
-                    mp.events.callRemote("OnPlayerShotPlayer", targetPosition, targetEntity, mp.players.local.weapon);
-                }
+                mp.events.callRemote("OnPlayerShotPlayer", targetPosition.x, targetPosition.y, targetPosition.z, targetEntity, mp.players.local.weapon);
 
                 if(targetEntity.getVariable("Team") != -1)
                 {
@@ -514,6 +510,7 @@ function OnPlayerWeaponShot(targetPosition, targetEntity)
 }
 
 mp.events.add("playerWeaponShot", OnPlayerWeaponShot);
+
 
 mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage) => {
 

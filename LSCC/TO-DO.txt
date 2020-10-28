@@ -4,6 +4,11 @@ Check LSCC discord.
 
 increase shot tag distance
 
+enable chat or anything to display messages in login screen like login errors because u dont see it without chat
+or actually send notifications? it worked maybe we disabled thats y
+
+for CHAT scroll, so you can scroll just by mwheel up or down in chat, forward chat box's mwheelup and down to scroll in javascript or smth
+
 BUSTED TYPE MODE IN A LOBBY? STAY CLOSE = BUSTTT NO WEAPONS
 
 admin records system
