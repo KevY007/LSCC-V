@@ -2313,6 +2313,7 @@ namespace LSCC
             if (EPlayer.GetAccount(player).Admin >= 4)
             {
                 player.SendChatMessage("[Admin Lv 4]: /serveroptions /grantxp /saveserver /dbgplayanim /dbgmaxspeed /dbgdriveforce");
+                player.SendChatMessage("[Admin Lv 4]: /triggerupdate");
             }
             if (EPlayer.GetAccount(player).Admin >= 5)
             {
@@ -2346,6 +2347,33 @@ namespace LSCC
             target.SendChatMessage($"!{{#FF6347]}}[AdmCmd] {player.Name} has given you {xp} xp.");
             return;
         }
+
+        [Command("triggerupdate", Alias = "timeupdate")]
+        public void cmd_triggerupdate(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                return;
+            }
+
+            if ((Settings.Timers.TimeUpdate == null || !Settings.Timers.TimeUpdate.IsRunning) || 
+                (Settings.Timers.GameUpdate == null || !Settings.Timers.GameUpdate.IsRunning)) {
+                player.SendChatMessage("!{#FF6347}[CRITICAL] One or more of server's crucial updating timers has crashed. Restart server ASAP please.");
+                return;
+            }
+
+            Settings.Timers.TimeUpdate.Execute(false);
+            Settings.Timers.GameUpdate.Execute(false);
+
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has triggered server's updating timers outside of schedule.");
+
+            return;
+        }
+
 
         [Command("maps")]
         public void cmd_maps(Player player)

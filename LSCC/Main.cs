@@ -15,7 +15,7 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Globalization;
-using System.Timers;
+using RAGETimer.Shared;
 
 public partial class jWeaponData
 {
@@ -229,8 +229,12 @@ public static class Settings
     public static List<LoadoutData> Loadouts { get; set; }
     public static Dictionary<ulong, jWeaponData> WeaponData { get; set; }
 
-    public static int LastGameUpdate { get; set; }
-    public static int LastTimeUpdate { get; set; }
+
+    public static class Timers
+    { 
+        public static Timer GameUpdate { get; set; }
+        public static Timer TimeUpdate { get; set; }
+    }
 
 
     // Locations
@@ -636,6 +640,10 @@ namespace LSCC
         [ServerEvent(Event.ResourceStop)]
         public void OnResourceStop()
         {
+            if (Settings.Timers.GameUpdate != null) Settings.Timers.GameUpdate.Kill();
+            if (Settings.Timers.TimeUpdate != null) Settings.Timers.TimeUpdate.Kill();
+
+
             ContextFactory.Instance.SaveChanges();
 
             RAGE.Entities.Players.All.ForEach((Player p) => {
@@ -708,8 +716,10 @@ namespace LSCC
             Settings.NextLobbyID = 1;
             Settings.NextRequestID = 1;
             Settings.LastCountUpdate = Environment.TickCount;
-            Settings.LastTimeUpdate = 0;
-            Settings.LastGameUpdate = 0;
+
+
+            Settings.Timers.TimeUpdate = null;
+            Settings.Timers.GameUpdate = null;
 
             NAPI.World.SetTime(12, 0, 0);
             NAPI.World.SetWeather(Weather.CLOUDS);
@@ -788,23 +798,16 @@ namespace LSCC
 
 
             ///////////////////////////////////////////////////////////////////////////////
+
+
+            Settings.Timers.GameUpdate = new RAGETimer.Shared.Timer(() => GameUpdate(), 1000, 0);
+            Settings.Timers.TimeUpdate = new RAGETimer.Shared.Timer(() => TimeUpdate(), 15000, 0);
         }
 
         [ServerEvent(Event.Update)]
         public void OnUpdate()
         {
-            if (Environment.TickCount - Settings.LastTimeUpdate >= 15000)
-            {
-                TimeUpdate();
-                Settings.LastTimeUpdate = Environment.TickCount;
-                NAPI.Util.ConsoleOutput("Time Update called");
-            }
-            if (Environment.TickCount - Settings.LastGameUpdate >= 1000)
-            {
-                GameUpdate();
-                Settings.LastGameUpdate = Environment.TickCount;
-                NAPI.Util.ConsoleOutput("Game Update called");
-            }
+            
         }
 
         public void GameStartCountdown(int time, int lobbyid)
