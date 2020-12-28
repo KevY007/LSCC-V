@@ -644,16 +644,22 @@ namespace LSCC
             if (Settings.Timers.GameUpdate != null) Settings.Timers.GameUpdate.Kill();
             if (Settings.Timers.TimeUpdate != null) Settings.Timers.TimeUpdate.Kill();
 
-
             ContextFactory.Instance.SaveChanges();
 
             RAGE.Entities.Players.All.ForEach((Player p) => {
                 p.SendChatMessage("!{#FFFFFF}(( !{#FF6347}Server is stopping... !{#FFFFFF}))");
                 p.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
-                p.KickSilent();
-            }
-            );
+                EPlayer.Freeze(p, true);
+                EPlayer.Handcuff(p, true);
+                p.Position = Vector3.RandomXy();
+                p.SendNotification("~r~Server stopping now!", true);
+
+
+
+                p.KickSilent(); // Sends a "timeout" type disconnection so they can reconnect.
+
+            });
 
             NAPI.Util.ConsoleOutput("Server saving & exiting...");
         }
