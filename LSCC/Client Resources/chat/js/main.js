@@ -139,6 +139,7 @@ for(let fn in api)
 	mp.events.add(fn, api[fn]);
 }
 
+
 $(document).ready(function()
 {
 	chat.container = $("#chat ul#chat_messages");
@@ -147,7 +148,32 @@ $(document).ready(function()
     $(".ui_element").show();
 	chatAPI.push("!{#A9C4E4}Connected to Los Santos Copchase.");
 
+	window.addEventListener("wheel", function(event)
+	{
+		event.preventDefault();
+
+		document.getElementById("chat_messages").scrollTo(0, document.getElementById("chat_messages").scrollTop - event.deltaY); 
+
+		/*document.getElementById("chat_messages").scrollBy({ 
+			top: rate,
+			left: 0, 
+			behavior: 'smooth' 
+		});*/
+
+		// inversely equally scroll
+
+	}, { passive: false });
+
 	toggleScroll(false);
+
+	window.addEventListener("keydown", function(e) {
+		// space and arrow keys
+		if([32].indexOf(e.keyCode) > -1) {
+			e.preventDefault();
+		}
+	}, false);
+
+	
 
     $("body").keydown(function(event)
 	{
@@ -205,6 +231,8 @@ $(document).ready(function()
 
 				chat.historyMsgs.unshift(value);
 				chat.currentIndex = 0;
+
+				$("#chat ul#chat_messages").scrollTop(0); // Scroll all the way to down.
 
                 if (value[0] == "/")
 				{
