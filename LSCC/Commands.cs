@@ -234,6 +234,21 @@ namespace LSCC
             return;
         }
 
+        [Command("info", Alias = "discord")]
+        public void cmd_info(Player player)
+        {
+            player.SendChatMessage("!{FFFF00}============| SERVER INFORMATION |============");
+
+            player.SendChatMessage("!{#FF6347}Server Discord: !{#FFFFFF}discord.gg/y3g2WuR");
+            player.SendChatMessage("!{#FFDD00}Community/Portal Discord: !{#FFFFFF}discord.gg/8wBg82v");
+            player.SendChatMessage("!{#FFFF00}Website: !{#FFFFFF}ls-cc.info");
+            player.SendChatMessage(" ");
+            player.SendChatMessage("!{#FFFFFF}Scripted by !{#FF6347}KevY !{#FFFFFF}as the sole dev.");
+            player.SendChatMessage("!{#FFFFFF}Thanks to !{#FF6347}RotX & LSCC SAMP staff !{#FFFFFF}for web assistance and ideas respectively.");
+            player.SendChatMessage(" ");
+            return;
+        }
+
         [Command("aveh", "!{#AFAFAF}[USAGE] aveh (vehicle model name)", Alias = "av")]
         public void cmd_aveh(Player player, string carname)
         {
@@ -1754,7 +1769,7 @@ namespace LSCC
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /derby");
             player.SendChatMessage("!{#28E0DA}[Mode: DM]: /dm /dmarena");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /freeroam /veh /customvehlist /teleport /mytime /myweather");
-            player.SendChatMessage("!{#A5A8A8}[Dbg/Test/Misc]: /pos /updaterate /lcmenu");
+            player.SendChatMessage("!{#A5A8A8}[Dbg/Test/Misc]: /pos /updaterate /lcmenu /info (credits etc)");
 
             if (EPlayer.GetAccount(player).DonatorLevel >= 1)
             {

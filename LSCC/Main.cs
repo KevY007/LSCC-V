@@ -223,6 +223,7 @@ public static class Settings
     public static int[] Time { get; set; }
     public static int DerbyTimeLeft { get; set; }
     public static int LastDerbyTick { get; set; }
+    public static int LastMessageTick { get; set; }
     public static List<RequestData> Requests { get; set; }
     public static int NextRequestID { get; set; }
     public static int LastCountUpdate { get; set; }
@@ -716,6 +717,7 @@ namespace LSCC
             Settings.NextLobbyID = 1;
             Settings.NextRequestID = 1;
             Settings.LastCountUpdate = Environment.TickCount;
+            Settings.LastMessageTick = Environment.TickCount;
 
 
             Settings.Timers.TimeUpdate = null;
@@ -860,6 +862,22 @@ namespace LSCC
 
         public void TimeUpdate()
         {
+            if(Environment.TickCount - Settings.LastMessageTick > 90000)
+            {
+                string[] msgList = {
+                    "If you would like to experience some exclusive and limited features then donate to keep the server running!",
+                    "The server's discord, information and credits can be found at /discord or /info!",
+                    "Use /rules to see the server rules.",
+                    "Use /cmds to see the server commands.",
+                    "Have you seen someone cheating? Please, contact an administrator ASAP.",
+                    "Bored of waiting in the lobby? Check out our side activities like DM. Freeroam, Derby!",
+                    "Want to earn some tokens? Head over to /dm!"
+                };
+
+                RAGE.Entities.Players.All.ForEach((Player e) => e.SendChatMessage("[?] !{#F0FC72}" + msgList.ElementAt(new Random().Next(0, msgList.Length))));
+
+                Settings.LastMessageTick = Environment.TickCount;
+            }
             lock (Settings.Lobbies)
             {
                 foreach (LobbyData lobby in Settings.Lobbies)
