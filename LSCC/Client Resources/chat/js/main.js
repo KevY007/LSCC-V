@@ -169,7 +169,9 @@ $(document).ready(function()
 	window.addEventListener("keydown", function(e) {
 		// space and arrow keys
 		if([32].indexOf(e.keyCode) > -1) {
-			e.preventDefault();
+			if((chat.input != null && chat.active) == false) {
+				e.preventDefault();
+			}
 		}
 	}, false);
 
