@@ -969,7 +969,7 @@ namespace LSCC
                 }
             }
 
-            if (!spam && Settings.UseDiscord) Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) |** {message}");
+            if (!spam) Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) |** {message}");
         }
         
         public static void SendMessageToAllAdmins(string message)
@@ -985,7 +985,7 @@ namespace LSCC
                 }
             }
 
-            if (Settings.UseDiscord) Discord.SendTextChannel("staff-bot", $"(ADM) |** {message}**");
+            Discord.SendTextChannel("staff-bot", $"(ADM) |** {message}**");
         }
     }
 }

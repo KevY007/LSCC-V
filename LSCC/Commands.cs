@@ -3219,10 +3219,7 @@ namespace LSCC
                 NAPI.Chat.SendChatMessageToAll($"(( [OOC] {EPlayer.GetAdminLevelName(EPlayer.GetAccount(player).Admin, true)}!{{#FFFFFF}} {player.Name}: {text} ))");
             }
 
-            if (Settings.UseDiscord)
-            {
-                Discord.SendTextChannel("staff-bot", $"**(OOC) | {player.Name}**: {text}");
-            }
+            Discord.SendTextChannel("staff-bot", $"**(OOC) | {player.Name}**: {text}");
         }
 
         [Command("pm", "!{#AFAFAF}[USAGE] pm (target) (text)", GreedyArg = true)]

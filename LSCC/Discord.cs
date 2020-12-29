@@ -21,18 +21,21 @@ namespace LSCC
 
         private Task Log(LogMessage msg)
         {
+            if (!Settings.UseDiscord) return Task.CompletedTask;
             Console.WriteLine("[DISCORD] " + msg.ToString());
             return Task.CompletedTask;
         }
 
         private Task Log(string msg)
         {
+            if (!Settings.UseDiscord) return Task.CompletedTask;
             Console.WriteLine("[DISCORD] " + msg);
             return Task.CompletedTask;
         }
 
         public static Task SendTextChannel(string channel, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
+            if (!Settings.UseDiscord) return Task.CompletedTask;
             if (_client == null) return Task.CompletedTask;
             if (_client.ConnectionState != ConnectionState.Connected) return Task.CompletedTask;
 
@@ -57,6 +60,7 @@ namespace LSCC
 
         public static Task MessageReceived(SocketMessage context)
         {
+            if (!Settings.UseDiscord) return Task.CompletedTask;
             if (_client == null) return Task.CompletedTask;
             if (_client.ConnectionState != ConnectionState.Connected) return Task.CompletedTask;
 
@@ -165,15 +169,18 @@ namespace LSCC
 
         public async Task MainAsync()
         {
-            _client = new DiscordSocketClient();
+            if (Settings.UseDiscord)
+            {
+                _client = new DiscordSocketClient();
 
-            _client.Log += Log;
-            _client.MessageReceived += MessageReceived;
+                _client.Log += Log;
+                _client.MessageReceived += MessageReceived;
 
-            var token = Settings.DCBotToken;
+                var token = Settings.DCBotToken;
 
-            await _client.LoginAsync(TokenType.Bot, token);
-            await _client.StartAsync();
+                await _client.LoginAsync(TokenType.Bot, token);
+                await _client.StartAsync();
+            }
         }
     }
 }

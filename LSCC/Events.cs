@@ -20,7 +20,7 @@ namespace LSCC
             BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.HWID.CompareTo(player.Serial) == 0 || ban.IP.CompareTo(player.Address) == 0 ||
                 ban.RockstarID == player.SocialClubId);
 
-            if (Settings.UseDiscord) Discord.SendTextChannel("staff-bot", $"**{player.Name} has joined the server.** *(Total online: {RAGE.Entities.Players.Count})*");
+            Discord.SendTextChannel("staff-bot", $"**{player.Name} has joined the server.** *(Total online: {RAGE.Entities.Players.Count})*");
 
             if (ban != null)
             {
@@ -73,7 +73,7 @@ namespace LSCC
 
             player.TriggerEvent("InitChaseTimer");
 
-            player.TriggerEvent("PlayThemeSong");
+            player.TriggerEvent("PlayThemeSong", "http://51.91.109.79/_lsccv_stuff/v_open.mp3", 0.055);
 
             NAPI.Task.Run(() =>
             {
@@ -337,7 +337,7 @@ namespace LSCC
 
                 EPlayer.ResetPlayerData(player);
 
-                if (Settings.UseDiscord) Discord.SendTextChannel("staff-bot", $"**{player.Name} has left the server.** *(Total online: {RAGE.Entities.Players.Count - 1})*");
+                Discord.SendTextChannel("staff-bot", $"**{player.Name} has left the server.** *(Total online: {RAGE.Entities.Players.Count - 1})*");
             }
         }
 
@@ -387,7 +387,7 @@ namespace LSCC
             if (killer != null && !killer.IsNull && killer != player)
             {
                 NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
-                if (Settings.UseDiscord) Discord.SendTextChannel("staff-bot", $"`(Death) | Killer: {killer.Name} ({killer.GetSharedData<int>("Team")}), Victim: {player.Name} ({player.GetSharedData<int>("Team")}), Item: {(reasonStr == null ? "N/A" : reasonStr)}`");
+                Discord.SendTextChannel("staff-bot", $"`(Death) | Killer: {killer.Name} ({killer.GetSharedData<int>("Team")}), Victim: {player.Name} ({player.GetSharedData<int>("Team")}), Item: {(reasonStr == null ? "N/A" : reasonStr)}`");
 
                 if (killer.GetSharedData<int>("InLobby") > -1 && killer.GetSharedData<int>("InDM") > -1)
                 {
@@ -687,7 +687,7 @@ namespace LSCC
         public static void OnPlayerLogin(Player player, Account acc)
         {
             player.TriggerEvent("StopThemeSong");
-            if (Settings.UseDiscord) Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in as {acc.Username}.*");
+            Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in as {acc.Username}.*");
 
             EPlayer.SetDiscordStatus(player, $"Logging in as {acc.Username}");
             NAPI.Util.ConsoleOutput($"[Login] {player.Name} has logged in as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
@@ -939,7 +939,7 @@ namespace LSCC
 
         public static void OnPlayerRegister(Player player, Account acc)
         {
-            if (Settings.UseDiscord) Discord.SendTextChannel("staff-bot", $"*{player.Name} has registered.*");
+            Discord.SendTextChannel("staff-bot", $"*{player.Name} has registered.*");
 
             EPlayer.SetDiscordStatus(player, $"Registering as {acc.Username}");
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has registered as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");

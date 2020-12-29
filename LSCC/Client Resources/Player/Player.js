@@ -722,8 +722,8 @@ mp.events.add(
             mp.game.invoke("0xD966D51AA5B28BB9", player.handle, weapon, comp);
             mp.game.invoke("0xADF692B254977C0C", player.handle, weapon, true);
         },
-        "PlayThemeSong": () => {
-            themeSoundID = mp.game.audio.playSoundEx("http://51.89.22.60/uploads/goodbye_apparat.mp3", 0.035);
+        "PlayThemeSong": (link, level) => {
+            themeSoundID = mp.game.audio.playSoundEx(link, level);
         },
         "StopThemeSong": () => {
             mp.game.audio.stopSoundEx(themeSoundID);
