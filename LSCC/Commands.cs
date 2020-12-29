@@ -1759,7 +1759,7 @@ namespace LSCC
             player.SendChatMessage("!{#0079DB}[Los Santos Copchase V !{#2BA3FF}BETA Commands]:");
             player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /keys /admins /fontsize");
             player.SendChatMessage("[General]: /report /helpme /l(ow) /c(ar)w(hisper) /s(hout)");
-            player.SendChatMessage("[Squad/Partner]: /squad /squadjoin /s(quad)c(hat) /squadaccept /squadmembers");
+            player.SendChatMessage("[Squad/Partner]: /squad /squadleave /s(quad)c(hat) /squadaccept /squadmembers");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys for activation)");
