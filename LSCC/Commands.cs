@@ -913,12 +913,15 @@ namespace LSCC
 
             foreach (KeyValuePair<ulong, wComponentData> i in wepItems)
             {
+                wComponentData newDataTwo = new wComponentData();
+
                 if (i.Key == wephash)
                 {
-                    if (i.Value.Components.Contains(comphash)) i.Value.Components.Remove(comphash);
+                    newDataTwo = i.Value;
+                    if (i.Value.Components.Contains(comphash)) newDataTwo.Components.Remove(comphash);
                 }
 
-                newWepData.Add(i.Key, i.Value);
+                newWepData.Add(i.Key, newDataTwo);
             }
 
             EPlayer.GetAccount(target).WeaponComponents = NAPI.Util.ToJson(newWepData);
@@ -1058,12 +1061,15 @@ namespace LSCC
 
             foreach (KeyValuePair<ulong, wComponentData> i in wepItems)
             {
+                wComponentData newDataTwo = new wComponentData();
+
                 if(i.Key == wephash)
                 {
-                    if (!i.Value.Components.Contains(comphash)) i.Value.Components.Add(comphash);
+                    newDataTwo = i.Value; 
+                    if(!i.Value.Components.Contains(comphash)) newDataTwo.Components.Add(comphash);
                 }
 
-                newWepData.Add(i.Key, i.Value);
+                newWepData.Add(i.Key, newDataTwo);
             }
 
             EPlayer.GetAccount(target).WeaponComponents = NAPI.Util.ToJson(newWepData);

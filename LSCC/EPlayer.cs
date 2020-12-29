@@ -593,36 +593,30 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).WeaponComponents != null && EPlayer.GetAccount(player).WeaponComponents.Length > 3)
             {
-                var weapons = Enum.GetValues(typeof(WeaponHash)).Cast<WeaponHash>();
-                weapons.ToList().ForEach(wep =>
+                try
                 {
-                    int ammo = player.GetWeaponAmmo(wep);
-                    if (ammo > 0)
+
+                    Dictionary<ulong, wComponentData> weaponCompsData = new Dictionary<ulong, wComponentData>();
+                    weaponCompsData = NAPI.Util.FromJson<Dictionary<ulong, wComponentData>>(EPlayer.GetAccount(player).WeaponComponents);
+
+                    foreach (KeyValuePair<ulong, wComponentData> i in weaponCompsData)
                     {
-                        wComponentData wepComps;
-
-                        wComponentData.FromJson(EPlayer.GetAccount(player).WeaponComponents).TryGetValue((ulong)wep, out wepComps);
-
-                        jWeaponData wepdat;
-                        if (Settings.WeaponData.TryGetValue((ulong)wep, out wepdat))
+                        if (player.Weapons.Contains((WeaponHash)i.Key))
                         {
-                            foreach (ulong compid in wepComps.Components)
+                            i.Value.Components.ForEach((ulong comphash) =>
                             {
-                                Component comp;
-                                if (wepdat.Components.TryGetValue(compid, out comp))
+                                foreach (Player p in RAGE.Entities.Players.All)
                                 {
-                                    foreach (Player i in RAGE.Entities.Players.All)
+                                    if (p.Dimension == player.Dimension)
                                     {
-                                        if (i.Dimension == player.Dimension)
-                                        {
-                                            i.TriggerEvent("AttachWeaponComponent", player, (ulong)wep, compid);
-                                        }
+                                        p.TriggerEvent("AttachWeaponComponent", player, i.Key, comphash);
                                     }
                                 }
-                            }
+                            });
                         }
                     }
-                });
+                }
+                catch { }
             }
 
             player.GiveWeapon(WeaponHash.Stungun, 1);
@@ -668,36 +662,30 @@ namespace LSCC
 
             if (EPlayer.GetAccount(player).WeaponComponents != null && EPlayer.GetAccount(player).WeaponComponents.Length > 3)
             {
-                var weapons = Enum.GetValues(typeof(WeaponHash)).Cast<WeaponHash>(); 
-                weapons.ToList().ForEach(wep =>
+                try
                 {
-                    int ammo = player.GetWeaponAmmo(wep);
-                    if (ammo > 0)
+
+                    Dictionary<ulong, wComponentData> weaponCompsData = new Dictionary<ulong, wComponentData>();
+                    weaponCompsData = NAPI.Util.FromJson<Dictionary<ulong, wComponentData>>(EPlayer.GetAccount(player).WeaponComponents);
+
+                    foreach (KeyValuePair<ulong, wComponentData> i in weaponCompsData)
                     {
-                        wComponentData wepComps;
-
-                        wComponentData.FromJson(EPlayer.GetAccount(player).WeaponComponents).TryGetValue((ulong)wep, out wepComps);
-
-                        jWeaponData wepdat;
-                        if (Settings.WeaponData.TryGetValue((ulong)wep, out wepdat))
+                        if (player.Weapons.Contains((WeaponHash)i.Key))
                         {
-                            foreach (ulong compid in wepComps.Components)
+                            i.Value.Components.ForEach((ulong comphash) =>
                             {
-                                Component comp;
-                                if (wepdat.Components.TryGetValue(compid, out comp))
+                                foreach (Player p in RAGE.Entities.Players.All)
                                 {
-                                    foreach (Player i in RAGE.Entities.Players.All)
+                                    if (p.Dimension == player.Dimension)
                                     {
-                                        if (i.Dimension == player.Dimension)
-                                        {
-                                            i.TriggerEvent("AttachWeaponComponent", player, (ulong)wep, compid);
-                                        }
+                                        p.TriggerEvent("AttachWeaponComponent", player, i.Key, comphash);
                                     }
                                 }
-                            }
+                            });
                         }
                     }
-                });
+                }
+                catch { }
             }
             return;
         }
