@@ -943,7 +943,7 @@ namespace LSCC
 
             UInt64 wephash = 0;
             bool found = false;
-            jWeaponData itemData = null;
+            jWeaponData itemData = new jWeaponData();
 
             if (!UInt64.TryParse(wep, out wephash))
             {
@@ -989,7 +989,7 @@ namespace LSCC
 
             found = false;
             UInt64 comphash = 0;
-            Component comp = null;
+            Component comp = new Component();
 
             if (!UInt64.TryParse(component, out comphash))
             {
@@ -998,7 +998,7 @@ namespace LSCC
 
             foreach (var item in itemData.Components)
             {
-                if (wephash != 0)
+                if (comphash != 0)
                 {
                     if (item.Key == wephash)
                     {
