@@ -522,11 +522,10 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                 if(targetEntity.getVariable("Team") == player.getVariable("Team"))
                 {
                     breakShot = true; // Break team-kill car by default
-
-                    targetEntity.getOccupants().forEach(occupant => {
-                        if(occupant.getVariable("Team") != player.getVariable("Team")) {
+                    
+                    mp.players.forEach(occupant => {
+                        if(occupant.isInVehicle(targetEntity.handle, false) && occupant.getVariable("Team") != player.getVariable("Team")) {
                             breakShot = false; // Don't break shot if there's a fugi in!
-                            break;
                         }
                     });
 
@@ -536,11 +535,9 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                 {
                     breakShot = true; // Break innocent car shots by default.
 
-
-                    targetEntity.getOccupants().forEach(occupant => {
-                        if(occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true) {
+                    mp.players.forEach(occupant => {
+                        if(occupant.isInVehicle(targetEntity.handle, false) && occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true) {
                             breakShot = false; // Don't break shot if there's a fugitive that shot in!
-                            break;
                         }
                     });
 
@@ -611,6 +608,8 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
 
 mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weapon, boneIndex, damage) => {
 
+    if(damage >= 700) damage -= 700;
+
     if(targetEntity.type === 'player' && targetEntity == player)
     {
         if(sourceEntity.type === 'player')
@@ -634,6 +633,8 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
 
 mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage) => {
 
+    if(damage >= 700) damage -= 700;
+    
     if(sourceEntity.type === 'player' && sourceEntity == player)
     {
         if(targetEntity.type === 'player')
@@ -662,10 +663,9 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 {
                     breakShot = true; // Break team-kill car by default
 
-                    targetEntity.getOccupants().forEach(occupant => {
-                        if(occupant.getVariable("Team") != player.getVariable("Team")) {
+                    mp.players.forEach(occupant => {
+                        if(occupant.isInVehicle(targetEntity.handle, false) && occupant.getVariable("Team") != player.getVariable("Team")) {
                             breakShot = false; // Don't break shot if there's a fugi in!
-                            break;
                         }
                     });
 
@@ -675,11 +675,9 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 {
                     breakShot = true; // Break innocent car shots by default.
 
-
-                    targetEntity.getOccupants().forEach(occupant => {
-                        if(occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true) {
+                    mp.players.forEach(occupant => {
+                        if(occupant.isInVehicle(targetEntity.handle, false) && occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true) {
                             breakShot = false; // Don't break shot if there's a fugitive that shot in!
-                            break;
                         }
                     });
 
