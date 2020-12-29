@@ -34,6 +34,13 @@ var clickDisable = false;
 
 var themeSoundID = 1;
 
+var checker_lastHealth = 0;
+var healthLossTime = Date.now();
+var healthLoss = 0;
+
+const bones = [0, 10706, 11816, 14201, 18905, 23553, 24816, 24817, 24818, 28252, 31086, 36864, 39317, 40269, 45509, 51826, 52301, 57005, 57597, 58271, 61163, 63931, 64729];
+const boneDistanceThreshold = 1;
+
 traceLastFunc("[Players] CreateVars");
 
 function calcDist(v1, v2) {
@@ -46,6 +53,17 @@ function calcDist(v1, v2) {
         v2.z
     );
 }
+
+
+function getPointToBoneOffset(aimX, aimY, aimZ, boneX, boneY, boneZ) {
+    let xDif = (aimX - boneX) < 0 ? -(aimX - boneX) : aimX - boneX;
+    let yDif = (aimY - boneY) < 0 ? -(aimY - boneY) : aimY - boneY;
+    let zDif = (aimZ - boneZ) < 0 ? -(aimZ - boneZ) : aimZ - boneZ;
+
+    return (xDif + yDif + zDif);
+}
+
+
 
 mp.keys.bind(
     71,
@@ -140,6 +158,12 @@ mp.events.add("SendLastSeen", () => {
 });
 
 mp.events.add("render", () => {
+
+    // Taken from GTA.World
+    // IsPedArmed (0x475768A975D5AD17): 4 returns true if you are equipped with any weapon except Explosives weapon group AND melee weapons
+    // If the player is armed with anything but a melee weapon or explosive weapon disable the lock-on functionality, otherwise enable it
+    mp.game.invoke('0x475768A975D5AD17', player.handle, 4) ? mp.game.invoke('0x5C8B2F450EE4328E', player, false) :  mp.game.invoke('0x5C8B2F450EE4328E', player, true);
+
     if (specState == true && specCam != null && specTarget != null) {
 
         if (mp.players.exists(specTarget)) 
@@ -156,6 +180,13 @@ mp.events.add("render", () => {
             specState = false;
             mp.events.callLocal("StopSpectating");
         }
+    }
+
+    if(checker_lastHealth != player.getHealth() && player.getHealth() >= 99 ) 
+    {
+        healthLoss = checker_lastHealth - player.getHealth();
+        healthLossTime = Date.now();
+        checker_lastHealth = player.getHealth();
     }
 });
 
@@ -231,7 +262,7 @@ mp.events.add('render', () => {
 
                 traceLastFunc(`[Players] Update VoiceData`);
 
-                mp.players.forEachFast(target => {
+                mp.players.forEach(target => {
                     target.voiceVolume = 0.0;
                     if(!target.voice3d) target.voice3d = true;
 
@@ -297,7 +328,7 @@ mp.events.add('render', () => {
 
                     var TimeNow = 0;
 
-                    mp.players.forEachFast(target => {
+                    mp.players.forEach(target => {
 
                         if(target.getVariable("pLogged") !== undefined && target.getVariable("InLobby") == -4)
                         {
@@ -403,7 +434,7 @@ mp.events.add('render', () => {
 
         traceLastFunc(`[Players] Blips Stage2`);
 
-        mp.players.forEachFast(target => {
+        mp.players.forEach(target => {
 
             if(target.dimension == mp.players.local.dimension/* && target != mp.players.local*/)
             {
@@ -478,55 +509,184 @@ mp.events.add('render', () => {
     }
 });
 
-
-function OnPlayerWeaponShot(targetPosition, targetEntity)
+mp._events.add("playerWeaponShot", (targetPosition, targetEntity) => 
 {
-    if(targetEntity !== null && targetEntity !== undefined && targetEntity.type === 'player')
+    if(targetEntity !== null && targetEntity !== undefined)
     {
-        if(targetEntity.getVariable("Team") !== undefined && targetEntity.getVariable("HasShot") !== undefined)
+        if(targetEntity.type === 'vehicle')
         {
-            if(targetEntity.isInAnyVehicle(false) == false)
+            if(targetEntity.getVariable("Team") !== undefined)
             {
-                mp.events.callRemote("OnPlayerShotPlayer", targetPosition.x, targetPosition.y, targetPosition.z, targetEntity, mp.players.local.weapon);
+                let breakShot = false;
 
-                if(targetEntity.getVariable("Team") != -1)
+                if(targetEntity.getVariable("Team") == player.getVariable("Team"))
                 {
-                    if(player.getVariable("Team") == targetEntity.getVariable("Team"))
+                    breakShot = true; // Break team-kill car by default
+
+                    targetEntity.getOccupants().forEach(occupant => {
+                        if(occupant.getVariable("Team") != player.getVariable("Team")) {
+                            breakShot = false; // Don't break shot if there's a fugi in!
+                            break;
+                        }
+                    });
+
+                    if(!breakShot) mp.players.local.notify("~r~Do not teamkill!");
+                }
+                else if(targetEntity.getVariable("Team") != player.getVariable("Team") && player.getVariable("Team") == 1)
+                {
+                    breakShot = true; // Break innocent car shots by default.
+
+
+                    targetEntity.getOccupants().forEach(occupant => {
+                        if(occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true) {
+                            breakShot = false; // Don't break shot if there's a fugitive that shot in!
+                            break;
+                        }
+                    });
+
+                    if(!breakShot) mp.players.local.notify("~r~Do not deathmatch!");
+                }
+
+                if(breakShot == false) return true;
+            }
+        }
+        if(targetEntity.type === 'player')
+        {
+            if(targetEntity.getVariable("Team") !== undefined && targetEntity.getVariable("HasShot") !== undefined)
+            {
+                if(targetEntity.isInAnyVehicle(false) == false)
+                {
+                    if(targetEntity.getVariable("Team") != -1)
                     {
-                        mp.events.callRemote("PlayerShotAtWrongPlayer", 0, targetEntity);
+                        if(player.getVariable("Team") == targetEntity.getVariable("Team"))
+                        {
+                            mp.events.callRemote("PlayerShotAtWrongPlayer", 0, targetEntity);
+                            return true;
+                        }
+                        if(player.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && targetEntity.getVariable("HasShot") == false && 
+                            player.weapon != 911657153) // Shot a fugitive that hasn't shot.
+                        {
+                            mp.events.callRemote("PlayerShotAtWrongPlayer", 1, targetEntity);
+                            return true;
+                        }
                     }
-                    if(player.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
-                    {
-                        mp.events.callRemote("PlayerShotAtWrongPlayer", 1, targetEntity);
+
+                    if( targetPosition === undefined || targetPosition === null ) {
+                        x = targetEntity.position.x;
+                        y = targetEntity.position.y;
+                        z = targetEntity.position.z;
                     }
+                    else {
+                        x = targetPosition.x;
+                        y = targetPosition.y;
+                        z = targetPosition.z;
+                    }
+
+                    let bone = -1;
+                    let previousOffset = 9999;
+
+                    for (let i = 0; i < bones.length; i++) {
+                        let boneCoords = targetEntity.getBoneCoords(bones[i], 0, 0, 0);
+                        let newOffset = getPointToBoneOffset(targetPosition.x, targetPosition.y, targetPosition.z, boneCoords.x, boneCoords.y, boneCoords.z);
+
+                        if (newOffset < previousOffset) {
+                            bone = bones[i];
+                            previousOffset = newOffset;
+                        }
+                    }
+
+                    if (previousOffset < boneDistanceThreshold)
+                        mp.events.callRemote('opsp', targetEntity, bone, mp.players.local.weapon);
                 }
             }
         }
     }
+
     if(mp.players.local.getVariable("HasShot") == false && player.getVariable("Team") == 0)
     {
         mp.events.callRemote("GivePlayerShotTag");
     }
-}
-
-mp.events.add("playerWeaponShot", OnPlayerWeaponShot);
+});
 
 
-mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage) => {
+mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weapon, boneIndex, damage) => {
 
-    if(targetEntity && targetEntity.type === 'player' && sourceEntity && sourceEntity.type === 'player')
+    if(targetEntity.type === 'player' && targetEntity == player)
     {
-        if(targetEntity.getVariable("Team") != -1)
+        if(sourceEntity.type === 'player')
         {
-            if(sourceEntity.getVariable("Team") == targetEntity.getVariable("Team"))
+            if(sourceEntity.getVariable("Team") != -1)
             {
-                return false;
-            }
+                if(player.getVariable("Team") == sourceEntity.getVariable("Team"))
+                {
+                    return true;
+                }
 
-            if(sourceEntity.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && 
-                targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
+                if(sourceEntity.getVariable("Team") == 1 && player.getVariable("Team") == 0 && 
+                    player.getVariable("HasShot") == false && weapon != 911657153) // Took damage from a cop and hasn't shot.
+                {
+                    return true;
+                }
+            }
+        }
+    }
+})
+
+mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage) => {
+
+    if(sourceEntity.type === 'player' && sourceEntity == player)
+    {
+        if(targetEntity.type === 'player')
+        {
+            if(targetEntity.getVariable("Team") != -1)
             {
-                return false;
+                if(sourceEntity.getVariable("Team") == targetEntity.getVariable("Team"))
+                {
+                    return true;
+                }
+
+                if(sourceEntity.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && 
+                    targetEntity.getVariable("HasShot") == false && weapon != 911657153) // Shot a fugitive that hasn't shot.
+                {
+                    return true;
+                }
+            }
+        }
+        else if(targetEntity.type === 'vehicle')
+        {
+            if(targetEntity.getVariable("Team") !== undefined)
+            {
+                let breakShot = false;
+
+                if(targetEntity.getVariable("Team") == player.getVariable("Team"))
+                {
+                    breakShot = true; // Break team-kill car by default
+
+                    targetEntity.getOccupants().forEach(occupant => {
+                        if(occupant.getVariable("Team") != player.getVariable("Team")) {
+                            breakShot = false; // Don't break shot if there's a fugi in!
+                            break;
+                        }
+                    });
+
+                    if(!breakShot) mp.players.local.notify("~r~Do not teamkill!");
+                }
+                else if(targetEntity.getVariable("Team") != player.getVariable("Team") && player.getVariable("Team") == 1)
+                {
+                    breakShot = true; // Break innocent car shots by default.
+
+
+                    targetEntity.getOccupants().forEach(occupant => {
+                        if(occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true) {
+                            breakShot = false; // Don't break shot if there's a fugitive that shot in!
+                            break;
+                        }
+                    });
+
+                    if(!breakShot) mp.players.local.notify("~r~Do not deathmatch!");
+                }
+
+                if(breakShot == false) return true;
             }
         }
     }
@@ -564,6 +724,9 @@ mp.events.add("entclearanim", (entity, animDictionary, animName) => {
 
 mp.events.add(
     {
+        "AttachWeaponComponent": (target, weapon, comp) => {
+            mp.game.invoke('0xAD084726D7F23594', target.handle, weapon, comp);
+        },
         "PlayThemeSong": () => {
             themeSoundID = mp.game.audio.playSoundEx("http://51.89.22.60/uploads/goodbye_apparat.mp3", 0.035);
         },
@@ -699,8 +862,8 @@ mp.events.add(
         "ToggleChaseCollisions": (toggle) => {
             if(toggle)
             {
-                mp.vehicles.forEachFast(target => {
-                    mp.vehicles.forEachFast(target2 => {
+                mp.vehicles.forEach(target => {
+                    mp.vehicles.forEach(target2 => {
                         target.setNoCollision(target2.handle, true);
                         target2.setNoCollision(target.handle, true);
 
@@ -711,8 +874,8 @@ mp.events.add(
             }
             else
             {
-                mp.vehicles.forEachFast(target => {
-                    mp.vehicles.forEachFast(target2 => {
+                mp.vehicles.forEach(target => {
+                    mp.vehicles.forEach(target2 => {
                         target.setNoCollision(target2.handle, false);
                         target2.setNoCollision(target.handle, false);
 

@@ -85,8 +85,11 @@ mp.events.add("pushToKillFeed", (message) => {
 });
 
 mp.events.add("render", () => {
-    for (let i = 0, max = killFeedItems.length; i < max; i++) {
-        mp.game.graphics.drawRect(finalDrawX - (killFeedItems[i].TextWidth / 2), finalDrawY + (itemMargin * i), killFeedItems[i].TextWidth + itemPadding, itemHeight + itemPadding, 0, 0, 0, 150);
-        drawText(killFeedItems[i].Text, [finalDrawX, finalDrawY + (itemMargin * i) - (itemHeight / 2)], fontStyle, [255, 255, 255, 255], fontScale, true);
+    
+    if(showHud) {
+        for (let i = 0, max = killFeedItems.length; i < max; i++) {
+            mp.game.graphics.drawRect(finalDrawX - (killFeedItems[i].TextWidth / 2), finalDrawY + (itemMargin * i), killFeedItems[i].TextWidth + itemPadding, itemHeight + itemPadding, 0, 0, 0, 150);
+            drawText(killFeedItems[i].Text, [finalDrawX, finalDrawY + (itemMargin * i) - (itemHeight / 2)], fontStyle, [255, 255, 255, 255], fontScale, true);
+        }
     }
 });

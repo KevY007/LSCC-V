@@ -203,6 +203,7 @@ public static class Settings
     public const int GameRunTime = 390; // Game Running Time in Seconds before STOP
     public const int MaxLobbies = 5; // Default/starting lobby num.
     public const int DefaultMaxInLobby = 35;
+    public const bool UseDiscord = false;
 
     // Connection Settings
     public const string MySQL_Host = "localhost";
@@ -725,7 +726,6 @@ namespace LSCC
             Settings.LastCountUpdate = Environment.TickCount;
             Settings.LastMessageTick = Environment.TickCount;
 
-
             Settings.Timers.TimeUpdate = null;
             Settings.Timers.GameUpdate = null;
 
@@ -786,13 +786,16 @@ namespace LSCC
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Assaultrifle_mk2, 120));
             new LoadoutData(0, "Assassin", 20, wepList);
 
-            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Loading discord plugin.");
-            Discord.Main();
-
-            int tick = Environment.TickCount + 5000;
-            while(tick > Environment.TickCount)
+            if (Settings.UseDiscord)
             {
+                NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Loading discord plugin.");
+                Discord.Main();
 
+                int tick = Environment.TickCount + 5000;
+                while (tick > Environment.TickCount)
+                {
+
+                }
             }
 
             NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Server startup proceeded:\n");
@@ -1026,36 +1029,39 @@ namespace LSCC
                 }
             }
 
-            System.Threading.Tasks.Task.Run(() =>
+            if (Settings.UseDiscord)
             {
-                if (Environment.TickCount - Settings.LastCountUpdate >= 120000 &&
-                    (int)Discord._client.ConnectionState == 2)
+                System.Threading.Tasks.Task.Run(() =>
                 {
-                    Settings.LastCountUpdate = Environment.TickCount;
-
-                    foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
+                    if (Environment.TickCount - Settings.LastCountUpdate >= 120000 &&
+                        (int)Discord._client.ConnectionState == 2)
                     {
-                        var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCCountID);
+                        Settings.LastCountUpdate = Environment.TickCount;
 
-                        if (botchan != null)
+                        foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
                         {
-                            botchan.ModifyAsync(vc => vc.Name = ($"Players Online: {RAGE.Entities.Players.Count}"));
+                            var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCCountID);
+
+                            if (botchan != null)
+                            {
+                                botchan.ModifyAsync(vc => vc.Name = ($"Players Online: {RAGE.Entities.Players.Count}"));
+                            }
                         }
-                    }
 
-                    foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
-                    {
-                        var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCGamesID);
-
-                        if (botchan != null)
+                        foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
                         {
-                            botchan.ModifyAsync(vc => vc.Name = ($"Chases Running: {Settings.Lobbies.Where(l => l.gameStatus == 1).Count()}"));
+                            var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCGamesID);
+
+                            if (botchan != null)
+                            {
+                                botchan.ModifyAsync(vc => vc.Name = ($"Chases Running: {Settings.Lobbies.Where(l => l.gameStatus == 1).Count()}"));
+                            }
                         }
-                    }
 
                     //NAPI.Util.ConsoleOutput("Updated the DISCORD counts.");
                 }
-            });
+                });
+            }
             return;
         }
 
@@ -1066,7 +1072,7 @@ namespace LSCC
             {
                 Player winner = null;
                 int lastBigTime = 0;
-                int winXP = derbyPlayers / 2;
+                int winXP = derbyPlayers * 2;
 
                 foreach(Player player in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
                 {
@@ -1087,7 +1093,10 @@ namespace LSCC
                     else
                     {
                         player.SendChatMessage("!{#E6DD3C}[DERBY] " + winner.Name + " won the derby and has gained " + winXP + "XP.");
-                        Discord.SendTextChannel("staff-bot", $"**(Derby) | Winner: {winner.Name} | XP Gained: {winXP}**");
+                        if (Settings.UseDiscord)
+                        {
+                            Discord.SendTextChannel("staff-bot", $"**(Derby) | Winner: {winner.Name} | XP Gained: {winXP}**");
+                        }
                     }
                 }
 
@@ -1161,6 +1170,14 @@ namespace LSCC
                     if (!lobby.Vehicles[i].IsNull && lobby.Vehicles[i] != null)
                     {
                         lobby.Vehicles[i].Delete();
+                        lobby.Vehicles.RemoveAt(i);
+                    }
+                }
+
+                if(lobby.Vehicles.Count > 0)
+                {
+                    for (int i = 0; i < lobby.Vehicles.Count; i++)
+                    {
                         lobby.Vehicles.RemoveAt(i);
                     }
                 }

@@ -20,7 +20,7 @@ namespace LSCC
             BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.HWID.CompareTo(player.Serial) == 0 || ban.IP.CompareTo(player.Address) == 0 ||
                 ban.RockstarID == player.SocialClubId);
 
-            Discord.SendTextChannel("staff-bot", $"**{player.Name} has joined the server.** *(Total online: {RAGE.Entities.Players.Count})*");
+            if (Settings.UseDiscord) Discord.SendTextChannel("staff-bot", $"**{player.Name} has joined the server.** *(Total online: {RAGE.Entities.Players.Count})*");
 
             if (ban != null)
             {
@@ -237,6 +237,16 @@ namespace LSCC
             return;
         }
 
+        [ServerEvent(Event.PlayerEnterVehicle)]
+        public void OnPlayerEnterVehicle(Player player, Vehicle vehicle, sbyte seatID)
+        {
+            if(NAPI.Vehicle.GetVehicleClass((VehicleHash)vehicle.Model) == 16 || NAPI.Vehicle.GetVehicleClass((VehicleHash)vehicle.Model) == 15 ||
+                vehicle.Model == NAPI.Util.GetHashKey("polmav"))
+            {
+                player.GiveWeapon(WeaponHash.Parachute, 1);
+            }
+        }
+
         [ServerEvent(Event.PlayerDisconnected)]
         public void OnPlayerDisconnected(Player player, DisconnectionType type, string reason)
         {
@@ -301,6 +311,14 @@ namespace LSCC
                         }
                     }
 
+                    if(freeroamVehs.Count > 0)
+                    {
+                        for(int i = 0; i < freeroamVehs.Count; i++)
+                        {
+                            freeroamVehs.RemoveAt(i);
+                        }
+                    }
+
                     freeroamVehs.Clear();
 
                     switch (type)
@@ -319,7 +337,7 @@ namespace LSCC
 
                 EPlayer.ResetPlayerData(player);
 
-                Discord.SendTextChannel("staff-bot", $"**{player.Name} has left the server.** *(Total online: {RAGE.Entities.Players.Count - 1})*");
+                if (Settings.UseDiscord) Discord.SendTextChannel("staff-bot", $"**{player.Name} has left the server.** *(Total online: {RAGE.Entities.Players.Count - 1})*");
             }
         }
 
@@ -369,7 +387,7 @@ namespace LSCC
             if (killer != null && !killer.IsNull && killer != player)
             {
                 NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
-                Discord.SendTextChannel("staff-bot", $"`(Death) | Killer: {killer.Name} ({killer.GetSharedData<int>("Team")}), Victim: {player.Name} ({player.GetSharedData<int>("Team")}), Item: {(reasonStr == null ? "N/A" : reasonStr)}`");
+                if (Settings.UseDiscord) Discord.SendTextChannel("staff-bot", $"`(Death) | Killer: {killer.Name} ({killer.GetSharedData<int>("Team")}), Victim: {player.Name} ({player.GetSharedData<int>("Team")}), Item: {(reasonStr == null ? "N/A" : reasonStr)}`");
 
                 if (killer.GetSharedData<int>("InLobby") > -1 && killer.GetSharedData<int>("InDM") > -1)
                 {
@@ -399,32 +417,6 @@ namespace LSCC
 
                     if (reason != 696988 && player.GetSharedData<int>("Team") == 0 && killer.GetSharedData<int>("Team") == 1 && player.GetSharedData<bool>("HasShot") == false)
                     {
-                        EPlayer.GrantXP(killer, -3);
-                        RAGE.Entities.Players.All.ForEach((Player ey) =>
-                        {
-                            ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by 3 for killing a fugitive that hasn't shot.");
-                        });
-
-                        int warnings = 0;
-                        if (killer.HasData("InnocentShotWarning")) warnings = killer.GetData<int>("InnocentShotWarning");
-
-                        warnings += 5;
-                        if (warnings >= 14)
-                        {
-                            RAGE.Entities.Players.All.ForEach((Player i) =>
-                            {
-                                i.SendChatMessage($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}HoeHunter has jailed {killer.Name} for 5 minutes due to killing innocents.");
-                            });
-                            EPlayer.Jail(killer, 3, "Killing Innocents (HoeHunter)");
-                            warnings = 0;
-                        }
-
-                        killer.SetData<int>("InnocentShotWarning", warnings);
-                        killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Repeated attacking of fugitive's that haven't shot will result in a jail.");
-
-                        
-
-                        player.SetData("UnfairKillSpawn", true);
 
                         Vehicle pVeh = null;
                         int seat = 0;
@@ -433,6 +425,35 @@ namespace LSCC
                             pVeh = player.Vehicle;
                             seat = player.VehicleSeat;
                         }
+
+                        if (pVeh == null || RAGE.Entities.Players.All.Count(ey => ey.IsInVehicle && ey.Vehicle == player.Vehicle &&
+                                 ey.GetSharedData<int>("Team") == 0 && ey.GetSharedData<bool>("HasShot") == true) == 0)
+                        {
+                            EPlayer.GrantXP(killer, -3);
+                            RAGE.Entities.Players.All.ForEach((Player ey) =>
+                            {
+                                ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by 3 for killing a fugitive that hasn't shot.");
+                            });
+
+                            int warnings = 0;
+                            if (killer.HasData("InnocentShotWarning")) warnings = killer.GetData<int>("InnocentShotWarning");
+
+                            warnings += 5;
+                            if (warnings >= 7)
+                            {
+                                killer.Health = 0;
+                                killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] You have been killed for killing an innocent fugitive.");
+                                warnings = 0;
+                            }
+
+                            killer.SetData<int>("InnocentShotWarning", warnings);
+                            killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Repeated attacking of fugitive's that haven't shot will result in a jail.");
+                        }
+
+
+                        player.SetData("UnfairKillSpawn", true);
+
+                        
 
                         NAPI.Player.SpawnPlayer(player, player.Position);
 
@@ -452,38 +473,36 @@ namespace LSCC
 
                 if (reason != 696988 && player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("Team") == killer.GetSharedData<int>("Team"))
                 {
-                    EPlayer.GrantXP(killer, -2);
-                    RAGE.Entities.Players.All.ForEach((Player ey) =>
+                    if (RAGE.Entities.Players.All.Count(ey => ey.GetSharedData<int>("Team") != -1 && ey.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") &&
+                             ey.Position.DistanceTo(player.Position) < 10.0) == 0)
                     {
-                        ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by 2 for team killing.");
-                    });
-
-                    int warnings = 0;
-                    if (killer.HasData("TeamShotWarning")) warnings = killer.GetData<int>("TeamShotWarning");
-
-                    warnings += 5;
-
-                    if (killer.IsInVehicle == true && killer.Vehicle.Model == NAPI.Util.GetHashKey("polmav"))
-                    {
-                        killer.Vehicle.Position = new Vector3(killer.Vehicle.Position.X, killer.Vehicle.Position.Y, killer.Vehicle.Position.Z + 20.0f);
-                        killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Please do not heliblade.");
-                    }
-                    else
-                    {
-                        if (warnings >= 14)
+                        EPlayer.GrantXP(killer, -2);
+                        RAGE.Entities.Players.All.ForEach((Player ey) =>
                         {
-                            RAGE.Entities.Players.All.ForEach((Player i) =>
-                            {
-                                i.SendChatMessage($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}HoeHunter has jailed {killer.Name} for 5 minutes due to killing teammates.");
-                            });
-                            EPlayer.Jail(killer, 3, "Killing Teammates (HoeHunter)");
+                            ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by 2 for team killing.");
+                        });
+
+                        int warnings = 0;
+                        if (killer.HasData("TeamShotWarning")) warnings = killer.GetData<int>("TeamShotWarning");
+
+                        warnings += 5;
+
+                        if (killer.IsInVehicle == true && killer.Vehicle.Model == NAPI.Util.GetHashKey("polmav"))
+                        {
+                            killer.Vehicle.Position = new Vector3(killer.Vehicle.Position.X, killer.Vehicle.Position.Y, killer.Vehicle.Position.Z + 20.0f);
+                            killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Please do not heliblade.");
+                        }
+                        else if(warnings >= 7)
+                        {
+                            killer.Health = 0;
+                            killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] You have been killed for team killing.");
                             warnings = 0;
                         }
+
+                        killer.SetData<int>("TeamShotWarning", warnings);
+
+                        killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Repeated team killing will result in a jail.");
                     }
-
-                    killer.SetData<int>("TeamShotWarning", warnings);
-
-                    killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Repeated team killing will result in a jail.");
 
                     player.SetData("UnfairKillSpawn", true);
 
@@ -668,7 +687,7 @@ namespace LSCC
         public static void OnPlayerLogin(Player player, Account acc)
         {
             player.TriggerEvent("StopThemeSong");
-            Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in as {acc.Username}.*");
+            if (Settings.UseDiscord) Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in as {acc.Username}.*");
 
             EPlayer.SetDiscordStatus(player, $"Logging in as {acc.Username}");
             NAPI.Util.ConsoleOutput($"[Login] {player.Name} has logged in as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
@@ -909,7 +928,7 @@ namespace LSCC
 
         public static void OnPlayerRegister(Player player, Account acc)
         {
-            Discord.SendTextChannel("staff-bot", $"*{player.Name} has registered.*");
+            if (Settings.UseDiscord) Discord.SendTextChannel("staff-bot", $"*{player.Name} has registered.*");
 
             EPlayer.SetDiscordStatus(player, $"Registering as {acc.Username}");
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has registered as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
@@ -1051,105 +1070,104 @@ namespace LSCC
         [RemoteEvent("PlayerShotAtWrongPlayer")]
         public void PlayerShootWrongPlayer(Player player, int caseid, Player target)
         {
-            if (caseid == 0)
+            if (caseid == 0 && (false == true)) // DISABLING THIS BECAUSE DAMAGE IS DISABLED NOW
             {
-                int warnings = 0;
-                if (player.HasData("TeamShotWarning")) warnings = player.GetData<int>("TeamShotWarning");
-
-                if (warnings >= 3)
+                if (RAGE.Entities.Players.All.Count(ey => ey.GetSharedData<int>("Team") != -1 && ey.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") &&
+                        ey.Position.DistanceTo(player.Position) < 10.0) == 0)
                 {
-                    EPlayer.Freeze(player, true);
+                    int warnings = 0;
+                    if (player.HasData("TeamShotWarning")) warnings = player.GetData<int>("TeamShotWarning");
 
-                    NAPI.Task.Run(() =>
+                    if (warnings >= 3)
                     {
-                        lock (player)
+                        EPlayer.Freeze(player, true);
+
+                        NAPI.Task.Run(() =>
                         {
-                            if (player != null && player.Exists)
+                            lock (player)
                             {
-                                if (!player.IsNull && player != null && player.IsInstanceAlive)
+                                if (player != null && player.Exists)
                                 {
-                                    EPlayer.Freeze(player, false);
+                                    if (!player.IsNull && player != null && player.IsInstanceAlive)
+                                    {
+                                        EPlayer.Freeze(player, false);
+                                    }
                                 }
                             }
-                        }
-                    }, player.IsInVehicle == true ? 500 : 2500);
-                }
-               
+                        }, player.IsInVehicle == true ? 500 : 2500);
+                    }
 
-                warnings++;
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Do not shoot at teammates, repeatedly doing this will result in punishment!");
 
-                if (warnings >= 7)
-                {
-                    player.Health = 0;
-                    EPlayer.GrantXP(player, -1);
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have lost 1XP due to team attacking.");
-                }
-                if (warnings >= 14)
-                {
-                    RAGE.Entities.Players.All.ForEach((Player i) =>
+                    warnings++;
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Do not shoot at teammates, repeatedly doing this will result in punishment!");
+
+                    if (warnings >= 7)
                     {
-                        i.SendChatMessage($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}HoeHunter has jailed {player.Name} for 5 minutes due to team-killing.");
-                    });
-                    EPlayer.Jail(player, 5, "Team Killing (HoeHunter)");
-                    warnings = 0;
+                        player.Health = 0;
+                        EPlayer.GrantXP(player, -1);
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have been killed and lost 1XP due to team attacking.");
+                        warnings = 0;
+                    }
+
+                    player.SetData("TeamShotWarning", warnings);
                 }
-                player.SetData("TeamShotWarning", warnings);
 
-
-                if ((target.GetSharedData<bool>("HasShot") == true && target.GetSharedData<int>("Team") == 0) == false)
+                /* // Heal fellow COP as long as there's no fugitive nearby that hasn't shot.
+                if ( (target.GetSharedData<bool>("HasShot") == true && target.GetSharedData<int>("Team") == 0) == false) // Not a fugitive that has shot.
                 {
+                    // So any fugitive that hasn't shot got TK'd or lost hp somehow can has his hp reset to 100.
+
+
                     if (RAGE.Entities.Players.All.Count(a => a.Position.DistanceTo(target.Position) < 100.0f &&
-                     a.GetSharedData<bool>("HasShot") == true && a.GetSharedData<int>("Team") == 0 && a.Dimension == target.Dimension) == 0)
+                        a.GetSharedData<bool>("HasShot") == true && a.GetSharedData<int>("Team") == 0 && a.Dimension == target.Dimension && a != target) == 0)
                     { // No nearby "has shot" fugitive's to the target so they can't have healing advantage.
                         target.Health = 100;
                     }
-                }
+                }*/
             }
-            else if (caseid == 1 && player.CurrentWeapon != WeaponHash.Stungun)
+            else if (caseid == 1 && player.CurrentWeapon != WeaponHash.Stungun && (false == true)) // DISABLING THIS CUZ DAMAGE IS DISABLED NOW
             {
-                int warnings = 0;
-                if (player.HasData("InnocentShotWarning")) warnings = player.GetData<int>("InnocentShotWarning");
 
-                if (warnings >= 3)
+                if (!target.IsInVehicle || RAGE.Entities.Players.All.Count(ey => ey.IsInVehicle && ey.Vehicle == target.Vehicle &&
+                                 ey.GetSharedData<int>("Team") == 0 && ey.GetSharedData<bool>("HasShot") == true) == 0)
                 {
-                    EPlayer.Freeze(player, true);
-                    NAPI.Task.Run(() =>
+
+                    int warnings = 0;
+                    if (player.HasData("InnocentShotWarning")) warnings = player.GetData<int>("InnocentShotWarning");
+
+                    if (warnings >= 3)
                     {
-                        lock (player)
+                        EPlayer.Freeze(player, true);
+                        NAPI.Task.Run(() =>
                         {
-                            if (player != null && player.Exists)
+                            lock (player)
                             {
-                                if (!player.IsNull && player != null && player.IsInstanceAlive)
+                                if (player != null && player.Exists)
                                 {
-                                    EPlayer.Freeze(player, false);
+                                    if (!player.IsNull && player != null && player.IsInstanceAlive)
+                                    {
+                                        EPlayer.Freeze(player, false);
+                                    }
                                 }
                             }
-                        }
-                    }, player.IsInVehicle == true ? 500 : 2500);
-                }
+                        }, player.IsInVehicle == true ? 500 : 2500);
+                    }
 
-                warnings++;
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Do not shoot at fugitives that haven't shot, repeatedly doing this will result in punishment!");
+                    warnings++;
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Do not shoot at fugitives that haven't shot, repeatedly doing this will result in punishment!");
 
-                if (warnings >= 7)
-                {
-                    player.Health = 0;
-                    EPlayer.GrantXP(player, -1);
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have lost 1XP due to shooting at a fugitive without shot tag.");
-                }
-                if (warnings >= 14)
-                {
-                    RAGE.Entities.Players.All.ForEach((Player i) =>
+                    if (warnings >= 7)
                     {
-                        i.SendChatMessage($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}HoeHunter has jailed {player.Name} for 5 minutes due to shooting at fugitives that haven't shot.");
-                    });
-                    EPlayer.Jail(player, 5, "Shooting at fugitives that haven't shot yet (HoeHunter)");
-                    warnings = 0;
-                }
-                player.SetData("InnocentShotWarning", warnings);
+                        player.Health = 0;
+                        EPlayer.GrantXP(player, -1);
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have lost 1XP due to shooting at a fugitive without shot tag.");
+                        warnings = 0;
+                    }
 
-                target.Health = 100;
+                    player.SetData("InnocentShotWarning", warnings);
+                }
+
+                //target.Health = 100;
             }
         }
 
@@ -1385,10 +1403,9 @@ namespace LSCC
             return;
         }
 
-        [RemoteEvent("OnPlayerShotPlayer")] // wont trigger incar btw 
-        public void OnPlayerShootPlayer(Player player, float x, float y, float z, Player target, uint weapon)
+        [RemoteEvent("opsp")] // wont trigger incar btw 
+        public void OnPlayerShootPlayer(Player player, Player target, uint bone, UInt64 weapon)
         {
-            Vector3 targetPosition = new Vector3(x, y, z);
             if (weapon == (uint)WeaponHash.Stungun)
             {
                 if (target.GetSharedData<bool>("HasShot") != true)
@@ -1398,27 +1415,40 @@ namespace LSCC
                     {
                         if (lobby.Cops.Contains(player) && lobby.Cops.Contains(target))
                         {
-                            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Do not tase your own teammates! You have been given a teamattack warning.");
-                            EPlayer.Freeze(player, true);
-
-                            NAPI.Task.Run(() =>
+                            if (RAGE.Entities.Players.All.Count(ey => lobby.Fugitives.Contains(ey) &&
+                                ey.Position.DistanceTo(player.Position) < 10.0) == 0)
                             {
-                                lock (player)
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Do not tase your own teammates! You have been given a teamattack warning.");
+                                EPlayer.Freeze(player, true);
+
+                                NAPI.Task.Run(() =>
                                 {
-                                    if (player != null && player.Exists)
+                                    lock (player)
                                     {
-                                        if (!player.IsNull && player != null && player.IsInstanceAlive)
+                                        if (player != null && player.Exists)
                                         {
-                                            EPlayer.Freeze(player, false);
+                                            if (!player.IsNull && player != null && player.IsInstanceAlive)
+                                            {
+                                                EPlayer.Freeze(player, false);
+                                            }
                                         }
                                     }
+                                }, 1500);
+
+                                int warnings = 0;
+                                if (player.HasData("TeamShotWarning")) warnings = player.GetData<int>("TeamShotWarning");
+
+                                warnings++;
+
+                                if (warnings >= 4)
+                                {
+                                    player.Health = 0;
+                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have been killed for team tasing!");
+                                    warnings = 0;
                                 }
-                            }, 1500);
 
-                            int warnings = 0;
-                            if (player.HasData("TeamShotWarning")) warnings = player.GetData<int>("TeamShotWarning");
-
-                            warnings++;
+                                player.SetData("TeamShotWarning", warnings);
+                            }
                             return;
                         }
                     }
@@ -1596,6 +1626,8 @@ namespace LSCC
 
                 if (player.GetSharedData<int>("InLobby") == -4) // Derby
                 {
+                    player.TriggerEvent("showHPBars", 0); // Never show HP Bars.
+
                     player.SetData("DerbySpawnTick", Environment.TickCount);
 
                     Random rand = new Random();

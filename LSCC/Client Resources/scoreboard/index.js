@@ -51,7 +51,9 @@ function updatePlayer(player)
     else if(player.getVariable("InLobby") == -5) lobbystr = "CUSTOMIZER";
     else if(player.getVariable("InLobby") > -1) lobbystr = player.getVariable("InLobby").toString();
     
-    browser.execute('updateUser("' + lobbystr + '", "' + player.name + '", "' + player.getVariable("Level") + '", "' + player.getVariable("Ping") +
+    browser.execute('updateUser("' + lobbystr + '", "' + player.name + '", "' + 
+    (player.getVariable("Level") === undefined ? 'n/a' : player.getVariable("Level")) + '", "' + 
+    (player.getVariable("Ping") === undefined ? 'n/a' : player.getVariable("Ping")) +
     '", ' + player.getVariable("Color_R") + ', ' + player.getVariable("Color_G") + ', ' + player.getVariable("Color_B") + ');');
 
     return;

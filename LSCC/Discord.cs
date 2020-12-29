@@ -92,29 +92,27 @@ namespace LSCC
 
                 foreach (Player pl in RAGE.Entities.Players.All)
                 {
-                    string lobby = "Lobby " + pl.GetSharedData<int>("InLobby");
+                    string lobby = "Lobby: " + pl.GetSharedData<int>("InLobby");
                     switch (pl.GetSharedData<int>("InLobby"))
                     {
                         case -1:
-                            lobby = "LOGIN";
+                            lobby = "Login";
                             break;
                         case -2:
-                            lobby = "JAIL";
+                            lobby = "Jail";
                             break;
                         case -3:
-                            lobby = "FREEROAM";
+                            lobby = "Freeroam";
                             break;
                         case -4:
-                            lobby = "DERBY";
+                            lobby = "Derby";
                             break;
                         case -5:
-                            lobby = "CUSTOMIZER";
+                            lobby = "Customizer";
                             break;
                     }
 
-                    builder.AddField("|", lobby, true);
-                    builder.AddField("|", pl.Name, true);
-                    builder.AddField("|", pl.GetSharedData<int>("Level").ToString(), true);
+                    builder.AddField(pl.Name, lobby + " | Level: " + pl.GetSharedData<int>("Level").ToString() + " | Ping: " + pl.Ping.ToString(), true);
                 }
 
                 var embed = builder.Build();

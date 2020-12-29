@@ -92,89 +92,106 @@ mp.events.add('render', (nametags) => {
 	
     nametags.forEach(nametag => {
         let [player, x, y, distance] = nametag;
-        
-        if(distance <= maxDistance && isPlayerInLOS(player) == true) {	   
+    
+        if(isPlayerInLOS(player) == true) {	   
 
-            let scale = (distance / maxDistance);
-            if(scale < 0.6) scale = 0.6;
-
-            var health = player.getHealth() / 100;
-		   
-            var armour = player.getArmour() / 100;
-			
-            y -= scale * (0.005 * (screenRes.y / 1080));
-
-            if(player.getVariable("Team") == 0 && player.getVariable("HasShot") == true)
+            if(distance <= maxDistance)
             {
-                mp.game.graphics.drawText("(( THIS PLAYER HAS SHOT ))", [x, y - 0.045],
-                {
-                    font: 0,
-                    color: [237, 212, 52, 255],
-                    scale: [0.3, 0.3],
-                    outline: true
-                });
-            }
+                let scale = (distance / maxDistance);
+                if(scale < 0.6) scale = 0.6;
 
-            if(player.getVariable("IsTyping") == true || player.isVoiceActive == true)
-            {
-                var typingStr = "...";
-                if(timerCount == 0) typingStr = ".";
-                else if(timerCount == 1) typingStr = "..";
-                else if(timerCount == 2) typingStr = "...";
-
-                mp.game.graphics.drawText(typingStr, [x, y - 0.055],
-                {
-                    font: 0,
-                    color: [228, 240, 48, 228],
-                    scale: [0.335, 0.335],
-                    outline: true
-                });
-            }
+                var health = player.getHealth() / 100;
+            
+                var armour = player.getArmour() / 100;
                 
-            if(player.col)
-            {
-                mp.game.graphics.drawText(player.name.replace('_', ' '), [x, y],
+                y -= scale * (0.005 * (screenRes.y / 1080));
+
+                if(player.getVariable("Team") == 0 && player.getVariable("HasShot") == true)
                 {
-                font: 4,
-                color: [player.col_r, player.col_g, player.col_b, player.col_a],
-                scale: [0.4, 0.4],
-                outline: true
-                });
+                    mp.game.graphics.drawText("(( THIS PLAYER HAS SHOT ))", [x, y - 0.045],
+                    {
+                        font: 0,
+                        color: [237, 212, 52, 255],
+                        scale: [0.3, 0.3],
+                        outline: true
+                    });
+                }
+
+                if(player.getVariable("IsTyping") == true || player.isVoiceActive == true)
+                {
+                    var typingStr = "...";
+                    if(timerCount == 0) typingStr = ".";
+                    else if(timerCount == 1) typingStr = "..";
+                    else if(timerCount == 2) typingStr = "...";
+
+                    mp.game.graphics.drawText(typingStr, [x, y - 0.055],
+                    {
+                        font: 0,
+                        color: [228, 240, 48, 228],
+                        scale: [0.335, 0.335],
+                        outline: true
+                    });
+                }
+                    
+                if(player.col)
+                {
+                    mp.game.graphics.drawText(player.name.replace('_', ' '), [x, y],
+                    {
+                    font: 4,
+                    color: [player.col_r, player.col_g, player.col_b, player.col_a],
+                    scale: [0.4, 0.4],
+                    outline: true
+                    });
+                }
+                else
+                {
+                    mp.game.graphics.drawText(player.name.replace('_', ' '), [x, y],
+                    {
+                    font: 4,
+                    color: defaultcolor,
+                    scale: [0.4, 0.4],
+                    outline: true
+                    });
+                }
+
+                if(showHPStatus == 1 || (mp.game.player.isFreeAimingAtEntity(player.handle) && showHPStatus == 2))
+                {
+
+                    let y2 = y + 0.056;
+                    
+                    graphics.drawRect(x, y2, width + border * 2, height + border * 2, 0, 0, 0, 200);
+                    graphics.drawRect(x, y2, width, height, 176, 12, 12, 255);
+                    graphics.drawRect(x - width / 2 * (1 - health), y2, width * health, height, 245, 73, 73, 200);
+                    
+                    if(armour > 0) 
+                    {
+                        y2 -= 0.012;
+                        graphics.drawRect(x, y2, width + border * 2, height + border * 2, 0, 0, 0, 200);
+                        graphics.drawRect(x, y2, width, height, 143, 143, 143, 255);
+                        graphics.drawRect(x - width / 2 * (1 - armour), y2, width * armour, height, 255, 255, 255, 200);
+                    }
+                }
+
+                if(mp.game.player.isFreeAimingAtEntity(player.handle) && mp.players.local.weaponAmmo > 0)
+                {
+                    if(mp.players.local.getVariable("HasShot") == false && mp.players.local.getVariable("Team") == 0 && player.getVariable("Team") == 1)
+                    {
+                        mp.events.callRemote("GivePlayerShotTag");
+                    }
+                }
             }
             else
             {
-                mp.game.graphics.drawText(player.name.replace('_', ' '), [x, y],
+                if(player.getVariable("Team") == 0 && player.getVariable("HasShot") == true)
                 {
-                font: 4,
-                color: defaultcolor,
-                scale: [0.4, 0.4],
-                outline: true
-                });
-            }
-
-            if(showHPStatus == 1 || (mp.game.player.isFreeAimingAtEntity(player.handle) && showHPStatus == 2))
-            {
-
-                let y2 = y + 0.056;
-                
-                graphics.drawRect(x, y2, width + border * 2, height + border * 2, 0, 0, 0, 200);
-                graphics.drawRect(x, y2, width, height, 176, 12, 12, 255);
-                graphics.drawRect(x - width / 2 * (1 - health), y2, width * health, height, 245, 73, 73, 200);
-                
-                if(armour > 0) 
-                {
-                    y2 -= 0.012;
-                    graphics.drawRect(x, y2, width + border * 2, height + border * 2, 0, 0, 0, 200);
-                    graphics.drawRect(x, y2, width, height, 143, 143, 143, 255);
-                    graphics.drawRect(x - width / 2 * (1 - armour), y2, width * armour, height, 255, 255, 255, 200);
-                }
-            }
-
-            if(mp.game.player.isFreeAimingAtEntity(player.handle) && mp.players.local.weaponAmmo > 0)
-            {
-                if(mp.players.local.getVariable("HasShot") == false && mp.players.local.getVariable("Team") == 0 && player.getVariable("Team") == 1)
-                {
-                    mp.events.callRemote("GivePlayerShotTag");
+                    // They out of distance but still try?
+                    mp.game.graphics.drawText("(( THIS PLAYER HAS SHOT ))", [x, y],
+                    {
+                        font: 0,
+                        color: [237, 212, 52, 255],
+                        scale: [0.3, 0.3],
+                        outline: true
+                    });
                 }
             }
         }

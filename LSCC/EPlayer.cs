@@ -615,7 +615,7 @@ namespace LSCC
                                     {
                                         if (i.Dimension == player.Dimension)
                                         {
-                                            i.TriggerEvent("addComponentToPlayer", player, (ulong)wep, compid);
+                                            i.TriggerEvent("AttachWeaponComponent", player, (ulong)wep, compid);
                                         }
                                     }
                                 }
@@ -690,7 +690,7 @@ namespace LSCC
                                     {
                                         if (i.Dimension == player.Dimension)
                                         {
-                                            i.TriggerEvent("addComponentToPlayer", player, (ulong)wep, compid);
+                                            i.TriggerEvent("AttachWeaponComponent", player, (ulong)wep, compid);
                                         }
                                     }
                                 }
@@ -976,7 +976,7 @@ namespace LSCC
                 }
             }
 
-            if (!spam) Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) |** {message}");
+            if (!spam && Settings.UseDiscord) Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) |** {message}");
         }
         
         public static void SendMessageToAllAdmins(string message)
@@ -992,7 +992,7 @@ namespace LSCC
                 }
             }
 
-            Discord.SendTextChannel("staff-bot", $"(ADM) |** {message}**");
+            if (Settings.UseDiscord) Discord.SendTextChannel("staff-bot", $"(ADM) |** {message}**");
         }
     }
 }
