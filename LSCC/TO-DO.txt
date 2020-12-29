@@ -1,5 +1,5 @@
 ﻿FORMAT: ADDED BY - ITEM.
-
+ONPLAYERSHOTPLAYER : C# CANNOT CONVERT SYSTEM.SINGLE TO INT32
 Check LSCC discord.
 
 increase shot tag distance
