@@ -608,8 +608,6 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
 
 mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weapon, boneIndex, damage) => {
 
-    if(damage >= 700) damage -= 700;
-
     if(targetEntity.type === 'player' && targetEntity == player)
     {
         if(sourceEntity.type === 'player')
@@ -633,8 +631,6 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
 
 mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage) => {
 
-    if(damage >= 700) damage -= 700;
-    
     if(sourceEntity.type === 'player' && sourceEntity == player)
     {
         if(targetEntity.type === 'player')
@@ -722,8 +718,9 @@ mp.events.add("entclearanim", (entity, animDictionary, animName) => {
 
 mp.events.add(
     {
-        "AttachWeaponComponent": (target, weapon, comp) => {
-            mp.game.invoke('0xAD084726D7F23594', target.handle, weapon, comp);
+        "AttachWeaponComponent": (weapon, comp) => {
+            mp.game.invoke("0xD966D51AA5B28BB9", player.handle, weapon, comp);
+            mp.game.invoke("0xADF692B254977C0C", player.handle, weapon, true);
         },
         "PlayThemeSong": () => {
             themeSoundID = mp.game.audio.playSoundEx("http://51.89.22.60/uploads/goodbye_apparat.mp3", 0.035);

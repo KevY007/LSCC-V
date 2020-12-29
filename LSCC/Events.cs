@@ -1659,7 +1659,7 @@ namespace LSCC
                     }
 
                     Vector3 PlayerSpawn = (Vector3)Settings.DerbySpawns[spawnID, 0];
-                    PlayerSpawn.Z += 30.0f;
+                    PlayerSpawn.Z += 15.0f;
                     player.Position = PlayerSpawn;
                     player.Heading = (float)Settings.DerbySpawns[spawnID, 1];
                     player.Dimension = 500;

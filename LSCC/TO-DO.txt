@@ -1,14 +1,4 @@
 ﻿FORMAT: ADDED BY - ITEM.
-
-add /rules and add simple rules but add in discord are more better
-
-tennis map in /dm court
-
-Check LSCC discord.
-
-enable chat or anything to display messages in login screen like login errors because u dont see it without chat
-or actually send notifications? it worked maybe we disabled thats y
-
 BUSTED TYPE MODE IN A LOBBY? STAY CLOSE = BUSTTT NO WEAPONS
 
 admin records system
@@ -16,7 +6,7 @@ admin records system
 Check out + Added server-side: NAPI.Task.WaitForMainThread(int delayTime = 0) (Task-based NAPI.Task.Run alternative, could be used with async/await)
 in 1.1 xperimental when it is released.
 reset time on death in derby
-check imrpovements
+
 
 
 ( for later if we still have issues >> << bottom.)

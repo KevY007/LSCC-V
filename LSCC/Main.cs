@@ -262,7 +262,9 @@ public static class Settings
     public static string[] DMNames = new string[]
     {
         "Life Invader Office",
-        "Warehouse"
+        "Warehouse",
+        "Tennis Court",
+        "Construction Site"
     };
 
     public static object[][,] DMSpawns = new object[][,]
@@ -289,6 +291,31 @@ public static class Settings
             { new Vector3(1009.0142f, -3105.6724f, -38.999836f), -94.19384f },
             { new Vector3(1014.16077f, -3111.6494f, -38.999855f), -16.558058f },
             { new Vector3(1023.80054f, -3101.6365f, -38.999866f), 91.27259f },
+        },
+        new object[,] { // Tennis Court
+            { new Vector3(-1339.0612f, -86.17103f, 50.70433f), 163.59131f },
+            { new Vector3(-1350.675f, -114.54801f, 50.704338f), -55.28427f },
+            { new Vector3(-1339.0763f, -112.86697f, 50.704353f), 78.14612f },
+            { new Vector3(-1356.3923f, -120.092705f, 50.674458f), -21.771978f },
+            { new Vector3(-1376.948f, -117.589f, 50.704338f), 2.0458739f },
+            { new Vector3(-1380.0442f, -89.38932f, 50.70434f), -109.858505f },
+            { new Vector3(-1367.795f, -85.32934f, 50.704365f), -141.75507f },
+            { new Vector3(-1363.9862f, -103.44455f, 50.704327f), -161.3273f },
+            { new Vector3(-1315.6982f, -110.76596f, 47.866528f), -15.326206f },
+            { new Vector3(-1302.3474f, -111.222145f, 47.86635f), 27.674273f },
+            { new Vector3(-1303.0864f, -86.85428f, 47.86452f), 67.42608f },
+            { new Vector3(-1313.2341f, -86.358795f, 47.86452f), -129.29897f },
+        },
+        new object[,] { // Construction Site
+            { new Vector3(99.4386f, -374.97763f, 55.496834f), -12.512988f },
+            { new Vector3(106.195435f, -375.18335f, 55.496834f), -2.4919534f },
+            { new Vector3(106.47802f, -357.54053f, 55.496834f), 107.3899f },
+            { new Vector3(116.39296f, -342.71448f, 55.496826f), -177.35867f },
+            { new Vector3(105.71075f, -336.08627f, 55.49683f), 146.98698f },
+            { new Vector3(82.705376f, -328.99182f, 55.508385f), -163.03473f },
+            { new Vector3(54.689102f, -342.37216f, 55.50839f), -132.10645f },
+            { new Vector3(74.776054f, -351.3653f, 55.506992f), -45.4294f },
+            { new Vector3(94.19476f, -360.79895f, 55.496826f), -19.65776f },
         },
     };
 

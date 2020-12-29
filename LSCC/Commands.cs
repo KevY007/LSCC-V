@@ -924,11 +924,37 @@ namespace LSCC
                 newWepData.Add(i.Key, newDataTwo);
             }
 
+            wComponentData val = new wComponentData();
+            if(newWepData.TryGetValue(wephash, out val))
+            {
+                if(val.Components.Count > 0)
+                {
+                    newWepData.Remove(wephash);
+                }
+            }
+
             EPlayer.GetAccount(target).WeaponComponents = NAPI.Util.ToJson(newWepData);
 
             player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have removed '{comp.Name}' on '{itemData.Name}' from {target.Name}.");
             target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}{player.Name} has removed '{comp.Name}' on '{itemData.Name}' from you.");
+
+            EPlayer.Save(target);
             return;
+        }
+
+        [Command("rules")]
+        public void cmd_rules(Player player)
+        {
+            player.SendChatMessage("!{#FF6347}Rule 1) Common Courtesy: Mind your own business, avoid toxicity and insults. Not applied to IC chat.");
+            player.SendChatMessage("!{#FF6347}Rule 2) Common Sense: If you are caught cheating, it's obvious you're getting punished so keep that in mind.");
+            player.SendChatMessage("!{#FF6347}Rule 3) Bug Abusing: According to the severity of the bug, punishment will be carried out, do not abuse any bugs!");
+            player.SendChatMessage("!{#FF6347}Rule 4) Chat & Voice Rules: Don't speak foreign languages, spam, annoy or insult any other player! Don't shout either.");
+            player.SendChatMessage("!{#FF6347}Rule 5) Ramming Rules: Do not suicide ram into 'stationary' vehicles, don't ram people onfoot.");
+            player.SendChatMessage("!{#FF6347}Rule 6) Deathmatching: Don't try to kill fugitive's that don't have the tag or anything except arresting.");
+            player.SendChatMessage("!{#FF6347}Rule 7) Abusing the mode: Forgetting the purpose of serer and teaming with enemy team etc is strictly bannable!");
+
+            player.SendChatMessage("!{#FFFFFF}>>");
+            player.SendChatMessage("!{#FF6347}These are just some basic rules for detailed, complete rule list, visit our discord! (/discord)");
         }
 
         [Command("givecomp", "!{#AFAFAF}[USAGE] givecomp (target) (weapon/hash) (component/hash)", GreedyArg = true)]
@@ -1072,10 +1098,21 @@ namespace LSCC
                 newWepData.Add(i.Key, newDataTwo);
             }
 
+            if (!newWepData.ContainsKey(wephash))
+            {
+                wComponentData newDataTwo = new wComponentData();
+
+                newDataTwo.Components.Add(comphash);
+
+                newWepData.Add(wephash, newDataTwo);
+            }
+
             EPlayer.GetAccount(target).WeaponComponents = NAPI.Util.ToJson(newWepData);
 
             player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You gave '{comp.Name}' on '{itemData.Name}' to {target.Name}.");
             target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been given '{comp.Name}' on '{itemData.Name}' by {player.Name}.");
+
+            EPlayer.Save(target);
             return;
         }
 
@@ -2053,7 +2090,7 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player)) return;
 
             player.SendChatMessage("!{#0079DB}[Los Santos Copchase V !{#2BA3FF}BETA Commands]:");
-            player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /keys /admins /fontsize");
+            player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /keys /admins /rules");
             player.SendChatMessage("[General]: /report /helpme /l(ow) /c(ar)w(hisper) /s(hout)");
             player.SendChatMessage("[Squad/Partner]: /squad /squadleave /s(quad)c(hat) /squadaccept /squadmembers");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
@@ -2065,7 +2102,7 @@ namespace LSCC
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /derby");
             player.SendChatMessage("!{#28E0DA}[Mode: DM]: /dm /dmarena");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /freeroam /veh /customvehlist /teleport /mytime /myweather");
-            player.SendChatMessage("!{#A5A8A8}[Dbg/Test/Misc]: /pos /updaterate /lcmenu /info (credits etc)");
+            player.SendChatMessage("!{#A5A8A8}[Dbg/Test/Misc]: /pos /updaterate /lcmenu /info /fontsize");
 
             if (EPlayer.GetAccount(player).DonatorLevel >= 1)
             {
@@ -2290,7 +2327,7 @@ namespace LSCC
         [Command("suspend", "!{#AFAFAF}[USAGE] suspend (target)")]
         public void cmd_suspend(Player player, Player target)
         {
-            if (!EPlayer.LoggedIn(player) || !EPlayer.LoggedIn(target))
+            if (!EPlayer.LoggedIn(player) || !EPlayer.LoggedIn(target) || player == target)
                 return;
 
             if (EPlayer.GetAccount(player).Admin < 2)
