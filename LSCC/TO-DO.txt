@@ -8,6 +8,8 @@ in 1.1 xperimental when it is released.
 reset time on death in derby
 
 
+we had event.update that is the best timer we could use for timeupdate etc, it wasnt working on linux before but maybe fixed now? check later
+
 
 ( for later if we still have issues >> << bottom.)
 use clientside to put player in vehicle as well on gmae start
