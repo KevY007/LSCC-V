@@ -736,6 +736,17 @@ namespace LSCC
                 return;
             }
 
+            if(acc.WeaponComponents == null || acc.WeaponComponents.Length < 4)
+            {
+                Dictionary<ulong, wComponentData> wepItems = new Dictionary<ulong, wComponentData>();
+
+                wComponentData test = new wComponentData();
+                test.Components.Add(123456789);
+                wepItems.Add(123456789, test);
+
+                acc.WeaponComponents = NAPI.Util.ToJson(wepItems);
+            }
+
             EPlayer.ApplyCharacter(player, ConvChar, acc.LobbyClothing);
 
             EPlayer.Spawn(player);
@@ -1229,6 +1240,13 @@ namespace LSCC
             player.SetData("LastCryptAttempt", Environment.TickCount);
             string salt = AccountManager.GenSalt();
             string newPass = AccountManager.Crypt(password, salt);
+
+            Dictionary<ulong, wComponentData> wepItems = new Dictionary<ulong, wComponentData>();
+
+            wComponentData test = new wComponentData();
+            test.Components.Add(123456789);
+            wepItems.Add(123456789, test);
+
             var _new = new Account
             {
                 Email = email,
@@ -1251,7 +1269,7 @@ namespace LSCC
                 LoadoutCop = "?",
                 LoadoutFugitive = "?",
                 CarCop = "?",
-                WeaponComponents = "{}",
+                WeaponComponents = NAPI.Util.ToJson(wepItems),
                 Character = "{}",
             };
             AccountManager.Add(_new);

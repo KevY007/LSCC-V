@@ -783,6 +783,296 @@ namespace LSCC
             return;
         }
 
+        [Command("removecomp", "!{#AFAFAF}[USAGE] removecomp (target) (weapon/hash) (component/hash)", GreedyArg = true)]
+        public void cmd_removecomp(Player player, Player target, string wep, string component)
+        {
+            if (!EPlayer.LoggedIn(player) || !EPlayer.LoggedIn(target))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 3 admin.");
+                return;
+            }
+
+
+            UInt64 wephash = 0;
+            bool found = false;
+            jWeaponData itemData = null;
+
+            if (!UInt64.TryParse(wep, out wephash))
+            {
+                wephash = 0;
+            }
+
+            foreach (KeyValuePair<ulong, jWeaponData> i in Settings.WeaponData)
+            {
+                if (wephash != 0)
+                {
+                    if (i.Key == wephash)
+                    {
+                        found = true;
+                        itemData = i.Value;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (!found)
+                    {
+                        if (i.Value.Name.Contains(wep, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            found = true;
+                            wephash = i.Key;
+                            itemData = i.Value;
+                        }
+                    }
+                    if (i.Value.Name.Equals(wep, StringComparison.CurrentCultureIgnoreCase)) // If it's really equal then override old found
+                    {
+                        found = true;
+                        wephash = i.Key;
+                        itemData = i.Value;
+                    }
+                }
+            }
+
+            if (found == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid weapon! Try using hashes or exact names.");
+                return;
+            }
+
+            found = false;
+            UInt64 comphash = 0;
+            Component comp = null;
+
+            if (!UInt64.TryParse(component, out comphash))
+            {
+                comphash = 0;
+            }
+
+            foreach (var item in itemData.Components)
+            {
+                if (wephash != 0)
+                {
+                    if (item.Key == wephash)
+                    {
+                        found = true;
+                        comp = item.Value;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (!found)
+                    {
+                        if (item.Value.Name.Contains(component, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            found = true;
+                            comphash = item.Key;
+                            comp = item.Value;
+                        }
+                    }
+                    if (item.Value.Name.Equals(component, StringComparison.CurrentCultureIgnoreCase)) // If it's really equal then override old found
+                    {
+                        found = true;
+                        comphash = item.Key;
+                        comp = item.Value;
+                    }
+                }
+            }
+
+            if (found == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid component! Try using hashes or exact names.");
+                return;
+            }
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:removecomp:{target.Name}:{itemData.Name}:{comp.Name}"); } catch { }
+
+
+            Dictionary<ulong, wComponentData> wepItems = new Dictionary<ulong, wComponentData>();
+
+            Account acc = EPlayer.GetAccount(target);
+            try
+            {
+                if (acc.WeaponComponents == null || acc.WeaponComponents.Length < 4) throw (new System.Exception("Invalid weapon component > going to new."));
+
+                wepItems = NAPI.Util.FromJson<Dictionary<ulong, wComponentData>>(acc.WeaponComponents);
+            }
+            catch
+            {
+                wepItems = new Dictionary<ulong, wComponentData>();
+
+                wComponentData test = new wComponentData();
+                test.Components.Add(123456789);
+                wepItems.Add(123456789, test);
+            }
+
+            Dictionary<ulong, wComponentData> newWepData = new Dictionary<ulong, wComponentData>();
+
+            foreach (KeyValuePair<ulong, wComponentData> i in wepItems)
+            {
+                if (i.Key == wephash)
+                {
+                    if (i.Value.Components.Contains(comphash)) i.Value.Components.Remove(comphash);
+                }
+
+                newWepData.Add(i.Key, i.Value);
+            }
+
+            EPlayer.GetAccount(target).WeaponComponents = NAPI.Util.ToJson(newWepData);
+
+            player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have removed '{comp.Name}' on '{itemData.Name}' from {target.Name}.");
+            target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}{player.Name} has removed '{comp.Name}' on '{itemData.Name}' from you.");
+            return;
+        }
+
+        [Command("givecomp", "!{#AFAFAF}[USAGE] givecomp (target) (weapon/hash) (component/hash)", GreedyArg = true)]
+        public void cmd_givecomp(Player player, Player target, string wep, string component)
+        {
+            if (!EPlayer.LoggedIn(player) || !EPlayer.LoggedIn(target))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 3 admin.");
+                return;
+            }
+
+
+            UInt64 wephash = 0;
+            bool found = false;
+            jWeaponData itemData = null;
+
+            if (!UInt64.TryParse(wep, out wephash))
+            {
+                wephash = 0;
+            }
+
+            foreach (KeyValuePair<ulong, jWeaponData> i in Settings.WeaponData)
+            {
+                if (wephash != 0)
+                {
+                    if (i.Key == wephash)
+                    {
+                        found = true;
+                        itemData = i.Value;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (!found)
+                    {
+                        if (i.Value.Name.Contains(wep, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            found = true;
+                            wephash = i.Key;
+                            itemData = i.Value;
+                        }
+                    }
+                    if (i.Value.Name.Equals(wep, StringComparison.CurrentCultureIgnoreCase)) // If it's really equal then override old found
+                    {
+                        found = true;
+                        wephash = i.Key;
+                        itemData = i.Value;
+                    }
+                }
+            }
+
+            if (found == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid weapon! Try using hashes or exact names.");
+                return;
+            }
+
+            found = false;
+            UInt64 comphash = 0;
+            Component comp = null;
+
+            if (!UInt64.TryParse(component, out comphash))
+            {
+                comphash = 0;
+            }
+
+            foreach (var item in itemData.Components)
+            {
+                if (wephash != 0)
+                {
+                    if (item.Key == wephash)
+                    {
+                        found = true;
+                        comp = item.Value;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (!found)
+                    {
+                        if (item.Value.Name.Contains(component, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            found = true;
+                            comphash = item.Key;
+                            comp = item.Value;
+                        }
+                    }
+                    if (item.Value.Name.Equals(component, StringComparison.CurrentCultureIgnoreCase)) // If it's really equal then override old found
+                    {
+                        found = true;
+                        comphash = item.Key;
+                        comp = item.Value;
+                    }
+                }
+            }
+
+            if (found == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid component! Try using hashes or exact names.");
+                return;
+            }
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:givecomp:{target.Name}:{itemData.Name}:{comp.Name}"); } catch { }
+
+
+            Dictionary<ulong, wComponentData> wepItems = new Dictionary<ulong, wComponentData>();
+
+            Account acc = EPlayer.GetAccount(target);
+            try
+            {
+                if (acc.WeaponComponents == null || acc.WeaponComponents.Length < 4) throw (new System.Exception("Invalid weapon component > going to new."));
+
+                wepItems = NAPI.Util.FromJson<Dictionary<ulong, wComponentData>>(acc.WeaponComponents);
+            }
+            catch
+            {
+                wepItems = new Dictionary<ulong, wComponentData>();
+
+                wComponentData test = new wComponentData();
+                test.Components.Add(123456789);
+                wepItems.Add(123456789, test);
+            }
+
+            Dictionary<ulong, wComponentData> newWepData = new Dictionary<ulong, wComponentData>();
+
+            foreach (KeyValuePair<ulong, wComponentData> i in wepItems)
+            {
+                if(i.Key == wephash)
+                {
+                    if (!i.Value.Components.Contains(comphash)) i.Value.Components.Add(comphash);
+                }
+
+                newWepData.Add(i.Key, i.Value);
+            }
+
+            EPlayer.GetAccount(target).WeaponComponents = NAPI.Util.ToJson(newWepData);
+
+            player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You gave '{comp.Name}' on '{itemData.Name}' to {target.Name}.");
+            target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been given '{comp.Name}' on '{itemData.Name}' by {player.Name}.");
+            return;
+        }
+
         [Command("givegun", "!{#AFAFAF}[USAGE] givegun (target) (ammo) (weapon)", GreedyArg = true)]
         public void cmd_givegun(Player player, Player target, int ammo, string wep)
         {
@@ -2323,7 +2613,7 @@ namespace LSCC
             }
             if (EPlayer.GetAccount(player).Admin >= 3)
             {
-                player.SendChatMessage("[Admin Lv 3]: /givegun(all) /gotopos /bringall /sethpall /(un)freezeall /r(emove)g(uns)f(rom)a(ll)");
+                player.SendChatMessage("[Admin Lv 3]: /givegun(all) /gotopos /bringall /sethpall /(un)freezeall /r(emove)g(uns)f(rom)a(ll) /givecomp /removecomp");
             }
             if (EPlayer.GetAccount(player).Admin >= 4)
             {
