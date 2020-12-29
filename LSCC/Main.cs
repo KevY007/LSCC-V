@@ -225,6 +225,7 @@ public static class Settings
     public static int DerbyTimeLeft { get; set; }
     public static int LastDerbyTick { get; set; }
     public static int LastMessageTick { get; set; }
+    public static int AutoSaveTick { get; set; }
     public static List<RequestData> Requests { get; set; }
     public static int NextRequestID { get; set; }
     public static int LastCountUpdate { get; set; }
@@ -751,6 +752,7 @@ namespace LSCC
             Settings.NextLobbyID = 1;
             Settings.NextRequestID = 1;
             Settings.LastCountUpdate = Environment.TickCount;
+            Settings.AutoSaveTick = Environment.TickCount;
             Settings.LastMessageTick = Environment.TickCount;
 
             Settings.Timers.TimeUpdate = null;
@@ -898,6 +900,14 @@ namespace LSCC
 
         public void TimeUpdate()
         {
+            if(Environment.TickCount - Settings.AutoSaveTick >= 300000) // 5 mins
+            {
+                ContextFactory.Instance.SaveChangesAsync();
+                NAPI.Util.ConsoleOutput("Server auto-saved => " + DateTime.Now.ToString());
+
+                Settings.AutoSaveTick = Environment.TickCount;
+            }
+
             if(Environment.TickCount - Settings.LastMessageTick > 90000)
             {
                 string[] msgList = {
