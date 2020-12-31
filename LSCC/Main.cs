@@ -199,11 +199,11 @@ public class LoadoutData
 public static class Settings
 {
     // Static Settings / Const
-    public const string Version = "0.1b";
+    public const string Version = "0.1c";
     public const int GameRunTime = 390; // Game Running Time in Seconds before STOP
     public const int MaxLobbies = 5; // Default/starting lobby num.
     public const int DefaultMaxInLobby = 35;
-    public const bool UseDiscord = true;
+    public const bool UseDiscord = false;
 
     // Connection Settings
     public const string MySQL_Host = "localhost";

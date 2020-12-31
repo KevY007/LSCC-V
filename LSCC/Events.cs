@@ -962,8 +962,10 @@ namespace LSCC
         [RemoteEvent("OnPlayerLoginAttempt")]
         public static void OnPlayerLoginAttempt(Player player, string username, string password)
         {
+            if ((username == null || username.Length < 2) || (password == null || password.Length < 2)) return;
+
             NAPI.Util.ConsoleOutput($"[Login Attempt] Username {username}");
-            if (Environment.TickCount - player.GetData<int>("LastCryptAttempt") < 1000)
+            if (Environment.TickCount - player.GetData<int>("LastCryptAttempt") < 1000 || EPlayer.LoggedIn(player))
             {
                 player.SendNotification("~r~Please wait some time between each login attempt!", true);
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please wait some time between each login attempt!");
@@ -1185,25 +1187,31 @@ namespace LSCC
         [RemoteEvent("OnPlayerRegisterAttempt")]
         public static void OnPlayerRegisterAttempt(Player player, string email, string username, string password, string confirmpass)
         {
+            if ( (email == null || email.Length < 2) || (username == null || username.Length < 2) || (password == null || password.Length < 2)) return;
+
             NAPI.Util.ConsoleOutput($"[Register Attempt] Username {username}");
-            if (Environment.TickCount - player.GetData<int>("LastCryptAttempt") < 1000)
+            if (Environment.TickCount - player.GetData<int>("LastCryptAttempt") < 1000 || EPlayer.LoggedIn(player))
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please wait some time between each register attempt!");
+                player.SendNotification("~r~Please wait some time between each register attempt!", true);
                 return;
             }
             if (!password.Equals(confirmpass))
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Passwords do not match!");
+                player.SendNotification("~r~Passwords do not match!", true);
                 return;
             }
             if (password.Length < 5)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your password is too small!");
+                player.SendNotification("~r~Password is too small!", true);
                 return;
             }
             if (username.Contains("@") || username.Length < 4)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your username is too small or it cannot contain the character '@'");
+                player.SendNotification("~r~Username small or contains illegal characters!", true);
                 return;
             }
             Regex exp = new Regex(@"^[a-zA-Z0-9]*$");
@@ -1211,29 +1219,36 @@ namespace LSCC
             if (!match.Success)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your username can only contain alphabets or numbers!");
+                player.SendNotification("~r~Username contains illegal characters!", true);
                 return;
             }
             if (!email.Contains("@") || email.Length < 5)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your username cannot contain the character '@'");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your email is invalid or too small!");
+                player.SendNotification("~r~Invalid email!", true);
                 return;
             }
+
             Account acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase) == true);
             if (acc != null)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}An account with this name already exists!");
+                player.SendNotification("~r~Account with this name already exists!", true);
                 return;
             }
-            acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Email == email);
+
+            /*acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Email == email);
             if (acc != null)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}An account with this email already exists!");
+                player.SendNotification("~r~Account with this email already exists!", true);
                 return;
-            }
+            }*/
 
             if (ContextFactory.Instance.Accounts.Count(a => a.HWID.Equals(player.Serial) || a.RockstarID == player.SocialClubId) >= 2)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can only have TWO accounts per computer or rockstar ID!");
+                player.SendNotification("~r~You have more than two accounts on the same computer/game serial!", true);
                 return;
             }
 
