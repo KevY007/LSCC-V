@@ -2463,8 +2463,13 @@ namespace LSCC
 
             if(newLobby.gameStatus == 1) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's currently a game running in that lobby!"); return; }
             
+           
             Settings.Lobbies.Remove(newLobby);
+            Settings.Lobbies.RemoveAll(a => a.lobbyId == lobbyid);
+
             newLobby.Enabled = false;
+            newLobby.gameStatus = 0;
+            newLobby.lobbyId = -1;
 
             NAPI.Util.ConsoleOutput($"{player.Name} deleted lobby ID {lobbyid}");
 

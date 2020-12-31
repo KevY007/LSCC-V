@@ -15,7 +15,6 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Globalization;
-using RAGETimer.Shared;
 
 public partial class jWeaponData
 {
@@ -142,7 +141,7 @@ public class LobbyData
         lobbyId = -1;
         for(int i = 1; i < Settings.NextLobbyID; i++)
         {
-            if(Settings.Lobbies.Count(a => a.lobbyId == i) == 0 && i > 0)
+            if(Settings.Lobbies.Count(a => a.lobbyId == i) == 0)
             {
                 lobbyId = i;
             }
@@ -246,8 +245,8 @@ public static class Settings
 
     public static class Timers
     { 
-        public static Timer GameUpdate { get; set; }
-        public static Timer TimeUpdate { get; set; }
+        public static long GameUpdate_Tick { get; set; }
+        public static long TimeUpdate_Tick { get; set; }
     }
 
 
@@ -681,9 +680,6 @@ namespace LSCC
         [ServerEvent(Event.ResourceStop)]
         public void OnResourceStop()
         {
-            if (Settings.Timers.GameUpdate != null) Settings.Timers.GameUpdate.Kill();
-            if (Settings.Timers.TimeUpdate != null) Settings.Timers.TimeUpdate.Kill();
-
             ContextFactory.Instance.SaveChanges();
 
             RAGE.Entities.Players.All.ForEach((Player p) => {
@@ -766,9 +762,6 @@ namespace LSCC
             Settings.AutoSaveTick = Environment.TickCount;
             Settings.LastMessageTick = Environment.TickCount;
 
-            Settings.Timers.TimeUpdate = null;
-            Settings.Timers.GameUpdate = null;
-
             NAPI.World.SetTime(12, 0, 0);
             NAPI.World.SetWeather(Weather.CLOUDS);
 
@@ -850,15 +843,21 @@ namespace LSCC
 
             ///////////////////////////////////////////////////////////////////////////////
 
-
-            Settings.Timers.GameUpdate = new RAGETimer.Shared.Timer(() => GameUpdate(), 1000, 0);
-            Settings.Timers.TimeUpdate = new RAGETimer.Shared.Timer(() => TimeUpdate(), 15000, 0);
+            Settings.Timers.GameUpdate_Tick = Environment.TickCount64 + 1000;
+            Settings.Timers.TimeUpdate_Tick = Environment.TickCount64 + 1000;
         }
 
         [ServerEvent(Event.Update)]
         public void OnUpdate()
         {
-            
+            if(Environment.TickCount64 - Settings.Timers.GameUpdate_Tick >= 1000)
+            {
+                GameUpdate();
+            }
+            if (Environment.TickCount64 - Settings.Timers.TimeUpdate_Tick >= 15000)
+            {
+                TimeUpdate();
+            }
         }
 
         public void GameStartCountdown(int time, int lobbyid)
@@ -1885,7 +1884,7 @@ namespace LSCC
         {
             if (Environment.TickCount - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
             {
-                Settings.DerbyTimeLeft--;
+                //Settings.DerbyTimeLeft--;
                 Settings.LastDerbyTick = Environment.TickCount;
 
                 if (Settings.DerbyTimeLeft <= 0)
