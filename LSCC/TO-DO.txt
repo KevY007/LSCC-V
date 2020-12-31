@@ -1,15 +1,12 @@
 ﻿FORMAT: ADDED BY - ITEM.
+
 BUSTED TYPE MODE IN A LOBBY? STAY CLOSE = BUSTTT NO WEAPONS (lobbydata.mode)
-deletelobby should stop copchase if running and force all players out
-when a lobby is deleted and created, e.g. num 6, then next lobby starts at num 7.
-make that lobby next num either resets down or you can join swl lobby id check not using count
-/lobby forces u to lobby 1 or w/e, like if ur i0n lobby 7 or 8 u go in 1, add check if ur already in lobby why reset bruv
-disable swl if in game etc
+
+
 admin records system
 
 Check out + Added server-side: NAPI.Task.WaitForMainThread(int delayTime = 0) (Task-based NAPI.Task.Run alternative, could be used with async/await)
 in 1.1 xperimental when it is released.
-reset time on death in derby
 
 
 we had event.update that is the best timer we could use for timeupdate etc, it wasnt working on linux before but maybe fixed now? check later

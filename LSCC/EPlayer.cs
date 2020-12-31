@@ -889,7 +889,8 @@ namespace LSCC
 
             if (player.HasData("DerbyVehicle"))
             {
-                player.GetData<Vehicle>("DerbyVehicle").Delete();
+                try { player.GetData<Vehicle>("DerbyVehicle").Delete(); }
+                catch { }
 
                 player.ResetData("DerbyVehicle");
             }
@@ -900,7 +901,8 @@ namespace LSCC
                 player.SetData("AutoJoin", true);
             }
 
-            if (player.GetSharedData<int>("InLobby") == -1 || player.GetSharedData<int>("InLobby") == -5 && player.GetData<bool>("Creator_Using") == false)
+            if (Settings.Lobbies.Count(lob => lob.lobbyId == player.GetSharedData<int>("InLobby")) == 0 || // Invalid lobby
+                player.GetSharedData<int>("InLobby") == -1 || player.GetSharedData<int>("InLobby") == -5 && player.GetData<bool>("Creator_Using") == false)
             {
                 player.SetSharedData("InDM", -1);
                 int LobbyToBeIn = Settings.MaxLobbies;

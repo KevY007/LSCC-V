@@ -1468,10 +1468,13 @@ namespace LSCC
 
             if (player.HasData("DerbyVehicle"))
             {
-                player.GetData<Vehicle>("DerbyVehicle").Delete();
+                try { player.GetData<Vehicle>("DerbyVehicle").Delete(); }
+                catch { }
 
                 player.ResetData("DerbyVehicle");
             }
+
+            if(player.Health == 0 || player.Dead) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are respawning!"); return; }
 
             List<Vehicle> freeroamVehs = new List<Vehicle>();
             freeroamVehs = player.GetData<List<Vehicle>>("FreeroamVehicles");
@@ -1485,9 +1488,29 @@ namespace LSCC
                 }
             }
 
-            if(!player.HasData("ForcedData"))
+            if (freeroamVehs.Count > 0)
+            {
+                for (int i = 0; i < freeroamVehs.Count; i++)
+                {
+                    freeroamVehs.RemoveAt(i);
+                }
+            }
+
+            if (!player.HasData("ForcedData"))
             {
                 // Do lobby checks here so /sendtolobby ignores all of them.
+                // like ingame etc so you cant lobby midgame or some stuff like that you get it?
+                // not really needed for ingame but other stuff
+            }
+
+            LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (elobby != null)
+            {
+                if (elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
+                {
+                    player.Health = 0;
+                    return;
+                }
             }
 
             freeroamVehs.Clear();
@@ -1495,7 +1518,9 @@ namespace LSCC
             player.SetSharedData("InDM", -1);
             player.ResetData("ForcedData");
 
-            player.SetSharedData("InLobby", -1);
+
+            if(elobby == null) player.SetSharedData("InLobby", -1);
+
             player.SendChatMessage($"!{{#FFFF00}}[!] Sending you to !{{#FF6347}}LOBBY.");
             EPlayer.Spawn(player);
 
@@ -1591,9 +1616,9 @@ namespace LSCC
             string[] split = args.Split(' ');
             if (split.Count() > 0)
             {
-                if (!Int32.TryParse(split[0], out lobbyid) || lobbyid < 1 || lobbyid > Settings.Lobbies.Count)
+                if (!Int32.TryParse(split[0], out lobbyid) || lobbyid < 1)
                 {
-                    player.SendChatMessage($"!{{#999999}}Lobby ID must be between 1-{Settings.Lobbies.Count}!");
+                    player.SendChatMessage($"!{{#999999}}Lobby ID cannot be less than 1!");
                     return;
                 }
             }
@@ -1643,7 +1668,7 @@ namespace LSCC
             {
                 if(elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot switch lobbies in an ongoing game!");
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot switch lobbies in an ongoing game! (/lobby)");
                     return;
                 }
             }
@@ -1717,7 +1742,13 @@ namespace LSCC
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into DM while the match is starting!");
                 return;
             }
-            
+
+            if (elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
+            {                    
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into DM while in the copchase! (/lobby)");
+                return;
+            }
+
 
             player.SetSharedData("InDM", arenaid);
 
@@ -1744,12 +1775,20 @@ namespace LSCC
             if (player.GetSharedData<int>("InLobby") > -1)
             {
                 LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
-                if (elobby == null) return;
-
-                if (elobby.gameStatus == 2)
+                if (elobby != null)
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into freeroam while the match is starting!");
-                    return;
+
+                    if (elobby.gameStatus == 2)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into freeroam while the match is starting!");
+                        return;
+                    }
+
+                    if (elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into DM while in the copchase! (/lobby)");
+                        return;
+                    }
                 }
             }
 
@@ -1789,7 +1828,8 @@ namespace LSCC
 
             if (player.HasData("DerbyVehicle"))
             {
-                player.GetData<Vehicle>("DerbyVehicle").Delete();
+                try { player.GetData<Vehicle>("DerbyVehicle").Delete(); }
+                catch { }
 
                 player.ResetData("DerbyVehicle");
             }
@@ -1916,6 +1956,7 @@ namespace LSCC
 
             player.SetData("ForcedLobby", true);
             cmd_lobby(target);
+
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has sent {target.Name} to lobby.");
         }
 
@@ -2398,6 +2439,7 @@ namespace LSCC
 
             NAPI.Util.ConsoleOutput($"{player.Name} created lobby ID {newLobby.lobbyId}");
             player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have created a new lobby with ID " + newLobby.lobbyId + ", /setlobbypassword to lock it.");
+            Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} created lobby {newLobby.lobbyId}.**");
 
             return;
         }
@@ -2419,11 +2461,24 @@ namespace LSCC
 
             if(newLobby == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That lobby ID is invalid or that lobby cannot be deleted."); return; }
 
+            if(newLobby.gameStatus == 1) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's currently a game running in that lobby!"); return; }
+            
             Settings.Lobbies.Remove(newLobby);
             newLobby.Enabled = false;
 
             NAPI.Util.ConsoleOutput($"{player.Name} deleted lobby ID {lobbyid}");
-            player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have deleted lobby ID " + lobbyid);
+
+            Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} deleted lobby {lobbyid}.**");
+
+            RAGE.Entities.Players.All.ForEach((Player pl) =>
+            {
+                pl.SendChatMessage("!{#FF6347}[#] !{#FFFFFF} " + player.Name + " has deleted lobby " + lobbyid + ".");
+
+                if(pl.GetSharedData<int>("InLobby") == lobbyid)
+                {
+                    EPlayer.Spawn(pl, true);
+                }
+            });
 
             return;
         }
@@ -2449,6 +2504,7 @@ namespace LSCC
 
             NAPI.Util.ConsoleOutput($"{player.Name} set lobby ID {newLobby.lobbyId} password to {newLobby.Password}");
             player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have set password for lobby ID " + lobbyid + " to " + newLobby.Password);
+            Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s password to {newLobby.Password}.**");
 
             return;
         }
@@ -2476,6 +2532,7 @@ namespace LSCC
 
             NAPI.Util.ConsoleOutput($"{player.Name} set lobby ID {newLobby.lobbyId} percentage to {newLobby.FugitivePercent}");
             player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have set fugitive percentage for lobby ID " + lobbyid + " to " + newLobby.FugitivePercent);
+            Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s fugitive percentage to {newLobby.FugitivePercent}.**");
 
             return;
         }
@@ -2510,6 +2567,7 @@ namespace LSCC
 
                 NAPI.Util.ConsoleOutput($"{player.Name} disabled lobby ID {newLobby.lobbyId}.");
                 player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have disabled lobby ID " + lobbyid + ".");
+                Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} disabled lobby {lobbyid}.**");
             }
             else
             {
@@ -2517,6 +2575,7 @@ namespace LSCC
 
                 NAPI.Util.ConsoleOutput($"{player.Name} enabled lobby ID {newLobby.lobbyId}.");
                 player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have enabled lobby ID " + lobbyid + ".");
+                Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} disabled {lobbyid}.**");
             }
 
             return;
@@ -2651,7 +2710,7 @@ namespace LSCC
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
-                player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword");
+                player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword /toglobby");
                 player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension /r(emove)guns /suspend /unsuspend");
             }
             if (EPlayer.GetAccount(player).Admin >= 3)

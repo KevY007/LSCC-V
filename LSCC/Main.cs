@@ -139,8 +139,19 @@ public class LobbyData
 
         Weather = new Random().Next(0, 9);
 
-        lobbyId = Settings.NextLobbyID;
+        lobbyId = -1;
+        for(int i = 1; i < Settings.NextLobbyID; i++)
+        {
+            if(Settings.Lobbies.Count(a => a.lobbyId == i) == 0 && i > 0)
+            {
+                lobbyId = i;
+            }
+        }
+
+        if(lobbyId == -1) lobbyId = Settings.NextLobbyID;
+
         Settings.NextLobbyID++;
+
         gameStatus = 0;
         FugitiveShowCounter = 0;
         LastSeenCounter = 0;
@@ -882,18 +893,17 @@ namespace LSCC
                             }
                         }
                     }
-                }
-
-                if (time > 0)
-                {
-                    NAPI.Task.Run(() =>
+                    if (time > 0)
                     {
-                        GameStartCountdown(time, lobbyid);
-                    }, delayTime: 2000);
-                }
-                else
-                {
-                    StartGame(lobbyid);
+                        NAPI.Task.Run(() =>
+                        {
+                            GameStartCountdown(time, lobbyid);
+                        }, delayTime: 2000);
+                    }
+                    else
+                    {
+                        StartGame(lobbyid);
+                    }
                 }
             }
         }

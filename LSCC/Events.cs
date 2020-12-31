@@ -278,7 +278,8 @@ namespace LSCC
                 {
                     if (player.HasData("DerbyVehicle"))
                     {
-                        player.GetData<Vehicle>("DerbyVehicle").Delete();
+                        try { player.GetData<Vehicle>("DerbyVehicle").Delete(); }
+                        catch { }
 
                         player.ResetData("DerbyVehicle");
                     }
@@ -381,6 +382,8 @@ namespace LSCC
                     {
                         indm.TriggerEvent("pushToKillFeed", $"DERBY> {player.Name} fell down");
                     }
+
+                    player.SetSharedData("DerbyTime", 0);
                 }
             }
 
@@ -1507,11 +1510,33 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player)) return;
             if (player.GetSharedData<int>("InLobby") != -4) return;
 
+            if(Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() < 2)
+            {
+                player.SetSharedData("DerbyTime", 0);
+            }
+            else
+            {
+                int highestDerbyTime = 0;
+                foreach (Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
+                {
+                    if(p.GetSharedData<int>("DerbyTime") > highestDerbyTime) highestDerbyTime = p.GetSharedData<int>("DerbyTime");
+                }
+                Settings.DerbyTimeLeft = 180 - highestDerbyTime;
+            }
+
+            foreach (Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
+            {
+                if (Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
+                {
+                    p.TriggerEvent("SetDerbyCounting", true, Settings.DerbyTimeLeft);
+                }
+            }
+
             player.SetSharedData("DerbyTime", player.GetSharedData<int>("DerbyTime") + 1);
 
             if (Environment.TickCount - player.GetData<int>("DerbySpawnTick") > 2000)
             {
-                if (player.IsInstanceAlive && player.Health > 10 && !player.IsInVehicle)
+                if (!player.Dead && player.Health > 10 && !player.IsInVehicle)
                 {
                     player.Health = 0;
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please do not get out of your vehicle in derby!");
@@ -1668,7 +1693,8 @@ namespace LSCC
 
                     if (player.HasData("DerbyVehicle"))
                     {
-                        player.GetData<Vehicle>("DerbyVehicle").Delete();
+                        try { player.GetData<Vehicle>("DerbyVehicle").Delete(); }
+                        catch { }
 
                         player.ResetData("DerbyVehicle");
                     }
