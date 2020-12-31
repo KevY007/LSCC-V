@@ -61,7 +61,7 @@ namespace LSCC
             EPlayer.SetDiscordStatus(player, "Connecting to the server...");
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has joined the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
             NAPI.Notification.SendNotificationToPlayer(player, "~g~Welcome to ~w~Los Santos Copchase!");
-            player.SetData("LastCryptAttempt", Environment.TickCount);
+            player.SetData("LastCryptAttempt", Environment.TickCount64);
 
             EPlayer.ResetPlayerData(player);
             EPlayer.Freeze(player, true);
@@ -968,13 +968,13 @@ namespace LSCC
             if ((username == null || username.Length < 2) || (password == null || password.Length < 2)) return;
 
             NAPI.Util.ConsoleOutput($"[Login Attempt] Username {username}");
-            if (Environment.TickCount - player.GetData<int>("LastCryptAttempt") < 1000 || EPlayer.LoggedIn(player))
+            if (Environment.TickCount64 - player.GetData<long>("LastCryptAttempt") < 1000 || EPlayer.LoggedIn(player))
             {
                 player.SendNotification("~r~Please wait some time between each login attempt!", true);
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please wait some time between each login attempt!");
                 return;
             }
-            player.SetData("LastCryptAttempt", Environment.TickCount);
+            player.SetData("LastCryptAttempt", Environment.TickCount64);
             if (username.Contains("@"))
             {
                 Account acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Email == username);
@@ -1029,7 +1029,7 @@ namespace LSCC
                     player.Health = 0;
                 }
 
-                if (Environment.TickCount - player.GetData<int>("DerbySpawnTick") > 2000)
+                if (Environment.TickCount64 - player.GetData<long>("DerbySpawnTick") > 2000)
                 {
                     if (player.IsInstanceAlive && player.Health > 10 && !player.IsInVehicle)
                     {
@@ -1193,7 +1193,7 @@ namespace LSCC
             if ( (email == null || email.Length < 2) || (username == null || username.Length < 2) || (password == null || password.Length < 2)) return;
 
             NAPI.Util.ConsoleOutput($"[Register Attempt] Username {username}");
-            if (Environment.TickCount - player.GetData<int>("LastCryptAttempt") < 1000 || EPlayer.LoggedIn(player))
+            if (Environment.TickCount64 - player.GetData<long>("LastCryptAttempt") < 1000 || EPlayer.LoggedIn(player))
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please wait some time between each register attempt!");
                 player.SendNotification("~r~Please wait some time between each register attempt!", true);
@@ -1255,7 +1255,7 @@ namespace LSCC
                 return;
             }
 
-            player.SetData("LastCryptAttempt", Environment.TickCount);
+            player.SetData("LastCryptAttempt", Environment.TickCount64);
             string salt = AccountManager.GenSalt();
             string newPass = AccountManager.Crypt(password, salt);
 
@@ -1489,11 +1489,11 @@ namespace LSCC
                         }
                     }
 
-                    if (target.HasData("TasedTill") && Environment.TickCount - (target.GetData<int>("TasedTill") - 30000) >= 2000)
+                    if (target.HasData("TasedTill") && Environment.TickCount64 - (target.GetData<long>("TasedTill") - 30000) >= 2000)
                     {
                         int time = 30000;
                         target.TriggerEvent("setToRagdoll", time, time * 2, 0, false, false, false);
-                        target.SetData("TasedTill", Environment.TickCount + 30000);
+                        target.SetData("TasedTill", Environment.TickCount64 + 30000);
                         Commands.cmd_do(player, $"{target.Name} has been tased and has been rendered immobile.");
                     }
                 }
@@ -1534,7 +1534,7 @@ namespace LSCC
 
             player.SetSharedData("DerbyTime", player.GetSharedData<int>("DerbyTime") + 1);
 
-            if (Environment.TickCount - player.GetData<int>("DerbySpawnTick") > 2000)
+            if (Environment.TickCount64 - player.GetData<long>("DerbySpawnTick") > 4000)
             {
                 if (!player.Dead && player.Health > 10 && !player.IsInVehicle)
                 {
@@ -1543,10 +1543,10 @@ namespace LSCC
                 }
             }
 
-            if (Environment.TickCount - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
+            if (Environment.TickCount64 - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
             {
                 Settings.DerbyTimeLeft--;
-                Settings.LastDerbyTick = Environment.TickCount;
+                Settings.LastDerbyTick = Environment.TickCount64;
 
                 if (Settings.DerbyTimeLeft <= 0)
                 {
@@ -1686,7 +1686,7 @@ namespace LSCC
                 {
                     player.TriggerEvent("showHPBars", 0); // Never show HP Bars.
 
-                    player.SetData("DerbySpawnTick", Environment.TickCount);
+                    player.SetData("DerbySpawnTick", Environment.TickCount64);
 
                     Random rand = new Random();
                     int spawnID = rand.Next(Settings.DerbySpawns.GetLength(0));
@@ -1727,7 +1727,7 @@ namespace LSCC
                     {
                         player.SendNotification("~r~Derby time will not be counted unless there are enough players.");
                         Settings.DerbyTimeLeft = 180;
-                        Settings.LastDerbyTick = Environment.TickCount;
+                        Settings.LastDerbyTick = Environment.TickCount64;
                     }
 
                     Vehicle derbyVeh = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey("brioso"), (Vector3)Settings.DerbySpawns[spawnID, 0], (float)Settings.DerbySpawns[spawnID, 1], rand.Next(255), rand.Next(255), "DERBY", 255, false, true, 500);

@@ -626,7 +626,7 @@ namespace LSCC
         [Command("stopanim", Alias = "sa")]
         public void cmd_sa(Player player)
         {
-            if(player.HasData("TasedTill") && Environment.TickCount < player.GetData<int>("TasedTill"))
+            if(player.HasData("TasedTill") && Environment.TickCount64 < player.GetData<long>("TasedTill"))
                 { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this right now as you're tased."); return; }
 
             if (player.HasData("Cuffed"))
@@ -650,7 +650,7 @@ namespace LSCC
         [Command("handsup")]
         public void cmd_handsup(Player player)
         {
-            if (player.HasData("Cuffed") || (player.HasData("TasedTill") && Environment.TickCount < player.GetData<int>("TasedTill"))) 
+            if (player.HasData("Cuffed") || (player.HasData("TasedTill") && Environment.TickCount64 < player.GetData<long>("TasedTill"))) 
                 { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this right now."); return; }
 
             if (player.IsInVehicle)
@@ -1599,11 +1599,11 @@ namespace LSCC
 
             if (!player.HasData("LastLobbySwitch"))
             {
-                player.SetData<int>("LastLobbySwitch", Environment.TickCount);
+                player.SetData<long>("LastLobbySwitch", Environment.TickCount64);
             }
             else
             {
-                if (Environment.TickCount - player.GetData<int>("LastLobbySwitch") < 1000)
+                if (Environment.TickCount64 - player.GetData<long>("LastLobbySwitch") < 1000)
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot switch lobbies that fast.");
                     return;
@@ -1834,7 +1834,7 @@ namespace LSCC
                 player.ResetData("DerbyVehicle");
             }
 
-            player.SetData("DerbySpawnTick", Environment.TickCount + 2000);
+            player.SetData("DerbySpawnTick", Environment.TickCount64 + 2000);
             player.SetSharedData("InDM", -1);
             player.SetSharedData("InLobby", -4);
 
@@ -2725,7 +2725,7 @@ namespace LSCC
             if (EPlayer.GetAccount(player).Admin >= 4)
             {
                 player.SendChatMessage("[Admin Lv 4]: /serveroptions /grantxp /saveserver /dbgplayanim /dbgmaxspeed /dbgdriveforce");
-                player.SendChatMessage("[Admin Lv 4]: /triggerupdate");
+                player.SendChatMessage("[Admin Lv 4]: n/a");
             }
             if (EPlayer.GetAccount(player).Admin >= 5)
             {
@@ -2759,33 +2759,6 @@ namespace LSCC
             target.SendChatMessage($"!{{#FF6347]}}[AdmCmd] {player.Name} has given you {xp} xp.");
             return;
         }
-
-        [Command("triggerupdate", Alias = "timeupdate")]
-        public void cmd_triggerupdate(Player player)
-        {
-            if (!EPlayer.LoggedIn(player))
-                return;
-
-            if (EPlayer.GetAccount(player).Admin < 4)
-            {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
-                return;
-            }
-
-            if ((Settings.Timers.TimeUpdate == null || !Settings.Timers.TimeUpdate.IsRunning) || 
-                (Settings.Timers.GameUpdate == null || !Settings.Timers.GameUpdate.IsRunning)) {
-                player.SendChatMessage("!{#FF6347}[CRITICAL] One or more of server's crucial updating timers has crashed. Restart server ASAP please.");
-                return;
-            }
-
-            Settings.Timers.TimeUpdate.Execute(false);
-            Settings.Timers.GameUpdate.Execute(false);
-
-            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has triggered server's updating timers outside of schedule.");
-
-            return;
-        }
-
 
         [Command("maps")]
         public void cmd_maps(Player player)

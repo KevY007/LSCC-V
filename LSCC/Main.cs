@@ -118,7 +118,7 @@ public class LobbyData
     public int GameProgress { get; set; }
     public int FugitivePercent { get; set; }
     public bool GameAutoStart { get; set; }
-    public int LastAutoStartMsg { get; set; }
+    public long LastAutoStartMsg { get; set; }
     public bool Enabled { get; set; }
     public bool PlayerCreated { get; set; }
     public string Password { get; set; }
@@ -213,7 +213,7 @@ public static class Settings
     public const int GameRunTime = 390; // Game Running Time in Seconds before STOP
     public const int MaxLobbies = 5; // Default/starting lobby num.
     public const int DefaultMaxInLobby = 35;
-    public const bool UseDiscord = false;
+    public const bool UseDiscord = true;
 
     // Connection Settings
     public const string MySQL_Host = "localhost";
@@ -231,14 +231,13 @@ public static class Settings
     public static List<Vehicle> AdminVehicles { get; set; }
     public static int NextLobbyID { get; set; }
     public static int MaxPlayersInLobby { get; set; }
-    public static int[] Time { get; set; }
     public static int DerbyTimeLeft { get; set; }
-    public static int LastDerbyTick { get; set; }
-    public static int LastMessageTick { get; set; }
-    public static int AutoSaveTick { get; set; }
+    public static long LastDerbyTick { get; set; }
+    public static long LastMessageTick { get; set; }
+    public static long AutoSaveTick { get; set; }
     public static List<RequestData> Requests { get; set; }
     public static int NextRequestID { get; set; }
-    public static int LastCountUpdate { get; set; }
+    public static long LastCountUpdate { get; set; }
     public static List<LoadoutData> Loadouts { get; set; }
     public static Dictionary<ulong, jWeaponData> WeaponData { get; set; }
 
@@ -758,9 +757,9 @@ namespace LSCC
             Settings.MaxPlayersInLobby = Settings.DefaultMaxInLobby;
             Settings.NextLobbyID = 1;
             Settings.NextRequestID = 1;
-            Settings.LastCountUpdate = Environment.TickCount;
-            Settings.AutoSaveTick = Environment.TickCount;
-            Settings.LastMessageTick = Environment.TickCount;
+            Settings.LastCountUpdate = Environment.TickCount64;
+            Settings.AutoSaveTick = Environment.TickCount64;
+            Settings.LastMessageTick = Environment.TickCount64;
 
             NAPI.World.SetTime(12, 0, 0);
             NAPI.World.SetWeather(Weather.CLOUDS);
@@ -824,8 +823,8 @@ namespace LSCC
                 NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Loading discord plugin.");
                 Discord.Main();
 
-                int tick = Environment.TickCount + 5000;
-                while (tick > Environment.TickCount)
+                long tick = Environment.TickCount64 + 5000;
+                while (tick > Environment.TickCount64)
                 {
 
                 }
@@ -909,15 +908,15 @@ namespace LSCC
 
         public void TimeUpdate()
         {
-            if(Environment.TickCount - Settings.AutoSaveTick >= 300000) // 5 mins
+            if(Environment.TickCount64 - Settings.AutoSaveTick >= 300000) // 5 mins
             {
                 ContextFactory.Instance.SaveChangesAsync();
                 NAPI.Util.ConsoleOutput("Server auto-saved => " + DateTime.Now.ToString());
 
-                Settings.AutoSaveTick = Environment.TickCount;
+                Settings.AutoSaveTick = Environment.TickCount64;
             }
 
-            if(Environment.TickCount - Settings.LastMessageTick > 90000)
+            if(Environment.TickCount64 - Settings.LastMessageTick > 90000)
             {
                 string[] msgList = {
                     "If you would like to experience some exclusive and limited features then donate to keep the server running!",
@@ -931,7 +930,7 @@ namespace LSCC
 
                 RAGE.Entities.Players.All.ForEach((Player e) => e.SendChatMessage("[?] !{#F0FC72}" + msgList.ElementAt(new Random().Next(0, msgList.Length))));
 
-                Settings.LastMessageTick = Environment.TickCount;
+                Settings.LastMessageTick = Environment.TickCount64;
             }
             lock (Settings.Lobbies)
             {
@@ -1034,11 +1033,11 @@ namespace LSCC
                                         }
                                         else
                                         {
-                                            if (Environment.TickCount - lobby.LastAutoStartMsg >= 90000)
+                                            if (Environment.TickCount64 - lobby.LastAutoStartMsg >= 90000)
                                             {
                                                 EPlayer.SendMessageInLobby(lobby.lobbyId, "!{#FFFF00}[GAME] !{#FFFFFF}Game will not start unless there are 2+ players to start a match.", true);
 
-                                                lobby.LastAutoStartMsg = Environment.TickCount;
+                                                lobby.LastAutoStartMsg = Environment.TickCount64;
                                             }
                                         }
                                     }
@@ -1079,10 +1078,10 @@ namespace LSCC
             {
                 System.Threading.Tasks.Task.Run(() =>
                 {
-                    if (Environment.TickCount - Settings.LastCountUpdate >= 120000 &&
+                    if (Environment.TickCount64 - Settings.LastCountUpdate >= 120000 &&
                         (int)Discord._client.ConnectionState == 2)
                     {
-                        Settings.LastCountUpdate = Environment.TickCount;
+                        Settings.LastCountUpdate = Environment.TickCount64;
 
                         foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
                         {
@@ -1147,7 +1146,7 @@ namespace LSCC
                 if (winner != null) EPlayer.GrantXP(winner, winXP);
 
                 Settings.DerbyTimeLeft = 180;
-                Settings.LastDerbyTick = Environment.TickCount + 3000;
+                Settings.LastDerbyTick = Environment.TickCount64 + 3000;
             }
             return;
         }
@@ -1882,10 +1881,10 @@ namespace LSCC
 
         public static void GameUpdate()
         {
-            if (Environment.TickCount - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
+            if (Environment.TickCount64 - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
             {
                 //Settings.DerbyTimeLeft--;
-                Settings.LastDerbyTick = Environment.TickCount;
+                Settings.LastDerbyTick = Environment.TickCount64;
 
                 if (Settings.DerbyTimeLeft <= 0)
                 {
