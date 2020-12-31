@@ -852,10 +852,12 @@ namespace LSCC
             if(Environment.TickCount64 - Settings.Timers.GameUpdate_Tick >= 1000)
             {
                 GameUpdate();
+                Settings.Timers.GameUpdate_Tick = Environment.TickCount64;
             }
             if (Environment.TickCount64 - Settings.Timers.TimeUpdate_Tick >= 15000)
             {
                 TimeUpdate();
+                Settings.Timers.TimeUpdate_Tick = Environment.TickCount64;
             }
         }
 
