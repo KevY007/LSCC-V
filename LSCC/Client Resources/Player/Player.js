@@ -656,7 +656,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
     {
         if(sourceEntity.type === 'player')
         {
-            if(sourceEntity.getVariable("Team") != -1)
+            if(sourceEntity.getVariable("Team") != -1 && player.getVariable("Team") != -1)
             {
                 if(player.getVariable("Team") == sourceEntity.getVariable("Team"))
                 {
@@ -675,7 +675,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
 
 mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage) => {
 
-    if(sourceEntity.type === 'player' && sourceEntity == player)
+    if(sourceEntity.type === 'player' && sourceEntity == player && player.getVariable("Team") != -1)
     {
         if(targetEntity.type === 'player')
         {
