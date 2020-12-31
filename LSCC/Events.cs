@@ -73,7 +73,7 @@ namespace LSCC
 
             player.TriggerEvent("InitChaseTimer");
 
-            player.TriggerEvent("PlayThemeSong", "http://51.91.109.79/_lsccv_stuff/v_open.mp3", 0.055);
+            player.TriggerEvent("PlayThemeSong", "http://51.91.109.79/_lsccv_stuff/v_open.mp3", 0.035);
 
             NAPI.Task.Run(() =>
             {

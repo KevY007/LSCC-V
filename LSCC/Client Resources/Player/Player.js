@@ -521,12 +521,40 @@ mp.events.add('render', () => {
                             if(player.getVariable("Team") == target.getVariable("Team"))
                             {
                                 clickDisable = true;
+
+                                if(target.isInAnyVehicle(true) && clickDisable == true && target.vehicle) {
+                                    if(target.vehicle.getVariable("Team") !== undefined && target.vehicle.getVariable("Team") != target.getVariable("Team")) {
+                                        clickDisable = false;
+                                    }
+                                    else {
+                                        mp.players.forEach(occupant => {
+                                            if(occupant.isInVehicle(target.vehicle.handle, true) && occupant.getVariable("Team") != target.getVariable("Team")) { 
+                                                clickDisable = false; // Member of opposite team in it? Shoot.
+                                            }
+                                        });
+                                    }
+                                }
                             }
 
                             if(player.getVariable("Team") == 1 && target.getVariable("Team") == 0 && 
                                 target.getVariable("HasShot") == false && player.weapon != 911657153) // Disable click for fugi with no tag
                             {
                                 clickDisable = true;
+
+                                if(target.isInAnyVehicle(true) && clickDisable == true && target.vehicle)
+                                {
+                                    if(target.vehicle.getVariable("Team") !== undefined && target.vehicle.getVariable("Team") != target.getVariable("Team")) {
+                                        clickDisable = false;
+                                    }
+                                    else {
+                                        mp.players.forEach(occupant => {
+                                            if(occupant.isInVehicle(target.vehicle.handle, true) && occupant.getVariable("Team") == target.getVariable("Team") && 
+                                            occupant.getVariable("HasShot") == true) {
+                                                clickDisable = false;
+                                            }
+                                        });
+                                    }
+                                }
                             }
                         }
                     }
@@ -558,7 +586,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
 
                     if(breakShot) mp.game.graphics.notify("~r~Do not teamkill!");
                 }
-                else if(targetEntity.getVariable("Team") == 0 && player.getVariable("Team") == 1)
+                else if(targetEntity.getVariable("Team") == 0 && player.getVariable("Team") == 1 && player.weapon != 911657153)
                 {
                     breakShot = true; // Break innocent car shots by default.
 
@@ -683,7 +711,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
 
                     if(breakShot) mp.game.graphics.notify("~r~Do not teamkill!");
                 }
-                else if(targetEntity.getVariable("Team") == 0 && player.getVariable("Team") == 1)
+                else if(targetEntity.getVariable("Team") == 0 && player.getVariable("Team") == 1 && weapon != 911657153)
                 {
                     breakShot = true; // Break innocent car shots by default.
 
