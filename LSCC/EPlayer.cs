@@ -431,6 +431,7 @@ namespace LSCC
             lock (player)
             {
                 player.ResetData("AccountHandle");
+
                 player.SetData("TeamShotWarning", 0);
                 player.SetData("UnfairKillSpawn", false);
                 player.SetData("InnocentShotWarning", 0);
@@ -448,22 +449,35 @@ namespace LSCC
                 player.SetSharedData("Team", -1);
                 player.TriggerEvent("ToggleHud", false);
                 player.SetData("GPS", false);
+
                 player.SetData("EditingClothing", -1);
                 player.SetData("Creator_Using", false);
+
                 player.ResetData("BlockList");
+
                 player.ResetData("AskedBySquad");
                 player.ResetData("PlayerSquad");
+
                 player.SetSharedData("InLobby", -1);
                 player.SetSharedData("InDM", -1);
-                player.SetSharedData("IsTyping", false);
+
+                player.SetSharedData("IsTabbed", false);
+                player.SetData("LastTabUpdate", Environment.TickCount64);
+
                 player.SetSharedData("Color_R", 255);
                 player.SetSharedData("Color_G", 255);
                 player.SetSharedData("Color_B", 255);
+
                 player.SetSharedData("Ping", player.Ping);
                 player.SetSharedData("Level", 1);
                 player.SetSharedData("JailTime", 0);
                 player.SetSharedData("MuteTime", 0);
+
                 player.SetData("TasedTill", Environment.TickCount64);
+
+                player.SetData("TUA_LT", 0);
+                player.SetData("TUA_LP", new Vector3(0.0, 0.0, 0.0)); // AFK CHECKERS
+
                 player.SetSharedData("UnstreamedState", 0);
                 player.SetSharedData("UnstreamedX", 0.0f);
                 player.SetSharedData("UnstreamedY", 0.0f);
@@ -488,6 +502,23 @@ namespace LSCC
                     player.SetData("LoggedIn", false);
                 }
             }
+        }
+
+        public static bool IsAFK(Player? player)
+        {
+            if (!EPlayer.LoggedIn(player)) return true;
+
+            if(player.GetSharedData<bool>("IsTabbed") == true && Environment.TickCount64 - player.GetData<long>("LastTabUpdate") >= 60000)
+            {
+                return true;
+            }
+
+            if(player.GetData<int>("TUA_LT") >= 4) // 4 times TimeUpdate has ticked and the player remained stationary / same spot and not chatted.
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public static void Jail(Player? player, int minutes, string reason)

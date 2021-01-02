@@ -4,17 +4,4 @@ BUSTED TYPE MODE IN A LOBBY? STAY CLOSE = BUSTTT NO WEAPONS (lobbydata.mode)
 
 admin records system
 
-mp.system.isFocused
-for afk checks etc (add TAB beside name if this?)
-+ https://wiki.rage.mp/index.php?title=PlayerReady
-for on player connect alt
-
-change synchronization-extrapolation-multiplier is new one << (0.0 to disable)
-
-add Added mp.system.notify({ title: string, text: string, attribute: string, duration: int, silent: bool }) (RAGE.Ui.Windows.Notify)
-use this if game starting and alt tabbed if focus
-
-adapt? Added client-side player.isTypingInTextChat (synchronized and works both for local and streamed remote players, intended to replace third party custom typing state synchronization that mostly was implemented *not the most optimized way*)
-Added mp.invoke("setTypingInChatState", state); (CEF)
-
 add a linux script that will keep on restarting server if goes off??

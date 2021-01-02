@@ -39,7 +39,7 @@ require("./Player/LightsMenu.js");
 mp.events.add("onOpenChatbox", (toggle) =>
 {
     chatStatus = toggle;
-    mp.events.callRemote("UpdateChatState", toggle);
+    //mp.events.callRemote("UpdateChatState", toggle);
     traceLastFunc(`[Players] ChatBox Toggled ${toggle}`);
 });
 

@@ -2,12 +2,12 @@
 	"maxplayers" : 100,
 	"name" : "Los Santos Copchase: V [BETA]", 
 	"gamemode" : "copchase", 
-	"stream-distance" : 500.0,
+	"stream-distance" : 1000.0,
 	"announce" : false,
 	"csharp" : "enabled",
 	"port": 22005,
 	"language": "en",
 	"voice-chat": true,
 	"server-side-weapons-only-mode": true,
-	"enable-synchronisation-extrapolation": false
+	"synchronization-extrapolation-multiplier": 0.0
 }

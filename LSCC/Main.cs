@@ -934,6 +934,18 @@ namespace LSCC
 
                 Settings.LastMessageTick = Environment.TickCount64;
             }
+
+            RAGE.Entities.Players.All.ForEach((Player e) =>
+            {
+                if (e.Position.DistanceTo(e.GetData<Vector3>("TUA_LP")) < 2.0) // Haven't moved more than 2m
+                {
+                    e.SetData("TUA_LT", e.GetData<int>("TUA_LT") + 1);
+                }
+                else { e.SetData("TUA_LT", 0); }
+
+                e.SetData("TUA_LP", e.Position); // Set new pos so it keeps checking
+            });
+            
             lock (Settings.Lobbies)
             {
                 foreach (LobbyData lobby in Settings.Lobbies)
@@ -1024,6 +1036,12 @@ namespace LSCC
                                                         NAPI.Notification.SendNotificationToPlayer(player, $"~w~Game is starting in ~g~10 seconds~w~.", true);
 
                                                         NAPI.Util.ConsoleOutput($"[TimeUpdate] Game starting in 10 seconds in lobby {lobby.lobbyId}...");
+
+                                                        if (player.GetSharedData<bool>("IsTabbed") == true || EPlayer.IsAFK(player)) {
+
+                                                            player.TriggerEvent("SendNotification", "AFK Check", "Copchase is starting in 10 seconds",
+                                                                "Los Santos Copchase", 10, false);
+                                                        }
                                                     }
                                                 }
                                             }
@@ -1252,7 +1270,7 @@ namespace LSCC
 
                 foreach (Player player in Settings.LoggedInPlayers)
                 {
-                    if (player.GetSharedData<int>("InLobby") == lobbyid && player.GetData<bool>("AutoJoin") == true)
+                    if (player.GetSharedData<int>("InLobby") == lobbyid && player.GetData<bool>("AutoJoin") == true && !EPlayer.IsAFK(player))
                     {
                         player.SetSharedData("InDM", -1);
 
@@ -1301,7 +1319,7 @@ namespace LSCC
                     List<int> UsedSpawns = new List<int>(Spawns.Count + 1);
                     crashcheck++;
 
-                    List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid).ToList();
+                    List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && !EPlayer.IsAFK(a)).ToList();
                     crashcheck++;
 
                     List<Player> PutInsideCar = new List<Player>(lobbyPlayers.Count());

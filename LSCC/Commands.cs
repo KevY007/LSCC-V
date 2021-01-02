@@ -3011,6 +3011,8 @@ namespace LSCC
         [Command("adminchat", "!{#AFAFAF}[USAGE] adminchat (text)", Alias = "a", GreedyArg = true)]
         public void cmd_adminchat(Player player, string text)
         {
+            player.SetData("TUA_LT", 0);
+
             if (!EPlayer.LoggedIn(player))
                 return;
 
@@ -3026,6 +3028,8 @@ namespace LSCC
         [Command("looc", "!{#AFAFAF}[USAGE] looc (text)", Alias = "b", GreedyArg = true)]
         public void cmd_b(Player player, string text)
         {
+            player.SetData("TUA_LT", 0);
+
             if (!EPlayer.LoggedIn(player))
                 return;
 
@@ -3234,6 +3238,8 @@ namespace LSCC
         [Command("ooc", "!{#AFAFAF}[USAGE] ooc (text)", Alias = "o", GreedyArg = true)]
         public void cmd_ooc(Player player, string text)
         {
+            player.SetData("TUA_LT", 0);
+
             if (!EPlayer.LoggedIn(player))
                 return;
 

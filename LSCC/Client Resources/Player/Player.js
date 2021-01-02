@@ -38,6 +38,8 @@ var checker_lastHealth = 0;
 var healthLossTime = Date.now();
 var healthLoss = 0;
 
+var tabUpdate = false;
+
 const bones = [0, 10706, 11816, 14201, 18905, 23553, 24816, 24817, 24818, 28252, 31086, 36864, 39317, 40269, 45509, 51826, 52301, 57005, 57597, 58271, 61163, 63931, 64729];
 const boneDistanceThreshold = 1;
 
@@ -187,6 +189,11 @@ mp.events.add("render", () => {
         healthLoss = checker_lastHealth - player.getHealth();
         healthLossTime = Date.now();
         checker_lastHealth = player.getHealth();
+    }
+
+    if(tabUpdate != mp.system.isFocused)
+    {
+        mp.events.callRemote("UpdateTabbedState", mp.system.isFocused);
     }
 });
 
@@ -452,10 +459,12 @@ mp.events.add('render', () => {
                     if(target.getVariable("InLobby") == -4) blipColor = 73;
                     if(target.getVariable("InDM") != -1) blipColor = 39;
                     if(target.isInAnyVehicle(false)) blipId = 724;
+
                     var position = target.position;
+
                     if(mp.game.system.vdist2(position.x, position.y, position.z, mp.players.local.position.x, mp.players.local.position.y, mp.players.local.position.z) >= 1000.0 
                     || (target.handle !== 0) == false || target.handle === null || 
-                        target.handle === undefined || (target.position.x == 0.0 && target.position.z == 0.0))
+                        target.handle === undefined || target.position == null || (target.position.x == 0.0 && target.position.z == 0.0))
                     {
                         position.x = target.getVariable("UnstreamedX");
                         position.y = target.getVariable("UnstreamedY");
@@ -995,6 +1004,10 @@ mp.events.add(
             chaseRunning = true;
         },
 
+        "SendNotification": (title, text, attribute, duration, silent) => {
+            mp.system.notify(title, text, attribute, duration, silent);
+        },
+
         "HideChaseTimer": () => {
             chaseProgBar.visible = false;
             chaseProgText.visible = false;
@@ -1065,5 +1078,9 @@ mp.events.add(
 
         "SetDiscordStatus": (serverName, status) => {
             mp.discord.update(serverName, status);
+        },
+
+        "playerReady": (player) => {
+            mp.events.callRemote("playerReadyCon");
         },
     });

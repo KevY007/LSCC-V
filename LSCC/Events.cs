@@ -15,6 +15,12 @@ namespace LSCC
     class Events : Script
     {
         [ServerEvent(Event.PlayerConnected)]
+        public void OnPlayerConnected_Old(Player player)
+        {
+
+        }
+
+        [RemoteEvent("playerReadyCon")]
         public void OnPlayerConnected(Player player)
         {
             BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.HWID.CompareTo(player.Serial) == 0 || ban.IP.CompareTo(player.Address) == 0 ||
@@ -665,6 +671,8 @@ namespace LSCC
         [ServerEvent(Event.ChatMessage)]
         public void OnPlayerText(Player player, string message)
         {
+            player.SetData("TUA_LT", 0);
+
             if (!EPlayer.LoggedIn(player))
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You must be logged in to chat!");
@@ -934,12 +942,13 @@ namespace LSCC
             player.SetAccessories(0, drawable, texture);
         }
 
-        [RemoteEvent("UpdateChatState")]
-        public void OnRequestUpdateChatState(Player player, bool toggle)
+        [RemoteEvent("UpdateTabbedState")]
+        public void OnRequestUpdateTabState(Player player, bool toggle)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            player.SetSharedData("IsTyping", toggle);
+            player.SetSharedData("IsTabbed", toggle);
+            player.SetData("LastTabUpdate", Environment.TickCount64);
         }
 
         public static void OnPlayerRegister(Player player, Account acc)

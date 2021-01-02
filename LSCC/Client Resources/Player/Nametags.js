@@ -106,7 +106,7 @@ mp.events.add('render', (nametags) => {
                 
                 y -= scale * (0.005 * (screenRes.y / 1080));
 
-                if(player.getVariable("Team") == 0 && player.getVariable("HasShot") == true)
+                if(player.getVariable("Team") !== undefined && player.getVariable("Team") == 0 && player.getVariable("HasShot") == true)
                 {
                     mp.game.graphics.drawText("(( THIS PLAYER HAS SHOT ))", [x, y - 0.045],
                     {
@@ -117,12 +117,27 @@ mp.events.add('render', (nametags) => {
                     });
                 }
 
-                if(player.getVariable("IsTyping") == true || player.isVoiceActive == true)
+                if(player.getVariable("IsTabbed") !== undefined && player.getVariable("IsTabbed") == true)
                 {
-                    var typingStr = "...";
-                    if(timerCount == 0) typingStr = ".";
-                    else if(timerCount == 1) typingStr = "..";
-                    else if(timerCount == 2) typingStr = "...";
+                    var typingStr = "(( TABBED ))";
+                    if(timerCount == 0) typingStr = "(( TABBED ))";
+                    else if(timerCount == 1) typingStr = "( TABBED )";
+                    else if(timerCount == 2) timerCount = 0;
+
+                    mp.game.graphics.drawText(typingStr, [x, y - 0.055],
+                    {
+                        font: 0,
+                        color: [228, 240, 48, 228],
+                        scale: [0.335, 0.335],
+                        outline: true
+                    });
+                }
+                else if(player.isTypingInTextChat || player.isVoiceActive == true)
+                {
+                    var typingStr = "( ... )";
+                    if(timerCount == 0) typingStr = "( . )";
+                    else if(timerCount == 1) typingStr = "( .. )";
+                    else if(timerCount == 2) typingStr = "( ... )";
 
                     mp.game.graphics.drawText(typingStr, [x, y - 0.055],
                     {
