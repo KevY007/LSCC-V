@@ -34,13 +34,14 @@ namespace LSCC
                 {
                     lock (Settings.LoggedInPlayers)
                     {
-                        lock (player)
+                        try
                         {
                             if (player != null && player.Exists)
                             {
                                 player.Kick("Banned.");
                             }
                         }
+                        catch { }
                     }
                 }, 350);
 
@@ -77,13 +78,14 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                lock (player)
+                try
                 {
                     if (player != null && player.Exists)
                     {
                         EPlayer.LoginCameraSetup(player);
                     }
                 }
+                catch { }
             }, 2000);
         }
 
@@ -635,7 +637,7 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                lock (player)
+                try
                 {
                     if (player != null && player.Exists)
                     {
@@ -656,7 +658,7 @@ namespace LSCC
                         NAPI.Player.SpawnPlayer(player, SpawnArea);
                     }
                 }
-
+                catch { }
             }, wasInGame == true ? 10000 : 3000);
         }
 
@@ -709,7 +711,7 @@ namespace LSCC
 
                 NAPI.Task.Run(() =>
                 {
-                    lock (player) { if (player != null && player.Exists) player.Kick("Banned."); }
+                    try { { if (player != null && player.Exists) player.Kick("Banned."); } } catch { }
                 }, 350);
 
                 return;
@@ -1100,7 +1102,7 @@ namespace LSCC
 
                         NAPI.Task.Run(() =>
                         {
-                            lock (player)
+                            try
                             {
                                 if (player != null && player.Exists)
                                 {
@@ -1110,6 +1112,7 @@ namespace LSCC
                                     }
                                 }
                             }
+                            catch { }
                         }, player.IsInVehicle == true ? 500 : 2500);
                     }
 
@@ -1156,7 +1159,7 @@ namespace LSCC
                         EPlayer.Freeze(player, true);
                         NAPI.Task.Run(() =>
                         {
-                            lock (player)
+                            try
                             {
                                 if (player != null && player.Exists)
                                 {
@@ -1166,6 +1169,7 @@ namespace LSCC
                                     }
                                 }
                             }
+                            catch { }
                         }, player.IsInVehicle == true ? 500 : 2500);
                     }
 
@@ -1459,7 +1463,7 @@ namespace LSCC
 
                                 NAPI.Task.Run(() =>
                                 {
-                                    lock (player)
+                                    try
                                     {
                                         if (player != null && player.Exists)
                                         {
@@ -1469,6 +1473,7 @@ namespace LSCC
                                             }
                                         }
                                     }
+                                    catch { }
                                 }, 1500);
 
                                 int warnings = 0;
@@ -1737,7 +1742,7 @@ namespace LSCC
 
                     NAPI.Task.Run(() =>
                     {
-                        lock (player)
+                        try
                         {
                             if (player != null && player.Exists)
                             {
@@ -1745,6 +1750,7 @@ namespace LSCC
                                 EPlayer.SetColor(player, new Color(250, 191, 62), 0);
                             }
                         }
+                        catch { }
                     }, 750);
                 }
 

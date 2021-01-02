@@ -2,20 +2,7 @@
 
 BUSTED TYPE MODE IN A LOBBY? STAY CLOSE = BUSTTT NO WEAPONS (lobbydata.mode)
 
-
 admin records system
-
-Check out + Added server-side: NAPI.Task.WaitForMainThread(int delayTime = 0) (Task-based NAPI.Task.Run alternative, could be used with async/await)
-in 1.1 xperimental when it is released.
-
-
-we had event.update that is the best timer we could use for timeupdate etc, it wasnt working on linux before but maybe fixed now? check later
-
-
-( for later if we still have issues >> << bottom.)
-use clientside to put player in vehicle as well on gmae start
-while(!incar)
- put
 
 mp.system.isFocused
 for afk checks etc (add TAB beside name if this?)
@@ -33,18 +20,5 @@ Added mp.invoke("setTypingInChatState", state); (CEF)
 ADD NEW scoreboard from rotx chat
 also on car selector, add an onky esc listener where if esc = trigger event in client onpressesc of tab to hide it
 so for who are stuck
-
-
-this is what hpapened crash fix soon
-[Lobby 1] Game has been started with 1 cops & 1 fugitives on map Sandy Shores.
-[Connection] GeneralHB has left the server. (IP: 82.30.49.94 - Serial: D8903A045B6A1CD809DCA564685496C075181E48B1706DD80CF018C8DD22F9807B22021C1F30EA900C12643862165810B91808A056B6E988E41E3B2893F87A80 - SC: MenaceHB)
-[N] 82.30.49.94:61899 has been disconnected.
-Object reference not set to an instance of an object.
-Object reference not set to an instance of an object.
-Unhandled exception. System.NullReferenceException: Object reference not set to an instance of an object.
-   at LSCC.EPlayer.<>c__DisplayClass10_0.<GiveCopWeapons>b__0() in E:\Github\LSCC-V\LSCC\EPlayer.cs:line 596
-   at System.Collections.Generic.List`1.ForEach(Action`1 action)
-   at GTANetworkInternals.TaskMngr.PulseDelayed()
-   at Bootstrapper.EventInternalClass.Tick()
 
 add a linux script that will keep on restarting server if goes off??
