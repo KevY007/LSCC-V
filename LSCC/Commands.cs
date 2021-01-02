@@ -721,7 +721,7 @@ namespace LSCC
                                 player.ResetData("CuffingTarget");
                                 return;
                             }
-
+                            
                             LobbyData lobbye = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedData<int>("InLobby"));
                             if (lobbye != null)
                             {

@@ -21,7 +21,7 @@ mp.events.add("InitiateCustomChat", () => {
 });
 
 mp.events.add("TogglePlayerChat", (toggle) => {
-	mp.gui.chat.activate(toggle);
+    mp.gui.chat.activate(toggle);
 });
 
 mp.events.add("setFontsize", (size) => {

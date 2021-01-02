@@ -123,12 +123,12 @@ mp.events.add('render', (nametags) => {
                     if(timerCount == 0) typingStr = "(( TABBED ))";
                     else if(timerCount == 1) typingStr = "( TABBED )";
                     else if(timerCount == 2) timerCount = 0;
-
-                    mp.game.graphics.drawText(typingStr, [x, y - 0.058],
+            
+                    mp.game.graphics.drawText(typingStr, [x, y - 0.0250],
                     {
                         font: 0,
                         color: [255, 99, 71, 228],
-                        scale: [0.335, 0.335],
+                        scale: [0.285, 0.285],
                         outline: true
                     });
                 }

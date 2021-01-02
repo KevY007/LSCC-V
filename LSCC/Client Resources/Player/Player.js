@@ -63,6 +63,10 @@ function getPointToBoneOffset(aimX, aimY, aimZ, boneX, boneY, boneZ) {
     return (xDif + yDif + zDif);
 }
 
+setInterval(() => {
+    mp.events.callRemote("UpdateTabbedState", mp.system.isFocused);
+}, 2000);
+
 
 
 mp.keys.bind(
@@ -253,8 +257,6 @@ mp.events.add('render', () => {
 
         if(secondCounter >= Math.round(1000 / updateRate))
         {
-            mp.events.callRemote("UpdateTabbedState", mp.system.isFocused);
-
             secondCounter = 0;
 
             if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
