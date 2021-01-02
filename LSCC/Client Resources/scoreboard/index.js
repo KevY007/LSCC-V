@@ -71,8 +71,8 @@ function updatePlayer(player)
     browser.execute('updateUser("' + lobbystr + '", "' + player.name + '", "' + 
     (player.getVariable("Level") === undefined ? 'n/a' : player.getVariable("Level")) + '", "' + 
     (player.getVariable("Ping") === undefined ? 'n/a' : player.getVariable("Ping")) +
-    '", ' + 0 + ', ' + 0 + ', ' + 0 + ');');
-    //'", ' + player.getVariable("Color_R") + ', ' + player.getVariable("Color_G") + ', ' + player.getVariable("Color_B") + ');');
+    //'", ' + 0 + ', ' + 0 + ', ' + 0 + ');');
+    '", ' + player.getVariable("Color_R") + ', ' + player.getVariable("Color_G") + ', ' + player.getVariable("Color_B") + ');');
 
     return;
 }
