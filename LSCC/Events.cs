@@ -951,6 +951,14 @@ namespace LSCC
             player.SetData("LastTabUpdate", Environment.TickCount64);
         }
 
+        [RemoteEvent("UpdateChatState")]
+        public void OnRequestUpdateChatState(Player player, bool toggle)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            player.SetData("TUA_LT", 0);
+        }
+
         public static void OnPlayerRegister(Player player, Account acc)
         {
             Discord.SendTextChannel("staff-bot", $"*{player.Name} has registered.*");

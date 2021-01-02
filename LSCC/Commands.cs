@@ -3034,27 +3034,28 @@ namespace LSCC
 
             predicate.ForEach((p) =>
             {
-                string lobby = "Lobby " + p.GetSharedData<int>("InLobby");
+                string lobby = "!{#ffffff}[Lobby " + p.GetSharedData<int>("InLobby") + "]";
+                if (p.GetSharedData<int>("InDM") > -1) lobby = lobby + " [DM " + p.GetSharedData<int>("InDM") + " ]";
                 switch (p.GetSharedData<int>("InLobby"))
                 {
                     case -1:
-                        lobby = "Login";
+                        lobby = "!{#FF6347}[Login]";
                         break;
                     case -2:
-                        lobby = "Jail";
+                        lobby = "!{#a88008}[Jail]";
                         break;
                     case -3:
-                        lobby = "Freeroam";
+                        lobby = "!{#66e8d9}[Freeroam]";
                         break;
                     case -4:
-                        lobby = "Derby";
+                        lobby = "!{#fabf3e}[Derby]";
                         break;
                     case -5:
-                        lobby = "Customizer";
+                        lobby = "!{#FF6347}[Customizer]";
                         break;
                 }
 
-                player.SendChatMessage("!{#C4C4C4}" + p.Name + " (ID: " + p.Id + ") (" + lobby + ") " + (EPlayer.IsAFK(p) ? "!{#FF6347}(AFK)" : ""));
+                player.SendChatMessage("!{#C4C4C4}" + p.Name + " (ID: " + p.Id + ") " + lobby + " " + (EPlayer.IsAFK(p) ? "!{#FF0000}(AFK)" : ""));
             });
 
             return;

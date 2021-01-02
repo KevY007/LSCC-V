@@ -45,7 +45,7 @@ function enableChatInput(enable)
 
         if (enable)
 		{
-            chat.input = $("#chat").append('<div><input id="chat_msg" type="text" /></div>').children(":last");
+            chat.input = $("#chat").append('<div><input id="chat_msg" type="text" maxlength="128" /></div>').children(":last");
 			chat.input.children("input").focus();
         } 
 		else
@@ -196,9 +196,10 @@ $(document).ready(function()
 
 			chat.input.children("input").val(previousMessages[chat.currentIndex]);
 			
+			chat.input.children("input").setSelectionRange(128, 128);
 			setTimeout(() => {
-				chat.input.children("input").setSelectionRange(previousMessages[chat.currentIndex].length, previousMessages[chat.currentIndex].length);
-            }, 1);
+				chat.input.children("input").setSelectionRange(128, 128);
+            }, 100);
 
             chat.currentIndex = chat.currentIndex + 1;
 
@@ -217,15 +218,16 @@ $(document).ready(function()
 			chat.currentIndex = chat.currentIndex - 1;
 			chat.input.children("input").val(previousMessages[chat.currentIndex]);
 
+			chat.input.children("input").setSelectionRange(128, 128);
 			setTimeout(() => {
-				chat.input.children("input").setSelectionRange(previousMessages[chat.currentIndex].length, previousMessages[chat.currentIndex].length);
-			}, 1);
+				chat.input.children("input").setSelectionRange(128, 128);
+			}, 100);
 		}
 		else if (event.which == 13 && chat.input != null)
 		{
 			var value = chat.input.children("input").val();
 
-            if (value.length > 0) 
+            if (value.length > 0 && value.length < 129) 
 			{
 				if (chat.historyMsgs.length >= MAX_MSG_HISTORY) {
 					chat.historyMsgs.pop();
