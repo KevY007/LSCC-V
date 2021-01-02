@@ -496,22 +496,35 @@ mp.events.add('render', () => {
                         if(target.getVariable("Team") == player.getVariable("Team"))
                         {
                             clickDisable = true; // Disable shooting team-kill car by default
+                            var vehicleOccupants = 0;
                             
                             mp.players.forEach(occupant => {
-                                if(occupant.isInVehicle(target.handle, false) && occupant.getVariable("Team") != player.getVariable("Team")) {
-                                    clickDisable = false; // Don't break shot if there's a fugi in or opposite team member!
+                                if(occupant.isInVehicle(target.handle, false)) {
+                                    vehicleOccupants++;
+                                    if(occupant.getVariable("Team") != player.getVariable("Team")) 
+                                    {
+                                        clickDisable = false; // Don't break shot if there's a fugi in or opposite team member!
+                                    }
                                 }
                             });
+
+                            if(vehicleOccupants == 0) clickDisable = false;
                         }
                         else if(target.getVariable("Team") == 0 && player.getVariable("Team") == 1)
                         {
                             clickDisable = true; // Disable innocent car shots by default.
+                            var vehicleOccupants = 0;
 
                             mp.players.forEach(occupant => {
-                                if(occupant.isInVehicle(target.handle, false) && occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true) {
-                                    clickDisable = false; // Don't break shot if there's a fugitive that shot in!
+                                if(occupant.isInVehicle(target.handle, false)) {
+                                    vehicleOccupants++;
+                                    if(occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true) {
+                                        clickDisable = false; // Don't break shot if there's a fugitive that shot in!
+                                    }
                                 }
                             });
+
+                            if(vehicleOccupants == 0) clickDisable = false;
                         }
                     }
                     else if(target.type === 'player')
@@ -572,6 +585,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         {
             if(targetEntity.getVariable("Team") !== undefined)
             {
+                var vehicleOccupants = 0;
                 let breakShot = false;
 
                 if(targetEntity.getVariable("Team") == player.getVariable("Team"))
@@ -579,10 +593,16 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                     breakShot = true; // Break team-kill car by default
                     
                     mp.players.forEach(occupant => {
-                        if(occupant.isInVehicle(targetEntity.handle, false) && occupant.getVariable("Team") != player.getVariable("Team")) {
-                            breakShot = false; // Don't break shot if there's a fugi in or opposite team member!
+                        if(occupant.isInVehicle(targetEntity.handle, false)) {
+                            vehicleOccupants++;
+                            if(occupant.getVariable("Team") != player.getVariable("Team")) 
+                            {
+                                breakShot = false; // Don't break shot if there's a fugi in or opposite team member!
+                            }
                         }
                     });
+
+                    if(vehicleOccupants == 0) breakShot = false;
 
                     if(breakShot) mp.game.graphics.notify("~r~Do not teamkill!");
                 }
@@ -591,10 +611,15 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                     breakShot = true; // Break innocent car shots by default.
 
                     mp.players.forEach(occupant => {
-                        if(occupant.isInVehicle(targetEntity.handle, false) && occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true) {
-                            breakShot = false; // Don't break shot if there's a fugitive that shot in!
+                        if(occupant.isInVehicle(targetEntity.handle, false)) {
+                            vehicleOccupants++;
+                            if(occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true) {
+                                breakShot = false; // Don't break shot if there's a fugitive that shot in!
+                            }
                         }
                     });
+
+                    if(vehicleOccupants == 0) breakShot = false;
 
                     if(breakShot) mp.game.graphics.notify("~r~Do not deathmatch!");
                 }
@@ -698,16 +723,22 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
             if(targetEntity.getVariable("Team") !== undefined && player.getVariable("Team") != -1)
             {
                 let breakShot = false;
+                var vehicleOccupants = 0;
 
                 if(targetEntity.getVariable("Team") == player.getVariable("Team"))
                 {
                     breakShot = true; // Break team-kill car by default
                     
                     mp.players.forEach(occupant => {
-                        if(occupant.isInVehicle(targetEntity.handle, false) && occupant.getVariable("Team") != player.getVariable("Team")) {
-                            breakShot = false; // Don't break shot if there's a fugi in or opposite team member!
+                        if(occupant.isInVehicle(targetEntity.handle, false)) {
+                            vehicleOccupants++;
+                            if(occupant.getVariable("Team") != player.getVariable("Team")) {
+                                breakShot = false; // Don't break shot if there's a fugi in or opposite team member!
+                            }
                         }
                     });
+
+                    if(vehicleOccupants == 0) breakShot = false;
 
                     if(breakShot) mp.game.graphics.notify("~r~Do not teamkill!");
                 }
@@ -716,10 +747,15 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     breakShot = true; // Break innocent car shots by default.
 
                     mp.players.forEach(occupant => {
-                        if(occupant.isInVehicle(targetEntity.handle, false) && occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true) {
-                            breakShot = false; // Don't break shot if there's a fugitive that shot in!
+                        if(occupant.isInVehicle(targetEntity.handle, false)) {
+                            vehicleOccupants++;
+                            if(occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true) {
+                               breakShot = false; // Don't break shot if there's a fugitive that shot in!
+                            }
                         }
                     });
+
+                    if(vehicleOccupants == 0) breakShot = false;
 
                     if(breakShot) mp.game.graphics.notify("~r~Do not deathmatch!");
                 }
