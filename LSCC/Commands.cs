@@ -2131,7 +2131,7 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player)) return;
 
             player.SendChatMessage("!{#0079DB}[Los Santos Copchase V !{#2BA3FF}BETA Commands]:");
-            player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /keys /admins /rules");
+            player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /keys /admins /rules /id");
             player.SendChatMessage("[General]: /report /helpme /l(ow) /c(ar)w(hisper) /s(hout)");
             player.SendChatMessage("[Squad/Partner]: /squad /squadleave /s(quad)c(hat) /squadaccept /squadmembers");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
@@ -3005,6 +3005,58 @@ namespace LSCC
             {
                 if(EPlayer.GetAccount(p).DonatorLevel > 0) p.SendChatMessage($"!{{#F7EB05}}[{EPlayer.GetDonatorLevelName(EPlayer.GetAccount(player).DonatorLevel, true)}!{{#F7EB05}}] {player.Name}: {text}");
             }
+            return;
+        }
+
+        [Command("id", "!{#AFAFAF}[USAGE] id (Id/PartOfName)", GreedyArg = true)]
+        public void cmd_id(Player player, string name)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            player.SendChatMessage("!{#FF6347}[>] !{#FFFFFF}Player Query Result:");
+
+            List<Player> predicate = new List<Player>();
+
+            int id = 0;
+            if (Int32.TryParse(name, out id))
+            {
+                try { if (RAGE.Entities.Players.GetAt((ushort)id) != null) predicate.Add(RAGE.Entities.Players.GetAt((ushort)id)); } catch { }
+            }
+
+            RAGE.Entities.Players.All.ForEach((Player p) =>
+            {
+                if(p.Name.Contains(name, StringComparison.OrdinalIgnoreCase))
+                {
+                    if(!predicate.Contains(p)) predicate.Add(p);
+                }
+            });
+
+            predicate.ForEach((p) =>
+            {
+                string lobby = "Lobby " + p.GetSharedData<int>("InLobby");
+                switch (p.GetSharedData<int>("InLobby"))
+                {
+                    case -1:
+                        lobby = "Login";
+                        break;
+                    case -2:
+                        lobby = "Jail";
+                        break;
+                    case -3:
+                        lobby = "Freeroam";
+                        break;
+                    case -4:
+                        lobby = "Derby";
+                        break;
+                    case -5:
+                        lobby = "Customizer";
+                        break;
+                }
+
+                player.SendChatMessage("!{#C4C4C4}" + p.Name + " (ID: " + p.Id + ") (" + lobby + ") " + (EPlayer.IsAFK(p) ? "!{#FF6347}(AFK)" : ""));
+            });
+
             return;
         }
 

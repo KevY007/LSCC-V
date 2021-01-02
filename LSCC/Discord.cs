@@ -96,7 +96,7 @@ namespace LSCC
 
                 foreach (Player pl in RAGE.Entities.Players.All)
                 {
-                    string lobby = "Lobby: " + pl.GetSharedData<int>("InLobby");
+                    string lobby = "Lobby " + pl.GetSharedData<int>("InLobby");
                     switch (pl.GetSharedData<int>("InLobby"))
                     {
                         case -1:

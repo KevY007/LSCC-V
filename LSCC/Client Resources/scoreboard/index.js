@@ -17,14 +17,30 @@ mp.events.add("updateSBServerName", (eUpdatedName) =>
 function ToggleScoreboard()
 {
     if (browser != null) {
-        browser.destroy();
-        browser = null;
-        if(updater != null) clearInterval(updater);
-        updater = null;
-        if(tablistLen >= 9)
+        
+        if(browser.active)
         {
-            mp.gui.cursor.show(false, false);
-            mp.events.call("TogglePlayerChat", true);
+            if(updater != null) clearInterval(updater);
+            updater = null;
+
+            if(tablistLen >= 9)
+            {
+                mp.gui.cursor.show(false, false);
+                mp.events.call("TogglePlayerChat", true);
+            }
+            browser.active = false;
+
+        } else {
+            browser.active = true;
+
+            tablistLen = mp.players.length;
+
+            if(tablistLen >= 9)
+            {
+                mp.gui.cursor.show(true, true);
+                mp.events.call("TogglePlayerChat", false);
+            }
+            mp.events.call("browserDomReady", browser);
         }
         return;
     }
@@ -38,6 +54,7 @@ function ToggleScoreboard()
     }
 
     browser = mp.browsers.new("package://scoreboard/cef/index.html");
+    
     return;
 }
 
@@ -54,7 +71,8 @@ function updatePlayer(player)
     browser.execute('updateUser("' + lobbystr + '", "' + player.name + '", "' + 
     (player.getVariable("Level") === undefined ? 'n/a' : player.getVariable("Level")) + '", "' + 
     (player.getVariable("Ping") === undefined ? 'n/a' : player.getVariable("Ping")) +
-    '", ' + player.getVariable("Color_R") + ', ' + player.getVariable("Color_G") + ', ' + player.getVariable("Color_B") + ');');
+    '", ' + 0 + ', ' + 0 + ', ' + 0 + ');');
+    //'", ' + player.getVariable("Color_R") + ', ' + player.getVariable("Color_G") + ', ' + player.getVariable("Color_B") + ');');
 
     return;
 }
@@ -64,37 +82,61 @@ mp.events.add('browserDomReady', (ebrowser) => {
     {
         if(forceOff == true)
         {
-            ToggleScoreboard();
+            if(browser.active) ToggleScoreboard();
             return;
         }
+        else if(browser.active) {
+            tablistLen = mp.players.length;
 
-        mp.players.forEachFast(
-            (player) => {
-                //browser.execute('createUser("N/A", "' + player.name + '", "N/A", "N/A", ' + player.getVariable("Color_R") + ', ' + player.getVariable("Color_G") + ', ' + player.getVariable("Color_B") + ')');
-                updatePlayer(player);
-            }
-        );
-    
-        if(serverName != "Los Santos Copchase") 
-        {
-            browser.execute('updateServerName("' + serverName + '");');
-        }
-    
-        updater = setInterval(function()
-        {
-            if(forceOff == true && browser != null)
+            if(tablistLen >= 9)
             {
-                ToggleScoreboard();
+                mp.gui.cursor.show(true, true);
+                mp.events.call("TogglePlayerChat", false);
             }
-            else if(browser != null && forceOff != true)
+
+            mp.players.forEach(
+                (player) => {
+                    //browser.execute('createUser("N/A", "' + player.name + '", "N/A", "N/A", ' + player.getVariable("Color_R") + ', ' + player.getVariable("Color_G") + ', ' + player.getVariable("Color_B") + ')');
+                    updatePlayer(player);
+                }
+            );
+        
+            if(serverName != "Los Santos Copchase") 
             {
-                mp.players.forEachFast(
-                    (player) => {
-                        updatePlayer(player);
+                browser.execute('updateServerName("' + serverName + '");');
+            }
+        
+            updater = setInterval(function()
+            {
+                if(forceOff == true && browser != null && browser.active)
+                {
+                    ToggleScoreboard();
+                }
+                else if(browser != null && forceOff != true && browser.active)
+                {
+                    if(mp.players.length >= 9 && tablistLen <= 8)
+                    {
+                        tablistLen = mp.players.length;
+
+                        mp.gui.cursor.show(true, true);
+                        mp.events.call("TogglePlayerChat", false);
                     }
-                );
-            }
-        }, 1000);
+                    else if(mp.players.length <= 8 && tablistLen >= 9)
+                    {
+                        tablistLen = mp.players.length;
+                        
+                        mp.gui.cursor.show(false, false);
+                        mp.events.call("TogglePlayerChat", true);
+                    }
+
+                    mp.players.forEach(
+                        (player) => {
+                            updatePlayer(player);
+                        }
+                    );
+                }
+            }, 1000);
+        }
     }
 });
 
@@ -102,7 +144,7 @@ mp.keys.bind(
     0x1B,
     false,
     () => {
-        if(browser != null) ToggleScoreboard();
+        if(browser != null && browser.active) ToggleScoreboard();
     }
 );
 
