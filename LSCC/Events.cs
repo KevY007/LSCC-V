@@ -126,7 +126,7 @@ namespace LSCC
         [RemoteEvent("play_anim")]
         public static void RequestPlayAnimation(Player player, string animDict, string animName, int animFlags)
         {
-            RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a.Position.DistanceTo(player.Position) < 200.0).ToList().ForEach((Player act) =>
+            RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a.Position.DistanceTo(player.Position) < 500.0).ToList().ForEach((Player act) =>
             {
                 act.TriggerEvent("entplayanim", player, animDict, animName, animFlags);
             });

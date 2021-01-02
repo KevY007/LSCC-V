@@ -710,75 +710,71 @@ namespace LSCC
 
             NAPI.Task.Run(() =>
             {
-                lock (player)
-                {
-                    lock (target)
+                try {
+                    if (player != null && player.Exists)
                     {
-                        if (player != null && player.Exists)
+                        if (player != null && target != null && target.Exists)
                         {
-                            if (player != null && target != null && target.Exists)
+                            if (target == null || !target.IsInstanceAlive || player == null || !player.IsInstanceAlive)
                             {
-                                if (target == null || !target.IsInstanceAlive || player == null || !player.IsInstanceAlive)
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, target or you are no longer alive.");
+                                player.ResetData("CuffingTarget");
+                                return;
+                            }
+
+                            LobbyData lobbye = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedData<int>("InLobby"));
+                            if (lobbye != null)
+                            {
+                                if (lobbye.Cops.Contains(player) && lobbye.gameStatus == 1 && lobbye.Fugitives.Contains(target) && !target.HasData("Cuffed"))
                                 {
-                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, target or you are no longer alive.");
-                                    player.ResetData("CuffingTarget");
-                                    return;
+                                    isACop = true;
                                 }
+                            }
 
-                                LobbyData lobbye = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedData<int>("InLobby"));
-                                if (lobbye != null)
-                                {
-                                    if (lobbye.Cops.Contains(player) && lobbye.gameStatus == 1 && lobbye.Fugitives.Contains(target) && !target.HasData("Cuffed"))
-                                    {
-                                        isACop = true;
-                                    }
-                                }
+                            if (!isACop)
+                            {
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, you cannot cuff that target anymore.");
+                                player.ResetData("CuffingTarget");
+                                return;
+                            }
 
-                                if (!isACop)
-                                {
-                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, you cannot cuff that target anymore.");
-                                    player.ResetData("CuffingTarget");
-                                    return;
-                                }
-
-                                if (player.Position.DistanceTo(target.Position) > 2.0)
-                                {
-                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near the target!");
-                                    player.ResetData("CuffingTarget");
-
-                                    return;
-                                }
-
+                            if (player.Position.DistanceTo(target.Position) > 2.0)
+                            {
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near the target!");
                                 player.ResetData("CuffingTarget");
 
-                                EPlayer.GrantXP(player, 5);
-                                EPlayer.Action(player, $"has grabbed ahold of {target.Name} and slapped the handcuffs on their wrists.");
-
-                                target.SetAccessories(7, 41, 0); // Handcuffs
-
-                                EPlayer.Handcuff(target, true);
-
-                                Events.RequestPlayAnimation(player, "mp_arresting", "a_uncuff", 2);
-
-                                NAPI.Task.Run(() =>
-                                {
-                                    lock (player)
-                                    {
-                                        if (player != null && player.Exists)
-                                        {
-                                            Events.RequestClearAnimation(player);
-                                        }
-                                    }
-                                }, 2000);
-
-                                target.Heading = player.Heading;
-
-                                Events.OnPlayerDeath(target, player, 696988); // Reason 696988 = handcuffs.
+                                return;
                             }
+
+                            player.ResetData("CuffingTarget");
+
+                            EPlayer.GrantXP(player, 5);
+                            EPlayer.Action(player, $"has grabbed ahold of {target.Name} and slapped the handcuffs on their wrists.");
+
+                            target.SetAccessories(7, 41, 0); // Handcuffs
+
+                            EPlayer.Handcuff(target, true);
+
+                            Events.RequestPlayAnimation(player, "mp_arresting", "a_uncuff", 2);
+
+                            NAPI.Task.Run(() =>
+                            {
+                                lock (player)
+                                {
+                                    if (player != null && player.Exists)
+                                    {
+                                        Events.RequestClearAnimation(player);
+                                    }
+                                }
+                            }, 2000);
+
+                            target.Heading = player.Heading;
+
+                            Events.OnPlayerDeath(target, player, 696988); // Reason 696988 = handcuffs.
                         }
                     }
                 }
-
+                catch { }
             }, 3000);
             return;
         }
@@ -3034,8 +3030,7 @@ namespace LSCC
 
             predicate.ForEach((p) =>
             {
-                string lobby = "!{#ffffff}[Lobby " + p.GetSharedData<int>("InLobby") + "]";
-                if (p.GetSharedData<int>("InDM") > -1) lobby = lobby + " [DM " + p.GetSharedData<int>("InDM") + " ]";
+                string lobby = "!{#ffffff}[Lobby " + p.GetSharedData<int>("InLobby") + (p.GetSharedData<int>("InDM") > -1 ? (" DM " + p.GetSharedData<int>("InDM")) : "")  + "]";
                 switch (p.GetSharedData<int>("InLobby"))
                 {
                     case -1:

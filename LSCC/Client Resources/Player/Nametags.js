@@ -116,7 +116,7 @@ mp.events.add('render', (nametags) => {
                         outline: true
                     });
                 }
-
+                
                 if(player.getVariable("IsTabbed") !== undefined && player.getVariable("IsTabbed") == true)
                 {
                     var typingStr = "(( TABBED ))";
@@ -124,10 +124,10 @@ mp.events.add('render', (nametags) => {
                     else if(timerCount == 1) typingStr = "( TABBED )";
                     else if(timerCount == 2) timerCount = 0;
 
-                    mp.game.graphics.drawText(typingStr, [x, y - 0.055],
+                    mp.game.graphics.drawText(typingStr, [x, y - 0.058],
                     {
                         font: 0,
-                        color: [228, 240, 48, 228],
+                        color: [255, 99, 71, 228],
                         scale: [0.335, 0.335],
                         outline: true
                     });

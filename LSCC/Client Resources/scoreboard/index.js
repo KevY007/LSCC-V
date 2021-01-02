@@ -14,6 +14,12 @@ mp.events.add("updateSBServerName", (eUpdatedName) =>
 	serverName = eUpdatedName;
 });
 
+mp.events.add("playerQuit", (player) => {
+    if(browser != null) {
+        browser.execute('removeUser("' + player.id + '");');
+    }
+});
+
 function ToggleScoreboard()
 {
     if (browser != null) {
@@ -68,7 +74,7 @@ function updatePlayer(player)
     else if(player.getVariable("InLobby") == -5) lobbystr = "CUSTOMIZER";
     else if(player.getVariable("InLobby") > -1) lobbystr = player.getVariable("InLobby").toString();
     
-    browser.execute('updateUser("' + lobbystr + '", "' + player.name + '", "' + 
+    browser.execute('updateUser("' + lobbystr + '", "' + player.id + '", "' + player.name + '", "' + 
     (player.getVariable("Level") === undefined ? 'n/a' : player.getVariable("Level")) + '", "' + 
     (player.getVariable("Ping") === undefined ? 'n/a' : player.getVariable("Ping")) +
     //'", ' + 0 + ', ' + 0 + ', ' + 0 + ');');

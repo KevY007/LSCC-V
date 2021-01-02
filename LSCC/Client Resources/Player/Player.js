@@ -38,8 +38,6 @@ var checker_lastHealth = 0;
 var healthLossTime = Date.now();
 var healthLoss = 0;
 
-var tabUpdate = false;
-
 const bones = [0, 10706, 11816, 14201, 18905, 23553, 24816, 24817, 24818, 28252, 31086, 36864, 39317, 40269, 45509, 51826, 52301, 57005, 57597, 58271, 61163, 63931, 64729];
 const boneDistanceThreshold = 1;
 
@@ -190,11 +188,6 @@ mp.events.add("render", () => {
         healthLossTime = Date.now();
         checker_lastHealth = player.getHealth();
     }
-
-    if(tabUpdate != mp.system.isFocused)
-    {
-        mp.events.callRemote("UpdateTabbedState", mp.system.isFocused);
-    }
 });
 
 function destroyCam() {
@@ -260,6 +253,8 @@ mp.events.add('render', () => {
 
         if(secondCounter >= Math.round(1000 / updateRate))
         {
+            mp.events.callRemote("UpdateTabbedState", mp.system.isFocused);
+
             secondCounter = 0;
 
             if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
@@ -1004,8 +999,8 @@ mp.events.add(
             chaseRunning = true;
         },
 
-        "SendNotification": (title, text, attribute, duration, silent) => {
-            mp.system.notify(title, text, attribute, duration, silent);
+        "SendNotification": (title, text, attribute, duration) => {
+            mp.system.notify(title, text, attribute, duration, false);
         },
 
         "HideChaseTimer": () => {

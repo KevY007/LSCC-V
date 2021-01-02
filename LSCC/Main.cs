@@ -1011,7 +1011,7 @@ namespace LSCC
                                         {
                                             lock (player)
                                             {
-                                                if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetData<bool>("AutoJoin") == true)
+                                                if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetData<bool>("AutoJoin") == true && !EPlayer.IsAFK(player))
                                                 {
                                                     pCount++;
                                                 }
@@ -1040,7 +1040,7 @@ namespace LSCC
                                                         if (player.GetSharedData<bool>("IsTabbed") == true || EPlayer.IsAFK(player)) {
 
                                                             player.TriggerEvent("SendNotification", "AFK Check", "Copchase is starting in 10 seconds",
-                                                                "Los Santos Copchase", 10, false);
+                                                                "Los Santos Copchase", 10);
                                                         }
                                                     }
                                                 }

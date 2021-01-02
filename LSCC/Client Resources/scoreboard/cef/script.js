@@ -2,14 +2,14 @@ function rgb(r, g, b){ // im lazy
 	return ["rgb(",r,",",g,",",b,")"].join("");
 }
 
-function createUser(lid, name, level, ping, color_r, color_g, color_b) {
+function createUser(lid, plid, name, level, ping, color_r, color_g, color_b) {
 	//var playerCont = document.createElement("div");
 	var trfirst = document.createElement("tr");
 	var thLID = document.createElement("th");
 	var tdName = document.createElement("td");
 	var tdLevel = document.createElement("td");
 	var tdPing = document.createElement("td");
-	trfirst.setAttribute("id", name);
+	trfirst.setAttribute("id", `p${plid}`);
 
 	var LID = document.createTextNode(lid);
 	var Name = document.createTextNode(name);
@@ -28,12 +28,12 @@ function createUser(lid, name, level, ping, color_r, color_g, color_b) {
 
 	document.getElementById("playershere").appendChild(trfirst);
 	
-	updateUser(lid, name, level, ping, color_r, color_g, color_b);
+	updateUser(lid, plid, name, level, ping, color_r, color_g, color_b);
 };
 
 function removeUser(userRemove) {
-	if (document.getElementById(userRemove) !== null) {
-		var elmnt = document.getElementById(userRemove);
+	if (document.getElementById(`p${userRemove}`) !== null) {
+		var elmnt = document.getElementById(`p${userRemove}`);
 		elmnt.remove();
 
 	} else {
@@ -50,12 +50,14 @@ function updateServerName(name) {
 	}
 };
 
-function updateUser(userLID, userName, userLevel, userPing, color_r, color_g, color_b) {
-	if (document.getElementById(userName) !== null) {
-		var userElement = document.getElementById(userName);
+function updateUser(userLID, plid, userName, userLevel, userPing, color_r, color_g, color_b) {
+	if (document.getElementById(`p${plid}`) !== null) {
+		var userElement = document.getElementById(`p${plid}`);
 		var editThLID = userElement.getElementsByTagName('th')[0];
+		var editTdName = userElement.getElementsByTagName('td')[0];
 		var editTdLevel = userElement.getElementsByTagName('td')[1];
 		var editTdPing = userElement.getElementsByTagName('td')[2];
+		editTdName.innerHTML = userName;
 		editThLID.innerHTML = userLID;
 		editTdLevel.innerHTML = userLevel;
 		editTdPing.innerHTML = userPing;
@@ -63,6 +65,6 @@ function updateUser(userLID, userName, userLevel, userPing, color_r, color_g, co
 		if(userElement && userElement.style) userElement.style.color = rgb(color_r, color_g, color_b);
 	} else {
 		//console.log('No user by that name!')
-		createUser(userLID, userName, userLevel, userPing, color_r, color_g, color_b);
+		createUser(userLID, plid, userName, userLevel, userPing, color_r, color_g, color_b);
 	}
 };
