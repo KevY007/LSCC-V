@@ -17,8 +17,4 @@ use this if game starting and alt tabbed if focus
 adapt? Added client-side player.isTypingInTextChat (synchronized and works both for local and streamed remote players, intended to replace third party custom typing state synchronization that mostly was implemented *not the most optimized way*)
 Added mp.invoke("setTypingInChatState", state); (CEF)
 
-ADD NEW scoreboard from rotx chat
-also on car selector, add an onky esc listener where if esc = trigger event in client onpressesc of tab to hide it
-so for who are stuck
-
 add a linux script that will keep on restarting server if goes off??

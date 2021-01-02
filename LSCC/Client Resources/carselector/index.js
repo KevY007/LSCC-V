@@ -31,6 +31,14 @@ mp.events.add("OnSelectCar", (carName) => {
     mp.events.callRemote("OnCarSelectorSelect", carName);
 });
 
+mp.keys.bind(
+    0x1B,
+    false,
+    () => {
+        if(carbrowser != null) mp.events.call("hideCarSelector");
+    }
+);
+
 mp.events.add('browserDomReady', (ebrowser) => {
     if(carbrowser != null && carbrowser === ebrowser)
     {

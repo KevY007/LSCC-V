@@ -98,6 +98,14 @@ mp.events.add('browserDomReady', (ebrowser) => {
     }
 });
 
+mp.keys.bind(
+    0x1B,
+    false,
+    () => {
+        if(browser != null) ToggleScoreboard();
+    }
+);
+
 mp.keys.bind(0x4F, false, function () {
 
     if(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false || forceOff == true) return;
