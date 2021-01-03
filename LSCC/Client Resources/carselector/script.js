@@ -55,7 +55,7 @@ function addCar(carImage, carName, levelReq, carDesc, locked) {
     {
         cardButton.onclick = function()
         {
-            mp.events.call("OnSelectCar", carName);
+            mp.events.call("OnSelectCar", 1, carName);
         };
     }
     //Card END

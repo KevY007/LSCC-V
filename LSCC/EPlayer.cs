@@ -162,6 +162,7 @@ namespace LSCC
     {
         public string[] Cars { get; set; }
         public string[] Images { get; set; }
+        public int[] Teams { get; set; }
         public int[] Levels { get; set; }
         public string[] Desc { get; set; }
         public bool[] Locked { get; set; }
@@ -172,6 +173,7 @@ namespace LSCC
 
             this.Cars = new string[numcars];
             this.Images = new string[numcars];
+            this.Teams = new int[numcars];
             this.Levels = new int[numcars];
             this.Desc = new string[numcars];
             this.Locked = new bool[numcars];
@@ -180,8 +182,62 @@ namespace LSCC
             {
                 this.Cars[i] = (string)carData[i, 0];
                 this.Images[i] = (string)carData[i, 1];
-                this.Levels[i] = (int)carData[i, 2];
-                this.Desc[i] = (string)carData[i, 3];
+                this.Teams[i] = (int)carData[i, 2];
+                this.Levels[i] = (int)carData[i, 3];
+                this.Desc[i] = (string)carData[i, 4];
+                this.Locked[i] = (level >= this.Levels[i] ? false : true);
+            }
+        }
+    }
+
+    public class LoadoutSelWepData
+    {
+        public string[] Images { get; set; }
+        public string[] Weapons { get; set; }
+        public int[] WeaponAmmos { get; set; }
+
+        public LoadoutSelWepData(int numweps)
+        {
+            this.Images = new string[numweps];
+            this.Weapons = new string[numweps];
+            this.WeaponAmmos = new int[numweps];
+        }
+    }
+
+    public class LoadoutSelectorData
+    {
+        public string[] Names { get; set; }
+        public int[] Levels { get; set; }
+        public int[] Teams { get; set; }
+        public LoadoutSelWepData[] Weapons { get; set; }
+        public bool[] Locked { get; set; }
+
+        public LoadoutSelectorData(object[,] loadoutData, int level)
+        {
+            int numloadouts = loadoutData.GetLength(0);
+
+            this.Names = new string[numloadouts];
+            this.Levels = new int[numloadouts];
+            this.Teams = new int[numloadouts];
+            this.Weapons = new LoadoutSelWepData[numloadouts];
+            this.Locked = new bool[numloadouts];
+
+            for (int i = 0; i < loadoutData.GetLength(0); i++)
+            {
+                this.Names[i] = (string)loadoutData[i, 0];
+                this.Levels[i] = (int)loadoutData[i, 1];
+                this.Teams[i] = (int)loadoutData[i, 2];
+
+                object[,] items = NAPI.Util.FromJson<object[,]>(loadoutData[i, 3]);
+                this.Weapons[i] = new LoadoutSelWepData(items.GetLength(0));
+
+                for (int j = 0; j < items.GetLength(0); j++) // Num weps
+                {
+                    this.Weapons[i].Images[j] = (string)items[j, 0];
+                    this.Weapons[i].Weapons[j] = (string)items[j, 1];
+                    this.Weapons[i].WeaponAmmos[j] = (int)((long)items[j, 2]);
+                }
+
                 this.Locked[i] = (level >= this.Levels[i] ? false : true);
             }
         }
@@ -440,8 +496,8 @@ namespace LSCC
                 player.SetData("DerbySpawnTick", 0);
                 player.SetData("FreeroamTime", 12);
                 player.SetData("FreeroamWeather", 0);
-                player.ResetData("ViewingCarSelectorTeam");
                 player.ResetData("ViewingCarSelector");
+                player.ResetData("ViewingLoadoutSelector");
                 player.SetSharedData("HasShot", false);
                 player.SetSharedData("VoiceMode", 0);
                 player.SetSharedData("VisibleBlip", false);
@@ -619,7 +675,7 @@ namespace LSCC
             else
             {
                 player.GiveWeapon(WeaponHash.Pumpshotgun, 20);
-                player.GiveWeapon(WeaponHash.Pistol, 100);
+                player.GiveWeapon(WeaponHash.Pistol, 40);
             }
 
             NAPI.Task.Run(() =>
@@ -689,7 +745,7 @@ namespace LSCC
             }
             else
             {
-                player.GiveWeapon(WeaponHash.Pistol, 100);
+                player.GiveWeapon(WeaponHash.Pistol, 40);
                 player.GiveWeapon(WeaponHash.Pumpshotgun, 20);
             }
 

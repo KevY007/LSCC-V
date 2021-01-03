@@ -795,7 +795,7 @@ namespace LSCC
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Appistol, 60));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Heavyshotgun, 40));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Bzgas, 3));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Mg, 200));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Mg, 120));
             new LoadoutData(1, "SWAT", 10, wepList);
 
             wepList = new List<Tuple<WeaponHash, int>>();
@@ -813,8 +813,7 @@ namespace LSCC
 
             wepList = new List<Tuple<WeaponHash, int>>();
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Knife, 1));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Revolver_mk2, 30));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Sniperrifle, 20));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Revolver_mk2, 15));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Assaultrifle_mk2, 120));
             new LoadoutData(0, "Assassin", 20, wepList);
 

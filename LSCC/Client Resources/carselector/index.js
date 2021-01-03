@@ -20,15 +20,15 @@ mp.events.add("showCarSelector", (cars) => {
     mp.events.callLocal("hideCarSelector");
 
     mp.events.call("TogglePlayerChat", false);
+    carList = JSON.parse(cars);
     carbrowser = mp.browsers.new("package://carselector/index.html");
 
-    carList = JSON.parse(cars);
     mp.gui.cursor.show(true, true);
 });
 
-mp.events.add("OnSelectCar", (carName) => {
+mp.events.add("OnSelectCar", (team, carName) => {
     mp.events.call("hideCarSelector");
-    mp.events.callRemote("OnCarSelectorSelect", carName);
+    mp.events.callRemote("OnCarSelectorSelect", team, carName);
 });
 
 mp.keys.bind(
@@ -44,6 +44,7 @@ mp.events.add('browserDomReady', (ebrowser) => {
     {
         mp.gui.cursor.show(true, true);
 
+        // There exists a 'carList.Teams[i]' too now
         for (let i = 0; i < carList.Cars.length; i++) {
             carbrowser.execute(`addCar("` + carList.Images[i] + `", "` + carList.Cars[i] + `", "Lvl ` + carList.Levels[i] + `", "` + carList.Desc[i] + `", ` + carList.Locked[i] + `);`);
         }

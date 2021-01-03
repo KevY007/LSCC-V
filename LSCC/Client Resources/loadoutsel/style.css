@@ -1,0 +1,195 @@
+/*
+Fonts
+*/
+@font-face {
+    font-family: RenogareSoft;
+    src: url(RenogareSoft-Regular.ttf);
+}
+
+* {
+    user-select: none !important;
+}
+
+body {
+    /*background-image: url(./bg.png) !important;
+    background-repeat: no-repeat !important;
+    background-size: cover !important;*/
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0);
+    font-family: RenogareSoft;
+}
+
+.card-custom {
+    width: 62.6rem;
+    height: 45rem;
+}
+
+.cop-navlink {
+    margin-left: 5px;
+    color: rgb(92, 168, 255) !important;
+    border-radius: 20px !important;
+    border: 2px solid rgb(92, 168, 255);
+    padding: 5px 25px;
+}
+
+.cop-navlink:hover {
+    background: rgb(92, 168, 255) !important;
+    color: rgb(255, 255, 255) !important;
+}
+
+.cop-navlink:focus {
+    background: rgb(92, 168, 255) !important;
+    color: rgb(255, 255, 255) !important;
+}
+
+.fugitive-navlink {
+    margin-left: 5px;
+    color: rgb(255, 92, 92, 1) !important;
+    border-radius: 20px !important;
+    border: 2px solid rgb(255, 92, 92, 1);
+    padding: 5px 25px;
+}
+
+.fugitive-navlink:hover {
+    background: rgb(255, 92, 92) !important;
+    color: rgb(255, 255, 255) !important;
+}
+
+.fugitive-navlink:focus {
+    background: rgb(255, 92, 92) !important;
+    color: rgb(255, 255, 255) !important;
+}
+
+.active {
+    background: none !important;
+}
+
+.cop-navlink-active {
+    background: rgb(92, 168, 255) !important;
+    color: rgb(255, 255, 255) !important;
+}
+
+.fugitive-navlink-active {
+    background: rgb(255, 92, 92) !important;
+    color: rgb(255, 255, 255) !important;
+}
+
+.custom-card {
+    width: 20rem;
+    padding: 0 !important;
+    margin: 5px;
+}
+
+.weapon_icon {
+    height: 30px;
+    float: left;
+}
+
+.weapon_ammo {
+    font-size: 13px;
+}
+
+.loadout_desc {
+    font-size: 13px;
+    margin: 0 0 5px;
+}
+
+/* Normal equip button */
+.equip-btn-locked {
+    border-radius: 20px;
+    background: rgb(250, 108, 89);
+    border: 1px solid rgb(250, 108, 89);
+    color: rgb(255, 255, 255);
+    padding: 5px 25px;
+}
+
+.equip-btn-locked:hover {
+    background: rgb(3, 231, 125);
+    border: 1px solid rgb(3, 231, 125);
+}
+
+.equip-btn-locked:focus {
+    background: rgb(3, 231, 125);
+    border: 1px solid rgb(3, 231, 125);
+    box-shadow: none;
+}
+
+.equip-btn-locked:visited {
+    background: rgb(3, 231, 125);
+    border: 1px solid rgb(3, 231, 125);
+    box-shadow: none;
+}
+
+/* Normal equip button */
+
+/* Normal equip button */
+.equip-btn {
+    border-radius: 20px;
+    background: rgb(4, 255, 138);
+    border: 1px solid rgb(4, 255, 138);
+    color: rgb(255, 255, 255);
+    padding: 5px 25px;
+
+}
+
+.equip-btn:hover {
+    background: rgb(3, 231, 125);
+    border: 1px solid rgb(3, 231, 125);
+}
+
+.equip-btn:focus {
+    background: rgb(3, 231, 125);
+    border: 1px solid rgb(3, 231, 125);
+    box-shadow: none;
+}
+
+.equip-btn:visited {
+    background: rgb(3, 231, 125);
+    border: 1px solid rgb(3, 231, 125);
+    box-shadow: none;
+}
+
+/* Normal equip button */
+
+.my-custom-scrollbar {
+    height: 430px;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+.card-footer {
+    background: rgb(255, 255, 255);
+    border-top: 0;
+    padding-top: 0;
+}
+
+.container-custom {
+    padding: 0 11px;
+}
+
+/********************************
+Custom Scrollbar
+********************************/
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background-color: rgb(247, 247, 247);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: rgb(216, 216, 216);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(99, 98, 98);
+}

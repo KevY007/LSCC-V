@@ -2064,46 +2064,32 @@ namespace LSCC
             return;
         }
 
-        [Command("car", "!{#AFAFAF}[USAGE] car (option: help, cop)", GreedyArg = true)]
-        public void cmd_car(Player player, string action)
+        [Command("car")]
+        public void cmd_car(Player player)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (action.StartsWith("help", StringComparison.OrdinalIgnoreCase))
+            CarSelectorData a = new CarSelectorData(
+            new object[,]
             {
-                player.SendChatMessage("!{#FF6347}[Option] !{#999999}cop !{#FFFFFF}- Shows the car selection for cops.");
-            }
-            else if (action.StartsWith("cop", StringComparison.OrdinalIgnoreCase))
-            {
+                { "Default", "images/default.png", 1, 0, "Random starter vehicles" },
+                { "Police Cruiser", "images/polc1.png", 1, 0, "Default Cruiser" },
+                { "Police Cruiser (U)", "images/polc2.png", 1, 2, "Unmarked Variant" },
+                { "Police Bike", "images/policeb.png", 1, 3, "You don't wanna drive this" },
+                { "Police Buffalo", "images/polbufac.png", 1, 5, "Buffalo Police Cruiser" },
+                { "Police Buffalo (U)", "images/polbufac2.png", 1, 10, "Unmarked Variant" },
+                { "Police Caracara", "images/lspdcara.png", 1, 12, "It is what it is" },
+                { "FBI Buffalo", "images/fbibufac.png", 1, 13, "FBI Variant of Buffalo" },
+                { "FBI Granger", "images/fbi2.png", 1, 13, "Space for 8 occupants" },
+                { "Charger '16 (U)", "images/udchall1.png", 1, 15, "Vroom." },
+                { "Chopper", "images/polmav.png", 1, 20, "Police Maverick, Air Support" },
+                { "SWAT Truck", "images/riot.png", 1, 25, "Heavily armored and spacious" },
+            },
+            EPlayer.GetAccount(player).Level);
 
-                CarSelectorData a = new CarSelectorData(
-                new object[,]
-                {
-                    { "Default", "images/default.png", 0, "Random starter vehicles" },
-                    { "Police Cruiser", "images/polc1.png", 0, "Default Cruiser" },
-                    { "Police Cruiser (U)", "images/polc2.png", 2, "Unmarked Variant" },
-                    { "Police Bike", "images/policeb.png", 3, "You don't wanna drive this" },
-                    { "Police Buffalo", "images/polbufac.png", 5, "Buffalo Police Cruiser" },
-                    { "Police Buffalo (U)", "images/polbufac2.png", 10, "Unmarked Variant" },
-                    { "Police Caracara", "images/lspdcara.png", 12, "It is what it is" },
-                    { "FBI Buffalo", "images/fbibufac.png", 13, "FBI Variant of Buffalo" },
-                    { "FBI Granger", "images/fbi2.png", 13, "Space for 8 occupants" },
-                    { "Charger '16 (U)", "images/udchall1.png", 15, "Vroom." },
-                    { "Chopper", "images/polmav.png", 20, "Police Maverick, Air Support" },
-                    { "SWAT Truck", "images/riot.png", 25, "Heavily armored and spacious" },
-                },
-                EPlayer.GetAccount(player).Level);
-
-                player.SetData("ViewingCarSelector", true);
-                player.SetData("ViewingCarSelectorTeam", 1);
-                player.TriggerEvent("showCarSelector", NAPI.Util.ToJson(a));
-            }
-            else
-            {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'help', 'cop'");
-                return;
-            }
+            player.SetData("ViewingCarSelector", true);
+            player.TriggerEvent("showCarSelector", NAPI.Util.ToJson(a));
 
             return;
         }
@@ -3990,150 +3976,59 @@ namespace LSCC
             return;
         }
 
-        [Command("loadout", "!{#AFAFAF}[USAGE] loadout (option: help, list, cop, fugitive)", GreedyArg = true, Alias = "loadouts")]
-        public void cmd_loadout(Player player, string action)
+        [Command("loadout", Alias = "loadouts")]
+        public void cmd_loadout(Player player)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (action.StartsWith("help", StringComparison.OrdinalIgnoreCase))
+            LoadoutSelectorData a = new LoadoutSelectorData(
+            new object[,]
             {
-                player.SendChatMessage("!{#FF6347}[Option] !{#999999}list <cop/fugitive> !{#FFFFFF}- Shows all the loadouts for the specific team.");
-                player.SendChatMessage("!{#FF6347}[Option] !{#999999}<cop/fugitive> <name> !{#FFFFFF}- Sets the specified loadout for a team, fugitive or cop. ('default' for starter loadout)");
-                player.SendChatMessage("!{#FF6347}To select a loadout, execute the command like /loadout team loadoutname, for example: /loadout cop default");
-            }
-            else if (action.StartsWith("list", StringComparison.OrdinalIgnoreCase))
-            {
-                string[] args = action.Split(' ');
-                if (args.Count() > 1)
-                {
-                    int lteam = 0;
-                    if (args[1].StartsWith("cop", StringComparison.OrdinalIgnoreCase))
-                    {
-                        lteam = 1;
-                    }
-                    else if (args[1].StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
-                    {
-                        lteam = 0;
-                    }
-                    else
-                    {
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid team, loadouts are only for 'fugitive' or 'cop' team.");
-                        return;
-                    }
-                    player.SendChatMessage(" ");
-                    player.SendChatMessage("!{#33C446}Loadout 'Default' | Min Level: 0");
-                    player.SendChatMessage("!{#FFFFFF}Weapons: 100x Pistol, 20x Pump Shotgun");
+                // Name, Level, Team, Weapons {ImgUrl, Name, Ammo}
+                { "Default", 0, 0, NAPI.Util.ToJson(new object[,] { 
+                    { "https://static.wikia.nocookie.net/gtawiki/images/8/8f/Pistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pistol", 40 }, 
+                    { "https://static.wikia.nocookie.net/gtawiki/images/e/e0/PumpShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pump Shotgun", 20 },
+                }) },
+                { "Default", 0, 1, NAPI.Util.ToJson(new object[,] {
+                    { "https://static.wikia.nocookie.net/gtawiki/images/8/8f/Pistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pistol", 40 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/e/e0/PumpShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pump Shotgun", 20 },
+                }) },
 
+                { "Heavy", 5, 1, NAPI.Util.ToJson(new object[,] {
+                    { "https://static.wikia.nocookie.net/gtawiki/images/8/8f/Pistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pistol", 40 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/e/e0/PumpShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pump Shotgun", 20 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/f/fe/TearGas-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "BZ Gas", 1 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/7/7a/CarbineRifle-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Carbine Rifle", 80 },
+                }) },
+                { "SWAT", 10, 1, NAPI.Util.ToJson(new object[,] {
+                    { "https://static.wikia.nocookie.net/gtawiki/images/0/07/APPistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "AP Pistol", 60 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/5/55/HeavyShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Heavy Shotgun", 40 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/f/fe/TearGas-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "BZ Gas", 3 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/4/4c/MG-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Machine Gun", 120 },
+                }) },
 
-                    foreach (LoadoutData loadout in Settings.Loadouts.Where(b => b.Team == lteam))
-                    {
-                        player.SendChatMessage("!{#" + (lteam == 1 ? "00D0FA" : "FFC038") + "}Loadout '" + loadout.Name + "' | Min Level: " + loadout.LevelRequired.ToString());
+                { "Convicted", 5, 0, NAPI.Util.ToJson(new object[,] {
+                    { "https://static.wikia.nocookie.net/gtawiki/images/8/8f/Pistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pistol", 40 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/e/e0/PumpShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pump Shotgun", 15 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/8/80/AssaultRifle-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Assault Rifle", 80 },
+                }) },
+                { "Rebel", 10, 0, NAPI.Util.ToJson(new object[,] {
+                    { "https://static.wikia.nocookie.net/gtawiki/images/f/f8/BattleAxe-GTAO-HUDIcon.png/revision/latest/scale-to-width-down/128", "Battle Axe", 1 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/0/07/APPistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "AP Pistol", 40 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/9/96/BullpupShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Bullpup Shotgun", 30 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/2/21/Combat_PDW_HUD_GTA_V_PC.png/revision/latest/scale-to-width-down/128", "Combat PDW", 125 },
+                }) },
+                { "Assassin", 20, 0, NAPI.Util.ToJson(new object[,] {
+                    { "https://static.wikia.nocookie.net/gtawiki/images/8/8f/Pistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Knife", 40 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/c/c0/Heavy-revolver-mk2-icon.png/revision/latest/scale-to-width-down/128", "Heavy Revolver Mk.II", 15 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/b/ba/AssaultRifleMkII-GTAO-HUDIcon.png/revision/latest/scale-to-width-down/128", "Assault Rifle Mk.II", 120 },
+                }) },
+            },
+            EPlayer.GetAccount(player).Level);
 
-                        if (loadout.Weapons.Count() > 0)
-                        {
-                            string wepStr = "";
-                            int count = 0;
-
-                            foreach (var weapon in loadout.Weapons)
-                            {
-                                if (count != 0) wepStr = wepStr + ", ";
-
-                                string wepname = "";
-
-                                jWeaponData wepDat = new jWeaponData();
-                                if(Settings.WeaponData.TryGetValue((ulong)weapon.Item1, out wepDat))
-                                {
-                                    wepname = wepDat.Name;
-                                }
-
-                                foreach (KeyValuePair<ulong, string> i in Main.WeaponReasons)
-                                {
-                                    if (i.Key == (ulong)weapon.Item1 && wepname.Length < 2)
-                                    {
-                                        wepname = i.Value;
-                                        break;
-                                    }
-                                }
-
-                                if (wepname.Length > 1)
-                                {
-                                    wepStr = wepStr + weapon.Item2.ToString() + "x " + wepname;
-                                    count++;
-                                }
-                            }
-                            if (count > 0) player.SendChatMessage("!{#FFFFFF}Weapons: " + wepStr);
-                        }
-                    }
-                }
-                else player.SendChatMessage("!{#999999}Proper usage: /loadout list (team), teams: cop OR fugitive");
-            }
-            else if (action.StartsWith("cop", StringComparison.OrdinalIgnoreCase))
-            {
-                string[] args = action.Split(' ', 2);
-                if (args.Count() > 1)
-                {
-                    if (args[1].StartsWith("default", StringComparison.OrdinalIgnoreCase))
-                    {
-                        EPlayer.GetAccount(player).LoadoutCop = "?";
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your loadout for team cop has been set to 'default'.");
-                        return;
-                    }
-                    LoadoutData loadout = Settings.Loadouts.Find(b => b.Team == 1 && b.Name.Equals(args[1], StringComparison.OrdinalIgnoreCase));
-
-                    if ((loadout != null) == false)
-                    {
-                        player.SendChatMessage("!{#999999}Failed to find a loadout with the specified name. Are you sure that's a cop/valid loadout?");
-                        return;
-                    }
-
-                    if (loadout.LevelRequired > EPlayer.GetAccount(player).Level)
-                    {
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You don't have the required level (" + loadout.LevelRequired.ToString() + ") " + "for this loadout.");
-                        return;
-                    }
-
-                    EPlayer.GetAccount(player).LoadoutCop = loadout.Name;
-                    player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set your cop loadout to " + loadout.Name + ".");
-                }
-                else player.SendChatMessage("!{#999999}Proper usage: /loadout cop (loadout name), for names: /loadout list");
-            }
-            else if (action.StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
-            {
-                string[] args = action.Split(' ', 2);
-                if (args.Count() > 1)
-                {
-                    if (args[1].StartsWith("default", StringComparison.OrdinalIgnoreCase))
-                    {
-                        EPlayer.GetAccount(player).LoadoutFugitive = "?";
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your loadout for team fugitive has been set to 'default'.");
-                        return;
-                    }
-                    LoadoutData loadout = Settings.Loadouts.Find(b => b.Team == 0 && b.Name.Equals(args[1], StringComparison.OrdinalIgnoreCase));
-
-                    if ((loadout != null) == false)
-                    {
-                        player.SendChatMessage("!{#999999}Failed to find a loadout with the specified name. Are you sure that's a fugitive/valid loadout?");
-                        return;
-                    }
-
-                    if (loadout.LevelRequired > EPlayer.GetAccount(player).Level)
-                    {
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You don't have the required level (" + loadout.LevelRequired.ToString() + ") " + "for this loadout.");
-                        return;
-                    }
-
-                    EPlayer.GetAccount(player).LoadoutFugitive = loadout.Name;
-                    player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set your fugitive loadout to " + loadout.Name + ".");
-                }
-                else player.SendChatMessage("!{#999999}Proper usage: /loadout fugitive (loadout name), for names: /loadout list");
-            }
-
-            else
-            {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'help', 'list', 'cop (loadout)', or 'fugitive (loadout)'");
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please refer to /loadout help on how to select.");
-            }
+            player.SetData("ViewingLoadoutSelector", true);
+            player.TriggerEvent("showLoadoutSelector", NAPI.Util.ToJson(a));
             return;
         }
 

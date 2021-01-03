@@ -35,6 +35,7 @@ require("./Player/Sync.js");
 require("./carselector/index.js");
 require("./Player/musicPlayer.js");
 require("./Player/LightsMenu.js");
+require("./loadoutsel/index.js");
 
 mp.events.add("onOpenChatbox", (toggle) =>
 {

@@ -2,22 +2,24 @@ let chatbox = null;
 let fontsized = false;
 
 mp.events.add("InitiateCustomChat", () => {
-    mp.gui.chat.show(false); 
 
-    chatbox = mp.browsers.new('package://chat/index.html');
-    chatbox.markAsChat();
+    if(chatbox == null) {
+        mp.gui.chat.show(false); 
 
-    setTimeout(() => {
-        if(!fontsized)
-        {
-            if(mp.storage.data.fontsize !== undefined)
+        chatbox = mp.browsers.new('package://chat/index.html');
+        chatbox.markAsChat();
+
+        setTimeout(() => {
+            if(!fontsized)
             {
-                var fsize = mp.storage.data.fontsize;
-                mp.events.callLocal("setFontsize", mp.storage.data.fontsize);
+                if(mp.storage.data.fontsize !== undefined)
+                {
+                    mp.events.callLocal("setFontsize", mp.storage.data.fontsize);
+                }
+                fontsized = true;
             }
-            fontsized = true;
-        }
-    }, 2500);
+        }, 2500);
+    }
 });
 
 mp.events.add("TogglePlayerChat", (toggle) => {
