@@ -947,8 +947,7 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            player.SetSharedData("IsTabbed", toggle);
-            player.SetData("LastTabUpdate", Environment.TickCount64);
+            //player.SetSharedData("IsTabbed", toggle);
         }
 
         [RemoteEvent("UpdateChatState")]

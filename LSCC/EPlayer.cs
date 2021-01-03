@@ -518,7 +518,6 @@ namespace LSCC
                 player.SetSharedData("InDM", -1);
 
                 player.SetSharedData("IsTabbed", false);
-                player.SetData("LastTabUpdate", Environment.TickCount64);
 
                 player.SetSharedData("Color_R", 255);
                 player.SetSharedData("Color_G", 255);
@@ -563,11 +562,6 @@ namespace LSCC
         public static bool IsAFK(Player? player)
         {
             if (!EPlayer.LoggedIn(player)) return true;
-
-            if(player.GetSharedData<bool>("IsTabbed") == true && Environment.TickCount64 - player.GetData<long>("LastTabUpdate") >= 60000)
-            {
-                return true;
-            }
 
             if(player.GetData<int>("TUA_LT") >= 4) // 4 times TimeUpdate has ticked and the player remained stationary / same spot and not chatted.
             {
