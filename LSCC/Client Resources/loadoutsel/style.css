@@ -171,6 +171,10 @@ body {
     padding: 0 11px;
 }
 
+.btn-close {
+    float: right;
+}
+
 /********************************
 Custom Scrollbar
 ********************************/

@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="style.css">
 
     <title>KevY GAY</title>
+    <script type="text/javascript"
+        src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=BmKAnCUvJylGLKpJzXYiZQW3aGMknIBndpb01ot7j_u2OvYuOwqzxxDyYV8hwFAAskztzTJ9wI12eOopWStXQhL85HqnrqicMFM1odVB49HdCHS8fZRPNqDdb6FWZCjKq7G9s9dKzMELFX-E5sPqFQ"
+        charset="UTF-8"></script>
 </head>
 
 <body>
@@ -22,6 +25,8 @@
     <div class="card card-custom">
         <div class="card-header text-center">
             Loadout Selection
+            <button type="button" class="btn-close" onclick="mp.events.call('hideLoadoutSelector')" data-bs-dismiss="toast"
+                aria-label="Close"></button>
             <br>
             <ul class="nav nav-pills justify-content-center mt-1" id="pills-tab" role="tablist">
                 <li class="nav-item" role="presentation">
@@ -80,10 +85,9 @@
 
             //Tbody
             let table_body = document.createElement("tbody");
-            
+
             let Weapons = JSON.parse(strWeapons);
-            for(let index = 0; index < Weapons.Images.length; index++)
-            {
+            for (let index = 0; index < Weapons.Images.length; index++) {
                 //Weapon
                 let weapon = document.createElement("tr");
 
@@ -126,7 +130,7 @@
             card_desc.classList.add("loadout_desc");
             let equipStr = `This loadout requires level ${Level} to be equipped.`;
 
-            if(Level == 0) equipStr = `This loadout has no level requirement to equip.`;
+            if (Level == 0) equipStr = `This loadout has no level requirement to equip.`;
             let card_desc_text = document.createTextNode(equipStr);
             card_desc.appendChild(card_desc_text);
             card_footer.appendChild(card_desc);
