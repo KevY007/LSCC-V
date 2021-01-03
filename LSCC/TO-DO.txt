@@ -5,3 +5,7 @@ BUSTED TYPE MODE IN A LOBBY? STAY CLOSE = BUSTTT NO WEAPONS (lobbydata.mode)
 admin records system
 
 add a linux script that will keep on restarting server if goes off??
+
+
+ADD A G THAT IT GOES TO OUTSIDE SEATS FIRST IF HOLDING SHIFT KEY? LOOP FROM MAX SEATS OR SMTH IN REVERSE
+IN SPECIFIC CARS LIKE GRANGER AND FIB GRANGER
