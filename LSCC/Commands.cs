@@ -98,7 +98,7 @@ namespace LSCC
         }
 
 
-        [Command("game", "!{#AFAFAF}[USAGE] game (option: stop, start, autostart, teambalance)", GreedyArg = true)]
+        [Command("game", "!{#AFAFAF}[USAGE] game (option: stop, start, autostart, teambalance, mode)", GreedyArg = true)]
         public void cmd_game(Player player, string action)
         {
             if (!EPlayer.LoggedIn(player))
@@ -205,7 +205,41 @@ namespace LSCC
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /game teambalance <lobby id> <percentage of fugitives>");
             }
-            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'start', 'stop', 'autostart', 'teambalance'");
+            else if (action.StartsWith("mode", StringComparison.OrdinalIgnoreCase))
+            {
+                string[] args = action.Split(' ');
+                if (args.Count() > 2)
+                {
+                    int value = 0;
+                    int lobbyid = 0;
+                    if (!Int32.TryParse(args[1], out lobbyid) || lobbyid < 1 || lobbyid > Settings.Lobbies.Count)
+                    {
+                        player.SendChatMessage("!{#999999}Lobby ID must be in numbers between 1-" + Settings.Lobbies.Count + "!");
+                        return;
+                    }
+
+                    LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == lobbyid);
+                    if ((lobby != null) == false)
+                    {
+                        player.SendChatMessage("!{#999999}Lobby ID is invalid!");
+                        return;
+                    }
+
+                    if (args[2].Equals("standard", StringComparison.OrdinalIgnoreCase))
+                    {
+                        lobby.gameMode = GameModes.STANDARD;
+                    }
+                    else if (args[2].Equals("busted", StringComparison.OrdinalIgnoreCase))
+                    {
+                        lobby.gameMode = GameModes.BUSTED;
+                    }
+                    else { player.SendChatMessage("!{#999999}Proper usage: /game mode <lobby id> <mode: 'standard', 'busted'>"); return; }
+
+                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set lobby {lobby.lobbyId}'s mode to {Main.ConvertGameMode(lobby.gameMode)}.");
+                }
+                else player.SendChatMessage("!{#999999}Proper usage: /game mode <lobby id> <mode: 'standard', 'busted'>");
+            }
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'start', 'stop', 'autostart', 'teambalance', 'mode'");
 
             return;
         }
@@ -1573,7 +1607,7 @@ namespace LSCC
 
                 player.SendChatMessage($">> !{{#DAA520}}Lobby {lobby.lobbyId} | {enabledStr} " +
                     $"!{{#DAA520}}| Players: " +
-                    $"{Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId)} | Status: {Main.ConvertGameStatus(lobby.gameStatus)}");
+                    $"{Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId)} | Status: {Main.ConvertGameStatus(lobby.gameStatus)} | Mode: {Main.ConvertGameMode(lobby.gameMode)}");
             }
 
             return;

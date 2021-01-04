@@ -16,7 +16,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Globalization;
 
-public partial class jWeaponData
+namespace LSCC
+{
+    public partial class jWeaponData
 {
     [JsonProperty("HashKey")]
     public string HashKey { get; set; }
@@ -68,284 +70,291 @@ public partial class jWeaponData
     });
 }
 
-public partial class Component
-{
-    [JsonProperty("HashKey")]
-    public string HashKey { get; set; }
-
-    [JsonProperty("NameGXT")]
-    public string NameGxt { get; set; }
-
-    [JsonProperty("DescriptionGXT")]
-    public string DescriptionGxt { get; set; }
-
-    [JsonProperty("Name")]
-    public string Name { get; set; }
-
-    [JsonProperty("Description")]
-    public string Description { get; set; }
-
-    [JsonProperty("ModelHashKey")]
-    public string ModelHashKey { get; set; }
-
-    [JsonProperty("IsDefault")]
-    public bool IsDefault { get; set; }
-
-    [JsonProperty("AmmoType", NullValueHandling = NullValueHandling.Ignore)]
-    public string AmmoType { get; set; }
-}
-
-public partial class LiveryColor
-{
-    [JsonProperty("NameGXT")]
-    public string NameGxt { get; set; }
-
-    [JsonProperty("Name")]
-    public string Name { get; set; }
-}
-
-public class LobbyData
-{
-    public List<Player> Cops { get; set; }
-    public List<Player> Fugitives { get; set; }
-    public List<Vehicle> Vehicles { get; set; }
-
-    public int lobbyId { get; set; }
-    public int gameStatus { get; set; }
-    public int FugitiveShowCounter { get; set; }
-    public int LastSeenCounter { get; set; }
-    public int CollisionCounter { get; set; }
-    public int GameProgress { get; set; }
-    public int FugitivePercent { get; set; }
-    public bool GameAutoStart { get; set; }
-    public long LastAutoStartMsg { get; set; }
-    public bool Enabled { get; set; }
-    public bool PlayerCreated { get; set; }
-    public string Password { get; set; }
-    public int[] Time { get; set; }
-    public int Weather { get; set; }
-
-    public LobbyData()
+    public partial class Component
     {
-        Cops = new List<Player>();
-        Fugitives = new List<Player>();
-        Vehicles = new List<Vehicle>();
+        [JsonProperty("HashKey")]
+        public string HashKey { get; set; }
 
-        Time = new int[3];
-        Time[0] = new Random().Next(0, 23);
-        Time[1] = new Random().Next(0, 59);
-        Time[2] = new Random().Next(0, 59);
+        [JsonProperty("NameGXT")]
+        public string NameGxt { get; set; }
 
-        Weather = new Random().Next(0, 9);
+        [JsonProperty("DescriptionGXT")]
+        public string DescriptionGxt { get; set; }
 
-        lobbyId = -1;
-        for(int i = 1; i < Settings.NextLobbyID; i++)
+        [JsonProperty("Name")]
+        public string Name { get; set; }
+
+        [JsonProperty("Description")]
+        public string Description { get; set; }
+
+        [JsonProperty("ModelHashKey")]
+        public string ModelHashKey { get; set; }
+
+        [JsonProperty("IsDefault")]
+        public bool IsDefault { get; set; }
+
+        [JsonProperty("AmmoType", NullValueHandling = NullValueHandling.Ignore)]
+        public string AmmoType { get; set; }
+    }
+
+    public partial class LiveryColor
+    {
+        [JsonProperty("NameGXT")]
+        public string NameGxt { get; set; }
+
+        [JsonProperty("Name")]
+        public string Name { get; set; }
+    }
+
+    public enum GameModes : short
+    {
+        STANDARD = 0,
+        BUSTED = 1,
+    }
+
+    public class LobbyData
+    {
+        public List<Player> Cops { get; set; }
+        public List<Player> Fugitives { get; set; }
+        public List<Vehicle> Vehicles { get; set; }
+
+        public int lobbyId { get; set; }
+        public int gameStatus { get; set; }
+        public GameModes gameMode { get; set; }
+
+        public int FugitiveShowCounter { get; set; }
+        public int LastSeenCounter { get; set; }
+        public int CollisionCounter { get; set; }
+        public int GameProgress { get; set; }
+        public int FugitivePercent { get; set; }
+        public bool GameAutoStart { get; set; }
+        public long LastAutoStartMsg { get; set; }
+        public bool Enabled { get; set; }
+        public bool PlayerCreated { get; set; }
+        public string Password { get; set; }
+        public int[] Time { get; set; }
+        public int Weather { get; set; }
+
+        public LobbyData()
         {
-            if(Settings.Lobbies.Count(a => a.lobbyId == i) == 0)
+            Cops = new List<Player>();
+            Fugitives = new List<Player>();
+            Vehicles = new List<Vehicle>();
+
+            Time = new int[3];
+            Time[0] = new Random().Next(0, 23);
+            Time[1] = new Random().Next(0, 59);
+            Time[2] = new Random().Next(0, 59);
+
+            Weather = new Random().Next(0, 9);
+
+            lobbyId = -1;
+            for(int i = 1; i < Settings.NextLobbyID; i++)
             {
-                lobbyId = i;
+                if(Settings.Lobbies.Count(a => a.lobbyId == i) == 0)
+                {
+                    lobbyId = i;
+                }
             }
+
+            if(lobbyId == -1) lobbyId = Settings.NextLobbyID;
+
+            Settings.NextLobbyID++;
+
+            gameStatus = 0;
+            gameMode = GameModes.STANDARD;
+            FugitiveShowCounter = 0;
+            LastSeenCounter = 0;
+            CollisionCounter = 0;
+            GameProgress = 0;
+            GameAutoStart = true;
+            LastAutoStartMsg = 0;
+            FugitivePercent = 28;
+            Enabled = true;
+            PlayerCreated = false;
+            Password = "";
+
+            Settings.Lobbies.Add(this);
+        }
+    };
+
+    public class RequestData
+    {
+        public int RequestID { get; set; }
+        public int RequestType { get; set; }
+        public string Description { get; set; }
+        public Player Reporter { get; set; }
+        public Player Reported { get; set; }
+
+        public RequestData(Player reporter, string description, int type)
+        {
+            RequestID = Settings.NextRequestID;
+            Settings.NextRequestID++;
+            Reporter = reporter;
+            Description = description;
+            RequestType = type;
+            Reported = reporter;
+        }
+    };
+
+    public class LoadoutData
+    {
+        public int Team { get; set; }
+        public string Name { get; set; }
+        public int LevelRequired { get; set; }
+        public List<Tuple<WeaponHash, int>> Weapons { get; set; }
+
+        public LoadoutData(int team, string name, int level, List<Tuple<WeaponHash, int>> weps)
+        {
+            this.Team = team;
+            this.Name = name;
+            this.LevelRequired = level;
+
+            this.Weapons = new List<Tuple<WeaponHash, int>>();
+            this.Weapons.AddRange(weps);
+
+            Settings.Loadouts.Add(this);
+        }
+    };
+
+    public static class Settings
+    {
+        // Static Settings / Const
+        public const string Version = "0.1d";
+        public const int GameRunTime = 390; // Game Running Time in Seconds before STOP
+        public const int MaxLobbies = 5; // Default/starting lobby num.
+        public const int DefaultMaxInLobby = 35;
+        public const bool UseDiscord = true;
+
+        // Connection Settings
+        public const string MySQL_Host = "localhost";
+        public const string MySQL_User = "lsccv";
+        public const string MySQL_Password = "perkovicMatko3035";
+        public const string MySQL_Database = "lsccv";
+        public const string DCBotToken = "NjAyNTQ1Mzc0MDY1OTgzNTgw.XtaCEQ.clpqVL5c0X_38xkT-mYTr4_N9a4";
+        public const ulong DCServerID = 713731146072064040;
+        public const ulong DCCountID = 717405966123139104;
+        public const ulong DCGamesID = 717408461083639870;
+
+        // Global Variables (changing accordingly)
+        public static List<LobbyData> Lobbies { get; set; }
+        public static List<Player> LoggedInPlayers { get; set; }
+        public static List<Vehicle> AdminVehicles { get; set; }
+        public static int NextLobbyID { get; set; }
+        public static int MaxPlayersInLobby { get; set; }
+        public static int DerbyTimeLeft { get; set; }
+        public static long LastDerbyTick { get; set; }
+        public static long LastMessageTick { get; set; }
+        public static long AutoSaveTick { get; set; }
+        public static List<RequestData> Requests { get; set; }
+        public static int NextRequestID { get; set; }
+        public static long LastCountUpdate { get; set; }
+        public static List<LoadoutData> Loadouts { get; set; }
+        public static Dictionary<ulong, jWeaponData> WeaponData { get; set; }
+
+
+        public static class Timers
+        { 
+            public static long GameUpdate_Tick { get; set; }
+            public static long TimeUpdate_Tick { get; set; }
         }
 
-        if(lobbyId == -1) lobbyId = Settings.NextLobbyID;
 
-        Settings.NextLobbyID++;
+        // Locations
+        public const float LoginCameraX = -550;
+        public const float LoginCameraY = -210;
+        public const float LoginCameraZ = 1200;
+        public const float LoginCameraRx = -50;
+        public const float LoginCameraRy = 0;
+        public const float LoginCameraRz = 0;
+        public const float LoginCameraViewAngle = 50;
 
-        gameStatus = 0;
-        FugitiveShowCounter = 0;
-        LastSeenCounter = 0;
-        CollisionCounter = 0;
-        GameProgress = 0;
-        GameAutoStart = true;
-        LastAutoStartMsg = 0;
-        FugitivePercent = 28;
-        Enabled = true;
-        PlayerCreated = false;
-        Password = "";
+        public static Vector3[] LobbySpawns = new Vector3[]
+        {
+            new Vector3(464.8465f, -995.0156f, 24.914879f),
+            new Vector3(450.13f, -987.06f, 26.67f),
+            new Vector3(439.86f, -995.12f, 30.68f),
+            new Vector3(443.308f, -986.31f, 30.689f),
+            new Vector3(441.24f, -978.24f, 30.68f)
+        };
 
-        Settings.Lobbies.Add(this);
-    }
-};
+        public static object[] VectorJail = { new Vector3(459.55798f, -998.202f, 24.914848f), -75.06f };
 
-public class RequestData
-{
-    public int RequestID { get; set; }
-    public int RequestType { get; set; }
-    public string Description { get; set; }
-    public Player Reporter { get; set; }
-    public Player Reported { get; set; }
+        public static string[] DMNames = new string[]
+        {
+            "Life Invader Office",
+            "Warehouse",
+            "Tennis Court",
+            "Construction Site"
+        };
 
-    public RequestData(Player reporter, string description, int type)
-    {
-        RequestID = Settings.NextRequestID;
-        Settings.NextRequestID++;
-        Reporter = reporter;
-        Description = description;
-        RequestType = type;
-        Reported = reporter;
-    }
-};
+        public static object[][,] DMSpawns = new object[][,]
+        {
+            new object[,] { // Life Invader Office
+                { new Vector3(-1042.9781f, -237.05504f, 37.96496f), 112.122505f },
+                { new Vector3(-1065.8978f, -246.8463f, 39.733177f), 2.7907195f },
+                { new Vector3(-1087.0682f, -250.7736f, 37.76329f), -84.64264f },
+                { new Vector3(-1071.687f, -240.58011f, 42.271416f), 158.59511f },
+                { new Vector3(-1081.3223f, -254.02095f, 44.023148f), -37.803333f },
+                { new Vector3(-1063.2289f, -248.76646f, 44.02106f), -19.056158f },
+                { new Vector3(-1055.6722f, -239.3023f, 44.021183f), 124.46403f },
+                { new Vector3(-1049.8112f, -242.46056f, 44.021015f), 80.71298f },
+                { new Vector3(-1056.6835f, -246.28284f, 44.02107f), 60.64799f },
+                { new Vector3(-1078.404f, -244.99226f, 44.021255f), -105.56132f },
+                { new Vector3(-1059.8085f, -238.40387f, 39.733192f), -145.55379f },
+            },
+            new object[,] { // Warehouse 
+                { new Vector3(1026.7279f, -3100.3984f, -38.999912f), 74.94901f },
+                { new Vector3(1018.37555f, -3093.7153f, -38.999912f), 92.48154f },
+                { new Vector3(1000.2626f, -3091.4524f, -38.999866f), -122.95632f },
+                { new Vector3(995.9403f, -3105.2683f, -38.999886f), -129.19583f },
+                { new Vector3(993.27515f, -3097.609f, -38.99586f), -87.74806f },
+                { new Vector3(1009.0142f, -3105.6724f, -38.999836f), -94.19384f },
+                { new Vector3(1014.16077f, -3111.6494f, -38.999855f), -16.558058f },
+                { new Vector3(1023.80054f, -3101.6365f, -38.999866f), 91.27259f },
+            },
+            new object[,] { // Tennis Court
+                { new Vector3(-1339.0612f, -86.17103f, 50.70433f), 163.59131f },
+                { new Vector3(-1350.675f, -114.54801f, 50.704338f), -55.28427f },
+                { new Vector3(-1339.0763f, -112.86697f, 50.704353f), 78.14612f },
+                { new Vector3(-1356.3923f, -120.092705f, 50.674458f), -21.771978f },
+                { new Vector3(-1376.948f, -117.589f, 50.704338f), 2.0458739f },
+                { new Vector3(-1380.0442f, -89.38932f, 50.70434f), -109.858505f },
+                { new Vector3(-1367.795f, -85.32934f, 50.704365f), -141.75507f },
+                { new Vector3(-1363.9862f, -103.44455f, 50.704327f), -161.3273f },
+                { new Vector3(-1315.6982f, -110.76596f, 47.866528f), -15.326206f },
+                { new Vector3(-1302.3474f, -111.222145f, 47.86635f), 27.674273f },
+                { new Vector3(-1303.0864f, -86.85428f, 47.86452f), 67.42608f },
+                { new Vector3(-1313.2341f, -86.358795f, 47.86452f), -129.29897f },
+            },
+            new object[,] { // Construction Site
+                { new Vector3(99.4386f, -374.97763f, 55.496834f), -12.512988f },
+                { new Vector3(106.195435f, -375.18335f, 55.496834f), -2.4919534f },
+                { new Vector3(106.47802f, -357.54053f, 55.496834f), 107.3899f },
+                { new Vector3(116.39296f, -342.71448f, 55.496826f), -177.35867f },
+                { new Vector3(105.71075f, -336.08627f, 55.49683f), 146.98698f },
+                { new Vector3(82.705376f, -328.99182f, 55.508385f), -163.03473f },
+                { new Vector3(54.689102f, -342.37216f, 55.50839f), -132.10645f },
+                { new Vector3(74.776054f, -351.3653f, 55.506992f), -45.4294f },
+                { new Vector3(94.19476f, -360.79895f, 55.496826f), -19.65776f },
+            },
+        };
 
-public class LoadoutData
-{
-    public int Team { get; set; }
-    public string Name { get; set; }
-    public int LevelRequired { get; set; }
-    public List<Tuple<WeaponHash, int>> Weapons { get; set; }
-
-    public LoadoutData(int team, string name, int level, List<Tuple<WeaponHash, int>> weps)
-    {
-        this.Team = team;
-        this.Name = name;
-        this.LevelRequired = level;
-
-        this.Weapons = new List<Tuple<WeaponHash, int>>();
-        this.Weapons.AddRange(weps);
-
-        Settings.Loadouts.Add(this);
-    }
-};
-
-public static class Settings
-{
-    // Static Settings / Const
-    public const string Version = "0.1d";
-    public const int GameRunTime = 390; // Game Running Time in Seconds before STOP
-    public const int MaxLobbies = 5; // Default/starting lobby num.
-    public const int DefaultMaxInLobby = 35;
-    public const bool UseDiscord = true;
-
-    // Connection Settings
-    public const string MySQL_Host = "localhost";
-    public const string MySQL_User = "lsccv";
-    public const string MySQL_Password = "perkovicMatko3035";
-    public const string MySQL_Database = "lsccv";
-    public const string DCBotToken = "NjAyNTQ1Mzc0MDY1OTgzNTgw.XtaCEQ.clpqVL5c0X_38xkT-mYTr4_N9a4";
-    public const ulong DCServerID = 713731146072064040;
-    public const ulong DCCountID = 717405966123139104;
-    public const ulong DCGamesID = 717408461083639870;
-
-    // Global Variables (changing accordingly)
-    public static List<LobbyData> Lobbies { get; set; }
-    public static List<Player> LoggedInPlayers { get; set; }
-    public static List<Vehicle> AdminVehicles { get; set; }
-    public static int NextLobbyID { get; set; }
-    public static int MaxPlayersInLobby { get; set; }
-    public static int DerbyTimeLeft { get; set; }
-    public static long LastDerbyTick { get; set; }
-    public static long LastMessageTick { get; set; }
-    public static long AutoSaveTick { get; set; }
-    public static List<RequestData> Requests { get; set; }
-    public static int NextRequestID { get; set; }
-    public static long LastCountUpdate { get; set; }
-    public static List<LoadoutData> Loadouts { get; set; }
-    public static Dictionary<ulong, jWeaponData> WeaponData { get; set; }
-
-
-    public static class Timers
-    { 
-        public static long GameUpdate_Tick { get; set; }
-        public static long TimeUpdate_Tick { get; set; }
+        public static object[,] DerbySpawns = new object[,]
+        {
+            { new Vector3(-1154.9131f, -4625.371f, 128.5272f), 1.1739266f },
+            { new Vector3(-1138.5717f, -4579.601f, 128.53639f), -2.9987478f },
+            { new Vector3(-1143.5912f, -4557.85f, 128.5494f), 46.68429f },
+            { new Vector3(-1124.3333f, -4560.672f, 128.51184f), 92.38568f },
+            { new Vector3(-1147.1642f, -4580.426f, 130.75934f), 87.83704f },
+            { new Vector3(-1170.742f, -4579.066f, 132.667f), 90.3033f },
+            { new Vector3(-1191.0192f, -4579.288f, 132.67397f), 90.938835f },
+            { new Vector3(-1201.3973f, -4579.4526f, 130.6752f), 90.72156f },
+            { new Vector3(-1173.9358f, -4588.8486f, 139.22603f), 0.6066646f },
+            { new Vector3(-1174.1758f, -4570.0615f, 139.22366f), -179.47902f }
+        };
     }
 
-
-    // Locations
-    public const float LoginCameraX = -550;
-    public const float LoginCameraY = -210;
-    public const float LoginCameraZ = 1200;
-    public const float LoginCameraRx = -50;
-    public const float LoginCameraRy = 0;
-    public const float LoginCameraRz = 0;
-    public const float LoginCameraViewAngle = 50;
-
-    public static Vector3[] LobbySpawns = new Vector3[]
-    {
-        new Vector3(464.8465f, -995.0156f, 24.914879f),
-        new Vector3(450.13f, -987.06f, 26.67f),
-        new Vector3(439.86f, -995.12f, 30.68f),
-        new Vector3(443.308f, -986.31f, 30.689f),
-        new Vector3(441.24f, -978.24f, 30.68f)
-    };
-
-    public static object[] VectorJail = { new Vector3(459.55798f, -998.202f, 24.914848f), -75.06f };
-
-    public static string[] DMNames = new string[]
-    {
-        "Life Invader Office",
-        "Warehouse",
-        "Tennis Court",
-        "Construction Site"
-    };
-
-    public static object[][,] DMSpawns = new object[][,]
-    {
-        new object[,] { // Life Invader Office
-            { new Vector3(-1042.9781f, -237.05504f, 37.96496f), 112.122505f },
-            { new Vector3(-1065.8978f, -246.8463f, 39.733177f), 2.7907195f },
-            { new Vector3(-1087.0682f, -250.7736f, 37.76329f), -84.64264f },
-            { new Vector3(-1071.687f, -240.58011f, 42.271416f), 158.59511f },
-            { new Vector3(-1081.3223f, -254.02095f, 44.023148f), -37.803333f },
-            { new Vector3(-1063.2289f, -248.76646f, 44.02106f), -19.056158f },
-            { new Vector3(-1055.6722f, -239.3023f, 44.021183f), 124.46403f },
-            { new Vector3(-1049.8112f, -242.46056f, 44.021015f), 80.71298f },
-            { new Vector3(-1056.6835f, -246.28284f, 44.02107f), 60.64799f },
-            { new Vector3(-1078.404f, -244.99226f, 44.021255f), -105.56132f },
-            { new Vector3(-1059.8085f, -238.40387f, 39.733192f), -145.55379f },
-        },
-        new object[,] { // Warehouse 
-            { new Vector3(1026.7279f, -3100.3984f, -38.999912f), 74.94901f },
-            { new Vector3(1018.37555f, -3093.7153f, -38.999912f), 92.48154f },
-            { new Vector3(1000.2626f, -3091.4524f, -38.999866f), -122.95632f },
-            { new Vector3(995.9403f, -3105.2683f, -38.999886f), -129.19583f },
-            { new Vector3(993.27515f, -3097.609f, -38.99586f), -87.74806f },
-            { new Vector3(1009.0142f, -3105.6724f, -38.999836f), -94.19384f },
-            { new Vector3(1014.16077f, -3111.6494f, -38.999855f), -16.558058f },
-            { new Vector3(1023.80054f, -3101.6365f, -38.999866f), 91.27259f },
-        },
-        new object[,] { // Tennis Court
-            { new Vector3(-1339.0612f, -86.17103f, 50.70433f), 163.59131f },
-            { new Vector3(-1350.675f, -114.54801f, 50.704338f), -55.28427f },
-            { new Vector3(-1339.0763f, -112.86697f, 50.704353f), 78.14612f },
-            { new Vector3(-1356.3923f, -120.092705f, 50.674458f), -21.771978f },
-            { new Vector3(-1376.948f, -117.589f, 50.704338f), 2.0458739f },
-            { new Vector3(-1380.0442f, -89.38932f, 50.70434f), -109.858505f },
-            { new Vector3(-1367.795f, -85.32934f, 50.704365f), -141.75507f },
-            { new Vector3(-1363.9862f, -103.44455f, 50.704327f), -161.3273f },
-            { new Vector3(-1315.6982f, -110.76596f, 47.866528f), -15.326206f },
-            { new Vector3(-1302.3474f, -111.222145f, 47.86635f), 27.674273f },
-            { new Vector3(-1303.0864f, -86.85428f, 47.86452f), 67.42608f },
-            { new Vector3(-1313.2341f, -86.358795f, 47.86452f), -129.29897f },
-        },
-        new object[,] { // Construction Site
-            { new Vector3(99.4386f, -374.97763f, 55.496834f), -12.512988f },
-            { new Vector3(106.195435f, -375.18335f, 55.496834f), -2.4919534f },
-            { new Vector3(106.47802f, -357.54053f, 55.496834f), 107.3899f },
-            { new Vector3(116.39296f, -342.71448f, 55.496826f), -177.35867f },
-            { new Vector3(105.71075f, -336.08627f, 55.49683f), 146.98698f },
-            { new Vector3(82.705376f, -328.99182f, 55.508385f), -163.03473f },
-            { new Vector3(54.689102f, -342.37216f, 55.50839f), -132.10645f },
-            { new Vector3(74.776054f, -351.3653f, 55.506992f), -45.4294f },
-            { new Vector3(94.19476f, -360.79895f, 55.496826f), -19.65776f },
-        },
-    };
-
-    public static object[,] DerbySpawns = new object[,]
-    {
-        { new Vector3(-1154.9131f, -4625.371f, 128.5272f), 1.1739266f },
-        { new Vector3(-1138.5717f, -4579.601f, 128.53639f), -2.9987478f },
-        { new Vector3(-1143.5912f, -4557.85f, 128.5494f), 46.68429f },
-        { new Vector3(-1124.3333f, -4560.672f, 128.51184f), 92.38568f },
-        { new Vector3(-1147.1642f, -4580.426f, 130.75934f), 87.83704f },
-        { new Vector3(-1170.742f, -4579.066f, 132.667f), 90.3033f },
-        { new Vector3(-1191.0192f, -4579.288f, 132.67397f), 90.938835f },
-        { new Vector3(-1201.3973f, -4579.4526f, 130.6752f), 90.72156f },
-        { new Vector3(-1173.9358f, -4588.8486f, 139.22603f), 0.6066646f },
-        { new Vector3(-1174.1758f, -4570.0615f, 139.22366f), -179.47902f }
-    };
-}
-
-namespace LSCC
-{
     public class Main : Script
     {
         public static int GetMaxSeats(string vehiclename)
@@ -661,6 +670,21 @@ namespace LSCC
                     break;
                 case 2:
                     ret = "Starting";
+                    break;
+            }
+            return ret;
+        }
+
+        public static string ConvertGameMode(object mode)
+        {
+            string ret = "Unknown";
+            switch (mode)
+            {
+                case GameModes.STANDARD:
+                    ret = "Standard";
+                    break;
+                case GameModes.BUSTED:
+                    ret = "Busted";
                     break;
             }
             return ret;
@@ -1648,7 +1672,7 @@ namespace LSCC
                         pVehicle.SetSharedData("Team", 0);
                         lobby.Vehicles.Add(pVehicle);
 
-                        pVehicle.SetSharedData("vMaxSpeed", 150 / 3.6); // KM/H max.
+                        pVehicle.SetSharedData("vMaxSpeed", (float)(150 / 3.6)); // KM/H max.
 
                         NAPI.Task.Run(() =>
                         {
@@ -1768,12 +1792,25 @@ namespace LSCC
 
                                 data.Item1.TriggerEvent("ToggleChaseCollisions", false);
                                 data.Item1.SetSharedData("HasShot", false);
-
-                                data.Item1.SendNotification($"~g~Weapons will be given after collisions enable.");
                             }
                         }
 
                         NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] Copchase started with !{{#8D8DFF}}{lobby.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{lobby.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{map.Name}!{{#FFFFFF}}.");
+
+                        foreach (Player p in RAGE.Entities.Players.All.Where(p => lobby.Cops.Contains(p) || lobby.Fugitives.Contains(p)))
+                        {
+                            if (lobby.gameMode == GameModes.STANDARD)
+                            {
+                                p.SendNotification($"~g~Weapons will be given after collisions enable.");
+                            }
+                            else if (lobby.gameMode == GameModes.BUSTED)
+                            {
+                                p.SendChatMessage($"!{{#1E9913}}[#] The lobby you are playing is in BUSTED! mode. This game mode is not played like standard copchase...");
+                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this gamemode, you do not receive weapons. You do not fight, rather you EVADE and partake in a true test of skills!");
+                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Cops have to chase/box and stick close to fugitive/vehicle to start busting them, just like in some NFS games but different!");
+                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}More cops would make the busting progress faster! Exceptional drivers will make it.");
+                            }
+                        }
 
                         lobby.FugitiveShowCounter = 60;
                         lobby.LastSeenCounter = 0;
@@ -1793,95 +1830,35 @@ namespace LSCC
 
                     NAPI.Task.Run(() =>
                     {
-                        foreach (Player p in lobby.Cops)
+                        try
                         {
-                            lock (p)
+                            foreach (Player p in RAGE.Entities.Players.All.Where(p => lobby.Cops.Contains(p) || lobby.Fugitives.Contains(p)))
                             {
-                                if(p != null && p.Exists) p.TriggerEvent("ToggleChaseCollisions", false);
+                                if (p != null && p.Exists)
+                                {
+                                    p.TriggerEvent("ToggleChaseCollisions", false);
+                                    if (p.HasData("putVehicle")) p.SetIntoVehicle(p.GetData<Vehicle>("putVehicle"), p.GetData<int>("putVehicleSeat"));
+                                }
                             }
                         }
-                        foreach (Player p in lobby.Fugitives)
-                        {
-                            lock (p)
-                            {
-                                if(p != null && p.Exists) p.TriggerEvent("ToggleChaseCollisions", false);
-                            }
-                        }
+                        catch { }
 
                     }, delayTime: 3000);
 
                     NAPI.Task.Run(() =>
                     {
-                        foreach (Player player in lobby.Fugitives)
+                        try
                         {
-                            lock (player)
+                            foreach (Player p in RAGE.Entities.Players.All.Where(p => lobby.Cops.Contains(p) || lobby.Fugitives.Contains(p)))
                             {
-                                if (player != null && player.Exists)
+                                if (p != null && p.Exists)
                                 {
-                                    try
-                                    {
-                                        player.TriggerEvent("ToggleChaseCollisions", false);
-                                        if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
-                                    }
-                                    catch { }
+                                    p.TriggerEvent("ToggleChaseCollisions", false);
+                                    if (p.HasData("putVehicle")) p.SetIntoVehicle(p.GetData<Vehicle>("putVehicle"), p.GetData<int>("putVehicleSeat"));
                                 }
                             }
                         }
-
-                        foreach (Player player in lobby.Cops)
-                        {
-                            lock (player)
-                            {
-                                if (player != null && player.Exists)
-                                {
-
-                                    try
-                                    {
-                                        player.TriggerEvent("ToggleChaseCollisions", false);
-                                        if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
-                                    }
-                                    catch { }
-                                }
-                            }
-                        }
-
-                    }, delayTime: 3000);
-
-                    NAPI.Task.Run(() =>
-                    {
-                        foreach (Player player in lobby.Fugitives)
-                        {
-                            lock (player)
-                            {
-                                if (player != null && player.Exists)
-                                {
-                                    try
-                                    {
-                                        player.TriggerEvent("ToggleChaseCollisions", false);
-                                        if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
-                                    }
-                                    catch { }
-                                }
-                            }
-                        }
-
-                        foreach (Player player in lobby.Cops)
-                        {
-
-                            lock (player)
-                            {
-                                if (player != null && player.Exists)
-                                {
-                                    try
-                                    {
-                                        player.TriggerEvent("ToggleChaseCollisions", false);
-                                        if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
-                                    }
-                                    catch { }
-                                }
-                            }
-                        }
-
+                        catch { }
                     }, delayTime: 5000);
 
 
@@ -1919,7 +1896,7 @@ namespace LSCC
                     {
                         lobby.GameProgress++;
 
-                        if (lobby.GameProgress >= Convert.ToInt32(0.6 * Settings.GameRunTime))
+                        if (lobby.GameProgress >= Convert.ToInt32(0.6 * Settings.GameRunTime) && lobby.gameMode == GameModes.BUSTED)
                         {
                             lock (lobby.Fugitives)
                             {
@@ -1935,7 +1912,7 @@ namespace LSCC
                                     }
                                 }
                             }
-                            if (lobby.GameProgress == Convert.ToInt32(0.6 * Settings.GameRunTime))
+                            if (lobby.GameProgress == Convert.ToInt32(0.6 * Settings.GameRunTime) && lobby.gameMode == GameModes.BUSTED)
                             {
                                 EPlayer.SendMessageInLobby(lobby.lobbyId, "!{#FF6347}[GAME] !{#FFFFFF}60% of the game has elapsed, all fugitives have shot tag now.");
                             }

@@ -640,67 +640,74 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            if (EPlayer.GetAccount(player).LoadoutCop.Length > 3)
+            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+
+            if (lobby == null) { return; }
+
+            if (lobby.gameMode != GameModes.BUSTED)
             {
-                LoadoutData loadout = Settings.Loadouts.Find(a => a.Team == 1 && a.Name.Equals(EPlayer.GetAccount(player).LoadoutCop));
-
-                if ((loadout != null) == false)
+                if (EPlayer.GetAccount(player).LoadoutCop.Length > 3)
                 {
-                    EPlayer.GetAccount(player).LoadoutCop = "?";
-                    GiveCopWeapons(player);
-                    return;
-                }
+                    LoadoutData loadout = Settings.Loadouts.Find(a => a.Team == 1 && a.Name.Equals(EPlayer.GetAccount(player).LoadoutCop));
 
-                if (EPlayer.GetAccount(player).Level < loadout.LevelRequired)
-                {
-                    EPlayer.GetAccount(player).LoadoutCop = "?";
-                    GiveCopWeapons(player);
-                    return;
-                }
-
-                if (loadout.Weapons.Count() > 0)
-                {
-                    loadout.Weapons.ForEach((wepar) =>
+                    if ((loadout != null) == false)
                     {
-                        player.GiveWeapon(wepar.Item1, wepar.Item2);
-                    });
-                }
-            }
-            else
-            {
-                player.GiveWeapon(WeaponHash.Pumpshotgun, 20);
-                player.GiveWeapon(WeaponHash.Pistol, 40);
-            }
+                        EPlayer.GetAccount(player).LoadoutCop = "?";
+                        GiveCopWeapons(player);
+                        return;
+                    }
 
-            NAPI.Task.Run(() =>
-            {
-                try
-                {
-                    if (player != null && !player.IsNull && EPlayer.GetAccount(player).WeaponComponents != null && EPlayer.GetAccount(player).WeaponComponents.Length > 3)
+                    if (EPlayer.GetAccount(player).Level < loadout.LevelRequired)
                     {
-                        Dictionary<ulong, wComponentData> weaponCompsData = new Dictionary<ulong, wComponentData>();
-                        weaponCompsData = NAPI.Util.FromJson<Dictionary<ulong, wComponentData>>(EPlayer.GetAccount(player).WeaponComponents);
+                        EPlayer.GetAccount(player).LoadoutCop = "?";
+                        GiveCopWeapons(player);
+                        return;
+                    }
 
-                        foreach (KeyValuePair<ulong, wComponentData> i in weaponCompsData)
+                    if (loadout.Weapons.Count() > 0)
+                    {
+                        loadout.Weapons.ForEach((wepar) =>
                         {
-                            if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
+                            player.GiveWeapon(wepar.Item1, wepar.Item2);
+                        });
+                    }
+                }
+                else
+                {
+                    player.GiveWeapon(WeaponHash.Pumpshotgun, 20);
+                    player.GiveWeapon(WeaponHash.Pistol, 40);
+                }
+
+                NAPI.Task.Run(() =>
+                {
+                    try
+                    {
+                        if (player != null && !player.IsNull && EPlayer.GetAccount(player).WeaponComponents != null && EPlayer.GetAccount(player).WeaponComponents.Length > 3)
+                        {
+                            Dictionary<ulong, wComponentData> weaponCompsData = new Dictionary<ulong, wComponentData>();
+                            weaponCompsData = NAPI.Util.FromJson<Dictionary<ulong, wComponentData>>(EPlayer.GetAccount(player).WeaponComponents);
+
+                            foreach (KeyValuePair<ulong, wComponentData> i in weaponCompsData)
                             {
-                                i.Value.Components.ForEach((ulong comphash) =>
+                                if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
                                 {
-                                    foreach (Player p in RAGE.Entities.Players.All)
+                                    i.Value.Components.ForEach((ulong comphash) =>
                                     {
-                                        if (p.Dimension == player.Dimension)
+                                        foreach (Player p in RAGE.Entities.Players.All)
                                         {
-                                            p.TriggerEvent("AttachWeaponComponent", player, (int)i.Key, (int)comphash);
+                                            if (p.Dimension == player.Dimension)
+                                            {
+                                                p.TriggerEvent("AttachWeaponComponent", player, (int)i.Key, (int)comphash);
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                                }
                             }
                         }
                     }
-                }
-                catch { }
-            }, 500);
+                    catch { }
+                }, 500);
+            }
 
             player.GiveWeapon(WeaponHash.Stungun, 1);
 
@@ -711,67 +718,75 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            if (EPlayer.GetAccount(player).LoadoutFugitive.Length > 3)
+            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+
+            if (lobby == null) { return; }
+
+            if (lobby.gameMode != GameModes.BUSTED)
             {
-                LoadoutData loadout = Settings.Loadouts.Find(a => a.Team == 0 && a.Name.Equals(EPlayer.GetAccount(player).LoadoutFugitive));
 
-                if ((loadout != null) == false)
+                if (EPlayer.GetAccount(player).LoadoutFugitive.Length > 3)
                 {
-                    EPlayer.GetAccount(player).LoadoutFugitive = "?";
-                    GiveFugitiveWeapons(player);
-                    return;
-                }
+                    LoadoutData loadout = Settings.Loadouts.Find(a => a.Team == 0 && a.Name.Equals(EPlayer.GetAccount(player).LoadoutFugitive));
 
-                if (EPlayer.GetAccount(player).Level < loadout.LevelRequired)
-                {
-                    EPlayer.GetAccount(player).LoadoutFugitive = "?";
-                    GiveFugitiveWeapons(player);
-                    return;
-                }
-
-                if (loadout.Weapons.Count() > 0)
-                {
-                    loadout.Weapons.ForEach((wepar) =>
+                    if ((loadout != null) == false)
                     {
-                        player.GiveWeapon(wepar.Item1, wepar.Item2);
-                    });
-                }
-            }
-            else
-            {
-                player.GiveWeapon(WeaponHash.Pistol, 40);
-                player.GiveWeapon(WeaponHash.Pumpshotgun, 20);
-            }
+                        EPlayer.GetAccount(player).LoadoutFugitive = "?";
+                        GiveFugitiveWeapons(player);
+                        return;
+                    }
 
-            NAPI.Task.Run(() =>
-            {
-                try
-                {
-                    if (player != null && !player.IsNull && EPlayer.GetAccount(player).WeaponComponents != null && EPlayer.GetAccount(player).WeaponComponents.Length > 3)
+                    if (EPlayer.GetAccount(player).Level < loadout.LevelRequired)
                     {
-                        Dictionary<ulong, wComponentData> weaponCompsData = new Dictionary<ulong, wComponentData>();
-                        weaponCompsData = NAPI.Util.FromJson<Dictionary<ulong, wComponentData>>(EPlayer.GetAccount(player).WeaponComponents);
+                        EPlayer.GetAccount(player).LoadoutFugitive = "?";
+                        GiveFugitiveWeapons(player);
+                        return;
+                    }
 
-                        foreach (KeyValuePair<ulong, wComponentData> i in weaponCompsData)
+                    if (loadout.Weapons.Count() > 0)
+                    {
+                        loadout.Weapons.ForEach((wepar) =>
                         {
-                            if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
+                            player.GiveWeapon(wepar.Item1, wepar.Item2);
+                        });
+                    }
+                }
+                else
+                {
+                    player.GiveWeapon(WeaponHash.Pistol, 40);
+                    player.GiveWeapon(WeaponHash.Pumpshotgun, 20);
+                }
+
+                NAPI.Task.Run(() =>
+                {
+                    try
+                    {
+                        if (player != null && !player.IsNull && EPlayer.GetAccount(player).WeaponComponents != null && EPlayer.GetAccount(player).WeaponComponents.Length > 3)
+                        {
+                            Dictionary<ulong, wComponentData> weaponCompsData = new Dictionary<ulong, wComponentData>();
+                            weaponCompsData = NAPI.Util.FromJson<Dictionary<ulong, wComponentData>>(EPlayer.GetAccount(player).WeaponComponents);
+
+                            foreach (KeyValuePair<ulong, wComponentData> i in weaponCompsData)
                             {
-                                i.Value.Components.ForEach((ulong comphash) =>
+                                if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
                                 {
-                                    foreach (Player p in RAGE.Entities.Players.All)
+                                    i.Value.Components.ForEach((ulong comphash) =>
                                     {
-                                        if (p.Dimension == player.Dimension)
+                                        foreach (Player p in RAGE.Entities.Players.All)
                                         {
-                                            p.TriggerEvent("AttachWeaponComponent", player, (int)i.Key, (int)comphash);
+                                            if (p.Dimension == player.Dimension)
+                                            {
+                                                p.TriggerEvent("AttachWeaponComponent", player, (int)i.Key, (int)comphash);
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                                }
                             }
                         }
                     }
-                }
-                 catch { }
-            }, 500);
+                    catch { }
+                }, 500);
+            }
 
             return;
         }
