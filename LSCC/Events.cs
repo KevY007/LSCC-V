@@ -1842,7 +1842,7 @@ namespace LSCC
 
                         if (lobby.gameStatus == 1)
                         {
-                            player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, lobby.CollisionCounter);
+                            player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
                         }
                     }
 

@@ -11,6 +11,7 @@ let collisionTime = 0;
 let chaseRunning = false;
 let chaseTimeCur = 0;
 let chaseTimeMax = 390;
+let chaseMode = 0;
 
 let derbyText = null;
 let derbyTimeText = null;
@@ -993,12 +994,13 @@ mp.events.add(
             }
         },
 
-        "StartChaseTimer": (iTimeCur, iTimeMax, collisionDuration) => {
+        "StartChaseTimer": (iTimeCur, iTimeMax, collisionDuration, mode) => {
 
             chaseTimeCur = iTimeCur - 1;
             chaseTimeMax = iTimeMax;
             collisionTime = collisionDuration;
             chaseRunning = true;
+            chaseMode = mode;
         },
 
         "SendNotification": (title, text, attribute, duration) => {

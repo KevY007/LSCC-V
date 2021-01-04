@@ -1823,7 +1823,7 @@ namespace LSCC
 
                             if (p.GetSharedData<int>("InLobby") == lobbyid)
                             {
-                                p.TriggerEvent("StartChaseTimer", 0, Settings.GameRunTime, lobby.CollisionCounter);
+                                p.TriggerEvent("StartChaseTimer", 0, Settings.GameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
                             }
                         }
                     }, delayTime: 2000);
