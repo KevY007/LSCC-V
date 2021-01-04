@@ -337,7 +337,7 @@ namespace LSCC
                             break;
 
                         case DisconnectionType.Timeout:
-                            NAPI.Chat.SendChatMessageToAll("!{#4343FA}[PART] !{#FFFFFF}" + player.Name + " has left the server. !{#4343FA}(Kicked/TimeOut)");
+                            NAPI.Chat.SendChatMessageToAll("!{#4343FA}[PART] !{#FFFFFF}" + player.Name + " has left the server. !{#4343FA}(Kicked/TimedOut)");
                             break;
                     }
 
