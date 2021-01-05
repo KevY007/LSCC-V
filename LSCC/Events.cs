@@ -1522,7 +1522,7 @@ namespace LSCC
         {
             if (weapon == (uint)WeaponHash.Stungun)
             {
-                if (target.GetSharedData<bool>("HasShot") != true)
+                if (target.GetSharedData<bool>("HasShot") != true && player.Position.DistanceTo(target.Position) < 20.0 && !target.IsInVehicle)
                 {
                     LobbyData lobby = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedData<int>("InLobby"));
                     if (lobby != null)

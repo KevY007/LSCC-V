@@ -655,6 +655,11 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                         }
                     }
                 }
+                
+                if(player.weapon == 911657153 && (targetEntity.isInAnyVehicle(false) == true || mp.game.system.vdist2(targetEntity.position.x, 
+                    targetEntity.position.y, targetEntity.position.z, player.position.x, player.position.y, player.position.z) >= 20.0)) {
+                     return true; // Stun Gun no shot if more than 20 meters or target in car.
+                }
 
                 let bone = -1;
                 let previousOffset = 9999;
@@ -719,9 +724,14 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 }
 
                 if(sourceEntity.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && 
-                    targetEntity.getVariable("HasShot") == false && weapon != 911657153) // Shot a fugitive that hasn't shot.
+                    targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
                 {
-                    return true;
+                    if(weapon != 911657153) return true;
+
+                    if(weapon == 911657153 && (targetEntity.isInAnyVehicle(false) == true || mp.game.system.vdist2(targetEntity.position.x, 
+                        targetEntity.position.y, targetEntity.position.z, player.position.x, player.position.y, player.position.z) >= 20.0)) {
+                         return true; // Stun Gun no shot if more than 20 meters or target in car.
+                    }
                 }
             }
         }

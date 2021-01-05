@@ -4054,7 +4054,7 @@ namespace LSCC
                     { "https://static.wikia.nocookie.net/gtawiki/images/2/21/Combat_PDW_HUD_GTA_V_PC.png/revision/latest/scale-to-width-down/128", "Combat PDW", 125 },
                 }) },
                 { "Assassin", 20, 0, NAPI.Util.ToJson(new object[,] {
-                    { "https://static.wikia.nocookie.net/gtawiki/images/8/8f/Pistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Knife", 40 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/9/9a/Knife-GTAVPC-HUD.png/revision/latest/scale-to-width-down/185", "Knife", 40 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/c/c0/Heavy-revolver-mk2-icon.png/revision/latest/scale-to-width-down/128", "Heavy Revolver Mk.II", 15 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/b/ba/AssaultRifleMkII-GTAO-HUDIcon.png/revision/latest/scale-to-width-down/128", "Assault Rifle Mk.II", 120 },
                 }) },

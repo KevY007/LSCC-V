@@ -11,8 +11,3 @@ add a linux script that will keep on restarting server if goes off??
 
 ADD A G THAT IT GOES TO OUTSIDE SEATS FIRST IF HOLDING SHIFT KEY? LOOP FROM MAX SEATS OR SMTH IN REVERSE
 IN SPECIFIC CARS LIKE GRANGER AND FIB GRANGER
-
-cant open parachute idk
-add return wep range under 20 or smth if tase and in car disable to rpomote tase
-
-fix knife weapon icon in loadot bruh
