@@ -635,7 +635,7 @@ namespace LSCC
                     weatherString = "There are chances for a smoggy weather according to reports.";
                     break;
                 case 4:
-                    weatherString = "The weather is reported to be foggy.";
+                    weatherString = "Dense fog tends to collect in the atmosphere, resulting in a low visibility.";
                     break;
                 case 5:
                     weatherString = "A huge overcast has been reported over the sky.";
@@ -644,13 +644,13 @@ namespace LSCC
                     weatherString = "The sky gets darker, cloudy and starts raining, it is advised to drive safe and slow.";
                     break;
                 case 7:
-                    weatherString = "Thunder has been detected, it is advised to stay indoors.";
+                    weatherString = "As the sky roars, a thunderstorm takes place. It is advised to stay indoors.";
                     break;
                 case 8:
-                    weatherString = "The clouds are clearing and the sky gets clearer.";
+                    weatherString = "The rainy atmosphere starts to clear and dark clouds fade.";
                     break;
                 case 9:
-                    weatherString = "The sky is bright and clear, small chances of rain.";
+                    weatherString = "The sky appears to be foggy, as snowflakes start to fall down.";
                     break;
                 default:
                     weatherString = "The atmosphere is clear.";
@@ -1390,9 +1390,17 @@ namespace LSCC
                     {
                         if (player.GetData<bool>("AutoJoin") == false) continue;
 
+                        player.SetSharedData("BustedProgress", 0.0);
+                        player.ResetData("BustSupporters");
+                        player.ResetData("CuffingTarget");
+
+                        if (lobby.gameMode == GameModes.STANDARD)
+                            player.TriggerEvent("showHPBars", 1);
+                        else if(lobby.gameMode == GameModes.BUSTED) 
+                            player.TriggerEvent("showHPBars", 3);
+
                         if (!lobby.Fugitives.Contains(player))
                         {
-                            player.ResetData("CuffingTarget");
                             lobby.Cops.Add(player);
                         }
                     }
@@ -1557,7 +1565,6 @@ namespace LSCC
 
                         player.TriggerEvent("SetActorInvulnerable", false);
                         player.TriggerEvent("CanFallOutOfCar", true);
-                        player.TriggerEvent("showHPBars", 1); // Always show HP Bars.
                         player.ResetData("CuffingTarget");
                         player.SetSharedData("Team", 1);
                     }
@@ -1595,7 +1602,6 @@ namespace LSCC
 
                         player.TriggerEvent("SetActorInvulnerable", false);
                         player.TriggerEvent("CanFallOutOfCar", true);
-                        player.TriggerEvent("showHPBars", 1); // Always show HP Bars.
 
                         player.SetSharedData("VisibleBlip", true);
                         player.ResetData("Handsup");
@@ -1903,7 +1909,7 @@ namespace LSCC
                     {
                         lobby.GameProgress++;
 
-                        if (lobby.GameProgress >= Convert.ToInt32(0.6 * Settings.GameRunTime) && lobby.gameMode == GameModes.BUSTED)
+                        if (lobby.GameProgress >= Convert.ToInt32(0.6 * Settings.GameRunTime) && lobby.gameMode != GameModes.BUSTED)
                         {
                             foreach (Player fugitive in lobby.Fugitives)
                             {
@@ -1956,6 +1962,7 @@ namespace LSCC
                                 {
                                     player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, 0, (short)lobby.gameMode);
 
+                                    player.SetSharedData("BustedProgress", 0.0);
                                     if (!lobby.Cops.Contains(player) && !lobby.Fugitives.Contains(player)) continue;
 
                                     player.SendNotification("~r~Collisions enabled and weapons deployed!", true);

@@ -519,6 +519,8 @@ namespace LSCC
 
                 player.SetSharedData("IsTabbed", false);
 
+                player.SetSharedData("BustedProgress", 0.0);
+
                 player.SetSharedData("Color_R", 255);
                 player.SetSharedData("Color_G", 255);
                 player.SetSharedData("Color_B", 255);

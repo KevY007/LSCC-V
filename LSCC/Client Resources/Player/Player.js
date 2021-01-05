@@ -4,14 +4,14 @@ let camera = null;
 const player = mp.players.local;
 const timerBarLib = require("./Player/Bar.js");
 
-let chaseProgBar = null;
-let chaseProgText = null;
-let collisionText = null;
-let collisionTime = -1;
-let chaseRunning = false;
-let chaseTimeCur = 0;
-let chaseTimeMax = 390;
-let chaseMode = 0;
+var chaseProgBar = null;
+var chaseProgText = null;
+var collisionText = null;
+var collisionTime = -1;
+var chaseRunning = false;
+var chaseTimeCur = 0;
+var chaseTimeMax = 390;
+var chaseMode = 0; // 0= STANDARD | 1= BUSTED | and others as in SCRIPT
 
 let derbyText = null;
 let derbyTimeText = null;
@@ -64,7 +64,11 @@ function getPointToBoneOffset(aimX, aimY, aimZ, boneX, boneY, boneZ) {
 }
 
 setInterval(() => {
-    mp.events.callRemote("UpdateTabbedState", mp.system.isFocused);
+    if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
+    {
+        mp.events.callRemote("UpdateTabbedState", mp.system.isFocused);
+        mp.events.callLocal("TwoSecondsEvent");
+    }
 }, 2000);
 
 mp.keys.bind(0x5A, false, function() {
@@ -221,6 +225,7 @@ mp.events.add('render', () => {
 
             if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
             {
+                mp.events.callLocal("OneSecondEvent");
                 traceLastFunc(`[Players] Parachute_Dive_Check();`);
 
                 if(mp.game.invoke('0x7DCE8BDA0F1C1200', player.handle)) { // Is Ped Parachute Free Falling?
@@ -572,7 +577,7 @@ mp.events.add('render', () => {
                                 {
                                     clickDisable = false; // Stun Gun allow if conditions down don't match.
 
-                                    if(target.isInAnyVehicle(false) == true || calcDist(target.position, player.position) > 32.0) clickDisable = true;
+                                    //if(target.isInAnyVehicle(false) == true || calcDist(target.position, player.position) > 7.5) clickDisable = true;
                                 }
                             }
                         }
@@ -656,8 +661,9 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                 }
                 
                 if(player.weapon == 911657153 && (targetEntity.isInAnyVehicle(false) == true || 
-                calcDist(targetEntity.position, player.position) > 32.0)) {
-                     return true; // Stun Gun no shot if more than 32 meters or target in car.
+                calcDist(targetEntity.position, player.position) > 7.5)) {
+                    mp.game.graphics.notify("~r~Taser out of reach, get closer!");
+                    return true; // Stun Gun no shot if more than 10 meters or target in car.
                 }
 
                 let bone = -1;
@@ -728,9 +734,10 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     if(weapon != 911657153) return true;
 
                     if(weapon == 911657153 && (targetEntity.isInAnyVehicle(false) == true || 
-                        calcDist(targetEntity.position, player.position) > 32.0)) {
+                        calcDist(targetEntity.position, player.position) > 7.5)) {
 
-                        return true; // Stun Gun no shot if more than 32 meters or target in car.
+                        mp.game.graphics.notify("~r~Taser out of reach, get closer!");
+                        return true; // Stun Gun no shot if more than 10 meters or target in car.
                     }
                 }
             }

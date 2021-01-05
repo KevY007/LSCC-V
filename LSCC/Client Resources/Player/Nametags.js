@@ -70,8 +70,9 @@ mp.events.add('playerNametagSet', (target, r, g, b, a, armour) => {
 });
 
 // HPBarStatus (0) := Never show HP & AR bars. (Lobby)
-// HPBarStatus (1) := Always show HP & AR bars. (Copchase?)
-// HPBarStatus (2) := Show only on aim. (DM/Freeroam?)
+// HPBarStatus (1) := Always show HP & AR bars. (Copchase)
+// HPBarStatus (2) := Show only on aim. (DM/Freeroam)
+// HPBarStatus (3) := Show busted progress var. (Busted)
 
 mp.events.add('showHPBars', (status) => {
     showHPStatus = status;
@@ -171,7 +172,6 @@ mp.events.add('render', (nametags) => {
 
                 if(showHPStatus == 1 || (mp.game.player.isFreeAimingAtEntity(player.handle) && showHPStatus == 2))
                 {
-
                     let y2 = y + 0.056;
                     
                     graphics.drawRect(x, y2, width + border * 2, height + border * 2, 0, 0, 0, 200);
@@ -184,6 +184,19 @@ mp.events.add('render', (nametags) => {
                         graphics.drawRect(x, y2, width + border * 2, height + border * 2, 0, 0, 0, 200);
                         graphics.drawRect(x, y2, width, height, 143, 143, 143, 255);
                         graphics.drawRect(x - width / 2 * (1 - armour), y2, width * armour, height, 255, 255, 255, 200);
+                    }
+                }
+                if(showHPStatus == 3)
+                {
+                    if(player.getVariable("BustedProgress") !== undefined && player.getVariable("Team") != undefined && player.getVariable("Team") == 0 && 
+                        player.getVariable("BustedProgress") >= 0.0) // -1.0 is used if busted.
+                    {
+                        health = player.getVariable("BustedProgress") / 100;
+                        let y2 = y + 0.056;
+                        
+                        graphics.drawRect(x, y2, (0.02 + width) + border * 2, (0.003 + height) + border * 2, 0, 0, 0, 200);
+                        graphics.drawRect(x, y2, (0.02 + width), (0.003 + height), 0, 13, 128, 255);
+                        graphics.drawRect(x - (width + 0.02) / 2 * (1 - health), y2, (0.02 + width) * health, (0.003 + height), 92, 95, 242, 200);
                     }
                 }
 

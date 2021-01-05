@@ -377,6 +377,7 @@ namespace LSCC
             }
 
             if (reason == 696988) reasonStr = "handcuffs";
+            if (reason == 696989) reasonStr = "arrest/busted";
 
             if (reasonStr != null)
             {
@@ -427,7 +428,7 @@ namespace LSCC
                 {
                     EPlayer.GrantXP(killer, 1);
 
-                    if (reason != 696988 && player.GetSharedData<int>("Team") == 0 && killer.GetSharedData<int>("Team") == 1 && player.GetSharedData<bool>("HasShot") == false)
+                    if (reason != 696988 && reason != 696989 && player.GetSharedData<int>("Team") == 0 && killer.GetSharedData<int>("Team") == 1 && player.GetSharedData<bool>("HasShot") == false)
                     {
 
                         Vehicle pVeh = null;
@@ -483,7 +484,7 @@ namespace LSCC
                 }
 
 
-                if (reason != 696988 && player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("Team") == killer.GetSharedData<int>("Team"))
+                if (reason != 696988 && reason != 696989 && player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("Team") == killer.GetSharedData<int>("Team"))
                 {
                     if (RAGE.Entities.Players.All.Count(ey => ey.GetSharedData<int>("Team") != -1 && ey.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") &&
                              ey.Position.DistanceTo(player.Position) < 10.0) == 0)
@@ -574,6 +575,10 @@ namespace LSCC
                                         if (reason == 696988)
                                         {
                                             ay.TriggerEvent("pushToKillFeed", $"{killer.Name} has apprehended {player.Name}");
+                                        }
+                                        else if (reason == 696989)
+                                        {
+                                            ay.TriggerEvent("pushToKillFeed", $"{killer.Name} has busted {player.Name}");
                                         }
                                         else ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}");
                                     }
@@ -666,7 +671,7 @@ namespace LSCC
                     }
                 }
                 catch { }
-            }, wasInGame == true ? 10000 : 3000);
+            }, (wasInGame == true && reason != 696989) ? 15000 : 3000);
         }
 
         [ServerEvent(Event.ChatMessage)]
@@ -1636,11 +1641,89 @@ namespace LSCC
             return;
         }
 
+        [RemoteEvent("BustProgress")]
+        public void OnPlayerBustProgress(Player cop, Player fugitive, float distance) // Triggers every 100ms a cop is near fugitive
+        {
+            if (!EPlayer.LoggedIn(cop) || !EPlayer.LoggedIn(fugitive)) return;
+
+            if (fugitive.GetSharedData<float>("BustedProgress") == -1.0) return;
+
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == cop.GetSharedData<int>("InLobby") && lobby.gameMode == GameModes.BUSTED);
+            if (lobby == null) return;
+
+            if (!lobby.Cops.Contains(cop) || !lobby.Fugitives.Contains(fugitive)) return;
+
+            List<ushort> bustSupporters = fugitive.HasData("BustSupporters") ? fugitive.GetData<List<ushort>>("BustSupporters") : new List<ushort>();
+
+            if (!bustSupporters.Contains(cop.Id)) bustSupporters.Add(cop.Id);
+
+            fugitive.SetData("BustSupporters", bustSupporters);
+
+            double rate = 0.5;
+
+            if (distance <= 3.5) rate = 1.0;
+            else if (distance <= 5.0) rate = 0.75;
+            else if (distance <= 10.0) rate = 0.5;
+
+            fugitive.SetSharedData("BustedProgress", fugitive.GetSharedData<float>("BustedProgress") + rate);
+
+            if (fugitive.GetSharedData<float>("BustedProgress") >= 100.0)
+            {
+                lobby.Fugitives.Remove(fugitive);
+                fugitive.SetSharedData("BustedProgress", -1.0);
+
+                foreach (Player assist in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                {
+                    if (!bustSupporters.Contains(assist.Id) || assist.Id == cop.Id) continue;
+
+                    EPlayer.GrantXP(assist, 5);
+                    assist.SendNotification("~g~+5 XP for helping bust " + fugitive.Name);
+                }
+
+                EPlayer.GrantXP(cop, 7);
+                cop.SendNotification("~g~+7 XP for busting " + fugitive.Name);
+
+                EPlayer.SendMessageInLobby(lobby.lobbyId, $"!{{#ADD8E6}}Fugitive {fugitive.Name} has been busted!");
+
+                Events.OnPlayerDeath(fugitive, cop, 696989); // Reason 696989 = handcuffs/busted (fast respawn).
+            }
+            return;
+        }
+
+        [RemoteEvent("BustRegress")]
+        public void OnPlayerBustRegress(Player fugitive, float closestCop) // Triggers every 100ms a fugitive is without cop and has progress
+        {
+            if (!EPlayer.LoggedIn(fugitive)) return;
+
+            if (fugitive.GetSharedData<float>("BustedProgress") == -1.0) return;
+            
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == fugitive.GetSharedData<int>("InLobby"));
+            if (lobby == null) return;
+
+            if (!lobby.Fugitives.Contains(fugitive) || lobby.gameMode != GameModes.BUSTED) return;
+
+
+            double rate = 1.0;
+            if (closestCop >= 30.0) rate = 2.5;
+            else if (closestCop <= 10.0) rate = 0.5;
+            else if (closestCop <= 15.0) rate = 1.0;
+
+            fugitive.SetSharedData("BustedProgress", fugitive.GetSharedData<float>("BustedProgress") - rate);
+
+            if (fugitive.GetSharedData<float>("BustedProgress") <= 1.0)
+            {
+                fugitive.ResetData("BustSupporters");
+                fugitive.SetSharedData("BustedProgress", 0.0);
+            }
+            return;
+        }
+
         [ServerEvent(Event.PlayerSpawn)]
         public static void OnPlayerSpawn(Player player)
         {
             lock (player)
             {
+                player.SetSharedData("BustedProgress", 0.0);
                 player.ResetData("CuffingTarget");
 
                 if (player.HasData("Cuffed"))
@@ -1843,7 +1926,7 @@ namespace LSCC
 
                         if (lobby.gameStatus == 1)
                         {
-                            player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
+                            player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, lobby.CollisionCounter, (int)lobby.gameMode);
                         }
                     }
 

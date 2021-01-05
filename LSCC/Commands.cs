@@ -419,6 +419,24 @@ namespace LSCC
             return;
         }
 
+        [Command("togblip")]
+        public void cmd_togblip(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (player.GetSharedData<int>("InLobby") != -3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                return;
+            }
+
+            player.SetSharedData("VisibleBlip", !player.GetSharedData<bool>("VisibleBlip"));
+            player.SendChatMessage("!{#FF6347}>> !{#FFFFFF}You have toggled your freeroam blip.");
+
+            return;
+        }
+
         [Command("gps", Alias = "bk")]
         public static void cmd_gps(Player player)
         {
@@ -784,6 +802,8 @@ namespace LSCC
 
                             EPlayer.GrantXP(player, 5);
                             EPlayer.Action(player, $"has grabbed ahold of {target.Name} and slapped the handcuffs on their wrists.");
+
+                            EPlayer.SendMessageInLobby(lobbye.lobbyId, $"!{{#ADD8E6}}Cop {player.Name} has apprehended Fugitive {target.Name}.");
 
                             target.SetAccessories(7, 41, 0); // Handcuffs
 
@@ -2159,6 +2179,7 @@ namespace LSCC
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /derby");
             player.SendChatMessage("!{#28E0DA}[Mode: DM]: /dm /dmarena");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /freeroam /veh /customvehlist /teleport /mytime /myweather");
+            player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /togblip");
             player.SendChatMessage("!{#A5A8A8}[Dbg/Test/Misc]: /pos /updaterate /lcmenu /info /fontsize");
 
             if (EPlayer.GetAccount(player).DonatorLevel >= 1)
