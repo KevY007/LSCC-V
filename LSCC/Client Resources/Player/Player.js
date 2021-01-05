@@ -657,8 +657,8 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                 }
                 
                 if(player.weapon == 911657153 && (targetEntity.isInAnyVehicle(false) == true || mp.game.system.vdist2(targetEntity.position.x, 
-                    targetEntity.position.y, targetEntity.position.z, player.position.x, player.position.y, player.position.z) >= 20.0)) {
-                     return true; // Stun Gun no shot if more than 20 meters or target in car.
+                    targetEntity.position.y, targetEntity.position.z, player.position.x, player.position.y, player.position.z) > 32.0)) {
+                     return true; // Stun Gun no shot if more than 32 meters or target in car.
                 }
 
                 let bone = -1;
@@ -729,8 +729,8 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     if(weapon != 911657153) return true;
 
                     if(weapon == 911657153 && (targetEntity.isInAnyVehicle(false) == true || mp.game.system.vdist2(targetEntity.position.x, 
-                        targetEntity.position.y, targetEntity.position.z, player.position.x, player.position.y, player.position.z) >= 20.0)) {
-                         return true; // Stun Gun no shot if more than 20 meters or target in car.
+                        targetEntity.position.y, targetEntity.position.z, player.position.x, player.position.y, player.position.z) > 32.0)) {
+                         return true; // Stun Gun no shot if more than 32 meters or target in car.
                     }
                 }
             }
