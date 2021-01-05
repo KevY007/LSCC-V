@@ -351,8 +351,8 @@ mp.events.add('render', () => {
 
                         mp.vehicles.forEach(target => {
                             mp.vehicles.forEach(target2 => {
-                                target.setNoCollision(target2.handle, true);
-                                target2.setNoCollision(target.handle, true);
+                                target.setNoCollision(target2.handle, false);
+                                target2.setNoCollision(target.handle, false);
         
                                 target2.setInvincible(false);
                                 target.setInvincible(false);
@@ -366,8 +366,8 @@ mp.events.add('render', () => {
 
                         mp.vehicles.forEach(target => {
                             mp.vehicles.forEach(target2 => {
-                                target.setNoCollision(target2.handle, false);
-                                target2.setNoCollision(target.handle, false);
+                                target.setNoCollision(target2.handle, true);
+                                target2.setNoCollision(target.handle, true);
         
                                 target.setCanBeDamaged(true);
                                 target2.setCanBeDamaged(true);
