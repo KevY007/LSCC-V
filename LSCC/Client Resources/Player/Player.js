@@ -7,7 +7,7 @@ const timerBarLib = require("./Player/Bar.js");
 let chaseProgBar = null;
 let chaseProgText = null;
 let collisionText = null;
-let collisionTime = 0;
+let collisionTime = -1;
 let chaseRunning = false;
 let chaseTimeCur = 0;
 let chaseTimeMax = 390;
@@ -382,10 +382,36 @@ mp.events.add('render', () => {
                         collisionText.text = TimeFormat(collisionTime);
 
                         collisionText.visible = true;
+
+                        mp.vehicles.forEach(target => {
+                            mp.vehicles.forEach(target2 => {
+                                target.setNoCollision(target2.handle, true);
+                                target2.setNoCollision(target.handle, true);
+        
+                                target2.setInvincible(false);
+                                target.setInvincible(false);
+                            });
+                        });
                     }
-                    else
+                    else if(collisionTime == 0)
                     {
                         collisionText.visible = false;
+                        collisionTime = -1;
+
+                        mp.vehicles.forEach(target => {
+                            mp.vehicles.forEach(target2 => {
+                                target.setNoCollision(target2.handle, false);
+                                target2.setNoCollision(target.handle, false);
+        
+                                target.setCanBeDamaged(true);
+                                target2.setCanBeDamaged(true);
+                                target.setCanBreak(true);
+                                target2.setCanBreak(true);
+        
+                                target2.setInvincible(false);
+                                target.setInvincible(false);
+                            });
+                        });
                     }
                 }
 
@@ -949,37 +975,6 @@ mp.events.add(
         "SetMuteCounter": (time) => {
             currentMuteTime = time;
             lastMuteUpdate = 10;
-        },
-        "ToggleChaseCollisions": (toggle) => {
-            if(toggle)
-            {
-                mp.vehicles.forEach(target => {
-                    mp.vehicles.forEach(target2 => {
-                        target.setNoCollision(target2.handle, true);
-                        target2.setNoCollision(target.handle, true);
-
-                        target2.setInvincible(false);
-                        target.setInvincible(false);
-                    });
-                });
-            }
-            else
-            {
-                mp.vehicles.forEach(target => {
-                    mp.vehicles.forEach(target2 => {
-                        target.setNoCollision(target2.handle, false);
-                        target2.setNoCollision(target.handle, false);
-
-                        target.setCanBeDamaged(true);
-                        target2.setCanBeDamaged(true);
-                        target.setCanBreak(true);
-                        target2.setCanBreak(true);
-
-                        target2.setInvincible(false);
-                        target.setInvincible(false);
-                    });
-                });
-            }
         },
 
         "SetActorInvulnerable": (toggle) => {

@@ -1793,7 +1793,6 @@ namespace LSCC
                                 data.Item1.SetIntoVehicle(data.Item2, data.Item3);
                                 EPlayer.Freeze(data.Item1, false);
 
-                                data.Item1.TriggerEvent("ToggleChaseCollisions", false);
                                 data.Item1.SetSharedData("HasShot", false);
                             }
                         }
@@ -1842,7 +1841,6 @@ namespace LSCC
                             {
                                 if (p != null && p.Exists)
                                 {
-                                    p.TriggerEvent("ToggleChaseCollisions", false);
                                     if (p.HasData("putVehicle")) p.SetIntoVehicle(p.GetData<Vehicle>("putVehicle"), p.GetData<int>("putVehicleSeat"));
                                 }
                             }
@@ -1859,7 +1857,6 @@ namespace LSCC
                             {
                                 if (p != null && p.Exists)
                                 {
-                                    p.TriggerEvent("ToggleChaseCollisions", false);
                                     if (p.HasData("putVehicle")) p.SetIntoVehicle(p.GetData<Vehicle>("putVehicle"), p.GetData<int>("putVehicleSeat"));
                                 }
                             }
@@ -1952,10 +1949,11 @@ namespace LSCC
                             {
                                 foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
                                 {
+                                    player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, 0, (short)lobby.gameMode);
+
                                     if (!lobby.Cops.Contains(player) && !lobby.Fugitives.Contains(player)) continue;
 
-                                    player.TriggerEvent("ToggleChaseCollisions", true);
-                                    NAPI.Notification.SendNotificationToPlayer(player, $"~r~Collisions enabled and weapons deployed!", true);
+                                    player.SendNotification("~r~Collisions enabled and weapons deployed!", true);
 
                                     if (lobby.Cops.Contains(player))
                                     {
