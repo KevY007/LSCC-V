@@ -55,7 +55,6 @@ function calcDist(v1, v2) {
     );
 }
 
-
 function getPointToBoneOffset(aimX, aimY, aimZ, boneX, boneY, boneZ) {
     let xDif = (aimX - boneX) < 0 ? -(aimX - boneX) : aimX - boneX;
     let yDif = (aimY - boneY) < 0 ? -(aimY - boneY) : aimY - boneY;
@@ -67,46 +66,6 @@ function getPointToBoneOffset(aimX, aimY, aimZ, boneX, boneY, boneZ) {
 setInterval(() => {
     mp.events.callRemote("UpdateTabbedState", mp.system.isFocused);
 }, 2000);
-
-
-
-mp.keys.bind(
-    71,
-    false,
-    () => {
-        if (mp.players.local.vehicle === null && chatStatus == false) {
-            let playerPos = mp.players.local.position;
-            let vehHandle = mp.game.vehicle.getClosestVehicle(playerPos.x, playerPos.y, playerPos.z, 30, 0, 70);
-            let vehicle = mp.vehicles.atHandle(vehHandle);
-
-            if (vehicle !== null) {
-                traceLastFunc(`[Players] Attempt passenger-enter on veh`);
-
-                let seat_pside_r = vehicle.getWorldPositionOfBone(vehicle.getBoneIndexByName("seat_pside_r"));
-                let seat_pside_f = vehicle.getWorldPositionOfBone(vehicle.getBoneIndexByName("seat_pside_f"));
-                let seat_dside_r = vehicle.getWorldPositionOfBone(vehicle.getBoneIndexByName("seat_dside_r"));
-                let seat_r = vehicle.getWorldPositionOfBone(vehicle.getBoneIndexByName("seat_r"));
-
-                let distance = calcDist(playerPos, seat_pside_r);
-                let seat = 2;
-                if (vehicle.isSeatFree(0) && calcDist(playerPos, seat_pside_f) < distance) {
-                    distance = calcDist(playerPos, seat_pside_f);
-                    seat = 0;
-                }
-                if (vehicle.isSeatFree(1) && calcDist(playerPos, seat_dside_r) < distance) {
-                    distance = calcDist(playerPos, seat_dside_r);
-                    seat = 1;
-                }
-                if (vehicle.isSeatFree(3) && calcDist(playerPos, seat_r) < distance) {
-                    seat = 3;
-                }
-
-                if (vehicle.isSeatFree(seat))
-                    mp.players.local.taskEnterVehicle(vehHandle, 5000, seat, 2.0, 1, 0);
-            }
-        }
-    }
-);
 
 mp.keys.bind(0x5A, false, function() {
     if(chatStatus == false)
@@ -276,7 +235,7 @@ mp.events.add('render', () => {
                     {
                         const playerPos = target.position;
                         var localPos = mp.players.local.position;
-                        let dist = mp.game.system.vdist(playerPos.x, playerPos.y, playerPos.z, localPos.x, localPos.y, localPos.z);
+                        let dist = calcDist(playerPos, localPos);
                         
                         if(dist > MaxVoiceRange) {
                             if(target.getVariable("VoiceMode") == 1) {
@@ -295,7 +254,7 @@ mp.events.add('render', () => {
                     {
                         var position = specTarget.position;
 
-                        if(mp.game.system.vdist2(position.x, position.y, position.z, mp.players.local.position.x, mp.players.local.position.y, mp.players.local.position.z) >= 100 
+                        if(calcDist(position, mp.players.local.position) >= 200 
                         || (specTarget.handle !== 0) == false || specTarget.handle === null || 
                             specTarget.handle === undefined)
                         {
@@ -486,7 +445,7 @@ mp.events.add('render', () => {
 
                     var position = target.position;
 
-                    if(mp.game.system.vdist2(position.x, position.y, position.z, mp.players.local.position.x, mp.players.local.position.y, mp.players.local.position.z) >= 1000.0 
+                    if(calcDist(position, mp.players.local.position) >= 1000.0 
                     || (target.handle !== 0) == false || target.handle === null || 
                         target.handle === undefined || target.position == null || (target.position.x == 0.0 && target.position.z == 0.0))
                     {
@@ -682,8 +641,8 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                     }
                 }
                 
-                if(player.weapon == 911657153 && (targetEntity.isInAnyVehicle(false) == true || mp.game.system.vdist2(targetEntity.position.x, 
-                    targetEntity.position.y, targetEntity.position.z, player.position.x, player.position.y, player.position.z) > 32.0)) {
+                if(player.weapon == 911657153 && (targetEntity.isInAnyVehicle(false) == true || 
+                calcDist(targetEntity, player.position) > 32.0)) {
                      return true; // Stun Gun no shot if more than 32 meters or target in car.
                 }
 
@@ -754,9 +713,10 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 {
                     if(weapon != 911657153) return true;
 
-                    if(weapon == 911657153 && (targetEntity.isInAnyVehicle(false) == true || mp.game.system.vdist2(targetEntity.position.x, 
-                        targetEntity.position.y, targetEntity.position.z, player.position.x, player.position.y, player.position.z) > 32.0)) {
-                         return true; // Stun Gun no shot if more than 32 meters or target in car.
+                    if(weapon == 911657153 && (targetEntity.isInAnyVehicle(false) == true || 
+                        calcDist(targetEntity.position, player.position) > 32.0)) {
+
+                        return true; // Stun Gun no shot if more than 32 meters or target in car.
                     }
                 }
             }
@@ -1021,6 +981,10 @@ mp.events.add(
 
         "playerEnterVehicle": (vehicle, seat) => {
             vehicle.setInvincible(false);
+
+            if(mp.game.vehicle.isThisModelAHeli(vehicle.model) || mp.game.vehicle.isThisModelAPlane(vehicle.model)) {
+                mp.events.callRemote("RequestParachute");
+            }
         },
 
         "InitChaseTimer": () => {

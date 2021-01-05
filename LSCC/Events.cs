@@ -245,14 +245,18 @@ namespace LSCC
             return;
         }
 
-        [ServerEvent(Event.PlayerEnterVehicle)]
-        public void OnPlayerEnterVehicle(Player player, Vehicle vehicle, sbyte seatID)
+        [RemoteEvent("RequestParachute")]
+        public void OnPlayerReqParachute(Player player)
         {
-            if(NAPI.Vehicle.GetVehicleClass((VehicleHash)vehicle.Model) == 16 || NAPI.Vehicle.GetVehicleClass((VehicleHash)vehicle.Model) == 15 ||
-                vehicle.Model == NAPI.Util.GetHashKey("polmav"))
+            if (player.GetWeaponAmmo(WeaponHash.Parachute) < 1)
             {
                 player.GiveWeapon(WeaponHash.Parachute, 1);
             }
+        }
+
+        [ServerEvent(Event.PlayerEnterVehicle)]
+        public void OnPlayerEnterVehicle(Player player, Vehicle vehicle, sbyte seatID)
+        {
         }
 
         [ServerEvent(Event.PlayerDisconnected)]
