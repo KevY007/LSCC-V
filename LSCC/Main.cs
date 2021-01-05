@@ -224,7 +224,7 @@ namespace LSCC
         public const int GameRunTime = 390; // Game Running Time in Seconds before STOP
         public const int MaxLobbies = 5; // Default/starting lobby num.
         public const int DefaultMaxInLobby = 35;
-        public const bool UseDiscord = true;
+        public static bool UseDiscord { get; set; }
 
         // Connection Settings
         public const string MySQL_Host = "localhost";
@@ -840,6 +840,10 @@ namespace LSCC
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Revolver_mk2, 15));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Assaultrifle_mk2, 120));
             new LoadoutData(0, "Assassin", 20, wepList);
+
+
+            if (File.Exists("lscc/disable_discord.txt")) { Settings.UseDiscord = false; NAPI.Util.ConsoleOutput("(LSCC | OPT) Discord Bot is disabled, live commands and statuses not updated!"); }
+            else Settings.UseDiscord = true;
 
             if (Settings.UseDiscord)
             {
