@@ -1820,10 +1820,11 @@ namespace LSCC
                             }
                             else if (lobby.gameMode == GameModes.BUSTED)
                             {
-                                p.SendChatMessage($"!{{#1E9913}}[#] The lobby you are playing is in BUSTED! mode. This game mode is not played like standard copchase...");
-                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this gamemode, you do not receive weapons. You do not fight, rather you EVADE and partake in a true test of skills!");
-                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Cops have to chase/box and stick close to fugitive/vehicle to start busting them, just like in some NFS games but different!");
-                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}More cops would make the busting progress faster! Exceptional drivers will make it.");
+                                p.SendChatMessage($"!{{#1E9913}}[!] ATTENTION: The lobby you're playing is in BUSTED! mode. This is not a standard chase.");
+                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you do not receive weapons nor fight, rather you EVADE and win by skills!");
+                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Cops have to box/stick close to fugitive's to start the busting process.");
+                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}More cops would makes the process a lot faster and the closer you get.");
+                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Fugitive's have to get away to regress the busting progress.");
                             }
                         }
 
@@ -1922,7 +1923,7 @@ namespace LSCC
                                     fugitive.SendChatMessage("!{#FF6347}You have the has shot tag now because the game has progress more than 60%!");
                                 }
                             }
-                            if (lobby.GameProgress == Convert.ToInt32(0.6 * Settings.GameRunTime) && lobby.gameMode == GameModes.BUSTED)
+                            if (lobby.GameProgress == Convert.ToInt32(0.6 * Settings.GameRunTime) && lobby.gameMode != GameModes.BUSTED)
                             {
                                 foreach (Player pl in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
                                 {
