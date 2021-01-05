@@ -1901,23 +1901,24 @@ namespace LSCC
 
                         if (lobby.GameProgress >= Convert.ToInt32(0.6 * Settings.GameRunTime) && lobby.gameMode == GameModes.BUSTED)
                         {
-                            lock (lobby.Fugitives)
+                            foreach (Player fugitive in lobby.Fugitives)
                             {
-                                foreach (Player fugitive in lobby.Fugitives)
+                                if (fugitive.GetSharedData<bool>("HasShot") == false)
                                 {
-                                    if (fugitive.GetSharedData<bool>("HasShot") == false)
-                                    {
-                                        fugitive.SetSharedData("HasShot", true);
-                                        fugitive.SetSharedData("VisibleBlip", true);
-                                        lobby.FugitiveShowCounter = 29; // Set them to VISIBLE
+                                    fugitive.SetSharedData("HasShot", true);
+                                    fugitive.SetSharedData("VisibleBlip", true);
+                                    lobby.FugitiveShowCounter = 29; // Set them to VISIBLE
 
-                                        fugitive.SendChatMessage("!{#FF6347}You have the has shot tag now because the game has progress more than 60%!");
-                                    }
+                                    fugitive.SendChatMessage("!{#FF6347}You have the has shot tag now because the game has progress more than 60%!");
                                 }
                             }
                             if (lobby.GameProgress == Convert.ToInt32(0.6 * Settings.GameRunTime) && lobby.gameMode == GameModes.BUSTED)
                             {
-                                EPlayer.SendMessageInLobby(lobby.lobbyId, "!{#FF6347}[GAME] !{#FFFFFF}60% of the game has elapsed, all fugitives have shot tag now.");
+                                foreach (Player pl in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                {
+                                    pl.SendChatMessage("!{#FF6347}[GAME] !{#FFFFFF}60% of the game has elapsed, all fugitives have shot tag now.");
+                                    pl.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, -1, (short)lobby.gameMode);
+                                }
                             }
                         }
                     }
@@ -1934,7 +1935,7 @@ namespace LSCC
                     {
                         if (lobby.Fugitives.Count() > 0)
                         {
-                            lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)].TriggerEvent("SendLastSeen");
+                            try { lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)].TriggerEvent("SendLastSeen"); } catch { }
                         }
                         lobby.LastSeenCounter = 0;
                     }
@@ -1991,6 +1992,14 @@ namespace LSCC
                                 fugi.SetSharedData("VisibleBlip", true);
 
                                 if (lobby.FugitiveShowCounter == 30) fugi.SendNotification("~r~You are now visible on the radar.", true);
+                            }
+
+                            if(lobby.FugitiveShowCounter == 30 && lobby.GameProgress >= 50)
+                            {
+                                foreach(Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                {
+                                    p.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, -1, (short)lobby.gameMode);
+                                }
                             }
                         }
                     }
