@@ -1948,7 +1948,7 @@ namespace LSCC
                     {
                         lobby.CollisionCounter--;
 
-                        if (lobby.CollisionCounter < 1)
+                        if (lobby.CollisionCounter <= 0)
                         {
                             lock (Settings.LoggedInPlayers)
                             {

@@ -261,7 +261,7 @@ mp.events.add('render', () => {
                     {
                         var position = specTarget.position;
 
-                        if(calcDist(position, mp.players.local.position) >= 200 
+                        if(calcDist(position, mp.players.local.position) >= 200.0 
                         || (specTarget.handle !== 0) == false || specTarget.handle === null || 
                             specTarget.handle === undefined)
                         {
@@ -477,7 +477,7 @@ mp.events.add('render', () => {
         traceLastFunc(`[Players] Update Completed`);
     }
 
-    if(Date.now() - targetChecker >= 125 && player.getVariable("Team") !== undefined && player.getVariable("Team") != -1)
+    if(Date.now() - targetChecker >= 75 && player.getVariable("Team") !== undefined && player.getVariable("Team") != -1)
     {
         targetChecker = Date.now();
 
@@ -549,7 +549,7 @@ mp.events.add('render', () => {
                             }
 
                             if(player.getVariable("Team") == 1 && target.getVariable("Team") == 0 && 
-                                target.getVariable("HasShot") == false && player.weapon != 911657153) // Disable click for fugi with no tag
+                                target.getVariable("HasShot") == false) // Disable click for fugi with no tag
                             {
                                 clickDisable = true;
 
@@ -566,6 +566,13 @@ mp.events.add('render', () => {
                                             }
                                         });
                                     }
+                                }
+
+                                if(player.weapon == 911657153) 
+                                {
+                                    clickDisable = false; // Stun Gun allow if conditions down don't match.
+
+                                    if(target.isInAnyVehicle(false) == true || calcDist(target.position, player.position) > 32.0) clickDisable = true;
                                 }
                             }
                         }
@@ -649,7 +656,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                 }
                 
                 if(player.weapon == 911657153 && (targetEntity.isInAnyVehicle(false) == true || 
-                calcDist(targetEntity, player.position) > 32.0)) {
+                calcDist(targetEntity.position, player.position) > 32.0)) {
                      return true; // Stun Gun no shot if more than 32 meters or target in car.
                 }
 
