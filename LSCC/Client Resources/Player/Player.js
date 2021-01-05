@@ -221,6 +221,13 @@ mp.events.add('render', () => {
 
             if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
             {
+                traceLastFunc(`[Players] Parachute_Dive_Check();`);
+
+                if(mp.game.invoke('0x7DCE8BDA0F1C1200', player.handle)) { // Is Ped Parachute Free Falling?
+                    traceLastFunc(`[Players] Parachute_Open();`);
+                    mp.game.invoke('0x16E42E800B472221', player.handle); // Force Open Parachute (( 1.1 Bug where you can't open ))
+                }
+
                 traceLastFunc(`[Players] Update Stream Data`);
                 mp.events.callRemote("UpdateStreamData");
 

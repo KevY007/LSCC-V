@@ -248,10 +248,7 @@ namespace LSCC
         [RemoteEvent("RequestParachute")]
         public void OnPlayerReqParachute(Player player)
         {
-            if (player.GetWeaponAmmo(WeaponHash.Parachute) < 1)
-            {
-                player.GiveWeapon(WeaponHash.Parachute, 1);
-            }
+            player.GiveWeapon(WeaponHash.Parachute, 1);
         }
 
         [ServerEvent(Event.PlayerEnterVehicle)]
