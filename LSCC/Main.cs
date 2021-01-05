@@ -1045,7 +1045,10 @@ namespace LSCC
                                         {
                                             lobby.gameStatus = 2;
 
-                                            NAPI.Chat.SendChatMessageToAll($"!{{#FFFF00}}[Lobby {lobby.lobbyId}] !{{#FFFFFF}}Copchase will start in 10 seconds... ({pCount} players)");
+                                            if(lobby.gameMode == GameModes.STANDARD)
+                                                NAPI.Chat.SendChatMessageToAll($"!{{#FFFF00}}[Lobby {lobby.lobbyId}] !{{#FFFFFF}}Copchase will start in 10 seconds... ({pCount} players)");
+                                            else if(lobby.gameMode == GameModes.BUSTED)
+                                                NAPI.Chat.SendChatMessageToAll($"!{{#FFFF00}}[Lobby {lobby.lobbyId}] !{{#FFFFFF}}BUSTED! mode will start in 10 seconds... ({pCount} players)");
 
                                             foreach (Player player in Settings.LoggedInPlayers)
                                             {
@@ -1795,7 +1798,10 @@ namespace LSCC
                             }
                         }
 
-                        NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] Copchase started with !{{#8D8DFF}}{lobby.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{lobby.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{map.Name}!{{#FFFFFF}}.");
+                        if(lobby.gameMode == GameModes.STANDARD)
+                            NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] Copchase started with !{{#8D8DFF}}{lobby.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{lobby.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{map.Name}!{{#FFFFFF}}.");
+                        else if(lobby.gameMode == GameModes.BUSTED)
+                            NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] Mode BUSTED! started with !{{#8D8DFF}}{lobby.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{lobby.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{map.Name}!{{#FFFFFF}}.");
 
                         foreach (Player p in RAGE.Entities.Players.All.Where(p => lobby.Cops.Contains(p) || lobby.Fugitives.Contains(p)))
                         {
@@ -1863,7 +1869,7 @@ namespace LSCC
 
 
                     lobby.gameStatus = 1;
-                    NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Game has been started with {lobby.Cops.Count} cops & {lobby.Fugitives.Count} fugitives on map {map.Name}.");
+                    NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Mode {ConvertGameMode(lobby.gameMode)} has been started with {lobby.Cops.Count} cops & {lobby.Fugitives.Count} fugitives on map {map.Name}.");
                 }
                 catch {
                     NAPI.Util.ConsoleOutput("Exception in startgame, ctx: " + crashcheck);
