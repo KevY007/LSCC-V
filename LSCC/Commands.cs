@@ -1627,7 +1627,7 @@ namespace LSCC
 
                 player.SendChatMessage($">> !{{#DAA520}}Lobby {lobby.lobbyId} | {enabledStr} " +
                     $"!{{#DAA520}}| Players: " +
-                    $"{Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId)} | Status: {Main.ConvertGameStatus(lobby.gameStatus)} | Mode: {Main.ConvertGameMode(lobby.gameMode)}");
+                    $"{Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId)}/{Settings.MaxPlayersInLobby} | Status: {Main.ConvertGameStatus(lobby.gameStatus)} | Mode: {Main.ConvertGameMode(lobby.gameMode)}");
             }
 
             return;
