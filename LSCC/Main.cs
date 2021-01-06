@@ -232,10 +232,7 @@ namespace LSCC
         public const string MySQL_Password = "perkovicMatko3035";
         public const string MySQL_Database = "lsccv";
         public const string DCBotToken = "NjAyNTQ1Mzc0MDY1OTgzNTgw.XtaCEQ.clpqVL5c0X_38xkT-mYTr4_N9a4";
-        public const ulong DCServerID = 713731146072064040;
-        public const ulong DCCountID = 717405966123139104;
-        public const ulong DCGamesID = 717408461083639870;
-
+        
         // Global Variables (changing accordingly)
         public static List<LobbyData> Lobbies { get; set; }
         public static List<Player> LoggedInPlayers { get; set; }
@@ -251,6 +248,16 @@ namespace LSCC
         public static long LastCountUpdate { get; set; }
         public static List<LoadoutData> Loadouts { get; set; }
         public static Dictionary<ulong, jWeaponData> WeaponData { get; set; }
+
+        // Discord Stuff
+        public const ulong DCServerID = 713731146072064040;
+        public const ulong DCCountID = 717405966123139104;
+        public const ulong DCGamesID = 717408461083639870;
+        public const ulong DCMentionRoleID = 796386517525725224;
+        public const ulong DCMentionRoleChan = 796389588880588830;
+        public static long DCMentionTime { get; set; }
+        public static int DCMentionPlayers { get; set; }
+
 
 
         public static class Timers
@@ -785,6 +792,9 @@ namespace LSCC
             Settings.AutoSaveTick = Environment.TickCount64;
             Settings.LastMessageTick = Environment.TickCount64;
 
+            Settings.DCMentionTime = Environment.TickCount64 - 900000;
+            Settings.DCMentionPlayers = 0;
+
             NAPI.World.SetTime(12, 0, 0);
             NAPI.World.SetWeather(Weather.CLOUDS);
 
@@ -945,7 +955,7 @@ namespace LSCC
                 Settings.AutoSaveTick = Environment.TickCount64;
             }
 
-            if(Environment.TickCount64 - Settings.LastMessageTick > 90000)
+            if (Environment.TickCount64 - Settings.LastMessageTick > 90000)
             {
                 string[] msgList = {
                     "If you would like to experience some exclusive and limited features then donate to keep the server running!",
@@ -1124,12 +1134,51 @@ namespace LSCC
                 }
             }
 
-            if (Settings.UseDiscord)
+            if (Settings.UseDiscord && (int)Discord._client.ConnectionState == 2)
             {
                 System.Threading.Tasks.Task.Run(() =>
                 {
-                    if (Environment.TickCount64 - Settings.LastCountUpdate >= 120000 &&
-                        (int)Discord._client.ConnectionState == 2)
+                    if (Settings.LoggedInPlayers.Count <= 1 && Settings.DCMentionTime > Environment.TickCount64) // Mention time is high but don't have pb
+                        Settings.DCMentionTime = Environment.TickCount64 - 600000; // Allow it to mention again next time players after 5 mins.
+
+                    if (Environment.TickCount64 - Settings.DCMentionTime >= 900000) // 15 mins passed?
+                    {
+                        if (Settings.LoggedInPlayers.Count >= 2)
+                        {
+                            if (Settings.LoggedInPlayers.Count >= (Settings.DCMentionPlayers * 2) || Settings.DCMentionPlayers == 0) // Players doubled
+                            {
+                                // trigger
+                                foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
+                                {
+                                    var botchan = guild.TextChannels.First(a => a.Id == Settings.DCMentionRoleChan);
+
+                                    if (botchan != null)
+                                    {
+                                        string playerDiff = "0";
+                                        if (Settings.LoggedInPlayers.Count - Settings.DCMentionPlayers >= 0)
+                                        {
+                                            playerDiff = $"+{Settings.LoggedInPlayers.Count - Settings.DCMentionPlayers}";
+                                        }
+                                        else playerDiff = $"{Settings.LoggedInPlayers.Count - Settings.DCMentionPlayers}";
+
+                                        botchan.SendMessageAsync($"<@&{Settings.DCMentionRoleID}> **There are {Settings.LoggedInPlayers.Count} players ingame.** \n" +
+                                            $"Last proper update: **{(Environment.TickCount64 - Settings.DCMentionTime) / 1000}s** ago. | " +
+                                            $"Last update players: **{Settings.DCMentionPlayers}** ({playerDiff} since before)");
+                                    }
+                                }
+
+                                Settings.DCMentionTime = Environment.TickCount64;
+
+                                Settings.DCMentionPlayers = Settings.LoggedInPlayers.Count;
+                            }
+                            else {
+                                Settings.DCMentionPlayers = (Settings.LoggedInPlayers.Count / 2); // Half the players, but next time mention in 30 mins.
+                                Settings.DCMentionTime = Environment.TickCount64 + (1800000 - 900000); // Mention next in half an hour unless PB drops.
+                            }
+                        }
+                        else Settings.DCMentionPlayers = Settings.LoggedInPlayers.Count;
+                    }
+                    if (Environment.TickCount64 - Settings.LastCountUpdate >= 120000)
                     {
                         Settings.LastCountUpdate = Environment.TickCount64;
 
