@@ -6,15 +6,20 @@
 <hr>Based on C# server-side and JavaScript client-side, it can be classified as a hybrid script that utilises two different languages, with of course HTML & CSS at frontend- UI pages.</hr>
 
 <br>
-Credits:
+</br>
 
-KevY - Everything in this script has been written by KevY as an individual, alone without any external or 'partners' in this project except some UI/ problem workarounds & related.
 
-GTA.World - Some clientside code preferred by players to use with other server's such as their 'G to enter as passenger' code (LSHIFT + G for options) & idea on how to use /spec.
+# Credits:
 
-RotX - User Interface and some front-end stuff such as HTML based selection menus, displays, progress bar etc.
+**KevY - Everything in this script has been written by KevY as an individual, alone without any external or 'partners' in this project except some UI/ problem workarounds & related.**
 
-Not to mention RAGE:MP wiki even though at the time the documentation was VERY POOR and there was minimal to non existent support.
+**GTA.World - Some clientside code preferred by players to use with other server's such as their 'G to enter as passenger' code (LSHIFT + G for options) & idea on how to use /spec.**
+
+**RotX - User Interface and some front-end stuff such as HTML based selection menus, displays, progress bar etc.**
+
+*Not to mention RAGE:MP wiki even though at the time the documentation was VERY POOR and there was minimal to non existent support.*
+
+<br>
 </br>
 
 *This repository is not public and intended for private use until and unless permission is given. Code from this repository is not allowed to be used under any circumstances without permission of the author.*
