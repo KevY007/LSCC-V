@@ -14,3 +14,5 @@ showing finger = tag
 keybind changeable for N (save in storage)
 cop model changeable between player custom char and predefined model list or smth (new model var if null and stuf)
 busted changeable by donor on player craed lobby
+add !a in discord
+!kick too and sum
