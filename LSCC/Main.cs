@@ -230,7 +230,7 @@ namespace LSCC
         public const string MySQL_Host = "localhost";
         public const string MySQL_User = "lsccv";
         public const string MySQL_Password = "perkovicMatko3035";
-        public const string MySQL_Database = "lsccv";
+        public const string MySQL_Database = "lscc_ragemp";
         public const string DCBotToken = "NjAyNTQ1Mzc0MDY1OTgzNTgw.XtaCEQ.clpqVL5c0X_38xkT-mYTr4_N9a4";
         
         // Global Variables (changing accordingly)

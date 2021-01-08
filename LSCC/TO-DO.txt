@@ -5,3 +5,4 @@ admin records system
 add a linux script that will keep on restarting server if goes off??
 
 DISALLOW ENTERING PLANES AND HELI AS FUGITIVE
+disable driver db
