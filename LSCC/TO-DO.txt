@@ -16,3 +16,7 @@ cop model changeable between player custom char and predefined model list or smt
 busted changeable by donor on player craed lobby
 add !a in discord
 !kick too and sum
+freecam for trailer or smth ask sharef or client resource script he got form someone
+hide nametags with shift f7
+add default clothes to default chars like default cop attire and fugitive attire so they arent naked by default
+attachcomp cmd (+ shows all available if invalid to attach instantly)
