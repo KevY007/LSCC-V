@@ -19,6 +19,7 @@ function getClosestVehicle( position )
 
 // G to ENTER + SHIFT + G to OUTER ENT script from GTAWorld
 
+mp.game.controls.useDefaultVehicleEntering = false;
 mp.keys.bind(71, false, () => 
 {
     if (mp.players.local.vehicle === null && !mp.gui.cursor.visible && !chatStatus)
@@ -37,6 +38,10 @@ mp.keys.bind(71, false, () =>
 
         if (vehicle.isAVehicle()) 
         {
+            if (vehicle.getVariable('locked') !== undefined && vehicle.getVariable('locked') === true) 
+            {
+                return; // No need to calc stuff, vehicle is locked.
+            }
             if (mp.game.vehicle.isThisModelABike(vehicle.model)) 
             {
                 if (vehicle.isSeatFree(0)) 
@@ -279,5 +284,19 @@ mp.keys.bind(71, false, () =>
                 mp.game.invoke('0x9A7D091411C5F684', mp.players.local.handle, vehicle.handle, closestFreeSeatNumber);
             }
         }
+    }
+});
+
+
+// Disable Idle-Cinematic camera (that focuses on random surroundings)
+
+let IdleDate = new Date();
+mp.events.add('render', () => {
+    const dif = new Date().getTime() - IdleDate.getTime();
+    const seconds = dif / 1000;
+
+    if (Math.abs(seconds) > 29.5) {
+        mp.game.invoke(`0xF4F2C0D4EE209E20`); //Clear Idle Timer
+        IdleDate = new Date();
     }
 });
