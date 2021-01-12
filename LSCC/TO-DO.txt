@@ -20,3 +20,12 @@ freecam for trailer or smth ask sharef or client resource script he got form som
 hide nametags with shift f7
 add default clothes to default chars like default cop attire and fugitive attire so they arent naked by default
 attachcomp cmd (+ shows all available if invalid to attach instantly)
+screen shaking effect on level up
+face features dont seem to save like nose cheeks esp on edit
+k/d record
+player.js 721: cant read variable type of null
+derby spawns so much high over time
+radio disabl
+no dm guns sometimes wtf
+can still get tased in car, add in incoming that u cancel it if in car its on incoming
+tablist cursor only at 14 players or more
