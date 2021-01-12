@@ -17,5 +17,4 @@ attachcomp cmd (+ shows all available if invalid to attach instantly)
 screen shaking effect on level up
 face features dont seem to save like nose cheeks esp on edit
 k/d record
-radio disabl
 maybe fix chat scroll manually
