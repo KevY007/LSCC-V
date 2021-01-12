@@ -1340,7 +1340,7 @@ namespace LSCC
                 Arrests = 0,
                 Kills = 1,
                 Deaths = 1,
-                MinutesPlayed = 0.0,
+                MinutesPlayed = 1.0,
                 Warns = 0,
                 Suspended = 0,
                 DonatorLevel = 0,

@@ -605,11 +605,11 @@ namespace LSCC
 
             Account acc = EPlayer.GetAccount(player);
 
-            string KDR = "0.0";
+            double KDR = 0.0;
             if (acc.Kills == 0) acc.Kills = 1;
-            if (acc.Deaths == 0) acc.Deaths = 0;
+            if (acc.Deaths == 0) acc.Deaths = 1;
 
-            KDR = (acc.Kills / acc.Deaths).ToString("{0:.00}");
+            KDR = acc.Kills / acc.Deaths;
 
             target.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} ({acc.SQL_ID}) at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
 
@@ -623,7 +623,7 @@ namespace LSCC
 
             target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Arrests: !{{#cbcfc4}}[{acc.Arrests}] !{{#ffffff}}| !{{#c7eb7f}}Time Played: !{{#cbcfc4}}[{acc.MinutesPlayed / 60.0} hours] ");
 
-            target.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
+            target.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} ({acc.SQL_ID}) at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
 
             EPlayer.GrantXP(target, 0);
             return;
