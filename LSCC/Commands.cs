@@ -2191,7 +2191,7 @@ namespace LSCC
             }
             if (EPlayer.GetAccount(player).DonatorLevel >= 2)
             {
-                player.SendChatMessage("!{#F7EB05}[Silver Donator] /createlobby /deletelobby /setlobbypassword /setlobbyfugitivepercent");
+                player.SendChatMessage("!{#F7EB05}[Silver Donator] /createlobby /deletelobby /setlobbypassword /setlobbyfugitivepercent /lobbymode");
             }
 
             if (EPlayer.GetAccount(player).Admin >= 1) player.SendChatMessage("!{#FF6347}For admin commands, visit /acmds.");
@@ -2550,6 +2550,42 @@ namespace LSCC
             NAPI.Util.ConsoleOutput($"{player.Name} set lobby ID {newLobby.lobbyId} password to {newLobby.Password}");
             player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have set password for lobby ID " + lobbyid + " to " + newLobby.Password);
             Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s password to {newLobby.Password}.**");
+
+            return;
+        }
+
+        [Command("lobbymode", "!{#AFAFAF}[USAGE] setlobbypassword (lobbyid) (mode)", Alias = "setlobbymode", GreedyArg = true)]
+        public void cmd_lobbymode(Player player, int lobbyid, string mode)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Account acc = EPlayer.GetAccount(player);
+
+            if (acc.Admin < 2 && acc.DonatorLevel < 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This command is reserved to donator level 2 and admin level 2+");
+                return;
+            }
+
+            LobbyData newLobby = Settings.Lobbies.Find(a => a.lobbyId == lobbyid && a.PlayerCreated == true);
+
+            if (newLobby == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That lobby ID is invalid or that lobby cannot be edited."); return; }
+
+            if (mode.Equals("standard", StringComparison.OrdinalIgnoreCase))
+            {
+                newLobby.gameMode = GameModes.STANDARD;
+                NAPI.Util.ConsoleOutput($"{player.Name} set lobby ID {newLobby.lobbyId} mode to STANDARD.");
+                player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have set mode for lobby ID " + lobbyid + " to STANDARD.");
+                Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s mode to STANDARD.**");
+            }
+            else if (mode.Equals("busted", StringComparison.OrdinalIgnoreCase))
+            {
+                newLobby.gameMode = GameModes.BUSTED;
+                NAPI.Util.ConsoleOutput($"{player.Name} set lobby ID {newLobby.lobbyId} mode to BUSTED.");
+                player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have set mode for lobby ID " + lobbyid + " to BUSTED.");
+                Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s mode to BUSTED.**");
+            }
+            else { player.SendChatMessage("!{#999999}Proper usage: /lobbymode <lobby id> <mode: 'standard', 'busted'>"); return; }
 
             return;
         }
