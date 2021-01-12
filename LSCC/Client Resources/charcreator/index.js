@@ -672,7 +672,6 @@ mp.events.add("toggleCreator", (active, charData) => {
             genderItem.Index = charData.Gender;
 
             creatorHairMenu.Clear();
-            creatorHairMenu.Refresh();
             fillHairMenu();
             applyCreatorOutfit();
 
