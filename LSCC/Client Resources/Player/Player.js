@@ -231,6 +231,38 @@ mp.events.add('render', () => {
             {
                 mp.events.callLocal("OneSecondEvent");
 
+                traceLastFunc(`[Players] Update Counters/JailTime`);
+
+                if(mp.players.local.getVariable("JailTime") >= 1)
+                {
+                    if(currentJailTime > 0) currentJailTime--;
+                    lastJailUpdate--;
+
+                    if(lastJailUpdate <= 0 || currentJailTime <= 0) // add current too so it unmutes/jails the second it hits 0. aka requests update
+                    {
+                        mp.events.callRemote("RequestCounterUpdate", currentJailTime, 0);
+                        lastJailUpdate = 20;
+                    }
+                }
+                else {
+                    if(currentJailTime > 0) currentJailTime = 0;
+                }
+
+                if(mp.players.local.getVariable("MuteTime") >= 1)
+                {
+                    if(currentMuteTime > 0) currentMuteTime--;
+                    lastMuteUpdate--;
+
+                    if(lastMuteUpdate <= 0 || currentMuteTime <= 0)
+                    {
+                        mp.events.callRemote("RequestCounterUpdate", currentMuteTime, 1);
+                        lastMuteUpdate = 20;
+                    }
+                }
+                else {
+                    if(currentMuteTime > 0) currentMuteTime = 0;
+                }
+
                 traceLastFunc(`[Players] Update Stream Data`);
                 mp.events.callRemote("UpdateStreamData");
 
@@ -382,38 +414,6 @@ mp.events.add('render', () => {
                             });
                         });
                     }
-                }
-
-                traceLastFunc(`[Players] Update Chase Data3`);
-
-                if(mp.players.local.getVariable("JailTime") >= 1)
-                {
-                    if(currentJailTime > 0) currentJailTime--;
-                    lastJailUpdate--;
-
-                    if(lastJailUpdate <= 0 || currentJailTime <= 0) // add current too so it unmutes/jails the second it hits 0. aka requests update
-                    {
-                        mp.events.callRemote("RequestCounterUpdate", currentJailTime, 0);
-                        lastJailUpdate = 20;
-                    }
-                }
-                else {
-                    if(currentJailTime > 0) currentJailTime = 0;
-                }
-
-                if(mp.players.local.getVariable("MuteTime") >= 1)
-                {
-                    if(currentMuteTime > 0) currentMuteTime--;
-                    lastMuteUpdate--;
-
-                    if(lastMuteUpdate <= 0 || currentMuteTime <= 0)
-                    {
-                        mp.events.callRemote("RequestCounterUpdate", currentMuteTime, 1);
-                        lastMuteUpdate = 20;
-                    }
-                }
-                else {
-                    if(currentMuteTime > 0) currentMuteTime = 0;
                 }
 
                 traceLastFunc(`[Players] Update Chase Data Complete`);

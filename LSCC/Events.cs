@@ -1737,6 +1737,14 @@ namespace LSCC
         {
             lock (player)
             {
+                if (EPlayer.GetAccount(player).MuteTime > 0)
+                {
+                    Account acc = EPlayer.GetAccount(player);
+
+                    player.SetSharedData("MuteTime", acc.MuteTime);
+                    player.TriggerEvent("SetMuteCounter", acc.MuteTime);
+                }
+
                 player.SetSharedData("BustedProgress", 0.0);
                 player.ResetData("CuffingTarget");
 
@@ -1807,6 +1815,7 @@ namespace LSCC
                     player.SetData("AutoJoin", false);
                     player.SetSharedData("InLobby", -2);
                     player.SetSharedData("JailTime", acc.JailTime);
+                    player.TriggerEvent("SetJailCounter", acc.JailTime);
                     EPlayer.SetColor(player, new Color(168, 128, 8, 255));
                     player.Position = (Vector3)Settings.VectorJail[0];
                     player.Heading = (float)Settings.VectorJail[1];
@@ -1861,6 +1870,7 @@ namespace LSCC
 
                 if (player.GetSharedData<int>("InLobby") == -4) // Derby
                 {
+                    player.TriggerEvent("SetTimeWeather", 12, 0, 0, 0);
                     player.TriggerEvent("showHPBars", 0); // Never show HP Bars.
 
                     player.SetData("DerbySpawnTick", Environment.TickCount64);
@@ -1923,7 +1933,33 @@ namespace LSCC
                             }
                         }
                         catch { }
+                    }, 350);
+
+                    NAPI.Task.Run(() =>
+                    {
+                        try
+                        {
+                            if (player != null && player.Exists)
+                            {
+                                player.SetIntoVehicle(derbyVeh, 0);
+                                EPlayer.SetColor(player, new Color(250, 191, 62), 0);
+                            }
+                        }
+                        catch { }
                     }, 750);
+
+                    NAPI.Task.Run(() =>
+                    {
+                        try
+                        {
+                            if (player != null && player.Exists)
+                            {
+                                player.SetIntoVehicle(derbyVeh, 0);
+                                EPlayer.SetColor(player, new Color(250, 191, 62), 0);
+                            }
+                        }
+                        catch { }
+                    }, player.Ping + 50);
                 }
 
                 if (player.GetSharedData<int>("InLobby") > -1) // Copchase Lobby
@@ -1966,19 +2002,27 @@ namespace LSCC
 
                         player.TriggerEvent("SetActorInvulnerable", false);
                         player.SetSharedData("VisibleBlip", true);
-                        player.TriggerEvent("showHPBars", 1); // Show if AIMing
-
-                        player.RemoveAllWeapons();
+                        player.TriggerEvent("showHPBars", 2); // Show if AIMing
 
                         player.Dimension = (uint)arenaID + 356 + Convert.ToUInt32(player.GetSharedData<int>("InLobby"));
 
                         EPlayer.SetDiscordStatus(player, $"[Lobby {player.GetSharedData<int>("InLobby")}] DM '{Settings.DMNames[arenaID]}' as {player.Name}");
                         EPlayer.SetColor(player, new Color(179, 179, 179), 100);
 
-                        player.GiveWeapon(WeaponHash.Revolver_mk2, 1000);
-                        player.GiveWeapon(WeaponHash.Pumpshotgun, 1000);
-                        player.GiveWeapon(WeaponHash.Smg_mk2, 1000);
-                        player.GiveWeapon(WeaponHash.Assaultrifle_mk2, 1000);
+                        NAPI.Task.Run(() =>
+                        {
+                            try
+                            {
+                                if (player != null && player.Exists)
+                                {
+                                    player.GiveWeapon(WeaponHash.Revolver_mk2, 1000);
+                                    player.GiveWeapon(WeaponHash.Pumpshotgun, 1000);
+                                    player.GiveWeapon(WeaponHash.Smg_mk2, 1000);
+                                    player.GiveWeapon(WeaponHash.Assaultrifle_mk2, 1000);
+                                }
+                            }
+                            catch { }
+                        }, 250 + player.Ping);
                     }
                 }
             }

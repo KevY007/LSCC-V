@@ -999,7 +999,8 @@ namespace LSCC
             }
 
             if ((player.GetSharedData<int>("InLobby") >= 1 && Settings.Lobbies.Count(lob => lob.lobbyId == player.GetSharedData<int>("InLobby")) == 0 ) ||
-                player.GetSharedData<int>("InLobby") == -1 || player.GetSharedData<int>("InLobby") == -5 && player.GetData<bool>("Creator_Using") == false)
+                player.GetSharedData<int>("InLobby") == -1 || player.GetSharedData<int>("InLobby") == -5 && player.GetData<bool>("Creator_Using") == false && 
+                EPlayer.GetAccount(player).JailTime < 1)
             {
                 player.SetSharedData("InDM", -1);
                 int LobbyToBeIn = Settings.MaxLobbies;
@@ -1055,7 +1056,6 @@ namespace LSCC
 
             EPlayer.Freeze(player, false);
             EPlayer.SetColor(player, new Color(255, 255, 255, 255));
-
         }
 
         public static void SendMessageInLobby(int lobbyid, string message, bool spam = false)
