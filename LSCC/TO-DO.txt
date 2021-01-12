@@ -4,8 +4,6 @@ admin records system
 
 add a linux script that will keep on restarting server if goes off??
 
-DISALLOW ENTERING PLANES AND HELI AS FUGITIVE
-disable driver db
 selectable fugitive cars
 buyammo
 60% to 80% when fugitive cuz killing is easy

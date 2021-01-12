@@ -246,14 +246,28 @@ namespace LSCC
         }
 
         [RemoteEvent("RequestParachute")]
-        public void OnPlayerReqParachute(Player player)
+        public void OnPlayerReqParachute(Player player, Vehicle veh)
         {
             player.GiveWeapon(WeaponHash.Parachute, 1);
+
+            if(player.GetSharedData<int>("Team") == 0 && player.GetSharedData<int>("InLobby") > -1)
+            {
+                if(veh != null)
+                {
+                    if(veh.HasSharedData("Team") && veh.GetSharedData<int>("Team") == 1)
+                    {
+                        player.WarpOutOfVehicle();
+                        player.Position = player.Position.Around(1.0f);
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot get inside a cop plane/chopper as a fugitive due to balance!");
+                    }
+                }
+            }
         }
 
         [ServerEvent(Event.PlayerEnterVehicle)]
         public void OnPlayerEnterVehicle(Player player, Vehicle vehicle, sbyte seatID)
         {
+            
         }
 
         [ServerEvent(Event.PlayerDisconnected)]

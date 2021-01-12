@@ -24,7 +24,7 @@ mp.keys.bind(71, false, () =>
 {
     if (mp.players.local.vehicle === null && !mp.gui.cursor.visible && !chatStatus)
     {
-        const driverSeatId = 0; // CHANGE THIS AS THE DRIVER INDEX CHANGES
+        const driverSeatId = -1; // CHANGE THIS AS THE DRIVER INDEX CHANGES
         const playerPos = mp.players.local.position;
         let closestVeh = getClosestVehicle(playerPos);
 

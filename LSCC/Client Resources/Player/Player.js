@@ -204,14 +204,42 @@ mp.events.addCommand("updaterate", function (rate) {
 });
 
 mp.events.add('render', () => {
-    mp.game.player.restoreStamina(100);
 
-    if(clickDisable) 
-    { 
-        mp.game.controls.disableControlAction(32, 257, true); 
-        mp.game.player.disableFiring(true);
+    if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
+    {
+        mp.game.player.restoreStamina(100);
+
+        if(clickDisable) 
+        { 
+            mp.game.controls.disableControlAction(32, 257, true); 
+            mp.game.player.disableFiring(true);
+        }
+        else { mp.game.controls.enableControlAction(32, 257, true); }
+
+        traceLastFunc(`[Players] render::Parachute_Dive_Check();`);
+
+        if(player.doesExist()) {
+            if(mp.game.invoke('0x7DCE8BDA0F1C1200', player.handle)) // Is Ped Parachute Free Falling?
+            {
+                traceLastFunc(`[Players] Parachute_Open();`);
+                mp.game.invoke('0x16E42E800B472221', player.handle); // Force Open Parachute (( 1.1 Bug where you can't open ))
+            }
+
+            if(player.isInAnyVehicle(false))
+            {
+                if (player.seat !== undefined && player.seat == -1 && player.getVariable("Team") >= 0)
+                {
+                    mp.game.controls.disableControlAction(32, 25, true); 
+                    mp.game.controls.disableControlAction(32, 68, true); 
+                    mp.game.controls.disableControlAction(32, 70, true); 
+                    mp.game.controls.disableControlAction(32, 91, true); 
+                    mp.game.controls.disableControlAction(32, 92, true); 
+                    mp.game.controls.disableControlAction(32, 69, true); 
+                    mp.game.controls.disableControlAction(32, 24, true); 
+                }
+            }
+        }
     }
-    else { mp.game.controls.enableControlAction(32, 257, true); }
 
     if(Date.now() - updateChecker >= updateRate)
     {
@@ -226,12 +254,6 @@ mp.events.add('render', () => {
             if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
             {
                 mp.events.callLocal("OneSecondEvent");
-                traceLastFunc(`[Players] Parachute_Dive_Check();`);
-
-                if(mp.game.invoke('0x7DCE8BDA0F1C1200', player.handle)) { // Is Ped Parachute Free Falling?
-                    traceLastFunc(`[Players] Parachute_Open();`);
-                    mp.game.invoke('0x16E42E800B472221', player.handle); // Force Open Parachute (( 1.1 Bug where you can't open ))
-                }
 
                 traceLastFunc(`[Players] Update Stream Data`);
                 mp.events.callRemote("UpdateStreamData");
@@ -1001,10 +1023,11 @@ mp.events.add(
         },
 
         "playerEnterVehicle": (vehicle, seat) => {
+            player.seat = seat;
             vehicle.setInvincible(false);
 
             if(mp.game.vehicle.isThisModelAHeli(vehicle.model) || mp.game.vehicle.isThisModelAPlane(vehicle.model)) {
-                mp.events.callRemote("RequestParachute");
+                mp.events.callRemote("RequestParachute", vehicle);
             }
         },
 
