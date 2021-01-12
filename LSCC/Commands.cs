@@ -2397,7 +2397,7 @@ namespace LSCC
                 {
                     if (target != null && target.Exists)
                     {
-                        target.Kick("Banned.");
+                        target.Kick();
                     }
                 }
             }, 350);
@@ -2447,7 +2447,7 @@ namespace LSCC
                 {
                     if (target != null && target.Exists)
                     {
-                        target.Kick("Banned.");
+                        target.Kick();
                     }
                 }
             }, 350);

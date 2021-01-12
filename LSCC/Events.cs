@@ -44,7 +44,7 @@ namespace LSCC
                         {
                             if (player != null && player.Exists)
                             {
-                                player.Kick("Banned.");
+                                player.Kick();
                             }
                         }
                         catch { }
@@ -739,7 +739,7 @@ namespace LSCC
 
                 NAPI.Task.Run(() =>
                 {
-                    try { { if (player != null && player.Exists) player.Kick("Banned."); } } catch { }
+                    try { { if (player != null && player.Exists) player.Kick(); } } catch { }
                 }, 350);
 
                 return;
