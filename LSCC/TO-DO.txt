@@ -18,5 +18,4 @@ screen shaking effect on level up
 face features dont seem to save like nose cheeks esp on edit
 k/d record
 radio disabl
-no dm guns sometimes wtf also add random weps in dm (random.next) you know
 maybe fix chat scroll manually
