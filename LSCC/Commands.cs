@@ -210,7 +210,6 @@ namespace LSCC
                 string[] args = action.Split(' ');
                 if (args.Count() > 2)
                 {
-                    int value = 0;
                     int lobbyid = 0;
                     if (!Int32.TryParse(args[1], out lobbyid) || lobbyid < 1 || lobbyid > Settings.Lobbies.Count)
                     {

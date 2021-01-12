@@ -219,6 +219,11 @@ mp.events.add('render', () => {
         traceLastFunc(`[Players] render::Parachute_Dive_Check();`);
 
         if(player.doesExist()) {
+            if(Date.now() - updateChecker >= updateRate)
+            {
+                // output any debug/stuff per update rate so it doesnt spam for debugging purposes
+            }
+
             if(mp.game.invoke('0x7DCE8BDA0F1C1200', player.handle)) // Is Ped Parachute Free Falling?
             {
                 traceLastFunc(`[Players] Parachute_Open();`);
@@ -227,7 +232,7 @@ mp.events.add('render', () => {
 
             if(player.isInAnyVehicle(false))
             {
-                if (player.seat !== undefined && player.seat == -1 && player.getVariable("Team") >= 0)
+                if (player.seat !== undefined && player.seat == -1 && player.weapon != 2725352035 && player.getVariable("Team") >= 0)
                 {
                     mp.game.controls.disableControlAction(32, 25, true); 
                     mp.game.controls.disableControlAction(32, 68, true); 

@@ -200,7 +200,8 @@ mp.events.add('render', (nametags) => {
                     }
                 }
 
-                if(mp.game.player.isFreeAimingAtEntity(player.handle) && mp.players.local.weaponAmmo > 0)
+                if(mp.game.player.isFreeAimingAtEntity(player.handle) && mp.players.local.weaponAmmo > 1 && 
+                    mp.players.local.weapon != 2725352035) // 2725352035 = fist
                 {
                     if(mp.players.local.getVariable("HasShot") == false && mp.players.local.getVariable("Team") == 0 && player.getVariable("Team") == 1)
                     {
