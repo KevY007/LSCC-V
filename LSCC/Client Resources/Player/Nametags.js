@@ -90,7 +90,7 @@ mp.events.add('render', (nametags) => {
     }
 
     if(mp.players.local.getVariable("pLogged") == false) return;
-	
+    
     nametags.forEach(nametag => {
         let [player, x, y, distance] = nametag;
     
@@ -107,96 +107,98 @@ mp.events.add('render', (nametags) => {
                 
                 y -= scale * (0.005 * (screenRes.y / 1080));
 
-                if(player.getVariable("Team") !== undefined && player.getVariable("Team") == 0 && player.getVariable("HasShot") == true)
-                {
-                    mp.game.graphics.drawText("(( THIS PLAYER HAS SHOT ))", [x, y - 0.045],
+                if(renderNametags == true) {
+                    if(player.getVariable("Team") !== undefined && player.getVariable("Team") == 0 && player.getVariable("HasShot") == true)
                     {
-                        font: 0,
-                        color: [237, 212, 52, 255],
-                        scale: [0.3, 0.3],
-                        outline: true
-                    });
-                }
-                
-                if(player.getVariable("IsTabbed") !== undefined && player.getVariable("IsTabbed") == true)
-                {
-                    var typingStr = "(( TABBED ))";
-                    if(timerCount == 0) typingStr = "(( TABBED ))";
-                    else if(timerCount == 1) typingStr = "( TABBED )";
-                    else if(timerCount == 2) timerCount = 0;
-            
-                    mp.game.graphics.drawText(typingStr, [x, y - 0.0250],
-                    {
-                        font: 0,
-                        color: [255, 99, 71, 228],
-                        scale: [0.285, 0.285],
-                        outline: true
-                    });
-                }
-                else if(player.isTypingInTextChat || player.isVoiceActive == true)
-                {
-                    var typingStr = "( ... )";
-                    if(timerCount == 0) typingStr = "( . )";
-                    else if(timerCount == 1) typingStr = "( .. )";
-                    else if(timerCount == 2) typingStr = "( ... )";
-
-                    mp.game.graphics.drawText(typingStr, [x, y - 0.055],
-                    {
-                        font: 0,
-                        color: [228, 240, 48, 228],
-                        scale: [0.335, 0.335],
-                        outline: true
-                    });
-                }
-                    
-                if(player.col)
-                {
-                    mp.game.graphics.drawText(player.name.replace('_', ' '), [x, y],
-                    {
-                    font: 4,
-                    color: [player.col_r, player.col_g, player.col_b, player.col_a],
-                    scale: [0.4, 0.4],
-                    outline: true
-                    });
-                }
-                else
-                {
-                    mp.game.graphics.drawText(player.name.replace('_', ' '), [x, y],
-                    {
-                    font: 4,
-                    color: defaultcolor,
-                    scale: [0.4, 0.4],
-                    outline: true
-                    });
-                }
-
-                if(showHPStatus == 1 || (mp.game.player.isFreeAimingAtEntity(player.handle) && showHPStatus == 2))
-                {
-                    let y2 = y + 0.056;
-                    
-                    graphics.drawRect(x, y2, width + border * 2, height + border * 2, 0, 0, 0, 200);
-                    graphics.drawRect(x, y2, width, height, 176, 12, 12, 255);
-                    graphics.drawRect(x - width / 2 * (1 - health), y2, width * health, height, 245, 73, 73, 200);
-                    
-                    if(armour > 0) 
-                    {
-                        y2 -= 0.012;
-                        graphics.drawRect(x, y2, width + border * 2, height + border * 2, 0, 0, 0, 200);
-                        graphics.drawRect(x, y2, width, height, 143, 143, 143, 255);
-                        graphics.drawRect(x - width / 2 * (1 - armour), y2, width * armour, height, 255, 255, 255, 200);
+                        mp.game.graphics.drawText("(( THIS PLAYER HAS SHOT ))", [x, y - 0.045],
+                        {
+                            font: 0,
+                            color: [237, 212, 52, 255],
+                            scale: [0.3, 0.3],
+                            outline: true
+                        });
                     }
-                }
-                if(showHPStatus == 3)
-                {
-                    if(player.getVariable("BustedProgress") !== undefined && player.getVariable("Team") != undefined && player.getVariable("Team") == 0 && 
-                        player.getVariable("BustedProgress") >= 0.0) // -1.0 is used if busted.
+                    
+                    if(player.getVariable("IsTabbed") !== undefined && player.getVariable("IsTabbed") == true)
                     {
-                        health = player.getVariable("BustedProgress") / 100;
+                        var typingStr = "(( TABBED ))";
+                        if(timerCount == 0) typingStr = "(( TABBED ))";
+                        else if(timerCount == 1) typingStr = "( TABBED )";
+                        else if(timerCount == 2) timerCount = 0;
+                
+                        mp.game.graphics.drawText(typingStr, [x, y - 0.0250],
+                        {
+                            font: 0,
+                            color: [255, 99, 71, 228],
+                            scale: [0.285, 0.285],
+                            outline: true
+                        });
+                    }
+                    else if(player.isTypingInTextChat || player.isVoiceActive == true)
+                    {
+                        var typingStr = "( ... )";
+                        if(timerCount == 0) typingStr = "( . )";
+                        else if(timerCount == 1) typingStr = "( .. )";
+                        else if(timerCount == 2) typingStr = "( ... )";
+
+                        mp.game.graphics.drawText(typingStr, [x, y - 0.055],
+                        {
+                            font: 0,
+                            color: [228, 240, 48, 228],
+                            scale: [0.335, 0.335],
+                            outline: true
+                        });
+                    }
+                        
+                    if(player.col)
+                    {
+                        mp.game.graphics.drawText(player.name.replace('_', ' '), [x, y],
+                        {
+                        font: 4,
+                        color: [player.col_r, player.col_g, player.col_b, player.col_a],
+                        scale: [0.4, 0.4],
+                        outline: true
+                        });
+                    }
+                    else
+                    {
+                        mp.game.graphics.drawText(player.name.replace('_', ' '), [x, y],
+                        {
+                        font: 4,
+                        color: defaultcolor,
+                        scale: [0.4, 0.4],
+                        outline: true
+                        });
+                    }
+
+                    if(showHPStatus == 1 || (mp.game.player.isFreeAimingAtEntity(player.handle) && showHPStatus == 2))
+                    {
                         let y2 = y + 0.056;
                         
-                        graphics.drawRect(x, y2, (0.02 + width) + border * 2, (0.003 + height) + border * 2, 0, 0, 0, 200);
-                        graphics.drawRect(x, y2, (0.02 + width), (0.003 + height), 0, 13, 128, 255);
-                        graphics.drawRect(x - (width + 0.02) / 2 * (1 - health), y2, (0.02 + width) * health, (0.003 + height), 92, 95, 242, 200);
+                        graphics.drawRect(x, y2, width + border * 2, height + border * 2, 0, 0, 0, 200);
+                        graphics.drawRect(x, y2, width, height, 176, 12, 12, 255);
+                        graphics.drawRect(x - width / 2 * (1 - health), y2, width * health, height, 245, 73, 73, 200);
+                        
+                        if(armour > 0) 
+                        {
+                            y2 -= 0.012;
+                            graphics.drawRect(x, y2, width + border * 2, height + border * 2, 0, 0, 0, 200);
+                            graphics.drawRect(x, y2, width, height, 143, 143, 143, 255);
+                            graphics.drawRect(x - width / 2 * (1 - armour), y2, width * armour, height, 255, 255, 255, 200);
+                        }
+                    }
+                    if(showHPStatus == 3)
+                    {
+                        if(player.getVariable("BustedProgress") !== undefined && player.getVariable("Team") != undefined && player.getVariable("Team") == 0 && 
+                            player.getVariable("BustedProgress") >= 0.0) // -1.0 is used if busted.
+                        {
+                            health = player.getVariable("BustedProgress") / 100;
+                            let y2 = y + 0.056;
+                            
+                            graphics.drawRect(x, y2, (0.02 + width) + border * 2, (0.003 + height) + border * 2, 0, 0, 0, 200);
+                            graphics.drawRect(x, y2, (0.02 + width), (0.003 + height), 0, 13, 128, 255);
+                            graphics.drawRect(x - (width + 0.02) / 2 * (1 - health), y2, (0.02 + width) * health, (0.003 + height), 92, 95, 242, 200);
+                        }
                     }
                 }
 
@@ -211,7 +213,7 @@ mp.events.add('render', (nametags) => {
             }
             else
             {
-                if(player.getVariable("Team") == 0 && player.getVariable("HasShot") == true)
+                if(player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && renderNametags == true)
                 {
                     // They out of distance but still try?
                     mp.game.graphics.drawText("(( THIS PLAYER HAS SHOT ))", [x, y],

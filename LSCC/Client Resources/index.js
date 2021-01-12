@@ -1,14 +1,15 @@
-﻿let currentJailTime = 0;
-let lastJailUpdate = 10;
+﻿var currentJailTime = 0;
+var lastJailUpdate = 10;
 
-let chatStatus = false;
-let streetName = null;
-let zoneName = null;
-let showHud = true;
+var chatStatus = false;
+var streetName = null;
+var zoneName = null;
+var showHud = true;
+var renderNametags = true;
 
-let currentMuteTime = 0;
-let lastMuteUpdate = 10;
-let lastFunc = "Init";
+var currentMuteTime = 0;
+var lastMuteUpdate = 10;
+var lastFunc = "Init";
 
 function traceLastFunc(iStr)
 {
