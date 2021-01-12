@@ -46,7 +46,7 @@ mp.events.add('browserDomReady', (ebrowser) => {
 
         // There exists a 'carList.Teams[i]' too now
         for (let i = 0; i < carList.Cars.length; i++) {
-            carbrowser.execute(`addCar("` + carList.Images[i] + `", "` + carList.Cars[i] + `", "Lvl ` + carList.Levels[i] + `", "` + carList.Desc[i] + `", ` + carList.Locked[i] + `);`);
+            carbrowser.execute(`addCar("` + carList.Cars[i] + `", "` + carList.Levels[i] + `", "` + carList.Images[i] + `", "` + carList.Teams[i] + `", ` + carList.Locked[i] + `);`);
         }
     }
 });

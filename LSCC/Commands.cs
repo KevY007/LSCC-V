@@ -2127,18 +2127,21 @@ namespace LSCC
             CarSelectorData a = new CarSelectorData(
             new object[,]
             {
-                { "Default", "images/default.png", 1, 0, "Random starter vehicles" },
-                { "Police Cruiser", "images/polc1.png", 1, 0, "Default Cruiser" },
-                { "Police Cruiser (U)", "images/polc2.png", 1, 2, "Unmarked Variant" },
-                { "Police Bike", "images/policeb.png", 1, 3, "You don't wanna drive this" },
-                { "Police Buffalo", "images/polbufac.png", 1, 5, "Buffalo Police Cruiser" },
-                { "Police Buffalo (U)", "images/polbufac2.png", 1, 10, "Unmarked Variant" },
-                { "Police Caracara", "images/lspdcara.png", 1, 12, "It is what it is" },
-                { "FBI Buffalo", "images/fbibufac.png", 1, 13, "FBI Variant of Buffalo" },
-                { "FBI Granger", "images/fbi2.png", 1, 13, "Space for 8 occupants" },
-                { "Charger '16 (U)", "images/udchall1.png", 1, 15, "Vroom." },
-                { "Chopper", "images/polmav.png", 1, 20, "Police Maverick, Air Support" },
-                { "SWAT Truck", "images/riot.png", 1, 25, "Heavily armored and spacious" },
+                { "Default", "images/default.png", 1, 0 },
+                { "Default", "images/default.png", 0, 0 },
+
+                // Cops
+                { "Police Cruiser", "images/polc1.png", 1, 0 },
+                { "Police Cruiser (U)", "images/polc2.png", 1, 2 },
+                { "Police Bike", "images/policeb.png", 1, 3 },
+                { "Police Buffalo", "images/polbufac.png", 1, 5 },
+                { "Police Buffalo (U)", "images/polbufac2.png", 1, 10 },
+                { "Police Caracara", "images/lspdcara.png", 1, 12 },
+                { "FBI Buffalo", "images/fbibufac.png", 1, 13 },
+                { "FBI Granger", "images/fbi2.png", 1, 13 },
+                { "Charger '16 (U)", "images/udchall1.png", 1, 15 },
+                { "Chopper", "images/polmav.png", 1, 20 },
+                { "SWAT Truck", "images/riot.png", 1, 25 },
             },
             EPlayer.GetAccount(player).Level);
 

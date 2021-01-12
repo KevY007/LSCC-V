@@ -164,7 +164,6 @@ namespace LSCC
         public string[] Images { get; set; }
         public int[] Teams { get; set; }
         public int[] Levels { get; set; }
-        public string[] Desc { get; set; }
         public bool[] Locked { get; set; }
 
         public CarSelectorData(object[,] carData, int level)
@@ -175,7 +174,6 @@ namespace LSCC
             this.Images = new string[numcars];
             this.Teams = new int[numcars];
             this.Levels = new int[numcars];
-            this.Desc = new string[numcars];
             this.Locked = new bool[numcars];
 
             for(int i = 0; i < carData.GetLength(0); i++)
@@ -184,7 +182,6 @@ namespace LSCC
                 this.Images[i] = (string)carData[i, 1];
                 this.Teams[i] = (int)carData[i, 2];
                 this.Levels[i] = (int)carData[i, 3];
-                this.Desc[i] = (string)carData[i, 4];
                 this.Locked[i] = (level >= this.Levels[i] ? false : true);
             }
         }

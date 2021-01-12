@@ -1,86 +1,164 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+
 
     <link rel="stylesheet" href="style.css">
 
-    <title>KevY isn't GAY</title>
+    <title>KevY GAY</title>
 </head>
+
 <body>
-<div class="card mx-auto fixed-bottom mb-4" style="max-width: 57.7rem; max-height: 52.3rem;">
-    <div class="card-header">
-        Vehicle Selection
-        <!--<button type="button" onclick="addCar('car1.png', 'Sultan', '22', 'mrs asdasdsad aasda sdas ')" class="btn btn-success">addCar</button> //Test addCar -->
-        <button type="button" onclick="mp.events.call('hideCarSelector')" class="close" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    <div class="card-body custom-card-body card-scrollbar">
-        <div class="row" id="carshere">
+    <!--<button style="position: absolute; top: 10;"
+        onclick="addCar('Kosatka', '15', './images/car_images/kosatka.png', 1, false)">addCar</button>-->
+    <div class="card card-custom">
+        <div class="card-header text-center">
+            Car Selection<button type="button" onclick="mp.events.call('hideCarSelector')" class="btn-close" aria-label="Close"></button>
+            <br>
+            <ul class="nav nav-pills justify-content-center mt-1" id="pills-tab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link cop-navlink cop-navlink-active active" id="loadout-police-tab"
+                        data-bs-toggle="pill" href="#loadout-police" role="tab" aria-controls="loadout-police"
+                        aria-selected="true">Police</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link fugitive-navlink" id="loadout-fugitive-tab" data-bs-toggle="pill"
+                        href="#loadout-fugitive" role="tab" aria-controls="loadout-fugitive"
+                        aria-selected="false">Fugitive</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body my-custom-scrollbar" style="padding: 0px;">
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="loadout-police" role="tabpanel"
+                    aria-labelledby="loadout-police-tab">
+                    <div class="container-custom">
+                        <div class="row" id="police-shere" style="min-width: 990.59px;">
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="loadout-fugitive" role="tabpanel" aria-labelledby="loadout-fugitive-tab">
+                    <div class="container-custom">
+                        <div class="row" id="fugitive-shere">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
         </div>
     </div>
-    <div class="card-footer">
-    </div>
-</div>
+    <script>
+        function addCar(Name, Level, carImage, Team, Locked) {
 
-<!--<script>
-    function addCar(carImage, carName, levelReq, carDesc) {
-        //Main card
-        let card = document.createElement("div");
-        card.classList.add("card", "custom-car-body");
-        //Car Image
-        let imgElement = document.createElement("img");
-        imgElement.src = carImage;
-        imgElement.setAttribute("class", "card-img-top");
-        card.appendChild(imgElement);
-        //Card Body
-        let cardbody = document.createElement("div");
-        cardbody.setAttribute("class", "card-body");
-        card.appendChild(cardbody);
-        //Car Name & Level
-        //Name
-        let cardCarName = document.createElement("h5");
-        cardCarName.setAttribute("class", "card-title");
-        let cardCarNameText = document.createTextNode(carName + " ");
-        cardCarName.appendChild(cardCarNameText);
-        cardbody.appendChild(cardCarName);
-        //Level
-        let cardCarLevel = document.createElement("span");
-        cardCarLevel.classList.add("badge", "badge-secondary");
-        let cardCarLevelText = document.createTextNode(levelReq);
-        cardCarLevel.appendChild(cardCarLevelText);
-        cardCarName.appendChild(cardCarLevel);
-        //Card Description
-        let cardDesc = document.createElement("p");
-        cardDesc.setAttribute("class", "card-text");
-        let cardDescText =  document.createTextNode(carDesc);
-        cardDesc.appendChild(cardDescText);
-        cardbody.appendChild(cardDesc);
-        //Card Button
-        let cardButton = document.createElement("button");
-        cardButton.type = "button";
-        cardButton.classList.add("btn", "btn-primary");
-        let cardButtonText = document.createTextNode("SELECT");
-        cardButton.appendChild(cardButtonText);
-        cardbody.appendChild(cardButton);
-        //Card END
+            //Main card
+            let card = document.createElement("div");
+            card.classList.add("card", "custom-card");
 
-        document.getElementById("carshere").appendChild(card);
+            //Card header
+            let card_header = document.createElement("div");
+            card_header.classList.add("card-header", "text-center")
+            let card_header_text = document.createTextNode(Name);
+            card_header.appendChild(card_header_text);
 
-    }
-</script>-->
+            //Badge
+            //let level_badge = document.createElement("span");
+            //level_badge.classList.add("badge", "rounded-pill", "bg-secondary", "custom-badge");
+            //let level_badge_text = document.createTextNode(Level);
+            //level_badge.appendChild(level_badge_text);
+            //card_header.appendChild(level_badge);
 
-<!-- Optional JavaScript -->
-<script src="script.js"></script>
-<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+            //Car Image
+            let imgElement = document.createElement("img");
+            imgElement.src = carImage;
+            imgElement.setAttribute("class", "card-img-top");
+            card.appendChild(imgElement);
+
+            card.appendChild(card_header);
+
+            //Card footer
+            let card_footer = document.createElement("div");
+            card_footer.classList.add("card-footer", "text-center");
+            let card_desc = document.createElement("p");
+            card_desc.classList.add("loadout_desc");
+            let equipStr = `This car requires level ${Level} to be equipped.`;
+
+            if (Level == 0) equipStr = `This car has no level requirement to equip.`;
+            let card_desc_text = document.createTextNode(equipStr);
+            card_desc.appendChild(card_desc_text);
+            card_footer.appendChild(card_desc);
+            //Equip button
+            let equip_button = document.createElement("button");
+            let equip_button_text = document.createTextNode("Equip");
+            equip_button.appendChild(equip_button_text);
+
+            if (Locked === true) {
+                equip_button.disabled = true;
+                equip_button.classList.add("btn", "equip-btn-locked");
+            } else {
+                equip_button.classList.add("btn", "equip-btn");
+                equip_button.onclick = function () {
+                    mp.events.call("OnSelectCar", Team, Name);
+                };
+            }
+            card_footer.appendChild(equip_button);
+
+            card.appendChild(card_footer);
+
+            if (Team == 1) {
+                document.getElementById("police-shere").appendChild(card);
+            } else if (Team == 0) {
+                document.getElementById("fugitive-shere").appendChild(card);
+            }
+
+        }
+    </script>
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous">
+    </script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"
+        integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js"
+        integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous">
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"
+        integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+
+    <!-- Button Style JS -->
+    <script>
+        $(".cop-navlink").click(function () {
+            $(".cop-navlink").removeClass("cop-navlink-active");
+            $(".fugitive-navlink").removeClass(
+                "fugitive-navlink-active");
+            $(this).addClass("cop-navlink-active");
+            return false;
+        })
+
+        $(".fugitive-navlink").click(function () {
+            $(".fugitive-navlink").removeClass(
+                "fugitive-navlink-active");
+            $(".cop-navlink").removeClass("cop-navlink-active");
+            $(this).addClass(
+                "fugitive-navlink-active");
+            return false;
+        })
+    </script>
+
 </body>
+
 </html>
