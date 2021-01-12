@@ -24,8 +24,6 @@ let updateRate = 200;
 let specCam = null;
 let specState = false;
 let specTarget = null;
-mp.voiceChat.muted = true;
-let MaxVoiceRange = 50;
 
 let playerBlips = [];
 
@@ -78,33 +76,6 @@ mp.keys.bind(0x5A, false, function() {
 
         mp.events.callRemote("OnScriptedKeyPress", 0x5A, true);
     }
-});
-
-
-mp.keys.bind(0x4E, false, function() {
-    traceLastFunc(`[Players] Disable Voice`);
-
-	mp.events.callRemote("OnScriptedKeyPress", 0x4E, false);
-    mp.voiceChat.muted = true;
-});
-
-mp.keys.bind(0x4E, true, function() {
-	if(!chatStatus && 
-		!(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false)) 
-	{
-        traceLastFunc(`[Players] Enable Voice`);
-
-		mp.voiceChat.muted = false;
-		mp.events.callRemote("OnScriptedKeyPress", 0x4E, true);
-	}
-});
-
-mp.keys.bind(0x09, true, function() {
-	if(!chatStatus && mp.voiceChat.muted == false && 
-		!(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false)) 
-	{
-		mp.events.callRemote("OnScriptedKeyPress", 0x09, true);
-	}
 });
 
 function createCam(x, y, z, rx, ry, rz, viewangle) {

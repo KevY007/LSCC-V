@@ -1594,7 +1594,7 @@ namespace LSCC
             return;
         }
 
-        [Command("clientcmd", Alias = "updaterate,lcmenu,fontsize,rappel", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
+        [Command("clientcmd", Alias = "updaterate,lcmenu,fontsize,rappel,voicebind", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
         public void cmd_clientcmd(Player player)
         {
             return;
@@ -2015,11 +2015,11 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player)) return;
 
             player.SendChatMessage("!{#FF6347} Key: Function.");
-            player.SendChatMessage("!{#FF6347} N: Push to talk voicechat.");
+            player.SendChatMessage("!{#FF6347} N: Push to talk voicechat. (Changed using /voicebind)");
             player.SendChatMessage("!{#FF6347} Z: Toggle GPS as a Cop.");
             player.SendChatMessage("!{#FF6347} O: Toggle scoreboard, displays a scrollbar and mouse if needed.");
             player.SendChatMessage("!{#FF6347} X: Rapple from a helicopter (not all helicopters, try maverick).");
-            player.SendChatMessage("!{#FF6347} Hold N and press TAB: Switch voice chat modes.");
+            player.SendChatMessage("!{#FF6347} Hold voice and press TAB: Switch voice chat modes.");
             player.SendChatMessage("!{#FF6347} F7: Hide/show chat.");
         }
 
@@ -2182,7 +2182,8 @@ namespace LSCC
             player.SendChatMessage("!{#28E0DA}[Mode: DM]: /dm /dmarena");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /freeroam /veh /customvehlist /teleport /mytime /myweather");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /togblip");
-            player.SendChatMessage("!{#A5A8A8}[Dbg/Test/Misc]: /pos /updaterate /lcmenu /info /fontsize");
+            player.SendChatMessage("!{#A5A8A8}[Misc]: /updaterate /info /fontsize /voicebind");
+            player.SendChatMessage("!{#A5A8A8}[Dbg/Test]: /pos /lcmenu");
 
             if (EPlayer.GetAccount(player).DonatorLevel >= 1)
             {
