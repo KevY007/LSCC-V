@@ -649,6 +649,20 @@ mp.events.add("toggleCreator", (active, charData) => {
             creatorCamera.setActive(true);
         }
 
+        creatorMainMenu.Visible = true;
+        mp.gui.chat.show(false);
+        mp.game.ui.displayRadar(false);
+        mp.game.ui.displayHud(false);
+        localPlayer.clearTasksImmediately();
+        localPlayer.freezePosition(true);
+
+        mp.game.cam.renderScriptCams(true, false, 0, true, false);
+
+        localPlayer.model = 0x705E61F2;
+        localPlayer.position = new mp.Vector3(402.8664, -996.4108, -99.00027);
+        localPlayer.heading = -185.0;
+        localPlayer.setAlpha(255);
+
         // update menus with current character data
         if (charData) {
             charData = JSON.parse(charData);
@@ -658,6 +672,7 @@ mp.events.add("toggleCreator", (active, charData) => {
             genderItem.Index = charData.Gender;
 
             creatorHairMenu.Clear();
+            creatorHairMenu.Refresh();
             fillHairMenu();
             applyCreatorOutfit();
 
@@ -667,9 +682,10 @@ mp.events.add("toggleCreator", (active, charData) => {
             similarityItem.Index = parseInt(charData.Parents.Similarity * 100);
             skinSimilarityItem.Index = parseInt(charData.Parents.SkinSimilarity * 100);
             updateParents();
+            
 
             // features
-            for (let i = 0; i < charData.Features.length; i++) {
+            for (let i = 0; i < 20; i++) {
                 featureItems[i].Index = (charData.Features[i] * 100) + 100;
                 updateFaceFeature(i);
             }
@@ -689,26 +705,17 @@ mp.events.add("toggleCreator", (active, charData) => {
             updateHairAndColors();
 
             // appearance
-            for (let i = 0; i < charData.Appearance.length; i++) {
+            for (let i = 0; i < 10; i++) {
                 appearanceItems[i].Index = (charData.Appearance[i].Value == 255) ? 0 : charData.Appearance[i].Value + 1;
                 appearanceOpacityItems[i].Index = charData.Appearance[i].Opacity * 100;
                 updateAppearance(i);
             }
+
+            creatorHairMenu.RefreshIndex();
+            creatorParentsMenu.RefreshIndex();
+            creatorFeaturesMenu.RefreshIndex();
+            creatorAppearanceMenu.RefreshIndex();
         }
-
-        creatorMainMenu.Visible = true;
-        mp.gui.chat.show(false);
-        mp.game.ui.displayRadar(false);
-        mp.game.ui.displayHud(false);
-        localPlayer.clearTasksImmediately();
-        localPlayer.freezePosition(true);
-
-        mp.game.cam.renderScriptCams(true, false, 0, true, false);
-
-        localPlayer.model = 0x705E61F2;
-        localPlayer.position = new mp.Vector3(402.8664, -996.4108, -99.00027);
-        localPlayer.heading = -185.0;
-        localPlayer.setAlpha(255);
 
         applyCreatorOutfit();
     } else {

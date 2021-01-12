@@ -3958,9 +3958,9 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("Team") != -1)
+            if (player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("InLobby") != -4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase!");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase or derby!");
                 return;
             }
 
@@ -3977,6 +3977,7 @@ namespace LSCC
                 {
                     ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
 
+                    player.SetData("cEditClothingData", ConvChar.Clothing);
                     EPlayer.ShowCharCreator(player, ConvChar);
                 }
                 catch { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have a character to edit!"); }

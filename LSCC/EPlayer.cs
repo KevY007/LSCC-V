@@ -73,13 +73,22 @@ namespace LSCC
         public int Glasses { get; set; }
         public int GlassesTxt { get; set; }
 
-        public ClothingData()
+        public ClothingData(int teamID = -1)
         {
             this.Clothes = new AccClothData[12];
 
             for (int i = 0; i < 12; i++)
             {
                 this.Clothes[i] = new AccClothData();
+            }
+
+            if(teamID == 0)
+            {
+
+            }
+            else if(teamID == 1)
+            {
+
             }
 
             Hat = -1;
@@ -113,8 +122,8 @@ namespace LSCC
             this.Appearance = new AppearanceData[10];
             this.Clothing = new ClothingData[2];
             
-            this.Clothing[0] = new ClothingData(); // Fugitive
-            this.Clothing[1] = new ClothingData(); // Cop
+            this.Clothing[0] = new ClothingData(0); // Fugitive
+            this.Clothing[1] = new ClothingData(1); // Cop
 
             for (int i = 0; i < 20; i++)
             {
@@ -303,9 +312,11 @@ namespace LSCC
                 headOverlays.Add(i, b);
             }
 
-            player.SetCustomization(playerChar.Gender == 0, a, playerChar.EyeColor, playerChar.Hair.Color, playerChar.Hair.HighlightColor, playerChar.Features,
-                headOverlays, new Decoration[0]);
+            float[] features = new float[20];
+            features = playerChar.Features;
 
+            player.SetCustomization(playerChar.Gender == 0, a, playerChar.EyeColor, playerChar.Hair.Color, playerChar.Hair.HighlightColor, features,
+                headOverlays, new Decoration[0]);
 
             var clothDictionary = new Dictionary<int, ComponentVariation>();
 
@@ -610,7 +621,7 @@ namespace LSCC
             if (acc.Deaths == 0) acc.Deaths = 1;
 
             KDR = acc.Kills / acc.Deaths;
-
+            
             target.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} ({acc.SQL_ID}) at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
 
             target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Account ID: !{{#cbcfc4}}[{acc.SQL_ID}] !{{#ffffff}}| !{{#c7eb7f}}Email: !{{#cbcfc4}}[{acc.Email}] !{{#ffffff}}| !{{#c7eb7f}}Admin Level: !{{#cbcfc4}}[{acc.Admin}]");
@@ -619,9 +630,9 @@ namespace LSCC
 
             target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Level: !{{#cbcfc4}}[{acc.Level}] !{{#ffffff}}| !{{#c7eb7f}}Experience: !{{#cbcfc4}}[{acc.XP}/{EPlayer.GetMaxLevelXP(acc.Level)}] !{{#ffffff}}| !{{#c7eb7f}}Escapes: !{{#cbcfc4}}[{acc.Escapes}]");
 
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Kills: !{{#cbcfc4}}[{acc.Kills}] !{{#ffffff}}| !{{#c7eb7f}}Deaths: !{{#cbcfc4}}[{acc.Deaths}] !{{#ffffff}}| !{{#c7eb7f}}K/D Ratio: !{{#cbcfc4}}[{KDR}]");
+            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Kills: !{{#cbcfc4}}[{acc.Kills}] !{{#ffffff}}| !{{#c7eb7f}}Deaths: !{{#cbcfc4}}[{acc.Deaths}] !{{#ffffff}}| !{{#c7eb7f}}K/D Ratio: !{{#cbcfc4}}[{Math.Round(KDR, 2, MidpointRounding.AwayFromZero).ToString()}]");
 
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Arrests: !{{#cbcfc4}}[{acc.Arrests}] !{{#ffffff}}| !{{#c7eb7f}}Time Played: !{{#cbcfc4}}[{acc.MinutesPlayed / 60.0} hours] ");
+            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Arrests: !{{#cbcfc4}}[{acc.Arrests}] !{{#ffffff}}| !{{#c7eb7f}}Time Played: !{{#cbcfc4}}[{Math.Round(acc.MinutesPlayed / 60.0, 2, MidpointRounding.AwayFromZero).ToString()} hours] ");
 
             target.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} ({acc.SQL_ID}) at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
 

@@ -827,7 +827,9 @@ namespace LSCC
             pChar.Parents.Similarity = tParentData.Similarity;
             pChar.Parents.SkinSimilarity = tParentData.SkinSimilarity;
 
-            float[] features = NAPI.Util.FromJson<float[]>(featureData);
+            float[] features = new float[20];
+            
+            features = NAPI.Util.FromJson<float[]>(featureData);
 
             for (int i = 0; i < 20; i++)
             {
@@ -838,8 +840,8 @@ namespace LSCC
                 catch { }
             }
 
+            pChar.Appearance = new AppearanceData[10];
             pChar.Appearance = NAPI.Util.FromJson<AppearanceData[]>(appearanceData);
-
             byte[] hairAndCol = NAPI.Util.FromJson<byte[]>(hairAndColorData);
             pChar.Hair.Hair = hairAndCol[0];
             pChar.Hair.Color = hairAndCol[1];
@@ -850,6 +852,13 @@ namespace LSCC
             pChar.BlushColor = hairAndCol[6];
             pChar.LipstickColor = hairAndCol[7];
             pChar.ChestHairColor = hairAndCol[8];
+
+
+            if (player.HasData("cEditClothingData"))
+            {
+                pChar.Clothing = player.GetData<ClothingData[]>("cEditClothingData");
+            }
+            player.ResetData("cEditClothingData");
 
             EPlayer.GetAccount(player).Character = NAPI.Util.ToJson(pChar);
             EPlayer.ApplyCharacter(player, pChar);
