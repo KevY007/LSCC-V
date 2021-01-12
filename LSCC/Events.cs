@@ -1907,7 +1907,7 @@ namespace LSCC
                         Settings.LastDerbyTick = Environment.TickCount64;
                     }
 
-                    Vehicle derbyVeh = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey("brioso"), (Vector3)Settings.DerbySpawns[spawnID, 0], (float)Settings.DerbySpawns[spawnID, 1], rand.Next(255), rand.Next(255), "DERBY", 255, false, true, 500);
+                    Vehicle derbyVeh = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey("dominator"), (Vector3)Settings.DerbySpawns[spawnID, 0], (float)Settings.DerbySpawns[spawnID, 1], rand.Next(255), rand.Next(255), "DERBY", 255, false, true, 500);
                     player.SetData("DerbyVehicle", derbyVeh);
 
                     player.SetIntoVehicle(derbyVeh, 0);
