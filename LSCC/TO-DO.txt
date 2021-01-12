@@ -18,10 +18,6 @@ attachcomp cmd (+ shows all available if invalid to attach instantly)
 screen shaking effect on level up
 face features dont seem to save like nose cheeks esp on edit
 k/d record
-player.js 721: cant read variable type of null
-derby spawns so much high over time
 radio disabl
 no dm guns sometimes wtf also add random weps in dm (random.next) you know
 maybe fix chat scroll manually
-can still get tased in car, add in incoming that u cancel it if in car its on incoming
-tablist cursor only at 14 players or more

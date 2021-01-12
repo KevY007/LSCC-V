@@ -29,7 +29,7 @@ function ToggleScoreboard()
             if(updater != null) clearInterval(updater);
             updater = null;
 
-            if(tablistLen >= 9)
+            if(tablistLen >= 17)
             {
                 mp.gui.cursor.show(false, false);
                 mp.events.call("TogglePlayerChat", true);
@@ -41,7 +41,7 @@ function ToggleScoreboard()
 
             tablistLen = mp.players.length;
 
-            if(tablistLen >= 9)
+            if(tablistLen >= 17)
             {
                 mp.gui.cursor.show(true, true);
                 mp.events.call("TogglePlayerChat", false);
@@ -53,7 +53,7 @@ function ToggleScoreboard()
 
     tablistLen = mp.players.length;
 
-    if(tablistLen >= 9)
+    if(tablistLen >= 17)
     {
         mp.gui.cursor.show(true, true);
         mp.events.call("TogglePlayerChat", false);
@@ -94,7 +94,7 @@ mp.events.add('browserDomReady', (ebrowser) => {
         else if(browser.active) {
             tablistLen = mp.players.length;
 
-            if(tablistLen >= 9)
+            if(tablistLen >= 17)
             {
                 mp.gui.cursor.show(true, true);
                 mp.events.call("TogglePlayerChat", false);
@@ -120,14 +120,14 @@ mp.events.add('browserDomReady', (ebrowser) => {
                 }
                 else if(browser != null && forceOff != true && browser.active)
                 {
-                    if(mp.players.length >= 9 && tablistLen <= 8)
+                    if(mp.players.length >= 17 && tablistLen <= 16)
                     {
                         tablistLen = mp.players.length;
 
                         mp.gui.cursor.show(true, true);
                         mp.events.call("TogglePlayerChat", false);
                     }
-                    else if(mp.players.length <= 8 && tablistLen >= 9)
+                    else if(mp.players.length <= 16 && tablistLen >= 17)
                     {
                         tablistLen = mp.players.length;
                         

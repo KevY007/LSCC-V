@@ -692,10 +692,12 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
 
 mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weapon, boneIndex, damage) => {
 
-    if(targetEntity.type === 'player' && targetEntity == player)
+    if(targetEntity !== null && targetEntity !== undefined && targetEntity.type === 'player' && targetEntity == player)
     {
-        if(sourceEntity.type === 'player')
+        if(sourceEntity !== null && sourceEntity !== undefined && sourceEntity.type === 'player')
         {
+            if(weapon == 911657153 && targetEntity.isInAnyVehicle(false)) return true; // Disable stun if in car.
+
             if(sourceEntity.getVariable("Team") != -1 && player.getVariable("Team") != -1)
             {
                 if(player.getVariable("Team") == sourceEntity.getVariable("Team"))
@@ -715,9 +717,9 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
 
 mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage) => {
 
-    if(sourceEntity.type === 'player' && sourceEntity == player && player.getVariable("Team") != -1)
+    if(sourceEntity !== undefined && sourceEntity !== null && sourceEntity.type === 'player' && sourceEntity == player && player.getVariable("Team") != -1)
     {
-        if(targetEntity.type === 'player')
+        if(targetEntity !== undefined && targetEntity !== null && targetEntity.type === 'player')
         {
             if(targetEntity.getVariable("Team") != -1 && player.getVariable("Team") != -1)
             {
