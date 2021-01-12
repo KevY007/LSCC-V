@@ -1704,6 +1704,12 @@ namespace LSCC
             return;
         }
 
+        [RemoteEvent("PlayerStreamIn")]
+        public void OnPlayerStreamIn(Player streamedfor, Player target)
+        {
+            EPlayer.SyncComponents(streamedfor, target);
+        }
+
         [RemoteEvent("BustRegress")]
         public void OnPlayerBustRegress(Player fugitive, float closestCop) // Triggers every 100ms a fugitive is without cop and has progress
         {
@@ -1735,6 +1741,8 @@ namespace LSCC
         [ServerEvent(Event.PlayerSpawn)]
         public static void OnPlayerSpawn(Player player)
         {
+            player.ResetData("AttachedComponents");
+
             lock (player)
             {
                 if (EPlayer.GetAccount(player).MuteTime > 0)

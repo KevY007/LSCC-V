@@ -1108,7 +1108,11 @@ namespace LSCC
 
             if (found == false)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid component! Try using hashes or exact names.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid component! List of supported comps on " + itemData.Name + ":");
+                foreach (var item in itemData.Components)
+                {
+                    player.SendChatMessage(item.Value.Name);
+                }
                 return;
             }
 
@@ -1163,6 +1167,102 @@ namespace LSCC
             target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been given '{comp.Name}' on '{itemData.Name}' by {player.Name}.");
 
             EPlayer.Save(target);
+            return;
+        }
+
+        [Command("attachcomp", "!{#AFAFAF}[USAGE] attachcomp (target) (component/hash)", GreedyArg = true)]
+        public void cmd_attachcomp(Player player, Player target, string component)
+        {
+            if (!EPlayer.LoggedIn(player) || !EPlayer.LoggedIn(target))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 3 admin.");
+                return;
+            }
+
+
+            UInt64 wephash = (UInt64)target.CurrentWeapon;
+            bool found = false;
+            jWeaponData itemData = new jWeaponData();
+
+            
+
+            foreach (KeyValuePair<ulong, jWeaponData> i in Settings.WeaponData)
+            {
+                if (wephash != 0)
+                {
+                    if (i.Key == wephash)
+                    {
+                        found = true;
+                        itemData = i.Value;
+                        break;
+                    }
+                }
+            }
+
+            if (found == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target doesn't have a compatible weapon in hand! Try using hashes or exact names.");
+                return;
+            }
+
+            found = false;
+            UInt64 comphash = 0;
+            Component comp = new Component();
+
+            if (!UInt64.TryParse(component, out comphash))
+            {
+                comphash = 0;
+            }
+
+            foreach (var item in itemData.Components)
+            {
+                if (comphash != 0)
+                {
+                    if (item.Key == wephash)
+                    {
+                        found = true;
+                        comp = item.Value;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (!found)
+                    {
+                        if (item.Value.Name.Contains(component, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            found = true;
+                            comphash = item.Key;
+                            comp = item.Value;
+                        }
+                    }
+                    if (item.Value.Name.Equals(component, StringComparison.CurrentCultureIgnoreCase)) // If it's really equal then override old found
+                    {
+                        found = true;
+                        comphash = item.Key;
+                        comp = item.Value;
+                    }
+                }
+            }
+
+            if (found == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid component! List of supported comps on " + itemData.Name + ":");
+                foreach (var item in itemData.Components)
+                {
+                    player.SendChatMessage(item.Value.Name);
+                }
+                return;
+            }
+
+
+            EPlayer.AttachComponent(target, (int)wephash, (int)comphash);
+            
+            player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}Temporarily attached '{comp.Name}' on '{itemData.Name}' for {target.Name}.");
+            target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}Temporarily attached '{comp.Name}' on '{itemData.Name}' by {player.Name}.");
             return;
         }
 
@@ -2797,7 +2897,8 @@ namespace LSCC
             }
             if (EPlayer.GetAccount(player).Admin >= 3)
             {
-                player.SendChatMessage("[Admin Lv 3]: /givegun(all) /gotopos /bringall /sethpall /(un)freezeall /r(emove)g(uns)f(rom)a(ll) /givecomp /removecomp");
+                player.SendChatMessage("[Admin Lv 3]: /givegun(all) /gotopos /bringall /sethpall /(un)freezeall /r(emove)g(uns)f(rom)a(ll)");
+                player.SendChatMessage("[Admin Lv 3]: /givecomp /removecomp /attachcomp");
             }
             if (EPlayer.GetAccount(player).Admin >= 4)
             {

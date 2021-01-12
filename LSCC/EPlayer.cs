@@ -635,6 +635,42 @@ namespace LSCC
             }
         }
 
+        public static void SyncComponents(Player? tosyncfor, Player? target)
+        {
+            if(target.HasData("AttachedComponents"))
+            {
+                List<KeyValuePair<int, int>> comps = target.GetData<List<KeyValuePair<int, int>>>("AttachedComponents");
+
+                foreach(var item in comps)
+                {
+                    tosyncfor.TriggerEvent("AttachWeaponComponent", target, (int)item.Key, (int)item.Value);
+                }
+            }
+            return;
+        }
+        public static void AttachComponent(Player? target, int weaponhash, int componenthash)
+        {
+            List<KeyValuePair<int, int>> comps = new List<KeyValuePair<int, int>>();
+            if (!target.HasData("AttachedComponents"))
+            {
+                target.SetData("AttachedComponents", comps);
+            }
+            else comps = target.GetData<List<KeyValuePair<int, int>>>("AttachedComponents");
+
+            comps.Add(new KeyValuePair<int, int>(weaponhash, componenthash));
+            target.SetData("AttachedComponents", comps);
+
+            foreach (Player p in RAGE.Entities.Players.All)
+            {
+                if (p.Dimension == target.Dimension)
+                {
+                    p.TriggerEvent("AttachWeaponComponent", target, (int)weaponhash, (int)componenthash);
+                }
+            }
+
+            return;
+        }
+
         public static void GiveCopWeapons(Player? player)
         {
             if (!EPlayer.LoggedIn(player)) return;
@@ -692,13 +728,7 @@ namespace LSCC
                                 {
                                     i.Value.Components.ForEach((ulong comphash) =>
                                     {
-                                        foreach (Player p in RAGE.Entities.Players.All)
-                                        {
-                                            if (p.Dimension == player.Dimension)
-                                            {
-                                                p.TriggerEvent("AttachWeaponComponent", player, (int)i.Key, (int)comphash);
-                                            }
-                                        }
+                                        EPlayer.AttachComponent(player, (int)i.Key, (int)comphash);
                                     });
                                 }
                             }
@@ -771,13 +801,7 @@ namespace LSCC
                                 {
                                     i.Value.Components.ForEach((ulong comphash) =>
                                     {
-                                        foreach (Player p in RAGE.Entities.Players.All)
-                                        {
-                                            if (p.Dimension == player.Dimension)
-                                            {
-                                                p.TriggerEvent("AttachWeaponComponent", player, (int)i.Key, (int)comphash);
-                                            }
-                                        }
+                                        EPlayer.AttachComponent(player, (int)i.Key, (int)comphash);
                                     });
                                 }
                             }
@@ -918,7 +942,7 @@ namespace LSCC
             Account acc = EPlayer.GetAccount(player); 
             acc.XP += xp;
                
-            if(acc.XP < 0)
+            while(acc.XP < 0)
             {
                 if (acc.Level > 0)
                 {
@@ -930,6 +954,15 @@ namespace LSCC
                         pl.SendChatMessage($"!{{#00BA03}}[LEVEL DOWN] {player.Name} has levelled down to {acc.Level}!");
                     });
                     player.SendNotification($"~w~You have levelled down to ~r~{acc.Level}~w~!");
+
+                    player.TriggerEvent("PlayMissionComplete", "GENERIC_FAILED");
+                    try { NAPI.Task.Run(() => player.TriggerEvent("ShakeCam", "VIBRATE_SHAKE", 3.0f, 1500), 1000); } catch { }
+                }
+                else
+                {
+                    acc.XP = 0;
+                    acc.Level = 0;
+                    break;
                 }
             }
 
@@ -942,6 +975,9 @@ namespace LSCC
                     pl.SendChatMessage($"!{{#00BA03}}[LEVEL UP] {player.Name} has levelled up to {acc.Level}!");
                 });
                 player.SendNotification($"~w~You have levelled up to ~g~{acc.Level}~w~!");
+
+                player.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
+                try { NAPI.Task.Run(() => player.TriggerEvent("ShakeCam", "VIBRATE_SHAKE", 7.0f, 2000), 1000); } catch { }
             }
 
             player.SetSharedData("Level", acc.Level);
