@@ -1030,6 +1030,7 @@ mp.events.add(
         },
 
         "playerEnterVehicle": (vehicle, seat) => {
+            player.setCanBeKnockedOffVehicle(2); // Can't fall off
             player.seat = seat;
             vehicle.setInvincible(false);
 

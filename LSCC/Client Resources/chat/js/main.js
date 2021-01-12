@@ -1,7 +1,7 @@
 let chat =
 {
 	size: 0,
-	history_limit: 80,
+	history_limit: 128,
 	container: null,
 	input: null,
 	enabled: false,
@@ -12,7 +12,7 @@ let chat =
 	scrollStyle: null
 };
 
-const MAX_MSG_HISTORY = 12;
+const MAX_MSG_HISTORY = 64;
 
 function toggleScroll(enable) { 
 
@@ -45,7 +45,7 @@ function enableChatInput(enable)
 
         if (enable)
 		{
-            chat.input = $("#chat").append('<div><input id="chat_msg" type="text" maxlength="84" /></div>').children(":last");
+            chat.input = $("#chat").append('<div><input id="chat_msg" type="text" maxlength="128" /></div>').children(":last");
 			chat.input.children("input").focus();
         } 
 		else
@@ -152,15 +152,18 @@ $(document).ready(function()
 	{
 		event.preventDefault();
 
-		document.getElementById("chat_messages").scrollTo(0, document.getElementById("chat_messages").scrollTop - event.deltaY); 
+		if(chat.input != null) {
 
-		/*document.getElementById("chat_messages").scrollBy({ 
-			top: rate,
-			left: 0, 
-			behavior: 'smooth' 
-		});*/
+			document.getElementById("chat_messages").scrollTo(0, document.getElementById("chat_messages").scrollTop - event.deltaY); 
 
-		// inversely equally scroll
+			/*document.getElementById("chat_messages").scrollBy({ 
+				top: rate,
+				left: 0, 
+				behavior: 'smooth' 
+			});*/
+
+			// inversely equally scroll
+		}
 
 	}, { passive: false });
 
@@ -185,25 +188,26 @@ $(document).ready(function()
             enableChatInput(true);
             event.preventDefault();
         } else if (event.which == 38) {
+			event.preventDefault();
+
 			if (chat.historyMsgs.length === 0)
 				return;
 
 			const previousMessages = chat.historyMsgs;
 
-			if (previousMessages.length === chat.currentIndex)
+			if (chat.currentIndex >= previousMessages.length)
 				return;
 
 
-			chat.input.children("input").val(previousMessages[chat.currentIndex]);
-			
-			setTimeout(() => {
-				chat.input.children("input").setSelectionRange(85, 85);
-            }, 100);
-
             chat.currentIndex = chat.currentIndex + 1;
-
+			chat.input.children("input").val(previousMessages[chat.currentIndex-1]);
+			
+			document.getElementById("chat_msg").focus();
+			document.getElementById("chat_msg").setSelectionRange(129, 129);
 			
 		} else if (event.which == 40) {
+			event.preventDefault();
+
 			if (chat.historyMsgs.length === 0)
 				return;
 
@@ -217,15 +221,14 @@ $(document).ready(function()
 			chat.currentIndex = chat.currentIndex - 1;
 			chat.input.children("input").val(previousMessages[chat.currentIndex]);
 
-			setTimeout(() => {
-				chat.input.children("input").setSelectionRange(85, 85);
-			}, 100);
+			document.getElementById("chat_msg").focus();
+			document.getElementById("chat_msg").setSelectionRange(129, 129);
 		}
 		else if (event.which == 13 && chat.input != null)
 		{
 			var value = chat.input.children("input").val();
 
-            if (value.length > 0 && value.length < 86) 
+            if (value.length > 0 && value.length <= 128) 
 			{
 				if (chat.historyMsgs.length >= MAX_MSG_HISTORY) {
 					chat.historyMsgs.pop();
@@ -234,7 +237,6 @@ $(document).ready(function()
 				chat.historyMsgs.unshift(value);
 				chat.currentIndex = 0;
 
-				$("#chat ul#chat_messages").scrollTop(0); // Scroll all the way to down.
 
                 if (value[0] == "/")
 				{
@@ -247,8 +249,9 @@ $(document).ready(function()
 				{
                     mp.invoke("chatMessage", value);
                 }
-            }
-
+			}
+			
+			$("#chat ul#chat_messages").scrollTop(0); // Scroll all the way to down.
 			toggleScroll(false);
             enableChatInput(false);
         }

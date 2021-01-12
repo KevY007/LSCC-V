@@ -12,4 +12,3 @@ freecam for trailer or smth ask sharef or client resource script he got form som
 add default clothes to default chars like default cop attire and fugitive attire so they arent naked by default
 face features dont seem to save like nose cheeks esp on edit
 k/d record
-maybe fix chat scroll manually
