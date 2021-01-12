@@ -1621,26 +1621,20 @@ namespace LSCC
         [Command("stats")]
         public void cmd_stats(Player player)
         {
+            EPlayer.ShowStats(player, player);
+            return;
+        }
+
+        [Command("checkstats")]
+        public void cmd_checkstats(Player player, Player target)
+        {
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            Account acc = EPlayer.GetAccount(player);
+            if (EPlayer.GetAccount(player).Admin < 2)
+                return;
 
-            player.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} ({acc.SQL_ID}) at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
-            
-            player.SendChatMessage($"!{{#c7eb7f}}| !{{#c7eb7f}}Account ID: !{{#cbcfc4}}[{acc.SQL_ID}] !{{#ffffff}}| !{{#c7eb7f}}Email: !{{#cbcfc4}}[{acc.Email}] !{{#ffffff}}| !{{#c7eb7f}}Admin Level: !{{#cbcfc4}}[{acc.Admin}]");
-
-            player.SendChatMessage($"!{{#c7eb7f}}| !{{#c7eb7f}}Donator Level: !{{#cbcfc4}}[{acc.DonatorLevel}] !{{#ffffff}}| !{{#c7eb7f}}Warns: !{{#cbcfc4}}[{acc.Warns}] !{{#ffffff}}| !{{#c7eb7f}}Derby Wins: !{{#cbcfc4}}[{acc.DerbyWins}]");
-
-            player.SendChatMessage($"!{{#c7eb7f}}| !{{#c7eb7f}}Level: !{{#cbcfc4}}[{acc.Level}] !{{#ffffff}}| !{{#c7eb7f}}Experience: !{{#cbcfc4}}[{acc.XP}/{EPlayer.GetMaxLevelXP(acc.Level)}] !{{#ffffff}}| !{{#c7eb7f}}Escapes: !{{#cbcfc4}}[{acc.Escapes}]");
-
-            player.SendChatMessage($"!{{#c7eb7f}}| !{{#c7eb7f}}Kills: !{{#cbcfc4}}[{acc.Kills}] !{{#ffffff}}| !{{#c7eb7f}}Deaths: !{{#cbcfc4}}[{acc.Deaths}] !{{#ffffff}}| !{{#c7eb7f}}K/D Ratio: !{{#cbcfc4}}[{(acc.Kills/acc.Deaths).ToString("{0:.00}")}]");
-
-            player.SendChatMessage($"!{{#c7eb7f}}| !{{#c7eb7f}}Arrests: !{{#cbcfc4}}[{acc.Arrests}]");
-
-            player.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
-
-            EPlayer.GrantXP(player, 0);
+            EPlayer.ShowStats(player, target);
             return;
         }
 
@@ -2978,7 +2972,7 @@ namespace LSCC
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
                 player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword /toglobby");
-                player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension /r(emove)guns /suspend /unsuspend");
+                player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension /r(emove)guns /suspend /unsuspend /checkstats");
             }
             if (EPlayer.GetAccount(player).Admin >= 3)
             {

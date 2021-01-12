@@ -598,6 +598,37 @@ namespace LSCC
             }
         }
 
+        public static void ShowStats(Player? target, Player? player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            Account acc = EPlayer.GetAccount(player);
+
+            string KDR = "0.0";
+            if (acc.Kills == 0) acc.Kills = 1;
+            if (acc.Deaths == 0) acc.Deaths = 0;
+
+            KDR = (acc.Kills / acc.Deaths).ToString("{0:.00}");
+
+            target.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} ({acc.SQL_ID}) at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
+
+            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Account ID: !{{#cbcfc4}}[{acc.SQL_ID}] !{{#ffffff}}| !{{#c7eb7f}}Email: !{{#cbcfc4}}[{acc.Email}] !{{#ffffff}}| !{{#c7eb7f}}Admin Level: !{{#cbcfc4}}[{acc.Admin}]");
+
+            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Donator Level: !{{#cbcfc4}}[{acc.DonatorLevel}] !{{#ffffff}}| !{{#c7eb7f}}Warns: !{{#cbcfc4}}[{acc.Warns}] !{{#ffffff}}| !{{#c7eb7f}}Derby Wins: !{{#cbcfc4}}[{acc.DerbyWins}]");
+
+            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Level: !{{#cbcfc4}}[{acc.Level}] !{{#ffffff}}| !{{#c7eb7f}}Experience: !{{#cbcfc4}}[{acc.XP}/{EPlayer.GetMaxLevelXP(acc.Level)}] !{{#ffffff}}| !{{#c7eb7f}}Escapes: !{{#cbcfc4}}[{acc.Escapes}]");
+
+            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Kills: !{{#cbcfc4}}[{acc.Kills}] !{{#ffffff}}| !{{#c7eb7f}}Deaths: !{{#cbcfc4}}[{acc.Deaths}] !{{#ffffff}}| !{{#c7eb7f}}K/D Ratio: !{{#cbcfc4}}[{KDR}]");
+
+            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Arrests: !{{#cbcfc4}}[{acc.Arrests}]");
+
+            target.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
+
+            EPlayer.GrantXP(target, 0);
+            return;
+        }
+
         public static void Warn(Player? player)
         {
             if (!EPlayer.LoggedIn(player)) return;
