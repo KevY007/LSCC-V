@@ -6,7 +6,6 @@ add a linux script that will keep on restarting server if goes off??
 
 selectable fugitive cars
 buyammo
-60% to 80% when fugitive cuz killing is easy
 more fugitive car
 showing finger = tag
 keybind changeable for N (save in storage)
