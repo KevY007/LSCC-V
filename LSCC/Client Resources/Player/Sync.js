@@ -16,6 +16,10 @@ mp.events.addDataHandler('Status_Trunk', function (entity, value, oldValue)
     }
 });
 
+mp.events.add("OpenVehicleDoor", (vehicle, doorId) => {
+    if(vehicle.type === 'vehicle') vehicle.setDoorOpen(doorId, false, true);
+});
+
 mp.events.addDataHandler('vMaxSpeed', function (entity, value, oldValue) 
 {
     if (entity.type === 'vehicle') 

@@ -741,7 +741,7 @@ namespace LSCC
                 return;
             }
 
-            if (player.Position.DistanceTo(target.Position) > 3.0) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near that player!"); return; }
+            if (player.Position.DistanceTo(target.Position) > 3.0 || target.IsInVehicle) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near that player!"); return; }
 
             try
             {
@@ -830,6 +830,80 @@ namespace LSCC
                 }
                 catch { }
             }, 3000);
+            return;
+        }
+
+        [Command("dragout", "!{#AFAFAF}[USAGE] dragout (target)")]
+        public void cmd_dragout(Player player, Player target)
+        {
+            bool isACop = false;
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (lobby != null)
+            {
+                if (lobby.Cops.Contains(player) && lobby.gameStatus == 1 && lobby.Fugitives.Contains(target) && target.IsInVehicle)
+                {
+                    isACop = true;
+                }
+            }
+
+            if (!isACop)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a cop or the target cannot be dragged out!");
+                return;
+            }
+
+            if (player.Position.DistanceTo(target.Position) >= 3.5) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near that player!"); return; }
+
+            EPlayer.Action(player, $"leans towards {target.Name}'s vehicle and tries to open the door to drag them out.");
+            
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are now dragging out the target, stay with them for 5 seconds to complete the operation.");
+
+            NAPI.Task.Run(() =>
+            {
+                try
+                {
+                    if (player != null && player.Exists)
+                    {
+                        if (player != null && target != null && target.Exists)
+                        {
+                            if (target == null || !target.IsInstanceAlive || player == null || !player.IsInstanceAlive || player.Dead)
+                            {
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, target or you are no longer alive.");
+                                return;
+                            }
+
+                            LobbyData lobbye = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedData<int>("InLobby"));
+                            if (lobbye != null)
+                            {
+                                if (lobbye.Cops.Contains(player) && lobbye.gameStatus == 1 && lobbye.Fugitives.Contains(target) && target.IsInVehicle)
+                                {
+                                    isACop = true;
+                                }
+                            }
+
+                            if (!isACop)
+                            {
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, you cannot drag out that target anymore.");
+                                return;
+                            }
+
+                            if (player.Position.DistanceTo(target.Position) >= 3.5)
+                            {
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near the target!");
+
+                                return;
+                            }
+
+                            EPlayer.GrantXP(player, 2);
+                            cmd_do(player, $"{target.Name} has been dragged out of the vehicle.");
+
+                            EPlayer.SendMessageInLobby(lobbye.lobbyId, $"!{{#ADD8E6}}Cop {player.Name} has dragged {target.Name} out of the vehicle!");
+                            target.TriggerEvent("ThrowFromVehicle");
+                        }
+                    }
+                }
+                catch { }
+            }, 5000);
             return;
         }
 
@@ -2277,7 +2351,7 @@ namespace LSCC
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys for activation)");
             player.SendChatMessage("!{#339BC4}[Cop!{#F24C27}chase]: !{#FFFFFF}/r(adio) /wt /loadout /car");
-            player.SendChatMessage("!{#61A9FA}[Cop]: /gps /cuff /m(egaphone)");
+            player.SendChatMessage("!{#61A9FA}[Cop]: /gps /cuff /m(egaphone) /dragout");
             player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup /s(top)a(nim)");
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /derby");
             player.SendChatMessage("!{#28E0DA}[Mode: DM]: /dm /dmarena");

@@ -829,6 +829,13 @@ mp.events.add("entclearanim", (entity, animDictionary, animName) => {
 
 mp.events.add(
     {
+        "ThrowFromVehicle": () => {
+            let localVeh = mp.players.local.vehicle;
+            if (localVeh) {
+                mp.players.local.taskLeaveVehicle(localVeh.handle, 4160);
+            }
+        },
+
         "entityStreamIn": (entity) => {
             if(entity !== null && entity.type === 'player') mp.events.callRemote("PlayerStreamIn", entity);
         },
