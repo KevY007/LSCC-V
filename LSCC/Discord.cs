@@ -136,6 +136,57 @@ namespace LSCC
                 }
                 else context.Channel.SendMessageAsync("USAGE: !o (text)");
             }
+            if (context.Content.StartsWith("!a"))
+            {
+                string[] args = context.Content.Split(" ", 2);
+                if (args.Count() >= 2)
+                {
+                    EPlayer.SendMessageToAllAdmins($"(( [DADM] !{{#FF6347}}{context.Author.Username}!{{#FFFFFF}}: {args[1]} ))");
+                    context.Channel.SendMessageAsync($"**(DADM) | {context.Author.Username}**: {args[1]}");
+                }
+                else context.Channel.SendMessageAsync("USAGE: !a (text)");
+            }
+            if (context.Content.StartsWith("!a"))
+            {
+                string[] args = context.Content.Split(" ", 2);
+                if (args.Count() >= 2)
+                {
+                    EPlayer.SendMessageToAllAdmins($"(( [DADM] !{{#FF6347}}{context.Author.Username}!{{#FFFFFF}}: {args[1]} ))");
+                    context.Channel.SendMessageAsync($"**(DADM) | {context.Author.Username}**: {args[1]}");
+                }
+                else context.Channel.SendMessageAsync("USAGE: !a (text)");
+            }
+            if (context.Content.StartsWith("!kick"))
+            {
+                string[] args = context.Content.Split(" ", 3);
+                if (args.Count() >= 3)
+                {
+                    Player target = null;
+                    foreach(Player p in RAGE.Entities.Players.All)
+                    {
+                        if(p.Name.Equals(args[1]))
+                        {
+                            target = p;
+                        }
+                        if(target == null && p.Name.Contains(args[1], StringComparison.OrdinalIgnoreCase))
+                        {
+                            target = p;
+                        }
+                    }
+                    RAGE.Entities.Players.All.ForEach((Player playa) =>
+                    {
+                        playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] {target.Name} has been kicked by DISCORD: {context.Author.Username} for {args[2]}.");
+                    });
+
+                    try { LSCC.Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{context.Author.ToString()}:dckick:{target.Name}:{args[2].Replace(":", "|")}"); } catch { }
+
+                    target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+
+                    target.Kick();
+                    context.Channel.SendMessageAsync($"**(DADM) | {target.Name} has been kicked by DISCORD: {context.Author.Username} for {args[1]}.**");
+                }
+                else context.Channel.SendMessageAsync("USAGE: !kick (player/name) (reason)");
+            }
             if (context.Content.StartsWith("!cmds"))
             {
                 var builder = new EmbedBuilder()
@@ -156,6 +207,8 @@ namespace LSCC
                 builder.AddField("cmds", "Displays list of all the commands");
                 builder.AddField("o", "Sends a message in OOC chat");
                 builder.AddField("players", "Gives a list of all the players online");
+                builder.AddField("a", "Sends a message in ADM chat");
+                builder.AddField("kick", "Kicks a player from server");
 
                 var embed = builder.Build();
 

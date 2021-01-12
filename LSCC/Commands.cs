@@ -3522,7 +3522,7 @@ namespace LSCC
 
                 target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
-                target.Kick($"You have been kicked for the reason: {reason}");
+                target.Kick();
             }
 
         }
