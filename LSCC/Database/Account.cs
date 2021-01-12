@@ -36,6 +36,11 @@ namespace LSCC
         public int MuteTime { get; set; }
         public string MuteReason { get; set; }
         public int Warns { get; set; }
+        public int Kills { get; set; }
+        public int Deaths { get; set; }
+        public int Arrests { get; set; }
+        public int Escapes { get; set; }
+        public int DerbyWins { get; set; }
         public int Suspended { get; set; }
         public int LobbyClothing { get; set; }
         public string Character { get; set; }

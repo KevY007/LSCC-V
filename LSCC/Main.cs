@@ -1252,7 +1252,11 @@ namespace LSCC
                     }
                 }
 
-                if (winner != null) EPlayer.GrantXP(winner, winXP);
+                if (winner != null)
+                {
+                    EPlayer.GetAccount(winner).DerbyWins++;
+                    EPlayer.GrantXP(winner, winXP);
+                }
 
                 Settings.DerbyTimeLeft = 180;
                 Settings.LastDerbyTick = Environment.TickCount64 + 3000;
@@ -1275,6 +1279,7 @@ namespace LSCC
                         foreach (Player i in lobby.Fugitives)
                         {
                             // Reward
+                            EPlayer.GetAccount(i).Escapes++;
                             EPlayer.GrantXP(i, 5);
                         }
                         break;

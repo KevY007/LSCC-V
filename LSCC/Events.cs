@@ -433,6 +433,8 @@ namespace LSCC
                                 indm.TriggerEvent("pushToKillFeed", $"DM> {killer.Name} killed {player.Name} with {reasonStr}");
                             }
                         }
+                        EPlayer.GetAccount(killer).Kills++;
+                        EPlayer.GetAccount(player).Deaths++;
                     }
 
                     EPlayer.GrantXP(killer, 1);
@@ -570,6 +572,12 @@ namespace LSCC
                 {
                     if (lobby.Fugitives.Contains(player))
                     {
+                        if (killer != null)
+                        {
+                            EPlayer.GetAccount(player).Deaths++;
+                            EPlayer.GetAccount(killer).Kills++;
+                        }
+
                         wasInGame = true;
 
                         if (killer != null && killer.GetSharedData<int>("Team") == 1) EPlayer.GrantXP(killer, 2);
@@ -617,6 +625,12 @@ namespace LSCC
 
                     if (lobby.Cops.Contains(player))
                     {
+                        if (killer != null)
+                        {
+                            EPlayer.GetAccount(player).Deaths++;
+                            EPlayer.GetAccount(killer).Kills++;
+                        }
+
                         wasInGame = true;
 
                         if (killer != null && killer.GetSharedData<int>("Team") == 0) EPlayer.GrantXP(killer, 2);
@@ -1317,8 +1331,13 @@ namespace LSCC
                 MuteReason = "N/A",
                 JailTime = 0,
                 JailReason = "N/A",
+                DerbyWins = 0,
                 Level = 1,
                 XP = 1,
+                Escapes = 0,
+                Arrests = 0,
+                Kills = 0,
+                Deaths = 0,
                 Warns = 0,
                 Suspended = 0,
                 DonatorLevel = 0,
@@ -1691,10 +1710,12 @@ namespace LSCC
                     if (!bustSupporters.Contains(assist.Id) || assist.Id == cop.Id) continue;
 
                     EPlayer.GrantXP(assist, 5);
+                    EPlayer.GetAccount(assist).Arrests++;
                     assist.SendNotification("~g~+5 XP for helping bust " + fugitive.Name);
                 }
 
                 EPlayer.GrantXP(cop, 7);
+                EPlayer.GetAccount(cop).Arrests++;
                 cop.SendNotification("~g~+7 XP for busting " + fugitive.Name);
 
                 EPlayer.SendMessageInLobby(lobby.lobbyId, $"!{{#ADD8E6}}Fugitive {fugitive.Name} has been busted!");
