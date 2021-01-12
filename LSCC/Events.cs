@@ -733,6 +733,7 @@ namespace LSCC
 
         public static void OnPlayerLogin(Player player, Account acc)
         {
+            player.SetData("PlaytimeTick", Environment.TickCount64);
             player.TriggerEvent("StopThemeSong");
             Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in as {acc.Username}.*");
 
@@ -994,6 +995,7 @@ namespace LSCC
 
         public static void OnPlayerRegister(Player player, Account acc)
         {
+            player.SetData("PlaytimeTick", Environment.TickCount64);
             Discord.SendTextChannel("staff-bot", $"*{player.Name} has registered.*");
 
             EPlayer.SetDiscordStatus(player, $"Registering as {acc.Username}");
@@ -1336,8 +1338,9 @@ namespace LSCC
                 XP = 1,
                 Escapes = 0,
                 Arrests = 0,
-                Kills = 0,
-                Deaths = 0,
+                Kills = 1,
+                Deaths = 1,
+                MinutesPlayed = 0.0,
                 Warns = 0,
                 Suspended = 0,
                 DonatorLevel = 0,

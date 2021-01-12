@@ -41,6 +41,7 @@ namespace LSCC
         public int Arrests { get; set; }
         public int Escapes { get; set; }
         public int DerbyWins { get; set; }
+        public double MinutesPlayed { get; set; }
         public int Suspended { get; set; }
         public int LobbyClothing { get; set; }
         public string Character { get; set; }

@@ -621,7 +621,7 @@ namespace LSCC
 
             target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Kills: !{{#cbcfc4}}[{acc.Kills}] !{{#ffffff}}| !{{#c7eb7f}}Deaths: !{{#cbcfc4}}[{acc.Deaths}] !{{#ffffff}}| !{{#c7eb7f}}K/D Ratio: !{{#cbcfc4}}[{KDR}]");
 
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Arrests: !{{#cbcfc4}}[{acc.Arrests}]");
+            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Arrests: !{{#cbcfc4}}[{acc.Arrests}] !{{#ffffff}}| !{{#c7eb7f}}Time Played: !{{#cbcfc4}}[{acc.MinutesPlayed / 60.0} hours] ");
 
             target.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
 
@@ -1017,6 +1017,14 @@ namespace LSCC
         {
             if (LoggedIn(player))
             {
+                if (player.HasData("PlaytimeTick"))
+                {
+                    double minsPassed = (Environment.TickCount64 - player.GetData<long>("PlaytimeTick")) / 60000;
+
+                    EPlayer.GetAccount(player).MinutesPlayed += minsPassed;
+                }
+                player.SetData("PlaytimeTick", Environment.TickCount64);
+
                 ContextFactory.Instance.SaveChangesAsync();
             }
         }
