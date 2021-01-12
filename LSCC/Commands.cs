@@ -1889,7 +1889,7 @@ namespace LSCC
 
 
             player.SendChatMessage($"!{{#FFFF00}}[!] Sending you to !{{#FF6347}}DERBY");
-            EPlayer.Spawn(player, false, ((Vector3)Settings.DerbySpawns[0, 0]).Around(30.0f));
+            EPlayer.Spawn(player, false, ((Vector3)Settings.DerbySpawns[0, 0]).Around(2.0f));
 
             return;
         }

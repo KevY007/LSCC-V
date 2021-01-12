@@ -669,7 +669,7 @@ namespace LSCC
                     {
                         Random rand = new Random();
                         Vector3 SpawnArea = Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)];
-                        if (player.GetSharedData<int>("InLobby") == -4) SpawnArea = ((Vector3)Settings.DerbySpawns[0, 0]).Around(30.0f);
+                        if (player.GetSharedData<int>("InLobby") == -4) SpawnArea = ((Vector3)Settings.DerbySpawns[0, 0]).Around(2.0f);
                         if (player.GetSharedData<int>("InLobby") > -1 && lobby != null)
                         {
                             int arenaID = player.GetSharedData<int>("InDM");
@@ -1062,14 +1062,14 @@ namespace LSCC
 
             if (EPlayer.LoggedIn(player) && player.GetSharedData<int>("InLobby") == -4)
             {
-                if (player.Position.Z <= 15.0f && player.IsInstanceAlive && player.Health > 10)
+                if (player.Position.Z <= 3.0f && player.IsInstanceAlive && !player.Dead && player.Health > 10)
                 {
                     player.Health = 0;
                 }
 
                 if (Environment.TickCount64 - player.GetData<long>("DerbySpawnTick") > 2000)
                 {
-                    if (player.IsInstanceAlive && player.Health > 10 && !player.IsInVehicle)
+                    if (player.IsInstanceAlive && !player.Dead && player.Health > 10 && !player.IsInVehicle)
                     {
                         player.Health = 0;
                         player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please do not get out of your vehicle in derby!");
@@ -1877,7 +1877,7 @@ namespace LSCC
                     }
 
                     Vector3 PlayerSpawn = (Vector3)Settings.DerbySpawns[spawnID, 0];
-                    PlayerSpawn.Z += 15.0f;
+                    PlayerSpawn.Z += 5.0f;
                     player.Position = PlayerSpawn;
                     player.Heading = (float)Settings.DerbySpawns[spawnID, 1];
                     player.Dimension = 500;
