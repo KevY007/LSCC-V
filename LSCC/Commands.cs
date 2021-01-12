@@ -277,7 +277,8 @@ namespace LSCC
             player.SendChatMessage("!{#FFFF00}Website: !{#FFFFFF}ls-cc.info");
             player.SendChatMessage("  ");
             player.SendChatMessage("!{#FFFFFF}Scripted by !{#FF6347}KevY !{#FFFFFF}as the sole dev.");
-            player.SendChatMessage("!{#FFFFFF}Thanks to !{#FF6347}RotX & LSCC SAMP staff !{#FFFFFF}for assistance and ideas.");
+            player.SendChatMessage("!{#FFFFFF}Special Thanks: !{#FF6347}RotX !{#FFFFFF}(CEF/Web Pages) !{#FF6347}CodeName420 !{#FFFFFF}(Mapping) .");
+            player.SendChatMessage("!{#FFFFFF}Thanks to !{#FF6347}LSCC SAMP staff !{#FFFFFF}for assistance and ideas.");
             player.SendChatMessage("  ");
             return;
         }
