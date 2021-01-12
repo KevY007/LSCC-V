@@ -809,7 +809,8 @@ namespace LSCC
 
             for (int i = 0; i < Settings.MaxLobbies; i++)
             {
-                new LobbyData();
+                if (i >= Settings.MaxLobbies-1) new LobbyData().gameMode = GameModes.BUSTED; // Some busted lobby too.
+                else new LobbyData();
             }
 
             NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Created and initialised settings & enums.");
