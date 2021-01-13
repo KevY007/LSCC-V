@@ -4,4 +4,5 @@ admin records system
 
 add a linux script that will keep on restarting server if goes off??
 
-buyammo
+
+CURRENCY SYSTEM/DONOR POINTS THAT CAN ALLOW VIP STUFF AND CMDS LIKE buyammo USING VIP POINTS OR STUF
