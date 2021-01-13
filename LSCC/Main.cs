@@ -752,7 +752,7 @@ namespace LSCC
                 {
                     using (var client = new WebClient())
                     {
-                        client.DownloadFile("https://gist.githubusercontent.com/root-cause/3f29d38179b12245a003fb4fff615335/raw/e107026d7a622d7c73530ed2360ba4604d19f46f/v1868%2520Weapon%2520Data.json", "lscc/weapondata.json.tmp");
+                        client.DownloadFile("https://gist.githubusercontent.com/root-cause/3f29d38179b12245a003fb4fff615335/raw/7a8804b275fb1b9314cb39418a7415ea8bfd148d/v2189%2520Weapon%2520Data.json", "lscc/weapondata.json.tmp");
                     }
 
                     try
@@ -843,6 +843,13 @@ namespace LSCC
             new LoadoutData(1, "SWAT", 10, wepList);
 
             wepList = new List<Tuple<WeaponHash, int>>();
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Bzgas, 1));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.NavyRevolver, 30));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Musket, 30));
+            wepList.Add(new Tuple<WeaponHash, int>((WeaponHash)0x9D1F17E6, 90)); // Military Rifle
+            new LoadoutData(1, "Whiplash", 20, wepList);
+
+            wepList = new List<Tuple<WeaponHash, int>>();
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pistol, 40));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pumpshotgun, 15));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Assaultrifle, 80));
@@ -854,6 +861,13 @@ namespace LSCC
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Bullpupshotgun, 30));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Combatpdw, 125));
             new LoadoutData(0, "Rebel", 10, wepList);
+
+            wepList = new List<Tuple<WeaponHash, int>>();
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Bzgas, 1));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Doubleaction, 25));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Sawnoffshotgun, 30));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Gusenberg, 120));
+            new LoadoutData(0, "Executioner", 15, wepList);
 
             wepList = new List<Tuple<WeaponHash, int>>();
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Knife, 1));

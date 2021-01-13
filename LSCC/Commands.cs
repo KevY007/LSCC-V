@@ -4302,6 +4302,12 @@ namespace LSCC
                     { "https://static.wikia.nocookie.net/gtawiki/images/f/fe/TearGas-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "BZ Gas", 3 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/4/4c/MG-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Machine Gun", 120 },
                 }) },
+                { "Whiplash", 20, 1, NAPI.Util.ToJson(new object[,] {
+                    { "https://static.wikia.nocookie.net/gtawiki/images/9/9e/NavyRevolver-GTAO-icon.png/revision/latest/scale-to-width-down/128", "Navy Revolver", 30 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/8/8f/Musket-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Musket", 30 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/f/fe/TearGas-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "BZ Gas", 1 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/5/56/MilitaryRifle-GTAO-icon.png/revision/latest/scale-to-width-down/128", "Military Rifle", 90 },
+                }) },
 
                 { "Convicted", 5, 0, NAPI.Util.ToJson(new object[,] {
                     { "https://static.wikia.nocookie.net/gtawiki/images/8/8f/Pistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pistol", 40 },
@@ -4313,6 +4319,12 @@ namespace LSCC
                     { "https://static.wikia.nocookie.net/gtawiki/images/0/07/APPistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "AP Pistol", 40 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/9/96/BullpupShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Bullpup Shotgun", 30 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/2/21/Combat_PDW_HUD_GTA_V_PC.png/revision/latest/scale-to-width-down/128", "Combat PDW", 125 },
+                }) },
+                { "Executioner", 15, 0, NAPI.Util.ToJson(new object[,] {
+                    { "https://static.wikia.nocookie.net/gtawiki/images/4/45/Double-action-revolver-icon.png/revision/latest/scale-to-width-down/128", "Double Action Revolver", 25 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/b/b4/SawedoffShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Sawn Off Shotgun", 30 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/f/fe/TearGas-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "BZ Gas", 1 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/5/56/MilitaryRifle-GTAO-icon.png/revision/latest/scale-to-width-down/128", "Gusenberg Sweeper", 120 },
                 }) },
                 { "Assassin", 20, 0, NAPI.Util.ToJson(new object[,] {
                     { "https://static.wikia.nocookie.net/gtawiki/images/9/9a/Knife-GTAVPC-HUD.png/revision/latest/scale-to-width-down/185", "Knife", 40 },
