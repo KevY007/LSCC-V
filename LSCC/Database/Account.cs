@@ -47,6 +47,7 @@ namespace LSCC
         public string Character { get; set; }
         public string LoadoutCop { get; set; }
         public string LoadoutFugitive { get; set; }
+        public string CarFugitive { get; set; }
         public string CarCop { get; set; }
         public string WeaponComponents { get; set; }
     }

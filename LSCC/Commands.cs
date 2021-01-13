@@ -2340,6 +2340,18 @@ namespace LSCC
                 { "Charger '16 (U)", "images/udchall1.png", 1, 15 },
                 { "Chopper", "images/polmav.png", 1, 20 },
                 { "SWAT Truck", "images/riot.png", 1, 25 },
+
+                // Fugitive
+                { "Primo", "images/primo.png", 0, 3 },
+                { "Huntley", "images/huntley.png", 0, 5 },
+                { "Dubsta", "images/dubsta.png", 0, 8 },
+                { "Tailgater", "images/tailgater.png", 0, 10 },
+                { "Schafter", "images/schafter2.png", 0, 12 },
+                { "Blista Classic", "images/blista2.png", 0, 14 },
+                { "Cheburek", "images/cheburek.png", 0, 16 },
+                { "Buffalo", "images/buffalo.png", 0, 20 },
+                { "Sultan", "images/sultan.png", 0, 25 },
+                { "Kuruma", "images/kuruma.png", 0, 30 },
             },
             EPlayer.GetAccount(player).Level);
 

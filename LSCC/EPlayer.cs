@@ -656,7 +656,9 @@ namespace LSCC
 
             target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Kills: !{{#cbcfc4}}[{acc.Kills}] !{{#ffffff}}| !{{#c7eb7f}}Deaths: !{{#cbcfc4}}[{acc.Deaths}] !{{#ffffff}}| !{{#c7eb7f}}K/D Ratio: !{{#cbcfc4}}[{Math.Round(KDR, 2, MidpointRounding.AwayFromZero).ToString()}]");
 
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Arrests: !{{#cbcfc4}}[{acc.Arrests}] !{{#ffffff}}| !{{#c7eb7f}}Time Played: !{{#cbcfc4}}[{Math.Round(acc.MinutesPlayed / 60.0, 2, MidpointRounding.AwayFromZero).ToString()} hours] ");
+            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Arrests: !{{#cbcfc4}}[{acc.Arrests}] !{{#ffffff}}| !{{#c7eb7f}}Time Played: !{{#cbcfc4}}[{Math.Round(acc.MinutesPlayed / 60.0, 2, MidpointRounding.AwayFromZero).ToString()} hours]");
+            
+            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Vehicle (Fugitive): !{{#cbcfc4}}[{acc.CarFugitive}] !{{#ffffff}}| !{{#c7eb7f}}Vehicle (Cop): !{{#cbcfc4}}[{acc.CarCop}]");
 
             target.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} ({acc.SQL_ID}) at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
 

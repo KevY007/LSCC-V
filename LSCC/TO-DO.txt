@@ -4,6 +4,4 @@ admin records system
 
 add a linux script that will keep on restarting server if goes off??
 
-selectable fugitive cars
 buyammo
-more fugitive car

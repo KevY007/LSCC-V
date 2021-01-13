@@ -1744,23 +1744,33 @@ namespace LSCC
 
                         string carName = "washington";
 
-                        switch (random.Next(0, 5))
+                        if (EPlayer.GetAccount(_tempPlayer).CarFugitive.Length < 3)
                         {
-                            case 0:
-                                carName = "washington";
-                                break;
-                            case 1:
-                                carName = "600sel";
-                                break;
-                            case 2:
-                                carName = "asea";
-                                break;
-                            case 3:
-                                carName = "cognoscenti";
-                                break;
-                            case 4:
-                                carName = "oracle2";
-                                break;
+                            switch (random.Next(0, 6))
+                            {
+                                case 0:
+                                    carName = "washington";
+                                    break;
+                                case 1:
+                                    carName = "600sel";
+                                    break;
+                                case 2:
+                                    carName = "oracle";
+                                    break;
+                                case 3:
+                                    carName = "moonbeam";
+                                    break;
+                                case 4:
+                                    carName = "rancherxl";
+                                    break;
+                                case 5:
+                                    carName = "cavalcade2";
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            carName = EPlayer.GetAccount(_tempPlayer).CarFugitive;
                         }
 
                         Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, random.Next(122), random.Next(122), $"SA-{random.Next(1000, 9999)}", 255, false, true, Convert.ToUInt32(lobbyid));
@@ -1768,6 +1778,7 @@ namespace LSCC
                         lobby.Vehicles.Add(pVehicle);
 
                         pVehicle.SetSharedData("vMaxSpeed", (float)(150 / 3.6)); // KM/H max.
+
 
                         NAPI.Task.Run(() =>
                         {
@@ -1884,6 +1895,11 @@ namespace LSCC
 
                                 data.Item1.SetIntoVehicle(data.Item2, data.Item3);
                                 EPlayer.Freeze(data.Item1, false);
+
+                                if(data.Item2.GetSharedData<int>("Team") == 0)
+                                {
+                                    data.Item2.SetSharedData("vMaxSpeed", (float)(150 / 3.6)); // 150 KM/H
+                                }
 
                                 data.Item1.SetSharedData("HasShot", false);
                             }

@@ -1358,6 +1358,7 @@ namespace LSCC
                 LoadoutCop = "?",
                 LoadoutFugitive = "?",
                 CarCop = "?",
+                CarFugitive = "?",
                 WeaponComponents = NAPI.Util.ToJson(wepItems),
                 Character = "{}",
             };
@@ -1457,6 +1458,78 @@ namespace LSCC
                             {
                                 EPlayer.GetAccount(player).CarCop = "lspdcara";
                                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Police Caracara.");
+                                break;
+                            }
+                    }
+                }
+                if(team == 0)
+                {
+                    switch (carname)
+                    {
+                        case "Default":
+                            {
+                                EPlayer.GetAccount(player).CarFugitive = "?";
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Random/Default.");
+                                break;
+                            }
+                        case "primo":
+                            {
+                                EPlayer.GetAccount(player).CarFugitive = "primo";
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Primo.");
+                                break;
+                            }
+                        case "Huntley":
+                            {
+                                EPlayer.GetAccount(player).CarFugitive = "huntley";
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Huntley.");
+                                break;
+                            }
+                        case "Dubsta":
+                            {
+                                EPlayer.GetAccount(player).CarFugitive = "dubsta";
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Dubsta.");
+                                break;
+                            }
+                        case "Tailgater":
+                            {
+                                EPlayer.GetAccount(player).CarFugitive = "tailgater";
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Tailgater.");
+                                break;
+                            }
+                        case "Schafter":
+                            {
+                                EPlayer.GetAccount(player).CarFugitive = "schafter2";
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Schafter.");
+                                break;
+                            }
+                        case "Blista Classic":
+                            {
+                                EPlayer.GetAccount(player).CarFugitive = "blista2";
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Blista Classic.");
+                                break;
+                            }
+                        case "Cheburek":
+                            {
+                                EPlayer.GetAccount(player).CarFugitive = "cheburek";
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Cheburek.");
+                                break;
+                            }
+                        case "Buffalo":
+                            {
+                                EPlayer.GetAccount(player).CarFugitive = "buffalo";
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Buffalo.");
+                                break;
+                            }
+                        case "Sultan":
+                            {
+                                EPlayer.GetAccount(player).CarFugitive = "sultan";
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Sultan.");
+                                break;
+                            }
+                        case "Kuruma":
+                            {
+                                EPlayer.GetAccount(player).CarFugitive = "kuruma";
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Kuruma.");
                                 break;
                             }
                     }
