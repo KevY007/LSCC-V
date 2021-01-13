@@ -1472,7 +1472,7 @@ namespace LSCC
                                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Random/Default.");
                                 break;
                             }
-                        case "primo":
+                        case "Primo":
                             {
                                 EPlayer.GetAccount(player).CarFugitive = "primo";
                                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Primo.");
