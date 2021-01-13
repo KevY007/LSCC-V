@@ -330,8 +330,15 @@ mp.events.add('render', () => {
                 {
                     derbyText.text = "N/A";
 
-                    derbyText.visible = true;
-                    derbyTimeText.visible = true;
+                    if(showHud !== undefined && showHud == false)
+                    {
+                        derbyTimeText.visible = false;
+                        derbyText.visible = false;
+                    }
+                    else {
+                        derbyText.visible = true;
+                        derbyTimeText.visible = true;
+                    }
 
                     derbyTimeText.text = TimeFormat(derbyTimeCur);
                     if(derbyCounting)
@@ -370,8 +377,15 @@ mp.events.add('render', () => {
                     chaseProgBar.progress = chaseTimeCur / chaseTimeMax;
                     chaseProgText.text = TimeFormat(chaseTimeMax - chaseTimeCur);
 
-                    chaseProgText.visible = true;
-                    chaseProgBar.visible = true;
+                    if(showHud !== undefined && showHud == false)
+                    {
+                        chaseProgText.visible = false;
+                        chaseProgBar.visible = false;
+                    }
+                    else {
+                        chaseProgText.visible = true;
+                        chaseProgBar.visible = true;
+                    }
 
                     if(chaseTimeCur >= chaseTimeMax)
                     {
@@ -390,7 +404,7 @@ mp.events.add('render', () => {
                         collisionTime--;
                         collisionText.text = TimeFormat(collisionTime);
 
-                        collisionText.visible = true;
+                        if((showHud !== undefined && showHud == false) == false) collisionText.visible = true;
 
                         mp.vehicles.forEach(target => {
                             mp.vehicles.forEach(target2 => {
@@ -829,6 +843,29 @@ mp.events.add("entclearanim", (entity, animDictionary, animName) => {
 
 mp.events.add(
     {
+        "ToggleHud": (show) => {
+            if(show)
+            {
+                if(chaseProgBar != null && chaseProgText != null && chaseRunning == true)
+                {
+                    chaseProgBar.visible = true;
+                    chaseProgText.visible = true;
+
+                    if(collisionTime > 0) collisionText.visible = true;
+                }
+
+                if(mp.players.local.getVariable("InLobby") == -4) {
+                    derbyTimeText.visible = true;
+                    derbyText.visible = true;
+                }
+            }
+            else{
+                chaseProgBar.visible = false;
+                chaseProgText.visible = false;
+                collisionText.visible = false;
+                derbyText.visible = false;
+            }
+        },
         "ThrowFromVehicle": () => {
             let localVeh = mp.players.local.vehicle;
             if (localVeh) {
