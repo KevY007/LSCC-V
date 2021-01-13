@@ -4324,7 +4324,7 @@ namespace LSCC
                     { "https://static.wikia.nocookie.net/gtawiki/images/4/45/Double-action-revolver-icon.png/revision/latest/scale-to-width-down/128", "Double Action Revolver", 25 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/b/b4/SawedoffShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Sawn Off Shotgun", 30 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/f/fe/TearGas-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "BZ Gas", 1 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/5/56/MilitaryRifle-GTAO-icon.png/revision/latest/scale-to-width-down/128", "Gusenberg Sweeper", 120 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/c/cc/GusenbergSweeper-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Gusenberg Sweeper", 120 },
                 }) },
                 { "Assassin", 20, 0, NAPI.Util.ToJson(new object[,] {
                     { "https://static.wikia.nocookie.net/gtawiki/images/9/9a/Knife-GTAVPC-HUD.png/revision/latest/scale-to-width-down/185", "Knife", 40 },
