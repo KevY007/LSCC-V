@@ -326,13 +326,14 @@ var bindASCIIKeys = {
     Q: 69,
     E: 81,
     LCtrl: 17,
-    Shift: 16
+    Shift: 16,
 };
 
 var isNoClip = false;
 var noClipCamera;
 var shiftModifier = false;
 var controlModifier = false;
+var verySlowMult = 0.05;
 var localPlayer = mp.players.local;
 
 mp.events.add("ForceNoclip", (OnOrOff) => {
@@ -343,6 +344,20 @@ mp.events.add("ForceNoclip", (OnOrOff) => {
     } else {
       stopNoClip();
     }
+});
+
+
+mp.events.addCommand("noclip_vsm", function (rate) {
+    rate = Number(rate);
+
+    if (rate < 0.01 || rate > 100.0) {
+        mp.gui.chat.push("Invalid rate, must be between 0.01 - 100.0 (0.10 optimal)");
+        return;
+    }
+
+    verySlowMult = rate;
+
+    mp.gui.chat.push(`Very slow multiplier (LSHIFT + CTRL together) set to ${verySlowMult}.`);
 });
 
 mp.events.add("ToggleNoclip", () => {
@@ -396,6 +411,13 @@ mp.events.add('render', function()
     } else if (controlModifier) {
       slowMult = 0.5;
     }
+
+    if(shiftModifier && controlModifier)
+    {
+        fastMult = 1;
+        slowMult = verySlowMult;
+    }
+
     var rightAxisX = mp.game.controls.getDisabledControlNormal(0, 220);
     var rightAxisY = mp.game.controls.getDisabledControlNormal(0, 221);
     var leftAxisX = mp.game.controls.getDisabledControlNormal(0, 218);
@@ -411,9 +433,9 @@ mp.events.add('render', function()
       getNormalizedVector(rr),
       getNormalizedVector(upVector)
     );
-    rightVector.x *= leftAxisX * 0.5;
-    rightVector.y *= leftAxisX * 0.5;
-    rightVector.z *= leftAxisX * 0.5;
+    rightVector.x *= leftAxisX * 0.5 * slowMult;
+    rightVector.y *= leftAxisX * 0.5 * slowMult;
+    rightVector.z *= leftAxisX * 0.5 * slowMult;
     var upMovement = 0.0;
     if (mp.keys.isDown(bindASCIIKeys.Q)) {
       upMovement = 0.5;

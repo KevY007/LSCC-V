@@ -630,6 +630,9 @@ namespace LSCC
                 return;
             }
 
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Toggled noclip, actions:");
+            player.SendChatMessage("!{#FF6347}LSHIFT: Boost | LCTRL: Slow | LSHIFT + CTRL: Very slow (adjustable)");
+            player.SendChatMessage("!{#FF6347}/noclip_vsm (rate) (rate is in decimal like 0.10) -- will adjust very slow speed (for cinematic etc)");
             player.TriggerEvent("ToggleNoclip");
             return;
         }
@@ -1790,7 +1793,7 @@ namespace LSCC
             return;
         }
 
-        [Command("clientcmd", Alias = "updaterate,lcmenu,fontsize,rappel,voicebind", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
+        [Command("clientcmd", Alias = "updaterate,lcmenu,fontsize,rappel,voicebind,noclip_vsm", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
         public void cmd_clientcmd(Player player)
         {
             return;
