@@ -84,11 +84,31 @@ namespace LSCC
 
             if(teamID == 0)
             {
+                this.Clothes[4].Drawable = 8;
+                this.Clothes[4].Texture = 0;
 
+                this.Clothes[5].Drawable = 82;
+                this.Clothes[5].Texture = 0;
+
+                this.Clothes[6].Drawable = 7;
+                this.Clothes[6].Texture = 2;
+
+                this.Clothes[11].Drawable = 50;
+                this.Clothes[11].Texture = 1;
             }
             else if(teamID == 1)
             {
+                this.Clothes[3].Drawable = 11;
+                this.Clothes[3].Texture = 0;
 
+                this.Clothes[4].Drawable = 126;
+                this.Clothes[4].Texture = 0;
+
+                this.Clothes[6].Drawable = 96;
+                this.Clothes[6].Texture = 0;
+
+                this.Clothes[11].Drawable = 55;
+                this.Clothes[11].Texture = 0;
             }
 
             Hat = -1;
@@ -395,7 +415,6 @@ namespace LSCC
             player.TriggerEvent("DestroyPlayerCamera");
             player.SetData("Creator_Using", true);
 
-            player.SetSkin(PedHash.FreemodeFemale01);
             player.SetSkin(PedHash.FreemodeMale01);
 
             foreach (LobbyData il in Settings.Lobbies)

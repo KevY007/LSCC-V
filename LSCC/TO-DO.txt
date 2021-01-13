@@ -7,7 +7,4 @@ add a linux script that will keep on restarting server if goes off??
 selectable fugitive cars
 buyammo
 more fugitive car
-cop model changeable between player custom char and predefined model list or smth (new model var if null and stuf)
 freecam for trailer or smth ask sharef or client resource script he got form someone
-add default clothes to default chars like default cop attire and fugitive attire so they arent naked by default
-face features dont seem to save like nose cheeks esp on edit
