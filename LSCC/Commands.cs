@@ -618,6 +618,22 @@ namespace LSCC
             return;
         }
 
+        [Command("noclip", "!{#AFAFAF}[USAGE] noclip", GreedyArg = true)]
+        public void cmd_noclip(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+            player.TriggerEvent("ToggleNoclip");
+            return;
+        }
+
         [Command("sethp", "!{#AFAFAF}[USAGE] sethp (target) (health)")]
         public void cmd_sethp(Player player, Player target, int health)
         {
@@ -2977,7 +2993,7 @@ namespace LSCC
             if (EPlayer.GetAccount(player).Admin >= 3)
             {
                 player.SendChatMessage("[Admin Lv 3]: /givegun(all) /gotopos /bringall /sethpall /(un)freezeall /r(emove)g(uns)f(rom)a(ll)");
-                player.SendChatMessage("[Admin Lv 3]: /givecomp /removecomp /attachcomp");
+                player.SendChatMessage("[Admin Lv 3]: /givecomp /removecomp /attachcomp /noclip");
             }
             if (EPlayer.GetAccount(player).Admin >= 4)
             {

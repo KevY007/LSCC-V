@@ -7,4 +7,3 @@ add a linux script that will keep on restarting server if goes off??
 selectable fugitive cars
 buyammo
 more fugitive car
-freecam for trailer or smth ask sharef or client resource script he got form someone
