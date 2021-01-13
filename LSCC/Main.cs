@@ -877,6 +877,10 @@ namespace LSCC
                 }
             }
 
+            NAPI.TextLabel.CreateTextLabel("Bored of waiting? /dm & /dmarenas", new Vector3(440.95462f, -976.35516f, 31.059594f), 10.0f, 2.2f, 0, new Color(255, 0, 0, 156), false);
+            NAPI.TextLabel.CreateTextLabel("Check out /freeroam & /cmds", new Vector3(435.73737f, -981.86523f, 30.698616f), 10.0f, 2.2f, 0, new Color(118, 232, 221, 156), false);
+            NAPI.TextLabel.CreateTextLabel("Do you know about /derby?", new Vector3(448.35562f, -987.96454f, 30.689596f), 10.0f, 2.2f, 0, new Color(230, 177, 21, 156), false);
+
             NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Server startup proceeded:\n");
 
             NAPI.Util.ConsoleOutput("[>===========|Los Santos Copchase|===========<]");
