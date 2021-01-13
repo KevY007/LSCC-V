@@ -5,6 +5,7 @@ const Menu = NativeUI.Menu;
 const UIMenuItem = NativeUI.UIMenuItem;
 const UIMenuListItem = NativeUI.UIMenuListItem;
 const UIMenuCheckboxItem = NativeUI.UIMenuCheckboxItem;
+const UIMenuSliderItem = NativeUI.UIMenuSliderItem;
 const BadgeStyle = NativeUI.BadgeStyle;
 const Point = NativeUI.Point;
 const ItemsCollection = NativeUI.ItemsCollection;
@@ -73,8 +74,8 @@ function updateParents() {
     );
 }
 
-function updateFaceFeature(index) {
-    localPlayer.setFaceFeature(index, parseFloat(featureItems[index].SelectedValue));
+function updateFaceFeature(index, value) {
+    localPlayer.setFaceFeature(index, parseFloat(value));
 }
 
 function updateAppearance(index) {
@@ -171,8 +172,8 @@ function resetParentsMenu(refresh = false) {
 
 function resetFeaturesMenu(refresh = false) {
     for (let i = 0; i < Data.featureNames.length; i++) {
-        featureItems[i].Index = 100;
-        updateFaceFeature(i);
+        featureItems[i].Index = 20;
+        updateFaceFeature(i, features[featureItems[i].Index]);
     }
 
     if (refresh) creatorFeaturesMenu.RefreshIndex();
@@ -228,8 +229,10 @@ creatorMainMenu.AddItem(new UIMenuItem("Appearance", "Your character's appearanc
 creatorMainMenu.AddItem(new UIMenuItem("Hair & Colors", "Your character's hair and hair colors."));
 
 let angles = [];
-for (let i = -180.0; i <= 180.0; i += 10.0) angles.push(i.toFixed(1));
-let angleItem = new UIMenuListItem("Angle", "", new ItemsCollection(angles));
+for (let i = -180.0; i <= 180.0; i += 15.0) angles.push(i.toFixed(1));
+
+let angleItem = new UIMenuSliderItem("Angle", angles, 0, "", false);
+angleItem.Index = 0;
 creatorMainMenu.AddItem(angleItem);
 
 let saveItem = new UIMenuItem("Save", "Save all changes.");
@@ -269,8 +272,12 @@ creatorMainMenu.ListChange.on((item, listIndex) => {
         creatorHairMenu.Clear();
         fillHairMenu();
         creatorHairMenu.RefreshIndex();
-    } else if (item == angleItem) {
-        localPlayer.setHeading(parseFloat(angleItem.SelectedValue));
+    }
+});
+
+creatorMainMenu.SliderChange.on((item, listIndex, value) => {
+    if (item == angleItem) {
+        localPlayer.setHeading(parseFloat(value));
         localPlayer.clearTasksImmediately();
     }
 });
@@ -334,7 +341,7 @@ creatorMainMenu.ItemSelect.on((item, index) => {
             };
 
             let featureData = [];
-            for (let i = 0; i < featureItems.length; i++) featureData.push(parseFloat(featureItems[i].SelectedValue));
+            for (let i = 0; i < featureItems.length; i++) featureData.push(parseFloat(features[featureItems[i].Index]));
 
             let appearanceData = [];
             for (let i = 0; i < appearanceItems.length; i++) appearanceData.push({Value: ((appearanceItems[i].Index == 0) ? 255 : appearanceItems[i].Index - 1), Opacity: appearanceOpacityItems[i].Index * 0.01});
@@ -370,14 +377,14 @@ creatorMenus.push(creatorMainMenu);
 
 // CREATOR PARENTS
 let similarities = [];
-for (let i = 0; i <= 100; i += 2) similarities.push(i + "%");
+for (let i = 0; i <= 100; i += 2) similarities.push(i);
 
 let creatorParentsMenu = new Menu("Parents", "", new Point(50, 50));
 creatorParentsMenuExit = null;
 let fatherItem = new UIMenuListItem("Father", "Your character's father.", new ItemsCollection(Data.fatherNames));
 let motherItem = new UIMenuListItem("Mother", "Your character's mother.", new ItemsCollection(Data.motherNames));
-let similarityItem = new UIMenuListItem("Resemblance", "Similarity to parents.\n(lower = feminine, higher = masculine)", new ItemsCollection(similarities));
-let skinSimilarityItem = new UIMenuListItem("Skin Tone", "Skin color similarity to parents.\n(lower = mother's, higher = father's)", new ItemsCollection(similarities));
+let similarityItem = new UIMenuSliderItem("Resemblance", "Similarity to parents.\n(left = feminine, right = masculine)", similarities);
+let skinSimilarityItem = new UIMenuSliderItem("Skin Tone", "Skin color similarity to parents.\n(left = mother's, right = father's)", similarities);
 creatorParentsMenu.AddItem(fatherItem);
 creatorParentsMenu.AddItem(motherItem);
 creatorParentsMenu.AddItem(similarityItem);
@@ -420,6 +427,10 @@ creatorParentsMenu.ListChange.on((item, listIndex) => {
     updateParents();
 });
 
+creatorParentsMenu.SliderChange.on((item, listIndex, value) => {
+    updateParents();
+});
+
 creatorParentsMenu.ParentMenu = creatorMainMenu;
 creatorParentsMenu.Visible = false;
 creatorMenus.push(creatorParentsMenu);
@@ -434,8 +445,8 @@ let creatorFeaturesMenu = new Menu("Features", "", new Point(50, 50));
 creatorFeaturesMenuExit = null;
 
 for (let i = 0; i < Data.featureNames.length; i++) {
-    let tempFeatureItem = new UIMenuListItem(Data.featureNames[i], "", new ItemsCollection(features));
-    tempFeatureItem.Index = 100;
+    let tempFeatureItem = new UIMenuSliderItem(Data.featureNames[i], features, 20, "", false);
+    tempFeatureItem.Index = 20;
     featureItems.push(tempFeatureItem);
     creatorFeaturesMenu.AddItem(tempFeatureItem);
 }
@@ -454,8 +465,8 @@ creatorFeaturesMenu.ItemSelect.on((item, index) => {
     switch (item.Text) {
         case "Randomize":
             for (let i = 0; i < Data.featureNames.length; i++) {
-                featureItems[i].Index = getRandomInt(0, 200);
-                updateFaceFeature(i);
+                featureItems[i].Index = getRandomInt(0, features.length);
+                updateFaceFeature(i, features[featureItems[i].Index]);
             }
         break;
 
@@ -473,8 +484,8 @@ creatorFeaturesMenu.ItemSelect.on((item, index) => {
     }
 });
 
-creatorFeaturesMenu.ListChange.on((item, listIndex) => {
-    updateFaceFeature(featureItems.indexOf(item));
+creatorFeaturesMenu.SliderChange.on((item, listIndex, value) => {
+    updateFaceFeature(featureItems.indexOf(item), parseFloat(value));
 });
 
 creatorFeaturesMenu.ParentMenu = creatorMainMenu;
@@ -682,11 +693,22 @@ mp.events.add("toggleCreator", (active, charData) => {
             skinSimilarityItem.Index = parseInt(charData.Parents.SkinSimilarity * 100);
             updateParents();
             
-
+            let difference = function (a, b) { return Math.abs(a - b); }
             // features
             for (let i = 0; i < 20; i++) {
-                featureItems[i].Index = (charData.Features[i] * 100) + 100;
-                updateFaceFeature(i);
+
+                let lastDist = 9999.9;
+                let lastItem = 0;
+                for(let b = 0; b < features.length; b++)
+                {
+                    if(difference(charData.Features[i], features[b]) < lastDist)
+                    {
+                        lastDist = difference(charData.Features[i], features[b]);
+                        lastItem = b;
+                    }
+                }
+                featureItems[i].Index = lastItem;
+                updateFaceFeature(i, features[lastItem]);
             }
 
             // hair and colors

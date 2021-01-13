@@ -315,8 +315,10 @@ namespace LSCC
             float[] features = new float[20];
             features = playerChar.Features;
 
-            player.SetCustomization(playerChar.Gender == 0, a, playerChar.EyeColor, playerChar.Hair.Color, playerChar.Hair.HighlightColor, features,
+            player.SetCustomization((playerChar.Gender == 0) ? true : false, a, playerChar.EyeColor, playerChar.Hair.Color, playerChar.Hair.HighlightColor, playerChar.Features,
                 headOverlays, new Decoration[0]);
+
+            for (int i = 0; i < 20; i++) player.SetFaceFeature(i, features[i]);
 
             var clothDictionary = new Dictionary<int, ComponentVariation>();
 
@@ -392,6 +394,8 @@ namespace LSCC
 
             player.TriggerEvent("DestroyPlayerCamera");
             player.SetData("Creator_Using", true);
+
+            player.SetSkin(PedHash.FreemodeFemale01);
             player.SetSkin(PedHash.FreemodeMale01);
 
             foreach (LobbyData il in Settings.Lobbies)
@@ -408,6 +412,7 @@ namespace LSCC
             CharacterData defaultChar = new CharacterData();
             if (charData != null) defaultChar = charData;
 
+            defaultChar.Clothing = new CharacterData().Clothing;
             EPlayer.ApplyCharacter(player, defaultChar);
 
             player.Position = new Vector3(402.8664, -996.4108, -99.00027);
