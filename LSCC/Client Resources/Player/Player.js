@@ -851,19 +851,25 @@ mp.events.add(
                     chaseProgBar.visible = true;
                     chaseProgText.visible = true;
 
-                    if(collisionTime > 0) collisionText.visible = true;
+                    if(collisionTime > 0 && collisionText != null) collisionText.visible = true;
                 }
 
-                if(mp.players.local.getVariable("InLobby") == -4) {
+                if(mp.players.local.getVariable("InLobby") == -4 && derbyText != null && derbyTimeText != null) {
                     derbyTimeText.visible = true;
                     derbyText.visible = true;
                 }
             }
             else{
-                chaseProgBar.visible = false;
-                chaseProgText.visible = false;
-                collisionText.visible = false;
-                derbyText.visible = false;
+                if(chaseProgBar != null && chaseProgText != null && collisionText != null)
+                {
+                    chaseProgBar.visible = false;
+                    chaseProgText.visible = false;
+                    collisionText.visible = false;
+                }
+                if(derbyText != null && derbyTimeText != null) {
+                    derbyText.visible = false;
+                    derbyTimeText.visible = false;
+                }
             }
         },
         "ThrowFromVehicle": () => {
