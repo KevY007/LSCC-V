@@ -119,6 +119,7 @@ namespace LSCC
         public List<Vehicle> Vehicles { get; set; }
 
         public int lobbyId { get; set; }
+        public int lastMapId { get; set; }
         public int gameStatus { get; set; }
         public GameModes gameMode { get; set; }
 
@@ -150,6 +151,7 @@ namespace LSCC
             Weather = new Random().Next(0, 9);
 
             lobbyId = -1;
+            lastMapId = -1;
             for(int i = 1; i < Settings.NextLobbyID; i++)
             {
                 if(Settings.Lobbies.Count(a => a.lobbyId == i) == 0)
@@ -1518,6 +1520,8 @@ namespace LSCC
 
                     NAPI.Util.ConsoleOutput($"[Lobby " + lobbyid + $"] Selected Map [{map.Name}] | Total Spawns: [{ContextFactory.Instance.MapSpawns.AsQueryable().Where(a => a.mapID == map.SQL_ID).Count()}]");
                     crashcheck++;
+
+                    lobby.lastMapId = map.SQL_ID;
 
                     if (ContextFactory.Instance.MapSpawns.AsQueryable().Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 0).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no fugitive spawns! Abort."); return false; }
                     if (ContextFactory.Instance.MapSpawns.AsQueryable().Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 1).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no cop spawns! Abort."); return false; }

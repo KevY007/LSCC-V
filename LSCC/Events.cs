@@ -471,7 +471,6 @@ namespace LSCC
 
                     if (reason != 696988 && reason != 696989 && player.GetSharedData<int>("Team") == 0 && killer.GetSharedData<int>("Team") == 1 && player.GetSharedData<bool>("HasShot") == false)
                     {
-
                         Vehicle pVeh = null;
                         int seat = 0;
                         if (player.IsInVehicle)
@@ -595,6 +594,18 @@ namespace LSCC
             {
                 if (lobby.gameStatus == 1)
                 {
+                    if(killer != null)
+                    {
+                        int killStreak = killer.GetData<int>("Killstreak");
+                        killer.SetData("Killstreak", killStreak + 1);
+
+                        if(killStreak % 4 == 0)
+                        {
+                            EPlayer.GrantXP(killer, 5);
+                            EPlayer.SendMessageInLobby(lobby.lobbyId, $"!{{#FF0000}}[KILLSTREAK] !{{#FF6347}}{killer.Name} !{{#FFFFFF}}is on a {killStreak} kills rampage! Someone stop them!");
+                            killer.SendChatMessage("!{#00FF33}[!] !{#FFFFFF}You have earnt 5 XP for maintaining a killstreak!");
+                        }
+                    }
                     if (lobby.Fugitives.Contains(player))
                     {
                         if (killer != null)
@@ -725,6 +736,8 @@ namespace LSCC
                 }
                 catch { }
             }, (wasInGame == true && reason != 696989) ? 15000 : 3000);
+
+            player.SetData("Killstreak", 0);
         }
 
         [ServerEvent(Event.ChatMessage)]
@@ -1878,6 +1891,7 @@ namespace LSCC
         [ServerEvent(Event.PlayerSpawn)]
         public static void OnPlayerSpawn(Player player)
         {
+            player.SetData("Killstreak", 0);
             player.ResetData("AttachedComponents");
 
             lock (player)

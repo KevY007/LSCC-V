@@ -532,6 +532,7 @@ namespace LSCC
                 player.ResetData("ViewingLoadoutSelector");
                 player.SetSharedData("HasShot", false);
                 player.SetSharedData("VoiceMode", 0);
+                player.SetData("Killstreak", 0);
                 player.SetSharedData("VisibleBlip", false);
                 player.SetData("PMState", true);
                 player.SetSharedData("Team", -1);
