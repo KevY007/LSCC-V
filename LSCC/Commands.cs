@@ -1996,7 +1996,7 @@ namespace LSCC
             return;
         }
 
-        [Command("clientcmd", Alias = "updaterate,lcmenu,fontsize,rappel,rapple,voicebind,noclip_vsm", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
+        [Command("clientcmd", Alias = "updaterate,lcmenu,fontsize,rappel,rapple,voicebind,noclip_vsm,gpsbind", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
         public void cmd_clientcmd(Player player)
         {
             return;
@@ -2418,7 +2418,7 @@ namespace LSCC
 
             player.SendChatMessage("!{#FF6347} Key: Function.");
             player.SendChatMessage("!{#FF6347} N: Push to talk voicechat. (Changed using /voicebind)");
-            player.SendChatMessage("!{#FF6347} Z: Toggle GPS as a Cop.");
+            player.SendChatMessage("!{#FF6347} Z: Toggle GPS as a Cop. (Changed using /gpsbind)");
             player.SendChatMessage("!{#FF6347} O: Toggle scoreboard, displays a scrollbar and mouse if needed.");
             player.SendChatMessage("!{#FF6347} L: Lock/unlock vehicle.");
             player.SendChatMessage("!{#FF6347} X: Rapple from a helicopter (not all helicopters, try maverick).");
@@ -2599,7 +2599,7 @@ namespace LSCC
             player.SendChatMessage("!{#28E0DA}[Mode: DM]: /dm /dmarena");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /freeroam /veh /customvehlist /teleport /mytime /myweather");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /togblip");
-            player.SendChatMessage("!{#A5A8A8}[Misc]: /updaterate /info /fontsize /voicebind");
+            player.SendChatMessage("!{#A5A8A8}[Misc]: /updaterate /info /fontsize /voicebind /gpsbind");
             player.SendChatMessage("!{#A5A8A8}[Dbg/Test]: /pos /lcmenu");
 
             if (EPlayer.GetAccount(player).DonatorLevel >= 1)

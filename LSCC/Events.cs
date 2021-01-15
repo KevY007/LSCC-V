@@ -137,6 +137,7 @@ namespace LSCC
         {
             if (keyId == 0x5A)
             {
+                player.SendChatMessage("!{#FF6347}GPS");
                 LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
                 if (lobby != null)
                 {

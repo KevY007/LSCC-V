@@ -40,6 +40,9 @@ var healthLoss = 0;
 const bones = [0, 10706, 11816, 14201, 18905, 23553, 24816, 24817, 24818, 28252, 31086, 36864, 39317, 40269, 45509, 51826, 52301, 57005, 57597, 58271, 61163, 63931, 64729];
 const boneDistanceThreshold = 1;
 
+var lastGPSBind = 0x5A;
+var curGPSBind = 0x5A;
+
 mp.game.vehicle.defaultEngineBehaviour = false;
 
 traceLastFunc("[Players] CreateVars");
@@ -71,13 +74,46 @@ setInterval(() => {
     }
 }, 2000);
 
-mp.keys.bind(0x5A, false, function() {
-    if(chatStatus == false)
+
+function TogGPSMode()
+{
+    if(chatStatus == false && 
+        (mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true))
     {
         traceLastFunc(`[Players] Attempt tog GPS`);
 
         mp.events.callRemote("OnScriptedKeyPress", 0x5A, true);
     }
+}
+
+if(mp.storage.data.gpsbind !== undefined)
+{
+    curGPSBind = mp.storage.data.gpsbind;
+    lastGPSBind = mp.storage.data.gpsbind;
+}
+
+mp.keys.bind(lastGPSBind, true, TogGPSMode);
+
+mp.events.addCommand("gpsbind", function (bind) {
+    bind = Number(bind);
+
+    if (!Number.isInteger(bind)) {
+        mp.gui.chat.push("USAGE: gpsbind (keycode) --Input a virtual keycode e.g. 0x5A is 'Z' (default)");
+        mp.gui.chat.push("https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes");
+        return;
+    }
+
+    mp.storage.data.gpsbind = bind;
+
+    mp.storage.flush();
+
+    lastGPSBind = curGPSBind;
+    curGPSBind = bind;
+
+    mp.keys.unbind(lastGPSBind, true, TogGPSMode);
+    mp.keys.bind(curGPSBind, true, TogGPSMode);
+
+    mp.gui.chat.push("Key changed!");
 });
 
 mp.keys.bind(0x4C, false, function() {

@@ -10,5 +10,4 @@ weapon attachment/comp shop with points later
 
 setteam
 killstreak system
-gpsbind
 players or textdraw player list and lobby with it
