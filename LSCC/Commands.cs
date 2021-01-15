@@ -2952,6 +2952,42 @@ namespace LSCC
             return;
         }
 
+        [Command("nextmap", "!{#AFAFAF}[USAGE] nextmap (map ID or name)", Alias = "selectnextmap")]
+        public void cmd_nextmap(Player player, string map)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Account acc = EPlayer.GetAccount(player);
+
+            if (acc.Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                return;
+            }
+
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (lobby == null)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in a lobby!");
+                return;
+            }
+
+            int mapID = -1;
+            Map mapBruh = ContextFactory.Instance.Maps.First(a => (Int32.TryParse(map, out mapID) && mapID == a.SQL_ID) || a.Name.Contains(map, StringComparison.OrdinalIgnoreCase));
+
+            if (mapBruh == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}No map with that name/ID found."); return; }
+
+
+            lobby.NextMapID = mapBruh.SQL_ID;
+            
+
+            NAPI.Util.ConsoleOutput($"{player.Name} set lobby {lobby.lobbyId} next map to {mapBruh.Name} ({mapBruh.SQL_ID}).");
+
+            EPlayer.SendMessageInLobby(lobby.lobbyId, $"[Lobby {lobby.lobbyId}] Next game map has been set to !{{#8D8DFF}}{mapBruh.Name} !{{#FFFFFF}}by !{{#E84040}}{player.Name} !{{#FFFFFF}}.");
+           
+            return;
+        }
+
         [Command("saveserver")]
         public void cmd_saveserver(Player player)
         {

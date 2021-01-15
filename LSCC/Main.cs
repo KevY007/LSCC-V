@@ -134,6 +134,7 @@ namespace LSCC
         public string Password { get; set; }
         public int[] Time { get; set; }
         public int Weather { get; set; }
+        public int NextMapID { get; set; }
 
         public LobbyData()
         {
@@ -167,6 +168,7 @@ namespace LSCC
             LastSeenCounter = 0;
             CollisionCounter = 0;
             GameProgress = 0;
+            NextMapID = -1;
             GameAutoStart = true;
             LastAutoStartMsg = 0;
             FugitivePercent = 28;
@@ -1488,6 +1490,10 @@ namespace LSCC
                     crashcheck++;
 
                     Map map = mapList.OrderBy(c => Guid.NewGuid()).FirstOrDefault();
+                    if (lobby.NextMapID != -1) map = mapList.FirstOrDefault(a => a.SQL_ID == lobby.NextMapID);
+                    lobby.NextMapID = -1;
+
+                    if (map == null) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Next (force-set) MapID == null; Failed to start!"); return false; }
                     crashcheck++;
 
                     NAPI.Util.ConsoleOutput($"[Lobby " + lobbyid + $"] Selected Map [{map.Name}] | Total Spawns: [{ContextFactory.Instance.MapSpawns.AsQueryable().Where(a => a.mapID == map.SQL_ID).Count()}]");

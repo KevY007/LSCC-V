@@ -9,8 +9,6 @@ CURRENCY SYSTEM/DONOR POINTS THAT CAN ALLOW VIP STUFF AND CMDS LIKE buyammo USIN
 weapon attachment/comp shop with points later
 
 less car health for starting fugitives
-togglemap
-selectnextmap
 setteam
 add /lock and by default cop car locked
 override max seats set for new cars i dont see em even in dlcpack eh
