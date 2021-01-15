@@ -398,17 +398,17 @@ namespace LSCC
                 reasonStr.Replace(".", "");
             }
 
-            if (player.GetSharedData<int>("InLobby") == -4 && Settings.DerbyTimeLeft > 0 && Settings.DerbyTimeLeft != 180)
+            if (player.GetSharedData<int>("InLobby") == -4 && Settings.DerbyTimeLeft > 0 && Settings.DerbyTimeLeft != 180 && 
+                player.HasSharedData("DerbyTime"))
             {
-                lock (Settings.LoggedInPlayers)
+                if(player.GetSharedData<int>("DerbyTime") >= 5)
                 {
                     foreach (Player indm in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
                     {
                         indm.TriggerEvent("pushToKillFeed", $"DERBY> {player.Name} fell down");
                     }
-
-                    player.SetSharedData("DerbyTime", 0);
                 }
+                player.SetSharedData("DerbyTime", 0);
             }
 
             if (killer != null && !killer.IsNull && killer != player)

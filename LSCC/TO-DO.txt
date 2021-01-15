@@ -12,13 +12,10 @@ less car health for starting fugitives
 togglemap
 selectnextmap
 setteam
-sped car limit after collisions\
-derby only fall down every 3sec
 add /lock and by default cop car locked
 override max seats set for new cars i dont see em even in dlcpack eh
 killstreak system
 gpsbind
-re-enable collision etc manual with a function after getting in car etc in playerentervehicle
 players or textdraw player list and lobby with it
 /ann
 disble afk stand still time checker

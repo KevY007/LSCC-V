@@ -1077,6 +1077,17 @@ mp.events.add(
             player.seat = seat;
             vehicle.setInvincible(false);
 
+            if(chaseRunning == true && collisionTime >= 1)
+            {
+                mp.vehicles.forEach(target2 => {
+                    vehicle.setNoCollision(target2.handle, false);
+                    target2.setNoCollision(vehicle.handle, false);
+
+                    target2.setInvincible(false);
+                    vehicle.setInvincible(false);
+                });
+            }
+
             mp.game.invoke('0x1B9C0099CB942AC6', vehicle.handle, 'OFF');
 
             if(mp.game.vehicle.isThisModelAHeli(vehicle.model) || mp.game.vehicle.isThisModelAPlane(vehicle.model)) {

@@ -1850,9 +1850,6 @@ namespace LSCC
                         pVehicle.SetSharedData("Team", 0);
                         lobby.Vehicles.Add(pVehicle);
 
-                        pVehicle.SetSharedData("vMaxSpeed", (float)(150 / 3.6)); // KM/H max.
-
-
                         NAPI.Task.Run(() =>
                         {
                             lock (pVehicle)
@@ -1968,11 +1965,6 @@ namespace LSCC
 
                                 data.Item1.SetIntoVehicle(data.Item2, data.Item3);
                                 EPlayer.Freeze(data.Item1, false);
-
-                                if(data.Item2.GetSharedData<int>("Team") == 0)
-                                {
-                                    data.Item2.SetSharedData("vMaxSpeed", (float)(150 / 3.6)); // 150 KM/H
-                                }
 
                                 data.Item1.SetSharedData("HasShot", false);
                             }
@@ -2124,8 +2116,16 @@ namespace LSCC
 
                     if (lobby.CollisionCounter > 0)
                     {
-                        lobby.CollisionCounter--;
+                        if (lobby.CollisionCounter % 5 == 0) // Every 5 seconds/multiple during collision phase
+                        {
+                            foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                            {
+                                player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
+                            }
+                        }
 
+                        lobby.CollisionCounter--;
+                        
                         if (lobby.CollisionCounter <= 0)
                         {
                             lock (Settings.LoggedInPlayers)
@@ -2146,6 +2146,14 @@ namespace LSCC
                                     else if (lobby.Fugitives.Contains(player))
                                     {
                                         EPlayer.GiveFugitiveWeapons(player);
+                                    }
+                                }
+
+                                foreach(Vehicle veh in lobby.Vehicles)
+                                {
+                                    if(veh.HasSharedData("Team") && veh.GetSharedData<int>("Team") == 0)
+                                    {
+                                        veh.SetSharedData("vMaxSpeed", (float)(150 / 3.6)); // 150 KM/H
                                     }
                                 }
                             }
