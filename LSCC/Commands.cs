@@ -3865,7 +3865,7 @@ namespace LSCC
 
             NAPI.Chat.SendChatMessageToAll("!{#FF6347}|======================| ADMIN ANNOUNCEMENT |======================|");
             NAPI.Chat.SendChatMessageToAll($"(( From: {EPlayer.GetAdminLevelName(EPlayer.GetAccount(player).Admin, true)}!{{#FFFFFF}} {player.Name} ))");
-            NAPI.Chat.SendChatMessageToAll("(( !{#FF6347}" + text + "!{#FFFFFF} ))");
+            NAPI.Chat.SendChatMessageToAll("(( Message: !{#FF6347}" + text + "!{#FFFFFF} ))");
             NAPI.Chat.SendChatMessageToAll("  ");
 
             Discord.SendTextChannel("staff-bot", $"**(ANNOUNCEMENT) | {player.Name}**: {text}");
