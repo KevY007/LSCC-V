@@ -89,12 +89,12 @@ mp.keys.bind(0x4C, false, function() {
     }
 });
 
-mp.keys.bind(0x46, false, function() {
+mp.keys.bind(0x59, false, function() {
     if(chatStatus == false)
     {
         traceLastFunc(`[Players] Attempt Y key/engine`);
 
-        mp.events.callRemote("OnScriptedKeyPress", 0x46, true);
+        mp.events.callRemote("OnScriptedKeyPress", 0x59, true);
     }
 });
 

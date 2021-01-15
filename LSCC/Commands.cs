@@ -181,18 +181,11 @@ namespace LSCC
             player.Vehicle.EngineStatus = !player.Vehicle.EngineStatus;
             player.Vehicle.SetSharedData("Engine", player.Vehicle.EngineStatus);
 
-            if (player.Vehicle.HasSharedData("Team") && player.Vehicle.GetSharedData<int>("Team") != player.GetSharedData<int>("Team"))
+            if (player.Vehicle.EngineStatus)
             {
-                EPlayer.Action(player, "turns the vehicle's engine off.");
+                EPlayer.Action(player, "turns the vehicle's engine on.");
             }
-            else
-            {
-                if (player.Vehicle.EngineStatus)
-                {
-                    EPlayer.Action(player, "turns the vehicle's engine on.");
-                }
-                else EPlayer.Action(player, "turns the vehicle's engine off.");
-            }
+            else EPlayer.Action(player, "turns the vehicle's engine off.");
 
             return;
         }

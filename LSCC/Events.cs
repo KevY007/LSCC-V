@@ -150,7 +150,7 @@ namespace LSCC
                 Commands.cmd_lock(player);
             }
 
-            if (keyId == 0x46)
+            if (keyId == 0x59)
             {
                 Commands.cmd_engine(player);
             }
