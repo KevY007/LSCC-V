@@ -1484,6 +1484,12 @@ namespace LSCC
                                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Huntley.");
                                 break;
                             }
+                        case "S-Class":
+                            {
+                                EPlayer.GetAccount(player).CarFugitive = "600sel";
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Mercedes S-Class.");
+                                break;
+                            }
                         case "Dubsta":
                             {
                                 EPlayer.GetAccount(player).CarFugitive = "dubsta";

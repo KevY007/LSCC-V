@@ -11,7 +11,6 @@ weapon attachment/comp shop with points later
 less car health for starting fugitives
 setteam
 add /lock and by default cop car locked
-override max seats set for new cars i dont see em even in dlcpack eh
 killstreak system
 gpsbind
 players or textdraw player list and lobby with it

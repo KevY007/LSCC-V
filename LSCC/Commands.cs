@@ -2460,6 +2460,7 @@ namespace LSCC
                 // Fugitive
                 { "Primo", "images/primo.png", 0, 3 },
                 { "Huntley", "images/huntley.png", 0, 5 },
+                { "S-Class", "images/600sel.png", 0, 6 },
                 { "Dubsta", "images/dubsta.png", 0, 8 },
                 { "Tailgater", "images/tailgater.png", 0, 10 },
                 { "Schafter", "images/schafter2.png", 0, 12 },

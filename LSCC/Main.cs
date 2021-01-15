@@ -409,6 +409,21 @@ namespace LSCC
             {
                 switch(vehiclename)
                 {
+                    case "kuruma":
+                        seats = 4;
+                        break;
+                    case "sultan":
+                        seats = 4;
+                        break;
+                    case "buffalo":
+                        seats = 4;
+                        break;
+                    case "cheburek":
+                        seats = 4;
+                        break;
+                    case "blista2":
+                        seats = 2;
+                        break;
                     case "polbufac2":
                         seats = 4;
                         break;
