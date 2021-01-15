@@ -7,3 +7,23 @@ add a linux script that will keep on restarting server if goes off??
 
 CURRENCY SYSTEM/DONOR POINTS THAT CAN ALLOW VIP STUFF AND CMDS LIKE buyammo USING VIP POINTS OR STUF
 weapon attachment/comp shop with points later
+
+changeable derby vehicle lsccdata.json etc
+seat check in give tag
+less car health for starting fugitives
+togglemap
+selectnextmap
+setteam
+sped car limit after collisions\
+derby only fall down every 3sec
+add /lock and by default cop car locked
+override max seats set for new cars i dont see em even in dlcpack eh
+killstreak system
+gpsbind
+re-enable collision etc manual with a function after getting in car etc in playerentervehicle
+players or textdraw player list and lobby with it
+/ann
+disble afk stand still time checker
+switchseats
+disable taser in car key
+dragout in car disable
