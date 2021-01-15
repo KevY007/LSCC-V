@@ -1752,7 +1752,7 @@ namespace LSCC
                         EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Cop as {player.Name}");
 
                         player.TriggerEvent("SetActorInvulnerable", false);
-                        player.TriggerEvent("CanFallOutOfCar", true);
+                        player.TriggerEvent("CanFallOutOfCar", false);
                         player.ResetData("CuffingTarget");
                         player.SetSharedData("Team", 1);
                     }
@@ -1789,7 +1789,7 @@ namespace LSCC
                         EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Fugitive as {player.Name}");
 
                         player.TriggerEvent("SetActorInvulnerable", false);
-                        player.TriggerEvent("CanFallOutOfCar", true);
+                        player.TriggerEvent("CanFallOutOfCar", false);
 
                         player.SetSharedData("VisibleBlip", true);
                         player.ResetData("Handsup");

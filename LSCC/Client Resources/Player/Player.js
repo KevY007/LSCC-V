@@ -1126,9 +1126,11 @@ mp.events.add(
             if(toggle)
             {
                 player.canKnockOffVehicle(true);
+                player.setCanBeKnockedOffVehicle(0); // Can fall
             }
             else
             {
+                player.setCanBeKnockedOffVehicle(2); // Can't fall off
                 player.canKnockOffVehicle(false);
             }
         },
@@ -1154,7 +1156,6 @@ mp.events.add(
         },
 
         "playerEnterVehicle": (vehicle, seat) => {
-            player.setCanBeKnockedOffVehicle(2); // Can't fall off
             player.seat = seat;
             vehicle.setInvincible(false);
 

@@ -3343,6 +3343,254 @@ namespace LSCC
             return;
         }
 
+        [Command("setteam", "!{#AFAFAF}[USAGE] setteam (target) (team)", Alias = "steam")]
+        public void cmd_setteam(Player player, Player target, string team)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                return;
+            }
+
+            if (!EPlayer.LoggedIn(target)) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not logged in."); return; }
+
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == target.GetSharedData<int>("InLobby"));
+            if (lobby != null)
+            {
+                if (lobby.gameStatus != 1 || lobby.Fugitives.Contains(target) || lobby.Cops.Contains(target))
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not eligible to be set in a team!");
+                    return;
+                }
+            }
+
+            int teamID = 1;
+            if (team.Contains("cop", StringComparison.OrdinalIgnoreCase)) teamID = 1;
+            if (team.Contains("fugitive", StringComparison.OrdinalIgnoreCase)) teamID = 0;
+            if (team.Contains("0")) teamID = 0;
+            if (team.Contains("1")) teamID = 1;
+
+            Map bruh = ContextFactory.Instance.Maps.First(map => map.SQL_ID == lobby.lastMapId);
+
+            if (bruh == null)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid map on that game!");
+                return;
+            }
+
+            try
+            {
+                target.SetSharedData("BustedProgress", 0.0);
+                target.ResetData("BustSupporters");
+                target.ResetData("CuffingTarget");
+
+                if (lobby.gameMode == GameModes.STANDARD)
+                    target.TriggerEvent("showHPBars", 1);
+                else if (lobby.gameMode == GameModes.BUSTED)
+                    target.TriggerEvent("showHPBars", 3);
+
+                MapSpawn spawn = ContextFactory.Instance.MapSpawns.FirstOrDefault(b => b.spawnTeam == teamID);
+
+                if(teamID == 0)
+                {
+                    lobby.Fugitives.Add(target);
+                    lobby.Cops.Remove(target);
+
+                    Vector3 vecSpawn = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ);
+
+                    CharacterData ConvChar = new CharacterData();
+
+                    try
+                    {
+                        ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(target).Character);
+
+                        EPlayer.ApplyCharacter(target, ConvChar, 0);
+                    }
+                    catch { }
+
+                    target.Position = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ).Around(5f);
+                    EPlayer.Freeze(target, false);
+
+                    target.Health = 100;
+                    target.Armor = 0;
+                    EPlayer.SetColor(target, new Color(232, 64, 64, 255), target.Armor);
+
+                    EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Fugitive as {target.Name}");
+
+                    target.TriggerEvent("SetActorInvulnerable", false);
+                    target.TriggerEvent("CanFallOutOfCar", false);
+
+                    target.SetSharedData("VisibleBlip", true);
+                    target.ResetData("Handsup");
+                    target.ResetData("Cuffed");
+                    target.SetSharedData("Team", 0);
+                    target.ResetData("CuffingTarget");
+                    target.SetSharedData("HasShot", false);
+
+                    string carName = "washington";
+
+                    if (EPlayer.GetAccount(target).CarFugitive.Length < 3)
+                    {
+                        switch (new Random().Next(0, 6))
+                        {
+                            case 0:
+                                carName = "washington";
+                                break;
+                            case 1:
+                                carName = "600sel";
+                                break;
+                            case 2:
+                                carName = "oracle";
+                                break;
+                            case 3:
+                                carName = "moonbeam";
+                                break;
+                            case 4:
+                                carName = "rancherxl";
+                                break;
+                            case 5:
+                                carName = "cavalcade2";
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        carName = EPlayer.GetAccount(target).CarFugitive;
+                    }
+
+                    Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawn.spawnA, new Random().Next(122), new Random().Next(122), $"SPAWN", 255, false, true, Convert.ToUInt32(lobby.lobbyId));
+                    pVehicle.EngineStatus = true;
+                    pVehicle.SetSharedData("Engine", true);
+                    pVehicle.SetSharedData("Locked", true);
+                    pVehicle.Locked = true;
+                    pVehicle.SetSharedData("Team", 0);
+                    lobby.Vehicles.Add(pVehicle);
+
+                    NAPI.Task.Run(() =>
+                    {
+                        lock (pVehicle)
+                        {
+                            if (pVehicle != null && pVehicle.Exists) pVehicle.Position = vecSpawn;
+                        }
+                    }, 1000);
+
+                    target.Position = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ).Around(5f);
+                    EPlayer.Freeze(target, false);
+                    target.Dimension = Convert.ToUInt32(lobby.lobbyId);
+
+                    target.SetIntoVehicle(pVehicle, 0);
+
+                    NAPI.Task.Run(() =>
+                    {
+                        try { target.SetIntoVehicle(pVehicle, 0); } catch { }
+                    });
+                }
+                else
+                {
+                    lobby.Fugitives.Remove(target);
+                    lobby.Cops.Add(target);
+
+                    Vector3 vecSpawn = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ);
+
+                    CharacterData ConvChar = new CharacterData();
+
+                    try
+                    {
+                        ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(target).Character);
+
+                        EPlayer.ApplyCharacter(target, ConvChar, 1);
+                    }
+                    catch { }
+
+                    target.Health = 100;
+                    target.Armor = 60;
+                    EPlayer.SetColor(target, new Color(141, 141, 255, 255), target.Armor);
+
+                    string carName = "police";
+
+                    int col1 = 0;
+
+                    if (EPlayer.GetAccount(target).CarCop.Length < 3)
+                    {
+                        switch (new Random().Next(0, 3))
+                        {
+                            case 0:
+                                carName = "police";
+                                col1 = 111;
+                                break;
+                            case 1:
+                                carName = "police3";
+                                col1 = 8;
+                                break;
+                            case 2:
+                                carName = "police4";
+                                col1 = 111;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        carName = EPlayer.GetAccount(target).CarCop;
+
+                        if (carName.StartsWith("police"))
+                        {
+                            col1 = 111;
+                            if (carName.StartsWith("police3")) col1 = 8;
+                        }
+                    }
+
+                    Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawn.spawnA, col1, 111, target.Name, 255, false, true, Convert.ToUInt32(lobby.lobbyId));
+                    pVehicle.EngineStatus = true;
+                    pVehicle.SetSharedData("Engine", true);
+                    pVehicle.SetSharedData("Locked", true);
+                    pVehicle.Locked = true;
+                    pVehicle.SetSharedData("Team", 1);
+
+                    target.SetData("putVehicle", pVehicle);
+                    target.SetData("putVehicleSeat", 0);
+
+                    lobby.Vehicles.Add(pVehicle);
+
+                    NAPI.Task.Run(() =>
+                    {
+                        lock (pVehicle)
+                        {
+                            if (pVehicle.Exists && pVehicle != null) pVehicle.Position = vecSpawn;
+                        }
+                    }, 1000);
+
+
+                    target.Position = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ).Around(5f);
+                    target.Dimension = Convert.ToUInt32(lobby.lobbyId);
+                    EPlayer.Freeze(target, false);
+
+                    target.SetData("GPS", false);
+
+                    EPlayer.SetDiscordStatus(target, $"[Lobby {lobby.lobbyId}] Cop as {target.Name}");
+
+                    target.TriggerEvent("SetActorInvulnerable", false);
+                    target.TriggerEvent("CanFallOutOfCar", false);
+                    target.ResetData("CuffingTarget");
+                    target.SetSharedData("Team", 1);
+
+                    NAPI.Task.Run(() =>
+                    {
+                        try { target.SetIntoVehicle(pVehicle, 0); } catch { }
+                    });
+                }
+
+
+                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setteam:{target.Name}:{team}"); } catch { }
+
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has set {target.Name} as a cop in copchase.");
+            }
+            catch { player.SendChatMessage("!{#FF6347}Very very internal error occured, please don't use this. -kEVy"); }
+            return;
+        }
+
         [Command("maps")]
         public void cmd_maps(Player player)
         {
