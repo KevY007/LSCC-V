@@ -205,7 +205,7 @@ mp.events.add('render', () => {
 
             if(player.isInAnyVehicle(false))
             {
-                if (player.seat !== undefined && player.seat == -1 && player.weapon != 2725352035 && player.getVariable("Team") == 0)
+                /*if (player.seat !== undefined && player.seat == -1 && player.weapon != 2725352035 && player.getVariable("Team") == 0)
                 {
                     mp.game.controls.disableControlAction(32, 25, true); 
                     mp.game.controls.disableControlAction(32, 68, true); 
@@ -214,7 +214,7 @@ mp.events.add('render', () => {
                     mp.game.controls.disableControlAction(32, 92, true); 
                     mp.game.controls.disableControlAction(32, 69, true); 
                     mp.game.controls.disableControlAction(32, 24, true); 
-                }
+                } -- ALLOWED FUGITIVE DRIVER AIMING AGAIN!! */
             }
         }
     }
