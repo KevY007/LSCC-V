@@ -967,6 +967,83 @@ namespace LSCC
             return;
         }
 
+        [Command("switchseats", "!{#AFAFAF}[USAGE] switchseats (target)", Alias = "swapseats,swapseat,switchseat")]
+        public void cmd_switchseats(Player player, Player target)
+        {
+            if ((!player.IsInVehicle || !target.IsInVehicle) || player.Vehicle != target.Vehicle)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in the same vehicle as the target or not in one!");
+                return;
+            }
+
+            if (player.HasData("_currentlySwappingSeats")) return;
+
+            if(player.HasData("SwapSeating") && player.HasData("SwapSeatingTime"))
+            {
+                long tick = player.GetData<long>("SwapSeatingTime");
+                try
+                {
+                    Player seatingWith = player.GetData<Player>("SwapSeating");
+                    if (seatingWith.Exists && seatingWith == target 
+                        && Environment.TickCount64 - tick <= 5000) // They the one who sent requests and less than 5s.
+                    {
+                        target.Position.Z -= 30.0f;
+
+                        player.ResetData("SwapSeating");
+                        player.ResetData("SwapSeatingTime");
+                        target.ResetData("SwapSeating");
+                        target.ResetData("SwapSeatingTime");
+
+                        player.SetData("_currentlySwappingSeats", true);
+                        target.SetData("_currentlySwappingSeats", true);
+
+                        Vehicle hwnd = target.Vehicle;
+
+                        int playSeat = player.VehicleSeat;
+                        int targSeat = target.VehicleSeat;
+
+                        player.Position = player.Position.Subtract(new Vector3(0.0, 0.0, 30.0f));
+                        target.Position = target.Position.Subtract(new Vector3(0.0, 0.0, 30.0f));
+
+                        NAPI.Task.Run(() =>
+                        {
+                            try
+                            {
+                                if (player != null && target != null && player.Exists && target.Exists)
+                                {
+                                    player.SetIntoVehicle(hwnd, targSeat);
+                                    target.SetIntoVehicle(hwnd, playSeat);
+
+                                    var msg = "!{#FFFFFF}(( !{#FF6347}" + player.Name + " and  " + target.Name + " have swapped seats." + " !{#FFFFFF}))";
+
+                                    foreach (Player playa in NAPI.Player.GetPlayersInRadiusOfPlayer(40, player))
+                                    {
+                                        if (playa.Dimension == player.Dimension) playa.SendChatMessage(msg);
+                                    }
+                                }
+                                player.ResetData("_currentlySwappingSeats");
+                                target.ResetData("_currentlySwappingSeats");
+                            }
+                            catch { }
+                        }, player.Ping + target.Ping + 250);
+
+                        return;
+                    }
+                }
+                catch { }
+            }
+
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have sent a swapseats request to " + target.Name + ", they have 5s to accept.");
+            target.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have received a swapseats request from " + player.Name + ", you have 5s to accept.");
+
+            player.ResetData("SwapSeating");
+            player.ResetData("SwapSeatingTime");
+            target.SetData("SwapSeating", player);
+            target.SetData("SwapSeatingTime", Environment.TickCount64);
+
+            return;
+        }
+
         [Command("removecomp", "!{#AFAFAF}[USAGE] removecomp (target) (weapon/hash) (component/hash)", GreedyArg = true)]
         public void cmd_removecomp(Player player, Player target, string wep, string component)
         {
@@ -2926,8 +3003,13 @@ namespace LSCC
             }
 
             int mapID = -1;
-            Map mapBruh = ContextFactory.Instance.Maps.First( a => (Int32.TryParse(map, out mapID) && mapID == a.SQL_ID) || a.Name.Contains(map, StringComparison.OrdinalIgnoreCase));
+            Map mapBruh = null;
 
+            try
+            {
+                mapBruh = ContextFactory.Instance.Maps.First(a => (Int32.TryParse(map, out mapID) && mapID == a.SQL_ID) || a.Name.Contains(map, StringComparison.OrdinalIgnoreCase));
+            } catch { }
+            
             if (mapBruh == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}No map with that name/ID found."); return; }
 
             if (ContextFactory.Instance.Maps.Count(a => a.Enabled == true) <= 1)
@@ -2974,7 +3056,13 @@ namespace LSCC
             }
 
             int mapID = -1;
-            Map mapBruh = ContextFactory.Instance.Maps.First(a => (Int32.TryParse(map, out mapID) && mapID == a.SQL_ID) || a.Name.Contains(map, StringComparison.OrdinalIgnoreCase));
+            Map mapBruh = null;
+
+            try
+            {
+                mapBruh = ContextFactory.Instance.Maps.First(a => (Int32.TryParse(map, out mapID) && mapID == a.SQL_ID) || a.Name.Contains(map, StringComparison.OrdinalIgnoreCase));
+            }
+            catch { }
 
             if (mapBruh == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}No map with that name/ID found."); return; }
 
@@ -2984,7 +3072,7 @@ namespace LSCC
 
             NAPI.Util.ConsoleOutput($"{player.Name} set lobby {lobby.lobbyId} next map to {mapBruh.Name} ({mapBruh.SQL_ID}).");
 
-            EPlayer.SendMessageInLobby(lobby.lobbyId, $"[Lobby {lobby.lobbyId}] Next game map has been set to !{{#8D8DFF}}{mapBruh.Name} !{{#FFFFFF}}by !{{#E84040}}{player.Name} !{{#FFFFFF}}.");
+            EPlayer.SendMessageInLobby(lobby.lobbyId, $"[Lobby {lobby.lobbyId}] Next game map has been set to !{{#8D8DFF}}{mapBruh.Name} !{{#FFFFFF}}by !{{#E84040}}{player.Name}!{{#FFFFFF}}.");
            
             return;
         }

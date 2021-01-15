@@ -754,7 +754,7 @@ namespace LSCC
             {
                 try
                 {
-                    _dynset = NAPI.Util.FromJson(File.ReadAllText("lscc/lscc.json"));
+                    _dynset = NAPI.Util.FromJson<DynSet>(File.ReadAllText("lscc/lscc.json"));
                 }
                 catch { NAPI.Util.ConsoleOutput("(LSCC | SETTINGS) Failed to load in save dynamic settings!"); }
             }
@@ -803,23 +803,61 @@ namespace LSCC
             NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Ensuring LSCC folder..."); 
             System.IO.Directory.CreateDirectory("lscc");
 
-            DynSet _dynset = new DynSet();
+            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Ensuring logs folder..."); 
+            System.IO.Directory.CreateDirectory("lscc/logs");
 
+            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) ===== Heading towards second stage of startup =====");
+
+            NAPI.Server.SetAutoRespawnAfterDeath(false);
+            NAPI.Server.SetAutoSpawnOnConnect(false);
+            NAPI.Server.SetGlobalServerChat(false);
+            NAPI.Server.SetCommandErrorMessage("!{#FF6347}[!] !{#FFFFFF}This command is invalid, refer to /help for a list.");
+
+            ContextFactory.Instance.Database.EnsureCreated();
+            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Connected to database.");
+
+            Settings.Lobbies = new List<LobbyData>();
+            Settings.Requests = new List<RequestData>();
+            Settings.LoggedInPlayers = new List<Player>();
+            Settings.AdminVehicles = new List<Vehicle>();
+            Settings.Loadouts = new List<LoadoutData>();
+
+            Settings.WeaponData = new Dictionary<ulong, jWeaponData>();
+
+            Settings.MaxPlayersInLobby = Settings.DefaultMaxInLobby;
+            Settings.DerbyVehicle = "brioso";
+            Settings.NextLobbyID = 1;
+            Settings.NextRequestID = 1;
+            Settings.LastCountUpdate = Environment.TickCount64;
+            Settings.AutoSaveTick = Environment.TickCount64;
+            Settings.LastMessageTick = Environment.TickCount64;
+
+            Settings.DCMentionTime = Environment.TickCount64 - 900000;
+            Settings.DCMentionPlayers = 0;
+
+            NAPI.World.SetTime(12, 0, 0);
+            NAPI.World.SetWeather(Weather.CLOUDS);
+
+            for (int i = 0; i < Settings.MaxLobbies; i++)
+            {
+                if (i >= Settings.MaxLobbies-1) new LobbyData().gameMode = GameModes.BUSTED; // Some busted lobby too.
+                else new LobbyData();
+            }
+
+            DynSet _dynset = new DynSet();
             NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Ensuring & loading lscc.json...");
 
             try
             {
                 if (File.Exists("lscc/lscc.json"))
                 {
-                    _dynset = NAPI.Util.FromJson(File.ReadAllText("lscc/lscc.json"));
+                    _dynset = NAPI.Util.FromJson<DynSet>(File.ReadAllText("lscc/lscc.json"));
                     Settings.DerbyVehicle = _dynset.DerbyVehicle;
                     Settings.UseDiscord = _dynset.Discord;
                     Settings.MaxPlayersInLobby = _dynset.MaxInLobby;
                 }
             }
             catch { NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Failed to read lscc.json, permission problem or format?"); }
-            SaveDynSettings(_dynset);
-            
 
             if (!File.Exists("lscc/weapondata.json"))
             {
@@ -849,47 +887,10 @@ namespace LSCC
                 }
                 catch { NAPI.Util.ConsoleOutput("(LSCC | STARTUP) [Warning] Failed to update weapondata.json (not critical, using old instead, note that server will crash without one.)"); }
             }
-            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Ensuring logs folder..."); 
-            System.IO.Directory.CreateDirectory("lscc/logs");
-
-            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) ===== Heading towards final stage of startup =====");
-
-            NAPI.Server.SetAutoRespawnAfterDeath(false);
-            NAPI.Server.SetAutoSpawnOnConnect(false);
-            NAPI.Server.SetGlobalServerChat(false);
-            NAPI.Server.SetCommandErrorMessage("!{#FF6347}[!] !{#FFFFFF}This command is invalid, refer to /help for a list.");
-
-            ContextFactory.Instance.Database.EnsureCreated();
-            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Connected to database.");
-
-            Settings.Lobbies = new List<LobbyData>();
-            Settings.Requests = new List<RequestData>();
-            Settings.LoggedInPlayers = new List<Player>();
-            Settings.AdminVehicles = new List<Vehicle>();
-            Settings.Loadouts = new List<LoadoutData>();
-
-            Settings.WeaponData = new Dictionary<ulong, jWeaponData>();
-
-            //Settings.MaxPlayersInLobby = Settings.MaxPlayersInLobby; Loaded manually in DynSettings now.
-            Settings.NextLobbyID = 1;
-            Settings.NextRequestID = 1;
-            Settings.LastCountUpdate = Environment.TickCount64;
-            Settings.AutoSaveTick = Environment.TickCount64;
-            Settings.LastMessageTick = Environment.TickCount64;
-
-            Settings.DCMentionTime = Environment.TickCount64 - 900000;
-            Settings.DCMentionPlayers = 0;
-
-            NAPI.World.SetTime(12, 0, 0);
-            NAPI.World.SetWeather(Weather.CLOUDS);
-
-            for (int i = 0; i < Settings.MaxLobbies; i++)
-            {
-                if (i >= Settings.MaxLobbies-1) new LobbyData().gameMode = GameModes.BUSTED; // Some busted lobby too.
-                else new LobbyData();
-            }
 
             NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Created and initialised settings & enums.");
+
+            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) ===== Heading towards final stage of startup =====");
 
             try
             {
@@ -977,6 +978,10 @@ namespace LSCC
             NAPI.Util.ConsoleOutput("[Developers]: KevY");
             NAPI.Util.ConsoleOutput($"[Accounts]: {ContextFactory.Instance.Accounts.Count()}");
             NAPI.Util.ConsoleOutput("[>===========|Los Santos Copchase|===========<]");
+
+
+            // After all the stuff is set.
+            SaveDynSettings(_dynset);
 
 
 

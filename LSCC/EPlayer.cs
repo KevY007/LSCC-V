@@ -633,7 +633,7 @@ namespace LSCC
             }
         }
 
-        public static void ShowStats(Player? target, Player player)
+        public static void ShowStats(Player target, Player player)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -703,7 +703,7 @@ namespace LSCC
             }
         }
 
-        public static void SyncComponents(Player? tosyncfor, Player? target)
+        public static void SyncComponents(Player tosyncfor, Player? target)
         {
             if(target.HasData("AttachedComponents"))
             {
@@ -716,7 +716,7 @@ namespace LSCC
             }
             return;
         }
-        public static void AttachComponent(Player? target, int weaponhash, int componenthash)
+        public static void AttachComponent(Player target, int weaponhash, int componenthash)
         {
             List<KeyValuePair<int, int>> comps = new List<KeyValuePair<int, int>>();
             if (!target.HasData("AttachedComponents"))

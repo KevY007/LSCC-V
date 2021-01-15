@@ -895,6 +895,14 @@ mp.events.add(
             mp.game.audio.stopSoundEx(themeSoundID);
         },
 
+        "DisableControlActions": (actiongroup) => {
+            mp.game.controls.disableAllControlActions(actiongroup);
+        },
+
+        "EnableControlActions": (actiongroup) => {
+            mp.game.controls.enableAllControlActions(actiongroup);
+        },
+
         "SetHandcuffs": (status) => {
             if(status == true)
             {
