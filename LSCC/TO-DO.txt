@@ -17,5 +17,3 @@ gpsbind
 players or textdraw player list and lobby with it
 /ann
 switchseats
-disable taser in car key
-dragout in car disable

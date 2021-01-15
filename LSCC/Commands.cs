@@ -899,7 +899,7 @@ namespace LSCC
             LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
             if (lobby != null)
             {
-                if (lobby.Cops.Contains(player) && lobby.gameStatus == 1 && lobby.Fugitives.Contains(target) && target.IsInVehicle)
+                if (lobby.Cops.Contains(player) && lobby.gameStatus == 1 && lobby.Fugitives.Contains(target) && target.IsInVehicle && !player.IsInVehicle)
                 {
                     isACop = true;
                 }
@@ -907,7 +907,7 @@ namespace LSCC
 
             if (!isACop)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a cop or the target cannot be dragged out!");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a cop or the target cannot be dragged out right now!");
                 return;
             }
 
@@ -934,7 +934,8 @@ namespace LSCC
                             LobbyData lobbye = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedData<int>("InLobby"));
                             if (lobbye != null)
                             {
-                                if (lobbye.Cops.Contains(player) && lobbye.gameStatus == 1 && lobbye.Fugitives.Contains(target) && target.IsInVehicle)
+                                if (lobbye.Cops.Contains(player) && lobbye.gameStatus == 1 && lobbye.Fugitives.Contains(target) && target.IsInVehicle 
+                                    && !player.IsInVehicle)
                                 {
                                     isACop = true;
                                 }
