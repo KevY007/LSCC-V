@@ -241,6 +241,15 @@ mp.events.add('render', () => {
 
                 mp.events.callLocal("OneSecondEvent");
 
+                if(player.isInAnyVehicle(false))
+                {
+                    if (player.seat !== undefined && player.seat == -1)
+                    {
+                        if(player.vehicle.getHealth() == 1000) player.vehicle.setHealth(800);
+                        player.vehicle.setEngineHealth(player.vehicle.getHealth()); // Set eng health according to body health.
+                    }
+                }
+
                 traceLastFunc(`[Players] Update Counters/JailTime`);
 
                 if(mp.players.local.getVariable("JailTime") >= 1)
