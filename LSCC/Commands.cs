@@ -3417,6 +3417,13 @@ namespace LSCC
             return;
         }
 
+        [Command("afk", GreedyArg = true)]
+        public void cmd_afk(Player pl)
+        {
+            cmd_autojoin(pl);
+            pl.SendChatMessage("!{#FF6347}>> If you wish to go AFK, use /autojoin to toggle it to OFF. To avoid being put in a copchase!");
+        }
+
         [Command("adminchat", "!{#AFAFAF}[USAGE] adminchat (text)", Alias = "a", GreedyArg = true)]
         public void cmd_adminchat(Player player, string text)
         {

@@ -599,7 +599,7 @@ namespace LSCC
 
             if(player.GetData<int>("TUA_LT") >= 4) // 4 times TimeUpdate has ticked and the player remained stationary / same spot and not chatted.
             {
-                return true;
+                //return true;
             }
 
             return false;
