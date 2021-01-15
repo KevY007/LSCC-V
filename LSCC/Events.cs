@@ -2001,7 +2001,6 @@ namespace LSCC
                     }
 
                     Vector3 PlayerSpawn = (Vector3)Settings.DerbySpawns[spawnID, 0];
-                    PlayerSpawn.Z += 5.0f;
                     player.Position = PlayerSpawn;
                     player.Heading = (float)Settings.DerbySpawns[spawnID, 1];
                     player.Dimension = 500;
@@ -2031,23 +2030,10 @@ namespace LSCC
                         Settings.LastDerbyTick = Environment.TickCount64;
                     }
 
-                    Vehicle derbyVeh = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey("dominator"), (Vector3)Settings.DerbySpawns[spawnID, 0], (float)Settings.DerbySpawns[spawnID, 1], rand.Next(255), rand.Next(255), "DERBY", 255, false, true, 500);
+                    Vehicle derbyVeh = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(Settings.DerbyVehicle), PlayerSpawn, (float)Settings.DerbySpawns[spawnID, 1], rand.Next(255), rand.Next(255), "DERBY", 255, true, true, 500);
                     player.SetData("DerbyVehicle", derbyVeh);
 
                     player.SetIntoVehicle(derbyVeh, 0);
-
-                    NAPI.Task.Run(() =>
-                    {
-                        try
-                        {
-                            if (player != null && player.Exists)
-                            {
-                                player.SetIntoVehicle(derbyVeh, 0);
-                                EPlayer.SetColor(player, new Color(250, 191, 62), 0);
-                            }
-                        }
-                        catch { }
-                    }, 350);
 
                     NAPI.Task.Run(() =>
                     {

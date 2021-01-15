@@ -217,6 +217,29 @@ namespace LSCC
         }
     };
 
+    public partial class DynSet
+    {
+        [JsonProperty("DerbyVehicle")]
+        public string DerbyVehicle { get; set; }
+
+        [JsonProperty("WeaponDataURL")]
+        public string WeaponDataURL { get; set; }
+
+        [JsonProperty("MaxInLobby")]
+        public int MaxInLobby { get; set; }
+
+        [JsonProperty("Discord")]
+        public bool Discord { get; set; }
+
+        public DynSet()
+        {
+            this.WeaponDataURL = "https://gist.githubusercontent.com/root-cause/3f29d38179b12245a003fb4fff615335/raw/7a8804b275fb1b9314cb39418a7415ea8bfd148d/v2189%2520Weapon%2520Data.json";
+            this.DerbyVehicle = "brioso";
+            this.Discord = true;
+            this.MaxInLobby = Settings.DefaultMaxInLobby;
+        }
+    }
+
     public static class Settings
     {
         // Static Settings / Const
@@ -238,7 +261,6 @@ namespace LSCC
         public static List<Player> LoggedInPlayers { get; set; }
         public static List<Vehicle> AdminVehicles { get; set; }
         public static int NextLobbyID { get; set; }
-        public static int MaxPlayersInLobby { get; set; }
         public static int DerbyTimeLeft { get; set; }
         public static long LastDerbyTick { get; set; }
         public static long LastMessageTick { get; set; }
@@ -248,6 +270,11 @@ namespace LSCC
         public static long LastCountUpdate { get; set; }
         public static List<LoadoutData> Loadouts { get; set; }
         public static Dictionary<ulong, jWeaponData> WeaponData { get; set; }
+
+        // Dyn Settings Global
+        public static string DerbyVehicle { get; set; }
+        public static string WeaponDataURL { get; set; }
+        public static int MaxPlayersInLobby { get; set; }
 
         // Discord Stuff
         public const ulong DCServerID = 713731146072064040;
@@ -716,6 +743,35 @@ namespace LSCC
             return;
         }
 
+        public static void SaveDynSettings(DynSet set = null)
+        {
+            DynSet _dynset = new DynSet();
+            if (set != null) _dynset = set;
+
+            if (File.Exists("lscc/lscc.json"))
+            {
+                try
+                {
+                    _dynset = NAPI.Util.FromJson(File.ReadAllText("lscc/lscc.json"));
+                }
+                catch { NAPI.Util.ConsoleOutput("(LSCC | SETTINGS) Failed to load in save dynamic settings!"); }
+            }
+
+            _dynset.DerbyVehicle = Settings.DerbyVehicle;
+            _dynset.Discord = Settings.UseDiscord;
+            _dynset.MaxInLobby = Settings.MaxPlayersInLobby;
+
+            try
+            {
+                if (File.Exists("lscc/lscc.json")) File.Delete("lscc/lscc.json");
+
+                File.WriteAllText("lscc/lscc.json", NAPI.Util.ToJson(_dynset));
+            }
+            catch { NAPI.Util.ConsoleOutput("(LSCC | SETTINGS) Failed to save dynamic settings!"); }
+
+            return;
+        }
+
         [ServerEvent(Event.ResourceStop)]
         public void OnResourceStop()
         {
@@ -745,6 +801,24 @@ namespace LSCC
             NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Ensuring LSCC folder..."); 
             System.IO.Directory.CreateDirectory("lscc");
 
+            DynSet _dynset = new DynSet();
+
+            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Ensuring & loading lscc.json...");
+
+            try
+            {
+                if (File.Exists("lscc/lscc.json"))
+                {
+                    _dynset = NAPI.Util.FromJson(File.ReadAllText("lscc/lscc.json"));
+                    Settings.DerbyVehicle = _dynset.DerbyVehicle;
+                    Settings.UseDiscord = _dynset.Discord;
+                    Settings.MaxPlayersInLobby = _dynset.MaxInLobby;
+                }
+            }
+            catch { NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Failed to read lscc.json, permission problem or format?"); }
+            SaveDynSettings(_dynset);
+            
+
             if (!File.Exists("lscc/weapondata.json"))
             {
                 NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Updating weapondata.json...");
@@ -752,7 +826,7 @@ namespace LSCC
                 {
                     using (var client = new WebClient())
                     {
-                        client.DownloadFile("https://gist.githubusercontent.com/root-cause/3f29d38179b12245a003fb4fff615335/raw/7a8804b275fb1b9314cb39418a7415ea8bfd148d/v2189%2520Weapon%2520Data.json", "lscc/weapondata.json.tmp");
+                        client.DownloadFile(_dynset.WeaponDataURL, "lscc/weapondata.json.tmp");
                     }
 
                     try
@@ -794,7 +868,7 @@ namespace LSCC
 
             Settings.WeaponData = new Dictionary<ulong, jWeaponData>();
 
-            Settings.MaxPlayersInLobby = Settings.DefaultMaxInLobby;
+            //Settings.MaxPlayersInLobby = Settings.MaxPlayersInLobby; Loaded manually in DynSettings now.
             Settings.NextLobbyID = 1;
             Settings.NextRequestID = 1;
             Settings.LastCountUpdate = Environment.TickCount64;
@@ -876,8 +950,6 @@ namespace LSCC
             new LoadoutData(0, "Assassin", 20, wepList);
 
 
-            if (File.Exists("lscc/disable_discord.txt")) { Settings.UseDiscord = false; NAPI.Util.ConsoleOutput("(LSCC | OPT) Discord Bot is disabled, live commands and statuses not updated!"); }
-            else Settings.UseDiscord = true;
 
             if (Settings.UseDiscord)
             {
@@ -890,6 +962,7 @@ namespace LSCC
 
                 }
             }
+            else NAPI.Util.ConsoleOutput("(LSCC | OPT) Discord Bot is disabled, live commands and statuses not updated!");
 
             NAPI.TextLabel.CreateTextLabel("Bored of waiting? /dm & /dmarenas", new Vector3(440.95462f, -976.35516f, 32.059594f), 10.0f, 2.2f, 0, new Color(255, 0, 0, 156), false);
             NAPI.TextLabel.CreateTextLabel("Check out /freeroam & /cmds", new Vector3(435.73737f, -981.86523f, 30.698616f), 10.0f, 2.2f, 0, new Color(118, 232, 221, 156), false);

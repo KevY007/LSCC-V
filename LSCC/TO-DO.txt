@@ -8,7 +8,6 @@ add a linux script that will keep on restarting server if goes off??
 CURRENCY SYSTEM/DONOR POINTS THAT CAN ALLOW VIP STUFF AND CMDS LIKE buyammo USING VIP POINTS OR STUF
 weapon attachment/comp shop with points later
 
-changeable derby vehicle lsccdata.json etc
 seat check in give tag
 less car health for starting fugitives
 togglemap
