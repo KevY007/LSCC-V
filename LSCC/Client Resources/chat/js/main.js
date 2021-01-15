@@ -32,11 +32,11 @@ function enableChatInput(enable)
 	if(chat.active == false
 		&& enable == true)
 	{
-		toggleScroll(false);
+		//toggleScroll(false);
 		return;
 	}
 	
-	toggleScroll(enable);
+	//toggleScroll(enable);
 	mp.events.call("onOpenChatbox", enable);
     if (enable != (chat.input != null))
 	{
@@ -167,7 +167,7 @@ $(document).ready(function()
 
 	}, { passive: false });
 
-	toggleScroll(false);
+	//toggleScroll(false);
 
 	window.addEventListener("keydown", function(e) {
 		// space and arrow keys
@@ -252,7 +252,7 @@ $(document).ready(function()
 			}
 			
 			$("#chat ul#chat_messages").scrollTop(0); // Scroll all the way to down.
-			toggleScroll(false);
+			//toggleScroll(false);
             enableChatInput(false);
         }
     });

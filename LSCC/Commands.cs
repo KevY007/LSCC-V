@@ -3206,8 +3206,9 @@ namespace LSCC
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
-                player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword /togmap");
+                player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword /togglemap");
                 player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension /r(emove)guns /suspend /unsuspend /checkstats");
+                player.SendChatMessage("[Admin Lv 2]: /ann");
             }
             if (EPlayer.GetAccount(player).Admin >= 3)
             {
@@ -3845,6 +3846,29 @@ namespace LSCC
             }
 
             Discord.SendTextChannel("staff-bot", $"**(OOC) | {player.Name}**: {text}");
+        }
+
+        [Command("ann", "!{#AFAFAF}[USAGE] ann (text)", Alias = "announce", GreedyArg = true)]
+        public void cmd_ann(Player player, string text)
+        {
+            player.SetData("TUA_LT", 0);
+
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not allowed to use this command!");
+                return;
+            }
+
+
+            NAPI.Chat.SendChatMessageToAll("!{#FF6347}|======================| ADMIN ANNOUNCEMENT |======================|");
+            NAPI.Chat.SendChatMessageToAll($"(( From: {EPlayer.GetAdminLevelName(EPlayer.GetAccount(player).Admin, true)}!{{#FFFFFF}} {player.Name} ))");
+            NAPI.Chat.SendChatMessageToAll("(( !{#FF6347}" + text + "!{#FFFFFF} ))");
+            NAPI.Chat.SendChatMessageToAll("  ");
+
+            Discord.SendTextChannel("staff-bot", $"**(ANNOUNCEMENT) | {player.Name}**: {text}");
         }
 
         [Command("pm", "!{#AFAFAF}[USAGE] pm (target) (text)", GreedyArg = true)]

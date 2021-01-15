@@ -15,5 +15,3 @@ override max seats set for new cars i dont see em even in dlcpack eh
 killstreak system
 gpsbind
 players or textdraw player list and lobby with it
-/ann
-switchseats
