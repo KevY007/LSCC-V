@@ -137,7 +137,6 @@ namespace LSCC
         {
             if (keyId == 0x5A)
             {
-                player.SendChatMessage("!{#FF6347}GPS");
                 LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
                 if (lobby != null)
                 {
@@ -279,7 +278,7 @@ namespace LSCC
         [ServerEvent(Event.PlayerEnterVehicle)]
         public void OnPlayerEnterVehicle(Player player, Vehicle vehicle, sbyte seatID)
         {
-            
+            vehicle.SetSharedData("Engine", vehicle.EngineStatus);
         }
 
         [ServerEvent(Event.PlayerExitVehicle)]

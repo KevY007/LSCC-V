@@ -44,6 +44,9 @@ var lastGPSBind = 0x5A;
 var curGPSBind = 0x5A;
 
 mp.game.vehicle.defaultEngineBehaviour = false;
+mp.game.gameplay.enableMpDlcMaps(true);
+mp.game.player.disableVehicleRewards();
+mp.game.player.setHealthRechargeMultiplier(0.0);
 
 traceLastFunc("[Players] CreateVars");
 
@@ -301,8 +304,11 @@ mp.events.add('render', () => {
                 {
                     if (player.seat !== undefined && player.seat == -1)
                     {
-                        if(player.vehicle.getHealth() == 1000) player.vehicle.setHealth(800);
-                        player.vehicle.setEngineHealth(player.vehicle.getHealth()); // Set eng health according to body health.
+                        if(!mp.game.vehicle.isThisModelAHeli(player.vehicle.model) && !mp.game.vehicle.isThisModelAPlane(player.vehicle.model))
+                        {
+                            if(player.vehicle.getHealth() == 1000) player.vehicle.setHealth(800);
+                            player.vehicle.setEngineHealth(player.vehicle.getHealth()); // Set eng health according to body health.
+                        }
                     }
                 }
 
@@ -1174,7 +1180,7 @@ mp.events.add(
                 {
                     vehicle.setEngineOn(vehicle.getVariable("Engine"), true, true);
                 }
-                else vehicle.setEngineOn(vehicle.getIsEngineRunning(), true, true);
+                else vehicle.setEngineOn(true, true, true);
             }
         },
 

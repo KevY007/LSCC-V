@@ -13,6 +13,12 @@ var visibleTick = Date.now();
 var visibleCount = 0;
 var visibleText = "KEVYISGAY";
 
+var resolution = mp.game.graphics.getScreenResolution(0,0);
+var res_X = resolution.x;
+var res_Y = resolution.y;
+let bestlobbystr = "N/A";
+let dirtext = "NW";
+
 // https://github.com/glitchdetector/fivem-minimap-anchor
 function getMinimapAnchor() {
     let sfX = 1.0 / 20.0;
@@ -119,6 +125,7 @@ mp.events.add("render", () => {
     if(Date.now() - visibleTick >= 1000)
     {
         visibleTick = Date.now();
+        
 
         visibleCount++;
         visibleText = "~r~~h~BLIP VISIBLE~o~!";
@@ -127,6 +134,59 @@ mp.events.add("render", () => {
         {
             visibleCount = 0;
             visibleText = "~r~~h~BLIP VISIBLE";
+        }
+
+        var camera = mp.cameras.new("gameplay");
+        var cameraDirection = camera.getDirection();
+
+        if (0.3 < cameraDirection.x && 0.3 < cameraDirection.y) {
+            dirtext = "NE";
+        }
+        else if (cameraDirection.x < -0.3 && 0.3 < cameraDirection.y) {
+            dirtext = "NW";
+        }
+        else if (0.3 < cameraDirection.x && cameraDirection.y < -0.3) {
+            dirtext = "SE";
+        }
+        else if (cameraDirection.x < -0.3 && cameraDirection.y < -0.3) {
+            dirtext = "SW";
+        }
+        else if (-0.3 < cameraDirection.x && cameraDirection.x < 0.3 && cameraDirection.y < -0.3) {
+            dirtext = "S";
+        }
+        else if (cameraDirection.x < -0.3 && -0.3 < cameraDirection.y && cameraDirection.y < 0.3) {
+            dirtext = "W";
+        }
+        else if (0.3 < cameraDirection.x && -0.3 < cameraDirection.y && cameraDirection.y < 0.3) {
+            dirtext = "E";
+        }
+        else if (-0.3 < cameraDirection.x && cameraDirection.x < 0.3 && cameraDirection.y > 0.3) {
+            dirtext = "N";
+        }
+        camera.destroy(true);
+        
+        bestlobbystr = "";
+        if(!(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false || mp.players.local.getVariable("InLobby") === undefined))
+        {
+            let lobbyPlayers = 0;
+            mp.players.forEach((pl) => {
+                if(!(pl.getVariable("pLogged") === undefined || pl.getVariable("pLogged") == false || pl.getVariable("InLobby") === undefined))
+                {
+                    if(pl.getVariable("InLobby") == mp.players.local.getVariable("InLobby")) lobbyPlayers++;
+                }
+            });
+
+            if(mp.players.local.getVariable("InLobby") == -2) bestlobbystr = "~r~Jail";
+            if(mp.players.local.getVariable("InLobby") == -3) bestlobbystr = "~g~Freeroam";
+            if(mp.players.local.getVariable("InLobby") == -4)
+            {
+                bestlobbystr = "~y~Derby " + "~w~| ~w~Participants: ~y~" + lobbyPlayers;
+            }
+            if(mp.players.local.getVariable("InLobby") == -5) bestlobbystr = "~r~Player Customizer";
+            if(mp.players.local.getVariable("InLobby") > -1) 
+            {
+                bestlobbystr = "~w~Lobby ~y~" + mp.players.local.getVariable("InLobby").toString() + "  ~w~|  ~w~Players: ~y~" + lobbyPlayers;
+            }
         }
     }
 
@@ -214,6 +274,22 @@ mp.events.add("render", () => {
                 drawText(voiceString, [minimap.rightX + 0.0085, minimap.bottomY - 0.095], 4, [63, 135, 240, 255], 0.50);
                 drawText(streetName, [minimap.rightX + 0.0085, minimap.bottomY - 0.065], 4, [204, 204, 204, 255], 0.465);
                 drawText(zoneName, [minimap.rightX + 0.0085, minimap.bottomY - 0.035], 4, [255, 255, 255, 255], 0.48);
+
+                mp.game.graphics.drawText(bestlobbystr, [minimap.rightX + 0.121, minimap.bottomY - 0.0625], {
+                    font:4, 
+                    color:[255, 255, 255, 200],
+                    scale: [0.40, 0.40],
+                    outline: true,
+                    centre: true }
+                );
+
+                mp.game.graphics.drawText("~y~" + dirtext + " ~w~| " + "Online: " + mp.players.length, [minimap.rightX + 0.119, minimap.bottomY - 0.090], {
+                    font:4, 
+                    color:[255, 255, 255, 200],
+                    scale: [0.37, 0.37],
+                    outline: true,
+                    centre: true }
+                );
             }
         }
     }
