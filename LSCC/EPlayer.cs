@@ -301,7 +301,7 @@ namespace LSCC
             return color;
         }
 
-        public static void _ApplyCharacter(Player? player, CharacterData playerChar, int teamID)
+        public static void _ApplyCharacter(Player player, CharacterData playerChar, int teamID)
         {
             if (playerChar.Gender == 0) player.SetSkin(PedHash.FreemodeMale01);
             else player.SetSkin(PedHash.FreemodeFemale01);
@@ -368,7 +368,7 @@ namespace LSCC
             }
         }
 
-        public static void ApplyCharacter(Player? player, CharacterData playerChar, int teamID = 1)
+        public static void ApplyCharacter(Player player, CharacterData playerChar, int teamID = 1)
         {
             if(playerChar == null)
             {
@@ -408,7 +408,7 @@ namespace LSCC
             player.TriggerEvent("char_Reset");
         }
 
-        public static void ShowCharCreator(Player? player, CharacterData charData = null)
+        public static void ShowCharCreator(Player player, CharacterData charData = null)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
@@ -514,7 +514,7 @@ namespace LSCC
 
         public static Random rand = new Random();
 
-        public static void ResetPlayerData(Player? player)
+        public static void ResetPlayerData(Player player)
         {
             lock (player)
             {
@@ -593,7 +593,7 @@ namespace LSCC
             }
         }
 
-        public static bool IsAFK(Player? player)
+        public static bool IsAFK(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return true;
 
@@ -605,7 +605,7 @@ namespace LSCC
             return false;
         }
 
-        public static void Jail(Player? player, int minutes, string reason)
+        public static void Jail(Player player, int minutes, string reason)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
@@ -633,7 +633,7 @@ namespace LSCC
             }
         }
 
-        public static void ShowStats(Player? target, Player? player)
+        public static void ShowStats(Player? target, Player player)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -666,7 +666,7 @@ namespace LSCC
             return;
         }
 
-        public static void Warn(Player? player)
+        public static void Warn(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
@@ -739,7 +739,7 @@ namespace LSCC
             return;
         }
 
-        public static void GiveCopWeapons(Player? player)
+        public static void GiveCopWeapons(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
@@ -811,7 +811,7 @@ namespace LSCC
             player.SendChatMessage("!{#FF6347}[TASER] !{#FFFFFF}You have been equipped with a stungun, shoot at a fugitive that hasn't shot to tase them.");
             return;
         }
-        public static void GiveFugitiveWeapons(Player? player)
+        public static void GiveFugitiveWeapons(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
@@ -882,12 +882,12 @@ namespace LSCC
             return;
         }
 
-        public static void SetDiscordStatus(Player? player, string status)
+        public static void SetDiscordStatus(Player player, string status)
         {
             player.SetSharedData("Ping", player.Ping);
             player.TriggerEvent("SetDiscordStatus", "Los Santos Copchase", status);
         }
-        public static void Freeze(Player? player, bool toggle)
+        public static void Freeze(Player player, bool toggle)
         {
             player.TriggerEvent("SetPlayerFrozen", toggle);
 
@@ -931,7 +931,7 @@ namespace LSCC
             }
         }
 
-        public static void Action(Player? player, string text)
+        public static void Action(Player player, string text)
         {
             var msg = "!{#C3A3DB}* " + player.Name + " " + text;
            
@@ -941,14 +941,14 @@ namespace LSCC
             }
         }
 
-        public static void Handcuff(Player? player, bool toggle)
+        public static void Handcuff(Player player, bool toggle)
         {
             player.TriggerEvent("SetHandcuffs", toggle);
             player.SetData("Cuffed", true);
             if(!toggle) player.ResetData("Cuffed");
         }
 
-        public static void SetColor(Player? player, Color col, int armour = 0)
+        public static void SetColor(Player player, Color col, int armour = 0)
         {
             player.SetSharedData("Color_R", col.Red);
             player.SetSharedData("Color_G", col.Green);
@@ -959,7 +959,7 @@ namespace LSCC
             }
         }
 
-        public static bool LoggedIn(Player? player)
+        public static bool LoggedIn(Player player)
         {
             if (player == null) return false;
 
@@ -971,7 +971,7 @@ namespace LSCC
             return false;
         }
 
-        public static void LoginCameraSetup(Player? player)
+        public static void LoginCameraSetup(Player player)
         {
             NAPI.Entity.SetEntityTransparency(player, 0);
 
@@ -984,7 +984,7 @@ namespace LSCC
             player.TriggerEvent("CreatePlayerCamera", Settings.LoginCameraX, Settings.LoginCameraY, Settings.LoginCameraZ, Settings.LoginCameraRx, Settings.LoginCameraRy, Settings.LoginCameraRz, Settings.LoginCameraViewAngle);
         }
 
-        public static void LoginBrowserSetup(Player? player)
+        public static void LoginBrowserSetup(Player player)
         {
             player.TriggerEvent("InitiateCustomChat");
             player.TriggerEvent("TogglePlayerChat", false);
@@ -1003,7 +1003,7 @@ namespace LSCC
 
             return (xp >= GetMaxLevelXP(level) ? true : false);
         }
-        public static void GrantXP(Player? player, int xp)
+        public static void GrantXP(Player player, int xp)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
@@ -1050,7 +1050,7 @@ namespace LSCC
 
             player.SetSharedData("Level", acc.Level);
         }
-        public static void Save(Player? player)
+        public static void Save(Player player)
         {
             if (LoggedIn(player))
             {
@@ -1065,7 +1065,7 @@ namespace LSCC
                 ContextFactory.Instance.SaveChangesAsync();
             }
         }
-        public static Account GetAccount(Player? player)
+        public static Account GetAccount(Player player)
         {
             if (LoggedIn(player))
             {
@@ -1075,7 +1075,7 @@ namespace LSCC
 
             return null;
         }
-        public static void Spawn(Player? player, bool forceAutojoin = true, Vector3 spawn = default(Vector3))
+        public static void Spawn(Player player, bool forceAutojoin = true, Vector3 spawn = default(Vector3))
         {
             if (!LoggedIn(player)) return;
 

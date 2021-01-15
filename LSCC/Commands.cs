@@ -2911,6 +2911,47 @@ namespace LSCC
             return;
         }
 
+        [Command("togglemap", "!{#AFAFAF}[USAGE] togmap (map id/name)", Alias = "togmap")]
+        public void cmd_togmap(Player player, string map)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Account acc = EPlayer.GetAccount(player);
+
+            if (acc.Admin < 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                return;
+            }
+
+            int mapID = -1;
+            Map mapBruh = ContextFactory.Instance.Maps.First( a => (Int32.TryParse(map, out mapID) && mapID == a.SQL_ID) || a.Name.Contains(map, StringComparison.OrdinalIgnoreCase));
+
+            if (mapBruh == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}No map with that name/ID found."); return; }
+
+            if (ContextFactory.Instance.Maps.Count(a => a.Enabled == true) <= 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot disable all the maps in the server! If you want to disable CC then use /game autostart.");
+                return;
+            }
+
+            mapBruh.Enabled = !mapBruh.Enabled;
+            if (mapBruh.Enabled)
+            {
+                NAPI.Util.ConsoleOutput($"{player.Name} enabled map {mapBruh.Name} ID {mapBruh.SQL_ID}.");
+                RAGE.Entities.Players.All.ForEach((Player p) => p.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}" + player.Name + " has enabled the map: " + mapBruh.Name + "."));
+                Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} enabled map {mapBruh.Name}.**");
+            }
+            else
+            {
+                NAPI.Util.ConsoleOutput($"{player.Name} disabled map {mapBruh.Name} ID {mapBruh.SQL_ID}.");
+                RAGE.Entities.Players.All.ForEach((Player p) => p.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}" + player.Name + " has disabled the map: " + mapBruh.Name + "."));
+                Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} disabled map {mapBruh.Name}.**");
+            }
+
+            return;
+        }
+
         [Command("saveserver")]
         public void cmd_saveserver(Player player)
         {
@@ -3040,7 +3081,7 @@ namespace LSCC
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
-                player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword /toglobby");
+                player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword /togmap");
                 player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension /r(emove)guns /suspend /unsuspend /checkstats");
             }
             if (EPlayer.GetAccount(player).Admin >= 3)
