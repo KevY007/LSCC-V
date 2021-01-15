@@ -1,5 +1,3 @@
-
-
 mp.events.addDataHandler('Status_Trunk', function (entity, value, oldValue) 
 {
     if (entity.type === 'vehicle') 
@@ -36,6 +34,14 @@ mp.events.addDataHandler('vInitialDriveForce', function (entity, value, oldValue
     }
 });
 
+mp.events.addDataHandler('Engine', function (entity, value, oldValue) 
+{
+    if (entity.type === 'vehicle')
+    {
+        entity.setEngineOn(value, true, true);
+    }
+});
+
 mp.events.add('entityStreamIn', (entity) => {
     if (entity.type === 'vehicle') 
     {
@@ -53,6 +59,11 @@ mp.events.add('entityStreamIn', (entity) => {
                 entity.setDoorShut(6, true);
                 entity.setDoorShut(7, true);
             }
+        }
+
+        if(entity.getVariable("Engine") !== undefined)
+        {
+            entity.setEngineOn(entity.getVariable("Engine"), true, true);
         }
 
         if(entity.getVariable("vMaxSpeed") !== undefined)

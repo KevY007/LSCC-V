@@ -110,6 +110,93 @@ namespace LSCC
             return;
         }
 
+        [Command("lock")]
+        public static void cmd_lock(Player player)
+        {
+            Vehicle targetVeh = null;
+            if (!player.IsInVehicle || player.Vehicle == null)
+            {
+                foreach (Vehicle v in RAGE.Entities.Vehicles.All)
+                {
+                    if (v.Dimension == player.Dimension && v.Position.DistanceTo(player.Position) <= 3.5)
+                    {
+                        if (v.HasSharedData("Team") && v.GetSharedData<int>("Team") != player.GetSharedData<int>("Team")) continue;
+
+                        targetVeh = v;
+                        break;
+                    }
+                }
+            }
+            else targetVeh = player.Vehicle;
+
+            if (targetVeh == null)
+            {
+                if (!player.HasData("SilentLock")) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not close enough to a vehicle!"); }
+                player.ResetData("SilentLock");
+                return;
+            }
+
+            if (targetVeh.HasSharedData("Team") && targetVeh.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && 
+                targetVeh.Locked == true)
+            {
+                if (!player.HasData("SilentLock")) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot unlock this vehicle!"); }
+                player.ResetData("SilentLock");
+                return;
+            }
+
+            targetVeh.Locked = !targetVeh.Locked;
+            targetVeh.SetSharedData("Locked", targetVeh.Locked);
+
+            if (targetVeh.HasSharedData("Team") && targetVeh.GetSharedData<int>("Team") != player.GetSharedData<int>("Team"))
+            {
+                EPlayer.Action(player, "locks the door from inside.");
+            }
+            else
+            {
+                if (targetVeh.Locked)
+                {
+                    EPlayer.Action(player, "locks the door of the vehicle.");
+                }
+                else EPlayer.Action(player, "unlocks the door of the vehicle.");
+            }
+
+            return;
+        }
+
+        [Command("engine")]
+        public static void cmd_engine(Player player)
+        {
+            if (!player.IsInVehicle || player.Vehicle == null)
+            {
+                return;
+            }
+
+            if (player.Vehicle.HasSharedData("Team") && player.Vehicle.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && 
+                player.Vehicle.EngineStatus == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot start this vehicle!");
+                return;
+            }
+
+            player.Vehicle.EngineStatus = !player.Vehicle.EngineStatus;
+            player.Vehicle.SetSharedData("Engine", player.Vehicle.EngineStatus);
+
+            if (player.Vehicle.HasSharedData("Team") && player.Vehicle.GetSharedData<int>("Team") != player.GetSharedData<int>("Team"))
+            {
+                EPlayer.Action(player, "turns the vehicle's engine off.");
+            }
+            else
+            {
+                if (player.Vehicle.EngineStatus)
+                {
+                    EPlayer.Action(player, "turns the vehicle's engine on.");
+                }
+                else EPlayer.Action(player, "turns the vehicle's engine off.");
+            }
+
+            return;
+        }
+
         [Command("time", Alias = "weather")]
         public void cmd_timeweather(Player player)
         {
@@ -336,9 +423,12 @@ namespace LSCC
             Random rand = new Random();
 
             Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(122), rand.Next(122), player.SocialClubName, 255, false, true, player.Dimension);
-
+            aVehicle.EngineStatus = true;
+            aVehicle.SetSharedData("Engine", true);
+            aVehicle.SetSharedData("Locked", false);
+            aVehicle.Locked = false;
             aVehicle.SetSharedData("Team", -1);
-       
+
             Settings.AdminVehicles.Add(aVehicle);
 
             NAPI.Task.Run(() =>
@@ -382,6 +472,10 @@ namespace LSCC
             Random rand = new Random();
 
             Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(122), rand.Next(122), player.SocialClubName, 255, false, true, player.Dimension);
+            aVehicle.SetSharedData("Locked", false);
+            aVehicle.Locked = false;
+            aVehicle.EngineStatus = true;
+            aVehicle.SetSharedData("Engine", true);
 
             aVehicle.SetSharedData("Team", -1);
 
@@ -2333,6 +2427,7 @@ namespace LSCC
             player.SendChatMessage("!{#FF6347} N: Push to talk voicechat. (Changed using /voicebind)");
             player.SendChatMessage("!{#FF6347} Z: Toggle GPS as a Cop.");
             player.SendChatMessage("!{#FF6347} O: Toggle scoreboard, displays a scrollbar and mouse if needed.");
+            player.SendChatMessage("!{#FF6347} L: Lock/unlock vehicle.");
             player.SendChatMessage("!{#FF6347} X: Rapple from a helicopter (not all helicopters, try maverick).");
             player.SendChatMessage("!{#FF6347} Hold voice and press TAB: Switch voice chat modes.");
             player.SendChatMessage("!{#FF6347} F7: Hide/show HUD. (Hold SHIFT to toggle nametags as well)");
@@ -2506,6 +2601,7 @@ namespace LSCC
             player.SendChatMessage("!{#339BC4}[Cop!{#F24C27}chase]: !{#FFFFFF}/r(adio) /wt /loadout /car");
             player.SendChatMessage("!{#61A9FA}[Cop]: /gps /cuff /m(egaphone) /dragout");
             player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup /s(top)a(nim)");
+            player.SendChatMessage("!{#AB00BA}[Vehicle]: /trunk /lock /engine");
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /derby");
             player.SendChatMessage("!{#28E0DA}[Mode: DM]: /dm /dmarena");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /freeroam /veh /customvehlist /teleport /mytime /myweather");

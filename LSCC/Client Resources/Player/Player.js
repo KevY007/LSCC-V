@@ -40,6 +40,8 @@ var healthLoss = 0;
 const bones = [0, 10706, 11816, 14201, 18905, 23553, 24816, 24817, 24818, 28252, 31086, 36864, 39317, 40269, 45509, 51826, 52301, 57005, 57597, 58271, 61163, 63931, 64729];
 const boneDistanceThreshold = 1;
 
+mp.game.vehicle.defaultEngineBehaviour = false;
+
 traceLastFunc("[Players] CreateVars");
 
 function calcDist(v1, v2) {
@@ -75,6 +77,24 @@ mp.keys.bind(0x5A, false, function() {
         traceLastFunc(`[Players] Attempt tog GPS`);
 
         mp.events.callRemote("OnScriptedKeyPress", 0x5A, true);
+    }
+});
+
+mp.keys.bind(0x4C, false, function() {
+    if(chatStatus == false)
+    {
+        traceLastFunc(`[Players] Attempt L key/lock`);
+
+        mp.events.callRemote("OnScriptedKeyPress", 0x4C, true);
+    }
+});
+
+mp.keys.bind(0x46, false, function() {
+    if(chatStatus == false)
+    {
+        traceLastFunc(`[Players] Attempt Y key/engine`);
+
+        mp.events.callRemote("OnScriptedKeyPress", 0x46, true);
     }
 });
 
@@ -1111,6 +1131,20 @@ mp.events.add(
 
             if(mp.game.vehicle.isThisModelAHeli(vehicle.model) || mp.game.vehicle.isThisModelAPlane(vehicle.model)) {
                 mp.events.callRemote("RequestParachute", vehicle);
+            }
+
+            if (seat == -1) {
+                if(vehicle.getVariable("Engine") !== undefined)
+                {
+                    vehicle.setEngineOn(vehicle.getVariable("Engine"), true, true);
+                }
+                else vehicle.setEngineOn(vehicle.getIsEngineRunning(), true, true);
+            }
+        },
+
+        "playerLeaveVehicle": (vehicle, seat) => {
+            if (vehicle != null && vehicle.getVariable("Engine") !== undefined) {
+                vehicle.setEngineOn(vehicle.getVariable("Engine"), true, true);
             }
         },
 

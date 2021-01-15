@@ -144,6 +144,17 @@ namespace LSCC
                 }
             }
 
+            if(keyId == 0x4C)
+            {
+                player.SetData("SilentLock", Environment.TickCount);
+                Commands.cmd_lock(player);
+            }
+
+            if (keyId == 0x46)
+            {
+                Commands.cmd_engine(player);
+            }
+
             if (keyId == 0x09)
             {
                 int voiceMode = player.GetSharedData<int>("VoiceMode");
@@ -268,6 +279,20 @@ namespace LSCC
         public void OnPlayerEnterVehicle(Player player, Vehicle vehicle, sbyte seatID)
         {
             
+        }
+
+        [ServerEvent(Event.PlayerExitVehicle)]
+        public void OnPlayerExitVehicle(Player player, Vehicle vehicle)
+        {
+            if (vehicle.HasSharedData("Engine"))
+            {
+                vehicle.EngineStatus = vehicle.GetSharedData<bool>("Engine");
+                vehicle.SetSharedData("Engine", vehicle.EngineStatus);
+            }
+            else
+            {
+                vehicle.SetSharedData("Engine", vehicle.EngineStatus);
+            }
         }
 
         [ServerEvent(Event.PlayerDisconnected)]
@@ -2038,6 +2063,10 @@ namespace LSCC
 
                     Vehicle derbyVeh = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(Settings.DerbyVehicle), PlayerSpawn, (float)Settings.DerbySpawns[spawnID, 1], rand.Next(255), rand.Next(255), "DERBY", 255, true, true, 500);
                     player.SetData("DerbyVehicle", derbyVeh);
+                    derbyVeh.Locked = true;
+                    derbyVeh.SetSharedData("Locked", true);
+                    derbyVeh.EngineStatus = true;
+                    derbyVeh.SetSharedData("Engine", true);
 
                     player.SetIntoVehicle(derbyVeh, 0);
 
