@@ -644,9 +644,9 @@ namespace LSCC
             double KDR = 0.0;
             if (acc.Kills == 0) acc.Kills = 1;
             if (acc.Deaths == 0) acc.Deaths = 1;
+            if (acc.MinutesPlayed == 0.0) acc.MinutesPlayed = 0.1;
+            KDR = (double)acc.Kills / (double)acc.Deaths;
 
-            KDR = acc.Kills / acc.Deaths;
-            
             target.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} ({acc.SQL_ID}) at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
 
             target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Account ID: !{{#cbcfc4}}[{acc.SQL_ID}] !{{#ffffff}}| !{{#c7eb7f}}Email: !{{#cbcfc4}}[{acc.Email}] !{{#ffffff}}| !{{#c7eb7f}}Admin Level: !{{#cbcfc4}}[{acc.Admin}]");
@@ -655,9 +655,9 @@ namespace LSCC
 
             target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Level: !{{#cbcfc4}}[{acc.Level}] !{{#ffffff}}| !{{#c7eb7f}}Experience: !{{#cbcfc4}}[{acc.XP}/{EPlayer.GetMaxLevelXP(acc.Level)}] !{{#ffffff}}| !{{#c7eb7f}}Escapes: !{{#cbcfc4}}[{acc.Escapes}]");
 
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Kills: !{{#cbcfc4}}[{acc.Kills}] !{{#ffffff}}| !{{#c7eb7f}}Deaths: !{{#cbcfc4}}[{acc.Deaths}] !{{#ffffff}}| !{{#c7eb7f}}K/D Ratio: !{{#cbcfc4}}[{Math.Round(KDR, 2, MidpointRounding.AwayFromZero).ToString()}]");
+            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Kills: !{{#cbcfc4}}[{acc.Kills}] !{{#ffffff}}| !{{#c7eb7f}}Deaths: !{{#cbcfc4}}[{acc.Deaths}] !{{#ffffff}}| !{{#c7eb7f}}K/D Ratio: !{{#cbcfc4}}[{KDR.ToString("N3")}]");
 
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Arrests: !{{#cbcfc4}}[{acc.Arrests}] !{{#ffffff}}| !{{#c7eb7f}}Time Played: !{{#cbcfc4}}[{Math.Round(acc.MinutesPlayed / 60.0, 2, MidpointRounding.AwayFromZero).ToString()} hours]");
+            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Arrests: !{{#cbcfc4}}[{acc.Arrests}] !{{#ffffff}}| !{{#c7eb7f}}Time Played: !{{#cbcfc4}}[{(acc.MinutesPlayed / 60.0).ToString("N3")} hours]");
             
             target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Vehicle (Fugitive): !{{#cbcfc4}}[{acc.CarFugitive}] !{{#ffffff}}| !{{#c7eb7f}}Vehicle (Cop): !{{#cbcfc4}}[{acc.CarCop}]");
 

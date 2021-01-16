@@ -7,6 +7,3 @@ add a linux script that will keep on restarting server if goes off??
 
 CURRENCY SYSTEM/DONOR POINTS THAT CAN ALLOW VIP STUFF AND CMDS LIKE buyammo USING VIP POINTS OR STUF
 weapon attachment/comp shop with points later
-
-K/D ratio seems to be rounded for some reason
-BigDickBrazy had 101 kills 68 death and his K/D says 1
