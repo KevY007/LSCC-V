@@ -161,9 +161,9 @@ mp.events.add("render", () => {
     if (mp.game.invoke('0x475768A975D5AD17', player.handle, 6))
     {
         //Disable pistol whipping
-        RAGE.Game.Pad.DisableControlAction(0, 140, true); 
-        RAGE.Game.Pad.DisableControlAction(0, 141, true); 
-        RAGE.Game.Pad.DisableControlAction(0, 142, true); 
+        mp.game.controls.disableControlAction(0, 140, true); 
+        mp.game.controls.disableControlAction(0, 141, true); 
+        mp.game.controls.disableControlAction(0, 142, true); 
     }
 
     // Taken from GTA.World
