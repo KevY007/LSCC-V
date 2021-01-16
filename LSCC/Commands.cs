@@ -174,7 +174,13 @@ namespace LSCC
             if (player.Vehicle.HasSharedData("Team") && player.Vehicle.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && 
                 player.Vehicle.EngineStatus == false)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot start this vehicle!");
+                player.SendNotification("~r~You cannot start this vehicle!");
+                return;
+            }
+
+            if(player.VehicleSeat != 0)
+            {
+                player.SendNotification("~r~You are not the driver!");
                 return;
             }
 
@@ -1063,7 +1069,7 @@ namespace LSCC
         [Command("switchseats", "!{#AFAFAF}[USAGE] switchseats (target)", Alias = "swapseats,swapseat,switchseat,ss")]
         public void cmd_switchseats(Player player, Player target)
         {
-            if ((!player.IsInVehicle || !target.IsInVehicle) || player.Vehicle != target.Vehicle)
+            if ((!player.IsInVehicle || !target.IsInVehicle) || player.Vehicle != target.Vehicle && player != target)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in the same vehicle as the target or not in one!");
                 return;
@@ -1127,7 +1133,7 @@ namespace LSCC
             }
 
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have sent a swapseats request to " + target.Name + ", they have 5s to accept.");
-            target.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have received a swapseats request from " + player.Name + ", you have 5s to accept.");
+            target.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have received a swapseats request from " + player.Name + ", you have 5s to accept. (/ss " + target.Name + ")");
 
             player.ResetData("SwapSeating");
             player.ResetData("SwapSeatingTime");
@@ -4276,7 +4282,9 @@ namespace LSCC
             }
 
 
-            NAPI.Chat.SendChatMessageToAll("!{#FF6347}|======================| ADMIN ANNOUNCEMENT |======================|");
+            NAPI.Chat.SendChatMessageToAll("!{#FF6347}|======================|");
+            NAPI.Chat.SendChatMessageToAll("!{#FF6347}   ADMIN ANNOUNCEMENT");
+            NAPI.Chat.SendChatMessageToAll("!{#FF6347}|======================|");
             NAPI.Chat.SendChatMessageToAll($"(( From: {EPlayer.GetAdminLevelName(EPlayer.GetAccount(player).Admin, true)}!{{#FFFFFF}} {player.Name} ))");
             NAPI.Chat.SendChatMessageToAll("(( Message: !{#FF6347}" + text + "!{#FFFFFF} ))");
             NAPI.Chat.SendChatMessageToAll("  ");
