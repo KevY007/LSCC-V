@@ -1101,21 +1101,35 @@ namespace LSCC
                         int playSeat = player.VehicleSeat;
                         int targSeat = target.VehicleSeat;
 
-                        player.Position = player.Position.Subtract(new Vector3(0.0, 0.0, 30.0f));
-                        target.Position = target.Position.Subtract(new Vector3(0.0, 0.0, 30.0f));
+                        player.Position = player.Position.Subtract(new Vector3(0.0, 0.0, 5.0f));
+                        target.Position = target.Position.Subtract(new Vector3(0.0, 0.0, 5.0f));
 
                         NAPI.Task.Run(() =>
                         {
                             try
                             {
-                                if (player != null && target != null && player.Exists && target.Exists)
+                                if (hwnd != null && player != null && target != null && player.Exists && target.Exists)
                                 {
+                                    NAPI.Task.Run(() =>
+                                    {
+                                        try
+                                        {
+                                            if (hwnd != null && player != null && target != null && player.Exists && target.Exists)
+                                            {
+                                                player.SetIntoVehicle(hwnd, targSeat);
+                                                target.SetIntoVehicle(hwnd, playSeat);
+                                            }
+                                        }
+                                        catch
+                                        {
+                                        }
+                                    }, 500);
                                     player.SetIntoVehicle(hwnd, targSeat);
                                     target.SetIntoVehicle(hwnd, playSeat);
 
                                     var msg = "!{#FFFFFF}(( !{#FF6347}" + player.Name + " and  " + target.Name + " have swapped seats." + " !{#FFFFFF}))";
 
-                                    foreach (Player playa in NAPI.Player.GetPlayersInRadiusOfPlayer(40, player))
+                                    foreach (Player playa in NAPI.Player.GetPlayersInRadiusOfPlayer(60, player))
                                     {
                                         if (playa.Dimension == player.Dimension) playa.SendChatMessage(msg);
                                     }

@@ -100,12 +100,12 @@ mp.keys.bind(
         if(!chatStatus && 
             !(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false)) 
         {
-            if (mp.keys.isDown(16) === true) 
+            mp.events.callLocal("ToggleHud", !showHud);
+			
+			if (mp.keys.isDown(16) === true) 
             { // Shift is pressed
                 renderNametags = showHud;
             }
-
-            mp.events.callLocal("ToggleHud", !showHud);
         }
     }
 );
