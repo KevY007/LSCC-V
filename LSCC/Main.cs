@@ -192,7 +192,17 @@ namespace LSCC
 
         public RequestData(Player reporter, string description, int type)
         {
-            RequestID = Settings.NextRequestID;
+            RequestID = -1;
+            for (int i = 1; i < Settings.NextRequestID; i++)
+            {
+                if (Settings.Requests.Count(a => a.RequestID == i) == 0)
+                {
+                    RequestID = i;
+                }
+            }
+
+            if (RequestID == -1) RequestID = Settings.NextRequestID;
+
             Settings.NextRequestID++;
             Reporter = reporter;
             Description = description;
@@ -933,7 +943,7 @@ namespace LSCC
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Appistol, 60));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Heavyshotgun, 40));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Bzgas, 3));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Mg, 120));
+            wepList.Add(new Tuple<WeaponHash, int>((WeaponHash)0x9D1F17E6, 120));
             new LoadoutData(1, "SWAT", 10, wepList);
 
             wepList = new List<Tuple<WeaponHash, int>>();
@@ -945,7 +955,7 @@ namespace LSCC
 
             wepList = new List<Tuple<WeaponHash, int>>();
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pistol, 40));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pumpshotgun, 15));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Microsmg, 50));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Assaultrifle, 80));
             new LoadoutData(0, "Convicted", 5, wepList);
 
@@ -955,6 +965,13 @@ namespace LSCC
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Bullpupshotgun, 30));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Combatpdw, 125));
             new LoadoutData(0, "Rebel", 10, wepList);
+
+            wepList = new List<Tuple<WeaponHash, int>>();
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pistol50, 40));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Minismg, 100));
+            wepList.Add(new Tuple<WeaponHash, int>((WeaponHash)0x5A96BA4, 30)); // Combat Shotgun
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Molotov, 1));
+            new LoadoutData(0, "O.G", 13, wepList);
 
             wepList = new List<Tuple<WeaponHash, int>>();
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Bzgas, 1));

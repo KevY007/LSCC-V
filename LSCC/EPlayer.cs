@@ -938,7 +938,7 @@ namespace LSCC
            
             foreach (Player playa in NAPI.Player.GetPlayersInRadiusOfPlayer(40, player))
             {
-                playa.SendChatMessage(msg);
+                if(player.Dimension == playa.Dimension) playa.SendChatMessage(msg);
             }
         }
 

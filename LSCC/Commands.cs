@@ -774,6 +774,12 @@ namespace LSCC
                 return;
             }
 
+            if (String.Compare(player.Name, target.Name) == 0 && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.Equals("KevY"))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
+                return;
+            }
+
             try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:sethp:{target.Name}:health"); } catch { }
 
             target.Health = health;
@@ -1054,7 +1060,7 @@ namespace LSCC
             return;
         }
 
-        [Command("switchseats", "!{#AFAFAF}[USAGE] switchseats (target)", Alias = "swapseats,swapseat,switchseat")]
+        [Command("switchseats", "!{#AFAFAF}[USAGE] switchseats (target)", Alias = "swapseats,swapseat,switchseat,ss")]
         public void cmd_switchseats(Player player, Player target)
         {
             if ((!player.IsInVehicle || !target.IsInVehicle) || player.Vehicle != target.Vehicle)
@@ -2780,6 +2786,12 @@ namespace LSCC
                 return;
             }
 
+            if (String.Compare(player.Name, target.Name) == 0 && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.Equals("KevY"))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
+                return;
+            }
+
             var _new = new BanData
             {
                 IP = target.Address,
@@ -2837,6 +2849,12 @@ namespace LSCC
             if (EPlayer.GetAccount(player).Admin < EPlayer.GetAccount(target).Admin)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is more higher admin level than you!");
+                return;
+            }
+
+            if (String.Compare(player.Name, target.Name) == 0 && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.Equals("KevY"))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
                 return;
             }
 
@@ -3806,9 +3824,9 @@ namespace LSCC
                 return;
             }
 
-            if (String.Compare(player.Name, target.Name) == 0 && t_acc.Admin > EPlayer.GetAccount(player).Admin)
+            if (String.Compare(player.Name, target.Name) == 0 && t_acc.Admin >= EPlayer.GetAccount(player).Admin && !player.Name.Equals("KevY"))
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher admin level than you.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
                 return;
             }
 
@@ -4346,6 +4364,12 @@ namespace LSCC
             }
             else
             {
+                if (String.Compare(player.Name, target.Name) == 0 && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.Equals("KevY"))
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
+                    return;
+                }
+
                 EPlayer.Freeze(target, true);
                 try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:freeze:{target.Name}"); } catch { }
                 NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#FF6347}}[AdmCmd] YOU HAVE BEEN FROZEN BY !{{#FF0000}}{player.Name}");
@@ -4385,6 +4409,12 @@ namespace LSCC
             }
             else
             {
+                if (String.Compare(player.Name, target.Name) == 0 && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.Equals("KevY"))
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
+                    return;
+                }
+
                 RAGE.Entities.Players.All.ForEach((Player playa) =>
                 {
                     playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] {target.Name} has been kicked by {player.Name} for {reason}.");
@@ -4419,6 +4449,13 @@ namespace LSCC
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Time cannot be below 1 minutes, /unjail instead.");
                     return;
                 }
+
+                if (String.Compare(player.Name, target.Name) == 0 && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.Equals("KevY"))
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
+                    return;
+                }
+
                 RAGE.Entities.Players.All.ForEach((Player playa) =>
                 {
                     playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] {player.Name} has jailed {target.Name} for {mins} minutes, reason: {reason}.");
@@ -4541,8 +4578,8 @@ namespace LSCC
 
                 try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:mute:{target.Name}:{mins}:{reason.Replace(":", "|")}"); } catch { }
 
-                player.SetSharedData("MuteTime", Acc.MuteTime);
-                player.TriggerEvent("SetMuteCounter", Acc.MuteTime);
+                target.SetSharedData("MuteTime", Acc.MuteTime);
+                target.TriggerEvent("SetMuteCounter", Acc.MuteTime);
             }
 
         }
@@ -4607,7 +4644,7 @@ namespace LSCC
 
                 foreach (var players in playersAround)
                 {
-                    NAPI.Chat.SendChatMessageToPlayer(players, msg);
+                    if(players.Dimension == player.Dimension) NAPI.Chat.SendChatMessageToPlayer(players, msg);
                 }
             }
         }
@@ -4623,6 +4660,11 @@ namespace LSCC
             }
             else
             {
+                if (String.Compare(player.Name, target.Name) == 0 && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.Equals("KevY"))
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
+                    return;
+                }
                 target.Position = new Vector3(target.Position.X, target.Position.Y, target.Position.Z + 5f);
 
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {target.Name} has been slapped by {player.Name}.");
@@ -4973,7 +5015,7 @@ namespace LSCC
                     { "https://static.wikia.nocookie.net/gtawiki/images/0/07/APPistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "AP Pistol", 60 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/5/55/HeavyShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Heavy Shotgun", 40 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/f/fe/TearGas-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "BZ Gas", 3 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/4/4c/MG-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Machine Gun", 120 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/5/56/MilitaryRifle-GTAO-icon.png/revision/latest/scale-to-width-down/128", "Military Rifle", 120 },
                 }) },
                 { "Whiplash", 20, 1, NAPI.Util.ToJson(new object[,] {
                     { "https://static.wikia.nocookie.net/gtawiki/images/9/9e/NavyRevolver-GTAO-icon.png/revision/latest/scale-to-width-down/128", "Navy Revolver", 30 },
@@ -4984,7 +5026,7 @@ namespace LSCC
 
                 { "Convicted", 5, 0, NAPI.Util.ToJson(new object[,] {
                     { "https://static.wikia.nocookie.net/gtawiki/images/8/8f/Pistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pistol", 40 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/e/e0/PumpShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pump Shotgun", 15 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/0/09/MicroSMG-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Micro SMG", 50 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/8/80/AssaultRifle-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Assault Rifle", 80 },
                 }) },
                 { "Rebel", 10, 0, NAPI.Util.ToJson(new object[,] {
@@ -4992,6 +5034,12 @@ namespace LSCC
                     { "https://static.wikia.nocookie.net/gtawiki/images/0/07/APPistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "AP Pistol", 40 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/9/96/BullpupShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Bullpup Shotgun", 30 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/2/21/Combat_PDW_HUD_GTA_V_PC.png/revision/latest/scale-to-width-down/128", "Combat PDW", 125 },
+                }) },
+                { "O.G", 13, 0, NAPI.Util.ToJson(new object[,] {
+                    { "https://static.wikia.nocookie.net/gtawiki/images/d/d3/Pistol.50-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pistol .50", 40 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/c/c4/MiniSMG-GTAO-HUDIcon.png/revision/latest/scale-to-width-down/128", "Mini SMG", 100 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/9/9c/CombatShotgun-GTAO-icon.png/revision/latest/scale-to-width-down/128", "Combat Shotgun", 30 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/9/90/Molotov-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Molotov", 1 },
                 }) },
                 { "Executioner", 15, 0, NAPI.Util.ToJson(new object[,] {
                     { "https://static.wikia.nocookie.net/gtawiki/images/4/45/Double-action-revolver-icon.png/revision/latest/scale-to-width-down/128", "Double Action Revolver", 25 },
