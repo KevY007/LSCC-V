@@ -80,51 +80,71 @@ namespace LSCC
                     return Task.CompletedTask;
                 }
 
-                var builder = new EmbedBuilder()
-                    .WithTitle("**Lobby/Mode | Player | Level**")
-                    .WithDescription("```\n```")
-                    .WithColor(255, 0, 0)
-                    .WithFooter(footer => {
-                        footer
-                            .WithText("Online List");
-                    })
-                    .WithAuthor(author => {
-                        author
-                            .WithName("Players")
-                            .WithIconUrl("https://i.imgur.com/nJPbaL7.png");
-                    });
-
-                foreach (Player pl in RAGE.Entities.Players.All)
+                int players = 0;
+                int tries = 0;
+                NAPI.Task.Run(() =>
                 {
-                    string lobby = "Lobby " + pl.GetSharedData<int>("InLobby");
-                    switch (pl.GetSharedData<int>("InLobby"))
+                    while (players < RAGE.Entities.Players.Count)
                     {
-                        case -1:
-                            lobby = "Login";
-                            break;
-                        case -2:
-                            lobby = "Jail";
-                            break;
-                        case -3:
-                            lobby = "Freeroam";
-                            break;
-                        case -4:
-                            lobby = "Derby";
-                            break;
-                        case -5:
-                            lobby = "Customizer";
-                            break;
+                        tries++;
+                        if (tries >= 10) { NAPI.Util.ConsoleOutput("breaking cuz of tries"); break; }
+
+                        var builder = new EmbedBuilder()
+                            .WithTitle("**Lobby/Mode | Player | Level**")
+                            .WithDescription("```\n```")
+                            .WithColor(255, 0, 0)
+                            .WithFooter(footer =>
+                            {
+                                footer
+                                    .WithText("Online List");
+                            })
+                            .WithAuthor(author =>
+                            {
+                                author
+                                    .WithName("Players")
+                                    .WithIconUrl("https://i.imgur.com/nJPbaL7.png");
+                            });
+
+                        int thisCount = 0;
+                        foreach (Player pl in RAGE.Entities.Players.All)
+                        {
+                            thisCount++;
+                            if (thisCount <= players) continue;
+
+                            players++;
+                            string lobby = "Lobby " + pl.GetSharedData<int>("InLobby");
+                            switch (pl.GetSharedData<int>("InLobby"))
+                            {
+                                case -1:
+                                    lobby = "Login";
+                                    break;
+                                case -2:
+                                    lobby = "Jail";
+                                    break;
+                                case -3:
+                                    lobby = "Freeroam";
+                                    break;
+                                case -4:
+                                    lobby = "Derby";
+                                    break;
+                                case -5:
+                                    lobby = "Customizer";
+                                    break;
+                            }
+
+                            builder.AddField(pl.Name, lobby + " | Level: " + pl.GetSharedData<int>("Level").ToString() + " | Ping: " + pl.Ping.ToString(), true);
+
+                            if (thisCount >= 20) break;
+                        }
+
+                        var embed = builder.Build();
+
+                        context.Channel.SendMessageAsync(
+                            "Reporting...",
+                            embed: embed)
+                            .ConfigureAwait(false);
                     }
-
-                    builder.AddField(pl.Name, lobby + " | Level: " + pl.GetSharedData<int>("Level").ToString() + " | Ping: " + pl.Ping.ToString(), true);
-                }
-
-                var embed = builder.Build();
-
-                context.Channel.SendMessageAsync(
-                    "Reporting...",
-                    embed: embed)
-                    .ConfigureAwait(false);
+                }, 10);
             }
             if (context.Content.StartsWith("!o"))
             {
