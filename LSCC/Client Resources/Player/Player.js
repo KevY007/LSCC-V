@@ -157,6 +157,15 @@ mp.events.add("SendLastSeen", () => {
 
 mp.events.add("render", () => {
 
+    // Anti Pistol Whip?
+    if (mp.game.invoke('0x475768A975D5AD17', player.handle, 6))
+    {
+        //Disable pistol whipping
+        RAGE.Game.Pad.DisableControlAction(0, 140, true); 
+        RAGE.Game.Pad.DisableControlAction(0, 141, true); 
+        RAGE.Game.Pad.DisableControlAction(0, 142, true); 
+    }
+
     // Taken from GTA.World
     // IsPedArmed (0x475768A975D5AD17): 4 returns true if you are equipped with any weapon except Explosives weapon group AND melee weapons
     // If the player is armed with anything but a melee weapon or explosive weapon disable the lock-on functionality, otherwise enable it
