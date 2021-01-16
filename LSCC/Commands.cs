@@ -3310,7 +3310,7 @@ namespace LSCC
                 player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /set(hp/ar) /spec");
                 player.SendChatMessage("[Admin Lv 1]: /freeze /unfreeze /kick /slap /setinv(ulnerable) /specoff");
                 player.SendChatMessage("[Admin Lv 1]: /bancheck /jail /unjail /fix /sendtolobby /set(time/weather)");
-                player.SendChatMessage("[Admin Lv 1]: /mute /unmute /warn /unwarn");
+                player.SendChatMessage("[Admin Lv 1]: /mute /unmute /warn /unwarn /setteam");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
