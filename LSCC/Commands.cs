@@ -2588,7 +2588,7 @@ namespace LSCC
             player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /keys /admins /rules /id");
             player.SendChatMessage("[General]: /report /helpme /l(ow) /c(ar)w(hisper) /s(hout)");
             player.SendChatMessage("[Squad/Partner]: /squad /squadleave /s(quad)c(hat) /squadaccept /squadmembers");
-            player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
+            player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather) /lobbychat (/lo,/lc)");
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys for activation)");
             player.SendChatMessage("!{#339BC4}[Cop!{#F24C27}chase]: !{#FFFFFF}/r(adio) /wt /loadout /car");
@@ -4170,6 +4170,20 @@ namespace LSCC
                 return;
             }
 
+            if(RAGE.Entities.Players.All.Count > 20)
+            {
+                if(player.HasData("LastOOCTick"))
+                {
+                    if (Environment.TickCount64 - player.GetData<long>("LastOOCTick") < 5000)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}OOC slowmode is on! Wait a bit or use /lg or /lo");
+                        return;
+                    }
+                }
+
+                player.SetData("LastOOCTick", Environment.TickCount64);
+            }
+
             if (EPlayer.GetAccount(player).Admin < 1)
             {
                 if (EPlayer.GetAccount(player).DonatorLevel < 1)
@@ -4184,6 +4198,49 @@ namespace LSCC
             }
 
             Discord.SendTextChannel("staff-bot", $"**(OOC) | {player.Name}**: {text}");
+        }
+
+
+        [Command("lc", "!{#AFAFAF}[USAGE] lobbychat (text)", Alias = "lg,lo", GreedyArg = true)]
+        public void cmd_lobbychat(Player player, string text)
+        {
+            player.SetData("TUA_LT", 0);
+
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).MuteTime > 0)
+            {
+                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                return;
+            }
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                if (EPlayer.GetAccount(player).DonatorLevel < 1)
+                {
+                    foreach (Player pl in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")))
+                    {
+                        pl.SendChatMessage($"(( [LOBBY] {player.Name}: {text} ))");
+                    }
+                }
+                else
+                {
+                    foreach (Player pl in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")))
+                    {
+                        pl.SendChatMessage($"(( [LOBBY] {EPlayer.GetDonatorLevelName(EPlayer.GetAccount(player).DonatorLevel, true)}!{{#FFFFFF}} {player.Name}: {text} ))");
+                    }
+                }
+            }
+            else
+            {
+                foreach (Player pl in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")))
+                {
+                    pl.SendChatMessage($"(( [LOBBY] {EPlayer.GetAdminLevelName(EPlayer.GetAccount(player).Admin, true)}!{{#FFFFFF}} {player.Name}: {text} ))");
+                }
+            }
+
+            Discord.SendTextChannel("staff-bot", $"**(Lobby {player.GetSharedData<int>("InLobby")}) | {player.Name}**: {text}");
         }
 
         [Command("ann", "!{#AFAFAF}[USAGE] ann (text)", Alias = "announce", GreedyArg = true)]
