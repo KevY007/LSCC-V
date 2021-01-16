@@ -7,3 +7,4 @@ add a linux script that will keep on restarting server if goes off??
 
 CURRENCY SYSTEM/DONOR POINTS THAT CAN ALLOW VIP STUFF AND CMDS LIKE buyammo USING VIP POINTS OR STUF
 weapon attachment/comp shop with points later
+make compass not block the voice team thing
