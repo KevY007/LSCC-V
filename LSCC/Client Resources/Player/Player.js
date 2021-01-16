@@ -497,6 +497,17 @@ mp.events.add('render', () => {
                                 target.setInvincible(false);
                             });
                         });
+
+                        if(player.isInAnyVehicle(false))
+                        {
+                            mp.vehicles.forEach(target2 => {
+                                player.vehicle.setNoCollision(target2.handle, false);
+                                target2.setNoCollision(player.vehicle.handle, false);
+        
+                                target2.setInvincible(false);
+                                player.vehicle.setInvincible(false);
+                            });
+                        }
                     }
                     else if(collisionTime == 0)
                     {

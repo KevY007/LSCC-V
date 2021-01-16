@@ -599,7 +599,7 @@ namespace LSCC
                         int killStreak = killer.GetData<int>("Killstreak");
                         killer.SetData("Killstreak", killStreak + 1);
 
-                        if(killStreak % 4 == 0)
+                        if(killStreak % 4 == 0 && killStreak >= 4)
                         {
                             EPlayer.GrantXP(killer, 5);
                             EPlayer.SendMessageInLobby(lobby.lobbyId, $"!{{#FF0000}}[KILLSTREAK] !{{#FF6347}}{killer.Name} !{{#FFFFFF}}is on a {killStreak} kills rampage! Someone stop them!");
