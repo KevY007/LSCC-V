@@ -750,7 +750,7 @@ namespace LSCC
 
             if (lobby.gameMode != GameModes.BUSTED)
             {
-                if (EPlayer.GetAccount(player).LoadoutCop.Length > 3)
+                if (EPlayer.GetAccount(player).LoadoutCop.Length >= 2)
                 {
                     LoadoutData loadout = Settings.Loadouts.Find(a => a.Team == 1 && a.Name.Equals(EPlayer.GetAccount(player).LoadoutCop));
 
@@ -823,7 +823,7 @@ namespace LSCC
             if (lobby.gameMode != GameModes.BUSTED)
             {
 
-                if (EPlayer.GetAccount(player).LoadoutFugitive.Length > 3)
+                if (EPlayer.GetAccount(player).LoadoutFugitive.Length >= 2)
                 {
                     LoadoutData loadout = Settings.Loadouts.Find(a => a.Team == 0 && a.Name.Equals(EPlayer.GetAccount(player).LoadoutFugitive));
 
