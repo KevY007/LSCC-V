@@ -1118,7 +1118,7 @@ namespace LSCC
                                 target.ResetData("_currentlySwappingSeats");
                             }
                             catch { }
-                        }, player.Ping + target.Ping + 250);
+                        }, player.Ping + target.Ping + 1000);
 
                         return;
                     }
