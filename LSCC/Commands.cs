@@ -421,7 +421,7 @@ namespace LSCC
 
             Random rand = new Random();
 
-            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(122), rand.Next(122), player.SocialClubName, 255, false, true, player.Dimension);
+            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(122), rand.Next(122), player.Name, 255, false, true, player.Dimension);
             aVehicle.EngineStatus = true;
             aVehicle.SetSharedData("Engine", true);
             aVehicle.SetSharedData("Locked", false);
@@ -470,7 +470,7 @@ namespace LSCC
 
             Random rand = new Random();
 
-            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(122), rand.Next(122), player.SocialClubName, 255, false, true, player.Dimension);
+            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(122), rand.Next(122), player.Name, 255, false, true, player.Dimension);
             aVehicle.SetSharedData("Locked", false);
             aVehicle.Locked = false;
             aVehicle.EngineStatus = true;
