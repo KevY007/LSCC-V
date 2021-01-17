@@ -1929,8 +1929,8 @@ namespace LSCC
             return;
         }
 
-        [Command("fix", "!{#AFAFAF}[USAGE] fix (target)")]
-        public void cmd_fix(Player player, Player target)
+        [Command("afix", "!{#AFAFAF}[USAGE] afix (target)")]
+        public void cmd_afix(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -1952,8 +1952,15 @@ namespace LSCC
             return;
         }
 
-        [Command("flip", "!{#AFAFAF}[USAGE] flip (target)")]
-        public void cmd_flip(Player player, Player target)
+        [Command("flip")]
+        public void cmd_flip(Player player)
+        {
+            player.SendChatMessage("bruh just flip the car yourself??");
+            player.SendChatMessage("u literally in gta 5 not san andreas dumbo");
+        }
+
+        [Command("aflip", "!{#AFAFAF}[USAGE] aflip (target)")]
+        public void cmd_aflip(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -3506,7 +3513,7 @@ namespace LSCC
 
                 player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /set(hp/ar) /spec");
                 player.SendChatMessage("[Admin Lv 1]: /freeze /unfreeze /kick /slap /setinv(ulnerable) /specoff");
-                player.SendChatMessage("[Admin Lv 1]: /bancheck /jail /unjail /fix /flip /sendtolobby /set(time/weather)");
+                player.SendChatMessage("[Admin Lv 1]: /bancheck /jail /unjail /afix /aflip /sendtolobby /set(time/weather)");
                 player.SendChatMessage("[Admin Lv 1]: /mute /unmute /warn /unwarn /setteam /forceautojoin");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
