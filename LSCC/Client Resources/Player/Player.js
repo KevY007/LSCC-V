@@ -972,13 +972,6 @@ mp.events.add(
             }
         },
 
-        "entityStreamIn": (entity) => {
-            if(entity !== null && entity.type === 'player') mp.events.callRemote("PlayerStreamIn", entity);
-        },
-        "AttachWeaponComponent": (target, weapon, comp) => {
-            mp.game.invoke("0xD966D51AA5B28BB9", target.handle, weapon, comp);
-            mp.game.invoke("0xADF692B254977C0C", target.handle, weapon, true);
-        },
         "PlayThemeSong": (link, level) => {
             themeSoundID = mp.game.audio.playSoundEx(link, level);
         },

@@ -14,6 +14,11 @@ mp.events.addDataHandler('Status_Trunk', function (entity, value, oldValue)
     }
 });
 
+mp.events.addDataHandler('ComponentSyncTrigger', function (entity, value, oldValue) 
+{
+    if(entity != null && entity.type === 'player') mp.events.callRemote("RequestCompSync", entity);
+});
+
 mp.events.add("OpenVehicleDoor", (vehicle, doorId) => {
     if(vehicle.type === 'vehicle') vehicle.setDoorOpen(doorId, false, true);
 });
@@ -42,7 +47,17 @@ mp.events.addDataHandler('Engine', function (entity, value, oldValue)
     }
 });
 
+mp.events.add("AttachWeaponComponent", (target, weapon, comp) => {
+    mp.game.invoke("0xD966D51AA5B28BB9", target.handle, weapon, comp);
+    mp.game.invoke("0xADF692B254977C0C", target.handle, weapon, true);
+});
+
 mp.events.add('entityStreamIn', (entity) => {
+
+    if(entity != null && entity.type === 'player') 
+    {
+        mp.events.callRemote("RequestCompSync", entity);
+    }
     if (entity.type === 'vehicle') 
     {
         if(entity.getVariable("Status_Trunk") !== undefined)

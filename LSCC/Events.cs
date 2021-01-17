@@ -100,6 +100,21 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
+            if (newWeapon != WeaponHash.Unarmed)
+            {
+                try
+                {
+                    foreach (Player p in RAGE.Entities.Players.All)
+                    {
+                        if (p.Dimension == player.Dimension && p.Position.DistanceTo(player.Position) < 1000.0 && player != p)
+                        {
+                            OnPlayerRequestCompSync(p, player);
+                        }
+                    }
+                }
+                catch { }
+            }
+
             return;
         }
 
@@ -1864,10 +1879,14 @@ namespace LSCC
             return;
         }
 
-        [RemoteEvent("PlayerStreamIn")]
-        public void OnPlayerStreamIn(Player streamedfor, Player target)
+        [RemoteEvent("RequestCompSync")]
+        public void OnPlayerRequestCompSync(Player player, Player target)
         {
-            EPlayer.SyncComponents(streamedfor, target);
+            try
+            {
+                EPlayer.SyncComponents(player, target);
+            }
+            catch { }
         }
 
         [RemoteEvent("BustRegress")]

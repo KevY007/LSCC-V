@@ -704,7 +704,7 @@ namespace LSCC
             }
         }
 
-        public static void SyncComponents(Player tosyncfor, Player? target)
+        public static void SyncComponents(Player tosyncfor, Player target)
         {
             if(target.HasData("AttachedComponents"))
             {
@@ -729,11 +729,12 @@ namespace LSCC
             comps.Add(new KeyValuePair<int, int>(weaponhash, componenthash));
             target.SetData("AttachedComponents", comps);
 
+            target.SetSharedData("ComponentSyncTrigger", new Random().Next());
             foreach (Player p in RAGE.Entities.Players.All)
             {
                 if (p.Dimension == target.Dimension)
                 {
-                    p.TriggerEvent("AttachWeaponComponent", target, (int)weaponhash, (int)componenthash);
+                    SyncComponents(p, target);
                 }
             }
 
