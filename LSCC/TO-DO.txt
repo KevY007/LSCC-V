@@ -7,6 +7,6 @@ CURRENCY SYSTEM/DONOR POINTS THAT CAN ALLOW VIP STUFF AND CMDS LIKE buyammo USIN
 weapon attachment/comp shop with points later
 currency
 maybe add spec for people
-
+forceautojoin
 #bug reports and other chans sugeestion
 add a linux script that will keep on restarting server if goes off?
