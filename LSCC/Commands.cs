@@ -1586,6 +1586,156 @@ namespace LSCC
             return;
         }
 
+        [Command("buycomp", "!{#AFAFAF}[USAGE] buycomp (component/hash - hold weapon and use 'help' to list available)", GreedyArg = true)]
+        public void cmd_buycomp(Player player, string component)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            UInt64 wephash = (UInt64)player.CurrentWeapon;
+            bool found = false;
+            jWeaponData itemData = new jWeaponData();
+
+            foreach (KeyValuePair<ulong, jWeaponData> i in Settings.WeaponData)
+            {
+                if (wephash != 0)
+                {
+                    if (i.Key == wephash)
+                    {
+                        found = true;
+                        itemData = i.Value;
+                        break;
+                    }
+                }
+            }
+
+            if (found == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You don't have a compatible weapon in hand! Try using hashes or exact names.");
+                return;
+            }
+
+            found = false;
+            UInt64 comphash = 0;
+            Component comp = new Component();
+
+            if (!UInt64.TryParse(component, out comphash))
+            {
+                comphash = 0;
+            }
+
+            foreach (var item in itemData.Components)
+            {
+                if (comphash != 0)
+                {
+                    if (item.Key == wephash)
+                    {
+                        found = true;
+                        comp = item.Value;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (!found)
+                    {
+                        if (item.Value.Name.Contains(component, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            found = true;
+                            comphash = item.Key;
+                            comp = item.Value;
+                        }
+                    }
+                    if (item.Value.Name.Equals(component, StringComparison.CurrentCultureIgnoreCase)) // If it's really equal then override old found
+                    {
+                        found = true;
+                        comphash = item.Key;
+                        comp = item.Value;
+                    }
+                }
+            }
+
+            if (found == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}List of supported comps on " + itemData.Name + ":");
+                foreach (var item in itemData.Components)
+                {
+                    player.SendChatMessage(item.Value.Name);
+                }
+                return;
+            }
+
+            if (EPlayer.GetAccount(player).DonatorPoints < 100)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You need at least 100 donator points to buy a weapon component.");
+                return;
+            }
+
+
+            Dictionary<ulong, wComponentData> wepItems = new Dictionary<ulong, wComponentData>();
+
+            Account acc = EPlayer.GetAccount(player);
+            try
+            {
+                if (acc.WeaponComponents == null || acc.WeaponComponents.Length < 4) throw (new System.Exception("Invalid weapon component > going to new."));
+
+                wepItems = NAPI.Util.FromJson<Dictionary<ulong, wComponentData>>(acc.WeaponComponents);
+            }
+            catch
+            {
+                wepItems = new Dictionary<ulong, wComponentData>();
+
+                wComponentData test = new wComponentData();
+                test.Components.Add(123456789);
+                wepItems.Add(123456789, test);
+            }
+
+            bool alreadyHas = false;
+            Dictionary<ulong, wComponentData> newWepData = new Dictionary<ulong, wComponentData>();
+
+            foreach (KeyValuePair<ulong, wComponentData> i in wepItems)
+            {
+                wComponentData newDataTwo = new wComponentData();
+
+                if (i.Key == wephash)
+                {
+                    newDataTwo = i.Value;
+                    if (!i.Value.Components.Contains(comphash)) newDataTwo.Components.Add(comphash);
+                    else
+                    {
+                        alreadyHas = true;
+                        break;
+                    }
+                }
+
+                newWepData.Add(i.Key, newDataTwo);
+            }
+
+            if(alreadyHas)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have already bought this component!");
+                return;
+            }
+
+            if (!newWepData.ContainsKey(wephash))
+            {
+                wComponentData newDataTwo = new wComponentData();
+
+                newDataTwo.Components.Add(comphash);
+
+                newWepData.Add(wephash, newDataTwo);
+            }
+
+            EPlayer.GetAccount(player).WeaponComponents = NAPI.Util.ToJson(newWepData);
+
+            player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You bought '{comp.Name}' on '{itemData.Name}' for 100 donator points.");
+
+            try { Main.Log("currency.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:buycomp:{itemData.Name}:{comp.Name}"); } catch { }
+            EPlayer.GetAccount(player).DonatorPoints -= 100;
+            EPlayer.Save(player);
+            return;
+        }
+
         [Command("givegun", "!{#AFAFAF}[USAGE] givegun (target) (ammo) (weapon)", GreedyArg = true)]
         public void cmd_givegun(Player player, Player target, int ammo, string wep)
         {
@@ -2635,7 +2785,8 @@ namespace LSCC
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /togblip");
             player.SendChatMessage("!{#A5A8A8}[Misc]: /updaterate /info /fontsize /voicebind /gpsbind");
             player.SendChatMessage("!{#A5A8A8}[Dbg/Test]: /pos /lcmenu");
-
+            
+            player.SendChatMessage("!{#F7EB05}[Donator/Points] /buycomp");
             if (EPlayer.GetAccount(player).DonatorLevel >= 1)
             {
                 player.SendChatMessage("!{#F7EB05}[Bronze Donator] /d(onator)c(hat)");

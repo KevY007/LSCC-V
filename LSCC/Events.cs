@@ -1436,6 +1436,7 @@ namespace LSCC
                 Deaths = 1,
                 MinutesPlayed = 1.0,
                 DonatorPoints = 0,
+                Points = 0,
                 Warns = 0,
                 Suspended = 0,
                 DonatorLevel = 0,

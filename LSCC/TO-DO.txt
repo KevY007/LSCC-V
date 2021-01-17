@@ -2,7 +2,8 @@
 
 admin records system
 
-buyammo and weapon comp shop with donator points
+buyammo with donator points
+vehicle upgrade system with regular points later
 
 #bug reports and other chans sugeestion
 add a linux script that will keep on restarting server if goes off?
