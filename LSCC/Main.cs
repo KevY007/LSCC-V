@@ -417,44 +417,33 @@ namespace LSCC
         public static int GetMaxSeats(string vehiclename)
         {
             int seats = NAPI.Vehicle.GetVehicleMaxOccupants((VehicleHash)NAPI.Util.GetHashKey(vehiclename));
-            if(seats == 0)
+
+            switch(vehiclename)
             {
-                switch(vehiclename)
-                {
-                    case "kuruma":
-                        seats = 4;
-                        break;
-                    case "sultan":
-                        seats = 4;
-                        break;
-                    case "buffalo":
-                        seats = 4;
-                        break;
-                    case "cheburek":
-                        seats = 4;
-                        break;
-                    case "blista2":
-                        seats = 2;
-                        break;
-                    case "polbufac2":
-                        seats = 4;
-                        break;
-                    case "polbufac":
-                        seats = 4;
-                        break;
-                    case "fbibufac":
-                        seats = 4;
-                        break;
-                    case "600sel":
-                        seats = 4;
-                        break;
-                    case "udchall1":
-                        seats = 4;
-                        break;
-                    case "lspdcara":
-                        seats = 4;
-                        break;
-                }
+                case "cheburek":
+                    seats = 4;
+                    break;
+                case "blista2":
+                    seats = 2;
+                    break;
+                case "polbufac2":
+                    seats = 4;
+                    break;
+                case "polbufac":
+                    seats = 4;
+                    break;
+                case "fbibufac":
+                    seats = 4;
+                    break;
+                case "600sel":
+                    seats = 4;
+                    break;
+                case "udchall1":
+                    seats = 4;
+                    break;
+                case "lspdcara":
+                    seats = 4;
+                    break;
             }
             return seats;
         }
@@ -1925,6 +1914,8 @@ namespace LSCC
 
                         int maxseats = pVehicle.MaxOccupants;
                         if (overridemaxseats != 0) maxseats = overridemaxseats;
+
+                        if (lobby.gameMode == GameModes.BUSTED) maxseats = 1; // Separate cars for everyone by not giving available seats.
                         while (seat < maxseats)
                         {
                             if (fugitives == 0) break;
