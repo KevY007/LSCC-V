@@ -451,7 +451,7 @@ namespace LSCC
                 {
                     foreach (Player indm in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
                     {
-                        indm.TriggerEvent("pushToKillFeed", $"DERBY> {player.Name} fell down");
+                        indm.TriggerEvent("pushToKillFeed", $"DERBY> {player.Name} fell down".Replace('.', ' '));
                     }
                 }
                 player.SetSharedData("DerbyTime", 0);
@@ -474,11 +474,11 @@ namespace LSCC
                             {
                                 if (reasonStr == null)
                                 {
-                                    indm.TriggerEvent("pushToKillFeed", $"DM> {killer.Name} killed {player.Name}");
+                                    indm.TriggerEvent("pushToKillFeed", $"DM> {killer.Name} killed {player.Name}".Replace('.', ' '));
                                 }
                                 else
                                 {
-                                    indm.TriggerEvent("pushToKillFeed", $"DM> {killer.Name} killed {player.Name} with {reasonStr}");
+                                    indm.TriggerEvent("pushToKillFeed", $"DM> {killer.Name} killed {player.Name} with {reasonStr}".Replace('.', ' '));
                                 }
                             }
                             EPlayer.GetAccount(killer).Kills++;
@@ -649,19 +649,19 @@ namespace LSCC
                                     {
                                         if (reasonStr == null)
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name}");
+                                            ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name}".Replace('.', ' '));
                                         }
                                         else
                                         {
                                             if (reason == 696988)
                                             {
-                                                ay.TriggerEvent("pushToKillFeed", $"{killer.Name} has apprehended {player.Name}");
+                                                ay.TriggerEvent("pushToKillFeed", $"{killer.Name} has apprehended {player.Name}".Replace('.', ' '));
                                             }
                                             else if (reason == 696989)
                                             {
-                                                ay.TriggerEvent("pushToKillFeed", $"{killer.Name} has busted {player.Name}");
+                                                ay.TriggerEvent("pushToKillFeed", $"{killer.Name} has busted {player.Name}".Replace('.', ' '));
                                             }
-                                            else ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}");
+                                            else ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}".Replace('.', ' '));
                                         }
                                     }
                                     else
@@ -670,11 +670,11 @@ namespace LSCC
 
                                         if (reasonStr == null)
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", $"{player.Name} died");
+                                            ay.TriggerEvent("pushToKillFeed", $"{player.Name} died".Replace('.', ' '));
                                         }
                                         else
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", $"{player.Name} died of {reasonStr}");
+                                            ay.TriggerEvent("pushToKillFeed", $"{player.Name} died of {reasonStr}".Replace('.', ' '));
                                         }
                                     }
                                 }
@@ -704,11 +704,11 @@ namespace LSCC
 
                                         if (reasonStr == null)
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name}");
+                                            ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name}".Replace('.', ' '));
                                         }
                                         else
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}");
+                                            ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}".Replace('.', ' '));
                                         }
                                     }
                                     else
@@ -717,11 +717,11 @@ namespace LSCC
 
                                         if (reasonStr == null)
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", $"{player.Name} died");
+                                            ay.TriggerEvent("pushToKillFeed", $"{player.Name} died".Replace('.', ' '));
                                         }
                                         else
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", $"{player.Name} died of {reasonStr}");
+                                            ay.TriggerEvent("pushToKillFeed", $"{player.Name} died of {reasonStr}".Replace('.', ' '));
                                         }
                                     }
                                 }
@@ -1339,9 +1339,9 @@ namespace LSCC
                 player.SendNotification("~r~Password is too small!", true);
                 return;
             }
-            if (username.Contains("@") || username.Length < 4)
+            if (username.Contains("@") || username.Length < 4 || username.Length >= 24)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your username is too small or it cannot contain the character '@'");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your username is too small/big or it cannot contain the character '@'");
                 player.SendNotification("~r~Username small or contains illegal characters!", true);
                 return;
             }
@@ -2210,7 +2210,7 @@ namespace LSCC
                                                 player.GiveWeapon(WeaponHash.Microsmg, 1000);
                                                 break;
                                             case 2:
-                                                player.GiveWeapon(WeaponHash.Appistol, 1000);
+                                                player.GiveWeapon(WeaponHash.Pistol50, 1000);
                                                 player.GiveWeapon(WeaponHash.Carbinerifle, 1000);
                                                 player.GiveWeapon(WeaponHash.Sawnoffshotgun, 1000);
                                                 player.GiveWeapon(WeaponHash.Minismg, 1000);

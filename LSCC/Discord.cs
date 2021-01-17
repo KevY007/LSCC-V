@@ -60,132 +60,149 @@ namespace LSCC
 
         public static Task MessageReceived(SocketMessage context)
         {
-            if (!Settings.UseDiscord) return Task.CompletedTask;
-            if (_client == null) return Task.CompletedTask;
-            if (_client.ConnectionState != ConnectionState.Connected) return Task.CompletedTask;
-
-            if (context.Content.Equals("!up") || context.Content.Equals("!status"))
+            try
             {
-                context.Channel.SendMessageAsync($":white_check_mark: Server is online with {RAGE.Entities.Players.Count} players.");
-                return Task.CompletedTask;
-            }
+                if (!Settings.UseDiscord) return Task.CompletedTask;
+                if (_client == null) return Task.CompletedTask;
+                if (_client.ConnectionState != ConnectionState.Connected) return Task.CompletedTask;
 
-            if (context.Channel.Name != "staff-bot") return Task.CompletedTask;
-
-            if(context.Content.StartsWith("!players"))
-            {
-                if (RAGE.Entities.Players.Count < 1)
+                if (context.Content.Equals("!up") || context.Content.Equals("!status"))
                 {
-                    context.Channel.SendMessageAsync(":negative_squared_cross_mark: No players are online!");
+                    context.Channel.SendMessageAsync($":white_check_mark: Server is online with {RAGE.Entities.Players.Count} players.");
                     return Task.CompletedTask;
                 }
 
-                int players = 0;
-                int tries = 0;
-                NAPI.Task.Run(() =>
+                if (context.Channel.Name != "staff-bot") return Task.CompletedTask;
+
+                if (context.Content.StartsWith("!players"))
                 {
-                    while (players < RAGE.Entities.Players.Count)
+                    if (RAGE.Entities.Players.Count < 1)
                     {
-                        tries++;
-                        if (tries >= 10) { NAPI.Util.ConsoleOutput("breaking cuz of tries"); break; }
+                        context.Channel.SendMessageAsync(":negative_squared_cross_mark: No players are online!");
+                        return Task.CompletedTask;
+                    }
 
-                        var builder = new EmbedBuilder()
-                            .WithTitle("**Lobby/Mode | Player | Level**")
-                            .WithDescription("```\n```")
-                            .WithColor(255, 0, 0)
-                            .WithFooter(footer =>
-                            {
-                                footer
-                                    .WithText("Online List");
-                            })
-                            .WithAuthor(author =>
-                            {
-                                author
-                                    .WithName("Players")
-                                    .WithIconUrl("https://i.imgur.com/nJPbaL7.png");
-                            });
-
-                        int thisCount = 0;
-                        int proc = 0;
-                        foreach (Player pl in RAGE.Entities.Players.All)
+                    int players = 0;
+                    int tries = 0;
+                    NAPI.Task.Run(() =>
+                    {
+                        while (players < RAGE.Entities.Players.Count)
                         {
-                            thisCount++;
-                            if (thisCount <= players) continue;
+                            tries++;
+                            if (tries >= 10) { NAPI.Util.ConsoleOutput("breaking cuz of tries"); break; }
 
-                            players++;
-                            proc++;
-                            string lobby = "Lobby " + pl.GetSharedData<int>("InLobby");
-                            switch (pl.GetSharedData<int>("InLobby"))
+                            var builder = new EmbedBuilder()
+                                .WithTitle("**Lobby/Mode | Player | Level**")
+                                .WithDescription("```\n```")
+                                .WithColor(255, 0, 0)
+                                .WithFooter(footer =>
+                                {
+                                    footer
+                                        .WithText("Online List");
+                                })
+                                .WithAuthor(author =>
+                                {
+                                    author
+                                        .WithName("Players")
+                                        .WithIconUrl("https://i.imgur.com/nJPbaL7.png");
+                                });
+
+                            int thisCount = 0;
+                            int proc = 0;
+                            foreach (Player pl in RAGE.Entities.Players.All)
                             {
-                                case -1:
-                                    lobby = "Login";
-                                    break;
-                                case -2:
-                                    lobby = "Jail";
-                                    break;
-                                case -3:
-                                    lobby = "Freeroam";
-                                    break;
-                                case -4:
-                                    lobby = "Derby";
-                                    break;
-                                case -5:
-                                    lobby = "Customizer";
-                                    break;
+                                thisCount++;
+                                if (thisCount <= players) continue;
+
+                                players++;
+                                proc++;
+                                string lobby = "Lobby " + pl.GetSharedData<int>("InLobby");
+                                switch (pl.GetSharedData<int>("InLobby"))
+                                {
+                                    case -1:
+                                        lobby = "Login";
+                                        break;
+                                    case -2:
+                                        lobby = "Jail";
+                                        break;
+                                    case -3:
+                                        lobby = "Freeroam";
+                                        break;
+                                    case -4:
+                                        lobby = "Derby";
+                                        break;
+                                    case -5:
+                                        lobby = "Customizer";
+                                        break;
+                                }
+
+                                builder.AddField(pl.Name, lobby + " | Level: " + pl.GetSharedData<int>("Level").ToString() + " | Ping: " + pl.Ping.ToString(), true);
+
+                                if (proc >= 20) break;
                             }
 
-                            builder.AddField(pl.Name, lobby + " | Level: " + pl.GetSharedData<int>("Level").ToString() + " | Ping: " + pl.Ping.ToString(), true);
+                            var embed = builder.Build();
 
-                            if (proc >= 20) break;
+                            context.Channel.SendMessageAsync(
+                                "Reporting...",
+                                embed: embed)
+                                .ConfigureAwait(false);
                         }
-
-                        var embed = builder.Build();
-
-                        context.Channel.SendMessageAsync(
-                            "Reporting...",
-                            embed: embed)
-                            .ConfigureAwait(false);
-                    }
-                }, 10);
-            }
-            if (context.Content.StartsWith("!o"))
-            {
-                string[] args = context.Content.Split(" ", 2);
-                if (args.Count() >= 2)
-                {
-                    NAPI.Chat.SendChatMessageToAll($"(( [DOOC] !{{#FF6347}}{context.Author.Username}!{{#FFFFFF}}: {args[1]} ))");
-                    context.Channel.SendMessageAsync($"**(DOOC) | {context.Author.Username}**: {args[1]}");
+                    }, 10);
                 }
-                else context.Channel.SendMessageAsync("USAGE: !o (text)");
+                if (context.Content.StartsWith("!o"))
+                {
+                    string[] args = context.Content.Split(" ", 2);
+                    if (args.Count() >= 2)
+                    {
+                        NAPI.Chat.SendChatMessageToAll($"(( [DOOC] !{{#FF6347}}{context.Author.Username}!{{#FFFFFF}}: {args[1]} ))");
+                        context.Channel.SendMessageAsync($"**(DOOC) | {context.Author.Username}**: {args[1]}");
+                    }
+                    else context.Channel.SendMessageAsync("USAGE: !o (text)");
+                }
+                if (context.Content.StartsWith("!a"))
+                {
+                    string[] args = context.Content.Split(" ", 2);
+                    if (args.Count() >= 2)
+                    {
+                        NAPI.Task.Run(() => EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[A] (DISCORD) {context.Author.Username}:  {args[1]}"), 10);
+                    }
+                    else context.Channel.SendMessageAsync("USAGE: !a (text)");
+                }
+                if (context.Content.StartsWith("!cmds"))
+                {
+                    var builder = new EmbedBuilder()
+                        .WithTitle("**Command & Information**")
+                        .WithDescription("```\n```")
+                        .WithColor(255, 0, 0)
+                        .WithFooter(footer =>
+                        {
+                            footer
+                                .WithText("List");
+                        })
+                        .WithAuthor(author =>
+                        {
+                            author
+                                .WithName("Help")
+                                .WithIconUrl("https://i.imgur.com/nJPbaL7.png");
+                        });
+
+
+                    builder.AddField("cmds", "Displays list of all the commands");
+                    builder.AddField("o", "Sends a message in OOC chat");
+                    builder.AddField("a", "Sends a message in ADM chat");
+                    builder.AddField("players", "Gives a list of all the players online");
+
+                    var embed = builder.Build();
+
+                    context.Channel.SendMessageAsync(
+                        "Reporting...",
+                        embed: embed)
+                        .ConfigureAwait(false);
+                }
             }
-            if (context.Content.StartsWith("!cmds"))
-            {
-                var builder = new EmbedBuilder()
-                    .WithTitle("**Command & Information**")
-                    .WithDescription("```\n```")
-                    .WithColor(255, 0, 0)
-                    .WithFooter(footer => {
-                        footer
-                            .WithText("List");
-                    })
-                    .WithAuthor(author => {
-                        author
-                            .WithName("Help")
-                            .WithIconUrl("https://i.imgur.com/nJPbaL7.png");
-                    });
+            catch { }
 
-                
-                builder.AddField("cmds", "Displays list of all the commands");
-                builder.AddField("o", "Sends a message in OOC chat");
-                builder.AddField("players", "Gives a list of all the players online");
-
-                var embed = builder.Build();
-
-                context.Channel.SendMessageAsync(
-                    "Reporting...",
-                    embed: embed)
-                    .ConfigureAwait(false);
-            }
             return Task.CompletedTask;
         }
 

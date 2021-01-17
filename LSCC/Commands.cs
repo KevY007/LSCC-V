@@ -5030,7 +5030,7 @@ namespace LSCC
                     { "https://static.wikia.nocookie.net/gtawiki/images/7/7a/CarbineRifle-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Carbine Rifle", 80 },
                 }) },
                 { "SWAT", 10, 1, NAPI.Util.ToJson(new object[,] {
-                    { "https://static.wikia.nocookie.net/gtawiki/images/0/07/APPistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "AP Pistol", 60 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/d/d3/Pistol.50-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pistol .50", 60 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/5/55/HeavyShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Heavy Shotgun", 40 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/f/fe/TearGas-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "BZ Gas", 3 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/5/56/MilitaryRifle-GTAO-icon.png/revision/latest/scale-to-width-down/128", "Military Rifle", 120 },
@@ -5049,7 +5049,7 @@ namespace LSCC
                 }) },
                 { "Rebel", 10, 0, NAPI.Util.ToJson(new object[,] {
                     { "https://static.wikia.nocookie.net/gtawiki/images/f/f8/BattleAxe-GTAO-HUDIcon.png/revision/latest/scale-to-width-down/128", "Battle Axe", 1 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/0/07/APPistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "AP Pistol", 40 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/d/d3/Pistol.50-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pistol .50", 40 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/9/96/BullpupShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Bullpup Shotgun", 30 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/2/21/Combat_PDW_HUD_GTA_V_PC.png/revision/latest/scale-to-width-down/128", "Combat PDW", 125 },
                 }) },
