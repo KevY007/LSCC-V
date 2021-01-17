@@ -2,6 +2,7 @@
 var lastJailUpdate = 10;
 
 var chatStatus = false;
+var lastChatToggle = Date.now();
 var streetName = null;
 var zoneName = null;
 var showHud = true;
@@ -44,6 +45,7 @@ require("./Player/Voice.js");
 mp.events.add("onOpenChatbox", (toggle) =>
 {
     chatStatus = toggle;
+    lastChatToggle = Date.now();
     mp.events.callRemote("UpdateChatState", toggle);
     traceLastFunc(`[Players] ChatBox Toggled ${toggle}`);
 });

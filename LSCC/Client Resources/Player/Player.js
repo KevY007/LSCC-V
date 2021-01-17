@@ -80,7 +80,7 @@ setInterval(() => {
 
 function TogGPSMode()
 {
-    if(chatStatus == false && 
+    if(Date.now() - lastChatToggle >= 500 && chatStatus == false && 
         (mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true))
     {
         traceLastFunc(`[Players] Attempt tog GPS`);
@@ -120,7 +120,7 @@ mp.events.addCommand("gpsbind", function (bind) {
 });
 
 mp.keys.bind(0x4C, false, function() {
-    if(chatStatus == false)
+    if(Date.now() - lastChatToggle >= 500 && chatStatus == false)
     {
         traceLastFunc(`[Players] Attempt L key/lock`);
 
@@ -129,7 +129,7 @@ mp.keys.bind(0x4C, false, function() {
 });
 
 mp.keys.bind(0x59, false, function() {
-    if(chatStatus == false)
+    if(Date.now() - lastChatToggle >= 500 && chatStatus == false)
     {
         traceLastFunc(`[Players] Attempt Y key/engine`);
 
