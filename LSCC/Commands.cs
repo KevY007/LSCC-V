@@ -1086,8 +1086,6 @@ namespace LSCC
                     if (seatingWith.Exists && seatingWith == target 
                         && Environment.TickCount64 - tick <= 5000) // They the one who sent requests and less than 5s.
                     {
-                        target.Position.Z -= 30.0f;
-
                         player.ResetData("SwapSeating");
                         player.ResetData("SwapSeatingTime");
                         target.ResetData("SwapSeating");
@@ -1118,21 +1116,19 @@ namespace LSCC
                                             {
                                                 player.SetIntoVehicle(hwnd, targSeat);
                                                 target.SetIntoVehicle(hwnd, playSeat);
+
+                                                var msg = "!{#FFFFFF}(( !{#FF6347}" + player.Name + " and  " + target.Name + " have swapped seats." + " !{#FFFFFF}))";
+
+                                                foreach (Player playa in NAPI.Player.GetPlayersInRadiusOfPlayer(60, player))
+                                                {
+                                                    if (playa.Dimension == player.Dimension) playa.SendChatMessage(msg);
+                                                }
                                             }
                                         }
-                                        catch
-                                        {
-                                        }
-                                    }, 1000);
+                                        catch {}
+                                    }, 1000 + player.Ping + target.Ping);
                                     player.SetIntoVehicle(hwnd, targSeat);
                                     target.SetIntoVehicle(hwnd, playSeat);
-
-                                    var msg = "!{#FFFFFF}(( !{#FF6347}" + player.Name + " and  " + target.Name + " have swapped seats." + " !{#FFFFFF}))";
-
-                                    foreach (Player playa in NAPI.Player.GetPlayersInRadiusOfPlayer(60, player))
-                                    {
-                                        if (playa.Dimension == player.Dimension) playa.SendChatMessage(msg);
-                                    }
                                 }
                                 player.ResetData("_currentlySwappingSeats");
                                 target.ResetData("_currentlySwappingSeats");
