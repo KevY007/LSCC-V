@@ -3328,7 +3328,7 @@ namespace LSCC
                 player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /set(hp/ar) /spec");
                 player.SendChatMessage("[Admin Lv 1]: /freeze /unfreeze /kick /slap /setinv(ulnerable) /specoff");
                 player.SendChatMessage("[Admin Lv 1]: /bancheck /jail /unjail /fix /sendtolobby /set(time/weather)");
-                player.SendChatMessage("[Admin Lv 1]: /mute /unmute /warn /unwarn /setteam");
+                player.SendChatMessage("[Admin Lv 1]: /mute /unmute /warn /unwarn /setteam /forceautojoin");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
@@ -3519,6 +3519,8 @@ namespace LSCC
 
                     target.SetIntoVehicle(pVehicle, 0);
 
+                    EPlayer.GiveFugitiveWeapons(target);
+
                     NAPI.Task.Run(() =>
                     {
                         try { target.SetIntoVehicle(pVehicle, 0); } catch { }
@@ -3612,6 +3614,7 @@ namespace LSCC
                     target.ResetData("CuffingTarget");
                     target.SetSharedData("Team", 1);
 
+                    EPlayer.GiveCopWeapons(target);
                     NAPI.Task.Run(() =>
                     {
                         try { target.SetIntoVehicle(pVehicle, 0); } catch { }
@@ -4670,6 +4673,50 @@ namespace LSCC
                 }
             }
         }
+
+        [Command("forceautojoin", "!{#AFAFAF}[USAGE] forceautojoin (target)", GreedyArg = true)]
+        public void cmd_forceautojoin(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+            else
+            {
+                if (!player.Name.Equals(target.Name) && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
+                    return;
+                }
+
+                if (target.GetSharedData<int>("InLobby") == -5) return;
+
+                if (EPlayer.GetAccount(target).JailTime > 0)
+                {
+                    target.SetData("AutoJoin", false);
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is in jail!");
+                    return;
+                }
+
+                if (target.GetData<bool>("AutoJoin") == true)
+                {
+                    target.SendNotification("~r~AutoJoin has been turned off by ~y~" + player.Name + ".", false);
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target's auto join has been turned off!");
+                    target.SetData("AutoJoin", false);
+                }
+                else
+                {
+                    target.SendNotification("~w~AutoJoin has been turned on by ~y~" + player.Name + ".", false);
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target's auto join has been turned on!");
+                    target.SetData("AutoJoin", true);
+                }
+            }
+        }
+
         [Command("slap", "!{#AFAFAF}[USAGE] slap (target)", GreedyArg = true)]
         public void cmd_slap(Player player, Player target)
         {
