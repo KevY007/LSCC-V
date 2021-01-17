@@ -5,8 +5,8 @@ admin records system
 
 CURRENCY SYSTEM/DONOR POINTS THAT CAN ALLOW VIP STUFF AND CMDS LIKE buyammo USING VIP POINTS OR STUF
 weapon attachment/comp shop with points later
-squad chat
 currency
 maybe add spec for people
+
 #bug reports and other chans sugeestion
 add a linux script that will keep on restarting server if goes off?

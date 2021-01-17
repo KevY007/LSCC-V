@@ -265,6 +265,10 @@ mp.events.add("render", () => {
                 {
                     voiceString = mp.voiceChat.muted ? "Voice: ~w~Standby (T)" : "Voice: ~g~Speaking (T)";
                 }
+                else if(mp.players.local.getVariable("VoiceMode") == 2)
+                {
+                    voiceString = mp.voiceChat.muted ? "Voice: ~w~Standby (S)" : "Voice: ~g~Speaking (S)";
+                }
 
                 if(currentMuteTime >= 1)
                 {

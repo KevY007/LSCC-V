@@ -175,17 +175,20 @@ namespace LSCC
                 int voiceMode = player.GetSharedData<int>("VoiceMode");
                 voiceMode++;
 
-                if (voiceMode >= 3) voiceMode = 0;
+                if (voiceMode >= 4) voiceMode = 0;
 
                 switch (voiceMode)
                 {
                     case 0:
-                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Nearby (30m) (70m with megaphone/cop car)");
+                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Nearby (30m) (70m in cop car)");
                         break;
                     case 1:
-                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Team Chat");
+                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Team Only");
                         break;
                     case 2:
+                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Squad Only");
+                        break;
+                    case 3:
                         player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Disabled");
                         break;
                 }
@@ -238,9 +241,17 @@ namespace LSCC
                     }
                     else if (player.GetSharedData<int>("VoiceMode") == 2)
                     {
+                        if (player.HasData("PlayerSquad"))
+                        {
+                            listeners.AddRange(Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player.GetData<Player>("PlayerSquad")));
+                        }
+                        else player.SendChatMessage("!{#FF6347}NOTE: You are trying to speak in squad chat while not being in a squad!");
+                    }
+                    else if (player.GetSharedData<int>("VoiceMode") == 3)
+                    {
                         // Disabled voice. Nah, no listeners for you.
                     }
-
+                    
                     listeners.RemoveAll(p => p.Id == player.Id); // Remove ALL instances of local player.
 
                     foreach (Player t in listeners)
@@ -254,7 +265,7 @@ namespace LSCC
                             }
                         }
 
-                        if (t.GetSharedData<int>("VoiceMode") == 2) continue;
+                        if (t.GetSharedData<int>("VoiceMode") == 3) continue;
 
                         player.EnableVoiceTo(t);
                     }
