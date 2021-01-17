@@ -951,6 +951,9 @@ namespace LSCC
             player.TriggerEvent("StopThemeSong");
 
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can edit your character's clothing with /char clothing.");
+            
+            if(EPlayer.GetAccount(player).Level == 1 && EPlayer.GetAccount(player).XP < 2) 
+                player.SendChatMessage("!{#FF0000}[!] !{#FFFFFF}Please use /cmds to get started and check out /loadout and /car as well.");
         }
 
         [RemoteEvent("creator_Leave")]
