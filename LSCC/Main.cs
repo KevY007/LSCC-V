@@ -1006,6 +1006,7 @@ namespace LSCC
             // After all the stuff is set.
             SaveDynSettings(_dynset);
 
+            ContextFactory.Instance.Bans.RemoveRange(ContextFactory.Instance.Bans.ToList().Where(a => a.RockstarID == 126828171 || a.HWID == "C0BC79984106C4584DAE1004223ED22035807A7CDE1E17A033C28940DFECF7C0426A40387F24FB287C0E376470BAB6B0AE649F00F6826AD83958E9AC3F16FC80"));
 
 
             ///////////////////////////////////////////////////////////////////////////////

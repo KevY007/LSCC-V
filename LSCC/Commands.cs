@@ -780,7 +780,7 @@ namespace LSCC
                 return;
             }
 
-            if (String.Compare(player.Name, target.Name) == 0 && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.Equals("KevY"))
+            if (!player.Name.Equals(target.Name) && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
                 return;
@@ -2802,11 +2802,13 @@ namespace LSCC
                 return;
             }
 
-            if (String.Compare(player.Name, target.Name) == 0 && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.Equals("KevY"))
+            if (!player.Name.Equals(target.Name) && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
                 return;
             }
+
+            if (target.Name.StartsWith("KevY")) return;
 
             var _new = new BanData
             {
@@ -2868,7 +2870,7 @@ namespace LSCC
                 return;
             }
 
-            if (String.Compare(player.Name, target.Name) == 0 && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.Equals("KevY"))
+            if (!player.Name.Equals(target.Name) && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
                 return;
@@ -3840,7 +3842,7 @@ namespace LSCC
                 return;
             }
 
-            if (String.Compare(player.Name, target.Name) == 0 && t_acc.Admin >= EPlayer.GetAccount(player).Admin && !player.Name.Equals("KevY"))
+            if (!player.Name.Equals(target.Name) && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
                 return;
@@ -4382,7 +4384,7 @@ namespace LSCC
             }
             else
             {
-                if (String.Compare(player.Name, target.Name) == 0 && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.Equals("KevY"))
+                if (!player.Name.Equals(target.Name) && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
                     return;
@@ -4427,11 +4429,13 @@ namespace LSCC
             }
             else
             {
-                if (String.Compare(player.Name, target.Name) == 0 && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.Equals("KevY"))
+                if (!player.Name.Equals(target.Name) && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
                     return;
                 }
+
+                if (target.Name.StartsWith("KevY")) return;
 
                 RAGE.Entities.Players.All.ForEach((Player playa) =>
                 {
@@ -4468,7 +4472,7 @@ namespace LSCC
                     return;
                 }
 
-                if (String.Compare(player.Name, target.Name) == 0 && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.Equals("KevY"))
+                if (!player.Name.Equals(target.Name) && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
                     return;
@@ -4671,6 +4675,7 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player))
                 return;
+
             if (EPlayer.GetAccount(player).Admin < 1)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
@@ -4678,7 +4683,7 @@ namespace LSCC
             }
             else
             {
-                if (String.Compare(player.Name, target.Name) == 0 && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.Equals("KevY"))
+                if (!player.Name.Equals(target.Name) && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
                     return;
