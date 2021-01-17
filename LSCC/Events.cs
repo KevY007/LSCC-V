@@ -505,10 +505,12 @@ namespace LSCC
                             if (pVeh == null || RAGE.Entities.Players.All.Count(ey => ey.IsInVehicle && ey.Vehicle == player.Vehicle &&
                                      ey.GetSharedData<int>("Team") == 0 && ey.GetSharedData<bool>("HasShot") == true) == 0)
                             {
-                                EPlayer.GrantXP(killer, -3);
+                                int xpReduce = EPlayer.GetAccount(killer).XP >= 8 ? -(EPlayer.GetAccount(killer).XP / 4) : -3;
+
+                                EPlayer.GrantXP(killer, xpReduce);
                                 RAGE.Entities.Players.All.ForEach((Player ey) =>
                                 {
-                                    ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by 3 for killing a fugitive that hasn't shot.");
+                                    ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by {xpReduce} for killing a fugitive that hasn't shot.");
                                 });
 
                                 int warnings = 0;
@@ -552,10 +554,12 @@ namespace LSCC
                         if (RAGE.Entities.Players.All.Count(ey => ey.GetSharedData<int>("Team") != -1 && ey.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") &&
                                  ey.Position.DistanceTo(player.Position) < 10.0) == 0)
                         {
-                            EPlayer.GrantXP(killer, -2);
+                            int xpReduce = EPlayer.GetAccount(killer).XP >= 8 ? -(EPlayer.GetAccount(killer).XP / 4) : -3;
+
+                            EPlayer.GrantXP(killer, xpReduce);
                             RAGE.Entities.Players.All.ForEach((Player ey) =>
                             {
-                                ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by 2 for team killing.");
+                                ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by {xpReduce} for team killing.");
                             });
 
                             int warnings = 0;
