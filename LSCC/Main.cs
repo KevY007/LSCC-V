@@ -1202,6 +1202,10 @@ namespace LSCC
                                                 {
                                                     if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetData<bool>("AutoJoin") == true)
                                                     {
+                                                        if(player.HasData("Spectating"))
+                                                        {
+                                                            Commands.cmd_specoff(player);
+                                                        }
                                                         player.SetSharedData("InDM", -1);
 
                                                         EPlayer.Spawn(player);
@@ -1431,6 +1435,11 @@ namespace LSCC
                 {
                     if (i.GetSharedData<int>("InLobby") != lobby.lobbyId) continue;
 
+                    if (i.HasData("Spectating") && EPlayer.GetAccount(i).Admin < 1)
+                    {
+                        Commands.cmd_specoff(i);
+                    }
+
                     i.TriggerEvent("HideChaseTimer");
                     if (lobby.Cops.Contains(i))
                     {
@@ -1486,7 +1495,8 @@ namespace LSCC
 
                 foreach (Player player in Settings.LoggedInPlayers)
                 {
-                    if (player.GetSharedData<int>("InLobby") == lobbyid && player.GetData<bool>("AutoJoin") == true && !EPlayer.IsAFK(player))
+                    if (player.GetSharedData<int>("InLobby") == lobbyid && player.GetData<bool>("AutoJoin") == true && !EPlayer.IsAFK(player) && 
+                        !player.HasData("Spectating"))
                     {
                         player.SetSharedData("InDM", -1);
 
@@ -1541,7 +1551,7 @@ namespace LSCC
                     List<int> UsedSpawns = new List<int>(Spawns.Count + 1);
                     crashcheck++;
 
-                    List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && !EPlayer.IsAFK(a)).ToList();
+                    List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && !EPlayer.IsAFK(a) && !a.HasData("Spectating")).ToList();
                     crashcheck++;
 
                     List<Player> PutInsideCar = new List<Player>(lobbyPlayers.Count());

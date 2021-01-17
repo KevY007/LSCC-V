@@ -330,6 +330,10 @@ namespace LSCC
         [ServerEvent(Event.PlayerDisconnected)]
         public void OnPlayerDisconnected(Player player, DisconnectionType type, string reason)
         {
+            foreach(Player p in Settings.LoggedInPlayers.Where(a => a.HasData("Spectating") && a.GetData<Player>("SpectatingPlayer") == player))
+            {
+                Commands.cmd_specoff(p);
+            }
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has left the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
             lock (Settings.Requests)
@@ -1431,6 +1435,7 @@ namespace LSCC
                 Kills = 1,
                 Deaths = 1,
                 MinutesPlayed = 1.0,
+                DonatorPoints = 0,
                 Warns = 0,
                 Suspended = 0,
                 DonatorLevel = 0,
@@ -1938,6 +1943,10 @@ namespace LSCC
         [ServerEvent(Event.PlayerSpawn)]
         public static void OnPlayerSpawn(Player player)
         {
+            foreach(Player p in Settings.LoggedInPlayers.Where(a => a.HasData("Spectating") && a.GetData<Player>("SpectatingPlayer") == player))
+            {
+                Commands.cmd_specoff(p);
+            }
             player.SetData("Killstreak", 0);
             player.ResetData("AttachedComponents");
 

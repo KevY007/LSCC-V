@@ -651,13 +651,13 @@ namespace LSCC
 
             target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Account ID: !{{#cbcfc4}}[{acc.SQL_ID}] !{{#ffffff}}| !{{#c7eb7f}}Email: !{{#cbcfc4}}[{acc.Email}] !{{#ffffff}}| !{{#c7eb7f}}Admin Level: !{{#cbcfc4}}[{acc.Admin}]");
 
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Donator Level: !{{#cbcfc4}}[{acc.DonatorLevel}] !{{#ffffff}}| !{{#c7eb7f}}Warns: !{{#cbcfc4}}[{acc.Warns}] !{{#ffffff}}| !{{#c7eb7f}}Derby Wins: !{{#cbcfc4}}[{acc.DerbyWins}]");
+            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Donator Level: !{{#cbcfc4}}[{acc.DonatorLevel}] !{{#ffffff}}| !{{#c7eb7f}}Donator Points: !{{#cbcfc4}}[{acc.DonatorPoints}] !{{#ffffff}}| !{{#c7eb7f}}Derby Wins: !{{#cbcfc4}}[{acc.DerbyWins}]");
 
             target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Level: !{{#cbcfc4}}[{acc.Level}] !{{#ffffff}}| !{{#c7eb7f}}Experience: !{{#cbcfc4}}[{acc.XP}/{EPlayer.GetMaxLevelXP(acc.Level)}] !{{#ffffff}}| !{{#c7eb7f}}Escapes: !{{#cbcfc4}}[{acc.Escapes}]");
 
             target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Kills: !{{#cbcfc4}}[{acc.Kills}] !{{#ffffff}}| !{{#c7eb7f}}Deaths: !{{#cbcfc4}}[{acc.Deaths}] !{{#ffffff}}| !{{#c7eb7f}}K/D Ratio: !{{#cbcfc4}}[{KDR.ToString("N3")}]");
 
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Arrests: !{{#cbcfc4}}[{acc.Arrests}] !{{#ffffff}}| !{{#c7eb7f}}Time Played: !{{#cbcfc4}}[{(acc.MinutesPlayed / 60.0).ToString("N3")} hours]");
+            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Arrests: !{{#cbcfc4}}[{acc.Arrests}] !{{#ffffff}}| !{{#c7eb7f}}Time Played: !{{#cbcfc4}}[{(acc.MinutesPlayed / 60.0).ToString("N3")} hours] !{{#ffffff}}| !{{#c7eb7f}}Warns: !{{#cbcfc4}}[{acc.Warns}]");
             
             target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Vehicle (Fugitive): !{{#cbcfc4}}[{acc.CarFugitive}] !{{#ffffff}}| !{{#c7eb7f}}Vehicle (Cop): !{{#cbcfc4}}[{acc.CarCop}]");
 
@@ -1082,7 +1082,12 @@ namespace LSCC
         {
             if (!LoggedIn(player)) return;
 
-            if(!Settings.LoggedInPlayers.Contains(player)) Settings.LoggedInPlayers.Add(player);
+            if (player.HasData("Spectating"))
+            {
+                Commands.cmd_specoff(player);
+            }
+
+            if (!Settings.LoggedInPlayers.Contains(player)) Settings.LoggedInPlayers.Add(player);
 
             CharacterData ConvChar = new CharacterData();
 

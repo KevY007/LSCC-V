@@ -2,11 +2,7 @@
 
 admin records system
 
+buyammo and weapon comp shop with donator points
 
-CURRENCY SYSTEM/DONOR POINTS THAT CAN ALLOW VIP STUFF AND CMDS LIKE buyammo USING VIP POINTS OR STUF
-weapon attachment/comp shop with points later
-currency
-maybe add spec for people
-forceautojoin
 #bug reports and other chans sugeestion
 add a linux script that will keep on restarting server if goes off?

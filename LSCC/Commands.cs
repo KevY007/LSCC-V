@@ -1939,6 +1939,11 @@ namespace LSCC
 
             if (player.GetSharedData<int>("InLobby") == -5) return;
 
+            if(player.HasData("Spectating"))
+            {
+                cmd_specoff(player);
+            }
+
             if (player.HasData("DerbyVehicle"))
             {
                 try { player.GetData<Vehicle>("DerbyVehicle").Delete(); }
@@ -2188,6 +2193,12 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player)) return;
             if (EPlayer.GetAccount(player).JailTime > 0) return;
+
+            if (player.HasData("Spectating"))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are in spectate mode!");
+                return;
+            }
 
             if (player.GetSharedData<int>("Team") != -1)
             {
@@ -2610,7 +2621,8 @@ namespace LSCC
             player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /keys /admins /rules /id");
             player.SendChatMessage("[General]: /report /helpme /l(ow) /c(ar)w(hisper) /s(hout)");
             player.SendChatMessage("[Squad/Partner]: /squad /squadleave /s(quad)c(hat) /squadaccept /squadmembers");
-            player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather) /lobbychat (/lo,/lc)");
+            player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
+            player.SendChatMessage("[Lobby]: /lobbychat (/lo,/lc) /spec /specoff");
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys for activation)");
             player.SendChatMessage("!{#339BC4}[Cop!{#F24C27}chase]: !{#FFFFFF}/r(adio) /wt /loadout /car");
@@ -3348,7 +3360,7 @@ namespace LSCC
             }
             if (EPlayer.GetAccount(player).Admin >= 5)
             {
-                player.SendChatMessage("[Admin Lv 5]: /maps /deletemap /createmap /addmapspawn /setdonator");
+                player.SendChatMessage("[Admin Lv 5]: /maps /deletemap /createmap /addmapspawn /setdonator /givedonorpoints");
             }
             if (EPlayer.GetAccount(player).Admin >= 6)
             {
@@ -3855,7 +3867,32 @@ namespace LSCC
 
             t_acc.Admin = level;
             player.SendChatMessage($"!{{#00FF33}}You have set {target.Name}'s admin level to {EPlayer.GetAdminLevelName(level, true)} ({level})");
-            NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#00FF33}}{player.Name} has set your admin level to {EPlayer.GetAdminLevelName(level, true)} ({level})");
+            target.SendChatMessage($"!{{#00FF33}}{player.Name} has set your admin level to {EPlayer.GetAdminLevelName(level, true)} ({level})");
+            EPlayer.Save(target);
+        }
+
+        [Command("givedonorpoints", "!{#AFAFAF}[USAGE] givedonorpoints (target) (points)")]
+        public void cmd_givedonorpoints(Player player, Player target, int points)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 5)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                return;
+            }
+
+            if (!EPlayer.LoggedIn(target)) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target not logged in."); return; }
+
+
+            Account t_acc = target.GetData<Account>("AccountHandle");
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:givedonorpoints:{target.Name}:{points}"); } catch { }
+
+            t_acc.DonatorPoints += points;
+            player.SendChatMessage($"!{{#00FF33}}You gave {points} donator points to {target.Name}.");
+            target.SendChatMessage($"!{{#00FF33}}You received {points} donator points from {player.Name}.");
             EPlayer.Save(target);
         }
 
@@ -3886,7 +3923,7 @@ namespace LSCC
 
             t_acc.DonatorLevel = level;
             player.SendChatMessage($"!{{#00FF33}}You have set {target.Name}'s donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
-            NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#00FF33}}{player.Name} has set your donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
+            target.SendChatMessage($"!{{#00FF33}}{player.Name} has set your donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
             EPlayer.Save(target);
         }
 
@@ -4395,7 +4432,7 @@ namespace LSCC
 
                 EPlayer.Freeze(target, true);
                 try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:freeze:{target.Name}"); } catch { }
-                NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#FF6347}}[AdmCmd] YOU HAVE BEEN FROZEN BY !{{#FF0000}}{player.Name}");
+                target.SendChatMessage($"!{{#FF6347}}[AdmCmd] YOU HAVE BEEN FROZEN BY !{{#FF0000}}{player.Name}");
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen {target.Name}.");
             }
         }
@@ -4415,7 +4452,7 @@ namespace LSCC
             {
                 EPlayer.Freeze(target, false);
                 try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unfreeze:{target.Name}"); } catch { }
-                NAPI.Chat.SendChatMessageToPlayer(target, $"!{{#FF6347}}[AdmCmd] You have been unfrozen by !{{#FF0000}}{player.Name}");
+                target.SendChatMessage($"!{{#FF6347}}[AdmCmd] You have been unfrozen by !{{#FF0000}}{player.Name}");
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen {target.Name}.");
             }
         }
@@ -4669,7 +4706,7 @@ namespace LSCC
 
                 foreach (var players in playersAround)
                 {
-                    if(players.Dimension == player.Dimension) NAPI.Chat.SendChatMessageToPlayer(players, msg);
+                    if(players.Dimension == player.Dimension) players.SendChatMessage(msg);
                 }
             }
         }
@@ -5025,15 +5062,54 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (EPlayer.GetAccount(player).Admin < 1)
+            if(player.HasData("Spectating"))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are already spectating someone! Exiting spec, try spectating again!");
+                cmd_specoff(player);
+            }
+
+            if (player.GetSharedData<int>("InDM") != -1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are in /dm!");
                 return;
+            }
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                if (player.GetSharedData<int>("Team") != -1)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are in copchase!");
+                    return;
+                }
+
+                LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+                if (lobby != null)
+                {
+                    if (
+                        !(lobby.gameStatus == 1 && (lobby.Cops.Contains(target) || lobby.Fugitives.Contains(target)) && target.IsInstanceAlive && !target.Dead))
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF]You can only spectate people that are in your lobby and copchase!");
+                        return;
+                    }
+                }
+                else
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF]You are not in a copchase lobby!");
+                    return;
+                }
+            }
+
+            if(target.HasData("Spectating")) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The target is spectating someone else!"); return; }
+
+            player.SetData("Spectating", true);
+            player.SetData("SpectatingPlayer", target);
 
             player.SetData("Spec_Dimension", player.Dimension);
             player.SetData("Spec_Pos", player.Position);
 
             player.Dimension = target.Dimension;
             Vector3 pos = target.Position;
-            pos.Z -= 35.0f;
+            pos.Z -= 20.0f;
             player.Position = pos;
 
             NAPI.Task.Run(() =>
@@ -5052,7 +5128,7 @@ namespace LSCC
             }, 1000);
                 
 
-            player.SendChatMessage($"!{{#FF6347}}[AdmCmd] You are now spectating: !{{#FFFFFF}}{target.Name}");
+            player.SendChatMessage($"!{{#FF6347}}[SPEC] You are now spectating: !{{#FFFFFF}}{target.Name}");
             return;
         }
 
@@ -5131,26 +5207,27 @@ namespace LSCC
         }
 
         [Command("specoff", GreedyArg = true)]
-        public void cmd_specoff(Player player)
+        public static void cmd_specoff(Player player)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
-            if (EPlayer.GetAccount(player).Admin < 1)
-                return;
-            else
+
+            if (!player.HasData("Spectating")) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not spectating anyone!"); return; }
+
+            player.TriggerEvent("StopSpectating");
+            player.TriggerEvent("SetPlayerFrozen", false);
+
+            player.ResetData("Spectating");
+            player.ResetData("SpectatingPlayer");
+
+            if (player.HasData("Spec_Pos"))
             {
-                player.TriggerEvent("StopSpectating");
-                player.TriggerEvent("SetPlayerFrozen", false);
+                player.Dimension = player.GetData<uint>("Spec_Dimension");
+                player.Position = player.GetData<Vector3>("Spec_Pos");
 
-                if(player.HasData("Spec_Pos"))
-                {
-                    player.Dimension = player.GetData<uint>("Spec_Dimension");
-                    player.Position = player.GetData<Vector3>("Spec_Pos");
-
-                    player.ResetData("Spec_Pos");
-                }
+                player.ResetData("Spec_Pos");
             }
-
+            return;
         }
        
     }
