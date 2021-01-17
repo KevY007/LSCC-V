@@ -8,6 +8,6 @@ weapon attachment/comp shop with points later
 make compass not block the voice team thing
 remove ap??
 maybe add spec for people
-
+add !a in discord?
 #bug reports and other chans sugeestion
 add a linux script that will keep on restarting server if goes off?

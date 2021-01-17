@@ -106,12 +106,14 @@ namespace LSCC
                             });
 
                         int thisCount = 0;
+                        int proc = 0;
                         foreach (Player pl in RAGE.Entities.Players.All)
                         {
                             thisCount++;
                             if (thisCount <= players) continue;
 
                             players++;
+                            proc++;
                             string lobby = "Lobby " + pl.GetSharedData<int>("InLobby");
                             switch (pl.GetSharedData<int>("InLobby"))
                             {
@@ -134,7 +136,7 @@ namespace LSCC
 
                             builder.AddField(pl.Name, lobby + " | Level: " + pl.GetSharedData<int>("Level").ToString() + " | Ping: " + pl.Ping.ToString(), true);
 
-                            if (thisCount >= 20) break;
+                            if (proc >= 20) break;
                         }
 
                         var embed = builder.Build();
