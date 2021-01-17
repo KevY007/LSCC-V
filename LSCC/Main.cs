@@ -331,7 +331,7 @@ namespace LSCC
         public static string[] DMNames = new string[]
         {
             "Life Invader Office",
-            "Warehouse",
+            "Warehouse (Pistol Only)",
             "Tennis Court",
             "Construction Site"
         };

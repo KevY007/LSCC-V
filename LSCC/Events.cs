@@ -2141,7 +2141,7 @@ namespace LSCC
                         player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have been removed from DM as it's locked while copchase starts.");
                     }
 
-                    if (arenaID > -1)
+                    if (arenaID > -1) // DM
                     {
                         Random rand = new Random();
 
@@ -2168,39 +2168,43 @@ namespace LSCC
                             {
                                 if (player != null && player.Exists)
                                 {
-                                    switch (new Random().Next(0, 5))
+                                    if (arenaID != 1)
                                     {
-                                        case 0:
-                                            player.GiveWeapon(WeaponHash.Revolver_mk2, 1000);
-                                            player.GiveWeapon(WeaponHash.Pumpshotgun, 1000);
-                                            player.GiveWeapon(WeaponHash.Smg_mk2, 1000);
-                                            player.GiveWeapon(WeaponHash.Assaultrifle_mk2, 1000);
-                                            break;
-                                        case 1:
-                                            player.GiveWeapon(WeaponHash.Pistol50, 1000);
-                                            player.GiveWeapon(WeaponHash.Bullpuprifle_mk2, 1000);
-                                            player.GiveWeapon(WeaponHash.Bullpupshotgun, 1000);
-                                            player.GiveWeapon(WeaponHash.Microsmg, 1000);
-                                            break;
-                                        case 2:
-                                            player.GiveWeapon(WeaponHash.Appistol, 1000);
-                                            player.GiveWeapon(WeaponHash.Carbinerifle, 1000);
-                                            player.GiveWeapon(WeaponHash.Sawnoffshotgun, 1000);
-                                            player.GiveWeapon(WeaponHash.Minismg, 1000);
-                                            break;
-                                        case 3:
-                                            player.GiveWeapon(WeaponHash.Assaultsmg, 1000);
-                                            player.GiveWeapon(WeaponHash.CeramicPistol, 1000);
-                                            player.GiveWeapon(WeaponHash.Bottle, 1000);
-                                            player.GiveWeapon(WeaponHash.Autoshotgun, 1000);
-                                            break;
-                                        case 4:
-                                            player.GiveWeapon(WeaponHash.Compactrifle, 1000);
-                                            player.GiveWeapon(WeaponHash.Combatpdw, 1000);
-                                            player.GiveWeapon(WeaponHash.Raypistol, 1000);
-                                            player.GiveWeapon(WeaponHash.Assaultshotgun, 1000);
-                                            break;
+                                        switch (new Random().Next(0, 5))
+                                        {
+                                            case 0:
+                                                player.GiveWeapon(WeaponHash.Revolver_mk2, 1000);
+                                                player.GiveWeapon(WeaponHash.Pumpshotgun, 1000);
+                                                player.GiveWeapon(WeaponHash.Smg_mk2, 1000);
+                                                player.GiveWeapon(WeaponHash.Assaultrifle_mk2, 1000);
+                                                break;
+                                            case 1:
+                                                player.GiveWeapon(WeaponHash.Pistol50, 1000);
+                                                player.GiveWeapon(WeaponHash.Bullpuprifle_mk2, 1000);
+                                                player.GiveWeapon(WeaponHash.Bullpupshotgun, 1000);
+                                                player.GiveWeapon(WeaponHash.Microsmg, 1000);
+                                                break;
+                                            case 2:
+                                                player.GiveWeapon(WeaponHash.Appistol, 1000);
+                                                player.GiveWeapon(WeaponHash.Carbinerifle, 1000);
+                                                player.GiveWeapon(WeaponHash.Sawnoffshotgun, 1000);
+                                                player.GiveWeapon(WeaponHash.Minismg, 1000);
+                                                break;
+                                            case 3:
+                                                player.GiveWeapon(WeaponHash.Assaultsmg, 1000);
+                                                player.GiveWeapon(WeaponHash.CeramicPistol, 1000);
+                                                player.GiveWeapon(WeaponHash.Bottle, 1000);
+                                                player.GiveWeapon(WeaponHash.Autoshotgun, 1000);
+                                                break;
+                                            case 4:
+                                                player.GiveWeapon(WeaponHash.Compactrifle, 1000);
+                                                player.GiveWeapon(WeaponHash.Combatpdw, 1000);
+                                                player.GiveWeapon(WeaponHash.Raypistol, 1000);
+                                                player.GiveWeapon(WeaponHash.Assaultshotgun, 1000);
+                                                break;
+                                        }
                                     }
+                                    else player.GiveWeapon(WeaponHash.Pistol50, 1000);
                                 }
                             }
                             catch { }
