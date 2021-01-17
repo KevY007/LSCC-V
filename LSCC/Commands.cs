@@ -2561,11 +2561,11 @@ namespace LSCC
                 { "Police Buffalo", "images/polbufac.png", 1, 5 },
                 { "Police Buffalo (U)", "images/polbufac2.png", 1, 10 },
                 { "Police Caracara", "images/lspdcara.png", 1, 12 },
-                { "FBI Buffalo", "images/fbibufac.png", 1, 13 },
                 { "FBI Granger", "images/fbi2.png", 1, 13 },
-                { "Charger '16 (U)", "images/udchall1.png", 1, 15 },
+                { "SWAT Truck", "images/riot.png", 1, 15 },
+                { "FBI Buffalo", "images/fbibufac.png", 1, 17 },
                 { "Chopper", "images/polmav.png", 1, 20 },
-                { "SWAT Truck", "images/riot.png", 1, 25 },
+                { "Charger '16 (U)", "images/udchall1.png", 1, 25 },
 
                 // Fugitive
                 { "Primo", "images/primo.png", 0, 3 },

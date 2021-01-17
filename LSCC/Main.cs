@@ -2036,10 +2036,10 @@ namespace LSCC
                             }
                         }
 
-                        lobby.FugitiveShowCounter = 60;
+                        lobby.FugitiveShowCounter = 80;
                         lobby.LastSeenCounter = 0;
                         lobby.GameProgress = 0;
-                        lobby.CollisionCounter = 30;
+                        lobby.CollisionCounter = 60;
 
                         foreach (Player p in Settings.LoggedInPlayers)
                         {
@@ -2198,7 +2198,7 @@ namespace LSCC
                                 {
                                     if(veh.HasSharedData("Team") && veh.GetSharedData<int>("Team") == 0)
                                     {
-                                        veh.SetSharedData("vMaxSpeed", (float)(150 / 3.6)); // 150 KM/H
+                                        veh.SetSharedData("vMaxSpeed", (float)(165 / 3.6)); // 165 KM/H
                                     }
                                 }
                             }
@@ -2219,7 +2219,7 @@ namespace LSCC
                             }
                         }
                     }
-                    if (lobby.FugitiveShowCounter >= 30 && lobby.FugitiveShowCounter < 120)
+                    if (lobby.FugitiveShowCounter >= 60 && lobby.FugitiveShowCounter < 120)
                     {
                         lock (lobby.Fugitives)
                         {
@@ -2227,10 +2227,10 @@ namespace LSCC
                             {
                                 fugi.SetSharedData("VisibleBlip", true);
 
-                                if (lobby.FugitiveShowCounter == 30) fugi.SendNotification("~r~You are now visible on the radar.", true);
+                                if (lobby.FugitiveShowCounter == 60) fugi.SendNotification("~r~You are now visible on the radar.", true);
                             }
 
-                            if(lobby.FugitiveShowCounter == 30 && lobby.GameProgress >= 50)
+                            if(lobby.FugitiveShowCounter == 60 && lobby.GameProgress >= 60 && lobby.CollisionCounter <= -1)
                             {
                                 foreach(Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
                                 {
