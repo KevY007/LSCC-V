@@ -704,7 +704,7 @@ namespace LSCC
             }
         }
 
-        public static void SyncComponents(Player tosyncfor, Player target)
+        public static void SyncComponents(Player tosyncfor, Player target, int specificWeapon = -1)
         {
             if(target.HasData("AttachedComponents"))
             {
@@ -712,7 +712,8 @@ namespace LSCC
 
                 foreach(var item in comps)
                 {
-                    tosyncfor.TriggerEvent("AttachWeaponComponent", target, (int)item.Key, (int)item.Value);
+                    if(specificWeapon == -1 || (specificWeapon != -1 && 
+                        (int)item.Key == specificWeapon)) tosyncfor.TriggerEvent("AttachWeaponComponent", target, (int)item.Key, (int)item.Value);
                 }
             }
             return;

@@ -49,7 +49,7 @@ mp.events.addDataHandler('Engine', function (entity, value, oldValue)
 
 mp.events.add("AttachWeaponComponent", (target, weapon, comp) => {
     mp.game.invoke("0xD966D51AA5B28BB9", target.handle, weapon, comp);
-    mp.game.invoke("0xADF692B254977C0C", target.handle, weapon, true);
+    //mp.game.invoke("0xADF692B254977C0C", target.handle, weapon, true);
 });
 
 mp.events.add('entityStreamIn', (entity) => {

@@ -108,7 +108,7 @@ namespace LSCC
                     {
                         if (p.Dimension == player.Dimension && p.Position.DistanceTo(player.Position) < 1000.0)
                         {
-                            OnPlayerRequestCompSync(p, player);
+                            EPlayer.SyncComponents(p, player, (int)newWeapon);
                         }
                     }
                 }
