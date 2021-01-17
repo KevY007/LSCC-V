@@ -284,15 +284,21 @@ namespace LSCC
         [ServerEvent(Event.PlayerExitVehicle)]
         public void OnPlayerExitVehicle(Player player, Vehicle vehicle)
         {
-            if (vehicle.HasSharedData("Engine"))
+            try // Because triggers on disconnection and stuff invalid vehicles etc
             {
-                vehicle.EngineStatus = vehicle.GetSharedData<bool>("Engine");
-                vehicle.SetSharedData("Engine", vehicle.EngineStatus);
+                if (vehicle == null) return;
+
+                if (vehicle.HasSharedData("Engine"))
+                {
+                    vehicle.EngineStatus = vehicle.GetSharedData<bool>("Engine");
+                    vehicle.SetSharedData("Engine", vehicle.EngineStatus);
+                }
+                else
+                {
+                    vehicle.SetSharedData("Engine", vehicle.EngineStatus);
+                }
             }
-            else
-            {
-                vehicle.SetSharedData("Engine", vehicle.EngineStatus);
-            }
+            catch { }
         }
 
         [ServerEvent(Event.PlayerDisconnected)]

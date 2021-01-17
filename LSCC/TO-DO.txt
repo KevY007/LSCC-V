@@ -11,13 +11,4 @@ maybe add spec for people
 one car per fugitive in busted
 
 #bug reports and other chans sugeestion
-add a linux script that will keep on restarting server if goes off??
-Exception has been thrown by the target of an invocation. 
-Exception has been thrown by the target of an invocation.
-Unhandled exception. System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
- ---> System.NullReferenceException: Object reference not set to an instance of an object.
-   at void LSCC.Events.OnPlayerExitVehicle(Player player, Vehicle vehicle) in E:/Github/LSCC-V/LSCC/Events.cs:line 296
-   --- End of inner exception stack trace ---
-   at System.RuntimeMethodHandle.InvokeMethod(Object target, Object[] arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)
-   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
-   at GTANetworkInternals.EventHandler.Parse(Event _event, Object[] arguments)
+add a linux script that will keep on restarting server if goes off?
