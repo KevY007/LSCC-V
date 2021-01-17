@@ -106,7 +106,7 @@ namespace LSCC
                 {
                     foreach (Player p in RAGE.Entities.Players.All)
                     {
-                        if (p.Dimension == player.Dimension && p.Position.DistanceTo(player.Position) < 1000.0 && player != p)
+                        if (p.Dimension == player.Dimension && p.Position.DistanceTo(player.Position) < 1000.0)
                         {
                             OnPlayerRequestCompSync(p, player);
                         }
