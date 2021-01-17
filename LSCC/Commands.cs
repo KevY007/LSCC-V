@@ -1952,10 +1952,26 @@ namespace LSCC
             return;
         }
 
-        [Command("flip")]
-        public void cmd_flip(Player player)
+        [Command("flip", "!{#AFAFAF}[USAGE] flip (target)")]
+        public void cmd_flip(Player player, Player target)
         {
-            player.SendChatMessage("In GTA V you can literally unflip by yourself, dumbo.");
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 1 admin.");
+                return;
+            }
+
+            if (!target.IsInVehicle) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not in any vehicle!"); return; }
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:flip:{target.Name}"); } catch { }
+
+            target.Vehicle.Rotation = new Vector3(0, target.Vehicle.Rotation.Y, target.Vehicle.Rotation.Z);
+
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has flipped {target.Name}'s vehicle.");
+
             return;
         }
 
@@ -3490,7 +3506,7 @@ namespace LSCC
 
                 player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /set(hp/ar) /spec");
                 player.SendChatMessage("[Admin Lv 1]: /freeze /unfreeze /kick /slap /setinv(ulnerable) /specoff");
-                player.SendChatMessage("[Admin Lv 1]: /bancheck /jail /unjail /fix /sendtolobby /set(time/weather)");
+                player.SendChatMessage("[Admin Lv 1]: /bancheck /jail /unjail /fix /flip /sendtolobby /set(time/weather)");
                 player.SendChatMessage("[Admin Lv 1]: /mute /unmute /warn /unwarn /setteam /forceautojoin");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
