@@ -7,3 +7,8 @@ vehicle upgrade system with regular points later
 
 #bug reports and other chans sugeestion
 add a linux script that will keep on restarting server if goes off?
+sync markers in car
+reset chat scroll msg index to 0 when send msg
+passgun
+unlock fugitive car by default so
+killing cop as fugiitive = tag

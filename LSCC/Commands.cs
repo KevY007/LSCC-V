@@ -1075,7 +1075,7 @@ namespace LSCC
                 return;
             }
 
-            if (player.HasData("_currentlySwappingSeats")) return;
+            if (player.HasData("_currentlySwappingSeats") || player == target) return;
 
             if(player.HasData("SwapSeating") && player.HasData("SwapSeatingTime"))
             {
@@ -1143,7 +1143,7 @@ namespace LSCC
             }
 
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have sent a swapseats request to " + target.Name + ", they have 5s to accept.");
-            target.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have received a swapseats request from " + player.Name + ", you have 5s to accept. (/ss " + target.Name + ")");
+            target.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have received a swapseats request from " + player.Name + ", you have 5s to accept. (/ss " + player.Name + ")");
 
             player.ResetData("SwapSeating");
             player.ResetData("SwapSeatingTime");

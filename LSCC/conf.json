@@ -1,7 +1,7 @@
 {
 	"maxplayers" : 100,
-	"name" : "Los Santos Copchase: V [BETA]", 
-	"gamemode" : "copchase", 
+	"name" : "[EN/US] Los Santos Copchase: V | Multi-modded [Copchase][Pursuits][DM][Derby][Freeroam]",
+	"gamemode" : "copchase",
 	"stream-distance" : 1000.0,
 	"announce" : false,
 	"csharp" : "enabled",
@@ -9,5 +9,6 @@
 	"language": "en",
 	"voice-chat": true,
 	"server-side-weapons-only-mode": true,
-	"synchronization-extrapolation-multiplier": 0.0
+	"synchronization-extrapolation-multiplier": 0.0,
+	"api-threading-debugging": false
 }
