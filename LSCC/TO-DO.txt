@@ -11,4 +11,16 @@ sync markers in car
 reset chat scroll msg index to 0 when send msg
 passgun
 unlock fugitive car by default so
-killing cop as fugiitive = tag
+killing cop as fugiitive (ram) = tag
+disable cop getting in fugitive car on g-bug if passengers
+and fugitive getting in cop car in g-bug if passengers
+force swap seats
+save updaterate
+remove ruby donator, only bronze silver gold
+add more clothing using mods
+disable finger gives has shot wtf see unarmed and fist both weapon
+make donation stuf or page
+retro will send car list as well
+yep remove helmets cause they allow anti headshot
+fontsize not working tf?
+swapseats still bug or smth?? wtf
