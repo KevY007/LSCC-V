@@ -257,7 +257,7 @@ namespace LSCC
     public static class Settings
     {
         // Static Settings / Const
-        public const string Version = "0.2c";
+        public const string Version = "0.2d";
         public const int GameRunTime = 390; // Game Running Time in Seconds before STOP
         public const int MaxLobbies = 5; // Default/starting lobby num.
         public const int DefaultMaxInLobby = 30;
@@ -942,7 +942,7 @@ namespace LSCC
             NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Creating the loadouts...");
 
             List<Tuple<WeaponHash, int>> wepList = new List<Tuple<WeaponHash, int>>();
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pistol, 40));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Combatpistol, 40));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pumpshotgun, 20));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Bzgas, 1));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Carbinerifle, 80));
@@ -952,7 +952,7 @@ namespace LSCC
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pistol50, 60));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Heavyshotgun, 40));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Bzgas, 3));
-            wepList.Add(new Tuple<WeaponHash, int>((WeaponHash)0x9D1F17E6, 120));
+            wepList.Add(new Tuple<WeaponHash, int>((WeaponHash)0x9D1F17E6, 120)); // Military Rifle
             new LoadoutData(1, "SWAT", 10, wepList);
 
             wepList = new List<Tuple<WeaponHash, int>>();
@@ -963,7 +963,7 @@ namespace LSCC
             new LoadoutData(1, "Whiplash", 20, wepList);
 
             wepList = new List<Tuple<WeaponHash, int>>();
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pistol, 40));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Combatpistol, 40));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Microsmg, 50));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Assaultrifle, 80));
             new LoadoutData(0, "Convicted", 5, wepList);
@@ -976,7 +976,7 @@ namespace LSCC
             new LoadoutData(0, "Rebel", 10, wepList);
 
             wepList = new List<Tuple<WeaponHash, int>>();
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pistol50, 40));
+            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pistol_mk2, 40));
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Minismg, 100));
             wepList.Add(new Tuple<WeaponHash, int>((WeaponHash)0x5A96BA4, 30)); // Combat Shotgun
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Molotov, 1));

@@ -2343,7 +2343,7 @@ namespace LSCC
                                                 break;
                                         }
                                     }
-                                    else player.GiveWeapon(WeaponHash.Pistol50, 1000);
+                                    else player.GiveWeapon(WeaponHash.Pistol_mk2, 1000);
                                 }
                             }
                             catch { }

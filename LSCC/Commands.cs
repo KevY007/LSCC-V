@@ -5439,7 +5439,7 @@ namespace LSCC
                 }) },
 
                 { "Heavy", 5, 1, NAPI.Util.ToJson(new object[,] {
-                    { "https://static.wikia.nocookie.net/gtawiki/images/8/8f/Pistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pistol", 40 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/a/ad/CombatPistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Combat Pistol", 40 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/e/e0/PumpShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pump Shotgun", 20 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/f/fe/TearGas-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "BZ Gas", 1 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/7/7a/CarbineRifle-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Carbine Rifle", 80 },
@@ -5458,7 +5458,7 @@ namespace LSCC
                 }) },
 
                 { "Convicted", 5, 0, NAPI.Util.ToJson(new object[,] {
-                    { "https://static.wikia.nocookie.net/gtawiki/images/8/8f/Pistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pistol", 40 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/a/ad/CombatPistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Combat Pistol", 40 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/0/09/MicroSMG-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Micro SMG", 50 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/8/80/AssaultRifle-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Assault Rifle", 80 },
                 }) },
@@ -5469,7 +5469,7 @@ namespace LSCC
                     { "https://static.wikia.nocookie.net/gtawiki/images/2/21/Combat_PDW_HUD_GTA_V_PC.png/revision/latest/scale-to-width-down/128", "Combat PDW", 125 },
                 }) },
                 { "O.G", 13, 0, NAPI.Util.ToJson(new object[,] {
-                    { "https://static.wikia.nocookie.net/gtawiki/images/d/d3/Pistol.50-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pistol .50", 40 },
+                    { "https://static.wikia.nocookie.net/gtawiki/images/8/84/PistolMkII-GTAO-HUDIcon.png/revision/latest/scale-to-width-down/128", "Pistol MK.II", 40 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/c/c4/MiniSMG-GTAO-HUDIcon.png/revision/latest/scale-to-width-down/128", "Mini SMG", 100 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/9/9c/CombatShotgun-GTAO-icon.png/revision/latest/scale-to-width-down/128", "Combat Shotgun", 30 },
                     { "https://static.wikia.nocookie.net/gtawiki/images/9/90/Molotov-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Molotov", 1 },
