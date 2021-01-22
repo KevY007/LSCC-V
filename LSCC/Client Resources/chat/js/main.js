@@ -136,7 +136,7 @@ let api = {"chat:push": chatAPI.push, "chat:clear": chatAPI.clear, "chat:activat
 
 for(let fn in api)
 {
-	mp.events.add(fn, api[fn]);
+	//mp.events.add(fn, api[fn]);
 }
 
 

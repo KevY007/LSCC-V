@@ -27,7 +27,11 @@ mp.events.add("TogglePlayerChat", (toggle) => {
 });
 
 mp.events.add("setFontsize", (size) => {
-    if(chatbox != null) chatbox.execute(`document.getElementById('chat').style.fontSize = "${size}"`);
+    if(chatbox != null) 
+    {
+        chatbox.execute(`document.getElementById('chat').style.fontSize = "${size}"`);
+        chatbox.execute(`document.getElementById('chat_messages').style.fontSize = "${size}"`);
+    }
 });
 
 mp.events.addCommand("fontsize", function (rate) {
@@ -44,8 +48,8 @@ mp.events.addCommand("fontsize", function (rate) {
         return;
     }
 
-    if(rate < 8 || rate > 24) {
-        mp.gui.chat.push("Fontsize can be between 8-24, default is 16.");
+    if(rate < 8 || rate > 28) {
+        mp.gui.chat.push("Fontsize can be between 8-28, default is 16.");
         return;
     }
 
