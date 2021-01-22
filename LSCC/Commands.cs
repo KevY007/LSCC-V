@@ -1077,14 +1077,13 @@ namespace LSCC
 
             if (player.HasData("_currentlySwappingSeats") || player == target) return;
 
-            if(player.HasData("SwapSeating") && player.HasData("SwapSeatingTime"))
+            if(player.HasData("SwapSeating") && player.HasData("SwapSeatingTime") && 
+                Environment.TickCount64 - player.GetData<long>("SwapSeatingTime") <= 5000)
             {
-                long tick = player.GetData<long>("SwapSeatingTime");
                 try
                 {
                     Player seatingWith = player.GetData<Player>("SwapSeating");
-                    if (seatingWith.Exists && seatingWith == target 
-                        && Environment.TickCount64 - tick <= 5000) // They the one who sent requests and less than 5s.
+                    if (seatingWith.Exists && seatingWith == target) // They the one who sent requests
                     {
                         player.ResetData("SwapSeating");
                         player.ResetData("SwapSeatingTime");
@@ -1127,6 +1126,20 @@ namespace LSCC
                                         }
                                         catch {}
                                     }, 1000 + player.Ping + target.Ping);
+
+                                    NAPI.Task.Run(() =>
+                                    {
+                                        try
+                                        {
+                                            if (hwnd != null && player != null && target != null && player.Exists && target.Exists)
+                                            {
+                                                player.SetIntoVehicle(hwnd, targSeat);
+                                                target.SetIntoVehicle(hwnd, playSeat);
+                                            }
+                                        }
+                                        catch { }
+                                    }, 3000);
+
                                     player.SetIntoVehicle(hwnd, targSeat);
                                     target.SetIntoVehicle(hwnd, playSeat);
                                 }
