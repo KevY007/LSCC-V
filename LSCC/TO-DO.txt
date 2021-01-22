@@ -11,7 +11,6 @@ sync markers in car
 reset chat scroll msg index to 0 when send msg
 passgun
 unlock fugitive car by default so
-killing cop as fugiitive (ram) = tag
 disable cop getting in fugitive car on g-bug if passengers
 and fugitive getting in cop car in g-bug if passengers
 save updaterate

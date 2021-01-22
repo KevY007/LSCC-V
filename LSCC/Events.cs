@@ -711,7 +711,11 @@ namespace LSCC
 
                             wasInGame = true;
 
-                            if (killer != null && killer.GetSharedData<int>("Team") == 0) EPlayer.GrantXP(killer, 2);
+                            if (killer != null && killer.GetSharedData<int>("Team") == 0)
+                            {
+                                EPlayer.GrantXP(killer, 2);
+                                Events.PlayerRequestShotTag(killer);
+                            }
 
                             lock (Settings.LoggedInPlayers)
                             {
@@ -1239,12 +1243,13 @@ namespace LSCC
         }
 
         [RemoteEvent("GivePlayerShotTag")]
-        public void PlayerRequestShotTag(Player player)
+        public static void PlayerRequestShotTag(Player player)
         {
             if (player.GetSharedData<int>("Team") == 0)
             {
+                if(player.GetSharedData<bool>("HasShot") == false) player.SendNotification("~r~You have now shot, opposite team can now safely shoot you and detect you.");
+
                 player.SetSharedData("HasShot", true);
-                player.SendNotification("~r~You have now shot, opposite team can now safely shoot you and detect you.");
                 player.SetSharedData("VisibleBlip", true);
             }
         }
