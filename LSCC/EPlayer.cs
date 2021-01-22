@@ -346,6 +346,10 @@ namespace LSCC
             {
                 if (playerChar.Clothing[teamID].Clothes[i].Texture != -1)
                 {
+                    if (Main.BlacklistedClothing(i, playerChar.Clothing[teamID].Clothes[i].Texture))
+                    {
+                        continue;
+                    }
                     clothDictionary.Add(i, new ComponentVariation
                     {
                         Drawable = playerChar.Clothing[teamID].Clothes[i].Drawable,
@@ -358,11 +362,14 @@ namespace LSCC
             player.SetClothes(2, playerChar.Hair.Hair, 0);
 
 
-            if (playerChar.Clothing[teamID].Hat != -1 && playerChar.Clothing[teamID].HatTxt != -1)
+            if (playerChar.Clothing[teamID].Hat != -1 && playerChar.Clothing[teamID].HatTxt != -1 &&
+                !Main.BlacklistedClothing(0, playerChar.Clothing[teamID].Hat))
             {
+
                 player.SetAccessories(0, playerChar.Clothing[teamID].Hat, playerChar.Clothing[teamID].HatTxt);
             }
-            if (playerChar.Clothing[teamID].Glasses != -1 && playerChar.Clothing[teamID].GlassesTxt != -1)
+            if (playerChar.Clothing[teamID].Glasses != -1 && playerChar.Clothing[teamID].GlassesTxt != -1 &&
+                !Main.BlacklistedClothing(1, playerChar.Clothing[teamID].Glasses))
             {
                 player.SetAccessories(1, playerChar.Clothing[teamID].Glasses, playerChar.Clothing[teamID].GlassesTxt);
             }

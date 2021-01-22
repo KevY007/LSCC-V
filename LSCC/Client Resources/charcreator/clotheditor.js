@@ -88,7 +88,16 @@ menuRoupasMascaras.ItemSelect.on((item, index) => {
 
 // Drawable
 let chapeusDrawable = [];
-for (i = 0; i < player.getNumberOfPropDrawableVariations(0) + 1; i++) chapeusDrawable.push(i.toString())
+for (i = 0; i < player.getNumberOfPropDrawableVariations(0) + 1; i++) 
+{        
+    if (!((drawable >= 16 && drawable <= 18) || drawable == 39 || (drawable >= 48 && drawable <= 53) || 
+        drawable == 67 || (drawable >= 69 && drawable <= 75) || (drawable >= 78 && drawable <= 82) || 
+        (drawable >= 84 && drawable <= 94) || drawable == 111 || (drawable >= 115 && drawable <= 119) || 
+        (drawable >= 125 && drawable <= 128) || drawable == 144 || drawable == 150))
+    {
+        chapeusDrawable.push(i.toString())  // Unfair helmets blocked above. 
+    }
+}
 // Texture
 let chapeusTexture = [];
 let chapeusTextureLimite = player.getNumberOfPropTextureVariations(0, player.getPropIndex(0));

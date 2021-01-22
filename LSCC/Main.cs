@@ -414,6 +414,17 @@ namespace LSCC
 
     public class Main : Script
     {
+        public static bool BlacklistedClothing(int slot, int drawable)
+        {
+            if(slot == 0) // Hats
+            {
+                if ((drawable >= 16 && drawable <= 18) || drawable == 39 || (drawable >= 48 && drawable <= 53) || 
+                    drawable == 67 || (drawable >= 69 && drawable <= 75) || (drawable >= 78 && drawable <= 82) || 
+                    (drawable >= 84 && drawable <= 94) || drawable == 111 || (drawable >= 115 && drawable <= 119) || 
+                    (drawable >= 125 && drawable <= 128) || drawable == 144 || drawable == 150) return true; // (Blocks: Unfair headshot blocking helmets)
+            }
+            return false;
+        }
         public static int GetMaxSeats(string vehiclename)
         {
             int seats = NAPI.Vehicle.GetVehicleMaxOccupants((VehicleHash)NAPI.Util.GetHashKey(vehiclename));

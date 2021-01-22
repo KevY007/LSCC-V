@@ -993,6 +993,12 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
+            if (Main.BlacklistedClothing(slot, drawable))
+            {
+                player.SendNotification("~r~This clothing is blacklisted!");
+                return;
+            }
+
             Account acc = EPlayer.GetAccount(player);
 
             if ((slot == 1) && acc.DonatorLevel < 1)
@@ -1026,6 +1032,12 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
+            if (Main.BlacklistedClothing(1, drawable))
+            {
+                player.SendNotification("~r~This clothing is blacklisted!");
+                return;
+            }
+
             if (player.GetData<int>("EditingClothing") != -1)
             {
                 Account acc = EPlayer.GetAccount(player);
@@ -1050,6 +1062,12 @@ namespace LSCC
         public void OnRequestSetHat(Player player, int drawable, int texture)
         {
             if (!EPlayer.LoggedIn(player)) return;
+
+            if (Main.BlacklistedClothing(0, drawable))
+            {
+                player.SendNotification("~r~This clothing is blacklisted!");
+                return;
+            }
 
             if (player.GetData<int>("EditingClothing") != -1)
             {
