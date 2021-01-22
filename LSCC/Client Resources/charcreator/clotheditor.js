@@ -90,10 +90,10 @@ menuRoupasMascaras.ItemSelect.on((item, index) => {
 let chapeusDrawable = [];
 for (i = 0; i < player.getNumberOfPropDrawableVariations(0) + 1; i++) 
 {        
-    if (!((drawable >= 16 && drawable <= 18) || drawable == 39 || (drawable >= 48 && drawable <= 53) || 
-        drawable == 67 || (drawable >= 69 && drawable <= 75) || (drawable >= 78 && drawable <= 82) || 
-        (drawable >= 84 && drawable <= 94) || drawable == 111 || (drawable >= 115 && drawable <= 119) || 
-        (drawable >= 125 && drawable <= 128) || drawable == 144 || drawable == 150))
+    if (!((i >= 16 && i <= 18) || i == 39 || (i >= 48 && i <= 53) || 
+        i == 67 || (i >= 69 && i <= 75) || (i >= 78 && i <= 82) || 
+        (i >= 84 && i <= 94) || i == 111 || (i >= 115 && i <= 119) || 
+        (i >= 125 && i <= 128) || i == 144 || i == 150))
     {
         chapeusDrawable.push(i.toString())  // Unfair helmets blocked above. 
     }

@@ -1,3 +1,42 @@
+var lastWaypointStatus = false;
+
+
+mp.events.add("playerCreateWaypoint", (position) => {
+
+    if(!lastWaypointStatus) // Only if NEWLY created waypoint. Not like if it was force synced before.
+    {
+        mp.events.callRemote("SetWaypoint", position.x, position.y, position.z);
+
+        lastWaypointStatus = true;
+    }
+});
+
+mp.events.add("playerDisableWaypoint", () => {
+
+    if(lastWaypointStatus) // So this does not trigger on FORCESYNCED calls.
+    {
+        mp.events.callRemote("DisableWaypoint");
+
+        lastWaypointStatus = false;
+    }
+});
+
+mp.events.add("gameSetWaypoint", function (x, y) {
+    lastWaypointStatus = true;
+    mp.game.ui.setNewWaypoint(x, y);
+});
+
+mp.events.add("gameDisableWaypoint", function () {
+    lastWaypointStatus = false;
+    mp.game.invoke('0xA7E4E2D361C2627F'); // VOID SET_WAYPOINT_OFF()
+});
+
+mp.events.add("OneSecondEvent", () => {
+    if(!mp.game.invoke('0x1DD1F58F493F1DA5') && lastWaypointStatus) { // BOOL IS_WAYPOINT_ACTIVE() 
+        mp.events.callLocal("playerDisableWaypoint");
+    }
+});
+
 mp.events.addDataHandler('Status_Trunk', function (entity, value, oldValue) 
 {
     if (entity.type === 'vehicle') 

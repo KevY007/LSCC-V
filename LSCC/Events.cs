@@ -912,6 +912,7 @@ namespace LSCC
             player.Heading = -185.0f;
         }
 
+
         [RemoteEvent("creator_Save")]
         public void CreatorSave(Player player, byte gender, string parentData, string featureData, string appearanceData, string hairAndColorData)
         {
@@ -1120,6 +1121,36 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player)) return;
 
             player.SetData("TUA_LT", 0);
+        }
+
+        [RemoteEvent("SetWaypoint")]
+        public static void OnPlayerSetWaypoint(Player player, float x, float y, float z)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (player.IsInVehicle)
+            {
+                foreach (Player t in RAGE.Entities.Players.All.Where(a => a.IsInVehicle && a.Vehicle == player.Vehicle))
+                {
+                    t.TriggerEvent("gameSetWaypoint", x, y);
+                }
+            }
+            return;
+        }
+
+        [RemoteEvent("DisableWaypoint")]
+        public static void OnPlayerDisableWaypoint(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (player.IsInVehicle)
+            {
+                foreach (Player t in RAGE.Entities.Players.All.Where(a => a.IsInVehicle && a.Vehicle == player.Vehicle))
+                {
+                    t.TriggerEvent("gameDisableWaypoint");
+                }
+            }
+            return;
         }
 
         public static void OnPlayerRegister(Player player, Account acc)
