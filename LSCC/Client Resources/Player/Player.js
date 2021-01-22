@@ -21,6 +21,11 @@ let derbyCounting = false;
 let secondCounter = 0;
 let updateRate = 200;
 
+if(mp.storage.data.updaterate !== undefined)
+{
+    updateRate = mp.storage.data.updaterate;
+}
+
 let specCam = null;
 let specState = false;
 let specTarget = null;
@@ -238,6 +243,8 @@ mp.events.addCommand("updaterate", function (rate) {
     }
 
     updateRate = rate;
+    mp.storage.data.updaterate = rate;
+    mp.storage.flush();
 
     mp.gui.chat.push("Updates now happen " + Math.round(1000 / updateRate) + " times a second.");
 });
