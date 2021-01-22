@@ -455,6 +455,9 @@ namespace LSCC
                 case "lspdcara":
                     seats = 4;
                     break;
+                case "prevolter":
+                    seats = 4;
+                    break;
             }
             return seats;
         }

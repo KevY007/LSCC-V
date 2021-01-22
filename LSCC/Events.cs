@@ -1614,6 +1614,12 @@ namespace LSCC
                                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Police Caracara.");
                                 break;
                             }
+                        case "Revolter (U)":
+                            {
+                                EPlayer.GetAccount(player).CarCop = "prevolter";
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Police Revolter (Unmarked).");
+                                break;
+                            }
                     }
                 }
                 if(team == 0)

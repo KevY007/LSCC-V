@@ -2800,6 +2800,7 @@ namespace LSCC
                 { "FBI Buffalo", "images/fbibufac.png", 1, 17 },
                 { "Charger '16 (U)", "images/udchall1.png", 1, 20 },
                 { "Chopper", "images/polmav.png", 1, 20 },
+                { "Revolter (U)", "images/prevolter.png", 1, 25 },
 
                 // Fugitive
                 { "Primo", "images/primo.png", 0, 3 },
@@ -2832,6 +2833,7 @@ namespace LSCC
             player.SendChatMessage("Model 'sherbufac' - Sheriff Buffalo (sherbufac2 for Unmaarked)");
             player.SendChatMessage("Model 'hwaybufac' - Highway Buffalo (hwaybufac2 for Unmaarked)");
             player.SendChatMessage("Model '600sel' - Mercedes S600?");
+            player.SendChatMessage("Model 'prevolter' - Police Revolter Unmarked");
             return;
         }
 
