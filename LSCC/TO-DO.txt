@@ -9,7 +9,7 @@ vehicle upgrade system with regular points later
 add a linux script that will keep on restarting server if goes off?
 sync markers in car
 passgun
-save updaterate
+save updaterate 
 add more clothing using mods
 disable finger gives has shot wtf see unarmed and fist both weapon
 make donation stuf or page
