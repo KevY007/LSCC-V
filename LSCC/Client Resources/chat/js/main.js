@@ -136,7 +136,7 @@ let api = {"chat:push": chatAPI.push, "chat:clear": chatAPI.clear, "chat:activat
 
 for(let fn in api)
 {
-	//mp.events.add(fn, api[fn]);
+	mp.events.add(fn, api[fn]);
 }
 
 
@@ -185,6 +185,7 @@ $(document).ready(function()
         if (event.which == 84 && chat.input == null
 			&& chat.active == true)
 		{
+			chat.currentIndex = 0; // Reset index on open
             enableChatInput(true);
             event.preventDefault();
         } else if (event.which == 38) {
