@@ -1067,7 +1067,7 @@ namespace LSCC
         }
 
         [Command("switchseats", "!{#AFAFAF}[USAGE] switchseats (target)", Alias = "swapseats,swapseat,switchseat,ss")]
-        public void cmd_switchseats(Player player, Player target)
+        public static void cmd_switchseats(Player player, Player target)
         {
             if ((!player.IsInVehicle || !target.IsInVehicle) || player.Vehicle != target.Vehicle && player != target)
             {
@@ -1115,13 +1115,6 @@ namespace LSCC
                                             {
                                                 player.SetIntoVehicle(hwnd, targSeat);
                                                 target.SetIntoVehicle(hwnd, playSeat);
-
-                                                var msg = "!{#FFFFFF}(( !{#FF6347}" + player.Name + " and  " + target.Name + " have swapped seats." + " !{#FFFFFF}))";
-
-                                                foreach (Player playa in NAPI.Player.GetPlayersInRadiusOfPlayer(60, player))
-                                                {
-                                                    if (playa.Dimension == player.Dimension) playa.SendChatMessage(msg);
-                                                }
                                             }
                                         }
                                         catch {}
@@ -1135,6 +1128,16 @@ namespace LSCC
                                             {
                                                 player.SetIntoVehicle(hwnd, targSeat);
                                                 target.SetIntoVehicle(hwnd, playSeat);
+
+                                                player.ResetData("_currentlySwappingSeats");
+                                                target.ResetData("_currentlySwappingSeats");
+
+                                                var msg = "!{#FFFFFF}(( !{#FF6347}" + player.Name + " and  " + target.Name + " have swapped seats." + " !{#FFFFFF}))";
+
+                                                foreach (Player playa in NAPI.Player.GetPlayersInRadiusOfPlayer(60, player))
+                                                {
+                                                    if (playa.Dimension == player.Dimension) playa.SendChatMessage(msg);
+                                                }
                                             }
                                         }
                                         catch { }
@@ -1143,8 +1146,6 @@ namespace LSCC
                                     player.SetIntoVehicle(hwnd, targSeat);
                                     target.SetIntoVehicle(hwnd, playSeat);
                                 }
-                                player.ResetData("_currentlySwappingSeats");
-                                target.ResetData("_currentlySwappingSeats");
                             }
                             catch { }
                         }, player.Ping + target.Ping + 1000);
@@ -1162,6 +1163,42 @@ namespace LSCC
             player.ResetData("SwapSeatingTime");
             target.SetData("SwapSeating", player);
             target.SetData("SwapSeatingTime", Environment.TickCount64);
+
+            return;
+        }
+
+        [Command("forceswitchseats", "!{#AFAFAF}[USAGE] forceswitchseats (player) (target)", Alias = "forceswapseats,forceswapseat,forceswitchseat,fss")]
+        public void cmd_forceswitchseats(Player admin, Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(admin)) return;
+
+            Account acc = EPlayer.GetAccount(admin);
+
+            if (acc.Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                return;
+            }
+
+            if ((!player.IsInVehicle || !target.IsInVehicle) || player.Vehicle != target.Vehicle && player != target)
+            {
+                admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Players are not in the same vehicle!");
+                return;
+            }
+
+            if (player.HasData("_currentlySwappingSeats") || target.HasData("_currentlySwappingSeats")) 
+            { admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target's are currently switching..."); return; }
+
+            try
+            {
+                Commands.cmd_switchseats(player, target);
+                
+                NAPI.Task.Run(() => Commands.cmd_switchseats(target, player), 500 + target.Ping);
+            }
+            catch { admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}An error has occured. (FATAL)"); }
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{admin.Name}:forceswapseats:{target.Name}:{player.Name}"); } catch { }
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {admin.Name} has forced {player.Name} and {target.Name} to swap seats.");
 
             return;
         }
@@ -3527,7 +3564,7 @@ namespace LSCC
                 player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /set(hp/ar) /spec");
                 player.SendChatMessage("[Admin Lv 1]: /freeze /unfreeze /kick /slap /setinv(ulnerable) /specoff");
                 player.SendChatMessage("[Admin Lv 1]: /bancheck /jail /unjail /afix /aflip /sendtolobby /set(time/weather)");
-                player.SendChatMessage("[Admin Lv 1]: /mute /unmute /warn /unwarn /setteam /forceautojoin");
+                player.SendChatMessage("[Admin Lv 1]: /mute /unmute /warn /unwarn /setteam /forceautojoin /forceswapseats");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
