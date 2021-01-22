@@ -1910,8 +1910,8 @@ namespace LSCC
                         Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, random.Next(122), random.Next(122), $"SA-{random.Next(1000, 9999)}", 255, false, true, Convert.ToUInt32(lobbyid));
                         pVehicle.EngineStatus = true;
                         pVehicle.SetSharedData("Engine", true);
-                        pVehicle.SetSharedData("Locked", true);
-                        pVehicle.Locked = true;
+                        pVehicle.SetSharedData("Locked", false);
+                        pVehicle.Locked = false;
                         pVehicle.SetSharedData("Team", 0);
                         lobby.Vehicles.Add(pVehicle);
 
