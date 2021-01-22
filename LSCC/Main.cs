@@ -2218,10 +2218,12 @@ namespace LSCC
                                     if (lobby.Cops.Contains(player))
                                     {
                                         EPlayer.GiveCopWeapons(player);
+                                        player.TriggerEvent("SetActorInvulnerable", false);
                                     }
                                     else if (lobby.Fugitives.Contains(player))
                                     {
                                         EPlayer.GiveFugitiveWeapons(player);
+                                        player.TriggerEvent("SetActorInvulnerable", false);
                                     }
                                 }
 
