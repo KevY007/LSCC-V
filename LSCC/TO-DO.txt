@@ -9,11 +9,7 @@ vehicle upgrade system with regular points later
 add a linux script that will keep on restarting server if goes off?
 sync markers in car
 passgun
-unlock fugitive car by default so
-disable cop getting in fugitive car on g-bug if passengers
-and fugitive getting in cop car in g-bug if passengers
 save updaterate
-remove ruby donator, only bronze silver gold
 add more clothing using mods
 disable finger gives has shot wtf see unarmed and fist both weapon
 make donation stuf or page

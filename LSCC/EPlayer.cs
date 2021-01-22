@@ -504,14 +504,6 @@ namespace LSCC
                     if (colored) name = "!{#FFD700}";
                     name = name + "Gold Donator";
                     break;
-                case 4:
-                    if (colored) name = "!{#9DB7C9}";
-                    name = name + "Platinum Donator";
-                    break;
-                case 5:
-                    if (colored) name = "!{#E0115F}";
-                    name = name + "Ruby Donator";
-                    break;
                 default:
                     name = "Player";
                     break;

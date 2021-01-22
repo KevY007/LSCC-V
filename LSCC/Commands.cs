@@ -4137,8 +4137,8 @@ namespace LSCC
 
             Account t_acc = target.GetData<Account>("AccountHandle");
 
-            if (level < 0 || level > 5)
-            { // Bronze, Silver, Gold, Plat, Ruby
+            if (level < 0 || level > 3)
+            { // Bronze, Silver, Gold
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed 5.");
                 return;
             }

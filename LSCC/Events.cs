@@ -305,6 +305,19 @@ namespace LSCC
         public void OnPlayerEnterVehicle(Player player, Vehicle vehicle, sbyte seatID)
         {
             vehicle.SetSharedData("Engine", vehicle.EngineStatus);
+
+            if(player.HasSharedData("Team") && player.GetSharedData<int>("Team") >= 0)
+            {
+                int count = RAGE.Entities.Players.All.Where(a => a.IsInVehicle && a.Vehicle == vehicle && a.HasSharedData("Team") && a.VehicleSeat == 0 && 
+                    a.GetSharedData<int>("Team") != -1 && a.GetSharedData<int>("Team") != player.GetSharedData<int>("Team")).Count();
+               
+                if(count >= 1)
+                {
+                    player.WarpOutOfVehicle();
+
+                    player.SendNotification("~r~You cannot enter a vehicle that has an opposition team driver!");
+                }
+            }
         }
 
         [ServerEvent(Event.PlayerExitVehicle)]
