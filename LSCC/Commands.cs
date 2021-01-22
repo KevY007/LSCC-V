@@ -2799,7 +2799,7 @@ namespace LSCC
                 { "SWAT Truck", "images/riot.png", 1, 15 },
                 { "FBI Buffalo", "images/fbibufac.png", 1, 17 },
                 { "Charger '16 (U)", "images/udchall1.png", 1, 20 },
-                { "Chopper", "images/polmav.png", 1, 20 },
+                { "Chopper", "images/polmav.png", 1, 23 },
                 { "Revolter (U)", "images/prevolter.png", 1, 25 },
 
                 // Fugitive
@@ -2814,6 +2814,8 @@ namespace LSCC
                 { "Buffalo", "images/buffalo.png", 0, 20 },
                 { "Sultan", "images/sultan.png", 0, 25 },
                 { "Kuruma", "images/kuruma.png", 0, 30 },
+                { "Fastback '66", "images/66fastback.png", 0, 33 },
+                { "M3 E46", "images/m3e46.png", 0, 35 },
             },
             EPlayer.GetAccount(player).Level);
 
@@ -2834,6 +2836,8 @@ namespace LSCC
             player.SendChatMessage("Model 'hwaybufac' - Highway Buffalo (hwaybufac2 for Unmaarked)");
             player.SendChatMessage("Model '600sel' - Mercedes S600?");
             player.SendChatMessage("Model 'prevolter' - Police Revolter Unmarked");
+            player.SendChatMessage("Model 'm3e46' - M3 E46 BMW 2005");
+            player.SendChatMessage("Model '66fastback' - 1966 Ford Mustang Fastback");
             return;
         }
 

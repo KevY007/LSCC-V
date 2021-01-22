@@ -1698,6 +1698,18 @@ namespace LSCC
                                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Kuruma.");
                                 break;
                             }
+                        case "Fastback '66":
+                            {
+                                EPlayer.GetAccount(player).CarFugitive = "66fastback";
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to 1966 Mustang Fastback.");
+                                break;
+                            }
+                        case "M3 E46":
+                            {
+                                EPlayer.GetAccount(player).CarFugitive = "kuruma";
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to M3 E46.");
+                                break;
+                            }
                     }
                 }
             }

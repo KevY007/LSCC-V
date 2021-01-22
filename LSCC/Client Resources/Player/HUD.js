@@ -225,7 +225,8 @@ mp.events.add("render", () => {
                         sY = 0.13;
                     }
 
-                    if((vehicle.getSpeed() * 3.6).toFixed(0) % 2 == 0 || (vehicle.getSpeed() * 3.6).toFixed(0) == 0)
+                    if(((vehicle.getSpeed() * 3.6).toFixed(0) % 2 == 0 || (vehicle.getSpeed() * 3.6).toFixed(0) % 5 == 0) || 
+                        (vehicle.getSpeed() * 3.6).toFixed(0) == 0)
                     {
                         lastSpeed = (vehicle.getSpeed() * 3.6).toFixed(0);
                     }

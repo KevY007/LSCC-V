@@ -458,6 +458,12 @@ namespace LSCC
                 case "prevolter":
                     seats = 4;
                     break;
+                case "m3e46":
+                    seats = 2;
+                    break;
+                case "66fastback":
+                    seats = 2;
+                    break;
             }
             return seats;
         }
