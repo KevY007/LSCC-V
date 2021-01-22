@@ -1571,7 +1571,7 @@ namespace LSCC
                     List<int> UsedSpawns = new List<int>(Spawns.Count + 1);
                     crashcheck++;
 
-                    List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && !EPlayer.IsAFK(a) && !a.HasData("Spectating")).ToList();
+                    List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && !EPlayer.IsAFK(a) && !a.HasData("Spectating") && a.GetData<bool>("AutoJoin") == true).ToList();
                     crashcheck++;
 
                     List<Player> PutInsideCar = new List<Player>(lobbyPlayers.Count());
