@@ -375,14 +375,14 @@ namespace LSCC
 
             if (action.StartsWith("hud", StringComparison.OrdinalIgnoreCase))
             {
-                player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}Please press F7 to toggle HUD.");
+                player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}Please press F7 to toggle HUD.");
             }
             else if (action.StartsWith("pm", StringComparison.OrdinalIgnoreCase))
             {
                 player.SetData("PMState", !player.GetData<bool>("PMState"));
                 if (player.GetData<bool>("PMState") == true)
                 {
-                    player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have enabled your PMs.");
+                    player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have enabled your PMs.");
                 }
                 else player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have disabled your PMs.");
             }
@@ -593,7 +593,7 @@ namespace LSCC
             player.SetData("GPS", !player.GetData<bool>("GPS"));
             player.SetSharedData("VisibleBlip", player.GetData<bool>("GPS"));
 
-            player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have " + (player.GetData<bool>("GPS") == true ? "enabled" : "disabled") + 
+            player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have " + (player.GetData<bool>("GPS") == true ? "enabled" : "disabled") + 
                 " your emergency GPS beacon.");
 
             return;
@@ -2146,7 +2146,7 @@ namespace LSCC
             else
             {
                 blockList.Remove(target);
-                player.SendChatMessage($"!{{#FF6347}}[#] !{{#FFFFFF}}You have unmuted {target.Name} on voice chat.");
+                player.SendChatMessage($"!{{#33C446}}[#] !{{#FFFFFF}}You have unmuted {target.Name} on voice chat.");
             }
 
             player.SetData("BlockList", blockList);
@@ -2850,7 +2850,7 @@ namespace LSCC
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys for activation)");
             player.SendChatMessage("!{#339BC4}[Cop!{#F24C27}chase]: !{#FFFFFF}/r(adio) /wt /loadout /car");
             player.SendChatMessage("!{#61A9FA}[Cop]: /gps /cuff /m(egaphone) /dragout");
-            player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup /s(top)a(nim)");
+            player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup /s(top)a(nim) /passgun");
             player.SendChatMessage("!{#AB00BA}[Vehicle]: /trunk /lock /engine");
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /derby");
             player.SendChatMessage("!{#28E0DA}[Mode: DM]: /dm /dmarena");
@@ -3167,7 +3167,7 @@ namespace LSCC
             newLobby.PlayerCreated = true;
 
             NAPI.Util.ConsoleOutput($"{player.Name} created lobby ID {newLobby.lobbyId}");
-            player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have created a new lobby with ID " + newLobby.lobbyId + ", /setlobbypassword to lock it.");
+            player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have created a new lobby with ID " + newLobby.lobbyId + ", /setlobbypassword to lock it.");
             Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} created lobby {newLobby.lobbyId}.**");
 
             return;
@@ -3206,7 +3206,7 @@ namespace LSCC
 
             RAGE.Entities.Players.All.ForEach((Player pl) =>
             {
-                pl.SendChatMessage("!{#FF6347}[#] !{#FFFFFF} " + player.Name + " has deleted lobby " + lobbyid + ".");
+                pl.SendChatMessage("!{#33C446}[#] !{#FFFFFF} " + player.Name + " has deleted lobby " + lobbyid + ".");
 
                 if(pl.GetSharedData<int>("InLobby") == lobbyid)
                 {
@@ -3237,7 +3237,7 @@ namespace LSCC
             newLobby.Password = password;
 
             NAPI.Util.ConsoleOutput($"{player.Name} set lobby ID {newLobby.lobbyId} password to {newLobby.Password}");
-            player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have set password for lobby ID " + lobbyid + " to " + newLobby.Password);
+            player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set password for lobby ID " + lobbyid + " to " + newLobby.Password);
             Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s password to {newLobby.Password}.**");
 
             return;
@@ -3264,14 +3264,14 @@ namespace LSCC
             {
                 newLobby.gameMode = GameModes.STANDARD;
                 NAPI.Util.ConsoleOutput($"{player.Name} set lobby ID {newLobby.lobbyId} mode to STANDARD.");
-                player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have set mode for lobby ID " + lobbyid + " to STANDARD.");
+                player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set mode for lobby ID " + lobbyid + " to STANDARD.");
                 Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s mode to STANDARD.**");
             }
             else if (mode.Equals("busted", StringComparison.OrdinalIgnoreCase))
             {
                 newLobby.gameMode = GameModes.BUSTED;
                 NAPI.Util.ConsoleOutput($"{player.Name} set lobby ID {newLobby.lobbyId} mode to BUSTED.");
-                player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have set mode for lobby ID " + lobbyid + " to BUSTED.");
+                player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set mode for lobby ID " + lobbyid + " to BUSTED.");
                 Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s mode to BUSTED.**");
             }
             else { player.SendChatMessage("!{#999999}Proper usage: /lobbymode <lobby id> <mode: 'standard', 'busted'>"); return; }
@@ -3301,7 +3301,7 @@ namespace LSCC
             newLobby.FugitivePercent = percent;
 
             NAPI.Util.ConsoleOutput($"{player.Name} set lobby ID {newLobby.lobbyId} percentage to {newLobby.FugitivePercent}");
-            player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have set fugitive percentage for lobby ID " + lobbyid + " to " + newLobby.FugitivePercent);
+            player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set fugitive percentage for lobby ID " + lobbyid + " to " + newLobby.FugitivePercent);
             Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s fugitive percentage to {newLobby.FugitivePercent}.**");
 
             return;
@@ -3344,7 +3344,7 @@ namespace LSCC
                 newLobby.Enabled = true;
 
                 NAPI.Util.ConsoleOutput($"{player.Name} enabled lobby ID {newLobby.lobbyId}.");
-                player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have enabled lobby ID " + lobbyid + ".");
+                player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have enabled lobby ID " + lobbyid + ".");
                 Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} disabled {lobbyid}.**");
             }
 
@@ -3384,7 +3384,7 @@ namespace LSCC
             if (mapBruh.Enabled)
             {
                 NAPI.Util.ConsoleOutput($"{player.Name} enabled map {mapBruh.Name} ID {mapBruh.SQL_ID}.");
-                RAGE.Entities.Players.All.ForEach((Player p) => p.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}" + player.Name + " has enabled the map: " + mapBruh.Name + "."));
+                RAGE.Entities.Players.All.ForEach((Player p) => p.SendChatMessage("!{#33C446}[#] !{#FFFFFF}" + player.Name + " has enabled the map: " + mapBruh.Name + "."));
                 Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} enabled map {mapBruh.Name}.**");
             }
             else
@@ -4593,6 +4593,63 @@ namespace LSCC
             player.SendChatMessage($"!{{#FFFF00}}(( PM sent to {target.Name}: {text} ))");
             return;
         }
+
+        [Command("passgun", "!{#AFAFAF}[USAGE] passgun (target)", Alias = "pgun")]
+        public static void cmd_passgun(Player player, Player target)
+        {
+            if (!(player.IsInVehicle && target.IsInVehicle && player.Vehicle == target.Vehicle) && 
+                player.Position.DistanceTo(target.Position) >= 3.5)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not close enough to the target or in the same vehicle!");
+                return;
+            }
+
+            if(player == target || player.Dead) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot pass weapons to that target."); return; }
+
+            WeaponHash wep = player.CurrentWeapon;
+            string wepName = null;
+
+            foreach (KeyValuePair<ulong, jWeaponData> i in Settings.WeaponData)
+            {
+                if (i.Key == (ulong)wep)
+                {
+                    wepName = i.Value.Name;
+                    break;
+                }
+            }
+            if (wepName == null)
+            {
+                foreach (KeyValuePair<ulong, string> i in Main.WeaponReasons)
+                {
+                    if (i.Key == (ulong)wep)
+                    {
+                        wepName = i.Value;
+                        break;
+                    }
+                }
+            }
+
+            if (wep == WeaponHash.Unarmed || wepName == null)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please equip a proper weapon on your hands.");
+                return;
+            }
+
+
+            int ammo = player.GetWeaponAmmo(wep);
+
+            player.SetWeaponAmmo(wep, 0);
+            player.RemoveWeapon(wep);
+
+            target.GiveWeapon(wep, ammo);
+
+            EPlayer.Action(player, $"extends their arm towards {target.Name}, handing them a {wepName}.");
+            player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have passed your " + wepName + " and all of its ammo to " + target.Name + ".");
+            target.SendChatMessage("!{#33C446}[#] !{#FFFFFF}" + player.Name + " has passed you their " + wepName + " with " + ammo + " ammo.");
+
+            return;
+        }
+
 
         [Command("removeguns", "!{#AFAFAF}[USAGE] removeguns (target)", GreedyArg = true, Alias = "rguns")]
         public void cmd_removeguns(Player player, Player target)

@@ -7,7 +7,6 @@ vehicle upgrade system with regular points later
 
 #bug reports and other chans sugeestion
 add a linux script that will keep on restarting server if goes off?
-passgun
 add more clothing using mods
 make donation stuf or page
 retro will send car list as well
