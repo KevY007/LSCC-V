@@ -313,7 +313,7 @@ namespace LSCC
                
                 if(count >= 1)
                 {
-                    player.WarpOutOfVehicle();
+                    // player.WarpOutOfVehicle(); WARP MAGICALLY CRASHES UR GAME LIKE OK BRO
                     player.Position = player.Position.Around(5f);
 
                     player.SendNotification("~r~You cannot enter a vehicle that has an opposition team driver!");

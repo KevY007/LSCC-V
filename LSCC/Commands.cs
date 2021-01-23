@@ -1112,14 +1112,11 @@ namespace LSCC
                                     {
                                         try
                                         {
-                                            if (hwnd != null && player != null && target != null && player.Exists && target.Exists)
-                                            {
-                                                target.SetIntoVehicle(hwnd, playSeat);
-                                                player.SetIntoVehicle(hwnd, targSeat);
-                                            }
+                                            target.SetIntoVehicle(hwnd, playSeat);
+                                            player.SetIntoVehicle(hwnd, targSeat);
                                         }
                                         catch {}
-                                    }, 1000 + player.Ping + target.Ping);
+                                    }, 6000 + player.Ping + target.Ping);
 
                                     NAPI.Task.Run(() =>
                                     {
@@ -1129,6 +1126,9 @@ namespace LSCC
                                             {
                                                 player.SetIntoVehicle(hwnd, targSeat);
                                                 target.SetIntoVehicle(hwnd, playSeat);
+
+                                                player.TriggerEvent("SetInVehEx", hwnd, targSeat - 1);
+                                                target.TriggerEvent("SetInVehEx", hwnd, playSeat - 1);
 
                                                 player.ResetData("_currentlySwappingSeats");
                                                 target.ResetData("_currentlySwappingSeats");
@@ -1146,6 +1146,9 @@ namespace LSCC
 
                                     player.SetIntoVehicle(hwnd, targSeat);
                                     target.SetIntoVehicle(hwnd, playSeat);
+
+                                    player.TriggerEvent("SetInVehEx", hwnd, targSeat - 1);
+                                    target.TriggerEvent("SetInVehEx", hwnd, playSeat - 1);
                                 }
                             }
                             catch { }
