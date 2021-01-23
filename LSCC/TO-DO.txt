@@ -14,3 +14,4 @@ allow custom loadout in dm
 vehicle setmod with https://wiki.rage.mp/index.php?title=Vehicle_Mods
 you can use indexes and allow player to customize car in freeroam and save settings for a car wowohow donator stuf
 make default cruisers fast with some handling magic?
+setname and car cop etc manipulation stuf
