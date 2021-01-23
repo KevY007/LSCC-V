@@ -496,25 +496,27 @@ mp.events.add('render', () => {
                         if((showHud !== undefined && showHud == false) == false) collisionText.visible = true;
 
                         mp.vehicles.forEach(target => {
+                            if(player.isInAnyVehicle(false))
+                            {
+                                if(target != player.vehicle)
+                                {
+                                    player.vehicle.setNoCollision(target.handle, false);
+                                    target.setNoCollision(player.vehicle.handle, false);
+
+                                    player.setNoCollision(target.handle, false); // Collisions OFF for ourselves to other cars too.
+                                    target.setNoCollision(player.handle, false);
+                                }
+                            }
+
+                            target.setInvincible(true);
+                            target.setCanBeDamaged(false);
+                            target.setCanBreak(false);
+
                             mp.vehicles.forEach(target2 => {
                                 target.setNoCollision(target2.handle, false);
                                 target2.setNoCollision(target.handle, false);
-        
-                                target2.setInvincible(false);
-                                target.setInvincible(false);
                             });
                         });
-
-                        if(player.isInAnyVehicle(false))
-                        {
-                            mp.vehicles.forEach(target2 => {
-                                player.vehicle.setNoCollision(target2.handle, false);
-                                target2.setNoCollision(player.vehicle.handle, false);
-        
-                                target2.setInvincible(false);
-                                player.vehicle.setInvincible(false);
-                            });
-                        }
                     }
                     else if(collisionTime == 0)
                     {
@@ -522,17 +524,16 @@ mp.events.add('render', () => {
                         collisionTime = -1;
 
                         mp.vehicles.forEach(target => {
+                            player.setNoCollision(target.handle, true); // Collisions ON for ourselves to other cars too.
+                            target.setNoCollision(player.handle, true);
+
+                            target.setInvincible(false);
+                            target.setCanBeDamaged(true);
+                            target.setCanBreak(true);
+
                             mp.vehicles.forEach(target2 => {
                                 target.setNoCollision(target2.handle, true);
                                 target2.setNoCollision(target.handle, true);
-        
-                                target.setCanBeDamaged(true);
-                                target2.setCanBeDamaged(true);
-                                target.setCanBreak(true);
-                                target2.setCanBreak(true);
-        
-                                target2.setInvincible(false);
-                                target.setInvincible(false);
                             });
                         });
                     }
@@ -1182,11 +1183,13 @@ mp.events.add(
             if(chaseRunning == true && collisionTime >= 1)
             {
                 mp.vehicles.forEach(target2 => {
-                    vehicle.setNoCollision(target2.handle, false);
-                    target2.setNoCollision(vehicle.handle, false);
+                    if(target2 != vehicle) {
+                        vehicle.setNoCollision(target2.handle, false);
+                        target2.setNoCollision(vehicle.handle, false);
 
-                    target2.setInvincible(false);
-                    vehicle.setInvincible(false);
+                        target2.setInvincible(false);
+                        vehicle.setInvincible(false);
+                    }
                 });
             }
 

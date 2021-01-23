@@ -1707,7 +1707,7 @@ namespace LSCC
                             }
                         case "M3 E46":
                             {
-                                EPlayer.GetAccount(player).CarFugitive = "kuruma";
+                                EPlayer.GetAccount(player).CarFugitive = "m3e46";
                                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to M3 E46.");
                                 break;
                             }
