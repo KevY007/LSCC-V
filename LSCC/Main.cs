@@ -1710,12 +1710,13 @@ namespace LSCC
                                     col1 = 111;
                                 }
 
-                                if (carName.Equals("prevolter")) col2 = 0; // Full black undercover brr.
                             }
 
+                            if (carName.Equals("prevolter")) col2 = 0; // Full black undercover brr.
+                            if (carName.Equals("police4")) col1 = 8; // Stone Silver // Undercover Default Cruiser
                             int overridemaxseats = GetMaxSeats(carName);
 
-                            if(carName.Equals("polmav"))
+                            if (carName.Equals("polmav"))
                             {
                                 if (Spawns.Count(sp => sp.spawnTeam == 2) >= 1)
                                 {

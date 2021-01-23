@@ -1127,8 +1127,8 @@ namespace LSCC
                                                 player.SetIntoVehicle(hwnd, targSeat);
                                                 target.SetIntoVehicle(hwnd, playSeat);
 
-                                                player.TriggerEvent("SetInVehEx", hwnd, targSeat - 1);
-                                                target.TriggerEvent("SetInVehEx", hwnd, playSeat - 1);
+                                                player.TriggerEvent("SetInVehEx", hwnd, (int)(targSeat-1));
+                                                target.TriggerEvent("SetInVehEx", hwnd, (int)(playSeat-1));
 
                                                 player.ResetData("_currentlySwappingSeats");
                                                 target.ResetData("_currentlySwappingSeats");
@@ -1147,8 +1147,8 @@ namespace LSCC
                                     player.SetIntoVehicle(hwnd, targSeat);
                                     target.SetIntoVehicle(hwnd, playSeat);
 
-                                    player.TriggerEvent("SetInVehEx", hwnd, targSeat - 1);
-                                    target.TriggerEvent("SetInVehEx", hwnd, playSeat - 1);
+                                    player.TriggerEvent("SetInVehEx", hwnd, (int)(targSeat-1));
+                                    target.TriggerEvent("SetInVehEx", hwnd, (int)(playSeat-1));
                                 }
                             }
                             catch { }
@@ -3824,9 +3824,10 @@ namespace LSCC
                         {
                             col1 = 111;
                         }
-
-                        if (carName.Equals("prevolter")) col2 = 0; // Full black undercover brr.
                     }
+
+                    if (carName.Equals("prevolter")) col2 = 0; // Full black undercover brr.
+                    if (carName.Equals("police4")) col1 = 8; // Stone Silver // Undercover Default Cruiser
 
                     Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawn.spawnA, col1, col2, target.Name, 255, false, true, Convert.ToUInt32(lobby.lobbyId));
                     pVehicle.EngineStatus = true;
