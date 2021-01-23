@@ -88,6 +88,7 @@ menuRoupasMascaras.ItemSelect.on((item, index) => {
 
 // Drawable
 let chapeusDrawable = [];
+chapeusDrawable.push("-1")  // -1 = none.
 for (i = 0; i < player.getNumberOfPropDrawableVariations(0) + 1; i++) 
 {        
     if (!((i >= 16 && i <= 18) || i == 39 || (i >= 48 && i <= 53) || 
