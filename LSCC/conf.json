@@ -1,6 +1,6 @@
 {
 	"maxplayers" : 100,
-	"name" : "[EN/US] Los Santos Copchase: V | Multi-modded [Copchase][Pursuits][DM][Derby][Freeroam]",
+	"name" : "[EN] Los Santos Copchase: V | Multi-modded [Copchase][Pursuits][DM][Derby][Freeroam]",
 	"gamemode" : "copchase",
 	"stream-distance" : 1000.0,
 	"announce" : false,
