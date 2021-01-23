@@ -1011,6 +1011,7 @@ namespace LSCC
 
             Account acc = EPlayer.GetAccount(player); 
             acc.XP += xp;
+            int lvlDiff = 0;
                
             while(acc.XP < 0)
             {
@@ -1019,14 +1020,7 @@ namespace LSCC
                     acc.Level--;
 
                     acc.XP += GetMaxLevelXP(acc.Level);
-                    RAGE.Entities.Players.All.ForEach((Player pl) =>
-                    {
-                        pl.SendChatMessage($"!{{#00BA03}}[LEVEL DOWN] {player.Name} has levelled down to {acc.Level}!");
-                    });
-                    player.SendNotification($"~w~You have levelled down to ~r~{acc.Level}~w~!");
-
-                    player.TriggerEvent("PlayMissionComplete", "GENERIC_FAILED");
-                    try { NAPI.Task.Run(() => player.TriggerEvent("ShakeCam", "VIBRATE_SHAKE", 3.0f, 1500), 1000); } catch { }
+                    lvlDiff--;
                 }
                 else
                 {
@@ -1040,14 +1034,33 @@ namespace LSCC
             {
                 acc.XP -= GetMaxLevelXP(acc.Level);
                 acc.Level++;
+
+                lvlDiff++;
+            }
+
+            if(lvlDiff > 0)
+            {
                 RAGE.Entities.Players.All.ForEach((Player pl) =>
                 {
-                    pl.SendChatMessage($"!{{#00BA03}}[LEVEL UP] {player.Name} has levelled up to {acc.Level}!");
+                    if(lvlDiff > 1) pl.SendChatMessage($"!{{#00BA03}}[LEVEL UP] {player.Name} has levelled up +{lvlDiff} times to {acc.Level}!");
+                    else pl.SendChatMessage($"!{{#00BA03}}[LEVEL UP] {player.Name} has levelled up to {acc.Level}!");
                 });
                 player.SendNotification($"~w~You have levelled up to ~g~{acc.Level}~w~!");
 
                 player.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
                 try { NAPI.Task.Run(() => player.TriggerEvent("ShakeCam", "VIBRATE_SHAKE", 7.0f, 2000), 1000); } catch { }
+            }
+            else if (lvlDiff < 0)
+            {
+                RAGE.Entities.Players.All.ForEach((Player pl) =>
+                {
+                    if (lvlDiff < -1) pl.SendChatMessage($"!{{#FF6347}}[LEVEL DOWN] {player.Name} has levelled down {lvlDiff} times to {acc.Level}!");
+                    else pl.SendChatMessage($"!{{#FF6347}}[LEVEL DOWN] {player.Name} has levelled down to {acc.Level}!");
+                });
+                player.SendNotification($"~w~You have levelled down to ~r~{acc.Level}~w~!");
+
+                player.TriggerEvent("PlayMissionComplete", "GENERIC_FAILED");
+                try { NAPI.Task.Run(() => player.TriggerEvent("ShakeCam", "VIBRATE_SHAKE", 3.0f, 1500), 1000); } catch { }
             }
 
             player.SetSharedData("Level", acc.Level);
