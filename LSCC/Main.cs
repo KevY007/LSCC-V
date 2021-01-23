@@ -1680,7 +1680,8 @@ namespace LSCC
                         {
                             string carName = "police";
 
-                            int col1 = 0;
+                            int col1 = 0; // Black?
+                            int col2 = 111; // Frost white
 
                             if (EPlayer.GetAccount(player).CarCop.Length < 3)
                             {
@@ -1692,7 +1693,7 @@ namespace LSCC
                                         break;
                                     case 1:
                                         carName = "police3";
-                                        col1 = 8;
+                                        col1 = 111;
                                         break;
                                     case 2:
                                         carName = "police4";
@@ -1707,8 +1708,9 @@ namespace LSCC
                                 if(carName.StartsWith("police"))
                                 {
                                     col1 = 111;
-                                    if(carName.StartsWith("police3")) col1 = 8;
                                 }
+
+                                if (carName.Equals("prevolter")) col2 = 0; // Full black undercover brr.
                             }
 
                             int overridemaxseats = GetMaxSeats(carName);
@@ -1721,7 +1723,7 @@ namespace LSCC
                                 }
                             }
 
-                            Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, col1, 111, player.Name, 255, false, true, Convert.ToUInt32(lobbyid));
+                            Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, col1, col2, player.Name, 255, false, true, Convert.ToUInt32(lobbyid));
                             pVehicle.EngineStatus = true;
                             pVehicle.SetSharedData("Engine", true);
                             pVehicle.SetSharedData("Locked", true);
