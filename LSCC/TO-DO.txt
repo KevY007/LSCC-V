@@ -16,3 +16,4 @@ you can use indexes and allow player to customize car in freeroam and save setti
 make default cruisers fast with some handling magic?
 setname and car cop etc manipulation stuf
 caracara police handling copied from caracara normal but faster
+replace dodge charger with a non unmarked (livery) version
