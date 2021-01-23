@@ -1100,6 +1100,7 @@ namespace LSCC
 
                         player.Position = player.Position.Subtract(new Vector3(0.0, 0.0, 30.0f));
                         target.Position = player.Position.Subtract(new Vector3(0.0, 5.0, 30.0f));
+                        hwnd.Position = hwnd.Position.Add(new Vector3(0.5, 0.5, 0.5));
 
                         NAPI.Task.Run(() =>
                         {
@@ -1113,8 +1114,8 @@ namespace LSCC
                                         {
                                             if (hwnd != null && player != null && target != null && player.Exists && target.Exists)
                                             {
-                                                player.SetIntoVehicle(hwnd, targSeat);
                                                 target.SetIntoVehicle(hwnd, playSeat);
+                                                player.SetIntoVehicle(hwnd, targSeat);
                                             }
                                         }
                                         catch {}
