@@ -4147,7 +4147,7 @@ namespace LSCC
 
             if (level < 0 || level > 3)
             { // Bronze, Silver, Gold
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed 5.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed 3.");
                 return;
             }
 
