@@ -660,6 +660,8 @@ namespace LSCC
             
             target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Points: !{{#cbcfc4}}[{acc.Points}] !{{#ffffff}}| !{{#c7eb7f}}Vehicle (Fugitive): !{{#cbcfc4}}[{acc.CarFugitive}] !{{#ffffff}}| !{{#c7eb7f}}Vehicle (Cop): !{{#cbcfc4}}[{acc.CarCop}]");
 
+            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Last Jail: !{{#cbcfc4}}[{acc.JailReason}] !{{#ffffff}}| !{{#c7eb7f}}Last Warn: !{{#cbcfc4}}[{acc.MuteReason}] !{{#ffffff}}| !{{#c7eb7f}}Weapon Components: !{{#cbcfc4}}[/mycomps]");
+            
             target.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} ({acc.SQL_ID}) at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
 
             EPlayer.GrantXP(target, 0);

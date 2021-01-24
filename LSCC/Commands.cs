@@ -1504,9 +1504,9 @@ namespace LSCC
             {
                 wComponentData newDataTwo = new wComponentData();
 
+                newDataTwo = i.Value; 
                 if(i.Key == wephash)
                 {
-                    newDataTwo = i.Value; 
                     if(!i.Value.Components.Contains(comphash)) newDataTwo.Components.Add(comphash);
                 }
 
@@ -1738,14 +1738,13 @@ namespace LSCC
             {
                 wComponentData newDataTwo = new wComponentData();
 
+                newDataTwo = i.Value;
                 if (i.Key == wephash)
                 {
-                    newDataTwo = i.Value;
                     if (!i.Value.Components.Contains(comphash)) newDataTwo.Components.Add(comphash);
                     else
                     {
                         alreadyHas = true;
-                        break;
                     }
                 }
 
@@ -1774,6 +1773,56 @@ namespace LSCC
             try { Main.Log("currency.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:buycomp:{itemData.Name}:{comp.Name}"); } catch { }
             EPlayer.GetAccount(player).DonatorPoints -= 100;
             EPlayer.Save(player);
+            return;
+        }
+
+        [Command("mycomps", GreedyArg = true)]
+        public void cmd_mycomps(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            player.SendChatMessage("!{#FF6347}Listing bought weapon components ->");
+            
+            Dictionary<ulong, wComponentData> wepItems = new Dictionary<ulong, wComponentData>();
+
+            Account acc = EPlayer.GetAccount(player);
+            try
+            {
+                if (acc.WeaponComponents == null || acc.WeaponComponents.Length < 4) throw (new System.Exception("Invalid weapon component > going to new."));
+
+                wepItems = NAPI.Util.FromJson<Dictionary<ulong, wComponentData>>(acc.WeaponComponents);
+            }
+            catch
+            {
+                wepItems = new Dictionary<ulong, wComponentData>();
+
+                wComponentData test = new wComponentData();
+                test.Components.Add(123456789);
+                wepItems.Add(123456789, test);
+            }
+
+            int count = 0;
+            foreach (KeyValuePair<ulong, wComponentData> i in wepItems)
+            {
+                jWeaponData wep = new jWeaponData();
+
+                if(Settings.WeaponData.TryGetValue(i.Key, out wep))
+                {
+                    if (i.Value.Components.Count > 0) player.SendChatMessage("!{#31b55a}" + wep.Name + " | " + i.Value.Components.Count() + " attachments:");
+                    foreach (ulong comp in i.Value.Components)
+                    {
+                        Component compData = new Component();
+                        if(wep.Components.TryGetValue(comp, out compData))
+                        {
+                            player.SendChatMessage("!{#69f5a8}     -- " + compData.Name + " | " + compData.Description);
+                            count++;
+                        }
+                    }
+                }
+            }
+
+            if (count == 0) player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have not bought any weapon components yet, /buycomp.");
             return;
         }
 
@@ -2856,7 +2905,7 @@ namespace LSCC
             player.SendChatMessage("!{#A5A8A8}[Misc]: /updaterate /info /fontsize /voicebind /gpsbind");
             player.SendChatMessage("!{#A5A8A8}[Dbg/Test]: /pos /lcmenu");
             
-            player.SendChatMessage("!{#F7EB05}[Donator/Points] /buycomp");
+            player.SendChatMessage("!{#F7EB05}[Donator/Points] /buycomp /mycomps");
             if (EPlayer.GetAccount(player).DonatorLevel >= 1)
             {
                 player.SendChatMessage("!{#F7EB05}[Bronze Donator] /d(onator)c(hat)");
