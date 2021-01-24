@@ -1112,23 +1112,10 @@ namespace LSCC
                                     {
                                         try
                                         {
-                                            target.SetIntoVehicle(hwnd, playSeat);
-                                            player.SetIntoVehicle(hwnd, targSeat);
-                                        }
-                                        catch {}
-                                    }, 6000 + player.Ping + target.Ping);
-
-                                    NAPI.Task.Run(() =>
-                                    {
-                                        try
-                                        {
                                             if (hwnd != null && player != null && target != null && player.Exists && target.Exists)
                                             {
-                                                player.SetIntoVehicle(hwnd, targSeat);
-                                                target.SetIntoVehicle(hwnd, playSeat);
-
-                                                player.TriggerEvent("SetInVehEx", hwnd, (int)(targSeat-1));
-                                                target.TriggerEvent("SetInVehEx", hwnd, (int)(playSeat-1));
+                                                player.TriggerEvent("SetInVehEx", hwnd, targSeat-1);
+                                                target.TriggerEvent("SetInVehEx", hwnd, playSeat-1);
 
                                                 player.ResetData("_currentlySwappingSeats");
                                                 target.ResetData("_currentlySwappingSeats");
@@ -1142,17 +1129,17 @@ namespace LSCC
                                             }
                                         }
                                         catch { }
-                                    }, 3000);
+                                    }, 1000);
 
                                     player.SetIntoVehicle(hwnd, targSeat);
                                     target.SetIntoVehicle(hwnd, playSeat);
 
-                                    player.TriggerEvent("SetInVehEx", hwnd, (int)(targSeat-1));
-                                    target.TriggerEvent("SetInVehEx", hwnd, (int)(playSeat-1));
+                                    player.TriggerEvent("SetInVehEx", hwnd, targSeat-1);
+                                    target.TriggerEvent("SetInVehEx", hwnd, playSeat-1);
                                 }
                             }
                             catch { }
-                        }, player.Ping + target.Ping + 1000);
+                        }, player.Ping + target.Ping + 500);
 
                         return;
                     }

@@ -945,7 +945,7 @@ mp.events.add("entclearanim", (entity, animDictionary, animName) => {
 mp.events.add(
     {
         "SetInVehEx": (vehicle, vehseat) => {
-            mp.players.local.setIntoVehicle(vehicle, vehseat);
+            mp.players.local.setIntoVehicle(vehicle.handle, vehseat);
         },
         "ToggleHud": (show) => {
             if(show)

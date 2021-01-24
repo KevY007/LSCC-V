@@ -17,3 +17,4 @@ make default cruisers fast with some handling magic?
 setname and car cop etc manipulation stuf
 caracara police handling copied from caracara normal but faster
 replace dodge charger with a non unmarked (livery) version
+convert bcrypt
