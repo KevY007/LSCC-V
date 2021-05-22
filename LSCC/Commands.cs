@@ -3041,7 +3041,7 @@ namespace LSCC
                 return;
             }
 
-            Player target = RAGE.Entities.Players.All.First(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
+            Player target = RAGE.Entities.Players.All.FirstOrDefault(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
             if(target != null)
             {
                 target.SendChatMessage("!{#FF6347} Reconnect with your new name: !{#FFFFFF}" + newname);
@@ -3102,7 +3102,7 @@ namespace LSCC
                 return;
             }
 
-            Player target = RAGE.Entities.Players.All.First(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
+            Player target = RAGE.Entities.Players.All.FirstOrDefault(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
             if (target != null)
             {
                 target.SendChatMessage("!{#FF6347} Your password has been changed to: !{#FFFFFF}" + newpass);
