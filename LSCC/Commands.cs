@@ -2892,7 +2892,7 @@ namespace LSCC
             player.SendChatMessage("[Squad/Partner]: /squad /squadleave /s(quad)c(hat) /squadaccept /squadmembers");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
             player.SendChatMessage("[Lobby]: /lobbychat (/lo,/lc) /spec /specoff");
-            player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats");
+            player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats /changemypass");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys for activation)");
             player.SendChatMessage("!{#339BC4}[Cop!{#F24C27}chase]: !{#FFFFFF}/r(adio) /wt /loadout /car");
             player.SendChatMessage("!{#61A9FA}[Cop]: /gps /cuff /m(egaphone) /dragout");
@@ -3005,6 +3005,151 @@ namespace LSCC
             tpAcc.Suspended = 0;
             ContextFactory.Instance.SaveChanges();
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has unsuspended {tpAcc.Username}.");
+            return;
+        }
+
+        [Command("changename", "!{#AFAFAF}[USAGE] changename (account name) (new name)")]
+        public void cmd_changename(Player player, string name, string newname)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+
+            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+
+            if ((tpAcc != null) == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                return;
+            }
+
+            if(ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(newname, StringComparison.OrdinalIgnoreCase) == true) != null)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's already an account with that name!");
+                return;
+            }
+
+            if(tpAcc.Admin > EPlayer.GetAccount(player).Admin)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The target's admin level is higher than yours!");
+                return;
+            }
+
+            Player target = RAGE.Entities.Players.All.First(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
+            if(target != null)
+            {
+                target.SendChatMessage("!{#FF6347} Reconnect with your new name: !{#FFFFFF}" + newname);
+                target.SendNotification("Name changed to ~r~" + newname);
+
+                EPlayer.Save(target);
+                target.ResetData("AccountHandle");
+                target.ResetData("LoggedIn");
+
+                try
+                {
+                    NAPI.Task.Run(() =>
+                    {
+                        try
+                        {
+                            target.Kick();
+                        }
+                        catch { }
+                    }, 500);
+                }
+                catch { }
+            }
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:changename:{name}:{newname}"); } catch { }
+
+           
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has changed {tpAcc.Username}'s name to {newname}.");
+
+            tpAcc.Username = newname;
+            ContextFactory.Instance.SaveChanges();
+            return;
+        }
+
+        [Command("changepass", "!{#AFAFAF}[USAGE] changepass (account name) (new password)")]
+        public void cmd_changepass(Player player, string name, string newpass)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+
+            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+
+            if ((tpAcc != null) == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                return;
+            }
+
+            if (tpAcc.Admin > EPlayer.GetAccount(player).Admin)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The target's admin level is higher than yours!");
+                return;
+            }
+
+            Player target = RAGE.Entities.Players.All.First(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
+            if (target != null)
+            {
+                target.SendChatMessage("!{#FF6347} Your password has been changed to: !{#FFFFFF}" + newpass);
+                target.SendNotification("Password changed to ~r~" + newpass);
+            }
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:changepass:{name}"); } catch { }
+
+
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has changed {tpAcc.Username}'s password.");
+
+            string salt = AccountManager.GenSalt();
+            string password = AccountManager.Crypt(newpass, salt);
+            tpAcc.Salt = salt;
+            tpAcc.Password = password;
+            ContextFactory.Instance.SaveChanges();
+            return;
+        }
+
+        [Command("changemypass", "!{#AFAFAF}[USAGE] changemypass (new password)")]
+        public void cmd_changemypass(Player player, string newpass)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (player.HasData("LastCryptAttempt") && Environment.TickCount64 - player.GetData<long>("LastCryptAttempt") < 5000)
+            {
+                player.SendNotification("~r~Hold your horses.", true);
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Hold your horses!");
+                return;
+            }
+
+            if (newpass.Length < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your new password must be more than 3 characters!");
+                return;
+            }
+
+            player.SendChatMessage("!{#FF6347} Your password has been changed to: !{#FFFFFF}" + newpass);
+            player.SendNotification("Password changed to ~r~" + newpass);
+
+            string salt = AccountManager.GenSalt();
+            string password = AccountManager.Crypt(newpass, salt);
+            EPlayer.GetAccount(player).Salt = salt;
+            EPlayer.GetAccount(player).Password = password;
+            ContextFactory.Instance.SaveChanges();
+            player.SetData("LastCryptAttempt", Environment.TickCount64);
             return;
         }
 
@@ -3626,7 +3771,7 @@ namespace LSCC
             if (EPlayer.GetAccount(player).Admin >= 4)
             {
                 player.SendChatMessage("[Admin Lv 4]: /serveroptions /grantxp /saveserver /dbgplayanim /dbgmaxspeed /dbgdriveforce");
-                player.SendChatMessage("[Admin Lv 4]: n/a");
+                player.SendChatMessage("[Admin Lv 4]: /changename /changepass");
             }
             if (EPlayer.GetAccount(player).Admin >= 5)
             {
