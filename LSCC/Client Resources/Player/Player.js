@@ -745,7 +745,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                     mp.players.forEach(occupant => {
                         if(occupant.isInVehicle(targetEntity.handle, false)) {
                             vehicleOccupants++;
-                            if(occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true) {
+                            if(occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true && !occupant.isDead()) {
                                 breakShot = false; // Don't break shot if there's a fugitive that shot in!
                             }
                         }
@@ -787,6 +787,14 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                     return true; // Stun Gun no shot if more than 10 meters or target in car.
                 }
 
+                if(weapon == 911657153 && (Date.now() / 1000) - targetEntity.getVariable("LastVehEnterExit") <= 5 
+                    && targetEntity.getVariable("Team") == 0)
+                {
+                    mp.game.graphics.notify("~r~Cannot tase! Target exiting vehicle!");
+                    return true;
+                }
+
+
                 let bone = -1;
                 let previousOffset = 9999;
 
@@ -820,6 +828,8 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
         if(sourceEntity !== null && sourceEntity !== undefined && sourceEntity.type === 'player')
         {
             if(weapon == 911657153 && targetEntity.isInAnyVehicle(false)) return true; // Disable stun if in car.
+
+            if(weapon == 911657153 && ((Date.now() / 1000) - targetEntity.getVariable("LastVehEnterExit")) <= 5) return true;
 
             if(sourceEntity.getVariable("Team") != -1 && player.getVariable("Team") != -1)
             {
@@ -855,6 +865,13 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
                 {
                     if(weapon != 911657153) return true;
+
+                    if(weapon == 911657153 && (Date.now() / 1000) - targetEntity.getVariable("LastVehEnterExit") <= 5 
+                        && targetEntity.getVariable("Team") == 0)
+                    {
+                        mp.game.graphics.notify("~r~Cannot tase! Target exiting vehicle!");
+                        return true;
+                    }
 
                     if(weapon == 911657153 && (targetEntity.isInAnyVehicle(false) == true || 
                         calcDist(targetEntity.position, player.position) > 7.5)) {

@@ -470,6 +470,8 @@ namespace LSCC
 
             Random rand = new Random();
 
+            try { Main.Log("freeroam.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:veh:{carname}"); } catch { }
+
             Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(122), rand.Next(122), player.Name, 255, false, true, player.Dimension);
             aVehicle.SetSharedData("Locked", false);
             aVehicle.Locked = false;
@@ -1925,6 +1927,105 @@ namespace LSCC
             return;
         }
 
+        [Command("gun", "!{#AFAFAF}[USAGE] gun (ammo) (weapon)", GreedyArg = true)]
+        public void cmd_gun(Player player, int ammo, string wep)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension != 256)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                return;
+            }
+
+
+            UInt64 wephash = 0;
+            bool found = false;
+            string wepname = "";
+
+            if (!UInt64.TryParse(wep, out wephash))
+            {
+                wephash = 0;
+            }
+
+            foreach (KeyValuePair<ulong, jWeaponData> i in Settings.WeaponData)
+            {
+                if (wephash != 0)
+                {
+                    if (i.Key == wephash)
+                    {
+                        found = true;
+                        wepname = i.Value.Name;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (!found)
+                    {
+                        if (i.Value.Name.Contains(wep, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            found = true;
+                            wephash = i.Key;
+                            wepname = i.Value.Name;
+                        }
+                    }
+                    if (i.Value.Name.Equals(wep, StringComparison.CurrentCultureIgnoreCase)) // If it's really equal then override old found
+                    {
+                        found = true;
+                        wephash = i.Key;
+                        wepname = i.Value.Name;
+                    }
+                }
+            }
+
+            foreach (KeyValuePair<ulong, string> i in Main.WeaponReasons)
+            {
+                if (wephash != 0)
+                {
+                    if (i.Key == wephash)
+                    {
+                        found = true;
+                        wepname = i.Value;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (!found)
+                    {
+                        if (i.Value.Contains(wep, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            found = true;
+                            wephash = i.Key;
+                            wepname = i.Value;
+                        }
+                    }
+                    if (i.Value.Equals(wep, StringComparison.CurrentCultureIgnoreCase)) // If it's really equal then override old found
+                    {
+                        found = true;
+                        wephash = i.Key;
+                        wepname = i.Value;
+                    }
+                }
+            }
+
+
+            if (found == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid weapon! Try using hashes or exact names.");
+                return;
+            }
+
+            try { Main.Log("freeroam.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:gun:{wepname}:{ammo}"); } catch { }
+
+            player.GiveWeapon((WeaponHash)wephash, ammo);
+
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have given yourself " + wepname + " with " + ammo + " ammo.");
+            return;
+        }
+
         [Command("givegunall", "!{#AFAFAF}[USAGE] givegunall (ammo) (wep)", GreedyArg = true)]
         public void cmd_givegunall(Player player, int ammo, string wep)
         {
@@ -2901,7 +3002,7 @@ namespace LSCC
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /derby");
             player.SendChatMessage("!{#28E0DA}[Mode: DM]: /dm /dmarena");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /freeroam /veh /customvehlist /teleport /mytime /myweather");
-            player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /togblip");
+            player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /togblip /gun");
             player.SendChatMessage("!{#A5A8A8}[Misc]: /updaterate /info /fontsize /voicebind /gpsbind");
             player.SendChatMessage("!{#A5A8A8}[Dbg/Test]: /pos /lcmenu");
             

@@ -118,6 +118,23 @@ mp.events.add('render', (nametags) => {
                             outline: true
                         });
                     }
+
+                    if((Date.now() / 1000) - player.getVariable("LastVehEnterExit") <= 5 
+                        && player.getVariable("Team") == 0)
+                    {
+                        var typingStr = "(( TASE PROTECTION ))";
+                        if(timerCount == 0) typingStr = "(( TASE PROTECTION ))";
+                        else if(timerCount == 1) typingStr = "( TASE PROTECTION )";
+                        else if(timerCount == 2) timerCount = 0;
+                
+                        mp.game.graphics.drawText(typingStr, [x, y - 0.0250],
+                        {
+                            font: 0,
+                            color: [20, 103, 219, 228],
+                            scale: [0.285, 0.285],
+                            outline: true
+                        });
+                    }
                     
                     if(player.getVariable("IsTabbed") !== undefined && player.getVariable("IsTabbed") == true)
                     {

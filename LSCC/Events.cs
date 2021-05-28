@@ -319,6 +319,8 @@ namespace LSCC
                     player.SendNotification("~r~You cannot enter a vehicle that has an opposition team driver!");
                 }
             }
+
+            player.SetSharedData("LastVehEnterExit", (Int32)(DateTime.UtcNow.Subtract(DateTime.UnixEpoch)).TotalSeconds);
         }
 
         [ServerEvent(Event.PlayerExitVehicle)]
@@ -339,6 +341,8 @@ namespace LSCC
                 }
             }
             catch { }
+
+            player.SetSharedData("LastVehEnterExit", (Int32)(DateTime.UtcNow.Subtract(DateTime.UnixEpoch)).TotalSeconds);
         }
 
         [ServerEvent(Event.PlayerDisconnected)]

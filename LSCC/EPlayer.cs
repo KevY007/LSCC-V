@@ -523,6 +523,7 @@ namespace LSCC
                 player.SetData("UnfairKillSpawn", false);
                 player.SetData("InnocentShotWarning", 0);
                 player.SetData("AutoJoin", true);
+                player.SetSharedData("LastVehEnterExit", (Int32)(DateTime.UtcNow.Subtract(DateTime.UnixEpoch)).TotalSeconds);
                 player.SetSharedData("DerbyTime", 0);
                 player.SetData("DerbySpawnTick", 0);
                 player.SetData("FreeroamTime", 12);
