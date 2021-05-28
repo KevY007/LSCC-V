@@ -47,6 +47,7 @@ const boneDistanceThreshold = 1;
 
 var lastGPSBind = 0x5A;
 var curGPSBind = 0x5A;
+var radioToggle = 0;
 
 mp.game.vehicle.defaultEngineBehaviour = false;
 mp.game.gameplay.enableMpDlcMaps(true);
@@ -98,6 +99,11 @@ if(mp.storage.data.gpsbind !== undefined)
 {
     curGPSBind = mp.storage.data.gpsbind;
     lastGPSBind = mp.storage.data.gpsbind;
+}
+
+if(mp.storage.data.radiotoggle !== undefined)
+{
+    radioToggle = mp.storage.data.radiotoggle;
 }
 
 mp.keys.bind(lastGPSBind, true, TogGPSMode);
@@ -249,7 +255,7 @@ mp.events.addCommand("updaterate", function (rate) {
     mp.gui.chat.push("Updates now happen " + Math.round(1000 / updateRate) + " times a second.");
 });
 
-mp.game.audio.setInitialPlayerStation('OFF');
+if(!radioToggle) mp.game.audio.setInitialPlayerStation('OFF');
 
 mp.events.add('render', () => {
 
@@ -310,9 +316,9 @@ mp.events.add('render', () => {
             {
                 if(player.isInAnyVehicle(false))
                 {
-                    mp.game.invoke('0x1B9C0099CB942AC6', player.vehicle.handle, 'OFF');
+                    if(!radioToggle) mp.game.invoke('0x1B9C0099CB942AC6', player.vehicle.handle, 'OFF');
                 }
-                mp.game.audio.setRadioToStationName('OFF');
+                if(!radioToggle) mp.game.audio.setRadioToStationName('OFF');
 
                 mp.events.callLocal("OneSecondEvent");
 
@@ -787,7 +793,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                     return true; // Stun Gun no shot if more than 10 meters or target in car.
                 }
 
-                if(weapon == 911657153 && (Date.now() / 1000) - targetEntity.getVariable("LastVehEnterExit") <= 5 
+                if(player.weapon == 911657153 && (Date.now() / 1000) - targetEntity.getVariable("LastVehEnterExit") <= 5 
                     && targetEntity.getVariable("Team") == 0)
                 {
                     mp.game.graphics.notify("~r~Cannot tase! Target exiting vehicle!");
@@ -961,6 +967,16 @@ mp.events.add("entclearanim", (entity, animDictionary, animName) => {
 
 mp.events.add(
     {
+        "ToggleClientRadio": () => {
+            radioToggle = !radioToggle;
+
+            mp.storage.data.radiotoggle = radioToggle;
+
+            mp.storage.flush();
+
+            if(!radioToggle) mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Vehicle radio toggled OFF.");
+            else mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Vehicle radio toggled ON.");
+        },
         "SetInVehEx": (vehicle, vehseat) => {
             mp.players.local.setIntoVehicle(vehicle.handle, vehseat);
         },
@@ -1213,7 +1229,7 @@ mp.events.add(
                 });
             }
 
-            mp.game.invoke('0x1B9C0099CB942AC6', vehicle.handle, 'OFF');
+            if(!radioToggle) mp.game.invoke('0x1B9C0099CB942AC6', vehicle.handle, 'OFF');
 
             if(mp.game.vehicle.isThisModelAHeli(vehicle.model) || mp.game.vehicle.isThisModelAPlane(vehicle.model)) {
                 mp.events.callRemote("RequestParachute", vehicle);

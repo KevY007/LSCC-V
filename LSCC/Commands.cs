@@ -386,7 +386,11 @@ namespace LSCC
                 }
                 else player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have disabled your PMs.");
             }
-            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'hud', 'pm'");
+            else if (action.StartsWith("radio", StringComparison.OrdinalIgnoreCase))
+            {
+                player.TriggerEvent("ToggleClientRadio");
+            }
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'hud', 'pm', 'radio'");
 
             return;
         }
