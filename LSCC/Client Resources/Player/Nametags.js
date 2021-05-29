@@ -119,7 +119,7 @@ mp.events.add('render', (nametags) => {
                         });
                     }
 
-                    if((Date.now() / 1000) - player.getVariable("LastVehEnterExit") <= 5 
+                    if((Math.round((new Date()).getTime() / 1000) - player.getVariable("LastVehEnterExit")) <= 5
                         && player.getVariable("Team") == 0 && !player.isInAnyVehicle(false))
                     {
                         var typingStr = "(( TASE PROTECTION ))";

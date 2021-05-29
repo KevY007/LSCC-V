@@ -793,7 +793,8 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                     return true; // Stun Gun no shot if more than 10 meters or target in car.
                 }
 
-                if(player.weapon == 911657153 && (Date.now() / 1000) - targetEntity.getVariable("LastVehEnterExit") <= 5 
+                if(player.weapon == 911657153 && 
+                    (Math.round((new Date()).getTime() / 1000) - targetEntity.getVariable("LastVehEnterExit")) <= 5 
                     && targetEntity.getVariable("Team") == 0)
                 {
                     mp.game.graphics.notify("~r~Cannot tase! Target exiting vehicle!");
@@ -835,7 +836,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
         {
             if(weapon == 911657153 && targetEntity.isInAnyVehicle(false)) return true; // Disable stun if in car.
 
-            if(weapon == 911657153 && ((Date.now() / 1000) - targetEntity.getVariable("LastVehEnterExit")) <= 5) return true;
+            if(weapon == 911657153 && (Math.round((new Date()).getTime() / 1000) - targetEntity.getVariable("LastVehEnterExit")) <= 5) return true;
 
             if(sourceEntity.getVariable("Team") != -1 && player.getVariable("Team") != -1)
             {
@@ -872,7 +873,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 {
                     if(weapon != 911657153) return true;
 
-                    if(weapon == 911657153 && (Date.now() / 1000) - targetEntity.getVariable("LastVehEnterExit") <= 5 
+                    if(weapon == 911657153 && (Math.round((new Date()).getTime() / 1000) - targetEntity.getVariable("LastVehEnterExit")) <= 5 
                         && targetEntity.getVariable("Team") == 0)
                     {
                         mp.game.graphics.notify("~r~Cannot tase! Target exiting vehicle!");

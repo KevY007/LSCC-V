@@ -310,8 +310,8 @@ namespace LSCC
             {
                 int count = RAGE.Entities.Players.All.Where(a => a.IsInVehicle && a.Vehicle == vehicle && a.HasSharedData("Team") && a.VehicleSeat == 0 && 
                     a.GetSharedData<int>("Team") != -1 && a.GetSharedData<int>("Team") != player.GetSharedData<int>("Team")).Count();
-               
-                if(count >= 1)
+
+                if (count >= 1)
                 {
                     // player.WarpOutOfVehicle(); WARP MAGICALLY CRASHES UR GAME LIKE OK BRO
                     player.Position = player.Position.Around(5f);
@@ -319,8 +319,8 @@ namespace LSCC
                     player.SendNotification("~r~You cannot enter a vehicle that has an opposition team driver!");
                 }
             }
-
-            player.SetSharedData("LastVehEnterExit", (Int32)(DateTime.UtcNow.Subtract(DateTime.UnixEpoch)).TotalSeconds);
+            
+            player.SetSharedData("LastVehEnterExit", DateTimeOffset.Now.ToUnixTimeSeconds());
         }
 
         [ServerEvent(Event.PlayerExitVehicle)]
@@ -342,7 +342,7 @@ namespace LSCC
             }
             catch { }
 
-            player.SetSharedData("LastVehEnterExit", (Int32)(DateTime.UtcNow.Subtract(DateTime.UnixEpoch)).TotalSeconds);
+            player.SetSharedData("LastVehEnterExit", DateTimeOffset.Now.ToUnixTimeSeconds());
         }
 
         [ServerEvent(Event.PlayerDisconnected)]

@@ -367,7 +367,7 @@ namespace LSCC
             return;
         }
 
-        [Command("tog", "!{#AFAFAF}[USAGE] tog (option: hud, pm)", GreedyArg = true, Alias = "toggle")]
+        [Command("tog", "!{#AFAFAF}[USAGE] tog (option: hud, pm, radio)", GreedyArg = true, Alias = "toggle")]
         public void cmd_tog(Player player, string action)
         {
             if (!EPlayer.LoggedIn(player))
