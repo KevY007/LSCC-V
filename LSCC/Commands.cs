@@ -4937,7 +4937,7 @@ namespace LSCC
 
 
             player.SetData("Anonymous", !player.GetData<bool>("Anonymous"));
-            if (player.GetData<bool>("PMState") == true)
+            if (player.GetData<bool>("Anonymous") == true)
             {
                 EPlayer.SendMessageToAllAdmins($"!{{#33C446}}AdmCmd: {player.Name} has turned on anonymous/vanish mode.");
             }
