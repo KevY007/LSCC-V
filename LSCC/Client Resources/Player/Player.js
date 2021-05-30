@@ -179,10 +179,12 @@ mp.events.add("render", () => {
         mp.game.controls.disableControlAction(0, 142, true); 
     }
 
+    mp.game.invoke('0xB1906895227793F3', 3); // SET_PLAYER_TARGETTING_MODE => 3 (Free Aim)
+
     // Taken from GTA.World
     // IsPedArmed (0x475768A975D5AD17): 4 returns true if you are equipped with any weapon except Explosives weapon group AND melee weapons
     // If the player is armed with anything but a melee weapon or explosive weapon disable the lock-on functionality, otherwise enable it
-    mp.game.invoke('0x475768A975D5AD17', player.handle, 4) ? mp.game.invoke('0x5C8B2F450EE4328E', player, false) :  mp.game.invoke('0x5C8B2F450EE4328E', player, true);
+    mp.game.invoke('0x475768A975D5AD17', player.handle, 4) ? mp.game.invoke('0x5C8B2F450EE4328E', player.handle, false) :  mp.game.invoke('0x5C8B2F450EE4328E', player.handle, true);
 
     if (specState == true && specCam != null && specTarget != null) {
 

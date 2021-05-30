@@ -543,6 +543,8 @@ namespace LSCC
                 player.SetData("Killstreak", 0);
                 player.SetSharedData("VisibleBlip", false);
                 player.SetData("PMState", true);
+                player.SetData("OOCState", true);
+                player.SetData("Anonymous", false);
                 player.SetSharedData("Team", -1);
                 player.TriggerEvent("ToggleHud", false);
                 player.SetData("GPS", false);

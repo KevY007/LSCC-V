@@ -389,7 +389,7 @@ namespace LSCC
             return;
         }
 
-        [Command("tog", "!{#AFAFAF}[USAGE] tog (option: hud, pm, radio)", GreedyArg = true, Alias = "toggle")]
+        [Command("tog", "!{#AFAFAF}[USAGE] tog (option: hud, pm, radio, ooc)", GreedyArg = true, Alias = "toggle")]
         public void cmd_tog(Player player, string action)
         {
             if (!EPlayer.LoggedIn(player))
@@ -408,11 +408,20 @@ namespace LSCC
                 }
                 else player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have disabled your PMs.");
             }
+            else if (action.StartsWith("ooc", StringComparison.OrdinalIgnoreCase))
+            {
+                player.SetData("OOCState", !player.GetData<bool>("OOCState"));
+                if (player.GetData<bool>("OOCState") == true)
+                {
+                    player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have enabled OOC chat.");
+                }
+                else player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have disabled OOC chat.");
+            }
             else if (action.StartsWith("radio", StringComparison.OrdinalIgnoreCase))
             {
                 player.TriggerEvent("ToggleClientRadio");
             }
-            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'hud', 'pm', 'radio'");
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'hud', 'pm', 'radio', 'ooc'");
 
             return;
         }
@@ -3889,7 +3898,7 @@ namespace LSCC
             {
                 player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword /togglemap");
                 player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension /r(emove)guns /suspend /unsuspend /checkstats");
-                player.SendChatMessage("[Admin Lv 2]: /ann");
+                player.SendChatMessage("[Admin Lv 2]: /ann /vanish");
             }
             if (EPlayer.GetAccount(player).Admin >= 3)
             {
@@ -4771,7 +4780,7 @@ namespace LSCC
 
             player.SendChatMessage("!{#FF6347}Online Staff:");
 
-            foreach (Player adm in Settings.LoggedInPlayers.Where(b => EPlayer.LoggedIn(b) == true && EPlayer.GetAccount(b).Admin > 0))
+            foreach (Player adm in Settings.LoggedInPlayers.Where(b => EPlayer.LoggedIn(b) == true && EPlayer.GetAccount(b).Admin > 0 && b.GetData<bool>("Anonymous") == false))
             {
                 player.SendChatMessage($"{EPlayer.GetAdminLevelName(EPlayer.GetAccount(adm).Admin, true)}: !{{#FFFFFF}}{adm.Name}");
             }
@@ -4786,6 +4795,12 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player))
                 return;
 
+            if(player.GetData<bool>("OOCState") == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have currently disabled OOC chat! Re-enable it with /tog ooc to send and receive messages.");
+                return;
+            }
+
             if (EPlayer.GetAccount(player).MuteTime > 0)
             {
                 player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
@@ -4796,7 +4811,7 @@ namespace LSCC
             {
                 if(player.HasData("LastOOCTick"))
                 {
-                    if (Environment.TickCount64 - player.GetData<long>("LastOOCTick") < 5000)
+                    if (Environment.TickCount64 - player.GetData<long>("LastOOCTick") < 5000 && EPlayer.GetAccount(player).Admin < 1)
                     {
                         player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}OOC slowmode is on! Wait a bit or use /lg or /lo");
                         return;
@@ -4806,17 +4821,35 @@ namespace LSCC
                 player.SetData("LastOOCTick", Environment.TickCount64);
             }
 
-            if (EPlayer.GetAccount(player).Admin < 1)
+            if (EPlayer.GetAccount(player).Admin < 1 || (EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true))
             {
                 if (EPlayer.GetAccount(player).DonatorLevel < 1)
                 {
-                    NAPI.Chat.SendChatMessageToAll($"(( [OOC] {player.Name}: {text} ))");
+                    RAGE.Entities.Players.All.ForEach(pl =>
+                    {
+                        if (EPlayer.LoggedIn(pl))
+                        {
+                            if (pl.GetData<bool>("OOCState") == true) 
+                                pl.SendChatMessage($"(( [OOC] {player.Name}: {text} ))");
+                        }
+                    });
                 }
-                else NAPI.Chat.SendChatMessageToAll($"(( [OOC] {EPlayer.GetDonatorLevelName(EPlayer.GetAccount(player).DonatorLevel, true)}!{{#FFFFFF}} {player.Name}: {text} ))");
+                else
+                {
+                    Settings.LoggedInPlayers.ForEach(pl =>
+                    {
+                        if (pl.GetData<bool>("OOCState") == true) 
+                            pl.SendChatMessage($"(( [OOC] {EPlayer.GetDonatorLevelName(EPlayer.GetAccount(player).DonatorLevel, true)}!{{#FFFFFF}} {player.Name}: {text} ))");
+                    });
+                }
             }
             else
             {
-                NAPI.Chat.SendChatMessageToAll($"(( [OOC] {EPlayer.GetAdminLevelName(EPlayer.GetAccount(player).Admin, true)}!{{#FFFFFF}} {player.Name}: {text} ))");
+                Settings.LoggedInPlayers.ForEach(pl =>
+                {
+                    if (pl.GetData<bool>("OOCState") == true)
+                        pl.SendChatMessage($"(( [OOC] {EPlayer.GetAdminLevelName(EPlayer.GetAccount(player).Admin, true)}!{{#FFFFFF}} {player.Name}: {text} ))");
+                });
             }
 
             Discord.SendTextChannel("staff-bot", $"**(OOC) | {player.Name}**: {text}");
@@ -4837,7 +4870,7 @@ namespace LSCC
                 return;
             }
 
-            if (EPlayer.GetAccount(player).Admin < 1)
+            if (EPlayer.GetAccount(player).Admin < 1 || (EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true))
             {
                 if (EPlayer.GetAccount(player).DonatorLevel < 1)
                 {
@@ -4888,6 +4921,29 @@ namespace LSCC
             NAPI.Chat.SendChatMessageToAll("  ");
 
             Discord.SendTextChannel("staff-bot", $"**(ANNOUNCEMENT) | {player.Name}**: {text}");
+        }
+
+        [Command("anonymous", Alias = "vanish")]
+        public void cmd_anonymous(Player player, string text)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not allowed to use this command!");
+                return;
+            }
+
+
+            player.SetData("Anonymous", !player.GetData<bool>("Anonymous"));
+            if (player.GetData<bool>("PMState") == true)
+            {
+                EPlayer.SendMessageToAllAdmins($"!{{#33C446}}AdmCmd: {player.Name} has turned on anonymous/vanish mode.");
+            }
+            else EPlayer.SendMessageToAllAdmins($"!{{#33C446}}AdmCmd: {player.Name} has turned off anonymous/vanish mode.");
+
+            return;
         }
 
         [Command("pm", "!{#AFAFAF}[USAGE] pm (target) (text)", GreedyArg = true)]
