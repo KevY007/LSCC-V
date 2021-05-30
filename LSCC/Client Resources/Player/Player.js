@@ -572,8 +572,10 @@ mp.events.add('render', () => {
                     }
                     else
                     {
-                        player.setNoCollision(target.handle, true); // Collisions ON for ourselves to other cars too.
-                        target.setNoCollision(player.handle, true);
+                        mp.vehicles.forEach(target => {
+                            player.setNoCollision(target.handle, true); // Collisions ON for ourselves to other cars too.
+                            target.setNoCollision(player.handle, true);
+                        });
                     }
                 }
 
