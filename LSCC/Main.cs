@@ -1228,7 +1228,8 @@ namespace LSCC
                                                 NAPI.Chat.SendChatMessageToAll($"!{{#FFFF00}}[Lobby {lobby.lobbyId}] !{{#FFFFFF}}Copchase will start in 10 seconds... ({pCount} players)");
                                             else if(lobby.gameMode == GameModes.BUSTED)
                                                 NAPI.Chat.SendChatMessageToAll($"!{{#FFFF00}}[Lobby {lobby.lobbyId}] !{{#FFFFFF}}BUSTED! mode will start in 10 seconds... ({pCount} players)");
-
+											
+											NAPI.Util.ConsoleOutput($"[TimeUpdate] Game starting in 10 seconds in lobby {lobby.lobbyId}...");
                                             foreach (Player player in Settings.LoggedInPlayers)
                                             {
                                                 lock (player)
@@ -1243,8 +1244,6 @@ namespace LSCC
 
                                                         EPlayer.Spawn(player);
                                                         NAPI.Notification.SendNotificationToPlayer(player, $"~w~Game is starting in ~g~10 seconds~w~.", true);
-
-                                                        NAPI.Util.ConsoleOutput($"[TimeUpdate] Game starting in 10 seconds in lobby {lobby.lobbyId}...");
 
                                                         if (player.GetSharedData<bool>("IsTabbed") == true || EPlayer.IsAFK(player)) {
 
