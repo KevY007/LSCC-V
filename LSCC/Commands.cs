@@ -3942,7 +3942,7 @@ namespace LSCC
         }
 
         [Command("fugitivelist", Alias = "fugilist")]
-        public void cmd_fugichances(Player player)
+        public void cmd_fugitivelist(Player player)
         {
             if (!EPlayer.LoggedIn(player) || EPlayer.GetAccount(player).Admin < 2) return;
 
@@ -3958,7 +3958,7 @@ namespace LSCC
             player.SendChatMessage("!{#FF6347}Next Round Fugitive List =>");
             foreach(Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == elobby.lobbyId).OrderByDescending(a => a.HasData("GrantFugitive")).ThenByDescending(a => a.GetSharedData<float>("FugitiveChance")))
             {
-                player.SendChatMessage($"{p.Name} !{{#FF6347}}Chance !{{#FFFFFF}}[{p.GetSharedData<float>("FugitiveChance").ToString("N3")}] !{{#FF6347}}Grant !{{#FFFFFF}}[{p.HasData("GrantFugitive").ToString()}]");
+                player.SendChatMessage($"{p.Name} !{{#FF6347}}Chance !{{#FFFFFF}}[{p.GetSharedData<float>("FugitiveChance").ToString("N2")}%] !{{#FF6347}}Grant !{{#FFFFFF}}[{p.HasData("GrantFugitive").ToString()}]");
             }
             return;
         }
