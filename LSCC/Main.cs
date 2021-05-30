@@ -1404,7 +1404,7 @@ namespace LSCC
                     }
                     else
                     {
-                        player.SendChatMessage("!{#E6DD3C}[DERBY] " + winner.Name + " won the derby and has gained " + winXP + "XP.");
+                        player.SendChatMessage("!{#E6DD3C}[DERBY] " + winner.Name + " won the derby and has gained " + winXP + "XP and +5% fugitive chance.");
 
                         Discord.SendTextChannel("staff-bot", $"**(Derby) | Winner: {winner.Name} | XP Gained: {winXP}**");
                     }
@@ -1414,6 +1414,8 @@ namespace LSCC
                 {
                     EPlayer.GetAccount(winner).DerbyWins++;
                     EPlayer.GrantXP(winner, winXP);
+
+                    winner.SetSharedData("FugitiveChance", winner.GetSharedData<float>("FugitiveChance") + 5 + (EPlayer.GetAccount(winner).DonatorLevel / 2));
                 }
 
                 Settings.DerbyTimeLeft = 180;
@@ -1583,7 +1585,7 @@ namespace LSCC
                     List<int> UsedSpawns = new List<int>(Spawns.Count + 1);
                     crashcheck++;
 
-                    List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && !EPlayer.IsAFK(a) && !a.HasData("Spectating") && a.GetData<bool>("AutoJoin") == true).ToList();
+                    List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && !EPlayer.IsAFK(a) && !a.HasData("Spectating") && a.GetData<bool>("AutoJoin") == true).OrderBy(c => Guid.NewGuid()).ToList();
                     crashcheck++;
 
                     List<Player> PutInsideCar = new List<Player>(lobbyPlayers.Count());
@@ -1600,14 +1602,36 @@ namespace LSCC
 
                     while (fugitives > 0)
                     {
+                        /* FULL RANDOM CHANCE MODE 
                         _tempPlayer = lobbyPlayers[random.Next(lobbyPlayers.Count)];
+                        */
+
+                        
+                        /* HIGHEST FUGITIVE CHANCE MODE */
+                        var highestFugitives = lobbyPlayers.Where(p => !lobby.Fugitives.Contains(p) && p.GetData<bool>("AutoJoin") == true).
+                            OrderByDescending(p => p.GetSharedData<float>("FugitiveChance"));
+
+                        if(highestFugitives.Count() == 0) _tempPlayer = lobbyPlayers[random.Next(lobbyPlayers.Count)];
+
+                        _tempPlayer = highestFugitives.First();
+
+                        foreach(Player p in lobbyPlayers)
+                        {
+                            if(p.HasData("GrantFugitive"))
+                            {
+                                _tempPlayer = p;
+                                break;
+                            }
+                        }
 
                         if (_tempPlayer.GetData<bool>("AutoJoin") == false) continue;
+
 
                         if (!lobby.Fugitives.Contains(_tempPlayer))
                         {
                             fugitives--;
                             lobby.Fugitives.Add(_tempPlayer);
+                            _tempPlayer.SetSharedData("FugitiveChance", 10.0);
                         }
                         else pCount++;
 
@@ -1627,6 +1651,7 @@ namespace LSCC
                         player.SetSharedData("BustedProgress", 0.0);
                         player.ResetData("BustSupporters");
                         player.ResetData("CuffingTarget");
+                        player.RemoveAllWeapons();
 
                         if (lobby.gameMode == GameModes.STANDARD)
                             player.TriggerEvent("showHPBars", 1);
@@ -1636,6 +1661,7 @@ namespace LSCC
                         if (!lobby.Fugitives.Contains(player))
                         {
                             lobby.Cops.Add(player);
+                            player.SetSharedData("FugitiveChance", player.GetSharedData<float>("FugitiveChance") + 1.0);
                         }
                     }
                     crashcheck++;

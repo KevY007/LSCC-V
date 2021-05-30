@@ -561,6 +561,7 @@ namespace LSCC
                 player.SetSharedData("InDM", -1);
 
                 player.SetSharedData("IsTabbed", false);
+                player.SetSharedData("FugitiveChance", 10.0);
 
                 player.SetSharedData("BustedProgress", 0.0);
 

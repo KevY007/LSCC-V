@@ -553,8 +553,10 @@ namespace LSCC
                                 warnings += 5;
                                 if (warnings >= 7)
                                 {
-                                    killer.Health = 0;
-                                    killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] You have been killed for killing an innocent fugitive.");
+                                    killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") - 1.0);
+
+                                    //killer.Health = 0;
+                                    killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] Your fugitive chance has been decreased for killing an innocent fugitive.");
                                     warnings = 0;
                                 }
 
@@ -608,8 +610,10 @@ namespace LSCC
                             }
                             else if (warnings >= 7)
                             {
-                                killer.Health = 0;
-                                killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] You have been killed for team killing.");
+                                //killer.Health = 0;
+                                killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] Your fugitive chance has been decreased for team killing.");
+                                killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") - 1.0);
+
                                 warnings = 0;
                             }
 
@@ -665,6 +669,7 @@ namespace LSCC
                                 EPlayer.GrantXP(killer, 5);
                                 EPlayer.SendMessageInLobby(lobby.lobbyId, $"!{{#FF0000}}[KILLSTREAK] !{{#FF6347}}{killer.Name} !{{#FFFFFF}}is on a {killStreak} kills rampage! Someone stop them!");
                                 killer.SendChatMessage("!{#00FF33}[!] !{#FFFFFF}You have earnt 5 XP for maintaining a killstreak!");
+                                killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + (0.1 * (EPlayer.GetAccount(killer).DonatorLevel + 1)));
                             }
                         }
                         if (lobby.Fugitives.Contains(player))
@@ -673,6 +678,7 @@ namespace LSCC
                             {
                                 EPlayer.GetAccount(player).Deaths++;
                                 EPlayer.GetAccount(killer).Kills++;
+                                killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (EPlayer.GetAccount(killer).DonatorLevel / 10));
                             }
 
                             wasInGame = true;
@@ -726,6 +732,7 @@ namespace LSCC
                             {
                                 EPlayer.GetAccount(player).Deaths++;
                                 EPlayer.GetAccount(killer).Kills++;
+                                killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (EPlayer.GetAccount(killer).DonatorLevel / 10));
                             }
 
                             wasInGame = true;
@@ -2146,7 +2153,7 @@ namespace LSCC
 
                 player.SetSharedData("VisibleBlip", false);
 
-                player.TriggerEvent("SetActorInvulnerable", true);
+                if (player.GetSharedData<int>("InDM") != -1) player.TriggerEvent("SetActorInvulnerable", true);
                 player.TriggerEvent("CanFallOutOfCar", false);
                 player.TriggerEvent("showHPBars", 0); // Never show HP Bars.
 

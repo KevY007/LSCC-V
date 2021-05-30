@@ -320,9 +320,9 @@ mp.events.add('render', () => {
             {
                 if(player.isInAnyVehicle(false))
                 {
-                    if(!radioToggle) mp.game.invoke('0x1B9C0099CB942AC6', player.vehicle.handle, 'OFF');
+                    if(!radioToggle && player.seat == -1) mp.game.invoke('0x1B9C0099CB942AC6', player.vehicle.handle, 'OFF');
                 }
-                if(!radioToggle) mp.game.audio.setRadioToStationName('OFF');
+                if(!radioToggle && player.seat == -1) mp.game.audio.setRadioToStationName('OFF');
 
                 mp.events.callLocal("OneSecondEvent");
 
@@ -1278,7 +1278,7 @@ mp.events.add(
                 });
             }
 
-            if(!radioToggle) mp.game.invoke('0x1B9C0099CB942AC6', vehicle.handle, 'OFF');
+            if(!radioToggle && seat == -1) mp.game.invoke('0x1B9C0099CB942AC6', vehicle.handle, 'OFF');
 
             if(mp.game.vehicle.isThisModelAHeli(vehicle.model) || mp.game.vehicle.isThisModelAPlane(vehicle.model)) {
                 mp.events.callRemote("RequestParachute", vehicle);

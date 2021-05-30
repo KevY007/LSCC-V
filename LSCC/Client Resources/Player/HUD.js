@@ -238,24 +238,28 @@ mp.events.add("render", () => {
                     if(mp.players.local.getVariable("VisibleBlip") == true)
                     {
                         pX = minimap.rightX + 0.0875;
-                        pY = minimap.topY + 0.120;
+                        pY = minimap.topY + 0.110;
                         sX = 0.1625;
-                        sY = 0.110;
+                        sY = 0.1293;
 
-                        drawText(visibleText, [minimap.rightX + 0.0085, minimap.bottomY - 0.1125], 0, [204, 204, 204, 255], 0.35);
+                        drawText(visibleText, [minimap.rightX + 0.0085, minimap.bottomY - 0.1315], 0, [204, 204, 204, 255], 0.35);
                     }
                     else
                     {
                         pX = minimap.rightX + 0.0875;
-                        pY = minimap.topY + 0.125;
+                        pY = minimap.topY + 0.120;
                         sX = 0.1625;
-                        sY = 0.10;
+                        sY = 0.110;
                     }
                 }
 
                 mp.game.graphics.drawRect(pX, pY, sX, sY, 0, 0, 0, 150);
 
-                
+                if(!mp.players.local.isInAnyVehicle(false))
+                    drawText(`~r~Fugitive Chance: ~w~${mp.players.local.getVariable("FugitiveChance")}%`, [minimap.rightX + 0.0085, minimap.bottomY - 0.110], 0, [204, 204, 204, 255], 0.28);
+                else
+                    drawText(`~r~Fugitive Chance: ~w~${mp.players.local.getVariable("FugitiveChance")}%`, [minimap.rightX + 0.072, minimap.bottomY - 0.116], 0, [204, 204, 204, 255], 0.28);
+
                 let voiceString = "Voice: ~r~Disabled";
                 
                 if(mp.players.local.getVariable("VoiceMode") == 0)

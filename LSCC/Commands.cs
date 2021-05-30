@@ -995,6 +995,7 @@ namespace LSCC
                             player.ResetData("CuffingTarget");
 
                             EPlayer.GrantXP(player, 5);
+                            player.SetSharedData("FugitiveChance", player.GetSharedData<float>("FugitiveChance")+(0.2 * (EPlayer.GetAccount(player).DonatorLevel + 1)));
                             EPlayer.Action(player, $"has grabbed ahold of {target.Name} and slapped the handcuffs on their wrists.");
 
                             EPlayer.SendMessageInLobby(lobbye.lobbyId, $"!{{#ADD8E6}}Cop {player.Name} has apprehended Fugitive {target.Name}.");
@@ -1092,6 +1093,7 @@ namespace LSCC
                             }
 
                             EPlayer.GrantXP(player, 2);
+                            player.SetSharedData("FugitiveChance", player.GetSharedData<float>("FugitiveChance") + (0.1 * (EPlayer.GetAccount(player).DonatorLevel + 1)));
                             cmd_do(player, $"{target.Name} has been dragged out of the vehicle.");
 
                             EPlayer.SendMessageInLobby(lobbye.lobbyId, $"!{{#ADD8E6}}Cop {player.Name} has dragged {target.Name} out of the vehicle!");
@@ -3348,7 +3350,67 @@ namespace LSCC
             return;
         }
 
-        [Command("ban", "!{#AFAFAF}[USAGE] ban (target) (reason)")]
+        [Command("oban", "!{#AFAFAF}[USAGE] oban (target name) (reason)", GreedyArg = true)]
+        public void cmd_oban(Player player, string name, string reason)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+            if(RAGE.Entities.Players.All.Where(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).Count() > 0)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is currently in-game! Use /ban!");
+                return;
+            }
+
+            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true &&
+                ContextFactory.Instance.Bans.ToList().Where(a => a.AccountSQLID == p.SQL_ID).Count() == 0);
+
+            if ((tpAcc != null) == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no account with that name or target is already banned (/bancheck).");
+                return;
+            }
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:oban:{tpAcc.Username}:{reason}"); } catch { }
+
+            if (EPlayer.GetAccount(player).Admin < tpAcc.Admin)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is more higher admin level than you!");
+                return;
+            }
+
+            if (tpAcc.Username.StartsWith("KevY")) return;
+
+            var _new = new BanData
+            {
+                IP = "Offline Ban",
+                RockstarID = tpAcc.RockstarID,
+                Reason = reason,
+                Admin = player.Name,
+                DateTime = DateTime.Now.ToString(),
+                AccountSQLID = tpAcc.SQL_ID,
+                HWID = tpAcc.HWID
+            };
+            ContextFactory.Instance.Bans.Add(_new);
+
+            ContextFactory.Instance.SaveChanges();
+
+            RAGE.Entities.Players.All.ForEach((Player p) =>
+            {
+                p.SendChatMessage($"!{{#FF6347}}[AdmCmd] {player.Name} has offline-banned {tpAcc.Username} for: {reason}");
+            });
+
+           
+            return;
+        }
+
+        [Command("ban", "!{#AFAFAF}[USAGE] ban (name) (reason)", GreedyArg = true)]
         public void cmd_ban(Player player, Player target, string reason)
         {
             if (!EPlayer.LoggedIn(player))
@@ -3412,7 +3474,7 @@ namespace LSCC
                 }
             }, 350);
 
-           
+
             return;
         }
 
@@ -3890,7 +3952,7 @@ namespace LSCC
                 player.SendChatMessage("!{#FF6347}[REPORTS/REQS]: (Alt: /reports, e.g. /acceptreport.) (HELPME = REPORTS TOO)");
 
                 player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /set(hp/ar) /spec");
-                player.SendChatMessage("[Admin Lv 1]: /freeze /unfreeze /kick /slap /setinv(ulnerable) /specoff");
+                player.SendChatMessage("[Admin Lv 1]: /(r)freeze /(r)unfreeze /kick /slap /setinv(ulnerable) /specoff");
                 player.SendChatMessage("[Admin Lv 1]: /bancheck /jail /unjail /afix /aflip /sendtolobby /set(time/weather)");
                 player.SendChatMessage("[Admin Lv 1]: /mute /unmute /warn /unwarn /setteam /forceautojoin /forceswapseats");
             }
@@ -3898,12 +3960,12 @@ namespace LSCC
             {
                 player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword /togglemap");
                 player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension /r(emove)guns /suspend /unsuspend /checkstats");
-                player.SendChatMessage("[Admin Lv 2]: /ann /vanish");
+                player.SendChatMessage("[Admin Lv 2]: /ann /vanish /oban");
             }
             if (EPlayer.GetAccount(player).Admin >= 3)
             {
                 player.SendChatMessage("[Admin Lv 3]: /givegun(all) /gotopos /bringall /sethpall /(un)freezeall /r(emove)g(uns)f(rom)a(ll)");
-                player.SendChatMessage("[Admin Lv 3]: /givecomp /removecomp /attachcomp /noclip");
+                player.SendChatMessage("[Admin Lv 3]: /givecomp /removecomp /attachcomp /noclip /grantfugitive");
             }
             if (EPlayer.GetAccount(player).Admin >= 4)
             {
@@ -5096,6 +5158,50 @@ namespace LSCC
             }
         }
 
+        [Command("rfreeze", "!{#AFAFAF}[USAGE] rfreeze (range)")]
+        public void cmd_rfreeze(Player player, int range)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+            else
+            {
+                foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Position.DistanceTo(player.Position) <= range))
+                {
+                    EPlayer.Freeze(p, true);
+                }
+                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:rfreeze:{range}"); } catch { }
+
+                NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen all players within {range}m.");
+            }
+        }
+
+        [Command("runfreeze", "!{#AFAFAF}[USAGE] runfreeze (range)")]
+        public void cmd_runfreeze(Player player, int range)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+            else
+            {
+                foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Position.DistanceTo(player.Position) <= range))
+                {
+                    EPlayer.Freeze(p, false);
+                }
+                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:runfreeze:{range}"); } catch { }
+
+                NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen all players within {range}m.");
+            }
+        }
+
 
         [Command("unfreeze", "!{#AFAFAF}[USAGE] unfreeze (target)", GreedyArg = true)]
         public void cmd_unfreeze(Player player, Player target)
@@ -5434,6 +5540,32 @@ namespace LSCC
                 target.Position = new Vector3(target.Position.X, target.Position.Y, target.Position.Z + 5f);
 
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {target.Name} has been slapped by {player.Name}.");
+            }
+        }
+
+        [Command("grantfugitive", "!{#AFAFAF}[USAGE] grantfugitive (target)", GreedyArg = true)]
+        public void cmd_grantfugitive(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+            else
+            {
+                if (target.HasData("GrantFugitive"))
+                {
+                    target.ResetData("GrantFugitive");
+                    player.SendChatMessage("!{#FF6347}You have taken GrantFugitive flag from " + target.Name + ".");
+                }
+                else
+                {
+                    target.SetData("GrantFugitive", 10);
+                    player.SendChatMessage("!{#FF6347}You have given GrantFugitive flag to " + target.Name + ".");
+                }
             }
         }
 
