@@ -510,11 +510,11 @@ mp.events.add('render', () => {
                             {
                                 if(target != player.vehicle)
                                 {
-                                    player.vehicle.setNoCollision(target.handle, false);
-                                    target.setNoCollision(player.vehicle.handle, false);
-
                                     player.setNoCollision(target.handle, false); // Collisions OFF for ourselves to other cars too.
                                     target.setNoCollision(player.handle, false);
+
+                                    target.setNoCollision(player.vehicle.handle, false);
+                                    player.vehicle.setNoCollision(target.handle, false);
                                 }
                             }
 
