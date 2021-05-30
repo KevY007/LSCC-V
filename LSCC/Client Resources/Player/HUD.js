@@ -256,9 +256,9 @@ mp.events.add("render", () => {
                 mp.game.graphics.drawRect(pX, pY, sX, sY, 0, 0, 0, 150);
 
                 if(!mp.players.local.isInAnyVehicle(false))
-                    drawText(`~r~Fugitive Chance: ~w~${mp.players.local.getVariable("FugitiveChance")}%`, [minimap.rightX + 0.0085, minimap.bottomY - 0.110], 0, [204, 204, 204, 255], 0.28);
+                    drawText(`~r~Fugitive Chance: ~w~${mp.players.local.getVariable("FugitiveChance").toFixed(1)}%`, [minimap.rightX + 0.0085, minimap.bottomY - 0.110], 0, [204, 204, 204, 255], 0.28);
                 else
-                    drawText(`~r~Fugitive Chance: ~w~${mp.players.local.getVariable("FugitiveChance")}%`, [minimap.rightX + 0.072, minimap.bottomY - 0.116], 0, [204, 204, 204, 255], 0.28);
+                    drawText(`~r~Fugitive Chance: ~w~${mp.players.local.getVariable("FugitiveChance").toFixed(1)}%`, [minimap.rightX + 0.072, minimap.bottomY - 0.116], 0, [204, 204, 204, 255], 0.28);
 
                 let voiceString = "Voice: ~r~Disabled";
                 
