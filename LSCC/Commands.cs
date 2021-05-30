@@ -3085,7 +3085,7 @@ namespace LSCC
             if(sqlid != -1) ban = ContextFactory.Instance.Bans.ToList().Find(a => a.SQL_ID == sqlid);
             else
             {
-                Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.CompareTo(sqlorname) == 0);
+                Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(sqlorname, StringComparison.OrdinalIgnoreCase));
                 if(tpAcc != null)
                 {
                     ban = ContextFactory.Instance.Bans.ToList().Find(a => a.AccountSQLID == tpAcc.SQL_ID);
@@ -3941,6 +3941,28 @@ namespace LSCC
             
         }
 
+        [Command("fugitivelist", Alias = "fugilist")]
+        public void cmd_fugichances(Player player)
+        {
+            if (!EPlayer.LoggedIn(player) || EPlayer.GetAccount(player).Admin < 2) return;
+
+            if (player.GetSharedData<int>("InLobby") <= -1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in any lobby!");
+                return;
+            }
+
+            LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (elobby == null) return;
+
+            player.SendChatMessage("!{#FF6347}Next Round Fugitive List =>");
+            foreach(Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == elobby.lobbyId).OrderByDescending(a => a.HasData("GrantFugitive")).ThenByDescending(a => a.GetSharedData<float>("FugitiveChance")))
+            {
+                player.SendChatMessage($"{p.Name} !{{#FF6347}}Chance !{{#FFFFFF}}[{p.GetSharedData<float>("FugitiveChance").ToString("N3")}] !{{#FF6347}}Grant !{{#FFFFFF}}[{p.HasData("GrantFugitive").ToString()}]");
+            }
+            return;
+        }
+
         [Command("acmds", Alias = "ahelp")]
         public void cmd_ahelp(Player player)
         {
@@ -3960,7 +3982,7 @@ namespace LSCC
             {
                 player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword /togglemap");
                 player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension /r(emove)guns /suspend /unsuspend /checkstats");
-                player.SendChatMessage("[Admin Lv 2]: /ann /vanish /oban");
+                player.SendChatMessage("[Admin Lv 2]: /ann /vanish /oban /fugitivelist");
             }
             if (EPlayer.GetAccount(player).Admin >= 3)
             {
