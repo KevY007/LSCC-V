@@ -236,6 +236,9 @@ namespace LSCC
         [JsonProperty("DerbyVehicle")]
         public string DerbyVehicle { get; set; }
 
+        [JsonProperty("OnfootCollision")]
+        public bool OnfootCollision { get; set; }
+
         [JsonProperty("WeaponDataURL")]
         public string WeaponDataURL { get; set; }
 
@@ -249,6 +252,7 @@ namespace LSCC
         {
             this.WeaponDataURL = "https://gist.githubusercontent.com/root-cause/3f29d38179b12245a003fb4fff615335/raw/7a8804b275fb1b9314cb39418a7415ea8bfd148d/v2189%2520Weapon%2520Data.json";
             this.DerbyVehicle = "brioso";
+            this.OnfootCollision = true;
             this.Discord = true;
             this.MaxInLobby = Settings.DefaultMaxInLobby;
         }
@@ -287,6 +291,7 @@ namespace LSCC
 
         // Dyn Settings Global
         public static string DerbyVehicle { get; set; }
+        public static bool OnfootCollisions { get; set; }
         public static string WeaponDataURL { get; set; }
         public static int MaxPlayersInLobby { get; set; }
 
@@ -796,8 +801,14 @@ namespace LSCC
             }
 
             _dynset.DerbyVehicle = Settings.DerbyVehicle;
+            _dynset.OnfootCollision = Settings.OnfootCollisions;
             _dynset.Discord = Settings.UseDiscord;
             _dynset.MaxInLobby = Settings.MaxPlayersInLobby;
+
+            RAGE.Entities.Players.All.ForEach(pl =>
+            {
+                EPlayer.SyncServerSettings(pl);
+            });
 
             try
             {
@@ -862,6 +873,7 @@ namespace LSCC
 
             Settings.MaxPlayersInLobby = Settings.DefaultMaxInLobby;
             Settings.DerbyVehicle = "brioso";
+            Settings.OnfootCollisions = true;
             Settings.NextLobbyID = 1;
             Settings.NextRequestID = 1;
             Settings.LastCountUpdate = Environment.TickCount64;
@@ -889,6 +901,7 @@ namespace LSCC
                 {
                     _dynset = NAPI.Util.FromJson<DynSet>(File.ReadAllText("lscc/lscc.json"));
                     Settings.DerbyVehicle = _dynset.DerbyVehicle;
+                    Settings.OnfootCollisions = _dynset.OnfootCollision;
                     Settings.UseDiscord = _dynset.Discord;
                     Settings.MaxPlayersInLobby = _dynset.MaxInLobby;
                 }

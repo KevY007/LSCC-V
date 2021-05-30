@@ -49,6 +49,8 @@ var lastGPSBind = 0x5A;
 var curGPSBind = 0x5A;
 var radioToggle = 0;
 
+var ServerSettings = [];
+
 mp.game.vehicle.defaultEngineBehaviour = false;
 mp.game.gameplay.enableMpDlcMaps(true);
 mp.game.player.disableVehicleRewards();
@@ -519,8 +521,19 @@ mp.events.add('render', () => {
                             target.setCanBreak(false);
 
                             mp.vehicles.forEach(target2 => {
-                                target.setNoCollision(target2.handle, false);
-                                target2.setNoCollision(target.handle, false);
+                                if(player.isInAnyVehicle(false))
+                                {
+                                    if(target2 != player.vehicle)
+                                    {
+                                        target.setNoCollision(target2.handle, false);
+                                        target2.setNoCollision(target.handle, false);
+                                    }
+                                }
+                                else
+                                {
+                                    target.setNoCollision(target2.handle, false);
+                                    target2.setNoCollision(target.handle, false);
+                                }
                             });
                         });
                     }
@@ -542,6 +555,23 @@ mp.events.add('render', () => {
                                 target2.setNoCollision(target.handle, true);
                             });
                         });
+                    }
+                }
+
+                traceLastFunc(`[Players] Update Chase Data3`);
+                if((player.getVariable("Team") == 0 || player.getVariable("Team") == 1) && collisionTime == -1)
+                {
+                    if(!player.isInAnyVehicle(false) && ServerSettings.OnfootCollisions == false)
+                    {
+                        mp.vehicles.forEach(target => {
+                            player.setNoCollision(target.handle, false); // Collisions OFF for ourselves to other cars too.
+                            target.setNoCollision(player.handle, false);
+                        });
+                    }
+                    else
+                    {
+                        player.setNoCollision(target.handle, true); // Collisions ON for ourselves to other cars too.
+                        target.setNoCollision(player.handle, true);
                     }
                 }
 
@@ -609,7 +639,7 @@ mp.events.add('render', () => {
         traceLastFunc(`[Players] Update Completed`);
     }
 
-    if(Date.now() - targetChecker >= 75 && player.getVariable("Team") !== undefined && player.getVariable("Team") != -1)
+    if(Date.now() - targetChecker >= 25 && player.getVariable("Team") !== undefined && player.getVariable("Team") != -1)
     {
         targetChecker = Date.now();
 
@@ -794,10 +824,15 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                 }
 
                 if(player.weapon == 911657153 && 
-                    (BigInt(Math.round((new Date()).getTime() / 1000)) - BigInt(targetEntity.getVariable("LastVehEnterExit"))) <= BigInt(5) 
+                    (BigInt(Math.round((new Date()).getTime() / 1000)) - BigInt(targetEntity.getVariable("LastVehEnterExit"))) <= BigInt(7) 
                     && targetEntity.getVariable("Team") == 0)
                 {
                     mp.game.graphics.notify("~r~Cannot tase! Target exiting vehicle!");
+                    return true;
+                }
+
+                if(player.weapon == 911657153 && targetEntity.getVariable("HasShot") == true && targetEntity.getVariable("Team") == 0)
+                {
                     return true;
                 }
 
@@ -836,7 +871,9 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
         {
             if(weapon == 911657153 && targetEntity.isInAnyVehicle(false)) return true; // Disable stun if in car.
 
-            if(weapon == 911657153 && (BigInt(Math.round((new Date()).getTime() / 1000)) - BigInt(targetEntity.getVariable("LastVehEnterExit"))) <= BigInt(5)) return true;
+            if(weapon == 911657153 && (BigInt(Math.round((new Date()).getTime() / 1000)) - BigInt(targetEntity.getVariable("LastVehEnterExit"))) <= BigInt(7)) return true;
+
+            if(weapon == 911657153 && targetEntity.getVariable("HasShot") == true && targetEntity.getVariable("Tean") == 0) return true;
 
             if(sourceEntity.getVariable("Team") != -1 && player.getVariable("Team") != -1)
             {
@@ -873,10 +910,14 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 {
                     if(weapon != 911657153) return true;
 
-                    if(weapon == 911657153 && (BigInt(Math.round((new Date()).getTime() / 1000)) - BigInt(targetEntity.getVariable("LastVehEnterExit"))) <= BigInt(5) 
+                    if(weapon == 911657153 && (BigInt(Math.round((new Date()).getTime() / 1000)) - BigInt(targetEntity.getVariable("LastVehEnterExit"))) <= BigInt(7) 
                         && targetEntity.getVariable("Team") == 0)
                     {
                         mp.game.graphics.notify("~r~Cannot tase! Target exiting vehicle!");
+                        return true;
+                    }
+
+                    if(weapon == 911657153 && targetEntity.getVariable("Team") == 0 && targetEntity.getVariable("HasShot") == true) {
                         return true;
                     }
 
@@ -968,6 +1009,9 @@ mp.events.add("entclearanim", (entity, animDictionary, animName) => {
 
 mp.events.add(
     {
+        "SyncServerSettings": (onfootcollisions) => {
+            ServerSettings.OnfootCollisions = onfootcollisions;
+        },
         "ToggleClientRadio": () => {
             radioToggle = !radioToggle;
 

@@ -513,6 +513,14 @@ namespace LSCC
 
         public static Random rand = new Random();
 
+        public static void SyncServerSettings(Player player)
+        {
+            lock(player)
+            {
+                player.TriggerEvent("SyncServerSettings", Settings.OnfootCollisions);
+            }
+        }
+        
         public static void ResetPlayerData(Player player)
         {
             lock (player)

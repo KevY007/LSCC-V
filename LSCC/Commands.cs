@@ -10,7 +10,7 @@ namespace LSCC
 {
     class Commands : Script
     {
-        [Command("serveroptions", "!{#AFAFAF}[USAGE] serveroptions (option: maxinlobby, derbyveh, usediscord)", GreedyArg = true)]
+        [Command("serveroptions", "!{#AFAFAF}[USAGE] serveroptions (option: maxinlobby, derbyveh, usediscord, onfootcollisions)", GreedyArg = true)]
         public void cmd_serveroptions(Player player, string action)
         {
             if (!EPlayer.LoggedIn(player))
@@ -59,6 +59,28 @@ namespace LSCC
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions derbyveh <model name>");
             }
 
+            else if (action.StartsWith("onfootcollisions", StringComparison.OrdinalIgnoreCase))
+            {
+                string[] args = action.Split(' ');
+                if (args.Count() > 1)
+                {
+                    bool value = false;
+
+                    if (!Boolean.TryParse(args[1], out value))
+                    {
+                        player.SendChatMessage($"!{{#999999}}OnfootCollisions can only be either 'true' or 'false'!");
+                        return;
+                    }
+
+                    Settings.OnfootCollisions = value;
+
+                    Main.SaveDynSettings();
+
+                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set onfoot collisions to {value.ToString()}.");
+                }
+                else player.SendChatMessage("!{#999999}Proper usage: /serveroptions onfootcollisions <true/false>");
+            }
+
             else if (action.StartsWith("usediscord", StringComparison.OrdinalIgnoreCase))
             {
                 string[] args = action.Split(' ');
@@ -81,7 +103,7 @@ namespace LSCC
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions usediscord <true/false>");
             }
 
-            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'maxinlobby, derbyveh, usediscord'");
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'maxinlobby, derbyveh, usediscord, onfootcollisions'");
 
             return;
         }
@@ -400,6 +422,7 @@ namespace LSCC
         {
             player.SendChatMessage("!{FFFF00}============| SERVER INFORMATION |============");
 
+            player.SendChatMessage("!{#FFDD00}Los Santos Copchase !{#FFFFFF}v" + Settings.Version);
             player.SendChatMessage("!{#FF6347}Server Discord: !{#FFFFFF}discord.gg/y3g2WuR");
             player.SendChatMessage("!{#FFDD00}Community/Portal Discord: !{#FFFFFF}discord.gg/8wBg82v");
             player.SendChatMessage("!{#FFFF00}Website: !{#FFFFFF}ls-cc.info");
@@ -5216,7 +5239,7 @@ namespace LSCC
                 Account Acc = EPlayer.GetAccount(target);
                 Acc.MuteReason = reason;
                 Acc.MuteTime = mins * 60;
-                player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been muted for {mins} minutes, reason: {reason}.");
+                target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been muted for {mins} minutes, reason: {reason}.");
 
                 try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:mute:{target.Name}:{mins}:{reason.Replace(":", "|")}"); } catch { }
 

@@ -71,6 +71,7 @@ namespace LSCC
             player.SetData("LastCryptAttempt", Environment.TickCount64);
 
             EPlayer.ResetPlayerData(player);
+            EPlayer.SyncServerSettings(player);
             EPlayer.Freeze(player, true);
 
             EPlayer.LoginCameraSetup(player);
@@ -2336,14 +2337,14 @@ namespace LSCC
                                                 break;
                                             case 3:
                                                 player.GiveWeapon(WeaponHash.Assaultsmg, 1000);
-                                                player.GiveWeapon(WeaponHash.CeramicPistol, 1000);
+                                                player.GiveWeapon(WeaponHash.Pistol, 1000);
                                                 player.GiveWeapon(WeaponHash.Bottle, 1000);
                                                 player.GiveWeapon(WeaponHash.Autoshotgun, 1000);
                                                 break;
                                             case 4:
                                                 player.GiveWeapon(WeaponHash.Compactrifle, 1000);
                                                 player.GiveWeapon(WeaponHash.Combatpdw, 1000);
-                                                player.GiveWeapon(WeaponHash.Raypistol, 1000);
+                                                player.GiveWeapon(WeaponHash.Pistol50, 1000);
                                                 player.GiveWeapon(WeaponHash.Assaultshotgun, 1000);
                                                 break;
                                         }
