@@ -19,3 +19,4 @@ caracara police handling copied from caracara normal but faster
 replace dodge charger with a non unmarked (livery) version
 convert bcrypt
 squad style current voice listener thingy above map
+allow players to attach flashlight atleast

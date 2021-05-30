@@ -4924,7 +4924,7 @@ namespace LSCC
         }
 
         [Command("anonymous", Alias = "vanish")]
-        public void cmd_anonymous(Player player, string text)
+        public void cmd_anonymous(Player player)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
