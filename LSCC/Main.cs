@@ -1441,6 +1441,7 @@ namespace LSCC
                             // Reward
                             EPlayer.GetAccount(i).Escapes++;
                             EPlayer.GrantXP(i, 5);
+                            i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.3);
                         }
                         break;
                     case 2:
@@ -1450,6 +1451,7 @@ namespace LSCC
                         {
                             // Reward
                             EPlayer.GrantXP(i, 3);
+                            i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.2);
                         }
                         break;
                     case 3:
@@ -1459,6 +1461,7 @@ namespace LSCC
                         {
                             // Reward
                             EPlayer.GrantXP(i, 4);
+                            i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.3);
                         }
                         break;
                 }
@@ -1602,27 +1605,26 @@ namespace LSCC
 
                     while (fugitives > 0)
                     {
-                        /* FULL RANDOM CHANCE MODE 
-                        _tempPlayer = lobbyPlayers[random.Next(lobbyPlayers.Count)];
+                        // FULL RANDOM CHANCE MODE 
+                        /*
+                        if (lobbyPlayers.Where(a => a.HasData("GrantFugitive") && !lobby.Fugitives.Contains(a) && a.GetData<bool>("AutoJoin") == true).Count() > 0)
+                        {
+                            _tempPlayer = lobbyPlayers.Where(a => a.HasData("GrantFugitive") && !lobby.Fugitives.Contains(a) && a.GetData<bool>("AutoJoin") == true).OrderBy(c => Guid.NewGuid()).First();
+                        }
+                        else _tempPlayer = lobbyPlayers[random.Next(lobbyPlayers.Count)];
+
                         */
 
-                        
+                        // FULL RANDOM CHANCE MODE END
+
                         /* HIGHEST FUGITIVE CHANCE MODE */
-                        var highestFugitives = lobbyPlayers.Where(p => !lobby.Fugitives.Contains(p) && p.GetData<bool>("AutoJoin") == true).
-                            OrderByDescending(p => p.GetSharedData<float>("FugitiveChance"));
+                        var highestFugitives = lobbyPlayers.Where(p => !lobby.Fugitives.Contains(p) && p.GetData<bool>("AutoJoin") == true).OrderByDescending(p => p.HasData("GrantFugitive")).ThenByDescending(p => p.GetSharedData<float>("FugitiveChance"));
 
                         if(highestFugitives.Count() == 0) _tempPlayer = lobbyPlayers[random.Next(lobbyPlayers.Count)];
+                        else _tempPlayer = highestFugitives.First();
 
-                        _tempPlayer = highestFugitives.First();
 
-                        foreach(Player p in lobbyPlayers)
-                        {
-                            if(p.HasData("GrantFugitive"))
-                            {
-                                _tempPlayer = p;
-                                break;
-                            }
-                        }
+                        // HIGHEST CHANCE MODE END
 
                         if (_tempPlayer.GetData<bool>("AutoJoin") == false) continue;
 
