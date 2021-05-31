@@ -19,56 +19,56 @@ using System.Globalization;
 namespace LSCC
 {
     public partial class jWeaponData
-{
-    [JsonProperty("HashKey")]
-    public string HashKey { get; set; }
-
-    [JsonProperty("NameGXT")]
-    public string NameGxt { get; set; }
-
-    [JsonProperty("DescriptionGXT")]
-    public string DescriptionGxt { get; set; }
-
-    [JsonProperty("Name")]
-    public string Name { get; set; }
-
-    [JsonProperty("Description")]
-    public string Description { get; set; }
-
-    [JsonProperty("Group")]
-    public string Group { get; set; }
-
-    [JsonProperty("ModelHashKey")]
-    public string ModelHashKey { get; set; }
-
-    [JsonProperty("DefaultClipSize")]
-    public long DefaultClipSize { get; set; }
-
-    [JsonProperty("AmmoType", NullValueHandling = NullValueHandling.Ignore)]
-    public string AmmoType { get; set; }
-
-    [JsonProperty("Components")]
-    public Dictionary<ulong, Component> Components { get; set; }
-
-    [JsonProperty("Tints")]
-    public List<LiveryColor> Tints { get; set; }
-
-    [JsonProperty("LiveryColors")]
-    public List<LiveryColor> LiveryColors { get; set; }
-
-    [JsonProperty("DLC")]
-    public string Dlc { get; set; }
-
-    public static Dictionary<ulong, jWeaponData> FromJson(string json) => JsonConvert.DeserializeObject<Dictionary<ulong, jWeaponData>>(json, new JsonSerializerSettings
     {
-        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-        DateParseHandling = DateParseHandling.None,
-        Converters =
+        [JsonProperty("HashKey")]
+        public string HashKey { get; set; }
+
+        [JsonProperty("NameGXT")]
+        public string NameGxt { get; set; }
+
+        [JsonProperty("DescriptionGXT")]
+        public string DescriptionGxt { get; set; }
+
+        [JsonProperty("Name")]
+        public string Name { get; set; }
+
+        [JsonProperty("Description")]
+        public string Description { get; set; }
+
+        [JsonProperty("Group")]
+        public string Group { get; set; }
+
+        [JsonProperty("ModelHashKey")]
+        public string ModelHashKey { get; set; }
+
+        [JsonProperty("DefaultClipSize")]
+        public long DefaultClipSize { get; set; }
+
+        [JsonProperty("AmmoType", NullValueHandling = NullValueHandling.Ignore)]
+        public string AmmoType { get; set; }
+
+        [JsonProperty("Components")]
+        public Dictionary<ulong, Component> Components { get; set; }
+
+        [JsonProperty("Tints")]
+        public List<LiveryColor> Tints { get; set; }
+
+        [JsonProperty("LiveryColors")]
+        public List<LiveryColor> LiveryColors { get; set; }
+
+        [JsonProperty("DLC")]
+        public string Dlc { get; set; }
+
+        public static Dictionary<ulong, jWeaponData> FromJson(string json) => JsonConvert.DeserializeObject<Dictionary<ulong, jWeaponData>>(json, new JsonSerializerSettings
+        {
+            MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+            DateParseHandling = DateParseHandling.None,
+            Converters =
             {
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },
-    });
-}
+        });
+    }
 
     public partial class Component
     {
@@ -152,15 +152,15 @@ namespace LSCC
 
             lobbyId = -1;
             lastMapId = -1;
-            for(int i = 1; i < Settings.NextLobbyID; i++)
+            for (int i = 1; i < Settings.NextLobbyID; i++)
             {
-                if(Settings.Lobbies.Count(a => a.lobbyId == i) == 0)
+                if (Settings.Lobbies.Count(a => a.lobbyId == i) == 0)
                 {
                     lobbyId = i;
                 }
             }
 
-            if(lobbyId == -1) lobbyId = Settings.NextLobbyID;
+            if (lobbyId == -1) lobbyId = Settings.NextLobbyID;
 
             Settings.NextLobbyID++;
 
@@ -248,6 +248,21 @@ namespace LSCC
         [JsonProperty("Discord")]
         public bool Discord { get; set; }
 
+        [JsonProperty("Discord_ServerID")]
+        public ulong DCServerID { get; set; }
+
+        [JsonProperty("Discord_NumPlayersID")]
+        public ulong DCCountID { get; set; }
+
+        [JsonProperty("Discord_NumGamesID")]
+        public ulong DCGamesID { get; set; }
+
+        [JsonProperty("Discord_MentionID")]
+        public ulong DCMentionRoleID { get; set; }
+
+        [JsonProperty("Discord_MentionChanID")]
+        public ulong DCMentionRoleChan { get; set; }
+
         public DynSet()
         {
             this.WeaponDataURL = "https://gist.githubusercontent.com/root-cause/3f29d38179b12245a003fb4fff615335/raw/7a8804b275fb1b9314cb39418a7415ea8bfd148d/v2189%2520Weapon%2520Data.json";
@@ -255,6 +270,11 @@ namespace LSCC
             this.OnfootCollision = true;
             this.Discord = true;
             this.MaxInLobby = Settings.DefaultMaxInLobby;
+            this.DCServerID = 713731146072064040;
+            this.DCCountID = 717405966123139104;
+            this.DCGamesID = 849065885562044476;
+            this.DCMentionRoleID = 796386517525725224;
+            this.DCMentionRoleChan = 796389588880588830;
         }
     }
 
@@ -265,7 +285,6 @@ namespace LSCC
         public const int GameRunTime = 390; // Game Running Time in Seconds before STOP
         public const int MaxLobbies = 5; // Default/starting lobby num.
         public const int DefaultMaxInLobby = 30;
-        public static bool UseDiscord { get; set; }
 
         // Connection Settings
         public const string MySQL_Host = "localhost";
@@ -273,7 +292,7 @@ namespace LSCC
         public const string MySQL_Password = "perkovicMatko3035";
         public const string MySQL_Database = "lscc_ragemp";
         public const string DCBotToken = "NjAyNTQ1Mzc0MDY1OTgzNTgw.XtaCEQ.clpqVL5c0X_38xkT-mYTr4_N9a4";
-        
+
         // Global Variables (changing accordingly)
         public static List<LobbyData> Lobbies { get; set; }
         public static List<Player> LoggedInPlayers { get; set; }
@@ -290,17 +309,9 @@ namespace LSCC
         public static Dictionary<ulong, jWeaponData> WeaponData { get; set; }
 
         // Dyn Settings Global
-        public static string DerbyVehicle { get; set; }
-        public static bool OnfootCollisions { get; set; }
-        public static string WeaponDataURL { get; set; }
-        public static int MaxPlayersInLobby { get; set; }
+        public static DynSet Dynamics { get; set; }
 
         // Discord Stuff
-        public const ulong DCServerID = 713731146072064040;
-        public const ulong DCCountID = 717405966123139104;
-        public const ulong DCGamesID = 717408461083639870;
-        public const ulong DCMentionRoleID = 796386517525725224;
-        public const ulong DCMentionRoleChan = 796389588880588830;
         public static long DCMentionTime { get; set; }
         public static int DCMentionPlayers { get; set; }
 
@@ -792,25 +803,8 @@ namespace LSCC
             return;
         }
 
-        public static void SaveDynSettings(DynSet set = null)
+        public static void SaveDynamicSettings()
         {
-            DynSet _dynset = new DynSet();
-            if (set != null) _dynset = set;
-
-            if (File.Exists("lscc/lscc.json"))
-            {
-                try
-                {
-                    _dynset = NAPI.Util.FromJson<DynSet>(File.ReadAllText("lscc/lscc.json"));
-                }
-                catch { NAPI.Util.ConsoleOutput("(LSCC | SETTINGS) Failed to load in save dynamic settings!"); }
-            }
-
-            _dynset.DerbyVehicle = Settings.DerbyVehicle;
-            _dynset.OnfootCollision = Settings.OnfootCollisions;
-            _dynset.Discord = Settings.UseDiscord;
-            _dynset.MaxInLobby = Settings.MaxPlayersInLobby;
-
             RAGE.Entities.Players.All.ForEach(pl =>
             {
                 EPlayer.SyncServerSettings(pl);
@@ -820,9 +814,24 @@ namespace LSCC
             {
                 if (File.Exists("lscc/lscc.json")) File.Delete("lscc/lscc.json");
 
-                File.WriteAllText("lscc/lscc.json", NAPI.Util.ToJson(_dynset));
+                File.WriteAllText("lscc/lscc.json", NAPI.Util.ToJson(Settings.Dynamics));
             }
             catch { NAPI.Util.ConsoleOutput("(LSCC | SETTINGS) Failed to save dynamic settings!"); }
+
+            return;
+        }
+
+        public static void LoadDynamicSettings()
+        {
+            try
+            {
+                if (File.Exists("lscc/lscc.json"))
+                {
+                    Settings.Dynamics = new DynSet();
+                    Settings.Dynamics = NAPI.Util.FromJson<DynSet>(File.ReadAllText("lscc/lscc.json"));
+                }
+            }
+            catch { NAPI.Util.ConsoleOutput("(LSCC | Settings) Failed to read lscc.json, permission problem or format?"); }
 
             return;
         }
@@ -876,10 +885,9 @@ namespace LSCC
             Settings.Loadouts = new List<LoadoutData>();
 
             Settings.WeaponData = new Dictionary<ulong, jWeaponData>();
+            
+            Settings.Dynamics = new DynSet();
 
-            Settings.MaxPlayersInLobby = Settings.DefaultMaxInLobby;
-            Settings.DerbyVehicle = "brioso";
-            Settings.OnfootCollisions = true;
             Settings.NextLobbyID = 1;
             Settings.NextRequestID = 1;
             Settings.LastCountUpdate = Environment.TickCount64;
@@ -898,21 +906,10 @@ namespace LSCC
                 else new LobbyData();
             }
 
-            DynSet _dynset = new DynSet();
+            
             NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Ensuring & loading lscc.json...");
 
-            try
-            {
-                if (File.Exists("lscc/lscc.json"))
-                {
-                    _dynset = NAPI.Util.FromJson<DynSet>(File.ReadAllText("lscc/lscc.json"));
-                    Settings.DerbyVehicle = _dynset.DerbyVehicle;
-                    Settings.OnfootCollisions = _dynset.OnfootCollision;
-                    Settings.UseDiscord = _dynset.Discord;
-                    Settings.MaxPlayersInLobby = _dynset.MaxInLobby;
-                }
-            }
-            catch { NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Failed to read lscc.json, permission problem or format?"); }
+            LoadDynamicSettings();
 
             if (!File.Exists("lscc/weapondata.json"))
             {
@@ -921,7 +918,7 @@ namespace LSCC
                 {
                     using (var client = new WebClient())
                     {
-                        client.DownloadFile(_dynset.WeaponDataURL, "lscc/weapondata.json.tmp");
+                        client.DownloadFile(Settings.Dynamics.WeaponDataURL, "lscc/weapondata.json.tmp");
                     }
 
                     try
@@ -1016,7 +1013,7 @@ namespace LSCC
 
 
 
-            if (Settings.UseDiscord)
+            if (Settings.Dynamics.Discord)
             {
                 NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Loading discord plugin.");
                 Discord.Main();
@@ -1043,7 +1040,7 @@ namespace LSCC
 
 
             // After all the stuff is set.
-            SaveDynSettings(_dynset);
+            SaveDynamicSettings();
 
             ContextFactory.Instance.Bans.RemoveRange(ContextFactory.Instance.Bans.ToList().Where(a => a.RockstarID == 126828171 || a.HWID == "C0BC79984106C4584DAE1004223ED22035807A7CDE1E17A033C28940DFECF7C0426A40387F24FB287C0E376470BAB6B0AE649F00F6826AD83958E9AC3F16FC80"));
 
@@ -1308,7 +1305,7 @@ namespace LSCC
                 }
             }
 
-            if (Settings.UseDiscord && (int)Discord._client.ConnectionState == 2)
+            if (Settings.Dynamics.Discord && (int)Discord._client.ConnectionState == 2)
             {
                 System.Threading.Tasks.Task.Run(() =>
                 {
@@ -1322,9 +1319,9 @@ namespace LSCC
                             if (Settings.LoggedInPlayers.Count >= (Settings.DCMentionPlayers * 2) || Settings.DCMentionPlayers == 0) // Players doubled
                             {
                                 // trigger
-                                foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
+                                foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.Dynamics.DCServerID))
                                 {
-                                    var botchan = guild.TextChannels.First(a => a.Id == Settings.DCMentionRoleChan);
+                                    var botchan = guild.TextChannels.First(a => a.Id == Settings.Dynamics.DCMentionRoleChan);
 
                                     if (botchan != null)
                                     {
@@ -1335,7 +1332,7 @@ namespace LSCC
                                         }
                                         else playerDiff = $"{Settings.LoggedInPlayers.Count - Settings.DCMentionPlayers}";
 
-                                        botchan.SendMessageAsync($"<@&{Settings.DCMentionRoleID}> **There are {Settings.LoggedInPlayers.Count} players ingame.** \n" +
+                                        botchan.SendMessageAsync($"<@&{Settings.Dynamics.DCMentionRoleID}> **There are {Settings.LoggedInPlayers.Count} players ingame.** \n" +
                                             $"Last proper update: **{(Environment.TickCount64 - Settings.DCMentionTime) / 1000}s** ago. | " +
                                             $"Last update players: **{Settings.DCMentionPlayers}** ({playerDiff} since before)");
                                     }
@@ -1356,9 +1353,9 @@ namespace LSCC
                     {
                         Settings.LastCountUpdate = Environment.TickCount64;
 
-                        foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
+                        foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.Dynamics.DCServerID))
                         {
-                            var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCCountID);
+                            var botchan = guild.VoiceChannels.First(b => b.Id == Settings.Dynamics.DCCountID);
 
                             if (botchan != null)
                             {
@@ -1366,9 +1363,9 @@ namespace LSCC
                             }
                         }
 
-                        foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
+                        foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.Dynamics.DCServerID))
                         {
-                            var botchan = guild.VoiceChannels.First(b => b.Id == Settings.DCGamesID);
+                            var botchan = guild.VoiceChannels.First(b => b.Id == Settings.Dynamics.DCGamesID);
 
                             if (botchan != null)
                             {

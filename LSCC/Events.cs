@@ -2250,7 +2250,7 @@ namespace LSCC
                         Settings.LastDerbyTick = Environment.TickCount64;
                     }
 
-                    Vehicle derbyVeh = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(Settings.DerbyVehicle), PlayerSpawn, (float)Settings.DerbySpawns[spawnID, 1], rand.Next(255), rand.Next(255), "DERBY", 255, true, true, 500);
+                    Vehicle derbyVeh = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(Settings.Dynamics.DerbyVehicle), PlayerSpawn, (float)Settings.DerbySpawns[spawnID, 1], rand.Next(255), rand.Next(255), "DERBY", 255, true, true, 500);
                     player.SetData("DerbyVehicle", derbyVeh);
                     derbyVeh.Locked = true;
                     derbyVeh.SetSharedData("Locked", true);

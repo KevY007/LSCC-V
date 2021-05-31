@@ -517,7 +517,7 @@ namespace LSCC
         {
             lock(player)
             {
-                player.TriggerEvent("SyncServerSettings", Settings.OnfootCollisions);
+                player.TriggerEvent("SyncServerSettings", Settings.Dynamics.OnfootCollision);
             }
         }
         
@@ -1196,7 +1196,7 @@ namespace LSCC
                 int LobbyToBeIn = Settings.MaxLobbies;
                 foreach (LobbyData lobby in Settings.Lobbies)
                 {
-                    if (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId) >= Settings.MaxPlayersInLobby)
+                    if (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId) >= Settings.Dynamics.MaxInLobby)
                     {
                         continue;
                     }

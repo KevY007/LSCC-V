@@ -21,21 +21,21 @@ namespace LSCC
 
         private Task Log(LogMessage msg)
         {
-            if (!Settings.UseDiscord) return Task.CompletedTask;
+            if (!Settings.Dynamics.Discord) return Task.CompletedTask;
             Console.WriteLine("[DISCORD] " + msg.ToString());
             return Task.CompletedTask;
         }
 
         private Task Log(string msg)
         {
-            if (!Settings.UseDiscord) return Task.CompletedTask;
+            if (!Settings.Dynamics.Discord) return Task.CompletedTask;
             Console.WriteLine("[DISCORD] " + msg);
             return Task.CompletedTask;
         }
 
         public static Task SendTextChannel(string channel, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
-            if (!Settings.UseDiscord) return Task.CompletedTask;
+            if (!Settings.Dynamics.Discord) return Task.CompletedTask;
             if (_client == null) return Task.CompletedTask;
             if (_client.ConnectionState != ConnectionState.Connected) return Task.CompletedTask;
 
@@ -46,7 +46,7 @@ namespace LSCC
                 text = Regex.Replace(text, @"\!\{(.*?)}|\!\{(.*?)}", "");
             }
 
-            foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.DCServerID))
+            foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.Dynamics.DCServerID))
             {
                 var botchan = guild.TextChannels.First(a => a.Name == channel);
 
@@ -62,7 +62,7 @@ namespace LSCC
         {
             try
             {
-                if (!Settings.UseDiscord) return Task.CompletedTask;
+                if (!Settings.Dynamics.Discord) return Task.CompletedTask;
                 if (_client == null) return Task.CompletedTask;
                 if (_client.ConnectionState != ConnectionState.Connected) return Task.CompletedTask;
 
@@ -208,7 +208,7 @@ namespace LSCC
 
         public async Task MainAsync()
         {
-            if (Settings.UseDiscord)
+            if (Settings.Dynamics.Discord)
             {
                 _client = new DiscordSocketClient();
 

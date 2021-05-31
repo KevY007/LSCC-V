@@ -36,9 +36,9 @@ namespace LSCC
                         return;
                     }
 
-                    Settings.MaxPlayersInLobby = value;
+                    Settings.Dynamics.MaxInLobby = value;
 
-                    Main.SaveDynSettings();
+                    Main.SaveDynamicSettings();
 
                     NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has changed max players in a lobby to {value}.");
                 }
@@ -50,11 +50,11 @@ namespace LSCC
                 string[] args = action.Split(' ');
                 if (args.Count() > 1)
                 {
-                    Settings.DerbyVehicle = args[1];
+                    Settings.Dynamics.DerbyVehicle = args[1];
 
-                    Main.SaveDynSettings();
+                    Main.SaveDynamicSettings();
 
-                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set derby vehicle model to {Settings.DerbyVehicle}.");
+                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set derby vehicle model to {Settings.Dynamics.DerbyVehicle}.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions derbyveh <model name>");
             }
@@ -72,9 +72,9 @@ namespace LSCC
                         return;
                     }
 
-                    Settings.OnfootCollisions = value;
+                    Settings.Dynamics.OnfootCollision = value;
 
-                    Main.SaveDynSettings();
+                    Main.SaveDynamicSettings();
 
                     NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set onfoot collisions to {value.ToString()}.");
                 }
@@ -94,9 +94,9 @@ namespace LSCC
                         return;
                     }
 
-                    Settings.UseDiscord = value;
+                    Settings.Dynamics.Discord = value;
 
-                    Main.SaveDynSettings();
+                    Main.SaveDynamicSettings();
 
                     NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set server discord integration to {value.ToString()}.");
                 }
@@ -2457,7 +2457,7 @@ namespace LSCC
 
                 player.SendChatMessage($">> !{{#DAA520}}Lobby {lobby.lobbyId} | {enabledStr} " +
                     $"!{{#DAA520}}| Players: !{{#FFFFFF}}" +
-                    $"{Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId)}!{{#DAA520}}/!{{#FFFFFF}}{Settings.MaxPlayersInLobby} !{{#DAA520}}| Status: {Main.ConvertGameStatus(lobby.gameStatus, true)} !{{#DAA520}}| Mode: {Main.ConvertGameMode(lobby.gameMode, true)}!{{#DAA520}}");
+                    $"{Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId)}!{{#DAA520}}/!{{#FFFFFF}}{Settings.Dynamics.MaxInLobby} !{{#DAA520}}| Status: {Main.ConvertGameStatus(lobby.gameStatus, true)} !{{#DAA520}}| Mode: {Main.ConvertGameMode(lobby.gameMode, true)}!{{#DAA520}}");
             }
 
             return;
@@ -2537,7 +2537,7 @@ namespace LSCC
                 }
             }
 
-            if(Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobbyid) >= Settings.MaxPlayersInLobby && EPlayer.GetAccount(player).Admin < 1)
+            if(Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobbyid) >= Settings.Dynamics.MaxInLobby && EPlayer.GetAccount(player).Admin < 1)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That lobby is full!");
                 return;
