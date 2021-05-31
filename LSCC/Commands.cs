@@ -2456,8 +2456,8 @@ namespace LSCC
                 }
 
                 player.SendChatMessage($">> !{{#DAA520}}Lobby {lobby.lobbyId} | {enabledStr} " +
-                    $"!{{#DAA520}}| Players: " +
-                    $"{Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId)}/{Settings.MaxPlayersInLobby} | Status: {Main.ConvertGameStatus(lobby.gameStatus)} | Mode: {Main.ConvertGameMode(lobby.gameMode)}");
+                    $"!{{#DAA520}}| Players: !{{#FFFFFF}}" +
+                    $"{Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId)}!{{#DAA520}}/!{{#FFFFFF}}{Settings.MaxPlayersInLobby} !{{#DAA520}}| Status: {Main.ConvertGameStatus(lobby.gameStatus, true)} !{{#DAA520}}| Mode: {Main.ConvertGameMode(lobby.gameMode, true)}!{{#DAA520}}");
             }
 
             return;
@@ -2522,7 +2522,7 @@ namespace LSCC
                 return;
             }
 
-            if (lobby.Password.Length > 1)
+            if (lobby.Password.Length > 1 && EPlayer.GetAccount(player).Admin < 1)
             {
                 if(password.Length < 1)
                 {
@@ -2537,7 +2537,7 @@ namespace LSCC
                 }
             }
 
-            if(Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobbyid) >= Settings.MaxPlayersInLobby)
+            if(Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobbyid) >= Settings.MaxPlayersInLobby && EPlayer.GetAccount(player).Admin < 1)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That lobby is full!");
                 return;

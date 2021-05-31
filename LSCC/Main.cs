@@ -744,33 +744,39 @@ namespace LSCC
             }
             return weatherString;
         }
-        public static string ConvertGameStatus(int status)
+        public static string ConvertGameStatus(int status, bool colored = false)
         {
             string ret = "Waiting";
+			if(colored) ret = "!{#BD3831}" + ret;
             switch (status)
             {
                 case 0:
                     break;
                 case 1:
                     ret = "Running";
+					if(colored) ret = "!{#28993E}" + ret;
                     break;
                 case 2:
                     ret = "Starting";
+					if(colored) ret = "!{#00FF33}" + ret;
                     break;
             }
             return ret;
         }
 
-        public static string ConvertGameMode(object mode)
+        public static string ConvertGameMode(object mode, bool colored = false)
         {
             string ret = "Unknown";
+			if(colored) ret = "!{#FF0000}" + ret;
             switch (mode)
             {
                 case GameModes.STANDARD:
                     ret = "Standard";
+					if(colored) ret = "!{#FFFFFF}" + ret;
                     break;
                 case GameModes.BUSTED:
                     ret = "Busted";
+					if(colored) ret = "!{#3569DB}" + ret;
                     break;
             }
             return ret;
