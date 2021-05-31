@@ -3041,7 +3041,7 @@ namespace LSCC
             player.SendChatMessage("!{#28E0DA}[Mode: DM]: /dm /dmarena");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /freeroam /veh /customvehlist /teleport /mytime /myweather");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /togblip /gun");
-            player.SendChatMessage("!{#A5A8A8}[Misc]: /updaterate /info /fontsize /voicebind /gpsbind");
+            player.SendChatMessage("!{#A5A8A8}[Misc]: /updaterate /info /fontsize /voicebind /gpsbind /shotstats");
             player.SendChatMessage("!{#A5A8A8}[Dbg/Test]: /pos /lcmenu");
             
             player.SendChatMessage("!{#F7EB05}[Donator/Points] /buycomp /mycomps");
@@ -3977,6 +3977,7 @@ namespace LSCC
                 player.SendChatMessage("[Admin Lv 1]: /(r)freeze /(r)unfreeze /kick /slap /setinv(ulnerable) /specoff");
                 player.SendChatMessage("[Admin Lv 1]: /bancheck /jail /unjail /afix /aflip /sendtolobby /set(time/weather)");
                 player.SendChatMessage("[Admin Lv 1]: /mute /unmute /warn /unwarn /setteam /forceautojoin /forceswapseats");
+                player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
@@ -5563,6 +5564,50 @@ namespace LSCC
 
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {target.Name} has been slapped by {player.Name}.");
             }
+        }
+
+        [Command("showshotstats", "!{#AFAFAF}[USAGE] showshotstats (target)", GreedyArg = true)]
+        public void cmd_showshotstats(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+            else
+            {
+                EPlayer.ShowShotStats(player, target);
+            }
+        }
+
+        [Command("resetshotstats", "!{#AFAFAF}[USAGE] resetshotstats (target)", GreedyArg = true)]
+        public void cmd_resetshotstats(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+            else
+            {
+                EPlayer.ResetShotStats(target);
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has reset {player.Name}'s shot statistics.");
+            }
+        }
+
+        [Command("shotstats")]
+        public void cmd_shotstats(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            EPlayer.ShowShotStats(player, player);
         }
 
         [Command("grantfugitive", "!{#AFAFAF}[USAGE] grantfugitive (target)", GreedyArg = true)]

@@ -526,7 +526,7 @@ namespace LSCC
             lock (player)
             {
                 player.ResetData("AccountHandle");
-
+                ResetShotStats(player);
                 player.SetData("TeamShotWarning", 0);
                 player.SetData("UnfairKillSpawn", false);
                 player.SetData("InnocentShotWarning", 0);
@@ -677,6 +677,48 @@ namespace LSCC
             target.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} ({acc.SQL_ID}) at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
 
             EPlayer.GrantXP(target, 0);
+            return;
+        }
+
+        public static void ResetShotStats(Player player)
+        {
+            player.TriggerEvent("ResetShotStats");
+            Events.OnSynchronizeShotStatistics(player, 0, 0, 0, 0);
+        }
+
+        public static void ShowShotStats(Player target, Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            int TotalFired = player.GetData<int>("ShotStats.TotalFired");
+            int PlayerHits = player.GetData<int>("ShotStats.HitPlayer");
+            int VehicleHits = player.GetData<int>("ShotStats.HitVehicle");
+            int Missed = player.GetData<int>("ShotStats.Missed");
+            long LastSync = player.GetData<long>("ShotStats.LastSync");
+
+            target.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Shot Statistics of {player.Name} at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
+
+            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Total Shots Fired: !{{#cbcfc4}}[{TotalFired}] !{{#ffffff}}| !{{#c7eb7f}}Shots Hit Players: !{{#cbcfc4}}[{PlayerHits}] !{{#ffffff}}| !{{#c7eb7f}}Shot Hit Vehicles: !{{#cbcfc4}}[{VehicleHits}]");
+
+            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Missed/Shits Hit Nothing: !{{#cbcfc4}}[{Missed}] !{{#ffffff}}| !{{#c7eb7f}}Last Updated: !{{#cbcfc4}}[{(Environment.TickCount64 - LastSync) / 1000}s ago]");
+
+            string playerAccuracy = "Unavailable";
+            string vehicleAccuracy = "Unavailable";
+
+            if (TotalFired > 0) 
+            {
+                if(PlayerHits > 0)
+                {
+                    playerAccuracy = (PlayerHits / (TotalFired - VehicleHits)).ToString("N2");
+                }
+                if (VehicleHits > 0)
+                {
+                    vehicleAccuracy = (VehicleHits / (TotalFired - PlayerHits)).ToString("N2");
+                }
+            }
+
+            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Player Accuracy: !{{#cbcfc4}}[{playerAccuracy}] !{{#ffffff}}| !{{#c7eb7f}}Vehicle Accuracy: !{{#cbcfc4}}[{vehicleAccuracy}]");
             return;
         }
 

@@ -51,12 +51,40 @@ var radioToggle = 0;
 
 var ServerSettings = [];
 
+var ShotStats = [];
+
 mp.game.vehicle.defaultEngineBehaviour = false;
 mp.game.gameplay.enableMpDlcMaps(true);
 mp.game.player.disableVehicleRewards();
 mp.game.player.setHealthRechargeMultiplier(0.0);
 
 traceLastFunc("[Players] CreateVars");
+
+function ResetShotStats()
+{
+    ShotStats.TotalFired = 0;
+    ShotStats.HitPlayer = 0;
+    ShotStats.HitVehicle = 0;
+    ShotStats.Missed = 0;
+
+    ShotStats.UpdateInterval = 0;
+
+    traceLastFunc("[Players] ResetShotStats");
+}
+
+ResetShotStats();
+
+mp.events.add("OneSecondEvent", () => {
+    ShotStats.UpdateInterval++;
+
+    if(ShotStats.UpdateInterval >= 10)
+    {
+        ShotStats.UpdateInterval = 0;
+        mp.events.callRemote("SyncShotStats", ShotStats.TotalFired, ShotStats.HitPlayer, ShotStats.HitVehicle, ShotStats.Missed);
+    }
+});
+
+mp.events.add("ResetShotStats", ResetShotStats);
 
 function calcDist(v1, v2) {
     return mp.game.system.vdist(
@@ -751,8 +779,14 @@ mp.events.add('render', () => {
 
 mp._events.add("playerWeaponShot", (targetPosition, targetEntity) => 
 {
+    ShotStats.TotalFired++;
+
     if(targetEntity !== null && targetEntity !== undefined)
     {
+        if(targetEntity.type === 'vehicle') ShotStats.HitVehicle++;
+        else if(targetEntity.type === 'player') ShotStats.HitPlayer++;
+        else ShotStats.Missed++;
+
         if(targetEntity.type === 'vehicle' && player.getVariable("Team") != -1)
         {
             if(targetEntity.getVariable("Team") !== undefined)

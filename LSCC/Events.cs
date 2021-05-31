@@ -119,6 +119,16 @@ namespace LSCC
             return;
         }
 
+        [RemoteEvent("SyncShotStats")]
+        public static void OnSynchronizeShotStatistics(Player player, int TotalShotsFired, int PlayerHits, int VehicleHits, int Missed)
+        {
+            player.SetData("ShotStats.TotalFired", TotalShotsFired);
+            player.SetData("ShotStats.HitPlayer", PlayerHits);
+            player.SetData("ShotStats.HitVehicle", VehicleHits);
+            player.SetData("ShotStats.Missed", Missed);
+            player.SetData("ShotStats.LastSync", Environment.TickCount64);
+        }
+
         [RemoteEvent("clear_anim")]
         public static void RequestClearAnimation(Player player)
         {
