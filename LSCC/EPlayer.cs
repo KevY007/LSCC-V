@@ -701,7 +701,7 @@ namespace LSCC
 
             target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Total Shots Fired: !{{#cbcfc4}}[{TotalFired}] !{{#ffffff}}| !{{#c7eb7f}}Shots Hit Players: !{{#cbcfc4}}[{PlayerHits}] !{{#ffffff}}| !{{#c7eb7f}}Shot Hit Vehicles: !{{#cbcfc4}}[{VehicleHits}]");
 
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Missed/Shits Hit Nothing: !{{#cbcfc4}}[{Missed}] !{{#ffffff}}| !{{#c7eb7f}}Last Updated: !{{#cbcfc4}}[{(Environment.TickCount64 - LastSync) / 1000}s ago]");
+            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Missed/Shots Hit Nothing: !{{#cbcfc4}}[{Missed}] !{{#ffffff}}| !{{#c7eb7f}}Last Updated: !{{#cbcfc4}}[{(Environment.TickCount64 - LastSync) / 1000}s ago]");
 
             string playerAccuracy = "Unavailable";
             string vehicleAccuracy = "Unavailable";
@@ -710,13 +710,13 @@ namespace LSCC
             {
                 if(PlayerHits > 0)
                 {
-                    double calc = PlayerHits / (TotalFired - VehicleHits);
-                    playerAccuracy = calc.ToString("N2");
+                    double calc = (PlayerHits / (double)(TotalFired - VehicleHits)) * 100.0;
+                    playerAccuracy = $"{calc.ToString("N1")}%";
                 }
                 if (VehicleHits > 0)
                 {
-                    double calc = VehicleHits / (TotalFired - PlayerHits);
-                    vehicleAccuracy = calc.ToString("N2");
+                    double calc = (VehicleHits / (double)(TotalFired - PlayerHits)) * 100.0;
+                    vehicleAccuracy = $"{calc.ToString("N1")}%";
                 }
             }
 
