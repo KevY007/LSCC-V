@@ -2163,7 +2163,7 @@ namespace LSCC
 
                 player.SetSharedData("VisibleBlip", false);
 
-                if (player.GetSharedData<int>("InDM") != -1) player.TriggerEvent("SetActorInvulnerable", true);
+                if (player.GetSharedData<int>("InDM") == -1) player.TriggerEvent("SetActorInvulnerable", true);
                 player.TriggerEvent("CanFallOutOfCar", false);
                 player.TriggerEvent("showHPBars", 0); // Never show HP Bars.
 

@@ -710,11 +710,13 @@ namespace LSCC
             {
                 if(PlayerHits > 0)
                 {
-                    playerAccuracy = (PlayerHits / (TotalFired - VehicleHits)).ToString("N2");
+                    double calc = PlayerHits / (TotalFired - VehicleHits);
+                    playerAccuracy = calc.ToString("N2");
                 }
                 if (VehicleHits > 0)
                 {
-                    vehicleAccuracy = (VehicleHits / (TotalFired - PlayerHits)).ToString("N2");
+                    double calc = VehicleHits / (TotalFired - PlayerHits);
+                    vehicleAccuracy = calc.ToString("N2");
                 }
             }
 
