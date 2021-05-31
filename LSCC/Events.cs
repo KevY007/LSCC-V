@@ -124,6 +124,7 @@ namespace LSCC
         {
             if(vehicle != null && vehicle.Exists)
             {
+                if (!vehicle.HasSharedData("SilentSiren")) vehicle.SetSharedData("SilentSiren", false);
                 vehicle.SetSharedData("SilentSiren", !vehicle.GetSharedData<bool>("SilentSiren"));
             }
         }
