@@ -119,6 +119,15 @@ namespace LSCC
             return;
         }
 
+        [RemoteEvent("SilentSirenSync")]
+        public void OnSilentSirenSync(Player player, Vehicle vehicle)
+        {
+            if(vehicle != null && vehicle.Exists)
+            {
+                vehicle.SetSharedData("SilentSiren", !vehicle.GetSharedData<bool>("SilentSiren"));
+            }
+        }
+
         [RemoteEvent("SyncShotStats")]
         public static void OnSynchronizeShotStatistics(Player player, int TotalShotsFired, int PlayerHits, int VehicleHits, int Missed)
         {

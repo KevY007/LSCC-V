@@ -131,3 +131,23 @@ mp.events.add('entityStreamIn', (entity) => {
         }
     }
 });
+
+
+// Silent Siren
+let localPlayer = mp.players.local;
+
+mp.keys.bind(0x42, true, _ => {
+    if (localPlayer.vehicle && localPlayer.vehicle.getPedInSeat(-1) === localPlayer.handle && localPlayer.vehicle.getClass() === 18) {
+        localPlayer.vehicle.getVariable('SilentSiren') ? mp.game.graphics.notify(`Silent mode is deactivated.`) : mp.game.graphics.notify(`Silent mode is activated.`);
+        mp.events.callRemote('SilentSirenSync', localPlayer.vehicle)
+    }
+});
+
+mp.events.add('entityStreamIn', (entity) => {
+    if (entity.type === 'vehicle' && entity.getClass() === 18 && entity.hasVariable('SilentSiren')) entity.getVariable('SilentSiren') ? entity.setSirenSound(true) : entity.setSirenSound(false);
+    
+});
+
+mp.events.addDataHandler("SilentSiren", (entity, value) => {
+    if (entity.type === "vehicle") entity.setSirenSound(value);
+});

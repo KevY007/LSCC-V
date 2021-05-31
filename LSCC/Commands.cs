@@ -2859,6 +2859,7 @@ namespace LSCC
             player.SendChatMessage("!{#FF6347} X: Rapple from a helicopter (not all helicopters, try maverick).");
             player.SendChatMessage("!{#FF6347} Hold voice and press TAB: Switch voice chat modes.");
             player.SendChatMessage("!{#FF6347} F7: Hide/show HUD. (Hold SHIFT to toggle nametags as well)");
+            player.SendChatMessage("!{#FF6347} B: Toggle silent siren in police vehicles.");
         }
 
         [Command("teleport", "!{#AFAFAF}[USAGE] teleport (option: chilliad, airport)", Alias = "tp", GreedyArg = true)]
