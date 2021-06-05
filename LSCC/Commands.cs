@@ -1385,7 +1385,7 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:removecomp:{target.Name}:{itemData.Name}:{comp.Name}"); } catch { }
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:takecomp:{target.Name}:{itemData.Name}:{comp.Name}"); } catch { }
 
 
             Dictionary<ulong, wComponentData> wepItems = new Dictionary<ulong, wComponentData>();
@@ -1837,15 +1837,6 @@ namespace LSCC
                 return;
             }
 
-            if (newWepData.ContainsKey(wephash))
-            {
-                wComponentData newDataTwo = new wComponentData();
-
-                newDataTwo.Components.Add(comphash);
-
-                newWepData.Add(wephash, newDataTwo);
-            }
-
             EPlayer.GetAccount(player).WeaponComponents = NAPI.Util.ToJson(newWepData);
 
             player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You removed '{comp.Name}' from '{itemData.Name}' - No donator points will be refunded.");
@@ -1996,10 +1987,17 @@ namespace LSCC
 
             EPlayer.GetAccount(player).WeaponComponents = NAPI.Util.ToJson(newWepData);
 
-            player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You bought '{comp.Name}' on '{itemData.Name}' for 100 donator points. (Will attach in copchase)");
-
+            if (comp.Name.Contains("flashlight", StringComparison.OrdinalIgnoreCase))
+            {
+                player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have attached '{comp.Name}' on '{itemData.Name}'. (Will attach in copchase)");
+            }
+            else
+            {
+                player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You bought '{comp.Name}' on '{itemData.Name}' for 100 donator points. (Will attach in copchase)");
+                EPlayer.GetAccount(player).DonatorPoints -= 100;
+            }
+            
             try { Main.Log("currency.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:buycomp:{itemData.Name}:{comp.Name}"); } catch { }
-            EPlayer.GetAccount(player).DonatorPoints -= 100;
             EPlayer.Save(player);
             return;
         }
