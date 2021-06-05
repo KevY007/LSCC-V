@@ -1280,8 +1280,8 @@ namespace LSCC
             return;
         }
 
-        [Command("removecomp", "!{#AFAFAF}[USAGE] removecomp (target) (weapon/hash) (component/hash)", GreedyArg = true)]
-        public void cmd_removecomp(Player player, Player target, string wep, string component)
+        [Command("takecomp", "!{#AFAFAF}[USAGE] takecomp (target) (weapon/hash) (component/hash)", GreedyArg = true)]
+        public void cmd_takecomp(Player player, Player target, string wep, string component)
         {
             if (!EPlayer.LoggedIn(player) || !EPlayer.LoggedIn(target))
                 return;
@@ -4213,7 +4213,7 @@ namespace LSCC
             if (EPlayer.GetAccount(player).Admin >= 3)
             {
                 player.SendChatMessage("[Admin Lv 3]: /givegun(all) /gotopos /bringall /sethpall /(un)freezeall /r(emove)g(uns)f(rom)a(ll)");
-                player.SendChatMessage("[Admin Lv 3]: /givecomp /removecomp /attachcomp /noclip /grantfugitive /setspawn (default freeroam world) /godmode");
+                player.SendChatMessage("[Admin Lv 3]: /givecomp /takecomp /attachcomp /noclip /grantfugitive /setspawn (default freeroam world) /godmode");
             }
             if (EPlayer.GetAccount(player).Admin >= 4)
             {
