@@ -3041,6 +3041,58 @@ namespace LSCC
             player.Position = new Vector3(x, y, z);
         }
 
+        [Command("getip", "!{#AFAFAF}[USAGE] getip (target)")]
+        public void cmd_getip(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                return;
+            }
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:getip:{target.Name}"); } catch { }
+
+            if (EPlayer.LoggedIn(target))
+            {
+                if(EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher admin level than you.");
+                    return;
+                }
+            }
+
+            player.SendChatMessage("!{#FF6347}" + target.Name + "'s IP address: " + target.Address);
+            return;
+        }
+
+        [Command("gethwid", "!{#AFAFAF}[USAGE] gethwid (target)")]
+        public void cmd_gethwid(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                return;
+            }
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:gethwid:{target.Name}"); } catch { }
+
+            if (EPlayer.LoggedIn(target))
+            {
+                if (EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher admin level than you.");
+                    return;
+                }
+            }
+
+            player.SendChatMessage("!{#FF6347}" + target.Name + "'s Hardware ID: " + target.Serial);
+            return;
+        }
+
         [Command("setdimension", "!{#AFAFAF}[USAGE] setdimension (target) (vw)", Alias = "setvw")]
         public void cmd_setdimension(Player player, Player target, uint vw)
         {
@@ -4238,6 +4290,7 @@ namespace LSCC
 
                 player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /set(hp/ar) /spec");
                 player.SendChatMessage("[Admin Lv 1]: /(r)freeze /(r)unfreeze /kick /slap /setinv(ulnerable) /specoff");
+                player.SendChatMessage("[Admin Lv 1]: /(t)freeze /(t)unfreeze /kick /slap /setinv(ulnerable) /specoff");
                 player.SendChatMessage("[Admin Lv 1]: /bancheck /(o)jail /(o)unjail /afix /aflip /sendtolobby /set(time/weather)");
                 player.SendChatMessage("[Admin Lv 1]: /(o)mute /(o)unmute /warn /unwarn /setteam /forceautojoin /forceswapseats");
                 player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats");
@@ -4251,7 +4304,8 @@ namespace LSCC
             if (EPlayer.GetAccount(player).Admin >= 3)
             {
                 player.SendChatMessage("[Admin Lv 3]: /givegun(all) /gotopos /bringall /sethpall /(un)freezeall /r(emove)g(uns)f(rom)a(ll)");
-                player.SendChatMessage("[Admin Lv 3]: /givecomp /takecomp /attachcomp /noclip /grantfugitive /setspawn (default freeroam world) /godmode");
+                player.SendChatMessage("[Admin Lv 3]: /givecomp /takecomp /attachcomp /noclip /grantfugitive /setspawn (freeroam world)");
+                player.SendChatMessage("[Admin Lv 3]: /getip /gethwid");
             }
             if (EPlayer.GetAccount(player).Admin >= 4)
             {
@@ -5581,13 +5635,57 @@ namespace LSCC
             }
             else
             {
-                foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Position.DistanceTo(player.Position) <= range))
+                foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Position.DistanceTo(player.Position) <= range && a != player))
                 {
                     EPlayer.Freeze(p, true);
                 }
                 try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:rfreeze:{range}"); } catch { }
 
                 NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen all players within {range}m.");
+            }
+        }
+
+        [Command("tfreeze", "!{#AFAFAF}[USAGE] tfreeze (team 0 = fugitive, 1 = cop)")]
+        public void cmd_tfreeze(Player player, int teamid)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+            else
+            {
+                foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Position.DistanceTo(player.Position) <= 10000 && a.Dimension == player.Dimension && a != player && a.GetSharedData<int>("Team") == teamid))
+                {
+                    EPlayer.Freeze(p, true);
+                }
+                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:tfreeze:{teamid}"); } catch { }
+
+                NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen specific players.");
+            }
+        }
+
+        [Command("tunfreeze", "!{#AFAFAF}[USAGE] tfreeze (team 0 = fugitive, 1 = cop)")]
+        public void cmd_tunfreeze(Player player, int teamid)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+            else
+            {
+                foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Position.DistanceTo(player.Position) <= 10000 && a.Dimension == player.Dimension && a != player && a.GetSharedData<int>("Team") == teamid))
+                {
+                    EPlayer.Freeze(p, false);
+                }
+                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:tunfreeze:{teamid}"); } catch { }
+
+                NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen specific players.");
             }
         }
 
