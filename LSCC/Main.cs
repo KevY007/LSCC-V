@@ -2121,10 +2121,6 @@ namespace LSCC
                             if (lobby.gameMode == GameModes.STANDARD)
                             {
                                 p.SendNotification($"~g~Weapons will be given after collisions enable.");
-                                if (lobby.Cops.Contains(p))
-                                {
-                                    p.SendNotification("~b~Unfrozen in 10s...");
-                                }
                                 p.SendChatMessage("!{#FF6347}[!] !{#8D8DFF}Cops will be unfrozen in 10 seconds. !{#E84040}Fugitive's may take this time to prepare/start the chase.");
                             }
                             else if (lobby.gameMode == GameModes.BUSTED)
