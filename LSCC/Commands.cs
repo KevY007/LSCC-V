@@ -487,7 +487,7 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension != 256)
+            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
                 return;
@@ -542,7 +542,7 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension != 256)
+            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
                 return;
@@ -568,7 +568,7 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension != 256)
+            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
                 return;
@@ -594,15 +594,35 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("InLobby") != -3)
+            if((player.GetSharedData<int>("InLobby") == -3 && player.Dimension >= 256 && player.Dimension <= 512) == false && EPlayer.GetAccount(player).Admin < 3)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
                 return;
             }
 
-            player.SetSharedData("VisibleBlip", !player.GetSharedData<bool>("VisibleBlip"));
-            player.SendChatMessage("!{#FF6347}>> !{#FFFFFF}You have toggled your freeroam blip.");
+            player.SetData("FreeroamBlip", !player.GetData<bool>("FreeroamBlip"));
+            player.SetSharedData("VisibleBlip", player.GetData<bool>("FreeroamBlip"));
 
+            player.SendChatMessage("!{#FF6347}>> !{#FFFFFF}You have " + (player.GetData<bool>("FreeroamBlip") == true ? "enabled" : "disabled") + " your freeroam minimap blip.");
+            return;
+        }
+
+        [Command("godmode")]
+        public void cmd_godmode(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if ((player.GetSharedData<int>("InLobby") == -3 && player.Dimension >= 256 && player.Dimension <= 512) == false && EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                return;
+            }
+
+            player.SetData("FreeroamGodmode", !player.GetData<bool>("FreeroamGodmode"));
+            player.TriggerEvent("SetActorInvulnerable", player.GetData<bool>("FreeroamGodmode"));
+
+            player.SendChatMessage("!{#FF6347}>> !{#FFFFFF}You have " + (player.GetData<bool>("FreeroamGodmode") == true ? "enabled" : "disabled") + " freeroam godmode.");
             return;
         }
 
@@ -2113,9 +2133,9 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension != 256)
+            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension <= 256 || player.Dimension > 512)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam or in default world! (/world)");
                 return;
             }
 
@@ -2203,6 +2223,42 @@ namespace LSCC
             player.GiveWeapon((WeaponHash)wephash, ammo);
 
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have given yourself " + wepname + " with " + ammo + " ammo.");
+            return;
+        }
+
+        [Command("world", "!{#AFAFAF}[USAGE] world (number/id)")]
+        public void cmd_world(Player player, int worldid)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (player.GetSharedData<int>("InLobby") != -3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                return;
+            }
+
+            if (worldid < 0 || worldid > 256)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The world ID can only be between 0-256! (0 is default)");
+                return;
+            }
+
+            try { Main.Log("freeroam.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:world:{worldid}"); } catch { }
+
+            player.Dimension = (uint)256 + (uint)worldid;
+            player.SetData("FreeroamWorld", (uint)worldid);
+
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have changed your freeroam world to " + worldid.ToString() + ".");
+
+            if(worldid > 0)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can use /gun in this freeroam world.");
+            }
+            else if(worldid <= 0)
+            {
+                player.RemoveAllWeapons();
+            }
             return;
         }
 
@@ -3183,7 +3239,7 @@ namespace LSCC
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /derby");
             player.SendChatMessage("!{#28E0DA}[Mode: DM]: /dm /dmarena");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /freeroam /veh /customvehlist /teleport /mytime /myweather");
-            player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /togblip /gun");
+            player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /togblip /gun /world /godmode");
             player.SendChatMessage("!{#A5A8A8}[Misc]: /updaterate /info /fontsize /voicebind /gpsbind /shotstats");
             player.SendChatMessage("!{#A5A8A8}[Dbg/Test]: /pos /lcmenu");
             

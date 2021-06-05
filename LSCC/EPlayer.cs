@@ -536,6 +536,9 @@ namespace LSCC
                 player.SetData("DerbySpawnTick", 0);
                 player.SetData("FreeroamTime", 12);
                 player.SetData("FreeroamWeather", 0);
+                player.SetData("FreeroamWorld", (uint)0);
+                player.SetData("FreeroamGodmode", true);
+                player.SetData("FreeroamBlip", true);
                 player.ResetData("ViewingCarSelector");
                 player.ResetData("ViewingLoadoutSelector");
                 player.SetSharedData("HasShot", false);

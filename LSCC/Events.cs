@@ -2192,15 +2192,15 @@ namespace LSCC
 
                     EPlayer.SetColor(player, new Color(102, 232, 217), 0);
 
-                    player.TriggerEvent("SetActorInvulnerable", true);
+                    player.TriggerEvent("SetActorInvulnerable", player.GetData<bool>("FreeroamGodmode"));
 
-                    player.SetSharedData("VisibleBlip", true);
+                    player.SetSharedData("VisibleBlip", player.GetData<bool>("FreeroamBlip"));
 
                     player.TriggerEvent("SetTimeWeather", player.GetData<int>("FreeroamTime"), 0, 0, player.GetData<int>("FreeroamWeather"));
 
                     player.RemoveAllWeapons();
 
-                    player.Dimension = 256;
+                    player.Dimension = (uint)256 + player.GetData<uint>("FreeroamWorld");
                 }
 
                 if (player.GetSharedData<int>("InLobby") == -4) // Derby
