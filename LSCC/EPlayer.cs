@@ -648,12 +648,10 @@ namespace LSCC
             }
         }
 
-        public static void ShowStats(Player target, Player player)
+        public static void ShowStats(Player target, Account acc)
         {
-            if (!EPlayer.LoggedIn(player))
+            if (!EPlayer.LoggedIn(target))
                 return;
-
-            Account acc = EPlayer.GetAccount(player);
 
             double KDR = 0.0;
             if (acc.Kills == 0) acc.Kills = 1;

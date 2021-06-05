@@ -2489,7 +2489,9 @@ namespace LSCC
         [Command("stats")]
         public void cmd_stats(Player player)
         {
-            EPlayer.ShowStats(player, player);
+            if (!EPlayer.LoggedIn(player)) return;
+
+            EPlayer.ShowStats(player, EPlayer.GetAccount(player));
             return;
         }
 
@@ -2502,7 +2504,12 @@ namespace LSCC
             if (EPlayer.GetAccount(player).Admin < 2)
                 return;
 
-            EPlayer.ShowStats(player, target);
+            if (!EPlayer.LoggedIn(target))
+                return;
+
+            EPlayer.ShowStats(player, EPlayer.GetAccount(target));
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:checkstats:{target.Name}"); } catch { }
             return;
         }
 
@@ -3339,6 +3346,39 @@ namespace LSCC
             player.SendChatMessage($"!{{#FF6347}}Rockstar ID: {ban.RockstarID}");
             return;
         }
+
+        [Command("ocheckstats", "!{#AFAFAF}[USAGE] ocheckstats (target)", GreedyArg = true)]
+        public void cmd_ocheckstats(Player player, string name)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+            if (RAGE.Entities.Players.All.Where(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).Count() > 0)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is currently in-game! Use /checkstats!");
+                return;
+            }
+
+            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+
+            if ((tpAcc != null) == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                return;
+            }
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ocheckstats:{tpAcc.Username}"); } catch { }
+
+            EPlayer.ShowStats(player, tpAcc);
+            return;
+        }
+
 
         [Command("unsuspend", "!{#AFAFAF}[USAGE] unsuspend (account name)", GreedyArg = true)]
         public void cmd_unsuspend(Player player, string name)
