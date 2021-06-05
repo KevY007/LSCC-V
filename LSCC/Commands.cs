@@ -4245,7 +4245,7 @@ namespace LSCC
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
                 player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword /togglemap");
-                player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension /r(emove)guns /suspend /unsuspend /checkstats");
+                player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension /r(emove)guns /suspend /unsuspend /(o)checkstats");
                 player.SendChatMessage("[Admin Lv 2]: /ann /vanish /oban /fugitivelist");
             }
             if (EPlayer.GetAccount(player).Admin >= 3)
@@ -4260,11 +4260,11 @@ namespace LSCC
             }
             if (EPlayer.GetAccount(player).Admin >= 5)
             {
-                player.SendChatMessage("[Admin Lv 5]: /maps /deletemap /createmap /addmapspawn /setdonator /givedonorpoints");
+                player.SendChatMessage("[Admin Lv 5]: /maps /deletemap /createmap /addmapspawn /(o)setdonator /(o)givedonorpoints");
             }
             if (EPlayer.GetAccount(player).Admin >= 6)
             {
-                player.SendChatMessage("[Admin Lv 6]: /triggerevent /cameraset /setadmin");
+                player.SendChatMessage("[Admin Lv 6]: /triggerevent /cameraset /(o)setadmin");
             }
             return;
         }
@@ -4760,9 +4760,9 @@ namespace LSCC
                 return;
             }
 
-            if (!player.Name.Equals(target.Name) && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
+            if (!player.Name.Equals(target.Name) && EPlayer.GetAccount(target).Admin > EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher admin level than you.");
                 return;
             }
 
@@ -4772,6 +4772,90 @@ namespace LSCC
             player.SendChatMessage($"!{{#00FF33}}You have set {target.Name}'s admin level to {EPlayer.GetAdminLevelName(level, true)} ({level})");
             target.SendChatMessage($"!{{#00FF33}}{player.Name} has set your admin level to {EPlayer.GetAdminLevelName(level, true)} ({level})");
             EPlayer.Save(target);
+        }
+
+        [Command("osetadmin", "!{#AFAFAF}[USAGE] osetadmin (target) (level)")]
+        public void cmd_osetadmin(Player player, string name, int level)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 6)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+            if (RAGE.Entities.Players.All.Where(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).Count() > 0)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is currently in-game! Use /setadmin!");
+                return;
+            }
+
+            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+
+            if ((tpAcc != null) == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                return;
+            }
+
+            if (level < 0 || level > 6)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed level 6.");
+                return;
+            }
+
+            if (tpAcc.Admin > EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher admin level than you.");
+                return;
+            }
+
+
+            tpAcc.Admin = level;
+            player.SendChatMessage($"!{{#00FF33}}You have set {tpAcc.Username}'s admin level to {EPlayer.GetAdminLevelName(level, true)} ({level})");
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:osetadmin:{tpAcc.Username}:{level}"); } catch { }
+
+            ContextFactory.Instance.SaveChanges();
+            return;
+        }
+
+        [Command("ogivedonorpoints", "!{#AFAFAF}[USAGE] ogivedonorpoints (target) (points)")]
+        public void cmd_ogivedonorpoints(Player player, string name, int points)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 5)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+            if (RAGE.Entities.Players.All.Where(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).Count() > 0)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is currently in-game! Use /givedonorpoints!");
+                return;
+            }
+
+            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+
+            if ((tpAcc != null) == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                return;
+            }
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ogivedonorpoints:{tpAcc.Username}:{points}"); } catch { }
+
+
+            tpAcc.DonatorPoints += points;
+            player.SendChatMessage($"!{{#00FF33}}You have given {tpAcc.Username} {points} donator points. (Their total now: {tpAcc.DonatorPoints})");
+
+            ContextFactory.Instance.SaveChanges();
+            return;
         }
 
         [Command("givedonorpoints", "!{#AFAFAF}[USAGE] givedonorpoints (target) (points)")]
@@ -4828,6 +4912,47 @@ namespace LSCC
             player.SendChatMessage($"!{{#00FF33}}You have set {target.Name}'s donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
             target.SendChatMessage($"!{{#00FF33}}{player.Name} has set your donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
             EPlayer.Save(target);
+        }
+
+        [Command("osetdonator", "!{#AFAFAF}[USAGE] osetdonator (target) (level)")]
+        public void cmd_osetdonator(Player player, string name, int level)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 5)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+            if (RAGE.Entities.Players.All.Where(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).Count() > 0)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is currently in-game! Use /givedonorpoints!");
+                return;
+            }
+
+            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+
+            if ((tpAcc != null) == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                return;
+            }
+
+            if (level < 0 || level > 3)
+            { // Bronze, Silver, Gold
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed 3.");
+                return;
+            }
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:osetdonator:{tpAcc.Username}:{level}"); } catch { }
+
+            tpAcc.DonatorLevel = level;
+            player.SendChatMessage($"!{{#00FF33}}You have set {tpAcc.Username}'s donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
+
+            ContextFactory.Instance.SaveChanges();
+            return;
         }
 
         [Command("dc", "!{#AFAFAF}[USAGE] donatorchat (text)", Alias = "donatorchat", GreedyArg = true)]
@@ -5623,7 +5748,7 @@ namespace LSCC
             return;
         }
 
-        [Command("unjail", "!{#AFAFAF}[USAGE] unjail (target)", GreedyArg = true)]
+        [Command("unjail", "!{#AFAFAF}[USAGE] unjail (target)")]
         public void cmd_unjail(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player))
@@ -5818,7 +5943,7 @@ namespace LSCC
             return;
         }
 
-        [Command("ounmute", "!{#AFAFAF}[USAGE] ounmute (target)", GreedyArg = true)]
+        [Command("ounmute", "!{#AFAFAF}[USAGE] ounmute (target)")]
         public void cmd_ounmute(Player player, string name)
         {
             if (!EPlayer.LoggedIn(player))
@@ -5859,7 +5984,7 @@ namespace LSCC
             return;
         }
 
-        [Command("unmute", "!{#AFAFAF}[USAGE] unmute (target)", GreedyArg = true)]
+        [Command("unmute", "!{#AFAFAF}[USAGE] unmute (target)")]
         public void cmd_unmute(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player))
