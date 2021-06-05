@@ -4199,7 +4199,7 @@ namespace LSCC
                 player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /set(hp/ar) /spec");
                 player.SendChatMessage("[Admin Lv 1]: /(r)freeze /(r)unfreeze /kick /slap /setinv(ulnerable) /specoff");
                 player.SendChatMessage("[Admin Lv 1]: /bancheck /(o)jail /(o)unjail /afix /aflip /sendtolobby /set(time/weather)");
-                player.SendChatMessage("[Admin Lv 1]: /mute /unmute /warn /unwarn /setteam /forceautojoin /forceswapseats");
+                player.SendChatMessage("[Admin Lv 1]: /(o)mute /(o)unmute /warn /unwarn /setteam /forceautojoin /forceswapseats");
                 player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
@@ -5725,7 +5725,7 @@ namespace LSCC
 
                 Account Acc = EPlayer.GetAccount(target);
                 Acc.MuteReason = reason;
-                Acc.MuteTime = mins * 60;
+                Acc.MuteTime = Acc.MuteTime + (mins * 60);
                 target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been muted for {mins} minutes, reason: {reason}.");
 
                 try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:mute:{target.Name}:{mins}:{reason.Replace(":", "|")}"); } catch { }
@@ -5734,6 +5734,89 @@ namespace LSCC
                 target.TriggerEvent("SetMuteCounter", Acc.MuteTime);
             }
 
+        }
+
+        [Command("omute", "!{#AFAFAF}[USAGE] omute (target) (minutes) (reason)", GreedyArg = true)]
+        public void cmd_omute(Player player, string name, int minutes, string reason)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+            if (RAGE.Entities.Players.All.Where(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).Count() > 0)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is currently in-game! Use /mute!");
+                return;
+            }
+
+            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+
+            if ((tpAcc != null) == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                return;
+            }
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:omute:{tpAcc.Username}:{minutes}:{reason}"); } catch { }
+
+            tpAcc.MuteReason = reason;
+            tpAcc.MuteTime = tpAcc.MuteTime + (minutes * 60);
+
+            ContextFactory.Instance.SaveChanges();
+
+            RAGE.Entities.Players.All.ForEach((Player playa) =>
+            {
+                playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] {player.Name} has offline muted {tpAcc.Username} for {minutes} minutes, reason: {reason}.");
+            });
+
+
+            return;
+        }
+
+        [Command("ounmute", "!{#AFAFAF}[USAGE] ounmute (target)", GreedyArg = true)]
+        public void cmd_ounmute(Player player, string name)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+            if (RAGE.Entities.Players.All.Where(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).Count() > 0)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is currently in-game! Use /unmute!");
+                return;
+            }
+
+            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+
+            if ((tpAcc != null) == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                return;
+            }
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ounmute:{tpAcc.Username}"); } catch { }
+
+            tpAcc.MuteTime = 0;
+
+            ContextFactory.Instance.SaveChanges();
+
+            RAGE.Entities.Players.All.ForEach((Player playa) =>
+            {
+                playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] {player.Name} has offline unmuted {tpAcc.Username}.");
+            });
+
+
+            return;
         }
 
         [Command("unmute", "!{#AFAFAF}[USAGE] unmute (target)", GreedyArg = true)]
