@@ -50,7 +50,7 @@ var curGPSBind = 0x5A;
 var radioToggle = 0;
 
 var ServerSettings = [];
-
+let CollisionVehicles = [];
 var ShotStats = [];
 
 mp.game.vehicle.defaultEngineBehaviour = false;
@@ -288,6 +288,18 @@ mp.events.addCommand("updaterate", function (rate) {
 });
 
 if(!radioToggle) mp.game.audio.setInitialPlayerStation('OFF');
+
+
+mp.events.add('entityStreamOut', (entity) => {
+
+    if (entity.type === 'vehicle') 
+    {
+        if(CollisionVehicles.indexOf(entity.id) != -1)
+        {
+            CollisionVehicles.splice(CollisionVehicles.indexOf(entity.id), 1);
+        }
+    }
+});
 
 mp.events.add('render', () => {
 
@@ -534,37 +546,26 @@ mp.events.add('render', () => {
                         if((showHud !== undefined && showHud == false) == false) collisionText.visible = true;
 
                         mp.vehicles.forEach(target => {
-                            if(player.isInAnyVehicle(false))
+                            if(CollisionVehicles.indexOf(target.id) == -1)
                             {
-                                if(target != player.vehicle)
-                                {
-                                    player.setNoCollision(target.handle, false); // Collisions OFF for ourselves to other cars too.
-                                    target.setNoCollision(player.handle, false);
+                                player.setNoCollision(target.handle, false); // Collisions OFF for ourselves to other cars too.
+                                target.setNoCollision(player.handle, false);
 
-                                    target.setNoCollision(player.vehicle.handle, false);
-                                    player.vehicle.setNoCollision(target.handle, false);
-                                }
-                            }
+                                target.setInvincible(true);
+                                target.setCanBeDamaged(false);
+                                target.setCanBreak(false);
 
-                            target.setInvincible(true);
-                            target.setCanBeDamaged(false);
-                            target.setCanBreak(false);
-
-                            mp.vehicles.forEach(target2 => {
-                                if(player.isInAnyVehicle(false))
-                                {
-                                    if(target2 != player.vehicle)
+                                mp.vehicles.forEach(target2 => {
+                                    if(target2 != target)
                                     {
                                         target.setNoCollision(target2.handle, false);
                                         target2.setNoCollision(target.handle, false);
                                     }
-                                }
-                                else
-                                {
-                                    target.setNoCollision(target2.handle, false);
-                                    target2.setNoCollision(target.handle, false);
-                                }
-                            });
+                                    
+                                });
+
+                                CollisionVehicles.push(target.id);
+                            }
                         });
                     }
                     else if(collisionTime == 0)
@@ -573,17 +574,25 @@ mp.events.add('render', () => {
                         collisionTime = -1;
 
                         mp.vehicles.forEach(target => {
-                            player.setNoCollision(target.handle, true); // Collisions ON for ourselves to other cars too.
-                            target.setNoCollision(player.handle, true);
+                            if(CollisionVehicles.indexOf(target.id) != -1)
+                            {
+                                player.setNoCollision(target.handle, true); // Collisions ON for ourselves to other cars too.
+                                target.setNoCollision(player.handle, true);
 
-                            target.setInvincible(false);
-                            target.setCanBeDamaged(true);
-                            target.setCanBreak(true);
+                                target.setInvincible(false);
+                                target.setCanBeDamaged(true);
+                                target.setCanBreak(true);
 
-                            mp.vehicles.forEach(target2 => {
-                                target.setNoCollision(target2.handle, true);
-                                target2.setNoCollision(target.handle, true);
-                            });
+                                mp.vehicles.forEach(target2 => {
+                                    if(target2 != target)
+                                    {
+                                        target.setNoCollision(target2.handle, true);
+                                        target2.setNoCollision(target.handle, true);
+                                    }
+                                });
+
+                                CollisionVehicles.splice(CollisionVehicles.indexOf(target.id), 1);
+                            }
                         });
                     }
                 }
@@ -594,15 +603,25 @@ mp.events.add('render', () => {
                     if(!player.isInAnyVehicle(false) && ServerSettings.OnfootCollisions == false)
                     {
                         mp.vehicles.forEach(target => {
-                            player.setNoCollision(target.handle, false); // Collisions OFF for ourselves to other cars too.
-                            target.setNoCollision(player.handle, false);
+                            if(CollisionVehicles.indexOf(target.id) == -1)
+                            {
+                                player.setNoCollision(target.handle, false); // Collisions OFF for ourselves to other cars too.
+                                target.setNoCollision(player.handle, false);
+
+                                CollisionVehicles.push(target.id);
+                            }                            
                         });
                     }
                     else
                     {
                         mp.vehicles.forEach(target => {
-                            player.setNoCollision(target.handle, true); // Collisions ON for ourselves to other cars too.
-                            target.setNoCollision(player.handle, true);
+                            if(CollisionVehicles.indexOf(target.id) != -1)
+                            {
+                                player.setNoCollision(target.handle, true); // Collisions ON for ourselves to other cars too.
+                                target.setNoCollision(player.handle, true);
+
+                                CollisionVehicles.splice(CollisionVehicles.indexOf(target.id), 1);
+                            }
                         });
                     }
                 }
