@@ -1,5 +1,4 @@
 ﻿FORMAT: ADDED BY - ITEM.
-KEEP COPS FROZEN FOR 10 SECONDS IF COLLISIONS DONT WORK CUZ THEY DONT RN SOME CARS CAN STIL LRAM
 admin records system
 
 buyammo with donator points
@@ -10,7 +9,6 @@ add a linux script that will keep on restarting server if goes off?
 add more clothing using mods
 make donation stuf or page
 allow custom loadout in dm
-FREEROAM WORLD, ALLOW FREEEROAM WORLD SPAWN SET ETC, TOG INVINCIBILITY TOO
 vehicle setmod with https://wiki.rage.mp/index.php?title=Vehicle_Mods
 you can use indexes and allow player to customize car in freeroam and save settings for a car wowohow donator stuf
 make default cruisers fast with some handling magic?

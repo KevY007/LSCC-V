@@ -2186,8 +2186,18 @@ namespace LSCC
 
                 if (player.GetSharedData<int>("InLobby") == -3) // Freeroam
                 {
-                    player.Position = new Vector3(1061.547f, -720.113f, 56.786f);
-                    player.Heading = 130.497f;
+                    SpawnSet spawnCoords = new SpawnSet(0, 1061.547f, -720.113f, 56.786f, 130.497f);
+
+                    Settings.FreeroamSpawns.ForEach(spawn =>
+                    {
+                        if(spawn.ID == player.GetData<uint>("FreeroamWorld"))
+                        {
+                            spawnCoords = spawn;
+                        }
+                    });
+                    player.Position = spawnCoords.Coords;
+                    player.Heading = spawnCoords.Heading;
+
                     EPlayer.SetDiscordStatus(player, $"Freeroam as {player.Name}");
 
                     EPlayer.SetColor(player, new Color(102, 232, 217), 0);

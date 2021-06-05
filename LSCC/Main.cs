@@ -278,10 +278,24 @@ namespace LSCC
         }
     }
 
+    public class SpawnSet
+    {
+        public uint ID { get; set; }
+        public Vector3 Coords { get; set; }
+        public float Heading { get; set; }
+
+        public SpawnSet(uint id, float x, float y, float z, float h)
+        {
+            ID = id;
+            Coords = new Vector3(x, y, z);
+            Heading = h;
+        }
+    }
+
     public static class Settings
     {
         // Static Settings / Const
-        public const string Version = "0.2f";
+        public const string Version = "0.2g";
         public const int GameRunTime = 390; // Game Running Time in Seconds before STOP
         public const int MaxLobbies = 5; // Default/starting lobby num.
         public const int DefaultMaxInLobby = 30;
@@ -307,6 +321,7 @@ namespace LSCC
         public static long LastCountUpdate { get; set; }
         public static List<LoadoutData> Loadouts { get; set; }
         public static Dictionary<ulong, jWeaponData> WeaponData { get; set; }
+        public static List<SpawnSet> FreeroamSpawns { get; set; }
 
         // Dyn Settings Global
         public static DynSet Dynamics { get; set; }
@@ -883,6 +898,7 @@ namespace LSCC
             Settings.LoggedInPlayers = new List<Player>();
             Settings.AdminVehicles = new List<Vehicle>();
             Settings.Loadouts = new List<LoadoutData>();
+            Settings.FreeroamSpawns = new List<SpawnSet>();
 
             Settings.WeaponData = new Dictionary<ulong, jWeaponData>();
             
@@ -2086,8 +2102,11 @@ namespace LSCC
                                 catch { }
 
                                 data.Item1.SetIntoVehicle(data.Item2, data.Item3);
-                                EPlayer.Freeze(data.Item1, false);
 
+                                if (!lobby.Cops.Contains(data.Item1))
+                                {
+                                    EPlayer.Freeze(data.Item1, false);
+                                }
                                 data.Item1.SetSharedData("HasShot", false);
                             }
                         }
@@ -2102,6 +2121,11 @@ namespace LSCC
                             if (lobby.gameMode == GameModes.STANDARD)
                             {
                                 p.SendNotification($"~g~Weapons will be given after collisions enable.");
+                                if (lobby.Cops.Contains(p))
+                                {
+                                    p.SendNotification("~b~Unfrozen in 10s...");
+                                }
+                                p.SendChatMessage("!{#FF6347}[!] !{#8D8DFF}Cops will be unfrozen in 10 seconds. !{#E84040}Fugitive's may take this time to prepare/start the chase.");
                             }
                             else if (lobby.gameMode == GameModes.BUSTED)
                             {
@@ -2194,6 +2218,22 @@ namespace LSCC
                     lock (lobby)
                     {
                         lobby.GameProgress++;
+
+                        if ((10 - lobby.GameProgress) % 2 == 0 && lobby.GameProgress <= 8 && lobby.GameProgress > 0)
+                        {
+                            lobby.Cops.ForEach(p => {
+                                EPlayer.Freeze(p, true);
+                                p.SendNotification($"~b~Unfrozen in {10 - lobby.GameProgress}s...");
+                            });
+                        }
+
+                        if (lobby.GameProgress == 10)
+                        {
+                            lobby.Cops.ForEach(p => {
+                                EPlayer.Freeze(p, false);
+                                p.SendNotification("~b~You may begin the chase now.");
+                            });
+                        }
 
                         if (lobby.GameProgress >= Convert.ToInt32(0.8 * Settings.GameRunTime) && lobby.gameMode != GameModes.BUSTED)
                         {

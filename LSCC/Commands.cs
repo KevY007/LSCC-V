@@ -626,6 +626,32 @@ namespace LSCC
             return;
         }
 
+        [Command("setspawn")]
+        public void cmd_setspawn(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if ((player.GetSharedData<int>("InLobby") == -3 && player.Dimension > 256 && player.Dimension <= 512) == false && EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam or you are in the default world!");
+                return;
+            }
+
+            Settings.FreeroamSpawns.RemoveAll(a => a.ID == player.GetData<uint>("FreeroamWorld"));
+
+            Settings.FreeroamSpawns.Add(new SpawnSet(player.GetData<uint>("FreeroamWorld"), player.Position.X, player.Position.Y, player.Position.Z, player.Heading));
+
+            foreach (Player p in Settings.LoggedInPlayers.Where(a => a.GetData<uint>("FreeroamWorld") == player.GetData<uint>("FreeroamWorld")))
+            {
+                p.SendChatMessage("!{#FF6347}>> !{#FFFFFF}" + player.Name + " has changed the spawn of this freeroam world.");
+            }
+
+            try { Main.Log("freeroam.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setspawn:{player.Dimension-(uint)256}"); } catch { }
+
+            return;
+        }
+
         [Command("gps", Alias = "bk")]
         public static void cmd_gps(Player player)
         {
@@ -3239,7 +3265,7 @@ namespace LSCC
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /derby");
             player.SendChatMessage("!{#28E0DA}[Mode: DM]: /dm /dmarena");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /freeroam /veh /customvehlist /teleport /mytime /myweather");
-            player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /togblip /gun /world /godmode");
+            player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /togblip /gun /world /godmode /setspawn");
             player.SendChatMessage("!{#A5A8A8}[Misc]: /updaterate /info /fontsize /voicebind /gpsbind /shotstats");
             player.SendChatMessage("!{#A5A8A8}[Dbg/Test]: /pos /lcmenu");
             
@@ -4187,7 +4213,7 @@ namespace LSCC
             if (EPlayer.GetAccount(player).Admin >= 3)
             {
                 player.SendChatMessage("[Admin Lv 3]: /givegun(all) /gotopos /bringall /sethpall /(un)freezeall /r(emove)g(uns)f(rom)a(ll)");
-                player.SendChatMessage("[Admin Lv 3]: /givecomp /removecomp /attachcomp /noclip /grantfugitive");
+                player.SendChatMessage("[Admin Lv 3]: /givecomp /removecomp /attachcomp /noclip /grantfugitive /setspawn (default freeroam world) /godmode");
             }
             if (EPlayer.GetAccount(player).Admin >= 4)
             {
