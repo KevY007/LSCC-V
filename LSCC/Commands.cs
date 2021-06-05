@@ -5667,7 +5667,7 @@ namespace LSCC
             }
         }
 
-        [Command("tunfreeze", "!{#AFAFAF}[USAGE] tfreeze (team 0 = fugitive, 1 = cop)")]
+        [Command("tunfreeze", "!{#AFAFAF}[USAGE] tunfreeze (team 0 = fugitive, 1 = cop)")]
         public void cmd_tunfreeze(Player player, int teamid)
         {
             if (!EPlayer.LoggedIn(player))
