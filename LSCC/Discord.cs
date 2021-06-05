@@ -150,6 +150,37 @@ namespace LSCC
                         }
                     }, 10);
                 }
+                if (context.Content.StartsWith("!lobbies"))
+                {
+                    var builder = new EmbedBuilder()
+                                .WithTitle("**Lobby | Status | Players**")
+                                .WithDescription("```\n```")
+                                .WithColor(255, 0, 0)
+                                .WithFooter(footer =>
+                                {
+                                    footer
+                                        .WithText("Lobby List");
+                                })
+                                .WithAuthor(author =>
+                                {
+                                    author
+                                        .WithName("Lobbies")
+                                        .WithIconUrl("https://i.imgur.com/nJPbaL7.png");
+                                });
+
+                    foreach (LobbyData p in Settings.Lobbies)
+                    {
+                        builder.AddField(p.lobbyId.ToString(), LSCC.Main.ConvertGameStatus(p.gameStatus, false) + " | " + Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == p.lobbyId).ToString() + " Players", true);
+                    }
+
+                    var embed = builder.Build();
+
+                    context.Channel.SendMessageAsync(
+                        "Reporting...",
+                        embed: embed)
+                        .ConfigureAwait(false);
+                }
+
                 if (context.Content.StartsWith("!admins"))
                 {
                     if (Settings.LoggedInPlayers.Count(a => EPlayer.GetAccount(a).Admin > 0) < 1)
@@ -269,6 +300,7 @@ namespace LSCC
                     builder.AddField("a", "Sends a message in ADM chat");
                     builder.AddField("players", "Gives a list of all the players online");
                     builder.AddField("admins", "Gives a list of all the admins online");
+                    builder.AddField("lobbies", "Reports back lobbies and their statuses.");
 
                     var embed = builder.Build();
 
