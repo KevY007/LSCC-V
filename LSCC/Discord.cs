@@ -150,6 +150,82 @@ namespace LSCC
                         }
                     }, 10);
                 }
+                if (context.Content.StartsWith("!admins"))
+                {
+                    if (Settings.LoggedInPlayers.Count(a => EPlayer.GetAccount(a).Admin > 0) < 1)
+                    {
+                        context.Channel.SendMessageAsync(":negative_squared_cross_mark: No admins are online!");
+                        return Task.CompletedTask;
+                    }
+
+                    int players = 0;
+                    int tries = 0;
+                    NAPI.Task.Run(() =>
+                    {
+                        while (players < Settings.LoggedInPlayers.Count(a => EPlayer.GetAccount(a).Admin > 0))
+                        {
+                            tries++;
+                            if (tries >= 10) { NAPI.Util.ConsoleOutput("breaking cuz of tries"); break; }
+
+                            var builder = new EmbedBuilder()
+                                .WithTitle("**Lobby/Mode | Player | Level**")
+                                .WithDescription("```\n```")
+                                .WithColor(255, 0, 0)
+                                .WithFooter(footer =>
+                                {
+                                    footer
+                                        .WithText("Online List");
+                                })
+                                .WithAuthor(author =>
+                                {
+                                    author
+                                        .WithName("Admins")
+                                        .WithIconUrl("https://i.imgur.com/nJPbaL7.png");
+                                });
+
+                            int thisCount = 0;
+                            int proc = 0;
+                            foreach (Player pl in Settings.LoggedInPlayers.Where(a => EPlayer.GetAccount(a).Admin > 0))
+                            {
+                                thisCount++;
+                                if (thisCount <= players) continue;
+
+                                players++;
+                                proc++;
+                                string lobby = "Lobby " + pl.GetSharedData<int>("InLobby");
+                                switch (pl.GetSharedData<int>("InLobby"))
+                                {
+                                    case -1:
+                                        lobby = "Login";
+                                        break;
+                                    case -2:
+                                        lobby = "Jail";
+                                        break;
+                                    case -3:
+                                        lobby = "Freeroam";
+                                        break;
+                                    case -4:
+                                        lobby = "Derby";
+                                        break;
+                                    case -5:
+                                        lobby = "Customizer";
+                                        break;
+                                }
+
+                                builder.AddField(pl.Name, lobby + " | Level: " + EPlayer.GetAdminLevelName(EPlayer.GetAccount(pl).Admin, false), true);
+
+                                if (proc >= 20) break;
+                            }
+
+                            var embed = builder.Build();
+
+                            context.Channel.SendMessageAsync(
+                                "Reporting...",
+                                embed: embed)
+                                .ConfigureAwait(false);
+                        }
+                    }, 10);
+                }
                 if (context.Content.StartsWith("!o"))
                 {
                     string[] args = context.Content.Split(" ", 2);
@@ -192,6 +268,7 @@ namespace LSCC
                     builder.AddField("o", "Sends a message in OOC chat");
                     builder.AddField("a", "Sends a message in ADM chat");
                     builder.AddField("players", "Gives a list of all the players online");
+                    builder.AddField("admins", "Gives a list of all the admins online");
 
                     var embed = builder.Build();
 

@@ -516,7 +516,6 @@ namespace LSCC
                 if (killer != null && !killer.IsNull && killer != player)
                 {
                     NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
-                    Discord.SendTextChannel("staff-bot", $"`(Death) | Killer: {killer.Name} ({killer.GetSharedData<int>("Team")}), Victim: {player.Name} ({player.GetSharedData<int>("Team")}), Item: {(reasonStr == null ? "N/A" : reasonStr)}`");
 
                     if (killer.GetSharedData<int>("InLobby") > -1 && killer.GetSharedData<int>("InDM") > -1)
                     {
