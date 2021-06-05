@@ -2062,9 +2062,13 @@ namespace LSCC
         [ServerEvent(Event.PlayerSpawn)]
         public static void OnPlayerSpawn(Player player)
         {
+            if (player == null || !player.Exists) return;
+
             player.ResetData("_currentlySwappingSeats");
             foreach (Player p in Settings.LoggedInPlayers.Where(a => a.HasData("Spectating") && a.GetData<Player>("SpectatingPlayer") == player))
             {
+                if (p == null || !player.Exists) continue;
+
                 Commands.cmd_specoff(p);
             }
             player.SetData("Killstreak", 0);
@@ -2072,10 +2076,10 @@ namespace LSCC
 
             lock (player)
             {
-                if (EPlayer.GetAccount(player).MuteTime > 0)
-                {
-                    Account acc = EPlayer.GetAccount(player);
+                Account acc = EPlayer.GetAccount(player);
 
+                if (acc != null && acc.MuteTime > 0)
+                {
                     player.SetSharedData("MuteTime", acc.MuteTime);
                     player.TriggerEvent("SetMuteCounter", acc.MuteTime);
                 }
@@ -2089,7 +2093,6 @@ namespace LSCC
 
                     CharacterData ConvChar = new CharacterData();
 
-                    Account acc = EPlayer.GetAccount(player);
                     try
                     {
                         if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata-9 sending to creation."));
@@ -2137,15 +2140,13 @@ namespace LSCC
 
                 player.SetSharedData("DerbyTime", 0);
 
-                player.SetSharedData("Level", EPlayer.GetAccount(player).Level);
+                player.SetSharedData("Level", acc.Level);
                 player.SetSharedData("Ping", player.Ping);
                 player.SetSharedData("HasShot", false);
 
-                if (EPlayer.GetAccount(player).JailTime > 0)
+                if (acc.JailTime > 0)
                 {
                     EPlayer.SetDiscordStatus(player, $"In jail as {player.Name}");
-
-                    Account acc = EPlayer.GetAccount(player);
 
                     player.SetData("AutoJoin", false);
                     player.SetSharedData("InLobby", -2);
@@ -2251,6 +2252,8 @@ namespace LSCC
                     {
                         foreach (Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
                         {
+                            if (p == null || !p.Exists) continue;
+
                             p.TriggerEvent("SetDerbyCounting", true, Settings.DerbyTimeLeft);
                         }
                     }
@@ -2283,6 +2286,7 @@ namespace LSCC
                         catch { }
                     }, 750);
 
+                    int delayTimeCalc = 50 + player.Ping;
                     NAPI.Task.Run(() =>
                     {
                         try
@@ -2294,7 +2298,7 @@ namespace LSCC
                             }
                         }
                         catch { }
-                    }, player.Ping + 50);
+                    }, delayTimeCalc);
                 }
 
                 if (player.GetSharedData<int>("InLobby") > -1) // Copchase Lobby
@@ -2344,6 +2348,7 @@ namespace LSCC
                         EPlayer.SetDiscordStatus(player, $"[Lobby {player.GetSharedData<int>("InLobby")}] DM '{Settings.DMNames[arenaID]}' as {player.Name}");
                         EPlayer.SetColor(player, new Color(179, 179, 179), 100);
 
+                        int delayTimeCalc = 250 + player.Ping;
                         NAPI.Task.Run(() =>
                         {
                             try
@@ -2390,7 +2395,7 @@ namespace LSCC
                                 }
                             }
                             catch { }
-                        }, 250 + player.Ping);
+                        }, delayTimeCalc);
                     }
                 }
             }

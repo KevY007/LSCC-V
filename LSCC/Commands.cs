@@ -3267,7 +3267,7 @@ namespace LSCC
             player.SendChatMessage("!{#A5A8A8}[Misc]: /updaterate /info /fontsize /voicebind /gpsbind /shotstats");
             player.SendChatMessage("!{#A5A8A8}[Dbg/Test]: /pos /lcmenu");
             
-            player.SendChatMessage("!{#F7EB05}[Donator/Points] /buycomp (Flashlights are free!) /mycomps /removecomp (NO REFUND)");
+            player.SendChatMessage("!{#F7EB05}[Donator/Points] /buycomp (Free Flashlights) /mycomps /removecomp (NO REFUND)");
             if (EPlayer.GetAccount(player).DonatorLevel >= 1)
             {
                 player.SendChatMessage("!{#F7EB05}[Bronze Donator] /d(onator)c(hat)");
@@ -4198,7 +4198,7 @@ namespace LSCC
 
                 player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /set(hp/ar) /spec");
                 player.SendChatMessage("[Admin Lv 1]: /(r)freeze /(r)unfreeze /kick /slap /setinv(ulnerable) /specoff");
-                player.SendChatMessage("[Admin Lv 1]: /bancheck /jail /unjail /afix /aflip /sendtolobby /set(time/weather)");
+                player.SendChatMessage("[Admin Lv 1]: /bancheck /(o)jail /(o)unjail /afix /aflip /sendtolobby /set(time/weather)");
                 player.SendChatMessage("[Admin Lv 1]: /mute /unmute /warn /unwarn /setteam /forceautojoin /forceswapseats");
                 player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats");
             }
@@ -5502,6 +5502,48 @@ namespace LSCC
 
         }
 
+        [Command("ojail", "!{#AFAFAF}[USAGE] ojail (target) (minutes) (reason)", GreedyArg = true)]
+        public void cmd_ojail(Player player, string name, int minutes, string reason)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+            if (RAGE.Entities.Players.All.Where(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).Count() > 0)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is currently in-game! Use /jail!");
+                return;
+            }
+
+            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+
+            if ((tpAcc != null) == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                return;
+            }
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ojail:{tpAcc.Username}:{minutes}:{reason}"); } catch { }
+
+            tpAcc.JailReason = reason;
+            tpAcc.JailTime = tpAcc.JailTime + (minutes * 60);
+
+            ContextFactory.Instance.SaveChanges();
+
+            RAGE.Entities.Players.All.ForEach((Player playa) =>
+            {
+                playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] {player.Name} has offline jailed {tpAcc.Username} for {minutes} minutes, reason: {reason}.");
+            });
+
+
+            return;
+        }
+
         [Command("jail", "!{#AFAFAF}[USAGE] jail (target) (minutes) (reason)", GreedyArg = true)]
         public void cmd_jail(Player player, Player target, int mins, string reason)
         {
@@ -5568,6 +5610,43 @@ namespace LSCC
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has unjailed {target.Name}.");
                 EPlayer.Spawn(target);
             }
+            return;
+        }
+
+        [Command("ounjail", "!{#AFAFAF}[USAGE] ojail (target)")]
+        public void cmd_ounjail(Player player, string name)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+            if (RAGE.Entities.Players.All.Where(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).Count() > 0)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is currently in-game! Use /unjail!");
+                return;
+            }
+
+            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+
+            if ((tpAcc != null) == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                return;
+            }
+
+            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ounjail:{tpAcc.Username}"); } catch { }
+
+            tpAcc.JailTime = 0;
+
+            ContextFactory.Instance.SaveChanges();
+
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has offline unjailed {tpAcc.Username}.");
+
             return;
         }
 

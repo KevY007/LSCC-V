@@ -628,7 +628,7 @@ namespace LSCC
             {
                 Account Acc = EPlayer.GetAccount(player);
                 Acc.JailReason = reason;
-                Acc.JailTime = minutes * 60;
+                Acc.JailTime = Acc.JailTime + (minutes * 60);
                 player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been jailed for {minutes} minutes, reason: {reason}.");
 
                 lock (Settings.Lobbies)
