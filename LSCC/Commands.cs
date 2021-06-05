@@ -2250,7 +2250,7 @@ namespace LSCC
             return;
         }
 
-        [Command("world", "!{#AFAFAF}[USAGE] world (number/id)")]
+        [Command("world", "!{#AFAFAF}[USAGE] world (number/id, 0 is default)")]
         public void cmd_world(Player player, int worldid)
         {
             if (!EPlayer.LoggedIn(player))
