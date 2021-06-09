@@ -1041,7 +1041,7 @@ namespace LSCC
                             player.ResetData("CuffingTarget");
 
                             EPlayer.GrantXP(player, 5);
-                            player.SetSharedData("FugitiveChance", player.GetSharedData<float>("FugitiveChance")+(0.2 * (EPlayer.GetAccount(player).DonatorLevel + 1)));
+                            player.SetSharedData("FugitiveChance", player.GetSharedData<float>("FugitiveChance")+(0.2 * (double)((double)EPlayer.GetAccount(player).DonatorLevel + 1.0)));
                             EPlayer.Action(player, $"has grabbed ahold of {target.Name} and slapped the handcuffs on their wrists.");
 
                             EPlayer.SendMessageInLobby(lobbye.lobbyId, $"!{{#ADD8E6}}Cop {player.Name} has apprehended Fugitive {target.Name}.");
@@ -1139,7 +1139,7 @@ namespace LSCC
                             }
 
                             EPlayer.GrantXP(player, 2);
-                            player.SetSharedData("FugitiveChance", player.GetSharedData<float>("FugitiveChance") + (0.1 * (EPlayer.GetAccount(player).DonatorLevel + 1)));
+                            player.SetSharedData("FugitiveChance", player.GetSharedData<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(player).DonatorLevel + 1.0)));
                             cmd_do(player, $"{target.Name} has been dragged out of the vehicle.");
 
                             EPlayer.SendMessageInLobby(lobbye.lobbyId, $"!{{#ADD8E6}}Cop {player.Name} has dragged {target.Name} out of the vehicle!");

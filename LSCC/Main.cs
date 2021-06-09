@@ -1434,7 +1434,7 @@ namespace LSCC
                     EPlayer.GetAccount(winner).DerbyWins++;
                     EPlayer.GrantXP(winner, winXP);
 
-                    winner.SetSharedData("FugitiveChance", winner.GetSharedData<float>("FugitiveChance") + 5 + (EPlayer.GetAccount(winner).DonatorLevel / 2));
+                    winner.SetSharedData("FugitiveChance", winner.GetSharedData<float>("FugitiveChance") + 5 + (double)((double)EPlayer.GetAccount(winner).DonatorLevel / 2.0));
                 }
 
                 Settings.DerbyTimeLeft = 180;

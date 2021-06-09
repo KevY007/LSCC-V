@@ -3,7 +3,7 @@ admin records system
 
 buyammo with donator points
 vehicle upgrade system with regular points later
-
+ANTI SWIMMER, entity isInWAter
 #bug reports and other chans sugeestion
 add a linux script that will keep on restarting server if goes off?
 add more clothing using mods

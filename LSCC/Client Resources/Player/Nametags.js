@@ -89,7 +89,10 @@ mp.events.add('render', (nametags) => {
         if(timerCount >= 3) timerCount = 0;
     }
 
-    if(mp.players.local.getVariable("pLogged") == false) return;
+    if((mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true) == false)
+    {
+        return;
+    }
     
     nametags.forEach(nametag => {
         let [player, x, y, distance] = nametag;

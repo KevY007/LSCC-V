@@ -688,7 +688,7 @@ namespace LSCC
                                 EPlayer.GrantXP(killer, 5);
                                 EPlayer.SendMessageInLobby(lobby.lobbyId, $"!{{#FF0000}}[KILLSTREAK] !{{#FF6347}}{killer.Name} !{{#FFFFFF}}is on a {killStreak} kills rampage! Someone stop them!");
                                 killer.SendChatMessage("!{#00FF33}[!] !{#FFFFFF}You have earnt 5 XP for maintaining a killstreak!");
-                                killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + (0.1 * (EPlayer.GetAccount(killer).DonatorLevel + 1)));
+                                killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(killer).DonatorLevel + 1.0)));
                             }
                         }
                         if (lobby.Fugitives.Contains(player))
@@ -697,7 +697,7 @@ namespace LSCC
                             {
                                 EPlayer.GetAccount(player).Deaths++;
                                 EPlayer.GetAccount(killer).Kills++;
-                                killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (EPlayer.GetAccount(killer).DonatorLevel / 10));
+                                killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 10.0));
                             }
 
                             wasInGame = true;
@@ -751,7 +751,7 @@ namespace LSCC
                             {
                                 EPlayer.GetAccount(player).Deaths++;
                                 EPlayer.GetAccount(killer).Kills++;
-                                killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (EPlayer.GetAccount(killer).DonatorLevel / 10));
+                                killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 10.0));
                             }
 
                             wasInGame = true;
