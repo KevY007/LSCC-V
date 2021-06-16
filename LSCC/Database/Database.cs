@@ -5,6 +5,13 @@ using System.Reflection;
 
 namespace LSCC
 {
+    public class Language
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public string LanguageName { get; set; }
+    }
+
     public class MapSpawn
     {
         [Key]
@@ -49,6 +56,7 @@ namespace LSCC
         // Account model class created somewhere else
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Map> Maps { get; set; }
+        public DbSet<Language> Languages { get; set; }
         public DbSet<MapSpawn> MapSpawns { get; set; }
         public DbSet<BanData> Bans { get; set; }
     }
