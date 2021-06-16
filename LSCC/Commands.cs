@@ -4214,6 +4214,11 @@ namespace LSCC
         [Command("removelanguage", "!{#AFAFAF}[USAGE] removelanguage (language ID) | /languages for a list")]
         public void cmd_removelanguage(Player player, string language)
         {
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
             int langID = -1;
             bool success = int.TryParse(language, out langID);
             if (!success)
@@ -4248,6 +4253,11 @@ namespace LSCC
         [Command("addlanguage", "!{#AFAFAF}[USAGE] addlanguage (language name)", GreedyArg = true)]
         public void cmd_addlanguage(Player player, string language)
         {
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
             if (ContextFactory.Instance.Languages.First(lang => lang.LanguageName == language) != null)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That language is already added!");
