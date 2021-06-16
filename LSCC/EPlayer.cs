@@ -552,6 +552,8 @@ namespace LSCC
                 player.TriggerEvent("ToggleHud", false);
                 player.SetData("GPS", false);
 
+                player.ResetData("Language");
+
                 player.SetData("EditingClothing", -1);
                 player.SetData("Creator_Using", false);
 
