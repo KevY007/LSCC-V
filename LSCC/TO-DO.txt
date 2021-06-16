@@ -1,6 +1,7 @@
 ﻿FORMAT: ADDED BY - ITEM.
 admin records system
 
+heli icon/plane icon on blip
 buyammo with donator points
 vehicle upgrade system with regular points later
 ANTI SWIMMER, entity isInWAter
