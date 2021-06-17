@@ -3312,7 +3312,7 @@ namespace LSCC
             player.SendChatMessage("[General]: /report /helpme /l(ow) /c(ar)w(hisper) /s(hout)");
             player.SendChatMessage("[Squad/Partner]: /squad /squadleave /s(quad)c(hat) /squadaccept /squadmembers");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
-            player.SendChatMessage("[Lobby]: /lobbychat (/lo,/lc) /spec /specoff");
+            player.SendChatMessage("[Lobby]: /lobbychat (/lo,/lg) /spec /specoff");
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats /changemypass");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys for activation)");
             player.SendChatMessage("!{#339BC4}[Cop!{#F24C27}chase]: !{#FFFFFF}/r(adio) /wt /loadout /car");
@@ -5504,7 +5504,7 @@ namespace LSCC
         }
 
 
-        [Command("lc", "!{#AFAFAF}[USAGE] lobbychat (text)", Alias = "lg,lo", GreedyArg = true)]
+        [Command("lobbychat", "!{#AFAFAF}[USAGE] lobbychat (text)", Alias = "lg,lo", GreedyArg = true)]
         public void cmd_lobbychat(Player player, string text)
         {
             player.SetData("TUA_LT", 0);
