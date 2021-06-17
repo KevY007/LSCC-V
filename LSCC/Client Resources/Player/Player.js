@@ -655,13 +655,25 @@ mp.events.add('render', () => {
                     if(target.getVariable("Team") == 0) 
                     {
                         blipColor = 75;
-                        if(target.getVariable("HasShot") == true) blipColor = 76;
+                        if(target.getVariable("HasShot") == true){
+                            blipColor = 76;
+                            blipId = 458;
+                        }
                     }
                     else if(target.getVariable("Team") == 1) blipColor = 3;
                     if(target.getVariable("InLobby") == -3) blipColor = 15;
                     if(target.getVariable("InLobby") == -4) blipColor = 73;
                     if(target.getVariable("InDM") != -1) blipColor = 39;
-                    if(target.isInAnyVehicle(false)) blipId = 724;
+
+                    if(target.isInAnyVehicle(false)){ 
+                        blipId = 724; 
+                        if(target.isInAnyHeli()){
+                            blipId = 43;
+                        }
+                        if(target.isOnAnyBike()){
+                            blipId = 226;
+                        }
+                    }
 
                     var position = target.position;
 
