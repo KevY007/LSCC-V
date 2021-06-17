@@ -294,7 +294,7 @@ creatorMainMenu.ItemSelect.on((item, index) => {
 
             if(creatorParentsMenuExit == null)
             {
-                creatorParentsMenuExit = new UIMenuItem("Exit", "Go back to last menu.");
+                creatorParentsMenuExit = new UIMenuItem("Back", "Go back to last menu.");
                 creatorParentsMenuExit.ForeColor = new Color(127, 237, 28);
                 creatorParentsMenu.AddItem(creatorParentsMenuExit);
             }
@@ -306,7 +306,7 @@ creatorMainMenu.ItemSelect.on((item, index) => {
 
             if(creatorFeaturesMenuExit == null)
             {
-                creatorFeaturesMenuExit = new UIMenuItem("Exit", "Go back to last menu.");
+                creatorFeaturesMenuExit = new UIMenuItem("Back", "Go back to last menu.");
                 creatorFeaturesMenuExit.ForeColor = new Color(127, 237, 28);
                 creatorFeaturesMenu.AddItem(creatorFeaturesMenuExit);
             }
@@ -318,7 +318,7 @@ creatorMainMenu.ItemSelect.on((item, index) => {
 
             if(creatorAppearanceMenuExit == null)
             {
-                creatorAppearanceMenuExit = new UIMenuItem("Exit", "Go back to last menu.");
+                creatorAppearanceMenuExit = new UIMenuItem("Back", "Go back to last menu.");
                 creatorAppearanceMenuExit.ForeColor = new Color(127, 237, 28);
                 creatorAppearanceMenu.AddItem(creatorAppearanceMenuExit);
             }
@@ -330,7 +330,7 @@ creatorMainMenu.ItemSelect.on((item, index) => {
 
             if(creatorHairMenuExit == null)
             {
-                creatorHairMenuExit = new UIMenuItem("Exit", "Go back to last menu.");
+                creatorHairMenuExit = new UIMenuItem("Back", "Go back to last menu.");
                 creatorHairMenuExit.ForeColor = new Color(127, 237, 28);
                 creatorHairMenu.AddItem(creatorHairMenuExit);
             }
@@ -451,7 +451,7 @@ creatorParentsMenu.ItemSelect.on((item, index) => {
             resetParentsMenu();
         break;
 
-        case "Exit":
+        case "Back":
             creatorParentsMenu.RemoveItem(creatorParentsMenuExit);
             creatorParentsMenuExit = null;
 
@@ -512,7 +512,7 @@ creatorFeaturesMenu.ItemSelect.on((item, index) => {
             resetFeaturesMenu();
         break;
 
-        case "Exit":
+        case "Back":
             creatorFeaturesMenu.RemoveItem(creatorFeaturesMenuExit);
             creatorFeaturesMenuExit = null;
 
@@ -579,7 +579,7 @@ creatorAppearanceMenu.ItemSelect.on((item, index) => {
             resetAppearanceMenu();
         break;
 
-        case "Exit":
+        case "Back":
             creatorAppearanceMenu.RemoveItem(creatorAppearanceMenuExit);
             creatorAppearanceMenuExit = null;
 
@@ -633,7 +633,7 @@ creatorHairMenu.ItemSelect.on((item, index) => {
             resetHairAndColorsMenu();
         break;
 
-        case "Exit":
+        case "Back":
             creatorHairMenu.RemoveItem(creatorHairMenuExit);
             creatorHairMenuExit = null;
 
