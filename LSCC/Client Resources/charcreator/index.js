@@ -235,6 +235,10 @@ let angleItem = new UIMenuSliderItem("Angle", angles, 0, "", false);
 angleItem.Index = 0;
 creatorMainMenu.AddItem(angleItem);
 
+let randomizeItem = new UIMenuItem("Random", "Randomizes all of your character's features.");
+randomizeItem.ForeColor = new Color(245, 202, 47);
+creatorMainMenu.AddItem(randomizeItem);
+
 let saveItem = new UIMenuItem("Save", "Save all changes.");
 saveItem.ForeColor = new Color(118, 207, 39);
 creatorMainMenu.AddItem(saveItem);
@@ -332,7 +336,41 @@ creatorMainMenu.ItemSelect.on((item, index) => {
             }
         break;
 
-        case 6:
+        case 6: // full character randomization
+            // parents random
+            fatherItem.Index = getRandomInt(0, Data.fathers.length - 1);
+            motherItem.Index = getRandomInt(0, Data.mothers.length - 1);
+            similarityItem.Index = getRandomInt(0, 100);
+            skinSimilarityItem.Index = getRandomInt(0, 100);
+            updateParents();
+    
+            // features random
+            for (let i = 0; i < Data.featureNames.length; i++) {
+                featureItems[i].Index = getRandomInt(0, features.length);
+                updateFaceFeature(i, features[featureItems[i].Index]);
+            }
+
+            // appearance random
+            for (let i = 0; i < Data.appearanceNames.length; i++) {
+                appearanceItems[i].Index = getRandomInt(0, mp.game.ped.getNumHeadOverlayValues(i) - 1);
+                appearanceOpacityItems[i].Index = getRandomInt(0, 100);
+                updateAppearance(i);
+            }  
+            
+            // hair & colors random
+            hairItem.Index = getRandomInt(0, Data.hairList[currentGender].length - 1);
+            hairColorItem.Index = getRandomInt(0, Data.maxHairColor);
+            hairHighlightItem.Index = getRandomInt(0, Data.maxHairColor);
+            eyebrowColorItem.Index = getRandomInt(0, Data.maxHairColor);
+            beardColorItem.Index = getRandomInt(0, Data.maxHairColor);
+            eyeColorItem.Index = getRandomInt(0, Data.maxEyeColor);
+            blushColorItem.Index = getRandomInt(0, Data.maxBlushColor);
+            lipstickColorItem.Index = getRandomInt(0, Data.maxLipstickColor);
+            chestHairColorItem.Index = getRandomInt(0, Data.maxHairColor);
+            updateHairAndColors();            
+        break;
+
+        case 7:
             let parentData = {
                 Father: Data.fathers[fatherItem.Index],
                 Mother: Data.mothers[motherItem.Index],
@@ -361,7 +399,7 @@ creatorMainMenu.ItemSelect.on((item, index) => {
             mp.events.callRemote("creator_Save", currentGender, JSON.stringify(parentData), JSON.stringify(featureData), JSON.stringify(appearanceData), JSON.stringify(hairAndColors));
         break;
 
-        case 7:
+        case 8:
             mp.events.callRemote("creator_Leave");
         break;
     }
