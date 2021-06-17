@@ -897,6 +897,9 @@ namespace LSCC
             player.SetData("AccountHandle", acc);
             player.SetSharedData("pLogged", true);
 
+            if(EPlayer.GetAccount(player).Language != -1)
+                player.SetData("Language", ContextFactory.Instance.Languages.First(l => l.SQL_ID == EPlayer.GetAccount(player).Language));
+            
             CharacterData ConvChar = new CharacterData();
 
             try

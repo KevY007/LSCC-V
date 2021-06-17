@@ -4211,7 +4211,7 @@ namespace LSCC
             return;
         }
 
-        [Command("removelanguage", "!{#AFAFAF}[USAGE] removelanguage (language ID) | /languages for a list")]
+        [Command("removelanguage", "!{#AFAFAF}[USAGE] removelanguage (language) | /languages for a list")]
         public void cmd_removelanguage(Player player, string language)
         {
             if (EPlayer.GetAccount(player).Admin < 4)
@@ -4220,19 +4220,14 @@ namespace LSCC
                 return;
             }
             int langID = -1;
-            bool success = int.TryParse(language, out langID);
-            if (!success)
-            {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please enter a valid language ID.");
-                return;
-            }
 
-            Language lang = ContextFactory.Instance.Languages.First(l => l.SQL_ID == langID);
+            Language lang = ContextFactory.Instance.Languages.FirstOrDefault(l => l.LanguageName == language);
             if (lang == null)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}A language with that ID could not be found. Use !{#FFFF00}/languages!{#FFFFFF}.");
                 return;
             }
+            langID = lang.SQL_ID;
             string _langName = lang.LanguageName;
 
             foreach (Player pl in Settings.LoggedInPlayers.Where(p => p.HasData("Language")))
@@ -4258,7 +4253,7 @@ namespace LSCC
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
-            if (ContextFactory.Instance.Languages.First(lang => lang.LanguageName == language) != null)
+            if (ContextFactory.Instance.Languages.FirstOrDefault(lang => lang.LanguageName == language) != null)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That language is already added!");
                 return;
@@ -4277,54 +4272,54 @@ namespace LSCC
         public void cmd_languages(Player player)
         {
             player.SendChatMessage("!{#fcff99}==========[ LANGUAGES ]==========");
+            int _langCount = 0;
             foreach(Language lang in ContextFactory.Instance.Languages.ToList())
             {
-                player.SendChatMessage("!{#bfffbd}" + lang.SQL_ID + " !{#FFFFFF}| !{#f5fffe}" + lang.LanguageName);
+                player.SendChatMessage("!{#bfffbd} >!{#f5fffe} " + lang.LanguageName);
+                _langCount++;
             }
+            if (_langCount == 0) player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}No languages found! Ask the lazy-ass senior admins to add some. >:(");
             return;
         }
 
-        [Command("language", "!{#AFAFAF}[USAGE] language (ID or 'none') | /languages for a list")]
+        [Command("language", "!{#AFAFAF}[USAGE] language (language or 'none') | /languages for a list")]
         public void cmd_language(Player player, string language)
         {
             if(language.Equals("none", StringComparison.OrdinalIgnoreCase))
             {
                 EPlayer.GetAccount(player).Language = -1;
-                player.SetData("Language", -1);
+                player.ResetData("Language");
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You set your language to none & can no longer use the language chat.");
                 return;
             }
 
             int langID = -1;
-            bool success = int.TryParse(language, out langID);
-            if (!success)
-            {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please enter a valid language ID.");
-                return;
-            }
 
-            Language lang = ContextFactory.Instance.Languages.First(l => l.SQL_ID == langID);
+            Language lang = ContextFactory.Instance.Languages.FirstOrDefault(l => l.LanguageName == language);
             if(lang == null)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}A language with that ID could not be found. Use !{#FFFF00}/languages!{#FFFFFF}.");
                 return;
             }
+            langID = lang.SQL_ID;
 
             EPlayer.GetAccount(player).Language = langID;
-            player.SetData("Language", langID);
+            player.SetData("Language", lang);
             player.SendChatMessage("!{#A6F7B9}[Language] You set your language to !{#FFFF00}" + lang.LanguageName + " !{#A6F7B9}& can now use /L.");
-
+            EPlayer.Save(player);
             return;
         }
 
         [Command("languagechat", "!{#AFAFAF}[USAGE] languagechat (/lc) (text)", Alias = "lc", GreedyArg = true)]
         public void cmd_languagechat(Player player, string message)
         {
-            if (!player.HasData("Language"))
+            if (player.HasData("Language"))
             {
-                foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("Language") && p.GetData<Player>("Language") == player.GetData<Player>("Language")))
+                string lName = player.GetData<Language>("Language").LanguageName;
+                NAPI.Util.ConsoleOutput("lName worked: " + lName);
+                foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.GetData<Language>("Language").SQL_ID == player.GetData<Language>("Language").SQL_ID))
                 {
-                    mem.SendChatMessage("!{#A6F7B9}[Language] !{#FFFFFF}" + player.Name + ": " + message);
+                    mem.SendChatMessage("!{#A6F7B9}[" + lName + "] !{#FFFFFF}" + player.Name + ": " + message);
                 }
             }
             else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You did not set any language! Please do so by using !{#FFFF00}/language!{#FFFFFF}.");
