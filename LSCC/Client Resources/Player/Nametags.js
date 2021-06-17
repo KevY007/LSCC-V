@@ -57,6 +57,8 @@ function isPlayerInLOS(target) {
 }
 
 mp.events.add('playerNametagSet', (target, r, g, b, a, armour) => {
+    if(!(target != null && target !== undefined)) return;
+
     target.col = true;
     target.col_r = r;
     target.col_g = g;
