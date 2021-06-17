@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Reflection;
 
 namespace LSCC
@@ -95,7 +96,10 @@ namespace LSCC
 
         private static void LoadConnectionString()
         {
-            _connectionString = "Server=" + Settings.MySQL_Host + ";Database=" + Settings.MySQL_Database + ";Uid=" + Settings.MySQL_User + ";Pwd=" + Settings.MySQL_Password;
+            if (File.Exists("lscc/we_are_testing"))
+                _connectionString = "Server=" + Settings.MySQL_Host + ";Database=" + "lsccv_test" + ";Uid=" + Settings.MySQL_User + ";Pwd=" + Settings.MySQL_Password;
+            else 
+                _connectionString = "Server=" + Settings.MySQL_Host + ";Database=" + Settings.MySQL_Database + ";Uid=" + Settings.MySQL_User + ";Pwd=" + Settings.MySQL_Password;
         }
 
     }
