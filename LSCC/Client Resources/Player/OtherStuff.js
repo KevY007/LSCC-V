@@ -365,11 +365,11 @@ mp.events.add("ToggleNoclip", () => {
 });
   
 function startNoClip() 
-{
+{   
     var camPos = new mp.Vector3(
-      localPlayer.position.x,
-      localPlayer.position.y,
-      localPlayer.position.z
+        localPlayer.position.x,
+        localPlayer.position.y,
+        localPlayer.position.z
     );
     var camRot = mp.game.cam.getGameplayCamRot(2);
     noClipCamera = mp.cameras.new('default', camPos, camRot, 45);
@@ -444,10 +444,11 @@ mp.events.add('render', function()
     if (mp.keys.isDown(bindASCIIKeys.E)) {
       downMovement = 0.5;
     }
+
     mp.players.local.position = new mp.Vector3(
       pos.x + vector.x + 1,
       pos.y + vector.y + 1,
-      pos.z + vector.z + 1
+      pos.z + vector.z - 100
     );
     mp.players.local.heading = rr.z;
     noClipCamera.setCoord(

@@ -839,16 +839,30 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (EPlayer.GetAccount(player).Admin < 3)
+            if (EPlayer.GetAccount(player).Admin < 2)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
 
-            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Toggled noclip, actions:");
-            player.SendChatMessage("!{#FF6347}LSHIFT: Boost | LCTRL: Slow | LSHIFT + CTRL: Very slow (adjustable)");
-            player.SendChatMessage("!{#FF6347}/noclip_vsm (rate) (rate is in decimal like 0.10) -- will adjust very slow speed (for cinematic etc)");
-            player.TriggerEvent("ToggleNoclip");
+            if (player.HasData("IsNoclipping"))
+            {
+                player.SetSharedData("VisibleBlip", player.GetData<bool>("IsNoclipping"));
+                player.ResetData("IsNoclipping");
+                player.TriggerEvent("ForceNoclip", false);
+                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:noclip:stop"); } catch { }
+            }
+            else
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Toggled noclip, actions:");
+                player.SendChatMessage("!{#FF6347}LSHIFT: Boost | LCTRL: Slow | LSHIFT + CTRL: Very slow (adjustable)");
+                player.SendChatMessage("!{#FF6347}/noclip_vsm (rate) (rate is in decimal like 0.10) -- will adjust very slow speed (for cinematic etc)");
+
+                player.SetData("IsNoclipping", player.GetSharedData<bool>("VisibleBlip"));
+                player.SetSharedData("VisibleBlip", false);
+                player.TriggerEvent("ForceNoclip", true);
+                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:noclip:start"); } catch { }
+            }
             return;
         }
 
@@ -3056,7 +3070,7 @@ namespace LSCC
 
             if (EPlayer.LoggedIn(target))
             {
-                if(EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin)
+                if(EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && target != player)
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher admin level than you.");
                     return;
@@ -3082,7 +3096,7 @@ namespace LSCC
 
             if (EPlayer.LoggedIn(target))
             {
-                if (EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin)
+                if (EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && target != player)
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher admin level than you.");
                     return;
@@ -4424,12 +4438,12 @@ namespace LSCC
             {
                 player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword /togglemap");
                 player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension /r(emove)guns /suspend /unsuspend /(o)checkstats");
-                player.SendChatMessage("[Admin Lv 2]: /ann /vanish /oban /fugitivelist");
+                player.SendChatMessage("[Admin Lv 2]: /ann /vanish /oban /fugitivelist /noclip");
             }
             if (EPlayer.GetAccount(player).Admin >= 3)
             {
                 player.SendChatMessage("[Admin Lv 3]: /givegun(all) /gotopos /bringall /sethpall /(un)freezeall /r(emove)g(uns)f(rom)a(ll)");
-                player.SendChatMessage("[Admin Lv 3]: /givecomp /takecomp /attachcomp /noclip /grantfugitive /setspawn (freeroam world)");
+                player.SendChatMessage("[Admin Lv 3]: /givecomp /takecomp /attachcomp /grantfugitive /setspawn (freeroam world)");
                 player.SendChatMessage("[Admin Lv 3]: /getip /gethwid");
             }
             if (EPlayer.GetAccount(player).Admin >= 4)
@@ -6741,8 +6755,10 @@ namespace LSCC
 
             player.Dimension = target.Dimension;
             Vector3 pos = target.Position;
-            pos.Z -= 20.0f;
+            pos.Z -= 100.0f;
             player.Position = pos;
+
+            player.SetSharedData("VisibleBlip", false);
 
             NAPI.Task.Run(() =>
             {
