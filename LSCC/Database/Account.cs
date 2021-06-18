@@ -53,6 +53,7 @@ namespace LSCC
         public string CarFugitive { get; set; }
         public string CarCop { get; set; }
         public string WeaponComponents { get; set; }
+        public string MOTD { get; set; }
     }
 
     public static class AccountManager

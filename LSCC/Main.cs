@@ -231,6 +231,14 @@ namespace LSCC
         }
     };
 
+    public class MOTDData
+    {
+        public string AdminName { get; set; }
+        public string PostedOn { get; set; }
+        public string Message { get; set; }
+    };
+
+
     public partial class DynSet
     {
         [JsonProperty("DerbyVehicle")]
@@ -445,6 +453,16 @@ namespace LSCC
 
     public class Main : Script
     {
+        public static void DisplayMOTD(Player target, MOTDData motd)
+        {
+            target.SendChatMessage("!{#2B82FF}========================================");
+            target.SendChatMessage("!{#2B82FF}MOTD: !{#FFFFFF}" + motd.Message);
+            target.SendChatMessage("!{#2B82FF}Posted by !{#FF9100}" + motd.AdminName + " !{#2B82FF}on !{#FF9100}" + motd.PostedOn);
+            target.SendChatMessage("!{#2B82FF}========================================");
+
+            EPlayer.GetAccount(target).MOTD = "none"; // auto-clear the motd if they read it
+        }
+
         public static bool BlacklistedClothing(int slot, int drawable)
         {
             if(slot == 0) // Hats

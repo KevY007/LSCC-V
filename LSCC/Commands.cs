@@ -683,6 +683,111 @@ namespace LSCC
             return;
         }
 
+        [Command("motd", "!{#AFAFAF}[USAGE] motd (player name)(message | 'none' to delete)", GreedyArg = true)]
+        public void cmd_motd(Player player, string targetName, string message)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+            Player targetPlayer = null;
+            foreach(Player pl in Settings.LoggedInPlayers)
+            {
+                if(pl.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase))
+                {
+                    targetPlayer = pl;
+                    break;
+                }
+            }
+            if(targetPlayer == null)
+            {
+                Account targetAcc = ContextFactory.Instance.Accounts.FirstOrDefault(t => t.Username == targetName);
+                if (targetAcc == null)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fatal error when looking up player in database! Try to use correct capitalization.");
+                    return;
+                }
+
+                if (message.Equals("none"))
+                {
+                    targetAcc.MOTD = "none";
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You successfully deleted " + targetAcc.Username + "'s MOTD.");
+                    ContextFactory.Instance.SaveChangesAsync();
+                    return;
+                }
+                MOTDData newMotd = new MOTDData()
+                {
+                    AdminName = player.Name,
+                    PostedOn = DateTime.Now.ToString(),
+                    Message = message
+                };
+                string jsonMotd = NAPI.Util.ToJson(newMotd);
+
+                targetAcc.MOTD = jsonMotd;
+                ContextFactory.Instance.SaveChangesAsync();
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You set a MOTD for " + targetAcc.Username + " & they will see it when they login!");
+            }
+            else
+            {
+                MOTDData newMotd = new MOTDData()
+                {
+                    AdminName = player.Name,
+                    PostedOn = DateTime.Now.ToString(),
+                    Message = message
+                };
+                Main.DisplayMOTD(targetPlayer, newMotd);
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You set a MOTD for " + targetPlayer.Name + " & it has been shown to them!");
+            }
+        }
+
+        [Command("motdall", "!{#AFAFAF}[USAGE] motdall (message | 'none' to delete)", GreedyArg = true)]
+        public void cmd_motdall(Player player, string message)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+            if (message.Equals("none"))
+            {
+                foreach (Account acc in ContextFactory.Instance.Accounts)
+                {
+                    acc.MOTD = "none";
+                }
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You successfully deleted the server message of the day!");
+                ContextFactory.Instance.SaveChangesAsync();
+                return;
+            }
+
+            MOTDData newMotd = new MOTDData()
+            {
+                AdminName = player.Name,
+                PostedOn = DateTime.Now.ToString(),
+                Message = message
+            };
+            string jsonMotd = NAPI.Util.ToJson(newMotd);
+
+            foreach(Account acc in ContextFactory.Instance.Accounts)
+            {
+                acc.MOTD = jsonMotd;
+            }
+            foreach(Player pl in Settings.LoggedInPlayers)
+            {
+                Main.DisplayMOTD(pl, newMotd);
+            }
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You successfully updated the server message of the day!");
+            ContextFactory.Instance.SaveChangesAsync();
+        }
+
         [Command("goto", "!{#AFAFAF}[USAGE] goto (target)")]
         public void cmd_goto(Player player, Player target)
         {
@@ -4438,13 +4543,13 @@ namespace LSCC
             {
                 player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword /togglemap");
                 player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension /r(emove)guns /suspend /unsuspend /(o)checkstats");
-                player.SendChatMessage("[Admin Lv 2]: /ann /vanish /oban /fugitivelist /noclip");
+                player.SendChatMessage("[Admin Lv 2]: /ann /vanish /oban /fugitivelist /noclip /motd");
             }
             if (EPlayer.GetAccount(player).Admin >= 3)
             {
                 player.SendChatMessage("[Admin Lv 3]: /givegun(all) /gotopos /bringall /sethpall /(un)freezeall /r(emove)g(uns)f(rom)a(ll)");
                 player.SendChatMessage("[Admin Lv 3]: /givecomp /takecomp /attachcomp /grantfugitive /setspawn (freeroam world)");
-                player.SendChatMessage("[Admin Lv 3]: /getip /gethwid");
+                player.SendChatMessage("[Admin Lv 3]: /getip /gethwid /motdall");
             }
             if (EPlayer.GetAccount(player).Admin >= 4)
             {

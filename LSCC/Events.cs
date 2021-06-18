@@ -942,6 +942,12 @@ namespace LSCC
             EPlayer.ApplyCharacter(player, ConvChar, acc.LobbyClothing);
 
             EPlayer.Spawn(player);
+
+            if (!EPlayer.GetAccount(player).MOTD.Equals("none"))
+            {
+                MOTDData motdToShow = NAPI.Util.FromJson<MOTDData>(EPlayer.GetAccount(player).MOTD);
+                Main.DisplayMOTD(player, motdToShow);
+            }
         }
 
 
@@ -1560,6 +1566,7 @@ namespace LSCC
                 CarCop = "?",
                 CarFugitive = "?",
                 WeaponComponents = NAPI.Util.ToJson(wepItems),
+                MOTD = "none",
                 Character = "{}",
             };
             AccountManager.Add(_new);
