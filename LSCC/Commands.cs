@@ -3174,6 +3174,16 @@ namespace LSCC
             return;
         }
 
+        [Command("dbgteamvar")]
+        public void cmd_dbgteamvar(Player player, int id)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 5) return;
+
+            player.SetSharedData("Team", id);
+            return;
+        }
+
         [Command("dbgmaxspeed", Alias = "setmaxspeed")]
         public void cmd_maxspeed(Player player, int speed)
         {
@@ -4313,10 +4323,9 @@ namespace LSCC
         [Command("languagechat", "!{#AFAFAF}[USAGE] languagechat (/lc) (text)", Alias = "lc", GreedyArg = true)]
         public void cmd_languagechat(Player player, string message)
         {
-            if (player.HasData("Language"))
+            if (player.HasData("Language") && player.GetData<Language>("Language") != null)
             {
                 string lName = player.GetData<Language>("Language").LanguageName;
-                NAPI.Util.ConsoleOutput("lName worked: " + lName);
                 foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.GetData<Language>("Language").SQL_ID == player.GetData<Language>("Language").SQL_ID))
                 {
                     mem.SendChatMessage("!{#A6F7B9}[" + lName + "] !{#FFFFFF}" + player.Name + ": " + message);
@@ -4431,6 +4440,7 @@ namespace LSCC
             if (EPlayer.GetAccount(player).Admin >= 5)
             {
                 player.SendChatMessage("[Admin Lv 5]: /maps /deletemap /createmap /addmapspawn /(o)setdonator /(o)givedonorpoints");
+                player.SendChatMessage("[Admin Lv 5]: /dbgteamvar");
             }
             if (EPlayer.GetAccount(player).Admin >= 6)
             {

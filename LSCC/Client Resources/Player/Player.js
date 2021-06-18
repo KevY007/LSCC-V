@@ -84,6 +84,15 @@ mp.events.add("OneSecondEvent", () => {
     }
 });
 
+mp.events.add("TwoSecondsEvent", () => {
+    if(mp.players.local.getVariable("Team") !== undefined && mp.players.local.getVariable("Team") == 0)
+    {
+        if(mp.players.local.isSwimming() && !mp.players.local.isDead()) {
+            mp.events.callRemote("RequestSwimPenalty");
+        }
+    }
+});
+
 mp.events.add("ResetShotStats", ResetShotStats);
 
 function calcDist(v1, v2) {

@@ -862,6 +862,14 @@ namespace LSCC
             }
         }
 
+
+        [RemoteEvent("RequestSwimPenalty")]
+        public static void OnRequestSwimPenalty(Player player)
+        {
+            player.Health -= 5; // Slowly reduce health by 5 if in wotah.
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Evading by swimming is not allowed, you are taking damage.");
+        }
+
         public static void OnPlayerLogin(Player player, Account acc)
         {
             player.SetData("PlaytimeTick", Environment.TickCount64);
@@ -897,8 +905,10 @@ namespace LSCC
             player.SetData("AccountHandle", acc);
             player.SetSharedData("pLogged", true);
 
-            if(EPlayer.GetAccount(player).Language != -1)
-                player.SetData("Language", ContextFactory.Instance.Languages.First(l => l.SQL_ID == EPlayer.GetAccount(player).Language));
+            if (EPlayer.GetAccount(player).Language != -1 && ContextFactory.Instance.Languages.FirstOrDefault(l => l.SQL_ID == EPlayer.GetAccount(player).Language) != null)
+                player.SetData("Language", ContextFactory.Instance.Languages.FirstOrDefault(l => l.SQL_ID == EPlayer.GetAccount(player).Language));
+            else
+                player.ResetData("Language");
             
             CharacterData ConvChar = new CharacterData();
 
@@ -1531,6 +1541,7 @@ namespace LSCC
                 JailReason = "N/A",
                 DerbyWins = 0,
                 Level = 1,
+                Language = -1,
                 XP = 1,
                 Escapes = 0,
                 Arrests = 0,
