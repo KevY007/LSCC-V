@@ -717,7 +717,7 @@ namespace LSCC
                 {
                     targetAcc.MOTD = "none";
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You successfully deleted " + targetAcc.Username + "'s MOTD.");
-                    ContextFactory.Instance.SaveChangesAsync();
+                    ContextFactory.Instance.SaveChanges();
                     return;
                 }
                 MOTDData newMotd = new MOTDData()
@@ -729,7 +729,7 @@ namespace LSCC
                 string jsonMotd = NAPI.Util.ToJson(newMotd);
 
                 targetAcc.MOTD = jsonMotd;
-                ContextFactory.Instance.SaveChangesAsync();
+                ContextFactory.Instance.SaveChanges();
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You set a MOTD for " + targetAcc.Username + " & they will see it when they login!");
             }
             else
@@ -764,7 +764,7 @@ namespace LSCC
                     acc.MOTD = "none";
                 }
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You successfully deleted the server message of the day!");
-                ContextFactory.Instance.SaveChangesAsync();
+                ContextFactory.Instance.SaveChanges();
                 return;
             }
 
@@ -785,7 +785,7 @@ namespace LSCC
                 Main.DisplayMOTD(pl, newMotd);
             }
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You successfully updated the server message of the day!");
-            ContextFactory.Instance.SaveChangesAsync();
+            ContextFactory.Instance.SaveChanges();
         }
 
         [Command("goto", "!{#AFAFAF}[USAGE] goto (target)")]
@@ -4434,7 +4434,7 @@ namespace LSCC
 
             EPlayer.GetAccount(player).Language = langID;
             player.SetData("Language", lang);
-            player.SendChatMessage("!{#A6F7B9}[Language] You set your language to !{#FFFF00}" + lang.LanguageName + " !{#A6F7B9}& can now use /L.");
+            player.SendChatMessage("!{#A6F7B9}[Language] You set your language to !{#FFFF00}" + lang.LanguageName + " !{#A6F7B9}& can now use /LC.");
             EPlayer.Save(player);
             return;
         }

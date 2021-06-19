@@ -1222,6 +1222,8 @@ namespace LSCC
             player.TriggerEvent("DestroyPlayerCamera");
             player.TriggerEvent("TogglePlayerChat", true);
 
+            player.ResetData("Language");
+
             EPlayer.ShowCharCreator(player);
 
             //EPlayer.Spawn(player);
