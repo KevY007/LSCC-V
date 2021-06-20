@@ -4445,7 +4445,7 @@ namespace LSCC
             if (player.HasData("Language") && player.GetData<Language>("Language") != null)
             {
                 string lName = player.GetData<Language>("Language").LanguageName;
-                foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.GetData<Language>("Language").SQL_ID == player.GetData<Language>("Language").SQL_ID))
+                foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("Language") && p.GetData<Language>("Language").SQL_ID == player.GetData<Language>("Language").SQL_ID))
                 {
                     mem.SendChatMessage("!{#A6F7B9}[" + lName + "] !{#FFFFFF}" + player.Name + ": " + message);
                 }
