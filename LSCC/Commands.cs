@@ -1561,7 +1561,7 @@ namespace LSCC
         [Command("rules")]
         public void cmd_rules(Player player)
         {
-            player.SendChatMessage("!{#FF6347}Rule 1) Common Courtesy: Mind your own business, avoid toxicity and insults. Not applied to IC chat.");
+            player.SendChatMessage("!{#FF6347}Rule 1) Common Courtesy: Mind your own business, avoid toxicity and insults. This is now applied to IC chats as well as this is not a roleplay server.");
             player.SendChatMessage("!{#FF6347}Rule 2) Common Sense: If you are caught cheating, it's obvious you're getting punished so keep that in mind.");
             player.SendChatMessage("!{#FF6347}Rule 3) Bug Abusing: According to the severity of the bug, punishment will be carried out, do not abuse any bugs!");
             player.SendChatMessage("!{#FF6347}Rule 4) Chat & Voice Rules: Don't speak foreign languages, spam, annoy or insult any other player! Don't shout either.");
@@ -1569,8 +1569,8 @@ namespace LSCC
             player.SendChatMessage("!{#FF6347}Rule 6) Deathmatching: Don't try to kill fugitive's that don't have the tag or anything except arresting.");
             player.SendChatMessage("!{#FF6347}Rule 7) Abusing the mode: Forgetting the purpose of serer and teaming with enemy team etc is strictly bannable!");
 
-            player.SendChatMessage("!{#FFFFFF}>>");
-            player.SendChatMessage("!{#FF6347}These are just some basic rules for detailed, complete rule list, visit our discord! (/discord)");
+            player.SendChatMessage("!{#FF6347}>> These are just some basic rules for detailed, complete rule list, visit our discord! (/discord)");
+            player.SendChatMessage("!{#FF6347}[!!] A lot of our rules have been changed, these are from the legacy build so refer to our discord.");
         }
 
         [Command("givecomp", "!{#AFAFAF}[USAGE] givecomp (target) (weapon/hash) (component/hash)", GreedyArg = true)]

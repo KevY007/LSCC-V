@@ -905,8 +905,8 @@ namespace LSCC
             player.SetData("AccountHandle", acc);
             player.SetSharedData("pLogged", true);
 
-            if (EPlayer.GetAccount(player).Language != -1 && ContextFactory.Instance.Languages.FirstOrDefault(l => l.SQL_ID == EPlayer.GetAccount(player).Language) != null)
-                player.SetData("Language", ContextFactory.Instance.Languages.FirstOrDefault(l => l.SQL_ID == EPlayer.GetAccount(player).Language));
+            if (ContextFactory.Instance.Languages.FirstOrDefault(l => l.SQL_ID == acc.Language) != null && EPlayer.GetAccount(player).Language != -1)
+                player.SetData("Language", ContextFactory.Instance.Languages.FirstOrDefault(l => l.SQL_ID == acc.Language));
             else
                 player.ResetData("Language");
             
@@ -943,7 +943,7 @@ namespace LSCC
 
             EPlayer.Spawn(player);
 
-            if (!EPlayer.GetAccount(player).MOTD.Equals("none"))
+            if (EPlayer.GetAccount(player).MOTD != null && !EPlayer.GetAccount(player).MOTD.Equals("none"))
             {
                 MOTDData motdToShow = NAPI.Util.FromJson<MOTDData>(EPlayer.GetAccount(player).MOTD);
                 Main.DisplayMOTD(player, motdToShow);
