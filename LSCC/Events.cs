@@ -951,6 +951,13 @@ namespace LSCC
 
             player.SendChatMessage("!{#a6a6a6}Your last login was on !{#c2c1b6}" + EPlayer.GetAccount(player).LastLogin);
             EPlayer.GetAccount(player).LastLogin = DateTime.Now.ToString();
+
+            if (EPlayer.GetAccount(player).LastSessionMins >= 60.0) 
+                player.SendChatMessage($"!{{#a6a6a6}}Last session lasted !{{#c2c1b6}}{(EPlayer.GetAccount(player).LastSessionMins / 60.0).ToString("N1")} hours.");
+            else
+                player.SendChatMessage($"!{{#a6a6a6}}Last session lasted !{{#c2c1b6}}{(EPlayer.GetAccount(player).LastSessionMins).ToString("N1")} minutes.");
+
+            EPlayer.GetAccount(player).LastSessionMins = 0.0;
         }
 
 
@@ -1559,6 +1566,7 @@ namespace LSCC
                 Kills = 1,
                 Deaths = 1,
                 MinutesPlayed = 1.0,
+                LastSessionMins = 0.0,
                 DonatorPoints = 0,
                 Points = 0,
                 Warns = 0,

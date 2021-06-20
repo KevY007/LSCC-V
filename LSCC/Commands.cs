@@ -4522,7 +4522,7 @@ namespace LSCC
             return;
         }
 
-        [Command("lastlogin", "!{#AFAFAF}[USAGE] lastlogin (full username)")]
+        [Command("lastlogin", "!{#AFAFAF}[USAGE] lastlogin (full username)", Alias = "seen,lastseen")]
         public void cmd_lastlogin(Player player, string target)
         {
             if (!EPlayer.LoggedIn(player)) return;
@@ -4540,7 +4540,11 @@ namespace LSCC
                 return;
             }
 
-            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}" + _target.Username + "'s last login was on !{#fcf9d4}" + _target.LastLogin + "!{#ffffff}.");
+            if (_target.LastSessionMins >= 60.0)
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}" + _target.Username + "'s last login was on !{#fcf9d4}" + _target.LastLogin + "!{#ffffff} lasting !{#fcf9d4}" + $"{(_target.LastSessionMins / 60.0).ToString("N1")} hours!{{#FFFFFF}}.");
+            else
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}" + _target.Username + "'s last login was on !{#fcf9d4}" + _target.LastLogin + "!{#ffffff} lasting !{#fcf9d4}" + $"{_target.LastSessionMins.ToString("N1")} minutes!{{#FFFFFF}}.");
+
             return;
         }
 

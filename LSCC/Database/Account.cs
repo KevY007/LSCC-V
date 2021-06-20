@@ -55,6 +55,7 @@ namespace LSCC
         public string CarCop { get; set; }
         public string WeaponComponents { get; set; }
         public string MOTD { get; set; }
+        public double LastSessionMins { get; set; }
     }
 
     public static class AccountManager

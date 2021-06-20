@@ -1135,6 +1135,7 @@ namespace LSCC
                     double minsPassed = (Environment.TickCount64 - player.GetData<long>("PlaytimeTick")) / 60000;
 
                     EPlayer.GetAccount(player).MinutesPlayed += minsPassed;
+                    EPlayer.GetAccount(player).LastSessionMins += minsPassed;
                 }
                 player.SetData("PlaytimeTick", Environment.TickCount64);
 
