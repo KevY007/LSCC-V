@@ -948,6 +948,9 @@ namespace LSCC
                 MOTDData motdToShow = NAPI.Util.FromJson<MOTDData>(EPlayer.GetAccount(player).MOTD);
                 Main.DisplayMOTD(player, motdToShow);
             }
+
+            player.SendChatMessage("!{#a6a6a6}Your last login was on !{#c2c1b6}" + EPlayer.GetAccount(player).LastLogin);
+            EPlayer.GetAccount(player).LastLogin = DateTime.Now.ToString();
         }
 
 
@@ -1569,6 +1572,7 @@ namespace LSCC
                 CarFugitive = "?",
                 WeaponComponents = NAPI.Util.ToJson(wepItems),
                 MOTD = "none",
+                LastLogin = DateTime.Now.ToString(),
                 Character = "{}",
             };
             AccountManager.Add(_new);

@@ -709,7 +709,7 @@ namespace LSCC
                 Account targetAcc = ContextFactory.Instance.Accounts.FirstOrDefault(t => t.Username == targetName);
                 if (targetAcc == null)
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fatal error when looking up player in database! Try to use correct capitalization.");
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}A player with that username could not be found in the database!");
                     return;
                 }
 
@@ -4522,6 +4522,28 @@ namespace LSCC
             return;
         }
 
+        [Command("lastlogin", "!{#AFAFAF}[USAGE] lastlogin (full username)")]
+        public void cmd_lastlogin(Player player, string target)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+            Account _target = ContextFactory.Instance.Accounts.FirstOrDefault(t => t.Username.Equals(target, StringComparison.OrdinalIgnoreCase));
+            if(_target == null)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}A player with that username could not be found!");
+                return;
+            }
+
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}" + _target.Username + "'s last login was on !{#fcf9d4}" + _target.LastLogin + "!{#ffffff}.");
+            return;
+        }
+
         [Command("acmds", Alias = "ahelp")]
         public void cmd_ahelp(Player player)
         {
@@ -4537,7 +4559,7 @@ namespace LSCC
                 player.SendChatMessage("[Admin Lv 1]: /(t)freeze /(t)unfreeze /kick /slap /setinv(ulnerable) /specoff");
                 player.SendChatMessage("[Admin Lv 1]: /bancheck /(o)jail /(o)unjail /afix /aflip /sendtolobby /set(time/weather)");
                 player.SendChatMessage("[Admin Lv 1]: /(o)mute /(o)unmute /warn /unwarn /setteam /forceautojoin /forceswapseats");
-                player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats");
+                player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats /lastlogin");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
