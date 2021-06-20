@@ -1443,7 +1443,7 @@ namespace LSCC
                     {
                         player.SendChatMessage("!{#E6DD3C}[DERBY] " + winner.Name + " won the derby and has gained " + winXP + "XP and +5% fugitive chance.");
 
-                        Discord.SendTextChannel("staff-bot", $"**(Derby) | Winner: {winner.Name} | XP Gained: {winXP}**");
+                        Discord.SendTextChannel("game-notify", $"**(Derby) | Winner: {winner.Name} | XP Gained: {winXP} | Participants: {Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count()}**");
                     }
                 }
 
@@ -1469,11 +1469,11 @@ namespace LSCC
                 {
                     case 0:
                         NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] !{{#FF0000}}The game has been stopped by an administrator.");
-                        Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Stopped by an admin.**");
+                        Discord.SendTextChannel("game-notify", $"**(Lobby {lobbyid}) Copchase has ended! | Stopped by an admin.**");
                         break;
                     case 1:
                         NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] !{{#DAA520}}The fugitives managed to escape from the cops.");
-                        Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives have escaped.**");
+                        Discord.SendTextChannel("game-notify", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives have escaped.**");
 
                         foreach (Player i in lobby.Fugitives)
                         {
@@ -1485,7 +1485,7 @@ namespace LSCC
                         break;
                     case 2:
                         NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] !{{#DAA520}}All law enforcement units have been taken out by the fugitives.");
-                        Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | All cops have been eliminated.**");
+                        Discord.SendTextChannel("game-notify", $"**(Lobby {lobbyid}) Copchase has ended! | All cops have been eliminated.**");
 
                         foreach (Player i in lobby.Fugitives)
                         {
@@ -1496,7 +1496,7 @@ namespace LSCC
                         break;
                     case 3:
                         NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] !{{#DAA520}}The situation has been successfully handled by the police.");
-                        Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Police has neutralized all fugitives.**");
+                        Discord.SendTextChannel("game-notify", $"**(Lobby {lobbyid}) Copchase has ended! | Police has neutralized all fugitives.**");
 
                         foreach (Player i in lobby.Cops)
                         {
@@ -2136,12 +2136,12 @@ namespace LSCC
                         if (lobby.gameMode == GameModes.STANDARD)
                         {
                             NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] Copchase started with !{{#8D8DFF}}{lobby.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{lobby.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{map.Name}!{{#FFFFFF}}.");
-                            Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Standard Copchase has been started! | Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
+                            Discord.SendTextChannel("game-notify", $"**(Lobby {lobbyid}) Standard Copchase has been started! | Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
                         }
                         else if (lobby.gameMode == GameModes.BUSTED)
                         {
                             NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] Mode BUSTED! started with !{{#8D8DFF}}{lobby.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{lobby.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{map.Name}!{{#FFFFFF}}.");
-                            Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase in BUSTED! mode has been started! | Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
+                            Discord.SendTextChannel("game-notify", $"**(Lobby {lobbyid}) Copchase in BUSTED! mode has been started! | Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
                         }
 
                         foreach (Player p in RAGE.Entities.Players.All.Where(p => lobby.Cops.Contains(p) || lobby.Fugitives.Contains(p)))
