@@ -372,7 +372,8 @@ namespace LSCC
             "Life Invader Office",
             "Warehouse (Pistol Only)",
             "Tennis Court",
-            "Construction Site"
+            "Construction Site",
+            "Mile High Club"
         };
 
         public static object[][,] DMSpawns = new object[][,]
@@ -425,6 +426,19 @@ namespace LSCC
                 { new Vector3(74.776054f, -351.3653f, 55.506992f), -45.4294f },
                 { new Vector3(94.19476f, -360.79895f, 55.496826f), -19.65776f },
             },
+            new object[,] { // Mile High Club
+                { new Vector3(-189.9890f, -1006.218f, 257.2304f), 249.8210f },
+                { new Vector3(-152.8178f, -1022.546f, 254.3519f), 19.5289f },
+                { new Vector3(-145.1180f, -988.6318f, 254.1316f), 105.5798f},
+                { new Vector3(-163.8666f, -963.8352f, 254.1313f), 153.9387f},
+                { new Vector3(-165.9847f, -977.5870f, 269.2273f), 323.5029f},
+                { new Vector3(-139.0145f, -953.3565f, 269.1350f), 164.8710f},
+                { new Vector3(-159.3349f, -944.4025f, 269.2180f), 251.5890f},
+                { new Vector3(-153.8990f, -947.4684f, 264.2260f), 241.3984f},
+                { new Vector3(-160.5658f, -969.7756f, 264.2260f), 247.6226f},
+                { new Vector3(-153.6451f, -947.7322f, 254.1314f), 229.3157f},
+                { new Vector3(-139.3184f, -955.3798f, 254.1315f), 327.5726f},
+            }
         };
 
         public static object[,] DerbySpawns = new object[,]
