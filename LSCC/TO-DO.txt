@@ -1,6 +1,8 @@
 ﻿FORMAT: ADDED BY - ITEM.
 admin records system
 STOP SILENT SIREN WHEN DA CHAT OPEN AND SCOREBOARD ETC AAAWD
+
+15-second ladder protection so fugitives cant have ez win (maybe additional 2-3 seconds after they get off the ladder)
 nametag distance for spec and noclip players, entity.setalpha and sync for players in spec
 checkplayer, check player.IP and player.HWID/Serial w/e and player.Rockstar ez
 buyammo with donator points
