@@ -1442,8 +1442,6 @@ namespace LSCC
                     else
                     {
                         player.SendChatMessage("!{#E6DD3C}[DERBY] " + winner.Name + " won the derby and has gained " + winXP + "XP and +5% fugitive chance.");
-
-                        Discord.SendTextChannel("game-notify", $"**(Derby) | Winner: {winner.Name} | XP Gained: {winXP} | Participants: {Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count()}**");
                     }
                 }
 
@@ -1451,6 +1449,7 @@ namespace LSCC
                 {
                     EPlayer.GetAccount(winner).DerbyWins++;
                     EPlayer.GrantXP(winner, winXP);
+					Discord.SendTextChannel("game-notify", $"**(Derby) | Winner: {winner.Name} | XP Gained: {winXP} | Participants: {Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count()}**");
 
                     winner.SetSharedData("FugitiveChance", winner.GetSharedData<float>("FugitiveChance") + 5 + (double)((double)EPlayer.GetAccount(winner).DonatorLevel / 2.0));
                 }
