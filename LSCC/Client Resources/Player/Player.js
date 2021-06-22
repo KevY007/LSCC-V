@@ -87,7 +87,7 @@ mp.events.add("OneSecondEvent", () => {
 mp.events.add("TwoSecondsEvent", () => {
     if(mp.players.local.getVariable("Team") !== undefined && mp.players.local.getVariable("Team") == 0)
     {
-        if(mp.players.local.isSwimming() && !mp.players.local.isDead()) {
+        if(mp.players.local.isSwimming() && !mp.players.local.isDead() && !mp.players.local.isInAnyVehicle(false)) {
             mp.events.callRemote("RequestSwimPenalty");
         }
     }
