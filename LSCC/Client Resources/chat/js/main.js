@@ -11,6 +11,7 @@ let chat =
 	loaded: false,
 	scrollStyle: null
 };
+var chatOpacityTimeout;
 
 const MAX_MSG_HISTORY = 64;
 
@@ -46,7 +47,8 @@ function enableChatInput(enable)
         if (enable)
 		{
             chat.input = $("#chat").append('<div><input id="chat_msg" type="text" maxlength="128" /></div>').children(":last");
-			chat.input.children("input").focus();
+			chat.input.children("input").focus();			
+			$("#chat").fadeTo("fast", 1.0);
         } 
 		else
 		{
@@ -55,6 +57,11 @@ function enableChatInput(enable)
                 chat.input.remove();
                 chat.input = null;
             });
+
+			clearTimeout(chatOpacityTimeout);
+			chatOpacityTimeout = setTimeout(() =>{
+				$(("#chat")).fadeTo("slow", 0.4);
+			}, 5000);
         }
     }
 }
@@ -64,6 +71,9 @@ var chatAPI =
 	push: (text_) =>
 	{
 		if(!chat.loaded) return;
+		clearTimeout(chatOpacityTimeout);
+		$("#chat").fadeTo("fast", 1.0);
+
 		let colorPositions = [];
 		let colors = [];
 		let chatElement = "<li>";
@@ -100,6 +110,10 @@ var chatAPI =
 		{
 			chat.container.children(":last").remove();
 		}
+
+		chatOpacityTimeout = setTimeout(() =>{
+			$(("#chat")).fadeTo("slow", 0.4);
+		}, 5000);
 	},
 	
 	clear: () =>
