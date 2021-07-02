@@ -1937,11 +1937,11 @@ namespace LSCC
                         }
                     }
 
-                    if (target.HasData("TasedTill") && Environment.TickCount64 - (target.GetData<long>("TasedTill") - 30000) >= 2000)
+                    if (target.HasData("TasedTill") && Environment.TickCount64 - (target.GetData<long>("TasedTill") - 18000) >= 2000)
                     {
-                        int time = 30000;
-                        target.TriggerEvent("setToRagdoll", time, time * 2, 0, false, false, false);
-                        target.SetData("TasedTill", Environment.TickCount64 + 30000);
+                        int time = 18000;
+                        target.TriggerEvent("setToRagdoll", time, time * 2, 1, false, false, false);
+                        target.SetData("TasedTill", Environment.TickCount64 + 18000);
                         Commands.cmd_do(player, $"{target.Name} has been tased and has been rendered immobile.");
                     }
                 }
@@ -2389,7 +2389,7 @@ namespace LSCC
                             {
                                 if (player != null && player.Exists)
                                 {
-                                    if (arenaID != 1)
+                                    if (arenaID != 1 && arenaID != 4)
                                     {
                                         switch (new Random().Next(0, 5))
                                         {
@@ -2425,7 +2425,24 @@ namespace LSCC
                                                 break;
                                         }
                                     }
-                                    else player.GiveWeapon(WeaponHash.Pistol_mk2, 1000);
+                                    else
+                                    {
+                                        switch (arenaID)
+                                        {
+                                            case 1:
+                                                player.GiveWeapon(WeaponHash.Pistol_mk2, 1000);
+                                                break;
+                                            case 4:
+                                                player.GiveWeapon(WeaponHash.Marksmanrifle, 1000);
+                                                player.GiveWeapon(WeaponHash.Specialcarbine_mk2, 1000);
+                                                player.GiveWeapon(WeaponHash.Bullpupshotgun, 1000);
+                                                player.GiveWeapon(WeaponHash.Combatpdw, 1000);
+                                                player.GiveWeapon(WeaponHash.CeramicPistol, 1000);
+                                                player.GiveWeapon(WeaponHash.Snowball, 1000);
+                                                break;
+                                                
+                                        }
+                                    }
                                 }
                             }
                             catch { }

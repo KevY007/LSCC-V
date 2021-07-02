@@ -3021,7 +3021,8 @@ namespace LSCC
             int spawnID = new Random().Next(Settings.DMSpawns[arenaid].GetLength(0));
             Vector3 dmSpawn = (Vector3)Settings.DMSpawns[arenaid][spawnID, 0];
             EPlayer.Spawn(player, false, dmSpawn);
-            player.SendChatMessage($"[!] !{{#FFFF00}}Sending you to !{{#FF6347}}DM: {Settings.DMNames[arenaid]}.");
+            player.SendChatMessage($"[!] !{{#FFFF00}}Sending you to !{{#FF6347}}DM: {Settings.DMNames[arenaid]}."); 
+            player.TriggerEvent("SetActorInvulnerable", false);
 
             return;
         }

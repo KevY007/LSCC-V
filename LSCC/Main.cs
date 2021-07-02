@@ -2177,7 +2177,7 @@ namespace LSCC
                         lobby.FugitiveShowCounter = 80;
                         lobby.LastSeenCounter = 0;
                         lobby.GameProgress = 0;
-                        lobby.CollisionCounter = 60;
+                        lobby.CollisionCounter = 35;
 
                         foreach (Player p in Settings.LoggedInPlayers)
                         {
@@ -2355,6 +2355,10 @@ namespace LSCC
                                     if(veh.HasSharedData("Team") && veh.GetSharedData<int>("Team") == 0)
                                     {
                                         veh.SetSharedData("vMaxSpeed", (float)(165 / 3.6)); // 165 KM/H
+                                    }
+                                    if(veh.Model == 2149939648) // if it's a Prevolter reduce OP :(
+                                    {
+                                        veh.SetSharedData("vMaxSpeed", (float)(180 / 3.6)); // 180 KM/H
                                     }
                                 }
                             }
