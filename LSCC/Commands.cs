@@ -1081,11 +1081,25 @@ namespace LSCC
             return;
         }
 
-        [Command("cuff", "!{#AFAFAF}[USAGE] cuff (target)")]
-        public void cmd_cuff(Player player, Player target)
+        [Command("cuff", "!{#AFAFAF}[USAGE] cuff (optional:target)")]
+        public void cmd_cuff(Player player, Player target = null)
         {
-            bool isACop = false;
             LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+
+            float nearest = 9999.0f;
+            if (target == null)
+            {
+                foreach(Player fugi in lobby.Fugitives.Where<Player>(t => t.Position.DistanceTo(player.Position) <= 3.0))
+                {
+                    if(player.Position.DistanceTo(fugi.Position) < nearest)
+                    {
+                        target = fugi;
+                        nearest = player.Position.DistanceTo(fugi.Position);
+                    }
+                }
+            }
+
+            bool isACop = false;
             if (lobby != null)
             {
                 if (lobby.Cops.Contains(player) && lobby.gameStatus == 1 && lobby.Fugitives.Contains(target) && !target.HasData("Cuffed"))
@@ -1097,6 +1111,8 @@ namespace LSCC
             if (!isACop)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a cop or the target cannot be cuffed!");
+                player.SendChatMessage("!{#AFAFAF}[HINT] You can use /cuff (target) to handcuff a specific player.");
+                player.SendChatMessage("!{#AFAFAF}[HINT] Entering /cuff without any parameters will attempt to handcuff the nearest fugitive.");
                 return;
             }
 
@@ -1195,11 +1211,25 @@ namespace LSCC
             return;
         }
 
-        [Command("dragout", "!{#AFAFAF}[USAGE] dragout (target)")]
-        public void cmd_dragout(Player player, Player target)
+        [Command("dragout", "!{#AFAFAF}[USAGE] dragout (optional:target)")]
+        public void cmd_dragout(Player player, Player target = null)
         {
-            bool isACop = false;
             LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+
+            float nearest = 9999.0f;
+            if (target == null)
+            {
+                foreach (Player fugi in lobby.Fugitives.Where<Player>(t => t.Position.DistanceTo(player.Position) <= 3.0))
+                {
+                    if (player.Position.DistanceTo(fugi.Position) < nearest)
+                    {
+                        target = fugi;
+                        nearest = player.Position.DistanceTo(fugi.Position);
+                    }
+                }
+            }
+
+            bool isACop = false;
             if (lobby != null)
             {
                 if (lobby.Cops.Contains(player) && lobby.gameStatus == 1 && lobby.Fugitives.Contains(target) && target.IsInVehicle && !player.IsInVehicle)
@@ -1211,6 +1241,8 @@ namespace LSCC
             if (!isACop)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a cop or the target cannot be dragged out right now!");
+                player.SendChatMessage("!{#AFAFAF}[HINT] You can use /dragout (target) to drag out a specific player.");
+                player.SendChatMessage("!{#AFAFAF}[HINT] Entering /dragout without any parameters will attempt to drag out the nearest fugitive.");
                 return;
             }
 
