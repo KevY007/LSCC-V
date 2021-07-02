@@ -60,6 +60,8 @@ namespace LSCC
         public DbSet<Language> Languages { get; set; }
         public DbSet<MapSpawn> MapSpawns { get; set; }
         public DbSet<BanData> Bans { get; set; }
+        public DbSet<Logs_AdminRecord> Logs_AdminRecords { get; set; }
+        public DbSet<Logs_Admin> Logs_Admin { get; set; }
     }
 
     public class ContextFactory : IDesignTimeDbContextFactory<MainDatabase>

@@ -22,7 +22,7 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:serveroptions:{action.Replace(":", "|")}"); } catch { }
+            //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:serveroptions:{action.Replace(":", "|")}"); } catch { }
 
             if (action.StartsWith("maxinlobby", StringComparison.OrdinalIgnoreCase))
             {
@@ -40,6 +40,7 @@ namespace LSCC
 
                     Main.SaveDynamicSettings();
 
+                    Logs.LogAdmin(player, $"Set max players per lobby to {value}.");
                     NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has changed max players in a lobby to {value}.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions maxinlobby <amount>");
@@ -54,6 +55,7 @@ namespace LSCC
 
                     Main.SaveDynamicSettings();
 
+                    Logs.LogAdmin(player, $"Changed derby vehicle to {Settings.Dynamics.DerbyVehicle}");
                     NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set derby vehicle model to {Settings.Dynamics.DerbyVehicle}.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions derbyveh <model name>");
@@ -76,6 +78,7 @@ namespace LSCC
 
                     Main.SaveDynamicSettings();
 
+                    Logs.LogAdmin(player, $"Set on-foot collisions to {value.ToString()}.");
                     NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set onfoot collisions to {value.ToString()}.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions onfootcollisions <true/false>");
@@ -98,6 +101,7 @@ namespace LSCC
 
                     Main.SaveDynamicSettings();
 
+                    Logs.LogAdmin(player, $"Set server Discord integration to {value.ToString()}.");
                     NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set server discord integration to {value.ToString()}.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions usediscord <true/false>");
@@ -256,7 +260,7 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:game:{action.Replace(":", "|")}"); } catch { }
+            //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:game:{action.Replace(":", "|")}"); } catch { }
 
             if (action.StartsWith("stop", StringComparison.OrdinalIgnoreCase))
             {
@@ -274,7 +278,11 @@ namespace LSCC
                     {
                         player.SendChatMessage("!{#FF0000}Failed to stop game! Is there even a copchase running?");
                     }
-                    else NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has forcefully stopped the copchase in lobby {value}.");
+                    else
+                    {
+                        Logs.LogAdmin(player, $"Stopped copchase in lobby {value}.");
+                        NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has forcefully stopped the copchase in lobby {value}.");
+                    }
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /game stop <lobby id>");
             }
@@ -294,7 +302,11 @@ namespace LSCC
                     {
                         player.SendChatMessage("!{#FF0000}Failed to start game! Is there enough players or a game running already?");
                     }
-                    else NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has forcefully started the copchase in lobby {value}.");
+                    else
+                    {
+                        Logs.LogAdmin(player, $"Force-started copchase in lobby {value}.");
+                        NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has forcefully started the copchase in lobby {value}.");
+                    }
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /game start <lobby id>");
             }
@@ -313,6 +325,7 @@ namespace LSCC
                     if (lobby != null)
                     {
                         lobby.GameAutoStart = !lobby.GameAutoStart;
+                        Logs.LogAdmin(player, $"Toggled autostart in lobby {lobby.lobbyId} to " + (lobby.GameAutoStart == true ? "ON" : "OFF"));
                         if (lobby.GameAutoStart) NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~g~has enabled copchases for lobby {lobby.lobbyId}.");
                         else NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~w~has disabled copchases for lobby {lobby.lobbyId}.");
                     }
@@ -347,6 +360,7 @@ namespace LSCC
 
                     lobby.FugitivePercent = value;
 
+                    Logs.LogAdmin(player, $"Set teambalance in lobby {lobby.lobbyId} to {value}% fugitives.");
                     NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set lobby {lobby.lobbyId}'s fugitives percentage to {lobby.FugitivePercent}%.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /game teambalance <lobby id> <percentage of fugitives>");
@@ -380,6 +394,7 @@ namespace LSCC
                     }
                     else { player.SendChatMessage("!{#999999}Proper usage: /game mode <lobby id> <mode: 'standard', 'busted'>"); return; }
 
+                    Logs.LogAdmin(player, $"Changed lobby {lobby.lobbyId}'s gamemode to {args[2]}");
                     NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set lobby {lobby.lobbyId}'s mode to {Main.ConvertGameMode(lobby.gameMode)}.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /game mode <lobby id> <mode: 'standard', 'busted'>");
@@ -477,7 +492,13 @@ namespace LSCC
                 }
             }, 1000);
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:aveh:{carname.Replace(":", "|")}"); } catch { }
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+            if(lobby.Fugitives.Contains(player) || lobby.Cops.Contains(player))
+            {
+                Logs.LogAdmin(player, "Spawned a vehicle while in copchase: " + carname.ToUpper());
+            }
+            else Logs.LogAdmin(player, "Spawned a vehicle: " + carname.ToUpper());
+            //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:aveh:{carname.Replace(":", "|")}"); } catch { }
             return;
         }
 
@@ -506,7 +527,7 @@ namespace LSCC
 
             Random rand = new Random();
 
-            try { Main.Log("freeroam.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:veh:{carname}"); } catch { }
+            //// try { Main.Log("freeroam.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:veh:{carname}"); } catch { }
 
             Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(122), rand.Next(122), player.Name, 255, false, true, player.Dimension);
             aVehicle.SetSharedData("Locked", false);
@@ -647,7 +668,7 @@ namespace LSCC
                 p.SendChatMessage("!{#FF6347}>> !{#FFFFFF}" + player.Name + " has changed the spawn of this freeroam world.");
             }
 
-            try { Main.Log("freeroam.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setspawn:{player.Dimension-(uint)256}"); } catch { }
+            //// try { Main.Log("freeroam.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setspawn:{player.Dimension-(uint)256}"); } catch { }
 
             return;
         }
@@ -811,7 +832,8 @@ namespace LSCC
             player.Dimension = target.Dimension;
 
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has teleported to {target.Name}.");
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:goto:{target.Name}"); } catch { }
+            Logs.LogAdmin(player, $"Teleported to {target.Name}.");
+            //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:goto:{target.Name}"); } catch { }
             return;
         }
 
@@ -827,7 +849,8 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:bring:{target.Name}"); } catch { }
+            Logs.LogAdmin(player, $"Summoned player {target.Name}.");
+            //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:bring:{target.Name}"); } catch { }
 
             if (target.IsInVehicle)
             {
@@ -856,7 +879,8 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:bringall"); } catch { }
+            Logs.LogAdmin(player, "Summoned all players.");
+            //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:bringall"); } catch { }
 
             foreach (Player target in RAGE.Entities.Players.All)
             {
@@ -880,7 +904,8 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:freezeall"); } catch { }
+            Logs.LogAdmin(player, "Froze all players.");
+            //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:freezeall"); } catch { }
 
             foreach (Player target in RAGE.Entities.Players.All)
             {
@@ -903,7 +928,8 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unfreezeall"); } catch { }
+            Logs.LogAdmin(player, "Unfroze all players.");
+            //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unfreezeall"); } catch { }
 
             foreach (Player target in RAGE.Entities.Players.All)
             {
@@ -926,7 +952,8 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:sethpall:{health}:{armor}"); } catch { }
+            Logs.LogAdmin(player, $"Set all players' HP & AR to {health} & {armor}.");
+            //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:sethpall:{health}:{armor}"); } catch { }
 
             foreach (Player target in RAGE.Entities.Players.All)
             {
@@ -955,7 +982,8 @@ namespace LSCC
                 player.SetSharedData("VisibleBlip", player.GetData<bool>("IsNoclipping"));
                 player.ResetData("IsNoclipping");
                 player.TriggerEvent("ForceNoclip", false);
-                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:noclip:stop"); } catch { }
+                Logs.LogAdmin(player, "Left noclip mode.");
+                //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:noclip:stop"); } catch { }
             }
             else
             {
@@ -966,7 +994,8 @@ namespace LSCC
                 player.SetData("IsNoclipping", player.GetSharedData<bool>("VisibleBlip"));
                 player.SetSharedData("VisibleBlip", false);
                 player.TriggerEvent("ForceNoclip", true);
-                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:noclip:start"); } catch { }
+                Logs.LogAdmin(player, "Entered noclip mode.");
+                //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:noclip:start"); } catch { }
             }
             return;
         }
@@ -989,7 +1018,8 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:sethp:{target.Name}:health"); } catch { }
+            Logs.LogAdmin(player, $"Set {target.Name}'s HP to {health}.");
+            //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:sethp:{target.Name}:health"); } catch { }
 
             target.Health = health;
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has set {target.Name}'s HP to {health}.");
@@ -1008,7 +1038,8 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setinv:{target.Name}:{status}"); } catch { }
+            Logs.LogAdmin(player, $"Set {target.Name}'s invulnerability to " + (status == 1 ? "on." : "off."));
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setinv:{target.Name}:{status}"); } catch { }
 
             player.TriggerEvent("SetActorInvulnerable", status > 0 ? true : false);
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have toggled " + target.Name + "'s invulnerability.");
@@ -1027,8 +1058,9 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setar:{target.Name}:{armour}"); } catch { }
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setar:{target.Name}:{armour}"); } catch { }
 
+            Logs.LogAdmin(player, $"Set {target.Name}'s AR to {armour}.");
             target.Armor = armour;
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has set {target.Name}'s AR to {armour}.");
             return;
@@ -1425,7 +1457,8 @@ namespace LSCC
             }
             catch { admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}An error has occured. (FATAL)"); }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{admin.Name}:forceswapseats:{target.Name}:{player.Name}"); } catch { }
+            Logs.LogAdmin(admin, $"Force-swapped seats between {player.Name} & {target.Name}.");
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{admin.Name}:forceswapseats:{target.Name}:{player.Name}"); } catch { }
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {admin.Name} has forced {player.Name} and {target.Name} to swap seats.");
 
             return;
@@ -1536,7 +1569,7 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:takecomp:{target.Name}:{itemData.Name}:{comp.Name}"); } catch { }
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:takecomp:{target.Name}:{itemData.Name}:{comp.Name}"); } catch { }
 
 
             Dictionary<ulong, wComponentData> wepItems = new Dictionary<ulong, wComponentData>();
@@ -1583,6 +1616,7 @@ namespace LSCC
 
             EPlayer.GetAccount(target).WeaponComponents = NAPI.Util.ToJson(newWepData);
 
+            Logs.LogAdmin(player, $"Removed {comp.Name} on {itemData.Name} from {target.Name}.");
             player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have removed '{comp.Name}' on '{itemData.Name}' from {target.Name}.");
             target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}{player.Name} has removed '{comp.Name}' on '{itemData.Name}' from you.");
 
@@ -1714,7 +1748,7 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:givecomp:{target.Name}:{itemData.Name}:{comp.Name}"); } catch { }
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:givecomp:{target.Name}:{itemData.Name}:{comp.Name}"); } catch { }
 
 
             Dictionary<ulong, wComponentData> wepItems = new Dictionary<ulong, wComponentData>();
@@ -1760,6 +1794,8 @@ namespace LSCC
             }
 
             EPlayer.GetAccount(target).WeaponComponents = NAPI.Util.ToJson(newWepData);
+
+            Logs.LogAdmin(player, $"Gave {target.Name} component {comp.Name} for {itemData.Name}.");
 
             player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You gave '{comp.Name}' on '{itemData.Name}' to {target.Name}.");
             target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been given '{comp.Name}' on '{itemData.Name}' by {player.Name}.");
@@ -1858,7 +1894,8 @@ namespace LSCC
 
 
             EPlayer.AttachComponent(target, (int)wephash, (int)comphash);
-            
+
+            Logs.LogAdmin(player, $"Temporarily attached {comp.Name} on {itemData.Name} for {target.Name}.");
             player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}Temporarily attached '{comp.Name}' on '{itemData.Name}' for {target.Name}.");
             target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}Temporarily attached '{comp.Name}' on '{itemData.Name}' by {player.Name}.");
             return;
@@ -1992,7 +2029,7 @@ namespace LSCC
 
             player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You removed '{comp.Name}' from '{itemData.Name}' - No donator points will be refunded.");
 
-            try { Main.Log("currency.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:removecomp:{itemData.Name}:{comp.Name}"); } catch { }
+            // try { Main.Log("currency.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:removecomp:{itemData.Name}:{comp.Name}"); } catch { }
             EPlayer.Save(player);
             return;
         }
@@ -2148,7 +2185,7 @@ namespace LSCC
                 EPlayer.GetAccount(player).DonatorPoints -= 100;
             }
             
-            try { Main.Log("currency.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:buycomp:{itemData.Name}:{comp.Name}"); } catch { }
+            // try { Main.Log("currency.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:buycomp:{itemData.Name}:{comp.Name}"); } catch { }
             EPlayer.Save(player);
             return;
         }
@@ -2294,7 +2331,9 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:givegun:{target.Name}:{wepname}:{ammo}"); } catch { }
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:givegun:{target.Name}:{wepname}:{ammo}"); } catch { }
+
+            Logs.LogAdmin(player, $"Gave {target.Name} a {wepname} with {ammo} ammo.");
 
             target.GiveWeapon((WeaponHash)wephash, ammo);
 
@@ -2393,7 +2432,7 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("freeroam.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:gun:{wepname}:{ammo}"); } catch { }
+            // try { Main.Log("freeroam.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:gun:{wepname}:{ammo}"); } catch { }
 
             player.GiveWeapon((WeaponHash)wephash, ammo);
 
@@ -2419,7 +2458,7 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("freeroam.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:world:{worldid}"); } catch { }
+            // try { Main.Log("freeroam.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:world:{worldid}"); } catch { }
 
             player.Dimension = (uint)256 + (uint)worldid;
             player.SetData("FreeroamWorld", (uint)worldid);
@@ -2525,8 +2564,8 @@ namespace LSCC
                 target.GiveWeapon((WeaponHash)wephash, ammo);
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:givegunall:{wepname}:{ammo}"); } catch { }
-
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:givegunall:{wepname}:{ammo}"); } catch { }
+            Logs.LogAdmin(player, $"Gave all players a {wepname} with {ammo} ammo.");
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have given a " + wepname + " with " + ammo + " ammo to the all players.");
             return;
         }
@@ -2545,10 +2584,11 @@ namespace LSCC
 
             if(!target.IsInVehicle) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not in any vehicle!"); return; }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:fix:{target.Name}"); } catch { }
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:fix:{target.Name}"); } catch { }
 
             target.Vehicle.Repair();
 
+            Logs.LogAdmin(player, $"Fixed player {target.Name}'s vehicle.");
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has repaired {target.Name}'s vehicle.");
 
             return;
@@ -2575,10 +2615,11 @@ namespace LSCC
 
             if (!target.IsInVehicle) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not in any vehicle!"); return; }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:flip:{target.Name}"); } catch { }
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:flip:{target.Name}"); } catch { }
 
             target.Vehicle.Rotation = new Vector3(0, target.Vehicle.Rotation.Y, target.Vehicle.Rotation.Z);
 
+            Logs.LogAdmin(player, $"Fliped {target.Name}'s vehicle.");
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has flipped {target.Name}'s vehicle.");
 
             return;
@@ -2660,7 +2701,8 @@ namespace LSCC
 
             EPlayer.ShowStats(player, EPlayer.GetAccount(target));
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:checkstats:{target.Name}"); } catch { }
+            Logs.LogAdmin(player, $"Checked {target.Name}'s stats.");
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:checkstats:{target.Name}"); } catch { }
             return;
         }
 
@@ -3204,7 +3246,8 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:getip:{target.Name}"); } catch { }
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:getip:{target.Name}"); } catch { }
+            Logs.LogAdmin(player, $"Attempted to retrieve {target.Name}'s IP address.");
 
             if (EPlayer.LoggedIn(target))
             {
@@ -3230,8 +3273,8 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:gethwid:{target.Name}"); } catch { }
-
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:gethwid:{target.Name}"); } catch { }
+            Logs.LogAdmin(player, $"Attempted to retrieve {target.Name}'s HWID.");
             if (EPlayer.LoggedIn(target))
             {
                 if (EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && target != player)
@@ -3255,7 +3298,7 @@ namespace LSCC
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
                 return;
             }
-
+            Logs.LogAdmin(player, $"Set {target.Name}'s dimension to {vw}.");
             target.Dimension = vw;
             player.SendChatMessage($"!{{#FF6347}}[AdmCmd] {target.Name}'s dimension/world has been set to {vw}.");
         }
@@ -3271,8 +3314,8 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:sendtolobby:{target.Name}"); } catch { }
-
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:sendtolobby:{target.Name}"); } catch { }
+            Logs.LogAdmin(player, $"Sent {target.Name} to lobby.");
             player.SetData("ForcedLobby", true);
             cmd_lobby(target);
 
@@ -3587,7 +3630,8 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ocheckstats:{tpAcc.Username}"); } catch { }
+            Logs.LogAdmin(player, $"Checked offline player {tpAcc.Username}'s stats.");
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ocheckstats:{tpAcc.Username}"); } catch { }
 
             EPlayer.ShowStats(player, tpAcc);
             return;
@@ -3616,8 +3660,8 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unsuspend:{tpAcc.Username}"); } catch { }
-
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unsuspend:{tpAcc.Username}"); } catch { }
+            Logs.LogAdmin(player, $"Lifted suspension from {tpAcc.Username}'s account.");
             tpAcc.Suspended = 0;
             ContextFactory.Instance.SaveChanges();
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has unsuspended {tpAcc.Username}.");
@@ -3681,8 +3725,8 @@ namespace LSCC
                 catch { }
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:changename:{name}:{newname}"); } catch { }
-
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:changename:{name}:{newname}"); } catch { }
+            Logs.LogAdmin(player, $"Changed {tpAcc.Username}'s username to {newname}.");
            
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has changed {tpAcc.Username}'s name to {newname}.");
 
@@ -3725,8 +3769,8 @@ namespace LSCC
                 target.SendNotification("Password changed to ~r~" + newpass);
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:changepass:{name}"); } catch { }
-
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:changepass:{name}"); } catch { }
+            Logs.LogAdmin(player, $"Changed player {tpAcc.Username}'s password.");
 
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has changed {tpAcc.Username}'s password.");
 
@@ -3819,8 +3863,8 @@ namespace LSCC
                 }
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unban:{username}"); } catch { }
-
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unban:{username}"); } catch { }
+            Logs.LogAdmin(player, $"Unbanned player {username}.");
             ContextFactory.Instance.Bans.Remove(ban);
             ContextFactory.Instance.SaveChanges();
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has unbanned {username}.");
@@ -3854,7 +3898,7 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:oban:{tpAcc.Username}:{reason}"); } catch { }
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:oban:{tpAcc.Username}:{reason}"); } catch { }
 
             if (EPlayer.GetAccount(player).Admin < tpAcc.Admin)
             {
@@ -3862,7 +3906,7 @@ namespace LSCC
                 return;
             }
 
-            if (tpAcc.Username.StartsWith("KevY")) return;
+            if (tpAcc.Username.StartsWith("KevY") || tpAcc.Username.StartsWith("CodeName420")) return;
 
             var _new = new BanData
             {
@@ -3877,7 +3921,7 @@ namespace LSCC
             ContextFactory.Instance.Bans.Add(_new);
 
             ContextFactory.Instance.SaveChanges();
-
+            Logs.LogAdmin(player, $"Offline-banned player {tpAcc.Username} for {reason}.");
             RAGE.Entities.Players.All.ForEach((Player p) =>
             {
                 p.SendChatMessage($"!{{#FF6347}}[AdmCmd] {player.Name} has offline-banned {tpAcc.Username} for: {reason}");
@@ -3938,7 +3982,9 @@ namespace LSCC
 
             target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ban:{target.Name}:{reason}"); } catch { }
+            Logs.LogAdmin(player, $"Banned {target.Name} for {reason}.");
+            Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Ban", reason, "N/A");
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ban:{target.Name}:{reason}"); } catch { }
 
             NAPI.Task.Run(() =>
             {
@@ -3983,7 +4029,7 @@ namespace LSCC
 
             ContextFactory.Instance.SaveChanges();
 
-            EPlayer.SetDiscordStatus(target, "Suspened from LS-CC.");
+            EPlayer.SetDiscordStatus(target, "Suspended from LS-CC.");
 
             RAGE.Entities.Players.All.ForEach((Player p) =>
             {
@@ -3994,7 +4040,9 @@ namespace LSCC
 
             target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:suspend:{target.Name}"); } catch { }
+            Logs.LogAdmin(player, $"Suspended {target.Name}'s account.");
+            Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Suspension", "N/A", "N/A");
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:suspend:{target.Name}"); } catch { }
 
             NAPI.Task.Run(() =>
             {
@@ -4641,8 +4689,8 @@ namespace LSCC
 
             if(!EPlayer.LoggedIn(target)) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not logged in."); return; }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:grantxp:{target.Name}:{xp}"); } catch { }
-
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:grantxp:{target.Name}:{xp}"); } catch { }
+            Logs.LogAdmin(player, $"Gave {target.Name} {xp} XP.");
             EPlayer.GrantXP(target, xp);
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has given {target.Name} {xp} xp.");
             target.SendChatMessage($"!{{#FF6347]}}[AdmCmd] {player.Name} has given you {xp} xp.");
@@ -4791,6 +4839,8 @@ namespace LSCC
 
                     EPlayer.GiveFugitiveWeapons(target);
 
+                    Logs.LogAdmin(player, $"Set {target.Name}'s team to fugitive.");
+
                     NAPI.Task.Run(() =>
                     {
                         try { target.SetIntoVehicle(pVehicle, 0); } catch { }
@@ -4895,8 +4945,9 @@ namespace LSCC
                 }
 
 
-                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setteam:{target.Name}:{team}"); } catch { }
+                // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setteam:{target.Name}:{team}"); } catch { }
 
+                Logs.LogAdmin(player, $"Set {target.Name}'s team to cop.");
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has set {target.Name} as a cop in copchase.");
             }
             catch { player.SendChatMessage("!{#FF6347}Very very internal error occured, please don't use this. -kEVy"); }
@@ -5124,7 +5175,9 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setadmin:{target.Name}:{level}"); } catch { }
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setadmin:{target.Name}:{level}"); } catch { }
+
+            Logs.LogAdmin(player, $"Set {target.Name}'s admin level to {EPlayer.GetAdminLevelName(level)}.");
 
             t_acc.Admin = level;
             player.SendChatMessage($"!{{#00FF33}}You have set {target.Name}'s admin level to {EPlayer.GetAdminLevelName(level, true)} ({level})");
@@ -5173,9 +5226,11 @@ namespace LSCC
 
             tpAcc.Admin = level;
             player.SendChatMessage($"!{{#00FF33}}You have set {tpAcc.Username}'s admin level to {EPlayer.GetAdminLevelName(level, true)} ({level})");
+            
+            Logs.LogAdmin(player, $"Set offline player {tpAcc.Username}'s admin level to {EPlayer.GetAdminLevelName(level)}.");
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:osetadmin:{tpAcc.Username}:{level}"); } catch { }
-
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:osetadmin:{tpAcc.Username}:{level}"); } catch { }
+            
             ContextFactory.Instance.SaveChanges();
             return;
         }
@@ -5206,9 +5261,9 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ogivedonorpoints:{tpAcc.Username}:{points}"); } catch { }
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ogivedonorpoints:{tpAcc.Username}:{points}"); } catch { }
 
-
+            Logs.LogAdmin(player, $"Gave offline player {tpAcc.Username} {points} donator points.");
             tpAcc.DonatorPoints += points;
             player.SendChatMessage($"!{{#00FF33}}You have given {tpAcc.Username} {points} donator points. (Their total now: {tpAcc.DonatorPoints})");
 
@@ -5233,8 +5288,8 @@ namespace LSCC
 
             Account t_acc = target.GetData<Account>("AccountHandle");
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:givedonorpoints:{target.Name}:{points}"); } catch { }
-
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:givedonorpoints:{target.Name}:{points}"); } catch { }
+            Logs.LogAdmin(player, $"Gave {points} donator points to {target.Name}");
             t_acc.DonatorPoints += points;
             player.SendChatMessage($"!{{#00FF33}}You gave {points} donator points to {target.Name}.");
             target.SendChatMessage($"!{{#00FF33}}You received {points} donator points from {player.Name}.");
@@ -5264,8 +5319,8 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setdonator:{target.Name}:{level}"); } catch { }
-
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setdonator:{target.Name}:{level}"); } catch { }
+            Logs.LogAdmin(player, $"Set {target.Name}'s donator level to {EPlayer.GetDonatorLevelName(level)}.");
             t_acc.DonatorLevel = level;
             player.SendChatMessage($"!{{#00FF33}}You have set {target.Name}'s donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
             target.SendChatMessage($"!{{#00FF33}}{player.Name} has set your donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
@@ -5304,8 +5359,8 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:osetdonator:{tpAcc.Username}:{level}"); } catch { }
-
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:osetdonator:{tpAcc.Username}:{level}"); } catch { }
+            Logs.LogAdmin(player, $"Set offline player {tpAcc.Username}'s donator level to {EPlayer.GetDonatorLevelName(level)}.");
             tpAcc.DonatorLevel = level;
             player.SendChatMessage($"!{{#00FF33}}You have set {tpAcc.Username}'s donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
 
@@ -5874,8 +5929,8 @@ namespace LSCC
             {
                 target.RemoveAllWeapons();
 
-                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:removeguns:{target.Name}"); } catch { }
-
+                // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:removeguns:{target.Name}"); } catch { }
+                Logs.LogAdmin(player, $"Removed {target.Name}'s weapons.");
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has removed {target.Name}'s weapons.");
             }
         }
@@ -5897,7 +5952,8 @@ namespace LSCC
                 {
                     target.RemoveAllWeapons();
                 }
-                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:removegunsfromall"); } catch { }
+                // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:removegunsfromall"); } catch { }
+                Logs.LogAdmin(player, $"Removed weapons from all players.");
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has removed weapons from all players.");
             }
         }
@@ -5921,7 +5977,8 @@ namespace LSCC
                 }
 
                 EPlayer.Freeze(target, true);
-                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:freeze:{target.Name}"); } catch { }
+                // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:freeze:{target.Name}"); } catch { }
+                Logs.LogAdmin(player, $"Froze player {target.Name}.");
                 target.SendChatMessage($"!{{#FF6347}}[AdmCmd] YOU HAVE BEEN FROZEN BY !{{#FF0000}}{player.Name}");
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen {target.Name}.");
             }
@@ -5943,8 +6000,8 @@ namespace LSCC
                 {
                     EPlayer.Freeze(p, true);
                 }
-                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:rfreeze:{range}"); } catch { }
-
+                // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:rfreeze:{range}"); } catch { }
+                Logs.LogAdmin(player, $"Froze all players within {range}m.");
                 NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen all players within {range}m.");
             }
         }
@@ -5965,8 +6022,8 @@ namespace LSCC
                 {
                     EPlayer.Freeze(p, true);
                 }
-                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:tfreeze:{teamid}"); } catch { }
-
+                // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:tfreeze:{teamid}"); } catch { }
+                Logs.LogAdmin(player, "Froze all " + (teamid == 0 ? "fugitives." : "cops."));
                 NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen specific players.");
             }
         }
@@ -5987,8 +6044,8 @@ namespace LSCC
                 {
                     EPlayer.Freeze(p, false);
                 }
-                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:tunfreeze:{teamid}"); } catch { }
-
+                // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:tunfreeze:{teamid}"); } catch { }
+                Logs.LogAdmin(player, "Unfroze all " + (teamid == 0 ? "fugitives." : "cops."));
                 NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen specific players.");
             }
         }
@@ -6009,8 +6066,8 @@ namespace LSCC
                 {
                     EPlayer.Freeze(p, false);
                 }
-                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:runfreeze:{range}"); } catch { }
-
+                // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:runfreeze:{range}"); } catch { }
+                Logs.LogAdmin(player, $"Unfroze all players within {range}m");
                 NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen all players within {range}m.");
             }
         }
@@ -6029,7 +6086,8 @@ namespace LSCC
             else
             {
                 EPlayer.Freeze(target, false);
-                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unfreeze:{target.Name}"); } catch { }
+                // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unfreeze:{target.Name}"); } catch { }
+                Logs.LogAdmin(player, $"Unfroze player {target.Name}.");
                 target.SendChatMessage($"!{{#FF6347}}[AdmCmd] You have been unfrozen by !{{#FF0000}}{player.Name}");
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen {target.Name}.");
             }
@@ -6060,7 +6118,9 @@ namespace LSCC
                     playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] {target.Name} has been kicked by {player.Name} for {reason}.");
                 });
 
-                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:kick:{target.Name}:{reason.Replace(":", "|")}"); } catch { }
+                // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:kick:{target.Name}:{reason.Replace(":", "|")}"); } catch { }
+                Logs.LogAdmin(player, $"Kicked {target.Name} for {reason}.");
+                Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Kick", reason, "N/A");
 
                 target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
@@ -6095,7 +6155,9 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ojail:{tpAcc.Username}:{minutes}:{reason}"); } catch { }
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ojail:{tpAcc.Username}:{minutes}:{reason}"); } catch { }
+            Logs.LogAdmin(player, $"Offline-jailed {tpAcc.Username} for {minutes} minutes, reason: {reason}");
+            Logs.AddToAdminRecord(tpAcc.SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Jail", "(OFF) " + reason, minutes + " minutes.");
 
             tpAcc.JailReason = reason;
             tpAcc.JailTime = tpAcc.JailTime + (minutes * 60);
@@ -6143,9 +6205,10 @@ namespace LSCC
                     playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] {player.Name} has jailed {target.Name} for {mins} minutes, reason: {reason}.");
                 });
 
-                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:jail:{target.Name}:{mins}:{reason.Replace(":", "|")}"); } catch { }
-
-                EPlayer.Jail(target, mins, reason);
+                //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:jail:{target.Name}:{mins}:{reason.Replace(":", "|")}"); } catch { }
+                Logs.LogAdmin(player, $"Jailed player {target.Name} for {mins} minutes, reason: {reason}.");
+                EPlayer.Jail(target, mins, reason); 
+                Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Jail", reason, mins + " minutes.");
             }
             return;
         }
@@ -6168,12 +6231,12 @@ namespace LSCC
                 Account acc = EPlayer.GetAccount(target);
                 if(acc.JailTime == 0) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not jailed."); return; }
 
+                Logs.LogAdmin(player, $"Unjailed player {target.Name} who had {acc.JailTime} seconds remaining in jail.");
                 acc.JailTime = 0;
                 target.SetSharedData("JailTime", 0);
                 EPlayer.Freeze(player, false);
 
-                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unjail:{target.Name}"); } catch { }
-
+                //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unjail:{target.Name}"); } catch { }             
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has unjailed {target.Name}.");
                 EPlayer.Spawn(target);
             }
@@ -6206,8 +6269,8 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ounjail:{tpAcc.Username}"); } catch { }
-
+            //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ounjail:{tpAcc.Username}"); } catch { }
+            Logs.LogAdmin(player, $"Unjailed offline player {tpAcc.Username} who had {tpAcc.JailTime} seconds remaining in jail.");
             tpAcc.JailTime = 0;
 
             ContextFactory.Instance.SaveChanges();
@@ -6237,9 +6300,11 @@ namespace LSCC
                     playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] {player.Name} has warned {target.Name} for {reason}.");
                 });
 
-                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:warn:{target.Name}:{reason.Replace(":", "|")}"); } catch { }
-
+                //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:warn:{target.Name}:{reason.Replace(":", "|")}"); } catch { }
+                Logs.LogAdmin(player, $"Warned {target.Name} for {reason}.");
                 EPlayer.Warn(target);
+
+                Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Warn", "(#" + (EPlayer.GetAccount(target).Warns) + ") " + reason, "N/A");
             }
             return;
         }
@@ -6263,8 +6328,8 @@ namespace LSCC
                 if (acc.Warns < 1) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has no warns at all."); return; }
 
                 acc.Warns--;
-                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unwarn:{target.Name}"); } catch { }
-
+                //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unwarn:{target.Name}"); } catch { }
+                Logs.LogAdmin(player, $"Removed {target.Name}'s last warn."); 
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has removed {target.Name}'s last warn.");
             }
             return;
@@ -6295,8 +6360,10 @@ namespace LSCC
                 Acc.MuteTime = Acc.MuteTime + (mins * 60);
                 target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been muted for {mins} minutes, reason: {reason}.");
 
-                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:mute:{target.Name}:{mins}:{reason.Replace(":", "|")}"); } catch { }
+                Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Mute", reason, mins + " minutes.");
 
+                //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:mute:{target.Name}:{mins}:{reason.Replace(":", "|")}"); } catch { }
+                Logs.LogAdmin(player, $"Muted {target.Name} for {mins} minutes, reason: {reason}.");
                 target.SetSharedData("MuteTime", Acc.MuteTime);
                 target.TriggerEvent("SetMuteCounter", Acc.MuteTime);
             }
@@ -6329,8 +6396,9 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:omute:{tpAcc.Username}:{minutes}:{reason}"); } catch { }
-
+            //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:omute:{tpAcc.Username}:{minutes}:{reason}"); } catch { }
+            Logs.LogAdmin(player, $"Muted offline player {tpAcc.Username} for {minutes} minutes, reason: {reason}.");
+            Logs.AddToAdminRecord(tpAcc.SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Mute", "(OFF) " + reason, minutes + " minutes.");
             tpAcc.MuteReason = reason;
             tpAcc.MuteTime = tpAcc.MuteTime + (minutes * 60);
 
@@ -6371,8 +6439,8 @@ namespace LSCC
                 return;
             }
 
-            try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ounmute:{tpAcc.Username}"); } catch { }
-
+            //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ounmute:{tpAcc.Username}"); } catch { }
+            Logs.LogAdmin(player, $"Unmuted offline player {tpAcc.Username}.");
             tpAcc.MuteTime = 0;
 
             ContextFactory.Instance.SaveChanges();
@@ -6404,8 +6472,8 @@ namespace LSCC
                 Account acc = EPlayer.GetAccount(target);
                 if (acc.MuteTime == 0) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not muted."); return; }
 
-                try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unmute:{target.Name}"); } catch { }
-
+                //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unmute:{target.Name}"); } catch { }
+                Logs.LogAdmin(player, $"Unmuted {target.Name}.");
                 acc.MuteTime = 0;
                 target.SetSharedData("MuteTime", 0);
 
