@@ -456,6 +456,8 @@ namespace LSCC
                             break;
                     }
 
+                    Logs.LogSession(player);
+
                     EPlayer.Save(player);
                 }
 
@@ -909,7 +911,9 @@ namespace LSCC
                 player.SetData("Language", ContextFactory.Instance.Languages.FirstOrDefault(l => l.SQL_ID == acc.Language));
             else
                 player.ResetData("Language");
-            
+
+            player.SetData<long>("JoinTimeUnix", DateTimeOffset.Now.ToUnixTimeSeconds());
+
             CharacterData ConvChar = new CharacterData();
 
             try
@@ -1233,6 +1237,8 @@ namespace LSCC
             player.TriggerEvent("TogglePlayerChat", true);
 
             player.ResetData("Language");
+
+            player.SetData<long>("JoinTimeUnix", DateTimeOffset.Now.ToUnixTimeSeconds());
 
             EPlayer.ShowCharCreator(player);
 
