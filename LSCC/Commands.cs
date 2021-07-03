@@ -3369,6 +3369,20 @@ namespace LSCC
             return;
         }
 
+        [Command("dbglinkmane", Alias = "dbgcef", GreedyArg = true)]
+        public void cmd_dbgcef(Player player, string link)
+        {
+            player.TriggerEvent("showBrowser", link);
+            return;
+        }
+
+        [Command("dbgexitlinkmane", Alias = "dbgexitcef", GreedyArg = true)]
+        public void cmd_exitdbgcef(Player player)
+        {
+            player.TriggerEvent("destroyBrowser");
+            return;
+        }
+
         [Command("dbgteamvar")]
         public void cmd_dbgteamvar(Player player, int id)
         {

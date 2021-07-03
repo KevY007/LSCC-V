@@ -1085,6 +1085,36 @@ mp.events.add("entclearanim", (entity, animDictionary, animName) => {
     entity.clearTasks();
 });
 
+mp.events.add('native:call', (nativeName, args, hasCallback) => {
+    let commandString = "";
+    if(args.length > 0)
+    {
+        commandString = nativeName + "(";
+        for(var i = 0; i < args.length; i++)
+        {
+            if(typeof args[i] === 'string')
+            {
+                commandString += '"' + args[i] + '"';
+            }
+            else commandString += args[i];
+ 
+            if(i != args.length - 1)
+            {
+                commandString += ", ";
+            }
+        }
+        commandString += ");";
+    }
+    else commandString = nativeName + "();";
+ 
+    var native = eval(commandString);
+ 
+    if(hasCallback)
+    {
+        mp.events.callRemote("native:return", native);
+    }
+});
+
 mp.events.add(
     {
         "SyncServerSettings": (onfootcollisions) => {
