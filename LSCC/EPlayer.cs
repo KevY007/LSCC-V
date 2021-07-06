@@ -527,6 +527,7 @@ namespace LSCC
             {
                 player.ResetData("AccountHandle");
                 ResetShotStats(player);
+                player.SetData<long>("JoinTimeUnix", 0);
                 player.SetData("TeamShotWarning", 0);
                 player.SetData("UnfairKillSpawn", false);
                 player.SetData("InnocentShotWarning", 0);

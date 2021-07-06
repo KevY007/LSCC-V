@@ -62,6 +62,7 @@ namespace LSCC
         public DbSet<BanData> Bans { get; set; }
         public DbSet<Logs_AdminRecord> Logs_AdminRecords { get; set; }
         public DbSet<Logs_Admin> Logs_Admin { get; set; }
+        public DbSet<Logs_Session> Logs_Session { get; set; }
     }
 
     public class ContextFactory : IDesignTimeDbContextFactory<MainDatabase>
