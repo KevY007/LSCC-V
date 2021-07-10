@@ -1179,8 +1179,9 @@ namespace LSCC
                     "Use /rules to see the server rules.",
                     "Use /cmds to see the server commands.",
                     "Have you seen someone cheating? Please, contact an administrator ASAP.",
-                    "Bored of waiting in the lobby? Check out our side activities like DM. Freeroam, Derby!",
-                    "Want to earn some tokens? Head over to /dm!"
+                    "Bored of waiting in the lobby? Check out our side activities like Deathmatch, Freeroam, Derby!",
+                    "Want to earn some quick score? Head over to /dm!",
+                    "You can save your current cop & fugitive appearance profile and select a different one by using /outfit."
                 };
 
                 RAGE.Entities.Players.All.ForEach((Player e) => e.SendChatMessage("[?] !{#F0FC72}" + msgList.ElementAt(new Random().Next(0, msgList.Length))));

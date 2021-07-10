@@ -28,6 +28,7 @@ require("./Player/HUD.js");
 require("./Player/KillList.js");
 require("./charcreator/clotheditor.js")
 require("./charcreator/index.js");
+require("./charcreator/outfitslots.js")
 
 require('./camerasManager.js');
 require('./cefBrowser.js');

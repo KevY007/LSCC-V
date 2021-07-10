@@ -557,6 +557,7 @@ namespace LSCC
 
                 player.SetData("EditingClothing", -1);
                 player.SetData("Creator_Using", false);
+                player.SetData("LastEditedClothingTeam", 1);
 
                 player.ResetData("BlockList");
 

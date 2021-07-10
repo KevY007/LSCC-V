@@ -1633,7 +1633,7 @@ namespace LSCC
             player.SendChatMessage("!{#FF6347}Rule 4) Chat & Voice Rules: Don't speak foreign languages, spam, annoy or insult any other player! Don't shout either.");
             player.SendChatMessage("!{#FF6347}Rule 5) Ramming Rules: Do not suicide ram into 'stationary' vehicles, don't ram people onfoot.");
             player.SendChatMessage("!{#FF6347}Rule 6) Deathmatching: Don't try to kill fugitive's that don't have the tag or anything except arresting.");
-            player.SendChatMessage("!{#FF6347}Rule 7) Abusing the mode: Forgetting the purpose of serer and teaming with enemy team etc is strictly bannable!");
+            player.SendChatMessage("!{#FF6347}Rule 7) Abusing the mode: Forgetting the purpose of server and teaming with enemy team etc is strictly bannable!");
 
             player.SendChatMessage("!{#FF6347}>> These are just some basic rules for detailed, complete rule list, visit our discord! (/discord)");
             player.SendChatMessage("!{#FF6347}[!!] A lot of our rules have been changed, these are from the legacy build so refer to our discord.");
@@ -6670,6 +6670,33 @@ namespace LSCC
             }
         }
 
+        [Command("outfit", "!{#AFAFAF}[USAGE] outfit (option: save, select)")]
+        public void cmd_outfit(Player player, string option)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("InLobby") != -4)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase or derby!");
+                return;
+            }
+
+            if (option == "select")
+            {
+                player.TriggerEvent("ShowOutfitsMenu", player.GetData<int>("LastEditedClothingTeam"), (EPlayer.GetAccount(player).DonatorLevel > 1), 0);
+            }
+            else if(option == "save")
+            {
+                player.TriggerEvent("ShowOutfitsMenu", player.GetData<int>("LastEditedClothingTeam"), (EPlayer.GetAccount(player).DonatorLevel > 1), 1);
+            }
+            else
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option! Valid options are: save, select");
+                return; 
+            }
+        }
+
         [Command("clothing", "!{#AFAFAF}[USAGE] clothing (option: reset, cop, fugitive)", GreedyArg = true)]
         public void cmd_clothing(Player player, string team)
         {
@@ -6756,6 +6783,7 @@ namespace LSCC
                         catch { return; }
 
                         player.SetData("EditingClothing", 1);
+                        player.SetData("LastEditedClothingTeam", 1);
                         player.TriggerEvent("ShowClothesMenu");
                     }
                     else if (args[1].StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
@@ -6767,6 +6795,7 @@ namespace LSCC
                         catch { return; }
 
                         player.SetData("EditingClothing", 0);
+                        player.SetData("LastEditedClothingTeam", 0);
                         player.TriggerEvent("ShowClothesMenu");
                     }
                     else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid team, clothings can only be set for 'fugitive' or 'cop' team.");

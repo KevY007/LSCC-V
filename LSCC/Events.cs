@@ -961,6 +961,21 @@ namespace LSCC
             else
                 player.SendChatMessage($"!{{#a6a6a6}}Last session lasted !{{#c2c1b6}}{(EPlayer.GetAccount(player).LastSessionMins).ToString("N1")} minutes.");
 
+            if(ContextFactory.Instance.PlayerOutfits.FirstOrDefault(o => o.AccountID == acc.SQL_ID) == null)
+            {
+                CharacterData[] defaultOutfits = new CharacterData[5];
+                for(int i = 0; i < 5; i++)
+                {
+                    defaultOutfits[i] = new CharacterData();
+                }
+                ContextFactory.Instance.PlayerOutfits.Add(new PlayerOutfit()
+                {
+                    AccountID = acc.SQL_ID,
+                    OutfitData = NAPI.Util.ToJson(defaultOutfits)
+                });
+                ContextFactory.Instance.SaveChangesAsync();
+            }
+
             EPlayer.GetAccount(player).LastSessionMins = 0.0;
         }
 
@@ -1069,6 +1084,85 @@ namespace LSCC
             player.TriggerEvent("toggleCreator", false);
 
             EPlayer.Spawn(player);
+        }
+
+        [RemoteEvent("RequestSaveOutfit")]
+        public void OnRequestSaveOutfit(Player player, int slot)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Account acc = EPlayer.GetAccount(player);
+            if (slot >= 3 && acc.DonatorLevel < 1)
+            {
+                player.SendNotification("~r~I don't know how you got here, but this slot is for donator only!");
+                return;
+            }
+            if (slot == -1) return;
+
+            string jsonReceived = ContextFactory.Instance.PlayerOutfits.FirstOrDefault(o => o.AccountID == EPlayer.GetAccount(player).SQL_ID).OutfitData;
+
+            try
+            {
+                List<CharacterData> outfits = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CharacterData>>(jsonReceived);
+
+                outfits[slot] = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+                ContextFactory.Instance.PlayerOutfits.FirstOrDefault(o => o.AccountID == EPlayer.GetAccount(player).SQL_ID).OutfitData = NAPI.Util.ToJson(outfits);
+
+                ContextFactory.Instance.SaveChangesAsync();
+
+                player.SendChatMessage("!{#00FF00}You successfully saved your current outfit to slot " + (slot+1) + ".");
+            }
+            catch
+            {
+                player.SendNotification("~r~Error fetching outfits! Please try to relog or contact the devs.");
+            }
+        }
+
+        [RemoteEvent("RequestSetOutfit")]
+        public void OnRequestSetOutfit(Player player, int slot, int team, bool save)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Account acc = EPlayer.GetAccount(player);
+            if(slot >= 3 && acc.DonatorLevel < 1)
+            {
+                player.SendNotification("~r~I don't know how you got here, but this slot is for donator only!");
+                return;
+            }
+
+            if (slot != -1)
+            {
+                try
+                {
+                    string jsonReceived = jsonReceived = ContextFactory.Instance.PlayerOutfits.FirstOrDefault(o => o.AccountID == EPlayer.GetAccount(player).SQL_ID).OutfitData;
+
+                    List<CharacterData> outfits = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CharacterData>>(jsonReceived);
+
+                    EPlayer.ApplyCharacter(player, outfits[slot], team);
+
+                    if (save == true)
+                    {
+                        acc.Character = NAPI.Util.ToJson(outfits[slot]);
+                        EPlayer.Save(player);
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You selected your outfit on slot " + (slot + 1) + ".");
+                    }
+                }
+                catch
+                {
+                    player.SendNotification("~r~Error fetching outfits! Please try to relog or contact the devs.");
+                }
+            }
+            else
+            {
+                CharacterData normalChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+                EPlayer.ApplyCharacter(player, normalChar, team);
+
+                if(save == true)
+                {
+                    acc.Character = NAPI.Util.ToJson(normalChar);
+                    EPlayer.Save(player);
+                }
+            }
         }
 
         [RemoteEvent("RequestSetClothes")]
@@ -1241,6 +1335,19 @@ namespace LSCC
             player.SetData<long>("JoinTimeUnix", DateTimeOffset.Now.ToUnixTimeSeconds());
 
             EPlayer.ShowCharCreator(player);
+
+            // Adding the 5 default characters to the outfits section so he has his own entry in the outfits table bla bla boring
+            CharacterData[] defaultOutfits = new CharacterData[5];
+            for (int i = 0; i < 5; i++)
+            {
+                defaultOutfits[i] = new CharacterData();
+            }
+            ContextFactory.Instance.PlayerOutfits.Add(new PlayerOutfit()
+            {
+                AccountID = acc.SQL_ID,
+                OutfitData = NAPI.Util.ToJson(defaultOutfits)
+            });
+            ContextFactory.Instance.SaveChangesAsync();
 
             //EPlayer.Spawn(player);
         }
