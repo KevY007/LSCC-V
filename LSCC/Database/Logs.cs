@@ -5,6 +5,15 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Reflection;
 using GTANetworkAPI;
+using System.Collections.Generic;
+using System.Linq;
+using LSCC;
+using System.Text.RegularExpressions;
+using System.Runtime.CompilerServices;
+using System.Reflection.Metadata.Ecma335;
+using System.Runtime.InteropServices.ComTypes;
+using Microsoft.Extensions.Logging.Abstractions;
+using System.Net.Mail;
 
 namespace LSCC
 {
@@ -38,8 +47,77 @@ namespace LSCC
         public string IP { get; set; }
         public string HWID { get; set; }
     }
-    public static class Logs
+    public class Logs : Script
     {
+        enum LogType
+        {
+            Admin = 1,
+            Session = 2,
+            AdminRecord = 3
+        };
+
+        [RemoteEvent("ShowLogsPanel")]
+        public static void ShowLogsPanel(Player player, bool toggle)
+        {
+            player.TriggerEvent("ShowLogsCEF", toggle);
+        }
+
+        [RemoteEvent("ReqLogFromSrv")]
+        public static void RequestLogsFromServer(Player player, string targetName, int type)
+        {
+            Account target = ContextFactory.Instance.Accounts.FirstOrDefault<Account>(a => a.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+            if (target == null)
+            {
+                return;
+            }
+
+            switch(type)
+            {
+                case (int)LogType.AdminRecord:
+                    {
+                        List<Logs_AdminRecord> _logs = ContextFactory.Instance.Logs_AdminRecords.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToList();
+                        object[] _toSend = new object[_logs.Count];
+                        for (int i = 0; i < _logs.Count; i++)
+                        {
+                            (string, string, string, string) _toAdd = (_logs[i].Type, _logs[i].Reason, _logs[i].Timestamp, _logs[i].Duration);
+                            _toSend[i] = _toAdd;
+                        }
+                        string jsonShit = NAPI.Util.ToJson(_toSend);
+                        player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
+                        break;
+                    }
+                case (int)LogType.Admin:
+                    {
+                        List<Logs_Admin> _logs = ContextFactory.Instance.Logs_Admin.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToList();
+                        object[] _toSend = new object[_logs.Count];
+                        for (int i = 0; i < _logs.Count; i++)
+                        {
+                            (string, string) _toAdd = (_logs[i].Description, _logs[i].Timestamp);
+                            _toSend[i] = _toAdd;
+                        }
+                        string jsonShit = NAPI.Util.ToJson(_toSend);
+                        player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
+                        break;
+                    }
+                case (int)LogType.Session:
+                    {
+                        List<Logs_Session> _logs = ContextFactory.Instance.Logs_Session.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToList();
+                        object[] _toSend = new object[_logs.Count];
+                        for (int i = 0; i < _logs.Count; i++)
+                        {
+                            (string, string, string, string, string) _toAdd = (_logs[i].TimestampJoin, _logs[i].TimestampLeave, _logs[i].Duration, _logs[i].IP, _logs[i].HWID);
+                            _toSend[i] = _toAdd;
+                        }
+                        string jsonShit = NAPI.Util.ToJson(_toSend);
+                        player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
+                        break;
+                    }
+                default:
+                    {
+                        return;
+                    }
+            }
+        }
         public static void LogSession(Player player)
         {
             if (!player.HasData("JoinTimeUnix")) return;
@@ -65,6 +143,9 @@ namespace LSCC
         }
         public static void LogAdmin(Player player, string description)
         {
+            description = description.Replace("{", "(");
+            description = description.Replace("}", ")");
+
             Logs_Admin _a = new Logs_Admin()
             {
                 AccountID = EPlayer.GetAccount(player).SQL_ID,
@@ -75,16 +156,19 @@ namespace LSCC
             ContextFactory.Instance.SaveChangesAsync();
         }
 
-        public async static void RemoveAdminRecord(int recordID)
+        public static void RemoveAdminRecord(int recordID)
         {
-            Logs_AdminRecord _rem = await ContextFactory.Instance.Logs_AdminRecords.FirstOrDefaultAsync(t => t.SQL_ID == recordID);
+            Logs_AdminRecord _rem = ContextFactory.Instance.Logs_AdminRecords.AsQueryable().FirstOrDefault(l => l.SQL_ID == recordID);
             if (_rem == null) return;
 
             ContextFactory.Instance.Logs_AdminRecords.Remove(_rem);
-            await ContextFactory.Instance.SaveChangesAsync();
+            ContextFactory.Instance.SaveChangesAsync();
         }
         public static void AddToAdminRecord(int accountID, int adminID, string type, string reason, string duration)
         {
+            reason = reason.Replace("{", "(");
+            reason = reason.Replace("}", ")");
+
             Logs_AdminRecord _a = new Logs_AdminRecord()
             {
                 AccountID = accountID,

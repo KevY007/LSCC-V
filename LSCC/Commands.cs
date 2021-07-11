@@ -4643,6 +4643,19 @@ namespace LSCC
             return;
         }
 
+        [Command("logs", "!{#AFAFAF}[USAGE] logs")]
+        public void cmd_logs(Player player, string option)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+            Logs.ShowLogsPanel(player, option == "yes" ? true : false);
+            return;
+        }
+
         [Command("acmds", Alias = "ahelp")]
         public void cmd_ahelp(Player player)
         {
@@ -4658,7 +4671,7 @@ namespace LSCC
                 player.SendChatMessage("[Admin Lv 1]: /(t)freeze /(t)unfreeze /kick /slap /setinv(ulnerable) /specoff");
                 player.SendChatMessage("[Admin Lv 1]: /bancheck /(o)jail /(o)unjail /afix /aflip /sendtolobby /set(time/weather)");
                 player.SendChatMessage("[Admin Lv 1]: /(o)mute /(o)unmute /warn /unwarn /setteam /forceautojoin /forceswapseats");
-                player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats /lastlogin");
+                player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats /lastlogin /logs");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
