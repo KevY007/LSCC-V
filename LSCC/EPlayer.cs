@@ -561,6 +561,9 @@ namespace LSCC
 
                 player.ResetData("BlockList");
 
+                player.SetSharedData("ActionType", "none");
+                player.SetSharedData("ActionTime", 0);
+
                 player.ResetData("AskedBySquad");
                 player.ResetData("PlayerSquad");
 

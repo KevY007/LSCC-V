@@ -129,6 +129,31 @@ namespace LSCC
             }
         }
 
+        [RemoteEvent("OnPlayerActionTick")]
+        public static void OnPlayerActionTick(Player player)
+        {
+            player.SetSharedData("ActionTime", player.GetSharedData<int>("ActionTime") - 1);
+        }
+
+        [RemoteEvent("FinishPlayerAction")]
+        public static void OnFinishPlayerAction(Player player, string action)
+        {
+            switch (action.ToLower())
+            {
+                case "medkit":
+                    int pHP = player.Health;
+                    if (pHP + 60 > 100) { player.Health = 100; }
+                    else player.Health = pHP + 60;
+
+                    player.SendChatMessage($"~g~You used a medkit and gained +60HP. Your HP is now {(pHP + 60 > 100 ? 100 : pHP+60)}.");
+                    break;
+                default: return;
+            }
+
+            player.SetSharedData("ActionType", "none");
+            player.SetSharedData("ActionTime", 0);
+        }
+
         [RemoteEvent("SyncShotStats")]
         public static void OnSynchronizeShotStatistics(Player player, int TotalShotsFired, int PlayerHits, int VehicleHits, int Missed)
         {

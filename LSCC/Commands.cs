@@ -1078,6 +1078,9 @@ namespace LSCC
             if (player.IsInVehicle) 
                 { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this inside of a vehicle!"); return; }
 
+            if(!player.GetSharedData<string>("ActionType").Equals("none"))
+                { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this while performing an action!"); return; }
+
             if (player.HasData("Handsup"))
             {
                 player.TriggerEvent("SetHandsup", false);
@@ -1090,6 +1093,25 @@ namespace LSCC
             }
         }
 
+        [Command("blipdbg")]
+        public void cmd_blipdbg(Player player)
+        {
+            player.SetSharedData("VisibleBlip", !player.GetSharedData<bool>("VisibleBlip"));
+        }
+
+        [Command("medkit")]
+        public void cmd_medkit(Player player)
+        {
+            if (player.GetSharedData<string>("ActionType") != "none" || player.GetSharedData<int>("ActionTime") > 0)
+                { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are already performing an action!"); return; }
+
+            player.SetSharedData("ActionType", "medkit");
+            player.SetSharedData("ActionTime", 10);
+            player.TriggerEvent("StartPlayerAction", "medkit", 10);
+
+            player.SendChatMessage("~y~You are now using a medkit, this will take 10 seconds... " + player.GetSharedData<string>("ActionType"));
+        }
+
         [Command("handsup")]
         public void cmd_handsup(Player player)
         {
@@ -1098,6 +1120,9 @@ namespace LSCC
 
             if (player.IsInVehicle)
                 { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this inside of a vehicle!"); return; }
+
+            if (!player.GetSharedData<string>("ActionType").Equals("none"))
+            { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this while performing an action!"); return; }
 
             if (player.HasData("Handsup"))
             {

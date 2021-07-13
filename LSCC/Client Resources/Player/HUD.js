@@ -19,6 +19,11 @@ var res_Y = resolution.y;
 let bestlobbystr = "N/A";
 let dirtext = "NW";
 
+// StackOverflow cause I'm too lazy to do this myself and don't wanna type getvariable etc etc every time
+function firstLetterUpper(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
 // https://github.com/glitchdetector/fivem-minimap-anchor
 function getMinimapAnchor() {
     let sfX = 1.0 / 20.0;
@@ -210,19 +215,42 @@ mp.events.add("render", () => {
                 {
                     if(mp.players.local.getVariable("VisibleBlip") == true)
                     {
-                        pX = minimap.rightX + 0.0875;
-                        pY = minimap.topY + 0.100;
-                        sX = 0.165;
-                        sY = 0.15;
+                        if(mp.players.local.getVariable("ActionType") == "none")
+                        {
+                            pX = minimap.rightX + 0.0875;
+                            pY = minimap.topY + 0.100;
+                            sX = 0.165;
+                            sY = 0.15;
+                        }
+                        else
+                        {
+                            pX = minimap.rightX + 0.0875;
+                            pY = minimap.topY + 0.090;
+                            sX = 0.165;
+                            sY = 0.17;   
+                            drawText(`~y~Action: ~w~${firstLetterUpper(mp.players.local.getVariable("ActionType"))} ~b~| ~y~Time: ${mp.players.local.getVariable("ActionTime") > 3 ? "~o~" : "~g~"}${mp.players.local.getVariable("ActionTime")}`, [minimap.rightX + 0.0085, minimap.bottomY - 0.171], 0, [204, 204, 204, 255], 0.38);                        
+                        }
 
                         drawText(visibleText, [minimap.rightX + 0.0085, minimap.bottomY - 0.152], 0, [204, 204, 204, 255], 0.40);
                     }
                     else
                     {
-                        pX = minimap.rightX + 0.0875;
-                        pY = minimap.topY + 0.110;
-                        sX = 0.165;
-                        sY = 0.13;
+                        if(mp.players.local.getVariable("ActionType") == "none")
+                        {
+                            pX = minimap.rightX + 0.0875;
+                            pY = minimap.topY + 0.110;
+                            sX = 0.165;
+                            sY = 0.13;
+                        }
+                        else
+                        {
+                            pX = minimap.rightX + 0.0875;
+                            pY = minimap.topY + 0.100;
+                            sX = 0.165;
+                            sY = 0.15;      
+                            
+                            drawText(`~y~Action: ~w~${firstLetterUpper(mp.players.local.getVariable("ActionType"))} ~b~| ~y~Time: ${mp.players.local.getVariable("ActionTime") > 3 ? "~o~" : "~g~"}${mp.players.local.getVariable("ActionTime")}`, [minimap.rightX + 0.0085, minimap.bottomY - 0.150], 0, [204, 204, 204, 255], 0.38);
+                        }
                     }
 
                     if(((vehicle.getSpeed() * 3.6).toFixed(0) % 2 == 0 || (vehicle.getSpeed() * 3.6).toFixed(0) % 5 == 0) || 
@@ -237,19 +265,41 @@ mp.events.add("render", () => {
                 {
                     if(mp.players.local.getVariable("VisibleBlip") == true)
                     {
-                        pX = minimap.rightX + 0.0875;
-                        pY = minimap.topY + 0.110;
-                        sX = 0.1625;
-                        sY = 0.1293;
+                        if(mp.players.local.getVariable("ActionType") == "none")
+                        {
+                            pX = minimap.rightX + 0.0875;
+                            pY = minimap.topY + 0.110;
+                            sX = 0.1625;
+                            sY = 0.1293;
+                        }
+                        else
+                        {
+                            pX = minimap.rightX + 0.0875;
+                            pY = minimap.topY + 0.100;
+                            sX = 0.1625;
+                            sY = 0.1486;
+                            drawText(`~y~Action: ~w~${firstLetterUpper(mp.players.local.getVariable("ActionType"))} ~b~| ~y~Time Left: ${mp.players.local.getVariable("ActionTime") > 3 ? "~o~" : "~g~"}${mp.players.local.getVariable("ActionTime")}`, [minimap.rightX + 0.0085, minimap.bottomY - 0.1525], 0, [204, 204, 204, 255], 0.35);
+                        }
 
                         drawText(visibleText, [minimap.rightX + 0.0085, minimap.bottomY - 0.1315], 0, [204, 204, 204, 255], 0.35);
                     }
                     else
                     {
-                        pX = minimap.rightX + 0.0875;
-                        pY = minimap.topY + 0.120;
-                        sX = 0.1625;
-                        sY = 0.110;
+                        if(mp.players.local.getVariable("ActionType") == "none")
+                        {
+                            pX = minimap.rightX + 0.0875;
+                            pY = minimap.topY + 0.120;
+                            sX = 0.1625;
+                            sY = 0.110;
+                        }
+                        else
+                        {
+                            pX = minimap.rightX + 0.0875;
+                            pY = minimap.topY + 0.110;
+                            sX = 0.1625;
+                            sY = 0.1293;
+                            drawText(`~y~Action: ~w~${firstLetterUpper(mp.players.local.getVariable("ActionType"))} ~b~| ~y~Time Left: ${mp.players.local.getVariable("ActionTime") > 3 ? "~o~" : "~g~"}${mp.players.local.getVariable("ActionTime")}`, [minimap.rightX + 0.0085, minimap.bottomY - 0.1315], 0, [204, 204, 204, 255], 0.35);
+                        }                        
                     }
                 }
 
