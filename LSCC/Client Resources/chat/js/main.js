@@ -28,6 +28,29 @@ function toggleScroll(enable) {
 	}
 } 
 
+function toggleChatOpacity(enable){
+
+	if(chat.active == false){
+		$("#chat").opacity = 0.0;
+		return;
+	}
+
+	if(enable){
+		$("#chat").fadeTo("fast", 1.0);
+	}
+	else{
+		if(chat.input == null){
+			$(("#chat")).fadeTo("slow", 0.4);		
+		}
+		else{ // If the player is typing to prevent hiding the chat while they're doing so.
+			clearTimeout(chatOpacityTimeout);
+			chatOpacityTimeout = setTimeout(() =>{
+				toggleChatOpacity(false);
+			}, 5000);			
+		}
+	}
+}
+
 function enableChatInput(enable)
 {
 	if(chat.active == false
@@ -48,7 +71,7 @@ function enableChatInput(enable)
 		{
             chat.input = $("#chat").append('<div><input id="chat_msg" type="text" maxlength="128" /></div>').children(":last");
 			chat.input.children("input").focus();			
-			$("#chat").fadeTo("fast", 1.0);
+			toggleChatOpacity(true);
         } 
 		else
 		{
@@ -60,7 +83,7 @@ function enableChatInput(enable)
 
 			clearTimeout(chatOpacityTimeout);
 			chatOpacityTimeout = setTimeout(() =>{
-				$(("#chat")).fadeTo("slow", 0.4);
+				toggleChatOpacity(false);
 			}, 5000);
         }
     }
@@ -71,8 +94,8 @@ var chatAPI =
 	push: (text_) =>
 	{
 		if(!chat.loaded) return;
-		clearTimeout(chatOpacityTimeout);
-		$("#chat").fadeTo("fast", 1.0);
+		clearTimeout(chatOpacityTimeout);		
+		toggleChatOpacity(true);
 
 		let colorPositions = [];
 		let colors = [];
@@ -111,8 +134,8 @@ var chatAPI =
 			chat.container.children(":last").remove();
 		}
 
-		chatOpacityTimeout = setTimeout(() =>{
-			$(("#chat")).fadeTo("slow", 0.4);
+		chatOpacityTimeout = setTimeout(() =>{		
+			toggleChatOpacity(false);
 		}, 5000);
 	},
 	
