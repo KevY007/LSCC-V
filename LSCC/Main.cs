@@ -1494,6 +1494,7 @@ namespace LSCC
                             // Reward
                             EPlayer.GetAccount(i).Escapes++;
                             EPlayer.GrantXP(i, 5);
+                            EPlayer.GivePoints(i, 2);
                             i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.3);
                         }
                         break;
@@ -1505,6 +1506,7 @@ namespace LSCC
                         {
                             // Reward
                             EPlayer.GrantXP(i, 3);
+                            EPlayer.GivePoints(i, 2);
                             i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.2);
                         }
                         break;
@@ -1516,6 +1518,7 @@ namespace LSCC
                         {
                             // Reward
                             EPlayer.GrantXP(i, 4);
+                            EPlayer.GivePoints(i, 2);
                             i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.3);
                         }
                         break;

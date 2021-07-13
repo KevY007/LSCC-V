@@ -1054,6 +1054,12 @@ namespace LSCC
             player.TriggerEvent("CreatePlayerCamera", Settings.LoginCameraX, Settings.LoginCameraY, Settings.LoginCameraZ, Settings.LoginCameraRx, Settings.LoginCameraRy, Settings.LoginCameraRz, Settings.LoginCameraViewAngle);
         }
 
+        public static void StopPlayerAction(Player player, int reason)
+        {
+            player.TriggerEvent("StopPlayerActions");
+            Events.OnStopPlayerAction(player, reason);
+        }
+
         public static void LoginBrowserSetup(Player player)
         {
             player.TriggerEvent("InitiateCustomChat");
@@ -1062,6 +1068,11 @@ namespace LSCC
             SetDiscordStatus(player, "On login screen");
             ResetPlayerData(player);
             player.TriggerEvent("showBrowser", "package://LoginRegister/login.html");
+        }
+        public static void GivePoints(Player player, int points)
+        {
+            EPlayer.GetAccount(player).Points += points;
+            player.SetSharedData("Points", EPlayer.GetAccount(player).Points);
         }
         public static int GetMaxLevelXP(int level)
         {

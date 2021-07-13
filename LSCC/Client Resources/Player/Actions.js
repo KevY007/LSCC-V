@@ -15,6 +15,19 @@ mp.events.add("StartPlayerAction", (action, time) => {
     }
 });
 
+mp.events.add("StopPlayerActions", () => {
+    switch(actionType){
+        case "medkit":
+            mp.events.callRemote("clear_anim");
+            clearInterval(actionInterval);
+            break;
+        default: return;
+    }
+    actionType = "none";
+    actionTime = 0;
+    actionInterval = null;
+});
+
 function MedkitAction(){
     mp.events.callRemote("play_anim", "amb@medic@standing@kneel@enter", "enter", 0);
 

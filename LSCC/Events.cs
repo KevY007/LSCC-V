@@ -132,7 +132,29 @@ namespace LSCC
         [RemoteEvent("OnPlayerActionTick")]
         public static void OnPlayerActionTick(Player player)
         {
+            if(player.GetSharedData<int>("Team") == -1)
+            {
+                EPlayer.StopPlayerAction(player, 0);
+                return;
+            }
             player.SetSharedData("ActionTime", player.GetSharedData<int>("ActionTime") - 1);
+        }
+
+        [RemoteEvent("StopPlayerAction")]
+        public static void OnStopPlayerAction(Player player, int reason)
+        {
+            switch (reason)
+            {
+                case 0: // Not in CC
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your action was stopped: you are no longer in copchase.");
+                    break;
+                case 1: // Death
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your action has failed: you died.");
+                    break;
+                default: break;
+            }
+            player.SetSharedData("ActionType", "none");
+            player.SetSharedData("ActionTime", 0);
         }
 
         [RemoteEvent("FinishPlayerAction")]
@@ -141,6 +163,8 @@ namespace LSCC
             switch (action.ToLower())
             {
                 case "medkit":
+                    EPlayer.GetAccount(player).Medkits--;
+
                     int pHP = player.Health;
                     if (pHP + 60 > 100) { player.Health = 100; }
                     else player.Health = pHP + 60;
@@ -515,6 +539,11 @@ namespace LSCC
             else
             {
                 reasonStr = null;
+            }
+
+            if(player.GetSharedData<string>("ActionType") != "none")
+            {
+                EPlayer.StopPlayerAction(player, 1);
             }
 
             if (reason == 696988) reasonStr = "handcuffs";
@@ -1000,6 +1029,8 @@ namespace LSCC
                 });
                 ContextFactory.Instance.SaveChangesAsync();
             }
+
+            player.SetSharedData("Points", EPlayer.GetAccount(player).Points);
 
             EPlayer.GetAccount(player).LastSessionMins = 0.0;
         }
@@ -1706,7 +1737,7 @@ namespace LSCC
                 MinutesPlayed = 1.0,
                 LastSessionMins = 0.0,
                 DonatorPoints = 0,
-                Points = 0,
+                Points = 10,
                 Warns = 0,
                 Suspended = 0,
                 DonatorLevel = 0,

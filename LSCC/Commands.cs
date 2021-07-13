@@ -1096,22 +1096,81 @@ namespace LSCC
         [Command("blipdbg")]
         public void cmd_blipdbg(Player player)
         {
+            if (EPlayer.GetAccount(player).Admin < 6)
+            {
+                return;
+            }
             player.SetSharedData("VisibleBlip", !player.GetSharedData<bool>("VisibleBlip"));
         }
 
-        [Command("medkit")]
-        public void cmd_medkit(Player player)
+        [Command("medkit", "!{#AFAFAF}[USAGE] mk (option: buy/use/inv)", Alias = "mk")]
+        public void cmd_medkit(Player player, string option)
         {
-            if (player.GetSharedData<string>("ActionType") != "none" || player.GetSharedData<int>("ActionTime") > 0)
+            if(option == "buy")
+            {
+                Account acc = EPlayer.GetAccount(player);
+                if(acc.Points < 10)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You need 10 points to purchase a medkit!");
+                    return;
+                }
+                if(acc.Medkits >= 5)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot have more than 5 medkits on you at once!");
+                    return;
+                }
+
+                acc.Medkits++;
+                EPlayer.GivePoints(player, -10);
+                player.SendChatMessage($"~g~You successfully purchased a medkit for 10 points and how have !{{#FFFFFF}}{acc.Medkits} medkits~g~!");
+                return;
+            }
+            else if (option == "use")
+            {
+                if (player.GetSharedData<int>("Team") == -1)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can only use this in copchase!");
+                    return;
+                }
+
+                if(EPlayer.GetAccount(player).Medkits <= 0)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have any medkits! Please buy some using /mk buy.");
+                    return;
+                }
+
+                if (player.GetSharedData<string>("ActionType") != "none" || player.GetSharedData<int>("ActionTime") > 0)
                 { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are already performing an action!"); return; }
 
-            player.SetSharedData("ActionType", "medkit");
-            player.SetSharedData("ActionTime", 10);
-            player.TriggerEvent("StartPlayerAction", "medkit", 10);
+                if (player.HasData("Cuffed") || (player.HasData("TasedTill") && Environment.TickCount64 < player.GetData<long>("TasedTill")))
+                { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this right now."); return; }
 
-            player.SendChatMessage("~y~You are now using a medkit, this will take 10 seconds... " + player.GetSharedData<string>("ActionType"));
+                if (player.IsInVehicle)
+                { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this inside of a vehicle!"); return; }
+
+                if (player.Health > 80)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use medkits when your health is above 80!");
+                    return;
+                }
+
+                player.SetSharedData("ActionType", "medkit");
+                player.SetSharedData("ActionTime", 10);
+                player.TriggerEvent("StartPlayerAction", "medkit", 10);
+
+                player.SendChatMessage("~y~You are now using a medkit, this will take 10 seconds... " + player.GetSharedData<string>("ActionType"));
+                return;
+            }
+            else if(option == "inv")
+            {
+                player.SendChatMessage($"~w~You have ~y~{EPlayer.GetAccount(player).Medkits} ~w~in your inventory.");
+            }
+            else
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option! Valid options are: buy, use.");
+                return;
+            }
         }
-
         [Command("handsup")]
         public void cmd_handsup(Player player)
         {
@@ -4726,6 +4785,26 @@ namespace LSCC
             {
                 player.SendChatMessage("[Admin Lv 6]: /triggerevent /cameraset /(o)setadmin");
             }
+            return;
+        }
+
+        [Command("agivepoints", "!{#AFAFAF}[USAGE] agivepoints (target) (points)")]
+        public void cmd_agivepoints(Player player, Player target, int points)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                return;
+            }
+            if (!EPlayer.LoggedIn(target)) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not logged in."); return; }
+
+            Logs.LogAdmin(player, $"Gave {target.Name} {points} points. They now have {EPlayer.GetAccount(target).Points}.");
+            EPlayer.GivePoints(target, points);
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has given {target.Name} {points} points.");
+            target.SendChatMessage($"!{{#FF6347]}}[AdmCmd] {player.Name} has given you {points} points.");
             return;
         }
 
