@@ -3372,6 +3372,7 @@ namespace LSCC
         [Command("dbglinkmane", Alias = "dbgcef", GreedyArg = true)]
         public void cmd_dbgcef(Player player, string link)
         {
+            if (EPlayer.GetAccount(player).Admin < 6) return;
             player.TriggerEvent("showBrowser", link);
             return;
         }
@@ -3379,6 +3380,7 @@ namespace LSCC
         [Command("dbgexitlinkmane", Alias = "dbgexitcef", GreedyArg = true)]
         public void cmd_exitdbgcef(Player player)
         {
+            if (EPlayer.GetAccount(player).Admin < 6) return;
             player.TriggerEvent("destroyBrowser");
             return;
         }

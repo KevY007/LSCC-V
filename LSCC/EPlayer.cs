@@ -570,6 +570,8 @@ namespace LSCC
                 player.SetSharedData("IsTabbed", false);
                 player.SetSharedData("FugitiveChance", 10.0);
 
+                player.SetSharedData("Points", 0);
+
                 player.SetSharedData("BustedProgress", 0.0);
 
                 player.SetSharedData("Color_R", 255);

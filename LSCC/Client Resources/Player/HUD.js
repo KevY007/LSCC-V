@@ -260,6 +260,8 @@ mp.events.add("render", () => {
                 else
                     drawText(`~r~Fugitive Chance: ~w~${mp.players.local.getVariable("FugitiveChance").toFixed(1)}%`, [minimap.rightX + 0.072, minimap.bottomY - 0.116], 0, [204, 204, 204, 255], 0.28);
 
+                drawText(`~y~Points: ~w~${mp.players.local.getVariable("Points")}`, [minimap.rightX + 0.087, minimap.bottomY - 0.032], 0, [204, 204, 204, 255], 0.35);
+
                 let voiceString = "Voice: ~r~Disabled";
                 
                 if(mp.players.local.getVariable("VoiceMode") == 0)
