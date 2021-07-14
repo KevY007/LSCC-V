@@ -138,6 +138,19 @@ namespace LSCC
                 return;
             }
             player.SetSharedData("ActionTime", player.GetSharedData<int>("ActionTime") - 1);
+
+            string action = player.GetSharedData<string>("ActionType");
+            switch (action)
+            {
+                case "painkiller":
+                    player.Health++;
+                    if (player.Health >= 99)
+                    {
+                        EPlayer.StopPlayerAction(player, 2);
+                    }
+                    break;
+                default: return;
+            }
         }
 
         [RemoteEvent("StopPlayerAction")]
@@ -150,6 +163,9 @@ namespace LSCC
                     break;
                 case 1: // Death
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your action has failed: you died.");
+                    break;
+                case 2: // Max HP reached (painkillers)
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your painkillers effect stopped earlier: your HP is full.");
                     break;
                 default: break;
             }
@@ -170,6 +186,10 @@ namespace LSCC
                     else player.Health = pHP + 60;
 
                     player.SendChatMessage($"~g~You used a medkit and gained +60HP. Your HP is now {(pHP + 60 > 100 ? 100 : pHP+60)}.");
+                    break;
+                case "painkiller":
+                    EPlayer.GetAccount(player).Painkillers--;
+                    player.SendChatMessage($"~g~Painkillers effect expired. You gained +40HP from them and your HP is now {player.Health}.");
                     break;
                 default: return;
             }
@@ -1728,6 +1748,8 @@ namespace LSCC
                 JailReason = "N/A",
                 DerbyWins = 0,
                 Level = 1,
+                Medkits = 0,
+                Painkillers = 0,
                 Language = -1,
                 XP = 1,
                 Escapes = 0,

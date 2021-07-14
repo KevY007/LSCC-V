@@ -1102,6 +1102,75 @@ namespace LSCC
             }
             player.SetSharedData("VisibleBlip", !player.GetSharedData<bool>("VisibleBlip"));
         }
+        [Command("painkillers", "!{#AFAFAF}[USAGE] pk (option: buy/use/inv)", Alias = "pk")]
+        public void cmd_painkillers(Player player, string option)
+        {
+            if (option == "buy")
+            {
+                Account acc = EPlayer.GetAccount(player);
+                if (acc.Points < 6)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You need 6 points to purchase a painkiller!");
+                    return;
+                }
+                if (acc.Painkillers >= 15)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot have more than 15 painkillers on you at once!");
+                    return;
+                }
+
+                acc.Painkillers++;
+                EPlayer.GivePoints(player, -6);
+                player.SendChatMessage($"~g~You successfully purchased a painkiller for 6 points and how have !{{#FFFFFF}}{acc.Painkillers} panikillers~g~!");
+                return;
+            }
+            else if (option == "use")
+            {
+                /*if (player.GetSharedData<int>("Team") == -1)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can only use this in copchase!");
+                    return;
+                }*/
+
+                if (EPlayer.GetAccount(player).Painkillers <= 0)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have any painkillers! Please buy some using /pk buy.");
+                    return;
+                }
+
+                if (player.GetSharedData<string>("ActionType") != "none" || player.GetSharedData<int>("ActionTime") > 0)
+                { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are already performing an action!"); return; }
+
+                if (player.HasData("Cuffed") || (player.HasData("TasedTill") && Environment.TickCount64 < player.GetData<long>("TasedTill")))
+                { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this right now."); return; }
+
+                /*if (player.IsInVehicle)
+                { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this inside of a vehicle!"); return; }  
+                */
+                if (player.Health > 90)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use painkillers when your HP is above 90, aka we do not support overdosing on painkillers.");
+                    return;
+                }
+
+                player.SetSharedData("ActionType", "painkiller");
+                player.SetSharedData("ActionTime", 40);
+                player.TriggerEvent("StartPlayerAction", "painkiller", 40);
+
+                EPlayer.Action(player, $"takes out a small bottle containing painkillers and swallows one.");
+                player.SendChatMessage("~y~You swallowed a painkiller and will be getting +1HP for the next 40 seconds.");
+                return;
+            }
+            else if (option == "inv")
+            {
+                player.SendChatMessage($"~w~You have ~y~{EPlayer.GetAccount(player).Painkillers} painkillers ~w~in your inventory.");
+            }
+            else
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option! Valid options are: buy, use, inv.");
+                return;
+            }
+        }
 
         [Command("medkit", "!{#AFAFAF}[USAGE] mk (option: buy/use/inv)", Alias = "mk")]
         public void cmd_medkit(Player player, string option)
@@ -1158,16 +1227,17 @@ namespace LSCC
                 player.SetSharedData("ActionTime", 10);
                 player.TriggerEvent("StartPlayerAction", "medkit", 10);
 
-                player.SendChatMessage("~y~You are now using a medkit, this will take 10 seconds... " + player.GetSharedData<string>("ActionType"));
+                EPlayer.Action(player, $"takes out a first aid kit and starts treating their wounds.");
+                player.SendChatMessage("~y~You are now using a medkit, this will take 10 seconds.");
                 return;
             }
             else if(option == "inv")
             {
-                player.SendChatMessage($"~w~You have ~y~{EPlayer.GetAccount(player).Medkits} ~w~in your inventory.");
+                player.SendChatMessage($"~w~You have ~y~{EPlayer.GetAccount(player).Medkits} medkits ~w~in your inventory.");
             }
             else
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option! Valid options are: buy, use.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option! Valid options are: buy, use, inv.");
                 return;
             }
         }
