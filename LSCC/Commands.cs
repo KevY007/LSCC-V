@@ -1126,11 +1126,11 @@ namespace LSCC
             }
             else if (option == "use")
             {
-                /*if (player.GetSharedData<int>("Team") == -1)
+                if (player.GetSharedData<int>("Team") == -1)
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can only use this in copchase!");
                     return;
-                }*/
+                }
 
                 if (EPlayer.GetAccount(player).Painkillers <= 0)
                 {
