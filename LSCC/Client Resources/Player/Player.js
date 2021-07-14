@@ -970,8 +970,30 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
     }
 })
 
-mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage) => {
+function isMeleeWeapon(weapon){
+    switch(weapon){
+        case 2725352035:
+        case 2578778090:
+        case 1737195953:
+        case 1317494643:
+        case 2508868239:
+        case 1141786504:
+        case 2227010557:
+        case 4192643659:
+        case 2460120199:
+        case 3638508604:
+        case 4191993645:
+        case 3713923289:
+        case 3756226112:
+        case 3441901897:
+        case 2484171525:
+        case 419712736:
+            return true;
+        default: return false;
+    }
+}
 
+mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage) => {
     if(sourceEntity !== undefined && sourceEntity !== null && sourceEntity.type === 'player' && sourceEntity == player && player.getVariable("Team") != -1)
     {
         if(targetEntity !== undefined && targetEntity !== null && targetEntity.type === 'player')
@@ -1005,6 +1027,11 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                         mp.game.graphics.notify("~r~Taser out of reach, get closer!");
                         return true; // Stun Gun no shot if more than 10 meters or target in car.
                     }
+                }
+                if(sourceEntity.getVariable("Team") == 0 && targetEntity.getVariable("Team") == 1 && sourceEntity.getVariable("HasShot") == false
+                    && isMeleeWeapon(weapon))
+                {
+                    mp.events.callRemote("GivePlayerShotTag");
                 }
             }
         }
