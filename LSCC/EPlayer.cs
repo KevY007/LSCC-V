@@ -1073,6 +1073,7 @@ namespace LSCC
         {
             EPlayer.GetAccount(player).Points += points;
             player.SetSharedData("Points", EPlayer.GetAccount(player).Points);
+            EPlayer.Save(player);
         }
         public static int GetMaxLevelXP(int level)
         {
