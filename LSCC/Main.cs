@@ -303,7 +303,7 @@ namespace LSCC
     public static class Settings
     {
         // Static Settings / Const
-        public const string Version = "0.2h";
+        public const string Version = "0.2i";
         public const int GameRunTime = 390; // Game Running Time in Seconds before STOP
         public const int MaxLobbies = 5; // Default/starting lobby num.
         public const int DefaultMaxInLobby = 30;
@@ -1195,7 +1195,8 @@ namespace LSCC
                     "Have you seen someone cheating? Please, contact an administrator ASAP.",
                     "Bored of waiting in the lobby? Check out our side activities like Deathmatch, Freeroam, Derby!",
                     "Want to earn some quick score? Head over to /dm!",
-                    "You can save your current cop & fugitive appearance profile and select a different one by using /outfit."
+                    "You can save your current cop & fugitive appearance profile and select a different one by using /outfit.",
+                    "You can use Points to purchase some items, such as medkits (/mk) & painkillers (/pk)!"
                 };
 
                 RAGE.Entities.Players.All.ForEach((Player e) => e.SendChatMessage("[?] !{#F0FC72}" + msgList.ElementAt(new Random().Next(0, msgList.Length))));
