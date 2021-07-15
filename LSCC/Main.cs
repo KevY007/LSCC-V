@@ -373,7 +373,8 @@ namespace LSCC
             "Warehouse (Pistol Only)",
             "Tennis Court",
             "Construction Site",
-            "Mile High Club"
+            "Mile High Club",
+            "Diamond Casino Rooftop"
         };
 
         public static object[][,] DMSpawns = new object[][,]
@@ -438,6 +439,19 @@ namespace LSCC
                 { new Vector3(-160.5658f, -969.7756f, 264.2260f), 247.6226f},
                 { new Vector3(-153.6451f, -947.7322f, 254.1314f), 229.3157f},
                 { new Vector3(-139.3184f, -955.3798f, 254.1315f), 327.5726f},
+            },
+            new object[,] { // Diamond Casino Rooftop
+                { new Vector3(969.83386f, 66.50592f, 112.553055f), 59.639584f },
+                { new Vector3(959.83203f, 75.23554f, 111.24796f), -123.92462f },
+                { new Vector3(954.08466f, 75.75135f, 113.55563f), 154.49847f },
+                { new Vector3(912.97485f, 62.960815f, 111.66129f), -159.49384f },
+                { new Vector3(915.492f, 0.2503112f, 111.27825f), -37.55123f },
+                { new Vector3(933.18427f, 2.361477f, 111.29503f), 153.47862f },
+                { new Vector3(959.95807f, 1.698037f, 111.33385f), -40.16393f },
+                { new Vector3(993.58545f, 54.10783f, 111.33607f), 25.90957f },
+                { new Vector3(989.6868f, 74.41087f, 111.36049f), -31.775827f },
+                { new Vector3(951.07733f, 38.44182f, 112.52241f), 59.61095f },
+                { new Vector3(939.3183f, 19.616312f, 112.55286f), 60.126602f },
             }
         };
 

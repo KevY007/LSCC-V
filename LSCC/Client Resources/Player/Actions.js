@@ -35,47 +35,58 @@ mp.events.add("StopPlayerActions", () => {
 });
 
 function PainkillerAction(){
+    if(mp.players.local == null || mp.players.local.handle == null) return;
 
     if(!player.isInAnyVehicle(true))
         mp.events.callRemote("play_anim", "mini@sprunk", "plyr_buy_drink_pt2", 0);
 
     actionInterval = setInterval(() => {
-        mp.events.callRemote("OnPlayerActionTick");
-        if(actionTime <= 0){
-            mp.events.callRemote("FinishPlayerAction", actionType);
-            clearInterval(actionInterval);
-        }
-        else{
-            actionTime--;
 
-            if(!player.isInAnyVehicle(true))
-            {
-                if(actionTime == 39){
-                    mp.events.callRemote("play_anim", "mini@sprunk", "plyr_buy_drink_pt3", 0);
-                }
-                if(actionTime == 38){            
-                    mp.events.callRemote("clear_anim");
+        if(mp.players.local == null || mp.players.local.handle == null) return;
+
+        try{
+            mp.events.callRemote("OnPlayerActionTick");
+            if(actionTime <= 0){
+                mp.events.callRemote("FinishPlayerAction", actionType);
+                clearInterval(actionInterval);
+            }
+            else{
+                actionTime--;
+
+                if(!player.isInAnyVehicle(true))
+                {
+                    if(actionTime == 39){
+                        mp.events.callRemote("play_anim", "mini@sprunk", "plyr_buy_drink_pt3", 0);
+                    }
+                    if(actionTime == 38){            
+                        mp.events.callRemote("clear_anim");
+                    }
                 }
             }
-        }
+        } finally { }
     }, 1000);   
 }
 
 function MedkitAction(){
+    if(mp.players.local == null || mp.players.local.handle == null) return;
     mp.events.callRemote("play_anim", "amb@medic@standing@kneel@enter", "enter", 0);
 
     actionInterval = setInterval(() => {
-        mp.events.callRemote("OnPlayerActionTick");
-        if(actionTime <= 0){
-            mp.events.callRemote("clear_anim");
-            mp.events.callRemote("FinishPlayerAction", actionType);
-            clearInterval(actionInterval);
-        }
-        else{
-            actionTime--;
-            if(actionTime == 1){
-                mp.events.callRemote("play_anim", "amb@medic@standing@kneel@exit", "exit", 0);
+
+        if(mp.players.local == null || mp.players.local.handle == null) return;
+        try{
+            mp.events.callRemote("OnPlayerActionTick");
+            if(actionTime <= 0){
+                mp.events.callRemote("clear_anim");
+                mp.events.callRemote("FinishPlayerAction", actionType);
+                clearInterval(actionInterval);
             }
-        }
+            else{
+                actionTime--;
+                if(actionTime == 1){
+                    mp.events.callRemote("play_anim", "amb@medic@standing@kneel@exit", "exit", 0);
+                }
+            }
+        } finally { }
     }, 1000);
 }
