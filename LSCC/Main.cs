@@ -2119,7 +2119,13 @@ namespace LSCC
 
                             try
                             {
-                                if (player.HasData("putVehicle")) player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
+                                if (player.HasData("putVehicle"))
+                                {
+                                    player.SetIntoVehicle(player.GetData<Vehicle>("putVehicle"), player.GetData<int>("putVehicleSeat"));
+
+                                    if(player.GetData<int>("putVehicleSeat") == 0)
+                                        player.TriggerEvent("AFKDriverCheck", player.Position.X, player.Position.Y, player.Position.Z);
+                                }
                             }
                             catch { }
                         }

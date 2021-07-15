@@ -2,6 +2,7 @@
 
 let camera = null;
 const player = mp.players.local;
+//const { setTimeout } = require("timers");
 const timerBarLib = require("./Player/Bar.js");
 
 var chaseProgBar = null;
@@ -222,6 +223,19 @@ mp.events.add("SendLastSeen", () => {
     streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
 
     mp.events.callRemote("SentLastSeen", streetName, zoneName);
+});
+
+mp.events.add("AFKDriverCheck", (x,y,z) => {
+    let player = mp.players.local;
+    setTimeout(() => {
+        const oldPosition = new mp.Vector3(x,y,z);
+        const currentPosition = player.position;
+
+        const dist = new mp.Vector3(x-currentPosition.x, y-currentPosition.y, z-currentPosition.z).length();
+        if(dist < 5.0){
+            mp.events.callRemote("ReplaceAFKDriver");
+        }
+    }, 15000);
 });
 
 mp.events.add("render", () => {
