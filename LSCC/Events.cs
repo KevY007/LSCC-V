@@ -1659,20 +1659,24 @@ namespace LSCC
         [RemoteEvent("ReplaceAFKDriver")]
         public static void ReplaceAFKDriver(Player player)
         {
-            if (!player.IsInVehicle || player.GetSharedData<int>("Team") == -1) return;
+            if (player == null || !player.IsInVehicle || player.GetSharedData<int>("Team") == -1) return;
 
-            Vehicle car = player.Vehicle;
-            List<Entity> occupants = car.Occupants;
-            occupants.Remove(player);
+            try
+            {
+                Vehicle car = player.Vehicle;
+                List<Entity> occupants = car.Occupants;
+                occupants.Remove(player);
 
-            if (occupants.Count <= 0) return;
+                if (occupants.Count <= 0) return;
 
-            Player newDriver = (Player)occupants[new Random().Next(occupants.Count)];
-            Commands.cmd_switchseats(player, newDriver);
-            NAPI.Task.Run(() => Commands.cmd_switchseats(newDriver, player), 500 + newDriver.Ping);
+                Player newDriver = (Player)occupants[new Random().Next(occupants.Count)];
+                Commands.cmd_switchseats(player, newDriver);
+                NAPI.Task.Run(() => Commands.cmd_switchseats(newDriver, player), 500 + newDriver.Ping);
 
-            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Server detected you as an AFK driver and swapped your seat.");
-            newDriver.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}{player.Name} is AFK, you are now the new driver.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Server detected you as an AFK driver and swapped your seat.");
+                newDriver.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}{player.Name} is AFK, you are now the new driver.");
+            }
+            catch { }
         }
 
         [RemoteEvent("OnPlayerRegisterAttempt")]

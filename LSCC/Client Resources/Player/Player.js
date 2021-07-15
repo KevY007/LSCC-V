@@ -226,16 +226,23 @@ mp.events.add("SendLastSeen", () => {
 });
 
 mp.events.add("AFKDriverCheck", (x,y,z) => {
-    let player = mp.players.local;
-    setTimeout(() => {
-        const oldPosition = new mp.Vector3(x,y,z);
-        const currentPosition = player.position;
+    if(mp.players.local == null || mp.players.local.handle == null) return;
 
-        const dist = new mp.Vector3(x-currentPosition.x, y-currentPosition.y, z-currentPosition.z).length();
-        if(dist < 5.0){
-            mp.events.callRemote("ReplaceAFKDriver");
-        }
-    }, 15000);
+    try{
+        let player = mp.players.local;
+        setTimeout(() => {
+            const oldPosition = new mp.Vector3(x,y,z);
+            const currentPosition = player.position;
+
+            const dist = new mp.Vector3(x-currentPosition.x, y-currentPosition.y, z-currentPosition.z).length();
+            if(dist < 5.0){
+                mp.events.callRemote("ReplaceAFKDriver");
+            }
+        }, 15000);
+    }
+    finally{ // meh it should do the trick
+        return;
+    }
 });
 
 mp.events.add("render", () => {
