@@ -4800,7 +4800,7 @@ namespace LSCC
         }
 
         [Command("logs", "!{#AFAFAF}[USAGE] logs")]
-        public void cmd_logs(Player player, string option)
+        public void cmd_logs(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return;
             if (EPlayer.GetAccount(player).Admin < 1)
@@ -4808,7 +4808,7 @@ namespace LSCC
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
-            Logs.ShowLogsPanel(player, option == "yes" ? true : false);
+            Logs.ShowLogsPanel(player, true);
             return;
         }
 
