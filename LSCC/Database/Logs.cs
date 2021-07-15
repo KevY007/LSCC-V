@@ -70,6 +70,11 @@ namespace LSCC
             {
                 return;
             }
+            if(target.Admin >= EPlayer.GetAccount(player).Admin)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Nice try - that admin is a higher or equal level as you!");
+                return;
+            }
 
             switch(type)
             {
