@@ -91,6 +91,25 @@ mp.events.add("TwoSecondsEvent", () => {
             mp.events.callRemote("RequestSwimPenalty");
         }
     }
+
+    let team = mp.players.local.getVariable("Team");
+    switch(team){
+        case 0:
+            mp.game.ui.setHudColour(143, 255, 0, 0, 128);
+            mp.game.ui.setHudColour(144, 255, 0, 0, 128);
+            mp.game.ui.setHudColour(145, 255, 0, 0, 128);
+            break;
+        case 1:
+            mp.game.ui.setHudColour(143, 0, 0, 255, 128);
+            mp.game.ui.setHudColour(144, 0, 0, 255, 128);
+            mp.game.ui.setHudColour(145, 0, 0, 255, 128);  
+            break;
+        default:     
+            mp.game.ui.setHudColour(143, 150, 150, 150, 128);
+            mp.game.ui.setHudColour(144, 150, 150, 150, 128);
+            mp.game.ui.setHudColour(145, 150, 150, 150, 128);  
+            break; 
+    }
 });
 
 mp.events.add("ResetShotStats", ResetShotStats);
@@ -1005,27 +1024,35 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     return true;
                 }
 
-                if(sourceEntity.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && 
-                    targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
+                if(sourceEntity.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0) 
                 {
-                    if(weapon != 911657153) return true;
-
-                    if(weapon == 911657153 && (BigInt(Math.round((new Date()).getTime() / 1000)) - BigInt(targetEntity.getVariable("LastVehEnterExit"))) <= BigInt(7) 
-                        && targetEntity.getVariable("Team") == 0)
+                    if(targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
                     {
-                        mp.game.graphics.notify("~r~Cannot tase! Target exiting vehicle!");
-                        return true;
+                        if(weapon != 911657153) return true;
+
+                        if(weapon == 911657153 && (BigInt(Math.round((new Date()).getTime() / 1000)) - BigInt(targetEntity.getVariable("LastVehEnterExit"))) <= BigInt(7) 
+                            && targetEntity.getVariable("Team") == 0)
+                        {
+                            mp.game.graphics.notify("~r~Cannot tase! Target exiting vehicle!");
+                            return true;
+                        }
+
+                        if(weapon == 911657153 && targetEntity.getVariable("Team") == 0 && targetEntity.getVariable("HasShot") == true) {
+                            return true;
+                        }
+
+                        if(weapon == 911657153 && (targetEntity.isInAnyVehicle(false) == true || 
+                            calcDist(targetEntity.position, player.position) > 7.5)) {
+
+                            mp.game.graphics.notify("~r~Taser out of reach, get closer!");
+                            return true; // Stun Gun no shot if more than 10 meters or target in car.
+                        }
                     }
-
-                    if(weapon == 911657153 && targetEntity.getVariable("Team") == 0 && targetEntity.getVariable("HasShot") == true) {
-                        return true;
-                    }
-
-                    if(weapon == 911657153 && (targetEntity.isInAnyVehicle(false) == true || 
-                        calcDist(targetEntity.position, player.position) > 7.5)) {
-
-                        mp.game.graphics.notify("~r~Taser out of reach, get closer!");
-                        return true; // Stun Gun no shot if more than 10 meters or target in car.
+                    else{
+                        if(weapon == 911657153){ // Attempt to tase a fugitive with shot tag.
+                            mp.game.graphics.notify("~r~Target has shot, cannot tase them!");
+                            return true;
+                        }
                     }
                 }
                 if(sourceEntity.getVariable("Team") == 0 && targetEntity.getVariable("Team") == 1 && sourceEntity.getVariable("HasShot") == false
