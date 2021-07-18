@@ -23,7 +23,7 @@ namespace LSCC
         public int SQL_ID { get; set; }
         public int AccountID { get; set; }
         public string Description { get; set; }
-        public string Timestamp { get; set; }
+        public DateTime Timestamp { get; set; }
     }
     public class Logs_AdminRecord
     {
@@ -33,7 +33,7 @@ namespace LSCC
         public int AdminID { get; set; }
         public string Type { get; set; }
         public string Reason { get; set; }
-        public string Timestamp { get; set; }
+        public DateTime Timestamp { get; set; }
         public string Duration { get; set; }
     }
     public class Logs_Session
@@ -41,8 +41,8 @@ namespace LSCC
         [Key]
         public int SQL_ID { get; set; }
         public int AccountID { get; set; }
-        public string TimestampJoin { get; set; }
-        public string TimestampLeave { get; set; }
+        public DateTime TimestampJoin { get; set; }
+        public DateTime TimestampLeave { get; set; }
         public string Duration { get; set; }
         public string IP { get; set; }
         public string HWID { get; set; }
@@ -84,7 +84,7 @@ namespace LSCC
                         object[] _toSend = new object[_logs.Count];
                         for (int i = 0; i < _logs.Count; i++)
                         {
-                            (string, string, string, string) _toAdd = (_logs[i].Type, _logs[i].Reason, _logs[i].Timestamp, _logs[i].Duration);
+                            (string, string, string, string) _toAdd = (_logs[i].Type, _logs[i].Reason, _logs[i].Timestamp.ToString(), _logs[i].Duration);
                             _toSend[i] = _toAdd;
                         }
                         string jsonShit = NAPI.Util.ToJson(_toSend);
@@ -97,7 +97,7 @@ namespace LSCC
                         object[] _toSend = new object[_logs.Count];
                         for (int i = 0; i < _logs.Count; i++)
                         {
-                            (string, string) _toAdd = (_logs[i].Description, _logs[i].Timestamp);
+                            (string, string) _toAdd = (_logs[i].Description, _logs[i].Timestamp.ToString());
                             _toSend[i] = _toAdd;
                         }
                         string jsonShit = NAPI.Util.ToJson(_toSend);
@@ -110,7 +110,7 @@ namespace LSCC
                         object[] _toSend = new object[_logs.Count];
                         for (int i = 0; i < _logs.Count; i++)
                         {
-                            (string, string, string, string, string) _toAdd = (_logs[i].TimestampJoin, _logs[i].TimestampLeave, _logs[i].Duration, _logs[i].IP, _logs[i].HWID);
+                            (string, string, string, string, string) _toAdd = (_logs[i].TimestampJoin.ToString(), _logs[i].TimestampLeave.ToString(), _logs[i].Duration, _logs[i].IP, _logs[i].HWID);
                             _toSend[i] = _toAdd;
                         }
                         string jsonShit = NAPI.Util.ToJson(_toSend);
@@ -137,8 +137,8 @@ namespace LSCC
             Logs_Session _a = new Logs_Session()
             {
                 AccountID = EPlayer.GetAccount(player).SQL_ID,
-                TimestampJoin = new DateTime(1970, 1, 1, 0, 0, 0, 0).ToLocalTime().AddSeconds(_joinUnix).ToString(),
-                TimestampLeave = new DateTime(1970, 1, 1, 0, 0, 0, 0).ToLocalTime().AddSeconds(_currentUnix).ToString(),
+                TimestampJoin = new DateTime(1970, 1, 1, 0, 0, 0, 0).ToLocalTime().AddSeconds(_joinUnix),
+                TimestampLeave = new DateTime(1970, 1, 1, 0, 0, 0, 0).ToLocalTime().AddSeconds(_currentUnix),
                 Duration = _duration,
                 IP = player.Address,
                 HWID = player.Serial
@@ -155,7 +155,7 @@ namespace LSCC
             {
                 AccountID = EPlayer.GetAccount(player).SQL_ID,
                 Description = description,
-                Timestamp = DateTime.Now.ToString()
+                Timestamp = DateTime.Now
             };
             ContextFactory.Instance.Logs_Admin.Add(_a);
             ContextFactory.Instance.SaveChangesAsync();
@@ -180,7 +180,7 @@ namespace LSCC
                 AdminID = adminID,
                 Type = type,
                 Reason = reason,
-                Timestamp = DateTime.Now.ToString(),
+                Timestamp = DateTime.Now,
                 Duration = duration
             };
             ContextFactory.Instance.Logs_AdminRecords.Add(_a);
