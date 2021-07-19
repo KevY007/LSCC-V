@@ -1349,7 +1349,7 @@ mp.events.add(
             mp.game.cam.renderScriptCams(false, false, 0, true, false);
 
             specCam = mp.cameras.new('default', target.position, new mp.Vector3(0, 0, target.getHeading()), target.isInAnyVehicle(false) ? 80 : 60);
-            specCam.attachTo(target.handle, 0, target.isInAnyVehicle(false) ? -7 : -5, target.isInAnyVehicle(false) ? 2 : 1, true);
+            specCam.attachTo(target.handle, 0, target.isInAnyVehicle(false) ? -6 : -5, target.isInAnyVehicle(false) ? 3 : 1, true);
             specCam.setActive(true);
 
             mp.game.cam.renderScriptCams(true, false, 0, true, false);

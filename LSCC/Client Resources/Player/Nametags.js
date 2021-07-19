@@ -101,9 +101,10 @@ mp.events.add('render', (nametags) => {
     
         if(isPlayerInLOS(player) == true) {	   
 
-            if(distance <= maxDistance)
+            let distWithAdjust = distance - (specState ? 35 : (isNoClip ? 100 : 0));
+            if(distWithAdjust <= maxDistance)
             {
-                let scale = (distance / maxDistance);
+                let scale = (distWithAdjust / maxDistance);
                 if(scale < 0.6) scale = 0.6;
 
                 var health = player.getHealth() / 100;
