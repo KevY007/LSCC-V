@@ -2867,6 +2867,19 @@ namespace LSCC
             return;
         }
 
+        [Command("gethp", Alias = "checkhp,getar,checkar,getarmour,getarmor")]
+        public void cmd_checkar(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+                return;
+
+            player.SendChatMessage($"!{{#FFFFFF}}{target.Name}'s HP: !{{#FF6347}}{target.Health} !{{#FFFFFF}}Armour: !{{#FF6347}}{target.Armor}")
+            return;
+        }
+
         [Command("pos")]
         public void cmd_poslog(Player player)
         {
@@ -4834,7 +4847,7 @@ namespace LSCC
                 player.SendChatMessage("[Admin Lv 1]: /(t)freeze /(t)unfreeze /kick /slap /setinv(ulnerable) /specoff");
                 player.SendChatMessage("[Admin Lv 1]: /bancheck /(o)jail /(o)unjail /afix /aflip /sendtolobby /set(time/weather)");
                 player.SendChatMessage("[Admin Lv 1]: /(o)mute /(o)unmute /warn /unwarn /setteam /forceautojoin /forceswapseats");
-                player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats /lastlogin /logs");
+                player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats /lastlogin /logs /gethp");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
