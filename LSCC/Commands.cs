@@ -2262,6 +2262,7 @@ namespace LSCC
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}List of supported comps on " + itemData.Name + ":");
                 foreach (var item in itemData.Components)
                 {
+                    if (item.Value.Name.EndsWith("Rounds")) continue;
                     player.SendChatMessage(item.Value.Name);
                 }
                 return;
@@ -2273,6 +2274,11 @@ namespace LSCC
                 return;
             }
 
+            if (comp.Name.EndsWith("Rounds"))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Special ammunition components are not allowed.");
+                return;
+            }
 
             Dictionary<ulong, wComponentData> wepItems = new Dictionary<ulong, wComponentData>();
 
@@ -2318,6 +2324,7 @@ namespace LSCC
                 return;
             }
 
+            
             if (!newWepData.ContainsKey(wephash))
             {
                 wComponentData newDataTwo = new wComponentData();
