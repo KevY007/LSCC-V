@@ -74,7 +74,7 @@ mp.events.addDataHandler('vInitialDriveForce', function (entity, value, oldValue
 {
     if (entity.type === 'vehicle') 
     {
-        entity.setHandling("fInitialDriveForce", value);
+        entity.setEnginePowerMultiplier(value);
     }
 });
 
@@ -127,7 +127,7 @@ mp.events.add('entityStreamIn', (entity) => {
 
         if(entity.getVariable("vInitialDriveForce") !== undefined)
         {
-            entity.setHandling("fInitialDriveForce", entity.getVariable("vInitialDriveForce"));
+            entity.setEnginePowerMultiplier(entity.getVariable("vInitialDriveForce"));
         }
     }
 });

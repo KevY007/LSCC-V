@@ -2876,7 +2876,7 @@ namespace LSCC
             if (EPlayer.GetAccount(player).Admin < 1)
                 return;
 
-            player.SendChatMessage($"!{{#FFFFFF}}{target.Name}'s HP: !{{#FF6347}}{target.Health} !{{#FFFFFF}}Armour: !{{#FF6347}}{target.Armor}")
+            player.SendChatMessage($"!{{#FFFFFF}}{target.Name}'s HP: !{{#FF6347}}{target.Health} !{{#FFFFFF}}Armour: !{{#FF6347}}{target.Armor}");
             return;
         }
 

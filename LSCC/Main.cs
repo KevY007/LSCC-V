@@ -1796,6 +1796,8 @@ namespace LSCC
                             int col1 = 0; // Black?
                             int col2 = 111; // Frost white
 
+                            float enginePower = 1.0f;
+
                             if (EPlayer.GetAccount(player).CarCop.Length < 3)
                             {
                                 switch (random.Next(0, 3))
@@ -1803,14 +1805,17 @@ namespace LSCC
                                     case 0:
                                         carName = "police";
                                         col1 = 111;
+                                        enginePower = 30;
                                         break;
                                     case 1:
                                         carName = "police3";
                                         col1 = 111;
+                                        enginePower = 24;
                                         break;
                                     case 2:
                                         carName = "police4";
                                         col1 = 111;
+                                        enginePower = 34;
                                         break;
                                 }
                             }
@@ -1821,6 +1826,7 @@ namespace LSCC
                                 if(carName.StartsWith("police"))
                                 {
                                     col1 = 111;
+                                    enginePower = 18;
                                 }
 
                             }
@@ -1843,6 +1849,8 @@ namespace LSCC
                             pVehicle.SetSharedData("Locked", true);
                             pVehicle.Locked = true;
                             pVehicle.SetSharedData("Team", 1);
+                            if(enginePower > 1.0f) pVehicle.SetSharedData("vInitialDriveForce", enginePower);
+
 
                             player.SetData("putVehicle", pVehicle);
                             player.SetData("putVehicleSeat", 0);
