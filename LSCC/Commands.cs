@@ -1489,6 +1489,8 @@ namespace LSCC
             return;
         }
 
+
+
         [Command("switchseats", "!{#AFAFAF}[USAGE] switchseats (target)", Alias = "swapseats,swapseat,switchseat,ss")]
         public static void cmd_switchseats(Player player, Player target)
         {

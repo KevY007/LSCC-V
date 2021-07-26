@@ -11,6 +11,9 @@ let showHPStatus = 0;
 
 mp.nametags.enabled = false;
 
+let specState = false;
+let isNoClip = false;
+
 function isPlayerInLOS(target) {
     if(target === undefined) return false;
 
@@ -101,7 +104,18 @@ mp.events.add('render', (nametags) => {
     
         if(isPlayerInLOS(player) == true) {	   
 
-            let distWithAdjust = distance - (specState ? 35 : (isNoClip ? 100 : 0));
+            let distWithAdjust = 0;
+            if(specState){
+                if(isNoClip)
+                    distWithAdjust = distance - (specState ? 35 : (isNoClip ? 100 : 0));
+                else distWithAdjust = distance - (specState ? 35 : 0);
+            } 
+            else{
+                if(isNoClip)
+                    distWithAdjust = distance - (isNoClip ? 100 : 0);
+                else distWithAdjust = distance;
+            }
+            
             if(distWithAdjust <= maxDistance)
             {
                 let scale = (distWithAdjust / maxDistance);

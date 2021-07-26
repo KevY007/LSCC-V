@@ -603,11 +603,13 @@ namespace LSCC
                             {
                                 if (reasonStr == null)
                                 {
-                                    indm.TriggerEvent("pushToKillFeed", $"DM> {killer.Name} killed {player.Name}".Replace('.', ' '));
+                                    //indm.TriggerEvent("pushToKillFeed", $"DM> {killer.Name} killed {player.Name}".Replace('.', ' '));
+                                    indm.TriggerEvent("pushToKillFeed", killer.Name, "#B65149", "Unknown", player.Name, "#6248F0");
                                 }
                                 else
                                 {
-                                    indm.TriggerEvent("pushToKillFeed", $"DM> {killer.Name} killed {player.Name} with {reasonStr}".Replace('.', ' '));
+                                    //indm.TriggerEvent("pushToKillFeed", $"DM> {killer.Name} killed {player.Name} with {reasonStr}".Replace('.', ' '));
+                                    indm.TriggerEvent("pushToKillFeed", killer.Name, "#B65149", reasonStr, player.Name, "#6248F0");
                                 }
                             }
                             EPlayer.GetAccount(killer).Kills++;

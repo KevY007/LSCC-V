@@ -74,8 +74,14 @@ setInterval(() => {
     }
 }, feedVisualUpdateInterval);
 
+mp.events.add("pushToKillFeed", (killer, killerColor, weapon, victim, victimColor) => {
+    MainUI.execute(`gm.$refs.topRight.$refs.killFeed.add('${killer}', '${killerColor}', '${weapon}', '${victim}', '${victimColor}');`)
+})
+
+/*
 mp.events.add("pushToKillFeed", (message) => {
-    if (killFeedItems.length >= maxKillFeedItems) killFeedItems.shift();
+
+    /*if (killFeedItems.length >= maxKillFeedItems) killFeedItems.shift();
 
     killFeedItems.push({
         Text: message,
@@ -92,4 +98,4 @@ mp.events.add("render", () => {
             drawText(killFeedItems[i].Text, [finalDrawX, finalDrawY + (itemMargin * i) - (itemHeight / 2)], fontStyle, [255, 255, 255, 255], fontScale, true);
         }
     }
-});
+});*/
