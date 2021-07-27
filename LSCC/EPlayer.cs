@@ -1165,7 +1165,7 @@ namespace LSCC
                 }
                 player.SetData("PlaytimeTick", Environment.TickCount64);
 
-                ContextFactory.Instance.SaveChangesAsync();
+                ContextFactory.Instance.SaveChanges();
             }
         }
         public static Account GetAccount(Player player)

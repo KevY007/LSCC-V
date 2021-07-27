@@ -738,7 +738,7 @@ namespace LSCC
                 {
                     targetAcc.MOTD = "none";
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You successfully deleted " + targetAcc.Username + "'s MOTD.");
-                    ContextFactory.Instance.SaveChangesAsync();
+                    ContextFactory.Instance.SaveChanges();
                     return;
                 }
                 MOTDData newMotd = new MOTDData()
@@ -750,7 +750,7 @@ namespace LSCC
                 string jsonMotd = NAPI.Util.ToJson(newMotd);
 
                 targetAcc.MOTD = jsonMotd;
-                ContextFactory.Instance.SaveChangesAsync();
+                ContextFactory.Instance.SaveChanges();
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You set a MOTD for " + targetAcc.Username + " & they will see it when they login!");
             }
             else
@@ -785,7 +785,7 @@ namespace LSCC
                     acc.MOTD = "none";
                 }
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You successfully deleted the server message of the day!");
-                ContextFactory.Instance.SaveChangesAsync();
+                ContextFactory.Instance.SaveChanges();
                 return;
             }
 
@@ -806,7 +806,7 @@ namespace LSCC
                 Main.DisplayMOTD(pl, newMotd);
             }
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You successfully updated the server message of the day!");
-            ContextFactory.Instance.SaveChangesAsync();
+            ContextFactory.Instance.SaveChanges();
         }
 
         [Command("goto", "!{#AFAFAF}[USAGE] goto (target)")]

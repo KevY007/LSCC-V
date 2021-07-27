@@ -209,7 +209,7 @@ namespace LSCC
                 HWID = player.Serial
             };
             ContextFactory.Instance.Logs_Session.Add(_a);
-            await ContextFactory.Instance.SaveChangesAsync();
+            ContextFactory.Instance.SaveChanges();
         }
         public static void LogAdmin(Player player, string description)
         {
@@ -223,7 +223,7 @@ namespace LSCC
                 Timestamp = DateTime.Now
             };
             ContextFactory.Instance.Logs_Admin.Add(_a);
-            ContextFactory.Instance.SaveChangesAsync();
+            ContextFactory.Instance.SaveChanges();
         }
 
         public static void RemoveAdminRecord(int recordID)
@@ -232,7 +232,7 @@ namespace LSCC
             if (_rem == null) return;
 
             ContextFactory.Instance.Logs_AdminRecords.Remove(_rem);
-            ContextFactory.Instance.SaveChangesAsync();
+            ContextFactory.Instance.SaveChanges();
         }
         public static void AddToAdminRecord(int accountID, int adminID, string type, string reason, string duration)
         {
@@ -249,7 +249,7 @@ namespace LSCC
                 Duration = duration
             };
             ContextFactory.Instance.Logs_AdminRecords.Add(_a);
-            ContextFactory.Instance.SaveChangesAsync();
+            ContextFactory.Instance.SaveChanges();
         }
     }
 }

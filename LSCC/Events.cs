@@ -1049,7 +1049,7 @@ namespace LSCC
                     AccountID = acc.SQL_ID,
                     OutfitData = NAPI.Util.ToJson(defaultOutfits)
                 });
-                ContextFactory.Instance.SaveChangesAsync();
+                ContextFactory.Instance.SaveChanges();
             }
 
             player.SetSharedData("Points", EPlayer.GetAccount(player).Points);
@@ -1186,7 +1186,7 @@ namespace LSCC
                 outfits[slot] = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
                 ContextFactory.Instance.PlayerOutfits.FirstOrDefault(o => o.AccountID == EPlayer.GetAccount(player).SQL_ID).OutfitData = NAPI.Util.ToJson(outfits);
 
-                ContextFactory.Instance.SaveChangesAsync();
+                ContextFactory.Instance.SaveChanges();
 
                 player.SendChatMessage("!{#00FF00}You successfully saved your current outfit to slot " + (slot+1) + ".");
             }
@@ -1425,7 +1425,7 @@ namespace LSCC
                 AccountID = acc.SQL_ID,
                 OutfitData = NAPI.Util.ToJson(defaultOutfits)
             });
-            ContextFactory.Instance.SaveChangesAsync();
+            ContextFactory.Instance.SaveChanges();
 
             //EPlayer.Spawn(player);
         }

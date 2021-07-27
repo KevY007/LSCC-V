@@ -1179,7 +1179,7 @@ namespace LSCC
         {
             if(Environment.TickCount64 - Settings.AutoSaveTick >= 300000) // 5 mins
             {
-                ContextFactory.Instance.SaveChangesAsync();
+                ContextFactory.Instance.SaveChanges();
                 NAPI.Util.ConsoleOutput("Server auto-saved => " + DateTime.Now.ToString());
 
                 Settings.AutoSaveTick = Environment.TickCount64;
