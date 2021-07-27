@@ -4821,6 +4821,12 @@ namespace LSCC
             return;
         }
 
+        [Command("ivangej")]
+        public void cmd_ivangej(Player player, string gej)
+        {
+            Logs.GetAutoCompleteNames(player, gej);
+        }
+
         [Command("logs", "!{#AFAFAF}[USAGE] logs")]
         public void cmd_logs(Player player)
         {
@@ -4832,6 +4838,11 @@ namespace LSCC
             }
             Logs.ShowLogsPanel(player, true);
             return;
+        }
+        [Command("reqlog")]
+        public void cmd_reqlog(Player player, string targetName, int type)
+        {
+            Logs.RequestLogsFromServer(player, targetName, type);
         }
 
         [Command("acmds", Alias = "ahelp")]

@@ -773,15 +773,22 @@ namespace LSCC
 
         public static void SyncComponents(Player tosyncfor, Player target, int specificWeapon = -1)
         {
-            if(target.HasData("AttachedComponents"))
+            try
             {
-                List<KeyValuePair<int, int>> comps = target.GetData<List<KeyValuePair<int, int>>>("AttachedComponents");
-
-                foreach(var item in comps)
+                if (target.HasData("AttachedComponents"))
                 {
-                    if(specificWeapon == -1 || (specificWeapon != -1 && 
-                        (int)item.Key == specificWeapon)) tosyncfor.TriggerEvent("AttachWeaponComponent", target, (int)item.Key, (int)item.Value);
+                    List<KeyValuePair<int, int>> comps = target.GetData<List<KeyValuePair<int, int>>>("AttachedComponents");
+
+                    foreach (var item in comps)
+                    {
+                        if (specificWeapon == -1 || (specificWeapon != -1 &&
+                            (int)item.Key == specificWeapon)) tosyncfor.TriggerEvent("AttachWeaponComponent", target, (int)item.Key, (int)item.Value);
+                    }
                 }
+            }
+            catch(Exception ex) 
+            {
+                NAPI.Util.ConsoleOutput("[EPlayer.SyncComponents null shit] " + ex.ToString());
             }
             return;
         }

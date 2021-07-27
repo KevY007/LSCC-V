@@ -61,11 +61,17 @@ mp.events.add('loginInformationToServer', (username, password) => {
     mp.events.callRemote('OnPlayerLoginAttempt', username, password);
 
     if(MainUI == null || MainUI == undefined)
+    {
         MainUI = mp.browsers.new("package://MainUI/index.html");
+    }
 });
 
 mp.events.add('registerInformationToServer', (email, username, password, allcorrect, rules) => {
 
     mp.events.callRemote('OnPlayerRegisterAttempt', email, username, password, allcorrect, rules);
 
+    if(MainUI == null || MainUI == undefined)
+    {
+        MainUI = mp.browsers.new("package://MainUI/index.html");
+    }
 });
