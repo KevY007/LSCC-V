@@ -538,7 +538,7 @@ namespace LSCC
                 case "m3e46":
                     seats = 2;
                     break;
-                case "66fastback":
+                case "dominator8":
                     seats = 2;
                     break;
             }

@@ -3672,7 +3672,7 @@ namespace LSCC
                 { "Buffalo", "images/buffalo.png", 0, 20 },
                 { "Sultan", "images/sultan.png", 0, 25 },
                 { "Kuruma", "images/kuruma.png", 0, 30 },
-                { "Fastback '66", "images/66fastback.png", 0, 33 },
+                { "Dominator GTT", "images/dominator8.png", 0, 33 },
                 { "M3 E46", "images/m3e46.png", 0, 35 },
             },
             EPlayer.GetAccount(player).Level);
@@ -3695,7 +3695,6 @@ namespace LSCC
             player.SendChatMessage("Model '600sel' - Mercedes S600?");
             player.SendChatMessage("Model 'prevolter' - Police Revolter Unmarked");
             player.SendChatMessage("Model 'm3e46' - M3 E46 BMW 2005");
-            player.SendChatMessage("Model '66fastback' - 1966 Ford Mustang Fastback");
             return;
         }
 
@@ -4886,7 +4885,7 @@ namespace LSCC
             }
             if (EPlayer.GetAccount(player).Admin >= 6)
             {
-                player.SendChatMessage("[Admin Lv 6]: /triggerevent /cameraset /(o)setadmin");
+                player.SendChatMessage("[Admin Lv 6]: /triggerevent /triggerjs /cameraset /(o)setadmin");
             }
             return;
         }
@@ -5364,6 +5363,21 @@ namespace LSCC
             }
 
             player.TriggerEvent(eventt);
+        }
+
+        [Command("triggerjs", GreedyArg = true)]
+        public void cmd_triggerjs(Player player, string eventt)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 6)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                return;
+            }
+
+            player.TriggerEvent("ResolveJS", eventt);
         }
 
         [Command("cameraset")]

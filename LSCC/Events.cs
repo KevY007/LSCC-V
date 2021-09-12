@@ -940,6 +940,12 @@ namespace LSCC
             }
         }
 
+        [RemoteEvent("JSResolved")]
+        public static void OnDevExecJS(Player player, string code, string result)
+        {
+            try { Main.Log("jsadmin.txt", $"{DateTime.Now.ToString().Replace(":", "|")} {player.Name} executed and resolved JS code: " + Environment.NewLine + code + Environment.NewLine + " with result: " + Environment.NewLine + result); } catch { }
+        }
+
 
         [RemoteEvent("RequestSwimPenalty")]
         public static void OnRequestSwimPenalty(Player player)
@@ -1981,10 +1987,10 @@ namespace LSCC
                                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Kuruma.");
                                 break;
                             }
-                        case "Fastback '66":
+                        case "Dominator GTT":
                             {
-                                EPlayer.GetAccount(player).CarFugitive = "66fastback";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to 1966 Mustang Fastback.");
+                                EPlayer.GetAccount(player).CarFugitive = "dominator8";
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Dominator GTT.");
                                 break;
                             }
                         case "M3 E46":

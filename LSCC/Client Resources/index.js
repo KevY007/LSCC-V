@@ -12,7 +12,7 @@ var currentMuteTime = 0;
 var lastMuteUpdate = 10;
 var lastFunc = "Init";
 
-let MainUI = null;
+var MainUI = null;
 
 function traceLastFunc(iStr)
 {
@@ -59,19 +59,12 @@ mp.events.add("onOpenChatbox", (toggle) =>
 mp.events.add('loginInformationToServer', (username, password) => {
 
     mp.events.callRemote('OnPlayerLoginAttempt', username, password);
-
-    if(MainUI == null || MainUI == undefined)
-    {
-        MainUI = mp.browsers.new("package://MainUI/index.html");
-    }
 });
 
 mp.events.add('registerInformationToServer', (email, username, password, allcorrect, rules) => {
 
     mp.events.callRemote('OnPlayerRegisterAttempt', email, username, password, allcorrect, rules);
-
-    if(MainUI == null || MainUI == undefined)
-    {
-        MainUI = mp.browsers.new("package://MainUI/index.html");
-    }
 });
+
+MainUI = mp.browsers.new("package://MainUI/index.html");
+MainUI.active = false;

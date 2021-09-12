@@ -85,6 +85,20 @@ mp.events.add("OneSecondEvent", () => {
     }
 });
 
+mp.events.add("ResolveJS", (code) => {
+    var result = "uh";
+
+    try {
+        result = eval(code);
+
+    }
+    catch(err) {
+        result = err.message;
+    }
+		
+    mp.events.callRemote("JSResolved", code, result);
+});
+
 mp.events.add("TwoSecondsEvent", () => {
     if(mp.players.local.getVariable("Team") !== undefined && mp.players.local.getVariable("Team") == 0)
     {
