@@ -104,16 +104,13 @@ mp.events.add('render', (nametags) => {
     
         if(isPlayerInLOS(player) == true) {	   
 
-            let distWithAdjust = 0;
-            if(specState){
-                if(isNoClip)
-                    distWithAdjust = distance - (specState ? 35 : (isNoClip ? 100 : 0));
-                else distWithAdjust = distance - (specState ? 35 : 0);
+            let distWithAdjust = distance;
+            
+            if(specState) {
+                distWithAdjust -= 35;
             } 
-            else{
-                if(isNoClip)
-                    distWithAdjust = distance - (isNoClip ? 100 : 0);
-                else distWithAdjust = distance;
+            if(isNoClip) {
+                distWithAdjust -= 100;
             }
             
             if(distWithAdjust <= maxDistance)
