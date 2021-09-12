@@ -19,6 +19,9 @@ var res_Y = resolution.y;
 let bestlobbystr = "N/A";
 let dirtext = "NW";
 
+
+UIHud = mp.browsers.new("package://UI/HUD/index.html");
+
 // StackOverflow cause I'm too lazy to do this myself and don't wanna type getvariable etc etc every time
 function firstLetterUpper(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -121,6 +124,10 @@ mp.events.add('ToggleHud', (toggle) => {
     mp.gui.chat.show(showHud);
     mp.game.ui.displayRadar(showHud);
 });
+
+mp.events.add("pushToKillFeed", (killer, killerColor, weapon, victim, victimColor) => {
+    UIHud.execute(`gm.$refs.topRight.$refs.killFeed.add('${killer}', '${killerColor}', '${weapon}', '${victim}', '${victimColor}');`)
+})
 
 mp.events.add("render", () => {
     

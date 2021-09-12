@@ -12,7 +12,7 @@ var currentMuteTime = 0;
 var lastMuteUpdate = 10;
 var lastFunc = "Init";
 
-var MainUI = null;
+var UIHud = null;
 
 function traceLastFunc(iStr)
 {
@@ -29,8 +29,7 @@ require('./logspanel/logsview.js');
 require('./Player/Player.js');
 require('./Player/Actions.js');
 require("./Player/Nametags.js");
-require("./Player/HUD.js");
-require("./Player/KillList.js");
+require("./UI/HUD/HUD.js");
 require("./charcreator/clotheditor.js")
 require("./charcreator/index.js");
 require("./charcreator/outfitslots.js")
@@ -65,6 +64,3 @@ mp.events.add('registerInformationToServer', (email, username, password, allcorr
 
     mp.events.callRemote('OnPlayerRegisterAttempt', email, username, password, allcorrect, rules);
 });
-
-MainUI = mp.browsers.new("package://MainUI/index.html");
-MainUI.active = false;
