@@ -3062,7 +3062,7 @@ namespace LSCC
         }
 
         [Command("switchlobby", "!{#AFAFAF}[USAGE] switchlobby (lobbyid) (optional: password)", Alias = "swl", GreedyArg = true)]
-        public void cmd_switchlobby(Player player, string args)
+        public static void cmd_switchlobby(Player player, string args)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -3151,6 +3151,7 @@ namespace LSCC
                 }
             }
 
+            player.SetData("LastLobbySwitch", Environment.TickCount64);
             player.SetSharedData("InLobby", lobbyid);
             foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid))
             {
@@ -3179,11 +3180,9 @@ namespace LSCC
                 else
                 {
                     player.SendChatMessage($">> !{{#DAA520}}Arena ID {i} | !{{#FF6347}}{Settings.DMNames[i]} " +
-                       $"!{{#DAA520}}| Players: " +
-                       $"{Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == i)}");
+                       $"!{{#DAA520}}| Players: !{{#FFFFFF}}{Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == i)}!{{#DAA520}}/!{{#FFFFFF}}{7 + (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")) / 3)}");
                 }
             }
-
 
             return;
         }
@@ -3191,6 +3190,7 @@ namespace LSCC
         [Command("dm", "!{#AFAFAF}[USAGE] dm (arenaid)")]
         public void cmd_dm(Player player, int arenaid)
         {
+            if (arenaid == 666) return;
             if (!EPlayer.LoggedIn(player)) return;
             if (EPlayer.GetAccount(player).JailTime > 0) return;
 
@@ -3215,6 +3215,12 @@ namespace LSCC
             if (player.GetSharedData<int>("InLobby") <= -1)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in any lobby!");
+                return;
+            }
+
+            if(Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == arenaid) >= 7 + (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")) / 3))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That arena has maxed out on players.");
                 return;
             }
 

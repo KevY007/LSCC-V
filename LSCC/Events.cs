@@ -579,9 +579,9 @@ namespace LSCC
             {
                 if(player.GetSharedData<int>("DerbyTime") >= 5)
                 {
-                    foreach (Player indm in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
+                    foreach (Player inderby in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
                     {
-                        indm.TriggerEvent("pushToKillFeed", $"DERBY> {player.Name} fell down".Replace('.', ' '));
+                        inderby.TriggerEvent("pushToKillFeed", player.Name, "#E8C425", "fell down", "", "#00000000");
                     }
                 }
                 player.SetSharedData("DerbyTime", 0);
@@ -603,13 +603,11 @@ namespace LSCC
                             {
                                 if (reasonStr == null)
                                 {
-                                    //indm.TriggerEvent("pushToKillFeed", $"DM> {killer.Name} killed {player.Name}".Replace('.', ' '));
-                                    indm.TriggerEvent("pushToKillFeed", killer.Name, "#B65149", "Unknown", player.Name, "#6248F0");
+                                    indm.TriggerEvent("pushToKillFeed", killer.Name, "#777777", "Unknown", player.Name, "#777777");
                                 }
                                 else
                                 {
-                                    //indm.TriggerEvent("pushToKillFeed", $"DM> {killer.Name} killed {player.Name} with {reasonStr}".Replace('.', ' '));
-                                    indm.TriggerEvent("pushToKillFeed", killer.Name, "#B65149", reasonStr, player.Name, "#6248F0");
+                                    indm.TriggerEvent("pushToKillFeed", killer.Name, "#777777", reasonStr, player.Name, "#777777");
                                 }
                             }
                             EPlayer.GetAccount(killer).Kills++;
@@ -790,32 +788,30 @@ namespace LSCC
                                     {
                                         if (reasonStr == null)
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name}".Replace('.', ' '));
+                                            ay.TriggerEvent("pushToKillFeed", killer.Name, "#6248F0", "killed", player.Name, "#B65149");
                                         }
                                         else
                                         {
                                             if (reason == 696988)
                                             {
-                                                ay.TriggerEvent("pushToKillFeed", $"{killer.Name} has apprehended {player.Name}".Replace('.', ' '));
+                                                ay.TriggerEvent("pushToKillFeed", killer.Name, "#6248F0", "arrested", player.Name, "#B65149");
                                             }
                                             else if (reason == 696989)
                                             {
-                                                ay.TriggerEvent("pushToKillFeed", $"{killer.Name} has busted {player.Name}".Replace('.', ' '));
+                                                ay.TriggerEvent("pushToKillFeed", killer.Name, "#6248F0", "busted", player.Name, "#B65149");
                                             }
-                                            else ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}".Replace('.', ' '));
+                                            else ay.TriggerEvent("pushToKillFeed", killer.Name, "#6248F0", reasonStr, player.Name, "#B65149");
                                         }
                                     }
                                     else
                                     {
-                                        ay.SendNotification($"Fugitive ~r~<C>{player.Name}</C> ~w~has died.");
-
                                         if (reasonStr == null)
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", $"{player.Name} died".Replace('.', ' '));
+                                            ay.TriggerEvent("pushToKillFeed", player.Name, "#6248F0", "died", "", "#00000000");
                                         }
                                         else
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", $"{player.Name} died of {reasonStr}".Replace('.', ' '));
+                                            ay.TriggerEvent("pushToKillFeed", player.Name, "#6248F0", reasonStr, "", "#00000000");
                                         }
                                     }
                                 }
@@ -846,28 +842,24 @@ namespace LSCC
                                 {
                                     if (killer != null && !killer.IsNull && player != killer)
                                     {
-                                        ay.SendNotification($"Cop ~b~<C>{player.Name}</C> ~w~has been taken out by ~r~<C>{killer.Name}</C>~w~.");
-
                                         if (reasonStr == null)
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name}".Replace('.', ' '));
+                                            ay.TriggerEvent("pushToKillFeed", killer.Name, "#B65149", "killed", player.Name, "#6248F0");
                                         }
                                         else
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", $"{killer.Name} killed {player.Name} with {reasonStr}".Replace('.', ' '));
+                                            ay.TriggerEvent("pushToKillFeed", killer.Name, "#B65149", reasonStr, player.Name, "#6248F0");
                                         }
                                     }
                                     else
                                     {
-                                        ay.SendNotification($"Cop ~r~<C>{player.Name}</C> ~w~has died.");
-
                                         if (reasonStr == null)
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", $"{player.Name} died".Replace('.', ' '));
+                                            ay.TriggerEvent("pushToKillFeed", player.Name, "#6248F0", "died", "", "#00000000");
                                         }
                                         else
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", $"{player.Name} died of {reasonStr}".Replace('.', ' '));
+                                            ay.TriggerEvent("pushToKillFeed", player.Name, "#6248F0", reasonStr, "", "#00000000");
                                         }
                                     }
                                 }
@@ -944,6 +936,7 @@ namespace LSCC
         public static void OnDevExecJS(Player player, string code, string result)
         {
             try { Main.Log("jsadmin.txt", $"{DateTime.Now.ToString().Replace(":", "|")} {player.Name} executed and resolved JS code: " + Environment.NewLine + code + Environment.NewLine + " with result: " + Environment.NewLine + result); } catch { }
+            player.SendChatMessage(result);
         }
 
 
@@ -1476,6 +1469,106 @@ namespace LSCC
             player.SendNotification("~r~Invalid credentials or unable to log in!", true);
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid credentials or unable to log in!");
 
+        }
+
+        [RemoteEvent("RequestLobbySwitch")]
+        public void OnRequestLobbySwitch(Player player, int lobbyID, string password)
+        {
+            if (password.Length > 1)
+                Commands.cmd_switchlobby(player, $"{lobbyID} {password}");
+            else
+                Commands.cmd_switchlobby(player, $"{lobbyID}");
+
+            player.TriggerEvent("UpdateMenuLobbies", NAPI.Util.ToJson(Menu_LobbiesData(player)));
+        }
+
+        public List<object[]> Menu_LobbiesData(Player player)
+        {
+            // Lobby Data
+
+            List<object[]> lobbyItems = new List<object[]>();
+
+            // ID, Name, Background, Gamemode, Password, Players, MaxPlayers, Description
+            Settings.Lobbies.ForEach((LobbyData lobby) =>
+            {
+                int players = Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId);
+                lobbyItems.Add(new object[]
+                {
+                        lobby.lobbyId,
+                        "Lobby " + lobby.lobbyId.ToString(),
+                        lobby.Background,
+                        Main.ConvertGameMode(lobby.gameMode),
+                        lobby.Password,
+                        players,
+                        Settings.Dynamics.MaxInLobby,
+                        players > 0 ? Main.ConvertGameStatus(lobby.gameStatus) : ""
+                });
+            });
+            return lobbyItems;
+        }
+
+        public List<object[]> Menu_ArenasData(Player player)
+        {
+            // DM Arena Data
+            string[] dmBgs = {
+                   "https://live.staticflickr.com/7526/16232917915_3ef3d4ab4d_b.jpg"
+                };
+
+            List<object[]> dmItems = new List<object[]>();
+
+            int lobby = player.GetSharedData<int>("InLobby");
+            if (lobby <= -1)
+            {
+                dmItems.Add(new object[]
+                {
+                    666, "Not Available", dmBgs[0], 0, 0, "You must be in a copchase lobby to see and join arenas."
+                });
+            }
+            else
+            {
+                // ID, Name, Background, Players, MaxPlayers, Gamemode/Desc
+
+                for (int i = 0; i < Settings.DMNames.Length; i++)
+                {
+                    dmItems.Add(new object[]
+                    {
+                        i,
+                        Settings.DMNames[i],
+                        dmBgs[new Random().Next(dmBgs.Length)],
+                        Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == i),
+                        7 + (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")) / 3),
+                        "",
+                    });
+                }          
+            }
+           
+            return dmItems;
+        }
+
+        public List<object[]> Menu_VehicleData(Player player)
+        {
+            // Vehicle Data
+           
+
+            List<object[]> vehItems = new List<object[]>();
+
+          
+            return vehItems;
+        }
+
+        [RemoteEvent("OnToggleMenu")]
+        public void OnPlayerToggleMenu(Player player, bool status)
+        {
+            if(status == true) // OPEN: Update lobby data and everything else.
+            {
+                player.TriggerEvent("UpdateMenuArenas", NAPI.Util.ToJson(Menu_ArenasData(player)));
+                player.TriggerEvent("UpdateMenuLobbies", NAPI.Util.ToJson(Menu_LobbiesData(player)));
+                player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(Menu_VehicleData(player)));
+            }
+            else // CLOSE: Anything you want when menu gets closed.
+            {
+
+            }
         }
 
         [RemoteEvent("UpdateStreamData")]

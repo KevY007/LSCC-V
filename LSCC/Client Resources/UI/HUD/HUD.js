@@ -120,14 +120,45 @@ mp.keys.bind(
 
 mp.events.add('ToggleHud', (toggle) => {
     showHud = toggle;
+    
+    if(UIHud != null)
+    {
+        UIHud.execute(`gm.topRight = ${toggle};`);
+        UIHud.active = toggle;
+    }
 
     mp.gui.chat.show(showHud);
     mp.game.ui.displayRadar(showHud);
 });
 
 mp.events.add("pushToKillFeed", (killer, killerColor, weapon, victim, victimColor) => {
-    UIHud.execute(`gm.$refs.topRight.$refs.killFeed.add('${killer}', '${killerColor}', '${weapon}', '${victim}', '${victimColor}');`)
-})
+    if(UIHud != null) UIHud.execute(`gm.$refs.TopRight.$refs.KillFeed.add('${killer}', '${killerColor}', '${weapon}', '${victim}', '${victimColor}');`)
+});
+
+mp.events.add("OneSecondEvent", () => {
+    if(UIHud != null && (!(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false || mp.players.local.getVariable("InLobby") === undefined)))
+    {
+        UIHud.execute(`gm.$refs.TopRight.$refs.Info.onlinePlayers = ${mp.players.length};`);
+
+        let lobbyStr = "";
+        
+        let lobbyPlayers = 0;
+        mp.players.forEach((pl) => {
+            if(!(pl.getVariable("pLogged") === undefined || pl.getVariable("pLogged") == false || pl.getVariable("InLobby") === undefined))
+            {
+                if(pl.getVariable("InLobby") == mp.players.local.getVariable("InLobby")) lobbyPlayers++;
+            }
+        });
+
+        if(mp.players.local.getVariable("InLobby") == -2) lobbyStr = "Jail";
+        if(mp.players.local.getVariable("InLobby") == -3) lobbyStr = "Freeroam";
+        if(mp.players.local.getVariable("InLobby") == -4) lobbyStr = "Derby";
+        if(mp.players.local.getVariable("InLobby") == -5) lobbyStr = "Customizer";
+        if(mp.players.local.getVariable("InLobby") > -1) lobbyStr = mp.players.local.getVariable("InLobby").toString();
+        
+        UIHud.execute(`gm.$refs.TopRight.$refs.Info.lobbyID = "${lobbyStr}";`);
+    }
+});
 
 mp.events.add("render", () => {
     

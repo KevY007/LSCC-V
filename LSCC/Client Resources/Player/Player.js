@@ -2,6 +2,7 @@
 
 let camera = null;
 const player = mp.players.local;
+let localPlayer = mp.players.local;
 //const { setTimeout } = require("timers");
 const timerBarLib = require("./Player/Bar.js");
 
@@ -95,8 +96,8 @@ mp.events.add("ResolveJS", (code) => {
     catch(err) {
         result = err.message;
     }
-		
-    mp.events.callRemote("JSResolved", code, result);
+	if(result === undefined) result = "undefined";
+    mp.events.callRemote("JSResolved", code.toString(), result.toString());
 });
 
 mp.events.add("TwoSecondsEvent", () => {
@@ -218,6 +219,17 @@ mp.keys.bind(0x59, false, function() {
         traceLastFunc(`[Players] Attempt Y key/engine`);
 
         mp.events.callRemote("OnScriptedKeyPress", 0x59, true);
+    }
+});
+
+mp.keys.bind(0x42, true, _ => {
+    if(Date.now() - lastChatToggle >= 500 && chatStatus == false)
+    {
+        traceLastFunc(`[Players] Attempt B key/silent siren`);
+
+        if (localPlayer.vehicle && localPlayer.vehicle.getPedInSeat(-1) === localPlayer.handle && localPlayer.vehicle.getClass() === 18) {
+            mp.events.callRemote('SilentSirenSync', localPlayer.vehicle)
+        }
     }
 });
 

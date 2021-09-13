@@ -136,6 +136,7 @@ namespace LSCC
         public int[] Time { get; set; }
         public int Weather { get; set; }
         public int NextMapID { get; set; }
+        public string Background { get; set; }
 
         public LobbyData()
         {
@@ -177,6 +178,16 @@ namespace LSCC
             Enabled = true;
             PlayerCreated = false;
             Password = "";
+
+            string[] lobbyBgs = {
+                    "https://live.staticflickr.com/7526/16232917915_3ef3d4ab4d_b.jpg",
+                    "https://wallpapercave.com/wp/wp4501529.jpg",
+                    "https://wallpapers-hub.art/wallpaper-images/192181.jpg",
+                    "https://c4.wallpaperflare.com/wallpaper/519/763/782/gta-5-background-desktop-wallpaper-preview.jpg",
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaX9re0Ofp-nbJHKtv0FyaKlz5KQsOeP9doxhHDwCrEYkdpV8FDWKIo_gLqVc4JNGDHHs&usqp=CAU"
+                };
+
+            Background = lobbyBgs[new Random().Next(lobbyBgs.Length)];
 
             Settings.Lobbies.Add(this);
         }
@@ -923,7 +934,7 @@ namespace LSCC
         [ServerEvent(Event.ResourceStart)]
         public void OnResourceStart()
         {
-            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Ensuring LSCC folder..."); 
+            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Ensuring LSCC folder...");
             System.IO.Directory.CreateDirectory("lscc");
 
             NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Ensuring logs folder..."); 

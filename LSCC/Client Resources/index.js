@@ -13,6 +13,7 @@ var lastMuteUpdate = 10;
 var lastFunc = "Init";
 
 var UIHud = null;
+var UIMenu = null;
 
 function traceLastFunc(iStr)
 {
@@ -30,6 +31,7 @@ require('./Player/Player.js');
 require('./Player/Actions.js');
 require("./Player/Nametags.js");
 require("./UI/HUD/HUD.js");
+require("./UI/Menu/Menu.js");
 require("./charcreator/clotheditor.js")
 require("./charcreator/index.js");
 require("./charcreator/outfitslots.js")
