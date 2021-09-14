@@ -3931,7 +3931,7 @@ namespace LSCC
                     {
                         try
                         {
-                            target.Kick();
+                            target.KickSilent();
                         }
                         catch { }
                     }, 500);
@@ -4208,7 +4208,7 @@ namespace LSCC
                 {
                     if (target != null && target.Exists)
                     {
-                        target.Kick();
+                        target.KickSilent();
                     }
                 }
             }, 350);
@@ -4268,7 +4268,7 @@ namespace LSCC
                 {
                     if (target != null && target.Exists)
                     {
-                        target.Kick();
+                        target.KickSilent();
                     }
                 }
             }, 350);
@@ -6414,7 +6414,7 @@ namespace LSCC
                     {
                         if (target != null && target.Exists)
                         {
-                            target.Kick();
+                            target.KickSilent();
                         }
                     }
                 }, 350);
