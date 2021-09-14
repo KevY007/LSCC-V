@@ -6,9 +6,6 @@ let localPlayer = mp.players.local;
 //const { setTimeout } = require("timers");
 const timerBarLib = require("./Player/Bar.js");
 
-var chaseProgBar = null;
-var chaseProgText = null;
-var collisionText = null;
 var collisionTime = -1;
 var chaseRunning = false;
 var chaseTimeCur = 0;
@@ -16,7 +13,6 @@ var chaseTimeMax = 390;
 var chaseMode = 0; // 0= STANDARD | 1= BUSTED | and others as in SCRIPT
 
 let derbyText = null;
-let derbyTimeText = null;
 let derbyTimeCur = 0;
 let derbyCounting = false;
 
@@ -550,15 +546,19 @@ mp.events.add('render', () => {
 
                     if(showHud !== undefined && showHud == false)
                     {
-                        derbyTimeText.visible = false;
                         derbyText.visible = false;
                     }
                     else {
                         derbyText.visible = true;
-                        derbyTimeText.visible = true;
                     }
 
-                    derbyTimeText.text = TimeFormat(derbyTimeCur);
+                    if(UIHud != null)
+                    {
+                        UIHud.execute(`gm.gameProgress = true;`);
+                        UIHud.execute(`gm.$refs.TopRight.$refs.GameProgress.title = "Derby Time";`);
+                        UIHud.execute(`gm.$refs.TopRight.$refs.GameProgress.time = ${derbyTimeCur};`);
+                    }
+
                     if(derbyCounting)
                     {
                         mp.events.callRemote("DerbyIncreaseCount");
@@ -583,49 +583,41 @@ mp.events.add('render', () => {
                 else
                 {
                     derbyText.visible = false;
-                    derbyTimeText.visible = false;
                 }
 
                 traceLastFunc(`[Players] Update Chase Data1`);
 
-                if(chaseProgBar != null && chaseProgText != null && chaseRunning == true)
+                if(UIHud != null && chaseRunning == true)
                 {
                     chaseTimeCur += 1;
 
-                    chaseProgBar.progress = chaseTimeCur / chaseTimeMax;
-                    chaseProgText.text = TimeFormat(chaseTimeMax - chaseTimeCur);
-
-                    if(showHud !== undefined && showHud == false)
-                    {
-                        chaseProgText.visible = false;
-                        chaseProgBar.visible = false;
-                        if(UIHud != null) UIHud.execute(`gm.gameProgress = false;`);
-                    }
-                    else {
-                        chaseProgText.visible = true;
-                        chaseProgBar.visible = true;
-                        if(UIHud != null) UIHud.execute(`gm.gameProgress = true;`);
-                    }
-
                     if(chaseTimeCur >= chaseTimeMax)
                     {
-                        chaseProgText.visible = false;
-                        chaseProgBar.visible = false;
                         chaseRunning = false;
-                        if(UIHud != null) UIHud.execute(`gm.gameProgress = false;`);
+                        UIHud.execute(`gm.gameProgress = false;`);
+                    }
+                    else {
+                        UIHud.execute(`gm.gameProgress = true;`);
+                        if(collisionTime > 0)
+                        {
+                            UIHud.execute(`gm.$refs.TopRight.$refs.GameProgress.title = "Collisions";`);
+                            UIHud.execute(`gm.$refs.TopRight.$refs.GameProgress.time = ${collisionTime}`);
+                        }
+                        else 
+                        {
+                            UIHud.execute(`gm.$refs.TopRight.$refs.GameProgress.title = "Time Left";`);
+                            UIHud.execute(`gm.$refs.TopRight.$refs.GameProgress.time = ${chaseTimeMax - chaseTimeCur}`);
+                        }
                     }
                 }
 
                 traceLastFunc(`[Players] Update Chase Data2`);
 
-                if(collisionText != null && chaseRunning == true)
+                if(chaseRunning == true && UIHud != null)
                 {
                     if(collisionTime > 0)
                     {
                         collisionTime--;
-                        collisionText.text = TimeFormat(collisionTime);
-
-                        if((showHud !== undefined && showHud == false) == false) collisionText.visible = true;
 
                         mp.vehicles.forEach(target => {
                             if(CollisionVehicles.indexOf(target.id) == -1)
@@ -652,7 +644,6 @@ mp.events.add('render', () => {
                     }
                     else if(collisionTime == 0)
                     {
-                        collisionText.visible = false;
                         collisionTime = -1;
 
                         mp.vehicles.forEach(target => {
@@ -1248,31 +1239,14 @@ mp.events.add(
         "ToggleHud": (show) => {
             if(show)
             {
-                if(chaseProgBar != null && chaseProgText != null && chaseRunning == true)
-                {
-                    chaseProgBar.visible = true;
-                    chaseProgText.visible = true;
-                    if(UIHud != null) UIHud.execute(`gm.gameProgress = true;`);
-
-                    if(collisionTime > 0 && collisionText != null) collisionText.visible = true;
-                }
-
-                if(mp.players.local.getVariable("InLobby") == -4 && derbyText != null && derbyTimeText != null) {
-                    derbyTimeText.visible = true;
+                if(mp.players.local.getVariable("InLobby") == -4 && derbyText != null) {
                     derbyText.visible = true;
                 }
             }
             else{
-                if(chaseProgBar != null && chaseProgText != null && collisionText != null)
-                {
-                    chaseProgBar.visible = false;
-                    chaseProgText.visible = false;
-                    collisionText.visible = false;
-                    if(UIHud != null) UIHud.execute(`gm.gameProgress = false;`);
-                }
-                if(derbyText != null && derbyTimeText != null) {
+
+                if(derbyText != null) {
                     derbyText.visible = false;
-                    derbyTimeText.visible = false;
                 }
             }
         },
@@ -1473,9 +1447,6 @@ mp.events.add(
         },
 
         "HideChaseTimer": () => {
-            chaseProgBar.visible = false;
-            chaseProgText.visible = false;
-            collisionText.visible = false;
             if(UIHud != null) UIHud.execute(`gm.gameProgress = false;`);
             chaseRunning = false;
         },
@@ -1521,36 +1492,6 @@ mp.events.add(
         "InitChaseTimer": () => {
             
             if(UIHud != null) UIHud.execute(`gm.gameProgress = false;`);
-            if(chaseProgBar == null)
-            {
-                chaseProgBar = new timerBarLib.TimerBar("PROGRESS", true);
-                chaseProgBar.pbarFgColor = [64, 115, 222, 255];
-                chaseProgBar.pbarBgColor = [25, 53, 112, 255];
-                chaseProgBar.progress = 1.0;
-                chaseProgBar.visible = false;
-                
-            }
-
-            if(collisionText == null)
-            {
-                collisionText = new timerBarLib.TimerBar("COLLISIONS ENABLE");
-                collisionText.text = "99:99";
-                collisionText.visible = false;
-            }
-
-            if(chaseProgText == null)
-            {
-                chaseProgText = new timerBarLib.TimerBar("TIME LEFT");
-                chaseProgText.text = "99:99";
-                chaseProgText.visible = false;
-            }
-
-            if(derbyTimeText == null)
-            {
-                derbyTimeText = new timerBarLib.TimerBar("WINNER IN");
-                derbyTimeText.text = "99:99";
-                derbyTimeText.visible = false;
-            }
 
             if(derbyText == null)
             {

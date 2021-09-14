@@ -920,7 +920,7 @@ namespace LSCC
                 EPlayer.Freeze(p, true);
                 EPlayer.Handcuff(p, true);
                 p.Position = Vector3.RandomXy();
-                p.SendNotification("~r~Server stopping now!", true);
+                EPlayer.Notify(p, "Goodbye", "The server is going offline!");
 
 
 
@@ -1321,7 +1321,7 @@ namespace LSCC
                                                         player.SetSharedData("InDM", -1);
 
                                                         EPlayer.Spawn(player);
-                                                        NAPI.Notification.SendNotificationToPlayer(player, $"~w~Game is starting in ~g~10 seconds~w~.", true);
+                                                        EPlayer.Notify(player, "The round starts in 10 seconds!", "orange", "fas fa-hourglass-start", false, 3000);
 
                                                         if (player.GetSharedData<bool>("IsTabbed") == true || EPlayer.IsAFK(player)) {
 
@@ -2205,7 +2205,6 @@ namespace LSCC
                         {
                             if (lobby.gameMode == GameModes.STANDARD)
                             {
-                                p.SendNotification($"~g~Weapons will be given after collisions enable.");
                                 p.SendChatMessage("!{#FF6347}[!] !{#8D8DFF}Cops will be unfrozen in 10 seconds. !{#E84040}Fugitive's may take this time to prepare/start the chase.");
                             }
                             else if (lobby.gameMode == GameModes.BUSTED)
@@ -2380,7 +2379,7 @@ namespace LSCC
                                     player.SetSharedData("BustedProgress", 0.0);
                                     if (!lobby.Cops.Contains(player) && !lobby.Fugitives.Contains(player)) continue;
 
-                                    player.SendNotification("~r~Collisions enabled and weapons deployed!", true);
+                                    EPlayer.Notify(player, "Collisions have been enabled and weapons issued", "green", "fas fa-cars", false, 3000);
 
                                     if (lobby.Cops.Contains(player))
                                     {
@@ -2431,7 +2430,7 @@ namespace LSCC
                             {
                                 fugi.SetSharedData("VisibleBlip", true);
 
-                                if (lobby.FugitiveShowCounter == 60) fugi.SendNotification("~r~You are now visible on the radar.", true);
+                                if (lobby.FugitiveShowCounter == 60) EPlayer.Notify(fugi, "You are now visible on the radar.", "red", "fas fa-running", false, 3000);
                             }
 
                             if(lobby.FugitiveShowCounter == 60 && lobby.GameProgress >= 60 && lobby.CollisionCounter <= -1)
@@ -2454,7 +2453,7 @@ namespace LSCC
                             {
                                 fugi.SetSharedData("VisibleBlip", false);
 
-                                fugi.SendNotification("~g~You are no longer visible on the radar.", true);
+                                EPlayer.Notify(fugi, "You are no longer visible on the radar", "green", "fas fa-walking", false, 3000);
                             }
                         }
                     }
