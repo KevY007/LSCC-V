@@ -19,9 +19,6 @@ var res_Y = resolution.y;
 let bestlobbystr = "N/A";
 let dirtext = "NW";
 
-
-UIHud = mp.browsers.new("package://UI/HUD/index.html");
-
 // StackOverflow cause I'm too lazy to do this myself and don't wanna type getvariable etc etc every time
 function firstLetterUpper(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -105,6 +102,7 @@ mp.keys.bind(
     0x76,
     false,
     () => {
+        if(menuToggled !== undefined && menuToggled) return;
         if(!chatStatus && 
             !(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false)) 
         {
@@ -124,7 +122,7 @@ mp.events.add('ToggleHud', (toggle) => {
     if(UIHud != null)
     {
         UIHud.execute(`gm.topRight = ${toggle};`);
-        UIHud.active = toggle;
+        //UIHud.active = toggle;
     }
 
     mp.gui.chat.show(showHud);
@@ -133,6 +131,10 @@ mp.events.add('ToggleHud', (toggle) => {
 
 mp.events.add("pushToKillFeed", (killer, killerColor, weapon, victim, victimColor) => {
     if(UIHud != null) UIHud.execute(`gm.$refs.TopRight.$refs.KillFeed.add('${killer}', '${killerColor}', '${weapon}', '${victim}', '${victimColor}');`)
+});
+
+mp.events.add("pushToKillFeed2", (victim, color, cause) => {
+    if(UIHud != null) UIHud.execute(`gm.$refs.TopRight.$refs.KillFeed.add("${victim}", "${color}", "${cause}");`)
 });
 
 mp.events.add("OneSecondEvent", () => {
@@ -158,6 +160,27 @@ mp.events.add("OneSecondEvent", () => {
         
         UIHud.execute(`gm.$refs.TopRight.$refs.Info.lobbyID = "${lobbyStr}";`);
     }
+});
+
+mp.events.add("HUDNotify", (msg, color, icon, close, timeout) => {
+    let insertString = `iziToast.show({`;
+    insertString += `message: \`${msg}\`, `;
+    insertString += `color: "${color}", `;
+    insertString += `icon: "${icon}", `;
+    insertString += `close: ${close.toString()}, `;
+    insertString += `timeout: ${timeout},`;
+    insertString += "});";
+
+    if(UIHud != null) UIHud.execute(insertString);
+});
+
+mp.events.add("HUDNotify2", (title, msg) => {
+    let insertString = `iziToast.show({`;
+    insertString += `title: \`${title}\`, `;
+    insertString += `message: \`${msg}\`, `;
+    insertString += "});";
+
+    if(UIHud != null) UIHud.execute(insertString);
 });
 
 mp.events.add("render", () => {

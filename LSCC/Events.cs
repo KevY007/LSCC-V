@@ -36,6 +36,8 @@ namespace LSCC
 
                 player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
+                EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.ls-cc.info) or consult on discord server at discord.gg/y3g2WuR</p><p>Your ban ID is {ban.SQL_ID}.</p>", "red", "fas fa-ban", true, 30000);
+
                 NAPI.Task.Run(() =>
                 {
                     lock (Settings.LoggedInPlayers)
@@ -581,7 +583,7 @@ namespace LSCC
                 {
                     foreach (Player inderby in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
                     {
-                        inderby.TriggerEvent("pushToKillFeed", player.Name, "#E8C425", "fell down", "", "#00000000");
+                        inderby.TriggerEvent("pushToKillFeed2", player.Name, "#000", "Fell down");
                     }
                 }
                 player.SetSharedData("DerbyTime", 0);
@@ -603,11 +605,11 @@ namespace LSCC
                             {
                                 if (reasonStr == null)
                                 {
-                                    indm.TriggerEvent("pushToKillFeed", killer.Name, "#777777", "Unknown", player.Name, "#777777");
+                                    indm.TriggerEvent("pushToKillFeed2", player.Name, "#000", "Fell");
                                 }
                                 else
                                 {
-                                    indm.TriggerEvent("pushToKillFeed", killer.Name, "#777777", reasonStr, player.Name, "#777777");
+                                    indm.TriggerEvent("pushToKillFeed2", player.Name, "#000", reasonStr);
                                 }
                             }
                             EPlayer.GetAccount(killer).Kills++;
@@ -807,11 +809,11 @@ namespace LSCC
                                     {
                                         if (reasonStr == null)
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", player.Name, "#6248F0", "died", "", "#00000000");
+                                            ay.TriggerEvent("pushToKillFeed2", player.Name, "#000", "Fell");
                                         }
                                         else
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", player.Name, "#6248F0", reasonStr, "", "#00000000");
+                                            ay.TriggerEvent("pushToKillFeed2", player.Name, "#000", reasonStr);
                                         }
                                     }
                                 }
@@ -966,6 +968,8 @@ namespace LSCC
                 player.SendChatMessage($"!{{#FF6347}}[BANNED] You are not allowed to play on this server, Ban ID: {ban.SQL_ID}");
                 player.SendChatMessage("!{#A9C4E4}KevY is surprised how you made it this far though.");
 
+                EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.ls-cc.info) or consult on discord server at discord.gg/y3g2WuR</p><p>Your ban ID is {ban.SQL_ID}.</p>", "red", "fas fa-ban", true, 30000);
+
                 player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
                 NAPI.Task.Run(() =>
@@ -1054,6 +1058,8 @@ namespace LSCC
             player.SetSharedData("Points", EPlayer.GetAccount(player).Points);
 
             EPlayer.GetAccount(player).LastSessionMins = 0.0;
+
+            EPlayer.Notify(player, "Login successful!", "green", "fas fa-check", false, 2000);
         }
 
 
@@ -1427,6 +1433,7 @@ namespace LSCC
             ContextFactory.Instance.SaveChanges();
 
             //EPlayer.Spawn(player);
+            EPlayer.Notify(player, "Registration successful!", "green", "fas fa-check", false, 2000);
         }
 
         [RemoteEvent("OnPlayerLoginAttempt")]
@@ -1439,6 +1446,7 @@ namespace LSCC
             {
                 player.SendNotification("~r~Please wait some time between each login attempt!", true);
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please wait some time between each login attempt!");
+                EPlayer.Notify(player, "Please wait between each attempt.", "red", "fas fa-lock", false, 1500);
                 return;
             }
             player.SetData("LastCryptAttempt", Environment.TickCount64);
@@ -1467,6 +1475,7 @@ namespace LSCC
                 }
             }
             player.SendNotification("~r~Invalid credentials or unable to log in!", true);
+            EPlayer.Notify(player, "Invalid credentials or unable to log in.", "red", "fas fa-lock", false, 1500);
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid credentials or unable to log in!");
 
         }
@@ -1480,6 +1489,14 @@ namespace LSCC
                 Commands.cmd_switchlobby(player, $"{lobbyID}");
 
             player.TriggerEvent("UpdateMenuLobbies", NAPI.Util.ToJson(Menu_LobbiesData(player)));
+        }
+
+        [RemoteEvent("RequestDMJoin")]
+        public void OnRequestDMJoin(Player player, int dmID)
+        {
+            Commands.cmd_dm(player, dmID);
+
+            player.TriggerEvent("UpdateMenuArenas", NAPI.Util.ToJson(Menu_ArenasData(player)));
         }
 
         public List<object[]> Menu_LobbiesData(Player player)
@@ -1498,7 +1515,7 @@ namespace LSCC
                         "Lobby " + lobby.lobbyId.ToString(),
                         lobby.Background,
                         Main.ConvertGameMode(lobby.gameMode),
-                        lobby.Password,
+                        EPlayer.GetAccount(player).Admin > 0 ? "" : lobby.Password,
                         players,
                         Settings.Dynamics.MaxInLobby,
                         players > 0 ? Main.ConvertGameStatus(lobby.gameStatus) : ""
@@ -1790,24 +1807,28 @@ namespace LSCC
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please wait some time between each register attempt!");
                 player.SendNotification("~r~Please wait some time between each register attempt!", true);
+                EPlayer.Notify(player, "Please wait between each attempt.", "red", "fas fa-user-plus", false, 1500);
                 return;
             }
             if (!password.Equals(confirmpass))
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Passwords do not match!");
                 player.SendNotification("~r~Passwords do not match!", true);
+                EPlayer.Notify(player, "Passwords mismatch.", "red", "fas fa-lock", false, 1500);
                 return;
             }
             if (password.Length < 5)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your password is too small!");
                 player.SendNotification("~r~Password is too small!", true);
+                EPlayer.Notify(player, "Password is too small.", "red", "fas fa-lock", false, 1500);
                 return;
             }
             if (username.Contains("@") || username.Length < 4 || username.Length >= 24)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your username is too small/big or it cannot contain the character '@'");
                 player.SendNotification("~r~Username small or contains illegal characters!", true);
+                EPlayer.Notify(player, "Illegal characters detected in name.", "red", "fas fa-users", false, 1500);
                 return;
             }
             Regex exp = new Regex(@"^[a-zA-Z0-9]*$");
@@ -1816,12 +1837,14 @@ namespace LSCC
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your username can only contain alphabets or numbers!");
                 player.SendNotification("~r~Username contains illegal characters!", true);
+                EPlayer.Notify(player, "Illegal characters detected in name.", "red", "fas fa-users", false, 1500);
                 return;
             }
             if (!email.Contains("@") || email.Length < 5)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your email is invalid or too small!");
                 player.SendNotification("~r~Invalid email!", true);
+                EPlayer.Notify(player, "Invalid email.", "red", "fas fa-users", false, 1500);
                 return;
             }
 
@@ -1830,6 +1853,7 @@ namespace LSCC
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}An account with this name already exists!");
                 player.SendNotification("~r~Account with this name already exists!", true);
+                EPlayer.Notify(player, "An acount with this name already exists.", "red", "fas fa-user-plus", false, 1500);
                 return;
             }
 
@@ -1845,6 +1869,7 @@ namespace LSCC
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can only have TWO accounts per computer or rockstar ID!");
                 player.SendNotification("~r~You have more than two accounts on the same computer/game serial!", true);
+                EPlayer.Notify(player, "This machine/rockstar ID cannot be used to create more accounts.", "red", "fas fa-users", false, 1500);
                 return;
             }
 

@@ -1306,5 +1306,16 @@ namespace LSCC
 
             Discord.SendTextChannel("staff-bot", $"(ADM) |** {message}**");
         }
+
+        public static void Notify(Player player, string title, string message, bool HUD = true)
+        {
+            if(HUD) player.TriggerEvent("HUDNotify2", title, message);
+            else player.TriggerEvent("MenuNotify2", title, message);
+        }
+        public static void Notify(Player player, string msg, string color, string icon, bool close, int timeout, bool HUD = true)
+        {
+            if(HUD) player.TriggerEvent("HUDNotify", msg, color, icon, close, timeout);
+            else player.TriggerEvent("MenuNotify", msg, color, icon, close, timeout);
+        }
     }
 }

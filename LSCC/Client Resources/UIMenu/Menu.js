@@ -1,25 +1,56 @@
-var menuToggled = false;
+menuToggled = false;
 
-UIMenu = mp.browsers.new("package://UI/Menu/index.html");
-UIMenu.execute(`gm.mainMenu = false;`);
-UIMenu.active = false;
-
-mp.keys.bind(0x4D, false, function() {
-    if(Date.now() - lastChatToggle >= 500 && chatStatus == false && mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
+mp.events.add("MenuToggleTyping", (state) => {
+    if(state)
     {
-        traceLastFunc(`[Menu] Attempt open/M key`);
-
-        menuToggled = !menuToggled;
-        UIMenu.active = menuToggled;
-        UIMenu.execute(`gm.mainMenu = ${menuToggled};`);
-        mp.events.callRemote("OnToggleMenu", menuToggled);
-        mp.gui.cursor.show(menuToggled, menuToggled);
-        mp.gui.chat.activate(!menuToggled);
+        mp.keys.unbind(0x4D, false);
+    }
+    else
+    {
+        mp.keys.bind(0x4D, false, function() {
+            if(UIMenu != null && Date.now() - lastChatToggle >= 500 && chatStatus == false && mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
+            {
+                traceLastFunc(`[Menu] Attempt open/M key`);
+        
+                menuToggled = !menuToggled;
+                UIMenu.active = menuToggled;
+                UIMenu.execute(`gm.mainMenu = ${menuToggled};`);
+                mp.events.callRemote("OnToggleMenu", menuToggled);
+                mp.gui.cursor.show(menuToggled, menuToggled);
+                mp.gui.chat.activate(!menuToggled);
+                //mp.gui.chat.show(!menuToggled);
+            }
+        });
     }
 });
 
-mp.events.add("PutPlayerInLobby", (lobbyID) => { // Add 'password' here in future for server side confirmation.
-    mp.events.callRemote("RequestLobbySwitch", lobbyID, "");
+mp.events.add("MenuNotify", (msg, color, icon, close, timeout) => {
+    let insertString = `iziToast.show({`;
+    insertString += `message: \`${msg}\`, `;
+    insertString += `color: "${color}", `;
+    insertString += `icon: "${icon}", `;
+    insertString += `close: ${close.toString()}, `;
+    insertString += `timeout: ${timeout},`;
+    insertString += "});";
+
+    if(UIMenu != null) UIMenu.execute(insertString);
+});
+
+mp.events.add("MenuNotify2", (title, msg) => {
+    let insertString = `iziToast.show({`;
+    insertString += `title: \`${title}\`, `;
+    insertString += `message: \`${msg}\`, `;
+    insertString += "});";
+
+    if(UIMenu != null) UIMenu.execute(insertString);
+});
+
+mp.events.add("PutPlayerInLobby", (lobbyID, password) => {
+    mp.events.callRemote("RequestLobbySwitch", lobbyID, password);
+});
+
+mp.events.add("RequestJoinDM", (dmID) => {
+    mp.events.callRemote("RequestDMJoin", dmID);
 });
 
 mp.events.add("UpdateMenuArenas", (arenas) => {

@@ -55,6 +55,7 @@ function rappelPlayer(warningLevel)
 }
 
 mp.keys.bind(0x58, false, function() {
+    if(menuToggled !== undefined && menuToggled) return;
     if(!chatStatus)
     {
         rappelPlayer(2);

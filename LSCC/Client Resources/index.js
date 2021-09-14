@@ -14,6 +14,7 @@ var lastFunc = "Init";
 
 var UIHud = null;
 var UIMenu = null;
+var menuToggled = false;
 
 function traceLastFunc(iStr)
 {
@@ -30,8 +31,8 @@ require('./logspanel/logsview.js');
 require('./Player/Player.js');
 require('./Player/Actions.js');
 require("./Player/Nametags.js");
-require("./UI/HUD/HUD.js");
-require("./UI/Menu/Menu.js");
+require("./UIHud/HUD.js");
+require("./UIMenu/Menu.js");
 require("./charcreator/clotheditor.js")
 require("./charcreator/index.js");
 require("./charcreator/outfitslots.js")

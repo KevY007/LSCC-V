@@ -18,6 +18,20 @@ mp.events.add("InitiateCustomChat", () => {
                 }
                 fontsized = true;
             }
+
+            if(typeof UIMenu == "undefined" || UIMenu == null)
+            {
+                UIMenu = mp.browsers.new("package://UIMenu/index.html");
+                UIMenu.execute(`gm.mainMenu = false;`);
+                UIMenu.active = false;
+
+                mp.events.callLocal("MenuToggleTyping", false);
+            }
+            if(typeof UIHud == "undefined" || UIHud == null)
+            {
+                UIHud = mp.browsers.new("package://UIHud/index.html");
+                UIHud.execute(`gm.topRight = false;`);
+            }
         }, 2500);
     }
 });

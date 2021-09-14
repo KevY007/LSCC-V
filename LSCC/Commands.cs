@@ -3072,6 +3072,7 @@ namespace LSCC
             if (player.GetData<int>("JailTime") > 0)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are in jail!");
+                EPlayer.Notify(player, "You are currently jailed.", "red", "fas fa-lock", false, 1000, false);
                 return;
             }
 
@@ -3084,6 +3085,7 @@ namespace LSCC
                 if (Environment.TickCount64 - player.GetData<long>("LastLobbySwitch") < 1000)
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot switch lobbies that fast.");
+                    EPlayer.Notify(player, "Please don't spam join lobby.", "red", "fas fa-lock", false, 1000, false);
                     return;
                 }
             }
@@ -3111,12 +3113,14 @@ namespace LSCC
             if ((lobby != null) == false)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid lobby id!");
+                EPlayer.Notify(player, "Invalid lobby.", "red", "fas fa-lock", false, 1000, false);
                 return;
             }
 
             if (!lobby.Enabled)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Lobby is disabled!");
+                EPlayer.Notify(player, "Lobby is disabled.", "red", "fas fa-lock", false, 1000, false);
                 return;
             }
 
@@ -3125,12 +3129,14 @@ namespace LSCC
                 if(password.Length < 1)
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This lobby has a password, join with /swl (lobby id) (password).");
+                    EPlayer.Notify(player, "Lobby requires a password.", "red", "fas fa-lock", false, 1000, false);
                     return;
                 }
 
                 if(!password.Equals(lobby.Password))
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid password for the lobby!");
+                    EPlayer.Notify(player, "Invalid password.", "red", "fas fa-lock", false, 1000, false);
                     return;
                 }
             }
@@ -3138,6 +3144,7 @@ namespace LSCC
             if(Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobbyid) >= Settings.Dynamics.MaxInLobby && EPlayer.GetAccount(player).Admin < 1)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That lobby is full!");
+                EPlayer.Notify(player, "Lobby is full.", "red", "fas fa-lock", false, 1000, false);
                 return;
             }
 
@@ -3147,20 +3154,22 @@ namespace LSCC
                 if(elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot switch lobbies in an ongoing game! (/lobby)");
+                    EPlayer.Notify(player, "You are currently in an ongoing game.", "red", "fas fa-lock", false, 1000, false);
                     return;
                 }
             }
 
             player.SetData("LastLobbySwitch", Environment.TickCount64);
-            player.SetSharedData("InLobby", lobbyid);
             foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid))
             {
-                targ.SendChatMessage($"[Lobby {lobbyid}] {player.Name} has joined this lobby.");
+                //targ.SendChatMessage($"[Lobby {lobbyid}] {player.Name} has joined this lobby.");
+                EPlayer.Notify(player, $"<strong>{player.Name}</strong> joined the lobby", "blue", "fas fa-user-plus", false, 1000);
             }
 
+            player.SetSharedData("InLobby", lobbyid);
             Random rand = new Random();
             NAPI.Player.SpawnPlayer(player, Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)]);
-
+            EPlayer.Notify(player, $"Joined <strong>Lobby {lobbyid}</strong>", "blue", "fas fa-users", false, 1000, false);
             return;
         }
 
@@ -3188,7 +3197,7 @@ namespace LSCC
         }
 
         [Command("dm", "!{#AFAFAF}[USAGE] dm (arenaid)")]
-        public void cmd_dm(Player player, int arenaid)
+        public static void cmd_dm(Player player, int arenaid)
         {
             if (arenaid == 666) return;
             if (!EPlayer.LoggedIn(player)) return;
@@ -3197,30 +3206,35 @@ namespace LSCC
             if (player.HasData("Spectating"))
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are in spectate mode!");
+                EPlayer.Notify(player, "You are currently spectating.", "red", "fas fa-lock", false, 1000, false);
                 return;
             }
 
             if (player.GetSharedData<int>("Team") != -1)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase!");
+                EPlayer.Notify(player, "You are in a copchase.", "red", "fas fa-lock", false, 1000, false);
                 return;
             }
 
             if (arenaid < 0 || arenaid >= Settings.DMNames.Length)
             {
                 player.SendChatMessage("!{#FF6347}Invalid DM arena ID! /dmarenas to see all the arenas.");
+                EPlayer.Notify(player, "Invalid arena.", "red", "fas fa-lock", false, 1000, false);
                 return;
             }
 
             if (player.GetSharedData<int>("InLobby") <= -1)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in any lobby!");
+                EPlayer.Notify(player, "You must be in a lobby.", "red", "fas fa-lock", false, 1000, false);
                 return;
             }
 
             if(Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == arenaid) >= 7 + (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")) / 3))
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That arena has maxed out on players.");
+                EPlayer.Notify(player, "Arena is full.", "red", "fas fa-users-slash", false, 1000, false);
                 return;
             }
 
@@ -3230,12 +3244,14 @@ namespace LSCC
             if (elobby.gameStatus == 2)
             { 
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into DM while the match is starting!");
+                EPlayer.Notify(player, "Unable to join.", "red", "fas fa-lock", false, 1000, false);
                 return;
             }
 
             if (elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
             {                    
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into DM while in the copchase! (/lobby)");
+                EPlayer.Notify(player, "You are in a copchase.", "red", "fas fa-lock", false, 1000, false);
                 return;
             }
 
@@ -3248,6 +3264,7 @@ namespace LSCC
             player.SendChatMessage($"[!] !{{#FFFF00}}Sending you to !{{#FF6347}}DM: {Settings.DMNames[arenaid]}."); 
             player.TriggerEvent("SetActorInvulnerable", false);
 
+            EPlayer.Notify(player, $"Joined <strong>{Settings.DMNames[arenaid]}</strong>", "blue", "fas fa-users", false, 1000, false);
             return;
         }
 
@@ -4175,6 +4192,8 @@ namespace LSCC
                 p.SendChatMessage($"!{{#FF6347}}[AdmCmd] {player.Name} has banned {target.Name} for: {reason}");
             });
 
+            EPlayer.Notify(player, $"You have been banned from the server.<p>Reason: {reason}</p><p>Admin: {player.Name}</p>", "red", "fas fa-ban", true, 30000);
+
             target.SendChatMessage($"!{{#FF6347}}[BANNED] You have been banned from this server, Ban ID: {_new.SQL_ID}");
 
             target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
@@ -4234,6 +4253,8 @@ namespace LSCC
             });
 
             target.SendChatMessage($"!{{#FF6347}}[SUSPEND] Your account has been suspended and cannot be used anymore.");
+
+            EPlayer.Notify(player, $"Your account has been suspended.<p>Suspending Admin: {player.Name}</p>", "red", "fas fa-ban", true, 30000);
 
             target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
@@ -6235,7 +6256,8 @@ namespace LSCC
                 EPlayer.Freeze(target, true);
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:freeze:{target.Name}"); } catch { }
                 Logs.LogAdmin(player, $"Froze player {target.Name}.");
-                target.SendChatMessage($"!{{#FF6347}}[AdmCmd] YOU HAVE BEEN FROZEN BY !{{#FF0000}}{player.Name}");
+                //target.SendChatMessage($"!{{#FF6347}}[AdmCmd] YOU HAVE BEEN FROZEN BY !{{#FF0000}}{player.Name}");
+                EPlayer.Notify(target, $"You have been frozen by {player.Name}", "red", "fas fa-iciles", false, 2000);
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen {target.Name}.");
             }
         }
@@ -6255,10 +6277,11 @@ namespace LSCC
                 foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Position.DistanceTo(player.Position) <= range && a != player))
                 {
                     EPlayer.Freeze(p, true);
+                    EPlayer.Notify(p, $"You have been frozen by {player.Name}", "red", "fas fa-iciles", false, 2000);
                 }
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:rfreeze:{range}"); } catch { }
                 Logs.LogAdmin(player, $"Froze all players within {range}m.");
-                NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen all players within {range}m.");
+                //NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen all players within {range}m.");
             }
         }
 
@@ -6277,10 +6300,11 @@ namespace LSCC
                 foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Position.DistanceTo(player.Position) <= 10000 && a.Dimension == player.Dimension && a != player && a.GetSharedData<int>("Team") == teamid))
                 {
                     EPlayer.Freeze(p, true);
+                    EPlayer.Notify(p, $"You have been frozen by {player.Name}", "red", "fas fa-iciles", false, 2000);
                 }
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:tfreeze:{teamid}"); } catch { }
                 Logs.LogAdmin(player, "Froze all " + (teamid == 0 ? "fugitives." : "cops."));
-                NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen specific players.");
+                //NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen specific players.");
             }
         }
 
@@ -6299,10 +6323,11 @@ namespace LSCC
                 foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Position.DistanceTo(player.Position) <= 10000 && a.Dimension == player.Dimension && a != player && a.GetSharedData<int>("Team") == teamid))
                 {
                     EPlayer.Freeze(p, false);
+                    EPlayer.Notify(p, $"You have been thawed by {player.Name}", "green", "fas fa-walking", false, 2000);
                 }
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:tunfreeze:{teamid}"); } catch { }
                 Logs.LogAdmin(player, "Unfroze all " + (teamid == 0 ? "fugitives." : "cops."));
-                NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen specific players.");
+                //NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen specific players.");
             }
         }
 
@@ -6321,10 +6346,11 @@ namespace LSCC
                 foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Position.DistanceTo(player.Position) <= range))
                 {
                     EPlayer.Freeze(p, false);
+                    EPlayer.Notify(p, $"You have been thawed by {player.Name}", "green", "fas fa-walking", false, 2000);
                 }
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:runfreeze:{range}"); } catch { }
                 Logs.LogAdmin(player, $"Unfroze all players within {range}m");
-                NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen all players within {range}m.");
+                //NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen all players within {range}m.");
             }
         }
 
@@ -6344,8 +6370,8 @@ namespace LSCC
                 EPlayer.Freeze(target, false);
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unfreeze:{target.Name}"); } catch { }
                 Logs.LogAdmin(player, $"Unfroze player {target.Name}.");
-                target.SendChatMessage($"!{{#FF6347}}[AdmCmd] You have been unfrozen by !{{#FF0000}}{player.Name}");
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen {target.Name}.");
+                EPlayer.Notify(target, $"You have been thawed by {player.Name}", "green", "fas fa-walking", false, 2000);
             }
         }
         [Command("kick", "!{#AFAFAF}[USAGE] kick (target) (reason)", GreedyArg = true)]
@@ -6374,13 +6400,24 @@ namespace LSCC
                     playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] {target.Name} has been kicked by {player.Name} for {reason}.");
                 });
 
+                EPlayer.Notify(player, $"You have been kicked from the server by {player.Name} for <p>{reason}</p>", "red", "fas fa-ban", true, 30000);
+
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:kick:{target.Name}:{reason.Replace(":", "|")}"); } catch { }
                 Logs.LogAdmin(player, $"Kicked {target.Name} for {reason}.");
                 Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Kick", reason, "N/A");
 
                 target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
-                target.Kick();
+                NAPI.Task.Run(() =>
+                {
+                    lock (target)
+                    {
+                        if (target != null && target.Exists)
+                        {
+                            target.Kick();
+                        }
+                    }
+                }, 350);
             }
 
         }

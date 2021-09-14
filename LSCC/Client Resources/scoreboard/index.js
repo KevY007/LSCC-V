@@ -157,6 +157,6 @@ mp.keys.bind(
 mp.keys.bind(0x4F, false, function () {
 
     if(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false || forceOff == true) return;
-    
+    if(menuToggled !== undefined && menuToggled) return;
     ToggleScoreboard();
 })

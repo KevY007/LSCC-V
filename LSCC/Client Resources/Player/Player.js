@@ -160,6 +160,7 @@ setInterval(() => {
 
 function TogGPSMode()
 {
+    if(menuToggled !== undefined && menuToggled) return;
     if(Date.now() - lastChatToggle >= 500 && chatStatus == false && 
         (mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true))
     {
@@ -205,6 +206,7 @@ mp.events.addCommand("gpsbind", function (bind) {
 });
 
 mp.keys.bind(0x4C, false, function() {
+    if(menuToggled !== undefined && menuToggled) return;
     if(Date.now() - lastChatToggle >= 500 && chatStatus == false)
     {
         traceLastFunc(`[Players] Attempt L key/lock`);
@@ -214,6 +216,7 @@ mp.keys.bind(0x4C, false, function() {
 });
 
 mp.keys.bind(0x59, false, function() {
+    if(menuToggled !== undefined && menuToggled) return;
     if(Date.now() - lastChatToggle >= 500 && chatStatus == false)
     {
         traceLastFunc(`[Players] Attempt Y key/engine`);
@@ -223,6 +226,7 @@ mp.keys.bind(0x59, false, function() {
 });
 
 mp.keys.bind(0x42, true, _ => {
+    if(menuToggled !== undefined && menuToggled) return;
     if(Date.now() - lastChatToggle >= 500 && chatStatus == false)
     {
         traceLastFunc(`[Players] Attempt B key/silent siren`);
@@ -595,10 +599,12 @@ mp.events.add('render', () => {
                     {
                         chaseProgText.visible = false;
                         chaseProgBar.visible = false;
+                        if(UIHud != null) UIHud.execute(`gm.gameProgress = false;`);
                     }
                     else {
                         chaseProgText.visible = true;
                         chaseProgBar.visible = true;
+                        if(UIHud != null) UIHud.execute(`gm.gameProgress = true;`);
                     }
 
                     if(chaseTimeCur >= chaseTimeMax)
@@ -606,6 +612,7 @@ mp.events.add('render', () => {
                         chaseProgText.visible = false;
                         chaseProgBar.visible = false;
                         chaseRunning = false;
+                        if(UIHud != null) UIHud.execute(`gm.gameProgress = false;`);
                     }
                 }
 
@@ -1245,6 +1252,7 @@ mp.events.add(
                 {
                     chaseProgBar.visible = true;
                     chaseProgText.visible = true;
+                    if(UIHud != null) UIHud.execute(`gm.gameProgress = true;`);
 
                     if(collisionTime > 0 && collisionText != null) collisionText.visible = true;
                 }
@@ -1260,6 +1268,7 @@ mp.events.add(
                     chaseProgBar.visible = false;
                     chaseProgText.visible = false;
                     collisionText.visible = false;
+                    if(UIHud != null) UIHud.execute(`gm.gameProgress = false;`);
                 }
                 if(derbyText != null && derbyTimeText != null) {
                     derbyText.visible = false;
@@ -1467,6 +1476,7 @@ mp.events.add(
             chaseProgBar.visible = false;
             chaseProgText.visible = false;
             collisionText.visible = false;
+            if(UIHud != null) UIHud.execute(`gm.gameProgress = false;`);
             chaseRunning = false;
         },
 
@@ -1509,7 +1519,8 @@ mp.events.add(
         },
 
         "InitChaseTimer": () => {
-
+            
+            if(UIHud != null) UIHud.execute(`gm.gameProgress = false;`);
             if(chaseProgBar == null)
             {
                 chaseProgBar = new timerBarLib.TimerBar("PROGRESS", true);
@@ -1517,6 +1528,7 @@ mp.events.add(
                 chaseProgBar.pbarBgColor = [25, 53, 112, 255];
                 chaseProgBar.progress = 1.0;
                 chaseProgBar.visible = false;
+                
             }
 
             if(collisionText == null)
