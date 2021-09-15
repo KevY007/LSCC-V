@@ -881,10 +881,6 @@ mp.events.add('render', () => {
     }
 });
 
-mp._events.add("playerJoin", (player) => {
-    MainUI.execute(`gm.$refs.logsMenu.types = [{ name:'Admin', id:1}, {name:'Session', id:2}, {name:'Admin Record', id:3}];`);
-});
-
 mp._events.add("playerWeaponShot", (targetPosition, targetEntity) => 
 {
     ShotStats.TotalFired++;
