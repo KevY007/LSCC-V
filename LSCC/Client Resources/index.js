@@ -42,7 +42,6 @@ require('./cefBrowser.js');
 require("./rappel/index.js");
 require("./scoreboard/index.js");
 require("./Player/Sync.js");
-require("./carselector/index.js");
 require("./Player/musicPlayer.js");
 require("./Player/LightsMenu.js");
 require("./loadoutsel/index.js");

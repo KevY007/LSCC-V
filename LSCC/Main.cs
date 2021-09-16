@@ -238,6 +238,33 @@ namespace LSCC
         }
     };
 
+    public class CarData
+    {
+        public int Team { get; set; }
+        public string Model { get; set; }
+        public string Name { get; set; }
+        public string Image { get; set; }
+        public int LevelRequired { get; set; }
+        public int PointsRequired { get; set; }
+        public int DonatorPointsRequired { get; set; }
+        public int DonatorLevelRequired { get; set; }
+        public string Info { get; set; }
+        public CarData(int team, string name, string model, string image, string info, int level = 0, int points = 0, int donorpoints = 0, int donator = 0)
+        {
+            this.Team = team;
+            this.Name = name;
+            this.LevelRequired = level;
+            this.PointsRequired = points;
+            this.DonatorPointsRequired = donorpoints;
+            this.DonatorLevelRequired = donator;
+            this.Model = model;
+            this.Image = image;
+            this.Info = info;
+
+            Settings.Cars.Add(this);
+        }
+    };
+
     public class MOTDData
     {
         public string AdminName { get; set; }
@@ -335,6 +362,7 @@ namespace LSCC
         public static int NextRequestID { get; set; }
         public static long LastCountUpdate { get; set; }
         public static List<LoadoutData> Loadouts { get; set; }
+        public static List<CarData> Cars { get; set; }
         public static Dictionary<ulong, jWeaponData> WeaponData { get; set; }
         public static List<SpawnSet> FreeroamSpawns { get; set; }
 
@@ -951,6 +979,7 @@ namespace LSCC
             Settings.LoggedInPlayers = new List<Player>();
             Settings.AdminVehicles = new List<Vehicle>();
             Settings.Loadouts = new List<LoadoutData>();
+            Settings.Cars = new List<CarData>();
             Settings.FreeroamSpawns = new List<SpawnSet>();
 
             Settings.WeaponData = new Dictionary<ulong, jWeaponData>();
@@ -1080,7 +1109,36 @@ namespace LSCC
             wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Assaultrifle_mk2, 120));
             new LoadoutData(0, "Assassin", 20, wepList);
 
+            /* VEHICLES/SELECTION CREATION */
+            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Creating the selection vehicles...");
 
+            // Defaults
+            new CarData(0, "Random", "?", "package://Artwork/Vehicles/default.png", "");
+            new CarData(1, "Random", "?", "package://Artwork/Vehicles/default.png", "");
+
+            new CarData(1, "Police Cruiser", "police", "package://Artwork/Vehicles/polc1.png", "Average");
+            new CarData(1, "Unmarked Cruiser", "police4", "package://Artwork/Vehicles/polc2.png", "Average", 1);
+            new CarData(1, "Police Bike", "policeb", "package://Artwork/Vehicles/policeb.png", "Average", 3);
+            new CarData(1, "Police Buffalo", "polbufac", "package://Artwork/Vehicles/polbufac.png", "Fast", 5);
+            new CarData(1, "FBI Granger", "fbi2", "package://Artwork/Vehicles/fbi2.png", "Average", 13);
+            new CarData(1, "SWAT Truck", "riot", "package://Artwork/Vehicles/riot.png", "Slow", 15);
+            new CarData(1, "FBI Buffalo", "fbibufac", "package://Artwork/Vehicles/fbibufac.png", "Fast", 17);
+            new CarData(1, "Unmarked Charger", "udchall1", "package://Artwork/Vehicles/udchall1.png", "Fast+", 20);
+            new CarData(1, "Police Chopper", "polmav", "package://Artwork/Vehicles/polmav.png", "N/A", 23);
+            new CarData(1, "Unmarked Revolter", "prevolter", "package://Artwork/Vehicles/prevolter.png", "Fast+", 25);
+
+
+            new CarData(0, "Primo", "primo", "package://Artwork/Vehicles/primo.png", "Slow", 3);
+            new CarData(0, "Huntley", "huntley", "package://Artwork/Vehicles/huntley.png", "Average", 5);
+            new CarData(0, "Mercedes 600SEL", "600sel", "package://Artwork/Vehicles/600sel.png", "Average", 6);
+            new CarData(0, "Tailgater", "tailgater", "package://Artwork/Vehicles/tailgater.png", "Average", 10);
+            new CarData(0, "Blista Classic", "blista2", "package://Artwork/Vehicles/blista2.png", "Average", 14);
+            new CarData(0, "Cheburek", "cheburek", "package://Artwork/Vehicles/cheburek.png", "Fast", 16);
+            new CarData(0, "Buffalo", "buffalo", "package://Artwork/Vehicles/buffalo.png", "Fast", 20);
+            new CarData(0, "Sultan", "sultan", "package://Artwork/Vehicles/sultan.png", "Fast", 25);
+            new CarData(0, "Kuruma", "kuruma", "package://Artwork/Vehicles/kuruma.png", "Fast", 30);
+            new CarData(0, "Dominator GTT", "dominator8", "package://Artwork/Vehicles/dominator8.png", "Fast", 33);
+            new CarData(0, "BMW M3 E46", "m3e46", "package://Artwork/Vehicles/m3e46.png", "Fast+", 35);
 
             if (Settings.Dynamics.Discord)
             {

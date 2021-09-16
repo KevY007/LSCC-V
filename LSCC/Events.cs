@@ -1656,6 +1656,66 @@ namespace LSCC
             return dmItems;
         }
 
+        [RemoteEvent("MenuSelectedVehicle")]
+        public void OnMenuVehicleSelect(Player player, string model, int team)
+        {
+            if(Settings.Cars.Where(a => a.Model.Equals(model, StringComparison.OrdinalIgnoreCase) && a.Team == team).Count() == 0 || team > 1 || team < 0)
+            {
+                EPlayer.Notify(player, "An unknown error has occured. Bad juju?!", "red", "fas fa-ban", false, 3000, false);
+                return;
+            }
+
+            Account acc = EPlayer.GetAccount(player);
+            CarData car = Settings.Cars.FirstOrDefault(a => a.Model.Equals(model, StringComparison.OrdinalIgnoreCase) && a.Team == team);
+
+            if (EPlayer.HasOwnedVehicle(player, model, team))
+            {
+                if (team == 0)
+                {
+                    EPlayer.Notify(player, $"Fugitive vehicle set to <strong>{car.Name}</strong>.", "blue", "fas fa-car", false, 5000, false);
+                    acc.CarFugitive = car.Model;
+                }
+                else
+                {
+                    EPlayer.Notify(player, $"Police vehicle set to <strong>{car.Name}</strong>.", "blue", "fas fa-car", false, 5000, false);
+                    acc.CarCop = car.Model;
+                }
+
+                player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(Menu_VehicleData(player)), acc.CarCop, acc.CarFugitive);
+            }
+            else
+            {
+                if(car.LevelRequired != 0 && car.LevelRequired >= acc.Level)
+                {
+                    EPlayer.Notify(player, $"You need to be at least <strong>Level {car.LevelRequired}</strong> for this vehicle.", "red", "fas fa-lock", false, 3000, false);
+                    return;
+                }
+                if (car.DonatorPointsRequired != 0 && car.DonatorPointsRequired > acc.DonatorPoints)
+                {
+                    EPlayer.Notify(player, $"You need <strong>{car.DonatorPointsRequired} Donator Points</strong> for this vehicle.", "red", "fas fa-lock", false, 3000, false);
+                    return;
+                }
+                if (car.PointsRequired != 0 && car.PointsRequired > acc.Points)
+                {
+                    EPlayer.Notify(player, $"You need <strong>{car.PointsRequired} Points</strong> for this vehicle.", "red", "fas fa-lock", false, 3000, false);
+                    return;
+                }
+                if (car.DonatorLevelRequired != 0 && car.DonatorLevelRequired > acc.DonatorLevel)
+                {
+                    EPlayer.Notify(player, $"This vehicle is restricted to <strong>{EPlayer.GetDonatorLevelName(car.DonatorLevelRequired)}</strong>.", "red", "fas fa-lock", false, 3000, false);
+                    return;
+                }
+
+                acc.Points -= car.PointsRequired;
+                acc.DonatorPoints -= car.DonatorPointsRequired;
+                EPlayer.UnlockVehicle(player, car.Model, car.Team);
+                EPlayer.Notify(player, $"You have unlocked <strong>{car.Name}</strong>. You may select it now.", "green", "fas fa-unlock", false, 10000, false);
+
+                player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(Menu_VehicleData(player)), acc.CarCop, acc.CarFugitive);
+            }
+            return;
+        }
+
         public List<object[]> Menu_VehicleData(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return new List<object[]>();
@@ -1663,8 +1723,26 @@ namespace LSCC
 
 
             List<object[]> vehItems = new List<object[]>();
+            foreach (var car in Settings.Cars)
+            {
+                string price = "Free";
+                if (car.LevelRequired > 0) price = "Level " + car.LevelRequired.ToString();
+                if (car.PointsRequired > 0) price = price + (price.Length > 3 ? " & " : "") + car.PointsRequired.ToString() + " Points";
+                if (car.DonatorPointsRequired > 0) price = price + (price.Length > 3 ? " & " : "") + car.DonatorPointsRequired.ToString() + " Donator Points";
+                if (car.DonatorLevelRequired > 0) price = price + (price.Length > 3 ? " & " : "") + EPlayer.GetDonatorLevelName(car.DonatorLevelRequired);
 
-          
+                vehItems.Add(new object[]
+                {
+                    car.Team,
+                    car.Model,
+                    car.Name,
+                    car.Image,
+                    price,
+                    !EPlayer.HasOwnedVehicle(player, car.Model, car.Team),
+                    car.Info
+                });
+            }
+            
             return vehItems;
         }
 
@@ -2033,192 +2111,6 @@ namespace LSCC
             }
 
             player.SetData("LastResetEchoEvent", 0);
-        }
-
-        [RemoteEvent("OnCarSelectorSelect")]
-        public void OnSelectorSelectCar(Player player, int team, string carname)
-        {
-            if (!EPlayer.LoggedIn(player)) return;
-
-            if (player.HasData("ViewingCarSelector") && player.GetData<bool>("ViewingCarSelector") == true)
-            {
-                if (team == 1)
-                {
-                    switch (carname)
-                    {
-                        case "Default":
-                            {
-                                EPlayer.GetAccount(player).CarCop = "?";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Random/Default.");
-                                break;
-                            }
-                        case "Police Cruiser":
-                            {
-                                EPlayer.GetAccount(player).CarCop = "police";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Police Cruiser.");
-                                break;
-                            }
-                        case "Police Cruiser (U)":
-                            {
-                                EPlayer.GetAccount(player).CarCop = "police4";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Unmarked Cruiser.");
-                                break;
-                            }
-                        case "Police Bike":
-                            {
-                                EPlayer.GetAccount(player).CarCop = "policeb";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Police Bike.");
-                                break;
-                            }
-                        case "Police Buffalo":
-                            {
-                                EPlayer.GetAccount(player).CarCop = "polbufac";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Police Buffalo.");
-                                break;
-                            }
-                        case "Police Buffalo (U)":
-                            {
-                                EPlayer.GetAccount(player).CarCop = "polbufac2";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Unmarked Police Buffalo.");
-                                break;
-                            }
-                        case "FBI Buffalo":
-                            {
-                                EPlayer.GetAccount(player).CarCop = "fbibufac";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to FBI Buffalo.");
-                                break;
-                            }
-                        case "FBI Granger":
-                            {
-                                EPlayer.GetAccount(player).CarCop = "fbi2";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to FBI Granger.");
-                                break;
-                            }
-                        case "Chopper":
-                            {
-                                EPlayer.GetAccount(player).CarCop = "polmav";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Police Chopper.");
-                                break;
-                            }
-                        case "SWAT Truck":
-                            {
-                                EPlayer.GetAccount(player).CarCop = "riot";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to SWAT Truck.");
-                                break;
-                            }
-                        case "Charger '16 (U)":
-                            {
-                                EPlayer.GetAccount(player).CarCop = "udchall1";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Unmarked Dodge Charger 2016.");
-                                break;
-                            }
-                        case "Police Caracara":
-                            {
-                                EPlayer.GetAccount(player).CarCop = "lspdcara";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Police Caracara.");
-                                break;
-                            }
-                        case "Revolter (U)":
-                            {
-                                EPlayer.GetAccount(player).CarCop = "prevolter";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cop car set to Police Revolter (Unmarked).");
-                                break;
-                            }
-                    }
-                }
-                if(team == 0)
-                {
-                    switch (carname)
-                    {
-                        case "Default":
-                            {
-                                EPlayer.GetAccount(player).CarFugitive = "?";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Random/Default.");
-                                break;
-                            }
-                        case "Primo":
-                            {
-                                EPlayer.GetAccount(player).CarFugitive = "primo";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Primo.");
-                                break;
-                            }
-                        case "Huntley":
-                            {
-                                EPlayer.GetAccount(player).CarFugitive = "huntley";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Huntley.");
-                                break;
-                            }
-                        case "S-Class":
-                            {
-                                EPlayer.GetAccount(player).CarFugitive = "600sel";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Mercedes S-Class.");
-                                break;
-                            }
-                        case "Dubsta":
-                            {
-                                EPlayer.GetAccount(player).CarFugitive = "dubsta";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Dubsta.");
-                                break;
-                            }
-                        case "Tailgater":
-                            {
-                                EPlayer.GetAccount(player).CarFugitive = "tailgater";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Tailgater.");
-                                break;
-                            }
-                        case "Schafter":
-                            {
-                                EPlayer.GetAccount(player).CarFugitive = "schafter2";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Schafter.");
-                                break;
-                            }
-                        case "Blista Classic":
-                            {
-                                EPlayer.GetAccount(player).CarFugitive = "blista2";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Blista Classic.");
-                                break;
-                            }
-                        case "Cheburek":
-                            {
-                                EPlayer.GetAccount(player).CarFugitive = "cheburek";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Cheburek.");
-                                break;
-                            }
-                        case "Buffalo":
-                            {
-                                EPlayer.GetAccount(player).CarFugitive = "buffalo";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Buffalo.");
-                                break;
-                            }
-                        case "Sultan":
-                            {
-                                EPlayer.GetAccount(player).CarFugitive = "sultan";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Sultan.");
-                                break;
-                            }
-                        case "Kuruma":
-                            {
-                                EPlayer.GetAccount(player).CarFugitive = "kuruma";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Kuruma.");
-                                break;
-                            }
-                        case "Dominator GTT":
-                            {
-                                EPlayer.GetAccount(player).CarFugitive = "dominator8";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to Dominator GTT.");
-                                break;
-                            }
-                        case "M3 E46":
-                            {
-                                EPlayer.GetAccount(player).CarFugitive = "m3e46";
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Fugitive car set to M3 E46.");
-                                break;
-                            }
-                    }
-                }
-            }
-            player.ResetData("ViewingCarSelector");
-            return;
         }
 
         [RemoteEvent("OnLoadoutSelectorSelect")]

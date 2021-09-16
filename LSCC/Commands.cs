@@ -3549,6 +3549,7 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player)) return;
 
             player.SendChatMessage("!{#FF6347} Key: Function.");
+            player.SendChatMessage("!{#FF6347} M: Toggle menu.");
             player.SendChatMessage("!{#FF6347} N: Push to talk voicechat. (Changed using /voicebind)");
             player.SendChatMessage("!{#FF6347} Z: Toggle GPS as a Cop. (Changed using /gpsbind)");
             player.SendChatMessage("!{#FF6347} O: Toggle scoreboard, displays a scrollbar and mouse if needed.");
@@ -3685,46 +3686,7 @@ namespace LSCC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            CarSelectorData a = new CarSelectorData(
-            new object[,]
-            {
-                { "Default", "images/default.png", 1, 0 },
-                { "Default", "images/default.png", 0, 0 },
-
-                // Cops
-                { "Police Cruiser", "images/polc1.png", 1, 0 },
-                { "Police Cruiser (U)", "images/polc2.png", 1, 2 },
-                { "Police Bike", "images/policeb.png", 1, 3 },
-                { "Police Buffalo", "images/polbufac.png", 1, 5 },
-                { "Police Buffalo (U)", "images/polbufac2.png", 1, 10 },
-                { "Police Caracara", "images/lspdcara.png", 1, 12 },
-                { "FBI Granger", "images/fbi2.png", 1, 13 },
-                { "SWAT Truck", "images/riot.png", 1, 15 },
-                { "FBI Buffalo", "images/fbibufac.png", 1, 17 },
-                { "Charger '16 (U)", "images/udchall1.png", 1, 20 },
-                { "Chopper", "images/polmav.png", 1, 23 },
-                { "Revolter (U)", "images/prevolter.png", 1, 25 },
-
-                // Fugitive
-                { "Primo", "images/primo.png", 0, 3 },
-                { "Huntley", "images/huntley.png", 0, 5 },
-                { "S-Class", "images/600sel.png", 0, 6 },
-                { "Dubsta", "images/dubsta.png", 0, 8 },
-                { "Tailgater", "images/tailgater.png", 0, 10 },
-                { "Schafter", "images/schafter2.png", 0, 12 },
-                { "Blista Classic", "images/blista2.png", 0, 14 },
-                { "Cheburek", "images/cheburek.png", 0, 16 },
-                { "Buffalo", "images/buffalo.png", 0, 20 },
-                { "Sultan", "images/sultan.png", 0, 25 },
-                { "Kuruma", "images/kuruma.png", 0, 30 },
-                { "Dominator GTT", "images/dominator8.png", 0, 33 },
-                { "M3 E46", "images/m3e46.png", 0, 35 },
-            },
-            EPlayer.GetAccount(player).Level);
-
-            player.SetData("ViewingCarSelector", true);
-            player.TriggerEvent("showCarSelector", NAPI.Util.ToJson(a));
-
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This option has been migrated to server menu. (/keys)");
             return;
         }
 
@@ -3756,7 +3718,7 @@ namespace LSCC
             player.SendChatMessage("[Lobby]: /lobbychat (/lo,/lg) /spec /specoff");
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats /changemypass");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys for activation)");
-            player.SendChatMessage("!{#339BC4}[Cop!{#F24C27}chase]: !{#FFFFFF}/r(adio) /wt /loadout /car");
+            player.SendChatMessage("!{#339BC4}[Cop!{#F24C27}chase]: !{#FFFFFF}/r(adio) /wt /loadout");
             player.SendChatMessage("!{#61A9FA}[Cop]: /gps /cuff /m(egaphone) /dragout");
             player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup /s(top)a(nim) /passgun");
             player.SendChatMessage("!{#AB00BA}[Vehicle]: /trunk /lock /engine");

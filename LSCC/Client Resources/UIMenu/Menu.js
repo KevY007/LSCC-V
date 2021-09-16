@@ -53,6 +53,10 @@ mp.events.add("RequestJoinMinigame", (ID) => {
     mp.events.callRemote("RequestMinigameJoin", ID);
 });
 
+mp.events.add("MenuSelectVehicle", (model, team) => {
+    mp.events.callRemote("MenuSelectedVehicle", model, team);
+});
+
 mp.events.add("UpdateMenuMinigames", (arenas, currentMinigame) => {
     UIMenu.execute(`gm.$refs.mainMenu.$refs.minigames.games = [];`);
     UIMenu.execute(`gm.$refs.mainMenu.$refs.minigames.currentMinigame = ${currentMinigame};`);
@@ -80,6 +84,26 @@ mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) =>
     UIMenu.execute(`gm.$refs.mainMenu.$refs.vehicles.$refs.fugitive.vehicles = [];`);
     UIMenu.execute(`gm.$refs.mainMenu.$refs.vehicles.$refs.police.selectedModel = "${currentCopCar}";`);
     UIMenu.execute(`gm.$refs.mainMenu.$refs.vehicles.$refs.fugitive.selectedModel = "${currentFugiCar}";`);
+
+    // Vehicle Data
+    // Model, Name, Background, Energy, Price, Locked
+    let menuItems = JSON.parse(vehicles);
+    for(let i = 0; i < menuItems.length; i++)
+    {
+        let insertString = "";
+        if(menuItems[i][0] == 0) insertString = `gm.$refs.mainMenu.$refs.vehicles.$refs.fugitive.vehicles.push({`;
+        else if(menuItems[i][0] == 1) insertString = `gm.$refs.mainMenu.$refs.vehicles.$refs.police.vehicles.push({`;
+        
+        insertString += `"model": "${menuItems[i][1]}", `;
+        insertString += `"name": "${menuItems[i][2]}", `;
+        insertString += `"background": "${menuItems[i][3]}", `;
+        if(menuItems[i][4].length > 1) insertString += `"price": "${menuItems[i][4]}", `;
+        insertString += `"locked": ${menuItems[i][5]}, `;
+        if(menuItems[i][6].length > 1) insertString += `"energy": "${menuItems[i][6]}", `;
+        insertString += "});";
+
+        UIMenu.execute(insertString);
+    }
 });
 
 mp.events.add("UpdateMenuLobbies", (lobbies, currentLobby) => {

@@ -186,36 +186,6 @@ namespace LSCC
             },
         });
     }
-
-    public class CarSelectorData
-    {
-        public string[] Cars { get; set; }
-        public string[] Images { get; set; }
-        public int[] Teams { get; set; }
-        public int[] Levels { get; set; }
-        public bool[] Locked { get; set; }
-
-        public CarSelectorData(object[,] carData, int level)
-        {
-            int numcars = carData.GetLength(0);
-
-            this.Cars = new string[numcars];
-            this.Images = new string[numcars];
-            this.Teams = new int[numcars];
-            this.Levels = new int[numcars];
-            this.Locked = new bool[numcars];
-
-            for(int i = 0; i < carData.GetLength(0); i++)
-            {
-                this.Cars[i] = (string)carData[i, 0];
-                this.Images[i] = (string)carData[i, 1];
-                this.Teams[i] = (int)carData[i, 2];
-                this.Levels[i] = (int)carData[i, 3];
-                this.Locked[i] = (level >= this.Levels[i] ? false : true);
-            }
-        }
-    }
-
     public class LoadoutSelWepData
     {
         public string[] Images { get; set; }
@@ -540,7 +510,6 @@ namespace LSCC
                 player.SetData("FreeroamWorld", (uint)0);
                 player.SetData("FreeroamGodmode", true);
                 player.SetData("FreeroamBlip", true);
-                player.ResetData("ViewingCarSelector");
                 player.ResetData("ViewingLoadoutSelector");
                 player.SetSharedData("HasShot", false);
                 player.SetSharedData("VoiceMode", 0);
@@ -1104,6 +1073,52 @@ namespace LSCC
             if (xp == 0) return false;
 
             return (xp >= GetMaxLevelXP(level) ? true : false);
+        }
+        public static List<string> GetOwnedVehicles(Player player, int team)
+        {
+            List<string> ownedCars = new List<string>();
+
+            if(LoggedIn(player))
+            {
+                Account acc = GetAccount(player);
+                var cars = ContextFactory.Instance.OwnedVehicles.ToList().Where(a => a.AccountSQLID == acc.SQL_ID && a.Team == team);
+                foreach (var item in cars) ownedCars.Add(item.Model);
+            }
+            return ownedCars;
+        }
+        public static bool UnlockVehicle(Player player, string model, int team)
+        {
+            if (!LoggedIn(player)) return false;
+            if (HasOwnedVehicle(player, model, team)) return false;
+
+            var _new = new OwnedVehData
+            {
+                AccountSQLID = EPlayer.GetAccount(player).SQL_ID,
+                Model = model,
+                Team = team,
+            };
+            ContextFactory.Instance.OwnedVehicles.Add(_new);
+
+            ContextFactory.Instance.SaveChanges();
+            return true;
+        }
+        public static bool HasOwnedVehicle(Player player, string model, int team)
+        {
+            if (model == "?") return true;
+
+            if (LoggedIn(player))
+            {
+                Account acc = GetAccount(player);
+                /*foreach(var car in Settings.Cars)
+                {
+                    if(car.Model.Equals(model, StringComparison.OrdinalIgnoreCase) && car.Team == team)
+                    {
+                        if (car.LevelRequired == 0 || car.LevelRequired >= acc.Level) return true;
+                    }
+                }*/
+                if (ContextFactory.Instance.OwnedVehicles.Count(a => a.AccountSQLID == acc.SQL_ID && a.Team == team && a.Model.Equals(model, StringComparison.OrdinalIgnoreCase)) > 0) return true;
+            }
+            return false;
         }
         public static void GrantXP(Player player, int xp)
         {
