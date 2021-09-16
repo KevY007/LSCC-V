@@ -1792,6 +1792,8 @@ namespace LSCC
                         player.ResetData("BustSupporters");
                         player.ResetData("CuffingTarget");
                         player.RemoveAllWeapons();
+                        player.Health = 100;
+                        player.Armor = 0;
 
                         if (lobby.gameMode == GameModes.STANDARD)
                             player.TriggerEvent("showHPBars", 1);
@@ -2032,6 +2034,11 @@ namespace LSCC
                     while (fugitives > 0)
                     {
                         _tempPlayer = lobby.Fugitives[random.Next(lobby.Fugitives.Count)];
+
+                        if (lobby.Fugitives.Count(a => !PutInsideCar.Contains(a) && !iteratedAlready.Contains(a) && a.Ping < 350) > 0)
+                        {
+                            _tempPlayer = lobby.Fugitives.Where(a => !PutInsideCar.Contains(a) && !iteratedAlready.Contains(a) && a.Ping < 350).OrderBy(c => Guid.NewGuid()).FirstOrDefault();
+                        }
 
                         if (PutInsideCar.Contains(_tempPlayer))
                         {
