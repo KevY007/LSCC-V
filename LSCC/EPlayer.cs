@@ -1268,7 +1268,7 @@ namespace LSCC
 
                 foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == LobbyToBeIn))
                 {
-                    targ.SendChatMessage($"!{{#FF6347}}[Lobby {LobbyToBeIn}] !{{#A6A6A6}}{player.Name} !{{#FFFFFF}}has joined this lobby.");
+                    targ.SendChatMessage($"!{{#FF6347}}[Lobby {LobbyToBeIn}] !{{#BFBFBF}}{player.Name} !{{#FFFFFF}}has joined this lobby.");
                 }
             }
 
