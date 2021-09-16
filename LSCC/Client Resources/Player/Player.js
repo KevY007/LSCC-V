@@ -719,7 +719,7 @@ mp.events.add('render', () => {
 
         mp.players.forEach(target => {
 
-            if(target.dimension == mp.players.local.dimension/* && target != mp.players.local*/)
+            if(target.dimension == mp.players.local.dimension/* && target != mp.players.local*/ && !target.isDead())
             {
                 if (target.getVariable("VisibleBlip") !== undefined && target.getVariable("VisibleBlip") == true)
                 {
