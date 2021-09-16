@@ -53,6 +53,11 @@ mp.events.addDataHandler('Status_Trunk', function (entity, value, oldValue)
     }
 });
 
+mp.events.addDataHandler('EntAlpha', function (entity, value, oldValue) 
+{
+    entity.setAlpha(value);
+});
+
 mp.events.addDataHandler('ComponentSyncTrigger', function (entity, value, oldValue) 
 {
     if(entity != null && entity.type === 'player') mp.events.callRemote("RequestCompSync", entity);
@@ -96,6 +101,7 @@ mp.events.add('entityStreamIn', (entity) => {
     if(entity != null && entity.type === 'player') 
     {
         mp.events.callRemote("RequestCompSync", entity);
+        if(entity.getVariable("EntAlpha") !== undefined) entity.setAlpha(entity.getVariable("EntAlpha"));
     }
     if (entity.type === 'vehicle') 
     {

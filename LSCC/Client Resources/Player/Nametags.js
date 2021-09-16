@@ -102,7 +102,7 @@ mp.events.add('render', (nametags) => {
     nametags.forEach(nametag => {
         let [player, x, y, distance] = nametag;
     
-        if(isPlayerInLOS(player) == true) {	   
+        if(isPlayerInLOS(player) == true && player.getAlpha() > 32) {	   
 
             let distWithAdjust = distance;
             
@@ -110,7 +110,7 @@ mp.events.add('render', (nametags) => {
                 distWithAdjust -= 35;
             } 
             if(isNoClip) {
-                distWithAdjust -= 100;
+                distWithAdjust -= 50;
             }
             
             if(distWithAdjust <= maxDistance)

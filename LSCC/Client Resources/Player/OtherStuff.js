@@ -448,7 +448,7 @@ mp.events.add('render', function()
     mp.players.local.position = new mp.Vector3(
       pos.x + vector.x + 1,
       pos.y + vector.y + 1,
-      pos.z + vector.z - 100
+      pos.z + vector.z - 50
     );
     mp.players.local.heading = rr.z;
     noClipCamera.setCoord(

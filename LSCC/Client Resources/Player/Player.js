@@ -289,8 +289,12 @@ mp.events.add("render", () => {
     // If the player is armed with anything but a melee weapon or explosive weapon disable the lock-on functionality, otherwise enable it
     mp.game.invoke('0x475768A975D5AD17', player.handle, 4) ? mp.game.invoke('0x5C8B2F450EE4328E', player.handle, false) :  mp.game.invoke('0x5C8B2F450EE4328E', player.handle, true);
 
-    if (specState == true && specCam != null && specTarget != null) {
 
+    // Spectate Things
+    
+    if (specState == true && specCam !== null && specTarget != null) 
+    {
+        // Automatically stop spec if target goes woosh
         if (mp.players.exists(specTarget)) 
         {
             specCam.detach();
@@ -305,7 +309,46 @@ mp.events.add("render", () => {
             specState = false;
             mp.events.callLocal("StopSpectating");
         }
+
+        // Move spectate camera
+        if(specCam.isActive() && specCam.isRendering())
+        {
+            /* Camera settings */
+            let mouseSensitivity = 3.5;
+            let zoomSpeed = 1.5;
+            let minZoom = 5.0;
+            let maxZoom = 60.0;
+            mp.game.controls.disableAllControlActions(2);
+
+            let x = (mp.game.controls.getDisabledControlNormal(7, 1) * mouseSensitivity);
+            let y = (mp.game.controls.getDisabledControlNormal(7, 2) * mouseSensitivity);
+            let zoomIn = (mp.game.controls.getDisabledControlNormal(2, 40) * zoomSpeed);
+            let zoomOut = (mp.game.controls.getDisabledControlNormal(2, 41) * zoomSpeed);
+
+            let currentRot = specCam.getRot(2);
+
+            currentRot = new mp.Vector3(currentRot.x - y, 0, currentRot.z - x);
+
+            specCam.setRot(currentRot.x, currentRot.y, currentRot.z, 2);
+
+            if (zoomIn > 0)
+            {
+                let currentFov = specCam.getFov();
+                currentFov -= zoomIn;
+                if (currentFov < minZoom)
+                    currentFov = minZoom;
+                specCam.setFov(currentFov);
+            } else if (zoomOut > 0)
+            {
+                let currentFov = specCam.getFov();
+                currentFov += zoomOut;
+                if (currentFov > maxZoom)
+                    currentFov = maxZoom;
+                specCam.setFov(currentFov);
+            }
+        }
     }
+
 
     if(checker_lastHealth != player.getHealth() && player.getHealth() >= 99 ) 
     {
@@ -323,23 +366,6 @@ function destroyCam() {
     mp.game.cam.renderScriptCams(false, true, 0, true, true);
     camera.destroy();
     camera = null;
-}
-
-function TimeFormat(time)
-{   
-    var hrs = ~~(time / 3600);
-    var mins = ~~((time % 3600) / 60);
-    var secs = ~~time % 60;
-
-    var ret = "";
-
-    if (hrs > 0) {
-        ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
-    }
-
-    ret += "" + mins + ":" + (secs < 10 ? "0" : "");
-    ret += "" + secs;
-    return ret;
 }
 
 mp.events.addCommand("updaterate", function (rate) {
@@ -512,7 +538,7 @@ mp.events.add('render', () => {
                     }
                 });
 
-                if (specState == true && specCam != null && specTarget != null) {
+                if (specState == true && specCam !== null && specTarget !== null) {
 
                     if (mp.players.exists(specTarget)) 
                     {

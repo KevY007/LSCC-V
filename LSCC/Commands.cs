@@ -983,6 +983,8 @@ namespace LSCC
                 player.ResetData("IsNoclipping");
                 player.TriggerEvent("ForceNoclip", false);
                 Logs.LogAdmin(player, "Left noclip mode.");
+                player.SetSharedData("EntAlpha", 255);
+
                 //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:noclip:stop"); } catch { }
             }
             else
@@ -995,8 +997,32 @@ namespace LSCC
                 player.SetSharedData("VisibleBlip", false);
                 player.TriggerEvent("ForceNoclip", true);
                 Logs.LogAdmin(player, "Entered noclip mode.");
+                player.SetSharedData("EntAlpha", 0);
                 //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:noclip:start"); } catch { }
             }
+            return;
+        }
+
+        [Command("setalpha", "!{#AFAFAF}[USAGE] setalpha (target) (0-255)")]
+        public void cmd_setalpha(Player player, Player target, int alpha)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+            if (alpha < 0 || alpha > 255)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You good? This shit finna bring us to 4D, tone it down between 0-255.");
+                return;
+            }
+
+            target.SetSharedData("EntAlpha", alpha);
+            Logs.LogAdmin(player, $"Set {target.Name}'s alpha to {alpha}.");
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has set {target.Name}'s alpha (transparency) to {alpha}.");
             return;
         }
 
@@ -4896,7 +4922,7 @@ namespace LSCC
             {
                 player.SendChatMessage("[Admin Lv 3]: /givegun(all) /gotopos /bringall /sethpall /(un)freezeall /r(emove)g(uns)f(rom)a(ll)");
                 player.SendChatMessage("[Admin Lv 3]: /givecomp /takecomp /attachcomp /grantfugitive /setspawn (freeroam world)");
-                player.SendChatMessage("[Admin Lv 3]: /getip /gethwid /motdall");
+                player.SendChatMessage("[Admin Lv 3]: /getip /gethwid /motdall /setalpha");
             }
             if (EPlayer.GetAccount(player).Admin >= 4)
             {
@@ -7304,10 +7330,11 @@ namespace LSCC
 
             player.SetData("Spec_Dimension", player.Dimension);
             player.SetData("Spec_Pos", player.Position);
+            player.SetSharedData("EntAlpha", 0);
 
             player.Dimension = target.Dimension;
             Vector3 pos = target.Position;
-            pos.Z -= 100.0f;
+            pos.Z -= 35.0f;
             player.Position = pos;
 
             player.SetSharedData("VisibleBlip", false);
@@ -7420,6 +7447,7 @@ namespace LSCC
             player.ResetData("Spectating");
             player.ResetData("SpectatingPlayer");
 
+            player.SetSharedData("EntAlpha", 255);
             if (player.HasData("Spec_Pos"))
             {
                 player.Dimension = player.GetData<uint>("Spec_Dimension");
