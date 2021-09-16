@@ -11,9 +11,6 @@ let showHPStatus = 0;
 
 mp.nametags.enabled = false;
 
-let specState = false;
-let isNoClip = false;
-
 function isPlayerInLOS(target) {
     if(target === undefined) return false;
 
@@ -102,20 +99,23 @@ mp.events.add('render', (nametags) => {
     nametags.forEach(nametag => {
         let [player, x, y, distance] = nametag;
     
-        if(isPlayerInLOS(player) == true && player.getAlpha() > 32) {	   
-
-            let distWithAdjust = distance;
+        if((specState || isNoClip) || (isPlayerInLOS(player) == true && player.getAlpha() > 32)) {	   
+            
+            let distWithAdjust = 0 + distance;
+            let maxDistWithAdjust = 0 + maxDistance;
             
             if(specState) {
-                distWithAdjust -= 35;
+                distWithAdjust -= 20;
+                maxDistWithAdjust += 20*20;
             } 
             if(isNoClip) {
-                distWithAdjust -= 50;
+                distWithAdjust -= 35;
+                maxDistWithAdjust = 35*35;
             }
             
-            if(distWithAdjust <= maxDistance)
+            if((distWithAdjust <= (maxDistWithAdjust)) || (specState || isNoClip))
             {
-                let scale = (distWithAdjust / maxDistance);
+                let scale = (distWithAdjust / (maxDistWithAdjust));
                 if(scale < 0.6) scale = 0.6;
 
                 var health = player.getHealth() / 100;

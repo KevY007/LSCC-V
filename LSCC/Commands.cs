@@ -7334,7 +7334,7 @@ namespace LSCC
 
             player.Dimension = target.Dimension;
             Vector3 pos = target.Position;
-            pos.Z -= 35.0f;
+            pos.Z -= 20f;
             player.Position = pos;
 
             player.SetSharedData("VisibleBlip", false);

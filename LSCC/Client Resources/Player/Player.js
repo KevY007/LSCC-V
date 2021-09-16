@@ -25,8 +25,17 @@ if(mp.storage.data.updaterate !== undefined)
 }
 
 let specCam = null;
-let specState = false;
+var specState = false;
 let specTarget = null;
+
+/* Spec Camera move settings */
+let mouseSensitivity = 3.5;
+let zoomSpeed = 1.5;
+let minZoom = 5.0;
+let maxZoom = 60.0;
+let moveRotX = 0.0;
+let moveRotY = 0.0;
+let moveRotZ = 0.0;
 
 let playerBlips = [];
 
@@ -311,13 +320,9 @@ mp.events.add("render", () => {
         }
 
         // Move spectate camera
-        if(specCam.isActive() && specCam.isRendering())
+        if(specCam.isActive() && specCam.isRendering() && mp.players.exists(specTarget))
         {
-            /* Camera settings */
-            let mouseSensitivity = 3.5;
-            let zoomSpeed = 1.5;
-            let minZoom = 5.0;
-            let maxZoom = 60.0;
+            
             mp.game.controls.disableAllControlActions(2);
 
             let x = (mp.game.controls.getDisabledControlNormal(7, 1) * mouseSensitivity);
@@ -325,9 +330,11 @@ mp.events.add("render", () => {
             let zoomIn = (mp.game.controls.getDisabledControlNormal(2, 40) * zoomSpeed);
             let zoomOut = (mp.game.controls.getDisabledControlNormal(2, 41) * zoomSpeed);
 
-            let currentRot = specCam.getRot(2);
-
-            currentRot = new mp.Vector3(currentRot.x - y, 0, currentRot.z - x);
+            //let currentRot = specCam.getRot(2);
+            let currentRot = new mp.Vector3(0, 0, specTarget.getHeading())
+            moveRotX += y;
+            moveRotZ += x;
+            currentRot = new mp.Vector3(currentRot.x - moveRotX, moveRotY, currentRot.z - moveRotZ);
 
             specCam.setRot(currentRot.x, currentRot.y, currentRot.z, 2);
 
@@ -552,7 +559,7 @@ mp.events.add('render', () => {
                             position.y = specTarget.getVariable("UnstreamedY");
                             position.z = specTarget.getVariable("UnstreamedZ");
                         }
-                        position.z -= 35;
+                        position.z -= 20;
 
                         mp.players.local.position = position;
                     }

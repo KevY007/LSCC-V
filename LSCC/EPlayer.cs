@@ -504,7 +504,7 @@ namespace LSCC
                 player.SetData("AutoJoin", true);
                 player.SetSharedData("LastVehEnterExit", DateTimeOffset.Now.ToUnixTimeSeconds()-5);
                 player.SetSharedData("DerbyTime", 0);
-                player.SetSharedData("EntAlpha", 255);
+                player.SetSharedData("EntAlpha", 0);
                 player.SetData("DerbySpawnTick", 0);
                 player.SetData("FreeroamTime", 12);
                 player.SetData("FreeroamWeather", 0);
@@ -1039,6 +1039,7 @@ namespace LSCC
             EPlayer.Freeze(player, true);
             player.Position = new Vector3(Settings.LoginCameraX, Settings.LoginCameraY, Settings.LoginCameraZ);
             player.Dimension = 666 + Convert.ToUInt32(RAGE.Entities.Players.Count);
+            player.SetSharedData("EntAlpha", 0);
  
             player.TriggerEvent("DestroyPlayerCamera");
             player.TriggerEvent("CreatePlayerCamera", Settings.LoginCameraX, Settings.LoginCameraY, Settings.LoginCameraZ, Settings.LoginCameraRx, Settings.LoginCameraRy, Settings.LoginCameraRz, Settings.LoginCameraViewAngle);

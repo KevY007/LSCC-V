@@ -951,6 +951,7 @@ namespace LSCC
 
         public static void OnPlayerLogin(Player player, Account acc)
         {
+            player.SetSharedData("EntAlpha", 255);
             player.SetData("PlaytimeTick", Environment.TickCount64);
             player.TriggerEvent("StopThemeSong");
             Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in as {acc.Username}.*");
@@ -1397,6 +1398,7 @@ namespace LSCC
 
         public static void OnPlayerRegister(Player player, Account acc)
         {
+            player.SetSharedData("EntAlpha", 255);
             player.SetData("PlaytimeTick", Environment.TickCount64);
             Discord.SendTextChannel("staff-bot", $"*{player.Name} has registered.*");
 
