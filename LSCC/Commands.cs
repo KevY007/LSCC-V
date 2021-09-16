@@ -1291,17 +1291,10 @@ namespace LSCC
             }
 
             bool isACop = false;
-            if (lobby != null)
-            {
-                if (lobby.GameProgress < 25)
-                {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot cuff right at the start of the game!");
-                    return;
-                }
-                if (lobby.Cops.Contains(player) && lobby.gameStatus == 1 && lobby.Fugitives.Contains(target) && !target.HasData("Cuffed"))
-                {
-                    isACop = true;
-                }
+
+            if (lobby.Cops.Contains(player) && lobby.gameStatus == 1 && lobby.Fugitives.Contains(target) && !target.HasData("Cuffed"))
+            { 
+                isACop = true;
             }
 
             if (!isACop)
@@ -1309,6 +1302,12 @@ namespace LSCC
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a cop or the target cannot be cuffed!");
                 player.SendChatMessage("!{#AFAFAF}[HINT] You can use /cuff (target) to handcuff a specific player.");
                 player.SendChatMessage("!{#AFAFAF}[HINT] Entering /cuff without any parameters will attempt to handcuff the nearest fugitive.");
+                return;
+            }
+
+            if (lobby.GameProgress < 25)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot cuff right at the start of the game!");
                 return;
             }
 
@@ -1431,24 +1430,24 @@ namespace LSCC
             }
 
             bool isACop = false;
-            if (lobby != null)
+
+            if (lobby.Cops.Contains(player) && lobby.gameStatus == 1 && lobby.Fugitives.Contains(target) && target.IsInVehicle && !player.IsInVehicle)
             {
-                if (lobby.GameProgress < 25)
-                {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot dragout at the start of the game!");
-                    return;
-                }
-                if (lobby.Cops.Contains(player) && lobby.gameStatus == 1 && lobby.Fugitives.Contains(target) && target.IsInVehicle && !player.IsInVehicle)
-                {
-                    isACop = true;
-                }
+                isACop = true;
             }
+            
 
             if (!isACop)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a cop or the target cannot be dragged out right now!");
                 player.SendChatMessage("!{#AFAFAF}[HINT] You can use /dragout (target) to drag out a specific player.");
                 player.SendChatMessage("!{#AFAFAF}[HINT] Entering /dragout without any parameters will attempt to drag out the nearest fugitive.");
+                return;
+            }
+
+            if (lobby.GameProgress < 25)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot dragout at the start of the game!");
                 return;
             }
 
