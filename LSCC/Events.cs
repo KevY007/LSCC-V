@@ -1483,20 +1483,57 @@ namespace LSCC
         [RemoteEvent("RequestLobbySwitch")]
         public void OnRequestLobbySwitch(Player player, int lobbyID, string password)
         {
-            if (password.Length > 1)
-                Commands.cmd_switchlobby(player, $"{lobbyID} {password}");
+            if (player.GetSharedData<int>("InLobby") == lobbyID)
+            {
+                Commands.cmd_lobby(player);
+            }
             else
-                Commands.cmd_switchlobby(player, $"{lobbyID}");
+            {
+                if (password.Length > 1)
+                    Commands.cmd_switchlobby(player, $"{lobbyID} {password}");
+                else
+                    Commands.cmd_switchlobby(player, $"{lobbyID}");
+            }
 
             player.TriggerEvent("UpdateMenuLobbies", NAPI.Util.ToJson(Menu_LobbiesData(player)));
+            player.TriggerEvent("UpdateMenuArenas", NAPI.Util.ToJson(Menu_ArenasData(player)));
         }
 
         [RemoteEvent("RequestDMJoin")]
         public void OnRequestDMJoin(Player player, int dmID)
         {
-            Commands.cmd_dm(player, dmID);
+            if (!player.HasData("LastLobbySwitch"))
+            {
+                player.SetData<long>("LastLobbySwitch", Environment.TickCount64);
+            }
+            else
+            {
+                if (Environment.TickCount64 - player.GetData<long>("LastLobbySwitch") < 1000)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot switch minigames that fast.");
+                    EPlayer.Notify(player, "Please don't repeatedly join minigames.", "red", "fas fa-lock", false, 1000, false);
+                    return;
+                }
+            }
 
+
+            if (dmID == -3)
+            {
+                Commands.cmd_freeroam(player);
+            }
+            else if(dmID == -4)
+            {
+                Commands.cmd_derby(player);
+            }
+            else if(dmID == -999)
+            {
+                Commands.cmd_lobby(player);
+            }
+            else Commands.cmd_dm(player, dmID);
+
+            player.TriggerEvent("UpdateMenuLobbies", NAPI.Util.ToJson(Menu_LobbiesData(player)));
             player.TriggerEvent("UpdateMenuArenas", NAPI.Util.ToJson(Menu_ArenasData(player)));
+            player.SetData<long>("LastLobbySwitch", Environment.TickCount64);
         }
 
         public List<object[]> Menu_LobbiesData(Player player)
@@ -1528,29 +1565,46 @@ namespace LSCC
         {
             // DM Arena Data
             string[] dmBgs = {
-                   "https://live.staticflickr.com/7526/16232917915_3ef3d4ab4d_b.jpg"
+                   "package://Artwork/DM1.jpg",
+                   "package://Artwork/DM2.jpg",
                 };
 
             List<object[]> dmItems = new List<object[]>();
 
+            // ID, Name, Background, Players, MaxPlayers, Gamemode/Desc
+
+            dmItems.Add(new object[]
+            {
+                -3, "Freeroam", "package://Artwork/Freeroam.png",
+                Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == -3), 1000, "Enter a world with no limits"
+            });
+
+
+            dmItems.Add(new object[]
+            {
+                -4, "Derby", "package://Artwork/Derby.jpg",
+                Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == -4), 1000, "Longest alive till end wins"
+            });
+
+
             int lobby = player.GetSharedData<int>("InLobby");
+            int dmArena = player.GetSharedData<int>("InDM");
+
             if (lobby <= -1)
             {
                 dmItems.Add(new object[]
                 {
-                    666, "Not Available", dmBgs[0], 0, 0, "You must be in a copchase lobby to see and join arenas."
+                    666, "Not Available", dmBgs[0], 0, 0, "You must be in a copchase lobby to see and join DM arenas!"
                 });
             }
             else
             {
-                // ID, Name, Background, Players, MaxPlayers, Gamemode/Desc
-
                 for (int i = 0; i < Settings.DMNames.Length; i++)
                 {
                     dmItems.Add(new object[]
                     {
                         i,
-                        Settings.DMNames[i],
+                        "DM: " + Settings.DMNames[i],
                         dmBgs[new Random().Next(dmBgs.Length)],
                         Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == i),
                         7 + (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")) / 3),
@@ -1558,7 +1612,16 @@ namespace LSCC
                     });
                 }          
             }
-           
+
+            if (dmArena >= 0 || lobby < 0)
+            {
+                dmItems.Add(new object[]
+                {
+                    -999, "Lobby", "package://Artwork/ExitMinigame.jpg",
+                    0, 1, "Return to lobby"
+                });
+            }
+
             return dmItems;
         }
 

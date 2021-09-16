@@ -2932,14 +2932,28 @@ namespace LSCC
         }
 
         [Command("lobby")]
-        public void cmd_lobby(Player player)
+        public static void cmd_lobby(Player player)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
 
             if (player.GetSharedData<int>("InLobby") == -5) return;
 
-            if(player.HasData("Spectating"))
+            if (!player.HasData("LastLobbySwitch"))
+            {
+                player.SetData<long>("LastLobbySwitch", Environment.TickCount64);
+            }
+            else
+            {
+                if (Environment.TickCount64 - player.GetData<long>("LastLobbySwitch") < 1000)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot enter lobbies that fast.");
+                    EPlayer.Notify(player, "Please don't repeatedly join lobby.", "red", "fas fa-lock", false, 1000, false);
+                    return;
+                }
+            }
+
+            if (player.HasData("Spectating"))
             {
                 cmd_specoff(player);
             }
@@ -2952,7 +2966,11 @@ namespace LSCC
                 player.ResetData("DerbyVehicle");
             }
 
-            if(player.Health == 0 || player.Dead) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are respawning!"); return; }
+            if(player.Health == 0 || player.Dead) { 
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are respawning!"); 
+                EPlayer.Notify(player, "Please wait to respawn.", "red", "fas fa-ban", false, 1000, false);
+                return;
+            }
 
             List<Vehicle> freeroamVehs = new List<Vehicle>();
             freeroamVehs = player.GetData<List<Vehicle>>("FreeroamVehicles");
@@ -3001,7 +3019,8 @@ namespace LSCC
 
             player.SendChatMessage($"!{{#FFFF00}}[!] Sending you to !{{#FF6347}}LOBBY.");
             EPlayer.Spawn(player);
-
+            EPlayer.Notify(player, $"Joined <strong>Lobby</strong>", "blue", "fas fa-users", false, 1000, false);
+            player.SetData<long>("LastLobbySwitch", Environment.TickCount64);
             return;
         }
 
@@ -3160,10 +3179,10 @@ namespace LSCC
             }
 
             player.SetData("LastLobbySwitch", Environment.TickCount64);
-            foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid))
+            foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && a.Id != player.Id))
             {
                 //targ.SendChatMessage($"[Lobby {lobbyid}] {player.Name} has joined this lobby.");
-                EPlayer.Notify(player, $"<strong>{player.Name}</strong> joined the lobby", "blue", "fas fa-user-plus", false, 1000);
+                EPlayer.Notify(targ, $"<strong>{player.Name}</strong> joined the lobby", "blue", "fas fa-user-plus", false, 1000);
             }
 
             player.SetSharedData("InLobby", lobbyid);
@@ -3269,14 +3288,15 @@ namespace LSCC
         }
 
         [Command("freeroam")]
-        public void cmd_freeroam(Player player)
+        public static void cmd_freeroam(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return;
             if (EPlayer.GetAccount(player).JailTime > 0) return;
 
             if (player.GetSharedData<int>("Team") != -1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase!");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in a copchase!");
+                EPlayer.Notify(player, "You are currently in a copchase!", "red", "fas fa-ban", false, 1000, false);
                 return;
             }
 
@@ -3289,12 +3309,14 @@ namespace LSCC
                     if (elobby.gameStatus == 2)
                     {
                         player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into freeroam while the match is starting!");
+                        EPlayer.Notify(player, "You cannot go into freeroam while copchase is starting!", "red", "fas fa-ban", false, 1000, false);
                         return;
                     }
 
                     if (elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
                     {
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into DM while in the copchase! (/lobby)");
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into freeroam while in the copchase! (/lobby)");
+                        EPlayer.Notify(player, "You are currently in a copchase!", "red", "fas fa-ban", false, 1000, false);
                         return;
                     }
                 }
@@ -3304,14 +3326,12 @@ namespace LSCC
             player.SetSharedData("InLobby", -3); 
             EPlayer.Spawn(player, false, new Vector3(1061.547f, -720.113f, 56.786f));
             player.SendChatMessage($"!{{#FFFF00}}[!] Sending you to !{{#FF6347}}FREEROAM");
-
-
-
+            EPlayer.Notify(player, $"Joined <strong>Freeroam</strong>", "blue", "fas fa-check", false, 1000, false);
             return;
         }
 
         [Command("derby")]
-        public void cmd_derby(Player player)
+        public static void cmd_derby(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return;
             if (EPlayer.GetAccount(player).JailTime > 0) return;
@@ -3319,6 +3339,7 @@ namespace LSCC
             if (player.GetSharedData<int>("Team") != -1)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase!");
+                EPlayer.Notify(player, "You are currently in a copchase!", "red", "fas fa-ban", false, 1000, false);
                 return;
             }
 
@@ -3330,6 +3351,7 @@ namespace LSCC
                 if (elobby.gameStatus == 2)
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into derby while the match is starting!");
+                    EPlayer.Notify(player, "You cannot join derby while the copchase is starting!", "red", "fas fa-ban", false, 1000, false);
                     return;
                 }
             }
@@ -3349,7 +3371,7 @@ namespace LSCC
 
             player.SendChatMessage($"!{{#FFFF00}}[!] Sending you to !{{#FF6347}}DERBY");
             EPlayer.Spawn(player, false, ((Vector3)Settings.DerbySpawns[0, 0]).Around(2.0f));
-
+            EPlayer.Notify(player, $"Joined <strong>Derby</strong>", "blue", "fas fa-check", false, 1000, false);
             return;
         }
 

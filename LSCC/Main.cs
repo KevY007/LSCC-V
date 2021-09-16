@@ -180,11 +180,7 @@ namespace LSCC
             Password = "";
 
             string[] lobbyBgs = {
-                    "https://live.staticflickr.com/7526/16232917915_3ef3d4ab4d_b.jpg",
-                    "https://wallpapercave.com/wp/wp4501529.jpg",
-                    "https://wallpapers-hub.art/wallpaper-images/192181.jpg",
-                    "https://c4.wallpaperflare.com/wallpaper/519/763/782/gta-5-background-desktop-wallpaper-preview.jpg",
-                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaX9re0Ofp-nbJHKtv0FyaKlz5KQsOeP9doxhHDwCrEYkdpV8FDWKIo_gLqVc4JNGDHHs&usqp=CAU"
+                    "package://Artwork/CC1.jpg",
                 };
 
             Background = lobbyBgs[new Random().Next(lobbyBgs.Length)];
@@ -381,7 +377,7 @@ namespace LSCC
         public static string[] DMNames = new string[]
         {
             "Life Invader Office",
-            "Warehouse (Pistol)",
+            "Warehouse (Pistol Only)",
             "Tennis Court",
             "Construction Site",
             "Mile High Club",
