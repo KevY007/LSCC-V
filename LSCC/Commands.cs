@@ -3781,6 +3781,15 @@ namespace LSCC
             return;
         }
 
+        [Command("testkill")]
+        public void testkill(Player player)
+        {
+            EPlayer.SetColor(player, new Color(new Random().Next(255), new Random().Next(255), new Random().Next(255)));
+            player.SendChatMessage($"{EPlayer.HexConverter(EPlayer.GetColor(player))} | {EPlayer.GetColor(player).Red}, {EPlayer.GetColor(player).Green}, {EPlayer.GetColor(player).Blue}");
+            player.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell down");
+
+        }
+
         [Command("bancheck", "!{#AFAFAF}[USAGE] bancheck (target name or ban id)", GreedyArg = true)]
         public void cmd_bancheck(Player player, string sqlorname)
         {

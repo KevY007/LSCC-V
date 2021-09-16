@@ -583,7 +583,7 @@ namespace LSCC
                 {
                     foreach (Player inderby in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
                     {
-                        inderby.TriggerEvent("pushToKillFeed2", player.Name, "#000", "Fell down");
+                        inderby.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell down");
                     }
                 }
                 player.SetSharedData("DerbyTime", 0);
@@ -605,11 +605,11 @@ namespace LSCC
                             {
                                 if (reasonStr == null)
                                 {
-                                    indm.TriggerEvent("pushToKillFeed2", player.Name, "#000", "Fell");
+                                    indm.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell");
                                 }
                                 else
                                 {
-                                    indm.TriggerEvent("pushToKillFeed2", player.Name, "#000", reasonStr);
+                                    indm.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
                                 }
                             }
                             EPlayer.GetAccount(killer).Kills++;
@@ -790,30 +790,30 @@ namespace LSCC
                                     {
                                         if (reasonStr == null)
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", killer.Name, "#6248F0", "killed", player.Name, "#B65149");
+                                            ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "killed", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
                                         }
                                         else
                                         {
                                             if (reason == 696988)
                                             {
-                                                ay.TriggerEvent("pushToKillFeed", killer.Name, "#6248F0", "arrested", player.Name, "#B65149");
+                                                ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "arrested", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
                                             }
                                             else if (reason == 696989)
                                             {
-                                                ay.TriggerEvent("pushToKillFeed", killer.Name, "#6248F0", "busted", player.Name, "#B65149");
+                                                ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "busted", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
                                             }
-                                            else ay.TriggerEvent("pushToKillFeed", killer.Name, "#6248F0", reasonStr, player.Name, "#B65149");
+                                            else ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
                                         }
                                     }
                                     else
                                     {
                                         if (reasonStr == null)
                                         {
-                                            ay.TriggerEvent("pushToKillFeed2", player.Name, "#000", "Fell");
+                                            ay.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell");
                                         }
                                         else
                                         {
-                                            ay.TriggerEvent("pushToKillFeed2", player.Name, "#000", reasonStr);
+                                            ay.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), reasonStr);
                                         }
                                     }
                                 }
@@ -846,22 +846,22 @@ namespace LSCC
                                     {
                                         if (reasonStr == null)
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", killer.Name, "#B65149", "killed", player.Name, "#6248F0");
+                                            ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "killed", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
                                         }
                                         else
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", killer.Name, "#B65149", reasonStr, player.Name, "#6248F0");
+                                            ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
                                         }
                                     }
                                     else
                                     {
                                         if (reasonStr == null)
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", player.Name, "#6248F0", "died", "", "#00000000");
+                                            ay.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell");
                                         }
                                         else
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", player.Name, "#6248F0", reasonStr, "", "#00000000");
+                                            ay.TriggerEvent("pushToKillFee2d", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), reasonStr);
                                         }
                                     }
                                 }
@@ -1483,6 +1483,8 @@ namespace LSCC
         [RemoteEvent("RequestLobbySwitch")]
         public void OnRequestLobbySwitch(Player player, int lobbyID, string password)
         {
+            if (!EPlayer.LoggedIn(player)) return;
+
             if (player.GetSharedData<int>("InLobby") == lobbyID)
             {
                 Commands.cmd_lobby(player);
@@ -1495,13 +1497,15 @@ namespace LSCC
                     Commands.cmd_switchlobby(player, $"{lobbyID}");
             }
 
-            player.TriggerEvent("UpdateMenuLobbies", NAPI.Util.ToJson(Menu_LobbiesData(player)));
-            player.TriggerEvent("UpdateMenuArenas", NAPI.Util.ToJson(Menu_ArenasData(player)));
+            player.TriggerEvent("UpdateMenuLobbies", NAPI.Util.ToJson(Menu_LobbiesData(player)), player.GetSharedData<int>("InLobby"));
+            player.TriggerEvent("UpdateMenuMinigames", NAPI.Util.ToJson(Menu_MinigamesData(player)), (player.GetSharedData<int>("InLobby") < 0) ? player.GetSharedData<int>("InLobby") : player.GetSharedData<int>("InDM"));
         }
 
-        [RemoteEvent("RequestDMJoin")]
-        public void OnRequestDMJoin(Player player, int dmID)
+        [RemoteEvent("RequestMinigameJoin")]
+        public void OnRequestMinigameJoin(Player player, int dmID)
         {
+            if (!EPlayer.LoggedIn(player)) return;
+
             if (!player.HasData("LastLobbySwitch"))
             {
                 player.SetData<long>("LastLobbySwitch", Environment.TickCount64);
@@ -1521,23 +1525,36 @@ namespace LSCC
             {
                 Commands.cmd_freeroam(player);
             }
-            else if(dmID == -4)
+            else if (dmID == -4)
             {
                 Commands.cmd_derby(player);
             }
-            else if(dmID == -999)
+            else if (dmID == -999)
             {
                 Commands.cmd_lobby(player);
             }
-            else Commands.cmd_dm(player, dmID);
+            else
+            {
+                if (player.HasData("DMLobbySkipID"))
+                {
+                    int skipToLobby = player.GetData<int>("DMLobbySkipID");
+                    player.ResetData("DMLobbySkipID");
+                    Commands.cmd_switchlobby(player, $"{skipToLobby}");
+                    player.SetData("AutoJoin", false);
+                }
 
-            player.TriggerEvent("UpdateMenuLobbies", NAPI.Util.ToJson(Menu_LobbiesData(player)));
-            player.TriggerEvent("UpdateMenuArenas", NAPI.Util.ToJson(Menu_ArenasData(player)));
+                Commands.cmd_dm(player, dmID);
+            }
+
+            player.TriggerEvent("UpdateMenuLobbies", NAPI.Util.ToJson(Menu_LobbiesData(player)), player.GetSharedData<int>("InLobby"));
+            player.TriggerEvent("UpdateMenuMinigames", NAPI.Util.ToJson(Menu_MinigamesData(player)), (player.GetSharedData<int>("InLobby") < 0) ? player.GetSharedData<int>("InLobby") : player.GetSharedData<int>("InDM"));
             player.SetData<long>("LastLobbySwitch", Environment.TickCount64);
         }
 
         public List<object[]> Menu_LobbiesData(Player player)
         {
+            if (!EPlayer.LoggedIn(player)) return new List<object[]>();
+
             // Lobby Data
 
             List<object[]> lobbyItems = new List<object[]>();
@@ -1561,8 +1578,10 @@ namespace LSCC
             return lobbyItems;
         }
 
-        public List<object[]> Menu_ArenasData(Player player)
+        public List<object[]> Menu_MinigamesData(Player player, int lobbyOverride = 0)
         {
+            if (!EPlayer.LoggedIn(player)) return new List<object[]>();
+
             // DM Arena Data
             string[] dmBgs = {
                    "package://Artwork/DM1.jpg",
@@ -1576,26 +1595,37 @@ namespace LSCC
             dmItems.Add(new object[]
             {
                 -3, "Freeroam", "package://Artwork/Freeroam.png",
-                Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == -3), 1000, "Enter a world with no limits"
+                Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == -3), 1000, "", "Enter a world with no limits"
             });
 
 
             dmItems.Add(new object[]
             {
                 -4, "Derby", "package://Artwork/Derby.jpg",
-                Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == -4), 1000, "Longest alive till end wins"
+                Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == -4), 1000, "", "Longest alive till end wins"
             });
 
 
             int lobby = player.GetSharedData<int>("InLobby");
             int dmArena = player.GetSharedData<int>("InDM");
 
+            if (lobbyOverride != 0) lobby = lobbyOverride;
+
             if (lobby <= -1)
             {
-                dmItems.Add(new object[]
+                var lobbies = Settings.Lobbies.Where(a => a.Enabled && a.Password.Length < 2 && Settings.LoggedInPlayers.Count(b => b.GetSharedData<int>("InLobby") == a.lobbyId) < Settings.Dynamics.MaxInLobby).OrderByDescending(l => Settings.LoggedInPlayers.Count(b => b.GetSharedData<int>("InLobby") == l.lobbyId));
+                if (lobbies.Count() > 0)
                 {
-                    666, "Not Available", dmBgs[0], 0, 0, "You must be in a copchase lobby to see and join DM arenas!"
-                });
+                    player.SetData("DMLobbySkipID", lobbies.First().lobbyId);
+                    return Menu_MinigamesData(player, lobbies.First().lobbyId);
+                }
+                else
+                {
+                    dmItems.Add(new object[]
+                    {
+                        666, "Not Available", dmBgs[0], 0, 0, "", "You must be in a copchase lobby to see and join DM arenas!"
+                    });
+                }
             }
             else
             {
@@ -1604,21 +1634,22 @@ namespace LSCC
                     dmItems.Add(new object[]
                     {
                         i,
-                        "DM: " + Settings.DMNames[i],
+                        Regex.Replace(Regex.Replace(Settings.DMNames[i], @"\(.*\)", ""), @"\s+", " "),
                         dmBgs[new Random().Next(dmBgs.Length)],
                         Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == i),
                         7 + (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")) / 3),
-                        "",
+                        "DM",
+                        Settings.DMNames[i].Contains('(') ? Settings.DMNames[i].Split('(', ')')[1] : "",
                     });
                 }          
             }
 
-            if (dmArena >= 0 || lobby < 0)
+            if (dmArena >= 0 || player.GetSharedData<int>("InLobby") < 0)
             {
                 dmItems.Add(new object[]
                 {
                     -999, "Lobby", "package://Artwork/ExitMinigame.jpg",
-                    0, 1, "Return to lobby"
+                    0, 1, "Return to lobby", ""
                 });
             }
 
@@ -1627,8 +1658,9 @@ namespace LSCC
 
         public List<object[]> Menu_VehicleData(Player player)
         {
+            if (!EPlayer.LoggedIn(player)) return new List<object[]>();
             // Vehicle Data
-           
+
 
             List<object[]> vehItems = new List<object[]>();
 
@@ -1639,11 +1671,13 @@ namespace LSCC
         [RemoteEvent("OnToggleMenu")]
         public void OnPlayerToggleMenu(Player player, bool status)
         {
+            if (!EPlayer.LoggedIn(player)) return;
+
             if(status == true) // OPEN: Update lobby data and everything else.
             {
-                player.TriggerEvent("UpdateMenuArenas", NAPI.Util.ToJson(Menu_ArenasData(player)));
-                player.TriggerEvent("UpdateMenuLobbies", NAPI.Util.ToJson(Menu_LobbiesData(player)));
-                player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(Menu_VehicleData(player)));
+                player.TriggerEvent("UpdateMenuLobbies", NAPI.Util.ToJson(Menu_LobbiesData(player)), player.GetSharedData<int>("InLobby"));
+                player.TriggerEvent("UpdateMenuMinigames", NAPI.Util.ToJson(Menu_MinigamesData(player)), (player.GetSharedData<int>("InLobby") < 0) ? player.GetSharedData<int>("InLobby") : player.GetSharedData<int>("InDM"));
+                player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(Menu_VehicleData(player)), EPlayer.GetAccount(player).CarCop, EPlayer.GetAccount(player).CarFugitive);
             }
             else // CLOSE: Anything you want when menu gets closed.
             {

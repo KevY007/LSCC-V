@@ -49,23 +49,25 @@ mp.events.add("PutPlayerInLobby", (lobbyID, password) => {
     mp.events.callRemote("RequestLobbySwitch", lobbyID, password);
 });
 
-mp.events.add("RequestJoinDM", (dmID) => {
-    mp.events.callRemote("RequestDMJoin", dmID);
+mp.events.add("RequestJoinMinigame", (ID) => {
+    mp.events.callRemote("RequestMinigameJoin", ID);
 });
 
-mp.events.add("UpdateMenuArenas", (arenas) => {
-    UIMenu.execute(`gm.$refs.mainMenu.$refs.dmarenas.arenas = [];`);
+mp.events.add("UpdateMenuMinigames", (arenas, currentMinigame) => {
+    UIMenu.execute(`gm.$refs.mainMenu.$refs.minigames.games = [];`);
+    UIMenu.execute(`gm.$refs.mainMenu.$refs.minigames.currentMinigame = ${currentMinigame};`);
     
     let menuItems = JSON.parse(arenas);
     for(let i = 0; i < menuItems.length; i++)
     {
-        let insertString = `gm.$refs.mainMenu.$refs.dmarenas.arenas.push({`;
+        let insertString = `gm.$refs.mainMenu.$refs.minigames.games.push({`;
         insertString += `"id": ${menuItems[i][0]}, `;
         insertString += `"name": "${menuItems[i][1]}", `;
         insertString += `"background": "${menuItems[i][2]}", `;
         insertString += `"players": ${menuItems[i][3]}, `;
-        insertString += `"maxplayers": ${menuItems[i][4]}`;
-        if(menuItems[i][5].length > 1) insertString += `, "gamemode": "${menuItems[i][5]}"`;
+        insertString += `"maxplayers": ${menuItems[i][4]}, `;
+        if(menuItems[i][5].length > 1) insertString += `"gamemode": "${menuItems[i][5]}", `;
+        if(menuItems[i][6].length > 1) insertString += `"description": "${menuItems[i][6]}", `;
         
         insertString += "});";
 
@@ -73,12 +75,16 @@ mp.events.add("UpdateMenuArenas", (arenas) => {
     }
 });
 
-mp.events.add("UpdateMenuVehicles", (vehicles) => {
+mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) => {
     UIMenu.execute(`gm.$refs.mainMenu.$refs.vehicles.$refs.police.vehicles = [];`);
+    UIMenu.execute(`gm.$refs.mainMenu.$refs.vehicles.$refs.fugitive.vehicles = [];`);
+    UIMenu.execute(`gm.$refs.mainMenu.$refs.vehicles.$refs.police.selectedModel = "${currentCopCar}";`);
+    UIMenu.execute(`gm.$refs.mainMenu.$refs.vehicles.$refs.fugitive.selectedModel = "${currentFugiCar}";`);
 });
 
-mp.events.add("UpdateMenuLobbies", (lobbies) => {
+mp.events.add("UpdateMenuLobbies", (lobbies, currentLobby) => {
     UIMenu.execute(`gm.$refs.mainMenu.$refs.lobbies.lobbies = [];`);
+    UIMenu.execute(`gm.$refs.mainMenu.$refs.lobbies.currentLobby = ${currentLobby};`);
 
     // Lobby Data
     // ID, Name, Background, Gamemode, Password, Players, MaxPlayers, Description

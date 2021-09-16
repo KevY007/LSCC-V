@@ -1036,6 +1036,19 @@ namespace LSCC
             }
         }
 
+        public static Color GetColor(Player player)
+        {
+            return new Color(
+                player.GetSharedData<int>("Color_R"), 
+                player.GetSharedData<int>("Color_G"),
+                player.GetSharedData<int>("Color_B"));
+        }
+
+        public static String HexConverter(Color c)
+        {
+            return "#" + c.Red.ToString("X2") + c.Green.ToString("X2") + c.Blue.ToString("X2");
+        }
+
         public static bool LoggedIn(Player player)
         {
             if (player == null) return false;
