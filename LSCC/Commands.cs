@@ -727,7 +727,7 @@ namespace LSCC
             }
             if(targetPlayer == null)
             {
-                Account targetAcc = ContextFactory.Instance.Accounts.FirstOrDefault(t => t.Username == targetName);
+                Account targetAcc = ContextFactory.Instance.Accounts.ToList().Find(t => t.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
                 if (targetAcc == null)
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}A player with that username could not be found in the database!");
@@ -1271,6 +1271,11 @@ namespace LSCC
         public void cmd_cuff(Player player, Player target = null)
         {
             LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+            if(lobby == null)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in a copchase lobby!");
+                return;
+            }
 
             float nearest = 9999.0f;
             if (target == null)
@@ -1288,6 +1293,11 @@ namespace LSCC
             bool isACop = false;
             if (lobby != null)
             {
+                if (lobby.GameProgress < 25)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot cuff right at the start of the game!");
+                    return;
+                }
                 if (lobby.Cops.Contains(player) && lobby.gameStatus == 1 && lobby.Fugitives.Contains(target) && !target.HasData("Cuffed"))
                 {
                     isACop = true;
@@ -1401,6 +1411,11 @@ namespace LSCC
         public void cmd_dragout(Player player, Player target = null)
         {
             LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+            if(lobby == null)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in a copchase lobby!");
+                return;
+            }
 
             float nearest = 9999.0f;
             if (target == null)
@@ -1418,6 +1433,11 @@ namespace LSCC
             bool isACop = false;
             if (lobby != null)
             {
+                if (lobby.GameProgress < 25)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot dragout at the start of the game!");
+                    return;
+                }
                 if (lobby.Cops.Contains(player) && lobby.gameStatus == 1 && lobby.Fugitives.Contains(target) && target.IsInVehicle && !player.IsInVehicle)
                 {
                     isACop = true;
@@ -3738,15 +3758,6 @@ namespace LSCC
             return;
         }
 
-        [Command("testkill")]
-        public void testkill(Player player)
-        {
-            EPlayer.SetColor(player, new Color(new Random().Next(255), new Random().Next(255), new Random().Next(255)));
-            player.SendChatMessage($"{EPlayer.HexConverter(EPlayer.GetColor(player))} | {EPlayer.GetColor(player).Red}, {EPlayer.GetColor(player).Green}, {EPlayer.GetColor(player).Blue}");
-            player.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell down");
-
-        }
-
         [Command("bancheck", "!{#AFAFAF}[USAGE] bancheck (target name or ban id)", GreedyArg = true)]
         public void cmd_bancheck(Player player, string sqlorname)
         {
@@ -3903,7 +3914,7 @@ namespace LSCC
                 return;
             }
 
-            Player target = RAGE.Entities.Players.All.FirstOrDefault(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
+            Player target = RAGE.Entities.Players.All.Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
             if(target != null)
             {
                 target.SendChatMessage("!{#FF6347} Reconnect with your new name: !{#FFFFFF}" + newname);
@@ -3964,7 +3975,7 @@ namespace LSCC
                 return;
             }
 
-            Player target = RAGE.Entities.Players.All.FirstOrDefault(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
+            Player target = RAGE.Entities.Players.All.Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
             if (target != null)
             {
                 target.SendChatMessage("!{#FF6347} Your password has been changed to: !{#FFFFFF}" + newpass);
@@ -4490,7 +4501,7 @@ namespace LSCC
 
             try
             {
-                mapBruh = ContextFactory.Instance.Maps.First(a => (Int32.TryParse(map, out mapID) && mapID == a.SQL_ID) || a.Name.Contains(map, StringComparison.OrdinalIgnoreCase));
+                mapBruh = ContextFactory.Instance.Maps.ToList().Find(a => (Int32.TryParse(map, out mapID) && mapID == a.SQL_ID) || a.Name.Contains(map, StringComparison.OrdinalIgnoreCase));
             } catch { }
             
             if (mapBruh == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}No map with that name/ID found."); return; }
@@ -4543,7 +4554,7 @@ namespace LSCC
 
             try
             {
-                mapBruh = ContextFactory.Instance.Maps.First(a => (Int32.TryParse(map, out mapID) && mapID == a.SQL_ID) || a.Name.Contains(map, StringComparison.OrdinalIgnoreCase));
+                mapBruh = ContextFactory.Instance.Maps.ToList().Find(a => (Int32.TryParse(map, out mapID) && mapID == a.SQL_ID) || a.Name.Contains(map, StringComparison.OrdinalIgnoreCase));
             }
             catch { }
 
@@ -4637,7 +4648,7 @@ namespace LSCC
             }
             int langID = -1;
 
-            Language lang = ContextFactory.Instance.Languages.FirstOrDefault(l => l.LanguageName == language);
+            Language lang = ContextFactory.Instance.Languages.ToList().Find(l => l.LanguageName == language);
             if (lang == null)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}A language with that ID could not be found. Use !{#FFFF00}/languages!{#FFFFFF}.");
@@ -4669,7 +4680,7 @@ namespace LSCC
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
-            if (ContextFactory.Instance.Languages.FirstOrDefault(lang => lang.LanguageName == language) != null)
+            if (ContextFactory.Instance.Languages.ToList().Find(lang => lang.LanguageName == language) != null)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That language is already added!");
                 return;
@@ -4711,7 +4722,7 @@ namespace LSCC
 
             int langID = -1;
 
-            Language lang = ContextFactory.Instance.Languages.FirstOrDefault(l => l.LanguageName == language);
+            Language lang = ContextFactory.Instance.Languages.ToList().Find(l => l.LanguageName == language);
             if(lang == null)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}A language with that ID could not be found. Use !{#FFFF00}/languages!{#FFFFFF}.");
@@ -4820,7 +4831,7 @@ namespace LSCC
                 return;
             }
 
-            Account _target = ContextFactory.Instance.Accounts.FirstOrDefault(t => t.Username.Equals(target, StringComparison.OrdinalIgnoreCase));
+            Account _target = ContextFactory.Instance.Accounts.ToList().Find(t => t.Username.Equals(target, StringComparison.OrdinalIgnoreCase));
             if(_target == null)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}A player with that username could not be found!");
@@ -4977,7 +4988,7 @@ namespace LSCC
             if (team.Contains("0")) teamID = 0;
             if (team.Contains("1")) teamID = 1;
 
-            Map bruh = ContextFactory.Instance.Maps.First(map => map.SQL_ID == lobby.lastMapId);
+            Map bruh = ContextFactory.Instance.Maps.ToList().Find(map => map.SQL_ID == lobby.lastMapId);
 
             if (bruh == null)
             {
@@ -4996,7 +5007,7 @@ namespace LSCC
                 else if (lobby.gameMode == GameModes.BUSTED)
                     target.TriggerEvent("showHPBars", 3);
 
-                MapSpawn spawn = ContextFactory.Instance.MapSpawns.FirstOrDefault(b => b.spawnTeam == teamID);
+                MapSpawn spawn = ContextFactory.Instance.MapSpawns.ToList().Find(b => b.spawnTeam == teamID);
 
                 if(teamID == 0)
                 {
@@ -5235,7 +5246,7 @@ namespace LSCC
                 return;
             }
 
-            Map map = ContextFactory.Instance.Maps.FirstOrDefault(a => a.SQL_ID == mapid);
+            Map map = ContextFactory.Instance.Maps.ToList().Find(a => a.SQL_ID == mapid);
             if (map == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}No map with this ID exists."); return; }
 
             if (teamid > 2) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Valid TeamID's are 0 (fugitive), 1 (cop) or 2 (cop maverick)."); return; }
@@ -5287,7 +5298,7 @@ namespace LSCC
                 return;
             }
 
-            Map map = ContextFactory.Instance.Maps.FirstOrDefault(a => a.Name == mapname);
+            Map map = ContextFactory.Instance.Maps.ToList().Find(a => a.Name == mapname);
             if (map == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}No map with this name exists."); return; }
 
 
@@ -7206,7 +7217,7 @@ namespace LSCC
 
             if (Settings.Requests.Count(r => r.RequestID == requestid) < 1) { player.SendChatMessage("!{#FF6347}No request with that ID, see /requests."); return; }
 
-            RequestData req = Settings.Requests.First(a => a.RequestID == requestid);
+            RequestData req = Settings.Requests.ToList().Find(a => a.RequestID == requestid);
 
             if (req.RequestType == 0)
             {
@@ -7234,7 +7245,7 @@ namespace LSCC
 
             if (Settings.Requests.Count(r => r.RequestID == requestid) < 1) { player.SendChatMessage("!{#FF6347}No request with that ID, see /requests."); return; }
 
-            RequestData req = Settings.Requests.First(a => a.RequestID == requestid);
+            RequestData req = Settings.Requests.ToList().Find(a => a.RequestID == requestid);
 
             req.Reporter.SendChatMessage($"!{{#FF6347}}[REQUEST {requestid}] {player.Name} has denied your request, for {reason}.");
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} denied {req.Reporter.Name}'s request ID {requestid} for {reason}.");

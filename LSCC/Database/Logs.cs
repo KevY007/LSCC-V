@@ -81,7 +81,7 @@ namespace LSCC
         {
             player.SendChatMessage("REQUESTED LOGS FOR " + targetName + " TYPE " + type);
 
-            Account target = ContextFactory.Instance.Accounts.FirstOrDefault<Account>(a => a.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+            Account target = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
             if (target == null)
             {
                 return;
@@ -129,7 +129,7 @@ namespace LSCC
         [RemoteEvent("ReqLogFromSrv")]
         public static void RequestLogsFromServer(Player player, string targetName, int type)
         {
-            Account target = ContextFactory.Instance.Accounts.FirstOrDefault<Account>(a => a.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+            Account target = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
             if (target == null)
             {
                 return;
@@ -228,7 +228,7 @@ namespace LSCC
 
         public static void RemoveAdminRecord(int recordID)
         {
-            Logs_AdminRecord _rem = ContextFactory.Instance.Logs_AdminRecords.AsQueryable().FirstOrDefault(l => l.SQL_ID == recordID);
+            Logs_AdminRecord _rem = ContextFactory.Instance.Logs_AdminRecords.ToList().Find(l => l.SQL_ID == recordID);
             if (_rem == null) return;
 
             ContextFactory.Instance.Logs_AdminRecords.Remove(_rem);

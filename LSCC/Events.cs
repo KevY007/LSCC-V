@@ -986,8 +986,8 @@ namespace LSCC
             player.SetData("AccountHandle", acc);
             player.SetSharedData("pLogged", true);
 
-            if (ContextFactory.Instance.Languages.FirstOrDefault(l => l.SQL_ID == acc.Language) != null && EPlayer.GetAccount(player).Language != -1)
-                player.SetData("Language", ContextFactory.Instance.Languages.FirstOrDefault(l => l.SQL_ID == acc.Language));
+            if (ContextFactory.Instance.Languages.ToList().Find(l => l.SQL_ID == acc.Language) != null && EPlayer.GetAccount(player).Language != -1)
+                player.SetData("Language", ContextFactory.Instance.Languages.ToList().Find(l => l.SQL_ID == acc.Language));
             else
                 player.ResetData("Language");
 
@@ -1040,7 +1040,7 @@ namespace LSCC
             else
                 player.SendChatMessage($"!{{#a6a6a6}}Last session lasted !{{#c2c1b6}}{(EPlayer.GetAccount(player).LastSessionMins).ToString("N1")} minutes.");
 
-            if(ContextFactory.Instance.PlayerOutfits.FirstOrDefault(o => o.AccountID == acc.SQL_ID) == null)
+            if(ContextFactory.Instance.PlayerOutfits.ToList().Find(o => o.AccountID == acc.SQL_ID) == null)
             {
                 CharacterData[] defaultOutfits = new CharacterData[5];
                 for(int i = 0; i < 5; i++)
@@ -1182,14 +1182,14 @@ namespace LSCC
             }
             if (slot == -1) return;
 
-            string jsonReceived = ContextFactory.Instance.PlayerOutfits.FirstOrDefault(o => o.AccountID == EPlayer.GetAccount(player).SQL_ID).OutfitData;
+            string jsonReceived = ContextFactory.Instance.PlayerOutfits.ToList().Find(o => o.AccountID == EPlayer.GetAccount(player).SQL_ID).OutfitData;
 
             try
             {
                 List<CharacterData> outfits = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CharacterData>>(jsonReceived);
 
                 outfits[slot] = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-                ContextFactory.Instance.PlayerOutfits.FirstOrDefault(o => o.AccountID == EPlayer.GetAccount(player).SQL_ID).OutfitData = NAPI.Util.ToJson(outfits);
+                ContextFactory.Instance.PlayerOutfits.ToList().Find(o => o.AccountID == EPlayer.GetAccount(player).SQL_ID).OutfitData = NAPI.Util.ToJson(outfits);
 
                 ContextFactory.Instance.SaveChanges();
 
@@ -1217,7 +1217,7 @@ namespace LSCC
             {
                 try
                 {
-                    string jsonReceived = jsonReceived = ContextFactory.Instance.PlayerOutfits.FirstOrDefault(o => o.AccountID == EPlayer.GetAccount(player).SQL_ID).OutfitData;
+                    string jsonReceived = jsonReceived = ContextFactory.Instance.PlayerOutfits.ToList().Find(o => o.AccountID == EPlayer.GetAccount(player).SQL_ID).OutfitData;
 
                     List<CharacterData> outfits = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CharacterData>>(jsonReceived);
 
@@ -1452,7 +1452,7 @@ namespace LSCC
             player.SetData("LastCryptAttempt", Environment.TickCount64);
             if (username.Contains("@"))
             {
-                Account acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Email == username);
+                Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Email == username);
                 if (acc != null)
                 {
                     if (AccountManager.Login(acc, password))
@@ -1464,7 +1464,7 @@ namespace LSCC
             }
             else
             {
-                Account acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username == username);
+                Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username == username);
                 if (acc != null)
                 {
                     if (AccountManager.Login(acc, password))
@@ -1666,7 +1666,7 @@ namespace LSCC
             }
 
             Account acc = EPlayer.GetAccount(player);
-            CarData car = Settings.Cars.FirstOrDefault(a => a.Model.Equals(model, StringComparison.OrdinalIgnoreCase) && a.Team == team);
+            CarData car = Settings.Cars.ToList().Find(a => a.Model.Equals(model, StringComparison.OrdinalIgnoreCase) && a.Team == team);
 
             if (EPlayer.HasOwnedVehicle(player, model, team))
             {
@@ -2023,7 +2023,7 @@ namespace LSCC
                 return;
             }
 
-            Account acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase) == true);
+            Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase) == true);
             if (acc != null)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}An account with this name already exists!");
@@ -2032,7 +2032,7 @@ namespace LSCC
                 return;
             }
 
-            /*acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Email == email);
+            /*acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Email == email);
             if (acc != null)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}An account with this email already exists!");
@@ -2268,6 +2268,12 @@ namespace LSCC
 
                     if (target.HasData("TasedTill") && Environment.TickCount64 - (target.GetData<long>("TasedTill") - 18000) >= 2000)
                     {
+                        if (lobby.GameProgress < 25)
+                        {
+                            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot tase at the start of the round!");
+                            return;
+                        }
+
                         int time = 18000;
                         target.TriggerEvent("setToRagdoll", time, time * 2, 1, false, false, false);
                         target.SetData("TasedTill", Environment.TickCount64 + 18000);

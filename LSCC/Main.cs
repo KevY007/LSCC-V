@@ -1450,7 +1450,7 @@ namespace LSCC
                                 // trigger
                                 foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.Dynamics.DCServerID))
                                 {
-                                    var botchan = guild.TextChannels.First(a => a.Id == Settings.Dynamics.DCMentionRoleChan);
+                                    var botchan = guild.TextChannels.ToList().Find(a => a.Id == Settings.Dynamics.DCMentionRoleChan);
 
                                     if (botchan != null)
                                     {
@@ -1484,7 +1484,7 @@ namespace LSCC
 
                         foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.Dynamics.DCServerID))
                         {
-                            var botchan = guild.VoiceChannels.First(b => b.Id == Settings.Dynamics.DCCountID);
+                            var botchan = guild.VoiceChannels.ToList().Find(b => b.Id == Settings.Dynamics.DCCountID);
 
                             if (botchan != null)
                             {
@@ -1494,7 +1494,7 @@ namespace LSCC
 
                         foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.Dynamics.DCServerID))
                         {
-                            var botchan = guild.VoiceChannels.First(b => b.Id == Settings.Dynamics.DCGamesID);
+                            var botchan = guild.VoiceChannels.ToList().Find(b => b.Id == Settings.Dynamics.DCGamesID);
 
                             if (botchan != null)
                             {
@@ -1704,7 +1704,7 @@ namespace LSCC
                     crashcheck++;
 
                     Map map = mapList.OrderBy(c => Guid.NewGuid()).FirstOrDefault();
-                    if (lobby.NextMapID != -1) map = mapList.FirstOrDefault(a => a.SQL_ID == lobby.NextMapID);
+                    if (lobby.NextMapID != -1) map = mapList.Find(a => a.SQL_ID == lobby.NextMapID);
                     lobby.NextMapID = -1;
 
                     if (map == null) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Next (force-set) MapID == null; Failed to start!"); return false; }
@@ -1906,7 +1906,7 @@ namespace LSCC
                             {
                                 if (Spawns.Count(sp => sp.spawnTeam == 2) >= 1)
                                 {
-                                    spawnLoc = Spawns.OrderBy(x => new Random().Next()).First(a => a.spawnTeam == 2);
+                                    spawnLoc = Spawns.OrderBy(x => Guid.NewGuid()).First(a => a.spawnTeam == 2);
                                 }
                             }
 
