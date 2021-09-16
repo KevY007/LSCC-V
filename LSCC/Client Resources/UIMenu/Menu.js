@@ -60,27 +60,6 @@ mp.events.add("MenuChangeSettings", (id, value) => {
     mp.storage.flush();
 });
 
-mp.events.add("MenuNotify", (msg, color, icon, close, timeout) => {
-    let insertString = `iziToast.show({`;
-    insertString += `message: \`${msg}\`, `;
-    insertString += `color: "${color}", `;
-    insertString += `icon: "${icon}", `;
-    insertString += `close: ${close.toString()}, `;
-    insertString += `timeout: ${timeout},`;
-    insertString += "});";
-
-    if(UIMenu != null) UIMenu.execute(insertString);
-});
-
-mp.events.add("MenuNotify2", (title, msg) => {
-    let insertString = `iziToast.show({`;
-    insertString += `title: \`${title}\`, `;
-    insertString += `message: \`${msg}\`, `;
-    insertString += "});";
-
-    if(UIMenu != null) UIMenu.execute(insertString);
-});
-
 mp.events.add("PutPlayerInLobby", (lobbyID, password) => {
     mp.events.callRemote("RequestLobbySwitch", lobbyID, password);
 });

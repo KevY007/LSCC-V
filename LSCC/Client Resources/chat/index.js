@@ -18,22 +18,22 @@ mp.events.add("InitiateCustomChat", () => {
                 }
                 fontsized = true;
             }
-
-            if(typeof UIMenu == "undefined" || UIMenu == null)
-            {
-                UIMenu = mp.browsers.new("package://UIMenu/index.html");
-                UIMenu.execute(`gm.mainMenu = false;`);
-                UIMenu.active = false;
-
-                mp.events.callLocal("MenuToggleTyping", false);
-            }
-            if(typeof UIHud == "undefined" || UIHud == null)
-            {
-                UIHud = mp.browsers.new("package://UIHud/index.html");
-                UIHud.execute(`gm.hud = false;`);
-                UIHud.execute(`gm.topRightInfo = ${mp.storage.data.menu.topRightInfo}; gm.killFeed = ${mp.storage.data.menu.killFeed}; gm.gameProgress = ${mp.storage.data.menu.gameProgress};`);
-            }
         }, 2500);
+
+        if(typeof UIMenu == "undefined" || UIMenu == null)
+        {
+            UIMenu = mp.browsers.new("package://UIMenu/index.html");
+            UIMenu.execute(`gm.mainMenu = false;`);
+            UIMenu.active = false;
+
+            mp.events.callLocal("MenuToggleTyping", false);
+        }
+        if(typeof UIHud == "undefined" || UIHud == null)
+        {
+            UIHud = mp.browsers.new("package://UIHud/index.html");
+            UIHud.execute(`gm.hud = false;`);
+            UIHud.execute(`gm.topRightInfo = ${mp.storage.data.menu.topRightInfo}; gm.killFeed = ${mp.storage.data.menu.killFeed};`);
+        }
     }
 });
 

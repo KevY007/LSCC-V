@@ -1375,7 +1375,7 @@ namespace LSCC
                                                         player.SetSharedData("InDM", -1);
 
                                                         EPlayer.Spawn(player);
-                                                        EPlayer.Notify(player, "The round starts in 10 seconds!", "orange", "fas fa-hourglass-start", false, 3000);
+                                                        EPlayer.Notify(player, "The round is about to start!", "orange", "fas fa-hourglass-start", false, 10000, false);
 
                                                         if (player.GetSharedData<bool>("IsTabbed") == true || EPlayer.IsAFK(player)) {
 

@@ -3017,7 +3017,6 @@ namespace LSCC
 
             if(elobby == null) player.SetSharedData("InLobby", -1);
 
-            player.SendChatMessage($"!{{#FFFF00}}[!] Sending you to !{{#FF6347}}LOBBY.");
             EPlayer.Spawn(player);
             EPlayer.Notify(player, $"Joined <strong>Lobby</strong>", "blue", "fas fa-users", false, 1000, false);
             player.SetData<long>("LastLobbySwitch", Environment.TickCount64);
@@ -3280,7 +3279,6 @@ namespace LSCC
             int spawnID = new Random().Next(Settings.DMSpawns[arenaid].GetLength(0));
             Vector3 dmSpawn = (Vector3)Settings.DMSpawns[arenaid][spawnID, 0];
             EPlayer.Spawn(player, false, dmSpawn);
-            player.SendChatMessage($"[!] !{{#FFFF00}}Sending you to !{{#FF6347}}DM: {Settings.DMNames[arenaid]}."); 
             player.TriggerEvent("SetActorInvulnerable", false);
 
             EPlayer.Notify(player, $"Joined <strong>{Settings.DMNames[arenaid]}</strong>", "blue", "fas fa-users", false, 1000, false);
@@ -3325,7 +3323,6 @@ namespace LSCC
             player.SetSharedData("InDM", -1);
             player.SetSharedData("InLobby", -3); 
             EPlayer.Spawn(player, false, new Vector3(1061.547f, -720.113f, 56.786f));
-            player.SendChatMessage($"!{{#FFFF00}}[!] Sending you to !{{#FF6347}}FREEROAM");
             EPlayer.Notify(player, $"Joined <strong>Freeroam</strong>", "blue", "fas fa-check", false, 1000, false);
             return;
         }
@@ -3368,8 +3365,6 @@ namespace LSCC
             player.SetSharedData("InDM", -1);
             player.SetSharedData("InLobby", -4);
 
-
-            player.SendChatMessage($"!{{#FFFF00}}[!] Sending you to !{{#FF6347}}DERBY");
             EPlayer.Spawn(player, false, ((Vector3)Settings.DerbySpawns[0, 0]).Around(2.0f));
             EPlayer.Notify(player, $"Joined <strong>Derby</strong>", "blue", "fas fa-check", false, 1000, false);
             return;

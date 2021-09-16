@@ -170,22 +170,24 @@ mp.events.add("OneSecondEvent", () => {
     }
 });
 
-mp.events.add("HUDNotify", (msg, color, icon, close, timeout) => {
+mp.events.add("HUDNotify", (msg, color, icon, close, timeout, orientation) => {
     let insertString = `iziToast.show({`;
     insertString += `message: \`${msg}\`, `;
     insertString += `color: "${color}", `;
     insertString += `icon: "${icon}", `;
     insertString += `close: ${close.toString()}, `;
     insertString += `timeout: ${timeout},`;
+    if(orientation.length > 1) insertString += `position: \`${orientation}\`, `;
     insertString += "});";
 
     if(UIHud != null) UIHud.execute(insertString);
 });
-
-mp.events.add("HUDNotify2", (title, msg) => {
+// bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter, center
+mp.events.add("HUDNotify2", (title, msg, orientation) => {
     let insertString = `iziToast.show({`;
     insertString += `title: \`${title}\`, `;
     insertString += `message: \`${msg}\`, `;
+    if(orientation.length > 1) insertString += `position: \`${orientation}\`, `;
     insertString += "});";
 
     if(UIHud != null) UIHud.execute(insertString);

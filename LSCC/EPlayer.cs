@@ -1268,7 +1268,7 @@ namespace LSCC
 
                 foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == LobbyToBeIn))
                 {
-                    targ.SendChatMessage($"[Lobby {LobbyToBeIn}] {player.Name} has joined this lobby.");
+                    targ.SendChatMessage($"!{{#FF6347}}[Lobby {LobbyToBeIn}] !{{#A6A6A6}}{player.Name} !{{#FFFFFF}}has joined this lobby.");
                 }
             }
 
@@ -1335,15 +1335,13 @@ namespace LSCC
             Discord.SendTextChannel("staff-bot", $"(ADM) |** {message}**");
         }
 
-        public static void Notify(Player player, string title, string message, bool HUD = true)
+        public static void Notify(Player player, string title, string message, bool bottomright = true)
         {
-            if(HUD) player.TriggerEvent("HUDNotify2", title, message);
-            else player.TriggerEvent("MenuNotify2", title, message);
+            player.TriggerEvent("HUDNotify2", title, message, bottomright ? "" : "bottomCenter");
         }
-        public static void Notify(Player player, string msg, string color, string icon, bool close, int timeout, bool HUD = true)
+        public static void Notify(Player player, string msg, string color, string icon, bool close, int timeout, bool bottomright = true)
         {
-            if(HUD) player.TriggerEvent("HUDNotify", msg, color, icon, close, timeout);
-            else player.TriggerEvent("MenuNotify", msg, color, icon, close, timeout);
+            player.TriggerEvent("HUDNotify", msg, color, icon, close, timeout, bottomright ? "" : "bottomCenter");
         }
     }
 }
