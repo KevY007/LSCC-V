@@ -4896,7 +4896,7 @@ namespace LSCC
             if (EPlayer.GetAccount(player).Admin >= 4)
             {
                 player.SendChatMessage("[Admin Lv 4]: /serveroptions /grantxp /saveserver /dbgplayanim /dbgmaxspeed /dbgdriveforce");
-                player.SendChatMessage("[Admin Lv 4]: /changename /changepass");
+                player.SendChatMessage("[Admin Lv 4]: /changename /changepass /agivepoints");
             }
             if (EPlayer.GetAccount(player).Admin >= 5)
             {
