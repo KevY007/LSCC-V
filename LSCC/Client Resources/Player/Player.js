@@ -554,7 +554,7 @@ mp.events.add('render', () => {
 
                     if(UIHud != null)
                     {
-                        UIHud.execute(`gm.gameProgress = true;`);
+                        UIHud.execute(`gm.gameProgress = ${mp.storage.data.menu.gameProgress};`);
                         UIHud.execute(`gm.$refs.TopRight.$refs.GameProgress.title = "Derby Time";`);
                         UIHud.execute(`gm.$refs.TopRight.$refs.GameProgress.time = ${derbyTimeCur};`);
                     }
@@ -597,7 +597,7 @@ mp.events.add('render', () => {
                         UIHud.execute(`gm.gameProgress = false;`);
                     }
                     else {
-                        UIHud.execute(`gm.gameProgress = true;`);
+                        UIHud.execute(`gm.gameProgress = ${mp.storage.data.menu.gameProgress};`);
                         if(collisionTime > 0)
                         {
                             UIHud.execute(`gm.$refs.TopRight.$refs.GameProgress.title = "Collisions";`);

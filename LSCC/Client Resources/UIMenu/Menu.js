@@ -1,5 +1,15 @@
 menuToggled = false;
 
+if(typeof mp.storage.data.menu == "undefined")
+{
+    mp.storage.data.menu = {};
+    mp.storage.data.menu.topRightInfo = true;
+    mp.storage.data.menu.gameProgress = true;
+    mp.storage.data.menu.killFeed = true;
+
+    mp.storage.flush();
+}
+
 mp.events.add("MenuToggleTyping", (state) => {
     if(state)
     {
@@ -19,9 +29,35 @@ mp.events.add("MenuToggleTyping", (state) => {
                 mp.gui.cursor.show(menuToggled, menuToggled);
                 mp.gui.chat.activate(!menuToggled);
                 //mp.gui.chat.show(!menuToggled);
+
+                UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.topRightInfo = ${mp.storage.data.menu.topRightInfo};`);
+                UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.gameProgress = ${mp.storage.data.menu.gameProgress};`);
+                UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.killFeed = ${mp.storage.data.menu.killFeed};`);
             }
         });
     }
+});
+
+mp.events.add("MenuChangeSettings", (id, value) => {
+    if(id == 1)
+    {
+        mp.storage.data.menu.topRightInfo = value;
+    }
+    else if(id == 2)
+    {
+        mp.storage.data.menu.killFeed = value;
+    }
+    else if(id == 3)
+    {
+        mp.storage.data.menu.gameProgress = value;
+    }
+
+    if(UIHud != null)
+    {
+        UIHud.execute(`gm.topRightInfo = ${mp.storage.data.menu.topRightInfo}; gm.killFeed = ${mp.storage.data.menu.killFeed};`);
+    }
+
+    mp.storage.flush();
 });
 
 mp.events.add("MenuNotify", (msg, color, icon, close, timeout) => {

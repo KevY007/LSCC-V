@@ -30,7 +30,8 @@ mp.events.add("InitiateCustomChat", () => {
             if(typeof UIHud == "undefined" || UIHud == null)
             {
                 UIHud = mp.browsers.new("package://UIHud/index.html");
-                UIHud.execute(`gm.topRight = false;`);
+                UIHud.execute(`gm.hud = false;`);
+                UIHud.execute(`gm.topRightInfo = ${mp.storage.data.menu.topRightInfo}; gm.killFeed = ${mp.storage.data.menu.killFeed}; gm.gameProgress = ${mp.storage.data.menu.gameProgress};`);
             }
         }, 2500);
     }

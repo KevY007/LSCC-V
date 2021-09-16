@@ -116,13 +116,21 @@ mp.keys.bind(
     }
 );
 
+/*
+ gm.topRight = false;
+      topRightInfo
+      killFeed
+      gameProgress
+      hud
+      topRight
+*/
+
 mp.events.add('ToggleHud', (toggle) => {
     showHud = toggle;
     
     if(UIHud != null)
     {
-        UIHud.execute(`gm.topRight = ${toggle};`);
-        //UIHud.active = toggle;
+        UIHud.execute(`gm.hud = ${toggle};`);
     }
 
     mp.gui.chat.show(showHud);
