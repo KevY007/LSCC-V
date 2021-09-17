@@ -70,6 +70,11 @@ require("./Player/Voice.js");
 
 mp.events.add("onOpenChatbox", (toggle) =>
 {
+    if(mp.players.local.LoggedIn == undefined || mp.players.local.LoggedIn == false)
+    {
+        mp.gui.chat.activate(false);
+        return;
+    }
     chatStatus = toggle;
     lastChatToggle = Date.now();
     mp.events.callRemote("UpdateChatState", toggle);

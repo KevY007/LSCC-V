@@ -285,6 +285,15 @@ mp.keys.bind(0x4F, false, function () {
     ToggleScoreboard();
 })
 
+mp.events.add("HUDError", (msg, icon) => {
+    let insertString = `iziToast.error({`;
+    insertString += `message: \`${msg}\`, `;
+    insertString += `icon: "${icon}" `;
+    insertString += "});";
+
+    if(UIHud != null) UIHud.execute(insertString);
+});
+
 mp.events.add("HUDNotify", (msg, color, icon, close, timeout, orientation, displaymode) => {
     let insertString = `iziToast.show({`;
     insertString += `message: \`${msg}\`, `;
