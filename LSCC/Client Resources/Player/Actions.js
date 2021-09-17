@@ -99,35 +99,55 @@ let cuffTimeLeft = 5;
 cuffTarget = null;
 cuffInterval = null;
 
-mp.keys.bind(0x48 , true, function (){
-    
+function requestCuffTarget(){
     if(player.Team != 1) return;
 
     mp.events.callRemote("RequestCuffTarget");
+}
 
-});
+mp.keys.bind(0x48 , true, requestCuffTarget);
 
 mp.events.add("StopCuffing", (reason) => { stopCuffing(reason); });
 
 mp.events.add("BeginCuffing", (target) => {
 
-    if(!mp.players.exists(cuffTarget)) return;
-    if(cuffTarget.Team != 0 || player.Team != 1) return;
+    if(!mp.players.exists(target)) return;
+    if(target.Team != 0 || player.Team != 1) return;
 
     isCuffing = true;
     cuffTarget = target;
     cuffTimeLeft = 5;
 
+    mp.gui.chat.push("begincuff called for  " + cuffTarget.name);
+
     if(cuffInterval != null) clearInterval(cuffInterval);
 
     cuffInterval = setInterval(() => {
 
-        if(!mp.players.exists(cuffTarget) || !mp.players.exists(player) || cuffTarget == null) stopCuffing(0);
-        if(cuffTarget.Team != 0 ) stopCuffing(1);
-        if(player.Team != 1) stopCuffing(3);
+        mp.gui.chat.push("cuff interval " + cuffTimeLeft);
+
+        if(!mp.players.exists(cuffTarget) || !mp.players.exists(player) || cuffTarget == null) {
+            stopCuffing(0);
+            return;
+        }
+        if(cuffTarget.Team != 0 ){ 
+            stopCuffing(1);
+            return;
+        }
+        if(player.Team != 1){
+            stopCuffing(3);
+            return;
+        }
+        if(!mp.keys.isDown(72)){ 
+            stopCuffing(5);
+            return;
+        }
 
         let distance = player.position.subtract(cuffTarget.position).length();
-        if(distance > 4.0) stopCuffing(2);
+        if(distance > 4.0){
+            stopCuffing(2);
+            return;
+        }
 
         cuffTimeLeft--;
         if(cuffTimeLeft <= 0){
@@ -146,6 +166,8 @@ function stopCuffing(reason){ // if unsuccessful / force stopped
     cuffInterval = null;
     cuffTarget = null;
 
+    mp.gui.chat.push("Cuffing stopped!");
+
     switch(reason){
         case 1:
             mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Cuffing failed - the target is no longer a fugitive.");
@@ -161,6 +183,8 @@ function finishCuffing(){ // if successful
     isCuffing = false;
     cuffTimeLeft = 5;
     cuffInterval = null;
+
+    mp.gui.chat.push("cuff finished");
 
     if(!mp.players.exists(cuffTarget) || !mp.players.exists(player) || cuffTarget == null){ cuffTarget = null; return;} // better safe than sorry :)
     mp.events.callRemote("FinishCuffing", cuffTarget);

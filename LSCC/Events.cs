@@ -2554,7 +2554,7 @@ namespace LSCC
                 p => p.Position.DistanceTo(player.Position) < 3.0f
                 && p.GetSharedData<int>("Team") == 0
                 && p.GetData<bool>("Cuffed") == false
-                && p.GetSharedData<int>("CuffedBy").Equals("n/a") // making sure the fugitive isnt being cuffed by someone else
+                && p.GetSharedData<string>("CuffedBy").Equals("n/a") // making sure the fugitive isnt being cuffed by someone else
             );
             if (target == null) return;
 
