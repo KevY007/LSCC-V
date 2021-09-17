@@ -2559,13 +2559,22 @@ namespace LSCC
             if (target == null) return;
 
             player.TriggerEvent("BeginCuffing", target);
-            player.SendChatMessage($"!{{#FF6347}}[!] {{#FFFFFF}}You began cuffing {target.Name}, keep holding {{#FFFF00}}H {{#FFFFFF}}to handcuff them.");
+            player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You began cuffing {target.Name}, keep holding !{{#FFFF00}}H !{{#FFFFFF}}to handcuff them.");
             EPlayer.Action(player, $" takes out a pair of handcuffs and starts applying them onto {target.Name}'s wrists.");
 
             Events.RequestPlayAnimation(player, "mp_arresting", "a_uncuff", 2);
 
             target.SetSharedData("CuffedBy", player.Name);
         }
+
+        [RemoteEvent("StopCuffing")]
+        public void OnStopCuffing(Player player)
+        {
+            Player target = NAPI.Pools.GetAllPlayers().FirstOrDefault(p => p.GetSharedData<string>("CuffedBy") == player.Name);
+            if (target == null) return;
+            target.SetSharedData("CuffedBy", "n/a");
+        }
+
         [RemoteEvent("FinishCuffing")]
         public void OnFinishCuffing(Player player, Player target)
         {

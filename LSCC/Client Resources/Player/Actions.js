@@ -118,13 +118,11 @@ mp.events.add("BeginCuffing", (target) => {
     cuffTarget = target;
     cuffTimeLeft = 5;
 
-    mp.gui.chat.push("begincuff called for  " + cuffTarget.name);
+    UIHud.execute(`gm.cuffProgress = true;`);
 
     if(cuffInterval != null) clearInterval(cuffInterval);
 
     cuffInterval = setInterval(() => {
-
-        mp.gui.chat.push("cuff interval " + cuffTimeLeft);
 
         if(!mp.players.exists(cuffTarget) || !mp.players.exists(player) || cuffTarget == null) {
             stopCuffing(0);
@@ -151,10 +149,11 @@ mp.events.add("BeginCuffing", (target) => {
 
         cuffTimeLeft--;
         if(cuffTimeLeft <= 0){
+            UIHud.execute(`gm.cuffProgress = false;`);
             finishCuffing();
         }
         else{
-            mp.gui.chat.push(`[CUFF] ${cuffTimeLeft} seconds remaining..`); // will be replaced by CEF
+            UIHud.execute(`gm.$refs.cuffProgress.time = ${cuffTimeLeft}`);
         }
     }, 1000);
 });
@@ -166,7 +165,9 @@ function stopCuffing(reason){ // if unsuccessful / force stopped
     cuffInterval = null;
     cuffTarget = null;
 
-    mp.gui.chat.push("Cuffing stopped!");
+    UIHud.execute(`gm.cuffProgress = false;`);
+
+    mp.events.callRemote("StopCuffing");
 
     switch(reason){
         case 1:
@@ -183,8 +184,6 @@ function finishCuffing(){ // if successful
     isCuffing = false;
     cuffTimeLeft = 5;
     cuffInterval = null;
-
-    mp.gui.chat.push("cuff finished");
 
     if(!mp.players.exists(cuffTarget) || !mp.players.exists(player) || cuffTarget == null){ cuffTarget = null; return;} // better safe than sorry :)
     mp.events.callRemote("FinishCuffing", cuffTarget);
