@@ -90,3 +90,79 @@ function MedkitAction(){
         } finally { }
     }, 1000);
 }
+
+
+
+// ------ CUFFING SYSTEM ------ //
+let isCuffing = false;
+let cuffTimeLeft = 5;
+cuffTarget = null;
+cuffInterval = null;
+
+mp.keys.bind(0x48 , true, function (){
+    
+    if(player.Team != 1) return;
+
+    mp.events.callRemote("RequestCuffTarget");
+
+});
+
+mp.events.add("StopCuffing", (reason) => { stopCuffing(reason); });
+
+mp.events.add("BeginCuffing", (target) => {
+
+    if(!mp.players.exists(cuffTarget)) return;
+    if(cuffTarget.Team != 0 || player.Team != 1) return;
+
+    isCuffing = true;
+    cuffTarget = target;
+    cuffTimeLeft = 5;
+
+    if(cuffInterval != null) clearInterval(cuffInterval);
+
+    cuffInterval = setInterval(() => {
+
+        if(!mp.players.exists(cuffTarget) || !mp.players.exists(player) || cuffTarget == null) stopCuffing(0);
+        if(cuffTarget.Team != 0 ) stopCuffing(1);
+        if(player.Team != 1) stopCuffing(3);
+
+        let distance = player.position.subtract(cuffTarget.position).length();
+        if(distance > 4.0) stopCuffing(2);
+
+        cuffTimeLeft--;
+        if(cuffTimeLeft <= 0){
+            finishCuffing();
+        }
+        else{
+            mp.gui.chat.push(`[CUFF] ${cuffTimeLeft} seconds remaining..`); // will be replaced by CEF
+        }
+    }, 1000);
+});
+function stopCuffing(reason){ // if unsuccessful / force stopped
+
+    clearInterval(cuffInterval);
+    isCuffing = false;
+    cuffTimeLeft = 5;
+    cuffInterval = null;
+    cuffTarget = null;
+
+    switch(reason){
+        case 1:
+            mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Cuffing failed - the target is no longer a fugitive.");
+            break;       
+        case 2:
+            mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Cuffing failed as you moved too far from the fugitive.");
+            break;
+    }
+}
+function finishCuffing(){ // if successful
+    clearInterval(cuffInterval);
+
+    isCuffing = false;
+    cuffTimeLeft = 5;
+    cuffInterval = null;
+
+    if(!mp.players.exists(cuffTarget) || !mp.players.exists(player) || cuffTarget == null){ cuffTarget = null; return;} // better safe than sorry :)
+    mp.events.callRemote("FinishCuffing", cuffTarget);
+    cuffTarget = null;
+}

@@ -1292,7 +1292,7 @@ namespace LSCC
            
             return;
         }
-
+        /*
         [Command("cuff", "!{#AFAFAF}[USAGE] cuff (optional:target)")]
         public void cmd_cuff(Player player, Player target = null)
         {
@@ -1431,6 +1431,7 @@ namespace LSCC
             }, 3000);
             return;
         }
+        */
 
         [Command("dragout", "!{#AFAFAF}[USAGE] dragout (optional:target)")]
         public void cmd_dragout(Player player, Player target = null)
@@ -5044,7 +5045,7 @@ namespace LSCC
             {
                 target.SetSharedData("BustedProgress", 0.0);
                 target.ResetData("BustSupporters");
-                target.ResetData("CuffingTarget");
+                target.SetSharedData("CuffedBy", "n/a");
 
                 if (lobby.gameMode == GameModes.STANDARD)
                     target.TriggerEvent("showHPBars", 1);
@@ -5086,7 +5087,7 @@ namespace LSCC
                     target.ResetData("Handsup");
                     target.ResetData("Cuffed");
                     target.SetSharedData("Team", 0);
-                    target.ResetData("CuffingTarget");
+                    target.SetSharedData("CuffedBy", "n/a");
                     target.SetSharedData("HasShot", false);
 
                     string carName = "washington";
@@ -5239,7 +5240,7 @@ namespace LSCC
 
                     target.TriggerEvent("SetActorInvulnerable", false);
                     target.TriggerEvent("CanFallOutOfCar", false);
-                    target.ResetData("CuffingTarget");
+                    target.SetSharedData("CuffedBy", "n/a");
                     target.SetSharedData("Team", 1);
 
                     EPlayer.GiveCopWeapons(target);

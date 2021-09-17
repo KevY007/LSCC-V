@@ -1794,7 +1794,7 @@ namespace LSCC
                         player.SetData("LastClimbProtection", Environment.TickCount64 - 30000);
                         player.SetData("ClimbProtectionProcs", 0);
                         player.SetData("ClimbProtectionEnd", Environment.TickCount64);
-                        player.ResetData("CuffingTarget");
+                        player.SetSharedData("CuffedBy", "n/a");
                         player.TriggerEvent("moveSkyCamera", player, "up", 1, false);
                         player.TriggerEvent("ToggleNametags", false);
                         player.RemoveAllWeapons();
@@ -1987,7 +1987,7 @@ namespace LSCC
 
                         player.TriggerEvent("SetActorInvulnerable", false);
                         player.TriggerEvent("CanFallOutOfCar", false);
-                        player.ResetData("CuffingTarget");
+                        player.SetSharedData("CuffedBy", "n/a");
                         player.SetSharedData("Team", 1);
                     }
 
@@ -2029,7 +2029,7 @@ namespace LSCC
                         player.ResetData("Handsup");
                         player.ResetData("Cuffed");
                         player.SetSharedData("Team", 0);
-                        player.ResetData("CuffingTarget");
+                        player.SetSharedData("CuffedBy", "n/a");
                         player.SetSharedData("HasShot", false);
                     }
 

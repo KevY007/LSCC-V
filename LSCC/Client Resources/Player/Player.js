@@ -1108,7 +1108,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
 
             if(weapon == 911657153 && (BigInt(Math.round((new Date()).getTime() / 1000)) - BigInt(targetEntity.getVariable("LastVehEnterExit"))) <= BigInt(7)) return true;
 
-            if(weapon == 911657153 && targetEntity.getVariable("HasShot") == true && targetEntity.getVariable("Tean") == 0) return true;
+            if(weapon == 911657153 && targetEntity.getVariable("HasShot") == true && targetEntity.Team == 0) return true;
 
             if(sourceEntity.Team != -1 && player.Team != -1)
             {

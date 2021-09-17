@@ -17,6 +17,9 @@ var UIHud = null;
 var UIMenu = null;
 var menuToggled = false;
 
+var cuffTarget = null;
+var cuffInterval = null;
+
 mp.players.local.Team = -1;
 mp.players.local.LoggedIn = false;
 

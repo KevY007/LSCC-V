@@ -544,7 +544,7 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            player.ResetData("CuffingTarget");
+            player.SetSharedData("CuffedBy", "n/a");
             player.ResetData("FreezeWeapons");
 
             string reasonStr;
@@ -2443,6 +2443,52 @@ namespace LSCC
             return;
         }
 
+        [RemoteEvent("RequestCuffTarget")]
+        public void OnRequestCuffTarget(Player player)
+        {
+            if (player.GetSharedData<int>("Team") != 1) return;
+
+            Player target = NAPI.Pools.GetAllPlayers().FirstOrDefault(
+                p => p.Position.DistanceTo(player.Position) < 3.0f
+                && p.GetSharedData<int>("Team") == 0
+                && p.GetData<bool>("Cuffed") == false
+                && p.GetSharedData<int>("CuffedBy").Equals("n/a") // making sure the fugitive isnt being cuffed by someone else
+            );
+            if (target == null) return;
+
+            player.TriggerEvent("BeginCuffing", target);
+            player.SendChatMessage($"!{{#FF6347}}[!] {{#FFFFFF}}You began cuffing {target.Name}, keep holding {{#FFFF00}}H {{#FFFFFF}}to handcuff them.");
+            EPlayer.Action(player, $" takes out a pair of handcuffs and starts applying them onto {target.Name}'s wrists.");
+
+            Events.RequestPlayAnimation(player, "mp_arresting", "a_uncuff", 2);
+
+            target.SetSharedData("CuffedBy", player.Name);
+        }
+        [RemoteEvent("FinishCuffing")]
+        public void OnFinishCuffing(Player player, Player target)
+        {
+            if (target == null) return;
+
+            LobbyData lobbye = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedData<int>("InLobby"));
+
+            Events.RequestClearAnimation(player);
+            EPlayer.GrantXP(player, 5);
+            player.SetSharedData("FugitiveChance", player.GetSharedData<float>("FugitiveChance") + (0.2 * (double)((double)EPlayer.GetAccount(player).DonatorLevel + 1.0)));
+            EPlayer.Action(player, $"has grabbed ahold of {target.Name} and slapped the handcuffs on their wrists.");
+
+            EPlayer.SendMessageInLobby(lobbye.lobbyId, $"!{{#ADD8E6}}Cop {player.Name} has apprehended Fugitive {target.Name}.");
+
+            target.SetAccessories(7, 41, 0); // Handcuffs
+
+            EPlayer.Handcuff(target, true);
+
+            EPlayer.GetAccount(player).Arrests++;
+
+            Events.OnPlayerDeath(target, player, 696988); // Reason 696988 = handcuffs.
+
+            target.SetSharedData("CuffedBy", "n/a");
+        }
+
         [RemoteEvent("RequestCompSync")]
         public void OnPlayerRequestCompSync(Player player, Player target)
         {
@@ -2511,7 +2557,7 @@ namespace LSCC
                 }
 
                 player.SetSharedData("BustedProgress", 0.0);
-                player.ResetData("CuffingTarget");
+                player.SetSharedData("CuffedBy", "n/a");
 
                 if (player.HasData("Cuffed"))
                 {
