@@ -222,19 +222,33 @@ namespace LSCC
     {
         public int Team { get; set; }
         public string Name { get; set; }
+        public string Background { get; set; }
         public int LevelRequired { get; set; }
-        public List<Tuple<WeaponHash, int>> Weapons { get; set; }
+        public int PointsRequired { get; set; }
+        public int DonatorPointsRequired { get; set; }
+        public int DonatorLevelRequired { get; set; }
+        public List<object[]> Weapons { get; set; }
 
-        public LoadoutData(int team, string name, int level, List<Tuple<WeaponHash, int>> weps)
+        public LoadoutData(int team, string name, int level = 0, int points = 0, int donorpoints = 0, int donator = 0)
         {
+            Background = "https://i.imgur.com/EqsruXf.png";
             this.Team = team;
             this.Name = name;
             this.LevelRequired = level;
+            this.PointsRequired = points;
+            this.DonatorPointsRequired = donorpoints;
+            this.DonatorLevelRequired = donator;
 
-            this.Weapons = new List<Tuple<WeaponHash, int>>();
-            this.Weapons.AddRange(weps);
+            this.Weapons = new List<object[]>();
+            //this.Weapons.AddRange(weps);
 
             Settings.Loadouts.Add(this);
+        }
+
+        public LoadoutData Add(WeaponHash weapon, string image, string name, int ammo)
+        {
+            this.Weapons.Add(new object[] { weapon, image, name, ammo });
+            return this;
         }
     };
 
@@ -1055,59 +1069,60 @@ namespace LSCC
             /* DEFAULT LOADOUTS CREATION */
             NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Creating the loadouts...");
 
-            List<Tuple<WeaponHash, int>> wepList = new List<Tuple<WeaponHash, int>>();
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Combatpistol, 40));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pumpshotgun, 20));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Bzgas, 1));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Carbinerifle, 80));
-            new LoadoutData(1, "Heavy", 5, wepList);
+            new LoadoutData(1, "Default")
+                .Add(WeaponHash.Pistol, "package://Artwork/Weapons/Pistol.png", "Pistol", 40)
+                .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Pump Shotgun", 20);
 
-            wepList = new List<Tuple<WeaponHash, int>>();
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pistol50, 60));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Heavyshotgun, 40));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Bzgas, 3));
-            wepList.Add(new Tuple<WeaponHash, int>((WeaponHash)0x9D1F17E6, 120)); // Military Rifle
-            new LoadoutData(1, "SWAT", 10, wepList);
+            new LoadoutData(0, "Default")
+                .Add(WeaponHash.Pistol, "package://Artwork/Weapons/Pistol.png", "Pistol", 40)
+                .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Pump Shotgun", 20);
 
-            wepList = new List<Tuple<WeaponHash, int>>();
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Bzgas, 1));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.NavyRevolver, 30));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Musket, 30));
-            wepList.Add(new Tuple<WeaponHash, int>((WeaponHash)0x9D1F17E6, 90)); // Military Rifle
-            new LoadoutData(1, "Whiplash", 20, wepList);
+            new LoadoutData(1, "Heavy", 5)
+                .Add(WeaponHash.Combatpistol, "package://Artwork/Weapons/CombatPistol.png", "Combat Pistol", 40)
+                .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Pump Shotgun", 20)
+                .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1)
+                .Add(WeaponHash.Carbinerifle, "package://Artwork/Weapons/CarbineRifle.png", "Carbine Rifle", 80);
+            
 
-            wepList = new List<Tuple<WeaponHash, int>>();
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Combatpistol, 40));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Microsmg, 50));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Assaultrifle, 80));
-            new LoadoutData(0, "Convicted", 5, wepList);
+            new LoadoutData(1, "SWAT", 10)
+                .Add(WeaponHash.Pistol50, "package://Artwork/Weapons/Pistol50.png", "Pistol .50", 60)
+                .Add(WeaponHash.Heavyshotgun, "package://Artwork/Weapons/HeavyShotgun.png", "Heavy Shotgun", 40)
+                .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 3)
+                .Add((WeaponHash)0x9D1F17E6, "package://Artwork/Weapons/MilitaryRifle.png", "Military Rifle", 120);
 
-            wepList = new List<Tuple<WeaponHash, int>>();
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Battleaxe, 1));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pistol50, 40));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Bullpupshotgun, 30));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Combatpdw, 125));
-            new LoadoutData(0, "Rebel", 10, wepList);
+            new LoadoutData(1, "Whiplash", 20)
+                .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1)
+                .Add(WeaponHash.NavyRevolver, "package://Artwork/Weapons/NavyRevolver.png", "Navy Revolver", 30)
+                .Add(WeaponHash.Musket, "package://Artwork/Weapons/Musket.png", "Musket", 30)
+                .Add((WeaponHash)0x9D1F17E6, "package://Artwork/Weapons/MilitaryRifle.png", "Military Rifle", 90);
 
-            wepList = new List<Tuple<WeaponHash, int>>();
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Pistol_mk2, 40));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Minismg, 100));
-            wepList.Add(new Tuple<WeaponHash, int>((WeaponHash)0x5A96BA4, 30)); // Combat Shotgun
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Molotov, 1));
-            new LoadoutData(0, "O.G", 13, wepList);
+            new LoadoutData(0, "Convicted", 5)
+                .Add(WeaponHash.Combatpistol, "package://Artwork/Weapons/CombatPistol.png", "Combat Pistol", 40)
+                .Add(WeaponHash.Microsmg, "package://Artwork/Weapons/MicroSMG.png", "Micro SMG", 50)
+                .Add(WeaponHash.Assaultrifle, "package://Artwork/Weapons/AssaultRifle.png", "Assault Rifle", 80);
 
-            wepList = new List<Tuple<WeaponHash, int>>();
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Bzgas, 1));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Doubleaction, 25));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Sawnoffshotgun, 30));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Gusenberg, 120));
-            new LoadoutData(0, "Executioner", 15, wepList);
+            new LoadoutData(0, "Rebel", 10)
+                .Add(WeaponHash.Battleaxe, "package://Artwork/Weapons/BattleAxe.png", "Battle Axe", 1)
+                .Add(WeaponHash.Pistol50, "package://Artwork/Weapons/Pistol50.png", "Pistol .50", 40)
+                .Add(WeaponHash.Bullpupshotgun, "package://Artwork/Weapons/BullpupShotgun.png", "Bullpup Shotgun", 30)
+                .Add(WeaponHash.Combatpdw, "package://Artwork/Weapons/CombatPDW.png", "Combat PDW", 125);
 
-            wepList = new List<Tuple<WeaponHash, int>>();
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Knife, 1));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Revolver_mk2, 15));
-            wepList.Add(new Tuple<WeaponHash, int>(WeaponHash.Assaultrifle_mk2, 120));
-            new LoadoutData(0, "Assassin", 20, wepList);
+            new LoadoutData(0, "O.G", 13)
+                .Add(WeaponHash.Pistol_mk2, "package://Artwork/Weapons/PistolMk2.png", "Pistol MK.II", 40)
+                .Add(WeaponHash.Minismg, "package://Artwork/Weapons/MiniSMG.png", "Mini SMG", 100)
+                .Add((WeaponHash)0x5A96BA4, "package://Artwork/Weapons/CombatShotgun.png", "Combat Shotgun", 30)
+                .Add(WeaponHash.Molotov, "package://Artwork/Weapons/Molotov.png", "Molotov", 1);
+
+            new LoadoutData(0, "Executioner", 15)
+                .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1)
+                .Add(WeaponHash.Doubleaction, "package://Artwork/Weapons/DoubleActionRevolver.png", "Double Action Revolver", 25)
+                .Add(WeaponHash.Sawnoffshotgun, "package://Artwork/Weapons/SawnoffShotgun.png", "Sawn Off Shotgun", 30)
+                .Add(WeaponHash.Gusenberg, "package://Artwork/Weapons/Gusenberg.png", "Gusenberg Sweeper", 120);
+
+            new LoadoutData(0, "Assassin", 20, 2500)
+                .Add(WeaponHash.Knife, "package://Artwork/Weapons/Knife.png", "Knife", 1)
+                .Add(WeaponHash.Revolver_mk2, "package://Artwork/Weapons/HeavyRevolverMk2.png", "Heavy Revolver Mk.II", 15)
+                .Add(WeaponHash.Assaultrifle_mk2, "package://Artwork/Weapons/AssaultRifleMk2.png", "Assault Rifle Mk.II", 120); 
 
             /* VEHICLES/SELECTION CREATION */
             NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Creating the selection vehicles...");

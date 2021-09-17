@@ -86,6 +86,10 @@ mp.events.add("MenuSelectVehicle", (model, team) => {
     mp.events.callRemote("MenuSelectedVehicle", model, team);
 });
 
+mp.events.add("MenuSelectLoadout", (name, team) => {
+    mp.events.callRemote("MenuSelectedLoadout", name, team);
+});
+
 mp.events.add("UpdateMenuMinigames", (arenas, currentMinigame) => {
     UIMenu.execute(`gm.$refs.mainMenu.$refs.minigames.games = [];`);
     UIMenu.execute(`gm.$refs.mainMenu.$refs.minigames.currentMinigame = ${currentMinigame};`);
@@ -129,6 +133,32 @@ mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) =>
         if(menuItems[i][4].length > 1) insertString += `"price": "${menuItems[i][4]}", `;
         insertString += `"locked": ${menuItems[i][5]}, `;
         if(menuItems[i][6].length > 1) insertString += `"energy": "${menuItems[i][6]}", `;
+        insertString += "});";
+
+        UIMenu.execute(insertString);
+    }
+});
+
+mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoadout) => {
+    UIMenu.execute(`gm.$refs.mainMenu.$refs.loadouts.$refs.police.loadouts = [];`);
+    UIMenu.execute(`gm.$refs.mainMenu.$refs.loadouts.$refs.fugitive.loadouts = [];`);
+    UIMenu.execute(`gm.$refs.mainMenu.$refs.loadouts.$refs.police.selectedLoadout = "${currentCopLoadout}";`);
+    UIMenu.execute(`gm.$refs.mainMenu.$refs.loadouts.$refs.fugitive.selectedLoadout = "${currentFugiLoadout}";`);
+
+    // Loadout Data
+    // Name, Locked, Background, Requirements, Weapons
+    let menuItems = JSON.parse(loadouts);
+    for(let i = 0; i < menuItems.length; i++)
+    {
+        let insertString = "";
+        if(menuItems[i][0] == 0) insertString = `gm.$refs.mainMenu.$refs.loadouts.$refs.fugitive.loadouts.push({`;
+        else if(menuItems[i][0] == 1) insertString = `gm.$refs.mainMenu.$refs.loadouts.$refs.police.loadouts.push({`;
+        
+        insertString += `"name": "${menuItems[i][1]}", `;
+        insertString += `"background": "${menuItems[i][2]}", `;
+        insertString += `"locked": ${menuItems[i][3]}, `;
+        insertString += menuItems[i][4];
+        insertString += menuItems[i][5];
         insertString += "});";
 
         UIMenu.execute(insertString);

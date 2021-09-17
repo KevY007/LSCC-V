@@ -820,7 +820,7 @@ namespace LSCC
                     {
                         loadout.Weapons.ForEach((wepar) =>
                         {
-                            player.GiveWeapon(wepar.Item1, wepar.Item2);
+                            player.GiveWeapon((WeaponHash)wepar[0], (int)wepar[3]);
                         });
                     }
                 }
@@ -893,7 +893,7 @@ namespace LSCC
                     {
                         loadout.Weapons.ForEach((wepar) =>
                         {
-                            player.GiveWeapon(wepar.Item1, wepar.Item2);
+                            player.GiveWeapon((WeaponHash)wepar[0], (int)wepar[3]);
                         });
                     }
                 }
@@ -1106,7 +1106,7 @@ namespace LSCC
         }
         public static bool HasOwnedVehicle(Player player, string model, int team)
         {
-            if (model == "?") return true;
+            if (model == "?" || model.Equals("default", StringComparison.OrdinalIgnoreCase)) return true;
 
             if (LoggedIn(player))
             {
@@ -1119,6 +1119,53 @@ namespace LSCC
                     }
                 }*/
                 if (ContextFactory.Instance.OwnedVehicles.Count(a => a.AccountSQLID == acc.SQL_ID && a.Team == team && a.Model.Equals(model, StringComparison.OrdinalIgnoreCase)) > 0) return true;
+            }
+            return false;
+        }
+
+        public static List<string> GetOwnedLoadouts(Player player, int team)
+        {
+            List<string> ownedLoadouts = new List<string>();
+
+            if (LoggedIn(player))
+            {
+                Account acc = GetAccount(player);
+                var loadouts = ContextFactory.Instance.OwnedLoadouts.ToList().Where(a => a.AccountSQLID == acc.SQL_ID && a.Team == team);
+                foreach (var item in loadouts) ownedLoadouts.Add(item.Name);
+            }
+            return ownedLoadouts;
+        }
+        public static bool UnlockLoadout(Player player, string name, int team)
+        {
+            if (!LoggedIn(player)) return false;
+            if (HasOwnedLoadout(player, name, team)) return false;
+
+            var _new = new OwnedLoadoutData
+            {
+                AccountSQLID = EPlayer.GetAccount(player).SQL_ID,
+                Name = name,
+                Team = team,
+            };
+            ContextFactory.Instance.OwnedLoadouts.Add(_new);
+
+            ContextFactory.Instance.SaveChanges();
+            return true;
+        }
+        public static bool HasOwnedLoadout(Player player, string name, int team)
+        {
+            if (name == "?" || name.Equals("default", StringComparison.OrdinalIgnoreCase)) return true;
+
+            if (LoggedIn(player))
+            {
+                Account acc = GetAccount(player);
+                /*foreach(var car in Settings.Cars)
+                {
+                    if(car.Model.Equals(model, StringComparison.OrdinalIgnoreCase) && car.Team == team)
+                    {
+                        if (car.LevelRequired == 0 || car.LevelRequired >= acc.Level) return true;
+                    }
+                }*/
+                if (ContextFactory.Instance.OwnedLoadouts.Count(a => a.AccountSQLID == acc.SQL_ID && a.Team == team && a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) > 0) return true;
             }
             return false;
         }

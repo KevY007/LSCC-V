@@ -60,6 +60,14 @@ namespace LSCC
         public string Model { get; set; }
         public int Team { get; set; }
     }
+    public class OwnedLoadoutData
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public int AccountSQLID { get; set; }
+        public string Name { get; set; }
+        public int Team { get; set; }
+    }
 
     public class MainDatabase : DbContext
     {
@@ -77,6 +85,7 @@ namespace LSCC
         public DbSet<BanData> Bans { get; set; }
         public DbSet<PlayerOutfit> PlayerOutfits { get; set; }
         public DbSet<OwnedVehData> OwnedVehicles { get; set; }
+        public DbSet<OwnedLoadoutData> OwnedLoadouts { get; set; }
         public DbSet<Logs_AdminRecord> Logs_AdminRecords { get; set; }
         public DbSet<Logs_Admin> Logs_Admin { get; set; }
         public DbSet<Logs_Session> Logs_Session { get; set; }
