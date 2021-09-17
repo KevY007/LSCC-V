@@ -72,6 +72,7 @@ function enableChatInput(enable)
             chat.input = $("#chat").append('<div><input id="chat_msg" type="text" maxlength="128" /></div>').children(":last");
 			chat.input.children("input").focus();			
 			toggleChatOpacity(true);
+
         } 
 		else
 		{
