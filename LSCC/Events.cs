@@ -1190,7 +1190,7 @@ namespace LSCC
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can edit your character's clothing with /char clothing.");
             
             if(EPlayer.GetAccount(player).Level == 1 && EPlayer.GetAccount(player).XP < 2) 
-                player.SendChatMessage("!{#FF0000}[!] !{#FFFFFF}Please use /cmds to get started and check out /loadout and /car as well.");
+                player.SendChatMessage("!{#FF0000}[!] !{#FFFFFF}Please use /cmds and /keys to get started. Press M to open menu.");
         }
 
         [RemoteEvent("creator_Leave")]
@@ -1738,7 +1738,7 @@ namespace LSCC
             }
             else
             {
-                if(car.LevelRequired != 0 && car.LevelRequired >= acc.Level)
+                if(car.LevelRequired != 0 && car.LevelRequired > acc.Level)
                 {
                     EPlayer.Notify(player, $"You need to be at least <strong>Level {car.LevelRequired}</strong> for this vehicle.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
                     return;
@@ -1799,6 +1799,107 @@ namespace LSCC
             return vehItems;
         }
 
+        [RemoteEvent("MenuSelectedLoadout")]
+        public void OnMenuLoadoutSelect(Player player, string name, int team)
+        {
+            if (Settings.Loadouts.Where(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && a.Team == team).Count() == 0 || team > 1 || team < 0)
+            {
+                EPlayer.Notify(player, "An unknown error has occured. Bad juju?!", "red", "fas fa-ban", false, 2000, "bottomCenter", "replace");
+                return;
+            }
+
+            Account acc = EPlayer.GetAccount(player);
+            LoadoutData loadout = Settings.Loadouts.ToList().Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && a.Team == team);
+
+            if (EPlayer.HasOwnedLoadout(player, name, team))
+            {
+                if (team == 0)
+                {
+                    EPlayer.Notify(player, $"Fugitive loadout set to <strong>{loadout.Name}</strong>.", "blue", "fas fa-check", false, 3000, "bottomCenter", "replace");
+                    acc.LoadoutFugitive = (loadout.Name.Equals("default", StringComparison.OrdinalIgnoreCase) ? "?" : loadout.Name);
+                }
+                else
+                {
+                    EPlayer.Notify(player, $"Police loadout set to <strong>{loadout.Name}</strong>.", "blue", "fas fa-check", false, 3000, "bottomCenter", "replace");
+                    acc.LoadoutCop = (loadout.Name.Equals("default", StringComparison.OrdinalIgnoreCase) ? "?" : loadout.Name);
+                }
+
+                player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(Menu_LoadoutData(player)), acc.LoadoutCop, acc.LoadoutFugitive);
+            }
+            else
+            {
+                if (loadout.LevelRequired != 0 && loadout.LevelRequired > acc.Level)
+                {
+                    EPlayer.Notify(player, $"You need to be at least <strong>Level {loadout.LevelRequired}</strong> for this loadout.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                    return;
+                }
+                if (loadout.DonatorPointsRequired != 0 && loadout.DonatorPointsRequired > acc.DonatorPoints)
+                {
+                    EPlayer.Notify(player, $"You need <strong>{loadout.DonatorPointsRequired} Donator Points</strong> for this loadout.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                    return;
+                }
+                if (loadout.PointsRequired != 0 && loadout.PointsRequired > acc.Points)
+                {
+                    EPlayer.Notify(player, $"You need <strong>{loadout.PointsRequired} Points</strong> for this loadout.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                    return;
+                }
+                if (loadout.DonatorLevelRequired != 0 && loadout.DonatorLevelRequired > acc.DonatorLevel)
+                {
+                    EPlayer.Notify(player, $"This loadout is restricted to <strong>{EPlayer.GetDonatorLevelName(loadout.DonatorLevelRequired)}</strong>.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                    return;
+                }
+
+                acc.Points -= loadout.PointsRequired;
+                acc.DonatorPoints -= loadout.DonatorPointsRequired;
+                EPlayer.UnlockLoadout(player, loadout.Name, loadout.Team);
+                EPlayer.Notify(player, $"You have unlocked <strong>{loadout.Name}</strong>. You may select it now.", "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
+
+                player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(Menu_LoadoutData(player)), acc.LoadoutCop, acc.LoadoutFugitive);
+            }
+            return;
+        }
+
+        public List<object[]> Menu_LoadoutData(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return new List<object[]>();
+            // Loadout Data
+
+
+            List<object[]> loadoutItems = new List<object[]>();
+            foreach (var loadout in Settings.Loadouts)
+            {
+                string weaponString = "weapons: [";
+
+                foreach(var weapon in loadout.Weapons)
+                {
+                    weaponString += "{name: \"" + (string)weapon[2] + "\", img: \"" + (string)weapon[1] + "\", ammo: " + (int)weapon[3] + ",},";
+                }
+
+                weaponString += "],";
+
+                string requireString = "requirements: [";
+
+                if (loadout.LevelRequired > 0) requireString += $"{{icon: \"fas fa-level-up-alt\", text: \"Level {loadout.LevelRequired}\"}},";
+                if (loadout.PointsRequired > 0) requireString += $"{{icon: \"bx bxs-dollar-circle\", text: \"{loadout.PointsRequired} Points\"}},";
+                if (loadout.DonatorPointsRequired > 0) requireString += $"{{icon: \"fas fa-credit-card\", text: \"{loadout.DonatorPointsRequired} Donator Points\"}},";
+                if (loadout.DonatorLevelRequired > 0) requireString += $"{{icon: \"bx bxs-crown\", text: \"{EPlayer.GetDonatorLevelName(loadout.DonatorLevelRequired)}\"}},";
+
+                requireString += "],";
+
+                loadoutItems.Add(new object[]
+                {
+                    loadout.Team,
+                    loadout.Name,
+                    loadout.Background,
+                    !EPlayer.HasOwnedLoadout(player, loadout.Name, loadout.Team),
+                    requireString,
+                    weaponString
+                });
+            }
+
+            return loadoutItems;
+        }
+
         [RemoteEvent("OnToggleMenu")]
         public void OnPlayerToggleMenu(Player player, bool status)
         {
@@ -1809,6 +1910,7 @@ namespace LSCC
                 player.TriggerEvent("UpdateMenuLobbies", NAPI.Util.ToJson(Menu_LobbiesData(player)), player.GetSharedData<int>("InLobby"));
                 player.TriggerEvent("UpdateMenuMinigames", NAPI.Util.ToJson(Menu_MinigamesData(player)), (player.GetSharedData<int>("InLobby") < 0) ? player.GetSharedData<int>("InLobby") : player.GetSharedData<int>("InDM"));
                 player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(Menu_VehicleData(player)), EPlayer.GetAccount(player).CarCop, EPlayer.GetAccount(player).CarFugitive);
+                player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(Menu_LoadoutData(player)), EPlayer.GetAccount(player).LoadoutCop, EPlayer.GetAccount(player).LoadoutFugitive);
             }
             else // CLOSE: Anything you want when menu gets closed.
             {

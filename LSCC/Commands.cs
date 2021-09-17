@@ -3600,7 +3600,7 @@ namespace LSCC
             player.SendChatMessage("!{#FF6347} M: Toggle menu.");
             player.SendChatMessage("!{#FF6347} N: Push to talk voicechat. (Changed using /voicebind)");
             player.SendChatMessage("!{#FF6347} Z: Toggle GPS as a Cop. (Changed using /gpsbind)");
-            player.SendChatMessage("!{#FF6347} O: Toggle scoreboard, displays a scrollbar and mouse if needed.");
+            player.SendChatMessage("!{#FF6347} O: Toggle scoreboard. (F2 enables cursor)");
             player.SendChatMessage("!{#FF6347} L: Lock/unlock vehicle.");
             player.SendChatMessage("!{#FF6347} X: Rapple from a helicopter (not all helicopters, try maverick).");
             player.SendChatMessage("!{#FF6347} Hold voice and press TAB: Switch voice chat modes.");
@@ -3766,7 +3766,7 @@ namespace LSCC
             player.SendChatMessage("[Lobby]: /lobbychat (/lo,/lg) /spec /specoff");
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats /changemypass");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys for activation)");
-            player.SendChatMessage("!{#339BC4}[Cop!{#F24C27}chase]: !{#FFFFFF}/r(adio) /wt /loadout");
+            player.SendChatMessage("!{#339BC4}[Cop!{#F24C27}chase]: !{#FFFFFF}/r(adio) /wt");
             player.SendChatMessage("!{#61A9FA}[Cop]: /gps /cuff /m(egaphone) /dragout");
             player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup /s(top)a(nim) /passgun");
             player.SendChatMessage("!{#AB00BA}[Vehicle]: /trunk /lock /engine");
@@ -7386,74 +7386,7 @@ namespace LSCC
         [Command("loadout", Alias = "loadouts")]
         public void cmd_loadout(Player player)
         {
-            if (!EPlayer.LoggedIn(player))
-                return;
-
-            LoadoutSelectorData a = new LoadoutSelectorData(
-            new object[,]
-            {
-                // Name, Level, Team, Weapons {ImgUrl, Name, Ammo}
-                { "Default", 0, 0, NAPI.Util.ToJson(new object[,] { 
-                    { "https://static.wikia.nocookie.net/gtawiki/images/8/8f/Pistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pistol", 40 }, 
-                    { "https://static.wikia.nocookie.net/gtawiki/images/e/e0/PumpShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pump Shotgun", 20 },
-                }) },
-                { "Default", 0, 1, NAPI.Util.ToJson(new object[,] {
-                    { "https://static.wikia.nocookie.net/gtawiki/images/8/8f/Pistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pistol", 40 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/e/e0/PumpShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pump Shotgun", 20 },
-                }) },
-
-                { "Heavy", 5, 1, NAPI.Util.ToJson(new object[,] {
-                    { "https://static.wikia.nocookie.net/gtawiki/images/a/ad/CombatPistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Combat Pistol", 40 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/e/e0/PumpShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pump Shotgun", 20 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/f/fe/TearGas-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "BZ Gas", 1 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/7/7a/CarbineRifle-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Carbine Rifle", 80 },
-                }) },
-                { "SWAT", 10, 1, NAPI.Util.ToJson(new object[,] {
-                    { "https://static.wikia.nocookie.net/gtawiki/images/d/d3/Pistol.50-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pistol .50", 60 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/5/55/HeavyShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Heavy Shotgun", 40 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/f/fe/TearGas-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "BZ Gas", 3 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/5/56/MilitaryRifle-GTAO-icon.png/revision/latest/scale-to-width-down/128", "Military Rifle", 120 },
-                }) },
-                { "Whiplash", 20, 1, NAPI.Util.ToJson(new object[,] {
-                    { "https://static.wikia.nocookie.net/gtawiki/images/9/9e/NavyRevolver-GTAO-icon.png/revision/latest/scale-to-width-down/128", "Navy Revolver", 30 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/8/8f/Musket-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Musket", 30 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/f/fe/TearGas-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "BZ Gas", 1 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/5/56/MilitaryRifle-GTAO-icon.png/revision/latest/scale-to-width-down/128", "Military Rifle", 90 },
-                }) },
-
-                { "Convicted", 5, 0, NAPI.Util.ToJson(new object[,] {
-                    { "https://static.wikia.nocookie.net/gtawiki/images/a/ad/CombatPistol-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Combat Pistol", 40 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/0/09/MicroSMG-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Micro SMG", 50 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/8/80/AssaultRifle-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Assault Rifle", 80 },
-                }) },
-                { "Rebel", 10, 0, NAPI.Util.ToJson(new object[,] {
-                    { "https://static.wikia.nocookie.net/gtawiki/images/f/f8/BattleAxe-GTAO-HUDIcon.png/revision/latest/scale-to-width-down/128", "Battle Axe", 1 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/d/d3/Pistol.50-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Pistol .50", 40 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/9/96/BullpupShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Bullpup Shotgun", 30 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/2/21/Combat_PDW_HUD_GTA_V_PC.png/revision/latest/scale-to-width-down/128", "Combat PDW", 125 },
-                }) },
-                { "O.G", 13, 0, NAPI.Util.ToJson(new object[,] {
-                    { "https://static.wikia.nocookie.net/gtawiki/images/8/84/PistolMkII-GTAO-HUDIcon.png/revision/latest/scale-to-width-down/128", "Pistol MK.II", 40 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/c/c4/MiniSMG-GTAO-HUDIcon.png/revision/latest/scale-to-width-down/128", "Mini SMG", 100 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/9/9c/CombatShotgun-GTAO-icon.png/revision/latest/scale-to-width-down/128", "Combat Shotgun", 30 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/9/90/Molotov-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Molotov", 1 },
-                }) },
-                { "Executioner", 15, 0, NAPI.Util.ToJson(new object[,] {
-                    { "https://static.wikia.nocookie.net/gtawiki/images/4/45/Double-action-revolver-icon.png/revision/latest/scale-to-width-down/128", "Double Action Revolver", 25 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/b/b4/SawedoffShotgun-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Sawn Off Shotgun", 30 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/f/fe/TearGas-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "BZ Gas", 1 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/c/cc/GusenbergSweeper-GTAVPC-HUD.png/revision/latest/scale-to-width-down/128", "Gusenberg Sweeper", 120 },
-                }) },
-                { "Assassin", 20, 0, NAPI.Util.ToJson(new object[,] {
-                    { "https://static.wikia.nocookie.net/gtawiki/images/9/9a/Knife-GTAVPC-HUD.png/revision/latest/scale-to-width-down/185", "Knife", 40 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/c/c0/Heavy-revolver-mk2-icon.png/revision/latest/scale-to-width-down/128", "Heavy Revolver Mk.II", 15 },
-                    { "https://static.wikia.nocookie.net/gtawiki/images/b/ba/AssaultRifleMkII-GTAO-HUDIcon.png/revision/latest/scale-to-width-down/128", "Assault Rifle Mk.II", 120 },
-                }) },
-            },
-            EPlayer.GetAccount(player).Level);
-
-            player.SetData("ViewingLoadoutSelector", true);
-            player.TriggerEvent("showLoadoutSelector", NAPI.Util.ToJson(a));
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This option has been migrated to server menu. (/keys)");
             return;
         }
 

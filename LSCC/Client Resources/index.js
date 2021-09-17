@@ -16,6 +16,8 @@ var lastFunc = "Init";
 var UIHud = null;
 var UIMenu = null;
 var menuToggled = false;
+var scoreboardToggled = false;
+var scoreboardCursor = false;
 
 var cuffTarget = null;
 var cuffInterval = null;
@@ -58,7 +60,6 @@ require("./charcreator/outfitslots.js")
 require('./camerasManager.js');
 require('./cefBrowser.js');
 require("./rappel/index.js");
-require("./scoreboard/index.js");
 require("./Player/Sync.js");
 require("./Player/musicPlayer.js");
 require("./Player/LightsMenu.js");
