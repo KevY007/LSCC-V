@@ -104,7 +104,7 @@ mp.keys.bind(
     () => {
         if(menuToggled !== undefined && menuToggled) return;
         if(!chatStatus && 
-            !(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false)) 
+            !(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false)) 
         {
             mp.events.callLocal("ToggleHud", !showHud);
 			
@@ -124,6 +124,18 @@ mp.keys.bind(
       hud
       topRight
 */
+
+mp.events.add('RestartHUD', () => {
+    if(UIHud !== null)
+    {
+        UIHud.destroy();
+        UIHud = null;
+    }
+
+    UIHud = mp.browsers.new("package://UIHud/index.html");
+    UIHud.execute(`gm.hud = false;`);
+    UIHud.execute(`gm.topRightInfo = ${mp.storage.data.menu.topRightInfo}; gm.killFeed = ${mp.storage.data.menu.killFeed};`);
+});
 
 mp.events.add('ToggleHud', (toggle) => {
     showHud = toggle;
@@ -146,7 +158,7 @@ mp.events.add("pushToKillFeed2", (victim, color, cause) => {
 });
 
 mp.events.add("OneSecondEvent", () => {
-    if(UIHud != null && (!(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false || mp.players.local.getVariable("InLobby") === undefined)))
+    if(UIHud != null && (!(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false || mp.players.local.getVariable("InLobby") === undefined)))
     {
         UIHud.execute(`gm.$refs.TopRight.$refs.Info.onlinePlayers = ${mp.players.length};`);
 
@@ -154,7 +166,7 @@ mp.events.add("OneSecondEvent", () => {
         
         let lobbyPlayers = 0;
         mp.players.forEach((pl) => {
-            if(!(pl.getVariable("pLogged") === undefined || pl.getVariable("pLogged") == false || pl.getVariable("InLobby") === undefined))
+            if(!(pl.LoggedIn === undefined || pl.LoggedIn == false || pl.getVariable("InLobby") === undefined))
             {
                 if(pl.getVariable("InLobby") == mp.players.local.getVariable("InLobby")) lobbyPlayers++;
             }
@@ -242,11 +254,11 @@ mp.events.add("render", () => {
         camera.destroy(true);
         
         bestlobbystr = "";
-        if(!(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false || mp.players.local.getVariable("InLobby") === undefined))
+        if(!(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false || mp.players.local.getVariable("InLobby") === undefined))
         {
             let lobbyPlayers = 0;
             mp.players.forEach((pl) => {
-                if(!(pl.getVariable("pLogged") === undefined || pl.getVariable("pLogged") == false || pl.getVariable("InLobby") === undefined))
+                if(!(pl.LoggedIn === undefined || pl.LoggedIn == false || pl.getVariable("InLobby") === undefined))
                 {
                     if(pl.getVariable("InLobby") == mp.players.local.getVariable("InLobby")) lobbyPlayers++;
                 }
@@ -266,7 +278,7 @@ mp.events.add("render", () => {
         }
     }
 
-    if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
+    if(mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
     {
         if (currentJailTime >= 1)
         {

@@ -25,6 +25,17 @@ function traceLastFunc(iStr)
     
 }
 
+// where IPL names name of your .ymap file in dlc -> mapping.rpf
+if(!mp.game.streaming.isIplActive("blockheisttunnel") || !mp.game.streaming.isIplActive("derby") || 
+    !mp.game.streaming.isIplActive("floydsapt") || !mp.game.streaming.isIplActive("whbig") || 
+    !mp.game.streaming.isIplActive("whmed") || !mp.game.streaming.isIplActive("whsmall"))
+{
+	mp.game.invoke("0xD7C10C4A637992C9"); // _LOAD_SP_DLC_MAPS
+	mp.game.invoke("0x0888C3502DBBEEF5"); // _LOAD_MP_DLC_MAPS
+}
+
+mp.players.local.position = new mp.Vector3(-1018.55300000, -2731.95600000, 15.70000000);
+
 traceLastFunc("RequireInit");
 require('mp-commands');
 require("./nativeui/index.js");

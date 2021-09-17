@@ -10,6 +10,20 @@ if(typeof mp.storage.data.menu == "undefined")
     mp.storage.flush();
 }
 
+mp.events.add('RestartMenu', () => {
+    if(UIMenu !== null)
+    {
+        UIMenu.destroy();
+        UIMenu = null;
+    }
+
+    UIMenu = mp.browsers.new("package://UIMenu/index.html");
+    UIMenu.execute(`gm.mainMenu = false;`);
+    UIMenu.active = false;
+
+    mp.events.callLocal("MenuToggleTyping", false);
+});
+
 mp.events.add("MenuToggleTyping", (state) => {
     if(state)
     {

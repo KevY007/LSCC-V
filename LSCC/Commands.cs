@@ -3092,6 +3092,13 @@ namespace LSCC
             return;
         }
 
+        [Command("restartmenu")]
+        public void cmd_restartmenu(Player player)
+        {
+            player.TriggerEvent("RestartMenu");
+            return;
+        }
+
 
         [Command("lobbies")]
         public void cmd_lobbies(Player player)
