@@ -19,6 +19,11 @@ var res_Y = resolution.y;
 let bestlobbystr = "N/A";
 let dirtext = "NW";
 
+// Scoreboard
+let updater = null;
+scoreboardToggled = false;
+scoreboardCursor = false;
+
 // StackOverflow cause I'm too lazy to do this myself and don't wanna type getvariable etc etc every time
 function firstLetterUpper(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -185,6 +190,100 @@ mp.events.add("OneSecondEvent", () => {
         UIHud.execute(`gm.$refs.TopRight.$refs.Info.lobbyID = "${lobbyStr}";`);
     }
 });
+
+function ToggleScoreboard()
+{
+    if (UIHud == null) return;
+
+    if(scoreboardToggled)
+    {
+        scoreboardToggled = false;
+
+        if(updater != null) clearInterval(updater);
+        updater = null;
+
+        mp.events.call("TogglePlayerChat", true);
+        UIHud.execute(`gm.scoreboard = false;`);
+
+        if(scoreboardCursor)
+        {
+            scoreboardCursor = false;
+            mp.gui.cursor.show(false, false);
+        }
+    }
+    else
+    {
+        scoreboardToggled = true;
+        mp.events.call("TogglePlayerChat", false);
+
+        UIHud.execute(`gm.scoreboard = true;`);
+
+        updatePlayers();
+
+        updater = setInterval(function()
+        {
+            if(chatStatus && scoreboardToggled)
+            {
+                ToggleScoreboard();
+            }
+            else if(!chatStatus && scoreboardToggled)
+            {
+                updatePlayers();
+            }
+        }, 1000);
+    }
+    return;
+}
+
+function updatePlayers()
+{
+    let updateString = `gm.$refs.scoreboard.setPlayers([`;
+
+    mp.players.forEach(player => {
+        updateString += `{id: ${player.id}, 
+        color: 'rgb(${player.getVariable("Color_R")}, ${player.getVariable("Color_G")}, ${player.getVariable("Color_B")})', 
+        name: '${player.name}', level: ${player.getVariable("Level")}, ping: ${player.getVariable("Ping")}},`;
+    });
+
+    updateString += `]);`;
+
+    if(UIHud != null) UIHud.execute(updateString);
+    return;
+}
+
+mp.keys.bind(
+    0x1B,
+    false,
+    () => {
+        if(UIHud != null && scoreboardToggled) ToggleScoreboard();
+    }
+);
+
+mp.keys.bind(0x71, false, function () {
+    if(scoreboardToggled)
+    {
+        if(scoreboardCursor)
+        {
+            scoreboardCursor = false;
+            mp.gui.cursor.show(false, false);
+        }
+        else
+        {
+            scoreboardCursor = true;
+            mp.gui.cursor.show(true, true);
+        }
+    }
+});
+
+mp.keys.bind(0x4F, false, function () {
+
+    if(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false) return;
+    if(Date.now() - lastChatToggle <= 500) return;
+    if(menuToggled !== undefined && menuToggled) return;
+    if(chatStatus && !scoreboardToggled) return;
+
+    ToggleScoreboard();
+})
 
 mp.events.add("HUDNotify", (msg, color, icon, close, timeout, orientation, displaymode) => {
     let insertString = `iziToast.show({`;

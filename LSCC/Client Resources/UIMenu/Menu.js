@@ -24,31 +24,42 @@ mp.events.add('RestartMenu', () => {
     mp.events.callLocal("MenuToggleTyping", false);
 });
 
+function ToggleMenu()
+{
+    if(UIMenu != null && !scoreboardToggled && Date.now() - lastChatToggle >= 500 && !chatStatus && mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
+    {
+        traceLastFunc(`[Menu] Attempt open/M key`);
+
+        menuToggled = !menuToggled;
+        UIMenu.active = menuToggled;
+        UIMenu.execute(`gm.mainMenu = ${menuToggled};`);
+        mp.events.callRemote("OnToggleMenu", menuToggled);
+        mp.gui.cursor.show(menuToggled, menuToggled);
+        mp.gui.chat.activate(!menuToggled);
+        //mp.gui.chat.show(!menuToggled);
+
+        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.topRightInfo = ${mp.storage.data.menu.topRightInfo};`);
+        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.gameProgress = ${mp.storage.data.menu.gameProgress};`);
+        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.killFeed = ${mp.storage.data.menu.killFeed};`);
+    }
+}
+
+mp.keys.bind(
+    0x1B,
+    false,
+    () => {
+        if(UIMenu != null && menuToggled) ToggleMenu();
+    }
+);
+
 mp.events.add("MenuToggleTyping", (state) => {
     if(state)
     {
-        mp.keys.unbind(0x4D, false);
+        mp.keys.unbind(0x4D, false, ToggleMenu);
     }
     else
     {
-        mp.keys.bind(0x4D, false, function() {
-            if(UIMenu != null && Date.now() - lastChatToggle >= 500 && chatStatus == false && mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
-            {
-                traceLastFunc(`[Menu] Attempt open/M key`);
-        
-                menuToggled = !menuToggled;
-                UIMenu.active = menuToggled;
-                UIMenu.execute(`gm.mainMenu = ${menuToggled};`);
-                mp.events.callRemote("OnToggleMenu", menuToggled);
-                mp.gui.cursor.show(menuToggled, menuToggled);
-                mp.gui.chat.activate(!menuToggled);
-                //mp.gui.chat.show(!menuToggled);
-
-                UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.topRightInfo = ${mp.storage.data.menu.topRightInfo};`);
-                UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.gameProgress = ${mp.storage.data.menu.gameProgress};`);
-                UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.killFeed = ${mp.storage.data.menu.killFeed};`);
-            }
-        });
+        mp.keys.bind(0x4D, false, ToggleMenu);
     }
 });
 

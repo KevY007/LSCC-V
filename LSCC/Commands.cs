@@ -3599,7 +3599,7 @@ namespace LSCC
             player.SendChatMessage("!{#FF6347} M: Toggle menu.");
             player.SendChatMessage("!{#FF6347} N: Push to talk voicechat. (Changed using /voicebind)");
             player.SendChatMessage("!{#FF6347} Z: Toggle GPS as a Cop. (Changed using /gpsbind)");
-            player.SendChatMessage("!{#FF6347} O: Toggle scoreboard, displays a scrollbar and mouse if needed.");
+            player.SendChatMessage("!{#FF6347} O: Toggle scoreboard. (F2 enables cursor)");
             player.SendChatMessage("!{#FF6347} L: Lock/unlock vehicle.");
             player.SendChatMessage("!{#FF6347} X: Rapple from a helicopter (not all helicopters, try maverick).");
             player.SendChatMessage("!{#FF6347} Hold voice and press TAB: Switch voice chat modes.");

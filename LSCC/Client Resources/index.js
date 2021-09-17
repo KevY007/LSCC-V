@@ -16,6 +16,8 @@ var lastFunc = "Init";
 var UIHud = null;
 var UIMenu = null;
 var menuToggled = false;
+var scoreboardToggled = false;
+var scoreboardCursor = false;
 
 mp.players.local.Team = -1;
 mp.players.local.LoggedIn = false;
@@ -55,7 +57,6 @@ require("./charcreator/outfitslots.js")
 require('./camerasManager.js');
 require('./cefBrowser.js');
 require("./rappel/index.js");
-require("./scoreboard/index.js");
 require("./Player/Sync.js");
 require("./Player/musicPlayer.js");
 require("./Player/LightsMenu.js");
