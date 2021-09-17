@@ -1875,7 +1875,7 @@ namespace LSCC
 
                         player.Health = 100;
                         player.Armor = 60;
-                        EPlayer.SetColor(player, new Color(141, 141, 255, 255), player.Armor);
+                        EPlayer.SetColor(player, new Color(0, 151, 255), player.Armor);
 
                         if (!PutInsideCar.Contains(player))
                         {
@@ -2033,7 +2033,7 @@ namespace LSCC
 
                         player.Health = 100;
                         player.Armor = 0;
-                        EPlayer.SetColor(player, new Color(232, 64, 64, 255), player.Armor);
+                        EPlayer.SetColor(player, new Color(255, 174, 0), player.Armor);
 
                         EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Fugitive as {player.Name}");
 

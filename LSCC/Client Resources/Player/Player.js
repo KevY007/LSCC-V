@@ -416,13 +416,13 @@ mp.events.addDataHandler('Team', function (entity, value, oldValue)
         if(value == 1)
         {
             r = 0;
-            g = 0;
+            g = 151;
             b = 255;
         }
         else if(value == 0)
         {
             r = 255;
-            g = 0;
+            g = 174;
             b = 0;
         }
         else
@@ -816,15 +816,15 @@ mp.events.add('render', () => {
                     var blipId = 1;
                     if(target.Team == 0) 
                     {
-                        blipColor = 75;
+                        blipColor = 70;
                         if(target.getVariable("HasShot") == true){
-                            blipColor = 76;
+                            blipColor = 75;
                             blipId = 458;
                         }
                     }
                     else if(target.Team == 1) blipColor = 3;
                     if(target.getVariable("InLobby") == -3) blipColor = 15;
-                    if(target.getVariable("InLobby") == -4) blipColor = 73;
+                    if(target.getVariable("InLobby") == -4) blipColor = 69;
                     if(target.getVariable("InDM") != -1) blipColor = 39;
 
                     if(target.isInAnyVehicle(false)){ 

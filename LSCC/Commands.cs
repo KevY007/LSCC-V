@@ -5076,7 +5076,7 @@ namespace LSCC
 
                     target.Health = 100;
                     target.Armor = 0;
-                    EPlayer.SetColor(target, new Color(232, 64, 64, 255), target.Armor);
+                    EPlayer.SetColor(target, new Color(255, 174, 0), target.Armor);
 
                     EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Fugitive as {target.Name}");
 
@@ -5171,7 +5171,7 @@ namespace LSCC
 
                     target.Health = 100;
                     target.Armor = 60;
-                    EPlayer.SetColor(target, new Color(141, 141, 255, 255), target.Armor);
+                    EPlayer.SetColor(target, new Color(0, 151, 255), target.Armor);
 
                     string carName = "police";
 

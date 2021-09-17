@@ -2854,7 +2854,7 @@ namespace LSCC
                             if (player != null && player.Exists)
                             {
                                 player.SetIntoVehicle(derbyVeh, 0);
-                                EPlayer.SetColor(player, new Color(250, 191, 62), 0);
+                                EPlayer.SetColor(player, new Color(41, 214, 101), 0);
                             }
                         }
                         catch { }
@@ -2868,7 +2868,7 @@ namespace LSCC
                             if (player != null && player.Exists)
                             {
                                 player.SetIntoVehicle(derbyVeh, 0);
-                                EPlayer.SetColor(player, new Color(250, 191, 62), 0);
+                                EPlayer.SetColor(player, new Color(41, 214, 101), 0);
                             }
                         }
                         catch { }
