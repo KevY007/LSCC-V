@@ -441,6 +441,11 @@ mp.events.addDataHandler('pLogged', function (entity, value, oldValue)
     entity.LoggedIn = value;
 });
 
+mp.events.addDataHandler('InLobby', function (entity, value, oldValue) 
+{
+    entity.Lobby = value;
+});
+
 mp.events.add('render', () => {
 
     if(mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
@@ -629,7 +634,7 @@ mp.events.add('render', () => {
 
                 traceLastFunc(`[Players] Update Derby Data`);
 
-                if(mp.players.local.getVariable("InLobby") == -4)
+                if(mp.players.local.Lobby == -4)
                 {
                     derbyText.text = "N/A";
 
@@ -658,7 +663,7 @@ mp.events.add('render', () => {
 
                     mp.players.forEach(target => {
 
-                        if(target.LoggedIn !== undefined && target.getVariable("InLobby") == -4)
+                        if(target.LoggedIn !== undefined && target.Lobby == -4)
                         {
                             if(target.getVariable("DerbyTime") > TimeNow)
                             {
@@ -823,8 +828,8 @@ mp.events.add('render', () => {
                         }
                     }
                     else if(target.Team == 1) blipColor = 3;
-                    if(target.getVariable("InLobby") == -3) blipColor = 15;
-                    if(target.getVariable("InLobby") == -4) blipColor = 69;
+                    if(target.Lobby == -3) blipColor = 15;
+                    if(target.Lobby == -4) blipColor = 69;
                     if(target.getVariable("InDM") != -1) blipColor = 39;
 
                     if(target.isInAnyVehicle(false)){ 
@@ -1330,7 +1335,7 @@ mp.events.add(
         "ToggleHud": (show) => {
             if(show)
             {
-                if(mp.players.local.getVariable("InLobby") == -4 && derbyText != null) {
+                if(mp.players.local.Lobby == -4 && derbyText != null) {
                     derbyText.visible = true;
                 }
             }

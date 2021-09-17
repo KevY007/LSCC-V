@@ -167,7 +167,7 @@ mp.events.add("pushToKillFeed2", (victim, color, cause) => {
 });
 
 mp.events.add("OneSecondEvent", () => {
-    if(UIHud != null && (!(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false || mp.players.local.getVariable("InLobby") === undefined)))
+    if(UIHud != null && (!(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false || mp.players.local.Lobby === undefined)))
     {
         UIHud.execute(`gm.$refs.TopRight.$refs.Info.onlinePlayers = ${mp.players.length};`);
 
@@ -175,17 +175,17 @@ mp.events.add("OneSecondEvent", () => {
         
         let lobbyPlayers = 0;
         mp.players.forEach((pl) => {
-            if(!(pl.LoggedIn === undefined || pl.LoggedIn == false || pl.getVariable("InLobby") === undefined))
+            if(!(pl.LoggedIn === undefined || pl.LoggedIn == false || pl.Lobby === undefined))
             {
-                if(pl.getVariable("InLobby") == mp.players.local.getVariable("InLobby")) lobbyPlayers++;
+                if(pl.Lobby == mp.players.local.Lobby) lobbyPlayers++;
             }
         });
 
-        if(mp.players.local.getVariable("InLobby") == -2) lobbyStr = "Jail";
-        if(mp.players.local.getVariable("InLobby") == -3) lobbyStr = "Freeroam";
-        if(mp.players.local.getVariable("InLobby") == -4) lobbyStr = "Derby";
-        if(mp.players.local.getVariable("InLobby") == -5) lobbyStr = "Customizer";
-        if(mp.players.local.getVariable("InLobby") > -1) lobbyStr = mp.players.local.getVariable("InLobby").toString();
+        if(mp.players.local.Lobby == -2) lobbyStr = "Jail";
+        if(mp.players.local.Lobby == -3) lobbyStr = "Freeroam";
+        if(mp.players.local.Lobby == -4) lobbyStr = "Derby";
+        if(mp.players.local.Lobby == -5) lobbyStr = "Customizer";
+        if(mp.players.local.Lobby > -1) lobbyStr = mp.players.local.Lobby.toString();
         
         UIHud.execute(`gm.$refs.TopRight.$refs.Info.lobbyID = "${lobbyStr}";`);
     }
@@ -368,26 +368,26 @@ mp.events.add("render", () => {
         camera.destroy(true);
         
         bestlobbystr = "";
-        if(!(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false || mp.players.local.getVariable("InLobby") === undefined))
+        if(!(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false || mp.players.local.Lobby === undefined))
         {
             let lobbyPlayers = 0;
             mp.players.forEach((pl) => {
-                if(!(pl.LoggedIn === undefined || pl.LoggedIn == false || pl.getVariable("InLobby") === undefined))
+                if(!(pl.LoggedIn === undefined || pl.LoggedIn == false || pl.Lobby === undefined))
                 {
-                    if(pl.getVariable("InLobby") == mp.players.local.getVariable("InLobby")) lobbyPlayers++;
+                    if(pl.Lobby == mp.players.local.Lobby) lobbyPlayers++;
                 }
             });
 
-            if(mp.players.local.getVariable("InLobby") == -2) bestlobbystr = "~r~Jail";
-            if(mp.players.local.getVariable("InLobby") == -3) bestlobbystr = "~g~Freeroam";
-            if(mp.players.local.getVariable("InLobby") == -4)
+            if(mp.players.local.Lobby == -2) bestlobbystr = "~r~Jail";
+            if(mp.players.local.Lobby == -3) bestlobbystr = "~g~Freeroam";
+            if(mp.players.local.Lobby == -4)
             {
                 bestlobbystr = "~y~Derby " + "~w~| ~w~Participants: ~y~" + lobbyPlayers;
             }
-            if(mp.players.local.getVariable("InLobby") == -5) bestlobbystr = "~r~Player Customizer";
-            if(mp.players.local.getVariable("InLobby") > -1) 
+            if(mp.players.local.Lobby == -5) bestlobbystr = "~r~Player Customizer";
+            if(mp.players.local.Lobby > -1) 
             {
-                bestlobbystr = "~w~Lobby ~y~" + mp.players.local.getVariable("InLobby").toString() + "  ~w~|  ~w~Players: ~y~" + lobbyPlayers;
+                bestlobbystr = "~w~Lobby ~y~" + mp.players.local.Lobby.toString() + "  ~w~|  ~w~Players: ~y~" + lobbyPlayers;
             }
         }
     }
