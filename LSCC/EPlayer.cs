@@ -1053,12 +1053,12 @@ namespace LSCC
 
         public static void LoginBrowserSetup(Player player)
         {
+            player.TriggerEvent("showBrowser", "package://LoginRegister/index.html");
             player.TriggerEvent("InitiateCustomChat");
             player.TriggerEvent("TogglePlayerChat", false);
 
             SetDiscordStatus(player, "On login screen");
             ResetPlayerData(player);
-            player.TriggerEvent("showBrowser", "package://LoginRegister/login.html");
         }
         public static void GivePoints(Player player, int points)
         {
@@ -1385,6 +1385,10 @@ namespace LSCC
         public static void Notify(Player player, string title, string message, string alignment = "", string displaymode = "")
         {
             player.TriggerEvent("HUDNotify2", title, message, alignment, displaymode);
+        }
+        public static void Error(Player player, string message, string icon)
+        {
+            player.TriggerEvent("HUDError", message, icon);
         }
         public static void Notify(Player player, string msg, string color, string icon, bool close, int timeout, string alignment = "", string displaymode = "")
         {

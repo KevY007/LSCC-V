@@ -1492,14 +1492,21 @@ namespace LSCC
         [RemoteEvent("OnPlayerLoginAttempt")]
         public static void OnPlayerLoginAttempt(Player player, string username, string password)
         {
-            if ((username == null || username.Length < 2) || (password == null || password.Length < 2)) return;
+            if ((username == null || username.Length < 2))
+            {
+                EPlayer.Error(player, "Username field is required!", "fas fa-user");
+                return;
+            }
+            if ((password == null || password.Length < 2))
+            {
+                EPlayer.Error(player, "Password field is required!", "fas fa-lock");
+                return;
+            }
 
-            NAPI.Util.ConsoleOutput($"[Login Attempt] Username {username}");
+            NAPI.Util.ConsoleOutput($"[Login Attempt] Username {username} from {player.Name}");
             if (Environment.TickCount64 - player.GetData<long>("LastCryptAttempt") < 1000 || EPlayer.LoggedIn(player))
             {
-                player.SendNotification("~r~Please wait some time between each login attempt!", true);
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please wait some time between each login attempt!");
-                EPlayer.Notify(player, "Please wait between each attempt.", "red", "fas fa-lock", false, 1500);
+                EPlayer.Error(player, "Please wait between each attempt.", "fas fa-lock");
                 return;
             }
             player.SetData("LastCryptAttempt", Environment.TickCount64);
@@ -1527,9 +1534,7 @@ namespace LSCC
                     }
                 }
             }
-            player.SendNotification("~r~Invalid credentials or unable to log in!", true);
-            EPlayer.Notify(player, "Invalid credentials or unable to log in.", "red", "fas fa-lock", false, 1500);
-            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid credentials or unable to log in!");
+            EPlayer.Error(player, "Invalid credentials or unable to log-in!", "fas fa-lock");
 
         }
 
@@ -2128,78 +2133,58 @@ namespace LSCC
         }
 
         [RemoteEvent("OnPlayerRegisterAttempt")]
-        public static void OnPlayerRegisterAttempt(Player player, string email, string username, string password, string confirmpass)
+        public static void OnPlayerRegisterAttempt(Player player, string email, string username, string password)
         {
-            if ( (email == null || email.Length < 2) || (username == null || username.Length < 2) || (password == null || password.Length < 2)) return;
+            if ((username == null || username.Length < 2))
+            {
+                EPlayer.Error(player, "Username field is required!", "fas fa-user");
+                return;
+            }
+            if ((password == null || password.Length < 2))
+            {
+                EPlayer.Error(player, "Password field is required!", "fas fa-lock");
+                return;
+            }
 
-            NAPI.Util.ConsoleOutput($"[Register Attempt] Username {username}");
+            NAPI.Util.ConsoleOutput($"[Register Attempt] Username {username} from {player.Name}");
             if (Environment.TickCount64 - player.GetData<long>("LastCryptAttempt") < 1000 || EPlayer.LoggedIn(player))
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please wait some time between each register attempt!");
-                player.SendNotification("~r~Please wait some time between each register attempt!", true);
-                EPlayer.Notify(player, "Please wait between each attempt.", "red", "fas fa-user-plus", false, 1500);
+                EPlayer.Error(player, "Please wait between each attempt.", "fas fa-lock");
                 return;
             }
-            if (!password.Equals(confirmpass))
-            {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Passwords do not match!");
-                player.SendNotification("~r~Passwords do not match!", true);
-                EPlayer.Notify(player, "Passwords mismatch.", "red", "fas fa-lock", false, 1500);
-                return;
-            }
+  
             if (password.Length < 5)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your password is too small!");
-                player.SendNotification("~r~Password is too small!", true);
-                EPlayer.Notify(player, "Password is too small.", "red", "fas fa-lock", false, 1500);
+                EPlayer.Error(player, "Password does not match requirements!", "fas fa-lock");
                 return;
             }
             if (username.Contains("@") || username.Length < 4 || username.Length >= 24)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your username is too small/big or it cannot contain the character '@'");
-                player.SendNotification("~r~Username small or contains illegal characters!", true);
-                EPlayer.Notify(player, "Illegal characters detected in name.", "red", "fas fa-users", false, 1500);
+                EPlayer.Error(player, "Username does not match requirements!", "fas fa-user");
                 return;
             }
             Regex exp = new Regex(@"^[a-zA-Z0-9]*$");
             Match match = exp.Match(username);
             if (!match.Success)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your username can only contain alphabets or numbers!");
-                player.SendNotification("~r~Username contains illegal characters!", true);
-                EPlayer.Notify(player, "Illegal characters detected in name.", "red", "fas fa-users", false, 1500);
+                EPlayer.Error(player, "Username contains illegal characters!", "fas fa-user");
                 return;
             }
-            if (!email.Contains("@") || email.Length < 5)
+            if (email == null || !email.Contains("@") || email.Length < 5)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your email is invalid or too small!");
-                player.SendNotification("~r~Invalid email!", true);
-                EPlayer.Notify(player, "Invalid email.", "red", "fas fa-users", false, 1500);
-                return;
+                email = "N/A";
             }
 
             Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase) == true);
             if (acc != null)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}An account with this name already exists!");
-                player.SendNotification("~r~Account with this name already exists!", true);
-                EPlayer.Notify(player, "An acount with this name already exists.", "red", "fas fa-user-plus", false, 1500);
+                EPlayer.Error(player, "An account with this name already exists!", "fas fa-user");
                 return;
             }
 
-            /*acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Email == email);
-            if (acc != null)
-            {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}An account with this email already exists!");
-                player.SendNotification("~r~Account with this email already exists!", true);
-                return;
-            }*/
-
             if (ContextFactory.Instance.Accounts.Count(a => a.HWID.Equals(player.Serial) || a.RockstarID == player.SocialClubId) >= 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can only have TWO accounts per computer or rockstar ID!");
-                player.SendNotification("~r~You have more than two accounts on the same computer/game serial!", true);
-                EPlayer.Notify(player, "This machine/rockstar ID cannot be used to create more accounts.", "red", "fas fa-users", false, 1500);
+                EPlayer.Error(player, "You cannot create any more accounts on the same machine!", "fas fa-user");
                 return;
             }
 
