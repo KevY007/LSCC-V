@@ -119,7 +119,8 @@ mp.events.add("BeginCuffing", (target) => {
     cuffTimeLeft = 5;
 
     UIHud.execute(`gm.cuffProgress = true;`);
-
+    UIHud.execute(`gm.$refs.cuffProgress.time = ${cuffTimeLeft}`);
+    
     if(cuffInterval != null) clearInterval(cuffInterval);
 
     cuffInterval = setInterval(() => {
