@@ -116,6 +116,10 @@ mp.keys.bind(
     }
 );
 
+mp.events.add('ToggleNametags', (state) => {
+    renderNametags = state;
+});
+
 /*
  gm.topRight = false;
       topRightInfo

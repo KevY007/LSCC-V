@@ -1795,6 +1795,8 @@ namespace LSCC
                         player.SetData("ClimbProtectionProcs", 0);
                         player.SetData("ClimbProtectionEnd", Environment.TickCount64);
                         player.ResetData("CuffingTarget");
+                        player.TriggerEvent("moveSkyCamera", player, "up", 1, false);
+                        player.TriggerEvent("ToggleNametags", false);
                         player.RemoveAllWeapons();
                         player.Health = 100;
                         player.Armor = 0;
@@ -2246,48 +2248,24 @@ namespace LSCC
                                 catch { }
 
                                 data.Item1.SetIntoVehicle(data.Item2, data.Item3);
-
-                                if (!lobby.Cops.Contains(data.Item1))
-                                {
-                                    EPlayer.Freeze(data.Item1, false);
-                                }
                                 data.Item1.SetSharedData("HasShot", false);
+                                EPlayer.Freeze(data.Item1, true);
                             }
                         }
 
                         if (lobby.gameMode == GameModes.STANDARD)
                         {
-                            NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] Copchase started with !{{#8D8DFF}}{lobby.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{lobby.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{map.Name}!{{#FFFFFF}}.");
                             Discord.SendTextChannel("game-notify", $"**(Lobby {lobbyid}) Standard Copchase has been started! | Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
                         }
                         else if (lobby.gameMode == GameModes.BUSTED)
                         {
-                            NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] Mode BUSTED! started with !{{#8D8DFF}}{lobby.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{lobby.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{map.Name}!{{#FFFFFF}}.");
                             Discord.SendTextChannel("game-notify", $"**(Lobby {lobbyid}) Copchase in BUSTED! mode has been started! | Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
                         }
 
-                        foreach (Player p in RAGE.Entities.Players.All.Where(p => lobby.Cops.Contains(p) || lobby.Fugitives.Contains(p)))
-                        {
-                            EPlayer.Notify(p, "Police beginning chase...", "red", "fas fa-hourglass-start", false, 10000, "topCenter");
-
-                            if (lobby.gameMode == GameModes.STANDARD)
-                            {
-                                p.SendChatMessage("!{#FF6347}[!] !{#8D8DFF}Cops will be unfrozen in 10 seconds. !{#E84040}Fugitive's may take this time to prepare/start the chase.");
-                            }
-                            else if (lobby.gameMode == GameModes.BUSTED)
-                            {
-                                p.SendChatMessage($"!{{#1E9913}}[!] ATTENTION: The lobby you're playing is in BUSTED! mode. This is not a standard chase.");
-                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you do not receive weapons nor fight, rather you EVADE and win by skills!");
-                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Cops have to box/stick close to fugitive's to start the busting process.");
-                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}More cops would makes the process a lot faster and the closer you get.");
-                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Fugitive's have to get away to regress the busting progress.");
-                            }
-                        }
-
-                        lobby.FugitiveShowCounter = 80;
-                        lobby.LastSeenCounter = 0;
-                        lobby.GameProgress = 0;
-                        lobby.CollisionCounter = 35;
+                        lobby.FugitiveShowCounter = 70;
+                        lobby.LastSeenCounter = -10;
+                        lobby.GameProgress = -10;
+                        lobby.CollisionCounter = 45;
 
                         foreach (Player p in Settings.LoggedInPlayers)
                         {
@@ -2295,7 +2273,7 @@ namespace LSCC
 
                             if (p.GetSharedData<int>("InLobby") == lobbyid)
                             {
-                                p.TriggerEvent("StartChaseTimer", 0, Settings.GameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
+                                p.TriggerEvent("StartChaseTimer", -8, Settings.GameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
                             }
                         }
                     }, delayTime: 2000);
@@ -2308,27 +2286,15 @@ namespace LSCC
                             {
                                 if (p != null && p.Exists)
                                 {
+                                    p.TriggerEvent("moveSkyCamera", p, "down");
+                                    EPlayer.Freeze(p, true);
+
                                     if (p.HasData("putVehicle")) p.SetIntoVehicle(p.GetData<Vehicle>("putVehicle"), p.GetData<int>("putVehicleSeat"));
                                 }
                             }
                         }
                         catch { }
 
-                    }, delayTime: 3000);
-
-                    NAPI.Task.Run(() =>
-                    {
-                        try
-                        {
-                            foreach (Player p in RAGE.Entities.Players.All.Where(p => lobby.Cops.Contains(p) || lobby.Fugitives.Contains(p)))
-                            {
-                                if (p != null && p.Exists)
-                                {
-                                    if (p.HasData("putVehicle")) p.SetIntoVehicle(p.GetData<Vehicle>("putVehicle"), p.GetData<int>("putVehicleSeat"));
-                                }
-                            }
-                        }
-                        catch { }
                     }, delayTime: 5000);
 
 
@@ -2366,12 +2332,47 @@ namespace LSCC
                     {
                         lobby.GameProgress++;
 
-                        if ((10 - lobby.GameProgress) % 2 == 0 && lobby.GameProgress <= 8 && lobby.GameProgress > 0)
+                        if (lobby.GameProgress == 0)
                         {
-                            lobby.Cops.ForEach(p => {
-                                EPlayer.Freeze(p, true);
-                                //p.SendNotification($"~b~Unfrozen in {10 - lobby.GameProgress}s...");
+                            lobby.Fugitives.ForEach(p =>
+                            {
+                                p.TriggerEvent("ToggleNametags", true);
+                                EPlayer.Freeze(p, false);
+                                if (p.HasData("putVehicle")) p.SetIntoVehicle(p.GetData<Vehicle>("putVehicle"), p.GetData<int>("putVehicleSeat"));
                             });
+                            lobby.Cops.ForEach(p =>
+                            {
+                                p.TriggerEvent("ToggleNametags", true);
+
+                                if (p.HasData("putVehicle")) p.SetIntoVehicle(p.GetData<Vehicle>("putVehicle"), p.GetData<int>("putVehicleSeat"));
+                            });
+
+                            if (lobby.gameMode == GameModes.STANDARD)
+                            {
+                                NAPI.Chat.SendChatMessageToAll($"[Lobby {lobby.lobbyId}] Copchase started with !{{#8D8DFF}}{lobby.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{lobby.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{ContextFactory.Instance.Maps.ToList().Find(a => a.SQL_ID == lobby.lastMapId).Name}!{{#FFFFFF}}.");
+                            }
+                            else if (lobby.gameMode == GameModes.BUSTED)
+                            {
+                                NAPI.Chat.SendChatMessageToAll($"[Lobby {lobby.lobbyId}] Mode BUSTED! started with !{{#8D8DFF}}{lobby.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{lobby.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{ContextFactory.Instance.Maps.ToList().Find(a => a.SQL_ID == lobby.lastMapId).Name}!{{#FFFFFF}}.");
+                            }
+
+
+                            foreach (Player p in Settings.LoggedInPlayers.Where(p => lobby.Cops.Contains(p) || lobby.Fugitives.Contains(p)))
+                            {
+                                if(lobby.Cops.Contains(p)) EPlayer.Notify(p, "You will be unfreezed in 10 seconds.", "orange", "fas fa-hourglass-start", false, 10000);
+                                if (lobby.gameMode == GameModes.STANDARD)
+                                {
+                                    p.SendChatMessage("!{#FF6347}[!] !{#8D8DFF}Cops will be unfrozen in 10 seconds. !{#E84040}Fugitive's may take this time to prepare/start the chase.");
+                                }
+                                else if (lobby.gameMode == GameModes.BUSTED)
+                                {
+                                    p.SendChatMessage($"!{{#1E9913}}[!] ATTENTION: The lobby you're playing is in BUSTED! mode. This is not a standard chase.");
+                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you do not receive weapons nor fight, rather you EVADE and win by skills!");
+                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Cops have to box/stick close to fugitive's to start the busting process.");
+                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}More cops would makes the process a lot faster and the closer you get.");
+                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Fugitive's have to get away to regress the busting progress.");
+                                }
+                            }
                         }
 
                         if (lobby.GameProgress == 10)
@@ -2446,7 +2447,7 @@ namespace LSCC
                                     player.SetSharedData("BustedProgress", 0.0);
                                     if (!lobby.Cops.Contains(player) && !lobby.Fugitives.Contains(player)) continue;
 
-                                    EPlayer.Notify(player, "Collisions have been enabled and weapons issued", "green", "fas fa-cars", false, 3000);
+                                    EPlayer.Notify(player, "Collisions have been enabled and weapons issued", "green", "fas fa-car-crash", false, 3000);
 
                                     if (lobby.Cops.Contains(player))
                                     {

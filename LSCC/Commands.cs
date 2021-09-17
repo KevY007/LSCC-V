@@ -4188,6 +4188,12 @@ namespace LSCC
                 return;
             }
 
+            if(!EPlayer.LoggedIn(target))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not logged in!");
+                return;
+            }
+
             if (EPlayer.GetAccount(player).Admin < EPlayer.GetAccount(target).Admin)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is more higher admin level than you!");
@@ -4223,7 +4229,7 @@ namespace LSCC
                 p.SendChatMessage($"!{{#FF6347}}[AdmCmd] {player.Name} has banned {target.Name} for: {reason}");
             });
 
-            EPlayer.Notify(player, $"You have been banned from the server.<p>Reason: {reason}</p><p>Admin: {player.Name}</p>", "red", "fas fa-ban", true, 30000);
+            EPlayer.Notify(target, $"You have been banned from the server.<p>Reason: {reason}</p><p>Admin: {player.Name}</p>", "red", "fas fa-ban", true, 30000);
 
             target.SendChatMessage($"!{{#FF6347}}[BANNED] You have been banned from this server, Ban ID: {_new.SQL_ID}");
 
@@ -4251,12 +4257,18 @@ namespace LSCC
         [Command("suspend", "!{#AFAFAF}[USAGE] suspend (target)")]
         public void cmd_suspend(Player player, Player target)
         {
-            if (!EPlayer.LoggedIn(player) || !EPlayer.LoggedIn(target) || player == target)
+            if (!EPlayer.LoggedIn(player) || player == target)
                 return;
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+            if (!EPlayer.LoggedIn(target))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not logged in!");
                 return;
             }
 
@@ -4285,7 +4297,7 @@ namespace LSCC
 
             target.SendChatMessage($"!{{#FF6347}}[SUSPEND] Your account has been suspended and cannot be used anymore.");
 
-            EPlayer.Notify(player, $"Your account has been suspended.<p>Suspending Admin: {player.Name}</p>", "red", "fas fa-ban", true, 30000);
+            EPlayer.Notify(target, $"Your account has been suspended.<p>Suspending Admin: {player.Name}</p>", "red", "fas fa-ban", true, 30000);
 
             target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
@@ -4538,7 +4550,7 @@ namespace LSCC
             
             if (mapBruh == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}No map with that name/ID found."); return; }
 
-            if (ContextFactory.Instance.Maps.Count(a => a.Enabled == true) <= 1)
+            if (ContextFactory.Instance.Maps.Count(a => a.Enabled == true) <= 1 && mapBruh.Enabled)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot disable all the maps in the server! If you want to disable CC then use /game autostart.");
                 return;
@@ -6418,10 +6430,15 @@ namespace LSCC
             }
             else
             {
-                if (!player.Name.Equals(target.Name) && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
+                if (EPlayer.LoggedIn(target))
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
-                    return;
+                    if (!player.Name.Equals(target.Name) && EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
+                        return;
+                    }
+                    Logs.LogAdmin(player, $"Kicked {target.Name} for {reason}.");
+                    Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Kick", reason, "N/A");
                 }
 
                 if (target.Name.StartsWith("KevY")) return;
@@ -6431,11 +6448,10 @@ namespace LSCC
                     playa.SendChatMessage($"!{{#FF6347}}[AdmCmd] {target.Name} has been kicked by {player.Name} for {reason}.");
                 });
 
-                EPlayer.Notify(player, $"You have been kicked from the server by {player.Name} for <p>{reason}</p>", "red", "fas fa-ban", true, 30000);
+                EPlayer.Notify(target, $"You have been kicked from the server by {player.Name} for <p>{reason}</p>", "red", "fas fa-ban", true, 30000);
 
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:kick:{target.Name}:{reason.Replace(":", "|")}"); } catch { }
-                Logs.LogAdmin(player, $"Kicked {target.Name} for {reason}.");
-                Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Kick", reason, "N/A");
+                
 
                 target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 

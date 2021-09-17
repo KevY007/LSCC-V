@@ -680,7 +680,7 @@ mp.events.add('render', () => {
                 {
                     chaseTimeCur += 1;
 
-                    if(chaseTimeCur >= chaseTimeMax)
+                    if(chaseTimeCur >= chaseTimeMax || chaseTimeCur <= -1)
                     {
                         chaseRunning = false;
                         UIHud.execute(`gm.gameProgress = false;`);
