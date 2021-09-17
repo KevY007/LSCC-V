@@ -106,15 +106,14 @@ mp.events.add("ResolveJS", (code) => {
 });
 
 mp.events.add("TwoSecondsEvent", () => {
-    if(mp.players.local.getVariable("Team") !== undefined && mp.players.local.getVariable("Team") == 0)
+    if(mp.players.local.Team !== undefined && mp.players.local.Team == 0)
     {
         if(mp.players.local.isSwimming() && !mp.players.local.isDead() && !mp.players.local.isInAnyVehicle(false)) {
             mp.events.callRemote("RequestSwimPenalty");
         }
     }
 
-    let team = mp.players.local.getVariable("Team");
-    switch(team){
+    switch(mp.players.local.Team){
         case 0:
             mp.game.ui.setHudColour(143, 255, 0, 0, 128);
             mp.game.ui.setHudColour(144, 255, 0, 0, 128);
@@ -154,20 +153,12 @@ function getPointToBoneOffset(aimX, aimY, aimZ, boneX, boneY, boneZ) {
     return (xDif + yDif + zDif);
 }
 
-setInterval(() => {
-    if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
-    {
-        mp.events.callRemote("UpdateTabbedState", mp.system.isFocused);
-        mp.events.callLocal("TwoSecondsEvent");
-    }
-}, 2000);
-
 
 function TogGPSMode()
 {
     if(menuToggled !== undefined && menuToggled) return;
     if(Date.now() - lastChatToggle >= 500 && chatStatus == false && 
-        (mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true))
+        (mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true))
     {
         traceLastFunc(`[Players] Attempt tog GPS`);
 
@@ -409,9 +400,47 @@ mp.events.add('entityStreamOut', (entity) => {
     }
 });
 
+mp.events.addDataHandler('Team', function (entity, value, oldValue) 
+{
+    entity.Team = value;
+    
+    if(entity.type === 'player' && entity.id == mp.players.local.id)
+    {
+        let r = 255;
+        let g = 255;
+        let b = 255;
+
+        if(value == 1)
+        {
+            r = 0;
+            g = 0;
+            b = 255;
+        }
+        else if(value == 0)
+        {
+            r = 255;
+            g = 0;
+            b = 0;
+        }
+        else
+        {
+            r = 110;
+            g = 200;
+            b = 200;
+        }
+        mp.game.invoke('0xF314CF4F0211894E', 143, r, g, b, 255); // Replace Michael colour
+        mp.game.invoke('0xF314CF4F0211894E', 116, r, g, b, 255); // Replace freemode colour
+    }
+});
+
+mp.events.addDataHandler('pLogged', function (entity, value, oldValue) 
+{
+    entity.LoggedIn = value;
+});
+
 mp.events.add('render', () => {
 
-    if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
+    if(mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
     {
         mp.game.player.restoreStamina(100);
 
@@ -448,7 +477,7 @@ mp.events.add('render', () => {
                     mp.game.controls.disableControlAction(32, 92, true); 
                     mp.game.controls.disableControlAction(32, 69, true); 
                     mp.game.controls.disableControlAction(32, 24, true); 
-                    // /*&& player.weapon != 2725352035 && player.getVariable("Team") == 0*/
+                    // /*&& player.weapon != 2725352035 && player.Team == 0*/
                 } //-- ALLOWED FUGITIVE DRIVER AIMING AGAIN!! 
             }
         }
@@ -464,7 +493,7 @@ mp.events.add('render', () => {
         {
             secondCounter = 0;
 
-            if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
+            if(mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
             {
                 if(player.isInAnyVehicle(false))
                 {
@@ -536,7 +565,7 @@ mp.events.add('render', () => {
                         
                         if(dist > MaxVoiceRange) {
                             if(target.getVariable("VoiceMode") == 1) {
-                                if(target.getVariable("Team") == mp.players.local.getVariable("Team")) target.voiceVolume = 0.5;
+                                if(target.Team == mp.players.local.Team) target.voiceVolume = 0.5;
                                 else target.voiceVolume = 0.7;
                             }
                             else target.voiceVolume = 0.0;
@@ -602,7 +631,7 @@ mp.events.add('render', () => {
 
                     mp.players.forEach(target => {
 
-                        if(target.getVariable("pLogged") !== undefined && target.getVariable("InLobby") == -4)
+                        if(target.LoggedIn !== undefined && target.getVariable("InLobby") == -4)
                         {
                             if(target.getVariable("DerbyTime") > TimeNow)
                             {
@@ -704,7 +733,7 @@ mp.events.add('render', () => {
                 }
 
                 traceLastFunc(`[Players] Update Chase Data3`);
-                if((player.getVariable("Team") == 0 || player.getVariable("Team") == 1) && collisionTime == -1)
+                if((player.Team == 0 || player.Team == 1) && collisionTime == -1)
                 {
                     if(!player.isInAnyVehicle(false) && ServerSettings.OnfootCollisions == false)
                     {
@@ -758,7 +787,7 @@ mp.events.add('render', () => {
                 {
                     var blipColor = 45;
                     var blipId = 1;
-                    if(target.getVariable("Team") == 0) 
+                    if(target.Team == 0) 
                     {
                         blipColor = 75;
                         if(target.getVariable("HasShot") == true){
@@ -766,7 +795,7 @@ mp.events.add('render', () => {
                             blipId = 458;
                         }
                     }
-                    else if(target.getVariable("Team") == 1) blipColor = 3;
+                    else if(target.Team == 1) blipColor = 3;
                     if(target.getVariable("InLobby") == -3) blipColor = 15;
                     if(target.getVariable("InLobby") == -4) blipColor = 73;
                     if(target.getVariable("InDM") != -1) blipColor = 39;
@@ -808,7 +837,7 @@ mp.events.add('render', () => {
         traceLastFunc(`[Players] Update Completed`);
     }
 
-    if(Date.now() - targetChecker >= 25 && player.getVariable("Team") !== undefined && player.getVariable("Team") != -1)
+    if(Date.now() - targetChecker >= 25 && player.Team !== undefined && player.Team != -1)
     {
         targetChecker = Date.now();
 
@@ -819,11 +848,11 @@ mp.events.add('render', () => {
         {
             if(typeof target.getVariable === 'function')
             {
-                if(target.getVariable("Team") !== undefined && target.getVariable("Team") != -1) 
+                if(target.Team !== undefined && target.Team != -1) 
                 {
                     if(target.type === 'vehicle')
                     {
-                        if(target.getVariable("Team") == player.getVariable("Team"))
+                        if(target.Team == player.Team)
                         {
                             clickDisable = true; // Disable shooting team-kill car by default
                             var vehicleOccupants = 0;
@@ -831,7 +860,7 @@ mp.events.add('render', () => {
                             mp.players.forEach(occupant => {
                                 if(occupant.isInVehicle(target.handle, false)) {
                                     vehicleOccupants++;
-                                    if(occupant.getVariable("Team") != player.getVariable("Team")) 
+                                    if(occupant.Team != player.Team) 
                                     {
                                         clickDisable = false; // Don't break shot if there's a fugi in or opposite team member!
                                     }
@@ -840,7 +869,7 @@ mp.events.add('render', () => {
 
                             if(vehicleOccupants == 0) clickDisable = false;
                         }
-                        else if(target.getVariable("Team") == 0 && player.getVariable("Team") == 1)
+                        else if(target.Team == 0 && player.Team == 1)
                         {
                             clickDisable = true; // Disable innocent car shots by default.
                             var vehicleOccupants = 0;
@@ -848,7 +877,7 @@ mp.events.add('render', () => {
                             mp.players.forEach(occupant => {
                                 if(occupant.isInVehicle(target.handle, false)) {
                                     vehicleOccupants++;
-                                    if(occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true) {
+                                    if(occupant.Team == 0 && occupant.getVariable("HasShot") == true) {
                                         clickDisable = false; // Don't break shot if there's a fugitive that shot in!
                                     }
                                 }
@@ -859,19 +888,19 @@ mp.events.add('render', () => {
                     }
                     else if(target.type === 'player')
                     {
-                        if(target.getVariable("Team") != -1 && player.getVariable("Team") != -1)
+                        if(target.Team != -1 && player.Team != -1)
                         {
-                            if(player.getVariable("Team") == target.getVariable("Team"))
+                            if(player.Team == target.Team)
                             {
                                 clickDisable = true;
 
                                 if(target.isInAnyVehicle(true) && clickDisable == true && target.vehicle) {
-                                    if(target.vehicle.getVariable("Team") !== undefined && target.vehicle.getVariable("Team") != target.getVariable("Team")) {
+                                    if(target.vehicle.Team !== undefined && target.vehicle.Team != target.Team) {
                                         clickDisable = false;
                                     }
                                     else {
                                         mp.players.forEach(occupant => {
-                                            if(occupant.isInVehicle(target.vehicle.handle, true) && occupant.getVariable("Team") != target.getVariable("Team")) { 
+                                            if(occupant.isInVehicle(target.vehicle.handle, true) && occupant.Team != target.Team) { 
                                                 clickDisable = false; // Member of opposite team in it? Shoot.
                                             }
                                         });
@@ -879,19 +908,19 @@ mp.events.add('render', () => {
                                 }
                             }
 
-                            if(player.getVariable("Team") == 1 && target.getVariable("Team") == 0 && 
+                            if(player.Team == 1 && target.Team == 0 && 
                                 target.getVariable("HasShot") == false) // Disable click for fugi with no tag
                             {
                                 clickDisable = true;
 
                                 if(target.isInAnyVehicle(true) && clickDisable == true && target.vehicle)
                                 {
-                                    if(target.vehicle.getVariable("Team") !== undefined && target.vehicle.getVariable("Team") != target.getVariable("Team")) {
+                                    if(target.vehicle.Team !== undefined && target.vehicle.Team != target.Team) {
                                         clickDisable = false;
                                     }
                                     else {
                                         mp.players.forEach(occupant => {
-                                            if(occupant.isInVehicle(target.vehicle.handle, true) && occupant.getVariable("Team") == target.getVariable("Team") && 
+                                            if(occupant.isInVehicle(target.vehicle.handle, true) && occupant.Team == target.Team && 
                                             occupant.getVariable("HasShot") == true) {
                                                 clickDisable = false;
                                             }
@@ -924,21 +953,21 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         else if(targetEntity.type === 'player') ShotStats.HitPlayer++;
         else ShotStats.Missed++;
 
-        if(targetEntity.type === 'vehicle' && player.getVariable("Team") != -1)
+        if(targetEntity.type === 'vehicle' && player.Team != -1)
         {
-            if(targetEntity.getVariable("Team") !== undefined)
+            if(targetEntity.Team !== undefined)
             {
                 var vehicleOccupants = 0;
                 let breakShot = false;
 
-                if(targetEntity.getVariable("Team") == player.getVariable("Team"))
+                if(targetEntity.Team == player.Team)
                 {
                     breakShot = true; // Break team-kill car by default
                     
                     mp.players.forEach(occupant => {
                         if(occupant.isInVehicle(targetEntity.handle, false)) {
                             vehicleOccupants++;
-                            if(occupant.getVariable("Team") != player.getVariable("Team")) 
+                            if(occupant.Team != player.Team) 
                             {
                                 breakShot = false; // Don't break shot if there's a fugi in or opposite team member!
                             }
@@ -949,14 +978,14 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
 
                     if(breakShot) mp.game.graphics.notify("~r~Do not teamkill!");
                 }
-                else if(targetEntity.getVariable("Team") == 0 && player.getVariable("Team") == 1 && player.weapon != 911657153)
+                else if(targetEntity.Team == 0 && player.Team == 1 && player.weapon != 911657153)
                 {
                     breakShot = true; // Break innocent car shots by default.
 
                     mp.players.forEach(occupant => {
                         if(occupant.isInVehicle(targetEntity.handle, false)) {
                             vehicleOccupants++;
-                            if(occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true && !occupant.isDead()) {
+                            if(occupant.Team == 0 && occupant.getVariable("HasShot") == true && !occupant.isDead()) {
                                 breakShot = false; // Don't break shot if there's a fugitive that shot in!
                             }
                         }
@@ -972,18 +1001,18 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         }
         if(targetEntity.type === 'player')
         {
-            if(targetEntity.getVariable("Team") !== undefined && targetEntity.getVariable("HasShot") !== undefined)
+            if(targetEntity.Team !== undefined && targetEntity.getVariable("HasShot") !== undefined)
             {
                 if(targetEntity.isInAnyVehicle(false) == false)
                 {
-                    if(targetEntity.getVariable("Team") != -1)
+                    if(targetEntity.Team != -1)
                     {
-                        if(player.getVariable("Team") == targetEntity.getVariable("Team"))
+                        if(player.Team == targetEntity.Team)
                         {
                             mp.events.callRemote("PlayerShotAtWrongPlayer", 0, targetEntity);
                             return true;
                         }
-                        if(player.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && targetEntity.getVariable("HasShot") == false && 
+                        if(player.Team == 1 && targetEntity.Team == 0 && targetEntity.getVariable("HasShot") == false && 
                             player.weapon != 911657153) // Shot a fugitive that hasn't shot.
                         {
                             mp.events.callRemote("PlayerShotAtWrongPlayer", 1, targetEntity);
@@ -1000,13 +1029,13 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
 
                 if(player.weapon == 911657153 && 
                     (BigInt(Math.round((new Date()).getTime() / 1000)) - BigInt(targetEntity.getVariable("LastVehEnterExit"))) <= BigInt(7) 
-                    && targetEntity.getVariable("Team") == 0)
+                    && targetEntity.Team == 0)
                 {
                     mp.game.graphics.notify("~r~Cannot tase! Target exiting vehicle!");
                     return true;
                 }
 
-                if(player.weapon == 911657153 && targetEntity.getVariable("HasShot") == true && targetEntity.getVariable("Team") == 0)
+                if(player.weapon == 911657153 && targetEntity.getVariable("HasShot") == true && targetEntity.Team == 0)
                 {
                     return true;
                 }
@@ -1031,7 +1060,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         }
     }
 
-    if(mp.players.local.getVariable("HasShot") == false && player.getVariable("Team") == 0)
+    if(mp.players.local.getVariable("HasShot") == false && player.Team == 0)
     {
         mp.events.callRemote("GivePlayerShotTag");
     }
@@ -1050,14 +1079,14 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
 
             if(weapon == 911657153 && targetEntity.getVariable("HasShot") == true && targetEntity.getVariable("Tean") == 0) return true;
 
-            if(sourceEntity.getVariable("Team") != -1 && player.getVariable("Team") != -1)
+            if(sourceEntity.Team != -1 && player.Team != -1)
             {
-                if(player.getVariable("Team") == sourceEntity.getVariable("Team"))
+                if(player.Team == sourceEntity.Team)
                 {
                     return true;
                 }
 
-                if(sourceEntity.getVariable("Team") == 1 && player.getVariable("Team") == 0 && 
+                if(sourceEntity.Team == 1 && player.Team == 0 && 
                     player.getVariable("HasShot") == false && weapon != 911657153) // Took damage from a cop and hasn't shot.
                 {
                     return true;
@@ -1091,31 +1120,31 @@ function isMeleeWeapon(weapon){
 }
 
 mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage) => {
-    if(sourceEntity !== undefined && sourceEntity !== null && sourceEntity.type === 'player' && sourceEntity == player && player.getVariable("Team") != -1)
+    if(sourceEntity !== undefined && sourceEntity !== null && sourceEntity.type === 'player' && sourceEntity == player && player.Team != -1)
     {
         if(targetEntity !== undefined && targetEntity !== null && targetEntity.type === 'player')
         {
-            if(targetEntity.getVariable("Team") != -1 && player.getVariable("Team") != -1)
+            if(targetEntity.Team != -1 && player.Team != -1)
             {
-                if(sourceEntity.getVariable("Team") == targetEntity.getVariable("Team"))
+                if(sourceEntity.Team == targetEntity.Team)
                 {
                     return true;
                 }
 
-                if(sourceEntity.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0) 
+                if(sourceEntity.Team == 1 && targetEntity.Team == 0) 
                 {
                     if(targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
                     {
                         if(weapon != 911657153) return true;
 
                         if(weapon == 911657153 && (BigInt(Math.round((new Date()).getTime() / 1000)) - BigInt(targetEntity.getVariable("LastVehEnterExit"))) <= BigInt(7) 
-                            && targetEntity.getVariable("Team") == 0)
+                            && targetEntity.Team == 0)
                         {
                             mp.game.graphics.notify("~r~Cannot tase! Target exiting vehicle!");
                             return true;
                         }
 
-                        if(weapon == 911657153 && targetEntity.getVariable("Team") == 0 && targetEntity.getVariable("HasShot") == true) {
+                        if(weapon == 911657153 && targetEntity.Team == 0 && targetEntity.getVariable("HasShot") == true) {
                             return true;
                         }
 
@@ -1133,28 +1162,28 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                         }
                     }
                 }
-                if(sourceEntity.getVariable("Team") == 0 && targetEntity.getVariable("Team") == 1 && sourceEntity.getVariable("HasShot") == false
+                if(sourceEntity.Team == 0 && targetEntity.Team == 1 && sourceEntity.getVariable("HasShot") == false
                     && isMeleeWeapon(weapon))
                 {
                     mp.events.callRemote("GivePlayerShotTag");
                 }
             }
         }
-        else if(targetEntity.type === 'vehicle' && player.getVariable("Team") != -1)
+        else if(targetEntity.type === 'vehicle' && player.Team != -1)
         {
-            if(targetEntity.getVariable("Team") !== undefined && player.getVariable("Team") != -1)
+            if(targetEntity.Team !== undefined && player.Team != -1)
             {
                 let breakShot = false;
                 var vehicleOccupants = 0;
 
-                if(targetEntity.getVariable("Team") == player.getVariable("Team"))
+                if(targetEntity.Team == player.Team)
                 {
                     breakShot = true; // Break team-kill car by default
                     
                     mp.players.forEach(occupant => {
                         if(occupant.isInVehicle(targetEntity.handle, false)) {
                             vehicleOccupants++;
-                            if(occupant.getVariable("Team") != player.getVariable("Team")) {
+                            if(occupant.Team != player.Team) {
                                 breakShot = false; // Don't break shot if there's a fugi in or opposite team member!
                             }
                         }
@@ -1164,14 +1193,14 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
 
                     if(breakShot) mp.game.graphics.notify("~r~Do not teamkill!");
                 }
-                else if(targetEntity.getVariable("Team") == 0 && player.getVariable("Team") == 1 && weapon != 911657153)
+                else if(targetEntity.Team == 0 && player.Team == 1 && weapon != 911657153)
                 {
                     breakShot = true; // Break innocent car shots by default.
 
                     mp.players.forEach(occupant => {
                         if(occupant.isInVehicle(targetEntity.handle, false)) {
                             vehicleOccupants++;
-                            if(occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true) {
+                            if(occupant.Team == 0 && occupant.getVariable("HasShot") == true) {
                                breakShot = false; // Don't break shot if there's a fugitive that shot in!
                             }
                         }
@@ -1286,10 +1315,10 @@ mp.events.add(
             }
         },
 
-        "PlayThemeSong": (link, level) => {
+        "PlaySong": (link, level) => {
             themeSoundID = mp.game.audio.playSoundEx(link, level);
         },
-        "StopThemeSong": () => {
+        "StopSong": () => {
             mp.game.audio.stopSoundEx(themeSoundID);
         },
 
@@ -1553,5 +1582,14 @@ mp.events.add(
 
         "playerReady": (player) => {
             mp.events.callRemote("playerReadyCon");
+            mp.game.gxt.set('PM_PAUSE_HDR', 'Los Santos Copchase'); // Replace map title
+
+            setInterval(() => {
+                if(mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
+                {
+                    mp.events.callRemote("UpdateTabbedState", mp.system.isFocused);
+                    mp.events.callLocal("TwoSecondsEvent");
+                }
+            }, 2000);
         },
     });

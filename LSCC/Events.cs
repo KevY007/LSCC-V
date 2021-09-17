@@ -17,12 +17,7 @@ namespace LSCC
         [ServerEvent(Event.PlayerConnected)]
         public void OnPlayerConnected_Old(Player player)
         {
-
-        }
-
-        [RemoteEvent("playerReadyCon")]
-        public void OnPlayerConnected(Player player)
-        {
+            EPlayer.ResetPlayerData(player);
             BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.HWID.CompareTo(player.Serial) == 0 || ban.IP.CompareTo(player.Address) == 0 ||
                 ban.RockstarID == player.SocialClubId);
 
@@ -67,8 +62,14 @@ namespace LSCC
 
 
 
-            EPlayer.SetDiscordStatus(player, "Connecting to the server...");
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has joined the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
+        }
+
+        [RemoteEvent("playerReadyCon")]
+        public void OnPlayerConnected(Player player)
+        {
+            EPlayer.SetDiscordStatus(player, "Connecting to the server...");
+
             NAPI.Notification.SendNotificationToPlayer(player, "~g~Welcome to ~w~Los Santos Copchase!");
             player.SetData("LastCryptAttempt", Environment.TickCount64);
 
@@ -83,7 +84,7 @@ namespace LSCC
 
             player.TriggerEvent("InitChaseTimer");
 
-            player.TriggerEvent("PlayThemeSong", "http://51.91.109.79/_lsccv_stuff/v_open.mp3", 0.015);
+            //player.TriggerEvent("PlaySong", "http://51.91.109.79/_lsccv_stuff/v_open.mp3", 0.015);
 
             NAPI.Task.Run(() =>
             {
@@ -953,10 +954,9 @@ namespace LSCC
         {
             player.SetSharedData("EntAlpha", 255);
             player.SetData("PlaytimeTick", Environment.TickCount64);
-            player.TriggerEvent("StopThemeSong");
+            player.TriggerEvent("StopSong");
             Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in as {acc.Username}.*");
 
-            EPlayer.SetDiscordStatus(player, $"Logging in as {acc.Username}");
             NAPI.Util.ConsoleOutput($"[Login] {player.Name} has logged in as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
 
@@ -1134,7 +1134,7 @@ namespace LSCC
 
             EPlayer.Spawn(player);
 
-            player.TriggerEvent("StopThemeSong");
+            player.TriggerEvent("StopSong");
 
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can edit your character's clothing with /char clothing.");
             

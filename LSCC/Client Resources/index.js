@@ -17,6 +17,9 @@ var UIHud = null;
 var UIMenu = null;
 var menuToggled = false;
 
+mp.players.local.Team = -1;
+mp.players.local.LoggedIn = false;
+
 function traceLastFunc(iStr)
 {
     

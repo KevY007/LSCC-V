@@ -18,7 +18,7 @@ mp.events.add("MenuToggleTyping", (state) => {
     else
     {
         mp.keys.bind(0x4D, false, function() {
-            if(UIMenu != null && Date.now() - lastChatToggle >= 500 && chatStatus == false && mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
+            if(UIMenu != null && Date.now() - lastChatToggle >= 500 && chatStatus == false && mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
             {
                 traceLastFunc(`[Menu] Attempt open/M key`);
         

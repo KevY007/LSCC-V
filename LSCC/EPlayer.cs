@@ -416,8 +416,6 @@ namespace LSCC
 
             player.TriggerEvent("toggleCreator", true, NAPI.Util.ToJson(defaultChar));
 
-            NAPI.Entity.SetEntityTransparency(player, 255);
-
             return;
         }
 
@@ -1033,8 +1031,6 @@ namespace LSCC
 
         public static void LoginCameraSetup(Player player)
         {
-            NAPI.Entity.SetEntityTransparency(player, 0);
-
             player.TriggerEvent("TogglePlayerChat", false);
             EPlayer.Freeze(player, true);
             player.Position = new Vector3(Settings.LoginCameraX, Settings.LoginCameraY, Settings.LoginCameraZ);
@@ -1301,8 +1297,6 @@ namespace LSCC
             }
 
             NAPI.Player.SpawnPlayer(player, VecSpawn);
-
-            NAPI.Entity.SetEntityTransparency(player, 255);
 
             EPlayer.Freeze(player, false);
             EPlayer.SetColor(player, new Color(255, 255, 255, 255));

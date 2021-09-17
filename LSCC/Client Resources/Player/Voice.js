@@ -15,7 +15,7 @@ function DisableVoice()
 function EnableVoice()
 {
     if(!chatStatus && 
-		!(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false)) 
+		!(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false)) 
 	{
         traceLastFunc(`[Players] Enable Voice`);
 
@@ -27,7 +27,7 @@ function EnableVoice()
 function TogVCMode()
 {
     if(!chatStatus && mp.voiceChat.muted == false && 
-		!(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false)) 
+		!(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false)) 
 	{
 		mp.events.callRemote("OnScriptedKeyPress", 0x09, true);
 	}

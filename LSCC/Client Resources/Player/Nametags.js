@@ -91,7 +91,7 @@ mp.events.add('render', (nametags) => {
         if(timerCount >= 3) timerCount = 0;
     }
 
-    if((mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true) == false)
+    if((mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true) == false)
     {
         return;
     }
@@ -125,7 +125,7 @@ mp.events.add('render', (nametags) => {
                 y -= scale * (0.005 * (screenRes.y / 1080));
 
                 if(renderNametags == true) {
-                    if(player.getVariable("Team") !== undefined && player.getVariable("Team") == 0 && player.getVariable("HasShot") == true)
+                    if(player.Team !== undefined && player.Team == 0 && player.getVariable("HasShot") == true)
                     {
                         mp.game.graphics.drawText("(( THIS PLAYER HAS SHOT ))", [x, y - 0.045],
                         {
@@ -137,7 +137,7 @@ mp.events.add('render', (nametags) => {
                     }
 
                     if((BigInt(Math.round((new Date()).getTime() / 1000)) - BigInt(player.getVariable("LastVehEnterExit"))) <= BigInt(7)
-                        && player.getVariable("Team") == 0 && !player.isInAnyVehicle(false))
+                        && player.Team == 0 && !player.isInAnyVehicle(false))
                     {
                         var typingStr = "(( TASE PROTECTION ))";
                         if(timerCount == 0) typingStr = "(( TASE PROTECTION ))";
@@ -223,7 +223,7 @@ mp.events.add('render', (nametags) => {
                     }
                     if(showHPStatus == 3)
                     {
-                        if(player.getVariable("BustedProgress") !== undefined && player.getVariable("Team") != undefined && player.getVariable("Team") == 0 && 
+                        if(player.getVariable("BustedProgress") !== undefined && player.Team != undefined && player.Team == 0 && 
                             player.getVariable("BustedProgress") >= 0.0) // -1.0 is used if busted.
                         {
                             health = player.getVariable("BustedProgress") / 100;
@@ -239,7 +239,7 @@ mp.events.add('render', (nametags) => {
                 if(mp.game.player.isFreeAimingAtEntity(player.handle) && mp.players.local.weaponAmmo > 1 && 
                     mp.players.local.weapon != 2725352035 && mp.players.local.weapon != 0xA2719263) // 2725352035/hex = fist 
                 {
-                    if(mp.players.local.getVariable("HasShot") == false && mp.players.local.getVariable("Team") == 0 && player.getVariable("Team") == 1)
+                    if(mp.players.local.getVariable("HasShot") == false && mp.players.local.Team == 0 && player.Team == 1)
                     {
                         mp.events.callRemote("GivePlayerShotTag");
                     }
@@ -247,7 +247,7 @@ mp.events.add('render', (nametags) => {
             }
             else
             {
-                if(player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && renderNametags == true)
+                if(player.Team == 0 && player.getVariable("HasShot") == true && renderNametags == true)
                 {
                     // They out of distance but still try?
                     mp.game.graphics.drawText("(( THIS PLAYER HAS SHOT ))", [x, y],
