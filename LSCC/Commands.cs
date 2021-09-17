@@ -3086,7 +3086,7 @@ namespace LSCC
             return;
         }
 
-        [Command("clientcmd", Alias = "updaterate,lcmenu,fontsize,rappel,rapple,voicebind,noclip_vsm,gpsbind", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
+        [Command("clientcmd", Alias = "pagesize,updaterate,lcmenu,fontsize,rappel,rapple,voicebind,noclip_vsm,gpsbind", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
         public void cmd_clientcmd(Player player)
         {
             return;

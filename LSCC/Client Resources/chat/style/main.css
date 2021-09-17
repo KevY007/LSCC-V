@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Abel&display=swap');
 
 *:focus {
 outline: 0;
@@ -19,7 +19,7 @@ outline: none;
 body,html{
     -webkit-font-smoothing:antialiased;
     overflow:hidden;
-    font-size:14px;
+    font-size:20px;
     -webkit-user-select:none
 }
 a{
@@ -27,27 +27,28 @@ a{
 }
 .ui_element{
     display:none;position:absolute;
-    width:100vw;height:100vh;z-index:2
+    width:100vw;z-index:2;
+    height:100vw;
 }
 #chat{
     display:block;
     z-index:0;
     line-height:24px;
-    font-weight:700;
-    text-shadow:1px 1px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;
-    font-family:'Noto Sans SC', sans-serif;
-    font-size:16px;
+    font-weight:800;
+    text-shadow:.5px .5px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;
+    font-family: 'Abel', sans-serif;
+    font-size:20px;
     letter-spacing:.4px;
     margin-left:15px;
 }
 @media screen and (min-height:1080px){
                                                                                                                                                                                                                                                                      
 #chat{
-    font-size:18px!important;
-      font-weight:700}}
+    font-size:20px!important;
+      font-weight:800}}
 #chat ul#chat_messages{
     overflow-y:auto;
-    height:285px;
+    height:300px;
     margin-top:2vh; /*2vh*/
     transform:rotate(180deg);
     /*width:37vw; /* old: 37vw*/
@@ -58,31 +59,37 @@ a{
     transform:rotate(-180deg)}
 #chat input#chat_msg{
     color:#fff;
-    background:rgba(0,0,0,.5);
+    background: rgba(5, 0, 94, .5);
     outline:0;border:none;
-    font-family:'Noto Sans SC', sans-serif;
-    font-size:13px;
-    line-height:35px;
-    width:35vw;
-    padding:5px 5px 5px 15px}
+    font-family: 'Abel', sans-serif;
+    font-size:18px;
+    line-height:30px;
+    width:30vw;
+    border-radius: 15px;
+    padding:5px 5px 5px 15px;
+}
 
 /* width */
 ::-webkit-scrollbar {
     width: 10px;
+    border-radius: 15px;
   }
   
   /* Track */
   ::-webkit-scrollbar-track {
-    background: #555;
+    background: rgba(5, 0, 94, .15);
+    border-radius: 15px;
   }
 
    
   /* Handle */
   ::-webkit-scrollbar-thumb {
-    background: #f1f1f1;
+    background: rgba(0, 59, 153, .35);
+    border-radius: 15px;
   }
 
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
-    background: #999999; 
+    background: rgba(0, 85, 219, .5);
+    border-radius: 15px;
   }
