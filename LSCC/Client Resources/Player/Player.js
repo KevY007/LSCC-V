@@ -43,6 +43,9 @@ var targetChecker = Date.now();
 var updateChecker = Date.now();
 var clickDisable = false;
 
+let climbingStart = 0;
+let climbTrigger = false;
+
 var themeSoundID = 1;
 
 var checker_lastHealth = 0;
@@ -450,6 +453,30 @@ mp.events.add('render', () => {
             mp.game.player.disableFiring(true);
         }
         else { mp.game.controls.enableControlAction(32, 257, true); }
+
+        if(mp.players.local.isClimbing())
+        {
+            if(climbingStart == 0)
+            {
+                climbingStart = Date.now();
+                climbTrigger = false;
+            }
+
+            if(Date.now() - climbingStart >= 2500 && !climbTrigger)
+            {
+                climbTrigger = true;
+                mp.events.callRemote("ClimbProtection", 0); // Long time climb start
+            }
+        }
+        else if(!mp.players.local.isClimbing() && climbingStart != 0)
+        {
+            //mp.gui.chat.push(`You were climbing for ${(Date.now() - climbingStart) / 1000}s`);
+            
+            if(climbTrigger) mp.events.callRemote("ClimbProtection", 1); // Long time climb stop
+
+            climbingStart = 0;
+            climbTrigger = false;
+        }
 
         traceLastFunc(`[Players] render::Parachute_Dive_Check();`);
 
@@ -1003,6 +1030,8 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         {
             if(targetEntity.Team !== undefined && targetEntity.getVariable("HasShot") !== undefined)
             {
+                if(targetEntity.getVariable("ClimbProtection") == true || player.getVariable("ClimbProtection") == true) return true;
+                
                 if(targetEntity.isInAnyVehicle(false) == false)
                 {
                     if(targetEntity.Team != -1)
@@ -1075,6 +1104,8 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
         {
             if(weapon == 911657153 && targetEntity.isInAnyVehicle(false)) return true; // Disable stun if in car.
 
+            if(targetEntity.getVariable("ClimbProtection") == true || sourceEntity.getVariable("ClimbProtection") == true) return true;
+
             if(weapon == 911657153 && (BigInt(Math.round((new Date()).getTime() / 1000)) - BigInt(targetEntity.getVariable("LastVehEnterExit"))) <= BigInt(7)) return true;
 
             if(weapon == 911657153 && targetEntity.getVariable("HasShot") == true && targetEntity.getVariable("Tean") == 0) return true;
@@ -1124,6 +1155,8 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
     {
         if(targetEntity !== undefined && targetEntity !== null && targetEntity.type === 'player')
         {
+            if(sourceEntity.getVariable("ClimbProtection") == true || targetEntity.getVariable("ClimbProtection") == true) return true;
+
             if(targetEntity.Team != -1 && player.Team != -1)
             {
                 if(sourceEntity.Team == targetEntity.Team)

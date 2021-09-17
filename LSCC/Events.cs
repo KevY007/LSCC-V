@@ -942,6 +942,57 @@ namespace LSCC
             player.SendChatMessage(result);
         }
 
+        [RemoteEvent("ClimbProtection")]
+        public static void OnClimbTrigger(Player player, int status)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (lobby == null)
+            {
+                return;
+            }
+            if (!lobby.Fugitives.Contains(player) && !lobby.Cops.Contains(player)) return;
+
+            if(Environment.TickCount64 - player.GetData<long>("LastClimbProtection") >= 45000)
+            {
+                player.SetData("ClimbProtectionProcs", 0);
+            }
+
+            int time = 0;
+            switch(status)
+            {
+                case 0:
+                    if (player.GetData<int>("ClimbProtectionProcs") < 2)
+                    {
+                        player.SetSharedData("ClimbProtection", true);
+
+                        if (player.GetSharedData<int>("Team") == 0) time = 7500;
+                        else time = 15000;
+
+                        player.SetData("ClimbProtectionEnd", Environment.TickCount64 + time);
+                        player.SetData("LastClimbProtection", Environment.TickCount64);
+                        player.SetData("ClimbProtectionProcs", player.GetData<int>("ClimbProtectionProcs")+1);
+                        EPlayer.Notify(player, "Climb protection...", "green", "fas fa-hourglass", false, time, "topCenter", "replace");
+                    }
+                    break;
+
+                case 1:
+                    if (player.GetData<int>("ClimbProtectionProcs") < 2)
+                    {
+                        player.SetSharedData("ClimbProtection", true);
+
+                        if (player.GetSharedData<int>("Team") == 0) time = 1000;
+                        else time = 2000;
+
+                        player.SetData("ClimbProtectionEnd", Environment.TickCount64 + time);
+                        player.SetData("LastClimbProtection", Environment.TickCount64);
+                        EPlayer.Notify(player, "Climb protection...", "green", "fas fa-hourglass", false, time, "topCenter", "replace");
+                    }
+                    break;
+            }
+            return;
+        }
 
         [RemoteEvent("RequestSwimPenalty")]
         public static void OnRequestSwimPenalty(Player player)
@@ -1517,7 +1568,7 @@ namespace LSCC
                 if (Environment.TickCount64 - player.GetData<long>("LastLobbySwitch") < 1000)
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot switch minigames that fast.");
-                    EPlayer.Notify(player, "Please don't repeatedly join minigames.", "red", "fas fa-lock", false, 1000, false);
+                    EPlayer.Notify(player, "Please don't repeatedly join minigames.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                     return;
                 }
             }
@@ -1663,7 +1714,7 @@ namespace LSCC
         {
             if(Settings.Cars.Where(a => a.Model.Equals(model, StringComparison.OrdinalIgnoreCase) && a.Team == team).Count() == 0 || team > 1 || team < 0)
             {
-                EPlayer.Notify(player, "An unknown error has occured. Bad juju?!", "red", "fas fa-ban", false, 3000, false);
+                EPlayer.Notify(player, "An unknown error has occured. Bad juju?!", "red", "fas fa-ban", false, 2000, "bottomCenter", "replace");
                 return;
             }
 
@@ -1674,12 +1725,12 @@ namespace LSCC
             {
                 if (team == 0)
                 {
-                    EPlayer.Notify(player, $"Fugitive vehicle set to <strong>{car.Name}</strong>.", "blue", "fas fa-car", false, 5000, false);
+                    EPlayer.Notify(player, $"Fugitive vehicle set to <strong>{car.Name}</strong>.", "blue", "fas fa-car", false, 3000, "bottomCenter", "replace");
                     acc.CarFugitive = car.Model;
                 }
                 else
                 {
-                    EPlayer.Notify(player, $"Police vehicle set to <strong>{car.Name}</strong>.", "blue", "fas fa-car", false, 5000, false);
+                    EPlayer.Notify(player, $"Police vehicle set to <strong>{car.Name}</strong>.", "blue", "fas fa-car", false, 3000, "bottomCenter", "replace");
                     acc.CarCop = car.Model;
                 }
 
@@ -1689,29 +1740,29 @@ namespace LSCC
             {
                 if(car.LevelRequired != 0 && car.LevelRequired >= acc.Level)
                 {
-                    EPlayer.Notify(player, $"You need to be at least <strong>Level {car.LevelRequired}</strong> for this vehicle.", "red", "fas fa-lock", false, 3000, false);
+                    EPlayer.Notify(player, $"You need to be at least <strong>Level {car.LevelRequired}</strong> for this vehicle.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
                     return;
                 }
                 if (car.DonatorPointsRequired != 0 && car.DonatorPointsRequired > acc.DonatorPoints)
                 {
-                    EPlayer.Notify(player, $"You need <strong>{car.DonatorPointsRequired} Donator Points</strong> for this vehicle.", "red", "fas fa-lock", false, 3000, false);
+                    EPlayer.Notify(player, $"You need <strong>{car.DonatorPointsRequired} Donator Points</strong> for this vehicle.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
                     return;
                 }
                 if (car.PointsRequired != 0 && car.PointsRequired > acc.Points)
                 {
-                    EPlayer.Notify(player, $"You need <strong>{car.PointsRequired} Points</strong> for this vehicle.", "red", "fas fa-lock", false, 3000, false);
+                    EPlayer.Notify(player, $"You need <strong>{car.PointsRequired} Points</strong> for this vehicle.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
                     return;
                 }
                 if (car.DonatorLevelRequired != 0 && car.DonatorLevelRequired > acc.DonatorLevel)
                 {
-                    EPlayer.Notify(player, $"This vehicle is restricted to <strong>{EPlayer.GetDonatorLevelName(car.DonatorLevelRequired)}</strong>.", "red", "fas fa-lock", false, 3000, false);
+                    EPlayer.Notify(player, $"This vehicle is restricted to <strong>{EPlayer.GetDonatorLevelName(car.DonatorLevelRequired)}</strong>.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
                     return;
                 }
 
                 acc.Points -= car.PointsRequired;
                 acc.DonatorPoints -= car.DonatorPointsRequired;
                 EPlayer.UnlockVehicle(player, car.Model, car.Team);
-                EPlayer.Notify(player, $"You have unlocked <strong>{car.Name}</strong>. You may select it now.", "green", "fas fa-unlock", false, 10000, false);
+                EPlayer.Notify(player, $"You have unlocked <strong>{car.Name}</strong>. You may select it now.", "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
 
                 player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(Menu_VehicleData(player)), acc.CarCop, acc.CarFugitive);
             }
@@ -2434,6 +2485,10 @@ namespace LSCC
         public static void OnPlayerSpawn(Player player)
         {
             if (player == null || !player.Exists) return;
+
+            player.SetSharedData("ClimbProtection", false);
+            player.SetData("LastClimbProtection", Environment.TickCount64-30000);
+            player.SetData("ClimbProtectionProcs", 0);
 
             player.ResetData("_currentlySwappingSeats");
             foreach (Player p in Settings.LoggedInPlayers.Where(a => a.HasData("Spectating") && a.GetData<Player>("SpectatingPlayer") == player))

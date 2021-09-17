@@ -1214,11 +1214,11 @@ namespace LSCC
                                     {
                                         if (time > 0)
                                         {
-                                            NAPI.Notification.SendNotificationToPlayer(player, $"Game is starting in ~g~{time} seconds~w~.", true);
+                                            //NAPI.Notification.SendNotificationToPlayer(player, $"Game is starting in ~g~{time} seconds~w~.", true);
                                         }
                                         else
                                         {
-                                            NAPI.Notification.SendNotificationToPlayer(player, $"~y~Game is now starting.", true);
+                                            //NAPI.Notification.SendNotificationToPlayer(player, $"~y~Game is now starting.", true);
                                         }
                                     }
                                 }
@@ -1375,7 +1375,7 @@ namespace LSCC
                                                         player.SetSharedData("InDM", -1);
 
                                                         EPlayer.Spawn(player);
-                                                        EPlayer.Notify(player, "The round is about to start!", "orange", "fas fa-hourglass-start", false, 10000, false);
+                                                        EPlayer.Notify(player, "The round is about to start!", "orange", "fas fa-hourglass-start", false, 10000, "topCenter");
 
                                                         if (player.GetSharedData<bool>("IsTabbed") == true || EPlayer.IsAFK(player)) {
 
@@ -1790,6 +1790,10 @@ namespace LSCC
 
                         player.SetSharedData("BustedProgress", 0.0);
                         player.ResetData("BustSupporters");
+                        player.SetSharedData("ClimbProtection", false);
+                        player.SetData("LastClimbProtection", Environment.TickCount64 - 30000);
+                        player.SetData("ClimbProtectionProcs", 0);
+                        player.SetData("ClimbProtectionEnd", Environment.TickCount64);
                         player.ResetData("CuffingTarget");
                         player.RemoveAllWeapons();
                         player.Health = 100;
@@ -2264,6 +2268,8 @@ namespace LSCC
 
                         foreach (Player p in RAGE.Entities.Players.All.Where(p => lobby.Cops.Contains(p) || lobby.Fugitives.Contains(p)))
                         {
+                            EPlayer.Notify(p, "Police beginning chase...", "red", "fas fa-hourglass-start", false, 10000, "topCenter");
+
                             if (lobby.gameMode == GameModes.STANDARD)
                             {
                                 p.SendChatMessage("!{#FF6347}[!] !{#8D8DFF}Cops will be unfrozen in 10 seconds. !{#E84040}Fugitive's may take this time to prepare/start the chase.");
@@ -2364,7 +2370,7 @@ namespace LSCC
                         {
                             lobby.Cops.ForEach(p => {
                                 EPlayer.Freeze(p, true);
-                                p.SendNotification($"~b~Unfrozen in {10 - lobby.GameProgress}s...");
+                                //p.SendNotification($"~b~Unfrozen in {10 - lobby.GameProgress}s...");
                             });
                         }
 
@@ -2372,7 +2378,7 @@ namespace LSCC
                         {
                             lobby.Cops.ForEach(p => {
                                 EPlayer.Freeze(p, false);
-                                p.SendNotification("~b~You may begin the chase now.");
+                                //p.SendNotification("~b~You may begin the chase now.");
                             });
                         }
 
@@ -2481,8 +2487,24 @@ namespace LSCC
                             {
                                 cop.SetSharedData("VisibleBlip", true);
                             }
+
+                            if(cop.GetSharedData<bool>("ClimbProtection") == true && cop.GetData<long>("ClimbProtectionEnd") < Environment.TickCount64)
+                            {
+                                cop.SetSharedData("ClimbProtection", false);
+                            }
                         }
                     }
+                    lock (lobby.Fugitives)
+                    {
+                        foreach(Player fugi in lobby.Fugitives)
+                        {
+                            if (fugi.GetSharedData<bool>("ClimbProtection") == true && fugi.GetData<long>("ClimbProtectionEnd") < Environment.TickCount64)
+                            {
+                                fugi.SetSharedData("ClimbProtection", false);
+                            }
+                        }
+                    }
+
                     if (lobby.FugitiveShowCounter >= 60 && lobby.FugitiveShowCounter < 120)
                     {
                         lock (lobby.Fugitives)

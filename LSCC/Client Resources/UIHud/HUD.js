@@ -182,7 +182,7 @@ mp.events.add("OneSecondEvent", () => {
     }
 });
 
-mp.events.add("HUDNotify", (msg, color, icon, close, timeout, orientation) => {
+mp.events.add("HUDNotify", (msg, color, icon, close, timeout, orientation, displaymode) => {
     let insertString = `iziToast.show({`;
     insertString += `message: \`${msg}\`, `;
     insertString += `color: "${color}", `;
@@ -190,16 +190,18 @@ mp.events.add("HUDNotify", (msg, color, icon, close, timeout, orientation) => {
     insertString += `close: ${close.toString()}, `;
     insertString += `timeout: ${timeout},`;
     if(orientation.length > 1) insertString += `position: \`${orientation}\`, `;
+    if(displaymode.length > 1) insertString += `displayMode: \`${displaymode}\`, `;
     insertString += "});";
 
     if(UIHud != null) UIHud.execute(insertString);
 });
 // bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter, center
-mp.events.add("HUDNotify2", (title, msg, orientation) => {
+mp.events.add("HUDNotify2", (title, msg, orientation, displaymode) => {
     let insertString = `iziToast.show({`;
     insertString += `title: \`${title}\`, `;
     insertString += `message: \`${msg}\`, `;
     if(orientation.length > 1) insertString += `position: \`${orientation}\`, `;
+    if(displaymode.length > 1) insertString += `displayMode: \`${displaymode}\`, `;
     insertString += "});";
 
     if(UIHud != null) UIHud.execute(insertString);

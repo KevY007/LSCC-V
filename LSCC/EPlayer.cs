@@ -511,6 +511,10 @@ namespace LSCC
                 player.SetData("FreeroamBlip", true);
                 player.ResetData("ViewingLoadoutSelector");
                 player.SetSharedData("HasShot", false);
+                player.SetSharedData("ClimbProtection", false);
+                player.SetData("ClimbProtectionEnd", Environment.TickCount64);
+                player.SetData("LastClimbProtection", Environment.TickCount64);
+                player.SetData("ClimbProtectionProcs", 0);
                 player.SetSharedData("VoiceMode", 0);
                 player.SetData("Killstreak", 0);
                 player.SetSharedData("VisibleBlip", false);
@@ -1331,13 +1335,13 @@ namespace LSCC
             Discord.SendTextChannel("staff-bot", $"(ADM) |** {message}**");
         }
 
-        public static void Notify(Player player, string title, string message, bool bottomright = true)
+        public static void Notify(Player player, string title, string message, string alignment = "", string displaymode = "")
         {
-            player.TriggerEvent("HUDNotify2", title, message, bottomright ? "" : "bottomCenter");
+            player.TriggerEvent("HUDNotify2", title, message, alignment, displaymode);
         }
-        public static void Notify(Player player, string msg, string color, string icon, bool close, int timeout, bool bottomright = true)
+        public static void Notify(Player player, string msg, string color, string icon, bool close, int timeout, string alignment = "", string displaymode = "")
         {
-            player.TriggerEvent("HUDNotify", msg, color, icon, close, timeout, bottomright ? "" : "bottomCenter");
+            player.TriggerEvent("HUDNotify", msg, color, icon, close, timeout, alignment, displaymode);
         }
     }
 }

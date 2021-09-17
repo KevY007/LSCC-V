@@ -2,7 +2,6 @@
 admin records system
 spectate should show speed etc, maybe add spectate info in UIHud and bla
 fix some bug where u type autojoin in dm and get full vest in copchase
-15-second ladder protection so fugitives cant have ez win (maybe additional 2-3 seconds after they get off the ladder)
 checkplayer, check player.IP and player.HWID/Serial w/e and player.Rockstar ez
 buyammo with donator points
 vehicle upgrade system with regular points later

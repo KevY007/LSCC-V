@@ -152,6 +152,21 @@ mp.events.add('render', (nametags) => {
                             outline: true
                         });
                     }
+                    else if(player.getVariable("ClimbProtection") == true)
+                    {
+                        var typingStr = "(( LADDER PROTECTION ))";
+                        if(timerCount == 0) typingStr = "(( LADDER PROTECTION ))";
+                        else if(timerCount == 1) typingStr = "( LADDER PROTECTION )";
+                        else if(timerCount == 2) timerCount = 0;
+                
+                        mp.game.graphics.drawText(typingStr, [x, y - 0.0250],
+                        {
+                            font: 0,
+                            color: [20, 103, 219, 228],
+                            scale: [0.285, 0.285],
+                            outline: true
+                        });
+                    }
                     
                     if(player.getVariable("IsTabbed") !== undefined && player.getVariable("IsTabbed") == true)
                     {

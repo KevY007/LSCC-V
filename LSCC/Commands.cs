@@ -2993,7 +2993,7 @@ namespace LSCC
                 if (Environment.TickCount64 - player.GetData<long>("LastLobbySwitch") < 1000)
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot enter lobbies that fast.");
-                    EPlayer.Notify(player, "Please don't repeatedly join lobby.", "red", "fas fa-lock", false, 1000, false);
+                    EPlayer.Notify(player, "Please don't repeatedly join lobby.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                     return;
                 }
             }
@@ -3013,7 +3013,7 @@ namespace LSCC
 
             if(player.Health == 0 || player.Dead) { 
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are respawning!"); 
-                EPlayer.Notify(player, "Please wait to respawn.", "red", "fas fa-ban", false, 1000, false);
+                EPlayer.Notify(player, "Please wait to respawn.", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
@@ -3063,7 +3063,7 @@ namespace LSCC
             if(elobby == null) player.SetSharedData("InLobby", -1);
 
             EPlayer.Spawn(player);
-            EPlayer.Notify(player, $"Joined <strong>Lobby</strong>", "blue", "fas fa-users", false, 1000, false);
+            EPlayer.Notify(player, $"Joined <strong>Lobby</strong>", "blue", "fas fa-users", false, 1000, "bottomCenter", "replace");
             player.SetData<long>("LastLobbySwitch", Environment.TickCount64);
             return;
         }
@@ -3142,7 +3142,7 @@ namespace LSCC
             if (player.GetData<int>("JailTime") > 0)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are in jail!");
-                EPlayer.Notify(player, "You are currently jailed.", "red", "fas fa-lock", false, 1000, false);
+                EPlayer.Notify(player, "You are currently jailed.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
@@ -3155,7 +3155,7 @@ namespace LSCC
                 if (Environment.TickCount64 - player.GetData<long>("LastLobbySwitch") < 1000)
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot switch lobbies that fast.");
-                    EPlayer.Notify(player, "Please don't spam join lobby.", "red", "fas fa-lock", false, 1000, false);
+                    EPlayer.Notify(player, "Please don't spam join lobby.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                     return;
                 }
             }
@@ -3183,14 +3183,14 @@ namespace LSCC
             if ((lobby != null) == false)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid lobby id!");
-                EPlayer.Notify(player, "Invalid lobby.", "red", "fas fa-lock", false, 1000, false);
+                EPlayer.Notify(player, "Invalid lobby.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
             if (!lobby.Enabled)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Lobby is disabled!");
-                EPlayer.Notify(player, "Lobby is disabled.", "red", "fas fa-lock", false, 1000, false);
+                EPlayer.Notify(player, "Lobby is disabled.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
@@ -3199,14 +3199,14 @@ namespace LSCC
                 if(password.Length < 1)
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This lobby has a password, join with /swl (lobby id) (password).");
-                    EPlayer.Notify(player, "Lobby requires a password.", "red", "fas fa-lock", false, 1000, false);
+                    EPlayer.Notify(player, "Lobby requires a password.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                     return;
                 }
 
                 if(!password.Equals(lobby.Password))
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid password for the lobby!");
-                    EPlayer.Notify(player, "Invalid password.", "red", "fas fa-lock", false, 1000, false);
+                    EPlayer.Notify(player, "Invalid password.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                     return;
                 }
             }
@@ -3214,7 +3214,7 @@ namespace LSCC
             if(Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobbyid) >= Settings.Dynamics.MaxInLobby && EPlayer.GetAccount(player).Admin < 1)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That lobby is full!");
-                EPlayer.Notify(player, "Lobby is full.", "red", "fas fa-lock", false, 1000, false);
+                EPlayer.Notify(player, "Lobby is full.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
@@ -3224,7 +3224,7 @@ namespace LSCC
                 if(elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot switch lobbies in an ongoing game! (/lobby)");
-                    EPlayer.Notify(player, "You are currently in an ongoing game.", "red", "fas fa-lock", false, 1000, false);
+                    EPlayer.Notify(player, "You are currently in an ongoing game.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                     return;
                 }
             }
@@ -3239,7 +3239,7 @@ namespace LSCC
             player.SetSharedData("InLobby", lobbyid);
             Random rand = new Random();
             NAPI.Player.SpawnPlayer(player, Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)]);
-            EPlayer.Notify(player, $"Joined <strong>Lobby {lobbyid}</strong>", "blue", "fas fa-users", false, 1000, false);
+            EPlayer.Notify(player, $"Joined <strong>Lobby {lobbyid}</strong>", "blue", "fas fa-users", false, 1000, "bottomCenter", "replace");
             return;
         }
 
@@ -3276,35 +3276,35 @@ namespace LSCC
             if (player.HasData("Spectating"))
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are in spectate mode!");
-                EPlayer.Notify(player, "You are currently spectating.", "red", "fas fa-lock", false, 1000, false);
+                EPlayer.Notify(player, "You are currently spectating.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
             if (player.GetSharedData<int>("Team") != -1)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase!");
-                EPlayer.Notify(player, "You are in a copchase.", "red", "fas fa-lock", false, 1000, false);
+                EPlayer.Notify(player, "You are in a copchase.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
             if (arenaid < 0 || arenaid >= Settings.DMNames.Length)
             {
                 player.SendChatMessage("!{#FF6347}Invalid DM arena ID! /dmarenas to see all the arenas.");
-                EPlayer.Notify(player, "Invalid arena.", "red", "fas fa-lock", false, 1000, false);
+                EPlayer.Notify(player, "Invalid arena.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
             if (player.GetSharedData<int>("InLobby") <= -1)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in any lobby!");
-                EPlayer.Notify(player, "You must be in a lobby.", "red", "fas fa-lock", false, 1000, false);
+                EPlayer.Notify(player, "You must be in a lobby.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
             if(Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == arenaid) >= 7 + (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")) / 3))
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That arena has maxed out on players.");
-                EPlayer.Notify(player, "Arena is full.", "red", "fas fa-users-slash", false, 1000, false);
+                EPlayer.Notify(player, "Arena is full.", "red", "fas fa-users-slash", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
@@ -3314,14 +3314,14 @@ namespace LSCC
             if (elobby.gameStatus == 2)
             { 
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into DM while the match is starting!");
-                EPlayer.Notify(player, "Unable to join.", "red", "fas fa-lock", false, 1000, false);
+                EPlayer.Notify(player, "Unable to join.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
             if (elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
             {                    
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into DM while in the copchase! (/lobby)");
-                EPlayer.Notify(player, "You are in a copchase.", "red", "fas fa-lock", false, 1000, false);
+                EPlayer.Notify(player, "You are in a copchase.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
@@ -3333,7 +3333,7 @@ namespace LSCC
             EPlayer.Spawn(player, false, dmSpawn);
             player.TriggerEvent("SetActorInvulnerable", false);
 
-            EPlayer.Notify(player, $"Joined <strong>{Settings.DMNames[arenaid]}</strong>", "blue", "fas fa-users", false, 1000, false);
+            EPlayer.Notify(player, $"Joined <strong>{Settings.DMNames[arenaid]}</strong>", "blue", "fas fa-users", false, 1000, "bottomCenter", "replace");
             return;
         }
 
@@ -3346,7 +3346,7 @@ namespace LSCC
             if (player.GetSharedData<int>("Team") != -1)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in a copchase!");
-                EPlayer.Notify(player, "You are currently in a copchase!", "red", "fas fa-ban", false, 1000, false);
+                EPlayer.Notify(player, "You are currently in a copchase!", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
@@ -3359,14 +3359,14 @@ namespace LSCC
                     if (elobby.gameStatus == 2)
                     {
                         player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into freeroam while the match is starting!");
-                        EPlayer.Notify(player, "You cannot go into freeroam while copchase is starting!", "red", "fas fa-ban", false, 1000, false);
+                        EPlayer.Notify(player, "You cannot go into freeroam while copchase is starting!", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
                         return;
                     }
 
                     if (elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
                     {
                         player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into freeroam while in the copchase! (/lobby)");
-                        EPlayer.Notify(player, "You are currently in a copchase!", "red", "fas fa-ban", false, 1000, false);
+                        EPlayer.Notify(player, "You are currently in a copchase!", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
                         return;
                     }
                 }
@@ -3375,7 +3375,7 @@ namespace LSCC
             player.SetSharedData("InDM", -1);
             player.SetSharedData("InLobby", -3); 
             EPlayer.Spawn(player, false, new Vector3(1061.547f, -720.113f, 56.786f));
-            EPlayer.Notify(player, $"Joined <strong>Freeroam</strong>", "blue", "fas fa-check", false, 1000, false);
+            EPlayer.Notify(player, $"Joined <strong>Freeroam</strong>", "blue", "fas fa-check", false, 1000, "bottomCenter", "replace");
             return;
         }
 
@@ -3388,7 +3388,7 @@ namespace LSCC
             if (player.GetSharedData<int>("Team") != -1)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase!");
-                EPlayer.Notify(player, "You are currently in a copchase!", "red", "fas fa-ban", false, 1000, false);
+                EPlayer.Notify(player, "You are currently in a copchase!", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
@@ -3400,7 +3400,7 @@ namespace LSCC
                 if (elobby.gameStatus == 2)
                 {
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into derby while the match is starting!");
-                    EPlayer.Notify(player, "You cannot join derby while the copchase is starting!", "red", "fas fa-ban", false, 1000, false);
+                    EPlayer.Notify(player, "You cannot join derby while the copchase is starting!", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
                     return;
                 }
             }
@@ -3418,7 +3418,7 @@ namespace LSCC
             player.SetSharedData("InLobby", -4);
 
             EPlayer.Spawn(player, false, ((Vector3)Settings.DerbySpawns[0, 0]).Around(2.0f));
-            EPlayer.Notify(player, $"Joined <strong>Derby</strong>", "blue", "fas fa-check", false, 1000, false);
+            EPlayer.Notify(player, $"Joined <strong>Derby</strong>", "blue", "fas fa-check", false, 1000, "bottomCenter", "replace");
             return;
         }
 
