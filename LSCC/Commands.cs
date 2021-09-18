@@ -517,7 +517,7 @@ namespace LSCC
             List<Vehicle> freeroamVehs = new List<Vehicle>();
             freeroamVehs = player.GetData<List<Vehicle>>("FreeroamVehicles");
 
-            if(freeroamVehs.Count >= 10)
+            if(freeroamVehs.Count >= 5)
             {
                 Vehicle veh = freeroamVehs.First();
                 freeroamVehs.Remove(veh);
