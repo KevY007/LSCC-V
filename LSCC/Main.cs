@@ -1155,7 +1155,7 @@ namespace LSCC
             new CarData(1, "FBI Granger", "fbi2", "package://Artwork/Vehicles/fbi2.png", "Average", 13);
             new CarData(1, "SWAT Truck", "riot", "package://Artwork/Vehicles/riot.png", "Slow", 15);
             new CarData(1, "FBI Buffalo", "fbibufac", "package://Artwork/Vehicles/fbibufac.png", "Fast", 17);
-            new CarData(1, "Unmarked Charger", "udchall1", "package://Artwork/Vehicles/udchall1.png", "Fast+", 20);
+            new CarData(1, "Unmarked Charger", "lspdunm", "package://Artwork/Vehicles/lspdunm.png", "Need recalculation", 20);
             new CarData(1, "Police Chopper", "polmav", "package://Artwork/Vehicles/polmav.png", "N/A", 23);
             new CarData(1, "Unmarked Revolter", "prevolter", "package://Artwork/Vehicles/prevolter.png", "Fast+", 25);
 

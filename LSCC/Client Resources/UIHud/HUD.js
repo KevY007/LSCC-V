@@ -23,6 +23,7 @@ let dirtext = "NW";
 let updater = null;
 scoreboardToggled = false;
 scoreboardCursor = false;
+let scoreboardBinded = false;
 
 // StackOverflow cause I'm too lazy to do this myself and don't wanna type getvariable etc etc every time
 function firstLetterUpper(string) {
@@ -203,6 +204,7 @@ function ToggleScoreboard()
         updater = null;
 
         mp.events.call("TogglePlayerChat", true);
+        UIHud.execute(`gm.$refs.scoreboard.disableInput = true;`);
         UIHud.execute(`gm.scoreboard = false;`);
 
         if(scoreboardCursor)
@@ -217,6 +219,7 @@ function ToggleScoreboard()
         mp.events.call("TogglePlayerChat", false);
 
         UIHud.execute(`gm.scoreboard = true;`);
+        UIHud.execute(`gm.$refs.scoreboard.disableInput = true;`);
 
         updatePlayers();
 
@@ -266,24 +269,45 @@ mp.keys.bind(0x71, false, function () {
         {
             scoreboardCursor = false;
             mp.gui.cursor.show(false, false);
+            UIHud.execute(`gm.$refs.scoreboard.disableInput = true;`);
+            
+            if(!scoreboardBinded) mp.events.callLocal('ScoreboardToggleTyping', false);
         }
         else
         {
             scoreboardCursor = true;
             mp.gui.cursor.show(true, true);
+            UIHud.execute(`gm.$refs.scoreboard.disableInput = false;`);
+
+            //if(scoreboardBinded) mp.events.callLocal('ScoreboardToggleTyping', true);
         }
     }
 });
 
-mp.keys.bind(0x4F, false, function () {
-
+function ScoreboardKeyTrigger()
+{
     if(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false) return;
     if(Date.now() - lastChatToggle <= 500) return;
     if(menuToggled !== undefined && menuToggled) return;
     if(chatStatus && !scoreboardToggled) return;
 
     ToggleScoreboard();
-})
+}
+
+mp.events.add('ScoreboardToggleTyping', (state) => {
+    if(state && scoreboardBinded)
+    {
+        mp.keys.unbind(0x4F, false, ScoreboardKeyTrigger);
+        scoreboardBinded = false;
+    }
+    else if(!state && !scoreboardBinded)
+    {
+        mp.keys.bind(0x4F, false, ScoreboardKeyTrigger);
+        scoreboardBinded = true;
+    }
+});
+
+mp.events.callLocal('ScoreboardToggleTyping', false);
 
 mp.events.add("HUDError", (msg, icon) => {
     let insertString = `iziToast.error({`;
