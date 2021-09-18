@@ -397,9 +397,9 @@ namespace LSCC
 
 
         // Locations
-        public const float LoginCameraX = -550;
-        public const float LoginCameraY = -210;
-        public const float LoginCameraZ = 1200;
+        public const float LoginCameraX = -1533.5159f;
+        public const float LoginCameraY = -1226.5405f;
+        public const float LoginCameraZ = 2.2699802f;
         public const float LoginCameraRx = -50;
         public const float LoginCameraRy = 0;
         public const float LoginCameraRz = 0;
@@ -1148,8 +1148,10 @@ namespace LSCC
 
             new CarData(1, "Police Cruiser", "police", "package://Artwork/Vehicles/polc1.png", "Average");
             new CarData(1, "Unmarked Cruiser", "police4", "package://Artwork/Vehicles/polc2.png", "Average", 1);
+            new CarData(1, "Police Scout", "pscout", "package://Artwork/Vehicles/pscout.png", "Average", 3);
             new CarData(1, "Police Bike", "policeb", "package://Artwork/Vehicles/policeb.png", "Average", 3);
             new CarData(1, "Police Buffalo", "polbufac", "package://Artwork/Vehicles/polbufac.png", "Fast", 5);
+            new CarData(1, "Unmarked Scout", "umkscout", "package://Artwork/Vehicles/umkscout.png", "Average", 8);
             new CarData(1, "FBI Granger", "fbi2", "package://Artwork/Vehicles/fbi2.png", "Average", 13);
             new CarData(1, "SWAT Truck", "riot", "package://Artwork/Vehicles/riot.png", "Slow", 15);
             new CarData(1, "FBI Buffalo", "fbibufac", "package://Artwork/Vehicles/fbibufac.png", "Fast", 17);
@@ -1159,14 +1161,18 @@ namespace LSCC
 
 
             new CarData(0, "Primo", "primo", "package://Artwork/Vehicles/primo.png", "Slow", 3);
+            new CarData(0, "Tahoma", "tahoma", "package://Artwork/Vehicles/tahoma.png", "Slow", 4);
             new CarData(0, "Huntley", "huntley", "package://Artwork/Vehicles/huntley.png", "Average", 5);
             new CarData(0, "Mercedes 600SEL", "600sel", "package://Artwork/Vehicles/600sel.png", "Average", 6);
+            new CarData(0, "Volvo 850 T5 Turbo", "850sw", "package://Artwork/Vehicles/850sw.png", "Average", 6);
             new CarData(0, "Tailgater", "tailgater", "package://Artwork/Vehicles/tailgater.png", "Average", 10);
             new CarData(0, "Blista Classic", "blista2", "package://Artwork/Vehicles/blista2.png", "Average", 14);
             new CarData(0, "Cheburek", "cheburek", "package://Artwork/Vehicles/cheburek.png", "Fast", 16);
+            new CarData(0, "Chevrolet Impala SS '96", "impala", "package://Artwork/Vehicles/impala.png", "Fast", 18);
             new CarData(0, "Buffalo", "buffalo", "package://Artwork/Vehicles/buffalo.png", "Fast", 20);
             new CarData(0, "Sultan", "sultan", "package://Artwork/Vehicles/sultan.png", "Fast", 25);
             new CarData(0, "Kuruma", "kuruma", "package://Artwork/Vehicles/kuruma.png", "Fast", 30);
+            new CarData(0, "Audi S8", "s8d2", "package://Artwork/Vehicles/s8d2.png", "Fast", 33);
             new CarData(0, "Dominator GTT", "dominator8", "package://Artwork/Vehicles/dominator8.png", "Fast", 33);
             new CarData(0, "BMW M3 E46", "m3e46", "package://Artwork/Vehicles/m3e46.png", "Fast+", 35);
 
