@@ -587,6 +587,24 @@ namespace LSCC
                 case "dominator8":
                     seats = 2;
                     break;
+                case "impala":
+                    seats = 4;
+                    break;
+                case "pscout":
+                    seats = 4;
+                    break;
+                case "umkscout":
+                    seats = 4;
+                    break;
+                case "tahoma":
+                    seats = 4;
+                    break;
+                case "850sw":
+                    seats = 4;
+                    break;
+                case "s8d2":
+                    seats = 4;
+                    break;
             }
             return seats;
         }
