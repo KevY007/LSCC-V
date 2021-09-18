@@ -575,10 +575,7 @@ namespace LSCC
                 case "600sel":
                     seats = 4;
                     break;
-                case "udchall1":
-                    seats = 4;
-                    break;
-                case "lspdcara":
+                case "lspdunm":
                     seats = 4;
                     break;
                 case "prevolter":

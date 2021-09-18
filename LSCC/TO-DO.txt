@@ -1,7 +1,6 @@
 ﻿FORMAT: ADDED BY - ITEM.
 admin records system
 spectate should show speed etc, maybe add spectate info in UIHud and bla
-fix some bug where u type autojoin in dm and get full vest in copchase
 checkplayer, check player.IP and player.HWID/Serial w/e and player.Rockstar ez
 buyammo with donator points
 vehicle upgrade system with regular points later
@@ -12,7 +11,6 @@ make donation stuf or page
 allow custom loadout in dm
 vehicle setmod with https://wiki.rage.mp/index.php?title=Vehicle_Mods
 you can use indexes and allow player to customize car in freeroam and save settings for a car wowohow donator stuf
-replace dodge charger with a non unmarked (livery) version
 convert bcrypt
 squad style current voice listener thingy above map
 
