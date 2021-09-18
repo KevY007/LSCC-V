@@ -3741,8 +3741,7 @@ namespace LSCC
         [Command("customvehlist")]
         public void cmd_customvehlist(Player player)
         {
-            player.SendChatMessage("Model 'udchall1' - Dodge Charger 2016");
-            player.SendChatMessage("Model 'lspdcara' - Police Caracara");
+            player.SendChatMessage("Model 'lspdunm' - Unmarked Dodge Charger");
             player.SendChatMessage("Model 'polbufac' - Police Buffalo (polbufac2 for Unmarked)");
             player.SendChatMessage("Model 'fbibufac' - FIB Buffalo");
             player.SendChatMessage("Model 'sherbufac' - Sheriff Buffalo (sherbufac2 for Unmaarked)");
