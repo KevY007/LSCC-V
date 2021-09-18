@@ -1252,8 +1252,13 @@ namespace LSCC
                 Account playerAcc = player.GetData<Account>("AccountHandle");
                 return playerAcc;
             }
-
-            return null;
+            Account nothing = new Account
+            {
+                SQL_ID = -1,
+                Admin = 0,
+                Level = 0,
+            };
+            return nothing;
         }
         public static void Spawn(Player player, bool forceAutojoin = true, Vector3 spawn = default(Vector3))
         {

@@ -351,7 +351,7 @@ namespace LSCC
     public static class Settings
     {
         // Static Settings / Const
-        public const string Version = "0.2i";
+        public const string Version = "0.3";
         public const int GameRunTime = 390; // Game Running Time in Seconds before STOP
         public const int MaxLobbies = 5; // Default/starting lobby num.
         public const int DefaultMaxInLobby = 30;
@@ -1152,12 +1152,12 @@ namespace LSCC
             new CarData(1, "Police Bike", "policeb", "package://Artwork/Vehicles/policeb.png", "Average", 3);
             new CarData(1, "Police Buffalo", "polbufac", "package://Artwork/Vehicles/polbufac.png", "Fast", 5);
             new CarData(1, "Unmarked Scout", "umkscout", "package://Artwork/Vehicles/umkscout.png", "Average", 8);
-            new CarData(1, "FBI Granger", "fbi2", "package://Artwork/Vehicles/fbi2.png", "Average", 13);
+            new CarData(1, "FBI Granger", "fbi2", "package://Artwork/Vehicles/fbi2.png", "Slow", 13);
             new CarData(1, "SWAT Truck", "riot", "package://Artwork/Vehicles/riot.png", "Slow", 15);
             new CarData(1, "FBI Buffalo", "fbibufac", "package://Artwork/Vehicles/fbibufac.png", "Fast", 17);
-            new CarData(1, "Unmarked Charger", "lspdunm", "package://Artwork/Vehicles/lspdunm.png", "Fast", 20);
+            new CarData(1, "Unmarked Charger", "lspdunm", "package://Artwork/Vehicles/lspdunm.png", "Fast+", 20);
             new CarData(1, "Police Chopper", "polmav", "package://Artwork/Vehicles/polmav.png", "N/A", 23);
-            new CarData(1, "Unmarked Revolter", "prevolter", "package://Artwork/Vehicles/prevolter.png", "Fast+", 25);
+            new CarData(1, "Unmarked Revolter", "prevolter", "package://Artwork/Vehicles/prevolter.png", "Fast", 25);
 
 
             new CarData(0, "Primo", "primo", "package://Artwork/Vehicles/primo.png", "Slow", 3);
@@ -1174,7 +1174,7 @@ namespace LSCC
             new CarData(0, "Kuruma", "kuruma", "package://Artwork/Vehicles/kuruma.png", "Fast", 30);
             new CarData(0, "Audi S8", "s8d2", "package://Artwork/Vehicles/s8d2.png", "Fast", 33);
             new CarData(0, "Dominator GTT", "dominator8", "package://Artwork/Vehicles/dominator8.png", "Fast", 33);
-            new CarData(0, "BMW M3 E46", "m3e46", "package://Artwork/Vehicles/m3e46.png", "Fast+", 35);
+            new CarData(0, "BMW M3 E46", "m3e46", "package://Artwork/Vehicles/m3e46.png", "Fast", 35);
 
             if (Settings.Dynamics.Discord)
             {
@@ -1195,10 +1195,20 @@ namespace LSCC
 
             NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Server startup proceeded:\n");
 
+            string admins = "";
+            int adminCount = 0;
+            foreach(Account acc in ContextFactory.Instance.Accounts.ToList().Where(a => a.Admin > 0))
+            {
+                if (adminCount != 0) admins += ", ";
+                admins += $"{acc.Username} [{acc.SQL_ID}]";
+            }
+            if (adminCount == 0) admins = "None";
+
             NAPI.Util.ConsoleOutput("[>===========|Los Santos Copchase|===========<]");
             NAPI.Util.ConsoleOutput("[Version]: " + Settings.Version);
-            NAPI.Util.ConsoleOutput("[Developers]: KevY");
+            NAPI.Util.ConsoleOutput("[Developers]: KevY, CodeName420 (jambredrek)");
             NAPI.Util.ConsoleOutput($"[Accounts]: {ContextFactory.Instance.Accounts.Count()}");
+            NAPI.Util.ConsoleOutput($"[Admins]: {admins}");
             NAPI.Util.ConsoleOutput("[>===========|Los Santos Copchase|===========<]");
 
 
@@ -1914,17 +1924,14 @@ namespace LSCC
                                     case 0:
                                         carName = "police";
                                         col1 = 111;
-                                        enginePower = 30;
                                         break;
                                     case 1:
                                         carName = "police3";
                                         col1 = 111;
-                                        enginePower = 24;
                                         break;
                                     case 2:
                                         carName = "police4";
                                         col1 = 111;
-                                        enginePower = 34;
                                         break;
                                 }
                             }
@@ -1935,7 +1942,6 @@ namespace LSCC
                                 if(carName.StartsWith("police"))
                                 {
                                     col1 = 111;
-                                    enginePower = 18;
                                 }
 
                             }
@@ -2505,7 +2511,7 @@ namespace LSCC
                                     }
                                     if(veh.Model == 2149939648) // if it's a Prevolter reduce OP :(
                                     {
-                                        veh.SetSharedData("vMaxSpeed", (float)(180 / 3.6)); // 180 KM/H
+                                        veh.SetSharedData("vMaxSpeed", (float)(170 / 3.6)); // 170 KM/H
                                     }
                                 }
                             }

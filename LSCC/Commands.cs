@@ -3647,6 +3647,16 @@ namespace LSCC
             return;
         }
 
+        [Command("dbgcargame", Alias = "dbgsetcar", GreedyArg = true)]
+        public void cmd_dbgcargame(Player player, int team, string car)
+        {
+            if (EPlayer.GetAccount(player).Admin < 6 && !player.Name.Equals("KevY", StringComparison.OrdinalIgnoreCase)) return;
+
+            if (team == 0) EPlayer.GetAccount(player).CarFugitive = car;
+            else if (team == 1) EPlayer.GetAccount(player).CarCop = car;
+            return;
+        }
+
         [Command("dbgexitlinkmane", Alias = "dbgexitcef", GreedyArg = true)]
         public void cmd_exitdbgcef(Player player)
         {
@@ -3744,8 +3754,6 @@ namespace LSCC
             player.SendChatMessage("Model 'lspdunm' - Unmarked Dodge Charger");
             player.SendChatMessage("Model 'polbufac' - Police Buffalo (polbufac2 for Unmarked)");
             player.SendChatMessage("Model 'fbibufac' - FIB Buffalo");
-            player.SendChatMessage("Model 'sherbufac' - Sheriff Buffalo (sherbufac2 for Unmaarked)");
-            player.SendChatMessage("Model 'hwaybufac' - Highway Buffalo (hwaybufac2 for Unmaarked)");
             player.SendChatMessage("Model '600sel' - Mercedes S600?");
             player.SendChatMessage("Model 'prevolter' - Police Revolter Unmarked");
             player.SendChatMessage("Model 'm3e46' - M3 E46 BMW 2005");
