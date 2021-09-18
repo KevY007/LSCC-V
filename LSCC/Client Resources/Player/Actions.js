@@ -3,10 +3,13 @@ let actionTime = 0;
 let actionType = "none";
 let player = mp.players.local;
 
+let maxActionTime = 0;
+
 
 mp.events.add("StartPlayerAction", (action, time) => {
     actionTime = time;
     actionType = action;
+    maxActionTime = time;
     switch(action){
         case "medkit":
             MedkitAction();
@@ -31,8 +34,10 @@ mp.events.add("StopPlayerActions", () => {
     }
     actionType = "none";
     actionTime = 0;
+    maxActionTime = 0;
     actionInterval = null;
-});
+    UIHud.execute(`gm.actionBar = false;`);
+})
 
 function PainkillerAction(){
     if(mp.players.local == null || mp.players.local.handle == null) return;
@@ -48,6 +53,7 @@ function PainkillerAction(){
             mp.events.callRemote("OnPlayerActionTick");
             if(actionTime <= 0){
                 mp.events.callRemote("FinishPlayerAction", actionType);
+                UIHud.execute(`gm.actionBar = false;`);
                 clearInterval(actionInterval);
             }
             else{
@@ -67,9 +73,19 @@ function PainkillerAction(){
     }, 1000);   
 }
 
+function initiateActionTimer(startTime){
+    maxActionTime = startTime;
+    UIHud.execute(`gm.$refs.actionBar.maxtime = ${startTime}`);
+    UIHud.execute(`gm.$refs.actionBar.time = 0.1`);
+    UIHud.execute(`gm.$refs.actionBar.fugitive = ${(player.Team == 0 ? true : false)}`);
+    UIHud.execute(`gm.actionBar = true;`);
+}
+
 function MedkitAction(){
     if(mp.players.local == null || mp.players.local.handle == null) return;
     mp.events.callRemote("play_anim", "amb@medic@standing@kneel@enter", "enter", 0);
+
+    initiateActionTimer(actionTime);
 
     actionInterval = setInterval(() => {
 
@@ -79,10 +95,12 @@ function MedkitAction(){
             if(actionTime <= 0){
                 mp.events.callRemote("clear_anim");
                 mp.events.callRemote("FinishPlayerAction", actionType);
+                UIHud.execute(`gm.actionBar = false;`);
                 clearInterval(actionInterval);
             }
             else{
-                actionTime--;
+                actionTime--;           
+                UIHud.execute(`gm.$refs.actionBar.time = ${((maxActionTime - actionTime) == 0 ? 0.1 : (maxActionTime - actionTime))}`);
                 if(actionTime == 1){
                     mp.events.callRemote("play_anim", "amb@medic@standing@kneel@exit", "exit", 0);
                 }
@@ -118,8 +136,7 @@ mp.events.add("BeginCuffing", (target) => {
     cuffTarget = target;
     cuffTimeLeft = 5;
 
-    UIHud.execute(`gm.cuffProgress = true;`);
-    UIHud.execute(`gm.$refs.cuffProgress.time = ${cuffTimeLeft}`);
+    initiateActionTimer(cuffTimeLeft);
     
     if(cuffInterval != null) clearInterval(cuffInterval);
 
@@ -150,11 +167,11 @@ mp.events.add("BeginCuffing", (target) => {
 
         cuffTimeLeft--;
         if(cuffTimeLeft <= 0){
-            UIHud.execute(`gm.cuffProgress = false;`);
+            UIHud.execute(`gm.actionBar = false;`);
             finishCuffing();
         }
         else{
-            UIHud.execute(`gm.$refs.cuffProgress.time = ${cuffTimeLeft}`);
+            UIHud.execute(`gm.$refs.actionBar.time = ${((maxActionTime - cuffTimeLeft) == 0 ? 0.1 : (maxActionTime - cuffTimeLeft))}`);
         }
     }, 1000);
 });
@@ -166,7 +183,7 @@ function stopCuffing(reason){ // if unsuccessful / force stopped
     cuffInterval = null;
     cuffTarget = null;
 
-    UIHud.execute(`gm.cuffProgress = false;`);
+    UIHud.execute(`gm.actionBar = false;`);
 
     mp.events.callRemote("StopCuffing");
 

@@ -118,14 +118,14 @@ mp.events.add("TwoSecondsEvent", () => {
 
     switch(mp.players.local.Team){
         case 0:
-            mp.game.ui.setHudColour(143, 255, 0, 0, 128);
-            mp.game.ui.setHudColour(144, 255, 0, 0, 128);
-            mp.game.ui.setHudColour(145, 255, 0, 0, 128);
+            mp.game.ui.setHudColour(143, 255, 174, 0, 128);
+            mp.game.ui.setHudColour(144, 255, 174, 0, 128);
+            mp.game.ui.setHudColour(145, 255, 174, 0, 128);
             break;
         case 1:
-            mp.game.ui.setHudColour(143, 0, 0, 255, 128);
-            mp.game.ui.setHudColour(144, 0, 0, 255, 128);
-            mp.game.ui.setHudColour(145, 0, 0, 255, 128);  
+            mp.game.ui.setHudColour(143, 0, 151, 255, 128);
+            mp.game.ui.setHudColour(144, 0, 151, 255, 128);
+            mp.game.ui.setHudColour(145, 0, 151, 255, 128);  
             break;
         default:     
             mp.game.ui.setHudColour(143, 150, 150, 150, 128);
