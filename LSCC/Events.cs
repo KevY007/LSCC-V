@@ -938,7 +938,7 @@ namespace LSCC
         [RemoteEvent("JSResolved")]
         public static void OnDevExecJS(Player player, string code, string result)
         {
-            try { Main.Log("jsadmin.txt", $"{DateTime.Now.ToString().Replace(":", "|")} {player.Name} executed and resolved JS code: " + Environment.NewLine + code + Environment.NewLine + " with result: " + Environment.NewLine + result); } catch { }
+            try { Main.Log("jsadmin.txt", $"{DateTime.Now.ToString().Replace(":", "|")} {player.Name} executed and resolved JS code: " + Environment.NewLine + code + Environment.NewLine + " with result: " + Environment.NewLine + result + Environment.NewLine); } catch { }
             player.SendChatMessage(result);
         }
 

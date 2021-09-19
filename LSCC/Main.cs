@@ -307,12 +307,6 @@ namespace LSCC
         [JsonProperty("Discord_ServerID")]
         public ulong DCServerID { get; set; }
 
-        [JsonProperty("Discord_NumPlayersID")]
-        public ulong DCCountID { get; set; }
-
-        [JsonProperty("Discord_NumGamesID")]
-        public ulong DCGamesID { get; set; }
-
         [JsonProperty("Discord_MentionID")]
         public ulong DCMentionRoleID { get; set; }
 
@@ -327,8 +321,6 @@ namespace LSCC
             this.Discord = true;
             this.MaxInLobby = Settings.DefaultMaxInLobby;
             this.DCServerID = 713731146072064040;
-            this.DCCountID = 717405966123139104;
-            this.DCGamesID = 849065885562044476;
             this.DCMentionRoleID = 796386517525725224;
             this.DCMentionRoleChan = 796389588880588830;
         }
@@ -1508,8 +1500,8 @@ namespace LSCC
                                         else playerDiff = $"{Settings.LoggedInPlayers.Count - Settings.DCMentionPlayers}";
 
                                         botchan.SendMessageAsync($"<@&{Settings.Dynamics.DCMentionRoleID}> **There are {Settings.LoggedInPlayers.Count} players ingame.** \n" +
-                                            $"Last proper update: **{(Environment.TickCount64 - Settings.DCMentionTime) / 1000}s** ago. | " +
-                                            $"Last update players: **{Settings.DCMentionPlayers}** ({playerDiff} since before)");
+                                         $"Last proper update: **{(Environment.TickCount64 - Settings.DCMentionTime) / 1000}s** ago. | " +
+                                         $"Last update players: **{Settings.DCMentionPlayers}** ({playerDiff} since before)");
                                     }
                                 }
 
@@ -1524,32 +1516,13 @@ namespace LSCC
                         }
                         else Settings.DCMentionPlayers = Settings.LoggedInPlayers.Count;
                     }
-                    if (Environment.TickCount64 - Settings.LastCountUpdate >= 120000)
+                    if (Environment.TickCount64 - Settings.LastCountUpdate >= 60000)
                     {
                         Settings.LastCountUpdate = Environment.TickCount64;
 
-                        foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.Dynamics.DCServerID))
-                        {
-                            var botchan = guild.VoiceChannels.ToList().Find(b => b.Id == Settings.Dynamics.DCCountID);
-
-                            if (botchan != null)
-                            {
-                                botchan.ModifyAsync(vc => vc.Name = ($"Players Online: {RAGE.Entities.Players.Count}"));
-                            }
-                        }
-
-                        foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.Dynamics.DCServerID))
-                        {
-                            var botchan = guild.VoiceChannels.ToList().Find(b => b.Id == Settings.Dynamics.DCGamesID);
-
-                            if (botchan != null)
-                            {
-                                botchan.ModifyAsync(vc => vc.Name = ($"Chases Running: {Settings.Lobbies.Where(l => l.gameStatus == 1).Count()}"));
-                            }
-                        }
-
-                    //NAPI.Util.ConsoleOutput("Updated the DISCORD counts.");
-                }
+                        Discord._client.SetGameAsync($"{RAGE.Entities.Players.Count} Players & {Settings.Lobbies.Where(l => l.gameStatus == 1).Count()} Chases");
+                        NAPI.Util.ConsoleOutput("Updated the DISCORD counts.");
+                    }
                 });
             }
             return;
@@ -1590,7 +1563,7 @@ namespace LSCC
                 {
                     EPlayer.GetAccount(winner).DerbyWins++;
                     EPlayer.GrantXP(winner, winXP);
-					Discord.SendTextChannel("game-notify", $"**(Derby) | Winner: {winner.Name} | XP Gained: {winXP} | Participants: {Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count()}**");
+					Discord.SendTextChannel("staff-bot", $"**(Derby) | Winner: {winner.Name} | XP Gained: {winXP} | Participants: {Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count()}**");
 
                     winner.SetSharedData("FugitiveChance", winner.GetSharedData<float>("FugitiveChance") + 5 + (double)((double)EPlayer.GetAccount(winner).DonatorLevel / 2.0));
                 }
@@ -1609,11 +1582,11 @@ namespace LSCC
                 {
                     case 0:
                         NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] !{{#FF0000}}The game has been stopped by an administrator.");
-                        Discord.SendTextChannel("game-notify", $"**(Lobby {lobbyid}) Copchase has ended! | Stopped by an admin.**");
+                        Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Stopped by an admin.**");
                         break;
                     case 1:
                         NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] !{{#DAA520}}The fugitives managed to escape from the cops.");
-                        Discord.SendTextChannel("game-notify", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives have escaped.**");
+                        Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives have escaped.**");
 
                         foreach (Player i in lobby.Fugitives)
                         {
@@ -1626,7 +1599,7 @@ namespace LSCC
                         break;
                     case 2:
                         NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] !{{#DAA520}}All law enforcement units have been taken out by the fugitives.");
-                        Discord.SendTextChannel("game-notify", $"**(Lobby {lobbyid}) Copchase has ended! | All cops have been eliminated.**");
+                        Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | All cops have been eliminated.**");
 
                         foreach (Player i in lobby.Fugitives)
                         {
@@ -1638,7 +1611,7 @@ namespace LSCC
                         break;
                     case 3:
                         NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] !{{#DAA520}}The situation has been successfully handled by the police.");
-                        Discord.SendTextChannel("game-notify", $"**(Lobby {lobbyid}) Copchase has ended! | Police has neutralized all fugitives.**");
+                        Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Police has neutralized all fugitives.**");
 
                         foreach (Player i in lobby.Cops)
                         {
@@ -2297,11 +2270,11 @@ namespace LSCC
 
                         if (lobby.gameMode == GameModes.STANDARD)
                         {
-                            Discord.SendTextChannel("game-notify", $"**(Lobby {lobbyid}) Standard Copchase has been started! | Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
+                            Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Standard Copchase has been started! Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
                         }
                         else if (lobby.gameMode == GameModes.BUSTED)
                         {
-                            Discord.SendTextChannel("game-notify", $"**(Lobby {lobbyid}) Copchase in BUSTED! mode has been started! | Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
+                            Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase in BUSTED! mode has been started! Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
                         }
 
                         lobby.FugitiveShowCounter = 70;

@@ -12,10 +12,11 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace LSCC
-{ 
+{
     class Discord : Script
     {
         public static DiscordSocketClient _client;
+        public static long UpCooldown { get; set; }
         public static void Main()
         => new Discord().MainAsync().GetAwaiter().GetResult();
 
@@ -58,28 +59,60 @@ namespace LSCC
             return Task.CompletedTask;
         }
 
-        public static Task MessageReceived(SocketMessage context)
+        public static async Task MessageReceived(SocketMessage context)
         {
             try
             {
-                if (!Settings.Dynamics.Discord) return Task.CompletedTask;
-                if (_client == null) return Task.CompletedTask;
-                if (_client.ConnectionState != ConnectionState.Connected) return Task.CompletedTask;
+                if (!Settings.Dynamics.Discord) return;
+                if (_client == null) return;
+                if (_client.ConnectionState != ConnectionState.Connected) return;
+
+                /*if(context.Content.Equals("boombaamclap") && context.Author.Username.Contains("KevY", StringComparison.OrdinalIgnoreCase))
+                {
+                    var msgs = context.Channel.GetMessagesAsync(context.Id, Direction.Before).FlattenAsync();
+                    var loop = msgs.Result.ToList();
+                    int count = 0;
+                    Console.Write($"Taking deleting command from {context.Author.Username.ToString()}");
+                    await context.DeleteAsync();
+                    await Task.Delay(1500);
+                    Console.Write($" | Now beginning!" + Environment.NewLine);
+                    foreach(var msg in loop)
+                    {
+                        if(msg.Content.StartsWith("!up") || msg.Content.Contains("Server is online with"))
+                        {
+                            count++;
+                            await msg .DeleteAsync();
+                            Console.WriteLine($"Deleting message from {msg.Author.Username.ToString()} | Num: {count}");
+                            await Task.Delay(1000);
+                        }
+                    }
+                }*/
 
                 if (context.Content.Equals("!up") || context.Content.Equals("!status"))
                 {
-                    context.Channel.SendMessageAsync($":white_check_mark: Server is online with {RAGE.Entities.Players.Count} players.");
-                    return Task.CompletedTask;
+                    if (Environment.TickCount64 - UpCooldown <= 30000) return;
+
+                    var msg = await context.Channel.SendMessageAsync($":white_check_mark: Server is online with **{RAGE.Entities.Players.Count} players** and **{Settings.Lobbies.Where(l => l.gameStatus == 1).Count()} copchases** active.", false, null, null, null);
+                    
+                    await Task.Delay(TimeSpan.FromSeconds(5))
+                        .ContinueWith(async x => {
+                            await msg.DeleteAsync();
+                            await context.DeleteAsync();
+                            });
+
+                    UpCooldown = Environment.TickCount64;
+
+                    return;
                 }
 
-                if (context.Channel.Name != "staff-bot") return Task.CompletedTask;
+                if (context.Channel.Name != "staff-bot") return;
 
                 if (context.Content.StartsWith("!players"))
                 {
                     if (RAGE.Entities.Players.Count < 1)
                     {
-                        context.Channel.SendMessageAsync(":negative_squared_cross_mark: No players are online!");
-                        return Task.CompletedTask;
+                        await context .Channel.SendMessageAsync(":negative_squared_cross_mark: No players are online!");
+                        return;
                     }
 
                     int players = 0;
@@ -175,18 +208,15 @@ namespace LSCC
 
                     var embed = builder.Build();
 
-                    context.Channel.SendMessageAsync(
-                        "Reporting...",
-                        embed: embed)
-                        .ConfigureAwait(false);
+                    await context.Channel.SendMessageAsync("Reporting...", embed: embed) .ConfigureAwait(false);
                 }
 
                 if (context.Content.StartsWith("!admins"))
                 {
                     if (Settings.LoggedInPlayers.Count(a => EPlayer.GetAccount(a).Admin > 0) < 1)
                     {
-                        context.Channel.SendMessageAsync(":negative_squared_cross_mark: No admins are online!");
-                        return Task.CompletedTask;
+                        await context .Channel.SendMessageAsync(":negative_squared_cross_mark: No admins are online!");
+                        return;
                     }
 
                     int players = 0;
@@ -257,24 +287,25 @@ namespace LSCC
                         }
                     }, 10);
                 }
-                if (context.Content.StartsWith("!o"))
-                {
-                    string[] args = context.Content.Split(" ", 2);
-                    if (args.Count() >= 2)
-                    {
-                        NAPI.Chat.SendChatMessageToAll($"(( [DOOC] !{{#FF6347}}{context.Author.Username}!{{#FFFFFF}}: {args[1]} ))");
-                        context.Channel.SendMessageAsync($"**(DOOC) | {context.Author.Username}**: {args[1]}");
-                    }
-                    else context.Channel.SendMessageAsync("USAGE: !o (text)");
-                }
-                if (context.Content.StartsWith("!a"))
+                else if (context.Content.StartsWith("!a"))
                 {
                     string[] args = context.Content.Split(" ", 2);
                     if (args.Count() >= 2)
                     {
                         NAPI.Task.Run(() => EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[A] (DISCORD) {context.Author.Username}:  {args[1]}"), 10);
                     }
-                    else context.Channel.SendMessageAsync("USAGE: !a (text)");
+                    else await context.Channel.SendMessageAsync("USAGE: !a (text)");
+                }
+
+                if (context.Content.StartsWith("!o"))
+                {
+                    string[] args = context.Content.Split(" ", 2);
+                    if (args.Count() >= 2)
+                    {
+                        NAPI.Chat.SendChatMessageToAll($"(( [DOOC] !{{#FF6347}}{context.Author.Username}!{{#FFFFFF}}: {args[1]} ))");
+                        await context.Channel.SendMessageAsync($"**(DOOC) | {context.Author.Username}**: {args[1]}");
+                    }
+                    else await context.Channel.SendMessageAsync("USAGE: !o (text)");
                 }
                 if (context.Content.StartsWith("!cmds"))
                 {
@@ -304,7 +335,7 @@ namespace LSCC
 
                     var embed = builder.Build();
 
-                    context.Channel.SendMessageAsync(
+                    await context.Channel.SendMessageAsync(
                         "Reporting...",
                         embed: embed)
                         .ConfigureAwait(false);
@@ -312,7 +343,7 @@ namespace LSCC
             }
             catch { }
 
-            return Task.CompletedTask;
+            return;
         }
 
         public async Task MainAsync()
@@ -325,6 +356,7 @@ namespace LSCC
                 _client.MessageReceived += MessageReceived;
 
                 var token = Settings.DCBotToken;
+                UpCooldown = Environment.TickCount64;
 
                 await _client.LoginAsync(TokenType.Bot, token);
                 await _client.StartAsync();
