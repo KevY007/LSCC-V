@@ -90,15 +90,15 @@ namespace LSCC
 
                 if (context.Content.Equals("!up") || context.Content.Equals("!status"))
                 {
-                    if (Environment.TickCount64 - UpCooldown <= 30000) return;
+                    if (Environment.TickCount64 - UpCooldown <= 7000) return;
 
                     var msg = await context.Channel.SendMessageAsync($":white_check_mark: Server is online with **{RAGE.Entities.Players.Count} players** and **{Settings.Lobbies.Where(l => l.gameStatus == 1).Count()} copchases** active.", false, null, null, null);
                     
-                    await Task.Delay(TimeSpan.FromSeconds(5))
-                        .ContinueWith(async x => {
-                            await msg.DeleteAsync();
-                            await context.DeleteAsync();
-                            });
+                    Task.Run(() => { // WE WANT THE CODE TO EXECUTE SEPARATELY AND NOT BLOCK MESSAGE RECEIVED SO DONT AWAIT THIS SH
+                        Task.Delay(5000);
+                        msg.DeleteAsync();
+                        context.DeleteAsync();
+                    });
 
                     UpCooldown = Environment.TickCount64;
 
@@ -111,7 +111,7 @@ namespace LSCC
                 {
                     if (RAGE.Entities.Players.Count < 1)
                     {
-                        await context .Channel.SendMessageAsync(":negative_squared_cross_mark: No players are online!");
+                        await context.Channel.SendMessageAsync(":negative_squared_cross_mark: No players are online!");
                         return;
                     }
 
@@ -356,7 +356,7 @@ namespace LSCC
                 _client.MessageReceived += MessageReceived;
 
                 var token = Settings.DCBotToken;
-                UpCooldown = Environment.TickCount64;
+                UpCooldown = Environment.TickCount64-30000;
 
                 await _client.LoginAsync(TokenType.Bot, token);
                 await _client.StartAsync();
