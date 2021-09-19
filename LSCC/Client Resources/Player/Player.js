@@ -60,7 +60,6 @@ var curGPSBind = 0x5A;
 var radioToggle = 0;
 
 var ServerSettings = [];
-let CollisionVehicles = [];
 var ShotStats = [];
 
 mp.game.vehicle.defaultEngineBehaviour = false;
@@ -393,18 +392,6 @@ mp.events.addCommand("updaterate", function (rate) {
 
 if(!radioToggle) mp.game.audio.setInitialPlayerStation('OFF');
 
-
-mp.events.add('entityStreamOut', (entity) => {
-
-    if (entity.type === 'vehicle') 
-    {
-        if(CollisionVehicles.indexOf(entity.id) != -1)
-        {
-            CollisionVehicles.splice(CollisionVehicles.indexOf(entity.id), 1);
-        }
-    }
-});
-
 mp.events.addDataHandler('Team', function (entity, value, oldValue) 
 {
     entity.Team = value;
@@ -714,87 +701,10 @@ mp.events.add('render', () => {
                     if(collisionTime > 0)
                     {
                         collisionTime--;
-
-                        mp.vehicles.forEach(target => {
-                            if(CollisionVehicles.indexOf(target.id) == -1)
-                            {
-                                player.setNoCollision(target.handle, false); // Collisions OFF for ourselves to other cars too.
-                                target.setNoCollision(player.handle, false);
-
-                                target.setInvincible(true);
-                                target.setCanBeDamaged(false);
-                                target.setCanBreak(false);
-
-                                mp.vehicles.forEach(target2 => {
-                                    if(target2 != target)
-                                    {
-                                        target.setNoCollision(target2.handle, false);
-                                        target2.setNoCollision(target.handle, false);
-                                    }
-                                    
-                                });
-
-                                CollisionVehicles.push(target.id);
-                            }
-                        });
-                    }
-                    else if(collisionTime == 0)
-                    {
-                        collisionTime = -1;
-
-                        mp.vehicles.forEach(target => {
-                            if(CollisionVehicles.indexOf(target.id) != -1)
-                            {
-                                player.setNoCollision(target.handle, true); // Collisions ON for ourselves to other cars too.
-                                target.setNoCollision(player.handle, true);
-
-                                target.setInvincible(false);
-                                target.setCanBeDamaged(true);
-                                target.setCanBreak(true);
-
-                                mp.vehicles.forEach(target2 => {
-                                    if(target2 != target)
-                                    {
-                                        target.setNoCollision(target2.handle, true);
-                                        target2.setNoCollision(target.handle, true);
-                                    }
-                                });
-
-                                CollisionVehicles.splice(CollisionVehicles.indexOf(target.id), 1);
-                            }
-                        });
-                    }
+                    } 
                 }
 
                 traceLastFunc(`[Players] Update Chase Data3`);
-                if((player.Team == 0 || player.Team == 1) && collisionTime == -1)
-                {
-                    if(!player.isInAnyVehicle(false) && ServerSettings.OnfootCollisions == false)
-                    {
-                        mp.vehicles.forEach(target => {
-                            if(CollisionVehicles.indexOf(target.id) == -1)
-                            {
-                                player.setNoCollision(target.handle, false); // Collisions OFF for ourselves to other cars too.
-                                target.setNoCollision(player.handle, false);
-
-                                CollisionVehicles.push(target.id);
-                            }                            
-                        });
-                    }
-                    else
-                    {
-                        mp.vehicles.forEach(target => {
-                            if(CollisionVehicles.indexOf(target.id) != -1)
-                            {
-                                player.setNoCollision(target.handle, true); // Collisions ON for ourselves to other cars too.
-                                target.setNoCollision(player.handle, true);
-
-                                CollisionVehicles.splice(CollisionVehicles.indexOf(target.id), 1);
-                            }
-                        });
-                    }
-                }
-
                 traceLastFunc(`[Players] Update Chase Data Complete`);
             }
         }
@@ -1317,319 +1227,308 @@ mp.events.add('native:call', (nativeName, args, hasCallback) => {
 });
 
 mp.events.add(
-    {
-        "SyncServerSettings": (onfootcollisions) => {
-            ServerSettings.OnfootCollisions = onfootcollisions;
-        },
-        "ToggleClientRadio": () => {
-            radioToggle = !radioToggle;
+{
+    "SyncServerSettings": (onfootcollisions) => {
+        ServerSettings.OnfootCollisions = onfootcollisions;
+    },
+    "ToggleClientRadio": () => {
+        radioToggle = !radioToggle;
 
-            mp.storage.data.radiotoggle = radioToggle;
+        mp.storage.data.radiotoggle = radioToggle;
 
-            mp.storage.flush();
+        mp.storage.flush();
 
-            if(!radioToggle) mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Vehicle radio toggled OFF.");
-            else mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Vehicle radio toggled ON.");
-        },
-        "SetInVehEx": (vehicle, vehseat) => {
-            mp.players.local.setIntoVehicle(vehicle.handle, vehseat);
-        },
-        "ToggleHud": (show) => {
-            if(show)
-            {
-                if(mp.players.local.Lobby == -4 && derbyText != null) {
-                    derbyText.visible = true;
-                }
-            }
-            else{
-
-                if(derbyText != null) {
-                    derbyText.visible = false;
-                }
-            }
-        },
-        "ThrowFromVehicle": () => {
-            let localVeh = mp.players.local.vehicle;
-            if (localVeh) {
-                mp.players.local.taskLeaveVehicle(localVeh.handle, 4160);
-            }
-        },
-
-        "PlaySong": (link, level) => {
-            themeSoundID = mp.game.audio.playSoundEx(link, level);
-        },
-        "StopSong": () => {
-            mp.game.audio.stopSoundEx(themeSoundID);
-        },
-
-        "DisableControlActions": (actiongroup) => {
-            mp.game.controls.disableAllControlActions(actiongroup);
-        },
-
-        "EnableControlActions": (actiongroup) => {
-            mp.game.controls.enableAllControlActions(actiongroup);
-        },
-
-        "SetHandcuffs": (status) => {
-            if(status == true)
-            {
-                mp.players.local.clearTasksImmediately();
-
-                mp.players.local.setEnableHandcuffs(true);
-
-                mp.events.callRemote("play_anim", "mp_prison_break", "handcuffed", 32);
-            }
-            else
-            {
-                mp.players.local.setEnableHandcuffs(false);
-
-                mp.players.local.clearTasksImmediately();
-            }
-        },
-        "SetHandsup": (status) =>
+        if(!radioToggle) mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Vehicle radio toggled OFF.");
+        else mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Vehicle radio toggled ON.");
+    },
+    "SetInVehEx": (vehicle, vehseat) => {
+        mp.players.local.setIntoVehicle(vehicle.handle, vehseat);
+    },
+    "ToggleHud": (show) => {
+        if(show)
         {
-            if(status == true)
-            {
-                mp.events.callRemote("play_anim", "ped", "handsup_base", 50);
+            if(mp.players.local.Lobby == -4 && derbyText != null) {
+                derbyText.visible = true;
             }
-            else
-            {
-                mp.events.callRemote("play_anim", "ped", "handsup_exit", 50);
-                mp.players.local.stopAnim("handsup", "ped", 8.0);
+        }
+        else{
 
-                setTimeout(() => {
-                    mp.players.local.stopAnim("handsup_exit", "ped", 8.0);
-                    mp.players.local.clearTasksImmediately();
-                }, 500);
-            }
-        },
-        "SetDerbyCounting": (status, time) => {
-            derbyTimeCur = time;
-            derbyCounting = status;
-        },
-        "SetTimeWeather": (hour, minute, second, weather) => {
-            mp.game.time.setClockTime(hour, minute, second);
-
-            switch(weather) {
-                case 0:
-                    mp.game.gameplay.setWeatherTypeNow('EXTRASUNNY');
-                    break;
-                case 1:
-                    mp.game.gameplay.setWeatherTypeNow('CLEAR');
-                    break;
-                case 2:
-                    mp.game.gameplay.setWeatherTypeNow('CLOUDS');
-                    break;
-                case 3:
-                    mp.game.gameplay.setWeatherTypeNow('SMOG');
-                    break;
-                case 4:
-                    mp.game.gameplay.setWeatherTypeNow('FOGGY');
-                    break;
-                case 5:
-                    mp.game.gameplay.setWeatherTypeNow('OVERCAST');
-                    break;
-                case 6:
-                    mp.game.gameplay.setWeatherTypeNow('RAIN');
-                    break;
-                case 7:
-                    mp.game.gameplay.setWeatherTypeNow('THUNDER');
-                    break;
-                case 8:
-                    mp.game.gameplay.setWeatherTypeNow('CLEARING');
-                    break;
-                case 9:
-                    mp.game.gameplay.setWeatherTypeNow('SNOWLIGHT');
-                    break;
-                default:
-                    mp.game.gameplay.setWeatherTypeNow('CLOUDS');
-                    break;
-            }
-        },
-        "SpectatePlayer": (target) => {
-
-            if(specCam != null)
-            {
-                specCam.setActive(false);
-                specCam.destroy();
-                specCam = null;
-            }
-
-            specTarget = target;
-    
-            mp.game.cam.renderScriptCams(false, false, 0, true, false);
-
-            specCam = mp.cameras.new('default', target.position, new mp.Vector3(0, 0, target.getHeading()), target.isInAnyVehicle(false) ? 80 : 60);
-            specCam.attachTo(target.handle, 0, target.isInAnyVehicle(false) ? -6 : -5, target.isInAnyVehicle(false) ? 3 : 1, true);
-            specCam.setActive(true);
-
-            mp.game.cam.renderScriptCams(true, false, 0, true, false);
-    
-            specState = true;
-        },
-
-        "ShakeCam": (shakeType, amplit, time) => {
-            mp.game.cam.shakeGameplayCam(shakeType, amplit);
-            setTimeout(() => {
-                mp.game.cam.stopGameplayCamShaking(true);
-            }, time);
-        },
-
-        "PlayMissionComplete": (type) => {
-            mp.game.audio.playMissionCompleteAudio(type);
-        },
-    
-        "StopSpectating": () => {
-
-            specTarget = null;
-            specState = false;
-    
-            mp.game.cam.renderScriptCams(false, false, 0, true, false);
-
-            if(specCam != null)
-            {
-                specCam.setActive(false);
-                specCam.destroy();
-                specCam = null;
-            }
-        },
-
-        "setToRagdoll": (time1, time2, ragdollType, p4, p5, p6) => {
-            player.clearTasksImmediately();
-            player.setToRagdoll(time1, time2, ragdollType, p4, p5, p6);
-        },
-        "SetJailCounter": (time) => {
-            currentJailTime = time;
-            lastJailUpdate = 10;
-        },
-        "SetMuteCounter": (time) => {
-            currentMuteTime = time;
-            lastMuteUpdate = 10;
-        },
-
-        "SetActorInvulnerable": (toggle) => {
-            if(toggle)
-            {
-                player.setInvincible(true);
-            }
-            else
-            {
-                player.setInvincible(false);
-            }
-        },
-
-        "CanFallOutOfCar": (toggle) => {
-            if(toggle)
-            {
-                player.canKnockOffVehicle(true);
-                player.setCanBeKnockedOffVehicle(0); // Can fall
-            }
-            else
-            {
-                player.setCanBeKnockedOffVehicle(2); // Can't fall off
-                player.canKnockOffVehicle(false);
-            }
-        },
-
-        "StartChaseTimer": (iTimeCur, iTimeMax, collisionDuration, mode) => {
-
-            chaseTimeCur = iTimeCur - 1;
-            chaseTimeMax = iTimeMax;
-            collisionTime = collisionDuration;
-            chaseRunning = true;
-            chaseMode = mode;
-        },
-
-        "SendNotification": (title, text, attribute, duration) => {
-            mp.system.notify(title, text, attribute, duration, false);
-        },
-
-        "HideChaseTimer": () => {
-            if(UIHud != null) UIHud.execute(`gm.gameProgress = false;`);
-            chaseRunning = false;
-        },
-
-        "playerEnterVehicle": (vehicle, seat) => {
-            player.seat = seat;
-            vehicle.setInvincible(false);
-
-            if(chaseRunning == true && collisionTime >= 1)
-            {
-                mp.vehicles.forEach(target2 => {
-                    if(target2 != vehicle) {
-                        vehicle.setNoCollision(target2.handle, false);
-                        target2.setNoCollision(vehicle.handle, false);
-
-                        target2.setInvincible(false);
-                        vehicle.setInvincible(false);
-                    }
-                });
-            }
-
-            if(!radioToggle && seat == -1) mp.game.invoke('0x1B9C0099CB942AC6', vehicle.handle, 'OFF');
-
-            if(mp.game.vehicle.isThisModelAHeli(vehicle.model) || mp.game.vehicle.isThisModelAPlane(vehicle.model)) {
-                mp.events.callRemote("RequestParachute", vehicle);
-            }
-
-            if (seat == -1) {
-                if(vehicle.getVariable("Engine") !== undefined)
-                {
-                    vehicle.setEngineOn(vehicle.getVariable("Engine"), true, true);
-                }
-                else vehicle.setEngineOn(true, true, true);
-            }
-        },
-
-        "playerLeaveVehicle": (vehicle, seat) => {
-            if (vehicle != null && vehicle.getVariable("Engine") !== undefined) {
-                vehicle.setEngineOn(vehicle.getVariable("Engine"), true, true);
-            }
-        },
-
-        "InitChaseTimer": () => {
-            
-            if(UIHud != null) UIHud.execute(`gm.gameProgress = false;`);
-
-            if(derbyText == null)
-            {
-                derbyText = new timerBarLib.TimerBar(" ", false);
-                derbyText.text = "N/A";
-                derbyText.textColor = 109; // HUD_COLOUR_GOLD
-                derbyText.usePlayerStyle = true;
+            if(derbyText != null) {
                 derbyText.visible = false;
             }
-        },
+        }
+    },
+    "ThrowFromVehicle": () => {
+        let localVeh = mp.players.local.vehicle;
+        if (localVeh) {
+            mp.players.local.taskLeaveVehicle(localVeh.handle, 4160);
+        }
+    },
 
-        "DestroyPlayerCamera": () => destroyCam(),
+    "PlaySong": (link, level) => {
+        themeSoundID = mp.game.audio.playSoundEx(link, level);
+    },
+    "StopSong": () => {
+        mp.game.audio.stopSoundEx(themeSoundID);
+    },
 
-        "SetPlayerFrozen": (status) => {
-            player.freezePosition(status);
+    "DisableControlActions": (actiongroup) => {
+        mp.game.controls.disableAllControlActions(actiongroup);
+    },
 
-            if(player.vehicle)
+    "EnableControlActions": (actiongroup) => {
+        mp.game.controls.enableAllControlActions(actiongroup);
+    },
+
+    "SetHandcuffs": (status) => {
+        if(status == true)
+        {
+            mp.players.local.clearTasksImmediately();
+
+            mp.players.local.setEnableHandcuffs(true);
+
+            mp.events.callRemote("play_anim", "mp_prison_break", "handcuffed", 32);
+        }
+        else
+        {
+            mp.players.local.setEnableHandcuffs(false);
+
+            mp.players.local.clearTasksImmediately();
+        }
+    },
+    "SetHandsup": (status) =>
+    {
+        if(status == true)
+        {
+            mp.events.callRemote("play_anim", "ped", "handsup_base", 50);
+        }
+        else
+        {
+            mp.events.callRemote("play_anim", "ped", "handsup_exit", 50);
+            mp.players.local.stopAnim("handsup", "ped", 8.0);
+
+            setTimeout(() => {
+                mp.players.local.stopAnim("handsup_exit", "ped", 8.0);
+                mp.players.local.clearTasksImmediately();
+            }, 500);
+        }
+    },
+    "SetDerbyCounting": (status, time) => {
+        derbyTimeCur = time;
+        derbyCounting = status;
+    },
+    "SetTimeWeather": (hour, minute, second, weather) => {
+        mp.game.time.setClockTime(hour, minute, second);
+
+        switch(weather) {
+            case 0:
+                mp.game.gameplay.setWeatherTypeNow('EXTRASUNNY');
+                break;
+            case 1:
+                mp.game.gameplay.setWeatherTypeNow('CLEAR');
+                break;
+            case 2:
+                mp.game.gameplay.setWeatherTypeNow('CLOUDS');
+                break;
+            case 3:
+                mp.game.gameplay.setWeatherTypeNow('SMOG');
+                break;
+            case 4:
+                mp.game.gameplay.setWeatherTypeNow('FOGGY');
+                break;
+            case 5:
+                mp.game.gameplay.setWeatherTypeNow('OVERCAST');
+                break;
+            case 6:
+                mp.game.gameplay.setWeatherTypeNow('RAIN');
+                break;
+            case 7:
+                mp.game.gameplay.setWeatherTypeNow('THUNDER');
+                break;
+            case 8:
+                mp.game.gameplay.setWeatherTypeNow('CLEARING');
+                break;
+            case 9:
+                mp.game.gameplay.setWeatherTypeNow('SNOWLIGHT');
+                break;
+            default:
+                mp.game.gameplay.setWeatherTypeNow('CLOUDS');
+                break;
+        }
+    },
+    "SpectatePlayer": (target) => {
+
+        if(specCam != null)
+        {
+            specCam.setActive(false);
+            specCam.destroy();
+            specCam = null;
+        }
+
+        specTarget = target;
+
+        mp.game.cam.renderScriptCams(false, false, 0, true, false);
+
+        specCam = mp.cameras.new('default', target.position, new mp.Vector3(0, 0, target.getHeading()), target.isInAnyVehicle(false) ? 80 : 60);
+        specCam.attachTo(target.handle, 0, target.isInAnyVehicle(false) ? -6 : -5, target.isInAnyVehicle(false) ? 3 : 1, true);
+        specCam.setActive(true);
+
+        mp.game.cam.renderScriptCams(true, false, 0, true, false);
+
+        specState = true;
+    },
+
+    "ShakeCam": (shakeType, amplit, time) => {
+        mp.game.cam.shakeGameplayCam(shakeType, amplit);
+        setTimeout(() => {
+            mp.game.cam.stopGameplayCamShaking(true);
+        }, time);
+    },
+
+    "PlayMissionComplete": (type) => {
+        mp.game.audio.playMissionCompleteAudio(type);
+    },
+
+    "StopSpectating": () => {
+
+        specTarget = null;
+        specState = false;
+
+        mp.game.cam.renderScriptCams(false, false, 0, true, false);
+
+        if(specCam != null)
+        {
+            specCam.setActive(false);
+            specCam.destroy();
+            specCam = null;
+        }
+    },
+
+    "setToRagdoll": (time1, time2, ragdollType, p4, p5, p6) => {
+        player.clearTasksImmediately();
+        player.setToRagdoll(time1, time2, ragdollType, p4, p5, p6);
+    },
+    "SetJailCounter": (time) => {
+        currentJailTime = time;
+        lastJailUpdate = 10;
+    },
+    "SetMuteCounter": (time) => {
+        currentMuteTime = time;
+        lastMuteUpdate = 10;
+    },
+
+    "SetActorInvulnerable": (toggle) => {
+        if(toggle)
+        {
+            player.setInvincible(true);
+        }
+        else
+        {
+            player.setInvincible(false);
+        }
+    },
+
+    "CanFallOutOfCar": (toggle) => {
+        if(toggle)
+        {
+            player.canKnockOffVehicle(true);
+            player.setCanBeKnockedOffVehicle(0); // Can fall
+        }
+        else
+        {
+            player.setCanBeKnockedOffVehicle(2); // Can't fall off
+            player.canKnockOffVehicle(false);
+        }
+    },
+
+    "StartChaseTimer": (iTimeCur, iTimeMax, collisionDuration, mode) => {
+
+        chaseTimeCur = iTimeCur - 1;
+        chaseTimeMax = iTimeMax;
+        collisionTime = collisionDuration;
+        chaseRunning = true;
+        chaseMode = mode;
+    },
+
+    "SendNotification": (title, text, attribute, duration) => {
+        mp.system.notify(title, text, attribute, duration, false);
+    },
+
+    "HideChaseTimer": () => {
+        if(UIHud != null) UIHud.execute(`gm.gameProgress = false;`);
+        chaseRunning = false;
+    },
+
+    "playerEnterVehicle": (vehicle, seat) => {
+        player.seat = seat;
+        if(vehicle.Collisions == undefined || vehicle.Collisions == true) vehicle.setInvincible(false);
+
+        if(!radioToggle && seat == -1) mp.game.invoke('0x1B9C0099CB942AC6', vehicle.handle, 'OFF');
+
+        if(mp.game.vehicle.isThisModelAHeli(vehicle.model) || mp.game.vehicle.isThisModelAPlane(vehicle.model)) {
+            mp.events.callRemote("RequestParachute", vehicle);
+        }
+
+        if (seat == -1) {
+            if(vehicle.getVariable("Engine") !== undefined)
             {
-                player.vehicle.freezePosition(status);
+                vehicle.setEngineOn(vehicle.getVariable("Engine"), true, true);
             }
-        },
+            else vehicle.setEngineOn(true, true, true);
+        }
+    },
 
-        "CreatePlayerCamera": (x, y, z, rx, ry, rz, viewangle) => {
-            createCam(x, y, z, rx, ry, rz, viewangle);
-        },
+    "playerLeaveVehicle": (vehicle, seat) => {
+        if (vehicle != null) {
+            if(vehicle.getVariable("Engine") !== undefined)
+                vehicle.setEngineOn(vehicle.getVariable("Engine"), true, true);
+            else vehicle.setEngineOn(true, true, true);
+        }
+    },
 
-        "SetDiscordStatus": (serverName, status) => {
-            mp.discord.update(serverName, status);
-        },
+    "InitChaseTimer": () => {
+        
+        if(UIHud != null) UIHud.execute(`gm.gameProgress = false;`);
 
-        "playerReady": (player) => {
-            mp.events.callRemote("playerReadyCon");
-            mp.game.gxt.set('PM_PAUSE_HDR', 'Los Santos Copchase'); // Replace map title
+        if(derbyText == null)
+        {
+            derbyText = new timerBarLib.TimerBar(" ", false);
+            derbyText.text = "N/A";
+            derbyText.textColor = 109; // HUD_COLOUR_GOLD
+            derbyText.usePlayerStyle = true;
+            derbyText.visible = false;
+        }
+    },
 
-            setInterval(() => {
-                if(mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
-                {
-                    mp.events.callRemote("UpdateTabbedState", mp.system.isFocused);
-                    mp.events.callLocal("TwoSecondsEvent");
-                }
-            }, 2000);
-        },
-    });
+    "DestroyPlayerCamera": () => destroyCam(),
+
+    "SetPlayerFrozen": (status) => {
+        player.freezePosition(status);
+
+        if(player.vehicle)
+        {
+            player.vehicle.freezePosition(status);
+        }
+    },
+
+    "CreatePlayerCamera": (x, y, z, rx, ry, rz, viewangle) => {
+        createCam(x, y, z, rx, ry, rz, viewangle);
+    },
+
+    "SetDiscordStatus": (serverName, status) => {
+        mp.discord.update(serverName, status);
+    },
+
+    "playerReady": (player) => {
+        mp.events.callRemote("playerReadyCon");
+        mp.game.gxt.set('PM_PAUSE_HDR', 'Los Santos Copchase'); // Replace map title
+
+        setInterval(() => {
+            if(mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
+            {
+                mp.events.callRemote("UpdateTabbedState", mp.system.isFocused);
+                mp.events.callLocal("TwoSecondsEvent");
+            }
+        }, 2000);
+    },
+});

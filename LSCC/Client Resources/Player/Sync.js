@@ -91,9 +91,23 @@ mp.events.addDataHandler('Engine', function (entity, value, oldValue)
     }
 });
 
+mp.events.addDataHandler('SirenState', function (entity, value, oldValue) {
+    if(entity.type === 'vehicle')
+    {
+        if(entity.getClass() === 18) entity.setSiren(value);
+    }
+});
+
 mp.events.add("AttachWeaponComponent", (target, weapon, comp) => {
     mp.game.invoke("0xD966D51AA5B28BB9", target.handle, weapon, comp);
     //mp.game.invoke("0xADF692B254977C0C", target.handle, weapon, true);
+});
+
+mp.events.add('playerLeaveVehicle', (vehicle, seat) => {
+    if(mp.vehicles.exists(vehicle) && vehicle.getClass() === 18)
+    {
+        mp.events.callRemote("SendSirenSync", vehicle, vehicle.isSirenOn());
+    }
 });
 
 mp.events.add('entityStreamIn', (entity) => {
@@ -105,6 +119,10 @@ mp.events.add('entityStreamIn', (entity) => {
     }
     if (entity.type === 'vehicle') 
     {
+        if(entity.getVariable("SirenState") !== undefined && entity.getClass() === 18)
+        {
+            entity.setSiren(entity.getVariable("SirenState"));
+        }
         if(entity.getVariable("Status_Trunk") !== undefined)
         {
             if (entity.getVariable("Status_Trunk") == true)
@@ -149,4 +167,53 @@ mp.events.add('entityStreamIn', (entity) => {
 
 mp.events.addDataHandler("SilentSiren", (entity, value) => {
     if (entity.type === "vehicle") entity.setSirenSound(value);
+});
+
+
+// Collision Sync, ffs this took me hours of researching the shitass system but hey I figured it out -kevy
+function ToggleCollisionsForEnt(ent, state)
+{
+    if(ent.type === 'vehicle')
+    { // ITS A VEH
+        ent.setInvincible(!state);
+        ent.setCanBeDamaged(state);
+        ent.setCanBreak(state);
+    }
+    ent.setAlpha(state ? 255 : 144);
+
+    mp.vehicles.forEach(targ => {
+
+        ent.setNoCollision(targ.handle, state);
+        targ.setNoCollision(ent.handle, state);
+
+        if((ent.Collisions != undefined && ent.Collisions == false) || (targ.Collisions != undefined && targ.Collisions == false))
+        { // EITHER of them has disabled, means disabled collisions take precedence over enabled.
+            ent.setNoCollision(targ.handle, false);
+            targ.setNoCollision(ent.handle, false);
+        }
+    });
+    mp.players.forEach(targ => {    
+
+        ent.setNoCollision(targ.handle, state);
+        targ.setNoCollision(ent.handle, state);
+
+        if((ent.Collisions != undefined && ent.Collisions == false) || (targ.Collisions != undefined && targ.Collisions == false))
+        { // EITHER of them has disabled, means disabled collisions take precedence over enabled.
+            ent.setNoCollision(targ.handle, false);
+            targ.setNoCollision(ent.handle, false);
+        }
+    });
+}
+
+mp.events.add('entityStreamIn', (entity) => {
+    if(entity.getVariable("Collisions") !== undefined) 
+        ToggleCollisionsForEnt(entity, entity.getVariable("Collisions"));
+    else
+        ToggleCollisionsForEnt(entity, true); // This will refresh and cause other vehicles collision relations to refresh with this one
+});
+
+mp.events.addDataHandler('Collisions', function (entity, value, oldValue) 
+{
+    entity.Collisions = value;
+    ToggleCollisionsForEnt(entity, value);
 });

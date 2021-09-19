@@ -436,6 +436,10 @@ namespace LSCC
             catch { }
 
             player.SetSharedData("LastVehEnterExit", DateTimeOffset.Now.ToUnixTimeSeconds());
+            if (vehicle.HasSharedData("SirenState")) {
+                vehicle.SetSharedData("SirenState", !vehicle.GetSharedData<bool>("SirenState"));
+                vehicle.SetSharedData("SirenState", !vehicle.GetSharedData<bool>("SirenState")); // Revert it to false then true or vice-versa so clients pick a "change" and apply it
+            }
         }
 
         [ServerEvent(Event.PlayerDisconnected)]
@@ -544,6 +548,7 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
+            player.SetSharedData("Collisions", true); // Reset collision from chase.
             player.SetSharedData("CuffedBy", "n/a");
             player.ResetData("FreezeWeapons");
 
@@ -2598,6 +2603,12 @@ namespace LSCC
             catch { }
         }
 
+        [RemoteEvent("SendSirenSync")]
+        public void OnPlayerSyncSiren(Player player, Vehicle vehicle, bool state)
+        {
+            if (vehicle != null) vehicle.SetSharedData("SirenState", state);
+        }
+
         [RemoteEvent("BustRegress")]
         public void OnPlayerBustRegress(Player fugitive, float closestCop) // Triggers every 100ms a fugitive is without cop and has progress
         {
@@ -2631,6 +2642,7 @@ namespace LSCC
         {
             if (player == null || !player.Exists) return;
 
+            player.SetSharedData("Collisions", true); // Reset collision from chase.
             player.SetSharedData("ClimbProtection", false);
             player.SetData("LastClimbProtection", Environment.TickCount64-30000);
             player.SetData("ClimbProtectionProcs", 0);

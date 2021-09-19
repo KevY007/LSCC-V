@@ -503,6 +503,7 @@ namespace LSCC
                 player.SetSharedData("LastVehEnterExit", DateTimeOffset.Now.ToUnixTimeSeconds()-5);
                 player.SetSharedData("DerbyTime", 0);
                 player.SetSharedData("EntAlpha", 0);
+                player.SetSharedData("Collisions", true);
                 player.SetData("DerbySpawnTick", 0);
                 player.SetData("FreeroamTime", 12);
                 player.SetData("FreeroamWeather", 0);

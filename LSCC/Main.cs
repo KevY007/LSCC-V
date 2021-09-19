@@ -1816,6 +1816,7 @@ namespace LSCC
                         player.SetSharedData("CuffedBy", "n/a");
                         player.TriggerEvent("moveSkyCamera", player, "up", 1, false);
                         player.TriggerEvent("ToggleNametags", false);
+                        player.SetSharedData("Collisions", false);
                         player.RemoveAllWeapons();
                         player.Health = 100;
                         player.Armor = 0;
@@ -1937,7 +1938,8 @@ namespace LSCC
                             pVehicle.SetSharedData("Locked", true);
                             pVehicle.Locked = true;
                             pVehicle.SetSharedData("Team", 1);
-                            if(enginePower > 1.0f) pVehicle.SetSharedData("vInitialDriveForce", enginePower);
+                            pVehicle.SetSharedData("Collisions", false);
+                            if (enginePower > 1.0f) pVehicle.SetSharedData("vInitialDriveForce", enginePower);
 
 
                             player.SetData("putVehicle", pVehicle);
@@ -2140,6 +2142,7 @@ namespace LSCC
                         pVehicle.Locked = false;
                         pVehicle.SetSharedData("Team", 0);
                         lobby.Vehicles.Add(pVehicle);
+                        pVehicle.SetSharedData("Collisions", false);
 
                         NAPI.Task.Run(() =>
                         {
@@ -2464,6 +2467,8 @@ namespace LSCC
 
                                     EPlayer.Notify(player, "Collisions have been enabled and weapons issued", "green", "fas fa-car-crash", false, 3000);
 
+                                    if(Settings.Dynamics.OnfootCollision) player.SetSharedData("Collisions", true);
+
                                     if (lobby.Cops.Contains(player))
                                     {
                                         EPlayer.GiveCopWeapons(player);
@@ -2478,7 +2483,8 @@ namespace LSCC
 
                                 foreach(Vehicle veh in lobby.Vehicles)
                                 {
-                                    if(veh.HasSharedData("Team") && veh.GetSharedData<int>("Team") == 0)
+                                    veh.SetSharedData("Collisions", true);
+                                    if (veh.HasSharedData("Team") && veh.GetSharedData<int>("Team") == 0)
                                     {
                                         veh.SetSharedData("vMaxSpeed", (float)(165 / 3.6)); // 165 KM/H
                                     }

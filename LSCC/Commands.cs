@@ -70,7 +70,7 @@ namespace LSCC
 
                     if (!Boolean.TryParse(args[1], out value))
                     {
-                        player.SendChatMessage($"!{{#999999}}OnfootCollisions can only be either 'true' or 'false'!");
+                        player.SendChatMessage($"!{{#999999}}OnfootCollisions can only be either 'true' or 'false'! (If its false all players will have no collision onfoot until chase ends)");
                         return;
                     }
 
@@ -79,7 +79,7 @@ namespace LSCC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Set on-foot collisions to {value.ToString()}.");
-                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set onfoot collisions to {value.ToString()}.");
+                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set copchase onfoot collisions to {value.ToString()}.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions onfootcollisions <true/false>");
             }
@@ -1023,6 +1023,43 @@ namespace LSCC
             target.SetSharedData("EntAlpha", alpha);
             Logs.LogAdmin(player, $"Set {target.Name}'s alpha to {alpha}.");
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has set {target.Name}'s alpha (transparency) to {alpha}.");
+            return;
+        }
+
+        [Command("togcols", "!{#AFAFAF}[USAGE] togcols (target)")]
+        public void cmd_togcollision(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+            
+            if(target.GetSharedData<bool>("Collisions") == false)
+            {
+                Logs.LogAdmin(player, $"Enabled {target.Name}'s collisions");
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has enabled {target.Name}'s collisions.");
+                target.SetSharedData("Collisions", true);
+
+                if(target.IsInVehicle)
+                {
+                    target.Vehicle.SetSharedData("Collisions", true);
+                }
+            }
+            else
+            {
+                Logs.LogAdmin(player, $"Disabled {target.Name}'s collisions");
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has disabled {target.Name}'s collisions.");
+                target.SetSharedData("Collisions", false);
+
+                if (target.IsInVehicle)
+                {
+                    target.Vehicle.SetSharedData("Collisions", false);
+                }
+            }
             return;
         }
 
@@ -4949,7 +4986,7 @@ namespace LSCC
             {
                 player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword /togglemap");
                 player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension /r(emove)guns /suspend /unsuspend /(o)checkstats");
-                player.SendChatMessage("[Admin Lv 2]: /ann /vanish /oban /fugitivelist /noclip /motd");
+                player.SendChatMessage("[Admin Lv 2]: /ann /vanish /oban /fugitivelist /noclip /motd /togcols");
             }
             if (EPlayer.GetAccount(player).Admin >= 3)
             {
