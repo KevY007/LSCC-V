@@ -2547,7 +2547,7 @@ namespace LSCC
             player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You began cuffing {target.Name}, keep holding !{{#FFFF00}}H !{{#FFFFFF}}to handcuff them.");
             EPlayer.Action(player, $"takes out a pair of handcuffs and starts locking them onto {target.Name}'s wrists.");
 
-            Events.RequestPlayAnimation(player, "mp_arresting", "a_uncuff", 2);
+            Events.RequestPlayAnimation(player, "mp_arresting", "a_uncuff", 50); // 50 = allow movement while anim
             target.SetSharedData("CuffedBy", player.Name);
         }
 

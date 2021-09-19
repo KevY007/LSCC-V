@@ -285,6 +285,8 @@ mp.events.add("render", () => {
         mp.game.controls.disableControlAction(0, 142, true); 
     }
 
+    if (disableSprint) mp.game.controls.disableControlAction(0, 21, true); // Used for cuffing sys
+
     mp.game.invoke('0xB1906895227793F3', 3); // SET_PLAYER_TARGETTING_MODE => 3 (Free Aim)
 
     // Taken from GTA.World

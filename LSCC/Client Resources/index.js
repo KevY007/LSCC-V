@@ -22,6 +22,8 @@ var scoreboardCursor = false;
 var cuffTarget = null;
 var cuffInterval = null;
 
+var disableSprint = false;
+
 mp.players.local.Team = -1;
 mp.players.local.LoggedIn = false;
 

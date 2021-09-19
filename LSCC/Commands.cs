@@ -1114,10 +1114,8 @@ namespace LSCC
             }
             else
             {
-                if(player.HasData("LastAnimDict"))
-                    Events.RequestClearAnimation(player);
-                else
-                    player.StopAnimation();
+                Events.RequestClearAnimation(player);
+                player.StopAnimation();
             }
         }
 

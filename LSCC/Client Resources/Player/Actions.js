@@ -5,7 +5,6 @@ let player = mp.players.local;
 
 let maxActionTime = 0;
 
-
 mp.events.add("StartPlayerAction", (action, time) => {
     actionTime = time;
     actionType = action;
@@ -135,6 +134,7 @@ mp.events.add("BeginCuffing", (target) => {
     isCuffing = true;
     cuffTarget = target;
     cuffTimeLeft = 5;
+    disableSprint = true;
 
     initiateActionTimer(cuffTimeLeft);
     
@@ -177,6 +177,7 @@ mp.events.add("BeginCuffing", (target) => {
 });
 function stopCuffing(reason){ // if unsuccessful / force stopped
 
+    disableSprint = false;
     clearInterval(cuffInterval);
     isCuffing = false;
     cuffTimeLeft = 5;
@@ -199,6 +200,7 @@ function stopCuffing(reason){ // if unsuccessful / force stopped
 function finishCuffing(){ // if successful
     clearInterval(cuffInterval);
 
+    disableSprint = false;
     isCuffing = false;
     cuffTimeLeft = 5;
     cuffInterval = null;
