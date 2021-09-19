@@ -2637,6 +2637,33 @@ namespace LSCC
             return;
         }
 
+        [RemoteEvent("RequestVehicleMod")]
+        public void OnRequestVehicleTune(Player player, int slot, int mod)
+        {
+            if (!player.IsInVehicle) return;
+
+            if (slot == 66)
+            {
+                player.Vehicle.PrimaryColor = mod;
+            }
+            else if (slot == 67)
+            {
+                player.Vehicle.SecondaryColor = mod;
+            }
+            else if (slot == 68)
+            {
+                player.Vehicle.PearlescentColor = mod;
+            }
+            else if (slot == 69)
+            {
+                player.Vehicle.WheelColor = mod;
+            }
+            else {
+                if (mod == -1) player.Vehicle.SetMod(slot, -1);
+                else player.Vehicle.SetMod(slot, mod);
+            }
+        }
+
         [ServerEvent(Event.PlayerSpawn)]
         public static void OnPlayerSpawn(Player player)
         {

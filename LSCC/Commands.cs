@@ -4965,6 +4965,12 @@ namespace LSCC
             Logs.RequestLogsFromServer(player, targetName, type);
         }
 
+        [Command("tuner")]
+        public void cmd_tuner(Player player)
+        {
+            player.TriggerEvent("OpenTuner");
+        }
+
         [Command("acmds", Alias = "ahelp")]
         public void cmd_ahelp(Player player)
         {
