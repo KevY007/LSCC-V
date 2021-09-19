@@ -128,9 +128,9 @@ mp.events.add("TwoSecondsEvent", () => {
             mp.game.ui.setHudColour(145, 0, 151, 255, 128);  
             break;
         default:     
-            mp.game.ui.setHudColour(143, 150, 150, 150, 128);
-            mp.game.ui.setHudColour(144, 150, 150, 150, 128);
-            mp.game.ui.setHudColour(145, 150, 150, 150, 128);  
+            mp.game.ui.setHudColour(143, 110, 200, 200, 128);
+            mp.game.ui.setHudColour(144, 110, 200, 200, 128);
+            mp.game.ui.setHudColour(145, 110, 200, 200, 128);  
             break; 
     }
 });
