@@ -123,13 +123,13 @@ function requestCuffTarget(){
     mp.events.callRemote("RequestCuffTarget");
 }
 
-mp.keys.bind(0x48 , true, requestCuffTarget);
+mp.keys.bind(0x48, true, requestCuffTarget);
 
 mp.events.add("StopCuffing", (reason) => { stopCuffing(reason); });
 
 mp.events.add("BeginCuffing", (target) => {
 
-    if(!mp.players.exists(target)) return;
+    if(target == null || !mp.players.exists(target)) return;
     if(target.Team != 0 || player.Team != 1) return;
 
     isCuffing = true;
@@ -142,15 +142,15 @@ mp.events.add("BeginCuffing", (target) => {
 
     cuffInterval = setInterval(() => {
 
-        if(!mp.players.exists(cuffTarget) || !mp.players.exists(player) || cuffTarget == null) {
+        if(cuffTarget == null || !mp.players.exists(cuffTarget) || !mp.players.exists(player)) {
             stopCuffing(0);
             return;
         }
-        if(cuffTarget.Team != 0 ){ 
+        if(cuffTarget.Team != 0 || cuffTarget.isDead()){ 
             stopCuffing(1);
             return;
         }
-        if(player.Team != 1){
+        if(player.Team != 1 || player.isDead()){
             stopCuffing(3);
             return;
         }
@@ -189,7 +189,7 @@ function stopCuffing(reason){ // if unsuccessful / force stopped
 
     switch(reason){
         case 1:
-            mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Cuffing failed - the target is no longer a fugitive.");
+            mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Cuffing failed - the target is no longer a fugitive or deceased.");
             break;       
         case 2:
             mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Cuffing failed as you moved too far from the fugitive.");
@@ -203,7 +203,7 @@ function finishCuffing(){ // if successful
     cuffTimeLeft = 5;
     cuffInterval = null;
 
-    if(!mp.players.exists(cuffTarget) || !mp.players.exists(player) || cuffTarget == null){ cuffTarget = null; return;} // better safe than sorry :)
+    if(!mp.players.exists(cuffTarget) || !mp.players.exists(player)) { cuffTarget = null; return;} // better safe than sorry :)
     mp.events.callRemote("FinishCuffing", cuffTarget);
     cuffTarget = null;
 }

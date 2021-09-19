@@ -1114,8 +1114,10 @@ namespace LSCC
             }
             else
             {
-                player.StopAnimation();
-                Events.RequestClearAnimation(player);
+                if(player.HasData("LastAnimDict"))
+                    Events.RequestClearAnimation(player);
+                else
+                    player.StopAnimation();
             }
         }
 
@@ -3596,16 +3598,16 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            player.SendChatMessage("!{#FF6347} Key: Function.");
-            player.SendChatMessage("!{#FF6347} M: Toggle menu.");
-            player.SendChatMessage("!{#FF6347} N: Push to talk voicechat. (Changed using /voicebind)");
-            player.SendChatMessage("!{#FF6347} Z: Toggle GPS as a Cop. (Changed using /gpsbind)");
-            player.SendChatMessage("!{#FF6347} O: Toggle scoreboard. (F2 enables cursor)");
-            player.SendChatMessage("!{#FF6347} L: Lock/unlock vehicle.");
-            player.SendChatMessage("!{#FF6347} X: Rapple from a helicopter (not all helicopters, try maverick).");
-            player.SendChatMessage("!{#FF6347} Hold voice and press TAB: Switch voice chat modes.");
-            player.SendChatMessage("!{#FF6347} F7: Hide/show HUD. (Hold SHIFT to toggle nametags as well)");
-            player.SendChatMessage("!{#FF6347} B: Toggle silent siren in police vehicles.");
+            player.SendChatMessage("!{#FF6347}[Key] !{#FFFFFF}Function");
+            player.SendChatMessage("!{#FF6347}[M] !{#FFFFFF}Toggle menu");
+            player.SendChatMessage("!{#FF6347}[N] !{#FFFFFF}Push to talk voicechat, Hold N+TAB to toggle voice (/voicebind to change)");
+            player.SendChatMessage("!{#FF6347}[Z] !{#FFFFFF}Toggle GPS as a !{#0097FF}cop !{#FFFFFF}(/gpsbind to change)");
+            player.SendChatMessage("!{#FF6347}[O] !{#FFFFFF}Toggle scoreboard (!{#FFFF00}F2 !{#FFFFFF}for cursor)");
+            player.SendChatMessage("!{#FF6347}[L] !{#FFFFFF}Lock/unlock vehicle");
+            player.SendChatMessage("!{#FF6347}[X] !{#FFFFFF}Rapple from a !{#FFFF00}supported !{#FFFFFF}helicopter");
+            player.SendChatMessage("!{#FF6347}[F7] !{#FFFFFF}Hide/show HUD & chat (Hold !{#FF0000}SHIFT+F7 !{#FFFFFF}to toggle nametags)");
+            player.SendChatMessage("!{#FF6347}[B] !{#FFFFFF}Toggle silent siren in !{#0097FF}police !{#FFFFFF}vehicles");
+            player.SendChatMessage("!{#FF6347}[H] !{#FFFFFF}Cuff a !{#FFAE00}fugitive");
         }
 
         [Command("teleport", "!{#AFAFAF}[USAGE] teleport (option: chilliad, airport)", Alias = "tp", GreedyArg = true)]
