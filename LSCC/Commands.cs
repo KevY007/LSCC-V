@@ -849,6 +849,12 @@ namespace LSCC
                 return;
             }
 
+            if (target.GetSharedData<int>("InLobby") == -5)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is in customizer/character creator. Use /sendtolobby to force them out.");
+                return;
+            }
+
             Logs.LogAdmin(player, $"Summoned player {target.Name}.");
             //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:bring:{target.Name}"); } catch { }
 
@@ -3620,9 +3626,45 @@ namespace LSCC
                 return;
             }
 
+            if(target.GetSharedData<int>("InLobby") == -5)
+            {
+                if (target.GetData<bool>("Creator_Using") == true)
+                {
+                    CharacterData ConvChar = new CharacterData();
+                    string PlayerChar = EPlayer.GetAccount(target).Character;
+
+                    try
+                    {
+                        if (PlayerChar == null || PlayerChar.Length < 10) throw (new System.Exception("Invalid characterdata-7 sending to creation."));
+                        ConvChar = NAPI.Util.FromJson<CharacterData>(PlayerChar);
+
+                        EPlayer.ApplyCharacter(target, ConvChar);
+                    }
+                    catch
+                    {
+                        CharacterData charp = new CharacterData();
+                        EPlayer.GetAccount(target).Character = "{}";
+                        EPlayer.ApplyCharacter(target, charp); // Give them the default CHAR.
+                    }
+
+                    target.SetData("Creator_Using", false);
+                    target.TriggerEvent("toggleCreator", false);
+                }
+                else if (target.GetData<bool>("Tuner_Using") == true)
+                {
+                    target.TriggerEvent("DestroyPlayerCamera");
+                    if (target.HasData("Tuner_Vehicle")) target.GetData<Vehicle>("Tuner_Vehicle").Delete();
+
+                    target.ResetData("Tuner_Vehicle");
+                    target.SetData("Tuner_Using", false);
+                }
+
+                EPlayer.Spawn(player);
+            }
+
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:sendtolobby:{target.Name}"); } catch { }
             Logs.LogAdmin(player, $"Sent {target.Name} to lobby.");
-            player.SetData("ForcedLobby", true);
+            target.SetData("ForcedLobby", true);
             cmd_lobby(target);
 
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has sent {target.Name} to lobby.");
@@ -3823,7 +3865,7 @@ namespace LSCC
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /derby");
             player.SendChatMessage("!{#28E0DA}[Mode: DM]: /dm /dmarena");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /freeroam /veh /customvehlist /teleport /mytime /myweather");
-            player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /togblip /gun /world /godmode /setspawn");
+            player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /togblip /gun /world /godmode /setspawn /tuneveh");
             player.SendChatMessage("!{#A5A8A8}[Misc]: /updaterate /info /fontsize /voicebind /gpsbind /shotstats");
             player.SendChatMessage("!{#A5A8A8}[Dbg/Test]: /pos /lcmenu");
             
@@ -4965,38 +5007,6 @@ namespace LSCC
             Logs.RequestLogsFromServer(player, targetName, type);
         }
 
-        [Command("tuner")]
-        public void cmd_tuner(Player player)
-        {
-            player.TriggerEvent("OpenTuner");
-        }
-
-        [Command("applytuner")]
-        public void cmd_applytuner(Player player)
-        {
-            if (!EPlayer.LoggedIn(player) || !player.IsInVehicle) return;
-
-            var inst = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.Model == player.Vehicle.Model && a.AccountSQLID == EPlayer.GetAccount(player).SQL_ID);
-            if(inst == null)
-            {
-                player.SendChatMessage("!{#FF6347}You don't have a profile saved! /tuner");
-                return;
-            }
-            else
-            {
-                player.Vehicle.PrimaryColor = inst.PrimaryColor;
-                player.Vehicle.SecondaryColor = inst.SecondaryColor;
-
-                foreach (var kvp in NAPI.Util.FromJson<Dictionary<int, int>>(inst.Mods))
-                {
-                    player.Vehicle.SetMod(kvp.Key, kvp.Value);
-                }
-                player.Vehicle.PearlescentColor = inst.PearlescentColor;
-                player.Vehicle.WheelColor = inst.WheelColor;
-            }
-            return;
-        }
-
         [Command("acmds", Alias = "ahelp")]
         public void cmd_ahelp(Player player)
         {
@@ -5531,6 +5541,74 @@ namespace LSCC
             }
 
             player.TriggerEvent("ResolveJS", eventt);
+        }
+
+        [Command("vtuner")]
+        public void cmd_vtuner(Player player, string vmodel)
+        {
+            if (player.GetData<bool>("Tuner_Using") == true) return;
+
+            if (player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("InLobby") != -4)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase or derby!");
+                return;
+            }
+
+            player.SetData("Tuner_Using", true);
+            player.SetSharedData("Team", -1);
+            player.SetSharedData("InLobby", -5);
+
+            uint dim = (uint)player.Id + 699;
+            Vehicle veh = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(vmodel), new Vector3(-372.2626f, -117.197556f, 38.08989f), 119.67291f, 64, 64, "KEVER", 255, true, true, dim);
+            
+            player.SetData("Tuner_Vehicle", veh);
+
+            player.SetData("Tuner_Pos", 0);
+            player.Position = new Vector3(-335.56015f, -137.33543f, -38.40311f);
+            EPlayer.Freeze(player, true);
+            player.TriggerEvent("DestroyPlayerCamera");
+            player.TriggerEvent("CreatePlayerCamera", -373, -121, 39, -10, 0, -10, 60, true);
+            player.TriggerEvent("SetTimeWeather", 12, 0, 0, 0);
+
+            EPlayer.Notify(player, "Controls", "LEFT CLICK to switch cameras, menu keys to select. When you're done, press Buy to confirm or Exit.", "topCenter");
+
+            var inst = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.Model == veh.Model && a.AccountSQLID == EPlayer.GetAccount(player).SQL_ID);
+            if (inst != null)
+            {
+                veh.PrimaryColor = inst.PrimaryColor;
+                veh.SecondaryColor = inst.SecondaryColor;
+
+                foreach (var kvp in NAPI.Util.FromJson<Dictionary<int, int>>(inst.Mods))
+                {
+                    veh.SetMod(kvp.Key, kvp.Value);
+                }
+                veh.PearlescentColor = inst.PearlescentColor;
+                veh.WheelColor = inst.WheelColor;
+            }
+
+            player.TriggerEvent("OpenTuner", veh.Id);
+            player.Dimension = dim; // FIRST THE TUNER SETTING ID AND THEN LAODING CAR
+        }
+
+        [Command("tuneveh")]
+        public void cmd_tuneveh(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (player.GetSharedData<int>("InLobby") != -3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                return;
+            }
+
+            if (!player.IsInVehicle)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in any vehicle!");
+                return;
+            }
+
+            player.TriggerEvent("OpenTuner", -1);
         }
 
         [Command("cameraset")]

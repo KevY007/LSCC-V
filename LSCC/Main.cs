@@ -1193,6 +1193,7 @@ namespace LSCC
             {
                 if (adminCount != 0) admins += ", ";
                 admins += $"{acc.Username} [{acc.SQL_ID}]";
+                adminCount++;
             }
             if (adminCount == 0) admins = "None";
 

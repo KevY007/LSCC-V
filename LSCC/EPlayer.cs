@@ -527,6 +527,9 @@ namespace LSCC
 
                 player.SetData("EditingClothing", -1);
                 player.SetData("Creator_Using", false);
+                player.SetData("Tuner_Using", false);
+                player.SetData("Tuner_Pos", 0);
+                player.ResetData("Tuner_Vehicle");
                 player.SetData("LastEditedClothingTeam", 1);
 
                 player.ResetData("BlockList");
@@ -1298,9 +1301,10 @@ namespace LSCC
                 player.SetData("AutoJoin", true);
             }
 
-            if ((player.GetSharedData<int>("InLobby") >= 1 && Settings.Lobbies.Count(lob => lob.lobbyId == player.GetSharedData<int>("InLobby")) == 0 ) ||
-                player.GetSharedData<int>("InLobby") == -1 || player.GetSharedData<int>("InLobby") == -5 && player.GetData<bool>("Creator_Using") == false && 
-                EPlayer.GetAccount(player).JailTime < 1)
+            if ( ( (player.GetSharedData<int>("InLobby") >= 1 && Settings.Lobbies.Count(lob => lob.lobbyId == player.GetSharedData<int>("InLobby")) == 0) || // IN DELETED/NON EXISTENT LOBBY
+                player.GetSharedData<int>("InLobby") == -1 ||  // IN INVALID LOBBY PT2
+                (player.GetSharedData<int>("InLobby") == -5 && player.GetData<bool>("Creator_Using") == false && player.GetData<bool>("Tuner_Using") == false) ) &&  // IN CUSTOMIZER & DONE
+                EPlayer.GetAccount(player).JailTime < 1) // NOT IN JAIL
             {
                 player.SetSharedData("InDM", -1);
                 int LobbyToBeIn = Settings.MaxLobbies;

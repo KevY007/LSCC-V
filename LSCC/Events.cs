@@ -396,7 +396,7 @@ namespace LSCC
 
         [ServerEvent(Event.PlayerEnterVehicle)]
         public void OnPlayerEnterVehicle(Player player, Vehicle vehicle, sbyte seatID)
-        {
+        {   
             vehicle.SetSharedData("Engine", vehicle.EngineStatus);
 
             if(player.HasSharedData("Team") && player.GetSharedData<int>("Team") >= 0)
@@ -445,6 +445,8 @@ namespace LSCC
         [ServerEvent(Event.PlayerDisconnected)]
         public void OnPlayerDisconnected(Player player, DisconnectionType type, string reason)
         {
+            if (player.HasData("Tuner_Vehicle")) player.GetData<Vehicle>("Tuner_Vehicle").Delete();
+
             foreach(Player p in Settings.LoggedInPlayers.Where(a => a.HasData("Spectating") && a.GetData<Player>("SpectatingPlayer") == player))
             {
                 Commands.cmd_specoff(p);
@@ -2639,37 +2641,105 @@ namespace LSCC
             return;
         }
 
+        [RemoteEvent("TunerRequestDrive")]
+        public void OnRequestTunerSet(Player player, Vehicle veh)
+        {
+            if (player.GetData<bool>("Tuner_Using") == true && !player.IsInVehicle)
+            {
+                player.SetIntoVehicle(veh, 0);
+            }
+        }
+
+        [RemoteEvent("TunerSwitch")]
+        public void OnSwitchTunerCamera(Player player, int leftClickOrRight)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            int pos = player.GetData<int>("Tuner_Pos");
+            if (leftClickOrRight == 1)
+            {
+                pos++;
+                if (pos >= 4) pos = 0;
+            }
+            else
+            {
+                pos--;
+                if (pos <= -1) pos = 3;
+            }
+
+            int x = -1, y = -1, z = -1, rx = -1, ry = -1, rz = -1;
+
+            switch (pos)
+            {
+                case 0: // Main / Front Side
+                    x = -373; y = -121; z = 39; rx = -10; ry = 0; rz = -10;
+                    break;
+                case 1: // Full Front
+                    x = -377; y = -120; z = 39; rx = 0; ry = 0; rz = 300;
+                    break;
+                case 2: // Other Side
+                    x = -376; y = -115; z = 39; rx = -10; ry = 0; rz = 240;
+                    break;
+                case 3: // Back
+                    x = -368; y = -115; z = 39; rx = 0; ry = 0; rz = 120;
+                    break;
+            }
+
+            player.SetData("Tuner_Pos", pos);
+            player.TriggerEvent("DestroyPlayerCamera");
+            player.TriggerEvent("CreatePlayerCamera", x, y, z, rx, ry, rz, 60, true);
+        }
+
         [RemoteEvent("RequestVehicleMod")]
         public void OnRequestVehicleTune(Player player, int slot, int mod)
         {
-            if (!EPlayer.LoggedIn(player) || !player.IsInVehicle || player.GetSharedData<int>("InLobby") != -3) return;
+            if (!EPlayer.LoggedIn(player) || !player.IsInVehicle) return; // Not using tuner nor in freeroam.
+
+            Vehicle veh = null;
+            if (player.GetData<bool>("Tuner_Using") == true) veh = player.GetData<Vehicle>("Tuner_Vehicle");
+            else if (player.GetSharedData<int>("InLobby") == -3) veh = player.Vehicle;
+            else return;
 
             if (slot == 66)
             {
-                player.Vehicle.PrimaryColor = mod;
+                veh.PrimaryColor = mod;
             }
             else if (slot == 67)
             {
-                player.Vehicle.SecondaryColor = mod;
+                veh.SecondaryColor = mod;
             }
             else if (slot == 68)
             {
-                player.Vehicle.PearlescentColor = mod;
+                veh.PearlescentColor = mod;
             }
             else if (slot == 69)
             {
-                player.Vehicle.WheelColor = mod;
+                veh.WheelColor = mod;
             }
             else {
-                if (mod == -1) player.Vehicle.SetMod(slot, -1);
-                else player.Vehicle.SetMod(slot, mod);
+                if (mod == -1) veh.SetMod(slot, -1);
+                else veh.SetMod(slot, mod);
             }
+        }
+
+        [RemoteEvent("OnTunerClose")]
+        public void OnCloseTuner(Player player)
+        {
+            if (player.GetData<bool>("Tuner_Using") == false) return;
+
+            player.SetData("Tuner_Using", false);
+            player.Position = new Vector3(0, 0, 0);
+            player.GetData<Vehicle>("Tuner_Vehicle").Delete();
+            player.ResetData("Tuner_Vehicle");
+            player.TriggerEvent("DestroyPlayerCamera");
+
+            EPlayer.Spawn(player);
         }
 
         [RemoteEvent("RequestSaveVehicleMod")]
         public void OnRequestSaveVehicleMod(Player player, string modstring, int priCol, int secCol, int pearlCol, int wheelCol)
         {
-            if (!EPlayer.LoggedIn(player) || !player.IsInVehicle || player.GetSharedData<int>("InLobby") != -3) return;
+            if (!EPlayer.LoggedIn(player) || player.GetData<bool>("Tuner_Using") == false) return;
 
             Account acc = EPlayer.GetAccount(player);
             var tuning = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.AccountSQLID == acc.SQL_ID && a.Model == player.Vehicle.Model);

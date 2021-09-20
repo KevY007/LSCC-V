@@ -1,6 +1,9 @@
 ﻿"use strict"
 
 let camera = null;
+let camera_moveable = false;
+let camera_lastmove = Date.now();
+
 const player = mp.players.local;
 let localPlayer = mp.players.local;
 //const { setTimeout } = require("timers");
@@ -31,8 +34,8 @@ let specTarget = null;
 /* Spec Camera move settings */
 let mouseSensitivity = 3.5;
 let zoomSpeed = 1.5;
-let minZoom = 5.0;
-let maxZoom = 60.0;
+let minZoom = -60.0;
+let maxZoom = 90.0;
 let moveRotX = 0.0;
 let moveRotY = 0.0;
 let moveRotZ = 0.0;
@@ -235,13 +238,17 @@ mp.keys.bind(0x42, true, _ => {
     }
 });
 
-function createCam(x, y, z, rx, ry, rz, viewangle) {
+function createCam(x, y, z, rx, ry, rz, viewangle, moveable = false) {
     traceLastFunc(`[Players] Create Cam`);
 
     camera = mp.cameras.new("Cam", { x, y, z }, { x: rx, y: ry, z: rz }, viewangle);
+    camera_moveable = moveable;
+
     camera.setActive(true);
     mp.game.cam.renderScriptCams(true, true, 20000000000000000000000000, false, false);
 }
+
+mp.events.add("SetVehicleLights", (vehicle, state) => vehicle.setLights(state));
 
 mp.events.add("SendLastSeen", () => {
     const position = mp.players.local.position;
@@ -293,6 +300,66 @@ mp.events.add("render", () => {
     // If the player is armed with anything but a melee weapon or explosive weapon disable the lock-on functionality, otherwise enable it
     mp.game.invoke('0x475768A975D5AD17', player.handle, 4) ? mp.game.invoke('0x5C8B2F450EE4328E', player.handle, false) :  mp.game.invoke('0x5C8B2F450EE4328E', player.handle, true);
 
+    // FOR VEH TUNER
+    if(camera != null && camera.isActive() && camera.isRendering() && camera_moveable == true && !chatStatus && !mp.gui.cursor.visible)
+    {
+        mp.game.controls.disableAllControlActions(2); // DISABLE ALL CONTROLS
+        mp.game.controls.enableControlAction(2, 172, true); // MENU KEYS START (FOR CONTROLLING, SELECTING ETC)
+        mp.game.controls.enableControlAction(2, 173, true);
+        mp.game.controls.enableControlAction(2, 174, true);
+        mp.game.controls.enableControlAction(2, 175, true);
+        mp.game.controls.enableControlAction(2, 176, true);
+        mp.game.controls.enableControlAction(2, 177, true);
+        mp.game.controls.enableControlAction(2, 178, true);
+        mp.game.controls.enableControlAction(2, 187, true);
+        mp.game.controls.enableControlAction(2, 188, true);
+        mp.game.controls.enableControlAction(2, 189, true);
+        mp.game.controls.enableControlAction(2, 190, true);
+        mp.game.controls.enableControlAction(2, 191, true);
+        mp.game.controls.enableControlAction(2, 194, true);
+        mp.game.controls.enableControlAction(2, 201, true);
+        mp.game.controls.enableControlAction(2, 202, true);
+        mp.game.controls.enableControlAction(2, 215, true); // MENU KEYS END
+        mp.game.controls.enableControlAction(2, 86, true); // HORN
+        mp.game.controls.enableControlAction(2, 74, true); // HEADLIGHTS
+
+        let x = (mp.game.controls.getDisabledControlNormal(7, 1) * 3.5);
+        let y = (mp.game.controls.getDisabledControlNormal(7, 2) * 3.5);
+        let zoomIn = (mp.game.controls.getDisabledControlNormal(2, 40) * 3.0);
+        let zoomOut = (mp.game.controls.getDisabledControlNormal(2, 41) * 3.0);
+
+        let LMB = mp.game.controls.getDisabledControlNormal(2, 24);
+        let RMB = mp.game.controls.getDisabledControlNormal(2, 25);
+        
+        if(LMB != 0.0 && Date.now() - camera_lastmove >= 500)
+        {
+            mp.events.callRemote("TunerSwitch", 0);
+            camera_lastmove = Date.now();
+        }
+        if(RMB != 0.0 && Date.now() - camera_lastmove >= 500)
+        {
+            mp.events.callRemote("TunerSwitch", 1);
+            camera_lastmove = Date.now();
+        }
+
+        let currentRot = camera.getRot(2);
+        currentRot = new mp.Vector3(currentRot.x - y, 0.0, currentRot.z - x);
+
+        camera.setRot(currentRot.x, currentRot.y, currentRot.z, 2);
+
+        if (zoomIn > 0)
+        {
+            let currentFov = camera.getFov();
+            currentFov -= zoomIn;
+            camera.setFov(currentFov);
+        } 
+        else if (zoomOut > 0)
+        {
+            let currentFov = camera.getFov();
+            currentFov += zoomOut;
+            camera.setFov(currentFov);
+        }
+    }
 
     // Spectate Things
     
@@ -315,7 +382,7 @@ mp.events.add("render", () => {
         }
 
         // Move spectate camera
-        if(specCam.isActive() && specCam.isRendering() && mp.players.exists(specTarget))
+        if(specCam.isActive() && specCam.isRendering() && mp.players.exists(specTarget) && !chatStatus)
         {
             
             mp.game.controls.disableAllControlActions(2);
@@ -1264,14 +1331,6 @@ mp.events.add(
             mp.players.local.taskLeaveVehicle(localVeh.handle, 4160);
         }
     },
-
-    "PlaySong": (link, level) => {
-        themeSoundID = mp.game.audio.playSoundEx(link, level);
-    },
-    "StopSong": () => {
-        mp.game.audio.stopSoundEx(themeSoundID);
-    },
-
     "DisableControlActions": (actiongroup) => {
         mp.game.controls.disableAllControlActions(actiongroup);
     },
@@ -1511,8 +1570,8 @@ mp.events.add(
         }
     },
 
-    "CreatePlayerCamera": (x, y, z, rx, ry, rz, viewangle) => {
-        createCam(x, y, z, rx, ry, rz, viewangle);
+    "CreatePlayerCamera": (x, y, z, rx, ry, rz, viewangle, moveable = false) => {
+        createCam(x, y, z, rx, ry, rz, viewangle, moveable);
     },
 
     "SetDiscordStatus": (serverName, status) => {

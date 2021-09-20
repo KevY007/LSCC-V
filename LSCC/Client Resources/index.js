@@ -29,9 +29,11 @@ mp.players.local.LoggedIn = false;
 
 function traceLastFunc(iStr)
 {
-    
+    mp.storage.data.lastFn = iStr;
+    mp.storage.flush();
 }
 
+traceLastFunc("Main::LoadIPLs()");
 // where IPL names name of your .ymap file in dlc -> mapping.rpf
 if(!mp.game.streaming.isIplActive("blockheisttunnel") || !mp.game.streaming.isIplActive("derby") || 
     !mp.game.streaming.isIplActive("floydsapt") || !mp.game.streaming.isIplActive("whbig") || 
@@ -63,13 +65,14 @@ require('./camerasManager.js');
 require('./cefBrowser.js');
 require("./rappel/index.js");
 require("./Player/Sync.js");
-require("./Player/musicPlayer.js");
 require("./Player/LightsMenu.js");
 require("./loadoutsel/index.js");
 require('./Player/OtherStuff.js');
 require("./Player/Busted.js");
 require("./Player/Voice.js");
 require("./Player/VehicleTuner.js");
+
+traceLastFunc("Main::Init()");
 
 mp.events.add("onOpenChatbox", (toggle) =>
 {

@@ -55,10 +55,31 @@ var vTuner_Items = [];
 var vTuner_Main = new Menu('Tune Vehicle', 'Start modding', new Point(50, 50));
 var vTuner_Buy = null;
 var vTuner_Exit = null;
+var vTuner_VehicleID = -1;
 
-mp.events.add('OpenTuner', () => {
+traceLastFunc("vTuner::Config()");
+
+mp.events.add('entityStreamIn', (entity) => {
+    if (vTuner_VehicleID != -1 && entity.type === 'vehicle' && entity.id == vTuner_VehicleID) 
+    {
+        if(mp.players.local.isInAnyVehicle(false) == false)
+        {
+            mp.events.callRemote("TunerRequestDrive", entity);
+        }
+    }
+});
+
+mp.events.add('OpenTuner', (vid) => {
+
+    vTuner_VehicleID = vid;
+
     if(!mp.players.local.isInAnyVehicle(false)) return;
+    if(vid != -1 && (mp.players.local.vehicle.id != vid || vTuner_Main.Visible))
+    {
+        return;
+    }
 
+    traceLastFunc("vTuner::Open()");
     for(let i = 0; i < vTuner_Items.length; i++)
     {
         vTuner_Main.RemoveItem(vTuner_Items[i]);
@@ -75,6 +96,11 @@ mp.events.add('OpenTuner', () => {
     {
         let num = vehicle.getNumMods(Number(slots));
         if(Number(slots) >= 66) num = 160;
+
+        if(Number(slots) == 18 || Number(slots) == 22) num = 1; // Since getNumMods doesn't work in this and ALL cars get Xenon & Turbo
+
+        if(vTuner_VehicleID != -1 && (Number(slots) == 11 || Number(slots) == 12 || Number(slots) == 13 || Number(slots) == 16 || 
+        Number(slots) == 18)) num = -1; // NO WIN PARTS IN TUNING FOR COPCHASE ITEMS
 
         if(num > 0)
         {
@@ -127,10 +153,13 @@ mp.events.add('OpenTuner', () => {
         }
     }
 
-    vTuner_Buy = new UIMenuItem("Buy", "Buy for ingame team.");
-    vTuner_Buy.ForeColor = new Color(220, 10, 10);
-    vTuner_Main.AddItem(vTuner_Buy);
-    vTuner_Items.push(vTuner_Buy);
+    if(vid != -1)
+    {
+        vTuner_Buy = new UIMenuItem("Buy", "Buy for ingame team.");
+        vTuner_Buy.ForeColor = new Color(220, 10, 10);
+        vTuner_Main.AddItem(vTuner_Buy);
+        vTuner_Items.push(vTuner_Buy);
+    }
 
     vTuner_Exit = new UIMenuItem("Exit", "Leave the editor.");
     vTuner_Exit.ForeColor = new Color(127, 237, 28);
@@ -169,12 +198,22 @@ vTuner_Main.ItemSelect.on((item, index) => {
     }
 });
 
-mp.events.add('playerLeaveVehicle', (vehicle, seat) => {
+mp.events.add("CloseTuner", () => {
     if(vTuner_Main.Visible) vTuner_Main.Close();
 });
 
+mp.events.add('playerLeaveVehicle', (vehicle, seat) => {
+    if(vTuner_Main.Visible) 
+    {
+        vTuner_Main.Close();
+    }
+});
+
 mp.events.add('playerEnterVehicle', (vehicle, seat) => {
-    if(vTuner_Main.Visible) vTuner_Main.Close();
+    if(vTuner_VehicleID != -1 && vehicle.id == vTuner_VehicleID && !vTuner_Main.Visible) 
+    {
+        mp.events.callLocal("OpenTuner", vTuner_VehicleID);
+    }
 });
 
 vTuner_Main.MenuOpen.on(() => {
@@ -192,6 +231,9 @@ vTuner_Main.MenuClose.on(() => {
     }
     delete vTuner_Items;
     vTuner_Items = [];
-
+    vTuner_VehicleID = -1;
     mp.gui.chat.show(true);
+
+    mp.events.callRemote("OnTunerClose");
 });
+traceLastFunc("vTuner::Init()");

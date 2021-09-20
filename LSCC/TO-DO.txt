@@ -1,5 +1,6 @@
 ﻿FORMAT: ADDED BY - ITEM.
 admin records system
+convert chase start putting into like in tuner system + chat font resource in package://
 fix no collision system, try looping in JS manually with and without timers and see if it works that way etc, can always pass .team related vehs only
 spectate should show speed etc, maybe add spectate info in UIHud and bla
 checkplayer, check player.IP and player.HWID/Serial w/e and player.Rockstar ez
