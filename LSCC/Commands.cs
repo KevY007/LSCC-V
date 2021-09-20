@@ -4249,12 +4249,12 @@ namespace LSCC
             var _new = new BanData
             {
                 IP = "Offline Ban",
-                RockstarID = tpAcc.RockstarID,
+                RockstarID = tpAcc.LastRID,
                 Reason = reason,
                 Admin = player.Name,
                 DateTime = DateTime.Now.ToString(),
                 AccountSQLID = tpAcc.SQL_ID,
-                HWID = tpAcc.HWID
+                HWID = tpAcc.LastHWID
             };
             ContextFactory.Instance.Bans.Add(_new);
 
@@ -5308,9 +5308,6 @@ namespace LSCC
                     pVehicle.Locked = true;
                     pVehicle.SetSharedData("Team", 1);
 
-                    target.SetData("putVehicle", pVehicle);
-                    target.SetData("putVehicleSeat", 0);
-
                     lobby.Vehicles.Add(pVehicle);
 
                     NAPI.Task.Run(() =>
@@ -5422,7 +5419,6 @@ namespace LSCC
 
             return;
         }
-
         [Command("deletemap", "!{#AFAFAF}[USAGE] deletemap (mapname)", GreedyArg = true)]
         public void cmd_delmap(Player player, string mapname)
         {

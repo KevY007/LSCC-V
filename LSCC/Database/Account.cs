@@ -25,9 +25,14 @@ namespace LSCC
         public string Username { get; set; }
         public string Password { get; set; }
         public string Salt { get; set; }
-        public string HWID { get; set; }
-        public ulong RockstarID { get; set; }
-        public string RockstarName { get; set; }
+        public string RegisterHWID { get; set; }
+        public ulong RegisterRID { get; set; }
+        public string RegisterIP { get; set; }
+        public string RegisterSC { get; set; }
+        public string LastHWID { get; set; }
+        public ulong LastRID { get; set; }
+        public string LastIP { get; set; }
+        public string LastSC { get; set; }
         public string LastLogin { get; set; }
         public int Admin { get; set; }
         public int Level { get; set; }

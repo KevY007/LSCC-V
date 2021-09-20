@@ -1013,11 +1013,14 @@ namespace LSCC
             player.SetSharedData("EntAlpha", 255);
             player.SetData("PlaytimeTick", Environment.TickCount64);
             player.TriggerEvent("StopSong");
-            Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in as {acc.Username}.*");
+            Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in ``as {acc.Username}.*");
 
             NAPI.Util.ConsoleOutput($"[Login] {player.Name} has logged in as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
-
+            acc.LastHWID = player.Serial;
+            acc.LastIP = player.Address;
+            acc.LastRID = player.SocialClubId;
+            acc.LastSC = player.SocialClubName;
             BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.AccountSQLID == acc.SQL_ID);
 
             if (ban != null)
@@ -1079,11 +1082,6 @@ namespace LSCC
                 wepItems.Add(123456789, test);
 
                 acc.WeaponComponents = NAPI.Util.ToJson(wepItems);
-            }
-
-            if (acc.RockstarName.Equals("n/a"))
-            {
-                acc.RockstarName = player.SocialClubName;
             }
 
             EPlayer.ApplyCharacter(player, ConvChar, acc.LobbyClothing);
@@ -1477,8 +1475,6 @@ namespace LSCC
 
             player.TriggerEvent("DestroyPlayerCamera");
             player.TriggerEvent("TogglePlayerChat", true);
-
-            acc.RockstarName = player.SocialClubName;
 
             player.ResetData("Language");
 
@@ -2196,7 +2192,7 @@ namespace LSCC
                 return;
             }
 
-            if (ContextFactory.Instance.Accounts.Count(a => a.HWID.Equals(player.Serial) || a.RockstarID == player.SocialClubId) >= 2)
+            if (ContextFactory.Instance.Accounts.Count(a => a.RegisterHWID.Equals(player.Serial) || a.RegisterRID == player.SocialClubId) >= 2)
             {
                 EPlayer.Error(player, "You cannot create any more accounts on the same machine!", "fas fa-user");
                 return;
@@ -2219,7 +2215,14 @@ namespace LSCC
                 Salt = salt,
                 Username = username,
                 Admin = 0,
-                HWID = player.Serial,
+                RegisterHWID = player.Serial,
+                RegisterIP = player.Address,
+                RegisterRID = player.SocialClubId,
+                RegisterSC = player.SocialClubName,
+                LastHWID = player.Serial,
+                LastIP = player.Address,
+                LastRID = player.SocialClubId,
+                LastSC = player.SocialClubName,
                 MuteTime = 0,
                 MuteReason = "N/A",
                 JailTime = 0,
@@ -2241,7 +2244,6 @@ namespace LSCC
                 Warns = 0,
                 Suspended = 0,
                 DonatorLevel = 0,
-                RockstarID = player.SocialClubId,
                 LobbyClothing = 1,
                 LoadoutCop = "?",
                 LoadoutFugitive = "?",
@@ -2646,6 +2648,15 @@ namespace LSCC
                 fugitive.SetSharedData("BustedProgress", 0.0);
             }
             return;
+        }
+
+        [RemoteEvent("RequestSetInVehicle")]
+        public void ChaseRequestSetInCar(Player player, Vehicle veh, int seat)
+        {
+            if (player.GetSharedData<int>("Team") >= 0)
+            {
+                player.SetIntoVehicle(veh, seat);
+            }
         }
 
         [RemoteEvent("TunerRequestDrive")]
