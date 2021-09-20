@@ -27,6 +27,7 @@ namespace LSCC
         public string Salt { get; set; }
         public string HWID { get; set; }
         public ulong RockstarID { get; set; }
+        public string RockstarName { get; set; }
         public string LastLogin { get; set; }
         public int Admin { get; set; }
         public int Level { get; set; }
