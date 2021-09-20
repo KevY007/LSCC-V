@@ -1083,6 +1083,11 @@ namespace LSCC
                 acc.WeaponComponents = NAPI.Util.ToJson(wepItems);
             }
 
+            if (acc.RockstarName.Equals("n/a"))
+            {
+                acc.RockstarName = player.SocialClubName;
+            }
+
             EPlayer.ApplyCharacter(player, ConvChar, acc.LobbyClothing);
 
             EPlayer.Spawn(player);
@@ -1474,6 +1479,8 @@ namespace LSCC
 
             player.TriggerEvent("DestroyPlayerCamera");
             player.TriggerEvent("TogglePlayerChat", true);
+
+            acc.RockstarName = player.SocialClubName;
 
             player.ResetData("Language");
 
