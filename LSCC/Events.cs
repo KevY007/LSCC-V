@@ -2538,12 +2538,13 @@ namespace LSCC
         [RemoteEvent("RequestCuffTarget")]
         public void OnRequestCuffTarget(Player player)
         {
-            if (player.GetSharedData<int>("Team") != 1) return;
+            if (player.GetSharedData<int>("Team") != 1 || player.IsInVehicle) return;
 
             Player target = Settings.LoggedInPlayers.Find(
                 p => p.Position.DistanceTo(player.Position) < 3.0f
                 && p.GetSharedData<int>("Team") == 0
                 && p.GetData<bool>("Cuffed") == false
+                && !p.IsInVehicle
                 && p.GetSharedData<string>("CuffedBy").Equals("n/a") // making sure the fugitive isnt being cuffed by someone else
             );
             if (target == null) return;
@@ -2587,6 +2588,7 @@ namespace LSCC
             EPlayer.Handcuff(target, true);
 
             EPlayer.GetAccount(player).Arrests++;
+            EPlayer.GivePoints(player, 5);
 
             Events.OnPlayerDeath(target, player, 696988); // Reason 696988 = handcuffs.
 
@@ -2640,7 +2642,7 @@ namespace LSCC
         [RemoteEvent("RequestVehicleMod")]
         public void OnRequestVehicleTune(Player player, int slot, int mod)
         {
-            if (!EPlayer.LoggedIn(player) || !player.IsInVehicle) return;
+            if (!EPlayer.LoggedIn(player) || !player.IsInVehicle || player.GetSharedData<int>("InLobby") != -3) return;
 
             if (slot == 66)
             {
@@ -2667,12 +2669,18 @@ namespace LSCC
         [RemoteEvent("RequestSaveVehicleMod")]
         public void OnRequestSaveVehicleMod(Player player, string modstring, int priCol, int secCol, int pearlCol, int wheelCol)
         {
-            if (!EPlayer.LoggedIn(player) || !player.IsInVehicle) return;
+            if (!EPlayer.LoggedIn(player) || !player.IsInVehicle || player.GetSharedData<int>("InLobby") != -3) return;
 
             Account acc = EPlayer.GetAccount(player);
             var tuning = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.AccountSQLID == acc.SQL_ID && a.Model == player.Vehicle.Model);
 
             Dictionary<int, int> vMods = NAPI.Util.FromJson<Dictionary<int, int>>(modstring);
+            vMods.Remove(11); // Engine
+            vMods.Remove(12); // Brakes
+            vMods.Remove(13); // Transmission
+            vMods.Remove(16); // Armor
+            vMods.Remove(18); // Turbo
+
             if (vMods.Count < 1)
             {
                 if (tuning != null)
@@ -2684,6 +2692,8 @@ namespace LSCC
             {
                 if (tuning == null)
                 {
+                    EPlayer.Notify(player, $"{vMods.Keys.Count} Mods", $"It will cost {vMods.Keys.Count * 50} points.", "center", "replace");
+
                     tuning = new PlayerTunings
                     {
                         AccountSQLID = acc.SQL_ID,
@@ -2698,6 +2708,21 @@ namespace LSCC
                 }
                 else
                 {
+                    var oldMods = NAPI.Util.FromJson<Dictionary<int, int>>(tuning.Mods);
+                    int changes = 0;
+
+                    foreach (var key1 in vMods)
+                    {
+                        int oldVal = -1;
+                        if (oldMods.TryGetValue(key1.Key, out oldVal))
+                        {
+                            if (key1.Value != oldVal && oldVal != -1 && key1.Value != -1) changes++;
+                        }
+                        else if (key1.Value != -1) changes++;
+                    }
+
+                    EPlayer.Notify(player, $"{changes} Mod Changes", $"It will cost {changes * 50} points.", "center", "replace");
+
                     tuning.PrimaryColor = priCol;
                     tuning.SecondaryColor = secCol;
                     tuning.PearlescentColor = pearlCol;

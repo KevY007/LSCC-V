@@ -173,6 +173,10 @@ mp.events.add('playerLeaveVehicle', (vehicle, seat) => {
     if(vTuner_Main.Visible) vTuner_Main.Close();
 });
 
+mp.events.add('playerEnterVehicle', (vehicle, seat) => {
+    if(vTuner_Main.Visible) vTuner_Main.Close();
+});
+
 vTuner_Main.MenuOpen.on(() => {
     
 });

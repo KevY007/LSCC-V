@@ -1945,6 +1945,20 @@ namespace LSCC
                             player.SetData("putVehicle", pVehicle);
                             player.SetData("putVehicleSeat", 0);
 
+                            var inst = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.Model == pVehicle.Model && a.AccountSQLID == EPlayer.GetAccount(player).SQL_ID);
+                            if (inst != null)
+                            {
+                                pVehicle.PrimaryColor = inst.PrimaryColor;
+                                pVehicle.SecondaryColor = inst.SecondaryColor;
+
+                                foreach (var kvp in NAPI.Util.FromJson<Dictionary<int, int>>(inst.Mods))
+                                {
+                                    pVehicle.SetMod(kvp.Key, kvp.Value);
+                                }
+                                pVehicle.PearlescentColor = inst.PearlescentColor;
+                                pVehicle.WheelColor = inst.WheelColor;
+                            }
+
                             lobby.Vehicles.Add(pVehicle);
 
                             NAPI.Task.Run(() =>
@@ -2145,6 +2159,20 @@ namespace LSCC
                         pVehicle.SetSharedData("Team", 0);
                         lobby.Vehicles.Add(pVehicle);
                         pVehicle.SetSharedData("Collisions", false);
+
+                        var inst = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.Model == pVehicle.Model && a.AccountSQLID == EPlayer.GetAccount(_tempPlayer).SQL_ID);
+                        if (inst != null)
+                        {
+                            pVehicle.PrimaryColor = inst.PrimaryColor;
+                            pVehicle.SecondaryColor = inst.SecondaryColor;
+
+                            foreach (var kvp in NAPI.Util.FromJson<Dictionary<int, int>>(inst.Mods))
+                            {
+                                pVehicle.SetMod(kvp.Key, kvp.Value);
+                            }
+                            pVehicle.PearlescentColor = inst.PearlescentColor;
+                            pVehicle.WheelColor = inst.WheelColor;
+                        }
 
                         NAPI.Task.Run(() =>
                         {
