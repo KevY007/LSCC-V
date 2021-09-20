@@ -60,6 +60,18 @@ namespace LSCC
         public string Model { get; set; }
         public int Team { get; set; }
     }
+    public class PlayerTunings
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public int AccountSQLID { get; set; }
+        public uint Model { get; set; }
+        public int PrimaryColor { get; set; }
+        public int SecondaryColor { get; set; }
+        public int PearlescentColor { get; set; }
+        public int WheelColor { get; set; }
+        public string Mods { get; set; }
+    }
     public class OwnedLoadoutData
     {
         [Key]
@@ -84,6 +96,7 @@ namespace LSCC
         public DbSet<MapSpawn> MapSpawns { get; set; }
         public DbSet<BanData> Bans { get; set; }
         public DbSet<PlayerOutfit> PlayerOutfits { get; set; }
+        public DbSet<PlayerTunings> PlayerTunings { get; set; }
         public DbSet<OwnedVehData> OwnedVehicles { get; set; }
         public DbSet<OwnedLoadoutData> OwnedLoadouts { get; set; }
         public DbSet<Logs_AdminRecord> Logs_AdminRecords { get; set; }

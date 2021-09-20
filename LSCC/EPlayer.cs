@@ -117,7 +117,6 @@ namespace LSCC
             GlassesTxt = -1;
         }
     }
-   
 
     public class CharacterData
     {
@@ -479,8 +478,6 @@ namespace LSCC
             return name;
         }
 
-        public static Random rand = new Random();
-
         public static void SyncServerSettings(Player player)
         {
             lock(player)
@@ -777,7 +774,7 @@ namespace LSCC
             comps.Add(new KeyValuePair<int, int>(weaponhash, componenthash));
             target.SetData("AttachedComponents", comps);
 
-            target.SetSharedData("ComponentSyncTrigger", new Random().Next());
+            target.SetSharedData("ComponentSyncTrigger", new Random(DateTimeOffset.UtcNow.Millisecond).Next());
             foreach (Player p in RAGE.Entities.Players.All)
             {
                 if (p.Dimension == target.Dimension)
@@ -1282,7 +1279,7 @@ namespace LSCC
             }
             catch { }
 
-            Vector3 SpawnArea = Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)];
+            Vector3 SpawnArea = Settings.LobbySpawns.OrderBy(c => Guid.NewGuid()).First();
 
             player.TriggerEvent("DestroyPlayerCamera");
             player.TriggerEvent("TogglePlayerChat", true);

@@ -886,7 +886,7 @@ namespace LSCC
                     {
                         if (player != null && player.Exists)
                         {
-                            Random rand = new Random();
+                            Random rand = new Random(DateTimeOffset.UtcNow.Millisecond);
                             Vector3 SpawnArea = Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)];
                             if (player.GetSharedData<int>("InLobby") == -4) SpawnArea = ((Vector3)Settings.DerbySpawns[0, 0]).Around(2.0f);
                             if (player.GetSharedData<int>("InLobby") > -1 && lobby != null)
@@ -1698,7 +1698,7 @@ namespace LSCC
                     {
                         i,
                         Regex.Replace(Regex.Replace(Settings.DMNames[i], @"\(.*\)", ""), @"\s+", " "),
-                        dmBgs[new Random().Next(dmBgs.Length)],
+                        dmBgs.OrderBy(c => Guid.NewGuid()).First(),
                         Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == i),
                         7 + (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")) / 3),
                         "DM",
@@ -2127,7 +2127,7 @@ namespace LSCC
 
                 if (occupants.Count <= 0) return;
 
-                Player newDriver = (Player)occupants[new Random().Next(occupants.Count)];
+                Player newDriver = (Player)occupants.OrderBy(c => Guid.NewGuid()).First();
                 Commands.cmd_switchseats(player, newDriver);
                 NAPI.Task.Run(() => Commands.cmd_switchseats(newDriver, player), 500 + newDriver.Ping);
 
@@ -2640,7 +2640,7 @@ namespace LSCC
         [RemoteEvent("RequestVehicleMod")]
         public void OnRequestVehicleTune(Player player, int slot, int mod)
         {
-            if (!player.IsInVehicle) return;
+            if (!EPlayer.LoggedIn(player) || !player.IsInVehicle) return;
 
             if (slot == 66)
             {
@@ -2662,6 +2662,50 @@ namespace LSCC
                 if (mod == -1) player.Vehicle.SetMod(slot, -1);
                 else player.Vehicle.SetMod(slot, mod);
             }
+        }
+
+        [RemoteEvent("RequestSaveVehicleMod")]
+        public void OnRequestSaveVehicleMod(Player player, string modstring, int priCol, int secCol, int pearlCol, int wheelCol)
+        {
+            if (!EPlayer.LoggedIn(player) || !player.IsInVehicle) return;
+
+            Account acc = EPlayer.GetAccount(player);
+            var tuning = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.AccountSQLID == acc.SQL_ID && a.Model == player.Vehicle.Model);
+
+            Dictionary<int, int> vMods = NAPI.Util.FromJson<Dictionary<int, int>>(modstring);
+            if (vMods.Count < 1)
+            {
+                if (tuning != null)
+                {
+                    ContextFactory.Instance.PlayerTunings.Remove(tuning);
+                }
+            }
+            else
+            {
+                if (tuning == null)
+                {
+                    tuning = new PlayerTunings
+                    {
+                        AccountSQLID = acc.SQL_ID,
+                        Model = player.Vehicle.Model,
+                        PrimaryColor = priCol,
+                        SecondaryColor = secCol,
+                        PearlescentColor = pearlCol,
+                        WheelColor = wheelCol,
+                        Mods = NAPI.Util.ToJson(vMods),
+                    };
+                    ContextFactory.Instance.PlayerTunings.Add(tuning);
+                }
+                else
+                {
+                    tuning.PrimaryColor = priCol;
+                    tuning.SecondaryColor = secCol;
+                    tuning.PearlescentColor = pearlCol;
+                    tuning.WheelColor = wheelCol;
+                    tuning.Mods = NAPI.Util.ToJson(vMods);
+                }
+            }
+            ContextFactory.Instance.SaveChanges();
         }
 
         [ServerEvent(Event.PlayerSpawn)]
@@ -2831,7 +2875,7 @@ namespace LSCC
 
                     player.SetData("DerbySpawnTick", Environment.TickCount64);
 
-                    Random rand = new Random();
+                    Random rand = new Random(DateTimeOffset.UtcNow.Millisecond);
                     int spawnID = rand.Next(Settings.DerbySpawns.GetLength(0));
 
                     if (player.HasData("DerbyVehicle"))
@@ -2939,7 +2983,7 @@ namespace LSCC
 
                     if (arenaID > -1) // DM
                     {
-                        Random rand = new Random();
+                        Random rand = new Random(DateTimeOffset.UtcNow.Millisecond);
 
                         int spawnID = rand.Next(Settings.DMSpawns[arenaID].GetLength(0));
                         Vector3 dmSpawn = (Vector3)Settings.DMSpawns[arenaID][spawnID, 0];
@@ -2967,7 +3011,7 @@ namespace LSCC
                                 {
                                     if (arenaID != 1 && arenaID != 4)
                                     {
-                                        switch (new Random().Next(0, 5))
+                                        switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 5))
                                         {
                                             case 0:
                                                 player.GiveWeapon(WeaponHash.Revolver_mk2, 1000);

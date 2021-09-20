@@ -145,11 +145,11 @@ namespace LSCC
             Vehicles = new List<Vehicle>();
 
             Time = new int[3];
-            Time[0] = new Random().Next(0, 23);
-            Time[1] = new Random().Next(0, 59);
-            Time[2] = new Random().Next(0, 59);
+            Time[0] = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 23);
+            Time[1] = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 59);
+            Time[2] = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 59);
 
-            Weather = new Random().Next(0, 9);
+            Weather = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 9);
 
             lobbyId = -1;
             lastMapId = -1;
@@ -183,7 +183,7 @@ namespace LSCC
                     "package://Artwork/CC1.jpg",
                 };
 
-            Background = lobbyBgs[new Random().Next(lobbyBgs.Length)];
+            Background = lobbyBgs.OrderBy(x => Guid.NewGuid()).First();
 
             Settings.Lobbies.Add(this);
         }
@@ -1299,10 +1299,11 @@ namespace LSCC
                     "Bored of waiting in the lobby? Check out our side activities like Deathmatch, Freeroam, Derby!",
                     "Want to earn some quick score? Head over to /dm!",
                     "You can save your current cop & fugitive appearance profile and select a different one by using /outfit.",
-                    "You can use Points to purchase some items, such as medkits (/mk) & painkillers (/pk)!"
+                    "You can use Points to purchase some items, such as medkits (/mk) & painkillers (/pk) and even tune vehicles!",
+                    "You can press M to open the menu, check more at /keys!"
                 };
 
-                RAGE.Entities.Players.All.ForEach((Player e) => e.SendChatMessage("[?] !{#F0FC72}" + msgList.ElementAt(new Random().Next(0, msgList.Length))));
+                RAGE.Entities.Players.All.ForEach((Player e) => e.SendChatMessage("[?] !{#F0FC72}" + msgList.OrderBy(c => Guid.NewGuid()).First()));
 
                 Settings.LastMessageTick = Environment.TickCount64;
             }
@@ -1337,7 +1338,7 @@ namespace LSCC
                                     lobby.Time[1] = 0;
                                     lobby.Time[0]++;
 
-                                    lobby.Weather = new Random().Next(0, 9); // Change weather every hour or so.
+                                    lobby.Weather = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 9); // Change weather every hour or so.
 
                                     if (lobby.Time[0] >= 24)
                                     {
@@ -1754,7 +1755,6 @@ namespace LSCC
                     UsedSpawns.Add(-1);
                     crashcheck++;
 
-                    Random random = new Random();
 
                     pCount = 0;
                     Player _tempPlayer;
@@ -1768,7 +1768,7 @@ namespace LSCC
                         {
                             _tempPlayer = lobbyPlayers.Where(a => a.HasData("GrantFugitive") && !lobby.Fugitives.Contains(a) && a.GetData<bool>("AutoJoin") == true).OrderBy(c => Guid.NewGuid()).First();
                         }
-                        else _tempPlayer = lobbyPlayers[random.Next(lobbyPlayers.Count)];
+                        else _tempPlayer = lobbyPlayers.OrderBy(c => Guid.NewGuid()).First();
 
                         */
 
@@ -1777,7 +1777,7 @@ namespace LSCC
                         /* HIGHEST FUGITIVE CHANCE MODE */
                         var highestFugitives = lobbyPlayers.Where(p => !lobby.Fugitives.Contains(p) && p.GetData<bool>("AutoJoin") == true).OrderByDescending(p => p.HasData("GrantFugitive")).ThenByDescending(p => p.GetSharedData<float>("FugitiveChance"));
 
-                        if(highestFugitives.Count() == 0) _tempPlayer = lobbyPlayers[random.Next(lobbyPlayers.Count)];
+                        if(highestFugitives.Count() == 0) _tempPlayer = lobbyPlayers.OrderBy(c => Guid.NewGuid()).First();
                         else _tempPlayer = highestFugitives.First();
 
 
@@ -1840,7 +1840,7 @@ namespace LSCC
                     MapSpawn spawnLoc = null;
                     pCount = 0;
                     
-                    foreach (Player player in lobby.Cops.OrderBy(x => new Random().Next()))
+                    foreach (Player player in lobby.Cops.OrderBy(x => Guid.NewGuid()))
                     {
                         foreach(MapSpawn tSpawn in Spawns.Where(a => a.spawnTeam == 1))
                         {
@@ -1893,7 +1893,7 @@ namespace LSCC
 
                             if (EPlayer.GetAccount(player).CarCop.Length < 3)
                             {
-                                switch (random.Next(0, 3))
+                                switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 3))
                                 {
                                     case 0:
                                         carName = "police";
@@ -2012,7 +2012,7 @@ namespace LSCC
                     pCount = 0;
                     crashcheck++;
 
-                    foreach (Player player in lobby.Fugitives.OrderBy(x => new Random().Next()))
+                    foreach (Player player in lobby.Fugitives.OrderBy(x => Guid.NewGuid()))
                     {
                         spawnLoc = new MapSpawn();
 
@@ -2056,7 +2056,7 @@ namespace LSCC
 
                     while (fugitives > 0)
                     {
-                        _tempPlayer = lobby.Fugitives[random.Next(lobby.Fugitives.Count)];
+                        _tempPlayer = lobby.Fugitives.OrderBy(c => Guid.NewGuid()).First();
 
                         if (lobby.Fugitives.Count(a => !PutInsideCar.Contains(a) && !iteratedAlready.Contains(a) && a.Ping < 350) > 0)
                         {
@@ -2108,7 +2108,7 @@ namespace LSCC
 
                         if (EPlayer.GetAccount(_tempPlayer).CarFugitive.Length < 3)
                         {
-                            switch (random.Next(0, 6))
+                            switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 6))
                             {
                                 case 0:
                                     carName = "washington";
@@ -2135,7 +2135,9 @@ namespace LSCC
                             carName = EPlayer.GetAccount(_tempPlayer).CarFugitive;
                         }
 
-                        Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, random.Next(122), random.Next(122), $"SA-{random.Next(1000, 9999)}", 255, false, true, Convert.ToUInt32(lobbyid));
+                        Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, 
+                            new Random(DateTimeOffset.UtcNow.Millisecond).Next(160), new Random(DateTimeOffset.UtcNow.Millisecond).Next(160), 
+                            $"SA-{new Random(DateTimeOffset.UtcNow.Millisecond).Next(1000, 9999)}", 255, false, true, Convert.ToUInt32(lobbyid));
                         pVehicle.EngineStatus = true;
                         pVehicle.SetSharedData("Engine", true);
                         pVehicle.SetSharedData("Locked", false);
@@ -2171,7 +2173,7 @@ namespace LSCC
                         {
                             if (fugitives == 0) break;
 
-                            Player _tempPlayer2 = lobby.Fugitives[random.Next(lobby.Fugitives.Count)];
+                            Player _tempPlayer2 = lobby.Fugitives.OrderBy(c => Guid.NewGuid()).First();
 
                             if (PutInsideCar.Contains(_tempPlayer2)) continue;
 
@@ -2437,7 +2439,7 @@ namespace LSCC
                     {
                         if (lobby.Fugitives.Count() > 0)
                         {
-                            try { lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)].TriggerEvent("SendLastSeen"); } catch { }
+                            try { lobby.Fugitives.OrderBy(x => Guid.NewGuid()).First().TriggerEvent("SendLastSeen"); } catch { }
                         }
                         lobby.LastSeenCounter = 0;
                     }

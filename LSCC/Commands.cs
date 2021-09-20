@@ -470,9 +470,9 @@ namespace LSCC
                 return;
             }
 
-            Random rand = new Random();
+            Random rand = new Random(DateTimeOffset.UtcNow.Millisecond);
 
-            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(122), rand.Next(122), player.Name, 255, false, true, player.Dimension);
+            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(160), rand.Next(160), player.Name, 255, false, true, player.Dimension);
             aVehicle.EngineStatus = true;
             aVehicle.SetSharedData("Engine", true);
             aVehicle.SetSharedData("Locked", false);
@@ -525,11 +525,11 @@ namespace LSCC
                 player.SendNotification("~r~You had too many freeroam vehicles, removed the least recent.");
             }
 
-            Random rand = new Random();
+            Random rand = new Random(DateTimeOffset.UtcNow.Millisecond);
 
             //// try { Main.Log("freeroam.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:veh:{carname}"); } catch { }
 
-            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(122), rand.Next(122), player.Name, 255, false, true, player.Dimension);
+            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(160), rand.Next(160), player.Name, 255, false, true, player.Dimension);
             aVehicle.SetSharedData("Locked", false);
             aVehicle.Locked = false;
             aVehicle.EngineStatus = true;
@@ -3275,8 +3275,8 @@ namespace LSCC
             }
 
             player.SetSharedData("InLobby", lobbyid);
-            Random rand = new Random();
-            NAPI.Player.SpawnPlayer(player, Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)]);
+     
+            NAPI.Player.SpawnPlayer(player, Settings.LobbySpawns.OrderBy(c => Guid.NewGuid()).First());
             EPlayer.Notify(player, $"Joined <strong>Lobby {lobbyid}</strong>", "blue", "fas fa-users", false, 1000, "bottomCenter", "replace");
             return;
         }
@@ -3366,7 +3366,7 @@ namespace LSCC
 
             player.SetSharedData("InDM", arenaid);
 
-            int spawnID = new Random().Next(Settings.DMSpawns[arenaid].GetLength(0));
+            int spawnID = new Random(DateTimeOffset.UtcNow.Millisecond).Next(Settings.DMSpawns[arenaid].GetLength(0));
             Vector3 dmSpawn = (Vector3)Settings.DMSpawns[arenaid][spawnID, 0];
             EPlayer.Spawn(player, false, dmSpawn);
             player.TriggerEvent("SetActorInvulnerable", false);
@@ -4971,6 +4971,32 @@ namespace LSCC
             player.TriggerEvent("OpenTuner");
         }
 
+        [Command("applytuner")]
+        public void cmd_applytuner(Player player)
+        {
+            if (!EPlayer.LoggedIn(player) || !player.IsInVehicle) return;
+
+            var inst = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.Model == player.Vehicle.Model && a.AccountSQLID == EPlayer.GetAccount(player).SQL_ID);
+            if(inst == null)
+            {
+                player.SendChatMessage("!{#FF6347}You don't have a profile saved! /tuner");
+                return;
+            }
+            else
+            {
+                player.Vehicle.PrimaryColor = inst.PrimaryColor;
+                player.Vehicle.SecondaryColor = inst.SecondaryColor;
+
+                foreach (var kvp in NAPI.Util.FromJson<Dictionary<int, int>>(inst.Mods))
+                {
+                    player.Vehicle.SetMod(kvp.Key, kvp.Value);
+                }
+                player.Vehicle.PearlescentColor = inst.PearlescentColor;
+                player.Vehicle.WheelColor = inst.WheelColor;
+            }
+            return;
+        }
+
         [Command("acmds", Alias = "ahelp")]
         public void cmd_ahelp(Player player)
         {
@@ -5150,7 +5176,7 @@ namespace LSCC
 
                     if (EPlayer.GetAccount(target).CarFugitive.Length < 3)
                     {
-                        switch (new Random().Next(0, 6))
+                        switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 6))
                         {
                             case 0:
                                 carName = "washington";
@@ -5177,7 +5203,7 @@ namespace LSCC
                         carName = EPlayer.GetAccount(target).CarFugitive;
                     }
 
-                    Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawn.spawnA, new Random().Next(122), new Random().Next(122), $"SPAWN", 255, false, true, Convert.ToUInt32(lobby.lobbyId));
+                    Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawn.spawnA, new Random(DateTimeOffset.UtcNow.Millisecond).Next(122), new Random(DateTimeOffset.UtcNow.Millisecond).Next(122), $"SPAWN", 255, false, true, Convert.ToUInt32(lobby.lobbyId));
                     pVehicle.EngineStatus = true;
                     pVehicle.SetSharedData("Engine", true);
                     pVehicle.SetSharedData("Locked", true);
@@ -5236,7 +5262,7 @@ namespace LSCC
 
                     if (EPlayer.GetAccount(target).CarCop.Length < 3)
                     {
-                        switch (new Random().Next(0, 3))
+                        switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 3))
                         {
                             case 0:
                                 carName = "police";

@@ -53,6 +53,7 @@ const modTypes = {0: "Spoilers",
 
 var vTuner_Items = [];
 var vTuner_Main = new Menu('Tune Vehicle', 'Start modding', new Point(50, 50));
+var vTuner_Buy = null;
 var vTuner_Exit = null;
 
 mp.events.add('OpenTuner', () => {
@@ -68,7 +69,7 @@ mp.events.add('OpenTuner', () => {
     }
     delete vTuner_Items;
     vTuner_Items = [];
-    
+
     let vehicle = mp.players.local.vehicle;
     for(let slots in modTypes)
     {
@@ -89,7 +90,7 @@ mp.events.add('OpenTuner', () => {
                     }
                     else name = i.toString();
                 }
-                else if(Number(slots) >= 66) continue; // Don't want -1 in any colours since it does nothing.
+                else if(Number(slots) >= 66) continue; // Don't want -1 aka "None" in any colours since it does nothing.
 
                 catItems.push(name);
             }
@@ -126,6 +127,11 @@ mp.events.add('OpenTuner', () => {
         }
     }
 
+    vTuner_Buy = new UIMenuItem("Buy", "Buy for ingame team.");
+    vTuner_Buy.ForeColor = new Color(220, 10, 10);
+    vTuner_Main.AddItem(vTuner_Buy);
+    vTuner_Items.push(vTuner_Buy);
+
     vTuner_Exit = new UIMenuItem("Exit", "Leave the editor.");
     vTuner_Exit.ForeColor = new Color(127, 237, 28);
     vTuner_Main.AddItem(vTuner_Exit);
@@ -146,7 +152,25 @@ vTuner_Main.ItemSelect.on((item, index) => {
         case "Exit":
             vTuner_Main.Close();
         break;
+
+        case "Buy":
+            let modItems = {};
+            let vehicle = mp.players.local.vehicle;
+            for(let slots in modTypes)
+            {
+                let mod = vehicle.getMod(Number(slots));
+                if(mod != -1) modItems[slots] = mod;
+            }
+            mp.events.callRemote("RequestSaveVehicleMod", JSON.stringify(modItems), vehicle.getColours(1, 1).colorPrimary, 
+                vehicle.getColours(1, 1).colorSecondary, vehicle.getExtraColours(1, 1).pearlescentColor, 
+                vehicle.getExtraColours(1, 1).wheelColor);
+
+        break;
     }
+});
+
+mp.events.add('playerLeaveVehicle', (vehicle, seat) => {
+    if(vTuner_Main.Visible) vTuner_Main.Close();
 });
 
 vTuner_Main.MenuOpen.on(() => {
