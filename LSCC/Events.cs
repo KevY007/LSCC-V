@@ -2641,6 +2641,15 @@ namespace LSCC
             return;
         }
 
+        [RemoteEvent("RequestSetInVehicle")]
+        public void ChaseRequestSetInCar(Player player, Vehicle veh, int seat)
+        {
+            if (player.GetSharedData<int>("Team") >= 0)
+            {
+                player.SetIntoVehicle(veh, seat);
+            }
+        }
+
         [RemoteEvent("TunerRequestDrive")]
         public void OnRequestTunerSet(Player player, Vehicle veh)
         {

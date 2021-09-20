@@ -26,6 +26,10 @@ var disableSprint = false;
 
 mp.players.local.Team = -1;
 mp.players.local.LoggedIn = false;
+mp.game.vehicle.defaultEngineBehaviour = false;
+mp.game.gameplay.enableMpDlcMaps(true);
+mp.game.player.disableVehicleRewards();
+mp.game.player.setHealthRechargeMultiplier(0.0);
 
 function traceLastFunc(iStr)
 {

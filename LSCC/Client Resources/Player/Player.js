@@ -13,7 +13,9 @@ var collisionTime = -1;
 var chaseRunning = false;
 var chaseTimeCur = 0;
 var chaseTimeMax = 390;
-var chaseMode = 0; // 0= STANDARD | 1= BUSTED | and others as in SCRIPT
+var chaseMode = 0; // 0= STANDARD | 1= BUSTED | and others as in SCRIPTf
+let chaseStartVeh = -1;
+let chaseStartSeat = -1;
 
 let derbyText = null;
 let derbyTimeCur = 0;
@@ -65,11 +67,6 @@ var radioToggle = 0;
 var ServerSettings = [];
 var ShotStats = [];
 
-mp.game.vehicle.defaultEngineBehaviour = false;
-mp.game.gameplay.enableMpDlcMaps(true);
-mp.game.player.disableVehicleRewards();
-mp.game.player.setHealthRechargeMultiplier(0.0);
-
 traceLastFunc("[Players] CreateVars");
 
 function ResetShotStats()
@@ -85,6 +82,21 @@ function ResetShotStats()
 }
 
 ResetShotStats();
+
+mp.events.add("SetChaseVehicle", (vid, seat) => {
+    chaseStartVeh = vid;
+    chaseStartSeat = seat;
+});
+
+mp.events.add('entityStreamIn', (entity) => {
+    if (chaseRunning && mp.players.local.Team >= 0 && entity.type === 'vehicle' && entity.id == chaseStartVeh)
+    {
+        if(chaseTimeCur <= 15) // Less than 15s passed to game start. If this doesn't make up, then get a better connection fag.
+        {
+            if(!mp.players.local.isInAnyVehicle(false)) mp.events.callRemote("RequestSetInVehicle", entity, chaseStartSeat)
+        }
+    }
+});
 
 mp.events.add("OneSecondEvent", () => {
     ShotStats.UpdateInterval++;
@@ -273,7 +285,7 @@ mp.events.add("AFKDriverCheck", (x,y,z) => {
             if(dist < 5.0){
                 mp.events.callRemote("ReplaceAFKDriver");
             }
-        }, 15000);
+        }, 25000);
     }
     finally{ // meh it should do the trick
         return;
