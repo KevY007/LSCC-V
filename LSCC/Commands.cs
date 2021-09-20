@@ -4249,12 +4249,12 @@ namespace LSCC
             var _new = new BanData
             {
                 IP = "Offline Ban",
-                RockstarID = tpAcc.RockstarID,
+                RockstarID = tpAcc.LastRID,
                 Reason = reason,
                 Admin = player.Name,
                 DateTime = DateTime.Now.ToString(),
                 AccountSQLID = tpAcc.SQL_ID,
-                HWID = tpAcc.HWID
+                HWID = tpAcc.LastHWID
             };
             ContextFactory.Instance.Bans.Add(_new);
 
