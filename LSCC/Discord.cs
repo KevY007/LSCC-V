@@ -107,6 +107,55 @@ namespace LSCC
 
                 if (context.Channel.Name != "staff-bot") return;
 
+                if (context.Content.StartsWith("!getinfo"))
+                {
+                    string[] args = context.Content.Split(" ", 2);
+                    if (args.Count() >= 2)
+                    {
+                        NAPI.Task.Run(async () =>
+                        {
+                            Account _acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(args[1], StringComparison.OrdinalIgnoreCase));
+                            if(_acc == null)
+                            {
+                                await context.Channel.SendMessageAsync(":exclamation: **Account with that username does not exist!**");
+                                return;
+                            }
+                            if (_acc.Admin > 0)
+                            {
+                                var builder = new EmbedBuilder()
+                                .WithTitle($"Listing information for admin ${_acc.Username}")
+                                .WithColor(255, 0, 255)
+                                .AddField("Social Club Username: ", _acc.RockstarName);
+
+                                var embed = builder.Build();
+
+                                await context.Channel.SendMessageAsync(
+                                    "Reporting...",
+                                    embed: embed)
+                                    .ConfigureAwait(false);
+                            }
+                            else
+                            {
+                                var builder = new EmbedBuilder()
+                                .WithTitle($"Listing information for ${_acc.Username}")
+                                .WithColor(255, 255, 0)
+                                .AddField("E-mail: ", _acc.Email)
+                                .AddField("Social Club Username: ", _acc.RockstarName)
+                                .AddField("HWID: ", _acc.HWID);
+
+                                var embed = builder.Build();
+
+                                await context.Channel.SendMessageAsync(
+                                    "Reporting...",
+                                    embed: embed)
+                                    .ConfigureAwait(false);
+                            }
+
+                        }, 10);
+                    }
+                    else await context.Channel.SendMessageAsync("USAGE: !getinfo (username)");
+                }
+
                 if (context.Content.StartsWith("!players"))
                 {
                     if (RAGE.Entities.Players.Count < 1)
