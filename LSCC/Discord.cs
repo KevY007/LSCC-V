@@ -112,48 +112,49 @@ namespace LSCC
                     string[] args = context.Content.Split(" ", 2);
                     if (args.Count() >= 2)
                     {
-                        NAPI.Task.Run(() =>
+                       Account _acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(args[1], StringComparison.OrdinalIgnoreCase));
+                       if(_acc == null)
                         {
-                            Account _acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(args[1], StringComparison.OrdinalIgnoreCase));
-                            if(_acc == null)
-                            {
-                                context.Channel.SendMessageAsync(":exclamation: **Account with that username does not exist!**");
-                                return;
-                            }
-                            if (_acc.Admin > 0)
-                            {
-                                var builder = new EmbedBuilder()
-                                .WithTitle($"Listing information for admin {_acc.Username}")
-                                .WithColor(255, 0, 255)
-                                .AddField("Social Club Username: ", _acc.RockstarName);
+                            await context .Channel.SendMessageAsync(":exclamation: **Account with that username does not exist!**");
+                            return;
+                        }
+                        if (_acc.Admin > 0)
+                        {
+                            var builder = new EmbedBuilder()
+                            .WithTitle($"Listing information for admin {_acc.Username} ({_acc.SQL_ID})")
+                            .WithColor(255, 0, 255)
+                            .AddField("Last Social Club: ", $"{_acc.LastSC} ({_acc.LastRID})")
+                            .AddField("Last Login: ", $"{_acc.LastLogin} (for {_acc.LastSessionMins} mins)");
 
-                                var embed = builder.Build();
+                            var embed = builder.Build();
 
-                                context.Channel.SendMessageAsync(
-                                    "Reporting...",
-                                    embed: embed)
-                                    .ConfigureAwait(false);
-                            }
-                            else
-                            {
-                                var builder = new EmbedBuilder()
-                                .WithTitle($"Listing information for {_acc.Username}")
-                                .WithColor(255, 255, 0)
-                                .AddField("E-mail: ", _acc.Email)
-                                .AddField("Social Club Username: ", _acc.RockstarName)
-                                .AddField("HWID: ", _acc.HWID);
+                            await context.Channel.SendMessageAsync(
+                                "Reporting...",
+                                embed: embed)
+                                .ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            var builder = new EmbedBuilder()
+                            .WithTitle($"Listing information for {_acc.Username} ({_acc.SQL_ID})")
+                            .WithColor(255, 255, 0)
+                            .AddField("E-mail: ", _acc.Email)
+                            .AddField("Register Social Club: ", $"{_acc.RegisterSC} ({_acc.RegisterRID})")
+                            .AddField("Last Social Club: ", $"{_acc.LastSC} ({_acc.LastRID})")
+                            .AddField("Register HWID: ", _acc.RegisterHWID)
+                            .AddField("Last HWID: ", _acc.LastHWID)
+                            .AddField("Last Login: ", $"{_acc.LastLogin} (for {_acc.LastSessionMins} mins)");
 
-                                var embed = builder.Build();
 
-                                context.Channel.SendMessageAsync(
-                                    "Reporting...",
-                                    embed: embed)
-                                    .ConfigureAwait(false);
-                            }
+                            var embed = builder.Build();
 
-                        }, 10);
+                            await context.Channel.SendMessageAsync(
+                                "Reporting...",
+                                embed: embed)
+                                .ConfigureAwait(false);
+                        }
                     }
-                    else context.Channel.SendMessageAsync("USAGE: !getinfo (username)");
+                    else await context.Channel.SendMessageAsync("USAGE: !getinfo (username)");
                 }
 
                 if (context.Content.StartsWith("!players"))

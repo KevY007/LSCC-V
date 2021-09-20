@@ -1020,6 +1020,7 @@ namespace LSCC
             acc.LastHWID = player.Serial;
             acc.LastIP = player.Address;
             acc.LastRID = player.SocialClubId;
+            acc.LastSC = player.SocialClubName;
             BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.AccountSQLID == acc.SQL_ID);
 
             if (ban != null)
@@ -1081,11 +1082,6 @@ namespace LSCC
                 wepItems.Add(123456789, test);
 
                 acc.WeaponComponents = NAPI.Util.ToJson(wepItems);
-            }
-
-            if (acc.RockstarName.Equals("n/a"))
-            {
-                acc.RockstarName = player.SocialClubName;
             }
 
             EPlayer.ApplyCharacter(player, ConvChar, acc.LobbyClothing);
@@ -1479,8 +1475,6 @@ namespace LSCC
 
             player.TriggerEvent("DestroyPlayerCamera");
             player.TriggerEvent("TogglePlayerChat", true);
-
-            acc.RockstarName = player.SocialClubName;
 
             player.ResetData("Language");
 
@@ -2224,9 +2218,11 @@ namespace LSCC
                 RegisterHWID = player.Serial,
                 RegisterIP = player.Address,
                 RegisterRID = player.SocialClubId,
+                RegisterSC = player.SocialClubName,
                 LastHWID = player.Serial,
                 LastIP = player.Address,
                 LastRID = player.SocialClubId,
+                LastSC = player.SocialClubName,
                 MuteTime = 0,
                 MuteReason = "N/A",
                 JailTime = 0,
