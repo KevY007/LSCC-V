@@ -112,24 +112,24 @@ namespace LSCC
                     string[] args = context.Content.Split(" ", 2);
                     if (args.Count() >= 2)
                     {
-                        NAPI.Task.Run(async () =>
+                        NAPI.Task.Run(() =>
                         {
                             Account _acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(args[1], StringComparison.OrdinalIgnoreCase));
                             if(_acc == null)
                             {
-                                await context.Channel.SendMessageAsync(":exclamation: **Account with that username does not exist!**");
+                                context.Channel.SendMessageAsync(":exclamation: **Account with that username does not exist!**");
                                 return;
                             }
                             if (_acc.Admin > 0)
                             {
                                 var builder = new EmbedBuilder()
-                                .WithTitle($"Listing information for admin ${_acc.Username}")
+                                .WithTitle($"Listing information for admin {_acc.Username}")
                                 .WithColor(255, 0, 255)
                                 .AddField("Social Club Username: ", _acc.RockstarName);
 
                                 var embed = builder.Build();
 
-                                await context.Channel.SendMessageAsync(
+                                context.Channel.SendMessageAsync(
                                     "Reporting...",
                                     embed: embed)
                                     .ConfigureAwait(false);
@@ -145,7 +145,7 @@ namespace LSCC
 
                                 var embed = builder.Build();
 
-                                await context.Channel.SendMessageAsync(
+                                context.Channel.SendMessageAsync(
                                     "Reporting...",
                                     embed: embed)
                                     .ConfigureAwait(false);
@@ -153,7 +153,7 @@ namespace LSCC
 
                         }, 10);
                     }
-                    else await context.Channel.SendMessageAsync("USAGE: !getinfo (username)");
+                    else context.Channel.SendMessageAsync("USAGE: !getinfo (username)");
                 }
 
                 if (context.Content.StartsWith("!players"))
