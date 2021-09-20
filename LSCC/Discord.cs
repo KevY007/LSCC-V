@@ -137,7 +137,7 @@ namespace LSCC
                             else
                             {
                                 var builder = new EmbedBuilder()
-                                .WithTitle($"Listing information for ${_acc.Username}")
+                                .WithTitle($"Listing information for {_acc.Username}")
                                 .WithColor(255, 255, 0)
                                 .AddField("E-mail: ", _acc.Email)
                                 .AddField("Social Club Username: ", _acc.RockstarName)
