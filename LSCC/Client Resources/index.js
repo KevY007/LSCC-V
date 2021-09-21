@@ -70,7 +70,6 @@ require('./cefBrowser.js');
 require("./rappel/index.js");
 require("./Player/Sync.js");
 require("./Player/LightsMenu.js");
-require("./loadoutsel/index.js");
 require('./Player/OtherStuff.js');
 require("./Player/Busted.js");
 require("./Player/Voice.js");

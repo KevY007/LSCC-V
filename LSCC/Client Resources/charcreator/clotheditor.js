@@ -94,7 +94,7 @@ for (i = 0; i < player.getNumberOfPropDrawableVariations(0) + 1; i++)
     if (!((i >= 16 && i <= 18) || i == 39 || (i >= 48 && i <= 53) || 
         i == 67 || (i >= 69 && i <= 75) || (i >= 78 && i <= 82) || 
         (i >= 84 && i <= 94) || i == 111 || (i >= 115 && i <= 119) || 
-        (i >= 125 && i <= 128) || i == 144 || i == 150))
+        (i >= 125 && i <= 128) || i == 144 || i == 150 || i == 112))
     {
         chapeusDrawable.push(i.toString())  // Unfair helmets blocked above. 
     }

@@ -124,7 +124,8 @@ namespace LSCC
                             .WithTitle($"Listing information for admin {_acc.Username} ({_acc.SQL_ID})")
                             .WithColor(255, 0, 255)
                             .AddField("Last Social Club: ", $"{_acc.LastSC} ({_acc.LastRID})")
-                            .AddField("Last Login: ", $"{_acc.LastLogin} (for {_acc.LastSessionMins} mins)");
+                            .AddField("Register Date: ", $"{_acc.RegisterDate.ToString()}")
+                            .AddField("Last Login: ", $"{_acc.LastLogin.ToString()} (for {_acc.LastSessionMins} mins)");
 
                             var embed = builder.Build();
 
@@ -143,7 +144,8 @@ namespace LSCC
                             .AddField("Last Social Club: ", $"{_acc.LastSC} ({_acc.LastRID})")
                             .AddField("Register HWID: ", _acc.RegisterHWID)
                             .AddField("Last HWID: ", _acc.LastHWID)
-                            .AddField("Last Login: ", $"{_acc.LastLogin} (for {_acc.LastSessionMins} mins)");
+                            .AddField("Register Date: ", $"{_acc.RegisterDate.ToString()}")
+                            .AddField("Last Login: ", $"{_acc.LastLogin.ToString()} (for {_acc.LastSessionMins} mins)");
 
 
                             var embed = builder.Build();
