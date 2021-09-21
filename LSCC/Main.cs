@@ -2280,13 +2280,13 @@ namespace LSCC
                             {
                                 p.Dimension = Convert.ToUInt32(lobby.lobbyId);
                                 p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
-                                EPlayer.Freeze(p, false);
+                                EPlayer.Freeze(p, true);
                             });
                             lobby.Cops.ForEach(p =>
                             {
                                 p.Dimension = Convert.ToUInt32(lobby.lobbyId);
                                 p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
-                                EPlayer.Freeze(p, false);
+                                EPlayer.Freeze(p, true);
                             });
                         }
                         if(lobby.GameProgress == -3)
@@ -2296,24 +2296,20 @@ namespace LSCC
                                 p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
 
                                 p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
-                                EPlayer.Freeze(p, false);
+                                EPlayer.Freeze(p, true);
+
+                                p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", true);
+                                p.SetSharedData("Collisions", true);
                             });
                             lobby.Cops.ForEach(p =>
                             {
                                 p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
 
                                 p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
-                                EPlayer.Freeze(p, false);
-                            });
+                                EPlayer.Freeze(p, true);
 
-                            lobby.Vehicles.ForEach(v =>
-                            {
-                                if(v.HasData("Spawn"))
-                                {
-                                    v.Position = v.GetData<Vector3>("Spawn");
-                                    
-                                    v.SetSharedData("Collisions", false);
-                                }
+                                p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", true);
+                                p.SetSharedData("Collisions", true);
                             });
                         }
 
@@ -2327,8 +2323,8 @@ namespace LSCC
 
                                 p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
 
-                                p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", true);
                                 p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
+                                p.SetSharedData("Collisions", false);
                             });
                             lobby.Cops.ForEach(p =>
                             {
@@ -2337,8 +2333,13 @@ namespace LSCC
 
                                 p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
 
-                                p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", true);
                                 p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
+                                p.SetSharedData("Collisions", false);
+                            });
+
+                            lobby.Vehicles.ForEach(v =>
+                            {
+                                v.SetSharedData("Collisions", false);
                             });
 
                             if (lobby.gameMode == GameModes.STANDARD)
