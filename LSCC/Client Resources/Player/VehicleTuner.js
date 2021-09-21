@@ -40,7 +40,7 @@ const modTypes = {0: "Spoilers",
     35: "Plaques", 
     38: "Hydraulics", 
     40: "Boost", 
-    //55: "Window Tint", TINTS NOT WORKING IN GETMODS AND THEY KINDA MESSY SO FUCK ET
+    55: "Window Tint",
     48: "Livery", 
     53: "Plate", 
     66: "Primary Colour", // 0-159
@@ -50,12 +50,12 @@ const modTypes = {0: "Spoilers",
     69: "Wheel Colour", // 0-159
 };
 
-
 var vTuner_Items = [];
 var vTuner_Main = new Menu('Tune Vehicle', 'Start modding', new Point(50, 50));
 var vTuner_Buy = null;
 var vTuner_Exit = null;
 var vTuner_VehicleID = -1;
+var vTuner_OtherMods = {}; // FOR MODS THAT CAN'T BE .GETMOD() LIKE PLATE AND WINDOW TINT
 
 traceLastFunc("vTuner::Config()");
 
@@ -69,6 +69,7 @@ mp.events.add('entityStreamIn', (entity) => {
     }
 });
 
+mp.events.add('SetOtherMods', (modID, value) => vTuner_OtherMods[modID] = value);
 mp.events.add('ModRequestComplete', () => {
     if(vTuner_VehicleID != -1 && vTuner_Main.Visible && mp.players.local.isInAnyVehicle(false))
     {
@@ -79,6 +80,11 @@ mp.events.add('ModRequestComplete', () => {
             let mod = vehicle.getMod(Number(slots));
             if(mod != -1) modItems[slots] = mod;
         }
+        for(let slots in vTuner_OtherMods)
+        {
+            if(vTuner_OtherMods[slots] != -1) modItems[slots] = vTuner_OtherMods[slots]; // FOR PLATES, AND TINTS THAT CAN'T BE .GETMOD
+        }
+
         mp.events.callRemote("RequestVehicleModPrice", JSON.stringify(modItems));
     }
 });
@@ -136,6 +142,7 @@ mp.events.add('OpenTuner', (vid) => {
             }
 
             let cursor = vehicle.getMod(Number(slots))+1;
+            if(vTuner_OtherMods[Number(slots)] != undefined) cursor = vTuner_OtherMods[Number(slots)]+1;
 
             if (Number(slots) == 66) cursor = vehicle.getColours(1, 1).colorPrimary;
             else if (Number(slots) == 67) cursor = vehicle.getColours(1, 1).colorSecondary;
@@ -159,6 +166,7 @@ mp.events.add('OpenTuner', (vid) => {
                     }
                 }
                 if(vTuner_Category.SlotID >= 66) selection += 1;
+                if(vTuner_Category.SlotID == 53 || vTuner_Category.SlotID == 55) vTuner_OtherMods[vTuner_Category.SlotID] = selection;
                 mp.events.callRemote('RequestVehicleMod', vTuner_Category.SlotID, selection);
             });
 
@@ -209,6 +217,11 @@ vTuner_Main.ItemSelect.on((item, index) => {
             let mod = vehicle.getMod(Number(slots));
             if(mod != -1) modItems[slots] = mod;
         }
+        for(let slots in vTuner_OtherMods)
+        {
+            if(vTuner_OtherMods[slots] != -1) modItems[slots] = vTuner_OtherMods[slots]; // FOR PLATES, AND TINTS THAT CAN'T BE .GETMOD
+        }
+
         mp.events.callRemote("RequestSaveVehicleMod", JSON.stringify(modItems), vehicle.getColours(1, 1).colorPrimary, 
             vehicle.getColours(1, 1).colorSecondary, vehicle.getExtraColours(1, 1).pearlescentColor, 
             vehicle.getExtraColours(1, 1).wheelColor);
@@ -248,6 +261,7 @@ vTuner_Main.MenuClose.on(() => {
     }
     delete vTuner_Items;
     vTuner_Items = [];
+    vTuner_OtherMods = {};
     vTuner_VehicleID = -1;
     vTuner_Buy = null;
     vTuner_Exit = null;

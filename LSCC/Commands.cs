@@ -5607,6 +5607,7 @@ namespace LSCC
                 foreach (var kvp in NAPI.Util.FromJson<Dictionary<int, int>>(inst.Mods))
                 {
                     veh.SetMod(kvp.Key, kvp.Value);
+                    if (kvp.Key == 53 || kvp.Key == 55) player.TriggerEvent("SetOtherMods", kvp.Key, kvp.Value);
                 }
                 veh.PearlescentColor = inst.PearlescentColor;
                 veh.WheelColor = inst.WheelColor;
