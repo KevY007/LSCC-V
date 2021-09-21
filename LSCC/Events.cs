@@ -2747,6 +2747,8 @@ namespace LSCC
                 if (mod == -1) veh.SetMod(slot, -1);
                 else veh.SetMod(slot, mod);
             }
+
+            player.TriggerEvent("ModRequestComplete");
         }
 
         [RemoteEvent("OnTunerClose")]
@@ -2761,6 +2763,47 @@ namespace LSCC
             player.TriggerEvent("DestroyPlayerCamera");
 
             EPlayer.Spawn(player);
+        }
+
+        [RemoteEvent("RequestVehicleModPrice")]
+        public void OnRequestVehicleModPrice(Player player, string modstring)
+        {
+            if (!EPlayer.LoggedIn(player) || player.GetData<bool>("Tuner_Using") == false) return;
+
+            Account acc = EPlayer.GetAccount(player);
+            var tuning = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.AccountSQLID == acc.SQL_ID && a.Model == player.Vehicle.Model);
+
+            Dictionary<int, int> vMods = NAPI.Util.FromJson<Dictionary<int, int>>(modstring);
+            vMods.Remove(11); // Engine
+            vMods.Remove(12); // Brakes
+            vMods.Remove(13); // Transmission
+            vMods.Remove(16); // Armor
+            vMods.Remove(18); // Turbo
+
+            if (vMods.Count > 0)
+            {
+                if (tuning == null)
+                {
+                    player.TriggerEvent("UpdateTunerPrice", vMods.Keys.Count * 50, vMods.Keys.Count);
+                }
+                else
+                {
+                    var oldMods = NAPI.Util.FromJson<Dictionary<int, int>>(tuning.Mods);
+                    int changes = 0;
+
+                    foreach (var key1 in vMods)
+                    {
+                        int oldVal = -1;
+                        if (oldMods.TryGetValue(key1.Key, out oldVal))
+                        {
+                            if (key1.Value != oldVal && oldVal != -1 && key1.Value != -1) changes++;
+                        }
+                        else if (key1.Value != -1) changes++;
+                    }
+                    player.TriggerEvent("UpdateTunerPrice", changes * 50, changes);
+                }
+            }
+            else player.TriggerEvent("UpdateTunerPrice", 0, 0);
         }
 
         [RemoteEvent("RequestSaveVehicleMod")]
@@ -2789,7 +2832,13 @@ namespace LSCC
             {
                 if (tuning == null)
                 {
-                    EPlayer.Notify(player, $"{vMods.Keys.Count} Mods", $"It will cost {vMods.Keys.Count * 50} points.", "center", "replace");
+                    if(acc.Points < (vMods.Keys.Count * 50))
+                    {
+                        EPlayer.Error(player, $"You need {(vMods.Keys.Count * 50) - acc.Points} more points for this upgrade!", "fas fa-lock");
+                        return;
+                    }
+                    acc.Points -= (vMods.Keys.Count * 50);
+                    EPlayer.Notify(player, $"Modifications saved!", "green", "fas fa-check", false, 2500, "topCenter");
 
                     tuning = new PlayerTunings
                     {
@@ -2802,6 +2851,7 @@ namespace LSCC
                         Mods = NAPI.Util.ToJson(vMods),
                     };
                     ContextFactory.Instance.PlayerTunings.Add(tuning);
+                    player.TriggerEvent("CloseTuner");
                 }
                 else
                 {
@@ -2818,13 +2868,20 @@ namespace LSCC
                         else if (key1.Value != -1) changes++;
                     }
 
-                    EPlayer.Notify(player, $"{changes} Mod Changes", $"It will cost {changes * 50} points.", "center", "replace");
+                    if (acc.Points < (changes * 50))
+                    {
+                        EPlayer.Error(player, $"You need {(changes * 50) - acc.Points} more points for this upgrade!", "fas fa-lock");
+                        return;
+                    }
+                    acc.Points -= (changes * 50);
+                    EPlayer.Notify(player, $"Modifications saved!", "green", "fas fa-check", false, 2500, "topCenter");
 
                     tuning.PrimaryColor = priCol;
                     tuning.SecondaryColor = secCol;
                     tuning.PearlescentColor = pearlCol;
                     tuning.WheelColor = wheelCol;
                     tuning.Mods = NAPI.Util.ToJson(vMods);
+                    player.TriggerEvent("CloseTuner");
                 }
             }
             ContextFactory.Instance.SaveChanges();

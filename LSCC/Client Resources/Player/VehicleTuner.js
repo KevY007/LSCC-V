@@ -40,7 +40,7 @@ const modTypes = {0: "Spoilers",
     35: "Plaques", 
     38: "Hydraulics", 
     40: "Boost", 
-    55: "Window Tint", 
+    //55: "Window Tint", TINTS NOT WORKING IN GETMODS AND THEY KINDA MESSY SO FUCK ET
     48: "Livery", 
     53: "Plate", 
     66: "Primary Colour", // 0-159
@@ -66,6 +66,20 @@ mp.events.add('entityStreamIn', (entity) => {
         {
             mp.events.callRemote("TunerRequestDrive", entity);
         }
+    }
+});
+
+mp.events.add('ModRequestComplete', () => {
+    if(vTuner_VehicleID != -1 && vTuner_Main.Visible && mp.players.local.isInAnyVehicle(false))
+    {
+        let modItems = {};
+        let vehicle = mp.players.local.vehicle;
+        for(let slots in modTypes)
+        {
+            let mod = vehicle.getMod(Number(slots));
+            if(mod != -1) modItems[slots] = mod;
+        }
+        mp.events.callRemote("RequestVehicleModPrice", JSON.stringify(modItems));
     }
 });
 
@@ -155,7 +169,7 @@ mp.events.add('OpenTuner', (vid) => {
 
     if(vid != -1)
     {
-        vTuner_Buy = new UIMenuItem("Buy", "Buy for ingame team.");
+        vTuner_Buy = new UIMenuItem("Buy: 0 Points", "No components upgraded.");
         vTuner_Buy.ForeColor = new Color(220, 10, 10);
         vTuner_Main.AddItem(vTuner_Buy);
         vTuner_Items.push(vTuner_Buy);
@@ -171,30 +185,33 @@ mp.events.add('OpenTuner', (vid) => {
     vTuner_Main.Open();
 });
 
+mp.events.add('UpdateTunerPrice', (points, components) => {
+    if(vTuner_Main.Visible && vTuner_VehicleID != -1 && vTuner_Buy != null)
+    {
+        vTuner_Buy.Text = `Buy: ${points} Points`;
+        vTuner_Buy.Description = `${components == 0 ? "No" : components} components upgraded.`;
+    }
+});
+
 vTuner_Main.ListChange.on((item, listIndex) => {
     item.Trigger(); // Cuz we can, OOP magick
 });
 
 vTuner_Main.ItemSelect.on((item, index) => {
-    switch (item.Text) {
-
-        case "Exit":
-            vTuner_Main.Close();
-        break;
-
-        case "Buy":
-            let modItems = {};
-            let vehicle = mp.players.local.vehicle;
-            for(let slots in modTypes)
-            {
-                let mod = vehicle.getMod(Number(slots));
-                if(mod != -1) modItems[slots] = mod;
-            }
-            mp.events.callRemote("RequestSaveVehicleMod", JSON.stringify(modItems), vehicle.getColours(1, 1).colorPrimary, 
-                vehicle.getColours(1, 1).colorSecondary, vehicle.getExtraColours(1, 1).pearlescentColor, 
-                vehicle.getExtraColours(1, 1).wheelColor);
-
-        break;
+    
+    if(item.Text.startsWith("Exit")) vTuner_Main.Close();
+    else if(item.Text.startsWith("Buy: ") && vTuner_VehicleID != -1)
+    {
+        let modItems = {};
+        let vehicle = mp.players.local.vehicle;
+        for(let slots in modTypes)
+        {
+            let mod = vehicle.getMod(Number(slots));
+            if(mod != -1) modItems[slots] = mod;
+        }
+        mp.events.callRemote("RequestSaveVehicleMod", JSON.stringify(modItems), vehicle.getColours(1, 1).colorPrimary, 
+            vehicle.getColours(1, 1).colorSecondary, vehicle.getExtraColours(1, 1).pearlescentColor, 
+            vehicle.getExtraColours(1, 1).wheelColor);
     }
 });
 
@@ -232,6 +249,8 @@ vTuner_Main.MenuClose.on(() => {
     delete vTuner_Items;
     vTuner_Items = [];
     vTuner_VehicleID = -1;
+    vTuner_Buy = null;
+    vTuner_Exit = null;
     mp.gui.chat.show(true);
 
     mp.events.callRemote("OnTunerClose");
