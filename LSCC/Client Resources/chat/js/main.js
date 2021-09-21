@@ -13,6 +13,8 @@ let chat =
 };
 var chatOpacityTimeout;
 
+let antiDoubleSend = Date.now();
+
 const MAX_MSG_HISTORY = 64;
 
 function toggleScroll(enable) { 
@@ -282,11 +284,21 @@ $(document).ready(function()
                     value = value.substr(1);
 
                     if (value.length > 0)
-                        mp.invoke("command", value);
+					{
+                        if(Date.now() - antiDoubleSend >= 200)
+						{
+							mp.invoke("command", value);
+							antiDoubleSend = Date.now();
+						}
+					}
                 }
 				else
 				{
-                    mp.invoke("chatMessage", value);
+					if(Date.now() - antiDoubleSend >= 200)
+					{
+	                    mp.invoke("chatMessage", value);
+						antiDoubleSend = Date.now();
+					}
                 }
 			}
 			

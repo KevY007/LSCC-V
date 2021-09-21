@@ -1822,6 +1822,7 @@ namespace LSCC
                         player.RemoveAllWeapons();
                         player.Health = 100;
                         player.Armor = 0;
+                        player.Dimension = Convert.ToUInt32(699 + player.Id);
 
                         if (lobby.gameMode == GameModes.STANDARD)
                             player.TriggerEvent("showHPBars", 1);
@@ -1957,8 +1958,11 @@ namespace LSCC
                             lobby.Vehicles.Add(pVehicle);
 
                             pVehicle.Position = vecSpawn;
+                            pVehicle.SetData("SpawnA", spawnLoc.spawnA);
 
                             player.TriggerEvent("SetChaseVehicle", pVehicle.Id, 0);
+                            player.SetData("ChaseVehicle", pVehicle);
+                            player.SetData("ChaseVehicleSeat", 0);
                             PutInsideCar.Add(player);
 
                             int seat = 1;
@@ -1978,15 +1982,19 @@ namespace LSCC
                                             // 4-2, 2
                                             // 4-3, 1
                                             mem.TriggerEvent("SetChaseVehicle", pVehicle.Id, maxseats - seat);
+                                            mem.SetData("ChaseVehicle", pVehicle);
+                                            mem.SetData("ChaseVehicleSeat", maxseats - seat);
                                         }
                                         else
                                         {
                                             // 0 + 1, 2, 3
                                             mem.TriggerEvent("SetChaseVehicle", pVehicle.Id, 0 + seat);
+                                            mem.SetData("ChaseVehicle", pVehicle);
+                                            mem.SetData("ChaseVehicleSeat", 0 + seat);
                                         }
 
                                         PutInsideCar.Add(mem);
-                                        mem.SendChatMessage("!{#FFAC38}[Partners] You have been put inside " + player.Name + "'s vehicle.");
+                                        mem.SendChatMessage("!{#FFAC38}[Partners] You are being paired with " + player.Name + " this chase.");
 
                                         seat++;
                                     }
@@ -1994,8 +2002,6 @@ namespace LSCC
                             }
                         }
 
-                        player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ - 30f).Around(5f);
-                        player.Dimension = Convert.ToUInt32(lobbyid);
                         EPlayer.Freeze(player, true);
 
                         player.SetData("GPS", false);
@@ -2030,7 +2036,6 @@ namespace LSCC
                         }
                         catch { }
 
-                        player.Position = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ - 30f).Around(5f);
                         EPlayer.Freeze(player, true);
 
                         player.Health = 100;
@@ -2162,11 +2167,13 @@ namespace LSCC
                         }
 
                         pVehicle.Position = vecSpawn;
+                        pVehicle.SetData("SpawnA", spawnLoc.spawnA);
 
                         _tempPlayer.TriggerEvent("SetChaseVehicle", pVehicle.Id, 0);
+                        _tempPlayer.SetData("ChaseVehicle", pVehicle);
+                        _tempPlayer.SetData("ChaseVehicleSeat", 0);
                         _tempPlayer.TriggerEvent("AFKDriverCheck", vecSpawn.X, vecSpawn.Y, vecSpawn.Z);
 
-                        _tempPlayer.Dimension = Convert.ToUInt32(lobbyid);
                         int seat = 1;
 
                         int overridemaxseats = GetMaxSeats(carName); // For DLC cars that aren't registered in vehicledata.
@@ -2188,8 +2195,9 @@ namespace LSCC
                             fugitives--;
 
                             _tempPlayer2.TriggerEvent("SetChaseVehicle", pVehicle.Id, 0 + seat);
+                            _tempPlayer2.SetData("ChaseVehicle", pVehicle);
+                            _tempPlayer2.SetData("ChaseVehicleSeat", 0 + seat);
 
-                            _tempPlayer2.Dimension = Convert.ToUInt32(lobbyid);
                             seat++;
                         }
                     }
@@ -2253,16 +2261,84 @@ namespace LSCC
                     {
                         lobby.GameProgress++;
 
-                        if (lobby.GameProgress == 0)
+                        if (lobby.GameProgress == -10)
+                        {
+                            MapSpawn fugi = ContextFactory.Instance.MapSpawns.ToList().Find(a => a.mapID == lobby.lastMapId && a.spawnTeam == 0);
+                            MapSpawn cop = ContextFactory.Instance.MapSpawns.ToList().Find(a => a.mapID == lobby.lastMapId && a.spawnTeam == 1);
+                            lobby.Fugitives.ForEach(p =>
+                            {
+                                p.Position = new Vector3(fugi.spawnX, fugi.spawnY, fugi.spawnZ).Around(30f);
+                            });
+                            lobby.Cops.ForEach(p =>
+                            {
+                                p.Position = new Vector3(cop.spawnX, cop.spawnY, cop.spawnZ).Around(30f);
+                            });
+                        }
+                        if (lobby.GameProgress == -5)
                         {
                             lobby.Fugitives.ForEach(p =>
                             {
-                                p.TriggerEvent("ToggleNametags", true);
+                                p.Dimension = Convert.ToUInt32(lobby.lobbyId);
+                                p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
                                 EPlayer.Freeze(p, false);
                             });
                             lobby.Cops.ForEach(p =>
                             {
+                                p.Dimension = Convert.ToUInt32(lobby.lobbyId);
+                                p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
+                                EPlayer.Freeze(p, false);
+                            });
+                        }
+                        if(lobby.GameProgress == -3)
+                        {
+                            lobby.Fugitives.ForEach(p =>
+                            {
+                                p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
+
+                                p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
+                                EPlayer.Freeze(p, false);
+                            });
+                            lobby.Cops.ForEach(p =>
+                            {
+                                p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
+
+                                p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
+                                EPlayer.Freeze(p, false);
+                            });
+
+                            lobby.Vehicles.ForEach(v =>
+                            {
+                                if(v.HasData("Spawn"))
+                                {
+                                    v.Position = v.GetData<Vector3>("Spawn");
+                                    
+                                    v.SetSharedData("Collisions", false);
+                                }
+                            });
+                        }
+
+                        if (lobby.GameProgress == 0)
+                        {
+                            lobby.Fugitives.ForEach(p =>
+                            {
+                                p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
                                 p.TriggerEvent("ToggleNametags", true);
+                                EPlayer.Freeze(p, false);
+
+                                p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
+
+                                p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", true);
+                                p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
+                            });
+                            lobby.Cops.ForEach(p =>
+                            {
+                                p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
+                                p.TriggerEvent("ToggleNametags", true);
+
+                                p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
+
+                                p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", true);
+                                p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
                             });
 
                             if (lobby.gameMode == GameModes.STANDARD)
@@ -2367,7 +2443,8 @@ namespace LSCC
 
                                     EPlayer.Notify(player, "Collisions have been enabled and weapons issued", "green", "fas fa-car-crash", false, 3000);
 
-                                    if(Settings.Dynamics.OnfootCollision) player.SetSharedData("Collisions", true);
+                                    player.SetSharedData("Collisions", true);
+                                    if(!Settings.Dynamics.OnfootCollision) player.SetSharedData("Collisions", false);
 
                                     if (lobby.Cops.Contains(player))
                                     {

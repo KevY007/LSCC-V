@@ -89,11 +89,11 @@ mp.events.add("SetChaseVehicle", (vid, seat) => {
 });
 
 mp.events.add('entityStreamIn', (entity) => {
-    if (chaseRunning && mp.players.local.Team >= 0 && entity.type === 'vehicle' && entity.id == chaseStartVeh)
+    if (chaseRunning && mp.players.local.Team >= 0 && entity.type === 'vehicle' && chaseStartVeh != -1 && entity.id == chaseStartVeh)
     {
-        if(chaseTimeCur <= 15) // Less than 15s passed to game start. If this doesn't make up, then get a better connection fag.
+        if(chaseTimeCur <= 25) // Less than 25s passed to game start. If this doesn't make up, then get a better connection fag.
         {
-            if(!mp.players.local.isInAnyVehicle(false)) mp.events.callRemote("RequestSetInVehicle", entity, chaseStartSeat)
+            mp.events.callRemote("RequestSetInVehicle", entity, chaseStartSeat);
         }
     }
 });
@@ -753,6 +753,16 @@ mp.events.add('render', () => {
                 {
                     chaseTimeCur += 1;
 
+                    if(chaseTimeCur <= 0)
+                    {
+                        mp.players.local.freezePosition(true);
+
+                        if(mp.players.local.isInAnyVehicle(false))
+                        {
+                            mp.players.local.vehicle.freezePosition(true);
+                        }
+                    }
+
                     if(chaseTimeCur >= chaseTimeMax || chaseTimeCur <= -1)
                     {
                         chaseRunning = false;
@@ -814,7 +824,7 @@ mp.events.add('render', () => {
                     {
                         blipColor = 70;
                         if(target.getVariable("HasShot") == true){
-                            blipColor = 75;
+                            blipColor = 70;
                             blipId = 458;
                         }
                     }
@@ -1307,6 +1317,10 @@ mp.events.add('native:call', (nativeName, args, hasCallback) => {
 
 mp.events.add(
 {
+    "ChangeVehicleHeading": (heading) => {
+        if(mp.players.local.isInAnyVehicle(false)) mp.players.local.vehicle.setHeading(heading);
+    },
+
     "SyncServerSettings": (onfootcollisions) => {
         ServerSettings.OnfootCollisions = onfootcollisions;
     },
