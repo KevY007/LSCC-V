@@ -25,6 +25,7 @@ namespace LSCC
         public string Username { get; set; }
         public string Password { get; set; }
         public string Salt { get; set; }
+        public DateTime RegisterDate { get; set; }
         public string RegisterHWID { get; set; }
         public ulong RegisterRID { get; set; }
         public string RegisterIP { get; set; }
@@ -33,7 +34,7 @@ namespace LSCC
         public ulong LastRID { get; set; }
         public string LastIP { get; set; }
         public string LastSC { get; set; }
-        public string LastLogin { get; set; }
+        public DateTime LastLogin { get; set; }
         public int Admin { get; set; }
         public int Level { get; set; }
         public int XP { get; set; }

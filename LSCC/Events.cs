@@ -1021,6 +1021,14 @@ namespace LSCC
             acc.LastIP = player.Address;
             acc.LastRID = player.SocialClubId;
             acc.LastSC = player.SocialClubName;
+
+            if (acc.RegisterHWID.Equals("n/a")) acc.RegisterHWID = player.Serial;
+            if (acc.RegisterIP.Equals("n/a")) acc.RegisterIP = player.Address;
+            if (acc.RegisterSC.Equals("n/a")) acc.RegisterSC = player.SocialClubName;
+            if (acc.RegisterRID == 0) acc.RegisterRID = player.SocialClubId;
+
+            if (acc.RegisterDate.Year == 2000) acc.RegisterDate = DateTime.Now; // Year 2000 = it's not set.
+
             BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.AccountSQLID == acc.SQL_ID);
 
             if (ban != null)
@@ -1094,8 +1102,8 @@ namespace LSCC
                 Main.DisplayMOTD(player, motdToShow);
             }
 
-            player.SendChatMessage("!{#a6a6a6}Your last login was on !{#c2c1b6}" + EPlayer.GetAccount(player).LastLogin);
-            EPlayer.GetAccount(player).LastLogin = DateTime.Now.ToString();
+            player.SendChatMessage("!{#a6a6a6}Your last login was on !{#c2c1b6}" + EPlayer.GetAccount(player).LastLogin.ToString());
+            EPlayer.GetAccount(player).LastLogin = DateTime.Now;
 
             if (EPlayer.GetAccount(player).LastSessionMins >= 60.0) 
                 player.SendChatMessage($"!{{#a6a6a6}}Last session lasted !{{#c2c1b6}}{(EPlayer.GetAccount(player).LastSessionMins / 60.0).ToString("N1")} hours.");
@@ -2251,7 +2259,8 @@ namespace LSCC
                 CarFugitive = "?",
                 WeaponComponents = NAPI.Util.ToJson(wepItems),
                 MOTD = "none",
-                LastLogin = DateTime.Now.ToString(),
+                RegisterDate = DateTime.Now,
+                LastLogin = DateTime.Now,
                 Character = "{}",
             };
             AccountManager.Add(_new);

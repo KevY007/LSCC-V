@@ -1,0 +1,11 @@
+db changes for main server to be done after update:
+
+Table OwnedVehicles {SQL_ID int(11), AccountSQLID int(11), Model longtext, Team int(11)}
+Table OwnedLoadouts {SQL_ID int(11), AccountSQLID int(11), Name longtext, Team int(11)}
+Table PlayerTunings {SQL_ID int(11), AccountSQLID int(11), Model int(10), PrimaryColor int 11, SecondaryColor int 11, PearlescentColor int 11, WheelColor int 11, Mods longtext}
+
+New entries on Accounts Table
+Edit HWID, RockstarID to RegisterHWID longtext, RegisterRID bigint(20)
+Delete LastLogin and Add new LastLogin and RegisterDate with variable type datetime and set the types to year 2000 as default for reset detection
+Add RegisterIP longtext, LastRID bigint(20), LastIP longtext, LastHWID longtext, RegisterSC longtext, LastSC longtext default "n/a" and 0 for ints in reset detection
+

@@ -3568,9 +3568,38 @@ namespace LSCC
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher admin level than you.");
                     return;
                 }
+                player.SendChatMessage("!{#FF6347}" + target.Name + "'s register IP address: " + EPlayer.GetAccount(target).RegisterIP);
             }
 
-            player.SendChatMessage("!{#FF6347}" + target.Name + "'s IP address: " + target.Address);
+            player.SendChatMessage("!{#FF6347}" + target.Name + "'s current IP address: " + target.Address);
+            return;
+        }
+
+        [Command("getsc", "!{#AFAFAF}[USAGE] getsc (target)")]
+        public void cmd_getsc(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                return;
+            }
+
+            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:getip:{target.Name}"); } catch { }
+            Logs.LogAdmin(player, $"Attempted to retrieve {target.Name}'s social club info.");
+
+            if (EPlayer.LoggedIn(target))
+            {
+                if (EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && target != player)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher admin level than you.");
+                    return;
+                }
+                player.SendChatMessage("!{#FF6347}" + target.Name + $"'s register social club: {EPlayer.GetAccount(target).RegisterSC} ({EPlayer.GetAccount(target).RegisterRID})");
+            }
+
+            player.SendChatMessage("!{#FF6347}" + target.Name + $"'s current social club: {target.SocialClubName} ({target.SocialClubId})");
             return;
         }
 
@@ -3594,9 +3623,10 @@ namespace LSCC
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher admin level than you.");
                     return;
                 }
+                player.SendChatMessage("!{#FF6347}" + target.Name + "'s register hardware ID: " + EPlayer.GetAccount(target).RegisterHWID);
             }
 
-            player.SendChatMessage("!{#FF6347}" + target.Name + "'s Hardware ID: " + target.Serial);
+            player.SendChatMessage("!{#FF6347}" + target.Name + "'s current hardware ID: " + target.Serial);
             return;
         }
 
@@ -4976,9 +5006,9 @@ namespace LSCC
             }
 
             if (_target.LastSessionMins >= 60.0)
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}" + _target.Username + "'s last login was on !{#fcf9d4}" + _target.LastLogin + "!{#ffffff} lasting !{#fcf9d4}" + $"{(_target.LastSessionMins / 60.0).ToString("N1")} hours!{{#FFFFFF}}.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}" + _target.Username + "'s last login was on !{#fcf9d4}" + _target.LastLogin.ToString() + "!{#ffffff} lasting !{#fcf9d4}" + $"{(_target.LastSessionMins / 60.0).ToString("N1")} hours!{{#FFFFFF}}.");
             else
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}" + _target.Username + "'s last login was on !{#fcf9d4}" + _target.LastLogin + "!{#ffffff} lasting !{#fcf9d4}" + $"{_target.LastSessionMins.ToString("N1")} minutes!{{#FFFFFF}}.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}" + _target.Username + "'s last login was on !{#fcf9d4}" + _target.LastLogin.ToString() + "!{#ffffff} lasting !{#fcf9d4}" + $"{_target.LastSessionMins.ToString("N1")} minutes!{{#FFFFFF}}.");
 
             return;
         }
@@ -5034,7 +5064,7 @@ namespace LSCC
             {
                 player.SendChatMessage("[Admin Lv 3]: /givegun(all) /gotopos /bringall /sethpall /(un)freezeall /r(emove)g(uns)f(rom)a(ll)");
                 player.SendChatMessage("[Admin Lv 3]: /givecomp /takecomp /attachcomp /grantfugitive /setspawn (freeroam world)");
-                player.SendChatMessage("[Admin Lv 3]: /getip /gethwid /motdall /setalpha");
+                player.SendChatMessage("[Admin Lv 3]: /getip /gethwid /getsc /motdall /setalpha");
             }
             if (EPlayer.GetAccount(player).Admin >= 4)
             {
