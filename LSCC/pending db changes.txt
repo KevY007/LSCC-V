@@ -1,5 +1,7 @@
 db changes for main server to be done after update:
 
+ALL MODELS AND ROCKSTAR ID INTEGER TYPE VARIABLES ARE SUPPOSED TO HAVE ATTRIBUTE UNSIGNED (ONLY MODEL AND RID DATAS)
+
 Table OwnedVehicles {SQL_ID int(11), AccountSQLID int(11), Model longtext, Team int(11)}
 Table OwnedLoadouts {SQL_ID int(11), AccountSQLID int(11), Name longtext, Team int(11)}
 Table PlayerTunings {SQL_ID int(11), AccountSQLID int(11), Model int(10), PrimaryColor int 11, SecondaryColor int 11, PearlescentColor int 11, WheelColor int 11, Mods longtext}
