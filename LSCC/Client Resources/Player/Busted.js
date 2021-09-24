@@ -60,7 +60,7 @@ mp.events.add('render', () => {
                         if(target.isInAnyVehicle(false)) bustDist = 7.5;
 
                         if(calcDist(target.position, mp.players.local.position) <= bustDist) {
-                            mp.events.callRemote("BustProgress", target, calcDist(target.position, mp.players.local.position));
+                            mp.events.callRemoteUnreliable("BustProgress", target, calcDist(target.position, mp.players.local.position));
                             progressed = true;
                         }
                     }
@@ -88,7 +88,7 @@ mp.events.add('render', () => {
                 });
 
                 if(canProceed) {
-                    mp.events.callRemote("BustRegress", closestDist);
+                    mp.events.callRemoteUnreliable("BustRegress", closestDist);
                 }
             }
         }

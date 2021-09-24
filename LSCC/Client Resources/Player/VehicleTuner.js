@@ -85,7 +85,7 @@ mp.events.add('ModRequestComplete', () => {
             if(vTuner_OtherMods[slots] != -1) modItems[slots] = vTuner_OtherMods[slots]; // FOR PLATES, AND TINTS THAT CAN'T BE .GETMOD
         }
 
-        mp.events.callRemote("RequestVehicleModPrice", JSON.stringify(modItems));
+        mp.events.callRemoteUnreliable("RequestVehicleModPrice", JSON.stringify(modItems));
     }
 });
 

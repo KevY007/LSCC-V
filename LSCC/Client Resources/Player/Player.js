@@ -104,7 +104,7 @@ mp.events.add("OneSecondEvent", () => {
     if(ShotStats.UpdateInterval >= 10)
     {
         ShotStats.UpdateInterval = 0;
-        mp.events.callRemote("SyncShotStats", ShotStats.TotalFired, ShotStats.HitPlayer, ShotStats.HitVehicle, ShotStats.Missed);
+        mp.events.callRemoteUnreliable("SyncShotStats", ShotStats.TotalFired, ShotStats.HitPlayer, ShotStats.HitVehicle, ShotStats.Missed);
     }
 });
 
@@ -649,7 +649,7 @@ mp.events.add('render', () => {
                 }
 
                 traceLastFunc(`[Players] Update Stream Data`);
-                mp.events.callRemote("UpdateStreamData");
+                mp.events.callRemoteUnreliable("UpdateStreamData");
 
                 traceLastFunc(`[Players] Update VoiceData`);
 
@@ -724,7 +724,7 @@ mp.events.add('render', () => {
 
                     if(derbyCounting)
                     {
-                        mp.events.callRemote("DerbyIncreaseCount");
+                        mp.events.callRemoteUnreliable("DerbyIncreaseCount");
                         derbyTimeCur--;
                     }
 
