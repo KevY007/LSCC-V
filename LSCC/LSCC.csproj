@@ -3,21 +3,21 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <AssemblyName>LSCC</AssemblyName>
-    <Version>0.0</Version>
+    <AssemblyName>RNC</AssemblyName>
+    <Version>1.0</Version>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
-    <FileVersion>0.1.0.0</FileVersion>
-    <PackageId>LSCC</PackageId>
+    <FileVersion>1.0.0.0</FileVersion>
+    <PackageId>RNC</PackageId>
     <Authors>KevY</Authors>
-    <Company>LSCC</Company>
-    <Product>Los Santos Copchase</Product>
-    <Description>Los Santos Copchase for GTA5 (RageMP)</Description>
-    <Copyright>Los Santos Copchase</Copyright>
+    <Company>KevY</Company>
+    <Product>Race 'n Chase</Product>
+    <Description>Race 'n Chase script for RAGE:MP. Formerly Los Santos Copchase (LSCC)</Description>
+    <Copyright>Race 'n Chase</Copyright>
     <NeutralLanguage>en</NeutralLanguage>
-    <RootNamespace>LSCC</RootNamespace>
+    <RootNamespace>RNC</RootNamespace>
     <Configurations>Debug;Release;Debug_KevY</Configurations>
     <SignAssembly>false</SignAssembly>
-    <PackageIcon>lscc.png</PackageIcon>
+    <PackageIcon></PackageIcon>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
   </PropertyGroup>
 
@@ -29,10 +29,6 @@
     <Compile Remove="Client Resources\cs_packages\**" />
     <EmbeddedResource Remove="Client Resources\cs_packages\**" />
     <None Remove="Client Resources\cs_packages\**" />
-    <None Include="lscc.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -60,6 +56,7 @@
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 
@@ -79,12 +76,20 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="rd /s /q &quot;C:\RAGEMP\server-files\dotnet\resources\LSCC&quot;&#xD;&#xA;mkdir &quot;C:\RAGEMP\server-files\dotnet\resources\LSCC&quot;&#xD;&#xA;xcopy &quot;$(OutDir)*&quot; &quot;C:\RAGEMP\server-files\dotnet\resources\LSCC&quot; /Y&#xD;&#xA;rd /s /q &quot;C:\RAGEMP\server-files\client_packages&quot;&#xD;&#xA;rmdir &quot;C:\RAGEMP\server-files\client_packages\&quot; /S /Q&#xD;&#xA;mkdir &quot;C:\RAGEMP\server-files\client_packages\&quot;&#xD;&#xA;xcopy /E &quot;Client Resources\*&quot; &quot;C:\RAGEMP\server-files\client_packages\&quot; /Y" />
+    <Exec Command="rd /s /q &quot;C:\RAGEMP\server-files\dotnet\resources\RNC&quot;&#xD;&#xA;mkdir &quot;C:\RAGEMP\server-files\dotnet\resources\RNC&quot;&#xD;&#xA;xcopy &quot;$(OutDir)*&quot; &quot;C:\RAGEMP\server-files\dotnet\resources\RNC&quot; /Y&#xD;&#xA;rd /s /q &quot;C:\RAGEMP\server-files\client_packages&quot;&#xD;&#xA;rmdir &quot;C:\RAGEMP\server-files\client_packages\&quot; /S /Q&#xD;&#xA;mkdir &quot;C:\RAGEMP\server-files\client_packages\&quot;&#xD;&#xA;xcopy /E &quot;Client Resources\*&quot; &quot;C:\RAGEMP\server-files\client_packages\&quot; /Y" />
   </Target>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="rd /s /q &quot;C:\RAGEMP\server-files\dotnet\resources\LSCC&quot;&#xD;&#xA;mkdir &quot;C:\RAGEMP\server-files\dotnet\resources\LSCC&quot;&#xD;&#xA;del &quot;C:\RAGEMP\server-files\dotnet\resources\LSCC\*.*&quot; /Q" />
+    <Exec Command="rd /s /q &quot;C:\RAGEMP\server-files\dotnet\resources\RNC&quot;&#xD;&#xA;mkdir &quot;C:\RAGEMP\server-files\dotnet\resources\RNC&quot;&#xD;&#xA;del &quot;C:\RAGEMP\server-files\dotnet\resources\RNC\*.*&quot; /Q" />
   </Target>
 
 </Project>

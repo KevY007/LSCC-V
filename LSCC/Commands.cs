@@ -446,14 +446,12 @@ namespace LSCC
         {
             player.SendChatMessage("!{FFFF00}============| SERVER INFORMATION |============");
 
-            player.SendChatMessage("!{#FFDD00}Los Santos Copchase !{#FFFFFF}v" + Settings.Version);
+            player.SendChatMessage("!{#ffae00}Race !{#FFFFFF}'n !{##0097ff}Chase !{#FFFFFF}v" + Settings.Version);
             player.SendChatMessage("!{#FF6347}Server Discord: !{#FFFFFF}discord.gg/y3g2WuR");
-            player.SendChatMessage("!{#FFDD00}Community/Portal Discord: !{#FFFFFF}discord.gg/8wBg82v");
-            player.SendChatMessage("!{#FFFF00}Website: !{#FFFFFF}ls-cc.info");
+            player.SendChatMessage("!{#FFFF00}Website: !{#FFFFFF}www.racenchase.com");
             player.SendChatMessage("  ");
-            player.SendChatMessage("!{#FFFFFF}Scripted by !{#FF6347}KevY !{#FFFFFF}as the sole dev.");
-            player.SendChatMessage("!{#FFFFFF}Special Thanks: !{#FF6347}RotX !{#FFFFFF}(CEF/Web Pages) !{#FF6347}CodeName420 !{#FFFFFF}(Mapping) .");
-            player.SendChatMessage("!{#FFFFFF}Thanks to !{#FF6347}LSCC SAMP staff !{#FFFFFF}for assistance and ideas.");
+            player.SendChatMessage("!{#FFFFFF}Developers: !{#FF6347}KevY (Lead), jambredrek (Game) and RotX (Web)");
+            player.SendChatMessage("!{#FFFFFF}Thanks to all those participated in !{#FF6347}beta testing and early launch!{#FFFFFF}.");
             player.SendChatMessage("  ");
             return;
         }
@@ -3880,7 +3878,7 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            player.SendChatMessage("!{#0079DB}[Los Santos Copchase V !{#2BA3FF}BETA Commands]:");
+            player.SendChatMessage("!{#0079DB}[!{#ffae00}Race !{#FFFFFF}'n !{##0097ff}Chase !{#2BA3FF}Commands]:");
             player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /keys /admins /rules /id");
             player.SendChatMessage("[General]: /report /helpme /l(ow) /c(ar)w(hisper) /s(hout)");
             player.SendChatMessage("[Squad/Partner]: /squad /squadleave /s(quad)c(hat) /squadaccept /squadmembers");

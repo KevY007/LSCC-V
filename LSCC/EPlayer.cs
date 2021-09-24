@@ -937,7 +937,7 @@ namespace LSCC
         public static void SetDiscordStatus(Player player, string status)
         {
             player.SetSharedData("Ping", player.Ping);
-            player.TriggerEvent("SetDiscordStatus", "Los Santos Copchase", status);
+            player.TriggerEvent("SetDiscordStatus", "Race 'n Chase", status);
         }
         public static void Freeze(Player player, bool toggle)
         {

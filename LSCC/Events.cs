@@ -70,7 +70,7 @@ namespace LSCC
         {
             EPlayer.SetDiscordStatus(player, "Connecting to the server...");
 
-            NAPI.Notification.SendNotificationToPlayer(player, "~g~Welcome to ~w~Los Santos Copchase!");
+            NAPI.Notification.SendNotificationToPlayer(player, "Welcome to ~y~Race ~w~'n ~b~Chase");
             player.SetData("LastCryptAttempt", Environment.TickCount64);
 
             EPlayer.ResetPlayerData(player);
@@ -83,8 +83,6 @@ namespace LSCC
             EPlayer.LoginBrowserSetup(player);
 
             player.TriggerEvent("InitChaseTimer");
-
-            //player.TriggerEvent("PlaySong", "http://51.91.109.79/_lsccv_stuff/v_open.mp3", 0.015);
 
             NAPI.Task.Run(() =>
             {

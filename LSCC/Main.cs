@@ -350,9 +350,9 @@ namespace LSCC
 
         // Connection Settings
         public const string MySQL_Host = "localhost";
-        public const string MySQL_User = "lsccv";
+        public const string MySQL_User = "racenchase";
         public const string MySQL_Password = "perkovicMatko3035";
-        public const string MySQL_Database = "lscc_ragemp";
+        public const string MySQL_Database = "racenchase";
         public const string DCBotToken = "NjAyNTQ1Mzc0MDY1OTgzNTgw.XtaCEQ.clpqVL5c0X_38xkT-mYTr4_N9a4";
 
         // Global Variables (changing accordingly)
@@ -912,7 +912,7 @@ namespace LSCC
 
         public static void Log(string fileName, string msg)
         {
-            var writer = new System.IO.StreamWriter($"lscc/logs/{fileName}", true);
+            var writer = new System.IO.StreamWriter($"racenchase/logs/{fileName}", true);
 
             writer.WriteLine(msg);
             writer.Flush();
@@ -929,11 +929,11 @@ namespace LSCC
 
             try
             {
-                if (File.Exists("lscc/lscc.json")) File.Delete("lscc/lscc.json");
+                if (File.Exists("racenchase/settings.json")) File.Delete("racenchase/settings.json");
 
-                File.WriteAllText("lscc/lscc.json", NAPI.Util.ToJson(Settings.Dynamics));
+                File.WriteAllText("racenchase/settings.json", NAPI.Util.ToJson(Settings.Dynamics));
             }
-            catch { NAPI.Util.ConsoleOutput("(LSCC | SETTINGS) Failed to save dynamic settings!"); }
+            catch { NAPI.Util.ConsoleOutput("(RnC | SETTINGS) Failed to save dynamic settings!"); }
 
             return;
         }
@@ -942,13 +942,13 @@ namespace LSCC
         {
             try
             {
-                if (File.Exists("lscc/lscc.json"))
+                if (File.Exists("racenchase/settings.json"))
                 {
                     Settings.Dynamics = new DynSet();
-                    Settings.Dynamics = NAPI.Util.FromJson<DynSet>(File.ReadAllText("lscc/lscc.json"));
+                    Settings.Dynamics = NAPI.Util.FromJson<DynSet>(File.ReadAllText("racenchase/settings.json"));
                 }
             }
-            catch { NAPI.Util.ConsoleOutput("(LSCC | Settings) Failed to read lscc.json, permission problem or format?"); }
+            catch { NAPI.Util.ConsoleOutput("(RnC | Settings) Failed to read settings.json, permission problem or format?"); }
 
             return;
         }
@@ -979,13 +979,13 @@ namespace LSCC
         [ServerEvent(Event.ResourceStart)]
         public void OnResourceStart()
         {
-            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Ensuring LSCC folder...");
-            System.IO.Directory.CreateDirectory("lscc");
+            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Ensuring 'racenchase' folder...");
+            System.IO.Directory.CreateDirectory("racenchase");
 
-            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Ensuring logs folder..."); 
-            System.IO.Directory.CreateDirectory("lscc/logs");
+            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Ensuring logs folder..."); 
+            System.IO.Directory.CreateDirectory("racenchase/logs");
 
-            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) ===== Heading towards second stage of startup =====");
+            NAPI.Util.ConsoleOutput("(RnC | STARTUP) ===== Heading towards second stage of startup =====");
 
             NAPI.Server.SetAutoRespawnAfterDeath(false);
             NAPI.Server.SetAutoSpawnOnConnect(false);
@@ -993,7 +993,7 @@ namespace LSCC
             NAPI.Server.SetCommandErrorMessage("!{#FF6347}[!] !{#FFFFFF}This command is invalid, refer to /help for a list.");
 
             ContextFactory.Instance.Database.EnsureCreated();
-            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Connected to database.");
+            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Connected to database.");
 
             Settings.Lobbies = new List<LobbyData>();
             Settings.Requests = new List<RequestData>();
@@ -1026,55 +1026,55 @@ namespace LSCC
             }
 
             
-            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Ensuring & loading lscc.json...");
+            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Ensuring & loading settings.json...");
 
             LoadDynamicSettings();
 
-            if (!File.Exists("lscc/weapondata.json"))
+            if (!File.Exists("racenchase/weapondata.json"))
             {
-                NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Updating weapondata.json...");
+                NAPI.Util.ConsoleOutput("(RnC | STARTUP) Updating weapondata.json...");
                 try
                 {
                     using (var client = new WebClient())
                     {
-                        client.DownloadFile(Settings.Dynamics.WeaponDataURL, "lscc/weapondata.json.tmp");
+                        client.DownloadFile(Settings.Dynamics.WeaponDataURL, "racenchase/weapondata.json.tmp");
                     }
 
                     try
                     {
-                        if (File.Exists("lscc/weapondata.json"))
+                        if (File.Exists("racenchase/weapondata.json"))
                         {
-                            File.Delete("lscc/weapondata.json");
+                            File.Delete("racenchase/weapondata.json");
                         }
                     }
-                    catch { NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Failed to clear old weapondata.json, permission problem?"); }
+                    catch { NAPI.Util.ConsoleOutput("(RnC | STARTUP) Failed to clear old weapondata.json, permission problem?"); }
 
                     try
                     {
-                        File.Move("lscc/weapondata.json.tmp", "lscc/weapondata.json");
+                        File.Move("racenchase/weapondata.json.tmp", "racenchase/weapondata.json");
                     }
-                    catch { NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Failed to update weapondata.json! (Complete final version, 'move' fail)"); }
+                    catch { NAPI.Util.ConsoleOutput("(RnC| STARTUP) Failed to update weapondata.json! (Complete final version, 'move' fail)"); }
 
                 }
-                catch { NAPI.Util.ConsoleOutput("(LSCC | STARTUP) [Warning] Failed to update weapondata.json (not critical, using old instead, note that server will crash without one.)"); }
+                catch { NAPI.Util.ConsoleOutput("(RnC | STARTUP) [Warning] Failed to update weapondata.json (not critical, using old instead, note that server will crash without one.)"); }
             }
 
-            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Created and initialised settings & enums.");
+            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Created and initialised settings & enums.");
 
-            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) ===== Heading towards final stage of startup =====");
+            NAPI.Util.ConsoleOutput("(RnC | STARTUP) ===== Heading towards final stage of startup =====");
 
             try
             {
-                foreach (KeyValuePair<ulong, jWeaponData> item in jWeaponData.FromJson(File.ReadAllText("lscc/weapondata.json")))
+                foreach (KeyValuePair<ulong, jWeaponData> item in jWeaponData.FromJson(File.ReadAllText("racenchase/weapondata.json")))
                 {
                     Settings.WeaponData.Add(item.Key, item.Value);
                 }
             }
-            catch { NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Unable to load in weapondata.json! Server will work but it can cause crashes due to component data."); }
-            NAPI.Util.ConsoleOutput($"(LSCC | STARTUP) Loading in weapondata.json... ({Settings.WeaponData.Count} weapons/entries)");
+            catch { NAPI.Util.ConsoleOutput("(RnC | STARTUP) Unable to load in weapondata.json! Server will work but it can cause crashes due to component data."); }
+            NAPI.Util.ConsoleOutput($"(RnC | STARTUP) Loading in weapondata.json... ({Settings.WeaponData.Count} weapons/entries)");
 
             /* DEFAULT LOADOUTS CREATION */
-            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Creating the loadouts...");
+            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the loadouts...");
 
             new LoadoutData(1, "Default")
                 .Add(WeaponHash.Pistol, "package://Artwork/Weapons/Pistol.png", "Pistol", 40)
@@ -1132,7 +1132,7 @@ namespace LSCC
                 .Add(WeaponHash.Assaultrifle_mk2, "package://Artwork/Weapons/AssaultRifleMk2.png", "Assault Rifle Mk.II", 120); 
 
             /* VEHICLES/SELECTION CREATION */
-            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Creating the selection vehicles...");
+            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the selection vehicles...");
 
             // Defaults
             new CarData(0, "Random", "?", "package://Artwork/Vehicles/default.png", "");
@@ -1170,7 +1170,7 @@ namespace LSCC
 
             if (Settings.Dynamics.Discord)
             {
-                NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Loading discord plugin.");
+                NAPI.Util.ConsoleOutput("(RnC | STARTUP) Loading discord plugin.");
                 Discord.Main();
 
                 long tick = Environment.TickCount64 + 5000;
@@ -1179,13 +1179,13 @@ namespace LSCC
 
                 }
             }
-            else NAPI.Util.ConsoleOutput("(LSCC | OPT) Discord Bot is disabled, live commands and statuses not updated!");
+            else NAPI.Util.ConsoleOutput("(RnC | OPT) Discord Bot is disabled, live commands and statuses not updated!");
 
             NAPI.TextLabel.CreateTextLabel("Bored of waiting? /dm & /dmarenas", new Vector3(440.95462f, -976.35516f, 32.059594f), 10.0f, 2.2f, 0, new Color(255, 0, 0, 156), false);
             NAPI.TextLabel.CreateTextLabel("Check out /freeroam & /cmds", new Vector3(435.73737f, -981.86523f, 30.698616f), 10.0f, 2.2f, 0, new Color(118, 232, 221, 156), false);
             NAPI.TextLabel.CreateTextLabel("Do you know about /derby?", new Vector3(448.35562f, -987.96454f, 30.689596f), 10.0f, 2.2f, 0, new Color(230, 177, 21, 156), false);
 
-            NAPI.Util.ConsoleOutput("(LSCC | STARTUP) Server startup proceeded:\n");
+            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Server startup proceeded:\n");
 
             string admins = "";
             int adminCount = 0;
@@ -1197,12 +1197,12 @@ namespace LSCC
             }
             if (adminCount == 0) admins = "None";
 
-            NAPI.Util.ConsoleOutput("[>===========|Los Santos Copchase|===========<]");
+            NAPI.Util.ConsoleOutput("[>===========|Race 'n Chase|===========<]");
             NAPI.Util.ConsoleOutput("[Version]: " + Settings.Version);
             NAPI.Util.ConsoleOutput("[Developers]: KevY, CodeName420 (jambredrek)");
             NAPI.Util.ConsoleOutput($"[Accounts]: {ContextFactory.Instance.Accounts.Count()}");
             NAPI.Util.ConsoleOutput($"[Admins]: {admins}");
-            NAPI.Util.ConsoleOutput("[>===========|Los Santos Copchase|===========<]");
+            NAPI.Util.ConsoleOutput("[>===========|Race 'n Chase|===========<]");
 
 
             // After all the stuff is set.
@@ -1419,8 +1419,8 @@ namespace LSCC
 
                                                         if (player.GetSharedData<bool>("IsTabbed") == true || EPlayer.IsAFK(player)) {
 
-                                                            player.TriggerEvent("SendNotification", "AFK Check", "Copchase is starting in 10 seconds",
-                                                                "Los Santos Copchase", 10);
+                                                            player.TriggerEvent("SendNotification", "AFK Check", "Chase is starting in 10 seconds",
+                                                                "Race 'n Chase", 10);
                                                         }
                                                     }
                                                 }

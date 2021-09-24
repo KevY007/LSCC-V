@@ -1606,7 +1606,7 @@ mp.events.add(
 
     "playerReady": (player) => {
         mp.events.callRemote("playerReadyCon");
-        mp.game.gxt.set('PM_PAUSE_HDR', 'Los Santos Copchase'); // Replace map title
+        mp.game.gxt.set('PM_PAUSE_HDR', 'Race \'n Chase'); // Replace map title
 
         setInterval(() => {
             if(mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
