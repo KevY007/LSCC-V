@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Resources;
 using GTANetworkAPI;
 using System.Linq;
-using LSCC;
+using RNC;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
@@ -16,7 +16,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Globalization;
 
-namespace LSCC
+namespace RNC
 {
     public partial class jWeaponData
     {
@@ -343,7 +343,7 @@ namespace LSCC
     public static class Settings
     {
         // Static Settings / Const
-        public const string Version = "0.3";
+        public const string Version = "1.0";
         public const int GameRunTime = 390; // Game Running Time in Seconds before STOP
         public const int MaxLobbies = 5; // Default/starting lobby num.
         public const int DefaultMaxInLobby = 30;

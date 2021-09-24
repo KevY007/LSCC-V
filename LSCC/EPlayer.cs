@@ -7,11 +7,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using GTANetworkAPI;
-using LSCC;
+using RNC;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace LSCC
+namespace RNC
 {
     public class ParentData
     {

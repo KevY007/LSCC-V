@@ -156,6 +156,11 @@ mp.events.add('OpenTuner', (vid) => {
             vTuner_Category.SlotID = JSON.parse(JSON.stringify(Number(slots)));
             
             vTuner_Category.Trigger = (function () {
+                if(vTuner_VehicleID != -1) 
+                {
+                    vTuner_Buy.Text = vTuner_Buy.Text + '..';
+                    //vTuner_Buy.ForeColor = new Color(189, 28, 17);
+                }
                 let selection = -1;
                 for(let i = 0; i < vTuner_Category.ItemNames.length; i++)
                 {
@@ -177,7 +182,7 @@ mp.events.add('OpenTuner', (vid) => {
 
     if(vid != -1)
     {
-        vTuner_Buy = new UIMenuItem("Buy: 0 Points", "No components upgraded.");
+        vTuner_Buy = new UIMenuItem("Buy: N/A", "No components upgraded.");
         vTuner_Buy.ForeColor = new Color(220, 10, 10);
         vTuner_Main.AddItem(vTuner_Buy);
         vTuner_Items.push(vTuner_Buy);
@@ -193,11 +198,12 @@ mp.events.add('OpenTuner', (vid) => {
     vTuner_Main.Open();
 });
 
-mp.events.add('UpdateTunerPrice', (points, components) => {
+mp.events.add('UpdateTunerPrice', (pricestr, descstr, r = 220, g = 10, b = 10) => {
     if(vTuner_Main.Visible && vTuner_VehicleID != -1 && vTuner_Buy != null)
     {
-        vTuner_Buy.Text = `Buy: ${points} Points`;
-        vTuner_Buy.Description = `${components == 0 ? "No" : components} components upgraded.`;
+        vTuner_Buy.Text = pricestr;
+        vTuner_Buy.Description = descstr;
+        vTuner_Buy.ForeColor = new Color(r, g, b);
     }
 });
 

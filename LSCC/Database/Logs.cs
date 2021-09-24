@@ -7,7 +7,7 @@ using System.Reflection;
 using GTANetworkAPI;
 using System.Collections.Generic;
 using System.Linq;
-using LSCC;
+using RNC;
 using System.Text.RegularExpressions;
 using System.Runtime.CompilerServices;
 using System.Reflection.Metadata.Ecma335;
@@ -15,7 +15,7 @@ using System.Runtime.InteropServices.ComTypes;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Net.Mail;
 
-namespace LSCC
+namespace RNC
 {
     public class Logs_Admin
     {

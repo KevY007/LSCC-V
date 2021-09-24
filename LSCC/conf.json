@@ -1,7 +1,7 @@
 {
 	"maxplayers" : 100,
 	"name" : "[EN] Race 'n Chase | Minigames! [Copchase][Pursuits][DM][Derby][Freeroam][Minigames]",
-	"gamemode" : "copchase",
+	"gamemode" : "pursuits",
 	"stream-distance" : 1000.0,
 	"announce" : false,
 	"csharp" : "enabled",

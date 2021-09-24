@@ -10,11 +10,11 @@ using Pomelo.EntityFrameworkCore.MySql;
 using Pomelo.EntityFrameworkCore.MySql.Design;
 using System.Reflection;
 using CryptSharp;
-using LSCC;
+using RNC;
 using System.Security.Cryptography;
 using GTANetworkAPI;
 
-namespace LSCC
+namespace RNC
 {
     public class Account
     {

@@ -1,6 +1,6 @@
 ﻿using GTANetworkAPI;
 using System;
-using LSCC;
+using RNC;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Runtime.InteropServices.ComTypes;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Net.Mail;
 
-namespace LSCC
+namespace RNC
 {
     class Events : Script
     {
@@ -246,7 +246,7 @@ namespace LSCC
                 LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
                 if (lobby != null)
                 {
-                    if (lobby.Cops.Contains(player)) LSCC.Commands.cmd_gps(player);
+                    if (lobby.Cops.Contains(player)) RNC.Commands.cmd_gps(player);
                 }
             }
 
@@ -1780,7 +1780,7 @@ namespace LSCC
                     return;
                 }
 
-                acc.Points -= car.PointsRequired;
+                EPlayer.GivePoints(player, -car.PointsRequired);
                 acc.DonatorPoints -= car.DonatorPointsRequired;
                 EPlayer.UnlockVehicle(player, car.Model, car.Team);
                 EPlayer.Notify(player, $"You have unlocked <strong>{car.Name}</strong>. You may select it now.", "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
@@ -1870,7 +1870,7 @@ namespace LSCC
                     return;
                 }
 
-                acc.Points -= loadout.PointsRequired;
+                EPlayer.GivePoints(player, -loadout.PointsRequired);
                 acc.DonatorPoints -= loadout.DonatorPointsRequired;
                 EPlayer.UnlockLoadout(player, loadout.Name, loadout.Team);
                 EPlayer.Notify(player, $"You have unlocked <strong>{loadout.Name}</strong>. You may select it now.", "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
@@ -2778,30 +2778,36 @@ namespace LSCC
             vMods.Remove(16); // Armor
             vMods.Remove(18); // Turbo
 
+            int items = 0;
+
             if (vMods.Count > 0)
             {
                 if (tuning == null)
                 {
-                    player.TriggerEvent("UpdateTunerPrice", vMods.Keys.Count * 50, vMods.Keys.Count);
+                    items = vMods.Keys.Count;
                 }
                 else
                 {
                     var oldMods = NAPI.Util.FromJson<Dictionary<int, int>>(tuning.Mods);
-                    int changes = 0;
+                    items = 0;
 
                     foreach (var key1 in vMods)
                     {
                         int oldVal = -1;
                         if (oldMods.TryGetValue(key1.Key, out oldVal))
                         {
-                            if (key1.Value != oldVal && oldVal != -1 && key1.Value != -1) changes++;
+                            if (key1.Value != oldVal && oldVal != -1 && key1.Value != -1) items++;
                         }
-                        else if (key1.Value != -1) changes++;
+                        else if (key1.Value != -1) items++;
                     }
-                    player.TriggerEvent("UpdateTunerPrice", changes * 50, changes);
                 }
             }
-            else player.TriggerEvent("UpdateTunerPrice", 0, 0);
+
+            if (items >= 3)
+            {
+                player.TriggerEvent("UpdateTunerPrice", $"Buy: {((items != 0) ? ($"{items * 10} Donator Points") : ("N/A"))}", $"{(items == 0 ? "No" : items.ToString())} components changed.", 235, 205, 12);
+            }
+            else player.TriggerEvent("UpdateTunerPrice", $"Buy: {((items != 0) ? ($"{items * 50} Points") : ("N/A") )}", $"{(items == 0 ? "No" : items.ToString())} components changed.", 220, 10, 10);
         }
 
         [RemoteEvent("RequestSaveVehicleMod")]
@@ -2830,12 +2836,24 @@ namespace LSCC
             {
                 if (tuning == null)
                 {
-                    if(acc.Points < (vMods.Keys.Count * 50))
+                    if (vMods.Keys.Count >= 3)
                     {
-                        EPlayer.Error(player, $"You need {(vMods.Keys.Count * 50) - acc.Points} more points for this upgrade!", "fas fa-lock");
-                        return;
+                        if (acc.DonatorPoints < (vMods.Keys.Count * 10))
+                        {
+                            EPlayer.Error(player, $"You need {(vMods.Keys.Count * 10) - acc.DonatorPoints} more donator points for this upgrade! You can only purchase max 2 components with standard points.", "fas fa-lock");
+                            return;
+                        }
+                        acc.DonatorPoints -= (vMods.Keys.Count * 10);
                     }
-                    acc.Points -= (vMods.Keys.Count * 50);
+                    else
+                    {
+                        if (acc.Points < (vMods.Keys.Count * 50))
+                        {
+                            EPlayer.Error(player, $"You need {(vMods.Keys.Count * 50) - acc.Points} more points for this upgrade!", "fas fa-lock");
+                            return;
+                        }
+                        EPlayer.GivePoints(player, -(vMods.Keys.Count * 50));
+                    }
                     EPlayer.Notify(player, $"Modifications saved!", "green", "fas fa-check", false, 2500, "topCenter");
 
                     tuning = new PlayerTunings
@@ -2866,12 +2884,24 @@ namespace LSCC
                         else if (key1.Value != -1) changes++;
                     }
 
-                    if (acc.Points < (changes * 50))
+                    if (changes >= 3)
                     {
-                        EPlayer.Error(player, $"You need {(changes * 50) - acc.Points} more points for this upgrade!", "fas fa-lock");
-                        return;
+                        if (acc.DonatorPoints < (changes * 10))
+                        {
+                            EPlayer.Error(player, $"You need {(changes * 10) - acc.DonatorPoints} more donator points for this upgrade! You can only purchase max 2 components with standard points.", "fas fa-lock");
+                            return;
+                        }
+                        acc.DonatorPoints -= (changes * 10);
                     }
-                    acc.Points -= (changes * 50);
+                    else
+                    {
+                        if (acc.Points < (changes * 50))
+                        {
+                            EPlayer.Error(player, $"You need {(changes * 50) - acc.Points} more points for this upgrade!", "fas fa-lock");
+                            return;
+                        }
+                        EPlayer.GivePoints(player, -(changes * 50));
+                    }
                     EPlayer.Notify(player, $"Modifications saved!", "green", "fas fa-check", false, 2500, "topCenter");
 
                     tuning.PrimaryColor = priCol;

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
-namespace LSCC
+namespace RNC
 {
     class Commands : Script
     {
@@ -446,12 +446,12 @@ namespace LSCC
         {
             player.SendChatMessage("!{FFFF00}============| SERVER INFORMATION |============");
 
-            player.SendChatMessage("!{#ffae00}Race !{#FFFFFF}'n !{##0097ff}Chase !{#FFFFFF}v" + Settings.Version);
-            player.SendChatMessage("!{#FF6347}Server Discord: !{#FFFFFF}discord.gg/y3g2WuR");
-            player.SendChatMessage("!{#FFFF00}Website: !{#FFFFFF}www.racenchase.com");
+            player.SendChatMessage("!{#ffae00}Race !{#FFFFFF}'n !{#0097FF}Chase !{#FFFFFF}v" + Settings.Version);
+            player.SendChatMessage("!{#FF6347}Server Discord: !{#0097FF}discord.gg/y3g2WuR");
+            player.SendChatMessage("!{#FFFF00}Website: !{#FFAE00}www.racenchase.com");
             player.SendChatMessage("  ");
             player.SendChatMessage("!{#FFFFFF}Developers: !{#FF6347}KevY (Lead), jambredrek (Game) and RotX (Web)");
-            player.SendChatMessage("!{#FFFFFF}Thanks to all those participated in !{#FF6347}beta testing and early launch!{#FFFFFF}.");
+            player.SendChatMessage("!{#FFFFFF}Thanks to all those who participated in !{#FF6347}beta testing and early launch!{#FFFFFF}.");
             player.SendChatMessage("  ");
             return;
         }
@@ -3878,7 +3878,7 @@ namespace LSCC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            player.SendChatMessage("!{#0079DB}[!{#ffae00}Race !{#FFFFFF}'n !{##0097ff}Chase !{#2BA3FF}Commands]:");
+            player.SendChatMessage("!{#FFFFFF}[!{#ffae00}Race !{#FFFFFF}'n !{#0097ff}Chase !{#FFFFFF}Commands]:");
             player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /keys /admins /rules /id");
             player.SendChatMessage("[General]: /report /helpme /l(ow) /c(ar)w(hisper) /s(hout)");
             player.SendChatMessage("[Squad/Partner]: /squad /squadleave /s(quad)c(hat) /squadaccept /squadmembers");
@@ -5567,10 +5567,15 @@ namespace LSCC
             player.TriggerEvent("ResolveJS", eventt);
         }
 
-        [Command("vtuner")]
+        [Command("vtuner", "!{#AFAFAF}[USAGE] vtuner (name) | Where 'name' must be same as in menu car selection", GreedyArg = true)]
         public void cmd_vtuner(Player player, string vmodel)
         {
             if (player.GetData<bool>("Tuner_Using") == true) return;
+
+            foreach(var car in Settings.Cars)
+            {
+                if (car.Name.Equals(vmodel, StringComparison.OrdinalIgnoreCase)) vmodel = car.Model;
+            }
 
             if (player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("InLobby") != -4)
             {

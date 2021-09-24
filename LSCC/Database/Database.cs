@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Reflection;
 
-namespace LSCC
+namespace RNC
 {
     public class Language
     {

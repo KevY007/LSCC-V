@@ -11,7 +11,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace LSCC
+namespace RNC
 {
     class Discord : Script
     {
@@ -255,7 +255,7 @@ namespace LSCC
 
                     foreach (LobbyData p in Settings.Lobbies)
                     {
-                        builder.AddField(p.lobbyId.ToString(), LSCC.Main.ConvertGameStatus(p.gameStatus, false) + " | " + Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == p.lobbyId).ToString() + " Players", true);
+                        builder.AddField(p.lobbyId.ToString(), RNC.Main.ConvertGameStatus(p.gameStatus, false) + " | " + Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == p.lobbyId).ToString() + " Players", true);
                     }
 
                     var embed = builder.Build();

@@ -186,7 +186,7 @@ $(document).ready(function()
 	chat.loaded = true;
 	
     $(".ui_element").show();
-	chatAPI.push("!{#A9C4E4}Connected to !{#ffae00}Race !{#FFFFFF}'n !{##0097ff}Chase!{#A9C4E4}.");
+	chatAPI.push("!{#A9C4E4}Connected to !{#ffae00}Race !{#FFFFFF}'n !{#0097ff}Chase!{#A9C4E4}.");
 
 	window.addEventListener("wheel", function(event)
 	{
