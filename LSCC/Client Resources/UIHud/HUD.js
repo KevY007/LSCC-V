@@ -508,6 +508,11 @@ mp.events.add("render", () => {
     
     mp.game.ui.hideHudComponentThisFrame(7); // area name
     mp.game.ui.hideHudComponentThisFrame(9); // street name
+    mp.game.ui.hideHudComponentThisFrame(6); // vehicle name
+    mp.game.ui.hideHudComponentThisFrame(8); // vehicle class
+    mp.game.ui.hideHudComponentThisFrame(3); // cash
+    mp.game.ui.hideHudComponentThisFrame(4); // mp_cash
+    mp.game.ui.displayAmmoThisFrame(false); // HIDE AMMO
 
     if(mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
     {       
