@@ -4409,7 +4409,7 @@ namespace LSCC
 
             ContextFactory.Instance.SaveChanges();
 
-            EPlayer.SetDiscordStatus(target, "Suspended from LS-CC.");
+            EPlayer.SetDiscordStatus(target, "Suspended from RnC.");
 
             RAGE.Entities.Players.All.ForEach((Player p) =>
             {

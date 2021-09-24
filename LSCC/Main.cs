@@ -1592,10 +1592,11 @@ namespace LSCC
 
                         foreach (Player i in lobby.Fugitives)
                         {
+                            if (lobby.GameProgress <= 40) continue;
                             // Reward
                             EPlayer.GetAccount(i).Escapes++;
                             EPlayer.GrantXP(i, 5);
-                            EPlayer.GivePoints(i, 2);
+                            EPlayer.GivePoints(i, 5);
                             i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.3);
                         }
                         break;
@@ -1605,6 +1606,7 @@ namespace LSCC
 
                         foreach (Player i in lobby.Fugitives)
                         {
+                            if (lobby.GameProgress <= 40) continue;
                             // Reward
                             EPlayer.GrantXP(i, 3);
                             EPlayer.GivePoints(i, 2);
@@ -1617,6 +1619,7 @@ namespace LSCC
 
                         foreach (Player i in lobby.Cops)
                         {
+                            if (lobby.GameProgress <= 40) continue;
                             // Reward
                             EPlayer.GrantXP(i, 4);
                             EPlayer.GivePoints(i, 2);

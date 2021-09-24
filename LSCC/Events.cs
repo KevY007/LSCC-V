@@ -31,7 +31,7 @@ namespace LSCC
 
                 player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
-                EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.ls-cc.info) or consult on discord server at discord.gg/y3g2WuR</p><p>Your ban ID is {ban.SQL_ID}.</p>", "red", "fas fa-ban", true, 30000);
+                EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Your ban ID is {ban.SQL_ID}.</p>", "red", "fas fa-ban", true, 30000);
 
                 NAPI.Task.Run(() =>
                 {
@@ -1036,7 +1036,7 @@ namespace LSCC
                 player.SendChatMessage($"!{{#FF6347}}[BANNED] You are not allowed to play on this server, Ban ID: {ban.SQL_ID}");
                 player.SendChatMessage("!{#A9C4E4}KevY is surprised how you made it this far though.");
 
-                EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.ls-cc.info) or consult on discord server at discord.gg/y3g2WuR</p><p>Your ban ID is {ban.SQL_ID}.</p>", "red", "fas fa-ban", true, 30000);
+                EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Your ban ID is {ban.SQL_ID}.</p>", "red", "fas fa-ban", true, 30000);
 
                 player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
