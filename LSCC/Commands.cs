@@ -1030,6 +1030,43 @@ namespace RNC
             return;
         }
 
+        [Command("setcaralpha", "!{#AFAFAF}[USAGE] setcaralpha (target) (0-255)")]
+        public void cmd_setcaralpha(Player player, Player target, int alpha)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+            if (alpha < 0 || alpha > 255)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You good? This shit finna bring us to 4D, tone it down between 0-255.");
+                return;
+            }
+            if(!target.IsInVehicle)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The target is not in any vehicle.");
+                return;
+            }
+
+            target.Vehicle.SetSharedData("EntAlpha", alpha);
+            Logs.LogAdmin(player, $"Set {target.Name}'s vehicle alpha to {alpha}.");
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has set {target.Name}'s vehicle alpha (transparency) to {alpha}.");
+            return;
+        }
+
+        [Command("chances", Alias = "fugichance,fugitivechance,fugitivechances,chance")]
+        public void cmd_chances(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+           
+            player.SendChatMessage("!{#f0c311}Chance of becoming a fugitive next round: !{#FFFFFF}" + player.GetSharedData<float>("FugitiveChance").ToString("N2") + "%");
+            player.SendChatMessage("!{#fa65b0}Highest chance in lobby: !{#FFFFFF}" + Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")).OrderByDescending(a => a.GetSharedData<float>("FugitiveChance")).First().GetSharedData<float>("FugitiveChance").ToString("N2") + "%");
+        }
+
         [Command("togcols", "!{#AFAFAF}[USAGE] togcols (target)")]
         public void cmd_togcollision(Player player, Player target)
         {
@@ -3883,7 +3920,7 @@ namespace RNC
             player.SendChatMessage("[General]: /report /helpme /l(ow) /c(ar)w(hisper) /s(hout)");
             player.SendChatMessage("[Squad/Partner]: /squad /squadleave /s(quad)c(hat) /squadaccept /squadmembers");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
-            player.SendChatMessage("[Lobby]: /lobbychat (/lo,/lg) /spec /specoff");
+            player.SendChatMessage("[Lobby]: /lobbychat (/lo,/lg) /spec /specoff /(fugitive)chances");
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats /changemypass");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys for activation)");
             player.SendChatMessage("!{#339BC4}[Cop!{#F24C27}chase]: !{#FFFFFF}/r(adio) /wt");
@@ -5062,7 +5099,7 @@ namespace RNC
             {
                 player.SendChatMessage("[Admin Lv 3]: /givegun(all) /gotopos /bringall /sethpall /(un)freezeall /r(emove)g(uns)f(rom)a(ll)");
                 player.SendChatMessage("[Admin Lv 3]: /givecomp /takecomp /attachcomp /grantfugitive /setspawn (freeroam world)");
-                player.SendChatMessage("[Admin Lv 3]: /getip /gethwid /getsc /motdall /setalpha");
+                player.SendChatMessage("[Admin Lv 3]: /getip /gethwid /getsc /motdall /set(car)alpha");
             }
             if (EPlayer.GetAccount(player).Admin >= 4)
             {

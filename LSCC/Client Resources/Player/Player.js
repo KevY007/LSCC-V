@@ -585,6 +585,7 @@ mp.events.add('render', () => {
 
     if(Date.now() - updateChecker >= updateRate)
     {
+        mp.events.callLocal("UpdateRateEvent");
         updateChecker = Date.now();
 
         secondCounter++;

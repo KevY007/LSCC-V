@@ -1,5 +1,3 @@
-const updateInterval = 1000; 
-
 const Natives = {
     IS_RADAR_HIDDEN: "0x157F93B036700462",
     IS_RADAR_ENABLED: "0xAF754F20EB5CD51A",
@@ -9,15 +7,17 @@ const Natives = {
 let minimap = {};
 let lastSpeed = 0;
 
-var visibleTick = Date.now();
-var visibleCount = 0;
-var visibleText = "KEVYISGAY";
+var resolution = mp.game.graphics.getScreenActiveResolution(0,0);
 
-var resolution = mp.game.graphics.getScreenResolution(0,0);
-var res_X = resolution.x;
-var res_Y = resolution.y;
-let bestlobbystr = "N/A";
-let dirtext = "NW";
+let miniHUDVars = {
+    visible: false,
+    voice: "Standby",
+    direction: "N/A",
+    street: "N/A",
+    zone: "N/A",
+    jailed: false,
+    jail: "N/A"
+};
 
 // Scoreboard
 let updater = null;
@@ -54,6 +54,8 @@ function getMinimapAnchor() {
     return minimap;
 }
 
+
+
 function drawText(text, drawXY, font, color, scale, alignRight = false) {
     mp.game.ui.setTextEntry("STRING");
     mp.game.ui.addTextComponentSubstringPlayerName(text);
@@ -86,23 +88,6 @@ function TimeFormat(time)
     ret += "" + secs;
     return ret;
 }
-
-setInterval(() => {
-    // only do stuff if radar is enabled and visible
-    if (mp.game.invoke(Natives.IS_RADAR_ENABLED) && !mp.game.invoke(Natives.IS_RADAR_HIDDEN)) {
-        isMetric = mp.game.gameplay.getProfileSetting(227) == 1;
-        minimap = getMinimapAnchor();
-
-        const position = mp.players.local.position;
-        let getStreet = mp.game.pathfind.getStreetNameAtCoord(position.x, position.y, position.z, 0, 0);
-
-        zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(position.x, position.y, position.z));
-        streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
-    } else {
-        streetName = null;
-        zoneName = null;
-    }
-}, updateInterval);
 
 mp.keys.bind(
     0x76,
@@ -144,7 +129,71 @@ mp.events.add('RestartHUD', () => {
 
     UIHud = mp.browsers.new("package://UIHud/index.html");
     UIHud.execute(`gm.hud = false;`);
-    UIHud.execute(`gm.topRightInfo = ${mp.storage.data.menu.topRightInfo}; gm.killFeed = ${mp.storage.data.menu.killFeed};`);
+});
+
+
+
+mp.events.add('browserDomReady', (browser) => {
+    if(UIHud != null && browser == UIHud)
+    {
+        // Set vars that aren't reset on login and shit. Basically init().
+        UIHud.execute(`gm.topRightInfo = ${mp.storage.data.menu.topRightInfo}; gm.killFeed = ${mp.storage.data.menu.killFeed};`);
+        UIHud.execute(`gm.$refs.MiniHud.items = [];`);
+
+        // Initialize miniHUD
+        let miniHUD = { 
+            bottom: ((resolution.y - (getMinimapAnchor().bottomY * resolution.y)) + 0), 
+            left: ((getMinimapAnchor().rightX * resolution.x) + 10)
+        }; // miniHUD["bottom"], miniHUD["left"]
+
+        UIHud.execute(`gm.$refs.MiniHud.left = "${miniHUD.left}px";`);
+        UIHud.execute(`gm.$refs.MiniHud.bottom = "${miniHUD.bottom}px";`);       
+
+        UIHud.execute(`gm.$refs.MiniHud.items.push({
+            name: "jail",
+            icon: "fa-solid fa-ban",
+            init: "N/A",
+            color: "#c73228"
+        });`);
+
+        UIHud.execute(`gm.$refs.MiniHud.items.push({
+            name: "visible",
+            icon: "fa-solid fa-globe",
+            init: "Visible",
+            color: "#65e9fa"
+        });`);
+
+        UIHud.execute(`gm.$refs.MiniHud.items.push({
+            name: "voice",
+            icon: "fa-solid fa-microphone",
+            init: "Standby",
+            color: "#c365fa"
+        });`);
+
+        UIHud.execute(`gm.$refs.MiniHud.items.push({
+            name: "direction",
+            icon: "fa-solid fa-compass",
+            init: "N/A",
+            color: "#c3fa65"
+        });`);
+
+        UIHud.execute(`gm.$refs.MiniHud.items.push({
+            name: "street",
+            icon: "fa-solid fa-location-dot",
+            init: "N/A",
+            color: "#fae165"
+        });`);
+
+        UIHud.execute(`gm.$refs.MiniHud.items.push({
+            name: "zone",
+            icon: "fa-solid fa-location-crosshairs",
+            init: "N/A",
+            color: "#fa65b0"
+        });`);
+        
+        UIHud.execute(`gm.$refs.MiniHud.$refs.jail.show = ${miniHUDVars["jailed"]};`);
+        UIHud.execute(`gm.$refs.MiniHud.$refs.visible.show = false;`);
+    }
 });
 
 mp.events.add('ToggleHud', (toggle) => {
@@ -167,11 +216,25 @@ mp.events.add("pushToKillFeed2", (victim, color, cause) => {
     if(UIHud != null) UIHud.execute(`gm.$refs.TopRight.$refs.KillFeed.add("${victim}", "${color}", "${cause}");`)
 });
 
-mp.events.add("OneSecondEvent", () => {
+mp.events.add("UpdateRateEvent", () => {
+
+    // only do stuff if radar is enabled and visible
+    let streetName = "N/A";
+    let zoneName = "N/A";
+    if (mp.game.invoke(Natives.IS_RADAR_ENABLED) && !mp.game.invoke(Natives.IS_RADAR_HIDDEN)) {
+        minimap = getMinimapAnchor();
+
+        const position = mp.players.local.position;
+        let getStreet = mp.game.pathfind.getStreetNameAtCoord(position.x, position.y, position.z, 0, 0);
+
+        zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(position.x, position.y, position.z));
+        streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
+    }
+    
     if(UIHud != null && (!(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false || mp.players.local.Lobby === undefined)))
     {
-        UIHud.execute(`gm.$refs.TopRight.$refs.Info.onlinePlayers = ${mp.players.length};`);
-
+        UIHud.execute(`gm.$refs.TopRight.$refs.Info.points = ${mp.players.local.getVariable("Points")};`);
+        
         let lobbyStr = "";
         
         let lobbyPlayers = 0;
@@ -189,6 +252,104 @@ mp.events.add("OneSecondEvent", () => {
         if(mp.players.local.Lobby > -1) lobbyStr = mp.players.local.Lobby.toString();
         
         UIHud.execute(`gm.$refs.TopRight.$refs.Info.lobbyID = "${lobbyStr}";`);
+
+        let camera = mp.cameras.new("gameplay");
+        let cameraDirection = camera.getDirection();
+        let dirtext = "N/A";
+
+        if (0.3 < cameraDirection.x && 0.3 < cameraDirection.y) {
+            dirtext = "NE";
+        }
+        else if (cameraDirection.x < -0.3 && 0.3 < cameraDirection.y) {
+            dirtext = "NW";
+        }
+        else if (0.3 < cameraDirection.x && cameraDirection.y < -0.3) {
+            dirtext = "SE";
+        }
+        else if (cameraDirection.x < -0.3 && cameraDirection.y < -0.3) {
+            dirtext = "SW";
+        }
+        else if (-0.3 < cameraDirection.x && cameraDirection.x < 0.3 && cameraDirection.y < -0.3) {
+            dirtext = "S";
+        }
+        else if (cameraDirection.x < -0.3 && -0.3 < cameraDirection.y && cameraDirection.y < 0.3) {
+            dirtext = "W";
+        }
+        else if (0.3 < cameraDirection.x && -0.3 < cameraDirection.y && cameraDirection.y < 0.3) {
+            dirtext = "E";
+        }
+        else if (-0.3 < cameraDirection.x && cameraDirection.x < 0.3 && cameraDirection.y > 0.3) {
+            dirtext = "N";
+        }
+        camera.destroy(true);
+
+        let voiceString = "Disabled";
+                
+        if(mp.players.local.getVariable("VoiceMode") == 0)
+        {
+            voiceString = mp.voiceChat.muted ? "Standby" : "Speaking";
+        }
+        else if(mp.players.local.getVariable("VoiceMode") == 1)
+        {
+            voiceString = mp.voiceChat.muted ? "Standby (Team)" : "Speaking (Team)";
+        }
+        else if(mp.players.local.getVariable("VoiceMode") == 2)
+        {
+            voiceString = mp.voiceChat.muted ? "Standby (Squad)" : "Speaking (Squad)";
+        }
+
+        if(currentMuteTime >= 1)
+        {
+            voiceString = `Muted for ${TimeFormat(currentMuteTime)}`;
+        }
+
+        let jailString = "N/A";
+        if(currentJailTime >= 1)
+        {
+            jailString = `Jailed for ${TimeFormat(currentJailTime)}`;
+        }
+
+        if(mp.players.local.getVariable("VisibleBlip") != miniHUDVars["visible"])
+        {
+            miniHUDVars["visible"] = mp.players.local.getVariable("VisibleBlip");
+            UIHud.execute(`gm.$refs.MiniHud.$refs.visible.show = ${miniHUDVars["visible"]};`);
+        }
+        if(voiceString != miniHUDVars["voice"])
+        {
+            miniHUDVars["voice"] = voiceString;
+            UIHud.execute(`gm.$refs.MiniHud.$refs.voice.value = "${miniHUDVars["voice"]}";`);
+        }
+        if(dirtext != miniHUDVars["direction"])
+        {
+            miniHUDVars["direction"] = dirtext;
+            UIHud.execute(`gm.$refs.MiniHud.$refs.direction.value = "${miniHUDVars["direction"]}";`);
+        }
+        if(streetName != miniHUDVars["street"])
+        {
+            miniHUDVars["street"] = streetName;
+            UIHud.execute(`gm.$refs.MiniHud.$refs.street.value = "${miniHUDVars["street"]}";`);
+        }
+        if(zoneName != miniHUDVars["zone"])
+        {
+            miniHUDVars["zone"] = zoneName;
+            UIHud.execute(`gm.$refs.MiniHud.$refs.zone.value = "${miniHUDVars["zone"]}";`);
+        }
+
+        if(currentJailTime >= 1)
+        {
+            if(miniHUDVars["jailed"] != true)
+            {
+                miniHUDVars["jailed"] = true;
+                UIHud.execute(`gm.$refs.MiniHud.$refs.jail.show = ${miniHUDVars["jailed"]};`);
+            }
+            miniHUDVars["jail"] = jailString;
+            UIHud.execute(`gm.$refs.MiniHud.$refs.jail.value = "${miniHUDVars["jail"]}";`);
+        }
+        else if(miniHUDVars["jailed"] == true)
+        {
+            miniHUDVars["jailed"] = false;
+            UIHud.execute(`gm.$refs.MiniHud.$refs.jail.show = ${miniHUDVars["jailed"]};`);
+        }
     }
 });
 
@@ -348,231 +509,14 @@ mp.events.add("render", () => {
     mp.game.ui.hideHudComponentThisFrame(7); // area name
     mp.game.ui.hideHudComponentThisFrame(9); // street name
 
-    if(Date.now() - visibleTick >= 1000)
-    {
-        visibleTick = Date.now();
-        
-
-        visibleCount++;
-        visibleText = "~r~~h~BLIP VISIBLE~o~!";
-
-        if(visibleCount >= 2)
-        {
-            visibleCount = 0;
-            visibleText = "~r~~h~BLIP VISIBLE";
-        }
-
-        var camera = mp.cameras.new("gameplay");
-        var cameraDirection = camera.getDirection();
-
-        if (0.3 < cameraDirection.x && 0.3 < cameraDirection.y) {
-            dirtext = "NE";
-        }
-        else if (cameraDirection.x < -0.3 && 0.3 < cameraDirection.y) {
-            dirtext = "NW";
-        }
-        else if (0.3 < cameraDirection.x && cameraDirection.y < -0.3) {
-            dirtext = "SE";
-        }
-        else if (cameraDirection.x < -0.3 && cameraDirection.y < -0.3) {
-            dirtext = "SW";
-        }
-        else if (-0.3 < cameraDirection.x && cameraDirection.x < 0.3 && cameraDirection.y < -0.3) {
-            dirtext = "S";
-        }
-        else if (cameraDirection.x < -0.3 && -0.3 < cameraDirection.y && cameraDirection.y < 0.3) {
-            dirtext = "W";
-        }
-        else if (0.3 < cameraDirection.x && -0.3 < cameraDirection.y && cameraDirection.y < 0.3) {
-            dirtext = "E";
-        }
-        else if (-0.3 < cameraDirection.x && cameraDirection.x < 0.3 && cameraDirection.y > 0.3) {
-            dirtext = "N";
-        }
-        camera.destroy(true);
-        
-        bestlobbystr = "";
-        if(!(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false || mp.players.local.Lobby === undefined))
-        {
-            let lobbyPlayers = 0;
-            mp.players.forEach((pl) => {
-                if(!(pl.LoggedIn === undefined || pl.LoggedIn == false || pl.Lobby === undefined))
-                {
-                    if(pl.Lobby == mp.players.local.Lobby) lobbyPlayers++;
-                }
-            });
-
-            if(mp.players.local.Lobby == -2) bestlobbystr = "~r~Jail";
-            if(mp.players.local.Lobby == -3) bestlobbystr = "~g~Freeroam";
-            if(mp.players.local.Lobby == -4)
-            {
-                bestlobbystr = "~y~Derby " + "~w~| ~w~Participants: ~y~" + lobbyPlayers;
-            }
-            if(mp.players.local.Lobby == -5) bestlobbystr = "~r~Player Customizer";
-            if(mp.players.local.Lobby > -1) 
-            {
-                bestlobbystr = "~w~Lobby ~y~" + mp.players.local.Lobby.toString() + "  ~w~|  ~w~Players: ~y~" + lobbyPlayers;
-            }
-        }
-    }
-
     if(mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
-    {
-        if (currentJailTime >= 1)
+    {       
+        /*if(((vehicle.getSpeed() * 3.6).toFixed(0) % 2 == 0 || (vehicle.getSpeed() * 3.6).toFixed(0) % 5 == 0) || 
+            (vehicle.getSpeed() * 3.6).toFixed(0) == 0)
         {
-            drawText(`~y~JAILED: ~w~${TimeFormat(currentJailTime)}`, [minimap.rightX + 0.0385, minimap.bottomY - 0.130], 4, [204, 204, 204, 255], 1.3);
+            lastSpeed = (vehicle.getSpeed() * 3.6).toFixed(0);
         }
-        else
-        {
-            if (streetName && zoneName && showHud) {
 
-                let vehicle = mp.players.local.vehicle;
-                var pX = 0.0;
-                var pY = 0.0;
-                var sX = 0.0;
-                var sY = 0.0;
-                
-                if (vehicle) 
-                {
-                    if(mp.players.local.getVariable("VisibleBlip") == true)
-                    {
-                        if(mp.players.local.getVariable("ActionType") == "none")
-                        {
-                            pX = minimap.rightX + 0.0875;
-                            pY = minimap.topY + 0.100;
-                            sX = 0.165;
-                            sY = 0.15;
-                        }
-                        else
-                        {
-                            pX = minimap.rightX + 0.0875;
-                            pY = minimap.topY + 0.090;
-                            sX = 0.165;
-                            sY = 0.17;   
-                            drawText(`~y~Action: ~w~${firstLetterUpper(mp.players.local.getVariable("ActionType"))} ~b~| ~y~Time: ${mp.players.local.getVariable("ActionTime") > 3 ? "~o~" : "~g~"}${mp.players.local.getVariable("ActionTime")}`, [minimap.rightX + 0.0085, minimap.bottomY - 0.171], 0, [204, 204, 204, 255], 0.38);                        
-                        }
-
-                        drawText(visibleText, [minimap.rightX + 0.0085, minimap.bottomY - 0.152], 0, [204, 204, 204, 255], 0.40);
-                    }
-                    else
-                    {
-                        if(mp.players.local.getVariable("ActionType") == "none")
-                        {
-                            pX = minimap.rightX + 0.0875;
-                            pY = minimap.topY + 0.110;
-                            sX = 0.165;
-                            sY = 0.13;
-                        }
-                        else
-                        {
-                            pX = minimap.rightX + 0.0875;
-                            pY = minimap.topY + 0.100;
-                            sX = 0.165;
-                            sY = 0.15;      
-                            
-                            drawText(`~y~Action: ~w~${firstLetterUpper(mp.players.local.getVariable("ActionType"))} ~b~| ~y~Time: ${mp.players.local.getVariable("ActionTime") > 3 ? "~o~" : "~g~"}${mp.players.local.getVariable("ActionTime")}`, [minimap.rightX + 0.0085, minimap.bottomY - 0.150], 0, [204, 204, 204, 255], 0.38);
-                        }
-                    }
-
-                    if(((vehicle.getSpeed() * 3.6).toFixed(0) % 2 == 0 || (vehicle.getSpeed() * 3.6).toFixed(0) % 5 == 0) || 
-                        (vehicle.getSpeed() * 3.6).toFixed(0) == 0)
-                    {
-                        lastSpeed = (vehicle.getSpeed() * 3.6).toFixed(0);
-                    }
-
-                    drawText(`~y~${lastSpeed} ~w~KM/H`, [minimap.rightX + 0.0085, minimap.bottomY - 0.130], 4, [204, 204, 204, 255], 0.7);
-                }
-                else
-                {
-                    if(mp.players.local.getVariable("VisibleBlip") == true)
-                    {
-                        if(mp.players.local.getVariable("ActionType") == "none")
-                        {
-                            pX = minimap.rightX + 0.0875;
-                            pY = minimap.topY + 0.110;
-                            sX = 0.1625;
-                            sY = 0.1293;
-                        }
-                        else
-                        {
-                            pX = minimap.rightX + 0.0875;
-                            pY = minimap.topY + 0.100;
-                            sX = 0.1625;
-                            sY = 0.1486;
-                            drawText(`~y~Action: ~w~${firstLetterUpper(mp.players.local.getVariable("ActionType"))} ~b~| ~y~Time Left: ${mp.players.local.getVariable("ActionTime") > 3 ? "~o~" : "~g~"}${mp.players.local.getVariable("ActionTime")}`, [minimap.rightX + 0.0085, minimap.bottomY - 0.1525], 0, [204, 204, 204, 255], 0.35);
-                        }
-
-                        drawText(visibleText, [minimap.rightX + 0.0085, minimap.bottomY - 0.1315], 0, [204, 204, 204, 255], 0.35);
-                    }
-                    else
-                    {
-                        if(mp.players.local.getVariable("ActionType") == "none")
-                        {
-                            pX = minimap.rightX + 0.0875;
-                            pY = minimap.topY + 0.120;
-                            sX = 0.1625;
-                            sY = 0.110;
-                        }
-                        else
-                        {
-                            pX = minimap.rightX + 0.0875;
-                            pY = minimap.topY + 0.110;
-                            sX = 0.1625;
-                            sY = 0.1293;
-                            drawText(`~y~Action: ~w~${firstLetterUpper(mp.players.local.getVariable("ActionType"))} ~b~| ~y~Time Left: ${mp.players.local.getVariable("ActionTime") > 3 ? "~o~" : "~g~"}${mp.players.local.getVariable("ActionTime")}`, [minimap.rightX + 0.0085, minimap.bottomY - 0.1315], 0, [204, 204, 204, 255], 0.35);
-                        }                        
-                    }
-                }
-
-                mp.game.graphics.drawRect(pX, pY, sX, sY, 0, 0, 0, 150);
-
-                if(!mp.players.local.isInAnyVehicle(false))
-                    drawText(`~r~Fugitive Chance: ~w~${mp.players.local.getVariable("FugitiveChance").toFixed(1)}%`, [minimap.rightX + 0.0085, minimap.bottomY - 0.110], 0, [204, 204, 204, 255], 0.28);
-                else
-                    drawText(`~r~Fugitive Chance: ~w~${mp.players.local.getVariable("FugitiveChance").toFixed(1)}%`, [minimap.rightX + 0.072, minimap.bottomY - 0.116], 0, [204, 204, 204, 255], 0.28);
-
-                drawText(`~y~Points: ~w~${mp.players.local.getVariable("Points")}`, [minimap.rightX + 0.087, minimap.bottomY - 0.032], 0, [204, 204, 204, 255], 0.35);
-
-                let voiceString = "Voice: ~r~Disabled";
-                
-                if(mp.players.local.getVariable("VoiceMode") == 0)
-                {
-                    voiceString = mp.voiceChat.muted ? "Voice: ~w~Standby" : "Voice: ~g~Speaking";
-                }
-                else if(mp.players.local.getVariable("VoiceMode") == 1)
-                {
-                    voiceString = mp.voiceChat.muted ? "Voice: ~w~Standby (T)" : "Voice: ~g~Speaking (T)";
-                }
-                else if(mp.players.local.getVariable("VoiceMode") == 2)
-                {
-                    voiceString = mp.voiceChat.muted ? "Voice: ~w~Standby (S)" : "Voice: ~g~Speaking (S)";
-                }
-
-                if(currentMuteTime >= 1)
-                {
-                    voiceString = `~r~Muted for ${TimeFormat(currentMuteTime)}`;
-                }
-
-                drawText(voiceString, [minimap.rightX + 0.0085, minimap.bottomY - 0.095], 4, [63, 135, 240, 255], 0.50);
-                drawText(streetName, [minimap.rightX + 0.0085, minimap.bottomY - 0.065], 4, [204, 204, 204, 255], 0.465);
-                drawText(zoneName, [minimap.rightX + 0.0085, minimap.bottomY - 0.035], 4, [255, 255, 255, 255], 0.48);
-
-                mp.game.graphics.drawText(bestlobbystr, [minimap.rightX + 0.121, minimap.bottomY - 0.0625], {
-                    font:4, 
-                    color:[255, 255, 255, 200],
-                    scale: [0.40, 0.40],
-                    outline: true,
-                    centre: true }
-                );
-
-                mp.game.graphics.drawText("~y~" + dirtext + " ~w~| " + "Online: " + mp.players.length, [minimap.rightX + 0.119, minimap.bottomY - 0.090], {
-                    font:4, 
-                    color:[255, 255, 255, 200],
-                    scale: [0.37, 0.37],
-                    outline: true,
-                    centre: true }
-                );
-            }
-        }
+        drawText(`~y~${lastSpeed} ~w~KM/H`, [minimap.rightX + 0.0085, minimap.bottomY - 0.130], 4, [204, 204, 204, 255], 0.7);;*/
     }
 });
