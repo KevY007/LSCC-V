@@ -2451,6 +2451,12 @@ namespace RNC
                         int time = 18000;
                         target.TriggerEvent("setToRagdoll", time, time * 2, 1, false, false, false);
                         target.SetData("TasedTill", Environment.TickCount64 + 18000);
+
+                        foreach(Player pl in NAPI.Pools.GetAllPlayers().Where(p => p.Position.DistanceTo(target.Position) < 15f))
+                        {
+                            pl.TriggerEvent("ShowHandcuffTooltip");
+                        }
+
                         Commands.cmd_do(player, $"{target.Name} has been tased and has been rendered immobile.");
                     }
                 }

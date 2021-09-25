@@ -94,6 +94,18 @@ mp.events.add('entityStreamIn', (entity) => {
     }
 });
 
+var HandcuffTooltipTime = 0;
+var HandcuffTooltipShown = false;
+
+mp.events.add("ShowHandcuffTooltip", () => {
+    HandcuffTooltipTime = Date.now() + 19000;
+
+    if(!HandcuffTooltipShown)
+        mp.events.callLocal("AddTooltip", "H", "Handcuff", 1);
+
+    HandcuffTooltipShown = true;
+});
+
 mp.events.add("OneSecondEvent", () => {
     ShotStats.UpdateInterval++;
 
@@ -102,6 +114,16 @@ mp.events.add("OneSecondEvent", () => {
         ShotStats.UpdateInterval = 0;
         mp.events.callRemoteUnreliable("SyncShotStats", ShotStats.TotalFired, ShotStats.HitPlayer, ShotStats.HitVehicle, ShotStats.Missed);
         mp.events.callRemote("UpdatePacketloss");
+    }
+
+    if(HandcuffTooltipShown){
+
+        if(Date.now() >= HandcuffTooltipTime || mp.players.local.Team != 1){
+            mp.events.callLocal("RemoveTooltip", "H");
+
+            HandcuffTooltipTime = 0;
+            HandcuffTooltipShown = false;
+        }
     }
 });
 
