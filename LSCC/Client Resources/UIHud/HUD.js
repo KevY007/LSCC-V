@@ -5,9 +5,9 @@ const Natives = {
 };
 
 let minimap = {};
-let lastSpeed = 0;
 
 var resolution = mp.game.graphics.getScreenActiveResolution(0,0);
+let lastSpecHPChange = Date.now();
 
 let miniHUDVars = {
     visible: false,
@@ -22,9 +22,6 @@ let miniHUDVars = {
     spec: false,
     ping: 0,
     packetloss: 0.0,
-    speed: 0.0,
-    health: 0,
-    armour: 0,
 };
 
 // Scoreboard
@@ -159,27 +156,6 @@ mp.events.add('browserDomReady', (browser) => {
 
         // SPECTATE VARS
         UIHud.execute(`gm.$refs.MiniHud.items.push({ 
-            name: "health",
-            icon: "fa-solid fa-heart",
-            init: "0%",
-            color: "#eb3f3f"
-        });`);
-
-        UIHud.execute(`gm.$refs.MiniHud.items.push({ 
-            name: "armour",
-            icon: "fa-solid fa-vest",
-            init: "0%",
-            color: "#c2c2c2"
-        });`);
-
-         UIHud.execute(`gm.$refs.MiniHud.items.push({ 
-            name: "speed",
-            icon: "fa-solid fa-car-side",
-            init: "0.0 KM/H",
-            color: "#59e04c"
-        });`);
-
-        UIHud.execute(`gm.$refs.MiniHud.items.push({ 
             name: "ping",
             icon: "fa-solid fa-stopwatch",
             init: "0 ms",
@@ -192,6 +168,7 @@ mp.events.add('browserDomReady', (browser) => {
             init: "0.0%",
             color: "#f7aa45"
         });`);
+        //
         
         UIHud.execute(`gm.$refs.MiniHud.items.push({
             name: "jail",
@@ -239,9 +216,6 @@ mp.events.add('browserDomReady', (browser) => {
         UIHud.execute(`gm.$refs.MiniHud.$refs.visible.show = false;`);
         UIHud.execute(`gm.$refs.MiniHud.$refs.ping.show = false;`);
         UIHud.execute(`gm.$refs.MiniHud.$refs.packetloss.show = false;`);
-        UIHud.execute(`gm.$refs.MiniHud.$refs.speed.show = false;`);
-        UIHud.execute(`gm.$refs.MiniHud.$refs.health.show = false;`);
-        UIHud.execute(`gm.$refs.MiniHud.$refs.armour.show = false;`);
     }
 });
 
@@ -407,21 +381,10 @@ mp.events.add("UpdateRateEvent", () => {
                 miniHUDVars["spec"] = true;
                 UIHud.execute(`gm.$refs.MiniHud.$refs.ping.show = true;`);
                 UIHud.execute(`gm.$refs.MiniHud.$refs.packetloss.show = true;`);
-                UIHud.execute(`gm.$refs.MiniHud.$refs.speed.show = true;`);
-                UIHud.execute(`gm.$refs.MiniHud.$refs.health.show = true;`);
-                UIHud.execute(`gm.$refs.MiniHud.$refs.armour.show = true;`);
 
                 UIHud.execute(`gm.$refs.MiniHud.$refs.direction.show = false;`);
             }
-
-            let speed = (specTarget.getSpeed() * 3.6).toFixed(0);
-            if(specTarget.isInAnyVehicle(false)) speed = (specTarget.vehicle.getSpeed() * 3.6).toFixed(0);
-            
-            if(miniHUDVars["speed"] != speed)
-            {
-                miniHUDVars["speed"] = speed; // REMOVE SPEED AND ADD IT IN SPEEDOMETER WHEN IT COMES OUT
-                UIHud.execute(`gm.$refs.MiniHud.$refs.speed.value = "${speed} KM/H"`);
-            }
+        
             if(miniHUDVars["packetloss"] != specTarget.getVariable("Packetloss").toFixed(2))
             {
                 miniHUDVars["packetloss"] = specTarget.getVariable("Packetloss").toFixed(2);
@@ -432,25 +395,12 @@ mp.events.add("UpdateRateEvent", () => {
                 miniHUDVars["ping"] = specTarget.getVariable("Ping");
                 UIHud.execute(`gm.$refs.MiniHud.$refs.ping.value = "${miniHUDVars["ping"]} ms"`);
             }
-            if(miniHUDVars["health"] != specTarget.getHealth())
-            {
-                miniHUDVars["health"] = specTarget.getHealth();
-                UIHud.execute(`gm.$refs.MiniHud.$refs.health.value = "${miniHUDVars["health"]}%"`);
-            }
-            if(miniHUDVars["armour"] != specTarget.getArmour())
-            {
-                miniHUDVars["armour"] = specTarget.getArmour();
-                UIHud.execute(`gm.$refs.MiniHud.$refs.armour.value = "${miniHUDVars["armour"]}%"`);
-            }
         }
         else if(miniHUDVars["spec"] == true) 
         {
             miniHUDVars["spec"] = false;
             UIHud.execute(`gm.$refs.MiniHud.$refs.ping.show = false;`);
             UIHud.execute(`gm.$refs.MiniHud.$refs.packetloss.show = false;`);
-            UIHud.execute(`gm.$refs.MiniHud.$refs.speed.show = false;`);
-            UIHud.execute(`gm.$refs.MiniHud.$refs.health.show = false;`);
-            UIHud.execute(`gm.$refs.MiniHud.$refs.armour.show = false;`);
 
             UIHud.execute(`gm.$refs.MiniHud.$refs.direction.show = true;`);
         }
@@ -620,12 +570,14 @@ mp.events.add("render", () => {
 
     if(mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
     {       
-        /*if(((vehicle.getSpeed() * 3.6).toFixed(0) % 2 == 0 || (vehicle.getSpeed() * 3.6).toFixed(0) % 5 == 0) || 
-            (vehicle.getSpeed() * 3.6).toFixed(0) == 0)
+        if (specState == true && specCam !== null && specTarget != null && mp.players.exists(specTarget)) 
         {
-            lastSpeed = (vehicle.getSpeed() * 3.6).toFixed(0);
+            if((mp.players.local.getHealth() != specTarget.getHealth() || mp.players.local.getArmour() != specTarget.getArmour()) && 
+                Date.now() - lastSpecHPChange >= 500)
+            {
+                mp.events.callRemote("SpectateChangeHPAR", specTarget.getHealth(), specTarget.getArmour());
+                lastSpecHPChange = Date.now();
+            }
         }
-
-        drawText(`~y~${lastSpeed} ~w~KM/H`, [minimap.rightX + 0.0085, minimap.bottomY - 0.130], 4, [204, 204, 204, 255], 0.7);;*/
     }
 });

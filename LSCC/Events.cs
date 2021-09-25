@@ -999,6 +999,17 @@ namespace RNC
             return;
         }
 
+        [RemoteEvent("SpectateChangeHPAR")]
+        public static void SpectateHPARChange(Player player, int health, int armour)
+        {
+            if (player.HasData("Spectating"))
+            {
+                if (health < 1) health = 1;
+                player.Health = health;
+                player.Armor = armour;
+            }
+        }
+
         [RemoteEvent("RequestSwimPenalty")]
         public static void OnRequestSwimPenalty(Player player)
         {
