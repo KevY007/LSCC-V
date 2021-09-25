@@ -3171,6 +3171,13 @@ namespace RNC
             return;
         }
 
+        [Command("packetloss", Alias = "pl,ploss")]
+        public void cmd_packetloss(Player player, Player target)
+        {
+            player.SendChatMessage($"{target.Name}'s packetloss is !{{#FF6347}}{Convert.ToDouble(target.GetSharedData<object>("Packetloss")).ToString("N2")}%");
+            return;
+        }
+
         [Command("restartmenu")]
         public void cmd_restartmenu(Player player)
         {
@@ -3932,7 +3939,8 @@ namespace RNC
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /freeroam /veh /customvehlist /teleport /mytime /myweather");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /togblip /gun /world /godmode /setspawn /tuneveh");
             player.SendChatMessage("!{#A5A8A8}[Misc]: /updaterate /info /fontsize /voicebind /gpsbind /shotstats");
-            player.SendChatMessage("!{#A5A8A8}[Dbg/Test]: /pos /lcmenu");
+            player.SendChatMessage("!{#A5A8A8}[Misc]: /p(acket)l(oss)");
+            player.SendChatMessage("!{#A5A8A8}[Debug/Test]: /pos /lcmenu");
             
             player.SendChatMessage("!{#F7EB05}[Donator/Points] /buycomp (Free Flashlights) /mycomps /removecomp (NO REFUND)");
             if (EPlayer.GetAccount(player).DonatorLevel >= 1)

@@ -5,9 +5,9 @@ const Natives = {
 };
 
 let minimap = {};
-let lastSpeed = 0;
 
 var resolution = mp.game.graphics.getScreenActiveResolution(0,0);
+let lastSpecHPChange = Date.now();
 
 let miniHUDVars = {
     visible: false,
@@ -16,7 +16,12 @@ let miniHUDVars = {
     street: "N/A",
     zone: "N/A",
     jailed: false,
-    jail: "N/A"
+    jail: "N/A",
+
+    // SPEC VARS
+    spec: false,
+    ping: 0,
+    packetloss: 0.0,
 };
 
 // Scoreboard
@@ -161,14 +166,30 @@ mp.events.add('browserDomReady', (browser) => {
         UIHud.execute(`gm.$refs.MiniHud.items = [];`);
 
         // Initialize miniHUD
-        let miniHUD = { 
+        let miniHUDSettings = { 
             bottom: ((resolution.y - (getMinimapAnchor().bottomY * resolution.y)) + 0), 
             left: ((getMinimapAnchor().rightX * resolution.x) + 10)
-        }; // miniHUD["bottom"], miniHUD["left"]
+        }; // miniHUDSettings["bottom"], miniHUD["left"]
 
-        UIHud.execute(`gm.$refs.MiniHud.left = "${miniHUD.left}px";`);
-        UIHud.execute(`gm.$refs.MiniHud.bottom = "${miniHUD.bottom}px";`);       
+        UIHud.execute(`gm.$refs.MiniHud.left = "${miniHUDSettings.left}px";`);
+        UIHud.execute(`gm.$refs.MiniHud.bottom = "${miniHUDSettings.bottom}px";`);  
 
+        // SPECTATE VARS
+        UIHud.execute(`gm.$refs.MiniHud.items.push({ 
+            name: "ping",
+            icon: "fa-solid fa-stopwatch",
+            init: "0 ms",
+            color: "#ff8084"
+        });`);
+
+        UIHud.execute(`gm.$refs.MiniHud.items.push({ 
+            name: "packetloss",
+            icon: "fa-solid fa-minus",
+            init: "0.0%",
+            color: "#f7aa45"
+        });`);
+        //
+        
         UIHud.execute(`gm.$refs.MiniHud.items.push({
             name: "jail",
             icon: "fa-solid fa-ban",
@@ -213,6 +234,8 @@ mp.events.add('browserDomReady', (browser) => {
         
         UIHud.execute(`gm.$refs.MiniHud.$refs.jail.show = ${miniHUDVars["jailed"]};`);
         UIHud.execute(`gm.$refs.MiniHud.$refs.visible.show = false;`);
+        UIHud.execute(`gm.$refs.MiniHud.$refs.ping.show = false;`);
+        UIHud.execute(`gm.$refs.MiniHud.$refs.packetloss.show = false;`);
     }
 });
 
@@ -369,6 +392,37 @@ mp.events.add("UpdateRateEvent", () => {
         {
             miniHUDVars["jailed"] = false;
             UIHud.execute(`gm.$refs.MiniHud.$refs.jail.show = ${miniHUDVars["jailed"]};`);
+        }
+
+        if (specState == true && specCam !== null && specTarget != null && mp.players.exists(specTarget)) 
+        {
+            if(miniHUDVars["spec"] == false)
+            {
+                miniHUDVars["spec"] = true;
+                UIHud.execute(`gm.$refs.MiniHud.$refs.ping.show = true;`);
+                UIHud.execute(`gm.$refs.MiniHud.$refs.packetloss.show = true;`);
+
+                UIHud.execute(`gm.$refs.MiniHud.$refs.direction.show = false;`);
+            }
+        
+            if(miniHUDVars["packetloss"] != specTarget.getVariable("Packetloss").toFixed(2))
+            {
+                miniHUDVars["packetloss"] = specTarget.getVariable("Packetloss").toFixed(2);
+                UIHud.execute(`gm.$refs.MiniHud.$refs.packetloss.value = "${miniHUDVars["packetloss"]}%"`);
+            }
+            if(miniHUDVars["ping"] != specTarget.getVariable("Ping"))
+            {
+                miniHUDVars["ping"] = specTarget.getVariable("Ping");
+                UIHud.execute(`gm.$refs.MiniHud.$refs.ping.value = "${miniHUDVars["ping"]} ms"`);
+            }
+        }
+        else if(miniHUDVars["spec"] == true) 
+        {
+            miniHUDVars["spec"] = false;
+            UIHud.execute(`gm.$refs.MiniHud.$refs.ping.show = false;`);
+            UIHud.execute(`gm.$refs.MiniHud.$refs.packetloss.show = false;`);
+
+            UIHud.execute(`gm.$refs.MiniHud.$refs.direction.show = true;`);
         }
     }
 });
@@ -536,12 +590,14 @@ mp.events.add("render", () => {
 
     if(mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
     {       
-        /*if(((vehicle.getSpeed() * 3.6).toFixed(0) % 2 == 0 || (vehicle.getSpeed() * 3.6).toFixed(0) % 5 == 0) || 
-            (vehicle.getSpeed() * 3.6).toFixed(0) == 0)
+        if (specState == true && specCam !== null && specTarget != null && mp.players.exists(specTarget)) 
         {
-            lastSpeed = (vehicle.getSpeed() * 3.6).toFixed(0);
+            if((mp.players.local.getHealth() != specTarget.getHealth() || mp.players.local.getArmour() != specTarget.getArmour()) && 
+                Date.now() - lastSpecHPChange >= 500)
+            {
+                mp.events.callRemote("SpectateChangeHPAR", specTarget.getHealth(), specTarget.getArmour());
+                lastSpecHPChange = Date.now();
+            }
         }
-
-        drawText(`~y~${lastSpeed} ~w~KM/H`, [minimap.rightX + 0.0085, minimap.bottomY - 0.130], 4, [204, 204, 204, 255], 0.7);;*/
     }
 });

@@ -85,11 +85,11 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="rd /s /q &quot;C:\RAGEMP\server-files\dotnet\resources\RNC&quot;&#xD;&#xA;mkdir &quot;C:\RAGEMP\server-files\dotnet\resources\RNC&quot;&#xD;&#xA;xcopy &quot;$(OutDir)*&quot; &quot;C:\RAGEMP\server-files\dotnet\resources\RNC&quot; /Y&#xD;&#xA;rd /s /q &quot;C:\RAGEMP\server-files\client_packages&quot;&#xD;&#xA;rmdir &quot;C:\RAGEMP\server-files\client_packages\&quot; /S /Q&#xD;&#xA;mkdir &quot;C:\RAGEMP\server-files\client_packages\&quot;&#xD;&#xA;xcopy /E &quot;Client Resources\*&quot; &quot;C:\RAGEMP\server-files\client_packages\&quot; /Y" />
+    <Exec Command="xcopy /E &quot;$(OutDir)*&quot; &quot;C:\RAGEMP\server-files\dotnet\resources\RNC\&quot; /Y&#xD;&#xA;&#xD;&#xA;xcopy /E &quot;Client Resources\*&quot; &quot;C:\RAGEMP\server-files\client_packages\&quot; /Y&#xD;&#xA;&#xD;&#xA;xcopy /E &quot;Serverside JS\*&quot; &quot;C:\RAGEMP\server-files\packages\&quot; /Y" />
   </Target>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="rd /s /q &quot;C:\RAGEMP\server-files\dotnet\resources\RNC&quot;&#xD;&#xA;mkdir &quot;C:\RAGEMP\server-files\dotnet\resources\RNC&quot;&#xD;&#xA;del &quot;C:\RAGEMP\server-files\dotnet\resources\RNC\*.*&quot; /Q" />
+    <Exec Command="rd /s /q &quot;C:\RAGEMP\server-files\dotnet\resources\RNC&quot;&#xD;&#xA;mkdir &quot;C:\RAGEMP\server-files\dotnet\resources\RNC&quot;&#xD;&#xA;&#xD;&#xA;rd /s /q &quot;C:\RAGEMP\server-files\packages&quot;&#xD;&#xA;mkdir &quot;C:\RAGEMP\server-files\packages&quot;&#xD;&#xA;&#xD;&#xA;rd /s /q &quot;C:\RAGEMP\server-files\client_packages&quot;&#xD;&#xA;mkdir &quot;C:\RAGEMP\server-files\client_packages&quot;" />
   </Target>
 
 </Project>

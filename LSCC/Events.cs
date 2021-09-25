@@ -999,6 +999,17 @@ namespace RNC
             return;
         }
 
+        [RemoteEvent("SpectateChangeHPAR")]
+        public static void SpectateHPARChange(Player player, int health, int armour)
+        {
+            if (player.HasData("Spectating"))
+            {
+                if (health < 1) health = 1;
+                player.Health = health;
+                player.Armor = armour;
+            }
+        }
+
         [RemoteEvent("RequestSwimPenalty")]
         public static void OnRequestSwimPenalty(Player player)
         {
@@ -3002,7 +3013,6 @@ namespace RNC
                 player.SetSharedData("DerbyTime", 0);
 
                 player.SetSharedData("Level", acc.Level);
-                player.SetSharedData("Ping", player.Ping);
                 player.SetSharedData("HasShot", false);
 
                 if (acc.JailTime > 0)

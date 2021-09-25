@@ -29,10 +29,6 @@ if(mp.storage.data.updaterate !== undefined)
     updateRate = mp.storage.data.updaterate;
 }
 
-let specCam = null;
-var specState = false;
-let specTarget = null;
-
 /* Spec Camera move settings */
 let mouseSensitivity = 3.5;
 let zoomSpeed = 1.5;
@@ -105,6 +101,7 @@ mp.events.add("OneSecondEvent", () => {
     {
         ShotStats.UpdateInterval = 0;
         mp.events.callRemoteUnreliable("SyncShotStats", ShotStats.TotalFired, ShotStats.HitPlayer, ShotStats.HitVehicle, ShotStats.Missed);
+        mp.events.callRemote("UpdatePacketloss");
     }
 });
 

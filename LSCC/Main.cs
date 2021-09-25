@@ -2221,8 +2221,6 @@ namespace RNC
 
                     foreach (Player p in Settings.LoggedInPlayers)
                     {
-                        p.SetSharedData("Ping", p.Ping);
-
                         if (p.GetSharedData<int>("InLobby") == lobbyid)
                         {
                             p.TriggerEvent("StartChaseTimer", -13, Settings.GameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
