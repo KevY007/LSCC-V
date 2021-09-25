@@ -24,6 +24,10 @@ let miniHUDVars = {
     packetloss: 0.0,
 };
 
+let speedo = false;
+let speedoMax = 0.0;
+let speedoCur = 0.0;
+
 // Scoreboard
 let updater = null;
 scoreboardToggled = false;
@@ -639,6 +643,60 @@ mp.events.add("render", () => {
                 mp.events.callRemote("SpectateChangeHPAR", specTarget.getHealth(), specTarget.getArmour());
                 lastSpecHPChange = Date.now();
             }
+
+            if(specTarget.isInAnyVehicle(false))
+            {
+                if(!speedo)
+                {
+                    UIHud.execute(`gm.speedo = true;`);
+                    speedo = true;
+                }
+
+                if(speedoMax != ((mp.game.vehicle.getVehicleModelMaxSpeed(specTarget.vehicle.model) * 3.6) + 25).toFixed(0))
+                {
+                    speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(specTarget.vehicle.model) * 3.6) + 25).toFixed(0);
+                    UIHud.execute(`gm.$refs.BottomRight.$refs.Speedometer.maxspeed = ${speedoMax};`);
+                }
+                if(speedoCur != (specTarget.getSpeed() * 3.6).toFixed(0))
+                {
+                    speedoCur = (specTarget.getSpeed() * 3.6).toFixed(0);
+                    UIHud.execute(`gm.$refs.BottomRight.$refs.Speedometer.speed = ${speedoCur};`);
+                }
+            }
+            else if(speedo)
+            {
+                speedo = false;
+                speedoMax = 0;
+                speedoCur = 0;
+                UIHud.execute(`gm.speedo = false;`);
+            }
+        }
+
+        if(mp.players.local.isInAnyVehicle(false))
+        {
+            if(!speedo)
+            {
+                UIHud.execute(`gm.speedo = true;`);
+                speedo = true;
+            }
+
+            if(speedoMax != ((mp.game.vehicle.getVehicleModelMaxSpeed(mp.players.local.vehicle.model) * 3.6) + 25).toFixed(0))
+            {
+                speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(mp.players.local.vehicle.model) * 3.6) + 25).toFixed(0);
+                UIHud.execute(`gm.$refs.BottomRight.$refs.Speedometer.maxspeed = ${speedoMax};`);
+            }
+            if(speedoCur != (mp.players.local.getSpeed() * 3.6).toFixed(0))
+            {
+                speedoCur = (mp.players.local.getSpeed() * 3.6).toFixed(0);
+                UIHud.execute(`gm.$refs.BottomRight.$refs.Speedometer.speed = ${speedoCur};`);
+            }
+        }
+        else if(speedo)
+        {
+            speedo = false;
+            speedoMax = 0;
+            speedoCur = 0;
+            UIHud.execute(`gm.speedo = false;`);
         }
     }
 });
