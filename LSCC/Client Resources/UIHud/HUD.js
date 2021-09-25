@@ -131,7 +131,27 @@ mp.events.add('RestartHUD', () => {
     UIHud.execute(`gm.hud = false;`);
 });
 
+mp.events.add('AddTooltip', (key, action, team) => {
+    let color = "#383838FF";
+    switch(team){
+        case 0: color = "#ffae00ff";
+        break;
+        case 1: color = "#0097ffff";
+        break;
+        default: color = "#383838FF";
+    }
 
+    UIHud.execute(`gm.$refs.TopRight.$refs.Tooltips.tips.push({
+        key: "${key}",
+        action: "${action}",
+        color: "${color}"
+    })`);
+});
+mp.events.add('RemoveTooltip', (key) => {
+    UIHud.execute(`if(gm.$refs.TopRight.$refs.Tooltips.tips.indexOf(gm.$refs.TopRight.$refs.Tooltips.tips.filter(function(el){return el.key == "${key}"})[0]) != -1){
+        gm.$refs.TopRight.$refs.Tooltips.tips.splice(gm.$refs.TopRight.$refs.Tooltips.tips.indexOf(gm.$refs.TopRight.$refs.Tooltips.tips.filter(function(el){return el.key == "${key}"})[0]), 1);        
+    }`);
+});
 
 mp.events.add('browserDomReady', (browser) => {
     if(UIHud != null && browser == UIHud)
