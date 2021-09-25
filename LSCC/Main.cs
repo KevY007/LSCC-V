@@ -1153,10 +1153,8 @@ namespace RNC
 
 
             new CarData(0, "Primo", "primo", "package://Artwork/Vehicles/primo.png", "Slow", 3);
-            new CarData(0, "Tahoma", "tahoma", "package://Artwork/Vehicles/tahoma.png", "Slow", 4);
             new CarData(0, "Huntley", "huntley", "package://Artwork/Vehicles/huntley.png", "Average", 5);
             new CarData(0, "Mercedes 600SEL", "600sel", "package://Artwork/Vehicles/600sel.png", "Average", 6);
-            new CarData(0, "Volvo 850 T5 Turbo", "850sw", "package://Artwork/Vehicles/850sw.png", "Average", 6);
             new CarData(0, "Tailgater", "tailgater", "package://Artwork/Vehicles/tailgater.png", "Average", 10);
             new CarData(0, "Blista Classic", "blista2", "package://Artwork/Vehicles/blista2.png", "Average", 14);
             new CarData(0, "Cheburek", "cheburek", "package://Artwork/Vehicles/cheburek.png", "Fast", 16);
@@ -1164,7 +1162,6 @@ namespace RNC
             new CarData(0, "Buffalo", "buffalo", "package://Artwork/Vehicles/buffalo.png", "Fast", 20);
             new CarData(0, "Sultan", "sultan", "package://Artwork/Vehicles/sultan.png", "Fast", 25);
             new CarData(0, "Kuruma", "kuruma", "package://Artwork/Vehicles/kuruma.png", "Fast", 30);
-            new CarData(0, "Audi S8", "s8d2", "package://Artwork/Vehicles/s8d2.png", "Fast", 33);
             new CarData(0, "Dominator GTT", "dominator8", "package://Artwork/Vehicles/dominator8.png", "Fast", 33);
             new CarData(0, "BMW M3 E46", "m3e46", "package://Artwork/Vehicles/m3e46.png", "Fast", 35);
 
