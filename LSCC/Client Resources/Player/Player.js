@@ -9,11 +9,6 @@ let localPlayer = mp.players.local;
 //const { setTimeout } = require("timers");
 const timerBarLib = require("./Player/Bar.js");
 
-var collisionTime = -1;
-var chaseRunning = false;
-var chaseTimeCur = 0;
-var chaseTimeMax = 390;
-var chaseMode = 0; // 0= STANDARD | 1= BUSTED | and others as in SCRIPTf
 let chaseStartVeh = -1;
 let chaseStartSeat = -1;
 

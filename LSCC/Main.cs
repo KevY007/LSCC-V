@@ -2278,12 +2278,14 @@ namespace RNC
                             {
                                 p.Dimension = Convert.ToUInt32(lobby.lobbyId);
                                 p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
+                                p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
                                 EPlayer.Freeze(p, true);
                             });
                             lobby.Cops.ForEach(p =>
                             {
                                 p.Dimension = Convert.ToUInt32(lobby.lobbyId);
                                 p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
+                                p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
                                 EPlayer.Freeze(p, true);
                             });
                         }

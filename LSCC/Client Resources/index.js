@@ -1,6 +1,12 @@
 ﻿var currentJailTime = 0;
 var lastJailUpdate = 10;
 
+var chaseRunning = false;
+var chaseTimeCur = 0;
+var chaseTimeMax = 390;
+var chaseMode = 0; // 0= STANDARD | 1= BUSTED | and others as in SCRIPT
+var collisionTime = -1;
+
 var chatStatus = false;
 var lastChatToggle = Date.now();
 var streetName = null;

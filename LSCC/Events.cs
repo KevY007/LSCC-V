@@ -2680,6 +2680,7 @@ namespace RNC
             if (player.GetSharedData<int>("Team") >= 0)
             {
                 player.SetIntoVehicle(veh, seat);
+                player.TriggerEvent("ChangeVehicleHeading", veh.GetData<float>("SpawnA"));
             }
         }
 

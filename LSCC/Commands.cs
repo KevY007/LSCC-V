@@ -6560,7 +6560,7 @@ namespace RNC
                 }
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:rfreeze:{range}"); } catch { }
                 Logs.LogAdmin(player, $"Froze all players within {range}m.");
-                //NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen all players within {range}m.");
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen all within {range}m.");
             }
         }
 
@@ -6583,7 +6583,7 @@ namespace RNC
                 }
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:tfreeze:{teamid}"); } catch { }
                 Logs.LogAdmin(player, "Froze all " + (teamid == 0 ? "fugitives." : "cops."));
-                //NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen specific players.");
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen all {(teamid == 0 ? "fugitives." : "cops.")}");
             }
         }
 
@@ -6599,14 +6599,14 @@ namespace RNC
             }
             else
             {
-                foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Position.DistanceTo(player.Position) <= 10000 && a.Dimension == player.Dimension && a != player && a.GetSharedData<int>("Team") == teamid))
+                foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a != player && a.GetSharedData<int>("Team") == teamid))
                 {
                     EPlayer.Freeze(p, false);
                     EPlayer.Notify(p, $"You have been thawed by {player.Name}", "green", "fas fa-walking", false, 2000);
                 }
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:tunfreeze:{teamid}"); } catch { }
                 Logs.LogAdmin(player, "Unfroze all " + (teamid == 0 ? "fugitives." : "cops."));
-                //NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen specific players.");
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen all {(teamid == 0 ? "fugitives." : "cops.")}");
             }
         }
 
@@ -6629,7 +6629,7 @@ namespace RNC
                 }
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:runfreeze:{range}"); } catch { }
                 Logs.LogAdmin(player, $"Unfroze all players within {range}m");
-                //NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen all players within {range}m.");
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen all within {range}m.");
             }
         }
 
