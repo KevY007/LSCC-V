@@ -7,11 +7,14 @@ var streetName = null;
 var zoneName = null;
 var showHud = true;
 var renderNametags = true;
-var specState = false;
-var isNoClip = false;
 var currentMuteTime = 0;
 var lastMuteUpdate = 10;
 var lastFunc = "Init";
+
+var specCam = null;
+var specState = false;
+var specTarget = null;
+var isNoClip = false;
 
 var UIHud = null;
 var UIMenu = null;

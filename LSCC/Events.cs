@@ -3002,7 +3002,6 @@ namespace RNC
                 player.SetSharedData("DerbyTime", 0);
 
                 player.SetSharedData("Level", acc.Level);
-                player.SetSharedData("Ping", player.Ping);
                 player.SetSharedData("HasShot", false);
 
                 if (acc.JailTime > 0)

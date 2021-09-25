@@ -522,6 +522,7 @@ namespace RNC
                 player.SetSharedData("Team", -1);
                 player.TriggerEvent("ToggleHud", false);
                 player.SetData("GPS", false);
+                player.SetSharedData("Packetloss", 65535.0); // Unknown/Unable to count as this is calculated in JS serverside since the function player.PacketLoss doesnt exist in C# RAGEMP
 
                 player.ResetData("Language");
 
@@ -936,7 +937,6 @@ namespace RNC
 
         public static void SetDiscordStatus(Player player, string status)
         {
-            player.SetSharedData("Ping", player.Ping);
             player.TriggerEvent("SetDiscordStatus", "Race 'n Chase", status);
         }
         public static void Freeze(Player player, bool toggle)
@@ -1028,7 +1028,6 @@ namespace RNC
         {
             if (player == null) return false;
 
-            player.SetSharedData("Ping", player.Ping);
             if (player.HasData("AccountHandle") && player.GetData<Account>("AccountHandle") != null && player.HasData("LoggedIn") && player.GetData<bool>("LoggedIn") == true)
             {
                 return true;

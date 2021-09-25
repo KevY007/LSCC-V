@@ -329,7 +329,6 @@ var bindASCIIKeys = {
     Shift: 16,
 };
 
-var isNoClip = false;
 var noClipCamera;
 var shiftModifier = false;
 var controlModifier = false;
