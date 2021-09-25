@@ -1,6 +1,5 @@
 ﻿FORMAT: ADDED BY - ITEM.
 INTENSIVE TESTING LEFT GAME SPAWNING AND SHIT
-spectate should show speed etc, maybe add spectate info in UIHud and bla
 checkplayer, check player.IP and player.HWID/Serial w/e and player.Rockstar ez
 buyammo with donator points
 #bug reports and other chans sugeestion
