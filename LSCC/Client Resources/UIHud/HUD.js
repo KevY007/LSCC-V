@@ -9,8 +9,7 @@ let minimap = {};
 var resolution = mp.game.graphics.getScreenActiveResolution(0,0);
 let lastSpecHPChange = Date.now();
 
-let miniHUDVars = {
-    miniHUDToggled: true,
+var miniHUDVars = {
     visible: false,
     voice: "Standby",
     direction: "N/A",
@@ -636,22 +635,6 @@ mp.events.add("render", () => {
 
     if(mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
     {       
-        if (chaseRunning && chaseTimeCur < 1)
-        {
-            if(miniHUDVars["miniHUDToggled"] == true)
-            {
-                miniHUDVars["miniHUDToggled"] = false;
-                UIHud.execute(`gm.miniHud = false;`);
-            }
-        }
-        else 
-        {
-            if(miniHUDVars["miniHUDToggled"] == false)
-            {
-                miniHUDVars["miniHUDToggled"] = true;
-                UIHud.execute(`gm.miniHud = true;`);
-            }   
-        }
         if (specState == true && specCam !== null && specTarget != null && mp.players.exists(specTarget)) 
         {
             if((mp.players.local.getHealth() != specTarget.getHealth() || mp.players.local.getArmour() != specTarget.getArmour()) && 

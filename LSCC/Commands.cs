@@ -6576,7 +6576,7 @@ namespace RNC
             }
             else
             {
-                foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Position.DistanceTo(player.Position) <= 10000 && a.Dimension == player.Dimension && a != player && a.GetSharedData<int>("Team") == teamid))
+                foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a != player && a.GetSharedData<int>("Team") == teamid))
                 {
                     EPlayer.Freeze(p, true);
                     EPlayer.Notify(p, $"You have been frozen by {player.Name}", "red", "fas fa-iciles", false, 2000);

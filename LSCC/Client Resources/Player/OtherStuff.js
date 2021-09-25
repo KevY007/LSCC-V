@@ -489,6 +489,7 @@ function moveFromToAir(moveTo, switchType, showGui, timeout = 1) {
                     if (showGui == false) {
                         //mp.gui.chat.show(showGui);
                         gui = 'false';
+                        UIHud.execute(`gm.hud = false;`);
                     };
                     mp.game.invoke(Natives.SWITCH_OUT_PLAYER, mp.players.local.handle, 0, parseInt(switchType));
                 break;
@@ -518,5 +519,6 @@ function checkCamInAir() {
     {
         //mp.gui.chat.show(true);
         gui = 'true';
+        UIHud.execute(`gm.hud = ${showHud};`);
     }
 }
