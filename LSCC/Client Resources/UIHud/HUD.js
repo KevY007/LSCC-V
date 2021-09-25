@@ -136,7 +136,11 @@ mp.events.add('RestartHUD', () => {
     UIHud.execute(`gm.hud = false;`);
 });
 
+let createdTooltips = []; // to keep track of created tooltips / preventing duplicates
+
 mp.events.add('AddTooltip', (key, action, team) => {
+    if(createdTooltips.indexOf(key) != -1) return;
+
     let color = "#383838FF";
     switch(team){
         case 0: color = "#ffae00ff";
@@ -146,6 +150,8 @@ mp.events.add('AddTooltip', (key, action, team) => {
         default: color = "#383838FF";
     }
 
+    createdTooltips.push(key);
+
     UIHud.execute(`gm.$refs.TopRight.$refs.Tooltips.tips.push({
         key: "${key}",
         action: "${action}",
@@ -153,9 +159,41 @@ mp.events.add('AddTooltip', (key, action, team) => {
     })`);
 });
 mp.events.add('RemoveTooltip', (key) => {
+    if(createdTooltips.indexOf(key) == -1) return;
+
     UIHud.execute(`if(gm.$refs.TopRight.$refs.Tooltips.tips.indexOf(gm.$refs.TopRight.$refs.Tooltips.tips.filter(function(el){return el.key == "${key}"})[0]) != -1){
         gm.$refs.TopRight.$refs.Tooltips.tips.splice(gm.$refs.TopRight.$refs.Tooltips.tips.indexOf(gm.$refs.TopRight.$refs.Tooltips.tips.filter(function(el){return el.key == "${key}"})[0]), 1);        
     }`);
+    createdTooltips.splice(createdTooltips.indexOf(key), 1);
+});
+mp.events.add("OneSecondEvent", () => {
+
+    if(mp.players.local.vehicle){
+        if(mp.players.local.Team == 1) 
+            if(createdTooltips.indexOf("B") == -1) mp.events.callLocal("AddTooltip", "B", "Silent Siren", 1);
+            
+        if(createdTooltips.indexOf("Y") == -1) mp.events.callLocal("AddTooltip", "Y", "Engine", -1);
+        if(createdTooltips.indexOf("L") == -1) mp.events.callLocal("AddTooltip", "L", "Lock", -1);
+    }
+    else{
+        if(createdTooltips.indexOf("Y") != -1) mp.events.callLocal("RemoveTooltip", "Y");
+        if(createdTooltips.indexOf("L") != -1) mp.events.callLocal("RemoveTooltip", "L");
+        if(createdTooltips.indexOf("B") != -1) mp.events.callLocal("RemoveTooltip", "B");        
+    }
+    if(mp.players.local.Team == 1){
+        if(createdTooltips.indexOf("Z") == -1) mp.events.callLocal("AddTooltip", "Z", "GPS", 1);
+    }
+    else{
+        if(createdTooltips.indexOf("Z") != -1) mp.events.callLocal("RemoveTooltip", "Z");
+        if(createdTooltips.indexOf("B") != -1) mp.events.callLocal("RemoveTooltip", "B");     
+    }
+    if(mp.players.local.Team == 0){
+        if(createdTooltips.indexOf("J") == -1) mp.events.callLocal("AddTooltip", "J", "Jammer", 0);
+    }
+    else{
+        if(createdTooltips.indexOf("J") != -1) mp.events.callLocal("RemoveTooltip", "J");
+    }    
+
 });
 
 mp.events.add('browserDomReady', (browser) => {
@@ -231,11 +269,14 @@ mp.events.add('browserDomReady', (browser) => {
             init: "N/A",
             color: "#fa65b0"
         });`);
-        
+
         UIHud.execute(`gm.$refs.MiniHud.$refs.jail.show = ${miniHUDVars["jailed"]};`);
         UIHud.execute(`gm.$refs.MiniHud.$refs.visible.show = false;`);
         UIHud.execute(`gm.$refs.MiniHud.$refs.ping.show = false;`);
         UIHud.execute(`gm.$refs.MiniHud.$refs.packetloss.show = false;`);
+
+        mp.events.callLocal("AddTooltip", "M", "Menu", -1);
+        mp.events.callLocal("AddTooltip", "N", "Voice Chat", -1);
     }
 });
 
