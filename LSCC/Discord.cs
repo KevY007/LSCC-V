@@ -169,75 +169,80 @@ namespace RNC
 
                     int players = 0;
                     int tries = 0;
-                    NAPI.Task.Run(() =>
+                    lock (RAGE.Entities.Players)
                     {
-                        while (players < RAGE.Entities.Players.Count)
+                        NAPI.Task.Run(() =>
                         {
-                            tries++;
-                            if (tries >= 10) { NAPI.Util.ConsoleOutput("breaking cuz of tries"); break; }
-
-                            var builder = new EmbedBuilder()
-                                .WithTitle("**Lobby/Mode | Player | Level**")
-                                .WithDescription("```\n```")
-                                .WithColor(255, 0, 0)
-                                .WithFooter(footer =>
-                                {
-                                    footer
-                                        .WithText("Online List");
-                                })
-                                .WithAuthor(author =>
-                                {
-                                    author
-                                        .WithName("Players")
-                                        .WithIconUrl("https://i.imgur.com/nJPbaL7.png");
-                                });
-
-                            int thisCount = 0;
-                            int proc = 0;
-                            foreach (Player pl in RAGE.Entities.Players.All)
+                            while (players < RAGE.Entities.Players.Count)
                             {
-                                thisCount++;
-                                if (thisCount <= players) continue;
+                                tries++;
+                                if (tries >= 10) { NAPI.Util.ConsoleOutput("breaking cuz of tries"); break; }
 
-                                players++;
-                                proc++;
-                                string lobby = "Lobby " + pl.GetSharedData<int>("InLobby");
-                                switch (pl.GetSharedData<int>("InLobby"))
+                                var builder = new EmbedBuilder()
+                                    .WithTitle("**Lobby/Mode | Player | Level**")
+                                    .WithDescription("```\n```")
+                                    .WithColor(255, 0, 0)
+                                    .WithFooter(footer =>
+                                    {
+                                        footer
+                                            .WithText("Online List");
+                                    })
+                                    .WithAuthor(author =>
+                                    {
+                                        author
+                                            .WithName("Players")
+                                            .WithIconUrl("https://i.imgur.com/nJPbaL7.png");
+                                    });
+
+                                int thisCount = 0;
+                                int proc = 0;
+                                foreach (Player pl in RAGE.Entities.Players.All)
                                 {
-                                    case -1:
-                                        lobby = "Login";
-                                        break;
-                                    case -2:
-                                        lobby = "Jail";
-                                        break;
-                                    case -3:
-                                        lobby = "Freeroam";
-                                        break;
-                                    case -4:
-                                        lobby = "Derby";
-                                        break;
-                                    case -5:
-                                        lobby = "Customizer";
-                                        break;
+                                    thisCount++;
+                                    if (thisCount <= players) continue;
+
+                                    players++;
+                                    proc++;
+                                    string lobby = "Lobby " + pl.GetSharedData<int>("InLobby");
+                                    switch (pl.GetSharedData<int>("InLobby"))
+                                    {
+                                        case -1:
+                                            lobby = "Login";
+                                            break;
+                                        case -2:
+                                            lobby = "Jail";
+                                            break;
+                                        case -3:
+                                            lobby = "Freeroam";
+                                            break;
+                                        case -4:
+                                            lobby = "Derby";
+                                            break;
+                                        case -5:
+                                            lobby = "Customizer";
+                                            break;
+                                    }
+
+                                    builder.AddField(pl.Name, lobby + " | Level: " + pl.GetSharedData<int>("Level").ToString() + " | Ping: " + pl.Ping.ToString(), true);
+
+                                    if (proc >= 20) break;
                                 }
 
-                                builder.AddField(pl.Name, lobby + " | Level: " + pl.GetSharedData<int>("Level").ToString() + " | Ping: " + pl.Ping.ToString(), true);
+                                var embed = builder.Build();
 
-                                if (proc >= 20) break;
+                                context.Channel.SendMessageAsync(
+                                    "Reporting...",
+                                    embed: embed)
+                                    .ConfigureAwait(false);
                             }
-
-                            var embed = builder.Build();
-
-                            context.Channel.SendMessageAsync(
-                                "Reporting...",
-                                embed: embed)
-                                .ConfigureAwait(false);
-                        }
-                    }, 10);
+                        }, 10);
+                    }
                 }
                 if (context.Content.StartsWith("!lobbies"))
                 {
-                    var builder = new EmbedBuilder()
+                    lock (Settings.LoggedInPlayers)
+                    {
+                        var builder = new EmbedBuilder()
                                 .WithTitle("**Lobby | Status | Players**")
                                 .WithDescription("```\n```")
                                 .WithColor(255, 0, 0)
@@ -253,98 +258,105 @@ namespace RNC
                                         .WithIconUrl("https://i.imgur.com/nJPbaL7.png");
                                 });
 
-                    foreach (LobbyData p in Settings.Lobbies)
-                    {
-                        builder.AddField(p.lobbyId.ToString(), RNC.Main.ConvertGameStatus(p.gameStatus, false) + " | " + Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == p.lobbyId).ToString() + " Players", true);
+                        foreach (LobbyData p in Settings.Lobbies)
+                        {
+                            builder.AddField(p.lobbyId.ToString(), RNC.Main.ConvertGameStatus(p.gameStatus, false) + " | " + Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == p.lobbyId).ToString() + " Players", true);
+                        }
+
+                        var embed = builder.Build();
+
+                        context.Channel.SendMessageAsync("Reporting...", embed: embed).ConfigureAwait(false);
                     }
-
-                    var embed = builder.Build();
-
-                    await context.Channel.SendMessageAsync("Reporting...", embed: embed) .ConfigureAwait(false);
                 }
 
                 if (context.Content.StartsWith("!admins"))
                 {
-                    if (Settings.LoggedInPlayers.Count(a => EPlayer.GetAccount(a).Admin > 0) < 1)
+                    lock (Settings.LoggedInPlayers)
                     {
-                        await context .Channel.SendMessageAsync(":negative_squared_cross_mark: No admins are online!");
-                        return;
-                    }
-
-                    int players = 0;
-                    int tries = 0;
-                    NAPI.Task.Run(() =>
-                    {
-                        while (players < Settings.LoggedInPlayers.Count(a => EPlayer.GetAccount(a).Admin > 0))
+                        if (Settings.LoggedInPlayers.Count(a => EPlayer.GetAccount(a).Admin > 0) < 1)
                         {
-                            tries++;
-                            if (tries >= 10) { NAPI.Util.ConsoleOutput("breaking cuz of tries"); break; }
+                            context.Channel.SendMessageAsync(":negative_squared_cross_mark: No admins are online!");
+                            return;
+                        }
 
-                            var builder = new EmbedBuilder()
-                                .WithTitle("**Lobby/Mode | Player | Level**")
-                                .WithDescription("```\n```")
-                                .WithColor(255, 0, 0)
-                                .WithFooter(footer =>
-                                {
-                                    footer
-                                        .WithText("Online List");
-                                })
-                                .WithAuthor(author =>
-                                {
-                                    author
-                                        .WithName("Admins")
-                                        .WithIconUrl("https://i.imgur.com/nJPbaL7.png");
-                                });
-
-                            int thisCount = 0;
-                            int proc = 0;
-                            foreach (Player pl in Settings.LoggedInPlayers.Where(a => EPlayer.GetAccount(a).Admin > 0))
+                        int players = 0;
+                        int tries = 0;
+                        NAPI.Task.Run(() =>
+                        {
+                            while (players < Settings.LoggedInPlayers.Count(a => EPlayer.GetAccount(a).Admin > 0))
                             {
-                                thisCount++;
-                                if (thisCount <= players) continue;
+                                tries++;
+                                if (tries >= 10) { NAPI.Util.ConsoleOutput("breaking cuz of tries"); break; }
 
-                                players++;
-                                proc++;
-                                string lobby = "Lobby " + pl.GetSharedData<int>("InLobby");
-                                switch (pl.GetSharedData<int>("InLobby"))
+                                var builder = new EmbedBuilder()
+                                    .WithTitle("**Lobby/Mode | Player | Level**")
+                                    .WithDescription("```\n```")
+                                    .WithColor(255, 0, 0)
+                                    .WithFooter(footer =>
+                                    {
+                                        footer
+                                            .WithText("Online List");
+                                    })
+                                    .WithAuthor(author =>
+                                    {
+                                        author
+                                            .WithName("Admins")
+                                            .WithIconUrl("https://i.imgur.com/nJPbaL7.png");
+                                    });
+
+                                int thisCount = 0;
+                                int proc = 0;
+                                foreach (Player pl in Settings.LoggedInPlayers.Where(a => EPlayer.GetAccount(a).Admin > 0))
                                 {
-                                    case -1:
-                                        lobby = "Login";
-                                        break;
-                                    case -2:
-                                        lobby = "Jail";
-                                        break;
-                                    case -3:
-                                        lobby = "Freeroam";
-                                        break;
-                                    case -4:
-                                        lobby = "Derby";
-                                        break;
-                                    case -5:
-                                        lobby = "Customizer";
-                                        break;
+                                    thisCount++;
+                                    if (thisCount <= players) continue;
+
+                                    players++;
+                                    proc++;
+                                    string lobby = "Lobby " + pl.GetSharedData<int>("InLobby");
+                                    switch (pl.GetSharedData<int>("InLobby"))
+                                    {
+                                        case -1:
+                                            lobby = "Login";
+                                            break;
+                                        case -2:
+                                            lobby = "Jail";
+                                            break;
+                                        case -3:
+                                            lobby = "Freeroam";
+                                            break;
+                                        case -4:
+                                            lobby = "Derby";
+                                            break;
+                                        case -5:
+                                            lobby = "Customizer";
+                                            break;
+                                    }
+
+                                    builder.AddField(pl.Name, lobby + " | Level: " + EPlayer.GetAdminLevelName(EPlayer.GetAccount(pl).Admin, false), true);
+
+                                    if (proc >= 20) break;
                                 }
 
-                                builder.AddField(pl.Name, lobby + " | Level: " + EPlayer.GetAdminLevelName(EPlayer.GetAccount(pl).Admin, false), true);
+                                var embed = builder.Build();
 
-                                if (proc >= 20) break;
+                                context.Channel.SendMessageAsync(
+                                    "Reporting...",
+                                    embed: embed)
+                                    .ConfigureAwait(false);
                             }
-
-                            var embed = builder.Build();
-
-                            context.Channel.SendMessageAsync(
-                                "Reporting...",
-                                embed: embed)
-                                .ConfigureAwait(false);
-                        }
-                    }, 10);
+                        }, 10);
+                    }
                 }
                 else if (context.Content.StartsWith("!a"))
                 {
                     string[] args = context.Content.Split(" ", 2);
                     if (args.Count() >= 2)
                     {
-                        NAPI.Task.Run(() => EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[A] (DISCORD) {context.Author.Username}:  {args[1]}"), 10);
+                        lock (RAGE.Entities.Players)
+                        {
+                            NAPI.Task.Run(() => EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[A] (DISCORD) {context.Author.Username}:  {args[1]}"), 10);
+                        }
                     }
                     else await context.Channel.SendMessageAsync("USAGE: !a (text)");
                 }
