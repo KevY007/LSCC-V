@@ -1988,36 +1988,6 @@ namespace RNC
             return;
         }
 
-        [RemoteEvent("SentLastSeen")]
-        public void OnReceiveLastSeen(Player player, string streetName, string zoneName)
-        {
-            if (!EPlayer.LoggedIn(player) || (player.HasData("VisibleBlip") && player.GetSharedData<bool>("VisibleBlip") == true))
-                return;
-
-            bool isGood = false;
-            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
-            if (lobby != null)
-            {
-                if (lobby.Fugitives.Contains(player) && lobby.gameStatus == 1)
-                {
-                    isGood = true;
-                }
-            }
-
-            if (!isGood)
-            {
-                return;
-            }
-
-            string chatStr = $"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: Felon {player.Name} last spotted at {streetName}, {zoneName}";
-
-            lobby.Cops.ForEach((Player cop) =>
-            {
-                cop.SendChatMessage(chatStr);
-            });
-            return;
-        }
-
         [RemoteEvent("GivePlayerShotTag")]
         public static void PlayerRequestShotTag(Player player)
         {

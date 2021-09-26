@@ -2414,7 +2414,12 @@ namespace RNC
                     {
                         if (lobby.Fugitives.Count() > 0)
                         {
-                            try { lobby.Fugitives.OrderBy(x => Guid.NewGuid()).First().TriggerEvent("SendLastSeen"); } catch { }
+                            try 
+                            {
+                                Player fugi = lobby.Fugitives.OrderBy(x => Guid.NewGuid()).First();
+                                lobby.Cops.ForEach(a => a.TriggerEvent("ReportLastSeen", fugi.Name, fugi.Position.X, fugi.Position.Y, fugi.Position.Z));
+                            } 
+                            catch { }
                         }
                         lobby.LastSeenCounter = 0;
                     }

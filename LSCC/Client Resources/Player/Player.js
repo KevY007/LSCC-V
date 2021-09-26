@@ -276,14 +276,13 @@ function createCam(x, y, z, rx, ry, rz, viewangle, moveable = false) {
 
 mp.events.add("SetVehicleLights", (vehicle, state) => vehicle.setLights(state));
 
-mp.events.add("SendLastSeen", () => {
-    const position = mp.players.local.position;
-    let getStreet = mp.game.pathfind.getStreetNameAtCoord(position.x, position.y, position.z, 0, 0);
+mp.events.add("ReportLastSeen", (name, posx, posy, posz) => {
+    let getStreet = mp.game.pathfind.getStreetNameAtCoord(posx, posy, posz, 0, 0);
 
-    zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(position.x, position.y, position.z));
+    zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(posx, posy, posz));
     streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
 
-    mp.events.callRemote("SentLastSeen", streetName, zoneName);
+    mp.gui.chat.push(`!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: Felon ${name} last spotted at ${streetName}, ${zoneName}.`);
 });
 
 mp.events.add("AFKDriverCheck", (x,y,z) => {
