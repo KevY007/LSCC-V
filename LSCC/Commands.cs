@@ -3992,7 +3992,7 @@ namespace RNC
 
             if((ban != null) == false)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no ban with that ID or Name.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no ban with that ID or Name. Try /checkplayer to see any outstanding bans.");
                 return;
             }
 
@@ -4212,7 +4212,7 @@ namespace RNC
                 return;
             }
 
-            player.SendChatMessage("!{#FF6347} Your password has been changed to: !{#FFFFFF}" + newpass);
+            player.SendChatMessage("!{#33C446}[>>] !{#FFFFFF}Your password has been changed to: !{#33C446}" + newpass);
             player.SendNotification("Password changed to ~r~" + newpass);
 
             string salt = AccountManager.GenSalt();
@@ -4221,6 +4221,65 @@ namespace RNC
             EPlayer.GetAccount(player).Password = password;
             ContextFactory.Instance.SaveChanges();
             player.SetData("LastCryptAttempt", Environment.TickCount64);
+            return;
+        }
+
+        [Command("checkplayer", "!{#AFAFAF}[USAGE] checkplayer (account name) | Checks & gets all associated accounts with a player")]
+        public void cmd_checkplayer(Player player, string accountname)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+            Account pAcc = ContextFactory.Instance.Accounts.ToList().Find(acc => acc.Username.Equals(accountname, StringComparison.OrdinalIgnoreCase));
+            if (pAcc == null)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Account does not exist. Use exact name. (case-insensitive)");
+                return;
+            }
+
+            Logs.LogAdmin(player, $"Checked {pAcc.Username}'s accounts.");
+
+            var accounts = ContextFactory.Instance.Accounts.ToList().Where(acc => 
+                new ulong[] { pAcc.RegisterRID, pAcc.LastRID }.Intersect(new ulong[] { acc.LastRID, acc.RegisterRID }).Any() ||
+                new string[] { pAcc.RegisterIP, pAcc.LastIP }.Intersect(new string[] { acc.RegisterIP, acc.LastIP }).Any() ||
+                new string[] { pAcc.RegisterHWID, pAcc.LastHWID }.Intersect(new string[] { acc.RegisterHWID, acc.LastHWID }).Any() || 
+                (acc.Email != null && acc.Email.Equals(pAcc.Email) && acc.Email.Length >= 5)).ToList(); // BONKERS
+
+
+            if (accounts.Count > 1) // Accounts will always be 1 as the main account matches and adds to the list.
+            {
+                player.SendChatMessage($"!{{#33C446}}[#] !{{#FFFFFF}}Matched !{{#33C446}}{accounts.Count - 1} !{{#FFFFFF}}other accounts with !{{#33C446}}{pAcc.Username} !{{#FFFFFF}}SQLID !{{#33C446}}{pAcc.SQL_ID}!{{#FFFFFF}}:");
+
+                int banCount = 0;
+                accounts.ForEach(acc =>
+                {
+                    if(ContextFactory.Instance.Bans.Count(ban => ban.AccountSQLID == acc.SQL_ID ||
+                    new string[] { acc.RegisterIP, acc.LastIP }.Intersect(new string[] { ban.IP }).Any() ||
+                    new string[] { acc.RegisterHWID, acc.LastHWID }.Intersect(new string[] { ban.HWID }).Any() ||
+                    new ulong[] { acc.RegisterRID, acc.LastRID }.Intersect(new ulong[] { ban.RockstarID }).Any()) >= 1)
+                    {
+                        player.SendChatMessage($"!{{#FF6347}}{acc.Username} SQLID {acc.SQL_ID} !{{#FF0000}}(/bancheck {acc.Username})");
+                        banCount++;
+                    }
+                    else
+                    {
+                        player.SendChatMessage($"!{{#33C446}}{acc.Username} SQLID {acc.SQL_ID}");
+                    }
+                });
+
+                if(banCount > 0)
+                {
+                    player.SendChatMessage($"!{{#FF6347}}[!!] {pAcc.Username}'s account records are NOT IN GOOD standing. You may tend to the potential ban evader.");
+                }
+                else player.SendChatMessage($"!{{#33C446}}[>>] {pAcc.Username}'s account records are in good standing. No redflags.");
+            }
+            else player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}No other accounts matched with !{{#FF6347}}{pAcc.Username} !{{#FFFFFF}}SQLID !{{#FF6347}}{pAcc.SQL_ID}!{{#FFFFFF}}.");
             return;
         }
 
@@ -4279,6 +4338,7 @@ namespace RNC
             ContextFactory.Instance.Bans.Remove(ban);
             ContextFactory.Instance.SaveChanges();
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has unbanned {username}.");
+            player.SendChatMessage("!{#33C446}[>>] !{#FFFFFF}You have successfully unbanned the player but you may want to /checkplayer to see if there are any outstanding bans on them.");
             return;
         }
 
@@ -5095,7 +5155,7 @@ namespace RNC
                 player.SendChatMessage("[Admin Lv 1]: /(t)freeze /(t)unfreeze /kick /slap /setinv(ulnerable) /specoff");
                 player.SendChatMessage("[Admin Lv 1]: /bancheck /(o)jail /(o)unjail /afix /aflip /sendtolobby /set(time/weather)");
                 player.SendChatMessage("[Admin Lv 1]: /(o)mute /(o)unmute /warn /unwarn /setteam /forceautojoin /forceswapseats");
-                player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats /lastlogin /logs /gethp");
+                player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats /lastlogin /logs /gethp /checkplayer");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
@@ -7614,7 +7674,7 @@ namespace RNC
             }, 1000);
                 
 
-            player.SendChatMessage($"!{{#FF6347}}[SPEC] You are now spectating: !{{#FFFFFF}}{target.Name}");
+            player.SendChatMessage($"!{{#33C446}}[>] !{{#FFFFFF}}You are now spectating: !{{#FF6347}}{target.Name}");
             return;
         }
 

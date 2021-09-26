@@ -1394,9 +1394,9 @@ namespace RNC
                                             lobby.gameStatus = 2;
 
                                             if(lobby.gameMode == GameModes.STANDARD)
-                                                NAPI.Chat.SendChatMessageToAll($"!{{#FFFF00}}[Lobby {lobby.lobbyId}] !{{#FFFFFF}}Copchase will start in 10 seconds... ({pCount} players)");
+                                                NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobby.lobbyId}] !{{#FFFFFF}}Copchase will start in 10 seconds... ({pCount} players)");
                                             else if(lobby.gameMode == GameModes.BUSTED)
-                                                NAPI.Chat.SendChatMessageToAll($"!{{#FFFF00}}[Lobby {lobby.lobbyId}] !{{#FFFFFF}}BUSTED! mode will start in 10 seconds... ({pCount} players)");
+                                                NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobby.lobbyId}] !{{#FFFFFF}}BUSTED! mode will start in 10 seconds... ({pCount} players)");
 											
 											NAPI.Util.ConsoleOutput($"[TimeUpdate] Game starting in 10 seconds in lobby {lobby.lobbyId}...");
                                             foreach (Player player in Settings.LoggedInPlayers)
@@ -1580,11 +1580,11 @@ namespace RNC
                 switch (reason)
                 {
                     case 0:
-                        NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] !{{#FF0000}}The game has been stopped by an administrator.");
+                        NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FF0000}}The game has been stopped by an administrator.");
                         Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Stopped by an admin.**");
                         break;
                     case 1:
-                        NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] !{{#DAA520}}The fugitives managed to escape from the cops.");
+                        NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}The fugitives managed to escape from the cops.");
                         Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives have escaped.**");
 
                         foreach (Player i in lobby.Fugitives)
@@ -1598,7 +1598,7 @@ namespace RNC
                         }
                         break;
                     case 2:
-                        NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] !{{#DAA520}}All law enforcement units have been taken out by the fugitives.");
+                        NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{FFFFFF}}All law enforcement units have been taken out by the fugitives.");
                         Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | All cops have been eliminated.**");
 
                         foreach (Player i in lobby.Fugitives)
@@ -1611,7 +1611,7 @@ namespace RNC
                         }
                         break;
                     case 3:
-                        NAPI.Chat.SendChatMessageToAll($"[Lobby {lobbyid}] !{{#DAA520}}The situation has been successfully handled by the police.");
+                        NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}The situation has been successfully handled by the police.");
                         Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Police has neutralized all fugitives.**");
 
                         foreach (Player i in lobby.Cops)
