@@ -1145,7 +1145,7 @@ namespace RNC
             Logs.LogAdmin(player, $"Set {target.Name}'s invulnerability to " + (status == 1 ? "on." : "off."));
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setinv:{target.Name}:{status}"); } catch { }
 
-            player.TriggerEvent("SetActorInvulnerable", status > 0 ? true : false);
+            target.TriggerEvent("SetActorInvulnerable", status > 0 ? true : false);
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have toggled " + target.Name + "'s invulnerability.");
             return;
         }
@@ -5238,11 +5238,10 @@ namespace RNC
 
                 player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /set(hp/ar) /spec");
                 player.SendChatMessage("[Admin Lv 1]: /(r)freeze /(r)unfreeze /kick /slap /setinv(ulnerable) /specoff");
-                player.SendChatMessage("[Admin Lv 1]: /(t)freeze /(t)unfreeze /kick /slap /setinv(ulnerable) /specoff");
                 player.SendChatMessage("[Admin Lv 1]: /bancheck /(o)jail /(o)unjail /afix /aflip /sendtolobby /set(time/weather)");
                 player.SendChatMessage("[Admin Lv 1]: /(o)mute /(o)unmute /warn /unwarn /setteam /forceautojoin /forceswapseats");
                 player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats /lastlogin /logs /gethp /checkplayer");
-                player.SendChatMessage("[Admin Lv 1]: /p(ut)i(n)v(ehicle)");
+                player.SendChatMessage("[Admin Lv 1]: /(t)freeze /(t)unfreeze /p(ut)i(n)v(ehicle)");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
