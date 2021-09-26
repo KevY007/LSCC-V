@@ -594,7 +594,9 @@ mp.events.add('render', () => {
                     {
                         let driver = null;
                         mp.players.forEach(p => {
-                            if(p.isInAnyVehicle(false) && p.vehicle.id == player.vehicle.id && player.vehicle.getOccupant(-1) == p)
+                            if(p.isInAnyVehicle(false) && p.vehicle.id == player.vehicle.id && player.vehicle.getPedInSeat(-1) == p.handle && 
+                            player.vehicle.getPedInSeat(-1).handle != 0 && p.getVariable("HasShot") == false) 
+                            // DRIVER HIMSELF HASN'T SHOT, THESE FACKEN HYPOCRITES SMH
                             {
                                 driver = p;
                                 return; // return in forEach exits the forEach loop btw.

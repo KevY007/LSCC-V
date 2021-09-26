@@ -16,4 +16,3 @@ to avoid farming however
 not priority, smth for the future: a offense-defense type event where the main focus is shootouts, completely opposite
 of the current busted event
 pistol only rounds etc? bank robbery. 
-serveroptions disable driveby
