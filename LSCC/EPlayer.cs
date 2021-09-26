@@ -824,7 +824,21 @@ namespace RNC
                     {
                         loadout.Weapons.ForEach((wepar) =>
                         {
-                            player.GiveWeapon((WeaponHash)wepar[0], (int)wepar[3]);
+                            int extraAmmo = 0;
+                            jWeaponData wepdat;
+                            if (Settings.WeaponData.TryGetValue(Convert.ToUInt64((WeaponHash)wepar[0]), out wepdat))
+                            {
+                                if (EPlayer.GetAccount(player).PurchasedAmmo.Length >= 4)
+                                {
+                                    var data = NAPI.Util.FromJson<Dictionary<string, int>>(EPlayer.GetAccount(player).PurchasedAmmo);
+                                    if (wepdat.AmmoType != null && wepdat.AmmoType.Length >= 2)
+                                    {
+                                        if (!data.TryGetValue(wepdat.AmmoType, out extraAmmo)) extraAmmo = 0;
+                                    }
+                                }
+                            }
+
+                            player.GiveWeapon((WeaponHash)wepar[0], (int)wepar[3]+extraAmmo);
                         });
                     }
                 }
@@ -856,7 +870,7 @@ namespace RNC
                         }
                     }
                     catch { }
-                }, 500);
+                }, 500 + player.Ping);
             }
 
             player.GiveWeapon(WeaponHash.Stungun, 1);
@@ -897,7 +911,21 @@ namespace RNC
                     {
                         loadout.Weapons.ForEach((wepar) =>
                         {
-                            player.GiveWeapon((WeaponHash)wepar[0], (int)wepar[3]);
+                            int extraAmmo = 0;
+                            jWeaponData wepdat;
+                            if (Settings.WeaponData.TryGetValue(Convert.ToUInt64((WeaponHash)wepar[0]), out wepdat))
+                            {
+                                if (EPlayer.GetAccount(player).PurchasedAmmo.Length >= 4)
+                                {
+                                    var data = NAPI.Util.FromJson<Dictionary<string, int>>(EPlayer.GetAccount(player).PurchasedAmmo);
+                                    if (wepdat.AmmoType != null && wepdat.AmmoType.Length >= 2)
+                                    {
+                                        if (!data.TryGetValue(wepdat.AmmoType, out extraAmmo)) extraAmmo = 0;
+                                    }
+                                }
+                            }
+
+                            player.GiveWeapon((WeaponHash)wepar[0], (int)wepar[3] + extraAmmo);
                         });
                     }
                 }
@@ -929,7 +957,7 @@ namespace RNC
                         }
                     }
                     catch { }
-                }, 500);
+                }, 500 + player.Ping);
             }
 
             return;

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Reflection;
@@ -43,7 +44,7 @@ namespace RNC
         public string HWID { get; set; }
         public string Reason { get; set; }
         public string Admin { get; set; }
-        public string DateTime { get; set; }
+        public DateTime DateTime { get; set; }
     }
     public class PlayerOutfit
     {
