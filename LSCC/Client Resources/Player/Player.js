@@ -284,7 +284,7 @@ mp.events.add("ReportLastSeen", (name, posx, posy, posz) => {
     zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(posx, posy, posz));
     streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
 
-    mp.gui.chat.push(`!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: Felon ${name} last spotted at ${streetName}, ${zoneName}.`);
+    mp.gui.chat.push(`!{#FFEC8B}** [RADIO | FREQ: 911] DISPATCH: Felon ${name} last spotted at ${streetName}, ${zoneName}.`);
 });
 
 mp.events.add("AFKDriverCheck", (x,y,z) => {
