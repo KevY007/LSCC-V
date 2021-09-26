@@ -1539,7 +1539,7 @@ namespace RNC
             player.SetData("LastCryptAttempt", Environment.TickCount64);
             if (username.Contains("@"))
             {
-                Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Email == username);
+                Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Email == username && a.Email.Length >= 5);
                 if (acc != null)
                 {
                     if (AccountManager.Login(acc, password))
