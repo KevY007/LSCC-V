@@ -897,6 +897,11 @@ namespace RNC
                     {
                         loadout.Weapons.ForEach((wepar) =>
                         {
+                            jWeaponData wepdat;
+                            if(Settings.WeaponData.TryGetValue((ulong)wepar[0], out wepdat))
+                            {
+                               
+                            }
                             player.GiveWeapon((WeaponHash)wepar[0], (int)wepar[3]);
                         });
                     }

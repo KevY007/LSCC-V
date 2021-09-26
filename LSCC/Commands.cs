@@ -4006,9 +4006,9 @@ namespace RNC
                 }
             }
 
-            player.SendChatMessage($"!{{#FF6347}}Ban ID: {ban.SQL_ID} | Ban By: {ban.Admin}");
+            player.SendChatMessage($"!{{#FF6347}}Ban ID: {ban.SQL_ID} | Admin: {ban.Admin}");
             player.SendChatMessage($"!{{#FF6347}}Reason: {ban.Reason} | DateTime: {ban.DateTime}");
-            player.SendChatMessage($"!{{#FF6347}}Player: {username} | SQLID: {ban.AccountSQLID}");
+            player.SendChatMessage($"!{{#FF6347}}Name: {username} | SQLID: {ban.AccountSQLID}");
             player.SendChatMessage($"!{{#FF6347}}IP: {ban.IP}");
             player.SendChatMessage($"!{{#FF6347}}HWID: {ban.HWID}");
             player.SendChatMessage($"!{{#FF6347}}Rockstar ID: {ban.RockstarID}");
@@ -4259,10 +4259,7 @@ namespace RNC
                 int banCount = 0;
                 accounts.ForEach(acc =>
                 {
-                    if(ContextFactory.Instance.Bans.Count(ban => ban.AccountSQLID == acc.SQL_ID ||
-                    new string[] { acc.RegisterIP, acc.LastIP }.Intersect(new string[] { ban.IP }).Any() ||
-                    new string[] { acc.RegisterHWID, acc.LastHWID }.Intersect(new string[] { ban.HWID }).Any() ||
-                    new ulong[] { acc.RegisterRID, acc.LastRID }.Intersect(new ulong[] { ban.RockstarID }).Any()) >= 1)
+                    if(ContextFactory.Instance.Bans.ToList().Count(ban => ban.AccountSQLID == acc.SQL_ID) >= 1)
                     {
                         player.SendChatMessage($"!{{#FF6347}}{acc.Username} SQLID {acc.SQL_ID} !{{#FF0000}}(/bancheck {acc.Username})");
                         banCount++;
@@ -4381,11 +4378,11 @@ namespace RNC
 
             var _new = new BanData
             {
-                IP = "Offline Ban",
+                IP = tpAcc.LastIP,
                 RockstarID = tpAcc.LastRID,
                 Reason = reason,
                 Admin = player.Name,
-                DateTime = DateTime.Now.ToString(),
+                DateTime = DateTime.Now,
                 AccountSQLID = tpAcc.SQL_ID,
                 HWID = tpAcc.LastHWID
             };
@@ -4440,7 +4437,7 @@ namespace RNC
                 RockstarID = target.SocialClubId,
                 Reason = reason,
                 Admin = player.Name,
-                DateTime = DateTime.Now.ToString(),
+                DateTime = DateTime.Now,
                 AccountSQLID = EPlayer.LoggedIn(target) ? EPlayer.GetAccount(target).SQL_ID : -1,
                 HWID = target.Serial
             };

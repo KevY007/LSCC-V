@@ -11,6 +11,8 @@ Edit HWID, RockstarID to RegisterHWID longtext, RegisterRID bigint(20)
 Delete LastLogin and Add new LastLogin and RegisterDate with variable type datetime
 Add RegisterIP longtext, LastRID bigint(20), LastIP longtext, LastHWID longtext, RegisterSC longtext, LastSC longtext
 
+Edit entry string Time of "Bans" table to DateTime
+
 execute the following SQL for reset detection in server.
 
 UPDATE Accounts SET RegisterDate = STR_TO_DATE('2000-3-2 6:03:22', '%Y-%m-%d %H:%i:%s'), LastLogin = STR_TO_DATE('2000-3-2 6:03:22', '%Y-%m-%d %H:%i:%s'), LastIP = 'n/a', LastRID = 0, LastHWID = 'n/a', LastSC = 'n/a', RegisterIP = 'n/a', RegisterSC = 'n/a', RegisterRID = 0, RegisterHWID = 'n/a'
