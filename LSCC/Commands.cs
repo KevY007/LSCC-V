@@ -2965,6 +2965,38 @@ namespace RNC
             }
         }
 
+        [Command("driveby", Alias = "db")]
+        public void cmd_driveby(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (player.GetSharedData<bool>("WantsDriveby") == true)
+            {
+                if(player.GetSharedData<int>("Team") == 0 && player.IsInVehicle && player.VehicleSeat == 0)
+                {
+                    foreach (Player p in Settings.LoggedInPlayers.Where(a => a.Vehicle == player.Vehicle && a != player))
+                    {
+                        //p.SendChatMessage("!{#FF6347}[!!] !{#FFFFFF}" + player.Name + " has disabled drive-by in this vehicle."); ALREADY SHOWED CLIENTSIDE
+                    }
+                }
+                player.SetSharedData("WantsDriveby", false);
+                player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have disabled drive-by in your vehicle. (Only takes effect as a fugitive driver)");
+            }
+            else
+            {
+                if (player.GetSharedData<int>("Team") == 0 && player.IsInVehicle && player.VehicleSeat == 0)
+                {
+                    foreach (Player p in Settings.LoggedInPlayers.Where(a => a.Vehicle == player.Vehicle && a != player))
+                    {
+                        p.SendChatMessage("!{#33C446}[!!] !{#FFFFFF}" + player.Name + " has enabled drive-by in this vehicle. You may shoot again.");
+                    }
+                }
+                player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have enabled drive-by in your vehicle again. (Only takes effect as a fugitive driver)");
+                player.SetSharedData("WantsDriveby", true);
+            }
+        }
+
         [Command("stats")]
         public void cmd_stats(Player player)
         {
@@ -3742,6 +3774,35 @@ namespace RNC
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has sent {target.Name} to lobby.");
         }
 
+        [Command("putinveh", "!{#AFAFAF}[USAGE] putinveh (target) (player) | \"Target\" is put inside \"player\"'s vehicle.", Alias = "piv, putinvehicle")]
+        public void cmd_putinveh(Player player, Player target, Player toputin)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                return;
+            }
+
+            if(!toputin.IsInVehicle)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The player is not in any vehicle!");
+                return;
+            }
+
+            int nextseat = 1;
+            while (Settings.LoggedInPlayers.Count(a => a.IsInVehicle && a.Vehicle == toputin.Vehicle && a.VehicleSeat == nextseat) >= 1)
+            {
+                nextseat++;
+            }
+            
+            Logs.LogAdmin(player, $"Put {target.Name} in {toputin.Name}'s vehicle.");
+            target.SetIntoVehicle(toputin.Vehicle, nextseat);
+
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has put {target.Name} in {toputin.Name}'s vehicle.");
+        }
+
         [Command("keys")]
         public void cmd_keys(Player player)
         {
@@ -3931,7 +3992,8 @@ namespace RNC
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats /changemypass");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys for activation)");
             player.SendChatMessage("!{#339BC4}[Cop!{#F24C27}chase]: !{#FFFFFF}/r(adio) /wt");
-            player.SendChatMessage("!{#61A9FA}[Cop]: /gps /cuff /m(egaphone) /dragout");
+            player.SendChatMessage("!{#0097ff}[Cop]: /gps /cuff /m(egaphone) /dragout");
+            player.SendChatMessage("!{#ffae00}[Fugitive]: /d(rive)b(y)");
             player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup /s(top)a(nim) /passgun");
             player.SendChatMessage("!{#AB00BA}[Vehicle]: /trunk /lock /engine");
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /derby");
@@ -5180,6 +5242,7 @@ namespace RNC
                 player.SendChatMessage("[Admin Lv 1]: /bancheck /(o)jail /(o)unjail /afix /aflip /sendtolobby /set(time/weather)");
                 player.SendChatMessage("[Admin Lv 1]: /(o)mute /(o)unmute /warn /unwarn /setteam /forceautojoin /forceswapseats");
                 player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats /lastlogin /logs /gethp /checkplayer");
+                player.SendChatMessage("[Admin Lv 1]: /p(ut)i(n)v(ehicle)");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {

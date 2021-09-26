@@ -501,6 +501,7 @@ namespace RNC
                 player.SetSharedData("DerbyTime", 0);
                 player.SetSharedData("EntAlpha", 0);
                 player.SetSharedData("Collisions", true);
+                player.SetSharedData("WantsDriveby", true);
                 player.SetData("DerbySpawnTick", 0);
                 player.SetData("FreeroamTime", 12);
                 player.SetData("FreeroamWeather", 0);

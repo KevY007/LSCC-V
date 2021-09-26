@@ -19,6 +19,8 @@ let derbyCounting = false;
 let secondCounter = 0;
 let updateRate = 200;
 
+let dbDisabledMsg = false;
+
 if(mp.storage.data.updaterate !== undefined)
 {
     updateRate = mp.storage.data.updaterate;
@@ -580,16 +582,50 @@ mp.events.add('render', () => {
 
             if(player.isInAnyVehicle(false))
             {
-                if (player.seat !== undefined && player.seat == -1 && 
-                    player.weapon == 911657153)
-                { // Stun Gun
-                    mp.game.controls.disableControlAction(32, 25, true); 
-                    mp.game.controls.disableControlAction(32, 68, true); 
-                    mp.game.controls.disableControlAction(32, 70, true); 
-                    mp.game.controls.disableControlAction(32, 91, true); 
-                    mp.game.controls.disableControlAction(32, 92, true); 
-                    mp.game.controls.disableControlAction(32, 69, true); 
-                    mp.game.controls.disableControlAction(32, 24, true); 
+                if (player.seat !== undefined)
+                {
+                    let disableDriveby = false;
+                    if(player.seat == -1 && player.weapon == 911657153)
+                    { // DISABLE STUN GUN AIMING
+                        disableDriveby = true;
+                    }
+
+                    if(player.Team == 0 && player.seat != -1 && player.getVariable("HasShot") == false)
+                    {
+                        let driver = null;
+                        mp.players.forEach(p => {
+                            if(p.isInAnyVehicle(false) && p.vehicle.id == player.vehicle.id && player.vehicle.getOccupant(-1) == p)
+                            {
+                                driver = p;
+                                return; // return in forEach exits the forEach loop btw.
+                            }
+                        });
+
+                        if(driver != null)
+                        {
+                            if(driver.getVariable("WantsDriveby") == false) 
+                            {
+                                disableDriveby = true;
+
+                                if(!dbDisabledMsg)
+                                {
+                                    mp.gui.chat.push(`!{#FF6347}[!] !{#FFFFFF}The driver does not want to engage in a driveby. Driver has to use /db to enable it again.`);
+                                    dbDisabledMsg = true;
+                                }
+                            }
+                        }
+                    }
+
+                    if(disableDriveby)
+                    {
+                        mp.game.controls.disableControlAction(32, 25, true); 
+                        mp.game.controls.disableControlAction(32, 68, true); 
+                        mp.game.controls.disableControlAction(32, 70, true); 
+                        mp.game.controls.disableControlAction(32, 91, true); 
+                        mp.game.controls.disableControlAction(32, 92, true); 
+                        mp.game.controls.disableControlAction(32, 69, true); 
+                        mp.game.controls.disableControlAction(32, 24, true); 
+                    }
                     // /*&& player.weapon != 2725352035 && player.Team == 0*/
                 } //-- ALLOWED FUGITIVE DRIVER AIMING AGAIN!! 
             }
@@ -1559,6 +1595,7 @@ mp.events.add(
     },
 
     "playerEnterVehicle": (vehicle, seat) => {
+        dbDisabledMsg = false;
         player.seat = seat;
         if(vehicle.Collisions == undefined || vehicle.Collisions == true) vehicle.setInvincible(false);
 
