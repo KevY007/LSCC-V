@@ -2241,6 +2241,7 @@ namespace RNC
                 RegisterDate = DateTime.Now,
                 LastLogin = DateTime.Now,
                 Character = "{}",
+                PurchasedAmmo = "{}",
             };
             AccountManager.Add(_new);
             OnPlayerRegister(player, _new);

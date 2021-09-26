@@ -65,6 +65,7 @@ namespace RNC
         public string WeaponComponents { get; set; }
         public string MOTD { get; set; }
         public double LastSessionMins { get; set; }
+        public string PurchasedAmmo { get; set; }
     }
 
     public static class AccountManager

@@ -126,8 +126,8 @@ mp.events.add("UpdateMenuMinigames", (arenas, currentMinigame) => {
 mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) => {
     UIMenu.execute(`gm.$refs.mainMenu.$refs.vehicles.$refs.police.vehicles = [];`);
     UIMenu.execute(`gm.$refs.mainMenu.$refs.vehicles.$refs.fugitive.vehicles = [];`);
-    UIMenu.execute(`gm.$refs.mainMenu.$refs.vehicles.$refs.police.selectedModel = "${currentCopCar}";`);
-    UIMenu.execute(`gm.$refs.mainMenu.$refs.vehicles.$refs.fugitive.selectedModel = "${currentFugiCar}";`);
+    UIMenu.execute(`gm.$refs.mainMenu.$refs.vehicles.$refs.police.selectedModel = "${(currentCopCar == "?" ? "Random" : currentCopCar)}";`);
+    UIMenu.execute(`gm.$refs.mainMenu.$refs.vehicles.$refs.fugitive.selectedModel = "${(currentFugiCar == "?" ? "Random" : currentFugiCar)}";`);
 
     // Vehicle Data
     // Model, Name, Background, Energy, Price, Locked
@@ -153,8 +153,8 @@ mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) =>
 mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoadout) => {
     UIMenu.execute(`gm.$refs.mainMenu.$refs.loadouts.$refs.police.loadouts = [];`);
     UIMenu.execute(`gm.$refs.mainMenu.$refs.loadouts.$refs.fugitive.loadouts = [];`);
-    UIMenu.execute(`gm.$refs.mainMenu.$refs.loadouts.$refs.police.selectedLoadout = "${currentCopLoadout}";`);
-    UIMenu.execute(`gm.$refs.mainMenu.$refs.loadouts.$refs.fugitive.selectedLoadout = "${currentFugiLoadout}";`);
+    UIMenu.execute(`gm.$refs.mainMenu.$refs.loadouts.$refs.police.selectedLoadout = "${(currentCopLoadout == "?" ? "Default" : currentCopLoadout)}";`);
+    UIMenu.execute(`gm.$refs.mainMenu.$refs.loadouts.$refs.fugitive.selectedLoadout = "${(currentFugiLoadout == "?" ? "Default" : currentFugiLoadout)}";`);
 
     // Loadout Data
     // Name, Locked, Background, Requirements, Weapons

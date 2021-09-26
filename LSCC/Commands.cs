@@ -3956,6 +3956,33 @@ namespace RNC
             return;
         }
 
+        /*[Command("purchaseammo")] // WORKS -- WAITING ON MENU TAB ADDITION TO INCLUDE THIS
+        public void cmd_purchaseammo(Player player)
+        {
+            jWeaponData wepdat;
+            if (Settings.WeaponData.TryGetValue((ulong)player.CurrentWeapon, out wepdat))
+            {
+                var data = NAPI.Util.FromJson<Dictionary<string, int>>(EPlayer.GetAccount(player).PurchasedAmmo);
+                if (wepdat.AmmoType != null && wepdat.AmmoType.Length >= 2)
+                {
+                    int purchased = 0;
+                    if (!data.TryGetValue(wepdat.AmmoType, out purchased)) purchased = 0;
+
+                    player.SendChatMessage($"already purchased: {purchased}");
+                    data.Remove(wepdat.AmmoType);
+                    purchased += 20;
+                    data.Add(wepdat.AmmoType, purchased);
+                    player.SendChatMessage($"bought now: {purchased}");
+
+                    EPlayer.GetAccount(player).PurchasedAmmo = NAPI.Util.ToJson(data);
+                    ContextFactory.Instance.SaveChanges();
+                }
+                else player.SendChatMessage("ammo type is null or inv");
+            }
+            else player.SendChatMessage("weapon cant be found in weapondata.json");
+        }
+        */
+
         [Command("bancheck", "!{#AFAFAF}[USAGE] bancheck (target name or ban id)", GreedyArg = true)]
         public void cmd_bancheck(Player player, string sqlorname)
         {
