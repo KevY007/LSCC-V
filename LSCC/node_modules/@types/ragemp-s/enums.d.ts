@@ -3,6 +3,8 @@ declare namespace RageEnums {
 		ENTITY_CREATED = "entityCreated",
 		ENTITY_DESTROYED = "entityDestroyed",
 		ENTITY_MODEL_CHANGE = "entityModelChange",
+		INCOMING_CONNECTION = "incomingConnection",
+		PACKAGES_LOADED = "packagesLoaded",
 		PLAYER_CHAT = "playerChat",
 		PLAYER_COMMAND = "playerCommand",
 		PLAYER_DAMAGE = "playerDamage",
@@ -24,8 +26,10 @@ declare namespace RageEnums {
 		PLAYER_STREAM_IN = "playerStreamIn",
 		PLAYER_STREAM_OUT = "playerStreamOut",
 		PLAYER_WEAPON_CHANGE = "playerWeaponChange",
+		SERVER_SHUTDOWN = "serverShutdown",
 		TRAILER_ATTACHED = "trailerAttached",
 		VEHICLE_DAMAGE = "vehicleDamage",
+		VEHICLE_DEATH = "vehicleDeath",
 		VEHICLE_HORN_TOGGLE = "vehicleHornToggle",
 		VEHICLE_SIREN_TOGGLE = "vehicleSirenToggle",
 		VEHICLE_STREAM_IN = "vehicleStreamIn",
@@ -61,6 +65,7 @@ declare namespace RageEnums {
 		BLIP = "blip",
 		CHECKPOINT = "checkpoint",
 		COLSHAPE = "colshape",
+		DUMMY = "dummy",
 		MARKER = "marker",
 		OBJECT = "object",
 		PICKUP = "pickup",
@@ -126,10 +131,23 @@ declare namespace RageEnums {
 	}
 
 	const enum VehicleSeat {
-		DRIVER = -1,
-		PASSENGER_1 = 0,
-		PASSENGER_2 = 1,
-		PASSENGER_3 = 2
+		DRIVER,
+		PASSENGER_1,
+		PASSENGER_2,
+		PASSENGER_3,
+		PASSENGER_4,
+		PASSENGER_5,
+		PASSENGER_6,
+		PASSENGER_7,
+		PASSENGER_8,
+		PASSENGER_9,
+		PASSENGER_10,
+		PASSENGER_11,
+		PASSENGER_12,
+		PASSENGER_13,
+		PASSENGER_14,
+		PASSENGER_15,
+		PASSENGER_16,
 	}
 
 	const enum Weather {
