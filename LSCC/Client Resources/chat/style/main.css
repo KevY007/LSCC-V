@@ -66,7 +66,7 @@ a{
     transform:rotate(-180deg)}
 #chat input#chat_msg{
     color:#fff;
-    background: rgba(5, 0, 94, .5);
+    background: rgba(0, 151, 255, .5);
     outline:0;border:none;
     font-family: 'Abel', sans-serif;
     font-size:18px;
@@ -84,19 +84,19 @@ a{
   
   /* Track */
   ::-webkit-scrollbar-track {
-    background: rgba(5, 0, 94, .15);
+    background: rgba(0, 151, 255, .15);
     border-radius: 15px;
   }
 
    
   /* Handle */
   ::-webkit-scrollbar-thumb {
-    background: rgba(0, 59, 153, .35);
+    background: rgba(18, 160, 255, 0.35);
     border-radius: 15px;
   }
 
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 85, 219, .5);
+    background: rgba(53, 174, 255, 0.5);
     border-radius: 15px;
   }
