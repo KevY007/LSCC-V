@@ -1130,6 +1130,50 @@ namespace RNC
             return;
         }
 
+        [Command("viewscreenshot", Alias = "viewss")]
+        public void cmd_viewscreenshot(Player player, string identifier)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (EPlayer.GetAccount(player).Admin < 1) return;
+
+            if (identifier.Equals("last", StringComparison.OrdinalIgnoreCase))
+            {
+                if(!player.HasData("LastSSIdentifier"))
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You don't have any last saved SS for this session.");
+                    return;
+                }
+                
+                identifier = player.GetData<string>("LastSSIdentifier");
+            }
+
+            player.TriggerEvent("ViewScreenshot", identifier);
+            player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}Viewing screenshot !{#FF6347}" + identifier + " !{#FFFFFF}now...");
+            Logs.LogAdmin(player, $"View screenshot {identifier}.");
+            return;
+        }
+
+        [Command("takescreenshot", Alias = "takess")]
+        public void cmd_takescreenshot(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (EPlayer.GetAccount(player).Admin < 1) return;
+
+            if (!player.Name.Equals(target.Name) && EPlayer.GetAccount(target).Admin > EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher admin level than you.");
+                return;
+            }
+
+            target.TriggerEvent("TakeScreenshot", 20, 100, $"adm_{player.Name}");
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has requested {target.Name}'s game screenshot.");
+            player.SendChatMessage("!{#33C446}[>>] !{#FFFFFF}The screenshot will arrive as soon as the uploading is complete. If it fails you will be notified.");
+            Logs.LogAdmin(player, $"Take {target.Name}'s game screenshot.");
+            return;
+        }
+
         [Command("setinv", "!{#AFAFAF}[USAGE] setinv(ulnerable) (target) (0 or 1)", Alias = "setinvulnerable")]
         public void cmd_setinv(Player player, Player target, int status)
         {
@@ -5241,7 +5285,7 @@ namespace RNC
                 player.SendChatMessage("[Admin Lv 1]: /bancheck /(o)jail /(o)unjail /afix /aflip /sendtolobby /set(time/weather)");
                 player.SendChatMessage("[Admin Lv 1]: /(o)mute /(o)unmute /warn /unwarn /setteam /forceautojoin /forceswapseats");
                 player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats /lastlogin /logs /gethp /checkplayer");
-                player.SendChatMessage("[Admin Lv 1]: /(t)freeze /(t)unfreeze /p(ut)i(n)v(ehicle)");
+                player.SendChatMessage("[Admin Lv 1]: /(t)freeze /(t)unfreeze /p(ut)i(n)v(ehicle) /view(s)creen(s)hot /take(s)creen(s)hot");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {

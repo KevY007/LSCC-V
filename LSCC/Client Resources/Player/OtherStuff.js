@@ -522,3 +522,69 @@ function checkCamInAir() {
         UIHud.execute(`gm.hud = ${showHud};`);
     }
 }
+
+
+// Screenshotter
+
+let ssViewCEF = null;
+let ssViewCursor = false;
+
+mp.events.add('TakeScreenshot', (quality, compression, identifier = "null") => 
+{
+    let _fdate = new Date();
+    let _fname = `${_fdate.getDate()}-${_fdate.getMonth()}-${_fdate.getFullYear()}+${_fdate.getHours()};${_fdate.getMinutes()};${_fdate.getSeconds()}+${Intl.DateTimeFormat().resolvedOptions().timeZone.replaceAll("/", "_")}.png`;
+
+    mp.gui.takeScreenshot(_fname, 1, quality, compression);
+    let screenshotter_cef = mp.browsers.new("package://Player/Screenshotter.html");
+    // function loadImage(name, url, event, identifier, uploadUrl)
+
+    mp.events.add(`Screenshotter${_fdate.getMilliseconds()}`, (result, data, identifier) => {
+        mp.events.callRemote(`ScreenshotReceived`, result, data, identifier);
+
+        screenshotter_cef.active = false;
+
+        setTimeout(() => {
+            screenshotter_cef.destroy(); // Destroying right after was crashing the client, not sure why.
+        }, 1000);
+        mp.events.remove(`Screenshotter${_fdate.getMilliseconds()}`);
+    });
+
+    screenshotter_cef.execute(`
+        loadImage("${mp.players.local.name};${identifier}+${_fname}", 
+        "http://screenshots/${_fname}", 
+        "Screenshotter${_fdate.getMilliseconds()}", 
+        "${identifier}", 
+        "http://192.210.243.62/lsccv/imguploader.php");`);
+});
+
+mp.events.add("ViewScreenshot", (identifier) => {
+    if(ssViewCEF != null)
+    {
+        ssViewCEF.destroy();
+        ssViewCEF = null;
+    }
+
+    ssViewCEF = mp.browsers.new(`http://192.210.243.62/lsccv/screenshots/${identifier}`);
+});
+
+mp.keys.bind(0x71, true, function() {
+    if(ssViewCEF != null)
+    {
+        ssViewCursor = !ssViewCursor;
+        mp.gui.cursor.show(ssViewCursor, ssViewCursor);
+    }
+});
+
+mp.keys.bind(0x73, true, function() {
+    if(ssViewCEF != null)
+    {
+        ssViewCEF.destroy();
+        ssViewCEF = null;
+
+        if(ssViewCursor)
+        {
+            ssViewCursor = false;
+            mp.gui.cursor.show(ssViewCursor, ssViewCursor);
+        }
+    }
+});
