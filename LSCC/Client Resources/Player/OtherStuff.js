@@ -532,9 +532,9 @@ let ssViewCursor = false;
 mp.events.add('TakeScreenshot', (quality, compression, identifier = "null") => 
 {
     let _fdate = new Date();
-    let _fname = `${_fdate.getDate()}-${_fdate.getMonth()}-${_fdate.getFullYear()}+${_fdate.getHours()};${_fdate.getMinutes()};${_fdate.getSeconds()}+${Intl.DateTimeFormat().resolvedOptions().timeZone.replaceAll("/", "_")}.png`;
+    let _fname = `${_fdate.getDate()}-${_fdate.getMonth()}-${_fdate.getFullYear()}+${_fdate.getHours()};${_fdate.getMinutes()};${_fdate.getSeconds()}+${Intl.DateTimeFormat().resolvedOptions().timeZone.replaceAll("/", "_")}.jpg`;
 
-    mp.gui.takeScreenshot(_fname, 1, quality, compression);
+    mp.gui.takeScreenshot(_fname, 0, quality, compression);
     let screenshotter_cef = mp.browsers.new("package://Player/Screenshotter.html");
     // function loadImage(name, url, event, identifier, uploadUrl)
 

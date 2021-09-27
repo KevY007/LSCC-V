@@ -12,13 +12,13 @@
 document.getElementById("uploader").hidden = true;
 document.getElementById("uploadersubmit").hidden = true;
 
-// loadImage("today-23-512;53;125_2015.png", "screenshot.png", "Screenshotter35125_3512", "null", "http://127.0.0.1/imguploader.php")
+// loadImage("today-23-512;53;125_2015.jpg", "screenshot.jpg", "Screenshotter35125_3512", "null", "http://127.0.0.1/imguploader.php")
 function loadImage(name, url, event, identifier, uploadUrl)
 {
 	document.getElementById("postForm").action = `${uploadUrl}?event=${event}&id=${identifier}`;
 	toDataUrl(url, (data) => {
 		let file = new File([dataURItoBlob(data)], name, 
-			{ type: "image/png", lastModified: new Date().getTime() } );
+			{ type: "image/jpg", lastModified: new Date().getTime() } );
 		
 		let container = new DataTransfer();
 		

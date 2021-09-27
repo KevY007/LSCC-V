@@ -1155,7 +1155,7 @@ namespace RNC
         }
 
         [Command("takescreenshot", Alias = "takess")]
-        public void cmd_takescreenshot(Player player, Player target)
+        public void cmd_takescreenshot(Player player, Player target, int quality)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
@@ -1167,7 +1167,13 @@ namespace RNC
                 return;
             }
 
-            target.TriggerEvent("TakeScreenshot", 20, 100, $"adm_{player.Name}");
+            if(quality < 0 || quality > 100)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Quality is between 0-100! Use 20 if you have no idea.");
+                return;
+            }
+
+            target.TriggerEvent("TakeScreenshot", quality, 100, $"adm_{player.Name}");
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has requested {target.Name}'s game screenshot.");
             player.SendChatMessage("!{#33C446}[>>] !{#FFFFFF}The screenshot will arrive as soon as the uploading is complete. If it fails you will be notified.");
             Logs.LogAdmin(player, $"Take {target.Name}'s game screenshot.");
