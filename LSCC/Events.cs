@@ -2847,6 +2847,13 @@ namespace RNC
             {
                 if (tuning != null)
                 {
+                    if (!player.HasData("TunerNoRefundWarn"))
+                    {
+                        player.SetData("TunerNoRefundWarn", true);
+                        EPlayer.Notify(player, "THIS ACTION IS IRREVERSIBLE AND NON REFUNDABLE, USE AGAIN TO PROCEED.", "red", "fas fa-exclamation", false, 2500, "topCenter", "replace");
+                        return;
+                    }
+
                     ContextFactory.Instance.PlayerTunings.Remove(tuning);
                 }
             }
@@ -2858,7 +2865,7 @@ namespace RNC
                     {
                         if (acc.DonatorPoints < (vMods.Keys.Count * 10))
                         {
-                            EPlayer.Error(player, $"You need {(vMods.Keys.Count * 10) - acc.DonatorPoints} more donator points for this upgrade! You can only purchase max 2 components with standard points.", "fas fa-lock");
+                            EPlayer.Notify(player, $"You need {(vMods.Keys.Count * 10) - acc.DonatorPoints} more donator points for this upgrade! <p>You can only purchase max 2 components with standard points.</p>", "red", "fas fa-lock", false, 2500, "topCenter", "replace");
                             return;
                         }
                         acc.DonatorPoints -= (vMods.Keys.Count * 10);
@@ -2867,7 +2874,7 @@ namespace RNC
                     {
                         if (acc.Points < (vMods.Keys.Count * 50))
                         {
-                            EPlayer.Error(player, $"You need {(vMods.Keys.Count * 50) - acc.Points} more points for this upgrade!", "fas fa-lock");
+                            EPlayer.Notify(player, $"You need {(vMods.Keys.Count * 50) - acc.Points} more points for this upgrade!", "red", "fas fa-lock", false, 2500, "topCenter", "replace");
                             return;
                         }
                         EPlayer.GivePoints(player, -(vMods.Keys.Count * 50));
@@ -2906,7 +2913,7 @@ namespace RNC
                     {
                         if (acc.DonatorPoints < (changes * 10))
                         {
-                            EPlayer.Error(player, $"You need {(changes * 10) - acc.DonatorPoints} more donator points for this upgrade! You can only purchase max 2 components with standard points.", "fas fa-lock");
+                            EPlayer.Notify(player, $"You need {(changes * 10) - acc.DonatorPoints} more donator points for this upgrade! <p>You can only purchase max 2 components with standard points.</p>", "red", "fas fa-lock", false, 2500, "topCenter", "replace");
                             return;
                         }
                         acc.DonatorPoints -= (changes * 10);
@@ -2915,7 +2922,7 @@ namespace RNC
                     {
                         if (acc.Points < (changes * 50))
                         {
-                            EPlayer.Error(player, $"You need {(changes * 50) - acc.Points} more points for this upgrade!", "fas fa-lock");
+                            EPlayer.Notify(player, $"You need {(changes * 50) - acc.Points} more points for this upgrade!", "red", "fas fa-lock", false, 2500, "topCenter", "replace");
                             return;
                         }
                         EPlayer.GivePoints(player, -(changes * 50));

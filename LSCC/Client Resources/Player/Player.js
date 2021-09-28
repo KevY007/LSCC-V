@@ -231,6 +231,7 @@ mp.events.addCommand("gpsbind", function (bind) {
     mp.keys.unbind(lastGPSBind, true, TogGPSMode);
     mp.keys.bind(curGPSBind, true, TogGPSMode);
 
+    mp.events.callLocal("RemoveTooltip", String.fromCharCode(lastGPSBind));
     mp.gui.chat.push("Key changed!");
 });
 

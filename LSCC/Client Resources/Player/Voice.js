@@ -67,4 +67,6 @@ mp.events.addCommand("voicebind", function (bind) {
     mp.keys.bind(curVoiceBind, true, EnableVoice);
 
     mp.gui.chat.push("Key changed!");
+    mp.events.callLocal("RemoveTooltip", String.fromCharCode(lastVoiceBind));
+    mp.events.callLocal("AddTooltip", String.fromCharCode(curVoiceBind), "Voice Chat", -1);
 });

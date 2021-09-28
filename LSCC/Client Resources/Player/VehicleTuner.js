@@ -196,6 +196,7 @@ mp.events.add('OpenTuner', (vid) => {
     mp.gui.chat.show(false);
 
     vTuner_Main.Open();
+    mp.events.callLocal("AddTooltip", "M1", "Switch camera", 0);
 });
 
 mp.events.add('UpdateTunerPrice', (pricestr, descstr, r = 220, g = 10, b = 10) => {
@@ -274,5 +275,6 @@ vTuner_Main.MenuClose.on(() => {
     mp.gui.chat.show(true);
 
     mp.events.callRemote("OnTunerClose");
+    mp.events.callLocal("RemoveTooltip", "M1");
 });
 traceLastFunc("vTuner::Init()");

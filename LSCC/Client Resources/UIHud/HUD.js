@@ -187,7 +187,10 @@ mp.events.add("OneSecondEvent", () => {
         if(createdTooltips.indexOf("B") != -1) mp.events.callLocal("RemoveTooltip", "B");        
     }
     if(mp.players.local.Team == 1){
-        if(createdTooltips.indexOf("Z") == -1) mp.events.callLocal("AddTooltip", "Z", "GPS", 1);
+        if(createdTooltips.indexOf(String.fromCharCode(curGPSBind)) == -1) 
+        {
+            mp.events.callLocal("AddTooltip", String.fromCharCode(curGPSBind), "GPS", 1);
+        }
     }
     else{
         if(createdTooltips.indexOf("Z") != -1) mp.events.callLocal("RemoveTooltip", "Z");
@@ -280,7 +283,7 @@ mp.events.add('browserDomReady', (browser) => {
         UIHud.execute(`gm.$refs.MiniHud.$refs.packetloss.show = false;`);
 
         mp.events.callLocal("AddTooltip", "M", "Menu", -1);
-        mp.events.callLocal("AddTooltip", "N", "Voice Chat", -1);
+        mp.events.callLocal("AddTooltip", String.fromCharCode(curVoiceBind), "Voice Chat", -1);
     }
 });
 

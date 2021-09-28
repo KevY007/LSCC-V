@@ -491,6 +491,8 @@ namespace RNC
             lock (player)
             {
                 player.ResetData("AccountHandle");
+                player.ResetData("CompNoRefundWarn");
+                player.ResetData("TunerNoRefundWarn");
                 ResetShotStats(player);
                 player.SetData<long>("JoinTimeUnix", 0);
                 player.SetData("TeamShotWarning", 0);

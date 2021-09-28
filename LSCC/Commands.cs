@@ -1250,7 +1250,7 @@ namespace RNC
         [Command("blipdbg")]
         public void cmd_blipdbg(Player player)
         {
-            if (EPlayer.GetAccount(player).Admin < 6)
+            if (EPlayer.GetAccount(player).Admin < 5)
             {
                 return;
             }
@@ -2231,11 +2231,18 @@ namespace RNC
             return;
         }
 
-        [Command("removecomp", "!{#AFAFAF}[USAGE] removecomp (component/hash - hold weapon and use 'help' to list available, no refunds/points are given back)", GreedyArg = true)]
+        [Command("removecomp", "!{#AFAFAF}[USAGE] removecomp (component/hash - hold weapon and use 'help' to list available)", GreedyArg = true)]
         public void cmd_removecomp(Player player, string component)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
+
+            if(!player.HasData("CompNoRefundWarn"))
+            {
+                player.SetData("CompNoRefundWarn", true);
+                player.SendChatMessage("!{#FF6347}[!!] !{#FF0000}THIS ACTION IS IRREVERSIBLE AND NON REFUNDABLE, USE THE COMMAND AGAIN TO PROCEED.");
+                return;
+            }
 
             UInt64 wephash = (UInt64)player.CurrentWeapon;
             bool found = false;
@@ -2444,9 +2451,9 @@ namespace RNC
                 return;
             }
 
-            if (EPlayer.GetAccount(player).DonatorPoints < 100 && !comp.Name.Contains("flashlight", StringComparison.OrdinalIgnoreCase))
+            if (EPlayer.GetAccount(player).DonatorPoints < 25 && !comp.Name.Contains("flashlight", StringComparison.OrdinalIgnoreCase))
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You need at least 100 donator points to buy a weapon component. (Flashlights are free)");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You need at least 25 donator points to buy a weapon component. (Flashlights are free)");
                 return;
             }
 
@@ -2518,8 +2525,8 @@ namespace RNC
             }
             else
             {
-                player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You bought '{comp.Name}' on '{itemData.Name}' for 100 donator points. (Will attach in copchase)");
-                EPlayer.GetAccount(player).DonatorPoints -= 100;
+                player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You bought '{comp.Name}' on '{itemData.Name}' for 25 donator points. (Will attach in copchase)");
+                EPlayer.GetAccount(player).DonatorPoints -= 25;
             }
             
             // try { Main.Log("currency.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:buycomp:{itemData.Name}:{comp.Name}"); } catch { }
@@ -4039,7 +4046,7 @@ namespace RNC
             player.SendChatMessage("[Squad/Partner]: /squad /squadleave /s(quad)c(hat) /squadaccept /squadmembers");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
             player.SendChatMessage("[Lobby]: /lobbychat (/lo,/lg) /spec /specoff /(fugitive)chances");
-            player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats /changemypass");
+            player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats /changemypass /outfit");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys for activation)");
             player.SendChatMessage("!{#339BC4}[Cop!{#F24C27}chase]: !{#FFFFFF}/r(adio) /wt");
             player.SendChatMessage("!{#0097ff}[Cop]: /gps /cuff /m(egaphone) /dragout");
@@ -4054,7 +4061,9 @@ namespace RNC
             player.SendChatMessage("!{#A5A8A8}[Misc]: /p(acket)l(oss)");
             player.SendChatMessage("!{#A5A8A8}[Debug/Test]: /pos /lcmenu");
             
-            player.SendChatMessage("!{#F7EB05}[Donator/Points] /buycomp (Free Flashlights) /mycomps /removecomp (NO REFUND)");
+            player.SendChatMessage("!{#d9f288}[Points] /vtuner /convertpoints /m(ed)k(it) /p(ain)k(illers)");
+            player.SendChatMessage("!{#faf146}[Donator Points] Weapon Components: /buycomp /mycomps /removecomp");
+
             if (EPlayer.GetAccount(player).DonatorLevel >= 1)
             {
                 player.SendChatMessage("!{#F7EB05}[Bronze Donator] /d(onator)c(hat)");
@@ -5313,7 +5322,7 @@ namespace RNC
             if (EPlayer.GetAccount(player).Admin >= 5)
             {
                 player.SendChatMessage("[Admin Lv 5]: /maps /deletemap /createmap /addmapspawn /(o)setdonator /(o)givedonorpoints");
-                player.SendChatMessage("[Admin Lv 5]: /dbgteamvar");
+                player.SendChatMessage("[Admin Lv 5]: /dbgteamvar /blipdbg");
             }
             if (EPlayer.GetAccount(player).Admin >= 6)
             {
@@ -5840,8 +5849,8 @@ namespace RNC
             player.TriggerEvent("CreatePlayerCamera", -373, -121, 39, -10, 0, -10, 60, true);
             player.TriggerEvent("SetTimeWeather", 12, 0, 0, 0);
 
-            EPlayer.Notify(player, "Controls", "LEFT CLICK to switch cameras, menu keys to select. When you're done, press Buy to confirm or Exit.", "topCenter");
-
+            EPlayer.Notify(player, "LMB to switch camera, menu keys to select, horn and lights can be used by default keys. <p>DISCLAIMER: Removing components is not refundable.</p>", "green", "fas fa-exclamation", false, 10000, "topCenter");
+           
             var inst = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.Model == veh.Model && a.AccountSQLID == EPlayer.GetAccount(player).SQL_ID);
             if (inst != null)
             {
