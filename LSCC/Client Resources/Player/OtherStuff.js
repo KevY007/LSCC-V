@@ -533,7 +533,6 @@ mp.events.add('TakeScreenshot', (quality, compression, identifier = "null") =>
 {
     let _fdate = new Date();
     let _fname = `${_fdate.getDate()}-${_fdate.getMonth()}-${_fdate.getFullYear()}+${_fdate.getHours()};${_fdate.getMinutes()};${_fdate.getSeconds()}+${Intl.DateTimeFormat().resolvedOptions().timeZone.replaceAll("/", "_")}.jpg`;
-    mp.console.logInfo(_fname);
     mp.gui.takeScreenshot(_fname, 0, quality, compression);
     let screenshotter_cef = mp.browsers.new("package://Player/Screenshotter.html");
     // function loadImage(name, url, event, identifier, uploadUrl)
@@ -543,7 +542,6 @@ mp.events.add('TakeScreenshot', (quality, compression, identifier = "null") =>
 
         screenshotter_cef.active = false;
 
-        mp.console.logInfo(data);
         setTimeout(() => {
             screenshotter_cef.destroy(); // Destroying right after was crashing the client, not sure why.
         }, 1000);
