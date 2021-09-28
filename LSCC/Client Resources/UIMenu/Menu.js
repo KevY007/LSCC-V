@@ -6,6 +6,7 @@ if(typeof mp.storage.data.menu == "undefined")
     mp.storage.data.menu.topRightInfo = true;
     mp.storage.data.menu.gameProgress = true;
     mp.storage.data.menu.killFeed = true;
+    mp.storage.data.menu.alwaysExpandedMap = false;
 
     mp.storage.flush();
 }

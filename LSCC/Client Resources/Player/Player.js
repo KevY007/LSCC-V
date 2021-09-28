@@ -6,7 +6,6 @@ let camera_lastmove = Date.now();
 
 const player = mp.players.local;
 let localPlayer = mp.players.local;
-//const { setTimeout } = require("timers");
 const timerBarLib = require("./Player/Bar.js");
 
 let chaseStartVeh = -1;
@@ -194,7 +193,7 @@ function TogGPSMode()
         (mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true))
     {
         traceLastFunc(`[Players] Attempt tog GPS`);
-
+        
         mp.events.callRemote("OnScriptedKeyPress", 0x5A, true);
     }
 }
@@ -213,6 +212,7 @@ if(mp.storage.data.radiotoggle !== undefined)
 mp.keys.bind(lastGPSBind, true, TogGPSMode);
 
 mp.events.addCommand("gpsbind", function (bind) {
+    
     bind = Number(bind);
 
     if (!Number.isInteger(bind)) {
@@ -482,6 +482,22 @@ mp.events.addCommand("updaterate", function (rate) {
     mp.storage.flush();
 
     mp.gui.chat.push("Updates now happen " + Math.round(1000 / updateRate) + " times a second.");
+});
+
+mp.events.addCommand("bigmap", function () {
+   
+    if(mp.storage.data.menu.alwaysExpandedMap == true)
+    {
+        mp.storage.data.menu.alwaysExpandedMap = false;
+        mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Minimap reverted to normal.");
+        mp.game.ui.setRadarBigmapEnabled(false, false);
+    }
+    else 
+    {
+        mp.storage.data.menu.alwaysExpandedMap = true;
+        mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Minimap will now always be expanded.");
+    }
+    mp.storage.flush();
 });
 
 if(!radioToggle) mp.game.audio.setInitialPlayerStation('OFF');

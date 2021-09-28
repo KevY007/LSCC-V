@@ -10,6 +10,8 @@ var resolution = mp.game.graphics.getScreenActiveResolution(0,0);
 let lastSpecHPChange = Date.now();
 
 var miniHUDVars = {
+    bottom: 0, 
+    left: 0,
     visible: false,
     voice: "Standby",
     direction: "N/A",
@@ -208,13 +210,11 @@ mp.events.add('browserDomReady', (browser) => {
         UIHud.execute(`gm.$refs.MiniHud.items = [];`);
 
         // Initialize miniHUD
-        let miniHUDSettings = { 
-            bottom: ((resolution.y - (getMinimapAnchor().bottomY * resolution.y)) + 0), 
-            left: ((getMinimapAnchor().rightX * resolution.x) + 10)
-        }; // miniHUDSettings["bottom"], miniHUD["left"]
+        miniHUDVars["bottom"] = ((resolution.y - (getMinimapAnchor().bottomY * resolution.y)) + 0);
+        miniHUDVars["left"] = ((getMinimapAnchor().rightX * resolution.x) + 10) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0);
 
-        UIHud.execute(`gm.$refs.MiniHud.left = "${miniHUDSettings.left}px";`);
-        UIHud.execute(`gm.$refs.MiniHud.bottom = "${miniHUDSettings.bottom}px";`);  
+        UIHud.execute(`gm.$refs.MiniHud.left = "${miniHUDVars["left"]}px";`);
+        UIHud.execute(`gm.$refs.MiniHud.bottom = "${miniHUDVars["bottom"]}px";`);  
 
         // SPECTATE VARS
         UIHud.execute(`gm.$refs.MiniHud.items.push({ 
@@ -635,6 +635,21 @@ mp.events.add("render", () => {
 
     if(mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
     {       
+        if ((resolution.x != mp.game.graphics.getScreenActiveResolution(0,0).x || miniHUDVars["left"] != (((getMinimapAnchor().rightX * resolution.x) + 10)) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0)) && UIHud != null)
+        {
+            resolution = mp.game.graphics.getScreenActiveResolution(0,0);
+            
+            miniHUDVars["bottom"] = ((resolution.y - (getMinimapAnchor().bottomY * resolution.y)) + 0);
+            miniHUDVars["left"] = ((getMinimapAnchor().rightX * resolution.x) + 10) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0);
+
+            UIHud.execute(`gm.$refs.MiniHud.left = "${miniHUDVars["left"]}px";`);
+            UIHud.execute(`gm.$refs.MiniHud.bottom = "${miniHUDVars["bottom"]}px";`);  
+        }
+        if (mp.storage.data.menu.alwaysExpandedMap == true)
+        {
+            mp.game.ui.setRadarBigmapEnabled(true, false);
+        }
+        
         if (specState == true && specCam !== null && specTarget != null && mp.players.exists(specTarget)) 
         {
             if((mp.players.local.getHealth() != specTarget.getHealth() || mp.players.local.getArmour() != specTarget.getArmour()) && 
