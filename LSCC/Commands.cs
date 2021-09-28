@@ -4184,9 +4184,6 @@ namespace RNC
             player.SendChatMessage("Model 'm3e46' - M3 E46 BMW 2005");
             player.SendChatMessage("Model 'pscout' - Police Scout");
             player.SendChatMessage("Model 'umkscout' - Unmarked Police Scout");
-            player.SendChatMessage("Model 'tahoma' - Tahoma (from GTA IV)");
-            player.SendChatMessage("Model '850sw' - Volvo 850 T5 Turbo");
-            player.SendChatMessage("Model 's8d2' - Audi S8");
             player.SendChatMessage("Model 'impala' - Chevrolet Impala SS '96");
             return;
         }
