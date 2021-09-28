@@ -2850,7 +2850,7 @@ namespace RNC
                     if (!player.HasData("TunerNoRefundWarn"))
                     {
                         player.SetData("TunerNoRefundWarn", true);
-                        EPlayer.Notify(player, "THIS ACTION IS IRREVERSIBLE AND NON REFUNDABLE, USE AGAIN TO PROCEED.", "red", "fas fa-exclamation", false, 2500, "topCenter", "replace");
+                        EPlayer.Notify(player, "Removing all components! <p>THIS ACTION IS IRREVERSIBLE AND NON REFUNDABLE, USE AGAIN TO PROCEED.</p>", "red", "fas fa-exclamation", false, 2500, "topCenter", "replace");
                         return;
                     }
 
@@ -2892,7 +2892,6 @@ namespace RNC
                         Mods = NAPI.Util.ToJson(vMods),
                     };
                     ContextFactory.Instance.PlayerTunings.Add(tuning);
-                    player.TriggerEvent("CloseTuner");
                 }
                 else
                 {
@@ -2927,16 +2926,20 @@ namespace RNC
                         }
                         EPlayer.GivePoints(player, -(changes * 50));
                     }
-                    EPlayer.Notify(player, $"Modifications saved!", "green", "fas fa-check", false, 2500, "topCenter");
 
-                    tuning.PrimaryColor = priCol;
-                    tuning.SecondaryColor = secCol;
-                    tuning.PearlescentColor = pearlCol;
-                    tuning.WheelColor = wheelCol;
-                    tuning.Mods = NAPI.Util.ToJson(vMods);
-                    player.TriggerEvent("CloseTuner");
+                    if (changes > 0)
+                    {
+                        EPlayer.Notify(player, $"Modifications saved!", "green", "fas fa-check", false, 2500, "topCenter");
+
+                        tuning.PrimaryColor = priCol;
+                        tuning.SecondaryColor = secCol;
+                        tuning.PearlescentColor = pearlCol;
+                        tuning.WheelColor = wheelCol;
+                        tuning.Mods = NAPI.Util.ToJson(vMods);
+                    }
                 }
             }
+            player.TriggerEvent("CloseTuner");
             ContextFactory.Instance.SaveChanges();
         }
 
