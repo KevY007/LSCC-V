@@ -1138,7 +1138,7 @@ namespace RNC
             new CarData(0, "Random", "?", "package://Artwork/Vehicles/default.png", "");
             new CarData(1, "Random", "?", "package://Artwork/Vehicles/default.png", "");
 
-            new CarData(1, "Police Cruiser", "police", "package://Artwork/Vehicles/polc1.png", "Average");
+            new CarData(1, "Ford Crown Vic", "police", "package://Artwork/Vehicles/polc1.png", "Average");
             new CarData(1, "Unmarked Cruiser", "police4", "package://Artwork/Vehicles/polc2.png", "Average", 1);
             new CarData(1, "Police Scout", "pscout", "package://Artwork/Vehicles/pscout.png", "Average", 3);
             new CarData(1, "Police Bike", "policeb", "package://Artwork/Vehicles/policeb.png", "Average", 3);
