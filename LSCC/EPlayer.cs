@@ -879,7 +879,7 @@ namespace RNC
             }
 
             player.GiveWeapon(WeaponHash.Stungun, 1);
-
+            player.GiveWeapon(WeaponHash.Nightstick, 1);
             player.SendChatMessage("!{#FF6347}[TASER] !{#FFFFFF}You have been equipped with a stungun, shoot at a fugitive that hasn't shot to tase them.");
             return;
         }

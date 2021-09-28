@@ -4177,13 +4177,11 @@ namespace RNC
         public void cmd_customvehlist(Player player)
         {
             player.SendChatMessage("Model 'lspdunm' - Unmarked Dodge Charger");
-            player.SendChatMessage("Model 'polbufac' - Police Buffalo (polbufac2 for Unmarked)");
-            player.SendChatMessage("Model 'fbibufac' - FIB Buffalo");
+            player.SendChatMessage("Model 'polbufac' - Police Buffalo A/C | 'fbibufac' for FIB variant A/C");
             player.SendChatMessage("Model '600sel' - Mercedes S600?");
             player.SendChatMessage("Model 'prevolter' - Police Revolter Unmarked");
             player.SendChatMessage("Model 'm3e46' - M3 E46 BMW 2005");
-            player.SendChatMessage("Model 'pscout' - Police Scout");
-            player.SendChatMessage("Model 'umkscout' - Unmarked Police Scout");
+            player.SendChatMessage("Model 'pscout' - Police Scout | 'umkscout' for Unmarked Variant");
             player.SendChatMessage("Model 'impala' - Chevrolet Impala SS '96");
             return;
         }

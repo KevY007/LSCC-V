@@ -1,5 +1,6 @@
 ﻿FORMAT: ADDED BY - ITEM.
 INTENSIVE TESTING LEFT GAME SPAWNING AND SHIT
+RESTOCK AMMO FROM TRUNK OF COP CAR??? + ON PLAYER DEATH MAYBE DROP THEIR AMMO SO SOMEONE ELSE CAN PICK?
 REDO LOADOUT PRICES AND CARS SKRRa
 buyammo with donator points
 allow something to be done with donator points like converting into normal points.
