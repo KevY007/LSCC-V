@@ -1152,14 +1152,14 @@ namespace RNC
             new CarData(1, "Ford Crown Vic", "police", "package://Artwork/Vehicles/polc1.png", "Slow", 2);
             new CarData(1, "Police Bike", "policeb", "package://Artwork/Vehicles/policeb.png", "Average", 3);
             new CarData(1, "Police Buffalo", "police2", "package://Artwork/Vehicles/police2.png", "Average", 5, 5);
-            new CarData(1, "Police Scout", "pscout", "package://Artwork/Vehicles/pscout.png", "Average", 6, 10);
-            new CarData(1, "Unmarked Scout", "umkscout", "package://Artwork/Vehicles/umkscout.png", "Average", 8, 10);
+            new CarData(1, "Police Scout", "pscout", "package://Artwork/Vehicles/pscout.png", "Average+", 6, 10);
+            new CarData(1, "Unmarked Scout", "umkscout", "package://Artwork/Vehicles/umkscout.png", "Average+", 8, 10);
             new CarData(1, "FBI Granger", "fbi2", "package://Artwork/Vehicles/fbi2.png", "Slow", 10, 15);
             new CarData(1, "Police Buffalo A/C", "polbufac", "package://Artwork/Vehicles/polbufac.png", "Fast", 13, 20);
             new CarData(1, "Police Transporter", "policet", "package://Artwork/Vehicles/policet.png", "Snail", 15);
             new CarData(1, "FBI Buffalo A/C", "fbibufac", "package://Artwork/Vehicles/fbibufac.png", "Fast", 17, 20);
             new CarData(1, "Police Chopper", "polmav", "package://Artwork/Vehicles/polmav.png", "N/A", 20, 20);
-            new CarData(1, "Unmarked Charger", "lspdunm", "package://Artwork/Vehicles/lspdunm.png", "Fast", 25, 40);
+            new CarData(1, "Unmarked Charger", "lspdunm", "package://Artwork/Vehicles/lspdunm.png", "Fast+", 25, 40);
             new CarData(1, "Unmarked Revolter", "prevolter", "package://Artwork/Vehicles/prevolter.png", "Super", 30, 70);
 
             // 0-100's Fugitive
@@ -1176,14 +1176,19 @@ namespace RNC
             new CarData(0, "Seminole Frontier", "seminole2", "package://Artwork/Vehicles/seminole2.png", "Slow", 1);
             new CarData(0, "Huntley", "huntley", "package://Artwork/Vehicles/huntley.png", "Average", 3);
             new CarData(0, "Tailgater", "tailgater", "package://Artwork/Vehicles/tailgater.png", "Slow", 5);
+            new CarData(0, "Sanchez", "sanchez2", "package://Artwork/Vehicles/sanchez2.png", "Fast", 5, 10);
             new CarData(0, "Blista Classic", "blista2", "package://Artwork/Vehicles/blista2.png", "Average", 10);
-            new CarData(0, "Cheburek", "cheburek", "package://Artwork/Vehicles/cheburek.png", "Average", 15, 25);
+            new CarData(0, "Cheburek", "cheburek", "package://Artwork/Vehicles/cheburek.png", "Average", 15, 10);
+            new CarData(0, "Exemplar", "exemplar", "package://Artwork/Vehicles/exemplar.png", "Average+", 17, 15);
             new CarData(0, "Chevrolet Impala SS '96", "impala", "package://Artwork/Vehicles/impala.png", "Average", 18, 30);
-            new CarData(0, "Buffalo", "buffalo", "package://Artwork/Vehicles/buffalo.png", "Average", 22, 40);
+            new CarData(0, "Buffalo", "buffalo", "package://Artwork/Vehicles/buffalo.png", "Average", 22, 30);
+            new CarData(0, "Tailgater S", "tailgater2", "package://Artwork/Vehicles/tailgater2.png", "Average+", 23, 30);
             new CarData(0, "Sultan", "sultan", "package://Artwork/Vehicles/sultan.png", "Average", 25, 40);
             new CarData(0, "Kuruma", "kuruma", "package://Artwork/Vehicles/kuruma.png", "Fast", 30, 60);
-            new CarData(0, "Dominator GTT", "dominator8", "package://Artwork/Vehicles/dominator8.png", "Fast", 32, 50);
-            new CarData(0, "BMW M3 E46", "m3e46", "package://Artwork/Vehicles/m3e46.png", "Fast", 35, 50, 5);
+            new CarData(0, "Dominator GTT", "dominator8", "package://Artwork/Vehicles/dominator8.png", "Super", 32, 50);
+            new CarData(0, "BMW M3 E46", "m3e46", "package://Artwork/Vehicles/m3e46.png", "Fast", 35, 0, 10);
+            new CarData(0, "Sultan Classic", "sultan2", "package://Artwork/Vehicles/sultan2.png", "Fast", 37, 80);
+            new CarData(0, "ZR350", "zr350", "package://Artwork/Vehicles/zr350.png", "Fast", 40, 70);
 
             if (Settings.Dynamics.Discord)
             {
