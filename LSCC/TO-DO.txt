@@ -1,9 +1,12 @@
 ﻿FORMAT: ADDED BY - ITEM.
+
+
 INTENSIVE TESTING LEFT GAME SPAWNING AND SHIT
-RESTOCK AMMO FROM TRUNK OF COP CAR??? + ON PLAYER DEATH MAYBE DROP THEIR AMMO SO SOMEONE ELSE CAN PICK?
+RESTOCK AMMO FROM TRUNK OF COP CAR??? (ONLY IF PLAYERS STILL HAVE THE AMMO SCARCITY PROBLEM BECAUSE AMMO DROPS ON DEATH ARE A THING NOW)
 REDO LOADOUT PRICES AND CARS SKRRa
+
+
 buyammo with donator points
-allow something to be done with donator points like converting into normal points.
 #bug reports and other chans sugeestion
 add a linux script that will keep on restarting server if goes off?
 add more clothing using mods
