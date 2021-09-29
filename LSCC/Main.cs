@@ -117,6 +117,7 @@ namespace RNC
         public List<Player> Cops { get; set; }
         public List<Player> Fugitives { get; set; }
         public List<Vehicle> Vehicles { get; set; }
+        public List<Pickup> Drops { get; set; }
 
         public int lobbyId { get; set; }
         public int lastMapId { get; set; }
@@ -143,6 +144,7 @@ namespace RNC
             Cops = new List<Player>();
             Fugitives = new List<Player>();
             Vehicles = new List<Vehicle>();
+            Drops = new List<Pickup>();
 
             Time = new int[3];
             Time[0] = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 23);
@@ -1669,9 +1671,27 @@ namespace RNC
                     }
                 }
 
+                for (int i = lobby.Drops.Count - 1; i >= 0; i--)
+                {
+                    if (lobby.Drops[i] != null)
+                    {
+                        lobby.Drops[i].Destroy();
+                        lobby.Drops.RemoveAt(i);
+                    }
+                }
+
+                if (lobby.Drops.Count > 0)
+                {
+                    for (int i = 0; i < lobby.Drops.Count; i++)
+                    {
+                        lobby.Drops.RemoveAt(i);
+                    }
+                }
+
                 lobby.Cops.Clear();
                 lobby.Fugitives.Clear();
                 lobby.Vehicles.Clear();
+                lobby.Drops.Clear();
             }
             else return false;
 

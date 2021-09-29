@@ -112,6 +112,73 @@ namespace RNC
             return;
         }
 
+        [Command("createpickup")]
+        public void cmd_createpickup(Player player, string model, int r, int g, int b, int range, int intensity, int shadow)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                return;
+            }
+
+            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+
+            if (lobby == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in a copchase lobby."); return; }
+
+
+            Pickup newPickup = new Pickup(NAPI.Util.GetHashKey(model), player.Position.Around(5f), 1.0f, player.Dimension, true, Pickups.ToPropLighting(r, g, b, range, intensity, shadow));
+            lobby.Drops.Add(newPickup);
+            newPickup.OnPickup = (guy) =>
+            {
+                guy.SendChatMessage($"You picked up {newPickup.id} wow damn!");
+
+                int randomChance = new Random().Next(100);
+                if (randomChance >= 60)
+                {
+                    guy.SendChatMessage($"random hits and we goin!");
+                    newPickup.Destroy();
+                }
+            };
+        }
+
+        [Command("deletepickups")]
+        public void cmd_deletepickup(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                return;
+            }
+
+            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+
+            if (lobby == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in a copchase lobby."); return; }
+
+
+            for (int i = lobby.Drops.Count - 1; i >= 0; i--)
+            {
+                if (lobby.Drops[i] != null)
+                {
+                    lobby.Drops[i].Destroy();
+                    lobby.Drops.RemoveAt(i);
+                }
+            }
+
+            if (lobby.Drops.Count > 0)
+            {
+                for (int i = 0; i < lobby.Drops.Count; i++)
+                {
+                    lobby.Drops.RemoveAt(i);
+                }
+            }
+
+            lobby.Drops.Clear();
+        }
+
         [Command("trunk", Alias = "boot")]
         public void cmd_trunk(Player player)
         {

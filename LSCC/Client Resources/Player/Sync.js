@@ -179,7 +179,7 @@ function ToggleCollisionsForEnt(ent, state)
         ent.setCanBeDamaged(state);
         ent.setCanBreak(state);
     }
-    ent.setAlpha(state ? 255 : 144);
+    ent.setAlpha(state ? 255 : 232);
 
     mp.vehicles.forEach(targ => {
 
@@ -216,4 +216,60 @@ mp.events.addDataHandler('Collisions', function (entity, value, oldValue)
 {
     entity.Collisions = value;
     ToggleCollisionsForEnt(entity, value);
+});
+
+
+// Pickups
+mp.events.add("entityStreamIn", (entity) => {
+    if (entity.type === 'object' && entity.getVariable("BelongsToPickup") !== undefined) {
+        entity.setCollision(false, false);
+        ToggleCollisionsForEnt(entity, false);
+
+        entity.BelongsToPickup = entity.getVariable("BelongsToPickup");
+        if(entity.getVariable("PropLighting") !== undefined)
+        {
+            entity.PropLighting = entity.getVariable("PropLighting");
+        }
+    }
+});
+
+mp.events.addDataHandler('BelongsToPickup', function (entity, value, oldValue) 
+{
+    if (entity.type === 'object') 
+    {
+        entity.setCollision(false, false);
+        ToggleCollisionsForEnt(entity, false);
+
+        entity.BelongsToPickup = entity.getVariable("BelongsToPickup");
+    }
+});
+
+mp.events.addDataHandler('PropLighting', function (entity, value, oldValue) 
+{
+    if (entity.type === 'object') 
+    {
+        if(value) entity.PropLighting = value;
+        else delete entity.PropLighting;
+    }
+});
+
+
+mp.events.add("render", () => {
+    const frameTime = mp.game.invokeFloat("0x0000000050597EE2"); // TIMESTEP
+
+    for (const obj of mp.objects.streamed) {
+        if (obj.BelongsToPickup === undefined) {
+            continue;
+        }
+
+        const { x: rotX, y: rotY, z: rotZ } = obj.getRotation(2);
+        obj.setRotation(rotX, rotY, rotZ + (90.0 * frameTime), 2, true); // 90.0 rotation amount * frameTime
+
+        if (obj.PropLighting !== undefined) {
+            const { x: posX, y: posY, z: posZ } = obj.position;
+            
+            mp.game.graphics.drawLightWithRangeAndShadow(posX, posY, posZ, obj.PropLighting[0], obj.PropLighting[1], obj.PropLighting[2], 
+                obj.PropLighting[3], obj.PropLighting[4], obj.PropLighting[5]);
+        }
+    }
 });
