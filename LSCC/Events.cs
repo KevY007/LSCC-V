@@ -1810,11 +1810,12 @@ namespace RNC
             List<object[]> vehItems = new List<object[]>();
             foreach (var car in Settings.Cars)
             {
-                string price = "Free";
+                string price = "";
                 if (car.LevelRequired > 0) price = "Level " + car.LevelRequired.ToString();
                 if (car.PointsRequired > 0) price = price + (price.Length > 3 ? " & " : "") + car.PointsRequired.ToString() + " Points";
                 if (car.DonatorPointsRequired > 0) price = price + (price.Length > 3 ? " & " : "") + car.DonatorPointsRequired.ToString() + " Donator Points";
                 if (car.DonatorLevelRequired > 0) price = price + (price.Length > 3 ? " & " : "") + EPlayer.GetDonatorLevelName(car.DonatorLevelRequired);
+                if (price.Length < 2) price = "Free";
 
                 vehItems.Add(new object[]
                 {
