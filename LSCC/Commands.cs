@@ -112,7 +112,7 @@ namespace RNC
             return;
         }
 
-        [Command("createpickup")]
+        [Command("dbgcreatepickup")]
         public void cmd_createpickup(Player player, string model, int r, int g, int b, int range, int intensity, int shadow)
         {
             if (!EPlayer.LoggedIn(player)) return;
@@ -143,40 +143,13 @@ namespace RNC
             };
         }
 
-        [Command("deletepickups")]
-        public void cmd_deletepickup(Player player)
+        [Command("dbgcreateammo")]
+        public void cmd_dbgcreateammo(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 6) return;
 
-            if (EPlayer.GetAccount(player).Admin < 1)
-            {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
-                return;
-            }
-
-            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
-
-            if (lobby == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in a copchase lobby."); return; }
-
-
-            for (int i = lobby.Drops.Count - 1; i >= 0; i--)
-            {
-                if (lobby.Drops[i] != null)
-                {
-                    lobby.Drops[i].Destroy();
-                    lobby.Drops.RemoveAt(i);
-                }
-            }
-
-            if (lobby.Drops.Count > 0)
-            {
-                for (int i = 0; i < lobby.Drops.Count; i++)
-                {
-                    lobby.Drops.RemoveAt(i);
-                }
-            }
-
-            lobby.Drops.Clear();
+            EPlayer.CreateAmmoBox(player);
         }
 
         [Command("trunk", Alias = "boot")]
@@ -1874,16 +1847,16 @@ namespace RNC
             }
 
 
-            UInt64 wephash = 0;
+            Int64 wephash = 0;
             bool found = false;
             jWeaponData itemData = new jWeaponData();
 
-            if (!UInt64.TryParse(wep, out wephash))
+            if (!Int64.TryParse(wep, out wephash))
             {
                 wephash = 0;
             }
 
-            foreach (KeyValuePair<ulong, jWeaponData> i in Settings.WeaponData)
+            foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
             {
                 if (wephash != 0)
                 {
@@ -1921,10 +1894,10 @@ namespace RNC
             }
 
             found = false;
-            UInt64 comphash = 0;
+            Int64 comphash = 0;
             Component comp = new Component();
 
-            if (!UInt64.TryParse(component, out comphash))
+            if (!Int64.TryParse(component, out comphash))
             {
                 comphash = 0;
             }
@@ -1969,27 +1942,27 @@ namespace RNC
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:takecomp:{target.Name}:{itemData.Name}:{comp.Name}"); } catch { }
 
 
-            Dictionary<ulong, wComponentData> wepItems = new Dictionary<ulong, wComponentData>();
+            Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
 
             Account acc = EPlayer.GetAccount(target);
             try
             {
                 if (acc.WeaponComponents == null || acc.WeaponComponents.Length < 4) throw (new System.Exception("Invalid weapon component > going to new."));
 
-                wepItems = NAPI.Util.FromJson<Dictionary<ulong, wComponentData>>(acc.WeaponComponents);
+                wepItems = NAPI.Util.FromJson<Dictionary<long, wComponentData>>(acc.WeaponComponents);
             }
             catch
             {
-                wepItems = new Dictionary<ulong, wComponentData>();
+                wepItems = new Dictionary<long, wComponentData>();
 
                 wComponentData test = new wComponentData();
                 test.Components.Add(123456789);
                 wepItems.Add(123456789, test);
             }
 
-            Dictionary<ulong, wComponentData> newWepData = new Dictionary<ulong, wComponentData>();
+            Dictionary<long, wComponentData> newWepData = new Dictionary<long, wComponentData>();
 
-            foreach (KeyValuePair<ulong, wComponentData> i in wepItems)
+            foreach (KeyValuePair<long, wComponentData> i in wepItems)
             {
                 wComponentData newDataTwo = new wComponentData();
 
@@ -2049,16 +2022,16 @@ namespace RNC
             }
 
 
-            UInt64 wephash = 0;
+            Int64 wephash = 0;
             bool found = false;
             jWeaponData itemData = new jWeaponData();
 
-            if (!UInt64.TryParse(wep, out wephash))
+            if (!Int64.TryParse(wep, out wephash))
             {
                 wephash = 0;
             }
 
-            foreach (KeyValuePair<ulong, jWeaponData> i in Settings.WeaponData)
+            foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
             {
                 if (wephash != 0)
                 {
@@ -2096,10 +2069,10 @@ namespace RNC
             }
 
             found = false;
-            UInt64 comphash = 0;
+            Int64 comphash = 0;
             Component comp = new Component();
 
-            if (!UInt64.TryParse(component, out comphash))
+            if (!Int64.TryParse(component, out comphash))
             {
                 comphash = 0;
             }
@@ -2148,27 +2121,27 @@ namespace RNC
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:givecomp:{target.Name}:{itemData.Name}:{comp.Name}"); } catch { }
 
 
-            Dictionary<ulong, wComponentData> wepItems = new Dictionary<ulong, wComponentData>();
+            Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
 
             Account acc = EPlayer.GetAccount(target);
             try
             {
                 if (acc.WeaponComponents == null || acc.WeaponComponents.Length < 4) throw (new System.Exception("Invalid weapon component > going to new."));
 
-                wepItems = NAPI.Util.FromJson<Dictionary<ulong, wComponentData>>(acc.WeaponComponents);
+                wepItems = NAPI.Util.FromJson<Dictionary<long, wComponentData>>(acc.WeaponComponents);
             }
             catch
             {
-                wepItems = new Dictionary<ulong, wComponentData>();
+                wepItems = new Dictionary<long, wComponentData>();
 
                 wComponentData test = new wComponentData();
                 test.Components.Add(123456789);
                 wepItems.Add(123456789, test);
             }
 
-            Dictionary<ulong, wComponentData> newWepData = new Dictionary<ulong, wComponentData>();
+            Dictionary<long, wComponentData> newWepData = new Dictionary<long, wComponentData>();
 
-            foreach (KeyValuePair<ulong, wComponentData> i in wepItems)
+            foreach (KeyValuePair<long, wComponentData> i in wepItems)
             {
                 wComponentData newDataTwo = new wComponentData();
 
@@ -2214,13 +2187,13 @@ namespace RNC
             }
 
 
-            UInt64 wephash = (UInt64)target.CurrentWeapon;
+            Int64 wephash = (Int64)target.CurrentWeapon;
             bool found = false;
             jWeaponData itemData = new jWeaponData();
 
             
 
-            foreach (KeyValuePair<ulong, jWeaponData> i in Settings.WeaponData)
+            foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
             {
                 if (wephash != 0)
                 {
@@ -2240,10 +2213,10 @@ namespace RNC
             }
 
             found = false;
-            UInt64 comphash = 0;
+            Int64 comphash = 0;
             Component comp = new Component();
 
-            if (!UInt64.TryParse(component, out comphash))
+            if (!Int64.TryParse(component, out comphash))
             {
                 comphash = 0;
             }
@@ -2311,11 +2284,11 @@ namespace RNC
                 return;
             }
 
-            UInt64 wephash = (UInt64)player.CurrentWeapon;
+            Int64 wephash = (Int64)player.CurrentWeapon;
             bool found = false;
             jWeaponData itemData = new jWeaponData();
 
-            foreach (KeyValuePair<ulong, jWeaponData> i in Settings.WeaponData)
+            foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
             {
                 if (wephash != 0)
                 {
@@ -2335,10 +2308,10 @@ namespace RNC
             }
 
             found = false;
-            UInt64 comphash = 0;
+            Int64 comphash = 0;
             Component comp = new Component();
 
-            if (!UInt64.TryParse(component, out comphash))
+            if (!Int64.TryParse(component, out comphash))
             {
                 comphash = 0;
             }
@@ -2385,18 +2358,18 @@ namespace RNC
             }
 
 
-            Dictionary<ulong, wComponentData> wepItems = new Dictionary<ulong, wComponentData>();
+            Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
 
             Account acc = EPlayer.GetAccount(player);
             try
             {
                 if (acc.WeaponComponents == null || acc.WeaponComponents.Length < 4) throw (new System.Exception("Invalid weapon component > going to new."));
 
-                wepItems = NAPI.Util.FromJson<Dictionary<ulong, wComponentData>>(acc.WeaponComponents);
+                wepItems = NAPI.Util.FromJson<Dictionary<long, wComponentData>>(acc.WeaponComponents);
             }
             catch
             {
-                wepItems = new Dictionary<ulong, wComponentData>();
+                wepItems = new Dictionary<long, wComponentData>();
 
                 wComponentData test = new wComponentData();
                 test.Components.Add(123456789);
@@ -2404,9 +2377,9 @@ namespace RNC
             }
 
             bool alreadyHas = false;
-            Dictionary<ulong, wComponentData> newWepData = new Dictionary<ulong, wComponentData>();
+            Dictionary<long, wComponentData> newWepData = new Dictionary<long, wComponentData>();
 
-            foreach (KeyValuePair<ulong, wComponentData> i in wepItems)
+            foreach (KeyValuePair<long, wComponentData> i in wepItems)
             {
                 wComponentData newDataTwo = new wComponentData();
 
@@ -2600,11 +2573,11 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            UInt64 wephash = (UInt64)player.CurrentWeapon;
+            Int64 wephash = (Int64)player.CurrentWeapon;
             bool found = false;
             jWeaponData itemData = new jWeaponData();
 
-            foreach (KeyValuePair<ulong, jWeaponData> i in Settings.WeaponData)
+            foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
             {
                 if (wephash != 0)
                 {
@@ -2624,10 +2597,10 @@ namespace RNC
             }
 
             found = false;
-            UInt64 comphash = 0;
+            Int64 comphash = 0;
             Component comp = new Component();
 
-            if (!UInt64.TryParse(component, out comphash))
+            if (!Int64.TryParse(component, out comphash))
             {
                 comphash = 0;
             }
@@ -2686,18 +2659,18 @@ namespace RNC
                 return;
             }
 
-            Dictionary<ulong, wComponentData> wepItems = new Dictionary<ulong, wComponentData>();
+            Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
 
             Account acc = EPlayer.GetAccount(player);
             try
             {
                 if (acc.WeaponComponents == null || acc.WeaponComponents.Length < 4) throw (new System.Exception("Invalid weapon component > going to new."));
 
-                wepItems = NAPI.Util.FromJson<Dictionary<ulong, wComponentData>>(acc.WeaponComponents);
+                wepItems = NAPI.Util.FromJson<Dictionary<long, wComponentData>>(acc.WeaponComponents);
             }
             catch
             {
-                wepItems = new Dictionary<ulong, wComponentData>();
+                wepItems = new Dictionary<long, wComponentData>();
 
                 wComponentData test = new wComponentData();
                 test.Components.Add(123456789);
@@ -2705,9 +2678,9 @@ namespace RNC
             }
 
             bool alreadyHas = false;
-            Dictionary<ulong, wComponentData> newWepData = new Dictionary<ulong, wComponentData>();
+            Dictionary<long, wComponentData> newWepData = new Dictionary<long, wComponentData>();
 
-            foreach (KeyValuePair<ulong, wComponentData> i in wepItems)
+            foreach (KeyValuePair<long, wComponentData> i in wepItems)
             {
                 wComponentData newDataTwo = new wComponentData();
 
@@ -2765,18 +2738,18 @@ namespace RNC
 
             player.SendChatMessage("!{#FF6347}Listing bought weapon components ->");
             
-            Dictionary<ulong, wComponentData> wepItems = new Dictionary<ulong, wComponentData>();
+            Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
 
             Account acc = EPlayer.GetAccount(player);
             try
             {
                 if (acc.WeaponComponents == null || acc.WeaponComponents.Length < 4) throw (new System.Exception("Invalid weapon component > going to new."));
 
-                wepItems = NAPI.Util.FromJson<Dictionary<ulong, wComponentData>>(acc.WeaponComponents);
+                wepItems = NAPI.Util.FromJson<Dictionary<long, wComponentData>>(acc.WeaponComponents);
             }
             catch
             {
-                wepItems = new Dictionary<ulong, wComponentData>();
+                wepItems = new Dictionary<long, wComponentData>();
 
                 wComponentData test = new wComponentData();
                 test.Components.Add(123456789);
@@ -2784,14 +2757,14 @@ namespace RNC
             }
 
             int count = 0;
-            foreach (KeyValuePair<ulong, wComponentData> i in wepItems)
+            foreach (KeyValuePair<long, wComponentData> i in wepItems)
             {
                 jWeaponData wep = new jWeaponData();
 
                 if(Settings.WeaponData.TryGetValue(i.Key, out wep))
                 {
                     if (i.Value.Components.Count > 0) player.SendChatMessage("!{#31b55a}" + wep.Name + " | " + i.Value.Components.Count() + " attachments:");
-                    foreach (ulong comp in i.Value.Components)
+                    foreach (long comp in i.Value.Components)
                     {
                         Component compData = new Component();
                         if(wep.Components.TryGetValue(comp, out compData))
@@ -2820,16 +2793,16 @@ namespace RNC
             }
 
 
-            UInt64 wephash = 0;
+            Int64 wephash = 0;
             bool found = false;
             string wepname = "";
 
-            if (!UInt64.TryParse(wep, out wephash))
+            if (!Int64.TryParse(wep, out wephash))
             {
                 wephash = 0;
             }
 
-            foreach (KeyValuePair<ulong, jWeaponData> i in Settings.WeaponData)
+            foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
             {
                 if (wephash != 0)
                 {
@@ -2860,7 +2833,7 @@ namespace RNC
                 }
             }
 
-            foreach (KeyValuePair<ulong, string> i in Main.WeaponReasons)
+            foreach (KeyValuePair<long, string> i in Main.WeaponReasons)
             {
                 if (wephash != 0)
                 {
@@ -2921,16 +2894,16 @@ namespace RNC
             }
 
 
-            UInt64 wephash = 0;
+            Int64 wephash = 0;
             bool found = false;
             string wepname = "";
 
-            if (!UInt64.TryParse(wep, out wephash))
+            if (!Int64.TryParse(wep, out wephash))
             {
                 wephash = 0;
             }
 
-            foreach (KeyValuePair<ulong, jWeaponData> i in Settings.WeaponData)
+            foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
             {
                 if (wephash != 0)
                 {
@@ -2961,7 +2934,7 @@ namespace RNC
                 }
             }
 
-            foreach (KeyValuePair<ulong, string> i in Main.WeaponReasons)
+            foreach (KeyValuePair<long, string> i in Main.WeaponReasons)
             {
                 if (wephash != 0)
                 {
@@ -3056,16 +3029,16 @@ namespace RNC
             }
 
 
-            UInt64 wephash = 0;
+            Int64 wephash = 0;
             bool found = false;
             string wepname = "";
 
-            if (!UInt64.TryParse(wep, out wephash))
+            if (!Int64.TryParse(wep, out wephash))
             {
                 wephash = 0;
             }
 
-            foreach (KeyValuePair<ulong, jWeaponData> i in Settings.WeaponData)
+            foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
             {
                 if (wephash != 0)
                 {
@@ -3096,7 +3069,7 @@ namespace RNC
                 }
             }
 
-            foreach (KeyValuePair<ulong, string> i in Main.WeaponReasons)
+            foreach (KeyValuePair<long, string> i in Main.WeaponReasons)
             {
                 if (wephash != 0)
                 {
@@ -4299,7 +4272,7 @@ namespace RNC
         public void cmd_purchaseammo(Player player)
         {
             jWeaponData wepdat;
-            if (Settings.WeaponData.TryGetValue((ulong)player.CurrentWeapon, out wepdat))
+            if (Settings.WeaponData.TryGetValue((long)player.CurrentWeapon, out wepdat))
             {
                 var data = NAPI.Util.FromJson<Dictionary<string, int>>(EPlayer.GetAccount(player).PurchasedAmmo);
                 if (wepdat.AmmoType != null && wepdat.AmmoType.Length >= 2)
@@ -6852,9 +6825,9 @@ namespace RNC
             WeaponHash wep = player.CurrentWeapon;
             string wepName = null;
 
-            foreach (KeyValuePair<ulong, jWeaponData> i in Settings.WeaponData)
+            foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
             {
-                if (i.Key == (ulong)wep)
+                if (i.Key == (long)wep)
                 {
                     wepName = i.Value.Name;
                     break;
@@ -6862,9 +6835,9 @@ namespace RNC
             }
             if (wepName == null)
             {
-                foreach (KeyValuePair<ulong, string> i in Main.WeaponReasons)
+                foreach (KeyValuePair<long, string> i in Main.WeaponReasons)
                 {
-                    if (i.Key == (ulong)wep)
+                    if (i.Key == (long)wep)
                     {
                         wepName = i.Value;
                         break;

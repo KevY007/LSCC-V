@@ -560,7 +560,7 @@ namespace RNC
             {
                 // oh its already set ^^
             }
-            else if(Settings.WeaponData.TryGetValue((ulong)reason, out wepDat))
+            else if(Settings.WeaponData.TryGetValue((long)reason, out wepDat))
             {
                 reasonStr = wepDat.Name;
             }
@@ -596,7 +596,6 @@ namespace RNC
             }
             try
             {
-
                 if (killer != null && !killer.IsNull && killer != player)
                 {
                     NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
@@ -762,6 +761,8 @@ namespace RNC
                 {
                     if (lobby.gameStatus == 1)
                     {
+                        if (lobby.Cops.Contains(player) || lobby.Fugitives.Contains(player)) EPlayer.CreateAmmoBox(player);
+
                         if (killer != null)
                         {
                             int killStreak = killer.GetData<int>("Killstreak");
@@ -1092,7 +1093,7 @@ namespace RNC
 
             if(acc.WeaponComponents == null || acc.WeaponComponents.Length < 4)
             {
-                Dictionary<ulong, wComponentData> wepItems = new Dictionary<ulong, wComponentData>();
+                Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
 
                 wComponentData test = new wComponentData();
                 test.Components.Add(123456789);
@@ -1951,6 +1952,49 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("ReturnAmmoPosZ")]
+        public void OnReturnAmmoCoordinates(Player player, float x, float y, float z, uint dimension)
+        {
+            if (!EPlayer.LoggedIn(player) || !player.HasData("CreatingAmmoBox")) return;
+
+            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+
+            if (lobby == null) return;
+
+            Pickup newPickup = new Pickup(NAPI.Util.GetHashKey("prop_box_ammo07b"), new Vector3(x, y, z), 2.0f, dimension, false, Pickups.ToPropLighting(255f, 255f, 255f, 1.0f, 1.5f, 0.5f));
+
+            newPickup.SetData("AmmoBox", player.GetData<Dictionary<string, int>>("CreatingAmmoBox"));
+            player.ResetData("CreatingAmmoBox");
+            lobby.Drops.Add(newPickup);
+
+            newPickup.OnPickup = (guy) =>
+            {
+                var ammoBox = newPickup.GetData<Dictionary<string, int>>("AmmoBox");
+                foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
+                {
+                    if (guy.GetWeaponAmmo((WeaponHash)i.Key) > 0 || guy.CurrentWeapon == (WeaponHash)i.Key)
+                    {
+                        if (i.Value.AmmoType != null)
+                        {
+                            int weaponAmmo = 0;
+                            if (ammoBox.TryGetValue(i.Value.AmmoType, out weaponAmmo))
+                            {
+                                guy.SetWeaponAmmo((WeaponHash)i.Key, guy.GetWeaponAmmo((WeaponHash)i.Key) + weaponAmmo);
+                                ammoBox.Remove(i.Value.AmmoType);
+                            }
+                        }
+                    }
+                }
+                
+                newPickup.SetData("AmmoBox", ammoBox);
+                if (ammoBox.Count == 0)
+                {
+                    lobby.Drops.Remove(newPickup);
+                    newPickup.Destroy();
+                }
+            };
+        }
+
         [RemoteEvent("UpdateStreamData")]
         public void OnPlayerUpdateStreamData(Player player)
         {
@@ -2190,7 +2234,7 @@ namespace RNC
             string salt = AccountManager.GenSalt();
             string newPass = AccountManager.Crypt(password, salt);
 
-            Dictionary<ulong, wComponentData> wepItems = new Dictionary<ulong, wComponentData>();
+            Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
 
             wComponentData test = new wComponentData();
             test.Components.Add(123456789);
@@ -2362,7 +2406,7 @@ namespace RNC
         }
 
         [RemoteEvent("opsp")] // wont trigger incar btw 
-        public void OnPlayerShootPlayer(Player player, Player target, uint bone, UInt64 weapon)
+        public void OnPlayerShootPlayer(Player player, Player target, uint bone, Int64 weapon)
         {
             if (weapon == (uint)WeaponHash.Stungun)
             {
@@ -2424,9 +2468,12 @@ namespace RNC
                         target.TriggerEvent("setToRagdoll", time, time * 2, 1, false, false, false);
                         target.SetData("TasedTill", Environment.TickCount64 + 18000);
 
-                        foreach(Player pl in NAPI.Pools.GetAllPlayers().Where(p => p.Position.DistanceTo(target.Position) < 15f))
+                        if (lobby.Fugitives.Contains(target))
                         {
-                            pl.TriggerEvent("ShowHandcuffTooltip");
+                            foreach (Player pl in Settings.LoggedInPlayers.Where(p => p.Position.DistanceTo(target.Position) < 15f && lobby.Cops.Contains(p)))
+                            {
+                                pl.TriggerEvent("ShowHandcuffTooltip");
+                            }
                         }
 
                         Commands.cmd_do(player, $"{target.Name} has been tased and has been rendered immobile.");

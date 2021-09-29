@@ -48,7 +48,7 @@ namespace RNC
         public string AmmoType { get; set; }
 
         [JsonProperty("Components")]
-        public Dictionary<ulong, Component> Components { get; set; }
+        public Dictionary<long, Component> Components { get; set; }
 
         [JsonProperty("Tints")]
         public List<LiveryColor> Tints { get; set; }
@@ -59,7 +59,7 @@ namespace RNC
         [JsonProperty("DLC")]
         public string Dlc { get; set; }
 
-        public static Dictionary<ulong, jWeaponData> FromJson(string json) => JsonConvert.DeserializeObject<Dictionary<ulong, jWeaponData>>(json, new JsonSerializerSettings
+        public static Dictionary<long, jWeaponData> FromJson(string json) => JsonConvert.DeserializeObject<Dictionary<long, jWeaponData>>(json, new JsonSerializerSettings
         {
             MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
             DateParseHandling = DateParseHandling.None,
@@ -371,7 +371,7 @@ namespace RNC
         public static long LastCountUpdate { get; set; }
         public static List<LoadoutData> Loadouts { get; set; }
         public static List<CarData> Cars { get; set; }
-        public static Dictionary<ulong, jWeaponData> WeaponData { get; set; }
+        public static Dictionary<long, jWeaponData> WeaponData { get; set; }
         public static List<SpawnSet> FreeroamSpawns { get; set; }
 
         // Dyn Settings Global
@@ -602,7 +602,7 @@ namespace RNC
             }
             return seats;
         }
-        public static IDictionary<ulong, string> WeaponReasons = new Dictionary<ulong, string>()
+        public static IDictionary<long, string> WeaponReasons = new Dictionary<long, string>()
         {
             {2460120199, "Antique Cavalry Dagger"},
 	        {2508868239, "Baseball Bat"},
@@ -1005,7 +1005,7 @@ namespace RNC
             Settings.Cars = new List<CarData>();
             Settings.FreeroamSpawns = new List<SpawnSet>();
 
-            Settings.WeaponData = new Dictionary<ulong, jWeaponData>();
+            Settings.WeaponData = new Dictionary<long, jWeaponData>();
             
             Settings.Dynamics = new DynSet();
 
@@ -1067,7 +1067,7 @@ namespace RNC
 
             try
             {
-                foreach (KeyValuePair<ulong, jWeaponData> item in jWeaponData.FromJson(File.ReadAllText("racenchase/weapondata.json")))
+                foreach (KeyValuePair<long, jWeaponData> item in jWeaponData.FromJson(File.ReadAllText("racenchase/weapondata.json")))
                 {
                     Settings.WeaponData.Add(item.Key, item.Value);
                 }

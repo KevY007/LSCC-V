@@ -223,7 +223,6 @@ mp.events.addDataHandler('Collisions', function (entity, value, oldValue)
 mp.events.add("entityStreamIn", (entity) => {
     if (entity.type === 'object' && entity.getVariable("BelongsToPickup") !== undefined) {
         entity.setCollision(false, false);
-        ToggleCollisionsForEnt(entity, false);
 
         entity.BelongsToPickup = entity.getVariable("BelongsToPickup");
         if(entity.getVariable("PropLighting") !== undefined)
@@ -238,7 +237,6 @@ mp.events.addDataHandler('BelongsToPickup', function (entity, value, oldValue)
     if (entity.type === 'object') 
     {
         entity.setCollision(false, false);
-        ToggleCollisionsForEnt(entity, false);
 
         entity.BelongsToPickup = entity.getVariable("BelongsToPickup");
     }
@@ -262,8 +260,15 @@ mp.events.add("render", () => {
             continue;
         }
 
-        const { x: rotX, y: rotY, z: rotZ } = obj.getRotation(2);
-        obj.setRotation(rotX, rotY, rotZ + (90.0 * frameTime), 2, true); // 90.0 rotation amount * frameTime
+        obj.setCollision(false, false);
+        mp.players.local.setNoCollision(obj.handle, false);
+        if(mp.players.local.isInAnyVehicle(false)) mp.players.local.vehicle.setNoCollision(obj.handle, false);
+
+        if(obj.getVariable("PropRotation") !== undefined && obj.getVariable("PropRotation") == true)
+        {
+            const { x: rotX, y: rotY, z: rotZ } = obj.getRotation(2);
+            obj.setRotation(rotX, rotY, rotZ + (90.0 * frameTime), 2, true); // 90.0 rotation amount * frameTime
+        }
 
         if (obj.PropLighting !== undefined) {
             const { x: posX, y: posY, z: posZ } = obj.position;

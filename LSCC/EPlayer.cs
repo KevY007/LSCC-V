@@ -168,14 +168,14 @@ namespace RNC
     public partial class wComponentData
     {
         [JsonProperty("Components")]
-        public List<ulong> Components { get; set; }
+        public List<long> Components { get; set; }
 
         public wComponentData()
         {
-            Components = new List<ulong>();
+            Components = new List<long>();
         }
 
-        public static Dictionary<ulong, wComponentData> FromJson(string json) => JsonConvert.DeserializeObject<Dictionary<ulong, wComponentData>>(json, new JsonSerializerSettings
+        public static Dictionary<long, wComponentData> FromJson(string json) => JsonConvert.DeserializeObject<Dictionary<long, wComponentData>>(json, new JsonSerializerSettings
         {
             MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
             DateParseHandling = DateParseHandling.None,
@@ -831,7 +831,7 @@ namespace RNC
                         {
                             int extraAmmo = 0;
                             jWeaponData wepdat;
-                            if (Settings.WeaponData.TryGetValue(Convert.ToUInt64((WeaponHash)wepar[0]), out wepdat))
+                            if (Settings.WeaponData.TryGetValue(Convert.ToInt64((WeaponHash)wepar[0]), out wepdat))
                             {
                                 if (EPlayer.GetAccount(player).PurchasedAmmo.Length >= 4)
                                 {
@@ -859,14 +859,14 @@ namespace RNC
                     {
                         if (player != null && !player.IsNull && EPlayer.GetAccount(player).WeaponComponents != null && EPlayer.GetAccount(player).WeaponComponents.Length > 3)
                         {
-                            Dictionary<ulong, wComponentData> weaponCompsData = new Dictionary<ulong, wComponentData>();
-                            weaponCompsData = NAPI.Util.FromJson<Dictionary<ulong, wComponentData>>(EPlayer.GetAccount(player).WeaponComponents);
+                            Dictionary<long, wComponentData> weaponCompsData = new Dictionary<long, wComponentData>();
+                            weaponCompsData = NAPI.Util.FromJson<Dictionary<long, wComponentData>>(EPlayer.GetAccount(player).WeaponComponents);
 
-                            foreach (KeyValuePair<ulong, wComponentData> i in weaponCompsData)
+                            foreach (KeyValuePair<long, wComponentData> i in weaponCompsData)
                             {
                                 if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
                                 {
-                                    i.Value.Components.ForEach((ulong comphash) =>
+                                    i.Value.Components.ForEach((long comphash) =>
                                     {
                                         EPlayer.AttachComponent(player, (int)i.Key, (int)comphash);
                                     });
@@ -918,7 +918,7 @@ namespace RNC
                         {
                             int extraAmmo = 0;
                             jWeaponData wepdat;
-                            if (Settings.WeaponData.TryGetValue(Convert.ToUInt64((WeaponHash)wepar[0]), out wepdat))
+                            if (Settings.WeaponData.TryGetValue(Convert.ToInt64((WeaponHash)wepar[0]), out wepdat))
                             {
                                 if (EPlayer.GetAccount(player).PurchasedAmmo.Length >= 4)
                                 {
@@ -946,14 +946,14 @@ namespace RNC
                     {
                         if (player != null && !player.IsNull && EPlayer.GetAccount(player).WeaponComponents != null && EPlayer.GetAccount(player).WeaponComponents.Length > 3)
                         {
-                            Dictionary<ulong, wComponentData> weaponCompsData = new Dictionary<ulong, wComponentData>();
-                            weaponCompsData = NAPI.Util.FromJson<Dictionary<ulong, wComponentData>>(EPlayer.GetAccount(player).WeaponComponents);
+                            Dictionary<long, wComponentData> weaponCompsData = new Dictionary<long, wComponentData>();
+                            weaponCompsData = NAPI.Util.FromJson<Dictionary<long, wComponentData>>(EPlayer.GetAccount(player).WeaponComponents);
 
-                            foreach (KeyValuePair<ulong, wComponentData> i in weaponCompsData)
+                            foreach (KeyValuePair<long, wComponentData> i in weaponCompsData)
                             {
                                 if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
                                 {
-                                    i.Value.Components.ForEach((ulong comphash) =>
+                                    i.Value.Components.ForEach((long comphash) =>
                                     {
                                         EPlayer.AttachComponent(player, (int)i.Key, (int)comphash);
                                     });
@@ -966,6 +966,31 @@ namespace RNC
             }
 
             return;
+        }
+
+        public static void CreateAmmoBox(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Dictionary<string, int> ammoData = new Dictionary<string, int>();
+            foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
+            {
+                if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
+                {
+                    if (i.Value.AmmoType != null)
+                    {
+                        if (!ammoData.ContainsKey(i.Value.AmmoType)) // IF ammo has not been added before in the box already (If 2 same category guns are there, 2 rifles. They will dupe)
+                        {
+                            ammoData.Add(i.Value.AmmoType, player.GetWeaponAmmo((WeaponHash)i.Key));
+                            player.SetWeaponAmmo((WeaponHash)i.Key, 0);
+                        }
+                    }
+                }
+            }
+            if (ammoData.Count == 0) return; // No weapons.
+
+            player.SetData("CreatingAmmoBox", ammoData);
+            player.TriggerEvent("GetGroundZ", player.Position.X, player.Position.Y, player.Position.Z, player.Dimension, "ReturnAmmoPosZ");
         }
 
         public static void SetDiscordStatus(Player player, string status)

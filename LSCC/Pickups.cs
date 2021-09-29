@@ -28,6 +28,8 @@ namespace RNC
 
         public readonly bool rotation;
 
+        private readonly Dictionary<string, object> Data; // WOHOW COPY RAGEMP BESTRP??
+
         public Action<Player> OnPickup { get; set; }
 
         public void Destroy()
@@ -37,6 +39,22 @@ namespace RNC
             this.colshape.Delete();
             if(this.prop != null) this.prop.Delete();
         }
+
+        public void SetData<T>(string key, T value)
+        {
+            this.Data.Remove(key);
+            this.Data.Add(key, (T)value);
+        }
+
+        public T GetData<T>(string key)
+        {
+            object value;
+            if (this.Data.TryGetValue(key, out value)) return (T)value;
+
+            return default(T);
+        }
+
+        public bool HasData(string key) { return this.Data.ContainsKey(key); }
      
         public Pickup(uint model, Vector3 position, float range, uint dimension, bool rotate = true, float[] lights = null)
         {
@@ -51,6 +69,7 @@ namespace RNC
             this.createTick = Environment.TickCount64;
             this.rotation = rotate;
             this.lightData = null;
+            this.Data = new Dictionary<string, object>();
 
             this.OnPickup += ((player) => this.Destroy());
 
@@ -62,10 +81,8 @@ namespace RNC
                 this.prop = NAPI.Object.CreateObject(this.model, this.position, new Vector3(0, 0, 0), 255, this.dimension);
                 this.prop.SetSharedData("BelongsToPickup", this.id);
 
-                if (rotate)
-                {
-                    this.prop.SetSharedData("PropRotation", this.rotation);
-                }
+                this.prop.SetSharedData("PropRotation", this.rotation);
+                
                 if (lights != null)
                 {
                     // R, G, B, RANGE, INTENSITY, SHADOW

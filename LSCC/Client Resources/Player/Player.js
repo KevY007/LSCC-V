@@ -1386,6 +1386,11 @@ mp.events.add('native:call', (nativeName, args, hasCallback) => {
 
 mp.events.add(
 {
+    "GetGroundZ": (px, py, pz, dimension, returnEvent) => {
+        let getGroundZ = mp.game.gameplay.getGroundZFor3dCoord(px, py, pz, parseFloat(0), false);
+
+        mp.events.callRemote(returnEvent, px, py, getGroundZ, dimension);
+    },
     "ChangeVehicleHeading": (heading) => {
         if(mp.players.local.isInAnyVehicle(false)) mp.players.local.vehicle.setHeading(heading);
     },
