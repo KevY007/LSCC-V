@@ -121,7 +121,11 @@ namespace RNC
                 LoadConnectionString();
             }
             // Use it to init the connection
-            builder.UseMySql(_connectionString, optionsBuilder => optionsBuilder.MigrationsAssembly(typeof(MainDatabase).GetTypeInfo().Assembly.GetName().Name));
+            builder.UseMySql(_connectionString, optionsBuilder => {
+                optionsBuilder.MigrationsAssembly(typeof(MainDatabase).GetTypeInfo().Assembly.GetName().Name);
+                optionsBuilder.EnableRetryOnFailure();
+                optionsBuilder.CommandTimeout(60); // Default: 30s
+            });
            
             return new MainDatabase(builder.Options);
         }
