@@ -4485,6 +4485,49 @@ namespace RNC
             return;
         }
 
+        [Command("deleteaccount", "!{#AFAFAF}[USAGE] deleteaccount (account name)")]
+        public void cmd_deleteaccount(Player player, string name)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 6)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+
+            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+
+            if ((tpAcc != null) == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                return;
+            }
+
+            if (tpAcc.Admin > EPlayer.GetAccount(player).Admin)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The target's admin level is higher than yours!");
+                return;
+            }
+
+            Player target = RAGE.Entities.Players.All.Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
+            if (target != null)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is online, duh.");
+                return;
+            }
+
+            Logs.LogAdmin(player, $"Deleted account '{tpAcc.Username}'.");
+
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has deleted account {tpAcc.Username}.");
+
+            ContextFactory.Instance.Remove(tpAcc);
+            ContextFactory.Instance.SaveChanges();
+            return;
+        }
+
         [Command("changepass", "!{#AFAFAF}[USAGE] changepass (account name) (new password)")]
         public void cmd_changepass(Player player, string name, string newpass)
         {
@@ -5508,7 +5551,7 @@ namespace RNC
             if (EPlayer.GetAccount(player).Admin >= 4)
             {
                 player.SendChatMessage("[Admin Lv 4]: /serveroptions /grantxp /saveserver /dbgplayanim /dbgmaxspeed /dbgdriveforce");
-                player.SendChatMessage("[Admin Lv 4]: /changename /changepass /agivepoints");
+                player.SendChatMessage("[Admin Lv 4]: /changename (works offline too) /changepass (works offline too) /agivepoints");
             }
             if (EPlayer.GetAccount(player).Admin >= 5)
             {
@@ -5517,7 +5560,7 @@ namespace RNC
             }
             if (EPlayer.GetAccount(player).Admin >= 6)
             {
-                player.SendChatMessage("[Admin Lv 6]: /triggerevent /triggerjs /cameraset /(o)setadmin");
+                player.SendChatMessage("[Admin Lv 6]: /triggerevent /triggerjs /cameraset /(o)setadmin /deleteaccount");
             }
             return;
         }
