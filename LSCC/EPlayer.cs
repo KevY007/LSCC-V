@@ -842,8 +842,12 @@ namespace RNC
                                     }
                                 }
                             }
-
-                            player.GiveWeapon((WeaponHash)wepar[0], (int)wepar[3]+extraAmmo);
+                            
+                            if((WeaponHash)wepar[0] == (WeaponHash)1)
+                            {
+                                player.Armor = player.Armor + (int)wepar[3];
+                            }
+                            else player.GiveWeapon((WeaponHash)wepar[0], (int)wepar[3]+extraAmmo);
                         });
                     }
                 }
@@ -930,7 +934,11 @@ namespace RNC
                                 }
                             }
 
-                            player.GiveWeapon((WeaponHash)wepar[0], (int)wepar[3] + extraAmmo);
+                            if ((WeaponHash)wepar[0] == (WeaponHash)1)
+                            {
+                                player.Armor = player.Armor + (int)wepar[3];
+                            }
+                            else player.GiveWeapon((WeaponHash)wepar[0], (int)wepar[3] + extraAmmo);
                         });
                     }
                 }

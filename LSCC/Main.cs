@@ -1079,31 +1079,55 @@ namespace RNC
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the loadouts...");
 
             new LoadoutData(1, "Default")
-                .Add(WeaponHash.Pistol, "package://Artwork/Weapons/Pistol.png", "Pistol", 40)
-                .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Pump Shotgun", 20);
+                .Add(WeaponHash.Pistol, "package://Artwork/Weapons/Pistol.png", "Pistol", 40);
 
             new LoadoutData(0, "Default")
                 .Add(WeaponHash.Pistol, "package://Artwork/Weapons/Pistol.png", "Pistol", 40)
                 .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Pump Shotgun", 20);
 
-            new LoadoutData(1, "Heavy", 5)
-                .Add(WeaponHash.Combatpistol, "package://Artwork/Weapons/CombatPistol.png", "Combat Pistol", 40)
-                .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Pump Shotgun", 20)
-                .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1)
-                .Add(WeaponHash.Carbinerifle, "package://Artwork/Weapons/CarbineRifle.png", "Carbine Rifle", 80);
-            
+            new LoadoutData(1, "Patrol", 5)
+                .Add(WeaponHash.Combatpistol, "package://Artwork/Weapons/CombatPistol.png", "Glock 17", 30)
+                .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Remington 870", 15);
 
-            new LoadoutData(1, "SWAT", 10)
-                .Add(WeaponHash.Pistol50, "package://Artwork/Weapons/Pistol50.png", "Pistol .50", 60)
-                .Add(WeaponHash.Heavyshotgun, "package://Artwork/Weapons/HeavyShotgun.png", "Heavy Shotgun", 40)
-                .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 3)
-                .Add((WeaponHash)0x9D1F17E6, "package://Artwork/Weapons/MilitaryRifle.png", "Military Rifle", 120);
 
-            new LoadoutData(1, "Whiplash", 20)
-                .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1)
-                .Add(WeaponHash.NavyRevolver, "package://Artwork/Weapons/NavyRevolver.png", "Navy Revolver", 30)
-                .Add(WeaponHash.Musket, "package://Artwork/Weapons/Musket.png", "Musket", 30)
-                .Add((WeaponHash)0x9D1F17E6, "package://Artwork/Weapons/MilitaryRifle.png", "Military Rifle", 90);
+            new LoadoutData(1, "Metropolitan", 8)
+                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "M1911", 40)
+                .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Remington 870", 25)
+                .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1);
+
+            new LoadoutData(1, "FBI", 12, 15)
+                .Add(WeaponHash.Pistol50, "package://Artwork/Weapons/Pistol50.png", "Desert Eagle", 40)
+                .Add(WeaponHash.Bullpupshotgun, "package://Artwork/Weapons/BullpupShotgun.png", "Kel Tec KSG", 28)
+                .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 2);
+
+            new LoadoutData(1, "CIA", 15, 30)
+                .Add(WeaponHash.Appistol, "package://Artwork/Weapons/APPistol.png", "Colt SCAMP", 50)
+                .Add(WeaponHash.Assaultshotgun, "package://Artwork/Weapons/AssaultShotgun.png", "AA-12", 20)
+                .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1);
+
+            new LoadoutData(1, "SWAT", 20, 50)
+                .Add(WeaponHash.Combatpistol, "package://Artwork/Weapons/CombatPistol.png", "Glock 17", 30)
+                .Add(WeaponHash.Smg, "package://Artwork/Weapons/SMG.png", "UMP-45", 60)
+                .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Remington 870", 15)
+                .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 2);
+
+            new LoadoutData(1, "Marine", 25, 70)
+                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "M1911", 30)
+                .Add(WeaponHash.Carbinerifle, "package://Artwork/Weapons/CarbineRifle.png", "AR-15", 60)
+                .Add(WeaponHash.Bullpupshotgun, "package://Artwork/Weapons/BullpupShotgun.png", "Kel Tec KSG", 28)
+                .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1);
+
+            new LoadoutData(1, "Navy SEAL", 35, 100)
+                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "M1911", 30)
+                .Add(WeaponHash.Assaultshotgun, "package://Artwork/Weapons/AssaultShotgun.png", "AA-12", 20)
+                .Add(WeaponHash.Specialcarbine, "package://Artwork/Weapons/SpecialCarbine.png", "SCAR-H", 70)
+                .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1);
+
+            new LoadoutData(1, "Juggernaut", 50, 150)
+                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "M1911", 40)
+                .Add(WeaponHash.Combatmg, "package://Artwork/Weapons/CombatMG.png", "M60", 160)
+                .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Remington 870", 15)
+                .Add((WeaponHash)1, "package://Artwork/Weapons/Armour.png", "+50 Armour", 50);
 
             new LoadoutData(0, "Convicted", 5)
                 .Add(WeaponHash.Combatpistol, "package://Artwork/Weapons/CombatPistol.png", "Combat Pistol", 40)
