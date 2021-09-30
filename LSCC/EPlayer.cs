@@ -897,7 +897,6 @@ namespace RNC
 
             if (lobby.gameMode != GameModes.BUSTED)
             {
-
                 if (EPlayer.GetAccount(player).LoadoutFugitive.Length >= 2)
                 {
                     LoadoutData loadout = Settings.Loadouts.Find(a => a.Team == 0 && a.Name.Equals(EPlayer.GetAccount(player).LoadoutFugitive));
@@ -973,6 +972,9 @@ namespace RNC
                 }, 500 + player.Ping);
             }
 
+            WeaponHash[] randomWeps = { WeaponHash.Bottle, WeaponHash.Knife, WeaponHash.Bat, WeaponHash.Battleaxe, WeaponHash.Dagger, WeaponHash.Crowbar, WeaponHash.Hammer };
+            
+            player.GiveWeapon(randomWeps.OrderBy(a => Guid.NewGuid()).First(), 1);
             return;
         }
 
