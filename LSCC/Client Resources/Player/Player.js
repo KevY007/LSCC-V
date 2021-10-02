@@ -16,13 +16,12 @@ let derbyTimeCur = 0;
 let derbyCounting = false;
 
 let secondCounter = 0;
-let updateRate = 200;
 
 let dbDisabledMsg = false;
 
-if(mp.storage.data.updaterate !== undefined)
+if(mp.storage.data.menu !== undefined && mp.storage.data.menu.updateRate !== undefined)
 {
-    updateRate = mp.storage.data.updaterate;
+    updateRate = mp.storage.data.menu.updateRate;
 }
 
 /* Spec Camera move settings */
@@ -231,8 +230,10 @@ mp.events.addCommand("gpsbind", function (bind) {
     mp.keys.unbind(lastGPSBind, true, TogGPSMode);
     mp.keys.bind(curGPSBind, true, TogGPSMode);
 
+    mp.events.callLocal("HUDNotify", `Push to talk key changed to <strong>${String.fromCharCode(curGPSBind)}</strong>.`, "blue", "fas fa-check", false, 
+        1000, "bottomCenter", "replace");
+
     mp.events.callLocal("RemoveTooltip", String.fromCharCode(lastGPSBind));
-    mp.gui.chat.push("Key changed!");
 });
 
 mp.keys.bind(0x4C, false, function() {
@@ -479,10 +480,11 @@ mp.events.addCommand("updaterate", function (rate) {
     }
 
     updateRate = rate;
-    mp.storage.data.updaterate = rate;
+    mp.storage.data.menu.updateRate = rate;
     mp.storage.flush();
 
-    mp.gui.chat.push("Updates now happen " + Math.round(1000 / updateRate) + " times a second.");
+    mp.events.callLocal("HUDNotify", `Updates now happen <strong>${Math.round(1000 / updateRate)}</strong> times a second.`, "blue", "fas fa-check", false, 
+        1000, "bottomCenter", "replace");
 });
 
 mp.events.addCommand("bigmap", function () {
@@ -490,13 +492,17 @@ mp.events.addCommand("bigmap", function () {
     if(mp.storage.data.menu.alwaysExpandedMap == true)
     {
         mp.storage.data.menu.alwaysExpandedMap = false;
-        mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Minimap reverted to normal.");
         mp.game.ui.setRadarBigmapEnabled(false, false);
+
+        mp.events.callLocal("HUDNotify", `Minimap reverted to <strong>normal</strong>.`, "blue", "fas fa-check", false, 
+        1000, "bottomCenter", "replace");
     }
     else 
     {
         mp.storage.data.menu.alwaysExpandedMap = true;
-        mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Minimap will now always be expanded.");
+
+        mp.events.callLocal("HUDNotify", `Minimap will now always be <strong>expanded</strong>.`, "blue", "fas fa-check", false, 
+        1000, "bottomCenter", "replace");
     }
     mp.storage.flush();
 });

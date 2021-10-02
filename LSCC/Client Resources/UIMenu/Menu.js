@@ -1,4 +1,5 @@
 menuToggled = false;
+let lastMenuToggle = Date.now();
 
 if(typeof mp.storage.data.menu == "undefined")
 {
@@ -7,6 +8,7 @@ if(typeof mp.storage.data.menu == "undefined")
     mp.storage.data.menu.gameProgress = true;
     mp.storage.data.menu.killFeed = true;
     mp.storage.data.menu.alwaysExpandedMap = false;
+    mp.storage.data.menu.updateRate = 200;
 
     mp.storage.flush();
 }
@@ -27,21 +29,94 @@ mp.events.add('RestartMenu', () => {
 
 function ToggleMenu()
 {
-    if(UIMenu != null && !scoreboardToggled && Date.now() - lastChatToggle >= 500 && !chatStatus && mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
+    if(UIMenu != null && !scoreboardToggled && Date.now() - lastChatToggle >= 500 && !chatStatus && mp.players.local.LoggedIn !== undefined 
+        && mp.players.local.LoggedIn == true && Date.now() - lastMenuToggle >= 1000)
     {
+        lastMenuToggle = Date.now();
         traceLastFunc(`[Menu] Attempt open/M key`);
 
         menuToggled = !menuToggled;
         UIMenu.active = menuToggled;
+        //if(UIHud != null) UIHud.execute(`gm.miniHud = ${!menuToggled};`);
         UIMenu.execute(`gm.mainMenu = ${menuToggled};`);
         mp.events.callRemote("OnToggleMenu", menuToggled);
         mp.gui.cursor.show(menuToggled, menuToggled);
         mp.gui.chat.activate(!menuToggled);
         //mp.gui.chat.show(!menuToggled);
 
-        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.topRightInfo = ${mp.storage.data.menu.topRightInfo};`);
-        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.gameProgress = ${mp.storage.data.menu.gameProgress};`);
-        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.killFeed = ${mp.storage.data.menu.killFeed};`);
+        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.settings = [
+            {
+              id: 1,
+              type: 1,
+              name: "tri",
+              label: "Top Right Info",
+              description: "This includes RnC Logo, Player Count, Current Lobby ID, Clock."
+            },
+            {
+              id: 2,
+              type: 1,
+              name: "kf",
+              label: "Kill Feed",
+              description: "This includes Kill Feed."
+            },
+            {
+              id: 3,
+              type: 1,
+              name: "gp",
+              label: "Game Progress",
+              description: "This includes In-Game Progress Timer."
+            },
+            {
+              id: 4,
+              type: 1,
+              name: "bigmap",
+              label: "Expanded Minimap",
+              description: "Toggle permanently expanded minimap."
+            },
+            {
+              id: 5,
+              type: 2,
+              name: "updr",
+              label: "Update Rate",
+              description: "How fast should blips & UI segments update.",
+              options: [
+                {
+                  name: "Slow",
+                  value: "1000",
+                },
+                {
+                  name: "Normal",
+                  value: "200",
+                },
+                {
+                  name: "Fast",
+                  value: "10",
+                },
+              ]
+            },
+            {
+              id: 6,
+              type: 3,
+              name: "vcbind",
+              label: "Push To Talk",
+              description: "Click to change the push to talk key."
+            },
+            {
+              id: 7,
+              type: 3,
+              name: "gpsbind",
+              label: "GPS Key",
+              description: "This is the key used to toggle GPS."
+            },
+          ]`);
+          
+        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.tri.value = ${mp.storage.data.menu.topRightInfo};`);
+        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.gp.value = ${mp.storage.data.menu.gameProgress};`);
+        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.kf.value = ${mp.storage.data.menu.killFeed};`);
+        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.bigmap.value = ${mp.storage.data.menu.alwaysExpandedMap};`);
+        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.updr.value = ${mp.storage.data.menu.updateRate};`);
+        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.vcbind.value = "${String.fromCharCode(curVoiceBind)}";`);
+        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.gpsbind.value = "${String.fromCharCode(curGPSBind)}";`);
     }
 }
 
@@ -64,7 +139,9 @@ mp.events.add("MenuToggleTyping", (state) => {
     }
 });
 
-mp.events.add("MenuChangeSettings", (id, value) => {
+mp.events.add("MenuChangeSettings", (id, value) => 
+{
+    mp.gui.chat.push(`id ${id} => ${value}`);
     if(id == 1)
     {
         mp.storage.data.menu.topRightInfo = value;
@@ -76,6 +153,25 @@ mp.events.add("MenuChangeSettings", (id, value) => {
     else if(id == 3)
     {
         mp.storage.data.menu.gameProgress = value;
+    }
+    else if(id == 4)
+    {
+        mp.events.callLocal("playerCommand", "bigmap");
+        //mp.storage.data.menu.alwaysExpandedMap = value;
+    }
+    else if(id == 5)
+    {
+        mp.events.callLocal("playerCommand", `updaterate ${value}`);
+        //mp.storage.data.menu.updateRate = value;
+        //updateRate = value;
+    }
+    else if(id == 6)
+    {
+        mp.events.callLocal("playerCommand", `voicebind ${value}`);
+    }
+    else if(id == 7)
+    {
+        mp.events.callLocal("playerCommand", `gpsbind ${value}`);
     }
 
     if(UIHud != null)

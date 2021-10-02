@@ -6,6 +6,7 @@ var chaseTimeCur = 0;
 var chaseTimeMax = 390;
 var chaseMode = 0; // 0= STANDARD | 1= BUSTED | and others as in SCRIPT
 var collisionTime = -1;
+var updateRate = 200;
 
 var chatStatus = false;
 var lastChatToggle = Date.now();
