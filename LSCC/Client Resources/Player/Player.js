@@ -1097,6 +1097,13 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
 
                     if(breakShot) mp.game.graphics.notify("~r~Do not deathmatch!");
                 }
+                
+                if(targetEntity.Team == 0 && player.Team == 1 && player.weapon == 911657153)
+                {
+                    breakShot = true;
+                    mp.console.logInfo("Taser does not work for vehicles.");
+                }
+
 
                 if(breakShot == true) return true;
             }
