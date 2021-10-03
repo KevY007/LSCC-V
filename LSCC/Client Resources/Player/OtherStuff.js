@@ -1,4 +1,4 @@
-function getClosestVehicle( position ) 
+function getClosestVehicle( position, lockcheck = false ) 
 {
     try {
         let closest = 50;
@@ -7,6 +7,13 @@ function getClosestVehicle( position )
         mp.vehicles.forEachInStreamRange( v => {
             let dist =  mp.game.system.vdist( position.x, position.y, position.z, v.position.x, v.position.y, v.position.z );
 
+            if(lockcheck)
+            {
+                if ((v.getVariable('locked') !== undefined && v.getVariable('locked') === true) || v.locked)
+                {
+                    return;
+                }
+            }
             if( dist < closest ) {
                 closest = dist;
                 closestVeh = v;
@@ -22,7 +29,8 @@ function getClosestVehicle( position )
 mp.game.controls.useDefaultVehicleEntering = false;
 mp.keys.bind(71, false, () => 
 {
-    if (mp.players.local.vehicle === null && !mp.gui.cursor.visible && !chatStatus)
+    if (mp.players.local.vehicle === null && !mp.gui.cursor.visible && !chatStatus && Date.now() - lastChatToggle >= 500 && !menuToggled && 
+        !scoreboardToggled)
     {
         const driverSeatId = -1; // CHANGE THIS AS THE DRIVER INDEX CHANGES
         const playerPos = mp.players.local.position;
@@ -585,5 +593,187 @@ mp.keys.bind(0x73, true, function() {
             ssViewCursor = false;
             mp.gui.cursor.show(ssViewCursor, ssViewCursor);
         }
+    }
+});
+
+/////////////////////////////////////////////////////////
+
+let operationType = 0; // 1: BOOT SHUT, 2: BOOT OPEN, 3: BONNET OPEN, 4: BONNET CLOSE
+
+mp.game.streaming.requestAnimDict("veh@low@front_ps@enter_exit");
+mp.game.streaming.requestAnimDict("rcmnigel3_trunk");
+mp.game.streaming.requestAnimDict("rcmepsilonism8");
+
+mp.keys.bind(74, false, () => {
+
+    if (!mp.players.local.isInAnyVehicle(false) && operationType == 0 
+        && chatStatus == false && Date.now() - lastChatToggle >= 500 && !menuToggled && !scoreboardToggled)
+    {
+        let veh = getClosestVehicle(mp.players.local.position, true);
+
+        if(veh === undefined) return;
+
+        if(!mp.vehicles.exists(veh.vehicle) || veh.vehicle.handle === 0) return;
+
+        let sidebones = [
+          "handle_dside_f",
+          "handle_dside_r",
+          "handle_pside_f",
+          "handle_pside_r",
+          "bonnet",
+          "boot"
+        ];
+
+        let closestHandle = "";
+        let closestDist = 100.0;
+        sidebones.forEach((side) => {
+            let bone = veh.vehicle.getBoneIndexByName(side);
+            if(bone != -1)
+            {
+                let dist = calcDist(mp.players.local.position, veh.vehicle.getWorldPositionOfBone(bone));
+                if(dist < closestDist)
+                {
+                    closestDist = dist;
+                    closestHandle = side;
+                }
+            }
+        });
+
+        if(closestDist <= 2.0)
+        {
+            if(closestHandle == "handle_dside_f")
+            {
+                if(veh.vehicle.getDoorAngleRatio(0) >= 0.25)
+                {
+                    mp.players.local.heading = veh.vehicle.heading;
+                    mp.players.local.taskPlayAnim("veh@low@front_ds@enter_exit", "d_close_out", 4.0, 0.0, -1, 128, 0.0, false, false, false);
+                    veh.vehicle.setDoorShut(0, false);
+
+
+                }
+                else 
+                {
+                    mp.players.local.heading = veh.vehicle.heading - 90.0;
+                    mp.players.local.taskPlayAnim("veh@low@front_ds@enter_exit", "d_open_out", 4.0, 0.0, -1, 128, 0.0, false, false, false);
+                    veh.vehicle.setDoorOpen(0, false, false);
+                }
+            }
+            else if (closestHandle == "handle_dside_r")
+            {
+                if(veh.vehicle.getDoorAngleRatio(2) >= 0.25)
+                {
+                    mp.players.local.heading = veh.vehicle.heading;
+                    mp.players.local.taskPlayAnim("veh@low@front_ds@enter_exit", "d_close_out", 4.0, 0.0, -1, 128, 0.0, false, false, false);
+                    veh.vehicle.setDoorShut(2, false);
+                }
+                else 
+                {
+                    mp.players.local.heading = veh.vehicle.heading - 90.0;
+                    mp.players.local.taskPlayAnim("veh@low@front_ds@enter_exit", "d_open_out", 4.0, 0.0, -1, 128, 0.0, false, false, false);
+                    veh.vehicle.setDoorOpen(2, false, false);
+                }
+            }
+            else if (closestHandle == "handle_pside_f")
+            {
+                if(veh.vehicle.getDoorAngleRatio(1) >= 0.25)
+                {
+                    mp.players.local.heading = veh.vehicle.heading;
+                    mp.players.local.taskPlayAnim("veh@low@front_ps@enter_exit", "d_close_out", 4.0, 0.0, -1, 128, 0.0, false, false, false);
+                    veh.vehicle.setDoorShut(1, false);
+                }
+                else 
+                {
+                    mp.players.local.heading = veh.vehicle.heading + 90.0;
+                    mp.players.local.taskPlayAnim("veh@low@front_ps@enter_exit", "d_open_out", 4.0, 0.0, -1, 128, 0.0, false, false, false);
+                    veh.vehicle.setDoorOpen(1, false, false);
+                }
+            }
+            else if (closestHandle == "handle_pside_r")
+            {
+                if(veh.vehicle.getDoorAngleRatio(3) >= 0.25)
+                {
+                    mp.players.local.heading = veh.vehicle.heading;
+                    mp.players.local.taskPlayAnim("veh@low@front_ps@enter_exit", "d_close_out", 4.0, 0.0, -1, 128, 0.0, false, false, false);
+                    veh.vehicle.setDoorShut(3, false);
+                }
+                else 
+                {
+                    mp.players.local.heading = veh.vehicle.heading + 90.0;
+                    mp.players.local.taskPlayAnim("veh@low@front_ps@enter_exit", "d_open_out", 4.0, 0.0, -1, 128, 0.0, false, false, false);
+                    veh.vehicle.setDoorOpen(3, false, false);
+                }
+            }
+            else if (closestHandle == "bonnet")
+            {
+                if(veh.vehicle.getDoorAngleRatio(4) >= 0.25)
+                {
+                    mp.players.local.heading = veh.vehicle.heading - 180.0;
+                    mp.players.local.taskPlayAnim("rcmepsilonism8", "bag_handler_close_trunk_walk_left", 4.0, 0.0, 2500, 48, 0.0, false, false, false);
+                    operationType = 4;
+
+                    setTimeout(() => {
+                        mp.players.local.stopAnim("rcmepsilonism8", "bag_handler_close_trunk_walk_left", 8.0);
+
+                        if (mp.vehicles.exists(veh.vehicle) && veh.vehicle.handle !== 0)
+                        {
+                            veh.vehicle.setDoorShut(4, false);
+                        }
+                        operationType = 0;
+                    }, 1250);
+                }
+                else 
+                {
+                    mp.players.local.heading = veh.vehicle.heading - 180.0;
+                    mp.players.local.taskPlayAnim("rcmnigel3_trunk", "out_trunk_trevor", 4.0, 0.0, 2500, 48, 0.0, false, false, false);
+                    operationType = 3;
+
+                    setTimeout(() => {
+                        mp.players.local.stopAnim("rcmnigel3_trunk", "out_trunk_trevor", 8.0);
+
+                        if (mp.vehicles.exists(veh.vehicle) && veh.vehicle.handle !== 0)
+                        {
+                            veh.vehicle.setDoorOpen(4, false, false);
+                        }
+                        operationTimer = 0;
+                        operationType = 0;
+                    }, 750);
+                }
+            }
+            else if (closestHandle == "boot")
+            {
+                if(veh.vehicle.getDoorAngleRatio(5) >= 0.25)
+                {
+                    mp.players.local.heading = veh.vehicle.heading;
+                    mp.players.local.taskPlayAnim("rcmepsilonism8", "bag_handler_close_trunk_walk_left", 4.0, 0.0, 2500, 48, 0.0, false, false, false);
+                    operationType = 1;
+
+                    setTimeout(() => {
+                        mp.players.local.stopAnim("rcmepsilonism8", "bag_handler_close_trunk_walk_left", 8.0);
+
+                        if (mp.vehicles.exists(veh.vehicle) && veh.vehicle.handle !== 0)
+                        {
+                            veh.vehicle.setDoorShut(5, false);
+                        }
+                        operationType = 0;
+                    }, 1250);
+                }
+                else 
+                {
+                    mp.players.local.heading = veh.vehicle.heading;
+                    mp.players.local.taskPlayAnim("rcmnigel3_trunk", "out_trunk_trevor", 4.0, 0.0, 2500, 48, 0.0, false, false, false);
+                    operationType = 2;
+
+                    setTimeout(() => {
+                        mp.players.local.stopAnim("rcmnigel3_trunk", "out_trunk_trevor", 8.0);
+
+                        if (mp.vehicles.exists(veh.vehicle) && veh.vehicle.handle !== 0)
+                        {
+                            veh.vehicle.setDoorOpen(5, false, false);
+                        }
+                        operationType = 0;
+                    }, 750);
+                }
+            }
+        }     
     }
 });
