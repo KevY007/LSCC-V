@@ -2022,8 +2022,19 @@ namespace RNC
                             pVehicle.SetSharedData("Locked", true);
                             pVehicle.Locked = true;
                             pVehicle.SetSharedData("Team", 1);
+
                             pVehicle.SetSharedData("Collisions", false);
                             if (enginePower > 1.0f) pVehicle.SetSharedData("vInitialDriveForce", enginePower);
+
+                            Dictionary<string, int> ammoTypes = new Dictionary<string, int>();
+                            ammoTypes.Add("AMMO_PISTOL", 40);
+                            ammoTypes.Add("AMMO_SMG", 30);
+                            ammoTypes.Add("AMMO_RIFLE", 20);
+                            ammoTypes.Add("AMMO_MG", 20);
+                            ammoTypes.Add("AMMO_SHOTGUN", 20);
+                            ammoTypes.Add("AMMO_BZGAS", 3);
+                            pVehicle.SetData("BackupAmmo", ammoTypes);
+
 
                             var inst = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.Model == pVehicle.Model && a.AccountSQLID == EPlayer.GetAccount(player).SQL_ID);
                             if (inst != null)

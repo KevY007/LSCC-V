@@ -250,12 +250,12 @@ namespace RNC
 
             if(index == 4)  // Bonnet
             {
-                vehicle.ResetSharedData("BonnetOpen");
+                vehicle.ResetSharedData("BonnetOpened");
                 EPlayer.Action(player, "slams the hood shut.");
             }
             else if (index == 5)  // Boot/Trunk
             {
-                vehicle.ResetSharedData("TrunkOpen");
+                vehicle.ResetSharedData("TrunkOpened");
                 EPlayer.Action(player, "closes the trunk of the vehicle.");
             }
         }
@@ -271,12 +271,12 @@ namespace RNC
 
             if (index == 4)  // Bonnet
             {
-                vehicle.SetSharedData("BonnetOpen", true);
+                vehicle.SetSharedData("BonnetOpened", true);
                 EPlayer.Action(player, "lifts up the hood of the vehicle.");
             }
             else if (index == 5)  // Boot
             {
-                vehicle.SetSharedData("TrunkOpen", true);
+                vehicle.SetSharedData("TrunkOpened", true);
                 EPlayer.Action(player, "pops the trunk open.");
             }
         }
@@ -2013,9 +2013,10 @@ namespace RNC
             newPickup.OnPickup = (guy) =>
             {
                 var ammoBox = newPickup.GetData<Dictionary<string, int>>("AmmoBox");
+                string notificationString = "";
                 foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
                 {
-                    if (guy.GetWeaponAmmo((WeaponHash)i.Key) > 0 || guy.CurrentWeapon == (WeaponHash)i.Key)
+                    if (guy.GetWeaponAmmo((WeaponHash)i.Key) > 0 || guy.CurrentWeapon == (WeaponHash)i.Key || (WeaponHash)i.Key == WeaponHash.Bzgas)
                     {
                         if (i.Value.AmmoType != null)
                         {
@@ -2023,6 +2024,7 @@ namespace RNC
                             if (ammoBox.TryGetValue(i.Value.AmmoType, out weaponAmmo))
                             {
                                 guy.SetWeaponAmmo((WeaponHash)i.Key, guy.GetWeaponAmmo((WeaponHash)i.Key) + weaponAmmo);
+                                notificationString = notificationString + $"<p>+{weaponAmmo} ammo to <strong>{i.Value.Name}</strong></p>";
                                 ammoBox.Remove(i.Value.AmmoType);
                             }
                         }
@@ -2030,6 +2032,12 @@ namespace RNC
                 }
                 
                 newPickup.SetData("AmmoBox", ammoBox);
+                if (notificationString.Length >= 3)
+                {
+                    EPlayer.Action(player, "restocks from an ammunition box.");
+                    EPlayer.Notify(player, notificationString, "green", "fas fa-boxes", false, 2000, "bottomRight");
+                }
+
                 if (ammoBox.Count == 0)
                 {
                     lobby.Drops.Remove(newPickup);

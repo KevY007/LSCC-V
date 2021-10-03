@@ -151,6 +151,21 @@ namespace RNC
 
             EPlayer.CreateAmmoBox(player);
         }
+        [Command("dbgcreateammocar")]
+        public void cmd_dbgcreateammocar(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 6 || !player.IsInVehicle) return;
+
+            Dictionary<string, int> ammoTypes = new Dictionary<string, int>();
+            ammoTypes.Add("AMMO_PISTOL", 40);
+            ammoTypes.Add("AMMO_SMG", 30);
+            ammoTypes.Add("AMMO_RIFLE", 20);
+            ammoTypes.Add("AMMO_MG", 20);
+            ammoTypes.Add("AMMO_SHOTGUN", 20);
+            ammoTypes.Add("AMMO_BZGAS", 3);
+            player.Vehicle.SetData("BackupAmmo", ammoTypes);
+        }
 
         [Command("trunk", Alias = "boot")]
         public void cmd_trunk(Player player)
@@ -4059,6 +4074,81 @@ namespace RNC
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has put {target.Name} in {toputin.Name}'s vehicle.");
         }
 
+        [Command("restock")]
+        public void cmd_restock(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if(player.IsInVehicle)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are in a vehicle.");
+                return;
+            }
+
+            Vehicle targetVeh = null;
+            foreach (Vehicle v in RAGE.Entities.Vehicles.All)
+            {
+                if (v.Dimension == player.Dimension && v.Position.DistanceTo(player.Position) <= 5.0)
+                {
+                    if (!v.HasSharedData("TrunkOpened")) continue;
+
+                    targetVeh = v;
+                    break;
+                }
+            }
+
+            if (targetVeh == null)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not close enough to a vehicle with a trunk open!");
+                return;
+            }
+
+            if(!targetVeh.HasData("BackupAmmo"))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no ammo inside the trunk.");
+                return;
+            }
+
+            Dictionary<string, int> ammoBox = targetVeh.GetData<Dictionary<string, int>>("BackupAmmo");
+            string notificationString = "";
+            foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
+            {
+                if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0 || player.CurrentWeapon == (WeaponHash)i.Key || (WeaponHash)i.Key == WeaponHash.Bzgas)
+                {
+                    if (i.Value.AmmoType != null)
+                    {
+                        int weaponAmmo = 0;
+                        if (ammoBox.TryGetValue(i.Value.AmmoType, out weaponAmmo))
+                        {
+                            player.SetWeaponAmmo((WeaponHash)i.Key, player.GetWeaponAmmo((WeaponHash)i.Key) + weaponAmmo);
+                            notificationString = notificationString + $"<p>+{weaponAmmo} ammo to <strong>{i.Value.Name}</strong></p>";
+                            ammoBox.Remove(i.Value.AmmoType);
+                        }
+                    }
+                }
+            }
+
+
+            if(notificationString.Length >= 3)
+            {
+                targetVeh.SetData("BackupAmmo", ammoBox);
+
+                EPlayer.Action(player, "restocks from an ammunition box.");
+                EPlayer.Notify(player, notificationString, "green", "fas fa-boxes", false, 2000, "bottomRight");
+            }
+            else
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no ammunition for your weapons. If the weapon is empty, hold it in hand and retry.");
+            }
+
+            if (ammoBox.Count == 0)
+            {
+                targetVeh.ResetSharedData("BackupAmmo");
+            }
+
+            return;
+        }
+
         [Command("keys")]
         public void cmd_keys(Player player)
         {
@@ -4242,8 +4332,8 @@ namespace RNC
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
             player.SendChatMessage("[Lobby]: /lobbychat (/lo,/lg) /spec /specoff /(fugitive)chances");
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats /changemypass /outfit");
-            player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys for activation)");
-            player.SendChatMessage("!{#339BC4}[Cop!{#F24C27}chase]: !{#FFFFFF}/r(adio) /wt");
+            player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys)");
+            player.SendChatMessage("!{#339BC4}[Cop!{#F24C27}chase]: !{#FFFFFF}/r(adio) /wt /restock");
             player.SendChatMessage("!{#0097ff}[Cop]: /gps /cuff /m(egaphone) /dragout");
             player.SendChatMessage("!{#ffae00}[Fugitive]: /d(rive)b(y)");
             player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup /s(top)a(nim) /passgun");
