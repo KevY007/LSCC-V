@@ -811,7 +811,7 @@ namespace RNC
                 {
                     LoadoutData loadout = Settings.Loadouts.Find(a => a.Team == 1 && a.Name.Equals(EPlayer.GetAccount(player).LoadoutCop));
 
-                    if ((loadout != null) == false)
+                    if (loadout == null)
                     {
                         EPlayer.GetAccount(player).LoadoutCop = "?";
                         GiveCopWeapons(player);
@@ -827,6 +827,12 @@ namespace RNC
 
                     if (loadout.Weapons.Count() > 0)
                     {
+                        OwnedLoadoutData _ld = ContextFactory.Instance.OwnedLoadouts.FirstOrDefault<OwnedLoadoutData>(l =>
+                                                l.AccountSQLID == EPlayer.GetAccount(player).SQL_ID &&
+                                                l.Name.Equals(EPlayer.GetAccount(player).LoadoutCop, StringComparison.OrdinalIgnoreCase));
+                        if (_ld != null)
+                            _ld.TimesUsed++;
+
                         loadout.Weapons.ForEach((wepar) =>
                         {
                             int extraAmmo = 0;

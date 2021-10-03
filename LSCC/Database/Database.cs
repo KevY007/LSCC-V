@@ -60,6 +60,7 @@ namespace RNC
         public int AccountSQLID { get; set; }
         public string Model { get; set; }
         public int Team { get; set; }
+        public int TimesUsed { get; set; }
     }
     public class PlayerTunings
     {
@@ -80,6 +81,7 @@ namespace RNC
         public int AccountSQLID { get; set; }
         public string Name { get; set; }
         public int Team { get; set; }
+        public int TimesUsed { get; set; }
     }
 
     public class MainDatabase : DbContext

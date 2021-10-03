@@ -2002,6 +2002,15 @@ namespace RNC
                                     col1 = 111;
                                 }
 
+                                // incrementing times this police vehicle was used
+                                if(EPlayer.HasOwnedVehicle(player, carName, 1))
+                                {
+                                    OwnedVehData ownedVeh = ContextFactory.Instance.OwnedVehicles.FirstOrDefault<OwnedVehData>(v => v.AccountSQLID == EPlayer.GetAccount(player).SQL_ID
+                                                            && v.Model.Equals(carName, StringComparison.OrdinalIgnoreCase));
+                                    if(ownedVeh != null)
+                                        ownedVeh.TimesUsed++;
+                                }
+
                             }
 
                             if (carName.Equals("prevolter")) col2 = 0; // Full black undercover brr.
@@ -2233,6 +2242,15 @@ namespace RNC
                         else
                         {
                             carName = EPlayer.GetAccount(_tempPlayer).CarFugitive;
+
+                            // incrementing times this police vehicle was used
+                            if (EPlayer.HasOwnedVehicle(_tempPlayer, carName, 0))
+                            {
+                                OwnedVehData ownedVeh = ContextFactory.Instance.OwnedVehicles.FirstOrDefault<OwnedVehData>(v => v.AccountSQLID == EPlayer.GetAccount(_tempPlayer).SQL_ID
+                                                        && v.Model.Equals(carName, StringComparison.OrdinalIgnoreCase));
+                                if (ownedVeh != null)
+                                    ownedVeh.TimesUsed++;
+                            }
                         }
 
                         Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, 
