@@ -508,7 +508,7 @@ namespace RNC
             player.SendChatMessage("!{#FF6347}Server Discord: !{#0097FF}discord.gg/y3g2WuR");
             player.SendChatMessage("!{#FFFF00}Website: !{#FFAE00}www.racenchase.com");
             player.SendChatMessage("  ");
-            player.SendChatMessage("!{#FFFFFF}Developers: !{#FF6347}KevY (Lead), jambredrek (Game) and RotX (Web)");
+            player.SendChatMessage("!{#FFFFFF}Developers: !{#FF6347}KevY (Lead), jambredrek (Game) and RotX (Web/UI)");
             player.SendChatMessage("!{#FFFFFF}Thanks to all those who participated in !{#FF6347}beta testing and early launch!{#FFFFFF}.");
             player.SendChatMessage("  ");
             return;

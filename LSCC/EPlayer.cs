@@ -667,6 +667,12 @@ namespace RNC
             
             target.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} ({acc.SQL_ID}) at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
 
+            DiscordData _d = NAPI.Util.FromJson<DiscordData>(acc.DiscordInfo);
+            if (_d.DiscordID.Equals("n/a"))
+            {
+                target.SendChatMessage("{#fa9194}You haven't linked a Discord account yet! {#ffffff}Please do so in order to activate some cool perks. {#ffff00}(/discord)");
+            }
+            
             EPlayer.GrantXP(target, 0);
             return;
         }
@@ -920,9 +926,15 @@ namespace RNC
                         GiveFugitiveWeapons(player);
                         return;
                     }
-
+                    
                     if (loadout.Weapons.Count() > 0)
                     {
+                        OwnedLoadoutData _ld = ContextFactory.Instance.OwnedLoadouts.FirstOrDefault<OwnedLoadoutData>(l =>
+                        l.AccountSQLID == EPlayer.GetAccount(player).SQL_ID &&
+                        l.Name.Equals(EPlayer.GetAccount(player).LoadoutFugitive, StringComparison.OrdinalIgnoreCase));
+                        if (_ld != null)
+                            _ld.TimesUsed++;
+
                         loadout.Weapons.ForEach((wepar) =>
                         {
                             int extraAmmo = 0;

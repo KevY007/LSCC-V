@@ -2311,12 +2311,16 @@ namespace RNC
             test.Components.Add(123456789);
             wepItems.Add(123456789, test);
 
+            DiscordData _discordData = new DiscordData();
+            string jsonDiscordData = NAPI.Util.ToJson(_discordData);
+
             var _new = new Account
             {
                 Email = email,
                 Password = newPass,
                 Salt = salt,
                 Username = username,
+                DiscordInfo = jsonDiscordData,
                 Admin = 0,
                 RegisterHWID = player.Serial,
                 RegisterIP = player.Address,

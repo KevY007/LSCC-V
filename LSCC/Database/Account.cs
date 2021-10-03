@@ -13,6 +13,7 @@ using CryptSharp;
 using RNC;
 using System.Security.Cryptography;
 using GTANetworkAPI;
+using System.Linq;
 
 namespace RNC
 {
@@ -25,6 +26,7 @@ namespace RNC
         public string Username { get; set; }
         public string Password { get; set; }
         public string Salt { get; set; }
+        public string DiscordInfo { get; set; }
         public DateTime RegisterDate { get; set; }
         public string RegisterHWID { get; set; }
         public ulong RegisterRID { get; set; }
@@ -66,6 +68,27 @@ namespace RNC
         public string MOTD { get; set; }
         public double LastSessionMins { get; set; }
         public string PurchasedAmmo { get; set; }
+    }
+
+    public class DiscordData
+    {
+        public string DiscordID;
+        public string DiscordCode;
+        public bool LeftDiscord;
+        public bool UsedDiscordPerks;
+        public DiscordData()
+        {
+            DiscordID = "n/a";
+            LeftDiscord = false;
+            UsedDiscordPerks = false;
+
+            Random random = new Random();
+            string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            string generatedCode = Enumerable.Repeat(chars, 5)
+              .Select(s => s[random.Next(s.Length)]).ToString();
+
+            DiscordCode = generatedCode;
+        }
     }
 
     public static class AccountManager
