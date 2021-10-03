@@ -1,0 +1,82 @@
+jebiga list =>
+
+
+
+Added an entirely new kill list. Player colors will be displayed accordingly along with cause of death.
+Old native GTA5 notifications have been replaced with new notifications.
+Removed the game progress bar and replaced with a timer in the new HUD.
+Replaced collision timer with a new one in HUD.
+Player weapon wheel and HUD color theme will now be set according to the current team.
+Added a new sky spawning effect on game starts.
+Added /pagesize and changed chat font and color theme according to team.
+Added a new scoreboard with the ability to filter players.
+Login screen has been changed and EMAIL for REGISTRATION CAN BE LEFT EMPTY AND IS NOT NECESSARY NOW.
+Added tooltips which show according to situations.
+Added /bigmap for always toggled expanded map. Can be changed from menu settings too.
+
+Removed the old speedometer and HUD, instead we've added a miniHUD along with radar which will show location separately.
+New speedometer added (experimental)
+
+Fixed last seen being reported in another language.
+
+Player color changes:
+Fugitive has been set to orange.
+Cops color slightly altered.
+Derby is now green.
+
+Added /convertpoints to convert donator points to normal and vice versa.
+Chat sending multiple same messages on spamming ENTer has been fixed.
+Players will no longer get XP if game ends under a certain amount of time to avoid duo farming.
+
+
+
+ Added a new interactable menu that can be opened with the M key.
+DM, Derby and Freeroam are now set into the Minigames tab in menu.
+Removed the old vehicle and loadout selectors, integrated them with a new one inside menu now.
+
+Spectators can now see nametags and health bars.
+Silent siren will no longer trigger when chat is open.
+Blips will no longer show of players who just died so there's no more confusion.
+Players with higher ping than 350 will not be set as drivers on fugitive team unless there's no one else available.
+Players will not retain armor from lobby or DM anymore.
+Disabled tasing, cuffing, dragging out for the starting 25 seconds of the round.
+Ladder protection has been added for cops. It will give ~15 seconds of invincibility from when you got on a ladder and when you get off it will give 2 seconds (1 second for fugitive) of lingering invincibility effect. While the protection is enabled, you cannot damage nor be damaged.
+Changed how players spawn at the start of the round to fix players being left without vehicle.
+/cuff has been removed and a new cuffing system with progress display has been added. Hold H to cuff now.
+Collision system has been reworked, should work better now.
+Added /vtuner (vehicle name) for tuning vehicles in pursuits.
+Added /driveby for players to toggle if they want someone to shoot or not as a fugitive driver.
+Added weapon ammo pickups when players die in copchase. You will only be able to replenish if the ammo type is same. If you have no ammo at all, you will have to hold the weapon in hand.
+
+Nitestick in every police loadout along with taser now.
+
+Fixed siren not syncing after leaving vehicle.
+
+Players' can only spawn a max of 5 vehicles in freeroam now.
+Added /tuneveh for freeroam.
+!up command has been changed and that it will delete messages once displayed.
+Discord bot will now show online players in it's status.
+
+On kicks/bans, the server will wait to show the proper messages to the player before proceeding to kick.
+Added /setalpha and /setcaralpha.
+Spectate system has been improved such that camera movement and zoom will be possible. (WASD and MWHEEL)
+Ban and kick should work appropriately for logged out players now.
+Added /checkplayer for all admins.
+/tfreeze and /rfreeze will show messages and notifications properly.
+Added /putinvehicle.
+[redacted] (screenshot)
+
+
+Removed LSPD Caracara.
+Replaced default cruiser with a crown vic. felt sexy.
+Removed 600sel/merc mod.
+
+Added new fugitives vehicles and loadouts. omg chefck it out yourself cant write so much
+Tasing fugitives vehicle tires will no longer work.
+
+
+Added Police Scout and Unmarked Police Scout.
+Charger's handling has been fixed and Revolter has been slowed down a bit.
+Fixed the police lights on the Charger mod.
+Weapon sounds and models have been improved/changed.
+Mustang '66 Fastback mod has been removed and replaced by Vapid Dominator GTT (dominator8)
