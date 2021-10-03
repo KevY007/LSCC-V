@@ -222,6 +222,7 @@ mp.events.add('entityStreamIn', (entity) => {
 
 mp.events.addDataHandler('Collisions', function (entity, value, oldValue) 
 {
+    mp.console.logInfo(`ent ${entity.id} type ${entity.type} collisions: ${value}`);
     entity.Collisions = value;
     ToggleCollisionsForEnt(entity, value);
 });

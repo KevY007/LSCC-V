@@ -2545,7 +2545,7 @@ namespace RNC
                                     EPlayer.Notify(player, "Collisions have been enabled and weapons issued", "green", "fas fa-car-crash", false, 3000);
 
                                     player.SetSharedData("Collisions", true);
-                                    if(!Settings.Dynamics.OnfootCollision) player.SetSharedData("Collisions", false);
+                                    if(Settings.Dynamics.OnfootCollision == false) player.SetSharedData("Collisions", false);
 
                                     if (lobby.Cops.Contains(player))
                                     {

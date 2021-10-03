@@ -4206,6 +4206,15 @@ namespace RNC
             return;
         }
 
+        [Command("dbgsetcol")]
+        public void cmd_dbgsetcol(Player player, bool state)
+        {
+            if (EPlayer.GetAccount(player).Admin < 6) return;
+
+            player.SetSharedData("Collisions", state);
+            return;
+        }
+
         [Command("dbgcargame", Alias = "dbgsetcar", GreedyArg = true)]
         public void cmd_dbgcargame(Player player, int team, string car)
         {

@@ -457,7 +457,15 @@ namespace RNC
                     player.SendNotification("~r~You cannot enter a vehicle that has an opposition team driver!");
                 }
             }
-            
+
+            if (Settings.Dynamics.OnfootCollision == false)
+            {
+                if (player.GetSharedData<int>("Team") == 0 || player.GetSharedData<int>("Team") == 1)
+                {
+                    player.SetSharedData("Collisions", true);
+                }
+            }
+
             player.SetSharedData("LastVehEnterExit", DateTimeOffset.Now.ToUnixTimeSeconds());
         }
 
@@ -467,6 +475,14 @@ namespace RNC
             try // Because triggers on disconnection and stuff invalid vehicles etc
             {
                 if (vehicle == null) return;
+
+                if (Settings.Dynamics.OnfootCollision == false)
+                {
+                    if (player.GetSharedData<int>("Team") == 0 || player.GetSharedData<int>("Team") == 1)
+                    {
+                        player.SetSharedData("Collisions", false);
+                    }
+                }
 
                 if (vehicle.HasSharedData("Engine"))
                 {
