@@ -230,7 +230,7 @@ mp.events.addCommand("gpsbind", function (bind) {
     mp.keys.unbind(lastGPSBind, true, TogGPSMode);
     mp.keys.bind(curGPSBind, true, TogGPSMode);
 
-    mp.events.callLocal("HUDNotify", `Push to talk key changed to <strong>${String.fromCharCode(curGPSBind)}</strong>.`, "blue", "fas fa-check", false, 
+    mp.events.callLocal("HUDNotify", `GPS key is now binded to <strong>${String.fromCharCode(curGPSBind)}</strong>.`, "blue", "fas fa-check", false, 
         1000, "bottomCenter", "replace");
 
     mp.events.callLocal("RemoveTooltip", String.fromCharCode(lastGPSBind));
@@ -487,21 +487,33 @@ mp.events.addCommand("updaterate", function (rate) {
         1000, "bottomCenter", "replace");
 });
 
-mp.events.addCommand("bigmap", function () {
-   
+mp.events.addCommand("bigmap", function (state) {
+    state = Number(state);
+
+    if (Number.isInteger(state) && (state == 0 || state == 1)) {
+        mp.storage.data.menu.alwaysExpandedMap = Boolean(state);
+    }
+    else {
+        if(mp.storage.data.menu.alwaysExpandedMap == true)
+        {
+            mp.storage.data.menu.alwaysExpandedMap = false;
+        }
+        else 
+        {
+            mp.storage.data.menu.alwaysExpandedMap = true;
+        }
+    }
+
     if(mp.storage.data.menu.alwaysExpandedMap == true)
     {
-        mp.storage.data.menu.alwaysExpandedMap = false;
-        mp.game.ui.setRadarBigmapEnabled(false, false);
-
-        mp.events.callLocal("HUDNotify", `Minimap reverted to <strong>normal</strong>.`, "blue", "fas fa-check", false, 
+        mp.events.callLocal("HUDNotify", `Minimap will now always be <strong>expanded</strong>.`, "blue", "fas fa-check", false, 
         1000, "bottomCenter", "replace");
     }
     else 
     {
-        mp.storage.data.menu.alwaysExpandedMap = true;
+        mp.game.ui.setRadarBigmapEnabled(false, false);
 
-        mp.events.callLocal("HUDNotify", `Minimap will now always be <strong>expanded</strong>.`, "blue", "fas fa-check", false, 
+        mp.events.callLocal("HUDNotify", `Minimap reverted to <strong>normal</strong>.`, "blue", "fas fa-check", false, 
         1000, "bottomCenter", "replace");
     }
     mp.storage.flush();
@@ -1408,8 +1420,9 @@ mp.events.add(
         if(mp.players.local.isInAnyVehicle(false)) mp.players.local.vehicle.setHeading(heading);
     },
 
-    "SyncServerSettings": (onfootcollisions) => {
+    "SyncServerSettings": (onfootcollisions, recoilsys) => {
         ServerSettings.OnfootCollisions = onfootcollisions;
+        ServerSettings.RecoilEnabled = recoilsys;
     },
     "ToggleClientRadio": () => {
         radioToggle = !radioToggle;

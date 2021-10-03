@@ -66,7 +66,7 @@ mp.events.addCommand("voicebind", function (bind) {
     mp.keys.bind(curVoiceBind, false, DisableVoice);
     mp.keys.bind(curVoiceBind, true, EnableVoice);
 
-    mp.events.callLocal("HUDNotify", `Push to talk key changed to <strong>${String.fromCharCode(curVoiceBind)}</strong>.`, "blue", "fas fa-check", false, 
+    mp.events.callLocal("HUDNotify", `Push to talk is now binded to <strong>${String.fromCharCode(curVoiceBind)}</strong>.`, "blue", "fas fa-check", false, 
         1000, "bottomCenter", "replace");
         
     mp.events.callLocal("RemoveTooltip", String.fromCharCode(lastVoiceBind));

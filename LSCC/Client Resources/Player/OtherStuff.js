@@ -646,15 +646,13 @@ mp.keys.bind(74, false, () => {
                 if(veh.vehicle.getDoorAngleRatio(0) >= 0.25)
                 {
                     mp.players.local.heading = veh.vehicle.heading;
-                    mp.players.local.taskPlayAnim("veh@low@front_ds@enter_exit", "d_close_out", 4.0, 0.0, -1, 128, 0.0, false, false, false);
+                    mp.players.local.taskPlayAnim("veh@low@front_ds@enter_exit", "d_close_out", 4.0, 0.0, 1000, 48, 0.0, false, false, false);
                     veh.vehicle.setDoorShut(0, false);
-
-
                 }
                 else 
                 {
                     mp.players.local.heading = veh.vehicle.heading - 90.0;
-                    mp.players.local.taskPlayAnim("veh@low@front_ds@enter_exit", "d_open_out", 4.0, 0.0, -1, 128, 0.0, false, false, false);
+                    mp.players.local.taskPlayAnim("veh@low@front_ds@enter_exit", "d_open_out", 4.0, 0.0, 1000, 48, 0.0, false, false, false);
                     veh.vehicle.setDoorOpen(0, false, false);
                 }
             }
@@ -663,13 +661,13 @@ mp.keys.bind(74, false, () => {
                 if(veh.vehicle.getDoorAngleRatio(2) >= 0.25)
                 {
                     mp.players.local.heading = veh.vehicle.heading;
-                    mp.players.local.taskPlayAnim("veh@low@front_ds@enter_exit", "d_close_out", 4.0, 0.0, -1, 128, 0.0, false, false, false);
+                    mp.players.local.taskPlayAnim("veh@low@front_ds@enter_exit", "d_close_out", 4.0, 0.0, 1000, 48, 0.0, false, false, false);
                     veh.vehicle.setDoorShut(2, false);
                 }
                 else 
                 {
                     mp.players.local.heading = veh.vehicle.heading - 90.0;
-                    mp.players.local.taskPlayAnim("veh@low@front_ds@enter_exit", "d_open_out", 4.0, 0.0, -1, 128, 0.0, false, false, false);
+                    mp.players.local.taskPlayAnim("veh@low@front_ds@enter_exit", "d_open_out", 4.0, 0.0, 1000, 48, 0.0, false, false, false);
                     veh.vehicle.setDoorOpen(2, false, false);
                 }
             }
@@ -678,13 +676,13 @@ mp.keys.bind(74, false, () => {
                 if(veh.vehicle.getDoorAngleRatio(1) >= 0.25)
                 {
                     mp.players.local.heading = veh.vehicle.heading;
-                    mp.players.local.taskPlayAnim("veh@low@front_ps@enter_exit", "d_close_out", 4.0, 0.0, -1, 128, 0.0, false, false, false);
+                    mp.players.local.taskPlayAnim("veh@low@front_ps@enter_exit", "d_close_out", 4.0, 0.0, 1000, 48, 0.0, false, false, false);
                     veh.vehicle.setDoorShut(1, false);
                 }
                 else 
                 {
                     mp.players.local.heading = veh.vehicle.heading + 90.0;
-                    mp.players.local.taskPlayAnim("veh@low@front_ps@enter_exit", "d_open_out", 4.0, 0.0, -1, 128, 0.0, false, false, false);
+                    mp.players.local.taskPlayAnim("veh@low@front_ps@enter_exit", "d_open_out", 4.0, 0.0, 1000, 48, 0.0, false, false, false);
                     veh.vehicle.setDoorOpen(1, false, false);
                 }
             }
@@ -693,13 +691,13 @@ mp.keys.bind(74, false, () => {
                 if(veh.vehicle.getDoorAngleRatio(3) >= 0.25)
                 {
                     mp.players.local.heading = veh.vehicle.heading;
-                    mp.players.local.taskPlayAnim("veh@low@front_ps@enter_exit", "d_close_out", 4.0, 0.0, -1, 128, 0.0, false, false, false);
+                    mp.players.local.taskPlayAnim("veh@low@front_ps@enter_exit", "d_close_out", 4.0, 0.0, 1000, 48, 0.0, false, false, false);
                     veh.vehicle.setDoorShut(3, false);
                 }
                 else 
                 {
                     mp.players.local.heading = veh.vehicle.heading + 90.0;
-                    mp.players.local.taskPlayAnim("veh@low@front_ps@enter_exit", "d_open_out", 4.0, 0.0, -1, 128, 0.0, false, false, false);
+                    mp.players.local.taskPlayAnim("veh@low@front_ps@enter_exit", "d_open_out", 4.0, 0.0, 1000, 48, 0.0, false, false, false);
                     veh.vehicle.setDoorOpen(3, false, false);
                 }
             }

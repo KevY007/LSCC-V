@@ -141,7 +141,6 @@ mp.events.add("MenuToggleTyping", (state) => {
 
 mp.events.add("MenuChangeSettings", (id, value) => 
 {
-    mp.gui.chat.push(`id ${id} => ${value}`);
     if(id == 1)
     {
         mp.storage.data.menu.topRightInfo = value;
@@ -156,7 +155,7 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     }
     else if(id == 4)
     {
-        mp.events.callLocal("playerCommand", "bigmap");
+        mp.events.callLocal("playerCommand", `bigmap ${value}`);
         //mp.storage.data.menu.alwaysExpandedMap = value;
     }
     else if(id == 5)
