@@ -37,6 +37,14 @@ mp.events.add("OneSecondEvent", () => {
     }
 });
 
+mp.events.add('Sync:SetDoorOpen', (entity, doorIndex, loose, instantly) => {
+    entity.setDoorOpen(doorIndex, loose, instantly);
+});
+
+mp.events.add('Sync:SetDoorShut', (entity, doorIndex, instantly) => {
+    entity.setDoorShut(doorIndex, instantly);
+});
+
 mp.events.addDataHandler('Status_Trunk', function (entity, value, oldValue) 
 {
     if (entity.type === 'vehicle') 

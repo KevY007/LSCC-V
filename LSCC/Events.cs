@@ -230,12 +230,55 @@ namespace RNC
         }
 
         [RemoteEvent("play_anim")]
-        public static void RequestPlayAnimation(Player player, string animDict, string animName, int animFlags)
+        public static void RequestPlayAnimation(Player player, string animDict, string animName, int animFlags, float speed = 8.0f, float speedMul = 0.0f, int duration = -1, float playbackRate = 0.0f, bool lockX = false, bool lockY = false, bool lockZ = false)
         {
             RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a.Position.DistanceTo(player.Position) < 500.0).ToList().ForEach((Player act) =>
             {
-                act.TriggerEvent("entplayanim", player, animDict, animName, animFlags);
+                act.TriggerEvent("entplayanim", player, animDict, animName, animFlags, speed, speedMul, duration, playbackRate, lockX, lockY, lockZ);
             });
+        }
+
+        [RemoteEvent("Sync:DoorShut")]
+        public static void OnShutDoorSync(Player player, Vehicle vehicle, int index, bool instantly)
+        {
+            if (vehicle == null) return;
+
+            RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a.Position.DistanceTo(player.Position) < 500.0).ToList().ForEach((Player act) =>
+            {
+                act.TriggerEvent("Sync:SetDoorShut", vehicle, index, instantly);
+            });
+
+            if(index == 4)  // Bonnet
+            {
+                vehicle.ResetSharedData("BonnetOpen");
+                EPlayer.Action(player, "slams the hood shut.");
+            }
+            else if (index == 5)  // Boot/Trunk
+            {
+                vehicle.ResetSharedData("TrunkOpen");
+                EPlayer.Action(player, "closes the trunk of the vehicle.");
+            }
+        }
+        [RemoteEvent("Sync:DoorOpen")]
+        public static void OnOpenDoorSync(Player player, Vehicle vehicle, int index, bool loose, bool instantly)
+        {
+            if (vehicle == null) return;
+
+            RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a.Position.DistanceTo(player.Position) < 500.0).ToList().ForEach((Player act) =>
+            {
+                act.TriggerEvent("Sync:SetDoorOpen", vehicle, index, loose, instantly);
+            });
+
+            if (index == 4)  // Bonnet
+            {
+                vehicle.SetSharedData("BonnetOpen", true);
+                EPlayer.Action(player, "lifts up the hood of the vehicle.");
+            }
+            else if (index == 5)  // Boot
+            {
+                vehicle.SetSharedData("TrunkOpen", true);
+                EPlayer.Action(player, "pops the trunk open.");
+            }
         }
 
         [RemoteEvent("OnScriptedKeyPress")]

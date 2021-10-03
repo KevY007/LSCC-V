@@ -161,16 +161,19 @@ namespace RNC
             {
                 if (player.Vehicle.GetSharedData<bool>("Status_Trunk") == false)
                 {
-                    player.Vehicle.SetSharedData("Status_Trunk", true);
+                    player.Vehicle.SetSharedData("Status_Trunk", true); // This variable is ONLY supposed to be used for syncing.
+                    player.Vehicle.SetSharedData("TrunkOpened", true); // THIS VARIABLE IS FOR SCRIPT SIDEDLY GETTING TRUNK STATUS...
                 }
                 else
                 {
                     player.Vehicle.SetSharedData("Status_Trunk", false);
+                    player.Vehicle.ResetSharedData("TrunkOpened");
                 }
             }
             else
             {
                 player.Vehicle.SetSharedData("Status_Trunk", true);
+                player.Vehicle.SetSharedData("TrunkOpened", true);
             }
 
             return;
@@ -4071,6 +4074,7 @@ namespace RNC
             player.SendChatMessage("!{#FF6347}[F7] !{#FFFFFF}Hide/show HUD & chat (Hold !{#FF0000}SHIFT+F7 !{#FFFFFF}to toggle nametags)");
             player.SendChatMessage("!{#FF6347}[B] !{#FFFFFF}Toggle silent siren in !{#0097FF}police !{#FFFFFF}vehicles");
             player.SendChatMessage("!{#FF6347}[H] !{#FFFFFF}Cuff a !{#FFAE00}fugitive");
+            player.SendChatMessage("!{#FF6347}[J] !{#FFFFFF}Close/open vehicle's (must be unlocked) !{#FFAE00}trunk/hood");
         }
 
         [Command("teleport", "!{#AFAFAF}[USAGE] teleport (option: chilliad, airport)", Alias = "tp", GreedyArg = true)]

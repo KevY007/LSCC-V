@@ -1349,7 +1349,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
     }
 });
 
-mp.events.add("entplayanim", (entity, animDictionary, animName, animFlag) => {
+mp.events.add("entplayanim", (entity, animDictionary, animName, animFlag, speed = 8.0, speedMul = 0.0, duration = -1, playbackRate = 0.0, lockX = false, lockY = false, lockZ = false) => {
     if(entity.id == mp.players.local.id)
     {
         mp.events.callRemote("UpdateLastAnim", animDictionary, animName);
@@ -1359,15 +1359,15 @@ mp.events.add("entplayanim", (entity, animDictionary, animName, animFlag) => {
 	const timer = setInterval(() => {
 		if(mp.game.streaming.hasAnimDictLoaded(animDictionary)) {
 			clearInterval(timer);
-			resolve(entity, animDictionary, animName, animFlag);
+			resolvePlayAnim(entity, animDictionary, animName, animFlag, speed, speedMul, duration, playbackRate, lockX, lockY, lockZ);
 		}
 	}, 100);
 });
 });
 
-function resolve(entity, animDictionary, animName, animFlag)
+function resolvePlayAnim(entity, animDictionary, animName, animFlag, speed = 8.0, speedMul = 0.0, duration = -1, playbackRate = 0.0, lockX = false, lockY = false, lockZ = false)
 {
-	entity.taskPlayAnim(animDictionary, animName, 8.0, 0.0, -1, animFlag, 0.0, false, false, false);
+	entity.taskPlayAnim(animDictionary, animName, speed, speedMul, duration, animFlag, playbackRate, lockX, lockY, lockZ);
 }
 
 mp.events.add("entclearanim", (entity, animDictionary, animName) => {
@@ -1472,7 +1472,7 @@ mp.events.add(
 
             mp.players.local.setEnableHandcuffs(true);
 
-            mp.events.callRemote("play_anim", "mp_prison_break", "handcuffed", 32);
+            mp.events.callRemote("play_anim", "mp_prison_break", "handcuffed", 32, 8.0, 0.0, -1, 0.0, false, false, false);
         }
         else
         {
@@ -1485,11 +1485,11 @@ mp.events.add(
     {
         if(status == true)
         {
-            mp.events.callRemote("play_anim", "ped", "handsup_base", 50);
+            mp.events.callRemote("play_anim", "ped", "handsup_base", 50, 8.0, 0.0, -1, 0.0, false, false, false);
         }
         else
         {
-            mp.events.callRemote("play_anim", "ped", "handsup_exit", 50);
+            mp.events.callRemote("play_anim", "ped", "handsup_exit", 50, 8.0, 0.0, -1, 0.0, false, false, false);
             mp.players.local.stopAnim("handsup", "ped", 8.0);
 
             setTimeout(() => {

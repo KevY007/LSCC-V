@@ -9,7 +9,7 @@ function getClosestVehicle( position, lockcheck = false )
 
             if(lockcheck)
             {
-                if ((v.getVariable('locked') !== undefined && v.getVariable('locked') === true) || v.locked)
+                if (v.getVariable('Locked') !== undefined && v.getVariable('Locked') === true)
                 {
                     return;
                 }
@@ -46,7 +46,7 @@ mp.keys.bind(71, false, () =>
 
         if (vehicle.isAVehicle()) 
         {
-            if (vehicle.getVariable('locked') !== undefined && vehicle.getVariable('locked') === true) 
+            if (vehicle.getVariable('Locked') !== undefined && vehicle.getVariable('Locked') === true) 
             {
                 return; // No need to calc stuff, vehicle is locked.
             }
@@ -607,7 +607,8 @@ mp.game.streaming.requestAnimDict("rcmepsilonism8");
 mp.keys.bind(74, false, () => {
 
     if (!mp.players.local.isInAnyVehicle(false) && operationType == 0 
-        && chatStatus == false && Date.now() - lastChatToggle >= 500 && !menuToggled && !scoreboardToggled)
+        && chatStatus == false && Date.now() - lastChatToggle >= 500 && !menuToggled && !scoreboardToggled && 
+        !mp.players.local.isRagdoll())
     {
         let veh = getClosestVehicle(mp.players.local.position, true);
 
@@ -641,96 +642,137 @@ mp.keys.bind(74, false, () => {
 
         if(closestDist <= 2.0)
         {
-            if(closestHandle == "handle_dside_f")
+            /*if(closestHandle == "handle_dside_f") // doors kinda buggy and bad
             {
                 if(veh.vehicle.getDoorAngleRatio(0) >= 0.25)
                 {
-                    mp.players.local.heading = veh.vehicle.heading;
-                    mp.players.local.taskPlayAnim("veh@low@front_ds@enter_exit", "d_close_out", 4.0, 0.0, 1000, 48, 0.0, false, false, false);
-                    veh.vehicle.setDoorShut(0, false);
+                    mp.players.local.setHeading(veh.vehicle.getHeading());
+                    mp.events.callRemote("play_anim", "veh@low@front_ds@enter_exit", "d_close_out", 48, 4.0, 0.0, 1000, 0.0, false, false, false);
+                    mp.events.callRemote("Sync:DoorShut", veh.vehicle, 0, false);
+        
+                    setTimeout(() => {
+                        mp.events.callRemote("clear_anim");
+                        mp.players.local.clearTasksImmediately();
+                    }, 1250);
                 }
                 else 
                 {
-                    mp.players.local.heading = veh.vehicle.heading - 90.0;
-                    mp.players.local.taskPlayAnim("veh@low@front_ds@enter_exit", "d_open_out", 4.0, 0.0, 1000, 48, 0.0, false, false, false);
-                    veh.vehicle.setDoorOpen(0, false, false);
+                    mp.players.local.setHeading(veh.vehicle.getHeading() - 90.0);
+                    mp.players.local.stopAnim()
+                    mp.events.callRemote("play_anim", "veh@low@front_ds@enter_exit", "d_open_out", 48, 4.0, 0.0, 1000, 0.0, false, false, false);
+                    mp.events.callRemote("Sync:DoorOpen", veh.vehicle, 0, false, false);
+                    
+                    setTimeout(() => {
+                        mp.events.callRemote("clear_anim");
+                        mp.players.local.clearTasksImmediately();
+                    }, 1250);
                 }
             }
             else if (closestHandle == "handle_dside_r")
             {
                 if(veh.vehicle.getDoorAngleRatio(2) >= 0.25)
                 {
-                    mp.players.local.heading = veh.vehicle.heading;
-                    mp.players.local.taskPlayAnim("veh@low@front_ds@enter_exit", "d_close_out", 4.0, 0.0, 1000, 48, 0.0, false, false, false);
-                    veh.vehicle.setDoorShut(2, false);
+                    mp.players.local.setHeading(veh.vehicle.getHeading());
+                    mp.events.callRemote("play_anim", "veh@low@front_ds@enter_exit", "d_close_out", 48, 4.0, 0.0, 1000, 0.0, false, false, false);
+                    mp.events.callRemote("Sync:DoorShut", veh.vehicle, 2, false);
+                    
+                    setTimeout(() => {
+                        mp.events.callRemote("clear_anim");
+                        mp.players.local.clearTasksImmediately();
+                    }, 1250);
                 }
                 else 
                 {
-                    mp.players.local.heading = veh.vehicle.heading - 90.0;
-                    mp.players.local.taskPlayAnim("veh@low@front_ds@enter_exit", "d_open_out", 4.0, 0.0, 1000, 48, 0.0, false, false, false);
-                    veh.vehicle.setDoorOpen(2, false, false);
+                    mp.players.local.setHeading(veh.vehicle.getHeading() - 90.0);
+                    mp.events.callRemote("play_anim", "veh@low@front_ds@enter_exit", "d_open_out", 48, 4.0, 0.0, 1000, 0.0, false, false, false);
+                    mp.events.callRemote("Sync:DoorOpen", veh.vehicle, 2, false, false);
+                    
+                    setTimeout(() => {
+                        mp.events.callRemote("clear_anim");
+                        mp.players.local.clearTasksImmediately();
+                    }, 1250);
                 }
             }
             else if (closestHandle == "handle_pside_f")
             {
                 if(veh.vehicle.getDoorAngleRatio(1) >= 0.25)
                 {
-                    mp.players.local.heading = veh.vehicle.heading;
-                    mp.players.local.taskPlayAnim("veh@low@front_ps@enter_exit", "d_close_out", 4.0, 0.0, 1000, 48, 0.0, false, false, false);
-                    veh.vehicle.setDoorShut(1, false);
+                    mp.players.local.setHeading(veh.vehicle.getHeading());
+                    mp.events.callRemote("play_anim", "veh@low@front_ps@enter_exit", "d_close_out", 48, 4.0, 0.0, 1000, 0.0, false, false, false);
+                    mp.events.callRemote("Sync:DoorShut", veh.vehicle, 1, false);
+                    
+                    setTimeout(() => {
+                        mp.events.callRemote("clear_anim");
+                        mp.players.local.clearTasksImmediately();
+                    }, 1250);
                 }
                 else 
                 {
-                    mp.players.local.heading = veh.vehicle.heading + 90.0;
-                    mp.players.local.taskPlayAnim("veh@low@front_ps@enter_exit", "d_open_out", 4.0, 0.0, 1000, 48, 0.0, false, false, false);
-                    veh.vehicle.setDoorOpen(1, false, false);
+                    mp.players.local.setHeading(veh.vehicle.getHeading() + 90.0);
+                    mp.events.callRemote("play_anim", "veh@low@front_ps@enter_exit", "d_open_out", 48, 4.0, 0.0, 1000, 0.0, false, false, false);
+                    mp.events.callRemote("Sync:DoorOpen", veh.vehicle, 1, false, false);
+                    
+                    setTimeout(() => {
+                        mp.events.callRemote("clear_anim");
+                        mp.players.local.clearTasksImmediately();
+                    }, 1250);
                 }
             }
             else if (closestHandle == "handle_pside_r")
             {
                 if(veh.vehicle.getDoorAngleRatio(3) >= 0.25)
                 {
-                    mp.players.local.heading = veh.vehicle.heading;
-                    mp.players.local.taskPlayAnim("veh@low@front_ps@enter_exit", "d_close_out", 4.0, 0.0, 1000, 48, 0.0, false, false, false);
-                    veh.vehicle.setDoorShut(3, false);
+                    mp.players.local.setHeading(veh.vehicle.getHeading());
+                    mp.events.callRemote("play_anim", "veh@low@front_ps@enter_exit", "d_close_out", 48, 4.0, 0.0, 1000, 0.0, false, false, false);
+                    mp.events.callRemote("Sync:DoorShut", veh.vehicle, 3, false);
+
+                    setTimeout(() => {
+                        mp.events.callRemote("clear_anim");
+                        mp.players.local.clearTasksImmediately();
+                    }, 1250);
                 }
                 else 
                 {
-                    mp.players.local.heading = veh.vehicle.heading + 90.0;
-                    mp.players.local.taskPlayAnim("veh@low@front_ps@enter_exit", "d_open_out", 4.0, 0.0, 1000, 48, 0.0, false, false, false);
-                    veh.vehicle.setDoorOpen(3, false, false);
+                    mp.players.local.setHeading(veh.vehicle.getHeading() + 90.0);
+                    mp.events.callRemote("play_anim", "veh@low@front_ps@enter_exit", "d_open_out", 48, 4.0, 0.0, 1000, 0.0, false, false, false);
+                    mp.events.callRemote("Sync:DoorOpen", veh.vehicle, 3, false, false);
+
+                    setTimeout(() => {
+                        mp.events.callRemote("clear_anim");
+                        mp.players.local.clearTasksImmediately();
+                    }, 1250);
                 }
             }
-            else if (closestHandle == "bonnet")
+            else */if (closestHandle == "bonnet")
             {
                 if(veh.vehicle.getDoorAngleRatio(4) >= 0.25)
                 {
-                    mp.players.local.heading = veh.vehicle.heading - 180.0;
-                    mp.players.local.taskPlayAnim("rcmepsilonism8", "bag_handler_close_trunk_walk_left", 4.0, 0.0, 2500, 48, 0.0, false, false, false);
+                    mp.players.local.setHeading(veh.vehicle.getHeading() - 180.0);
+                    mp.events.callRemote("play_anim", "rcmepsilonism8", "bag_handler_close_trunk_walk_left", 48, 4.0, 0.0, 2500, 0.0, false, false, false);
                     operationType = 4;
 
                     setTimeout(() => {
-                        mp.players.local.stopAnim("rcmepsilonism8", "bag_handler_close_trunk_walk_left", 8.0);
+                        mp.events.callRemote("clear_anim");
 
                         if (mp.vehicles.exists(veh.vehicle) && veh.vehicle.handle !== 0)
                         {
-                            veh.vehicle.setDoorShut(4, false);
+                            mp.events.callRemote("Sync:DoorShut", veh.vehicle, 4, false);
                         }
                         operationType = 0;
                     }, 1250);
                 }
                 else 
                 {
-                    mp.players.local.heading = veh.vehicle.heading - 180.0;
-                    mp.players.local.taskPlayAnim("rcmnigel3_trunk", "out_trunk_trevor", 4.0, 0.0, 2500, 48, 0.0, false, false, false);
+                    mp.players.local.setHeading(veh.vehicle.getHeading() - 180.0);
+                    mp.events.callRemote("play_anim", "rcmnigel3_trunk", "out_trunk_trevor", 48, 4.0, 0.0, 2500, 0.0, false, false, false);
                     operationType = 3;
 
                     setTimeout(() => {
-                        mp.players.local.stopAnim("rcmnigel3_trunk", "out_trunk_trevor", 8.0);
+                        mp.events.callRemote("clear_anim");
 
                         if (mp.vehicles.exists(veh.vehicle) && veh.vehicle.handle !== 0)
                         {
-                            veh.vehicle.setDoorOpen(4, false, false);
+                            mp.events.callRemote("Sync:DoorOpen", veh.vehicle, 4, false, false);
                         }
                         operationTimer = 0;
                         operationType = 0;
@@ -741,32 +783,32 @@ mp.keys.bind(74, false, () => {
             {
                 if(veh.vehicle.getDoorAngleRatio(5) >= 0.25)
                 {
-                    mp.players.local.heading = veh.vehicle.heading;
-                    mp.players.local.taskPlayAnim("rcmepsilonism8", "bag_handler_close_trunk_walk_left", 4.0, 0.0, 2500, 48, 0.0, false, false, false);
+                    mp.players.local.setHeading(veh.vehicle.getHeading());
+                    mp.events.callRemote("play_anim", "rcmepsilonism8", "bag_handler_close_trunk_walk_left", 48, 4.0, 0.0, 2500, 0.0, false, false, false);
                     operationType = 1;
 
                     setTimeout(() => {
-                        mp.players.local.stopAnim("rcmepsilonism8", "bag_handler_close_trunk_walk_left", 8.0);
+                        mp.events.callRemote("clear_anim");
 
                         if (mp.vehicles.exists(veh.vehicle) && veh.vehicle.handle !== 0)
                         {
-                            veh.vehicle.setDoorShut(5, false);
+                            mp.events.callRemote("Sync:DoorShut", veh.vehicle, 5, false);
                         }
                         operationType = 0;
                     }, 1250);
                 }
                 else 
                 {
-                    mp.players.local.heading = veh.vehicle.heading;
-                    mp.players.local.taskPlayAnim("rcmnigel3_trunk", "out_trunk_trevor", 4.0, 0.0, 2500, 48, 0.0, false, false, false);
+                    mp.players.local.setHeading(veh.vehicle.getHeading());
+                    mp.events.callRemote("play_anim", "rcmnigel3_trunk", "out_trunk_trevor", 48, 4.0, 0.0, 2500, 0.0, false, false, false);
                     operationType = 2;
 
                     setTimeout(() => {
-                        mp.players.local.stopAnim("rcmnigel3_trunk", "out_trunk_trevor", 8.0);
+                        mp.events.callRemote("clear_anim");
 
                         if (mp.vehicles.exists(veh.vehicle) && veh.vehicle.handle !== 0)
                         {
-                            veh.vehicle.setDoorOpen(5, false, false);
+                            mp.events.callRemote("Sync:DoorOpen", veh.vehicle, 5, false, false);
                         }
                         operationType = 0;
                     }, 750);

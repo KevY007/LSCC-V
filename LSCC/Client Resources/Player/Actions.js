@@ -42,7 +42,7 @@ function PainkillerAction(){
     if(mp.players.local == null || mp.players.local.handle == null) return;
 
     if(!player.isInAnyVehicle(true))
-        mp.events.callRemote("play_anim", "mini@sprunk", "plyr_buy_drink_pt2", 0);
+        mp.events.callRemote("play_anim", "mini@sprunk", "plyr_buy_drink_pt2", 0, 8.0, 0.0, -1, 0.0, false, false, false);
 
     actionInterval = setInterval(() => {
 
@@ -61,7 +61,7 @@ function PainkillerAction(){
                 if(!player.isInAnyVehicle(true))
                 {
                     if(actionTime == 39){
-                        mp.events.callRemote("play_anim", "mini@sprunk", "plyr_buy_drink_pt3", 0);
+                        mp.events.callRemote("play_anim", "mini@sprunk", "plyr_buy_drink_pt3", 0, 8.0, 0.0, -1, 0.0, false, false, false);
                     }
                     if(actionTime == 38){            
                         mp.events.callRemote("clear_anim");
@@ -82,7 +82,7 @@ function initiateActionTimer(startTime){
 
 function MedkitAction(){
     if(mp.players.local == null || mp.players.local.handle == null) return;
-    mp.events.callRemote("play_anim", "amb@medic@standing@kneel@enter", "enter", 0);
+    mp.events.callRemote("play_anim", "amb@medic@standing@kneel@enter", "enter", 0, 8.0, 0.0, -1, 0.0, false, false, false);
 
     initiateActionTimer(actionTime);
 
@@ -101,7 +101,7 @@ function MedkitAction(){
                 actionTime--;           
                 UIHud.execute(`gm.$refs.actionBar.time = ${((maxActionTime - actionTime) == 0 ? 0.1 : (maxActionTime - actionTime))}`);
                 if(actionTime == 1){
-                    mp.events.callRemote("play_anim", "amb@medic@standing@kneel@exit", "exit", 0);
+                    mp.events.callRemote("play_anim", "amb@medic@standing@kneel@exit", "exit", 0, 8.0, 0.0, -1, 0.0, false, false, false);
                 }
             }
         } finally { }
