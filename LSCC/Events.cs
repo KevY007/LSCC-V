@@ -272,12 +272,16 @@ namespace RNC
             if (index == 4)  // Bonnet
             {
                 vehicle.SetSharedData("BonnetOpened", true);
-                EPlayer.Action(player, "lifts up the hood of the vehicle.");
+
+                if (player.CurrentWeapon == WeaponHash.Crowbar) EPlayer.Action(player, "forces the bonnet open with a crowbar.");
+                else EPlayer.Action(player, "lifts up the hood of the vehicle.");
             }
             else if (index == 5)  // Boot
             {
                 vehicle.SetSharedData("TrunkOpened", true);
-                EPlayer.Action(player, "pops the trunk open.");
+
+                if (player.CurrentWeapon == WeaponHash.Crowbar) EPlayer.Action(player, "forces the trunk open with a crowbar.");
+                else EPlayer.Action(player, "pops the trunk open.");
             }
         }
 

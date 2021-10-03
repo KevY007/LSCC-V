@@ -1,4 +1,4 @@
-function getClosestVehicle( position, lockcheck = false ) 
+function getClosestVehicle( position ) 
 {
     try {
         let closest = 50;
@@ -7,13 +7,6 @@ function getClosestVehicle( position, lockcheck = false )
         mp.vehicles.forEachInStreamRange( v => {
             let dist =  mp.game.system.vdist( position.x, position.y, position.z, v.position.x, v.position.y, v.position.z );
 
-            if(lockcheck)
-            {
-                if (v.getVariable('Locked') !== undefined && v.getVariable('Locked') === true)
-                {
-                    return;
-                }
-            }
             if( dist < closest ) {
                 closest = dist;
                 closestVeh = v;
@@ -610,11 +603,18 @@ mp.keys.bind(74, false, () => {
         && chatStatus == false && Date.now() - lastChatToggle >= 500 && !menuToggled && !scoreboardToggled && 
         !mp.players.local.isRagdoll())
     {
-        let veh = getClosestVehicle(mp.players.local.position, true);
+        let veh = getClosestVehicle(mp.players.local.position);
 
         if(veh === undefined) return;
 
         if(!mp.vehicles.exists(veh.vehicle) || veh.vehicle.handle === 0) return;
+        if(veh.vehicle.getVariable("Locked") !== undefined && veh.vehicle.getVariable("Locked") == true)
+        {
+            if(mp.players.local.weapon != 0x84BD7BFD && mp.players.local.weapon != 2227010557) // Not crowbar
+            {
+                return;
+            }
+        }
 
         let sidebones = [
           "handle_dside_f",

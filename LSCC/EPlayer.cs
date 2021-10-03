@@ -972,7 +972,7 @@ namespace RNC
                 }, 500 + player.Ping);
             }
 
-            WeaponHash[] randomWeps = { WeaponHash.Bottle, WeaponHash.Knife, WeaponHash.Bat, WeaponHash.Battleaxe, WeaponHash.Dagger, WeaponHash.Crowbar, WeaponHash.Hammer };
+            WeaponHash[] randomWeps = { WeaponHash.Bottle, WeaponHash.Knife, WeaponHash.Bat, WeaponHash.Battleaxe, WeaponHash.Crowbar };
             
             player.GiveWeapon(randomWeps.OrderBy(a => Guid.NewGuid()).First(), 1);
             return;
