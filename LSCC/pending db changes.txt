@@ -16,4 +16,6 @@ Edit entry string Time of "Bans" table to DateTime
 
 execute the following SQL for reset detection in server.
 
+Add "DiscordData" field in accounts longtext (cuz it's json shit)
+
 UPDATE Accounts SET RegisterDate = STR_TO_DATE('2000-3-2 6:03:22', '%Y-%m-%d %H:%i:%s'), LastLogin = STR_TO_DATE('2000-3-2 6:03:22', '%Y-%m-%d %H:%i:%s'), LastIP = 'n/a', LastRID = 0, LastHWID = 'n/a', LastSC = 'n/a', RegisterIP = 'n/a', RegisterSC = 'n/a', RegisterRID = 0, RegisterHWID = 'n/a'

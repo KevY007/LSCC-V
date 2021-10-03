@@ -84,8 +84,8 @@ namespace RNC
 
             Random random = new Random();
             string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            string generatedCode = Enumerable.Repeat(chars, 5)
-              .Select(s => s[random.Next(s.Length)]).ToString();
+            string generatedCode = new string(Enumerable.Repeat(chars, 5)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
 
             DiscordCode = generatedCode;
         }

@@ -670,7 +670,7 @@ namespace RNC
             DiscordData _d = NAPI.Util.FromJson<DiscordData>(acc.DiscordInfo);
             if (_d.DiscordID.Equals("n/a"))
             {
-                target.SendChatMessage("{#fa9194}You haven't linked a Discord account yet! {#ffffff}Please do so in order to activate some cool perks. {#ffff00}(/discord)");
+                target.SendChatMessage("!{#fa9194}You haven't linked a Discord account yet! !{#ffffff}Please do so in order to activate some cool perks. !{#ffff00}(/discord)");
             }
             
             EPlayer.GrantXP(target, 0);
