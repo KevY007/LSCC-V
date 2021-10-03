@@ -187,7 +187,7 @@ function ToggleCollisionsForEnt(ent, state)
         ent.setCanBeDamaged(state);
         ent.setCanBreak(state);
     }
-    ent.setAlpha(state ? 255 : 232);
+    //ent.setAlpha(state ? 255 : 200);
 
     mp.vehicles.forEach(targ => {
 
@@ -222,7 +222,6 @@ mp.events.add('entityStreamIn', (entity) => {
 
 mp.events.addDataHandler('Collisions', function (entity, value, oldValue) 
 {
-    mp.console.logInfo(`ent ${entity.id} type ${entity.type} collisions: ${value}`);
     entity.Collisions = value;
     ToggleCollisionsForEnt(entity, value);
 });
