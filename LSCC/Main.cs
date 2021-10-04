@@ -1225,7 +1225,7 @@ namespace RNC
             new CarData(0, "Buffalo", "buffalo", "package://Artwork/Vehicles/buffalo.png", "Average", 22, 30);
             new CarData(0, "Tailgater S", "tailgater2", "package://Artwork/Vehicles/tailgater2.png", "Average+", 23, 30);
             new CarData(0, "Sultan", "sultan", "package://Artwork/Vehicles/sultan.png", "Average", 25, 40);
-            new CarData(0, "Kuruma", "kuruma", "package://Artwork/Vehicles/kuruma.png", "Fast", 30, 60);
+            //new CarData(0, "Kuruma", "kuruma", "package://Artwork/Vehicles/kuruma.png", "Fast", 30, 60); KURUMA TEMPORARILY REMOVED UNTIL BULLET PROOF GTA ONLIEN BUG FIX
             new CarData(0, "Dominator GTT", "dominator8", "package://Artwork/Vehicles/dominator8.png", "Super", 32, 50);
             new CarData(0, "BMW M3 E46", "m3e46", "package://Artwork/Vehicles/m3e46.png", "Fast", 35, 0, 10);
             new CarData(0, "Sultan Classic", "sultan2", "package://Artwork/Vehicles/sultan2.png", "Fast", 37, 80);
