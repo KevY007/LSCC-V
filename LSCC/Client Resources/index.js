@@ -64,8 +64,6 @@ require('mp-commands');
 require("./nativeui/index.js");
 require("./chat/index.js");
 
-require('./logspanel/logsview.js');
-
 require('./Player/Player.js');
 require('./Player/Actions.js');
 require("./Player/Nametags.js");
