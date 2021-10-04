@@ -50,7 +50,7 @@ Added weapon ammo pickups when players die in copchase. You will only be able to
 Players can press J to open trunk and bonnets of unlocked vehicles. Moreover in copchases, police cruisers spawn with some additional ammunition in the trunk. Open the trunk and /restock.
 Fugitive's with crowbar and force open the trunk as well of locked police cruisers.
 if server onfoot collisions are enabled, they can't be rammed by vehicles while being onfoot anymore.
-
+Fixed character customization opacities not working, now beard and facial hair etc will show properly.
 
 Nitestick in every police loadout along with taser now.
 
@@ -71,6 +71,7 @@ Added /putinvehicle.
 [redacted] (screenshot)
 
 
+Removed kuruma from selection because of a bulletproof bug in gta online.
 Removed LSPD Caracara.
 Replaced default cruiser with a crown vic. felt sexy.
 Removed 600sel/merc mod.
