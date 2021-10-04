@@ -29,7 +29,12 @@ mp.events.add('RestartMenu', () => {
 
 function ToggleMenu()
 {
-    if(UIMenu != null && !scoreboardToggled && Date.now() - lastChatToggle >= 500 && !chatStatus && mp.players.local.LoggedIn !== undefined 
+    if(scoreboardToggled)
+    {
+        ToggleScoreboard();
+    }
+    
+    if(UIMenu != null && Date.now() - lastChatToggle >= 500 && !chatStatus && mp.players.local.LoggedIn !== undefined 
         && mp.players.local.LoggedIn == true && Date.now() - lastMenuToggle >= 1000)
     {
         lastMenuToggle = Date.now();

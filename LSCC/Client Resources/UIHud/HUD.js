@@ -573,6 +573,7 @@ function ScoreboardKeyTrigger()
     if(Date.now() - lastChatToggle <= 500) return;
     if(menuToggled !== undefined && menuToggled) return;
     if(chatStatus && !scoreboardToggled) return;
+    if(menuToggled) return;
 
     ToggleScoreboard();
 }
@@ -582,11 +583,13 @@ mp.events.add('ScoreboardToggleTyping', (state) => {
     {
         mp.keys.unbind(0x4F, false, ScoreboardKeyTrigger);
         scoreboardBinded = false;
+        mp.events.callLocal("MenuToggleTyping", state);
     }
     else if(!state && !scoreboardBinded)
     {
         mp.keys.bind(0x4F, false, ScoreboardKeyTrigger);
         scoreboardBinded = true;
+        mp.events.callLocal("MenuToggleTyping", state);
     }
 });
 
