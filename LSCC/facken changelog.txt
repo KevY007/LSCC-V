@@ -47,6 +47,10 @@ Collision system has been reworked, should work better now.
 Added /vtuner (vehicle name) for tuning vehicles in pursuits.
 Added /driveby for players to toggle if they want someone to shoot or not as a fugitive driver.
 Added weapon ammo pickups when players die in copchase. You will only be able to replenish if the ammo type is same. If you have no ammo at all, you will have to hold the weapon in hand.
+Players can press J to open trunk and bonnets of unlocked vehicles. Moreover in copchases, police cruisers spawn with some additional ammunition in the trunk. Open the trunk and /restock.
+Fugitive's with crowbar and force open the trunk as well of locked police cruisers.
+if server onfoot collisions are enabled, they can't be rammed by vehicles while being onfoot anymore.
+
 
 Nitestick in every police loadout along with taser now.
 
