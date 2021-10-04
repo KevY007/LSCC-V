@@ -80,7 +80,7 @@ function updateFaceFeature(index, value) {
 
 function updateAppearance(index) {
     let overlayID = (appearanceItems[index].Index == 0) ? 255 : appearanceItems[index].Index - 1;
-    localPlayer.setHeadOverlay(index, overlayID, appearanceOpacityItems[index].Index * 0.01, colorForOverlayIdx(index), 0);
+    localPlayer.setHeadOverlay(index, overlayID, appearanceOpacityItems[index].Index * 0.1, colorForOverlayIdx(index), 0);
 }
 
 function updateHairAndColors() {
@@ -382,7 +382,7 @@ creatorMainMenu.ItemSelect.on((item, index) => {
             for (let i = 0; i < featureItems.length; i++) featureData.push(parseFloat(features[featureItems[i].Index]));
 
             let appearanceData = [];
-            for (let i = 0; i < appearanceItems.length; i++) appearanceData.push({Value: ((appearanceItems[i].Index == 0) ? 255 : appearanceItems[i].Index - 1), Opacity: appearanceOpacityItems[i].Index * 0.01});
+            for (let i = 0; i < appearanceItems.length; i++) appearanceData.push({Value: ((appearanceItems[i].Index == 0) ? 255 : appearanceItems[i].Index - 1), Opacity: appearanceOpacityItems[i].Index * 0.1});
 
             let hairAndColors = [
                 Data.hairList[currentGender][hairItem.Index].ID,
