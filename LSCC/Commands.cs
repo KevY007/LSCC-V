@@ -4045,7 +4045,7 @@ namespace RNC
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has sent {target.Name} to lobby.");
         }
 
-        [Command("resetclothing", "!{#AFAFAF}[USAGE] resetclothing (target) (cop/fugitive)", Alias = "resetclothing")]
+        [Command("resetclothing", "!{#AFAFAF}[USAGE] resetclothing (target) (cop/fugitive)")]
         public void cmd_resetclothing(Player player, Player target, string team)
         {
             if (!EPlayer.LoggedIn(player) || !EPlayer.LoggedIn(target)) return;
