@@ -1,14 +1,9 @@
 ﻿FORMAT: ADDED BY - ITEM.
 
 interiors vro
+anti falloff on bikes
 
 INTENSIVE TESTING LEFT GAME SPAWNING AND SHIT
-REDO LOADOUT PRICES AND CARS SKRRa
-
- idea for anti car ram
-disable collisions for all onfoot players for players who are driving car
-that could work
-and if car is without any player enable collisions
 
 buyammo with donator points
 #bug reports and other chans sugeestion
