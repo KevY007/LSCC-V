@@ -2582,7 +2582,7 @@ namespace RNC
                                     veh.SetSharedData("Collisions", true);
                                     if (veh.HasSharedData("Team") && veh.GetSharedData<int>("Team") == 0)
                                     {
-                                        veh.SetSharedData("vMaxSpeed", (float)(165 / 3.6)); // 165 KM/H
+                                        veh.SetSharedData("vMaxSpeed", (float)(155 / 3.6)); // 155 KM/H
                                     }
                                     if(veh.Model == 2149939648) // if it's a Prevolter reduce OP :(
                                     {

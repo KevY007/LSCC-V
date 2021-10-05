@@ -1086,7 +1086,7 @@ namespace RNC
             player.SetSharedData("EntAlpha", 255);
             player.SetData("PlaytimeTick", Environment.TickCount64);
             player.TriggerEvent("StopSong");
-            Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in ``as {acc.Username}.*");
+            Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in as {acc.Username}.*");
 
             NAPI.Util.ConsoleOutput($"[Login] {player.Name} has logged in as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 

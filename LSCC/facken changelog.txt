@@ -51,7 +51,7 @@ Players can press J to open trunk and bonnets of unlocked vehicles. Moreover in 
 Fugitive's with crowbar and force open the trunk as well of locked police cruisers.
 if server onfoot collisions are enabled, they can't be rammed by vehicles while being onfoot anymore.
 Fixed character customization opacities not working, now beard and facial hair etc will show properly.
-
+Fugitive vehicle max speed to 155 but they are given faster vehicles in return.
 Nitestick in every police loadout along with taser now.
 
 Fixed siren not syncing after leaving vehicle.
