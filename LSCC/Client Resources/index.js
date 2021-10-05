@@ -40,6 +40,7 @@ mp.game.vehicle.defaultEngineBehaviour = false;
 mp.game.gameplay.enableMpDlcMaps(true);
 mp.game.player.disableVehicleRewards();
 mp.game.player.setHealthRechargeMultiplier(0.0);
+mp.game.vehicle.setExperimentalAttachmentSyncEnabled(true);
 
 function traceLastFunc(iStr)
 {
