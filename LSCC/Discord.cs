@@ -92,12 +92,11 @@ namespace RNC
                 {
                     if (Environment.TickCount64 - UpCooldown <= 7000) return;
 
-                    var msg = await context.Channel.SendMessageAsync($":white_check_mark: Server is online with **{RAGE.Entities.Players.Count} players** and **{Settings.Lobbies.Where(l => l.gameStatus == 1).Count()} copchases** active.", false, null, null, null);
-                    
-                    Task.Run(() => { // WE WANT THE CODE TO EXECUTE SEPARATELY AND NOT BLOCK MESSAGE RECEIVED SO DONT AWAIT THIS SH
-                        Task.Delay(5000);
-                        msg.DeleteAsync();
-                        context.DeleteAsync();
+                    await context.DeleteAsync();
+                    await Task.Run(async () => { // WE WANT THE CODE TO EXECUTE SEPARATELY AND NOT BLOCK MESSAGE RECEIVED SO DONT AWAIT THIS SH
+                        var msg = await context.Channel.SendMessageAsync($":white_check_mark: Server is online with **{RAGE.Entities.Players.Count} players** and **{Settings.Lobbies.Where(l => l.gameStatus == 1).Count()} copchases** active.", false, null, null, null);
+                        await Task.Delay(5000);
+                        await msg.DeleteAsync();
                     });
 
                     UpCooldown = Environment.TickCount64;
