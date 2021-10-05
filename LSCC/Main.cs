@@ -1190,7 +1190,7 @@ namespace RNC
 
             // Cop
             new CarData(1, "Unmarked Cruiser", "police4", "package://Artwork/Vehicles/polc2.png", "Slow"); 
-            new CarData(1, "Ford Crown Vic", "police", "package://Artwork/Vehicles/polc1.png", "Slow", 2);
+            new CarData(1, "Ford Crown Vic", "police", "package://Artwork/Vehicles/polc1.png", "Slow");
             new CarData(1, "Police Bike", "policeb", "package://Artwork/Vehicles/policeb.png", "Average", 3);
             new CarData(1, "Police Buffalo", "police2", "package://Artwork/Vehicles/police2.png", "Average", 5, 5);
             new CarData(1, "Police Scout", "pscout", "package://Artwork/Vehicles/pscout.png", "Average+", 6, 10);

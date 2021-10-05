@@ -66,6 +66,8 @@ Added /setalpha and /setcaralpha.
 Spectate system has been improved such that camera movement and zoom will be possible. (WASD and MWHEEL)
 Ban and kick should work appropriately for logged out players now.
 Added /checkplayer for all admins.
+Added /deleteaccount.
+Added /resetclothing for admins.
 /tfreeze and /rfreeze will show messages and notifications properly.
 Added /putinvehicle.
 [redacted] (screenshot)
