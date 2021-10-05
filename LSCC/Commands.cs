@@ -3993,7 +3993,7 @@ namespace RNC
         [Command("sendtolobby", "!{#AFAFAF}[USAGE] sendtolobby (target)", Alias = "stl")]
         public void cmd_sendtolobby(Player player, Player target)
         {
-            if (!EPlayer.LoggedIn(player)) return;
+            if (!EPlayer.LoggedIn(player) || !EPlayer.LoggedIn(target)) return;
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
@@ -4043,6 +4043,71 @@ namespace RNC
             cmd_lobby(target);
 
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has sent {target.Name} to lobby.");
+        }
+
+        [Command("resetclothing", "!{#AFAFAF}[USAGE] resetclothing (target) (cop/fugitive)", Alias = "resetclothing")]
+        public void cmd_resetclothing(Player player, Player target, string team)
+        {
+            if (!EPlayer.LoggedIn(player) || !EPlayer.LoggedIn(target)) return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                return;
+            }
+
+            CharacterData ConvChar = new CharacterData();
+
+            try
+            {
+                ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(target).Character);
+            }
+            catch
+            {
+                ConvChar = new CharacterData();
+            }
+
+            if (EPlayer.GetAccount(target).Character.Length < 10 || EPlayer.GetAccount(target).Character == null)
+            {
+                EPlayer.GetAccount(target).Character = NAPI.Util.ToJson(ConvChar);
+            }
+
+            try
+            {
+
+                if (team.StartsWith("cop", StringComparison.OrdinalIgnoreCase))
+                {
+                    CharacterData charData = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(target).Character);
+                    charData.Clothing[1] = new ClothingData();
+                    EPlayer.GetAccount(target).Character = NAPI.Util.ToJson(charData);
+
+
+                    target.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your cop clothing has been reset by an admin.");
+
+                    EPlayer.ApplyCharacter(target, ConvChar, (target.GetSharedData<int>("Team") < 0) ? (EPlayer.GetAccount(target).LobbyClothing) : (target.GetSharedData<int>("Team")));
+                }
+                else if (team.StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
+                {
+                    CharacterData charData = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(target).Character);
+                    charData.Clothing[0] = new ClothingData();
+                    EPlayer.GetAccount(target).Character = NAPI.Util.ToJson(charData);
+
+                    target.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your fugitive clothing has been reset by an admin.");
+
+                    EPlayer.ApplyCharacter(target, ConvChar, (target.GetSharedData<int>("Team") < 0) ? (EPlayer.GetAccount(target).LobbyClothing) : (target.GetSharedData<int>("Team")));
+                }
+                else
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid team, clothings can only be reset for 'fugitive' or 'cop' team.");
+                    return;
+                }
+
+
+                Logs.LogAdmin(player, $"Reset {target.Name}'s {team.ToLower()} clothing.");
+
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has reset {target.Name}'s {team.ToLower()} clothing.");
+            }
+            catch { player.SendChatMessage("!{#FF6347}[!!] Unknown error occured, ask kevy to check da cooomsole."); }
         }
 
         [Command("putinveh", "!{#AFAFAF}[USAGE] putinveh (target) (player) | \"Target\" is put inside \"player\"'s vehicle.", Alias = "piv, putinvehicle")]
@@ -5632,12 +5697,13 @@ namespace RNC
                 player.SendChatMessage("!{#FF6347}[REPORTS/REQS]: /requests /a(ccept)r(equest) /d(eny)r(equest) ");
                 player.SendChatMessage("!{#FF6347}[REPORTS/REQS]: (Alt: /reports, e.g. /acceptreport.) (HELPME = REPORTS TOO)");
 
-                player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /set(hp/ar) /spec");
+                player.SendChatMessage("[Admin Lv 1]: /a /aveh /removeavehs /bring /goto /set(hp/ar) /spec /(un)freeze");
                 player.SendChatMessage("[Admin Lv 1]: /(r)freeze /(r)unfreeze /kick /slap /setinv(ulnerable) /specoff");
                 player.SendChatMessage("[Admin Lv 1]: /bancheck /(o)jail /(o)unjail /afix /aflip /sendtolobby /set(time/weather)");
                 player.SendChatMessage("[Admin Lv 1]: /(o)mute /(o)unmute /warn /unwarn /setteam /forceautojoin /forceswapseats");
                 player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats /lastlogin /logs /gethp /checkplayer");
                 player.SendChatMessage("[Admin Lv 1]: /(t)freeze /(t)unfreeze /p(ut)i(n)v(ehicle) /view(s)creen(s)hot /take(s)creen(s)hot");
+                player.SendChatMessage("[Admin Lv 1]: /resetclothing");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
