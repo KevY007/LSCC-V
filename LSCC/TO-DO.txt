@@ -1,6 +1,10 @@
 ﻿FORMAT: ADDED BY - ITEM.
 
 interiors vro
+tog tooltips
+kill feed reset/expire (gm.Killfeed = false or whateveer it is when we toggle kill list/hud to remove all items)
+stop freezing at start since collisions working fine now (if they are)
+dragout button?? also disable multiple people dragging same guy
 anti falloff on bikes
 
 INTENSIVE TESTING LEFT GAME SPAWNING AND SHIT
