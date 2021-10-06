@@ -80,7 +80,8 @@ mp.events.add("SetChaseVehicle", (vid, seat) => {
 });
 
 mp.events.add('entityStreamIn', (entity) => {
-    if (chaseRunning && mp.players.local.Team >= 0 && entity.type === 'vehicle' && chaseStartVeh != -1 && entity.id == chaseStartVeh)
+    if (chaseRunning && mp.players.local.Team >= 0 && entity.type === 'vehicle' 
+        && chaseStartVeh != -1 && entity.remoteId !== undefined && entity.remoteId == chaseStartVeh)
     {
         if(chaseTimeCur <= 25) // Less than 25s passed to game start. If this doesn't make up, then get a better connection fag.
         {
@@ -525,7 +526,7 @@ mp.events.addDataHandler('Team', function (entity, value, oldValue)
 {
     entity.Team = value;
     
-    if(entity.type === 'player' && entity.id == mp.players.local.id)
+    if(entity.type === 'player' && entity.remoteId == mp.players.local.remoteId)
     {
         let r = 255;
         let g = 255;
@@ -625,11 +626,11 @@ mp.events.add('render', () => {
                         disableDriveby = true;
                     }
 
-                    if(player.Team == 0 && player.seat != -1 && player.getVariable("HasShot") == false)
+                    if(player.Team == 0 /*&& player.seat != -1 */&& player.getVariable("HasShot") == false)
                     {
                         let driver = null;
                         mp.players.forEach(p => {
-                            if(p.isInAnyVehicle(false) && p.vehicle.id == player.vehicle.id && player.vehicle.getPedInSeat(-1) == p.handle && 
+                            if(p.isInAnyVehicle(false) && p.vehicle.remoteId == player.vehicle.remoteId && player.vehicle.getPedInSeat(-1) == p.handle && 
                             player.vehicle.getPedInSeat(-1).handle != 0 && p.getVariable("HasShot") == false) 
                             // DRIVER HIMSELF HASN'T SHOT, THESE FACKEN HYPOCRITES SMH
                             {
@@ -1350,7 +1351,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
 });
 
 mp.events.add("entplayanim", (entity, animDictionary, animName, animFlag, speed = 8.0, speedMul = 0.0, duration = -1, playbackRate = 0.0, lockX = false, lockY = false, lockZ = false) => {
-    if(entity.id == mp.players.local.id)
+    if(entity.remoteId == mp.players.local.remoteId)
     {
         mp.events.callRemote("UpdateLastAnim", animDictionary, animName);
     }

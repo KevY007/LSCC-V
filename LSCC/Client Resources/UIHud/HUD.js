@@ -526,7 +526,7 @@ function updatePlayers()
     let updateString = `gm.$refs.scoreboard.setPlayers([`;
 
     mp.players.forEach(player => {
-        updateString += `{id: ${player.id}, 
+        updateString += `{id: ${player.remoteId}, 
         color: 'rgb(${player.getVariable("Color_R")}, ${player.getVariable("Color_G")}, ${player.getVariable("Color_B")})', 
         name: '${player.name}', level: ${player.getVariable("Level")}, ping: ${player.getVariable("Ping")}},`;
     });
