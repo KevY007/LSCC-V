@@ -10,7 +10,7 @@ namespace RNC
 {
     class Commands : Script
     {
-        [Command("serveroptions", "!{#AFAFAF}[USAGE] serveroptions (option: maxinlobby, derbyveh, usediscord, onfootcollisions)", GreedyArg = true)]
+        [Command("serveroptions", "!{#AFAFAF}[USAGE] serveroptions (option: maxinlobby, derbyveh, usediscord, onfootcollisions, afob)", GreedyArg = true)]
         public void cmd_serveroptions(Player player, string action)
         {
             if (!EPlayer.LoggedIn(player))
@@ -84,6 +84,29 @@ namespace RNC
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions onfootcollisions <true/false>");
             }
 
+            else if (action.StartsWith("afob", StringComparison.OrdinalIgnoreCase))
+            {
+                string[] args = action.Split(' ');
+                if (args.Count() > 1)
+                {
+                    bool value = false;
+
+                    if (!Boolean.TryParse(args[1], out value))
+                    {
+                        player.SendChatMessage($"!{{#999999}}Anti fall off bike can only be either 'true' or 'false'!");
+                        return;
+                    }
+
+                    Settings.Dynamics.AntiFallOffBike = value;
+
+                    Main.SaveDynamicSettings();
+
+                    Logs.LogAdmin(player, $"Set AFOB to {value.ToString()}.");
+                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set Anti Fall Off Bike to {value.ToString()} for chases.");
+                }
+                else player.SendChatMessage("!{#999999}Proper usage: /serveroptions afob <true/false>");
+            }
+
             else if (action.StartsWith("usediscord", StringComparison.OrdinalIgnoreCase))
             {
                 string[] args = action.Split(' ');
@@ -107,7 +130,7 @@ namespace RNC
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions usediscord <true/false>");
             }
 
-            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'maxinlobby, derbyveh, usediscord, onfootcollisions'");
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'maxinlobby, derbyveh, usediscord, onfootcollisions, afob'");
 
             return;
         }
@@ -700,6 +723,33 @@ namespace RNC
             player.TriggerEvent("SetActorInvulnerable", player.GetData<bool>("FreeroamGodmode"));
 
             player.SendChatMessage("!{#FF6347}>> !{#FFFFFF}You have " + (player.GetData<bool>("FreeroamGodmode") == true ? "enabled" : "disabled") + " freeroam godmode.");
+            return;
+        }
+
+        [Command("afob")]
+        public void cmd_afob(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if ((player.GetSharedData<int>("InLobby") == -3 && player.Dimension >= 256 && player.Dimension <= 512) == false && EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                return;
+            }
+
+            if (player.HasData("FreeroamAFOB"))
+            {
+                player.ResetData("FreeroamAFOB");
+                player.TriggerEvent("ToggleAFOB", false);
+            }
+            else
+            {
+                player.SetData("FreeroamAFOB", true);
+                player.TriggerEvent("ToggleAFOB", true);
+            }
+
+            player.SendChatMessage("!{#FF6347}>> !{#FFFFFF}You have " + (player.HasData("FreeroamAFOB") ? "enabled" : "disabled") + " anti fall off bike.");
             return;
         }
 
@@ -3436,6 +3486,11 @@ namespace RNC
                 }
             }
 
+            if (player.GetSharedData<int>("InDM") != -1)
+            {
+                player.TriggerEvent("ResetKillFeed");
+            }
+
             freeroamVehs.Clear();
             player.SetData("FreeroamVehicles", freeroamVehs);
             player.SetSharedData("InDM", -1);
@@ -4415,7 +4470,7 @@ namespace RNC
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /derby");
             player.SendChatMessage("!{#28E0DA}[Mode: DM]: /dm /dmarena");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /freeroam /veh /customvehlist /teleport /mytime /myweather");
-            player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /togblip /gun /world /godmode /setspawn /tuneveh");
+            player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /togblip /gun /world /godmode /setspawn /tuneveh /afob");
             player.SendChatMessage("!{#A5A8A8}[Misc]: /updaterate /info /fontsize /voicebind /gpsbind /shotstats");
             player.SendChatMessage("!{#A5A8A8}[Misc]: /p(acket)l(oss)");
             player.SendChatMessage("!{#A5A8A8}[Debug/Test]: /pos /lcmenu");
@@ -5854,7 +5909,7 @@ namespace RNC
                     EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Fugitive as {target.Name}");
 
                     target.TriggerEvent("SetActorInvulnerable", false);
-                    target.TriggerEvent("CanFallOutOfCar", false);
+                    target.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike);
 
                     target.SetSharedData("VisibleBlip", true);
                     target.ResetData("Handsup");
@@ -6009,7 +6064,7 @@ namespace RNC
                     EPlayer.SetDiscordStatus(target, $"[Lobby {lobby.lobbyId}] Cop as {target.Name}");
 
                     target.TriggerEvent("SetActorInvulnerable", false);
-                    target.TriggerEvent("CanFallOutOfCar", false);
+                    target.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike);
                     target.SetSharedData("CuffedBy", "n/a");
                     target.SetSharedData("Team", 1);
 

@@ -1,7 +1,7 @@
 menuToggled = false;
 let lastMenuToggle = Date.now();
 
-if(typeof mp.storage.data.menu == "undefined")
+if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.tooltips == "undefined")
 {
     mp.storage.data.menu = {};
     mp.storage.data.menu.topRightInfo = true;
@@ -9,6 +9,7 @@ if(typeof mp.storage.data.menu == "undefined")
     mp.storage.data.menu.killFeed = true;
     mp.storage.data.menu.alwaysExpandedMap = false;
     mp.storage.data.menu.updateRate = 200;
+    mp.storage.data.menu.tooltips = true;
 
     mp.storage.flush();
 }
@@ -79,7 +80,14 @@ function ToggleMenu()
               description: "Toggle permanently expanded minimap."
             },
             {
-              id: 5,
+                id: 5,
+                type: 1,
+                name: "tooltips",
+                label: "Tooltips",
+                description: "Enable/disable tooltips."
+            },
+            {
+              id: 6,
               type: 2,
               name: "updr",
               label: "Update Rate",
@@ -100,14 +108,14 @@ function ToggleMenu()
               ]
             },
             {
-              id: 6,
+              id: 7,
               type: 3,
               name: "vcbind",
               label: "Push To Talk",
               description: "Click to change the push to talk key."
             },
             {
-              id: 7,
+              id: 8,
               type: 3,
               name: "gpsbind",
               label: "GPS Key",
@@ -117,6 +125,7 @@ function ToggleMenu()
           
         UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.tri.value = ${mp.storage.data.menu.topRightInfo};`);
         UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.gp.value = ${mp.storage.data.menu.gameProgress};`);
+        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.tooltips.value = ${mp.storage.data.menu.tooltips};`);
         UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.kf.value = ${mp.storage.data.menu.killFeed};`);
         UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.bigmap.value = ${mp.storage.data.menu.alwaysExpandedMap};`);
         UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.updr.value = ${mp.storage.data.menu.updateRate};`);
@@ -165,15 +174,20 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     }
     else if(id == 5)
     {
+        mp.storage.data.menu.tooltips = value;
+        mp.events.callLocal("ToggleTooltips", mp.storage.data.menu.tooltips);
+    }
+    else if(id == 6)
+    {
         mp.events.callLocal("playerCommand", `updaterate ${value}`);
         //mp.storage.data.menu.updateRate = value;
         //updateRate = value;
     }
-    else if(id == 6)
+    else if(id == 7)
     {
         mp.events.callLocal("playerCommand", `voicebind ${value}`);
     }
-    else if(id == 7)
+    else if(id == 8)
     {
         mp.events.callLocal("playerCommand", `gpsbind ${value}`);
     }

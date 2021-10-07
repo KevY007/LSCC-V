@@ -297,6 +297,9 @@ namespace RNC
         [JsonProperty("OnfootCollision")]
         public bool OnfootCollision { get; set; }
 
+        [JsonProperty("ChaseAntiFallOffBike")]
+        public bool AntiFallOffBike { get; set; }
+
         [JsonProperty("WeaponDataURL")]
         public string WeaponDataURL { get; set; }
 
@@ -320,6 +323,7 @@ namespace RNC
             this.WeaponDataURL = "https://gist.githubusercontent.com/root-cause/3f29d38179b12245a003fb4fff615335/raw/7a8804b275fb1b9314cb39418a7415ea8bfd148d/v2189%2520Weapon%2520Data.json";
             this.DerbyVehicle = "brioso";
             this.OnfootCollision = true;
+            this.AntiFallOffBike = true;
             this.Discord = true;
             this.MaxInLobby = Settings.DefaultMaxInLobby;
             this.DCServerID = 713731146072064040;
@@ -1697,6 +1701,8 @@ namespace RNC
                 {
                     if (i.GetSharedData<int>("InLobby") != lobby.lobbyId) continue;
 
+                    i.TriggerEvent("ResetKillFeed");
+
                     if (i.HasData("Spectating") && EPlayer.GetAccount(i).Admin < 1)
                     {
                         Commands.cmd_specoff(i);
@@ -2113,7 +2119,7 @@ namespace RNC
                         EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Cop as {player.Name}");
 
                         player.TriggerEvent("SetActorInvulnerable", false);
-                        player.TriggerEvent("CanFallOutOfCar", false);
+                        player.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike);
                         player.SetSharedData("CuffedBy", "n/a");
                         player.SetSharedData("Team", 1);
                     }
@@ -2149,7 +2155,7 @@ namespace RNC
                         EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Fugitive as {player.Name}");
 
                         player.TriggerEvent("SetActorInvulnerable", false);
-                        player.TriggerEvent("CanFallOutOfCar", false);
+                        player.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike);
 
                         player.SetSharedData("VisibleBlip", true);
                         player.ResetData("Handsup");
@@ -2443,6 +2449,7 @@ namespace RNC
                             {
                                 p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
                                 p.TriggerEvent("ToggleNametags", true);
+                                EPlayer.Freeze(p, false);
 
                                 p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
 
@@ -2467,10 +2474,10 @@ namespace RNC
 
                             foreach (Player p in Settings.LoggedInPlayers.Where(p => lobby.Cops.Contains(p) || lobby.Fugitives.Contains(p)))
                             {
-                                if(lobby.Cops.Contains(p)) EPlayer.Notify(p, "You will be unfreezed in 10 seconds.", "orange", "fas fa-hourglass-start", false, 10000);
+                               // if(lobby.Cops.Contains(p)) EPlayer.Notify(p, "You will be unfreezed in 10 seconds.", "orange", "fas fa-hourglass-start", false, 10000);
                                 if (lobby.gameMode == GameModes.STANDARD)
                                 {
-                                    p.SendChatMessage("!{#FF6347}[!] !{#8D8DFF}Cops will be unfrozen in 10 seconds. !{#E84040}Fugitive's may take this time to prepare/start the chase.");
+                                    //p.SendChatMessage("!{#FF6347}[!] !{#8D8DFF}Cops will be unfrozen in 10 seconds. !{#E84040}Fugitive's may take this time to prepare/start the chase.");
                                 }
                                 else if (lobby.gameMode == GameModes.BUSTED)
                                 {
@@ -2486,7 +2493,7 @@ namespace RNC
                         if (lobby.GameProgress == 10)
                         {
                             lobby.Cops.ForEach(p => {
-                                EPlayer.Freeze(p, false);
+                                //EPlayer.Freeze(p, false);
                                 //p.SendNotification("~b~You may begin the chase now.");
                             });
                         }

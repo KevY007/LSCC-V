@@ -146,6 +146,7 @@ let createdTooltips = []; // to keep track of created tooltips / preventing dupl
 
 mp.events.add('AddTooltip', (key, action, team) => {
     if(createdTooltips.indexOf(key) != -1) return;
+    if(mp.storage.data.menu.tooltips !== true) return;
 
     let color = "#383838FF";
     switch(team){
@@ -172,37 +173,61 @@ mp.events.add('RemoveTooltip', (key) => {
     }`);
     createdTooltips.splice(createdTooltips.indexOf(key), 1);
 });
+
+mp.events.add('ToggleTooltips', (status) =>
+{
+    mp.storage.data.menu.tooltips = status;
+
+    if(status)
+    {
+        mp.events.callLocal("AddTooltip", "M", "Menu", -1);
+        mp.events.callLocal("AddTooltip", String.fromCharCode(curVoiceBind), "Voice Chat", -1);
+    }
+    else {
+
+        createdTooltips.forEach(key => {
+            UIHud.execute(`if(gm.$refs.TopRight.$refs.Tooltips.tips.indexOf(gm.$refs.TopRight.$refs.Tooltips.tips.filter(function(el){return el.key == "${key}"})[0]) != -1){
+                gm.$refs.TopRight.$refs.Tooltips.tips.splice(gm.$refs.TopRight.$refs.Tooltips.tips.indexOf(gm.$refs.TopRight.$refs.Tooltips.tips.filter(function(el){return el.key == "${key}"})[0]), 1);        
+            }`);
+        });
+
+        createdTooltips = [];
+    }
+});
+
 mp.events.add("OneSecondEvent", () => {
 
-    if(mp.players.local.vehicle){
-        if(mp.players.local.Team == 1) 
-            if(createdTooltips.indexOf("B") == -1) mp.events.callLocal("AddTooltip", "B", "Silent Siren", 1);
-            
-        if(createdTooltips.indexOf("Y") == -1) mp.events.callLocal("AddTooltip", "Y", "Engine", -1);
-        if(createdTooltips.indexOf("L") == -1) mp.events.callLocal("AddTooltip", "L", "Lock", -1);
-    }
-    else{
-        if(createdTooltips.indexOf("Y") != -1) mp.events.callLocal("RemoveTooltip", "Y");
-        if(createdTooltips.indexOf("L") != -1) mp.events.callLocal("RemoveTooltip", "L");
-        if(createdTooltips.indexOf("B") != -1) mp.events.callLocal("RemoveTooltip", "B");        
-    }
-    if(mp.players.local.Team == 1){
-        if(createdTooltips.indexOf(String.fromCharCode(curGPSBind)) == -1) 
-        {
-            mp.events.callLocal("AddTooltip", String.fromCharCode(curGPSBind), "GPS", 1);
+    if(mp.storage.data.menu.tooltips == true)
+    {
+        if(mp.players.local.vehicle){
+            if(mp.players.local.Team == 1) 
+                if(createdTooltips.indexOf("B") == -1) mp.events.callLocal("AddTooltip", "B", "Silent Siren", 1);
+                
+            if(createdTooltips.indexOf("Y") == -1) mp.events.callLocal("AddTooltip", "Y", "Engine", -1);
+            if(createdTooltips.indexOf("L") == -1) mp.events.callLocal("AddTooltip", "L", "Lock", -1);
         }
+        else{
+            if(createdTooltips.indexOf("Y") != -1) mp.events.callLocal("RemoveTooltip", "Y");
+            if(createdTooltips.indexOf("L") != -1) mp.events.callLocal("RemoveTooltip", "L");
+            if(createdTooltips.indexOf("B") != -1) mp.events.callLocal("RemoveTooltip", "B");        
+        }
+        if(mp.players.local.Team == 1){
+            if(createdTooltips.indexOf(String.fromCharCode(curGPSBind)) == -1) 
+            {
+                mp.events.callLocal("AddTooltip", String.fromCharCode(curGPSBind), "GPS", 1);
+            }
+        }
+        else{
+            if(createdTooltips.indexOf("Z") != -1) mp.events.callLocal("RemoveTooltip", "Z");
+            if(createdTooltips.indexOf("B") != -1) mp.events.callLocal("RemoveTooltip", "B");     
+        }
+        if(mp.players.local.Team == 0){
+            if(createdTooltips.indexOf("J") == -1) mp.events.callLocal("AddTooltip", "J", "Jammer", 0);
+        }
+        else{
+            if(createdTooltips.indexOf("J") != -1) mp.events.callLocal("RemoveTooltip", "J");
+        }    
     }
-    else{
-        if(createdTooltips.indexOf("Z") != -1) mp.events.callLocal("RemoveTooltip", "Z");
-        if(createdTooltips.indexOf("B") != -1) mp.events.callLocal("RemoveTooltip", "B");     
-    }
-    if(mp.players.local.Team == 0){
-        if(createdTooltips.indexOf("J") == -1) mp.events.callLocal("AddTooltip", "J", "Jammer", 0);
-    }
-    else{
-        if(createdTooltips.indexOf("J") != -1) mp.events.callLocal("RemoveTooltip", "J");
-    }    
-
 });
 
 mp.events.add('browserDomReady', (browser) => {
@@ -282,8 +307,7 @@ mp.events.add('browserDomReady', (browser) => {
         UIHud.execute(`gm.$refs.MiniHud.$refs.ping.show = false;`);
         UIHud.execute(`gm.$refs.MiniHud.$refs.packetloss.show = false;`);
 
-        mp.events.callLocal("AddTooltip", "M", "Menu", -1);
-        mp.events.callLocal("AddTooltip", String.fromCharCode(curVoiceBind), "Voice Chat", -1);
+        mp.events.callLocal("ToggleTooltips", mp.storage.data.menu.tooltips);
     }
 });
 
@@ -297,6 +321,14 @@ mp.events.add('ToggleHud', (toggle) => {
 
     mp.gui.chat.show(showHud);
     mp.game.ui.displayRadar(showHud);
+});
+
+mp.events.add('ResetKillFeed', () => {
+    if(UIHud != null)
+    {
+        UIHud.execute(`gm.killFeed = false;`);
+        UIHud.execute(`gm.killFeed = ${mp.storage.data.menu.killFeed};`);
+    }
 });
 
 mp.events.add("pushToKillFeed", (killer, killerColor, weapon, victim, victimColor) => {

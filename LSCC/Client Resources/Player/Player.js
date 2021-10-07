@@ -58,6 +58,11 @@ var radioToggle = 0;
 var ServerSettings = [];
 var ShotStats = [];
 
+var AFOB_Enabled = false;
+var AFOB_LastF = Date.now();
+var AFOB_LastVeh = null;
+var AFOB_LastSeat = -1;
+
 traceLastFunc("[Players] CreateVars");
 
 function ResetShotStats()
@@ -77,6 +82,10 @@ ResetShotStats();
 mp.events.add("SetChaseVehicle", (vid, seat) => {
     chaseStartVeh = vid;
     chaseStartSeat = seat;
+});
+
+mp.keys.bind(0x46, true, function () {
+    if(!chatStatus && !menuToggled) AFOB_LastF = Date.now();
 });
 
 mp.events.add('entityStreamIn', (entity) => {
@@ -570,6 +579,17 @@ mp.events.add('render', () => {
     if(mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
     {
         mp.game.player.restoreStamina(100);
+
+        if(AFOB_Enabled === true && !mp.players.local.isDead() && !mp.players.local.isSwimming() && !mp.players.local.isInAnyVehicle(false))
+        {
+            if(AFOB_LastVeh !== null && mp.vehicles.exists(AFOB_LastVeh) && AFOB_LastVeh.handle !== 0)
+            {
+                if((AFOB_LastVeh.getSpeed() * 3.6).toFixed(0) >= 5 && AFOB_LastF < Date.now()-2000)
+                {
+                    mp.players.local.setIntoVehicle(AFOB_LastVeh.handle, AFOB_LastSeat);
+                }
+            }
+        }
 
         if(clickDisable) 
         { 
@@ -1421,9 +1441,15 @@ mp.events.add(
         if(mp.players.local.isInAnyVehicle(false)) mp.players.local.vehicle.setHeading(heading);
     },
 
-    "SyncServerSettings": (onfootcollisions, recoilsys) => {
+    "ToggleAFOB": (status) => {
+        AFOB_LastF = Date.now();
+        AFOB_LastSeat = -1;
+        AFOB_LastVeh = null;
+        AFOB_Enabled = status;
+    },
+
+    "SyncServerSettings": (onfootcollisions) => {
         ServerSettings.OnfootCollisions = onfootcollisions;
-        ServerSettings.RecoilEnabled = recoilsys;
     },
     "ToggleClientRadio": () => {
         radioToggle = !radioToggle;
@@ -1614,19 +1640,6 @@ mp.events.add(
         }
     },
 
-    "CanFallOutOfCar": (toggle) => {
-        if(toggle)
-        {
-            player.canKnockOffVehicle(true);
-            player.setCanBeKnockedOffVehicle(0); // Can fall
-        }
-        else
-        {
-            player.setCanBeKnockedOffVehicle(2); // Can't fall off
-            player.canKnockOffVehicle(false);
-        }
-    },
-
     "StartChaseTimer": (iTimeCur, iTimeMax, collisionDuration, mode) => {
 
         chaseTimeCur = iTimeCur - 1;
@@ -1646,6 +1659,13 @@ mp.events.add(
     },
 
     "playerEnterVehicle": (vehicle, seat) => {
+        if(AFOB_Enabled === true && vehicle.getClass() == 8 && !mp.players.local.isDead() && !mp.players.local.isSwimming())
+        {
+            AFOB_LastF = Date.now();
+            AFOB_LastVeh = vehicle;
+            AFOB_LastSeat = seat;
+        }
+
         dbDisabledMsg = false;
         player.seat = seat;
         if(vehicle.Collisions == undefined || vehicle.Collisions == true) vehicle.setInvincible(false);
@@ -1667,6 +1687,13 @@ mp.events.add(
 
     "playerLeaveVehicle": (vehicle, seat) => {
         if (vehicle != null) {
+
+            if(AFOB_Enabled === true && AFOB_LastF < Date.now()-2000)
+            {
+                AFOB_LastF = Date.now();
+                AFOB_LastVeh = null;
+            }
+
             if(vehicle.getVariable("Engine") !== undefined)
                 vehicle.setEngineOn(vehicle.getVariable("Engine"), true, true);
             else vehicle.setEngineOn(true, true, true);
