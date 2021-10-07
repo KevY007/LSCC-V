@@ -300,6 +300,9 @@ namespace RNC
         [JsonProperty("ChaseAntiFallOffBike")]
         public bool AntiFallOffBike { get; set; }
 
+        [JsonProperty("ChaseAntiFallOffBikeSpeedLimit")]
+        public int AntiFallOffBikeSpeedLimit { get; set; }
+
         [JsonProperty("WeaponDataURL")]
         public string WeaponDataURL { get; set; }
 
@@ -324,6 +327,7 @@ namespace RNC
             this.DerbyVehicle = "brioso";
             this.OnfootCollision = true;
             this.AntiFallOffBike = true;
+            this.AntiFallOffBikeSpeedLimit = 60;
             this.Discord = true;
             this.MaxInLobby = Settings.DefaultMaxInLobby;
             this.DCServerID = 713731146072064040;
@@ -2119,7 +2123,7 @@ namespace RNC
                         EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Cop as {player.Name}");
 
                         player.TriggerEvent("SetActorInvulnerable", false);
-                        player.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike);
+                        player.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
                         player.SetSharedData("CuffedBy", "n/a");
                         player.SetSharedData("Team", 1);
                     }
@@ -2155,7 +2159,7 @@ namespace RNC
                         EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Fugitive as {player.Name}");
 
                         player.TriggerEvent("SetActorInvulnerable", false);
-                        player.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike);
+                        player.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
 
                         player.SetSharedData("VisibleBlip", true);
                         player.ResetData("Handsup");

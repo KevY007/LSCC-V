@@ -62,6 +62,8 @@ var AFOB_Enabled = false;
 var AFOB_LastF = Date.now();
 var AFOB_LastVeh = null;
 var AFOB_LastSeat = -1;
+var AFOB_LastSpeed = 0;
+var AFOB_SpeedLimit = 999;
 
 traceLastFunc("[Players] CreateVars");
 
@@ -584,11 +586,21 @@ mp.events.add('render', () => {
         {
             if(AFOB_LastVeh !== null && mp.vehicles.exists(AFOB_LastVeh) && AFOB_LastVeh.handle !== 0)
             {
-                if((AFOB_LastVeh.getSpeed() * 3.6).toFixed(0) >= 5 && AFOB_LastF < Date.now()-2000)
+                if(AFOB_LastF < Date.now()-2000 && AFOB_LastSpeed <= AFOB_SpeedLimit)
                 {
                     mp.players.local.setIntoVehicle(AFOB_LastVeh.handle, AFOB_LastSeat);
+                    //mp.gui.chat.push(`Setting into vehicle as last speed was ${AFOB_LastSpeed} under the limit ${AFOB_SpeedLimit}`);
                 }
             }
+        }
+        else if (AFOB_Enabled === true && !mp.players.local.isDead() && !mp.players.local.isSwimming() && mp.players.local.isInAnyVehicle(false))
+        {
+            AFOB_LastSpeed = mp.players.local.vehicle.getSpeed() * 3.6;
+            AFOB_LastVeh = mp.players.local.vehicle;
+
+            if(mp.players.local.vehicle.getPedInSeat(-1) == mp.players.local.handle) AFOB_LastSeat = -1;
+            if(mp.players.local.vehicle.getPedInSeat(0) == mp.players.local.handle) AFOB_LastSeat = 0;
+            if(mp.players.local.vehicle.getPedInSeat(1) == mp.players.local.handle) AFOB_LastSeat = 1;
         }
 
         if(clickDisable) 
@@ -1441,11 +1453,14 @@ mp.events.add(
         if(mp.players.local.isInAnyVehicle(false)) mp.players.local.vehicle.setHeading(heading);
     },
 
-    "ToggleAFOB": (status) => {
+    "ToggleAFOB": (status, speedLimit) => {
         AFOB_LastF = Date.now();
         AFOB_LastSeat = -1;
         AFOB_LastVeh = null;
         AFOB_Enabled = status;
+        AFOB_LastSpeed = 0;
+
+        if(status) AFOB_SpeedLimit = speedLimit;
     },
 
     "SyncServerSettings": (onfootcollisions) => {
@@ -1690,6 +1705,7 @@ mp.events.add(
 
             if(AFOB_Enabled === true && AFOB_LastF < Date.now()-2000)
             {
+                AFOB_LastSpeed = 0;
                 AFOB_LastF = Date.now();
                 AFOB_LastVeh = null;
             }

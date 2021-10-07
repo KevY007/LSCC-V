@@ -3186,7 +3186,7 @@ namespace RNC
                 player.SetSharedData("VisibleBlip", false);
 
                 if (player.GetSharedData<int>("InDM") == -1) player.TriggerEvent("SetActorInvulnerable", true);
-                player.TriggerEvent("ToggleAFOB", false);
+                player.TriggerEvent("ToggleAFOB", false, 0);
                 player.TriggerEvent("showHPBars", 0); // Never show HP Bars.
 
                 EPlayer.SetColor(player, new Color(255, 255, 255, 255));

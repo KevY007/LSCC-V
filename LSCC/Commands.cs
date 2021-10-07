@@ -10,7 +10,7 @@ namespace RNC
 {
     class Commands : Script
     {
-        [Command("serveroptions", "!{#AFAFAF}[USAGE] serveroptions (option: maxinlobby, derbyveh, usediscord, onfootcollisions, afob)", GreedyArg = true)]
+        [Command("serveroptions", "!{#AFAFAF}[USAGE] serveroptions (option: maxinlobby, derbyveh, usediscord, onfootcollisions, afob, afoblimit)", GreedyArg = true)]
         public void cmd_serveroptions(Player player, string action)
         {
             if (!EPlayer.LoggedIn(player))
@@ -106,6 +106,28 @@ namespace RNC
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions afob <true/false>");
             }
+            else if (action.StartsWith("afoblimit", StringComparison.OrdinalIgnoreCase))
+            {
+                string[] args = action.Split(' ');
+                if (args.Count() > 1)
+                {
+                    int speed = 0;
+
+                    if (!Int32.TryParse(args[1], out speed))
+                    {
+                        player.SendChatMessage($"!{{#999999}}Maximum trigger speed limit can only be '0-999'");
+                        return;
+                    }
+
+                    Settings.Dynamics.AntiFallOffBikeSpeedLimit = speed;
+
+                    Main.SaveDynamicSettings();
+
+                    Logs.LogAdmin(player, $"Set AFOB Speed Lim to {speed.ToString()}.");
+                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set chase Anti Fall Off Bike max speed limit to {speed.ToString()}.");
+                }
+                else player.SendChatMessage("!{#999999}Proper usage: /serveroptions afoblimit <max speed>");
+            }
 
             else if (action.StartsWith("usediscord", StringComparison.OrdinalIgnoreCase))
             {
@@ -130,7 +152,7 @@ namespace RNC
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions usediscord <true/false>");
             }
 
-            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'maxinlobby, derbyveh, usediscord, onfootcollisions, afob'");
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'maxinlobby, derbyveh, usediscord, onfootcollisions, afob, afoblimit'");
 
             return;
         }
@@ -741,12 +763,12 @@ namespace RNC
             if (player.HasData("FreeroamAFOB"))
             {
                 player.ResetData("FreeroamAFOB");
-                player.TriggerEvent("ToggleAFOB", false);
+                player.TriggerEvent("ToggleAFOB", false, 999);
             }
             else
             {
                 player.SetData("FreeroamAFOB", true);
-                player.TriggerEvent("ToggleAFOB", true);
+                player.TriggerEvent("ToggleAFOB", true, 999);
             }
 
             player.SendChatMessage("!{#FF6347}>> !{#FFFFFF}You have " + (player.HasData("FreeroamAFOB") ? "enabled" : "disabled") + " anti fall off bike.");
@@ -5909,7 +5931,7 @@ namespace RNC
                     EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Fugitive as {target.Name}");
 
                     target.TriggerEvent("SetActorInvulnerable", false);
-                    target.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike);
+                    target.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
 
                     target.SetSharedData("VisibleBlip", true);
                     target.ResetData("Handsup");
@@ -6064,7 +6086,7 @@ namespace RNC
                     EPlayer.SetDiscordStatus(target, $"[Lobby {lobby.lobbyId}] Cop as {target.Name}");
 
                     target.TriggerEvent("SetActorInvulnerable", false);
-                    target.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike);
+                    target.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
                     target.SetSharedData("CuffedBy", "n/a");
                     target.SetSharedData("Team", 1);
 
