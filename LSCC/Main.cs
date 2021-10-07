@@ -1592,9 +1592,8 @@ namespace RNC
                     if (Environment.TickCount64 - Settings.LastCountUpdate >= 60000)
                     {
                         Settings.LastCountUpdate = Environment.TickCount64;
-
                         Discord._client.SetGameAsync($"{RAGE.Entities.Players.Count} Players & {Settings.Lobbies.Where(l => l.gameStatus == 1).Count()} Chases");
-                        NAPI.Util.ConsoleOutput("Updated the DISCORD counts.");
+                        //NAPI.Util.ConsoleOutput("Updated the DISCORD counts.");
                     }
                 });
             }
