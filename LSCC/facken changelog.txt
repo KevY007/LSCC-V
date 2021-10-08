@@ -53,6 +53,7 @@ if server onfoot collisions are enabled, they can't be rammed by vehicles while 
 Fixed character customization opacities not working, now beard and facial hair etc will show properly.
 Fugitive vehicle max speed to 155 but they are given faster vehicles in return.
 Nitestick in every police loadout along with taser now.
+Anti fall off for bikes but will be toggleable by the management and only trigger when under a certain speed limit.
 
 Fixed siren not syncing after leaving vehicle.
 
@@ -75,7 +76,6 @@ Added /putinvehicle.
 
 Removed kuruma from selection because of a bulletproof bug in gta online.
 Removed LSPD Caracara.
-Replaced default cruiser with a crown vic. felt sexy.
 Removed 600sel/merc mod.
 
 Added new fugitives vehicles and loadouts. omg chefck it out yourself cant write so much
@@ -83,7 +83,10 @@ Tasing fugitives vehicle tires will no longer work.
 
 
 Added Police Scout and Unmarked Police Scout.
-Charger's handling has been fixed and Revolter has been slowed down a bit.
+Charger's handling has been fixed and Revolter has been slowed down.
+Improved police buffalo A/C's turning.
+Added ford crown victoria (lspdvic).
+Added Huntley from GTA 4.
 Fixed the police lights on the Charger mod.
 Weapon sounds and models have been improved/changed.
 Mustang '66 Fastback mod has been removed and replaced by Vapid Dominator GTT (dominator8)
