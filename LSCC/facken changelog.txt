@@ -54,6 +54,8 @@ Fixed character customization opacities not working, now beard and facial hair e
 Fugitive vehicle max speed to 155 but they are given faster vehicles in return.
 Nitestick in every police loadout along with taser now.
 Anti fall off for bikes but will be toggleable by the management and only trigger when under a certain speed limit.
+Blocked more unfair helmets on female side.
+XP wouldn't be removed now until 3 unfair kills/team kills etc.
 
 Fixed siren not syncing after leaving vehicle.
 
@@ -67,6 +69,7 @@ Added /setalpha and /setcaralpha.
 Spectate system has been improved such that camera movement and zoom will be possible. (WASD and MWHEEL)
 Ban and kick should work appropriately for logged out players now.
 Added /checkplayer for all admins.
+Added /checkbanevaders.
 Added /deleteaccount.
 Added /resetclothing for admins.
 /tfreeze and /rfreeze will show messages and notifications properly.
