@@ -696,20 +696,22 @@ namespace RNC
                             if (pVeh == null || RAGE.Entities.Players.All.Count(ey => ey.IsInVehicle && ey.Vehicle == player.Vehicle &&
                                      ey.GetSharedData<int>("Team") == 0 && ey.GetSharedData<bool>("HasShot") == true) == 0)
                             {
-                                int xpReduce = EPlayer.GetAccount(killer).XP >= 8 ? -(EPlayer.GetAccount(killer).XP / 4) : -3;
-
-                                EPlayer.GrantXP(killer, xpReduce);
-                                RAGE.Entities.Players.All.ForEach((Player ey) =>
-                                {
-                                    ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by {xpReduce} for killing a fugitive that hasn't shot.");
-                                });
+                               
 
                                 int warnings = 0;
                                 if (killer.HasData("InnocentShotWarning")) warnings = killer.GetData<int>("InnocentShotWarning");
 
-                                warnings += 5;
+                                warnings += 3;
                                 if (warnings >= 7)
                                 {
+                                    int xpReduce = EPlayer.GetAccount(killer).XP >= 8 ? -(EPlayer.GetAccount(killer).XP / 4) : -3;
+
+                                    EPlayer.GrantXP(killer, xpReduce);
+                                    RAGE.Entities.Players.All.ForEach((Player ey) =>
+                                    {
+                                        ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by {xpReduce} for killing a fugitive that hasn't shot.");
+                                    });
+
                                     killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") - 1.0);
 
                                     //killer.Health = 0;
@@ -747,18 +749,10 @@ namespace RNC
                         if (RAGE.Entities.Players.All.Count(ey => ey.GetSharedData<int>("Team") != -1 && ey.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") &&
                                  ey.Position.DistanceTo(player.Position) < 10.0) == 0)
                         {
-                            int xpReduce = EPlayer.GetAccount(killer).XP >= 8 ? -(EPlayer.GetAccount(killer).XP / 4) : -3;
-
-                            EPlayer.GrantXP(killer, xpReduce);
-                            RAGE.Entities.Players.All.ForEach((Player ey) =>
-                            {
-                                ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by {xpReduce} for team killing.");
-                            });
-
                             int warnings = 0;
                             if (killer.HasData("TeamShotWarning")) warnings = killer.GetData<int>("TeamShotWarning");
 
-                            warnings += 5;
+                            warnings += 3;
 
                             if (killer.IsInVehicle == true && killer.Vehicle.Model == NAPI.Util.GetHashKey("polmav"))
                             {
@@ -770,6 +764,14 @@ namespace RNC
                                 //killer.Health = 0;
                                 killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] Your fugitive chance has been decreased for team killing.");
                                 killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") - 1.0);
+
+                                int xpReduce = EPlayer.GetAccount(killer).XP >= 8 ? -(EPlayer.GetAccount(killer).XP / 4) : -3;
+
+                                EPlayer.GrantXP(killer, xpReduce);
+                                RAGE.Entities.Players.All.ForEach((Player ey) =>
+                                {
+                                    ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by {xpReduce} for team killing.");
+                                });
 
                                 warnings = 0;
                             }
