@@ -144,7 +144,9 @@ namespace RNC
                             .AddField("Register HWID: ", _acc.RegisterHWID)
                             .AddField("Last HWID: ", _acc.LastHWID)
                             .AddField("Register Date: ", $"{_acc.RegisterDate.ToString()}")
-                            .AddField("Last Login: ", $"{_acc.LastLogin.ToString()} (for {_acc.LastSessionMins} mins)");
+                            .AddField("Last Login: ", $"{_acc.LastLogin.ToString()} (for {_acc.LastSessionMins} mins)")
+                            .AddField("Level: ", $"{_acc.Level}")
+                            .AddField("Points: ", $"{_acc.Points}");
 
 
                             var embed = builder.Build();
@@ -395,6 +397,7 @@ namespace RNC
                     builder.AddField("players", "Gives a list of all the players online");
                     builder.AddField("admins", "Gives a list of all the admins online");
                     builder.AddField("lobbies", "Reports back lobbies and their statuses.");
+                    builder.AddField("getinfo", "Reports back information about a user.");
 
                     var embed = builder.Build();
 
