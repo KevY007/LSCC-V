@@ -1409,7 +1409,7 @@ mp.events.add("entclearanim", (entity, animDictionary, animName) => {
     {
         entity.stopAnimTask(animDictionary, animName, 1.0);
     }
-    entity.clearTasks();
+    if(!entity.isFalling()) entity.clearTasks();
 });
 
 mp.events.add('native:call', (nativeName, args, hasCallback) => {
