@@ -87,7 +87,7 @@ mp.events.add("SetChaseVehicle", (vid, seat) => {
 });
 
 mp.keys.bind(0x46, true, function () {
-    if(!chatStatus && !menuToggled) AFOB_LastF = Date.now();
+    if(!chatStatus && !menuToggled && !scoreboardToggled) AFOB_LastF = Date.now();
 });
 
 mp.events.add('entityStreamIn', (entity) => {

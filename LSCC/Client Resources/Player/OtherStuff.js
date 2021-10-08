@@ -640,7 +640,7 @@ mp.keys.bind(74, false, () => {
             }
         });
 
-        if(closestDist <= 2.0)
+        if(closestDist <= 3.5)
         {
             /*if(closestHandle == "handle_dside_f") // doors kinda buggy and bad
             {

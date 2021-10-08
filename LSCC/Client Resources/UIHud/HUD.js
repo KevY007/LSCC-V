@@ -200,7 +200,7 @@ mp.events.add("OneSecondEvent", () => {
     if(mp.storage.data.menu.tooltips == true)
     {
         if(mp.players.local.vehicle){
-            if(mp.players.local.Team == 1) 
+            if(mp.players.local.Team == 1)
                 if(createdTooltips.indexOf("B") == -1) mp.events.callLocal("AddTooltip", "B", "Silent Siren", 1);
                 
             if(createdTooltips.indexOf("Y") == -1) mp.events.callLocal("AddTooltip", "Y", "Engine", -1);
@@ -209,7 +209,7 @@ mp.events.add("OneSecondEvent", () => {
         else{
             if(createdTooltips.indexOf("Y") != -1) mp.events.callLocal("RemoveTooltip", "Y");
             if(createdTooltips.indexOf("L") != -1) mp.events.callLocal("RemoveTooltip", "L");
-            if(createdTooltips.indexOf("B") != -1) mp.events.callLocal("RemoveTooltip", "B");        
+            if(createdTooltips.indexOf("B") != -1) mp.events.callLocal("RemoveTooltip", "B");     
         }
         if(mp.players.local.Team == 1){
             if(createdTooltips.indexOf(String.fromCharCode(curGPSBind)) == -1) 
@@ -221,8 +221,9 @@ mp.events.add("OneSecondEvent", () => {
             if(createdTooltips.indexOf("Z") != -1) mp.events.callLocal("RemoveTooltip", "Z");
             if(createdTooltips.indexOf("B") != -1) mp.events.callLocal("RemoveTooltip", "B");     
         }
-        if(mp.players.local.Team == 0){
-            if(createdTooltips.indexOf("J") == -1) mp.events.callLocal("AddTooltip", "J", "Jammer", 0);
+
+        if((mp.players.local.Team == 0 || mp.players.local.Team == 1) && !mp.players.local.isInAnyVehicle(false)) {
+            if(createdTooltips.indexOf("J") == -1) mp.events.callLocal("AddTooltip", "J", "Open trunk", -1);
         }
         else{
             if(createdTooltips.indexOf("J") != -1) mp.events.callLocal("RemoveTooltip", "J");

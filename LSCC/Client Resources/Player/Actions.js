@@ -117,7 +117,7 @@ cuffTarget = null;
 cuffInterval = null;
 
 function requestCuffTarget(){
-    if(player.Team != 1) return;
+    if(player.Team != 1 || chatStatus || menuToggled || scoreboardToggled || Date.now() - lastChatToggle <= 500) return;
 
     mp.events.callRemote("RequestCuffTarget");
 }
