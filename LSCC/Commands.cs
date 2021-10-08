@@ -4463,7 +4463,8 @@ namespace RNC
         {
             player.SendChatMessage("Model 'lspdunm' - Unmarked Dodge Charger");
             player.SendChatMessage("Model 'polbufac' - Police Buffalo A/C | 'fbibufac' for FIB variant A/C");
-            player.SendChatMessage("Model '600sel' - Mercedes S600?");
+            player.SendChatMessage("Model 'huntley2' - GTA IV Huntley");
+            player.SendChatMessage("Model 'lspdvic' - Ford Crown Victoria CVPI LSPD");
             player.SendChatMessage("Model 'prevolter' - Police Revolter Unmarked");
             player.SendChatMessage("Model 'm3e46' - M3 E46 BMW 2005");
             player.SendChatMessage("Model 'pscout' - Police Scout | 'umkscout' for Unmarked Variant");
