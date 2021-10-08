@@ -546,10 +546,13 @@ namespace RNC
         {
             if(slot == 0) // Hats
             {
-                if ((drawable >= 16 && drawable <= 18) || drawable == 39 || (drawable >= 48 && drawable <= 53) || 
-                    drawable == 67 || (drawable >= 69 && drawable <= 75) || (drawable >= 78 && drawable <= 82) || 
-                    (drawable >= 84 && drawable <= 94) || drawable == 111 || (drawable >= 115 && drawable <= 119) || 
-                    (drawable >= 125 && drawable <= 128) || drawable == 144 || drawable == 150) return true; // (Blocks: Unfair headshot blocking helmets)
+                if ((drawable >= 16 && drawable <= 18) || drawable == 39 || (drawable >= 47 && drawable <= 53) ||
+                       drawable == 38 || (drawable >= 66 && drawable <= 75) || (drawable >= 77 && drawable <= 82) ||
+                       (drawable >= 83 && drawable <= 94) || drawable == 111 || (drawable >= 114 && drawable <= 119) ||
+                       (drawable >= 125 && drawable <= 128) || drawable == 144 || drawable == 150 || drawable == 112 || drawable == 143 || drawable == 149 || drawable == 124)
+                {
+                    return true; // (Blocks: Unfair headshot blocking helmets)
+                }
             }
             return false;
         }
@@ -557,7 +560,7 @@ namespace RNC
         {
             int seats = NAPI.Vehicle.GetVehicleMaxOccupants((VehicleHash)NAPI.Util.GetHashKey(vehiclename));
 
-            switch(vehiclename)
+            switch (vehiclename)
             {
                 case "cheburek":
                     seats = 4;
@@ -565,7 +568,19 @@ namespace RNC
                 case "blista2":
                     seats = 2;
                     break;
-                case "polbufac2":
+                case "police2":
+                    seats = 4;
+                    break;
+                case "police3":
+                    seats = 4;
+                    break;
+                case "police4":
+                    seats = 4;
+                    break;
+                case "police":
+                    seats = 4;
+                    break;
+                case "lspdvic":
                     seats = 4;
                     break;
                 case "polbufac":
@@ -574,7 +589,7 @@ namespace RNC
                 case "fbibufac":
                     seats = 4;
                     break;
-                case "600sel":
+                case "sultan2":
                     seats = 4;
                     break;
                 case "lspdunm":
@@ -601,11 +616,22 @@ namespace RNC
                 case "tahoma":
                     seats = 4;
                     break;
-                case "850sw":
+                case "futo2":
+                    seats = 2;
+                    break;
+                case "seminole2":
                     seats = 4;
                     break;
-                case "s8d2":
+                case "huntley2":
                     seats = 4;
+                    break;
+
+                case "tailgater2":
+                    seats = 4;
+                    break;
+
+                case "zr350":
+                    seats = 2;
                     break;
             }
             return seats;
