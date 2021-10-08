@@ -84,28 +84,6 @@ namespace RNC
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions onfootcollisions <true/false>");
             }
 
-            else if (action.StartsWith("afob", StringComparison.OrdinalIgnoreCase))
-            {
-                string[] args = action.Split(' ');
-                if (args.Count() > 1)
-                {
-                    bool value = false;
-
-                    if (!Boolean.TryParse(args[1], out value))
-                    {
-                        player.SendChatMessage($"!{{#999999}}Anti fall off bike can only be either 'true' or 'false'!");
-                        return;
-                    }
-
-                    Settings.Dynamics.AntiFallOffBike = value;
-
-                    Main.SaveDynamicSettings();
-
-                    Logs.LogAdmin(player, $"Set AFOB to {value.ToString()}.");
-                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set Anti Fall Off Bike to {value.ToString()} for chases.");
-                }
-                else player.SendChatMessage("!{#999999}Proper usage: /serveroptions afob <true/false>");
-            }
             else if (action.StartsWith("afoblimit", StringComparison.OrdinalIgnoreCase))
             {
                 string[] args = action.Split(' ');
@@ -127,6 +105,28 @@ namespace RNC
                     NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set chase Anti Fall Off Bike max speed limit to {speed.ToString()}.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions afoblimit <max speed>");
+            }
+            else if (action.Equals("afob", StringComparison.OrdinalIgnoreCase))
+            {
+                string[] args = action.Split(' ');
+                if (args.Count() > 1)
+                {
+                    bool value = false;
+
+                    if (!Boolean.TryParse(args[1], out value))
+                    {
+                        player.SendChatMessage($"!{{#999999}}Anti fall off bike can only be either 'true' or 'false'!");
+                        return;
+                    }
+
+                    Settings.Dynamics.AntiFallOffBike = value;
+
+                    Main.SaveDynamicSettings();
+
+                    Logs.LogAdmin(player, $"Set AFOB to {value.ToString()}.");
+                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set Anti Fall Off Bike to {value.ToString()} for chases.");
+                }
+                else player.SendChatMessage("!{#999999}Proper usage: /serveroptions afob <true/false>");
             }
 
             else if (action.StartsWith("usediscord", StringComparison.OrdinalIgnoreCase))

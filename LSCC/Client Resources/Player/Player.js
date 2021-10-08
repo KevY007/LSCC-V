@@ -584,7 +584,7 @@ mp.events.add('render', () => {
 
         if(AFOB_Enabled === true && !mp.players.local.isDead() && !mp.players.local.isSwimming() && !mp.players.local.isInAnyVehicle(false))
         {
-            if(AFOB_LastVeh !== null && mp.vehicles.exists(AFOB_LastVeh) && AFOB_LastVeh.handle !== 0)
+            if(AFOB_LastVeh !== null && mp.vehicles.exists(AFOB_LastVeh) && AFOB_LastVeh.handle !== 0 && AFOB_LastVeh.getClass() == 8)
             {
                 if(AFOB_LastF < Date.now()-2000 && AFOB_LastSpeed <= AFOB_SpeedLimit)
                 {
