@@ -490,6 +490,7 @@ namespace RNC
         {
             lock (player)
             {
+                player.ResetData("Kicked");
                 player.ResetData("AccountHandle");
                 player.ResetData("CompNoRefundWarn");
                 player.ResetData("TunerNoRefundWarn");
@@ -1110,9 +1111,22 @@ namespace RNC
             return "#" + c.Red.ToString("X2") + c.Green.ToString("X2") + c.Blue.ToString("X2");
         }
 
+        public static List<Account> GetLinkedAccounts(Account pAcc) // Gets all linked accounts to a specific account, will always contain the input account.
+        {
+            var accounts = ContextFactory.Instance.Accounts.ToList().Where(acc =>
+                new ulong[] { pAcc.RegisterRID, pAcc.LastRID }.Intersect(new ulong[] { acc.LastRID, acc.RegisterRID }).Any() ||
+                new string[] { pAcc.RegisterIP, pAcc.LastIP }.Intersect(new string[] { acc.RegisterIP, acc.LastIP }).Any() ||
+                new string[] { pAcc.RegisterHWID, pAcc.LastHWID }.Intersect(new string[] { acc.RegisterHWID, acc.LastHWID }).Any() ||
+                (acc.Email != null && acc.Email.Equals(pAcc.Email) && acc.Email.Length >= 5)).ToList(); // BONKERS
+
+            return accounts;
+        }
+
         public static bool LoggedIn(Player player)
         {
             if (player == null) return false;
+
+            if (player.HasData("Kicked")) return false;
 
             if (player.HasData("AccountHandle") && player.GetData<Account>("AccountHandle") != null && player.HasData("LoggedIn") && player.GetData<bool>("LoggedIn") == true)
             {
@@ -1350,6 +1364,7 @@ namespace RNC
         }
         public static void Spawn(Player player, bool forceAutojoin = true, Vector3 spawn = default(Vector3))
         {
+            if (player.HasData("Kicked")) return;
             if (!LoggedIn(player)) return;
 
             if (player.HasData("Spectating"))

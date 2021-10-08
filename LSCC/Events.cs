@@ -18,7 +18,8 @@ namespace RNC
         public void OnPlayerConnected_Old(Player player)
         {
             EPlayer.ResetPlayerData(player);
-            BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.HWID.CompareTo(player.Serial) == 0 || ban.IP.CompareTo(player.Address) == 0 ||
+
+            BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.HWID.Equals(player.Serial) || ban.IP.Equals(player.Address) ||
                 ban.RockstarID == player.SocialClubId);
 
             Discord.SendTextChannel("staff-bot", $"**{player.Name} has joined the server.** *(Total online: {RAGE.Entities.Players.Count})*");
@@ -33,20 +34,9 @@ namespace RNC
 
                 EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Your ban ID is {ban.SQL_ID}.</p>", "red", "fas fa-ban", true, 30000);
 
-                NAPI.Task.Run(() =>
-                {
-                    lock (Settings.LoggedInPlayers)
-                    {
-                        try
-                        {
-                            if (player != null && player.Exists)
-                            {
-                                player.KickSilent();
-                            }
-                        }
-                        catch { }
-                    }
-                }, 350);
+
+                player.SetData("Kicked", true);
+                player.KickSilent();
 
                 return;
             }
@@ -68,6 +58,8 @@ namespace RNC
         [RemoteEvent("playerReadyCon")]
         public void OnPlayerConnected(Player player)
         {
+            if (player.HasData("Kicked")) return;
+
             EPlayer.SetDiscordStatus(player, "Connecting to the server...");
 
             NAPI.Notification.SendNotificationToPlayer(player, "Welcome to ~y~Race ~w~'n ~b~Chase");
@@ -1102,7 +1094,7 @@ namespace RNC
 
             if (acc.RegisterDate.Year == 2000) acc.RegisterDate = DateTime.Now; // Year 2000 = it's not set.
 
-            BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.AccountSQLID == acc.SQL_ID);
+            BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.AccountSQLID == acc.SQL_ID || ban.HWID.Equals(acc.LastHWID) || ban.IP.Equals(acc.LastIP) || ban.RockstarID == acc.LastRID);
 
             if (ban != null)
             {
@@ -1115,10 +1107,9 @@ namespace RNC
 
                 player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
-                NAPI.Task.Run(() =>
-                {
-                    try { { if (player != null && player.Exists) player.KickSilent(); } } catch { }
-                }, 350);
+               
+                player.SetData("Kicked", true);
+                player.KickSilent();
 
                 return;
             }
@@ -3069,6 +3060,8 @@ namespace RNC
         [ServerEvent(Event.PlayerSpawn)]
         public static void OnPlayerSpawn(Player player)
         {
+            if (player.HasData("Kicked")) return;
+
             if (player == null || !player.Exists) return;
 
             player.SetSharedData("Collisions", true); // Reset collision from chase.

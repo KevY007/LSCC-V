@@ -4873,11 +4873,7 @@ namespace RNC
 
             Logs.LogAdmin(player, $"Checked {pAcc.Username}'s accounts.");
 
-            var accounts = ContextFactory.Instance.Accounts.ToList().Where(acc => 
-                new ulong[] { pAcc.RegisterRID, pAcc.LastRID }.Intersect(new ulong[] { acc.LastRID, acc.RegisterRID }).Any() ||
-                new string[] { pAcc.RegisterIP, pAcc.LastIP }.Intersect(new string[] { acc.RegisterIP, acc.LastIP }).Any() ||
-                new string[] { pAcc.RegisterHWID, pAcc.LastHWID }.Intersect(new string[] { acc.RegisterHWID, acc.LastHWID }).Any() || 
-                (acc.Email != null && acc.Email.Equals(pAcc.Email) && acc.Email.Length >= 5)).ToList(); // BONKERS
+            var accounts = EPlayer.GetLinkedAccounts(pAcc); // BONKERS
 
 
             if (accounts.Count > 1) // Accounts will always be 1 as the main account matches and adds to the list.
@@ -4905,6 +4901,50 @@ namespace RNC
                 else player.SendChatMessage($"!{{#33C446}}[>>] {pAcc.Username}'s account records are in good standing. No redflags.");
             }
             else player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}No other accounts matched with !{{#FF6347}}{pAcc.Username} !{{#FFFFFF}}SQLID !{{#FF6347}}{pAcc.SQL_ID}!{{#FFFFFF}}.");
+            return;
+        }
+
+        [Command("checkbanevaders", Alias = "checkallplayers")]
+        public void cmd_checkbanevaders(Player player, string accountname)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+            Logs.LogAdmin(player, $"Checked all players for ban evade.");
+
+            int totalCount = 0;
+            foreach (Player p in Settings.LoggedInPlayers)
+            {
+                var accounts = EPlayer.GetLinkedAccounts(EPlayer.GetAccount(p));
+                int banCount = 0;
+                if(accounts.Count > 1)
+                {
+                    accounts.ForEach(acc =>
+                    {
+                        if (ContextFactory.Instance.Bans.ToList().Count(ban => ban.AccountSQLID == acc.SQL_ID) >= 1)
+                        {
+                            banCount++;
+                            totalCount++;
+                        }
+                    });
+                }
+
+                if(banCount > 1)
+                {
+                    player.SendChatMessage($"!{{#FF6347}} {p.Name} is linked to !{{#FF0000}}{banCount} banned accounts!{{#FF6347}}.");
+                }
+            }
+
+            if(totalCount == 0)
+            {
+                player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}No online players have been matched with ban evaders.");
+            }
             return;
         }
 
@@ -5090,18 +5130,9 @@ namespace RNC
             Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Ban", reason, "N/A");
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ban:{target.Name}:{reason}"); } catch { }
 
-            NAPI.Task.Run(() =>
-            {
-                lock (target)
-                {
-                    if (target != null && target.Exists)
-                    {
-                        target.KickSilent();
-                    }
-                }
-            }, 350);
-
-
+            
+            target.SetData("Kicked", true);
+            target.KickSilent();
             return;
         }
 
@@ -5156,17 +5187,8 @@ namespace RNC
             Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Suspension", "N/A", "N/A");
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:suspend:{target.Name}"); } catch { }
 
-            NAPI.Task.Run(() =>
-            {
-                lock (target)
-                {
-                    if (target != null && target.Exists)
-                    {
-                        target.KickSilent();
-                    }
-                }
-            }, 350);
-
+            target.SetData("Kicked", true);
+            target.KickSilent();
 
             return;
         }
@@ -5787,7 +5809,7 @@ namespace RNC
             {
                 player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword /togglemap");
                 player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension /r(emove)guns /suspend /unsuspend /(o)checkstats");
-                player.SendChatMessage("[Admin Lv 2]: /ann /vanish /oban /fugitivelist /noclip /motd /togcols");
+                player.SendChatMessage("[Admin Lv 2]: /ann /vanish /oban /fugitivelist /noclip /motd /togcols /checkbanevaders");
             }
             if (EPlayer.GetAccount(player).Admin >= 3)
             {
@@ -7377,16 +7399,8 @@ namespace RNC
 
                 target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
-                NAPI.Task.Run(() =>
-                {
-                    lock (target)
-                    {
-                        if (target != null && target.Exists)
-                        {
-                            target.KickSilent();
-                        }
-                    }
-                }, 350);
+                target.SetData("Kicked", true);
+                target.KickSilent();
             }
 
         }
