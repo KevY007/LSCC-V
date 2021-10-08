@@ -10,7 +10,7 @@ namespace RNC
 {
     class Commands : Script
     {
-        [Command("serveroptions", "!{#AFAFAF}[USAGE] serveroptions (option: maxinlobby, derbyveh, usediscord, onfootcollisions, afob, afoblimit)", GreedyArg = true)]
+        [Command("serveroptions", "!{#AFAFAF}[USAGE] serveroptions (option: maxinlobby, derbyveh, usediscord, onfootcollisions, afob, speedafob)", GreedyArg = true)]
         public void cmd_serveroptions(Player player, string action)
         {
             if (!EPlayer.LoggedIn(player))
@@ -84,7 +84,7 @@ namespace RNC
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions onfootcollisions <true/false>");
             }
 
-            else if (action.StartsWith("afoblimit", StringComparison.OrdinalIgnoreCase))
+            else if (action.StartsWith("speedafob", StringComparison.OrdinalIgnoreCase))
             {
                 string[] args = action.Split(' ');
                 if (args.Count() > 1)
@@ -104,9 +104,9 @@ namespace RNC
                     Logs.LogAdmin(player, $"Set AFOB Speed Lim to {speed.ToString()}.");
                     NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set chase Anti Fall Off Bike max speed limit to {speed.ToString()}.");
                 }
-                else player.SendChatMessage("!{#999999}Proper usage: /serveroptions afoblimit <max speed>");
+                else player.SendChatMessage("!{#999999}Proper usage: /serveroptions speedafob <max speed>");
             }
-            else if (action.Equals("afob", StringComparison.OrdinalIgnoreCase))
+            else if (action.StartsWith("afob", StringComparison.OrdinalIgnoreCase))
             {
                 string[] args = action.Split(' ');
                 if (args.Count() > 1)
@@ -152,7 +152,7 @@ namespace RNC
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions usediscord <true/false>");
             }
 
-            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'maxinlobby, derbyveh, usediscord, onfootcollisions, afob, afoblimit'");
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'maxinlobby, derbyveh, usediscord, onfootcollisions, afob, speedafob'");
 
             return;
         }

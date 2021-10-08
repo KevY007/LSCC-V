@@ -82,7 +82,6 @@ Removed LSPD Caracara.
 Removed 600sel/merc mod.
 
 Added new fugitives vehicles and loadouts. omg chefck it out yourself cant write so much
-Tasing fugitives vehicle tires will no longer work.
 
 
 Added Police Scout and Unmarked Police Scout.

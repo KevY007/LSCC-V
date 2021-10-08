@@ -2020,11 +2020,14 @@ namespace RNC
             Pickup newPickup = new Pickup(NAPI.Util.GetHashKey("prop_box_ammo07b"), new Vector3(x, y, z), 2.0f, dimension, false, Pickups.ToPropLighting(255f, 255f, 255f, 1.0f, 1.5f, 0.5f));
 
             newPickup.SetData("AmmoBox", player.GetData<Dictionary<string, int>>("CreatingAmmoBox"));
+            newPickup.SetData("Creator", player.Name);
             player.ResetData("CreatingAmmoBox");
             lobby.Drops.Add(newPickup);
 
             newPickup.OnPickup = (guy) =>
             {
+                if (guy.Dead || newPickup.GetData<string>("Creator").Equals(guy.Name)) return;
+
                 var ammoBox = newPickup.GetData<Dictionary<string, int>>("AmmoBox");
                 string notificationString = "";
                 foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
