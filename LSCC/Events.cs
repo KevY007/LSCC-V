@@ -94,8 +94,16 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            if (state) player.SetSharedData("IsAiming", state);
-            else player.ResetSharedData("IsAiming");
+            if (state)
+            {
+                player.SetSharedData("IsAiming", state);
+                player.SetSharedData("UpdateCameraData", true);
+            }
+            else
+            {
+                player.ResetSharedData("IsAiming");
+                player.ResetSharedData("UpdateCameraData");
+            }
         }
 
         [RemoteEvent("UpdateCameraDir")]
@@ -132,7 +140,6 @@ namespace RNC
                     if (newWeapon == WeaponHash.Flashlight)
                     {
                         player.SetSharedData("FlashlightEquipped", true);
-                        player.SetSharedData("UpdateCameraData", true);
                     }
 
                     if (player.HasData("AttachedComponents"))
@@ -149,7 +156,6 @@ namespace RNC
                                 if(comps.Contains(new KeyValuePair<long, long>(Convert.ToInt64(newWeapon), flashlights.Key)))
                                 {
                                     player.SetSharedData("FlashlightEquipped", true);
-                                    player.SetSharedData("UpdateCameraData", true);
                                     break;
                                 }
                             }
