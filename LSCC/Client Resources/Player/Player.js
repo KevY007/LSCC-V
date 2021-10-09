@@ -18,6 +18,7 @@ let derbyCounting = false;
 let secondCounter = 0;
 
 let dbDisabledMsg = false;
+let dbDisabledMsgLast = Date.now();
 
 if(mp.storage.data.menu !== undefined && mp.storage.data.menu.updateRate !== undefined)
 {
@@ -60,6 +61,7 @@ var ShotStats = [];
 
 var AFOB_Enabled = false;
 var AFOB_LastF = Date.now();
+var AFOB_LastMessage = Date.now();
 var AFOB_LastVeh = null;
 var AFOB_LastSeat = -1;
 var AFOB_LastSpeed = 0;
@@ -596,8 +598,12 @@ mp.events.add('render', () => {
                 if(AFOB_LastF < Date.now()-4000 && AFOB_LastSpeed <= AFOB_SpeedLimit)
                 {
                     mp.players.local.setIntoVehicle(AFOB_LastVeh.handle, AFOB_LastSeat);
-                    mp.gui.chat.push(`!{#FF6347}[!] !{#FFFFFF}Anti Fall Off Bike has put you back in the bike. To exit, press/spam F.`);
-                    //mp.gui.chat.push(`Setting into vehicle as last speed was ${AFOB_LastSpeed} under the limit ${AFOB_SpeedLimit}`);
+                    if(Date.now() > AFOB_LastMessage)
+                    {
+                        AFOB_LastMessage = Date.now() + 60000;
+                        mp.gui.chat.push(`!{#FF6347}[!] !{#FFFFFF}Anti Fall Off Bike has put you back in the bike. To exit, press/spam F.`);
+                        //mp.gui.chat.push(`Setting into vehicle as last speed was ${AFOB_LastSpeed} under the limit ${AFOB_SpeedLimit}`);
+                    }
                 }
             }
         }
@@ -695,7 +701,11 @@ mp.events.add('render', () => {
 
                                 if(!dbDisabledMsg)
                                 {
-                                    mp.gui.chat.push(`!{#FF6347}[!] !{#FFFFFF}The driver does not want to engage in a driveby. Driver has to use /db to enable it again.`);
+                                    if(dbDisabledMsgLast < Date.now())
+                                    {
+                                        mp.gui.chat.push(`!{#FF6347}[!] !{#FFFFFF}The driver does not want to engage in a driveby. Driver has to use /db to enable it again.`);
+                                        dbDisabledMsgLast = Date.now() + 10000;
+                                    }
                                     dbDisabledMsg = true;
                                 }
                             }
