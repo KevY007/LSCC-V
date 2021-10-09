@@ -1079,7 +1079,6 @@ namespace RNC
         {
             player.SetSharedData("EntAlpha", 255);
             player.SetData("PlaytimeTick", Environment.TickCount64);
-            player.TriggerEvent("StopSong");
             Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in as {acc.Username}.*");
 
             NAPI.Util.ConsoleOutput($"[Login] {player.Name} has logged in as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
@@ -1269,12 +1268,10 @@ namespace RNC
 
             EPlayer.Spawn(player);
 
-            player.TriggerEvent("StopSong");
-
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can edit your character's clothing with /char clothing.");
             
             if(EPlayer.GetAccount(player).Level == 1 && EPlayer.GetAccount(player).XP < 2) 
-                player.SendChatMessage("!{#FF0000}[!] !{#FFFFFF}Please use /cmds and /keys to get started. Press M to open menu.");
+                player.SendChatMessage("!{#FF0000}[!] !{#FFFFFF}Please use /help and /keys to get started. Press M to open menu.");
         }
 
         [RemoteEvent("creator_Leave")]

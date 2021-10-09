@@ -6344,7 +6344,7 @@ namespace RNC
             player.TriggerEvent("ResolveJS", eventt);
         }
 
-        [Command("vtuner", "!{#AFAFAF}[USAGE] vtuner (name) | Where 'name' must be same as in menu car selection", GreedyArg = true)]
+        [Command("vtuner", "!{#AFAFAF}[USAGE] vtuner (vehicle name) | Where 'name' must be same as in menu's car selection", GreedyArg = true)]
         public void cmd_vtuner(Player player, string vmodel)
         {
             if (player.GetData<bool>("Tuner_Using") == true) return;

@@ -409,11 +409,13 @@ namespace RNC
 
         public static Vector3[] LobbySpawns = new Vector3[]
         {
-            new Vector3(464.8465f, -995.0156f, 24.914879f),
-            new Vector3(450.13f, -987.06f, 26.67f),
-            new Vector3(439.86f, -995.12f, 30.68f),
-            new Vector3(443.308f, -986.31f, 30.689f),
-            new Vector3(441.24f, -978.24f, 30.68f)
+            new Vector3(117.00068f, -743.66974f, 242.15219f),
+            new Vector3(123.96491f, -768.45325f, 242.15216f),
+            new Vector3(124.12404f, -747.3597f, 242.15218f),
+            new Vector3(121.5661f, -728.85785f, 242.15215f),
+            new Vector3(109.62965f, -753.2608f, 242.15224f),
+            new Vector3(109.04599f, -744.92554f, 242.15225f),
+            new Vector3(135.08902f, -766.33203f, 242.152f),
         };
 
         public static object[] VectorJail = { new Vector3(459.55798f, -998.202f, 24.914848f), -75.06f };
@@ -1280,10 +1282,12 @@ namespace RNC
             }
             else NAPI.Util.ConsoleOutput("(RnC | OPT) Discord Bot is disabled, live commands and statuses not updated!");
 
-            NAPI.TextLabel.CreateTextLabel("Bored of waiting? /dm & /dmarenas", new Vector3(440.95462f, -976.35516f, 32.059594f), 10.0f, 2.2f, 0, new Color(255, 0, 0, 156), false);
-            NAPI.TextLabel.CreateTextLabel("Check out /freeroam & /cmds", new Vector3(435.73737f, -981.86523f, 30.698616f), 10.0f, 2.2f, 0, new Color(118, 232, 221, 156), false);
-            NAPI.TextLabel.CreateTextLabel("Do you know about /derby?", new Vector3(448.35562f, -987.96454f, 30.689596f), 10.0f, 2.2f, 0, new Color(230, 177, 21, 156), false);
-
+            NAPI.TextLabel.CreateTextLabel("Bored of waiting? Play some DM", new Vector3(107.493866f, -744.79114f, 242.15219f), 13.0f, 2.2f, 0, new Color(255, 0, 0, 156), false);
+            NAPI.TextLabel.CreateTextLabel("Press M to open menu and more", new Vector3(109.71294f, -753.1537f, 242.15219f), 13.0f, 2.2f, 0, new Color(56, 236, 242, 156), false);
+            NAPI.TextLabel.CreateTextLabel("Check out other modes in the menu", new Vector3(121.34787f, -738.852f, 242.1522f), 13.0f, 2.2f, 0, new Color(40, 153, 45, 156), false);
+            NAPI.TextLabel.CreateTextLabel("Change appearance with /char & /clothing", new Vector3(120.48237f, -726.71735f, 242.15198f), 13.0f, 2.2f, 0, new Color(212, 67, 217, 156), false);
+            NAPI.TextLabel.CreateTextLabel("Confused? /help or /helpme", new Vector3(120.84272f, -744.534f, 242.15207f), 13.0f, 2.2f, 0, new Color(255, 255, 255, 156), false);
+            
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Server startup proceeded:\n");
 
             string admins = "";
@@ -1394,13 +1398,14 @@ namespace RNC
                     "If you would like to experience some exclusive and limited features then donate to keep the server running!",
                     "The server's discord, information and credits can be found at /discord or /info!",
                     "Use /rules to see the server rules.",
-                    "Use /cmds to see the server commands.",
-                    "Have you seen someone cheating? Please, contact an administrator ASAP.",
+                    "Use /cmds to see the server commands & /helpme if you need assistance.",
+                    "Have you seen someone cheating? Screenshot or record them and you'll never see them again.",
                     "Bored of waiting in the lobby? Check out our side activities like Deathmatch, Freeroam, Derby!",
-                    "Want to earn some quick score? Head over to /dm!",
+                    "Want to earn some quick score? Head over to a DM arena!",
                     "You can save your current cop & fugitive appearance profile and select a different one by using /outfit.",
-                    "You can use Points to purchase some items, such as medkits (/mk) & painkillers (/pk) and even tune vehicles!",
-                    "You can press M to open the menu, check more at /keys!"
+                    "Points can be used to purchase items such as medkits (/mk), painkillers (/pk), and even tune vehicles (/vtuner).",
+                    "You can press M to open the menu, check more at /keys!",
+                    "Use /clothing and /char to change your clothing or character's face.",
                 };
 
                 RAGE.Entities.Players.All.ForEach((Player e) => e.SendChatMessage("[?] !{#F0FC72}" + msgList.OrderBy(c => Guid.NewGuid()).First()));
