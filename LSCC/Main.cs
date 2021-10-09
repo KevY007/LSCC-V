@@ -233,7 +233,7 @@ namespace RNC
 
         public LoadoutData(int team, string name, int level = 0, int points = 0, int donorpoints = 0, int donator = 0)
         {
-            Background = "https://i.imgur.com/EqsruXf.png";
+            Background = "package://Artwork/LoadoutBG.png";
             this.Team = team;
             this.Name = name;
             this.LevelRequired = level;
