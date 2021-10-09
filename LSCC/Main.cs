@@ -1018,7 +1018,7 @@ namespace RNC
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Ensuring 'racenchase' folder...");
             System.IO.Directory.CreateDirectory("racenchase");
 
-            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Ensuring logs folder..."); 
+            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Ensuring logs folder...");
             System.IO.Directory.CreateDirectory("racenchase/logs");
 
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) ===== Heading towards second stage of startup =====");
@@ -1040,7 +1040,7 @@ namespace RNC
             Settings.FreeroamSpawns = new List<SpawnSet>();
 
             Settings.WeaponData = new Dictionary<long, jWeaponData>();
-            
+
             Settings.Dynamics = new DynSet();
 
             Settings.NextLobbyID = 1;
@@ -1057,11 +1057,11 @@ namespace RNC
 
             for (int i = 0; i < Settings.MaxLobbies; i++)
             {
-                if (i >= Settings.MaxLobbies-1) new LobbyData().gameMode = GameModes.BUSTED; // Some busted lobby too.
+                if (i >= Settings.MaxLobbies - 1) new LobbyData().gameMode = GameModes.BUSTED; // Some busted lobby too.
                 else new LobbyData();
             }
 
-            
+
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Ensuring & loading settings.json...");
 
             LoadDynamicSettings();
@@ -1288,7 +1288,7 @@ namespace RNC
 
             string admins = "";
             int adminCount = 0;
-            foreach(Account acc in ContextFactory.Instance.Accounts.ToList().Where(a => a.Admin > 0))
+            foreach (Account acc in ContextFactory.Instance.Accounts.ToList().Where(a => a.Admin > 0))
             {
                 if (adminCount != 0) admins += ", ";
                 admins += $"{acc.Username} [{acc.SQL_ID}]";
