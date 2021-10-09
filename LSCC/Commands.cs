@@ -8271,7 +8271,7 @@ namespace RNC
 
             if(player.HasData("Spectating"))
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are already spectating someone! Exiting spec, try spectating again!");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Already spectating! Switching targets...");
                 cmd_specoff(player);
             }
 

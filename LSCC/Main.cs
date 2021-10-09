@@ -1287,6 +1287,7 @@ namespace RNC
             NAPI.TextLabel.CreateTextLabel("Check out other modes in the menu", new Vector3(121.34787f, -738.852f, 242.1522f), 13.0f, 2.2f, 0, new Color(40, 153, 45, 156), false);
             NAPI.TextLabel.CreateTextLabel("Change appearance with /char & /clothing", new Vector3(120.48237f, -726.71735f, 242.15198f), 13.0f, 2.2f, 0, new Color(212, 67, 217, 156), false);
             NAPI.TextLabel.CreateTextLabel("Confused? /help or /helpme", new Vector3(120.84272f, -744.534f, 242.15207f), 13.0f, 2.2f, 0, new Color(255, 255, 255, 156), false);
+            NAPI.TextLabel.CreateTextLabel("Want to watch the round? /spec", new Vector3(118.04166f, -757.9125f, 242.15215f), 13.0f, 2.2f, 0, new Color(255, 228, 0, 156), false);
             
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Server startup proceeded:\n");
 
