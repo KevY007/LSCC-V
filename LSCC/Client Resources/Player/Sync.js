@@ -348,7 +348,7 @@ mp.events.add('render', () => {
                         let origin = new mp.Vector3(handPos.x + forward.x * 3.4, handPos.y + forward.y * 3.4, (handPos.z + forward.z * 3.4));
                                                             
                         mp.game.graphics.drawSpotLightWithShadow(origin.x, origin.y, origin.z, target.getVariable("CameraDirectionX"), target.getVariable("CameraDirectionY"), target.getVariable("CameraDirectionZ"), 255, 255, 255, 15, 7, 2, 20, 1, 1);
-                        mp.game.graphics.drawLightWithRange(handPos.x, handPos.y, handPos.z, 255, 255, 255, 1, 15);
+                        mp.game.graphics.drawLightWithRange(handPos.x, handPos.y, handPos.z, 255, 255, 255, 1, 8);
                     }
                 }
             }
