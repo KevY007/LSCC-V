@@ -56,7 +56,10 @@ Nitestick in every police loadout along with taser now.
 Anti fall off for bikes but will be toggleable by the management and only trigger when under a certain speed limit.
 Blocked more unfair helmets on female side.
 XP wouldn't be removed now until 3 unfair kills/team kills etc.
-
+Changed lobby location and added more helpful messages.
+Added /kill.
+Players will now be put in the most populated available lobby instead of lobby 1 now.
+/sa will not mitigate fall damage now.
 Fixed siren not syncing after leaving vehicle.
 
 Players' can only spawn a max of 5 vehicles in freeroam now.
@@ -92,3 +95,8 @@ Added Huntley from GTA 4.
 Fixed the police lights on the Charger mod.
 Weapon sounds and models have been improved/changed.
 Mustang '66 Fastback mod has been removed and replaced by Vapid Dominator GTT (dominator8)
+
+LEFT TO TEST:
+Fugitive anti tase etc for starting 60 seconds. 
+One more go at anti tire tasing, should probably work now.
+Vehicles won't get damage if fugitive inside it that shot has died already.
