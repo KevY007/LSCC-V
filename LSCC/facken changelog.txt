@@ -6,7 +6,6 @@ Added an entirely new kill list. Player colors will be displayed accordingly alo
 Old native GTA5 notifications have been replaced with new notifications.
 Removed the game progress bar and replaced with a timer in the new HUD.
 Replaced collision timer with a new one in HUD.
-Player weapon wheel and HUD color theme will now be set according to the current team.
 Added a new sky spawning effect on game starts.
 Added /pagesize and changed chat font and color theme according to team.
 Added a new scoreboard with the ability to filter players.
