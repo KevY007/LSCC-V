@@ -3430,6 +3430,30 @@ namespace RNC
             return;
         }
 
+        [Command("kill")]
+        public static void cmd_kill(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (player.GetSharedData<int>("InLobby") == -5) return;
+
+            if (player.HasData("Spectating"))
+            {
+                cmd_specoff(player);
+            }
+
+            if (player.Health == 0 || player.Dead)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are respawning!");
+                EPlayer.Notify(player, "Please wait to respawn.", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
+                return;
+            }
+
+            player.Health = 0;
+            return;
+        }
+
         [Command("lobby")]
         public static void cmd_lobby(Player player)
         {
@@ -4478,7 +4502,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player)) return;
 
             player.SendChatMessage("!{#FFFFFF}[!{#ffae00}Race !{#FFFFFF}'n !{#0097ff}Chase !{#FFFFFF}Commands]:");
-            player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /keys /admins /rules /id");
+            player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /keys /admins /rules /id /kill");
             player.SendChatMessage("[General]: /report /helpme /l(ow) /c(ar)w(hisper) /s(hout)");
             player.SendChatMessage("[Squad/Partner]: /squad /squadleave /s(quad)c(hat) /squadaccept /squadmembers");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
