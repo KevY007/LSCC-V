@@ -303,6 +303,9 @@ namespace RNC
         [JsonProperty("ChaseAntiFallOffBikeSpeedLimit")]
         public int AntiFallOffBikeSpeedLimit { get; set; }
 
+        [JsonProperty("CameraSettingsUpdate")]
+        public int CameraSettingsUpdate { get; set; }
+
         [JsonProperty("WeaponDataURL")]
         public string WeaponDataURL { get; set; }
 
@@ -328,6 +331,7 @@ namespace RNC
             this.OnfootCollision = true;
             this.AntiFallOffBike = true;
             this.AntiFallOffBikeSpeedLimit = 60;
+            this.CameraSettingsUpdate = 100;
             this.Discord = true;
             this.MaxInLobby = Settings.DefaultMaxInLobby;
             this.DCServerID = 713731146072064040;

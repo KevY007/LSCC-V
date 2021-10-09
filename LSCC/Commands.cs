@@ -10,7 +10,7 @@ namespace RNC
 {
     class Commands : Script
     {
-        [Command("serveroptions", "!{#AFAFAF}[USAGE] serveroptions (option: maxinlobby, derbyveh, usediscord, onfootcollisions, afob, speedafob)", GreedyArg = true)]
+        [Command("serveroptions", "!{#AFAFAF}[USAGE] serveroptions (option) | use 'help' to get all options", GreedyArg = true)]
         public void cmd_serveroptions(Player player, string action)
         {
             if (!EPlayer.LoggedIn(player))
@@ -83,7 +83,16 @@ namespace RNC
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions onfootcollisions <true/false>");
             }
-
+            else if(action.StartsWith("help", StringComparison.OrdinalIgnoreCase))
+            {
+                player.SendChatMessage("maxinlobby => Maximum players in a lobby.");
+                player.SendChatMessage("derbyveh => Model name of derby vehicle.");
+                player.SendChatMessage("usediscord => Whether to use discord module or not.");
+                player.SendChatMessage("onfootcollisions => Toggle onfoot collisions in copchase.");
+                player.SendChatMessage("afob => Toggle copchase Anti Fall Off Bike.");
+                player.SendChatMessage("speedafob => Max speed for anti fall off to trigger/work.");
+                player.SendChatMessage("camupdate => Please don't touch. Rate clients update cam direction to server.");
+            }
             else if (action.StartsWith("speedafob", StringComparison.OrdinalIgnoreCase))
             {
                 string[] args = action.Split(' ');
@@ -105,6 +114,28 @@ namespace RNC
                     NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set chase Anti Fall Off Bike max speed limit to {speed.ToString()}.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions speedafob <max speed>");
+            }
+            else if (action.StartsWith("camupdate", StringComparison.OrdinalIgnoreCase))
+            {
+                string[] args = action.Split(' ');
+                if (args.Count() > 1)
+                {
+                    int speed = 10;
+
+                    if (!Int32.TryParse(args[1], out speed) || speed < 10 || speed > 100000)
+                    {
+                        player.SendChatMessage($"!{{#999999}}Camera update delay can only be '10-100000' Use 699 to disable.");
+                        return;
+                    }
+                    
+                    Settings.Dynamics.CameraSettingsUpdate = speed;
+
+                    Main.SaveDynamicSettings();
+
+                    Logs.LogAdmin(player, $"Set camera update rate to {speed.ToString()}.");
+                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has set camera updater rate to {speed.ToString()}.");
+                }
+                else player.SendChatMessage("!{#999999}Proper usage: /serveroptions camupdate <flashlight cam update rate>");
             }
             else if (action.StartsWith("afob", StringComparison.OrdinalIgnoreCase))
             {
@@ -152,7 +183,7 @@ namespace RNC
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions usediscord <true/false>");
             }
 
-            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'maxinlobby, derbyveh, usediscord, onfootcollisions, afob, speedafob'");
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'maxinlobby, derbyveh, usediscord, onfootcollisions, afob, speedafob, camupdate'");
 
             return;
         }
@@ -2353,7 +2384,7 @@ namespace RNC
             }
 
 
-            EPlayer.AttachComponent(target, (int)wephash, (int)comphash);
+            EPlayer.AttachComponent(target, wephash, comphash);
 
             Logs.LogAdmin(player, $"Temporarily attached {comp.Name} on {itemData.Name} for {target.Name}.");
             player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}Temporarily attached '{comp.Name}' on '{itemData.Name}' for {target.Name}.");

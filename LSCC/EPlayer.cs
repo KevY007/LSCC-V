@@ -482,7 +482,7 @@ namespace RNC
         {
             lock(player)
             {
-                player.TriggerEvent("SyncServerSettings", Settings.Dynamics.OnfootCollision);
+                player.TriggerEvent("SyncServerSettings", Settings.Dynamics.OnfootCollision, Settings.Dynamics.CameraSettingsUpdate);
             }
         }
         
@@ -495,6 +495,15 @@ namespace RNC
                 player.SetData("SpawnTick", Environment.TickCount64);
                 player.ResetData("AccountHandle");
                 player.ResetData("CompNoRefundWarn");
+                player.ResetData("AttachedComponents");
+
+                player.ResetSharedData("IsAiming");
+                player.ResetSharedData("CameraDirectionX");
+                player.ResetSharedData("CameraDirectionY");
+                player.ResetSharedData("CameraDirectionZ");
+                player.ResetSharedData("FlashlightEquipped");
+                player.ResetSharedData("UpdateCameraData");
+
                 player.ResetData("TunerNoRefundWarn");
                 player.ResetData("ConvertingType");
                 player.ResetData("ConvertingAmount");
@@ -761,18 +770,18 @@ namespace RNC
             }
         }
 
-        public static void SyncComponents(Player tosyncfor, Player target, int specificWeapon = -1)
+        public static void SyncComponents(Player tosyncfor, Player target, long specificWeapon = -1)
         {
             try
             {
                 if (target.HasData("AttachedComponents"))
                 {
-                    List<KeyValuePair<int, int>> comps = target.GetData<List<KeyValuePair<int, int>>>("AttachedComponents");
+                    List<KeyValuePair<long, long>> comps = target.GetData<List<KeyValuePair<long, long>>>("AttachedComponents");
 
                     foreach (var item in comps)
                     {
                         if (specificWeapon == -1 || (specificWeapon != -1 &&
-                            (int)item.Key == specificWeapon)) tosyncfor.TriggerEvent("AttachWeaponComponent", target, (int)item.Key, (int)item.Value);
+                            item.Key == specificWeapon)) tosyncfor.TriggerEvent("AttachWeaponComponent", target, (int)item.Key, (int)item.Value);
                     }
                 }
             }
@@ -782,20 +791,19 @@ namespace RNC
             }
             return;
         }
-        public static void AttachComponent(Player target, int weaponhash, int componenthash)
+        public static void AttachComponent(Player target, long weaponhash, long componenthash)
         {
-            List<KeyValuePair<int, int>> comps = new List<KeyValuePair<int, int>>();
-            if (!target.HasData("AttachedComponents"))
+            List<KeyValuePair<long, long>> comps = new List<KeyValuePair<long, long>>();
+            if (target.HasData("AttachedComponents"))
             {
-                target.SetData("AttachedComponents", comps);
+                comps = target.GetData<List<KeyValuePair<long, long>>>("AttachedComponents");
             }
-            else comps = target.GetData<List<KeyValuePair<int, int>>>("AttachedComponents");
 
-            comps.Add(new KeyValuePair<int, int>(weaponhash, componenthash));
+            comps.Add(new KeyValuePair<long, long>(weaponhash, componenthash));
             target.SetData("AttachedComponents", comps);
 
             target.SetSharedData("ComponentSyncTrigger", new Random(DateTimeOffset.UtcNow.Millisecond).Next());
-            foreach (Player p in RAGE.Entities.Players.All)
+            foreach (Player p in Settings.LoggedInPlayers)
             {
                 if (p.Dimension == target.Dimension)
                 {
@@ -887,7 +895,7 @@ namespace RNC
                                 {
                                     i.Value.Components.ForEach((long comphash) =>
                                     {
-                                        EPlayer.AttachComponent(player, (int)i.Key, (int)comphash);
+                                        EPlayer.AttachComponent(player, i.Key, comphash);
                                     });
                                 }
                             }
@@ -983,7 +991,7 @@ namespace RNC
                                 {
                                     i.Value.Components.ForEach((long comphash) =>
                                     {
-                                        EPlayer.AttachComponent(player, (int)i.Key, (int)comphash);
+                                        EPlayer.AttachComponent(player, i.Key, comphash);
                                     });
                                 }
                             }

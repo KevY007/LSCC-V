@@ -1473,8 +1473,9 @@ mp.events.add(
         if(status) AFOB_SpeedLimit = speedLimit;
     },
 
-    "SyncServerSettings": (onfootcollisions) => {
+    "SyncServerSettings": (onfootcollisions, cameraUpdateTime) => {
         ServerSettings.OnfootCollisions = onfootcollisions;
+        ServerSettings.CameraUpdateTime = cameraUpdateTime;
     },
     "ToggleClientRadio": () => {
         radioToggle = !radioToggle;

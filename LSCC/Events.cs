@@ -89,20 +89,78 @@ namespace RNC
             }, 2000);
         }
 
+        [RemoteEvent("UpdateAimingState")]
+        public void OnUpdateAimingState(Player player, bool state)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (state) player.SetSharedData("IsAiming", state);
+            else player.ResetSharedData("IsAiming");
+        }
+
+        [RemoteEvent("UpdateCameraDir")]
+        public void OnUpdateCameraDirection(Player player, float x, float y, float z)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (x == -1.0 && y == -1.0 && z == -1.0)
+            {
+                player.ResetSharedData("CameraDirectionX");
+                player.ResetSharedData("CameraDirectionY");
+                player.ResetSharedData("CameraDirectionZ");
+            }
+            else
+            {
+                player.SetSharedData("CameraDirectionX", x);
+                player.SetSharedData("CameraDirectionY", y);
+                player.SetSharedData("CameraDirectionZ", z);
+            }
+        }
+
         [ServerEvent(Event.PlayerWeaponSwitch)]
         public void OnPlayerWeaponSwitch(Player player, WeaponHash oldWeapon, WeaponHash newWeapon)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
+            player.ResetSharedData("FlashlightEquipped");
+            player.ResetSharedData("UpdateCameraData");
+
             if (newWeapon != WeaponHash.Unarmed)
             {
                 try
                 {
-                    foreach (Player p in RAGE.Entities.Players.All)
+                    if (newWeapon == WeaponHash.Flashlight)
                     {
-                        if (p.Dimension == player.Dimension && p.Position.DistanceTo(player.Position) < 1000.0)
+                        player.SetSharedData("FlashlightEquipped", true);
+                        player.SetSharedData("UpdateCameraData", true);
+                    }
+
+                    if (player.HasData("AttachedComponents"))
+                    {
+                        List<KeyValuePair<long, long>> comps = player.GetData<List<KeyValuePair<long, long>>>("AttachedComponents");
+
+                        jWeaponData wepdat;
+                        if (Settings.WeaponData.TryGetValue(Convert.ToInt64(newWeapon), out wepdat))
                         {
-                            EPlayer.SyncComponents(p, player, (int)newWeapon);
+                            var allFlashlights = wepdat.Components.Where(a => a.Value.Name.Contains("Flashlight")).ToList();
+
+                            foreach (var flashlights in allFlashlights)
+                            {
+                                if(comps.Contains(new KeyValuePair<long, long>(Convert.ToInt64(newWeapon), flashlights.Key)))
+                                {
+                                    player.SetSharedData("FlashlightEquipped", true);
+                                    player.SetSharedData("UpdateCameraData", true);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    foreach (Player p in Settings.LoggedInPlayers)
+                    {
+                        if (p.Dimension == player.Dimension && p.Position.DistanceTo(player.Position) < 500.0)
+                        {
+                            EPlayer.SyncComponents(p, player, Convert.ToInt64(newWeapon));
                         }
                     }
                 }
@@ -3081,6 +3139,8 @@ namespace RNC
 
             player.SetData("SpawnTick", Environment.TickCount64);
             player.ResetData("Dead");
+            player.ResetSharedData("FlashlightEquipped");
+            player.ResetSharedData("UpdateCameraData");
             player.SetSharedData("Collisions", true); // Reset collision from chase.
             player.SetSharedData("ClimbProtection", false);
             player.SetData("LastClimbProtection", Environment.TickCount64-30000);
