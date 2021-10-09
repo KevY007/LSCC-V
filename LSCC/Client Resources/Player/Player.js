@@ -1030,7 +1030,7 @@ mp.events.add('render', () => {
                             mp.players.forEach(occupant => {
                                 if(occupant.isInVehicle(target.handle, false)) {
                                     vehicleOccupants++;
-                                    if(occupant.Team == 0 && occupant.getVariable("HasShot") == true) {
+                                    if(occupant.Team == 0 && occupant.getVariable("HasShot") == true && !occupant.isDead()) {
                                         clickDisable = false; // Don't break shot if there's a fugitive that shot in!
                                     }
                                 }
@@ -1074,7 +1074,7 @@ mp.events.add('render', () => {
                                     else {
                                         mp.players.forEach(occupant => {
                                             if(occupant.isInVehicle(target.vehicle.handle, true) && occupant.Team == target.Team && 
-                                            occupant.getVariable("HasShot") == true) {
+                                            occupant.getVariable("HasShot") == true && !occupant.isDead()) {
                                                 clickDisable = false;
                                             }
                                         });
@@ -1197,7 +1197,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                     return true;
                 }
 
-                if(player.weapon == 911657153 && targetEntity.getVariable("HasShot") == true && targetEntity.Team == 0)
+                if(player.weapon == 911657153 && (targetEntity.getVariable("HasShot") == true || chaseTimeCur < 60) && targetEntity.Team == 0)
                 {
                     return true;
                 }
@@ -1301,20 +1301,22 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 {
                     if(targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
                     {
-                        if(weapon != 911657153) return true;
+                        if(weapon != 911657153) return true; // cant damage dem at alll if thy havent shot unless taser
 
-                        if(weapon == 911657153 && (BigInt(Math.round((new Date()).getTime() / 1000)) - BigInt(targetEntity.getVariable("LastVehEnterExit"))) <= BigInt(7) 
+                        if(chaseTimeCur < 60) return true; // nah not at da start
+
+                        if((BigInt(Math.round((new Date()).getTime() / 1000)) - BigInt(targetEntity.getVariable("LastVehEnterExit"))) <= BigInt(7) 
                             && targetEntity.Team == 0)
                         {
                             mp.game.graphics.notify("~r~Cannot tase! Target exiting vehicle!");
                             return true;
                         }
 
-                        if(weapon == 911657153 && targetEntity.Team == 0 && targetEntity.getVariable("HasShot") == true) {
+                        if(targetEntity.Team == 0 && targetEntity.getVariable("HasShot") == true) {
                             return true;
                         }
 
-                        if(weapon == 911657153 && (targetEntity.isInAnyVehicle(false) == true || 
+                        if((targetEntity.isInAnyVehicle(false) == true || 
                             calcDist(targetEntity.position, player.position) > 7.5)) {
 
                             mp.game.graphics.notify("~r~Taser out of reach, get closer!");
@@ -1342,6 +1344,12 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 let breakShot = false;
                 var vehicleOccupants = 0;
 
+                if(weapon == 911657153)
+                {
+                    breakShot = true;
+                    mp.console.logInfo("Taser does not work for vehicles. (2)");
+                }
+
                 if(targetEntity.Team == player.Team)
                 {
                     breakShot = true; // Break team-kill car by default
@@ -1366,7 +1374,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     mp.players.forEach(occupant => {
                         if(occupant.isInVehicle(targetEntity.handle, false)) {
                             vehicleOccupants++;
-                            if(occupant.Team == 0 && occupant.getVariable("HasShot") == true) {
+                            if(occupant.Team == 0 && occupant.getVariable("HasShot") == true && !occupant.isDead()) {
                                breakShot = false; // Don't break shot if there's a fugitive that shot in!
                             }
                         }
@@ -1376,6 +1384,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
 
                     if(breakShot) mp.game.graphics.notify("~r~Do not deathmatch!");
                 }
+
                 if(breakShot == true) return true;
             }
         }

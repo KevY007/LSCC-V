@@ -2526,7 +2526,7 @@ namespace RNC
 
                     if (target.HasData("TasedTill") && Environment.TickCount64 - (target.GetData<long>("TasedTill") - 18000) >= 2000)
                     {
-                        if (lobby.GameProgress < 25)
+                        if (lobby.GameProgress < 60)
                         {
                             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot tase at the start of the round!");
                             return;
@@ -2660,7 +2660,16 @@ namespace RNC
         [RemoteEvent("RequestCuffTarget")]
         public void OnRequestCuffTarget(Player player)
         {
+            if (!EPlayer.LoggedIn(player)) return;
+
             if (player.GetSharedData<int>("Team") != 1 || player.IsInVehicle) return;
+
+            LobbyData playerLobby = Settings.Lobbies.Find(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
+
+            if (playerLobby == null || playerLobby.GameProgress < 60)
+            {
+                return;
+            }
 
             Player target = Settings.LoggedInPlayers.Find(
                 p => p.Position.DistanceTo(player.Position) < 3.0f

@@ -1589,7 +1589,7 @@ namespace RNC
                 return;
             }
 
-            if (lobby.GameProgress < 25)
+            if (lobby.GameProgress < 60)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot cuff right at the start of the game!");
                 return;
@@ -1730,7 +1730,7 @@ namespace RNC
                 return;
             }
 
-            if (lobby.GameProgress < 25)
+            if (lobby.GameProgress < 60)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot dragout at the start of the game!");
                 return;
