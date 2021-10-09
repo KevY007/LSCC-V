@@ -4328,6 +4328,7 @@ namespace RNC
             player.SendChatMessage("!{#FF6347}[L] !{#FFFFFF}Lock/unlock vehicle");
             player.SendChatMessage("!{#FF6347}[X] !{#FFFFFF}Rapple from a !{#FFFF00}supported !{#FFFFFF}helicopter");
             player.SendChatMessage("!{#FF6347}[F7] !{#FFFFFF}Hide/show HUD & chat (Hold !{#FF0000}SHIFT+F7 !{#FFFFFF}to toggle nametags)");
+            player.SendChatMessage("!{#FF6347}[F6] !{#FFFFFF}Toggle weapon crosshair/reticule");
             player.SendChatMessage("!{#FF6347}[B] !{#FFFFFF}Toggle silent siren in !{#0097FF}police !{#FFFFFF}vehicles");
             player.SendChatMessage("!{#FF6347}[H] !{#FFFFFF}Cuff a !{#FFAE00}fugitive");
             player.SendChatMessage("!{#FF6347}[J] !{#FFFFFF}Close/open vehicle's (must be unlocked) !{#FFAE00}trunk/hood");
@@ -8313,6 +8314,7 @@ namespace RNC
 
             player.SetData("Spec_Dimension", player.Dimension);
             player.SetData("Spec_Pos", player.Position);
+            player.TriggerEvent("showHPBars", 1);
             player.SetSharedData("EntAlpha", 0);
 
             player.Dimension = target.Dimension;

@@ -1946,6 +1946,7 @@ namespace RNC
                         player.TriggerEvent("moveSkyCamera", "down", 1, false, 5000);
                         player.TriggerEvent("ToggleNametags", false);
                         player.SetSharedData("Collisions", false);
+                        EPlayer.Freeze(player, false);
                         player.RemoveAllWeapons();
                         player.Health = 100;
                         player.Armor = 0;

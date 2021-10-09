@@ -606,6 +606,7 @@ namespace RNC
             player.SetSharedData("Collisions", true); // Reset collision from chase.
             player.SetSharedData("CuffedBy", "n/a");
             player.ResetData("FreezeWeapons");
+            player.SetData("Dead", Environment.TickCount64);
 
             string reasonStr;
             bool wasInGame = false;
@@ -2017,44 +2018,47 @@ namespace RNC
             Pickup newPickup = new Pickup(NAPI.Util.GetHashKey("prop_box_ammo07b"), new Vector3(x, y, z), 2.0f, dimension, false, Pickups.ToPropLighting(255f, 255f, 255f, 1.0f, 1.5f, 0.5f));
 
             newPickup.SetData("AmmoBox", player.GetData<Dictionary<string, int>>("CreatingAmmoBox"));
-            newPickup.SetData("Creator", player.Name);
             player.ResetData("CreatingAmmoBox");
             lobby.Drops.Add(newPickup);
 
             newPickup.OnPickup = (guy) =>
             {
-                if (guy.Dead || newPickup.GetData<string>("Creator").Equals(guy.Name)) return;
-
-                var ammoBox = newPickup.GetData<Dictionary<string, int>>("AmmoBox");
-                string notificationString = "";
-                foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
+                if (!guy.Dead && guy.Health > 0 && !guy.HasData("Dead") && guy.Position.DistanceTo(newPickup.position) < 20.0) // so if player dies he isnt picking it up
                 {
-                    if (guy.GetWeaponAmmo((WeaponHash)i.Key) > 0 || guy.CurrentWeapon == (WeaponHash)i.Key || (WeaponHash)i.Key == WeaponHash.Bzgas)
+                    if (Environment.TickCount64 - 10000 > guy.GetData<long>("SpawnTick")) // spawned like more than 10 seconds ago
                     {
-                        if (i.Value.AmmoType != null)
+                        var ammoBox = newPickup.GetData<Dictionary<string, int>>("AmmoBox");
+                        string notificationString = "";
+                        foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
                         {
-                            int weaponAmmo = 0;
-                            if (ammoBox.TryGetValue(i.Value.AmmoType, out weaponAmmo))
+                            if (guy.GetWeaponAmmo((WeaponHash)i.Key) > 0 || guy.CurrentWeapon == (WeaponHash)i.Key || (WeaponHash)i.Key == WeaponHash.Bzgas)
                             {
-                                guy.SetWeaponAmmo((WeaponHash)i.Key, guy.GetWeaponAmmo((WeaponHash)i.Key) + weaponAmmo);
-                                notificationString = notificationString + $"<p>+{weaponAmmo} ammo to <strong>{i.Value.Name}</strong></p>";
-                                ammoBox.Remove(i.Value.AmmoType);
+                                if (i.Value.AmmoType != null)
+                                {
+                                    int weaponAmmo = 0;
+                                    if (ammoBox.TryGetValue(i.Value.AmmoType, out weaponAmmo))
+                                    {
+                                        guy.SetWeaponAmmo((WeaponHash)i.Key, guy.GetWeaponAmmo((WeaponHash)i.Key) + weaponAmmo);
+                                        notificationString = notificationString + $"<p>+{weaponAmmo} ammo to <strong>{i.Value.Name}</strong></p>";
+                                        ammoBox.Remove(i.Value.AmmoType);
+                                    }
+                                }
                             }
                         }
-                    }
-                }
-                
-                newPickup.SetData("AmmoBox", ammoBox);
-                if (notificationString.Length >= 3)
-                {
-                    EPlayer.Action(player, "restocks from an ammunition box.");
-                    EPlayer.Notify(player, notificationString, "green", "fas fa-boxes", false, 2000, "bottomRight");
-                }
 
-                if (ammoBox.Count == 0)
-                {
-                    lobby.Drops.Remove(newPickup);
-                    newPickup.Destroy();
+                        newPickup.SetData("AmmoBox", ammoBox);
+                        if (notificationString.Length >= 3)
+                        {
+                            EPlayer.Action(guy, "restocks from an ammunition box.");
+                            EPlayer.Notify(guy, notificationString, "green", "fas fa-boxes", false, 2000, "bottomRight");
+                        }
+
+                        if (ammoBox.Count == 0)
+                        {
+                            lobby.Drops.Remove(newPickup);
+                            newPickup.Destroy();
+                        }
+                    }
                 }
             };
         }
@@ -3075,6 +3079,8 @@ namespace RNC
 
             if (player == null || !player.Exists) return;
 
+            player.SetData("SpawnTick", Environment.TickCount64);
+            player.ResetData("Dead");
             player.SetSharedData("Collisions", true); // Reset collision from chase.
             player.SetSharedData("ClimbProtection", false);
             player.SetData("LastClimbProtection", Environment.TickCount64-30000);

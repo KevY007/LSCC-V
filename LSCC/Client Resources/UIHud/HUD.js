@@ -26,6 +26,8 @@ var miniHUDVars = {
     packetloss: 0.0,
 };
 
+var showReticule = true;
+
 let speedo = false;
 let speedoMax = 0.0;
 let speedoCur = 0.0;
@@ -322,6 +324,10 @@ mp.events.add('ToggleHud', (toggle) => {
 
     mp.gui.chat.show(showHud);
     mp.game.ui.displayRadar(showHud);
+});
+
+mp.keys.bind(0x75, false, () => {
+    showReticule = !showReticule;
 });
 
 mp.events.add('ResetKillFeed', () => {
@@ -671,6 +677,11 @@ mp.events.add("render", () => {
     mp.game.ui.hideHudComponentThisFrame(3); // cash
     mp.game.ui.hideHudComponentThisFrame(4); // mp_cash
     mp.game.ui.displayAmmoThisFrame(false); // HIDE AMMO
+
+    if(!showReticule)
+    {
+        mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
+    }
 
     if(mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
     {       

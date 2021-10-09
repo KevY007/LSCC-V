@@ -94,8 +94,6 @@ Added Huntley from GTA 4.
 Fixed the police lights on the Charger mod.
 Weapon sounds and models have been improved/changed.
 Mustang '66 Fastback mod has been removed and replaced by Vapid Dominator GTT (dominator8)
-
-LEFT TO TEST:
 Fugitive anti tase etc for starting 60 seconds. 
-One more go at anti tire tasing, should probably work now.
+Anti tire tasing should probably work now.
 Vehicles won't get damage if fugitive inside it that shot has died already.

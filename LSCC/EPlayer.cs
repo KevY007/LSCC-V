@@ -491,6 +491,8 @@ namespace RNC
             lock (player)
             {
                 player.ResetData("Kicked");
+                player.ResetData("Dead");
+                player.SetData("SpawnTick", Environment.TickCount64);
                 player.ResetData("AccountHandle");
                 player.ResetData("CompNoRefundWarn");
                 player.ResetData("TunerNoRefundWarn");
@@ -1388,6 +1390,7 @@ namespace RNC
 
             player.TriggerEvent("DestroyPlayerCamera");
             player.TriggerEvent("TogglePlayerChat", true);
+            player.ResetData("Dead");
 
             if (player.HasData("DerbyVehicle"))
             {
