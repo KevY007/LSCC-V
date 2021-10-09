@@ -1992,7 +1992,6 @@ namespace RNC
                     {
                         found = true;
                         itemData = i.Value;
-                        break;
                     }
                 }
                 else
@@ -2038,7 +2037,6 @@ namespace RNC
                     {
                         found = true;
                         comp = item.Value;
-                        break;
                     }
                 }
                 else
@@ -2167,7 +2165,6 @@ namespace RNC
                     {
                         found = true;
                         itemData = i.Value;
-                        break;
                     }
                 }
                 else
@@ -2213,7 +2210,6 @@ namespace RNC
                     {
                         found = true;
                         comp = item.Value;
-                        break;
                     }
                 }
                 else
@@ -2329,7 +2325,6 @@ namespace RNC
                     {
                         found = true;
                         itemData = i.Value;
-                        break;
                     }
                 }
             }
@@ -2357,7 +2352,6 @@ namespace RNC
                     {
                         found = true;
                         comp = item.Value;
-                        break;
                     }
                 }
                 else
@@ -2424,7 +2418,6 @@ namespace RNC
                     {
                         found = true;
                         itemData = i.Value;
-                        break;
                     }
                 }
             }
@@ -2452,7 +2445,6 @@ namespace RNC
                     {
                         found = true;
                         comp = item.Value;
-                        break;
                     }
                 }
                 else
@@ -2713,7 +2705,6 @@ namespace RNC
                     {
                         found = true;
                         itemData = i.Value;
-                        break;
                     }
                 }
             }
@@ -2741,7 +2732,6 @@ namespace RNC
                     {
                         found = true;
                         comp = item.Value;
-                        break;
                     }
                 }
                 else
@@ -2938,7 +2928,6 @@ namespace RNC
                     {
                         found = true;
                         wepname = i.Value.Name;
-                        break;
                     }
                 }
                 else
@@ -2969,7 +2958,6 @@ namespace RNC
                     {
                         found = true;
                         wepname = i.Value;
-                        break;
                     }
                 }
                 else
@@ -3039,7 +3027,6 @@ namespace RNC
                     {
                         found = true;
                         wepname = i.Value.Name;
-                        break;
                     }
                 }
                 else
@@ -3070,7 +3057,6 @@ namespace RNC
                     {
                         found = true;
                         wepname = i.Value;
-                        break;
                     }
                 }
                 else
@@ -3174,7 +3160,6 @@ namespace RNC
                     {
                         found = true;
                         wepname = i.Value.Name;
-                        break;
                     }
                 }
                 else
@@ -3205,7 +3190,6 @@ namespace RNC
                     {
                         found = true;
                         wepname = i.Value;
-                        break;
                     }
                 }
                 else
@@ -3215,7 +3199,6 @@ namespace RNC
                         found = true;
                         wephash = i.Key;
                         wepname = i.Value;
-                        break;
                     }
                 }
             }
