@@ -4930,7 +4930,7 @@ namespace RNC
         }
 
         [Command("checkbanevaders", Alias = "checkallplayers")]
-        public void cmd_checkbanevaders(Player player, string accountname)
+        public void cmd_checkbanevaders(Player player)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
