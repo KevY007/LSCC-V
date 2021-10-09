@@ -614,6 +614,11 @@ mp.events.add('render', () => {
             }
         }
 
+        if(AFOB_LastF > Date.now() - 4000 && !mp.players.local.isInAnyVehicle(false))
+        {
+            AFOB_LastVeh = null;
+        }
+
         if(clickDisable) 
         { 
             mp.game.controls.disableControlAction(32, 257, true); 
