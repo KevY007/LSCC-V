@@ -460,8 +460,15 @@ namespace RNC
                     {
                         lobby.GameAutoStart = !lobby.GameAutoStart;
                         Logs.LogAdmin(player, $"Toggled autostart in lobby {lobby.lobbyId} to " + (lobby.GameAutoStart == true ? "ON" : "OFF"));
-                        if (lobby.GameAutoStart) NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~g~has enabled copchases for lobby {lobby.lobbyId}.");
-                        else NAPI.Notification.SendNotificationToAll($"~r~<C>{player.Name}</C> ~w~has disabled copchases for lobby {lobby.lobbyId}.");
+
+                        if (lobby.GameAutoStart)
+                        {
+                            Settings.LoggedInPlayers.ForEach(target => EPlayer.Notify(target, $"<strong>{player.Name}</strong> has enabled copchases in <strong>lobby {lobby.lobbyId}</strong>.", "green", "fas fa-check", false, 1500, "bottomCenter", "replace"));
+                        }
+                        else
+                        {
+                            Settings.LoggedInPlayers.ForEach(target => EPlayer.Notify(target, $"<strong>{player.Name}</strong> has disabled copchases in <strong>lobby {lobby.lobbyId}</strong>.", "red", "fas fa-ban", false, 1500, "bottomCenter", "replace"));
+                        }
                     }
                     else NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}The lobby id is invalid or doesn't exist.");
                 }
@@ -3329,12 +3336,12 @@ namespace RNC
 
             if (player.GetData<bool>("AutoJoin") == true)
             {
-                player.SendNotification("~r~AutoJoin has been turned off.", false);
+                EPlayer.Notify(player, $"AutoJoin has been turned <strong>OFF</strong>.", "red", "fas fa-check", false, 1500, "bottomCenter", "replace");
                 player.SetData("AutoJoin", false);
             }
             else
             {
-                player.SendNotification("~w~AutoJoin has been turned on.", false);
+                EPlayer.Notify(player, $"AutoJoin has been turned <strong>ON</strong>.", "green", "fas fa-check", false, 1500, "bottomCenter", "replace");
                 player.SetData("AutoJoin", true);
             }
         }
@@ -4757,7 +4764,7 @@ namespace RNC
             if(target != null)
             {
                 target.SendChatMessage("!{#FF6347} Reconnect with your new name: !{#FFFFFF}" + newname);
-                target.SendNotification("Name changed to ~r~" + newname);
+                EPlayer.Notify(target, $"Please reconnect with your new name: {newname}", "green", "fas fa-check", false, 3000, "center", "replace");
 
                 EPlayer.Save(target);
                 target.ResetData("AccountHandle");
@@ -4861,7 +4868,7 @@ namespace RNC
             if (target != null)
             {
                 target.SendChatMessage("!{#FF6347} Your password has been changed to: !{#FFFFFF}" + newpass);
-                target.SendNotification("Password changed to ~r~" + newpass);
+                EPlayer.Notify(target, $"Your password has been changed to <p><strong>{newpass}</strong></p>", "green", "fas fa-check", false, 3000, "center", "replace");
             }
 
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:changepass:{name}"); } catch { }
@@ -4897,7 +4904,7 @@ namespace RNC
             }
 
             player.SendChatMessage("!{#33C446}[>>] !{#FFFFFF}Your password has been changed to: !{#33C446}" + newpass);
-            player.SendNotification("Password changed to ~r~" + newpass);
+            EPlayer.Notify(player, $"Your password has been changed to <p><strong>{newpass}</strong></p>", "green", "fas fa-check", false, 3000, "center", "replace");
 
             string salt = AccountManager.GenSalt();
             string password = AccountManager.Crypt(newpass, salt);
@@ -7881,13 +7888,13 @@ namespace RNC
 
                 if (target.GetData<bool>("AutoJoin") == true)
                 {
-                    target.SendNotification("~r~AutoJoin has been turned off by ~y~" + player.Name + ".", false);
+                    EPlayer.Notify(target, $"AutoJoin has been turned <strong>OFF</strong> by {player.Name}.", "red", "fas fa-check", false, 1500, "bottomCenter", "replace");
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target's auto join has been turned off!");
                     target.SetData("AutoJoin", false);
                 }
                 else
                 {
-                    target.SendNotification("~w~AutoJoin has been turned on by ~y~" + player.Name + ".", false);
+                    EPlayer.Notify(target, $"AutoJoin has been turned <strong>OFF</strong> by {player.Name}.", "green", "fas fa-check", false, 1500, "bottomCenter", "replace");
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target's auto join has been turned on!");
                     target.SetData("AutoJoin", true);
                 }

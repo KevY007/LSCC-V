@@ -2170,7 +2170,10 @@ namespace RNC
         {
             if (player.GetSharedData<int>("Team") == 0)
             {
-                if(player.GetSharedData<bool>("HasShot") == false) player.SendNotification("~r~You have now shot, opposite team can now safely shoot you and detect you.");
+                if (player.GetSharedData<bool>("HasShot") == false)
+                {
+                    EPlayer.Notify(player, $"You have now shot, <strong>cops can now kill you on sight.</strong>", "red", "fas fa-walking", false, 1500, "bottomCenter", "replace");
+                }
 
                 player.SetSharedData("HasShot", true);
                 player.SetSharedData("VisibleBlip", true);

@@ -1321,7 +1321,7 @@ namespace RNC
                     if(lvlDiff > 1) pl.SendChatMessage($"!{{#00BA03}}[LEVEL UP] {player.Name} has levelled up +{lvlDiff} times to {acc.Level}!");
                     else pl.SendChatMessage($"!{{#00BA03}}[LEVEL UP] {player.Name} has levelled up to {acc.Level}!");
                 });
-                player.SendNotification($"~w~You have levelled up to ~g~{acc.Level}~w~!");
+                EPlayer.Notify(player, $"You have <strong>levelled up</strong> to <strong>{acc.Level}</strong>.", "green", "fas fa-check", false, 1500, "bottomRight", "replace");
 
                 player.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
                 try { NAPI.Task.Run(() => player.TriggerEvent("ShakeCam", "VIBRATE_SHAKE", 7.0f, 2000), 1000); } catch { }
@@ -1333,7 +1333,7 @@ namespace RNC
                     if (lvlDiff < -1) pl.SendChatMessage($"!{{#FF6347}}[LEVEL DOWN] {player.Name} has levelled down {lvlDiff} times to {acc.Level}!");
                     else pl.SendChatMessage($"!{{#FF6347}}[LEVEL DOWN] {player.Name} has levelled down to {acc.Level}!");
                 });
-                player.SendNotification($"~w~You have levelled down to ~r~{acc.Level}~w~!");
+                EPlayer.Notify(player, $"You have <strong>levelled down</strong> to <strong>{acc.Level}</strong>.", "red", "fas fa-cross", false, 1500, "bottomRight", "replace");
 
                 player.TriggerEvent("PlayMissionComplete", "GENERIC_FAILED");
                 try { NAPI.Task.Run(() => player.TriggerEvent("ShakeCam", "VIBRATE_SHAKE", 3.0f, 1500), 1000); } catch { }
@@ -1410,7 +1410,7 @@ namespace RNC
 
             if (forceAutojoin && player.GetData<bool>("AutoJoin") == false)
             {
-                NAPI.Notification.SendNotificationToPlayer(player, $"~g~Autojoin has been enabled.", false);
+                EPlayer.Notify(player, $"AutoJoin has been turned <strong>ON</strong>.", "green", "fas fa-check", false, 1500, "bottomRight", "replace");
                 player.SetData("AutoJoin", true);
             }
 
