@@ -1710,17 +1710,20 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            if (!player.HasData("LastLobbySwitch"))
+            if (!player.HasData("DMLobbySkipID"))
             {
-                player.SetData<long>("LastLobbySwitch", Environment.TickCount64);
-            }
-            else
-            {
-                if (Environment.TickCount64 - player.GetData<long>("LastLobbySwitch") < 1000)
+                if (!player.HasData("LastLobbySwitch"))
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot switch minigames that fast.");
-                    EPlayer.Notify(player, "Please don't repeatedly join minigames.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
-                    return;
+                    player.SetData<long>("LastLobbySwitch", Environment.TickCount64);
+                }
+                else
+                {
+                    if (Environment.TickCount64 - player.GetData<long>("LastLobbySwitch") < 1000)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot switch minigames that fast.");
+                        EPlayer.Notify(player, "Please don't repeatedly join minigames.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                        return;
+                    }
                 }
             }
 
@@ -1839,7 +1842,7 @@ namespace RNC
                     {
                         i,
                         Regex.Replace(Regex.Replace(Settings.DMNames[i], @"\(.*\)", ""), @"\s+", " "),
-                        dmBgs.OrderBy(c => Guid.NewGuid()).First(),
+                        (dmBgs.Length > i) ? dmBgs[i] : dmBgs.OrderBy(c => Guid.NewGuid()).First(),
                         Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == i),
                         7 + (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")) / 3),
                         "DM",
@@ -2549,7 +2552,7 @@ namespace RNC
         {
             if (weapon == (uint)WeaponHash.Stungun)
             {
-                if(player.GetSharedData<int>("InDM") == 7 && target.GetSharedData<int>("InDM") == 7)
+                if(player.GetSharedData<int>("InDM") == 6 && target.GetSharedData<int>("InDM") == 6)
                 {
                     //target.Health = 0;
                     return;
@@ -3451,7 +3454,7 @@ namespace RNC
                             {
                                 if (player != null && player.Exists)
                                 {
-                                    if (arenaID != 1 && arenaID != 4 && arenaID != 6 && arenaID != 7)
+                                    if (arenaID != 1 && arenaID != 5 && arenaID != 6)
                                     {
                                         switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 5))
                                         {
@@ -3494,21 +3497,13 @@ namespace RNC
                                             case 1:
                                                 player.GiveWeapon(WeaponHash.Pistol_mk2, 1000);
                                                 break;
-                                            case 4:
-                                                player.GiveWeapon(WeaponHash.Marksmanrifle, 1000);
-                                                player.GiveWeapon(WeaponHash.Specialcarbine_mk2, 1000);
-                                                player.GiveWeapon(WeaponHash.Bullpupshotgun, 1000);
-                                                player.GiveWeapon(WeaponHash.Combatpdw, 1000);
-                                                player.GiveWeapon(WeaponHash.CeramicPistol, 1000);
-                                                player.GiveWeapon(WeaponHash.Snowball, 1000);
-                                                break;
-                                            case 6:
+                                            case 5:
                                                 player.GiveWeapon(WeaponHash.Pistol, 1000);
                                                 player.GiveWeapon(WeaponHash.Pumpshotgun, 1000);
                                                 player.Armor = 0;
                                                 player.Health = 100;
                                                 break;
-                                            case 7:
+                                            case 6:
                                                 player.GiveWeapon(WeaponHash.Stungun, 1000);
                                                 player.Health = 1;
                                                 player.Armor = 0;

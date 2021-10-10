@@ -3483,17 +3483,20 @@ namespace RNC
 
             if (player.GetSharedData<int>("InLobby") == -5) return;
 
-            if (!player.HasData("LastLobbySwitch"))
+            if (!player.HasData("DMLobbySkipID"))
             {
-                player.SetData<long>("LastLobbySwitch", Environment.TickCount64);
-            }
-            else
-            {
-                if (Environment.TickCount64 - player.GetData<long>("LastLobbySwitch") < 1000)
+                if (!player.HasData("LastLobbySwitch"))
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot enter lobbies that fast.");
-                    EPlayer.Notify(player, "Please don't repeatedly join lobby.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
-                    return;
+                    player.SetData<long>("LastLobbySwitch", Environment.TickCount64);
+                }
+                else
+                {
+                    if (Environment.TickCount64 - player.GetData<long>("LastLobbySwitch") < 1000)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot enter lobbies that fast.");
+                        EPlayer.Notify(player, "Please don't repeatedly join lobby.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                        return;
+                    }
                 }
             }
 
@@ -3657,17 +3660,20 @@ namespace RNC
                 return;
             }
 
-            if (!player.HasData("LastLobbySwitch"))
+            if (!player.HasData("DMLobbySkipID"))
             {
-                player.SetData<long>("LastLobbySwitch", Environment.TickCount64);
-            }
-            else
-            {
-                if (Environment.TickCount64 - player.GetData<long>("LastLobbySwitch") < 1000)
+                if (!player.HasData("LastLobbySwitch"))
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot switch lobbies that fast.");
-                    EPlayer.Notify(player, "Please don't spam join lobby.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
-                    return;
+                    player.SetData<long>("LastLobbySwitch", Environment.TickCount64);
+                }
+                else
+                {
+                    if (Environment.TickCount64 - player.GetData<long>("LastLobbySwitch") < 1000)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot switch lobbies that fast.");
+                        EPlayer.Notify(player, "Please don't spam join lobby.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                        return;
+                    }
                 }
             }
 
