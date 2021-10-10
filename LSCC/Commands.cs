@@ -6372,14 +6372,48 @@ namespace RNC
             player.TriggerEvent("ResolveJS", eventt);
         }
 
-        [Command("vtuner", "!{#AFAFAF}[USAGE] vtuner (vehicle name) | Where 'name' must be same as in menu's car selection", GreedyArg = true)]
-        public void cmd_vtuner(Player player, string vmodel)
+        [Command("vtuner", "!{#AFAFAF}[USAGE] vtuner (cop / fugitive / help)")]
+        public void cmd_vtuner(Player player, string team = "help")
         {
+            if (!EPlayer.LoggedIn(player)) return;
+
             if (player.GetData<bool>("Tuner_Using") == true) return;
 
-            foreach(var car in Settings.Cars)
+            string vehicleModel = "?";
+
+            if(team.Equals("help", StringComparison.OrdinalIgnoreCase))
             {
-                if (car.Name.Equals(vmodel, StringComparison.OrdinalIgnoreCase)) vmodel = car.Model;
+                player.SendChatMessage("!{#33C446}=> Vehicle Tuner Help/Frequently Asked Questions <=");
+                player.SendChatMessage("!{#33C446}Q: How to use the vehicle tuner?");
+                player.SendChatMessage("!{#999999}A: Simply equip the vehicle you want to tune and do /vtuner (team of the vehicle set).");
+                player.SendChatMessage("!{#33C446}Q: What happens if I change vehicles?");
+                player.SendChatMessage("!{#999999}A: Every vehicle's tuning data is saved differently for players, so you can switch vehicles normally.");
+                player.SendChatMessage("!{#33C446}Q: What is the price?");
+                player.SendChatMessage("!{#999999}A: As you're tuning the vehicle, the price will be updated in the bottom of the menu list. The price starts at 50 points per component but once you cross the 3 component limit (except colors), the price shifts in terms of donator points which can be converted with /convertpoints");
+                player.SendChatMessage("!{#33C446}Q: How to get rid of modifications/color?");
+                player.SendChatMessage("!{#999999}A: To remove all modifications and colors, you have to reset all parts to None or -1 and if there's not a single part, it'll remove all modifications. Similarly if you want to just keep the color on vehicle, you need to buy/save at least one modification (non color) on the vehicle.");
+
+                player.SendChatMessage("!{#AFAFAF}[USAGE] vtuner !{#33C446}(cop / fugitive / help)");
+                return;
+            }
+            else if(team.Equals("cop", StringComparison.OrdinalIgnoreCase))
+            {
+                vehicleModel = EPlayer.GetAccount(player).CarCop;
+            }
+            else if(team.Equals("fugitive", StringComparison.OrdinalIgnoreCase))
+            {
+                vehicleModel = EPlayer.GetAccount(player).CarFugitive;
+            }
+            else
+            {
+                player.SendChatMessage("!{#AFAFAF}[USAGE] vtuner (cop / fugitive / help)");
+                return;
+            }
+            
+            if(vehicleModel.Equals("?") || vehicleModel.StartsWith("default", StringComparison.OrdinalIgnoreCase))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot tune the default 'randomized' vehicle!");
+                return;
             }
 
             if (player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("InLobby") != -4)
@@ -6393,7 +6427,7 @@ namespace RNC
             player.SetSharedData("InLobby", -5);
 
             uint dim = (uint)player.Id + 699;
-            Vehicle veh = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(vmodel), new Vector3(-372.2626f, -117.197556f, 38.08989f), 119.67291f, 64, 64, "KEVER", 255, true, true, dim);
+            Vehicle veh = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(vehicleModel), new Vector3(-372.2626f, -117.197556f, 38.08989f), 119.67291f, 64, 64, "KEVER", 255, true, true, dim);
             
             player.SetData("Tuner_Vehicle", veh);
 
@@ -6404,7 +6438,7 @@ namespace RNC
             player.TriggerEvent("CreatePlayerCamera", -373, -121, 39, -10, 0, -10, 60, true);
             player.TriggerEvent("SetTimeWeather", 12, 0, 0, 0);
 
-            EPlayer.Notify(player, "LMB to switch camera, menu keys to select, horn and lights can be used by default keys. <p>DISCLAIMER: Removing components is not refundable.</p>", "green", "fas fa-exclamation", false, 10000, "topCenter");
+            EPlayer.Notify(player, $"Now tuning: {vehicleModel}<p>LMB to switch camera, menu keys to select, horn and lights can be used by default keys.</p> <p>DISCLAIMER: Removing components is not refundable.</p>", "green", "fas fa-exclamation", false, 10000, "topCenter");
            
             var inst = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.Model == veh.Model && a.AccountSQLID == EPlayer.GetAccount(player).SQL_ID);
             if (inst != null)

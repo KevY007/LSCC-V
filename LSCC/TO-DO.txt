@@ -4,7 +4,6 @@ interiors vro
 seatbelt (afob ripoff luL)
 TriggerJSAll
 TriggerJSP
-/vtuner (cop|fugitive|help) rather than vehicle name, tune currently selected vehicle woo, help will be ddefault like void cmd_vtuner(Player player, string opt="help")
 dragout button?? also disable multiple people dragging same guy
 
 buyammo with donator points
