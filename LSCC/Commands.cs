@@ -4238,8 +4238,8 @@ namespace RNC
             catch { player.SendChatMessage("!{#FF6347}[!!] Unknown error occured, ask kevy to check da cooomsole."); }
         }
 
-        [Command("putinveh", "!{#AFAFAF}[USAGE] putinveh (target) (player) | \"Target\" is put inside \"player\"'s vehicle.", Alias = "piv, putinvehicle")]
-        public void cmd_putinveh(Player player, Player target, Player toputin)
+        [Command("putinveh", "!{#AFAFAF}[USAGE] putinveh (target) (player) (optional: seatid) | \"Target\" is put inside \"player\"'s vehicle.", Alias = "piv, putinvehicle")]
+        public void cmd_putinveh(Player player, Player target, Player toputin, int seat = 0)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
@@ -4255,7 +4255,7 @@ namespace RNC
                 return;
             }
 
-            int nextseat = 1;
+            int nextseat = seat;
             while (Settings.LoggedInPlayers.Count(a => a.IsInVehicle && a.Vehicle == toputin.Vehicle && a.VehicleSeat == nextseat) >= 1)
             {
                 nextseat++;
