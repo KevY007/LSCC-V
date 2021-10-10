@@ -1,9 +1,10 @@
 ﻿FORMAT: ADDED BY - ITEM.
 
 interiors vro
+seatbelt (afob ripoff luL)
+/vtuner (cop|fugitive|help) rather than vehicle name, tune currently selected vehicle woo, help will be ddefault like void cmd_vtuner(Player player, string opt="help")
+Rapple tooltip (use class etc or supported vehs from the rapple.js command code)
 dragout button?? also disable multiple people dragging same guy
-
-INTENSIVE TESTING LEFT GAME SPAWNING AND SHIT
 
 buyammo with donator points
 #bug reports and other chans sugeestion
