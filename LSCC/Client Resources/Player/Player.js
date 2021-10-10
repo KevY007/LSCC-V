@@ -590,39 +590,42 @@ mp.events.add('render', () => {
     {
         mp.game.player.restoreStamina(100);
 
-        if(AFOB_Enabled === true && !mp.players.local.isDead() && !mp.players.local.isSwimming() && !mp.players.local.isInAnyVehicle(false))
+        if(AFOB_Enabled === true && !mp.players.local.isDead() && !mp.players.local.isSwimming())
         {
-            if(AFOB_LastVeh !== null && mp.vehicles.exists(AFOB_LastVeh) && AFOB_LastVeh.handle !== 0 &&
-             (AFOB_LastVeh.getClass() == 8 || AFOB_LastVeh.model == mp.game.joaat('policeb')))
+            if(AFOB_LastF > Date.now() - 4000 && !mp.players.local.isInAnyVehicle(false))
             {
-                if(AFOB_LastF < Date.now()-4000 && AFOB_LastSpeed <= AFOB_SpeedLimit)
+                AFOB_LastVeh = null;
+            }
+
+            if(AFOB_LastF < Date.now()-4000 && AFOB_LastSpeed <= AFOB_SpeedLimit)
+            {
+                if(mp.players.local.isInAnyVehicle(false) == false)
                 {
-                    mp.players.local.setIntoVehicle(AFOB_LastVeh.handle, AFOB_LastSeat);
-                    if(Date.now() > AFOB_LastMessage)
+                    if(AFOB_LastVeh != null && mp.vehicles.exists(AFOB_LastVeh) && AFOB_LastVeh.handle !== 0 &&
+                        (AFOB_LastVeh.getClass() == 8 || AFOB_LastVeh.model == mp.game.joaat('policeb')))
                     {
-                        AFOB_LastMessage = Date.now() + 60000;
-                        mp.gui.chat.push(`!{#FF6347}[!] !{#FFFFFF}Anti Fall Off Bike has put you back in the bike. To exit, press/spam F.`);
-                        //mp.gui.chat.push(`Setting into vehicle as last speed was ${AFOB_LastSpeed} under the limit ${AFOB_SpeedLimit}`);
+                    
+                        mp.players.local.setIntoVehicle(AFOB_LastVeh.handle, AFOB_LastSeat);
+                        if(Date.now() > AFOB_LastMessage)
+                        {
+                            AFOB_LastMessage = Date.now() + 60000;
+                            mp.gui.chat.push(`!{#FF6347}[!] !{#FFFFFF}Anti Fall Off Bike has put you back in the bike. To exit, press/spam F.`);
+                            //mp.gui.chat.push(`Setting into vehicle as last speed was ${AFOB_LastSpeed} under the limit ${AFOB_SpeedLimit}`);
+                        }
                     }
                 }
-            }
-        }
-        else if (AFOB_Enabled === true && !mp.players.local.isDead() && !mp.players.local.isSwimming() && mp.players.local.isInAnyVehicle(false))
-        {
-            if(AFOB_LastF < Date.now() - 4000)
-            {
-                AFOB_LastSpeed = Number((mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0));
-                AFOB_LastVeh = mp.players.local.vehicle;
+                else if(mp.players.local.vehicle != null && mp.players.local.vehicle.handle !== 0 && 
+                    (AFOB_LastVeh == null || !mp.vehicles.exists(AFOB_LastVeh) || AFOB_LastVeh.handle === 0 || 
+                    (AFOB_LastVeh.getClass() != 8 && AFOB_LastVeh.model != mp.game.joaat('policeb'))))
+                {
+                    AFOB_LastSpeed = Number((mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0));
+                    AFOB_LastVeh = mp.players.local.vehicle;
 
-                if(mp.players.local.vehicle.getPedInSeat(-1) == mp.players.local.handle) AFOB_LastSeat = -1;
-                if(mp.players.local.vehicle.getPedInSeat(0) == mp.players.local.handle) AFOB_LastSeat = 0;
-                if(mp.players.local.vehicle.getPedInSeat(1) == mp.players.local.handle) AFOB_LastSeat = 1;
+                    if(mp.players.local.vehicle.getPedInSeat(-1) == mp.players.local.handle) AFOB_LastSeat = -1;
+                    if(mp.players.local.vehicle.getPedInSeat(0) == mp.players.local.handle) AFOB_LastSeat = 0;
+                    if(mp.players.local.vehicle.getPedInSeat(1) == mp.players.local.handle) AFOB_LastSeat = 1;
+                }
             }
-        }
-
-        if(AFOB_LastF > Date.now() - 4000 && !mp.players.local.isInAnyVehicle(false))
-        {
-            AFOB_LastVeh = null;
         }
 
         if(clickDisable) 
@@ -1710,13 +1713,6 @@ mp.events.add(
     },
 
     "playerEnterVehicle": (vehicle, seat) => {
-        if(AFOB_Enabled === true && vehicle.getClass() == 8 && !mp.players.local.isDead() && !mp.players.local.isSwimming())
-        {
-            AFOB_LastF = Date.now();
-            AFOB_LastVeh = vehicle;
-            AFOB_LastSeat = seat;
-        }
-
         dbDisabledMsg = false;
         player.seat = seat;
         if(vehicle.Collisions == undefined || vehicle.Collisions == true) vehicle.setInvincible(false);
@@ -1738,13 +1734,6 @@ mp.events.add(
 
     "playerLeaveVehicle": (vehicle, seat) => {
         if (vehicle != null) {
-
-            if(AFOB_Enabled === true && AFOB_LastF < Date.now()-4000)
-            {
-                AFOB_LastSpeed = 0;
-                AFOB_LastF = Date.now();
-                AFOB_LastVeh = null;
-            }
 
             if(vehicle.getVariable("Engine") !== undefined)
                 vehicle.setEngineOn(vehicle.getVariable("Engine"), true, true);
