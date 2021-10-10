@@ -1989,9 +1989,10 @@ namespace RNC
                         player.TriggerEvent("ToggleNametags", false);
                         player.SetSharedData("Collisions", false);
                         EPlayer.Freeze(player, false);
+
                         player.RemoveAllWeapons();
                         player.Health = 100;
-                        player.Armor = 0;
+                        player.Armor = 0;  // ARMOR AND GEAR IS GIVEN ON COLLISIONS END
                         player.Dimension = Convert.ToUInt32(699 + player.Id);
 
                         if (lobby.gameMode == GameModes.STANDARD)
@@ -2048,9 +2049,7 @@ namespace RNC
                         }
                         catch { }
 
-                        player.Health = 100;
-                        player.Armor = 60;
-                        EPlayer.SetColor(player, new Color(0, 151, 255), player.Armor);
+                        EPlayer.SetColor(player, new Color(0, 151, 255), 0);
 
                         if (!PutInsideCar.Contains(player))
                         {
@@ -2228,9 +2227,7 @@ namespace RNC
 
                         EPlayer.Freeze(player, true);
 
-                        player.Health = 100;
-                        player.Armor = 0;
-                        EPlayer.SetColor(player, new Color(255, 174, 0), player.Armor);
+                        EPlayer.SetColor(player, new Color(255, 174, 0), 0);
 
                         EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Fugitive as {player.Name}");
 
@@ -2524,6 +2521,12 @@ namespace RNC
 
                                 p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
                                 p.SetSharedData("Collisions", false);
+
+                                p.RemoveAllWeapons();
+
+
+                                p.Health = 100;
+                                p.Armor = 0;
                             });
                             lobby.Cops.ForEach(p =>
                             {
@@ -2535,6 +2538,11 @@ namespace RNC
 
                                 p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
                                 p.SetSharedData("Collisions", false);
+
+                                p.RemoveAllWeapons();
+
+                                p.Health = 100;
+                                p.Armor = 0;
                             });
 
                             lobby.Vehicles.ForEach(v =>
@@ -2645,15 +2653,25 @@ namespace RNC
                                     player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, 0, (short)lobby.gameMode);
 
                                     player.SetSharedData("BustedProgress", 0.0);
+
+                                    //////////////////////////////////////////////////////////////////////////////////////////
+                                    ///
+
                                     if (!lobby.Cops.Contains(player) && !lobby.Fugitives.Contains(player)) continue;
 
                                     EPlayer.Notify(player, "Collisions have been enabled and weapons issued", "green", "fas fa-car-crash", false, 3000);
+                                    
+                                    player.Health = 100;
+                                    player.Armor = 0;
 
                                     player.SetSharedData("Collisions", true);
                                     if(Settings.Dynamics.OnfootCollision == false) player.SetSharedData("Collisions", false);
 
+
                                     if (lobby.Cops.Contains(player))
                                     {
+                                        player.Armor = 60;
+
                                         EPlayer.GiveCopWeapons(player);
                                         player.TriggerEvent("SetActorInvulnerable", false);
                                     }

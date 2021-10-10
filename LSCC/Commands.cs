@@ -7883,7 +7883,7 @@ namespace RNC
                 }
                 else
                 {
-                    EPlayer.Notify(target, $"AutoJoin has been turned <strong>OFF</strong> by {player.Name}.", "green", "fas fa-check", false, 1500, "bottomCenter", "replace");
+                    EPlayer.Notify(target, $"AutoJoin has been turned <strong>ON</strong> by {player.Name}.", "green", "fas fa-check", false, 1500, "bottomCenter", "replace");
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target's auto join has been turned on!");
                     target.SetData("AutoJoin", true);
                 }

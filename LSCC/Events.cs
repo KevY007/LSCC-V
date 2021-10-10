@@ -3454,12 +3454,12 @@ namespace RNC
                             {
                                 if (player != null && player.Exists)
                                 {
-                                    if (arenaID != 1 && arenaID != 5 && arenaID != 6)
+                                    if (arenaID != 1 && arenaID != 5 && arenaID != 6 && arenaID != 7)
                                     {
                                         switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 5))
                                         {
                                             case 0:
-                                                player.GiveWeapon(WeaponHash.Revolver_mk2, 1000);
+                                                player.GiveWeapon(WeaponHash.Appistol, 1000);
                                                 player.GiveWeapon(WeaponHash.Pumpshotgun, 1000);
                                                 player.GiveWeapon(WeaponHash.Smg_mk2, 1000);
                                                 player.GiveWeapon(WeaponHash.Assaultrifle_mk2, 1000);
@@ -3507,6 +3507,13 @@ namespace RNC
                                                 player.GiveWeapon(WeaponHash.Stungun, 1000);
                                                 player.Health = 1;
                                                 player.Armor = 0;
+                                                break;
+                                            case 7:
+                                                player.GiveWeapon(WeaponHash.Pistol, 1000);
+                                                player.GiveWeapon(WeaponHash.Smg, 1000);
+                                                player.GiveWeapon(WeaponHash.Specialcarbine, 1000);
+                                                player.GiveWeapon(WeaponHash.Marksmanrifle, 1000);
+                                                player.GiveWeapon(WeaponHash.Musket, 1000);
                                                 break;
                                         }
                                     }
