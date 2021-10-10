@@ -2549,6 +2549,11 @@ namespace RNC
         {
             if (weapon == (uint)WeaponHash.Stungun)
             {
+                if(player.GetSharedData<int>("InDM") == 7 && target.GetSharedData<int>("InDM") == 7)
+                {
+                    //target.Health = 0;
+                    return;
+                }
                 if (target.GetSharedData<bool>("HasShot") != true && player.Position.DistanceTo(target.Position) <= 32.0 && !target.IsInVehicle)
                 {
                     LobbyData lobby = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedData<int>("InLobby"));
@@ -3414,10 +3419,11 @@ namespace RNC
                     {
                         arenaID = -1;
                         player.SetSharedData("InDM", -1);
+                        EPlayer.Spawn(player, false);
                         player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have been removed from DM as it's locked while copchase starts.");
                     }
 
-                    if (arenaID > -1) // DM
+                    if (arenaID > -1 && lobby != null && lobby.gameStatus != 2) // DM
                     {
                         Random rand = new Random(DateTimeOffset.UtcNow.Millisecond);
 
@@ -3445,7 +3451,7 @@ namespace RNC
                             {
                                 if (player != null && player.Exists)
                                 {
-                                    if (arenaID != 1 && arenaID != 4)
+                                    if (arenaID != 1 && arenaID != 4 && arenaID != 6 && arenaID != 7)
                                     {
                                         switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 5))
                                         {
@@ -3496,7 +3502,17 @@ namespace RNC
                                                 player.GiveWeapon(WeaponHash.CeramicPistol, 1000);
                                                 player.GiveWeapon(WeaponHash.Snowball, 1000);
                                                 break;
-                                                
+                                            case 6:
+                                                player.GiveWeapon(WeaponHash.Pistol, 1000);
+                                                player.GiveWeapon(WeaponHash.Pumpshotgun, 1000);
+                                                player.Armor = 0;
+                                                player.Health = 100;
+                                                break;
+                                            case 7:
+                                                player.GiveWeapon(WeaponHash.Stungun, 1000);
+                                                player.Health = 1;
+                                                player.Armor = 0;
+                                                break;
                                         }
                                     }
                                 }
