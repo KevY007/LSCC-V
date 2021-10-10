@@ -255,7 +255,7 @@ $(document).ready(function()
 			const previousMessages = chat.historyMsgs;
 
 			if (chat.currentIndex === -1) {
-				chat.input.children("input").val("")
+				if(chat.input != null) chat.input.children("input").val("")
 				return;
 			}
 
