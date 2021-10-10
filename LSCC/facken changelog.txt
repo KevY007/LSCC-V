@@ -60,6 +60,14 @@ Added /kill.
 Players will now be put in the most populated available lobby instead of lobby 1 now.
 /sa will not mitigate fall damage now.
 Fixed siren not syncing after leaving vehicle.
+Cops and Fugitives will now receive and reset their HP & AR when collisions enable (in case they lost hp during spawning/starting)
+You can't bring extra armour from DM anymore.
+
+Added new DM arenas:
+Humane Labs (Pistol and Shotgun only)
+Morgue (Stungun/Taser only)
+Server Room (Extra large map with 25 spawns)
+Removed mile high club.
 
 Players' can only spawn a max of 5 vehicles in freeroam now.
 Added /tuneveh for freeroam.
