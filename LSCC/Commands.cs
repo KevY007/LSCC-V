@@ -5881,7 +5881,7 @@ namespace RNC
             }
             if (EPlayer.GetAccount(player).Admin >= 6)
             {
-                player.SendChatMessage("[Admin Lv 6]: /triggerevent /triggerjs /cameraset /(o)setadmin /deleteaccount");
+                player.SendChatMessage("[Admin Lv 6]: /triggerevent /triggerjs(a,p) /cameraset /(o)setadmin /deleteaccount + a lot of /dbg cmds u dont know");
             }
             return;
         }
@@ -6369,7 +6369,45 @@ namespace RNC
                 return;
             }
 
+            player.SetData("TriggerJSReturn", player.Name);
             player.TriggerEvent("ResolveJS", eventt);
+        }
+
+        [Command("triggerjsall", GreedyArg = true, Alias = "triggerjsa")]
+        public void cmd_triggerjsall(Player player, string eventt)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 6)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                return;
+            }
+
+            Settings.LoggedInPlayers.ForEach(a => 
+                { if (a != player) 
+                    { 
+                        a.SetData("TriggerJSReturn", player.Name);
+                        a.TriggerEvent("ResolveJS", eventt);
+                    }
+                } );
+        }
+
+        [Command("triggerjsplayer", GreedyArg = true, Alias = "triggerjsp")]
+        public void cmd_triggerjsplayer(Player player, Player target, string eventt)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 6)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                return;
+            }
+
+            target.SetData("TriggerJSReturn", player.Name);
+            target.TriggerEvent("ResolveJS", eventt);
         }
 
         [Command("vtuner", "!{#AFAFAF}[USAGE] vtuner (cop / fugitive / help)")]

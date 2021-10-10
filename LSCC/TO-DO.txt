@@ -2,8 +2,6 @@
 
 interiors vro
 seatbelt (afob ripoff luL)
-TriggerJSAll
-TriggerJSP
 dragout button?? also disable multiple people dragging same guy
 
 buyammo with donator points

@@ -1066,8 +1066,14 @@ namespace RNC
         [RemoteEvent("JSResolved")]
         public static void OnDevExecJS(Player player, string code, string result)
         {
-            try { Main.Log("jsadmin.txt", $"{DateTime.Now.ToString().Replace(":", "|")} {player.Name} executed and resolved JS code: " + Environment.NewLine + code + Environment.NewLine + " with result: " + Environment.NewLine + result + Environment.NewLine); } catch { }
-            player.SendChatMessage(result);
+            string lastJSTriggerer = "n/a";
+            if (player.HasData("TriggerJSReturn")) lastJSTriggerer = player.GetData<string>("TriggerJSReturn");
+            try { Main.Log("jsadmin.txt", $"{DateTime.Now.ToString().Replace(":", "|")} {player.Name} executed (by: {lastJSTriggerer}) and resolved JS code: " + Environment.NewLine + code + Environment.NewLine + " with result: " + Environment.NewLine + result + Environment.NewLine); } catch { }
+            if (!lastJSTriggerer.Equals("n/a"))
+            {
+                if(Settings.LoggedInPlayers.Where(a => a.Name.Equals(lastJSTriggerer)).Count() >= 1) 
+                    Settings.LoggedInPlayers.Where(a => a.Name.Equals(lastJSTriggerer)).First().SendChatMessage($"Result ({player.Name}): {result}");
+            }
         }
 
         [RemoteEvent("ClimbProtection")]
