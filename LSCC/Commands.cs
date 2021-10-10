@@ -92,6 +92,13 @@ namespace RNC
                 player.SendChatMessage("afob => Toggle copchase Anti Fall Off Bike.");
                 player.SendChatMessage("speedafob => Max speed for anti fall off to trigger/work.");
                 player.SendChatMessage("camupdate => Please don't touch. Rate clients update cam direction to server.");
+                player.SendChatMessage("ooc => Toggles the OOC chat in server. (Does not save during restarts)");
+            }
+            else if(action.StartsWith("ooc", StringComparison.OrdinalIgnoreCase))
+            {
+                Settings.OOC = !Settings.OOC;
+                Settings.LoggedInPlayers.ForEach(a => 
+                a.SendChatMessage($"!{{#FF6347}}AdmCmd: OOC chat has been {(Settings.OOC == true ? "!{#33C446}enabled" : "!{#FF0000}disabled")} !{{#FF6347}}by an administrator."));
             }
             else if (action.StartsWith("speedafob", StringComparison.OrdinalIgnoreCase))
             {
@@ -7068,6 +7075,16 @@ namespace RNC
 
             if (!EPlayer.LoggedIn(player))
                 return;
+
+            if(Settings.OOC != true)
+            {
+                if (EPlayer.GetAccount(player).Admin < 1)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}OOC is turned off.");
+                    return;
+                }
+                else player.SendNotification("~r~OOC chat is disabled (friendly reminder)");
+            }
 
             if(player.GetData<bool>("OOCState") == false)
             {

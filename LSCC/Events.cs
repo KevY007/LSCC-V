@@ -497,7 +497,8 @@ namespace RNC
 
         [ServerEvent(Event.PlayerEnterVehicle)]
         public void OnPlayerEnterVehicle(Player player, Vehicle vehicle, sbyte seatID)
-        {   
+        {
+            player.SetSharedData("Ping", player.Ping);
             vehicle.SetSharedData("Engine", vehicle.EngineStatus);
 
             if(player.HasSharedData("Team") && player.GetSharedData<int>("Team") >= 0)
@@ -528,6 +529,7 @@ namespace RNC
         [ServerEvent(Event.PlayerExitVehicle)]
         public void OnPlayerExitVehicle(Player player, Vehicle vehicle)
         {
+            player.SetSharedData("Ping", player.Ping);
             try // Because triggers on disconnection and stuff invalid vehicles etc
             {
                 if (vehicle == null) return;
@@ -3160,6 +3162,7 @@ namespace RNC
 
             if (player == null || !player.Exists) return;
 
+            player.SetSharedData("Ping", player.Ping);
             player.SetData("SpawnTick", Environment.TickCount64);
             player.ResetData("Dead");
             player.ResetSharedData("FlashlightEquipped");

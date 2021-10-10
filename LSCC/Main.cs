@@ -381,6 +381,7 @@ namespace RNC
         public static List<RequestData> Requests { get; set; }
         public static int NextRequestID { get; set; }
         public static long LastCountUpdate { get; set; }
+        public static bool OOC { get; set; }
         public static List<LoadoutData> Loadouts { get; set; }
         public static List<CarData> Cars { get; set; }
         public static Dictionary<long, jWeaponData> WeaponData { get; set; }
@@ -1092,6 +1093,7 @@ namespace RNC
             Settings.LastCountUpdate = Environment.TickCount64;
             Settings.AutoSaveTick = Environment.TickCount64;
             Settings.LastMessageTick = Environment.TickCount64;
+            Settings.OOC = true;
 
             Settings.DCMentionTime = Environment.TickCount64 - 900000;
             Settings.DCMentionPlayers = 0;
