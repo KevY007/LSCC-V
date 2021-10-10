@@ -60,7 +60,7 @@ var vTuner_OtherMods = {}; // FOR MODS THAT CAN'T BE .GETMOD() LIKE PLATE AND WI
 traceLastFunc("vTuner::Config()");
 
 mp.events.add('entityStreamIn', (entity) => {
-    if (vTuner_VehicleID != -1 && entity.type === 'vehicle' && entity.id == vTuner_VehicleID) 
+    if (vTuner_VehicleID != -1 && entity.type === 'vehicle' && entity.remoteId == vTuner_VehicleID) 
     {
         if(mp.players.local.isInAnyVehicle(false) == false)
         {
@@ -94,7 +94,7 @@ mp.events.add('OpenTuner', (vid) => {
     vTuner_VehicleID = vid;
 
     if(!mp.players.local.isInAnyVehicle(false)) return;
-    if(vid != -1 && (mp.players.local.vehicle.id != vid || vTuner_Main.Visible))
+    if(vid != -1 && (mp.players.local.vehicle.remoteId != vid || vTuner_Main.Visible))
     {
         return;
     }
@@ -247,7 +247,7 @@ mp.events.add('playerLeaveVehicle', (vehicle, seat) => {
 });
 
 mp.events.add('playerEnterVehicle', (vehicle, seat) => {
-    if(vTuner_VehicleID != -1 && vehicle.id == vTuner_VehicleID && !vTuner_Main.Visible) 
+    if(vTuner_VehicleID != -1 && vehicle.remoteId == vTuner_VehicleID && !vTuner_Main.Visible) 
     {
         mp.events.callLocal("OpenTuner", vTuner_VehicleID);
     }
