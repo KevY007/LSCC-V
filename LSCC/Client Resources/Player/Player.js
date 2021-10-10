@@ -611,7 +611,7 @@ mp.events.add('render', () => {
         {
             if(AFOB_LastF < Date.now() - 4000)
             {
-                AFOB_LastSpeed = mp.players.local.vehicle.getSpeed() * 3.6;
+                AFOB_LastSpeed = Number((mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0));
                 AFOB_LastVeh = mp.players.local.vehicle;
 
                 if(mp.players.local.vehicle.getPedInSeat(-1) == mp.players.local.handle) AFOB_LastSeat = -1;

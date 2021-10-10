@@ -722,9 +722,9 @@ mp.events.add("render", () => {
                     speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(specTarget.vehicle.model) * 3.6) + 25).toFixed(0);
                     UIHud.execute(`gm.$refs.BottomRight.$refs.Speedometer.maxspeed = ${speedoMax};`);
                 }
-                if(speedoCur != (specTarget.getSpeed() * 3.6).toFixed(0))
+                if(speedoCur != (specTarget.vehicle.getSpeed() * 3.6).toFixed(0))
                 {
-                    speedoCur = (specTarget.getSpeed() * 3.6).toFixed(0);
+                    speedoCur = (specTarget.vehicle.getSpeed() * 3.6).toFixed(0);
                     UIHud.execute(`gm.$refs.BottomRight.$refs.Speedometer.speed = ${speedoCur};`);
                 }
             }
@@ -750,9 +750,9 @@ mp.events.add("render", () => {
                 speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(mp.players.local.vehicle.model) * 3.6) + 25).toFixed(0);
                 UIHud.execute(`gm.$refs.BottomRight.$refs.Speedo.maxspeed = ${speedoMax};`);
             }
-            if(speedoCur != (mp.players.local.getSpeed() * 3.6).toFixed(0))
+            if(speedoCur != (mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0))
             {
-                speedoCur = (mp.players.local.getSpeed() * 3.6).toFixed(0);
+                speedoCur = (mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0);
                 UIHud.execute(`gm.$refs.BottomRight.$refs.Speedo.speed = ${speedoCur};`);
             }
         }
