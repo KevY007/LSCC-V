@@ -241,7 +241,7 @@ $(document).ready(function()
 
 
             chat.currentIndex = chat.currentIndex + 1;
-			chat.input.children("input").val(previousMessages[chat.currentIndex-1]);
+			if(chat.input != null) chat.input.children("input").val(previousMessages[chat.currentIndex-1]);
 			
 			document.getElementById("chat_msg").focus();
 			document.getElementById("chat_msg").setSelectionRange(129, 129);
@@ -260,7 +260,7 @@ $(document).ready(function()
 			}
 
 			chat.currentIndex = chat.currentIndex - 1;
-			chat.input.children("input").val(previousMessages[chat.currentIndex]);
+			if(chat.input != null) chat.input.children("input").val(previousMessages[chat.currentIndex]);
 
 			document.getElementById("chat_msg").focus();
 			document.getElementById("chat_msg").setSelectionRange(129, 129);
