@@ -1200,7 +1200,7 @@ namespace RNC
                 .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "M1911", 40)
                 .Add(WeaponHash.Combatmg, "package://Artwork/Weapons/CombatMG.png", "M60", 160)
                 .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Remington 870", 15)
-                .Add((WeaponHash)1, "package://Artwork/Weapons/Armour.png", "+50 Armour", 50);
+                .Add((WeaponHash)1, "package://Artwork/Weapons/Armour.png", "Full Armour", 100);
 
             //
 
@@ -2562,7 +2562,9 @@ namespace RNC
 
                             foreach (Player p in Settings.LoggedInPlayers.Where(p => lobby.Cops.Contains(p) || lobby.Fugitives.Contains(p)))
                             {
-                               // if(lobby.Cops.Contains(p)) EPlayer.Notify(p, "You will be unfreezed in 10 seconds.", "orange", "fas fa-hourglass-start", false, 10000);
+                                p.TriggerEvent("ResetKillFeed");
+
+                                // if(lobby.Cops.Contains(p)) EPlayer.Notify(p, "You will be unfreezed in 10 seconds.", "orange", "fas fa-hourglass-start", false, 10000);
                                 if (lobby.gameMode == GameModes.STANDARD)
                                 {
                                     //p.SendChatMessage("!{#FF6347}[!] !{#8D8DFF}Cops will be unfrozen in 10 seconds. !{#E84040}Fugitive's may take this time to prepare/start the chase.");
