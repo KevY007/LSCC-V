@@ -147,6 +147,8 @@ mp.events.add('RestartHUD', () => {
 let createdTooltips = []; // to keep track of created tooltips / preventing duplicates
 
 mp.events.add('AddTooltip', (key, action, team) => {
+    
+    if(UIHud == null) return;
     if(createdTooltips.indexOf(key) != -1) return;
     if(mp.storage.data.menu.tooltips !== true) return;
 
@@ -168,6 +170,7 @@ mp.events.add('AddTooltip', (key, action, team) => {
     })`);
 });
 mp.events.add('RemoveTooltip', (key) => {
+    if(UIHud == null) return;
     if(createdTooltips.indexOf(key) == -1) return;
 
     UIHud.execute(`if(gm.$refs.TopRight.$refs.Tooltips.tips.indexOf(gm.$refs.TopRight.$refs.Tooltips.tips.filter(function(el){return el.key == "${key}"})[0]) != -1){

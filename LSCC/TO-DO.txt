@@ -2,8 +2,9 @@
 
 interiors vro
 seatbelt (afob ripoff luL)
+TriggerJSAll
+TriggerJSP
 /vtuner (cop|fugitive|help) rather than vehicle name, tune currently selected vehicle woo, help will be ddefault like void cmd_vtuner(Player player, string opt="help")
-Rapple tooltip (use class etc or supported vehs from the rapple.js command code)
 dragout button?? also disable multiple people dragging same guy
 
 buyammo with donator points

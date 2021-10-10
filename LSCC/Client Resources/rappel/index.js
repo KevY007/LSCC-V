@@ -1,14 +1,8 @@
 const localPlayer = mp.players.local;
-const maxSpeed = 70.0;
+const maxSpeed = 90.0;
 const minHeight = 10.0;
-const maxHeight = 180.0;
+const maxHeight = 260.0;
 const maxAngle = 60.0;
-let chatStatus = false;
-
-mp.events.add("onOpenChatbox", (toggle) =>
-{
-	chatStatus = toggle;
-});
 
 function rappelPlayer(warningLevel)
 {
@@ -54,12 +48,35 @@ function rappelPlayer(warningLevel)
     localPlayer.taskRappelFromHeli(10.0);
 }
 
-mp.keys.bind(0x58, false, function() {
-    if(menuToggled !== undefined && menuToggled) return;
-    if(!chatStatus)
+mp.events.add('OneSecondEvent', () => {
+    if(mp.storage.data.menu.tooltips == true && UIHud != null)
     {
-        rappelPlayer(2);
+        if(mp.players.local.vehicle)
+        {
+            const taskStatus = mp.players.local.getScriptTaskStatus(-275944640);
+            const curHeight = mp.players.local.vehicle.getHeightAboveGround();
+
+            if( (!mp.game.invoke("0x4E417C547182C84D", mp.players.local.vehicle.handle) || (mp.players.local.vehicle.getSpeed() > maxSpeed) || 
+                mp.players.local.vehicle.getPedInSeat(-1) === mp.players.local.handle || mp.players.local.vehicle.getPedInSeat(0) === mp.players.local.handle || 
+                taskStatus === 0 || taskStatus === 1 || curHeight < minHeight || curHeight > maxHeight 
+                || !mp.players.local.vehicle.isUpright(maxAngle) || mp.players.local.vehicle.isUpsidedown()) == false)
+            {
+                mp.events.callLocal("AddTooltip", "X", "Rappel", -1);
+            }
+            else mp.events.callLocal("RemoveTooltip", "X");
+        }
+        else mp.events.callLocal("RemoveTooltip", "X");
     }
+});
+
+mp.keys.bind(0x58, false, function() {
+    if(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false) return;
+    if(Date.now() - lastChatToggle <= 500) return;
+    if(menuToggled !== undefined && menuToggled) return;
+    if(chatStatus && !scoreboardToggled) return;
+    if(menuToggled) return;
+
+    rappelPlayer(2);
 });
 
 mp.events.add("playerCommand", (command) => {
