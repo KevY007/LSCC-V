@@ -6135,7 +6135,7 @@ namespace RNC
                                 carName = "washington";
                                 break;
                             case 1:
-                                carName = "600sel";
+                                carName = "washington";
                                 break;
                             case 2:
                                 carName = "oracle";

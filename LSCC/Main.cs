@@ -2072,14 +2072,17 @@ namespace RNC
                                     case 0:
                                         carName = "police";
                                         col1 = 111;
+                                        enginePower = 30.0f;
                                         break;
                                     case 1:
                                         carName = "police3";
                                         col1 = 111;
+                                        enginePower = 15.0f;
                                         break;
                                     case 2:
                                         carName = "police4";
                                         col1 = 111;
+                                        enginePower = 30.0f;
                                         break;
                                 }
                             }
@@ -2089,6 +2092,7 @@ namespace RNC
 
                                 if(carName.StartsWith("police"))
                                 {
+                                    enginePower = 10.0f;
                                     col1 = 111;
                                 }
 
@@ -2114,6 +2118,8 @@ namespace RNC
                                     spawnLoc = Spawns.OrderBy(x => Guid.NewGuid()).First(a => a.spawnTeam == 2);
                                 }
                             }
+
+                            if (carName.Equals("lspdvic")) enginePower = 10.0f;
 
                             Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, col1, col2, player.Name, 255, false, true, Convert.ToUInt32(lobbyid));
                             pVehicle.EngineStatus = true;
@@ -2301,29 +2307,32 @@ namespace RNC
 
                         Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
 
+                        float enginePower = 1.0f;
                         string carName = "washington";
 
                         if (EPlayer.GetAccount(_tempPlayer).CarFugitive.Length < 3)
                         {
-                            switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 6))
+                            switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 5))
                             {
                                 case 0:
                                     carName = "washington";
+                                    enginePower = 10.0f;
                                     break;
                                 case 1:
-                                    carName = "600sel";
+                                    carName = "oracle";
+                                    enginePower = 10.0f;
                                     break;
                                 case 2:
-                                    carName = "oracle";
+                                    carName = "moonbeam";
+                                    enginePower = 20.0f;
                                     break;
                                 case 3:
-                                    carName = "moonbeam";
+                                    carName = "rancherxl";
+                                    enginePower = 10.0f;
                                     break;
                                 case 4:
-                                    carName = "rancherxl";
-                                    break;
-                                case 5:
                                     carName = "cavalcade2";
+                                    enginePower = 10.0f;
                                     break;
                             }
                         }
@@ -2352,6 +2361,8 @@ namespace RNC
                         pVehicle.SetSharedData("Team", 0);
                         lobby.Vehicles.Add(pVehicle);
                         pVehicle.SetSharedData("Collisions", false);
+
+                        if (enginePower > 1.0f) pVehicle.SetSharedData("vInitialDriveForce", enginePower);
 
                         var inst = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.Model == pVehicle.Model && a.AccountSQLID == EPlayer.GetAccount(_tempPlayer).SQL_ID);
                         if (inst != null)
