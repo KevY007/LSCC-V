@@ -42,7 +42,16 @@ function ToggleMenu()
         traceLastFunc(`[Menu] Attempt open/M key`);
 
         menuToggled = !menuToggled;
-        UIMenu.active = menuToggled;
+
+        if(menuToggled == false)
+        {
+            setTimeout(() => {
+                UIMenu.active = menuToggled;
+            }, 750);
+        }
+        else UIMenu.active = menuToggled;
+
+
         //if(UIHud != null) UIHud.execute(`gm.miniHud = ${!menuToggled};`);
         UIMenu.execute(`gm.mainMenu = ${menuToggled};`);
         mp.events.callRemote("OnToggleMenu", menuToggled);
