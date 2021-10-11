@@ -1209,6 +1209,7 @@ namespace RNC
                 AccountSQLID = EPlayer.GetAccount(player).SQL_ID,
                 Model = model,
                 Team = team,
+                TimesUsed = 0,
             };
             ContextFactory.Instance.OwnedVehicles.Add(_new);
 
@@ -1256,6 +1257,7 @@ namespace RNC
                 AccountSQLID = EPlayer.GetAccount(player).SQL_ID,
                 Name = name,
                 Team = team,
+                TimesUsed = 0
             };
             ContextFactory.Instance.OwnedLoadouts.Add(_new);
 
