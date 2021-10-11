@@ -23,38 +23,14 @@ namespace RNC
         [RemoteEvent("playerReadyCon")]
         public void OnPlayerConnected(Player player)
         {
-            BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.HWID.Equals(player.Serial) || ban.IP.Equals(player.Address) ||
-                ban.RockstarID == player.SocialClubId);
-
             Discord.SendTextChannel("staff-bot", $"**{player.Name} has joined the server.** *(Total online: {RAGE.Entities.Players.Count})*");
 
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has joined the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
-
-            if (ban != null)
-            {
-                EPlayer.SetDiscordStatus(player, "Gazing at the 'BANNED' screen.");
-
-                player.SendChatMessage($"!{{#FF6347}}[BANNED] You are not allowed to play on this server, Ban ID: {ban.SQL_ID}");
-
-                player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
-
-                EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Your ban ID is {ban.SQL_ID}.</p>", "red", "fas fa-ban", true, 30000);
-
-                string evadeAccountName = ContextFactory.Instance.Accounts.First(a => a.SQL_ID == ban.AccountSQLID).Username;
-
-                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {player.Name} for ban evading as {evadeAccountName}.");
-                NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking {player.Name} as they're banned. (BANID: {ban.SQL_ID} ACCOUNTID: {ban.AccountSQLID}.");
-
-                player.SetData("Kicked", true);
-                NAPI.Task.Run(() => { try { player.KickSilent(); } catch { } }, 1000);
-                return;
-            }
 
             if (player.HasData("Kicked")) return;
 
             EPlayer.SetDiscordStatus(player, "Connecting to the server...");
 
-            NAPI.Notification.SendNotificationToPlayer(player, "Welcome to ~y~Race ~w~'n ~b~Chase");
             player.SetData("LastCryptAttempt", Environment.TickCount64);
 
             EPlayer.ResetPlayerData(player);
@@ -79,6 +55,32 @@ namespace RNC
                 }
                 catch { }
             }, 2000);
+
+            BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.HWID.Equals(player.Serial) || ban.IP.Equals(player.Address) ||
+                ban.RockstarID == player.SocialClubId);
+
+            if (ban != null)
+            {
+                EPlayer.SetDiscordStatus(player, "Gazing at the 'BANNED' screen.");
+
+                player.SendChatMessage($"!{{#FF6347}}[BANNED] You are not allowed to play on this server, Ban ID: {ban.SQL_ID}");
+
+                player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+
+                EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Your ban ID is {ban.SQL_ID}.</p>", "red", "fas fa-ban", true, 30000);
+
+                string evadeAccountName = ContextFactory.Instance.Accounts.First(a => a.SQL_ID == ban.AccountSQLID).Username;
+
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {player.Name} for ban evading as {evadeAccountName}.");
+                NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking {player.Name} as they're banned. (BANID: {ban.SQL_ID} ACCOUNTID: {ban.AccountSQLID})");
+
+                player.SetData("Kicked", true);
+                NAPI.Task.Run(() => { try { player.KickSilent(); } catch { } }, 1000);
+                return;
+            }
+
+
+            NAPI.Notification.SendNotificationToPlayer(player, "Welcome to ~y~Race ~w~'n ~b~Chase");
         }
 
         [RemoteEvent("UpdateAimingState")]
@@ -1650,6 +1652,9 @@ namespace RNC
         [RemoteEvent("OnPlayerLoginAttempt")]
         public static void OnPlayerLoginAttempt(Player player, string username, string password)
         {
+            if (EPlayer.LoggedIn(player)) return;
+            if (player.HasData("Kicked")) return;
+
             if ((username == null || username.Length < 2))
             {
                 EPlayer.Error(player, "Username field is required!", "fas fa-user");
@@ -2327,6 +2332,9 @@ namespace RNC
         [RemoteEvent("OnPlayerRegisterAttempt")]
         public static void OnPlayerRegisterAttempt(Player player, string email, string username, string password)
         {
+            if (EPlayer.LoggedIn(player)) return;
+            if (player.HasData("Kicked")) return;
+
             if ((username == null || username.Length < 2))
             {
                 EPlayer.Error(player, "Username field is required!", "fas fa-user");
