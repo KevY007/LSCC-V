@@ -665,7 +665,7 @@ mp.events.add('render', () => {
                     if(Date.now() > Seatbelt_LastMessage)
                     {
                         Seatbelt_LastMessage = Date.now() + 5000;
-                        mp.gui.chat.push(`!{#FF6347}[!] !{#FFFFFF}Your seatbelt has prevented you from exiting the vehicle.`);
+                        mp.game.graphics.notify("~r~Seatbelt has prevented you from falling out.");
                         //mp.gui.chat.push(`Setting into vehicle as last speed was ${AFOB_LastSpeed} under the limit ${AFOB_SpeedLimit}`);
                     }
                 }
@@ -1804,6 +1804,7 @@ mp.events.add(
 
             if(Seatbelt_Enabled == true && vehicle.getClass() != 8 && vehicle.model != mp.game.joaat('policeb'))
             {
+                mp.game.graphics.notify("~r~You cannot leave with seatbelt on.");
                 mp.players.local.clearTasks();
                 mp.players.local.setIntoVehicle(vehicle.handle, seat);
             }
