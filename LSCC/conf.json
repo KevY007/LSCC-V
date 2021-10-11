@@ -1,14 +1,16 @@
 {
+	"announce" : true,	
 	"maxplayers" : 100,
-	"name" : "[EN] Race 'n Chase | Minigames! [Copchase][Pursuits][DM][Derby][Freeroam][Minigames]",
-	"gamemode" : "pursuits",
+	"name" : "[EN] Race 'N' Chase | Formerly Los Santos Copchase [Copchase][Pursuits][DM][Derby][Freeroam][Minigame]",
+	"gamemode" : "copchase",
 	"stream-distance" : 1000.0,
-	"announce" : false,
 	"csharp" : "enabled",
 	"port": 22005,
-	"language": "en",
+	"url": "racenchase.com",
+	"language": "gb",
 	"voice-chat": true,
 	"server-side-weapons-only-mode": true,
 	"synchronization-extrapolation-multiplier": 0.0,
-	"api-threading-debugging": false
+	"api-threading-debugging": false,
+	"fqdn": "server.racenchase.com"
 }
