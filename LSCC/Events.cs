@@ -1162,6 +1162,13 @@ namespace RNC
 
             if (acc.RegisterDate.Year == 2000) acc.RegisterDate = DateTime.Now; // Year 2000 = it's not set.
 
+            if (acc.DiscordInfo == null || acc.DiscordInfo.Length < 4)
+            {
+                DiscordData _discordData = new DiscordData();
+                acc.DiscordInfo = NAPI.Util.ToJson(_discordData);
+                NAPI.Util.ConsoleOutput($"[DISCORD INTEGRATION] {player.Name}'s discord data was invalid, generating them new. This is a one time thing, unless discord data is deleted.");
+            }
+
             BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.AccountSQLID == acc.SQL_ID || ban.HWID.Equals(acc.LastHWID) || ban.IP.Equals(acc.LastIP) || ban.RockstarID == acc.LastRID);
 
             if (ban != null)
