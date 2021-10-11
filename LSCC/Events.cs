@@ -18,11 +18,17 @@ namespace RNC
         public void OnPlayerConnected_Old(Player player)
         {
             EPlayer.ResetPlayerData(player);
+        }
 
+        [RemoteEvent("playerReadyCon")]
+        public void OnPlayerConnected(Player player)
+        {
             BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.HWID.Equals(player.Serial) || ban.IP.Equals(player.Address) ||
                 ban.RockstarID == player.SocialClubId);
 
             Discord.SendTextChannel("staff-bot", $"**{player.Name} has joined the server.** *(Total online: {RAGE.Entities.Players.Count})*");
+
+            NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has joined the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
             if (ban != null)
             {
@@ -34,20 +40,16 @@ namespace RNC
 
                 EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Your ban ID is {ban.SQL_ID}.</p>", "red", "fas fa-ban", true, 30000);
 
+                string evadeAccountName = ContextFactory.Instance.Accounts.First(a => a.SQL_ID == ban.AccountSQLID).Username;
+
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {player.Name} for ban evading as {evadeAccountName}.");
+                NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking {player.Name} as they're banned. (BANID: {ban.SQL_ID} ACCOUNTID: {ban.AccountSQLID}.");
 
                 player.SetData("Kicked", true);
                 player.KickSilent();
-
                 return;
             }
 
-
-            NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has joined the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
-        }
-
-        [RemoteEvent("playerReadyCon")]
-        public void OnPlayerConnected(Player player)
-        {
             if (player.HasData("Kicked")) return;
 
             EPlayer.SetDiscordStatus(player, "Connecting to the server...");
@@ -1169,20 +1171,21 @@ namespace RNC
                 NAPI.Util.ConsoleOutput($"[DISCORD INTEGRATION] {player.Name}'s discord data was invalid, generating them new. This is a one time thing, unless discord data is deleted.");
             }
 
-            BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.AccountSQLID == acc.SQL_ID || ban.HWID.Equals(acc.LastHWID) || ban.IP.Equals(acc.LastIP) || ban.RockstarID == acc.LastRID);
+            var linkedSQLs = EPlayer.GetLinkedAccounts(acc).Select(accs => accs.SQL_ID).ToList(); // BONKERS
 
-            if (ban != null)
+            if(linkedSQLs.Intersect(ContextFactory.Instance.Bans.ToList().Select(bans => bans.AccountSQLID)).Any())
             {
                 EPlayer.SetDiscordStatus(player, "Gazing at the 'BANNED' screen.");
 
-                player.SendChatMessage($"!{{#FF6347}}[BANNED] You are not allowed to play on this server, Ban ID: {ban.SQL_ID}");
-                player.SendChatMessage("!{#A9C4E4}KevY is surprised how you made it this far though.");
+                player.SendChatMessage($"!{{#FF6347}}[BANNED] You are not allowed to play on this server.");
 
-                EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Your ban ID is {ban.SQL_ID}.</p>", "red", "fas fa-ban", true, 30000);
+                EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Use your account name as a reference.</p>", "red", "fas fa-ban", true, 30000);
 
                 player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
-               
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {acc.Username} for ban evading/outstanding bans.");
+                NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
+
                 player.SetData("Kicked", true);
                 player.KickSilent();
 
