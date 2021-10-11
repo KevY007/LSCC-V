@@ -2120,6 +2120,8 @@ namespace RNC
                             }
 
                             if (carName.Equals("lspdvic")) enginePower = 10.0f;
+                            if (carName.Equals("fbi2")) enginePower = 15.0f;
+                            if (carName.Equals("policet")) enginePower = 12.0f;
 
                             Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, col1, col2, player.Name, 255, false, true, Convert.ToUInt32(lobbyid));
                             pVehicle.EngineStatus = true;
