@@ -17,11 +17,10 @@ CREATE TABLE `OwnedLoadouts` ( `SQL_ID` INT(11) NOT NULL AUTO_INCREMENT , `Accou
 CREATE TABLE `PlayerTunings` ( `SQL_ID` INT(11) NOT NULL AUTO_INCREMENT , `AccountSQLID` INT(11) NOT NULL , `Model` INT(10) UNSIGNED NOT NULL , `PrimaryColor` INT(11) NOT NULL , `SecondaryColor` INT(11) NOT NULL , `PearlescentColor` INT(11) NOT NULL , `WheelColor` INT(11) NOT NULL , `Mods` LONGTEXT NOT NULL , PRIMARY KEY (`SQL_ID`)) ENGINE = InnoDB;
 
 
+DELETE FROM `Bans`;
 ALTER TABLE `Bans` CHANGE `DateTime` `DateTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
 UPDATE Accounts SET RegisterDate = STR_TO_DATE('2000-3-2 6:03:22', '%Y-%m-%d %H:%i:%s'), LastLogin = STR_TO_DATE('2000-3-2 6:03:22', '%Y-%m-%d %H:%i:%s'), LastIP = 'n/a', LastRID = 0, LastHWID = 'n/a', LastSC = 'n/a', RegisterIP = 'n/a', RegisterSC = 'n/a', RegisterRID = 0, RegisterHWID = 'n/a';
-
-DELETE FROM `Bans`;
 
 INSERT INTO `Bans` (`SQL_ID`, `AccountSQLID`, `RockstarID`, `IP`, `HWID`, `Reason`, `Admin`, `DateTime`) VALUES
 (13, 2693, 165200226, '95.208.250.205', 'D1C0A06C3DF88DB070286B4C154C85A052720A14C9F62000630A5C343E207C205172BE0C126C773029921B80605AD7C0DBCCD0D0D556CF309384867C56DAE1C0', 'Hacking (car surf) and then using it to ram others', 'KevY', STR_TO_DATE('30/5/2021 10:13 PM', '%d/%m/%Y %h:%i %p')),
