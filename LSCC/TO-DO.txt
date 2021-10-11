@@ -1,7 +1,7 @@
 ﻿FORMAT: ADDED BY - ITEM.
 
 interiors vro
-
+menu.active = false after 1 second so closing anim plays
 buyammo with donator points
 #bug reports and other chans sugeestion
 add a linux script that will keep on restarting server if goes off?
