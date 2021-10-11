@@ -4794,18 +4794,7 @@ namespace RNC
                 target.ResetData("AccountHandle");
                 target.ResetData("LoggedIn");
 
-                try
-                {
-                    NAPI.Task.Run(() =>
-                    {
-                        try
-                        {
-                            target.KickSilent();
-                        }
-                        catch { }
-                    }, 500);
-                }
-                catch { }
+                NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
             }
 
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:changename:{name}:{newname}"); } catch { }
@@ -5254,7 +5243,7 @@ namespace RNC
 
             
             target.SetData("Kicked", true);
-            target.KickSilent();
+            NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
             return;
         }
 
@@ -5310,7 +5299,7 @@ namespace RNC
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:suspend:{target.Name}"); } catch { }
 
             target.SetData("Kicked", true);
-            target.KickSilent();
+            NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
 
             return;
         }
@@ -7606,7 +7595,7 @@ namespace RNC
                 target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
                 target.SetData("Kicked", true);
-                target.KickSilent();
+                NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
             }
 
         }
