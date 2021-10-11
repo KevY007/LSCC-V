@@ -10,9 +10,9 @@
     <PackageId>RNC</PackageId>
     <Authors>KevY</Authors>
     <Company>KevY</Company>
-    <Product>Race 'n Chase</Product>
-    <Description>Race 'n Chase script for RAGE:MP. Formerly Los Santos Copchase (LSCC)</Description>
-    <Copyright>Race 'n Chase</Copyright>
+    <Product>Race 'N' Chase</Product>
+    <Description>Race 'N' Chase script for RAGE:MP. Formerly Los Santos Copchase (LSCC)</Description>
+    <Copyright>Race 'N' Chase</Copyright>
     <NeutralLanguage>en</NeutralLanguage>
     <RootNamespace>RNC</RootNamespace>
     <Configurations>Debug;Release;Debug_KevY</Configurations>

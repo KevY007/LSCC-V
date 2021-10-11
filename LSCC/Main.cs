@@ -1345,12 +1345,12 @@ namespace RNC
             }
             if (adminCount == 0) admins = "None";
 
-            NAPI.Util.ConsoleOutput("[>===========|Race 'n Chase|===========<]");
+            NAPI.Util.ConsoleOutput("[>===========|Race 'N' Chase|===========<]");
             NAPI.Util.ConsoleOutput("[Version]: " + Settings.Version);
             NAPI.Util.ConsoleOutput("[Developers]: KevY, CodeName420 (jambredrek)");
             NAPI.Util.ConsoleOutput($"[Accounts]: {ContextFactory.Instance.Accounts.Count()}");
             NAPI.Util.ConsoleOutput($"[Admins]: {admins}");
-            NAPI.Util.ConsoleOutput("[>===========|Race 'n Chase|===========<]");
+            NAPI.Util.ConsoleOutput("[>===========|Race 'N' Chase|===========<]");
 
 
             // After all the stuff is set.
@@ -1569,7 +1569,7 @@ namespace RNC
                                                         if (player.GetSharedData<bool>("IsTabbed") == true || EPlayer.IsAFK(player)) {
 
                                                             player.TriggerEvent("SendNotification", "AFK Check", "Chase is starting in 10 seconds",
-                                                                "Race 'n Chase", 10);
+                                                                "Race 'N' Chase", 10);
                                                         }
                                                     }
                                                 }

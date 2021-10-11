@@ -1033,7 +1033,7 @@ namespace RNC
 
         public static void SetDiscordStatus(Player player, string status)
         {
-            player.TriggerEvent("SetDiscordStatus", "Race 'n Chase", status);
+            player.TriggerEvent("SetDiscordStatus", "Race 'N' Chase", status);
         }
         public static void Freeze(Player player, bool toggle)
         {
