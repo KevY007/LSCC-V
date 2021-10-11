@@ -1,7 +1,7 @@
 {
 	"announce" : true,	
 	"maxplayers" : 100,
-	"name" : "[EN] Race 'N' Chase | Formerly Los Santos Copchase [Copchase][Pursuits][DM][Derby][Freeroam][Minigame]",
+	"name" : "Race 'N' Chase | Formerly Los Santos Copchase [Pursuit][DM][Derby][Freeroam][Minigame]",
 	"gamemode" : "copchase",
 	"stream-distance" : 1000.0,
 	"csharp" : "enabled",
