@@ -2108,7 +2108,7 @@ namespace RNC
 
             newPickup.OnPickup = (guy) =>
             {
-                if (!guy.Dead && guy.Health > 0 && !guy.HasData("Dead") && guy.Position.DistanceTo(newPickup.position) < 20.0) // so if player dies he isnt picking it up
+                if (!guy.Dead && guy.Health > 0 && !guy.HasData("Dead") && guy.Position.DistanceTo(newPickup.position) < 20.0 && !guy.IsInVehicle) // so if player dies he isnt picking it up
                 {
                     if (Environment.TickCount64 - 10000 > guy.GetData<long>("SpawnTick")) // spawned like more than 10 seconds ago
                     {
