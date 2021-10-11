@@ -1977,7 +1977,7 @@ namespace RNC
 
                     foreach (Player player in lobbyPlayers)
                     {
-                        if (player.GetData<bool>("AutoJoin") == false) continue;
+                        if (player.GetData<bool>("AutoJoin") != true) continue;
 
                         player.SetSharedData("BustedProgress", 0.0);
                         player.ResetData("BustSupporters");

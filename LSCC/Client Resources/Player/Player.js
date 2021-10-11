@@ -962,7 +962,7 @@ mp.events.add('render', () => {
                 {
                     chaseTimeCur += 1;
 
-                    if(chaseTimeCur <= 0)
+                    if(chaseTimeCur <= 0 && mp.players.local.Team >= 0)
                     {
                         mp.players.local.freezePosition(true);
 
