@@ -1811,10 +1811,14 @@ namespace RNC
 
             if (player.Position.DistanceTo(target.Position) >= 3.5) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near that player!"); return; }
 
+            if (Settings.LoggedInPlayers.Count(a => a.HasData("DraggingOut") && a.GetData<string>("DraggingOut").Equals(target.Name) && lobby.Cops.Contains(a)) > 0) 
+            { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The target is already being dragged out!"); return; }
+
             target.TriggerEvent("ToggleSeatbelt", false);
             target.ResetData("Seatbelt");
             EPlayer.Action(player, $"leans towards {target.Name}'s vehicle and tries to open the door to drag them out.");
-            
+
+            player.SetData("DraggingOut", target.Name);
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are now dragging out the target, stay with them for 5 seconds to complete the operation.");
 
             NAPI.Task.Run(() =>
@@ -1828,6 +1832,7 @@ namespace RNC
                             if (target == null || !target.IsInstanceAlive || player == null || !player.IsInstanceAlive || player.Dead)
                             {
                                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, target or you are no longer alive.");
+                                player.ResetData("DraggingOut");
                                 return;
                             }
 
@@ -1844,13 +1849,14 @@ namespace RNC
                             if (!isACop)
                             {
                                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, you cannot drag out that target anymore.");
+                                player.ResetData("DraggingOut");
                                 return;
                             }
 
                             if (player.Position.DistanceTo(target.Position) >= 3.5)
                             {
                                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near the target!");
-
+                                player.ResetData("DraggingOut");
                                 return;
                             }
 
@@ -1859,6 +1865,7 @@ namespace RNC
                             target.ResetData("Seatbelt");
                             player.SetSharedData("FugitiveChance", player.GetSharedData<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(player).DonatorLevel + 1.0)));
                             cmd_do(player, $"{target.Name} has been dragged out of the vehicle.");
+                            player.ResetData("DraggingOut");
 
                             EPlayer.SendMessageInLobby(lobbye.lobbyId, $"!{{#ADD8E6}}Cop {player.Name} has dragged {target.Name} out of the vehicle!");
                             target.TriggerEvent("ThrowFromVehicle");
@@ -1869,8 +1876,6 @@ namespace RNC
             }, 5000);
             return;
         }
-
-
 
         [Command("switchseats", "!{#AFAFAF}[USAGE] switchseats (target)", Alias = "swapseats,swapseat,switchseat,ss")]
         public static void cmd_switchseats(Player player, Player target)
@@ -4218,16 +4223,15 @@ namespace RNC
 
             try
             {
-                ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(target).Character);
+                if (EPlayer.GetAccount(target).Character != null && EPlayer.GetAccount(target).Character.Length > 10)
+                {
+                    ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(target).Character);
+                }
+                else EPlayer.GetAccount(target).Character = NAPI.Util.ToJson(ConvChar);
             }
             catch
             {
                 ConvChar = new CharacterData();
-            }
-
-            if (EPlayer.GetAccount(target).Character.Length < 10 || EPlayer.GetAccount(target).Character == null)
-            {
-                EPlayer.GetAccount(target).Character = NAPI.Util.ToJson(ConvChar);
             }
 
             try
@@ -4235,9 +4239,8 @@ namespace RNC
 
                 if (team.StartsWith("cop", StringComparison.OrdinalIgnoreCase))
                 {
-                    CharacterData charData = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(target).Character);
-                    charData.Clothing[1] = new ClothingData();
-                    EPlayer.GetAccount(target).Character = NAPI.Util.ToJson(charData);
+                    ConvChar.Clothing[1] = new ClothingData();
+                    EPlayer.GetAccount(target).Character = NAPI.Util.ToJson(ConvChar);
 
 
                     target.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your cop clothing has been reset by an admin.");
@@ -4246,9 +4249,8 @@ namespace RNC
                 }
                 else if (team.StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
                 {
-                    CharacterData charData = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(target).Character);
-                    charData.Clothing[0] = new ClothingData();
-                    EPlayer.GetAccount(target).Character = NAPI.Util.ToJson(charData);
+                    ConvChar.Clothing[0] = new ClothingData();
+                    EPlayer.GetAccount(target).Character = NAPI.Util.ToJson(ConvChar);
 
                     target.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your fugitive clothing has been reset by an admin.");
 

@@ -574,6 +574,7 @@ namespace RNC
                 player.SetSharedData("Level", 1);
                 player.SetSharedData("JailTime", 0);
                 player.SetSharedData("MuteTime", 0);
+                player.ResetData("DraggingOut");
 
                 player.SetData("TasedTill", Environment.TickCount64);
 

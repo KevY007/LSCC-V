@@ -666,6 +666,7 @@ namespace RNC
             player.SetData("Dead", Environment.TickCount64);
             player.ResetData("Seatbelt");
             player.TriggerEvent("ToggleSeatbelt", false);
+            player.ResetData("DraggingOut");
 
             string reasonStr;
             bool wasInGame = false;
@@ -3166,6 +3167,7 @@ namespace RNC
             player.SetSharedData("ClimbProtection", false);
             player.SetData("LastClimbProtection", Environment.TickCount64-30000);
             player.SetData("ClimbProtectionProcs", 0);
+            player.ResetData("DraggingOut");
 
             player.ResetData("_currentlySwappingSeats");
             foreach (Player p in Settings.LoggedInPlayers.Where(a => a.HasData("Spectating") && a.GetData<Player>("SpectatingPlayer") == player))

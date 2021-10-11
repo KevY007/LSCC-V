@@ -1,7 +1,6 @@
 ﻿FORMAT: ADDED BY - ITEM.
 
 interiors vro
-dragout button?? also disable multiple people dragging same guy
 
 buyammo with donator points
 #bug reports and other chans sugeestion
