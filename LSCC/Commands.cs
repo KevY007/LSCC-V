@@ -3436,21 +3436,15 @@ namespace RNC
         [Command("voiceblock", "!{#AFAFAF}[USAGE] voiceblock (target)", GreedyArg = true)]
         public void cmd_vblock(Player player, Player target)
         {
-            List<Player> blockList = new List<Player>();
-            if (player.HasData("BlockList"))
+            if (player.HasData($"VoiceMute{target.Name}"))
             {
-                blockList.AddRange(player.GetData<List<Player>>("BlockList"));
-            }
-
-            if(!blockList.Contains(target))
-            {
-                blockList.Add(target);
-                player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have muted {target.Name} on voice chat, use this command again to unmute them.");
+                player.ResetData($"VoiceMute{target.Name}");
+                player.SendChatMessage($"!{{#33C446}}[#] !{{#FFFFFF}}You have unmuted {target.Name} on voice chat.");
             }
             else
             {
-                blockList.Remove(target);
-                player.SendChatMessage($"!{{#33C446}}[#] !{{#FFFFFF}}You have unmuted {target.Name} on voice chat.");
+                player.SetData($"VoiceMute{target.Name}", true);
+                player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have muted {target.Name} on voice chat, use this command again to unmute them.");
             }
 
             player.SetData("BlockList", blockList);

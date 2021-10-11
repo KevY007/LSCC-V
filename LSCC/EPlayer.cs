@@ -550,8 +550,6 @@ namespace RNC
                 player.ResetData("Tuner_Vehicle");
                 player.SetData("LastEditedClothingTeam", 1);
 
-                player.ResetData("BlockList");
-
                 player.SetSharedData("ActionType", "none");
                 player.SetSharedData("ActionTime", 0);
 

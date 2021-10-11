@@ -41,16 +41,6 @@ namespace RNC
                 return;
             }
 
-            foreach (Player pl in RAGE.Entities.Players.All)
-            {
-                if (player.HasData("BlockList"))
-                {
-                    List<Player> blockList = pl.GetData<List<Player>>("BlockList");
-                    blockList.Remove(player);
-                }
-            }
-
-
 
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has joined the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
         }
@@ -450,7 +440,7 @@ namespace RNC
 
                     foreach (Player t in listeners)
                     {
-                        if (t.HasData("BlockList"))
+                        if (t.HasData($"VoiceMute{player.Name}"))
                         {
                             List<Player> blockList = t.GetData<List<Player>>("BlockList");
                             if (blockList.Contains(player))
