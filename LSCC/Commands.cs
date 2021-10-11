@@ -3446,9 +3446,6 @@ namespace RNC
                 player.SetData($"VoiceMute{target.Name}", true);
                 player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have muted {target.Name} on voice chat, use this command again to unmute them.");
             }
-
-            player.SetData("BlockList", blockList);
-
             return;
         }
 

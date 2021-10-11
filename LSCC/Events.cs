@@ -442,11 +442,7 @@ namespace RNC
                     {
                         if (t.HasData($"VoiceMute{player.Name}"))
                         {
-                            List<Player> blockList = t.GetData<List<Player>>("BlockList");
-                            if (blockList.Contains(player))
-                            {
-                                continue;
-                            }
+                            continue;
                         }
 
                         if (t.GetSharedData<int>("VoiceMode") == 3) continue;
