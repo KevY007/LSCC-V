@@ -298,7 +298,7 @@ let cameraUpdateDisabled = false;
 
 mp.events.add('render', () => {
 
-    if(mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
+    if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
     {
         if(isAimingLastReport != mp.game.player.isFreeAiming())
         {

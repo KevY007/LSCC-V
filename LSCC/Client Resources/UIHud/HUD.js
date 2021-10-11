@@ -108,7 +108,7 @@ mp.keys.bind(
     () => {
         if(menuToggled !== undefined && menuToggled) return;
         if(!chatStatus && 
-            !(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false)) 
+            !(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false)) 
         {
             mp.events.callLocal("ToggleHud", !showHud);
 			
@@ -207,7 +207,7 @@ mp.events.add("OneSecondEvent", () => {
     if(mp.storage.data.menu.tooltips == true)
     {
         if(mp.players.local.vehicle){
-            if(mp.players.local.Team == 1)
+            if(mp.players.local.getVariable("Team") == 1)
                 if(createdTooltips.indexOf("B") == -1) mp.events.callLocal("AddTooltip", "B", "Silent Siren", 1);
                 
             if(createdTooltips.indexOf("Y") == -1) mp.events.callLocal("AddTooltip", "Y", "Engine", -1);
@@ -218,7 +218,7 @@ mp.events.add("OneSecondEvent", () => {
             if(createdTooltips.indexOf("L") != -1) mp.events.callLocal("RemoveTooltip", "L");
             if(createdTooltips.indexOf("B") != -1) mp.events.callLocal("RemoveTooltip", "B");     
         }
-        if(mp.players.local.Team == 1){
+        if(mp.players.local.getVariable("Team") == 1){
             if(createdTooltips.indexOf(String.fromCharCode(curGPSBind)) == -1) 
             {
                 mp.events.callLocal("AddTooltip", String.fromCharCode(curGPSBind), "GPS", 1);
@@ -423,7 +423,7 @@ mp.events.add("UpdateRateEvent", () => {
         streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
     }
     
-    if(UIHud != null && (!(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false || mp.players.local.Lobby === undefined)))
+    if(UIHud != null && (!(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false || mp.players.local.getVariable("InLobby") === undefined)))
     {
         UIHud.execute(`gm.$refs.TopRight.$refs.Info.points = ${mp.players.local.getVariable("Points")};`);
         
@@ -431,17 +431,17 @@ mp.events.add("UpdateRateEvent", () => {
         
         let lobbyPlayers = 0;
         mp.players.forEach((pl) => {
-            if(!(pl.LoggedIn === undefined || pl.LoggedIn == false || pl.Lobby === undefined))
+            if(!(pl.getVariable("pLogged") === undefined || pl.getVariable("pLogged") == false || pl.getVariable("InLobby") === undefined))
             {
-                if(pl.Lobby == mp.players.local.Lobby) lobbyPlayers++;
+                if(pl.getVariable("InLobby") == mp.players.local.getVariable("InLobby")) lobbyPlayers++;
             }
         });
 
-        if(mp.players.local.Lobby == -2) lobbyStr = "Jail";
-        if(mp.players.local.Lobby == -3) lobbyStr = "Freeroam";
-        if(mp.players.local.Lobby == -4) lobbyStr = "Derby";
-        if(mp.players.local.Lobby == -5) lobbyStr = "Customizer";
-        if(mp.players.local.Lobby > -1) lobbyStr = mp.players.local.Lobby.toString();
+        if(mp.players.local.getVariable("InLobby") == -2) lobbyStr = "Jail";
+        if(mp.players.local.getVariable("InLobby") == -3) lobbyStr = "Freeroam";
+        if(mp.players.local.getVariable("InLobby") == -4) lobbyStr = "Derby";
+        if(mp.players.local.getVariable("InLobby") == -5) lobbyStr = "Customizer";
+        if(mp.players.local.getVariable("InLobby") > -1) lobbyStr = mp.players.local.getVariable("InLobby").toString();
         
         UIHud.execute(`gm.$refs.TopRight.$refs.Info.lobbyID = "${lobbyStr}";`);
 
@@ -589,6 +589,7 @@ function ToggleScoreboard()
 
         mp.events.call("TogglePlayerChat", true);
         UIHud.execute(`gm.$refs.scoreboard.disableInput = true;`);
+		// UIHud.execute(`gm.$refs.scoreboard.setPlayers([]);`);
         UIHud.execute(`gm.scoreboard = false;`);
 
         if(scoreboardCursor)
@@ -604,7 +605,8 @@ function ToggleScoreboard()
 
         UIHud.execute(`gm.scoreboard = true;`);
         UIHud.execute(`gm.$refs.scoreboard.disableInput = true;`);
-
+		// UIHud.execute(`gm.$refs.scoreboard.setPlayers([]);`);
+		
         updatePlayers();
 
         updater = setInterval(function()
@@ -627,17 +629,34 @@ function updatePlayers()
     let updateString = `gm.$refs.scoreboard.setPlayers([`;
 
     let lobbyStr = '0';
-    mp.players.forEach(player => {
-        lobbyStr = player.Lobby.toString();
-        if(player.Lobby == -1) lobbyStr = "-";
-        if(player.Lobby == -2) lobbyStr = "-";
-        if(player.Lobby == -3) lobbyStr = "F";
-        if(player.Lobby == -4) lobbyStr = "D";
-        if(player.Lobby == -5) lobbyStr = "-";
+	let colr = 255;
+	let colg = 255;
+	let colb = 255;
+	let ping = 65535;
+	let level = 0;
+	
+    mp.players.forEach(sb => {
+        lobbyStr = "-";
+        colr = 255;
+        colg = 255;
+        colb = 255;
+        ping = 0;
+        level = 0;
+		
+        if(sb.getVariable("InLobby") == -3) lobbyStr = "F";
+        else if(sb.getVariable("InLobby") == -4) lobbyStr = "D";
+        else if(sb.getVariable("InLobby") > 0) lobbyStr = sb.getVariable("InLobby").toString();
+		
+		if(sb.getVariable("Color_R") !== undefined) colr = sb.getVariable("Color_R");
+		if(sb.getVariable("Color_G") !== undefined) colg = sb.getVariable("Color_G");
+		if(sb.getVariable("Color_B") !== undefined) colb = sb.getVariable("Color_B");
+		if(sb.getVariable("Level") !== undefined) level = sb.getVariable("Level");
+		if(sb.getVariable("Ping") !== undefined) ping = sb.getVariable("Ping");
+
 
         updateString += `{id: '${lobbyStr}', 
-        color: 'rgb(${player.getVariable("Color_R")}, ${player.getVariable("Color_G")}, ${player.getVariable("Color_B")})', 
-        name: '${player.name}', level: ${player.getVariable("Level")}, ping: ${player.getVariable("Ping")}},`;
+        color: 'rgb(${colr}, ${colg}, ${colb})', 
+        name: '${sb.name}', level: ${level}, ping: ${ping}},`;
     });
 
     updateString += `]);`;
@@ -678,7 +697,7 @@ mp.keys.bind(0x71, false, function () {
 
 function ScoreboardKeyTrigger()
 {
-    if(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false) return;
+    if(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false) return;
     if(Date.now() - lastChatToggle <= 500) return;
     if(menuToggled !== undefined && menuToggled) return;
     if(chatStatus && !scoreboardToggled) return;
@@ -753,7 +772,7 @@ mp.events.add("render", () => {
         mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
     }
 
-    if(mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
+    if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
     {       
         if ((resolution.x != mp.game.graphics.getScreenActiveResolution(0,0).x || miniHUDVars["left"] != (((getMinimapAnchor().rightX * resolution.x) + 10)) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0)) && UIHud != null)
         {

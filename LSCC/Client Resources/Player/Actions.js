@@ -76,7 +76,7 @@ function initiateActionTimer(startTime){
     maxActionTime = startTime;
     UIHud.execute(`gm.$refs.actionBar.maxtime = ${startTime}`);
     UIHud.execute(`gm.$refs.actionBar.time = 0.1`);
-    UIHud.execute(`gm.$refs.actionBar.fugitive = ${(player.Team == 0 ? true : false)}`);
+    UIHud.execute(`gm.$refs.actionBar.fugitive = ${(player.getVariable("Team") == 0 ? true : false)}`);
     UIHud.execute(`gm.actionBar = true;`);
 }
 
@@ -117,7 +117,7 @@ cuffTarget = null;
 cuffInterval = null;
 
 function requestCuffTarget(){
-    if(player.Team != 1 || chatStatus || menuToggled || scoreboardToggled || Date.now() - lastChatToggle <= 500) return;
+    if(player.getVariable("Team") != 1 || chatStatus || menuToggled || scoreboardToggled || Date.now() - lastChatToggle <= 500) return;
 
     mp.events.callRemote("RequestCuffTarget");
 }
@@ -129,7 +129,7 @@ mp.events.add("StopCuffing", (reason) => { stopCuffing(reason); });
 mp.events.add("BeginCuffing", (target) => {
 
     if(target == null || !mp.players.exists(target)) return;
-    if(target.Team != 0 || player.Team != 1) return;
+    if(target.getVariable("Team") != 0 || player.getVariable("Team") != 1) return;
 
     isCuffing = true;
     cuffTarget = target;
@@ -146,11 +146,11 @@ mp.events.add("BeginCuffing", (target) => {
             stopCuffing(0);
             return;
         }
-        if(cuffTarget.Team != 0 || cuffTarget.isDead()){ 
+        if(cuffTarget.getVariable("Team") != 0 || cuffTarget.isDead()){ 
             stopCuffing(1);
             return;
         }
-        if(player.Team != 1 || player.isDead()){
+        if(player.getVariable("Team") != 1 || player.isDead()){
             stopCuffing(3);
             return;
         }
