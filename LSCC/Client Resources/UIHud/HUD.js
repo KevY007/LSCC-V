@@ -179,6 +179,8 @@ mp.events.add('RemoveTooltip', (key) => {
     createdTooltips.splice(createdTooltips.indexOf(key), 1);
 });
 
+let keyTrunk = true; // true = key trunk, false = key seatbelt displayed
+
 mp.events.add('ToggleTooltips', (status) =>
 {
     mp.storage.data.menu.tooltips = status;
@@ -227,11 +229,68 @@ mp.events.add("OneSecondEvent", () => {
             if(createdTooltips.indexOf("B") != -1) mp.events.callLocal("RemoveTooltip", "B");     
         }
 
-        if((mp.players.local.Team == 0 || mp.players.local.Team == 1) && !mp.players.local.isInAnyVehicle(false)) {
-            if(createdTooltips.indexOf("J") == -1) mp.events.callLocal("AddTooltip", "J", "Open trunk", -1);
+        if(!mp.players.local.isInAnyVehicle(false)) 
+        {
+            if(createdTooltips.indexOf("J") != -1 && !keyTrunk)
+            {
+                mp.events.callLocal("RemoveTooltip", "J");
+                keyTrunk = true;
+            }
+
+            let veh = getClosestVehicle(mp.players.local.position);
+
+            if(veh !== undefined && mp.vehicles.exists(veh.vehicle) && veh.vehicle.handle !== 0)
+            {
+                let sidebones = [
+                    "bonnet",
+                    "boot"
+                ];
+          
+                let closestHandle = "";
+                let closestDist = 100.0;
+                sidebones.forEach((side) => {
+                    let bone = veh.vehicle.getBoneIndexByName(side);
+                    if(bone != -1)
+                    {
+                        let dist = calcDist(mp.players.local.position, veh.vehicle.getWorldPositionOfBone(bone));
+                        if(dist < closestDist)
+                        {
+                            closestDist = dist;
+                            closestHandle = side;
+                        }
+                    }
+                });
+        
+                if(closestDist <= 3.5)
+                {
+                    if((veh.vehicle.getVariable("Locked") === undefined || veh.vehicle.getVariable("Locked") == false) || 
+                    (veh.vehicle.getVariable("Locked") == true && (mp.players.local.weapon == 0x84BD7BFD || mp.players.local.weapon == 2227010557)))
+                    {
+                        if(createdTooltips.indexOf("J") == -1) 
+                        {
+                            if(closestHandle == "boot") mp.events.callLocal("AddTooltip", "J", "Trunk", -1);
+                            else if(closestHandle == "bonnet") mp.events.callLocal("AddTooltip", "J", "Bonnet", -1);
+                        }
+                    }
+                    else if(createdTooltips.indexOf("J") != -1) mp.events.callLocal("RemoveTooltip", "J");
+                }
+                else if(createdTooltips.indexOf("J") != -1) mp.events.callLocal("RemoveTooltip", "J");
+            }
+            else if(createdTooltips.indexOf("J") != -1) mp.events.callLocal("RemoveTooltip", "J");
         }
-        else{
-            if(createdTooltips.indexOf("J") != -1) mp.events.callLocal("RemoveTooltip", "J");
+        else
+        {
+            if((createdTooltips.indexOf("J") != -1 && keyTrunk) || createdTooltips.indexOf("J") == -1)
+            {
+                mp.events.callLocal("RemoveTooltip", "J");
+                
+                if(mp.players.local.vehicle.getClass() != 8 && mp.players.local.vehicle.model != mp.game.joaat('policeb'))
+                {
+                    mp.events.callLocal("AddTooltip", "J", "Seatbelt", -1);
+                }
+
+                keyTrunk = false;
+            }
         }    
     }
 });

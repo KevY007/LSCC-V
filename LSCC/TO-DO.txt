@@ -1,7 +1,6 @@
 ﻿FORMAT: ADDED BY - ITEM.
 
 interiors vro
-seatbelt (afob ripoff luL)
 dragout button?? also disable multiple people dragging same guy
 
 buyammo with donator points

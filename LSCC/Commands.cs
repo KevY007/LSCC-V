@@ -363,6 +363,31 @@ namespace RNC
             return;
         }
 
+        [Command("seatbelt")]
+        public static void cmd_seatbelt(Player player)
+        {
+            if (!player.IsInVehicle || player.Vehicle == null)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not inside any vehicle!");
+                return;
+            }
+
+            if (player.HasData("Seatbelt"))
+            {
+                EPlayer.Action(player, "releases the seatbelt.");
+                player.ResetData("Seatbelt");
+                player.TriggerEvent("ToggleSeatbelt", false);
+            }
+            else
+            {
+                EPlayer.Action(player, "fastens the seatbelt.");
+                player.SetData("Seatbelt", true);
+                player.TriggerEvent("ToggleSeatbelt", true);
+            }
+
+            return;
+        }
+
         [Command("time", Alias = "weather")]
         public void cmd_timeweather(Player player)
         {
@@ -997,6 +1022,7 @@ namespace RNC
             if (player.IsInVehicle)
             {
                 player.Vehicle.Position = target.Position.Around(5.0f);
+                player.Vehicle.Dimension = target.Dimension;
             }
             else
             {
@@ -1033,6 +1059,8 @@ namespace RNC
 
             if (target.IsInVehicle)
             {
+                target.ResetData("Seatbelt");
+                target.TriggerEvent("ToggleSeatbelt", false);
                 target.Vehicle.Position = player.Position.Around(5.0f);
                 target.Vehicle.Dimension = player.Dimension;
             }
@@ -1783,6 +1811,8 @@ namespace RNC
 
             if (player.Position.DistanceTo(target.Position) >= 3.5) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near that player!"); return; }
 
+            target.TriggerEvent("ToggleSeatbelt", false);
+            target.ResetData("Seatbelt");
             EPlayer.Action(player, $"leans towards {target.Name}'s vehicle and tries to open the door to drag them out.");
             
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are now dragging out the target, stay with them for 5 seconds to complete the operation.");
@@ -1825,6 +1855,8 @@ namespace RNC
                             }
 
                             EPlayer.GrantXP(player, 2);
+                            target.TriggerEvent("ToggleSeatbelt", false);
+                            target.ResetData("Seatbelt");
                             player.SetSharedData("FugitiveChance", player.GetSharedData<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(player).DonatorLevel + 1.0)));
                             cmd_do(player, $"{target.Name} has been dragged out of the vehicle.");
 
@@ -4260,6 +4292,8 @@ namespace RNC
             }
             
             Logs.LogAdmin(player, $"Put {target.Name} in {toputin.Name}'s vehicle.");
+            target.TriggerEvent("ToggleSeatbelt", false);
+            target.ResetData("Seatbelt");
             target.SetIntoVehicle(toputin.Vehicle, nextseat);
 
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has put {target.Name} in {toputin.Name}'s vehicle.");
@@ -4356,7 +4390,8 @@ namespace RNC
             player.SendChatMessage("!{#FF6347}[F6] !{#FFFFFF}Toggle weapon crosshair/reticule");
             player.SendChatMessage("!{#FF6347}[B] !{#FFFFFF}Toggle silent siren in !{#0097FF}police !{#FFFFFF}vehicles");
             player.SendChatMessage("!{#FF6347}[H] !{#FFFFFF}Cuff a !{#FFAE00}fugitive");
-            player.SendChatMessage("!{#FF6347}[J] !{#FFFFFF}Close/open vehicle's (must be unlocked) !{#FFAE00}trunk/hood");
+            player.SendChatMessage("!{#FF6347}[J: OnFoot] !{#FFFFFF}Close/open vehicle's (must be unlocked) !{#FFAE00}trunk/hood");
+            player.SendChatMessage("!{#FF6347}[J: InCar] !{#FFFFFF}Fasten/unfasten seatbelt (stops from falling out/leaving)");
         }
 
         [Command("teleport", "!{#AFAFAF}[USAGE] teleport (option: chilliad, airport)", Alias = "tp", GreedyArg = true)]
@@ -4539,7 +4574,7 @@ namespace RNC
             player.SendChatMessage("!{#0097ff}[Cop]: /gps /cuff /m(egaphone) /dragout");
             player.SendChatMessage("!{#ffae00}[Fugitive]: /d(rive)b(y)");
             player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup /s(top)a(nim) /passgun");
-            player.SendChatMessage("!{#AB00BA}[Vehicle]: /trunk /lock /engine");
+            player.SendChatMessage("!{#AB00BA}[Vehicle]: /trunk /lock /engine /seatbelt");
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /derby");
             player.SendChatMessage("!{#28E0DA}[Mode: DM]: /dm /dmarena");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /freeroam /veh /customvehlist /teleport /mytime /myweather");
@@ -6818,8 +6853,10 @@ namespace RNC
                         lobby = "!{#FF6347}[Customizer]";
                         break;
                 }
+                
+                p.SetSharedData("Ping", p.Ping);
 
-                player.SendChatMessage("!{#C4C4C4}" + p.Name + " (ID: " + p.Id + ") " + lobby + " " + (EPlayer.IsAFK(p) ? "!{#FF0000}(AFK)" : ""));
+                player.SendChatMessage($"!{{#C4C4C4}}{p.Name} (ID: {p.Id}) (Ping: {p.GetSharedData<int>("Ping")}ms) {lobby} {(EPlayer.IsAFK(p) ? "!{#FF0000}(AFK)" : "")}");
             });
 
             return;
@@ -7988,6 +8025,8 @@ namespace RNC
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher/equal admin level than you.");
                     return;
                 }
+                target.TriggerEvent("ToggleSeatbelt", false);
+                target.ResetData("Seatbelt");
                 target.Position = new Vector3(target.Position.X, target.Position.Y, target.Position.Z + 5f);
 
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {target.Name} has been slapped by {player.Name}.");

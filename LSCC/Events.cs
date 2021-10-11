@@ -354,6 +354,11 @@ namespace RNC
                 Commands.cmd_engine(player);
             }
 
+            if(keyId == 0x4A && player.IsInVehicle)
+            {
+                Commands.cmd_seatbelt(player);
+            }
+
             if (keyId == 0x09)
             {
                 int voiceMode = player.GetSharedData<int>("VoiceMode");
@@ -659,6 +664,8 @@ namespace RNC
             player.SetSharedData("CuffedBy", "n/a");
             player.ResetData("FreezeWeapons");
             player.SetData("Dead", Environment.TickCount64);
+            player.ResetData("Seatbelt");
+            player.TriggerEvent("ToggleSeatbelt", false);
 
             string reasonStr;
             bool wasInGame = false;
@@ -3151,6 +3158,8 @@ namespace RNC
             player.SetSharedData("Ping", player.Ping);
             player.SetData("SpawnTick", Environment.TickCount64);
             player.ResetData("Dead");
+            player.ResetData("Seatbelt");
+            player.TriggerEvent("ToggleSeatbelt", false);
             player.ResetSharedData("FlashlightEquipped");
             player.ResetSharedData("UpdateCameraData");
             player.SetSharedData("Collisions", true); // Reset collision from chase.

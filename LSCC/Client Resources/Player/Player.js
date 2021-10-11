@@ -67,6 +67,11 @@ var AFOB_LastSeat = -1;
 var AFOB_LastSpeed = 0;
 var AFOB_SpeedLimit = 999;
 
+var Seatbelt_Enabled = false;
+var Seatbelt_LastMessage = Date.now();
+var Seatbelt_LastVeh = null;
+var Seatbelt_LastSeat = -1;
+
 traceLastFunc("[Players] CreateVars");
 
 function ResetShotStats()
@@ -584,6 +589,19 @@ mp.events.addDataHandler('InLobby', function (entity, value, oldValue)
     entity.Lobby = value;
 });
 
+
+mp.keys.bind(0x4A, false, () => {
+
+    if (mp.players.local.isInAnyVehicle(false) && chatStatus == false && Date.now() - lastChatToggle >= 500 && 
+        !menuToggled && !scoreboardToggled)
+    {
+        if(mp.players.local.vehicle.getClass() != 8 && mp.players.local.vehicle.model != mp.game.joaat('policeb')) 
+        { // NO BIKE FUCKERS ALLOWED CUZ YALL GOT "ANTI FALL OFF BIKE" SMH
+            mp.events.callRemote("OnScriptedKeyPress", 0x4A, true); // For toggling da sseeaattbbelltt
+        }
+    }
+});
+
 mp.events.add('render', () => {
 
     if(mp.players.local.LoggedIn !== undefined && mp.players.local.LoggedIn == true)
@@ -633,6 +651,39 @@ mp.events.add('render', () => {
                     if(mp.players.local.vehicle.getPedInSeat(5) == mp.players.local.handle) AFOB_LastSeat = 5;
                     if(mp.players.local.vehicle.getPedInSeat(6) == mp.players.local.handle) AFOB_LastSeat = 6;
                 }
+            }
+        }
+
+        if(Seatbelt_Enabled === true && !mp.players.local.isDead() && !mp.players.local.isSwimming())
+        {
+            if(mp.players.local.isInAnyVehicle(false) == false)
+            {
+                if(Seatbelt_LastVeh != null && mp.vehicles.exists(Seatbelt_LastVeh) && Seatbelt_LastVeh.handle !== 0)
+                {
+                    mp.players.local.setIntoVehicle(Seatbelt_LastVeh.handle, Seatbelt_LastSeat);
+                    if(Date.now() > Seatbelt_LastMessage)
+                    {
+                        Seatbelt_LastMessage = Date.now() + 5000;
+                        mp.gui.chat.push(`!{#FF6347}[!] !{#FFFFFF}Your seatbelt has prevented you from exiting the vehicle.`);
+                        //mp.gui.chat.push(`Setting into vehicle as last speed was ${AFOB_LastSpeed} under the limit ${AFOB_SpeedLimit}`);
+                    }
+                }
+            }
+            else if(mp.players.local.vehicle != null && mp.players.local.vehicle.handle !== 0 && mp.players.local.isInAnyVehicle(false))
+            {
+                if(Seatbelt_LastVeh == null || !mp.vehicles.exists(Seatbelt_LastVeh) || Seatbelt_LastVeh.handle === 0)
+                {
+                    Seatbelt_LastVeh = mp.players.local.vehicle;
+                }
+                // Till seat 8.
+                if(mp.players.local.vehicle.getPedInSeat(-1) == mp.players.local.handle) Seatbelt_LastSeat = -1;
+                if(mp.players.local.vehicle.getPedInSeat(0) == mp.players.local.handle) Seatbelt_LastSeat = 0;
+                if(mp.players.local.vehicle.getPedInSeat(1) == mp.players.local.handle) Seatbelt_LastSeat = 1;
+                if(mp.players.local.vehicle.getPedInSeat(2) == mp.players.local.handle) Seatbelt_LastSeat = 2;
+                if(mp.players.local.vehicle.getPedInSeat(3) == mp.players.local.handle) Seatbelt_LastSeat = 3;
+                if(mp.players.local.vehicle.getPedInSeat(4) == mp.players.local.handle) Seatbelt_LastSeat = 4;
+                if(mp.players.local.vehicle.getPedInSeat(5) == mp.players.local.handle) Seatbelt_LastSeat = 5;
+                if(mp.players.local.vehicle.getPedInSeat(6) == mp.players.local.handle) Seatbelt_LastSeat = 6;
             }
         }
 
@@ -1509,6 +1560,13 @@ mp.events.add(
         if(status) AFOB_SpeedLimit = speedLimit;
     },
 
+    "ToggleSeatbelt": (status) => {
+        Seatbelt_Enabled = status;
+        Seatbelt_LastMessage = Date.now() - 100000;
+        Seatbelt_LastVeh = null;
+        Seatbelt_LastSeat = -1;
+    },
+
     "SyncServerSettings": (onfootcollisions, cameraUpdateTime) => {
         ServerSettings.OnfootCollisions = onfootcollisions;
         ServerSettings.CameraUpdateTime = cameraUpdateTime;
@@ -1742,6 +1800,12 @@ mp.events.add(
 
     "playerLeaveVehicle": (vehicle, seat) => {
         if (vehicle != null) {
+
+            if(Seatbelt_Enabled == true)
+            {
+                mp.players.local.clearTasks();
+                mp.players.local.setIntoVehicle(vehicle.handle, seat);
+            }
 
             if(vehicle.getVariable("Engine") !== undefined)
                 vehicle.setEngineOn(vehicle.getVariable("Engine"), true, true);

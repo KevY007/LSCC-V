@@ -63,6 +63,11 @@ Fixed siren not syncing after leaving vehicle.
 Cops and Fugitives will now receive and reset their HP & AR when collisions enable (in case they lost hp during spawning/starting)
 You can't bring extra armour from DM anymore.
 
+Fully functional seatbelt system that will prevent players from leaving vehicle (literally, even if they leave at will) ; this will be used to prevent players from falling out of vehicle on crash.
+Trunk/Bonnet tooltip will only show if its possible to open it (with crowbar/unlocked vehicle and/or being close the boot/hood itself)
+Added /serveroptions ooc for high ranking admins to disable OOC chat.
+Reworked /voiceblock. Maybe it works now? Untested.
+
 Added new DM arenas:
 Humane Labs (Pistol and Shotgun only)
 Morgue (Stungun/Taser only)

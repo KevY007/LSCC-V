@@ -1375,6 +1375,9 @@ namespace RNC
             if (player.HasData("Kicked")) return;
             if (!LoggedIn(player)) return;
 
+            player.ResetData("Seatbelt");
+            player.TriggerEvent("ToggleSeatbelt", false);
+
             if (player.HasData("Spectating"))
             {
                 Commands.cmd_specoff(player);

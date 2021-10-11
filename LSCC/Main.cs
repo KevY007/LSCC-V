@@ -1990,6 +1990,9 @@ namespace RNC
                         player.TriggerEvent("moveSkyCamera", "down", 1, false, 5000);
                         player.TriggerEvent("ToggleNametags", false);
                         player.SetSharedData("Collisions", false);
+                        player.ResetData("Seatbelt");
+                        player.TriggerEvent("ToggleSeatbelt", false);
+
                         EPlayer.Freeze(player, false);
 
                         player.RemoveAllWeapons();

@@ -597,7 +597,7 @@ mp.game.streaming.requestAnimDict("veh@low@front_ps@enter_exit");
 mp.game.streaming.requestAnimDict("rcmnigel3_trunk");
 mp.game.streaming.requestAnimDict("rcmepsilonism8");
 
-mp.keys.bind(74, false, () => {
+mp.keys.bind(0x4A, false, () => {
 
     if (!mp.players.local.isInAnyVehicle(false) && operationType == 0 
         && chatStatus == false && Date.now() - lastChatToggle >= 500 && !menuToggled && !scoreboardToggled && 
