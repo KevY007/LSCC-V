@@ -2,6 +2,7 @@
 
 interiors vro
 buyammo with donator points
+copy outfits for donors
 #bug reports and other chans sugeestion
 add a linux script that will keep on restarting server if goes off?
 add more clothing using mods
