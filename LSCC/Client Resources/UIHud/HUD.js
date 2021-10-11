@@ -629,10 +629,11 @@ function updatePlayers()
     let lobbyStr = '0';
     mp.players.forEach(player => {
         lobbyStr = player.Lobby.toString();
-        if(player.Lobby == -2) lobbyStr = "J";
+        if(player.Lobby == -1) lobbyStr = "-";
+        if(player.Lobby == -2) lobbyStr = "-";
         if(player.Lobby == -3) lobbyStr = "F";
         if(player.Lobby == -4) lobbyStr = "D";
-        if(player.Lobby == -5) lobbyStr = "C";
+        if(player.Lobby == -5) lobbyStr = "-";
 
         updateString += `{id: '${lobbyStr}', 
         color: 'rgb(${player.getVariable("Color_R")}, ${player.getVariable("Color_G")}, ${player.getVariable("Color_B")})', 
