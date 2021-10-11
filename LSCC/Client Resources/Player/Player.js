@@ -658,7 +658,8 @@ mp.events.add('render', () => {
         {
             if(mp.players.local.isInAnyVehicle(false) == false)
             {
-                if(Seatbelt_LastVeh != null && mp.vehicles.exists(Seatbelt_LastVeh) && Seatbelt_LastVeh.handle !== 0)
+                if(Seatbelt_LastVeh != null && mp.vehicles.exists(Seatbelt_LastVeh) && Seatbelt_LastVeh.handle !== 0 && 
+                    Seatbelt_LastVeh.getClass() != 8 && Seatbelt_LastVeh.model != mp.game.joaat('policeb'))
                 {
                     mp.players.local.setIntoVehicle(Seatbelt_LastVeh.handle, Seatbelt_LastSeat);
                     if(Date.now() > Seatbelt_LastMessage)
@@ -1801,7 +1802,7 @@ mp.events.add(
     "playerLeaveVehicle": (vehicle, seat) => {
         if (vehicle != null) {
 
-            if(Seatbelt_Enabled == true)
+            if(Seatbelt_Enabled == true && vehicle.getClass() != 8 && vehicle.model != mp.game.joaat('policeb'))
             {
                 mp.players.local.clearTasks();
                 mp.players.local.setIntoVehicle(vehicle.handle, seat);
