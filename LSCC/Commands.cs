@@ -4818,7 +4818,7 @@ namespace RNC
             return;
         }
 
-        [Command("deleteaccount", "!{#AFAFAF}[USAGE] deleteaccount (account name)")]
+        [Command("deleteaccount", "!{#AFAFAF}[USAGE] deleteaccount (account name) | THIS WILL DELETE ALL LOGS AND ALL KINDS OF DATA ON THEM")]
         public void cmd_deleteaccount(Player player, string name)
         {
             if (!EPlayer.LoggedIn(player))
@@ -4861,6 +4861,36 @@ namespace RNC
                 ContextFactory.Instance.Bans.RemoveRange(ContextFactory.Instance.Bans.ToList().Where(a => a.AccountSQLID == tpAcc.SQL_ID));
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There was an outstanding ban on that account, it has been deleted along with the account.");
             }
+            if (ContextFactory.Instance.PlayerTunings.Count(a => a.AccountSQLID == tpAcc.SQL_ID) > 0)
+            {
+                ContextFactory.Instance.PlayerTunings.RemoveRange(ContextFactory.Instance.PlayerTunings.ToList().Where(a => a.AccountSQLID == tpAcc.SQL_ID));
+            }
+            if (ContextFactory.Instance.PlayerOutfits.Count(a => a.AccountID == tpAcc.SQL_ID) > 0)
+            {
+                ContextFactory.Instance.PlayerOutfits.RemoveRange(ContextFactory.Instance.PlayerOutfits.ToList().Where(a => a.AccountID == tpAcc.SQL_ID));
+            }
+            if (ContextFactory.Instance.OwnedLoadouts.Count(a => a.AccountSQLID == tpAcc.SQL_ID) > 0)
+            {
+                ContextFactory.Instance.OwnedLoadouts.RemoveRange(ContextFactory.Instance.OwnedLoadouts.ToList().Where(a => a.AccountSQLID == tpAcc.SQL_ID));
+            }
+            if (ContextFactory.Instance.OwnedVehicles.Count(a => a.AccountSQLID == tpAcc.SQL_ID) > 0)
+            {
+                ContextFactory.Instance.OwnedVehicles.RemoveRange(ContextFactory.Instance.OwnedVehicles.ToList().Where(a => a.AccountSQLID == tpAcc.SQL_ID));
+            }
+
+            if (ContextFactory.Instance.Logs_Session.Count(a => a.AccountID == tpAcc.SQL_ID) > 0)
+            {
+                ContextFactory.Instance.Logs_Session.RemoveRange(ContextFactory.Instance.Logs_Session.ToList().Where(a => a.AccountID == tpAcc.SQL_ID));
+            }
+            if (ContextFactory.Instance.Logs_AdminRecords.Count(a => a.AccountID == tpAcc.SQL_ID || a.AdminID == tpAcc.SQL_ID) > 0)
+            {
+                ContextFactory.Instance.Logs_AdminRecords.RemoveRange(ContextFactory.Instance.Logs_AdminRecords.ToList().Where(a => a.AccountID == tpAcc.SQL_ID || a.AdminID == tpAcc.SQL_ID));
+            }
+            if (ContextFactory.Instance.Logs_Admin.Count(a => a.AccountID == tpAcc.SQL_ID) > 0)
+            {
+                ContextFactory.Instance.Logs_Admin.RemoveRange(ContextFactory.Instance.Logs_Admin.ToList().Where(a => a.AccountID == tpAcc.SQL_ID));
+            }
+
             ContextFactory.Instance.Accounts.Remove(tpAcc);
             ContextFactory.Instance.SaveChanges();
             return;
