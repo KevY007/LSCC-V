@@ -1025,7 +1025,8 @@ mp.events.add('render', () => {
 
             if(target.dimension == mp.players.local.dimension/* && target != mp.players.local*/ && !target.isDead())
             {
-                if (target.getVariable("VisibleBlip") !== undefined && target.getVariable("VisibleBlip") == true)
+                if ((target.getVariable("VisibleBlip") !== undefined && target.getVariable("VisibleBlip") == true) || 
+					(target.getVariable("Team") == 0 && target.getVariable("HasShot") == true))
                 {
                     var blipColor = 45;
                     var blipId = 1;

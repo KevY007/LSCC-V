@@ -893,8 +893,9 @@ namespace RNC
                             if (killStreak % 4 == 0 && killStreak >= 4)
                             {
                                 EPlayer.GrantXP(killer, 5);
+                                EPlayer.GivePoints(killer, 5);
                                 EPlayer.SendMessageInLobby(lobby.lobbyId, $"!{{#FF0000}}[KILLSTREAK] !{{#FF6347}}{killer.Name} !{{#FFFFFF}}is on a {killStreak} kills rampage! Someone stop them!");
-                                killer.SendChatMessage("!{#00FF33}[!] !{#FFFFFF}You have earnt 5 XP for maintaining a killstreak!");
+                                killer.SendChatMessage("!{#00FF33}[!] !{#FFFFFF}You have earnt 5 XP and 5 points for maintaining a killstreak!");
                                 killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(killer).DonatorLevel + 1.0)));
                             }
                         }
@@ -2153,12 +2154,16 @@ namespace RNC
             if (player.IsInVehicle) player.SetSharedData("UnstreamedState", 1);
             else player.SetSharedData("UnstreamedState", 0);
 
-            if (player.GetSharedData<int>("Team") == 0 && player.GetSharedData<int>("InLobby") > 0 && player.IsInVehicle && player.Vehicle.HasSharedData("Team"))
+            if (player.GetSharedData<int>("Team") == 0 && player.GetSharedData<int>("InLobby") > 0)
             {
-                if (player.Vehicle.GetSharedData<int>("Team") == 1)
-                {
+				if(player.IsInVehicle && player.Vehicle.HasSharedData("Team") && player.Vehicle.GetSharedData<int>("Team") == 1)
+				{
                     player.SetSharedData("VisibleBlip", true);
                 }
+				if(player.GetSharedData<bool>("HasShot") == true)
+				{
+					player.SetSharedData("VisibleBlip", true);
+				}
             }
 
             player.SetSharedData("UnstreamedX", player.Position.X);
