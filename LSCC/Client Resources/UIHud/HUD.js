@@ -626,8 +626,15 @@ function updatePlayers()
 {
     let updateString = `gm.$refs.scoreboard.setPlayers([`;
 
+    let lobbyStr = '0';
     mp.players.forEach(player => {
-        updateString += `{id: ${player.remoteId}, 
+        lobbyStr = player.Lobby.toString();
+        if(player.Lobby == -2) lobbyStr = "J";
+        if(player.Lobby == -3) lobbyStr = "F";
+        if(player.Lobby == -4) lobbyStr = "D";
+        if(player.Lobby == -5) lobbyStr = "C";
+
+        updateString += `{id: '${lobbyStr}', 
         color: 'rgb(${player.getVariable("Color_R")}, ${player.getVariable("Color_G")}, ${player.getVariable("Color_B")})', 
         name: '${player.name}', level: ${player.getVariable("Level")}, ping: ${player.getVariable("Ping")}},`;
     });
