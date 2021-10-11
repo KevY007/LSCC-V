@@ -12,12 +12,12 @@ ALTER TABLE `Accounts` ADD `RegisterIP` LONGTEXT NOT NULL DEFAULT 'n/a' AFTER `L
 ALTER TABLE `Accounts` ADD `PurchasedAmmo` LONGTEXT NULL DEFAULT '{}' AFTER `LastSC`, ADD `DiscordInfo` LONGTEXT NULL DEFAULT '{}' AFTER `PurchasedAmmo`;
 
 
-CREATE TABLE `racenchase`.`OwnedVehicles` ( `SQL_ID` INT(11) NOT NULL AUTO_INCREMENT , `AccountSQLID` INT(11) NOT NULL , `Model` LONGTEXT NOT NULL , `Team` INT(11) NOT NULL , `TimesUsed` INT(11) NOT NULL , PRIMARY KEY (`SQL_ID`)) ENGINE = InnoDB;
-CREATE TABLE `racenchase`.`OwnedLoadouts` ( `SQL_ID` INT(11) NOT NULL AUTO_INCREMENT , `AccountSQLID` INT(11) NOT NULL , `Name` LONGTEXT NOT NULL , `Team` INT(11) NOT NULL , `TimesUsed` INT(11) NOT NULL , PRIMARY KEY (`SQL_ID`)) ENGINE = InnoDB;
-CREATE TABLE `racenchase`.`PlayerTunings` ( `SQL_ID` INT(11) NOT NULL AUTO_INCREMENT , `AccountSQLID` INT(11) NOT NULL , `Model` INT(10) UNSIGNED NOT NULL , `PrimaryColor` INT(11) NOT NULL , `SecondaryColor` INT(11) NOT NULL , `PearlescentColor` INT(11) NOT NULL , `WheelColor` INT(11) NOT NULL , `Mods` LONGTEXT NOT NULL , PRIMARY KEY (`SQL_ID`)) ENGINE = InnoDB;
+CREATE TABLE `OwnedVehicles` ( `SQL_ID` INT(11) NOT NULL AUTO_INCREMENT , `AccountSQLID` INT(11) NOT NULL , `Model` LONGTEXT NOT NULL , `Team` INT(11) NOT NULL , `TimesUsed` INT(11) NOT NULL , PRIMARY KEY (`SQL_ID`)) ENGINE = InnoDB;
+CREATE TABLE `OwnedLoadouts` ( `SQL_ID` INT(11) NOT NULL AUTO_INCREMENT , `AccountSQLID` INT(11) NOT NULL , `Name` LONGTEXT NOT NULL , `Team` INT(11) NOT NULL , `TimesUsed` INT(11) NOT NULL , PRIMARY KEY (`SQL_ID`)) ENGINE = InnoDB;
+CREATE TABLE `PlayerTunings` ( `SQL_ID` INT(11) NOT NULL AUTO_INCREMENT , `AccountSQLID` INT(11) NOT NULL , `Model` INT(10) UNSIGNED NOT NULL , `PrimaryColor` INT(11) NOT NULL , `SecondaryColor` INT(11) NOT NULL , `PearlescentColor` INT(11) NOT NULL , `WheelColor` INT(11) NOT NULL , `Mods` LONGTEXT NOT NULL , PRIMARY KEY (`SQL_ID`)) ENGINE = InnoDB;
 
 
-ALTER TABLE `bans` CHANGE `DateTime` `DateTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE `Bans` CHANGE `DateTime` `DateTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
 UPDATE Accounts SET RegisterDate = STR_TO_DATE('2000-3-2 6:03:22', '%Y-%m-%d %H:%i:%s'), LastLogin = STR_TO_DATE('2000-3-2 6:03:22', '%Y-%m-%d %H:%i:%s'), LastIP = 'n/a', LastRID = 0, LastHWID = 'n/a', LastSC = 'n/a', RegisterIP = 'n/a', RegisterSC = 'n/a', RegisterRID = 0, RegisterHWID = 'n/a';
 
