@@ -3541,6 +3541,23 @@ namespace RNC
                                                 break;
                                         }
                                     }
+
+                                    if (EPlayer.GetAccount(player).WeaponComponents != null && EPlayer.GetAccount(player).WeaponComponents.Length > 3)
+                                    {
+                                        Dictionary<long, wComponentData> weaponCompsData = new Dictionary<long, wComponentData>();
+                                        weaponCompsData = NAPI.Util.FromJson<Dictionary<long, wComponentData>>(EPlayer.GetAccount(player).WeaponComponents);
+
+                                        foreach (KeyValuePair<long, wComponentData> i in weaponCompsData)
+                                        {
+                                            if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
+                                            {
+                                                i.Value.Components.ForEach((long comphash) =>
+                                                {
+                                                    EPlayer.AttachComponent(player, i.Key, comphash);
+                                                });
+                                            }
+                                        }
+                                    }
                                 }
                             }
                             catch { }

@@ -3,7 +3,6 @@
 interiors vro
 
 buyammo with donator points
-enable comps in DM, freeroam
 #bug reports and other chans sugeestion
 add a linux script that will keep on restarting server if goes off?
 add more clothing using mods

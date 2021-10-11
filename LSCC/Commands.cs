@@ -3037,6 +3037,23 @@ namespace RNC
 
             target.GiveWeapon((WeaponHash)wephash, ammo);
 
+            if (EPlayer.GetAccount(target).WeaponComponents != null && EPlayer.GetAccount(target).WeaponComponents.Length > 3)
+            {
+                Dictionary<long, wComponentData> weaponCompsData = new Dictionary<long, wComponentData>();
+                weaponCompsData = NAPI.Util.FromJson<Dictionary<long, wComponentData>>(EPlayer.GetAccount(target).WeaponComponents);
+
+                foreach (KeyValuePair<long, wComponentData> i in weaponCompsData)
+                {
+                    if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
+                    {
+                        i.Value.Components.ForEach((long comphash) =>
+                        {
+                            EPlayer.AttachComponent(target, i.Key, comphash);
+                        });
+                    }
+                }
+            }
+
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have given a " + wepname + " with " + ammo + " ammo to the target.");
             return;
         }
@@ -3135,6 +3152,23 @@ namespace RNC
             player.GiveWeapon((WeaponHash)wephash, ammo);
 
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have given yourself " + wepname + " with " + ammo + " ammo.");
+
+            if (EPlayer.GetAccount(player).WeaponComponents != null && EPlayer.GetAccount(player).WeaponComponents.Length > 3)
+            {
+                Dictionary<long, wComponentData> weaponCompsData = new Dictionary<long, wComponentData>();
+                weaponCompsData = NAPI.Util.FromJson<Dictionary<long, wComponentData>>(EPlayer.GetAccount(player).WeaponComponents);
+
+                foreach (KeyValuePair<long, wComponentData> i in weaponCompsData)
+                {
+                    if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
+                    {
+                        i.Value.Components.ForEach((long comphash) =>
+                        {
+                            EPlayer.AttachComponent(player, i.Key, comphash);
+                        });
+                    }
+                }
+            }
             return;
         }
 
@@ -3257,6 +3291,23 @@ namespace RNC
             foreach (Player target in Settings.LoggedInPlayers)
             {
                 target.GiveWeapon((WeaponHash)wephash, ammo);
+
+                if (EPlayer.GetAccount(target).WeaponComponents != null && EPlayer.GetAccount(target).WeaponComponents.Length > 3)
+                {
+                    Dictionary<long, wComponentData> weaponCompsData = new Dictionary<long, wComponentData>();
+                    weaponCompsData = NAPI.Util.FromJson<Dictionary<long, wComponentData>>(EPlayer.GetAccount(target).WeaponComponents);
+
+                    foreach (KeyValuePair<long, wComponentData> i in weaponCompsData)
+                    {
+                        if (target.GetWeaponAmmo((WeaponHash)i.Key) > 0)
+                        {
+                            i.Value.Components.ForEach((long comphash) =>
+                            {
+                                EPlayer.AttachComponent(target, i.Key, comphash);
+                            });
+                        }
+                    }
+                }
             }
 
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:givegunall:{wepname}:{ammo}"); } catch { }
