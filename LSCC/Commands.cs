@@ -6597,6 +6597,37 @@ namespace RNC
             return;
         }
 
+        [Command("createarena", "!{#AFAFAF}[USAGE] createdmthere (name)", GreedyArg = true)]
+        public void cmd_createarena(Player player, string name)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 4 admin.");
+                return;
+            }
+
+            var _new = new CustomDMArenas
+            {
+                Name = name,
+                Creator = player.Name,
+                Extras = "{}",
+                TimesEntered = 0,
+                IPLs = "{}",
+            };
+
+            ContextFactory.Instance.CustomArenas.Add(_new);
+
+            ContextFactory.Instance.SaveChanges();
+            // TO;DO ADDING ALL THE SHIT
+            player.SendChatMessage($"!{{#00FF33}}DM Arena '{_new.Name}' SQLID {_new.SQL_ID} has been added to the server and selected.");
+            player.SetData("EditingDMArena", _new.SQL_ID);
+            player.SendChatMessage($"!{{#00FF33}}/selectdm, /managedm");
+            return;
+        }
+
         [Command("triggerevent")]
         public void cmd_triggerevent(Player player, string eventt)
         {
@@ -7073,6 +7104,9 @@ namespace RNC
                         break;
                     case -5:
                         lobby = "!{#FF6347}[Customizer]";
+                        break;
+                    case -6:
+                        lobby = "!{#FF0000}[Deathmatch]";
                         break;
                 }
                 

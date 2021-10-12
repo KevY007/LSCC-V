@@ -112,6 +112,54 @@ namespace RNC
         public int Team { get; set; }
         public int TimesUsed { get; set; }
     }
+    public class CustomDMArenas
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public string Name { get; set; }
+        public string Creator { get; set; } // String so if the account is deleted, the DM arena still remains.
+        public int TimesEntered { get; set; }
+        public string IPLs { get; set; }
+        public string Extras { get; set; }
+    }
+    public class CustomDMArenaTeams
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public int ArenaID { get; set; }
+        public string Name { get; set; }
+        public int Team { get; set; }
+        public int Health { get; set; }
+        public int Armor { get; set; }
+        public bool Blip { get; set; }
+        public int BlipColor { get; set; }
+        public int ShowHPBars { get; set; } // 0 = Never, 1 = Always, 2 = On Aim, 3 = Busted!
+
+        public string WeaponSets { get; set; }
+    }
+    public class CustomDMArenaSpawns
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public int ArenaID { get; set; }
+        public int Team { get; set; }
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Z { get; set; }
+        public float A { get; set; }
+    }
+
+    public class DM_WeaponData
+    {
+        public long Weapon;
+        public int Ammo;
+        public long[] Components;
+    }
+
+    public class DM_WeaponSets
+    {
+        public DM_WeaponData[] Weapons;
+    }
 
     public class MainDatabase : DbContext
     {
@@ -135,6 +183,9 @@ namespace RNC
         public DbSet<Logs_AdminRecord> Logs_AdminRecords { get; set; }
         public DbSet<Logs_Admin> Logs_Admin { get; set; }
         public DbSet<Logs_Session> Logs_Session { get; set; }
+        public DbSet<CustomDMArenas> CustomArenas { get; set; }
+        public DbSet<CustomDMArenaTeams> CustomArenas_Teams { get; set; }
+        public DbSet<CustomDMArenaSpawns> CustomArenas_Spawns { get; set; }
     }
 
     public class ContextFactory : IDesignTimeDbContextFactory<MainDatabase>
