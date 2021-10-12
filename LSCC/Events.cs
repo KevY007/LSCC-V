@@ -730,7 +730,7 @@ namespace RNC
                 {
                     NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
 
-                    if (killer.GetSharedData<int>("InLobby") > -1 && killer.GetSharedData<int>("InDM") > -1)
+                    if ((killer.GetSharedData<int>("InLobby") == -6 || killer.GetSharedData<int>("InLobby") > -1) && killer.GetSharedData<int>("InDM") > -1)
                     {
                         int arenaID = killer.GetSharedData<int>("InDM");
 
@@ -1032,6 +1032,10 @@ namespace RNC
                                     Vector3 dmSpawn = (Vector3)Settings.DMSpawns[arenaID][spawnID, 0];
                                     SpawnArea = (Vector3)dmSpawn;
                                 }
+                            }
+                            if (player.GetSharedData<int>("InLobby") == -6)
+                            {
+                                SpawnArea = player.Position; // So that player spawns inside the arena, and is transported whenever he spawns to a new point.
                             }
 
                             NAPI.Player.SpawnPlayer(player, SpawnArea);
@@ -2587,7 +2591,7 @@ namespace RNC
         {
             if (weapon == (uint)WeaponHash.Stungun)
             {
-                if(player.GetSharedData<int>("InDM") == 6 && target.GetSharedData<int>("InDM") == 6)
+                if (player.GetSharedData<int>("InLobby") > -1 && player.GetSharedData<int>("InDM") == 6 && target.GetSharedData<int>("InDM") == 6)
                 {
                     //target.Health = 0;
                     return;
@@ -3577,6 +3581,102 @@ namespace RNC
                             }
                             catch { }
                         }, delayTimeCalc);
+                    }
+                }
+                else if(player.GetSharedData<int>("InLobby") == -6)
+                {
+                    player.TriggerEvent("SetActorInvulnerable", false);
+
+                    int arenaID = player.GetSharedData<int>("InDM");
+
+                    if(arenaID == -1)
+                    {
+                        EPlayer.Spawn(player);
+                        return;
+                    }
+
+                    int playerTeam = player.GetSharedData<int>("CustomDMTeam");
+
+                    var arena = ContextFactory.Instance.CustomArenas.FirstOrDefault(a => a.SQL_ID == arenaID);
+                    if (arena == null)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The arena you are playing in does not exist.");
+                        player.SetSharedData("InDM", -1);
+                        player.SetSharedData("CustomDMTeam", -1);
+
+                        EPlayer.Spawn(player);
+                        return;
+                    }
+
+                    var team = ContextFactory.Instance.CustomArenas_Teams.FirstOrDefault(a => a.Team == playerTeam && a.ArenaID == arenaID - 100);
+                    if (team == null)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The arena you are playing in does not have the team you are set as, resetting...");
+                        player.SetSharedData("InDM", -1);
+                        player.SetSharedData("CustomDMTeam", -1);
+
+                        EPlayer.Spawn(player);
+                        return;
+                    }
+
+
+                    player.TriggerEvent("showHPBars", team.ShowHPBars);
+
+                    var spawn = ContextFactory.Instance.CustomArenas_Spawns.ToList().OrderBy(a => Guid.NewGuid()).First(a => a.ArenaID == arenaID - 100 &&
+                        (a.Team == -1 || a.Team == playerTeam));
+
+                    if (spawn != null)
+                    {
+                        player.Health = team.Health;
+                        player.Armor = team.Armor;
+                        player.SetSharedData("VisibleBlip", team.Blip);
+                        player.SetSharedData("DMBlipColor", team.BlipColor);
+                        EPlayer.SetColor(player, new Color(179, 179, 179), team.Armor);
+
+                        player.Position = new Vector3(spawn.X, spawn.Y, spawn.Z);
+                        player.Heading = spawn.A;
+
+                        EPlayer.SetDiscordStatus(player, $"[Deathmatch] Team {team.Name} in {arena.Name}");
+
+                        int delayTimeCalc = 250 + player.Ping;
+                        NAPI.Task.Run(() =>
+                        {
+                            try
+                            {
+                                if (player != null && player.Exists)
+                                {
+                                    if (team.WeaponSets == null || team.WeaponSets.Length < 5)
+                                    {
+                                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This DM arena does not have weapons set for your team " + team.Team);
+                                        return;
+                                    }
+
+                                    DM_WeaponSets[] weaponSets = NAPI.Util.FromJson<DM_WeaponSets[]>(team.WeaponSets);
+                                    var set = weaponSets.OrderBy(a => Guid.NewGuid()).FirstOrDefault();
+
+                                    if (set == null)
+                                    {
+                                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This DM arena does not have a proper weapons set for your team " + team.Team);
+                                        return;
+                                    }
+
+                                    foreach (var wep in set.Weapons)
+                                    {
+                                        player.GiveWeapon((WeaponHash)wep.Weapon, wep.Ammo);
+
+                                        foreach (var comp in wep.Components)
+                                        {
+                                            EPlayer.AttachComponent(player, wep.Weapon, comp);
+                                        }
+                                    }
+                                }
+                            }
+                            catch { }
+                        }, delayTimeCalc);
+                    }
+                    else
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The arena you are playing in does not have a spawn for your team id: " + playerTeam);
                     }
                 }
             }

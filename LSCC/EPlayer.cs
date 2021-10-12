@@ -558,6 +558,8 @@ namespace RNC
 
                 player.SetSharedData("InLobby", -1);
                 player.SetSharedData("InDM", -1);
+                player.SetSharedData("CustomDMTeam", -1);
+                player.SetSharedData("DMBlipColor", 39);
 
                 player.SetSharedData("IsTabbed", false);
                 player.SetSharedData("FugitiveChance", 10.0);
@@ -1420,7 +1422,8 @@ namespace RNC
 
             if ( ( (player.GetSharedData<int>("InLobby") >= 1 && Settings.Lobbies.Count(lob => lob.lobbyId == player.GetSharedData<int>("InLobby")) == 0) || // IN DELETED/NON EXISTENT LOBBY
                 player.GetSharedData<int>("InLobby") == -1 ||  // IN INVALID LOBBY PT2
-                (player.GetSharedData<int>("InLobby") == -5 && player.GetData<bool>("Creator_Using") == false && player.GetData<bool>("Tuner_Using") == false) ) &&  // IN CUSTOMIZER & DONE
+                (player.GetSharedData<int>("InLobby") == -5 && player.GetData<bool>("Creator_Using") == false && player.GetData<bool>("Tuner_Using") == false) ||  // IN CUSTOMIZER & DONE
+                (player.GetSharedData<int>("InLobby") == -6 && player.GetSharedData<int>("InDM") == -1) ) && // IN CUSTOM ARENAS BUT NOT IN ANY ARENA
                 EPlayer.GetAccount(player).JailTime < 1) // NOT IN JAIL
             {
                 player.SetSharedData("InDM", -1);

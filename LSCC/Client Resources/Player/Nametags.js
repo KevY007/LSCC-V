@@ -239,7 +239,7 @@ mp.events.add('render', (nametags) => {
                     if(showHPStatus == 3)
                     {
                         if(player.getVariable("BustedProgress") !== undefined && player.getVariable("Team") != undefined && player.getVariable("Team") == 0 && 
-                            player.getVariable("BustedProgress") >= 0.0) // -1.0 is used if busted.
+                            player.getVariable("BustedProgress") >= 0.0 && chaseRunning) // -1.0 is used if busted.
                         {
                             health = player.getVariable("BustedProgress") / 100;
                             let y2 = y + 0.056;
@@ -254,7 +254,7 @@ mp.events.add('render', (nametags) => {
                 if(mp.game.player.isFreeAimingAtEntity(player.handle) && mp.players.local.weaponAmmo > 1 && 
                     mp.players.local.weapon != 2725352035 && mp.players.local.weapon != 0xA2719263) // 2725352035/hex = fist 
                 {
-                    if(mp.players.local.getVariable("HasShot") == false && mp.players.local.getVariable("Team") == 0 && player.getVariable("Team") == 1)
+                    if(mp.players.local.getVariable("HasShot") == false && mp.players.local.getVariable("Team") == 0 && player.getVariable("Team") == 1 && chaseRunning)
                     {
                         mp.events.callRemote("GivePlayerShotTag");
                     }
@@ -262,7 +262,7 @@ mp.events.add('render', (nametags) => {
             }
             else
             {
-                if(player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && renderNametags == true)
+                if(player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && renderNametags == true && chaseRunning)
                 {
                     // They out of distance but still try?
                     mp.game.graphics.drawText("(( THIS PLAYER HAS SHOT ))", [x, y],

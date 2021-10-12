@@ -1352,7 +1352,6 @@ namespace RNC
             NAPI.Util.ConsoleOutput($"[Admins]: {admins}");
             NAPI.Util.ConsoleOutput("[>===========|Race 'N' Chase|===========<]");
 
-
             // After all the stuff is set.
             SaveDynamicSettings();
 
