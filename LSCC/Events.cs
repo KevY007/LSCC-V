@@ -373,13 +373,13 @@ namespace RNC
                 switch (voiceMode)
                 {
                     case 0:
-                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Nearby (30m) (70m in cop car)");
+                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Nearby (30m) (All players)");
                         break;
                     case 1:
-                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Team Only");
+                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Team Only (+15m proximity)");
                         break;
                     case 2:
-                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Squad Only");
+                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Squad Only (Everyone else gets muted)");
                         break;
                     case 3:
                         player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Disabled");
@@ -405,10 +405,6 @@ namespace RNC
                     if (player.GetSharedData<int>("VoiceMode") == 0)
                     {
                         double dist = 30.0;
-                        if (player.IsInVehicle && player.Vehicle.HasSharedData("Team") && player.Vehicle.GetSharedData<int>("Team") == 1)
-                        {
-                            dist = 70.0;
-                        }
 
                         listeners.AddRange(RAGE.Entities.Players.All.Where(t => t.Dimension == player.Dimension &&
                             Vector3.Distance(t.Position, player.Position) <= dist));
@@ -455,6 +451,13 @@ namespace RNC
                         }
 
                         if (t.GetSharedData<int>("VoiceMode") == 3) continue;
+                        if (t.GetSharedData<int>("VoiceMode") == 2)
+                        {
+                            if (!t.HasData("PlayerSquad")) continue;
+                            if (!player.HasData("PlayerSquad")) continue;
+
+                            if (t.GetData<Player>("PlayerSquad") != player.GetData<Player>("PlayerSquad")) continue;
+                        }
 
                         player.EnableVoiceTo(t);
                     }

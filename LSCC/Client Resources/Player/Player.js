@@ -871,19 +871,34 @@ mp.events.add('render', () => {
 
                 mp.players.forEach(target => {
                     target.voiceVolume = 0.0;
-                    if(!target.voice3d) target.voice3d = true;
+                    if(!target.voice3d && target.handle !== 0) target.voice3d = true;
 
-                    if(target.dimension == mp.players.local.dimension && mp.players.exists(target) && target != mp.players.local && 
-                        target.handle !== 0)
+                    if(target.dimension == mp.players.local.dimension && target != mp.players.local)
                     {
-                        const playerPos = target.position;
+                        var playerPos = target.position;
+                        if(target.handle === 0)
+                        {
+                            playerPos = new mp.Vector3(target.getVariable("UnstreamedX"), target.getVariable("UnstreamedY"), target.getVariable("UnstreamedZ"));
+                        }
+                       
                         var localPos = mp.players.local.position;
                         let dist = calcDist(playerPos, localPos);
                         
-                        if(dist > MaxVoiceRange) {
-                            if(target.getVariable("VoiceMode") == 1) {
-                                if(target.getVariable("Team") == mp.players.local.getVariable("Team")) target.voiceVolume = 0.5;
+                        if(dist > MaxVoiceRange) 
+                        {
+                            if(target.getVariable("VoiceMode") == 1) // Team
+                            {
+                                if(target.getVariable("Team") == mp.players.local.getVariable("Team"))
+                                {
+                                    target.voice3d = false;
+                                    target.voiceVolume = 0.5;
+                                }
                                 else target.voiceVolume = 0.7;
+                            }
+                            else if(target.getVariable("VoiceMode") == 2) // Squad
+                            {
+                                target.voice3d = false;
+                                target.voiceVolume = 0.8;
                             }
                             else target.voiceVolume = 0.0;
                         }
