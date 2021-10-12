@@ -3726,6 +3726,124 @@ namespace RNC
             return;
         }
 
+        [Command("anotes", "!{#AFAFAF}[USAGE] anote (target) [add|view|delete]", Alias = "anote", GreedyArg = true)]
+        public void cmd_anote(Player player, Player target, string arg)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have permission to use this command!");
+                return;
+            }
+            if(EPlayer.GetAccount(target).Admin > EPlayer.GetAccount(player).Admin)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is higher admin level than you!");
+                return;
+            }
+
+            string option = (arg.Contains(' ') ? arg.Split(' ')[0] : arg);
+            switch (option)
+            {
+                case "view":
+                    {
+                        EPlayer.ShowAdminNotes(player, EPlayer.GetAccount(target), AdminNote.ANoteType.None); //none = no specific note type | shows all notes
+                        Logs.LogAdmin(player, $"Attempted to view {target.Name}'s admin notes.");
+                        break;
+                    }
+                case "add":
+                    {
+                        string[] args = arg.Split(' ');
+                        if(args.Length < 3)
+                        {
+                            player.SendChatMessage("!{#AFAFAF}[USAGE] anote add [type: none, connect, spectate, both](text)");
+                            return;
+                        }
+                        AdminNote.ANoteType type = AdminNote.ANoteType.None;
+                        switch (args[1])
+                        {
+                            case "none": type = AdminNote.ANoteType.None;
+                                break;
+                            case "connect": type = AdminNote.ANoteType.OnConnect;
+                                break;
+                            case "spectate": type = AdminNote.ANoteType.OnSpectate;
+                                break;
+                            case "both": type = AdminNote.ANoteType.Both;
+                                break;
+                            default:
+                                {
+                                    player.SendChatMessage("!{#AFAFAF}[USAGE] anote add !{#FF6347}[type: none, connect, spectate, both]!{#AFAFAF}(text)");
+                                    return;
+                                }
+                        }
+                        string text = arg.Substring(arg.IndexOf(args[1])+args[1].Length); // dont even ask pro maths 😎
+                        if(text.Length < 5)
+                        {
+                            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Note text should have more than 5 characters!");
+                            return;
+                        }
+
+                        AdminNote _n = new AdminNote()
+                        {
+                            AccountID = EPlayer.GetAccount(target).SQL_ID,
+                            AdminID = EPlayer.GetAccount(player).SQL_ID,
+                            Text = text,
+                            Timestamp = DateTime.Now.ToShortDateString(),
+                            Type = type
+                        };
+                        ContextFactory.Instance.AdminNotes.Add(_n);
+                        ContextFactory.Instance.SaveChanges();
+                        player.SendChatMessage($"!{{#72ff6b}}Successfully added admin note to {target.Name} ({text})!");
+                        Logs.LogAdmin(player, $"Added admin note to {target.Name} of type {_n.TypeToString()} at {_n.Timestamp}");
+                        break;
+                    }
+                case "delete":
+                    {
+                        string[] args = arg.Split(' ');
+                        if (args.Length < 2)
+                        {
+                            player.SendChatMessage("!{#AFAFAF}[USAGE] anote delete (Note ID | use 'view' to check)");
+                            return;
+                        }
+                        int nID = -1;
+                        try
+                        {
+                            nID = int.Parse(args[1]);
+                        }
+                        catch 
+                        {
+                            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Note ID must be a number! Use /anote view to check IDs.");
+                            return;
+                        };
+                        AdminNote _n = ContextFactory.Instance.AdminNotes.FirstOrDefault(a => a.SQL_ID == nID);
+                        if(_n == null)
+                        {
+                            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}A note with that ID could not be found!");
+                            return;
+                        }
+                        if(_n.AccountID != EPlayer.GetAccount(target).SQL_ID)
+                        {
+                            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The note ID you specified does not match any of target's notes.");
+                            player.SendChatMessage($"!{{#C9C9C9}}[TIP] Use /anote {target.Name} view to check their note IDs.");
+                            return;
+                        }
+
+                        Account tAcc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.SQL_ID == _n.AccountID);
+                        string nTargetName = tAcc.Username ?? "[Unknown]";
+                        ContextFactory.Instance.AdminNotes.Remove(_n);
+                        player.SendChatMessage($"!{{#72ff6b}}You deleted admin {nTargetName}'s admin note with ID {nID}");
+                        Logs.LogAdmin(player, $"Deleted {nTargetName}'s admin note ID {nID}.");
+                        break;
+                    }
+                default:
+                    {
+                        player.SendChatMessage("!{#AFAFAF}[USAGE] anote (target) [add|view|delete]");
+                        return;
+                    }
+            }
+        }
+
 
         [Command("lobbies")]
         public void cmd_lobbies(Player player)
@@ -8591,6 +8709,9 @@ namespace RNC
                 
 
             player.SendChatMessage($"!{{#33C446}}[>] !{{#FFFFFF}}You are now spectating: !{{#FF6347}}{target.Name}");
+
+            EPlayer.ShowAdminNotes(player, EPlayer.GetAccount(target), AdminNote.ANoteType.OnSpectate);
+            EPlayer.ShowAdminNotes(player, EPlayer.GetAccount(target), AdminNote.ANoteType.Both, false);
             return;
         }
 

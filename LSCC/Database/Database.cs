@@ -7,6 +7,35 @@ using System.Reflection;
 
 namespace RNC
 {
+    public class AdminNote
+    {
+        public enum ANoteType
+        {
+            None = 0,
+            OnConnect = 1,
+            OnSpectate = 2,
+            Both
+        };
+
+        [Key]
+        public int SQL_ID { get; set; }
+        public int AccountID { get; set; }
+        public int AdminID { get; set; }
+        public string Timestamp { get; set; }
+        public string Text { get; set; }
+        public ANoteType Type { get; set; }
+        public string TypeToString()
+        {
+            switch (this.Type)
+            {
+                case ANoteType.None: return "None";
+                case ANoteType.OnConnect: return "On Connect";
+                case ANoteType.OnSpectate: return "On Spectate";
+                case ANoteType.Both: return "Both";
+                default: return "None";
+            }
+        }
+    }
     public class Language
     {
         [Key]
@@ -102,6 +131,7 @@ namespace RNC
         public DbSet<PlayerTunings> PlayerTunings { get; set; }
         public DbSet<OwnedVehData> OwnedVehicles { get; set; }
         public DbSet<OwnedLoadoutData> OwnedLoadouts { get; set; }
+        public DbSet<AdminNote> AdminNotes { get; set; }
         public DbSet<Logs_AdminRecord> Logs_AdminRecords { get; set; }
         public DbSet<Logs_Admin> Logs_Admin { get; set; }
         public DbSet<Logs_Session> Logs_Session { get; set; }
