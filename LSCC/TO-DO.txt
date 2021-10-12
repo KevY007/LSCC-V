@@ -1,7 +1,10 @@
 ﻿FORMAT: ADDED BY - ITEM.
 
+cayo perico map (custom code column in maps tab so players can load custom code or ipls dk upto me lol)
+
 interiors vro
 buyammo with donator points
+
 copy outfits for donors
 #bug reports and other chans sugeestion
 add a linux script that will keep on restarting server if goes off?
