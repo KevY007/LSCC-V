@@ -330,6 +330,33 @@ namespace RNC
             return;
         }
 
+        [Command("applyvehmods")]
+        public static void cmd_applyvehmods(Player player)
+        {
+            if (!player.IsInVehicle || player.Vehicle == null || !EPlayer.LoggedIn(player))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You must be in a vehicle to apply saved mods.");
+                return;
+            }
+
+            var inst = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.Model == player.Vehicle.Model && a.AccountSQLID == EPlayer.GetAccount(player).SQL_ID);
+            if (inst != null)
+            {
+                player.Vehicle.PrimaryColor = inst.PrimaryColor;
+                player.Vehicle.SecondaryColor = inst.SecondaryColor;
+
+                foreach (var kvp in NAPI.Util.FromJson<Dictionary<int, int>>(inst.Mods))
+                {
+                    player.Vehicle.SetMod(kvp.Key, kvp.Value);
+                }
+                player.Vehicle.PearlescentColor = inst.PearlescentColor;
+                player.Vehicle.WheelColor = inst.WheelColor;
+             
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Mods applied!");
+            }
+            return;
+        }
+
         [Command("engine")]
         public static void cmd_engine(Player player)
         {
@@ -4627,7 +4654,7 @@ namespace RNC
             player.SendChatMessage("!{#0097ff}[Cop]: /gps /cuff /m(egaphone) /dragout");
             player.SendChatMessage("!{#ffae00}[Fugitive]: /d(rive)b(y)");
             player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup /s(top)a(nim) /passgun");
-            player.SendChatMessage("!{#AB00BA}[Vehicle]: /trunk /lock /engine /seatbelt");
+            player.SendChatMessage("!{#AB00BA}[Vehicle]: /trunk /lock /engine /seatbelt /applyvehmods");
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /derby");
             player.SendChatMessage("!{#28E0DA}[Mode: DM]: /dm /dmarena");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /freeroam /veh /customvehlist /teleport /mytime /myweather");

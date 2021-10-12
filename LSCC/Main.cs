@@ -2609,6 +2609,23 @@ namespace RNC
 
                                         p.Health = 100;
                                         p.Armor = 0;
+
+                                        if (p.GetData<int>("ChaseVehicleSeat") == 0)
+                                        {
+                                            var inst = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.Model == p.GetData<Vehicle>("ChaseVehicle").Model && a.AccountSQLID == EPlayer.GetAccount(p).SQL_ID);
+                                            if (inst != null)
+                                            {
+                                                p.GetData<Vehicle>("ChaseVehicle").PrimaryColor = inst.PrimaryColor;
+                                                p.GetData<Vehicle>("ChaseVehicle").SecondaryColor = inst.SecondaryColor;
+
+                                                foreach (var kvp in NAPI.Util.FromJson<Dictionary<int, int>>(inst.Mods))
+                                                {
+                                                    p.GetData<Vehicle>("ChaseVehicle").SetMod(kvp.Key, kvp.Value);
+                                                }
+                                                p.GetData<Vehicle>("ChaseVehicle").PearlescentColor = inst.PearlescentColor;
+                                                p.GetData<Vehicle>("ChaseVehicle").WheelColor = inst.WheelColor;
+                                            }
+                                        }
                                     }
                                     catch { }
                                 }
@@ -2634,6 +2651,23 @@ namespace RNC
 
                                         p.Health = 100;
                                         p.Armor = 0;
+
+                                        if(p.GetData<int>("ChaseVehicleSeat") == 0)
+                                        {
+                                            var inst = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.Model == p.GetData<Vehicle>("ChaseVehicle").Model && a.AccountSQLID == EPlayer.GetAccount(p).SQL_ID);
+                                            if (inst != null)
+                                            {
+                                                p.GetData<Vehicle>("ChaseVehicle").PrimaryColor = inst.PrimaryColor;
+                                                p.GetData<Vehicle>("ChaseVehicle").SecondaryColor = inst.SecondaryColor;
+
+                                                foreach (var kvp in NAPI.Util.FromJson<Dictionary<int, int>>(inst.Mods))
+                                                {
+                                                    p.GetData<Vehicle>("ChaseVehicle").SetMod(kvp.Key, kvp.Value);
+                                                }
+                                                p.GetData<Vehicle>("ChaseVehicle").PearlescentColor = inst.PearlescentColor;
+                                                p.GetData<Vehicle>("ChaseVehicle").WheelColor = inst.WheelColor;
+                                            }
+                                        }
                                     }
                                     catch { }
                                 }
