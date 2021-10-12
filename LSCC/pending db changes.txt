@@ -1,3 +1,13 @@
+NEW CHANGES after big update:
+Table: `adminnotes`:
+        SQL_ID  // int(11) AI PK
+        AccountID  // int(11)
+        AdminID  // int(11)
+        Timestamp  // longtext
+        Text  // longtext
+        Type  // int(11)
+
+
 db changes for main server to be done after update:
 
 MIGRATE DB FROM LSCC_RAGEMP TO RACENCHASE (USER: RACENCHASE) -- THE DB AND USER IS ALREADY CREATED JUST DATA IMPORTING
