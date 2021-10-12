@@ -903,12 +903,13 @@ namespace RNC
                             int killStreak = killer.GetData<int>("Killstreak");
                             killer.SetData("Killstreak", killStreak + 1);
 
-                            if (killStreak % 4 == 0 && killStreak >= 4)
+                            if (killStreak % 4 == 0 && killStreak >= 4 && (lobby.Cops.Contains(killer) || lobby.Fugitives.Contains(killer)))
                             {
                                 EPlayer.GrantXP(killer, 5);
-                                EPlayer.GivePoints(killer, 5);
                                 EPlayer.SendMessageInLobby(lobby.lobbyId, $"!{{#FF0000}}[KILLSTREAK] !{{#FF6347}}{killer.Name} !{{#FFFFFF}}is on a {killStreak} kills rampage! Someone stop them!");
+
                                 killer.SendChatMessage("!{#00FF33}[!] !{#FFFFFF}You have earnt 5 XP and 5 points for maintaining a killstreak!");
+                                EPlayer.GivePoints(killer, 5);
                                 killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(killer).DonatorLevel + 1.0)));
                             }
                         }
