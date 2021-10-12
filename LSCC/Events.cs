@@ -587,6 +587,15 @@ namespace RNC
             }
             catch { }
 
+            foreach(var lobby in Settings.Lobbies)
+            {
+                lock (lobby)
+                {
+                    lock (lobby.Cops) { lobby.Cops.Remove(player); }
+                    lock (lobby.Fugitives) { lobby.Fugitives.Remove(player); }
+                }
+            }
+
             lock (player)
             {
                 if (EPlayer.LoggedIn(player))
@@ -653,6 +662,7 @@ namespace RNC
                     EPlayer.Save(player);
                 }
 
+                Settings.LoggedInPlayers.Remove(player);
                 EPlayer.ResetPlayerData(player);
 
                 Discord.SendTextChannel("staff-bot", $"**{player.Name} has left the server.** *(Total online: {RAGE.Entities.Players.Count - 1})*");

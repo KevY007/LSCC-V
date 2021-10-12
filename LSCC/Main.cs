@@ -2477,96 +2477,178 @@ namespace RNC
                         {
                             MapSpawn fugi = ContextFactory.Instance.MapSpawns.ToList().Find(a => a.mapID == lobby.lastMapId && a.spawnTeam == 0);
                             MapSpawn cop = ContextFactory.Instance.MapSpawns.ToList().Find(a => a.mapID == lobby.lastMapId && a.spawnTeam == 1);
-                            lobby.Fugitives.ForEach(p =>
+
+                            lock (lobby.Fugitives)
                             {
-                                p.Position = new Vector3(fugi.spawnX, fugi.spawnY, fugi.spawnZ).Around(30f);
-                            });
-                            lobby.Cops.ForEach(p =>
+                                foreach (var p in lobby.Fugitives)
+                                {
+                                    try
+                                    {
+                                        if (p == null) continue;
+
+                                        p.Position = new Vector3(fugi.spawnX, fugi.spawnY, fugi.spawnZ).Around(30f);
+                                    }
+                                    catch { }
+                                }
+                            }
+
+                            lock (lobby.Cops)
                             {
-                                p.Position = new Vector3(cop.spawnX, cop.spawnY, cop.spawnZ).Around(30f);
-                            });
+                                foreach (var p in lobby.Cops)
+                                {
+                                    try
+                                    {
+                                        if (p == null) continue;
+
+                                        p.Position = new Vector3(cop.spawnX, cop.spawnY, cop.spawnZ).Around(30f);
+                                    }
+                                    catch { }
+                                }
+                            }
                         }
                         if (lobby.GameProgress == -5)
                         {
-                            lobby.Fugitives.ForEach(p =>
+                            lock (lobby.Fugitives)
                             {
-                                p.Dimension = Convert.ToUInt32(lobby.lobbyId);
-                                p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
-                                p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
-                                EPlayer.Freeze(p, true);
-                            });
-                            lobby.Cops.ForEach(p =>
+                                foreach (var p in lobby.Fugitives)
+                                {
+                                    try
+                                    {
+                                        if (p == null) continue;
+
+                                        p.Dimension = Convert.ToUInt32(lobby.lobbyId);
+                                        p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
+                                        p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
+                                        EPlayer.Freeze(p, true);
+                                    }
+                                    catch { }
+                                }
+                            }
+
+                            lock (lobby.Cops)
                             {
-                                p.Dimension = Convert.ToUInt32(lobby.lobbyId);
-                                p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
-                                p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
-                                EPlayer.Freeze(p, true);
-                            });
+                                foreach (var p in lobby.Cops)
+                                {
+                                    try
+                                    {
+                                        if (p == null) continue;
+
+                                        p.Dimension = Convert.ToUInt32(lobby.lobbyId);
+                                        p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
+                                        p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
+                                        EPlayer.Freeze(p, true);
+                                    }
+                                    catch { }
+                                }
+                            }
                         }
                         if(lobby.GameProgress == -3)
                         {
-                            lobby.Fugitives.ForEach(p =>
+                            lock (lobby.Fugitives)
                             {
-                                p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
+                                foreach (var p in lobby.Fugitives)
+                                {
+                                    try
+                                    {
+                                        if (p == null) continue;
 
-                                p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
-                                EPlayer.Freeze(p, true);
+                                        p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
 
-                                p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", true);
-                                p.SetSharedData("Collisions", true);
-                            });
-                            lobby.Cops.ForEach(p =>
+                                        p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
+                                        EPlayer.Freeze(p, true);
+
+                                        p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", true);
+                                        p.SetSharedData("Collisions", true);
+                                    }
+                                    catch { }
+                                }
+                            }
+
+                            lock (lobby.Cops)
                             {
-                                p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
+                                foreach (var p in lobby.Cops)
+                                {
+                                    try
+                                    {
+                                        if (p == null) continue;
 
-                                p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
-                                EPlayer.Freeze(p, true);
+                                        p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
 
-                                p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", true);
-                                p.SetSharedData("Collisions", true);
-                            });
+                                        p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
+                                        EPlayer.Freeze(p, true);
+
+                                        p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", true);
+                                        p.SetSharedData("Collisions", true);
+                                    }
+                                    catch { }
+                                }
+                            }
                         }
 
                         if (lobby.GameProgress == 0)
                         {
-                            lobby.Fugitives.ForEach(p =>
+                            lock (lobby.Fugitives)
                             {
-                                p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
-                                p.TriggerEvent("ToggleNametags", true);
-                                EPlayer.Freeze(p, false);
+                                foreach (var p in lobby.Fugitives)
+                                {
+                                    try
+                                    {
+                                        if (p == null) continue;
 
-                                p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
+                                        p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
+                                        p.TriggerEvent("ToggleNametags", true);
+                                        EPlayer.Freeze(p, false);
 
-                                p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
-                                p.SetSharedData("Collisions", false);
+                                        p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
 
-                                p.RemoveAllWeapons();
+                                        p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
+                                        p.SetSharedData("Collisions", false);
+
+                                        p.RemoveAllWeapons();
 
 
-                                p.Health = 100;
-                                p.Armor = 0;
-                            });
-                            lobby.Cops.ForEach(p =>
+                                        p.Health = 100;
+                                        p.Armor = 0;
+                                    }
+                                    catch { }
+                                }
+                            }
+
+                            lock (lobby.Cops)
                             {
-                                p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
-                                p.TriggerEvent("ToggleNametags", true);
-                                EPlayer.Freeze(p, false);
+                                foreach (var p in lobby.Cops)
+                                {
+                                    if (p == null) continue;
+                                    try
+                                    {
+                                        p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
+                                        p.TriggerEvent("ToggleNametags", true);
+                                        EPlayer.Freeze(p, false);
 
-                                p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
+                                        p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
 
-                                p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
-                                p.SetSharedData("Collisions", false);
+                                        p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
+                                        p.SetSharedData("Collisions", false);
 
-                                p.RemoveAllWeapons();
+                                        p.RemoveAllWeapons();
 
-                                p.Health = 100;
-                                p.Armor = 0;
-                            });
+                                        p.Health = 100;
+                                        p.Armor = 0;
+                                    }
+                                    catch { }
+                                }
+                            }
 
-                            lobby.Vehicles.ForEach(v =>
+                            foreach(var v in lobby.Vehicles)
                             {
-                                v.SetSharedData("Collisions", false);
-                            });
+                                try
+                                {
+                                    if (v == null) continue;
+
+                                    v.SetSharedData("Collisions", false);
+                                }
+                                catch { }
+                            }
 
                             if (lobby.gameMode == GameModes.STANDARD)
                             {
@@ -2580,51 +2662,72 @@ namespace RNC
 
                             foreach (Player p in Settings.LoggedInPlayers.Where(p => lobby.Cops.Contains(p) || lobby.Fugitives.Contains(p)))
                             {
-                                p.TriggerEvent("ResetKillFeed");
+                                lock (p)
+                                {
+                                    try
+                                    {
+                                        if (p == null) continue;
 
-                                // if(lobby.Cops.Contains(p)) EPlayer.Notify(p, "You will be unfreezed in 10 seconds.", "orange", "fas fa-hourglass-start", false, 10000);
-                                if (lobby.gameMode == GameModes.STANDARD)
-                                {
-                                    //p.SendChatMessage("!{#FF6347}[!] !{#8D8DFF}Cops will be unfrozen in 10 seconds. !{#E84040}Fugitive's may take this time to prepare/start the chase.");
-                                }
-                                else if (lobby.gameMode == GameModes.BUSTED)
-                                {
-                                    p.SendChatMessage($"!{{#1E9913}}[!] ATTENTION: The lobby you're playing is in BUSTED! mode. This is not a standard chase.");
-                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you do not receive weapons nor fight, rather you EVADE and win by skills!");
-                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Cops have to box/stick close to fugitive's to start the busting process.");
-                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}More cops would makes the process a lot faster and the closer you get.");
-                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Fugitive's have to get away to regress the busting progress.");
+                                        p.TriggerEvent("ResetKillFeed");
+
+                                        // if(lobby.Cops.Contains(p)) EPlayer.Notify(p, "You will be unfreezed in 10 seconds.", "orange", "fas fa-hourglass-start", false, 10000);
+                                        if (lobby.gameMode == GameModes.STANDARD)
+                                        {
+                                            //p.SendChatMessage("!{#FF6347}[!] !{#8D8DFF}Cops will be unfrozen in 10 seconds. !{#E84040}Fugitive's may take this time to prepare/start the chase.");
+                                        }
+                                        else if (lobby.gameMode == GameModes.BUSTED)
+                                        {
+                                            p.SendChatMessage($"!{{#1E9913}}[!] ATTENTION: The lobby you're playing is in BUSTED! mode. This is not a standard chase.");
+                                            p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you do not receive weapons nor fight, rather you EVADE and win by skills!");
+                                            p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Cops have to box/stick close to fugitive's to start the busting process.");
+                                            p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}More cops would makes the process a lot faster and the closer you get.");
+                                            p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Fugitive's have to get away to regress the busting progress.");
+                                        }
+                                    }
+                                    catch { }
                                 }
                             }
                         }
 
                         if (lobby.GameProgress == 10)
                         {
-                            lobby.Cops.ForEach(p => {
-                                //EPlayer.Freeze(p, false);
-                                //p.SendNotification("~b~You may begin the chase now.");
-                            });
+                            /*lobby.Cops.ForEach(p => {
+                                EPlayer.Freeze(p, false);
+                                p.SendNotification("~b~You may begin the chase now.");
+                            });*/
                         }
 
                         if (lobby.GameProgress >= Convert.ToInt32(0.8 * Settings.GameRunTime) && lobby.gameMode != GameModes.BUSTED)
                         {
                             foreach (Player fugitive in lobby.Fugitives)
                             {
-                                if (fugitive.GetSharedData<bool>("HasShot") == false)
+                                try
                                 {
-                                    fugitive.SetSharedData("HasShot", true);
-                                    fugitive.SetSharedData("VisibleBlip", true);
-                                    lobby.FugitiveShowCounter = 29; // Set them to VISIBLE
+                                    if (fugitive == null) continue;
 
-                                    fugitive.SendChatMessage("!{#FF6347}You have the has shot tag now because the game has progress more than 80%!");
+                                    if (fugitive.GetSharedData<bool>("HasShot") == false)
+                                    {
+                                        fugitive.SetSharedData("HasShot", true);
+                                        fugitive.SetSharedData("VisibleBlip", true);
+                                        lobby.FugitiveShowCounter = 29; // Set them to VISIBLE
+
+                                        fugitive.SendChatMessage("!{#FF6347}You have the has shot tag now because the game has progress more than 80%!");
+                                    }
                                 }
+                                catch { }
                             }
                             if (lobby.GameProgress == Convert.ToInt32(0.8 * Settings.GameRunTime) && lobby.gameMode != GameModes.BUSTED)
                             {
                                 foreach (Player pl in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
                                 {
-                                    pl.SendChatMessage("!{#FF6347}[GAME] !{#FFFFFF}80% of the game has elapsed, all fugitives have shot tag now.");
-                                    pl.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, -1, (short)lobby.gameMode);
+                                    try
+                                    {
+                                        if (pl == null) continue;
+
+                                        pl.SendChatMessage("!{#FF6347}[GAME] !{#FFFFFF}80% of the game has elapsed, all fugitives have shot tag now.");
+                                        pl.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, -1, (short)lobby.gameMode);
+                                    }
+                                    catch { }
                                 }
                             }
                         }
@@ -2645,7 +2748,16 @@ namespace RNC
                             try 
                             {
                                 Player fugi = lobby.Fugitives.OrderBy(x => Guid.NewGuid()).First();
-                                lobby.Cops.ForEach(a => a.TriggerEvent("ReportLastSeen", fugi.Name, fugi.Position.X, fugi.Position.Y, fugi.Position.Z));
+                                
+                                foreach (var a in lobby.Cops)
+                                {
+                                    try
+                                    {
+                                        if (a == null) continue;
+                                        a.TriggerEvent("ReportLastSeen", fugi.Name, fugi.Position.X, fugi.Position.Y, fugi.Position.Z);
+                                    }
+                                    catch { }
+                                }
                             } 
                             catch { }
                         }
@@ -2658,7 +2770,13 @@ namespace RNC
                         {
                             foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
                             {
-                                player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
+                                try
+                                {
+                                    if (player == null) continue;
+
+                                    player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
+                                }
+                                catch { }
                             }
                         }
 
@@ -2670,36 +2788,42 @@ namespace RNC
                             {
                                 foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
                                 {
-                                    player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, 0, (short)lobby.gameMode);
-
-                                    player.SetSharedData("BustedProgress", 0.0);
-
-                                    //////////////////////////////////////////////////////////////////////////////////////////
-                                    ///
-
-                                    if (!lobby.Cops.Contains(player) && !lobby.Fugitives.Contains(player)) continue;
-
-                                    EPlayer.Notify(player, "Collisions have been enabled and weapons issued", "green", "fas fa-car-crash", false, 3000);
-                                    
-                                    player.Health = 100;
-                                    player.Armor = 0;
-
-                                    player.SetSharedData("Collisions", true);
-                                    if(Settings.Dynamics.OnfootCollision == false) player.SetSharedData("Collisions", false);
-
-
-                                    if (lobby.Cops.Contains(player))
+                                    try
                                     {
-                                        player.Armor = 60;
+                                        if (player == null) continue;
 
-                                        EPlayer.GiveCopWeapons(player);
-                                        player.TriggerEvent("SetActorInvulnerable", false);
+                                        player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, 0, (short)lobby.gameMode);
+
+                                        player.SetSharedData("BustedProgress", 0.0);
+
+                                        //////////////////////////////////////////////////////////////////////////////////////////
+                                        ///
+
+                                        if (!lobby.Cops.Contains(player) && !lobby.Fugitives.Contains(player)) continue;
+
+                                        EPlayer.Notify(player, "Collisions have been enabled and weapons issued", "green", "fas fa-car-crash", false, 3000);
+
+                                        player.Health = 100;
+                                        player.Armor = 0;
+
+                                        player.SetSharedData("Collisions", true);
+                                        if (Settings.Dynamics.OnfootCollision == false) player.SetSharedData("Collisions", false);
+
+
+                                        if (lobby.Cops.Contains(player))
+                                        {
+                                            player.Armor = 60;
+
+                                            EPlayer.GiveCopWeapons(player);
+                                            player.TriggerEvent("SetActorInvulnerable", false);
+                                        }
+                                        else if (lobby.Fugitives.Contains(player))
+                                        {
+                                            EPlayer.GiveFugitiveWeapons(player);
+                                            player.TriggerEvent("SetActorInvulnerable", false);
+                                        }
                                     }
-                                    else if (lobby.Fugitives.Contains(player))
-                                    {
-                                        EPlayer.GiveFugitiveWeapons(player);
-                                        player.TriggerEvent("SetActorInvulnerable", false);
-                                    }
+                                    catch { }
                                 }
 
                                 foreach(Vehicle veh in lobby.Vehicles)
@@ -2718,29 +2842,39 @@ namespace RNC
                     {
                         foreach (Player cop in lobby.Cops)
                         {
-                            if (cop.GetData<bool>("GPS") == false)
+                            try
                             {
-                                cop.SetSharedData("VisibleBlip", false);
-                            }
-                            else
-                            {
-                                cop.SetSharedData("VisibleBlip", true);
-                            }
+                                if (cop == null) continue;
 
-                            if(cop.GetSharedData<bool>("ClimbProtection") == true && cop.GetData<long>("ClimbProtectionEnd") < Environment.TickCount64)
-                            {
-                                cop.SetSharedData("ClimbProtection", false);
-                            }
+                                if (cop.GetData<bool>("GPS") == false)
+                                {
+                                    cop.SetSharedData("VisibleBlip", false);
+                                }
+                                else
+                                {
+                                    cop.SetSharedData("VisibleBlip", true);
+                                }
+
+                                if (cop.GetSharedData<bool>("ClimbProtection") == true && cop.GetData<long>("ClimbProtectionEnd") < Environment.TickCount64)
+                                {
+                                    cop.SetSharedData("ClimbProtection", false);
+                                }
+                            } catch { }
                         }
                     }
                     lock (lobby.Fugitives)
                     {
                         foreach(Player fugi in lobby.Fugitives)
                         {
-                            if (fugi.GetSharedData<bool>("ClimbProtection") == true && fugi.GetData<long>("ClimbProtectionEnd") < Environment.TickCount64)
+                            try
                             {
-                                fugi.SetSharedData("ClimbProtection", false);
-                            }
+                                if (fugi == null) continue;
+
+                                if (fugi.GetSharedData<bool>("ClimbProtection") == true && fugi.GetData<long>("ClimbProtectionEnd") < Environment.TickCount64)
+                                {
+                                    fugi.SetSharedData("ClimbProtection", false);
+                                }
+                            } catch { }
                         }
                     }
 
