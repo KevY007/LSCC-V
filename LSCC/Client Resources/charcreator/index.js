@@ -286,6 +286,49 @@ creatorMainMenu.SliderChange.on((item, listIndex, value) => {
     }
 });
 
+function generateRandomChar(){
+    // parents random
+    fatherItem.Index = getRandomInt(0, Data.fathers.length - 1);
+    motherItem.Index = getRandomInt(0, Data.mothers.length - 1);
+    similarityItem.Index = getRandomInt(0, 100);
+    skinSimilarityItem.Index = getRandomInt(0, 100);
+    updateParents();
+
+    // features random
+    for (let i = 0; i < Data.featureNames.length; i++) {
+        featureItems[i].Index = getRandomInt(0, features.length);
+        updateFaceFeature(i, features[featureItems[i].Index]);
+    }
+
+    // appearance random
+    for (let i = 0; i < Data.appearanceNames.length; i++) {
+        if(i == 1 || i == 2 || i == 3 || i == 9)
+        {
+            appearanceItems[i].Index = getRandomInt(0, mp.game.ped.getNumHeadOverlayValues(i) - 1);
+            appearanceOpacityItems[i].Index = getRandomInt(0, 100);
+        }
+        else
+        {
+            appearanceItems[i].Index = 0;
+            appearanceOpacityItems[i].Index = 0;
+        } 
+        updateAppearance(i);
+    }  
+    
+    // hair & colors random
+    hairItem.Index = getRandomInt(0, Data.hairList[currentGender].length - 1);
+	let hairColorGen = getRandomInt(0, 14); // 0-14 is enough they can choose higher color if they want
+    hairColorItem.Index = hairColorGen;
+    hairHighlightItem.Index = hairColorGen;
+    eyebrowColorItem.Index = hairColorGen;
+    beardColorItem.Index = hairColorGen;
+    eyeColorItem.Index = getRandomInt(0, 8); // 0-8 are normal eyes, above that are weird alien-style ones
+    blushColorItem.Index = 0;
+    lipstickColorItem.Index = 0;
+    chestHairColorItem.Index = hairColorGen;
+    updateHairAndColors();    
+}
+
 creatorMainMenu.ItemSelect.on((item, index) => {
     switch (index) {
         case 1:
@@ -337,37 +380,7 @@ creatorMainMenu.ItemSelect.on((item, index) => {
         break;
 
         case 6: // full character randomization
-            // parents random
-            fatherItem.Index = getRandomInt(0, Data.fathers.length - 1);
-            motherItem.Index = getRandomInt(0, Data.mothers.length - 1);
-            similarityItem.Index = getRandomInt(0, 100);
-            skinSimilarityItem.Index = getRandomInt(0, 100);
-            updateParents();
-    
-            // features random
-            for (let i = 0; i < Data.featureNames.length; i++) {
-                featureItems[i].Index = getRandomInt(0, features.length);
-                updateFaceFeature(i, features[featureItems[i].Index]);
-            }
-
-            // appearance random
-            for (let i = 0; i < Data.appearanceNames.length; i++) {
-                appearanceItems[i].Index = getRandomInt(0, mp.game.ped.getNumHeadOverlayValues(i) - 1);
-                appearanceOpacityItems[i].Index = getRandomInt(0, 100);
-                updateAppearance(i);
-            }  
-            
-            // hair & colors random
-            hairItem.Index = getRandomInt(0, Data.hairList[currentGender].length - 1);
-            hairColorItem.Index = getRandomInt(0, Data.maxHairColor);
-            hairHighlightItem.Index = getRandomInt(0, Data.maxHairColor);
-            eyebrowColorItem.Index = getRandomInt(0, Data.maxHairColor);
-            beardColorItem.Index = getRandomInt(0, Data.maxHairColor);
-            eyeColorItem.Index = getRandomInt(0, Data.maxEyeColor);
-            blushColorItem.Index = getRandomInt(0, Data.maxBlushColor);
-            lipstickColorItem.Index = getRandomInt(0, Data.maxLipstickColor);
-            chestHairColorItem.Index = getRandomInt(0, Data.maxHairColor);
-            updateHairAndColors();            
+            generateRandomChar();
         break;
 
         case 7:

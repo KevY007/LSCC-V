@@ -82,35 +82,166 @@ namespace RNC
                 this.Clothes[i] = new AccClothData();
             }
 
-            if(teamID == 0)
+            if (teamID == 0)
             {
-                this.Clothes[4].Drawable = 8;
-                this.Clothes[4].Texture = 0;
+                int defOutfit = new Random().Next(0, 7);
+                #region - Six different fugitive outfits (switch case)
+                switch (defOutfit)
+                {
+                    case 0:
+                        {
+                            this.Clothes[4].Drawable = 1;
+                            this.Clothes[4].Texture = 0;
 
-                this.Clothes[5].Drawable = 82;
-                this.Clothes[5].Texture = 0;
+                            this.Clothes[5].Drawable = 82;
+                            this.Clothes[5].Texture = 0;
 
-                this.Clothes[6].Drawable = 7;
-                this.Clothes[6].Texture = 2;
+                            this.Clothes[6].Drawable = 7;
+                            this.Clothes[6].Texture = 2;
 
-                this.Clothes[11].Drawable = 50;
-                this.Clothes[11].Texture = 1;
+                            this.Clothes[11].Drawable = 50;
+                            this.Clothes[11].Texture = new Random().Next(0, 5);
+                            break;
+                        }
+                    case 1:
+                        {
+                            this.Clothes[3].Drawable = 23;
+                            this.Clothes[3].Drawable = 0;
+
+                            this.Clothes[11].Drawable = 5;
+                            int[] possibleTexts = { 0, 1, 2, 7 };
+                            this.Clothes[11].Texture = possibleTexts[new Random().Next(0, possibleTexts.Length)];
+
+                            this.Clothes[4].Drawable = 1;
+                            this.Clothes[4].Texture = new Random().Next(0, 15);
+
+                            this.Clothes[6].Drawable = 1;
+                            this.Clothes[6].Texture = 0;
+                            break;
+                        }
+                    case 2:
+                        {
+                            this.Clothes[3].Drawable = 1; // torso
+                            this.Clothes[3].Drawable = 0;
+
+                            this.Clothes[11].Drawable = 6; // shirt
+                            int[] possibleTexts = { 0, 1, 3, 4, 5, 6, 8, 9, 11 };
+                            this.Clothes[11].Texture = possibleTexts[new Random().Next(0, possibleTexts.Length)];
+
+                            this.Clothes[4].Drawable = 9; // pants
+                            this.Clothes[4].Texture = new Random().Next(0, 15);
+
+                            this.Clothes[8].Drawable = 2; // undershirt
+                            this.Clothes[8].Texture = new Random().Next(0, 5);
+
+                            this.Clothes[6].Drawable = 9; // shoes
+                            this.Clothes[6].Texture = 1;
+                            break;
+                        }
+                    case 3:
+                        {
+                            this.Clothes[3].Drawable = 1; // torso
+                            this.Clothes[3].Drawable = 0;
+
+                            this.Clothes[11].Drawable = 7; // shirt
+                            this.Clothes[11].Texture = new Random().Next(0, 16);
+
+                            this.Clothes[4].Drawable = 5; // pants
+                            this.Clothes[4].Texture = new Random().Next(0, 15);
+
+                            this.Clothes[8].Drawable = 0; // undershirt
+                            this.Clothes[8].Texture = new Random().Next(0, 6);
+
+                            this.Clothes[6].Drawable = 93; // shoes
+                            this.Clothes[6].Texture = new Random().Next(0, 14);
+                            break;
+                        }
+                    case 4:
+                        {
+                            this.Clothes[3].Drawable = 1; // torso
+                            this.Clothes[3].Drawable = 0;
+
+                            this.Clothes[11].Drawable = 14; // shirt
+                            this.Clothes[11].Texture = new Random().Next(0, 16);
+
+                            this.Clothes[4].Drawable = 22; // pants
+                            this.Clothes[4].Texture = new Random().Next(0, 2);
+
+                            this.Clothes[6].Drawable = 3; // shoes
+                            this.Clothes[6].Texture = 0;
+                            break;
+                        }
+                    case 5:
+                        {
+                            this.Clothes[3].Drawable = 55; // torso
+                            this.Clothes[3].Drawable = 0;
+
+                            this.Clothes[11].Drawable = 204; // shirt
+                            this.Clothes[11].Texture = new Random().Next(0, 13);
+
+                            this.Clothes[4].Drawable = 33; // pants
+                            this.Clothes[4].Texture = 0;
+
+                            this.Clothes[6].Drawable = 24; // shoes
+                            this.Clothes[6].Texture = 0;
+                            break;
+                        }
+                    case 6:
+                        {
+                            this.Clothes[3].Drawable = 1; // torso
+                            this.Clothes[3].Drawable = 0;
+
+                            this.Clothes[11].Drawable = 233; // shirt
+                            this.Clothes[11].Texture = new Random().Next(0, 10);
+
+                            this.Clothes[8].Drawable = 29; // undershirt
+                            this.Clothes[8].Texture = new Random().Next(0, 16);
+
+                            this.Clothes[4].Drawable = 43; // pants
+                            this.Clothes[4].Texture = 0;
+
+                            this.Clothes[6].Drawable = 24; // shoes
+                            this.Clothes[6].Texture = 0;
+                            break;
+                        }
+                    default:
+                        {
+                            this.Clothes[4].Drawable = 1;
+                            this.Clothes[4].Texture = 0;
+
+                            this.Clothes[5].Drawable = 82;
+                            this.Clothes[5].Texture = 0;
+
+                            this.Clothes[6].Drawable = 7;
+                            this.Clothes[6].Texture = 2;
+
+                            this.Clothes[11].Drawable = 50;
+                            this.Clothes[11].Texture = new Random().Next(0, 5);
+                            break;
+                        }
+                }
+                #endregion
             }
-            else if(teamID == 1)
+            else if (teamID == 1)
             {
-                this.Clothes[3].Drawable = 11;
+                int defOutfit = new Random().Next(0, 3);
+                this.Clothes[3].Drawable = 0; // torso
                 this.Clothes[3].Texture = 0;
 
-                this.Clothes[4].Drawable = 126;
+                this.Clothes[4].Drawable = 126; // pants
                 this.Clothes[4].Texture = 0;
 
-                this.Clothes[6].Drawable = 96;
+                this.Clothes[6].Drawable = 96; // shoes
                 this.Clothes[6].Texture = 0;
 
-                this.Clothes[11].Drawable = 55;
-                this.Clothes[11].Texture = 0;
-            }
+                // 153 - belt | 170 - kevlar
+                this.Clothes[8].Drawable = (new Random().NextDouble() > 0.5f) ? 153 : 170; // undershirts
+                this.Clothes[8].Texture = 0;
 
+                this.Clothes[11].Drawable = 55; // shirts
+                this.Clothes[11].Texture = 0;
+
+            }
             Hat = -1;
             HatTxt = -1;
             Glasses = -1;
