@@ -4175,7 +4175,7 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            if (EPlayer.GetAccount(player).Admin < 1)
+            if (EPlayer.GetAccount(player).Admin < 1 && EPlayer.GetAccount(player).Donator < 1)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
                 return;
@@ -4196,7 +4196,8 @@ namespace RNC
                 {
                     eplayer.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
 
-                    eplayer.SendChatMessage("!{#FF6347}AdmCmd: An admin has changed the current lobby weather: !{#A8FFAB} " + weatherString);
+                    if(EPlayer.GetAccount(player).Admin > 0) eplayer.SendChatMessage("!{#FF6347}AdmCmd: An admin has changed the current lobby weather: !{#A8FFAB} " + weatherString);
+					else eplayer.SendChatMessage("!{#FF6347}DonatorCmd: " + player.Name + " has changed the current lobby weather: !{#A8FFAB} " + weatherString);
                 }
             }
 
@@ -4209,7 +4210,7 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            if (EPlayer.GetAccount(player).Admin < 1)
+            if (EPlayer.GetAccount(player).Admin < 1 && EPlayer.GetAccount(player).Donator < 1)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
                 return;
@@ -4229,7 +4230,8 @@ namespace RNC
                 {
                     eplayer.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
 
-                    eplayer.SendChatMessage("!{#FF6347}AdmCmd: An admin has changed the current lobbies hour to " + lobby.Time[0]);
+                    if(EPlayer.GetAccount(player).Admin > 0) eplayer.SendChatMessage("!{#FF6347}AdmCmd: An admin has changed the current lobbies hour to " + lobby.Time[0]);
+					else eplayer.SendChatMessage("!{#FF6347}DonatorCmd: " + player.Name + " has changed the current lobbies hour to " + lobby.Time[0]);
                 }
             }
 
@@ -4786,7 +4788,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).DonatorLevel >= 1)
             {
-                player.SendChatMessage("!{#F7EB05}[Bronze Donator] /d(onator)c(hat)");
+                player.SendChatMessage("!{#F7EB05}[Bronze Donator] /d(onator)c(hat) /settime /setweather");
             }
             if (EPlayer.GetAccount(player).DonatorLevel >= 2)
             {
