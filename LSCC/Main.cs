@@ -2556,8 +2556,10 @@ namespace RNC
                                         p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
                                         EPlayer.Freeze(p, true);
 
-                                        p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", true);
-                                        p.SetSharedData("Collisions", true);
+                                        p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
+                                        p.TriggerEvent("ToggleCollisionsForEnt", p.GetData<Vehicle>("ChaseVehicle"), false);
+
+                                        p.SetSharedData("Collisions", false);
                                     }
                                     catch { }
                                 }
@@ -2576,8 +2578,8 @@ namespace RNC
                                         p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
                                         EPlayer.Freeze(p, true);
 
-                                        p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", true);
-                                        p.SetSharedData("Collisions", true);
+                                        p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
+                                        p.SetSharedData("Collisions", false);
                                     }
                                     catch { }
                                 }
@@ -2600,8 +2602,13 @@ namespace RNC
 
                                         p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
 
+                                        p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", true);
+                                        p.SetSharedData("Collisions", true);
+                                        p.TriggerEvent("ToggleCollisionsForEnt", p.GetData<Vehicle>("ChaseVehicle"), true);
+
                                         p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
                                         p.SetSharedData("Collisions", false);
+                                        p.TriggerEvent("ToggleCollisionsForEnt", p.GetData<Vehicle>("ChaseVehicle"), false);
 
                                         p.RemoveAllWeapons();
 
@@ -2643,8 +2650,13 @@ namespace RNC
 
                                         p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
 
+                                        p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", true);
+                                        p.SetSharedData("Collisions", true);
+                                        p.TriggerEvent("ToggleCollisionsForEnt", p.GetData<Vehicle>("ChaseVehicle"), true);
+
                                         p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
                                         p.SetSharedData("Collisions", false);
+                                        p.TriggerEvent("ToggleCollisionsForEnt", p.GetData<Vehicle>("ChaseVehicle"), false);
 
                                         p.RemoveAllWeapons();
 
@@ -2679,6 +2691,7 @@ namespace RNC
                                     if (v == null) continue;
 
                                     v.SetSharedData("Collisions", false);
+                                    Settings.LoggedInPlayers.ForEach((p) => { p.TriggerEvent("ToggleCollisionsForEnt", p.GetData<Vehicle>("ChaseVehicle"), false); });
                                 }
                                 catch { }
                             }

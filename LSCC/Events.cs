@@ -537,6 +537,7 @@ namespace RNC
                     if (player.GetSharedData<int>("Team") == 0 || player.GetSharedData<int>("Team") == 1)
                     {
                         player.SetSharedData("Collisions", false);
+                        player.TriggerEvent("ToggleCollisionsForEnt", player, false);
                     }
                 }
 

@@ -181,6 +181,8 @@ mp.events.addDataHandler("SilentSiren", (entity, value) => {
 // Collision Sync, ffs this took me hours of researching the shitass system but hey I figured it out -kevy
 function ToggleCollisionsForEnt(ent, state)
 {
+    if(ent.handle === 0) return;
+
     if(ent.type === 'vehicle')
     { // ITS A VEH
         ent.setInvincible(!state);
@@ -194,7 +196,7 @@ function ToggleCollisionsForEnt(ent, state)
         ent.setNoCollision(targ.handle, state);
         targ.setNoCollision(ent.handle, state);
 
-        if((ent.Collisions != undefined && ent.Collisions == false) || (targ.Collisions != undefined && targ.Collisions == false))
+        if((ent.getVariable("Collisions") != undefined && ent.getVariable("Collisions") == false) || (targ.getVariable("Collisions") != undefined && targ.getVariable("Collisions") == false))
         { // EITHER of them has disabled, means disabled collisions take precedence over enabled.
             ent.setNoCollision(targ.handle, false);
             targ.setNoCollision(ent.handle, false);
@@ -205,7 +207,7 @@ function ToggleCollisionsForEnt(ent, state)
         ent.setNoCollision(targ.handle, state);
         targ.setNoCollision(ent.handle, state);
 
-        if((ent.Collisions != undefined && ent.Collisions == false) || (targ.Collisions != undefined && targ.Collisions == false))
+        if((ent.getVariable("Collisions") != undefined && ent.getVariable("Collisions") == false) || (targ.getVariable("Collisions") != undefined && targ.getVariable("Collisions") == false))
         { // EITHER of them has disabled, means disabled collisions take precedence over enabled.
             ent.setNoCollision(targ.handle, false);
             targ.setNoCollision(ent.handle, false);
@@ -220,9 +222,10 @@ mp.events.add('entityStreamIn', (entity) => {
         ToggleCollisionsForEnt(entity, true); // This will refresh and cause other vehicles collision relations to refresh with this one
 });
 
+mp.events.add("ToggleCollisionsForEnt", (ent, state) => { ToggleCollisionsForEnt(ent, state); });
+
 mp.events.addDataHandler('Collisions', function (entity, value, oldValue) 
 {
-    entity.Collisions = value;
     ToggleCollisionsForEnt(entity, value);
 });
 
