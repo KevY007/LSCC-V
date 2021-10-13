@@ -994,6 +994,15 @@ mp.events.add('render', () => {
                             mp.players.local.vehicle.freezePosition(true);
                         }
                     }
+                    else if(chaseTimeCur == 1 && mp.players.local.getVariable("Team") == 0)
+                    {
+                        mp.players.local.freezePosition(false);
+
+                        if(mp.players.local.isInAnyVehicle(false))
+                        {
+                            mp.players.local.vehicle.freezePosition(false);
+                        }
+                    }
 
                     if(chaseTimeCur >= chaseTimeMax || chaseTimeCur <= -1)
                     {

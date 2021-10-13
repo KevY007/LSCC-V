@@ -2598,7 +2598,6 @@ namespace RNC
 
                                         p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
                                         p.TriggerEvent("ToggleNametags", true);
-                                        EPlayer.Freeze(p, false);
 
                                         p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
 
@@ -2632,6 +2631,8 @@ namespace RNC
                                                 p.GetData<Vehicle>("ChaseVehicle").WheelColor = inst.WheelColor;
                                             }
                                         }
+
+                                        EPlayer.Freeze(p, false);
                                     }
                                     catch { }
                                 }
@@ -2641,12 +2642,11 @@ namespace RNC
                             {
                                 foreach (var p in lobby.Cops)
                                 {
-                                    if (p == null) continue;
+                                    if (p == null || lobby.Fugitives.Contains(p)) continue;
                                     try
                                     {
                                         p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
                                         p.TriggerEvent("ToggleNametags", true);
-                                        EPlayer.Freeze(p, true);
 
                                         p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
 
@@ -2679,6 +2679,7 @@ namespace RNC
                                                 p.GetData<Vehicle>("ChaseVehicle").WheelColor = inst.WheelColor;
                                             }
                                         }
+                                        EPlayer.Freeze(p, true);
                                     }
                                     catch { }
                                 }
@@ -2743,17 +2744,29 @@ namespace RNC
 
                         if(lobby.GameProgress < 10)
                         {
-                            lobby.Cops.ForEach(p =>
+                            foreach(Player p in lobby.Cops)
                             {
-                                EPlayer.Freeze(p, true);
-                            });
+                                if(p != null) EPlayer.Freeze(p, true);
+                            }
+
+                            foreach (Player p in lobby.Fugitives)
+                            {
+                                if (p != null)
+                                {
+                                    EPlayer.Freeze(p, false);
+                                }
+                            }
                         }
                         if (lobby.GameProgress == 10)
                         {
-                            lobby.Cops.ForEach(p => {
-                                EPlayer.Freeze(p, false);
-                                p.SendNotification("~b~You may begin the chase now.");
-                            });
+                            foreach (Player p in lobby.Cops)
+                            {
+                                if (p != null)
+                                { 
+                                    EPlayer.Freeze(p, false);
+                                    p.SendNotification("~b~You may begin the chase now.");
+                                }
+                            }
                         }
 
                         if (lobby.GameProgress >= Convert.ToInt32(0.8 * Settings.GameRunTime) && lobby.gameMode != GameModes.BUSTED)
