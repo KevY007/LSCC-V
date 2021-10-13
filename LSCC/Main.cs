@@ -2646,7 +2646,7 @@ namespace RNC
                                     {
                                         p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
                                         p.TriggerEvent("ToggleNametags", true);
-                                        EPlayer.Freeze(p, false);
+                                        EPlayer.Freeze(p, true);
 
                                         p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
 
@@ -2691,7 +2691,13 @@ namespace RNC
                                     if (v == null) continue;
 
                                     v.SetSharedData("Collisions", false);
-                                    Settings.LoggedInPlayers.ForEach((p) => { p.TriggerEvent("ToggleCollisionsForEnt", p.GetData<Vehicle>("ChaseVehicle"), false); });
+                                    Settings.LoggedInPlayers.ForEach((p) => 
+                                    {
+                                        if (p.Position.DistanceTo(v.Position) < 500.0)
+                                        {
+                                            p.TriggerEvent("ToggleCollisionsForEnt", p.GetData<Vehicle>("ChaseVehicle"), false);
+                                        }
+                                    });
                                 }
                                 catch { }
                             }
@@ -2716,10 +2722,10 @@ namespace RNC
 
                                         p.TriggerEvent("ResetKillFeed");
 
-                                        // if(lobby.Cops.Contains(p)) EPlayer.Notify(p, "You will be unfreezed in 10 seconds.", "orange", "fas fa-hourglass-start", false, 10000);
+                                        if(lobby.Cops.Contains(p)) EPlayer.Notify(p, "You will be unfreezed in 10 seconds.", "orange", "fas fa-hourglass-start", false, 10000);
                                         if (lobby.gameMode == GameModes.STANDARD)
                                         {
-                                            //p.SendChatMessage("!{#FF6347}[!] !{#8D8DFF}Cops will be unfrozen in 10 seconds. !{#E84040}Fugitive's may take this time to prepare/start the chase.");
+                                            p.SendChatMessage("!{#FF6347}[!] !{#8D8DFF}Cops will be unfrozen in 10 seconds. !{#E84040}Fugitive's may take this time to prepare/start the chase.");
                                         }
                                         else if (lobby.gameMode == GameModes.BUSTED)
                                         {
@@ -2735,12 +2741,19 @@ namespace RNC
                             }
                         }
 
+                        if(lobby.GameProgress < 10)
+                        {
+                            lobby.Cops.ForEach(p =>
+                            {
+                                EPlayer.Freeze(p, true);
+                            });
+                        }
                         if (lobby.GameProgress == 10)
                         {
-                            /*lobby.Cops.ForEach(p => {
+                            lobby.Cops.ForEach(p => {
                                 EPlayer.Freeze(p, false);
                                 p.SendNotification("~b~You may begin the chase now.");
-                            });*/
+                            });
                         }
 
                         if (lobby.GameProgress >= Convert.ToInt32(0.8 * Settings.GameRunTime) && lobby.gameMode != GameModes.BUSTED)
