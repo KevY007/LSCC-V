@@ -724,6 +724,8 @@ mp.events.add('ScoreboardToggleTyping', (state) => {
 mp.events.callLocal('ScoreboardToggleTyping', false);
 
 mp.events.add("HUDError", (msg, icon) => {
+    if(!showHud) return;
+
     let insertString = `iziToast.error({`;
     insertString += `message: \`${msg}\`, `;
     insertString += `icon: "${icon}" `;
@@ -733,6 +735,8 @@ mp.events.add("HUDError", (msg, icon) => {
 });
 
 mp.events.add("HUDNotify", (msg, color, icon, close, timeout, orientation, displaymode) => {
+    if(!showHud) return;
+    
     let insertString = `iziToast.show({`;
     insertString += `message: \`${msg}\`, `;
     insertString += `color: "${color}", `;
@@ -747,6 +751,8 @@ mp.events.add("HUDNotify", (msg, color, icon, close, timeout, orientation, displ
 });
 // bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter, center
 mp.events.add("HUDNotify2", (title, msg, orientation, displaymode) => {
+    if(!showHud) return;
+    
     let insertString = `iziToast.show({`;
     insertString += `title: \`${title}\`, `;
     insertString += `message: \`${msg}\`, `;
