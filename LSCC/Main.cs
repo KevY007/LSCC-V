@@ -2823,19 +2823,27 @@ namespace RNC
                         lobby.LastSeenCounter = 0;
                     }
 
+                    if (lobby.GameProgress % 5 == 0) // Every 5 seconds/multiple during collision phase
+                    {
+                        foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                        {
+                            try
+                            {
+                                if (player == null) continue;
+
+                                player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
+                            }
+                            catch { }
+                        }
+                    }
+
                     if (lobby.CollisionCounter > 0)
                     {
                         if (lobby.CollisionCounter % 5 == 0) // Every 5 seconds/multiple during collision phase
                         {
-                            foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                            foreach (Vehicle veh in lobby.Vehicles)
                             {
-                                try
-                                {
-                                    if (player == null) continue;
-
-                                    player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
-                                }
-                                catch { }
+                                veh.SetSharedData("Collisions", false);
                             }
                         }
 
