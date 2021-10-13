@@ -1360,7 +1360,7 @@ namespace RNC
             return;
         }
 
-        [Command("viewscreenshot", Alias = "viewss")]
+        [Command("viewscreenshot", "!{#AFAFAF}[USAGE] viewss (identifier) | Use 'last' for last taken screenshot", Alias = "viewss")]
         public void cmd_viewscreenshot(Player player, string identifier)
         {
             if (!EPlayer.LoggedIn(player)) return;
@@ -1384,7 +1384,7 @@ namespace RNC
             return;
         }
 
-        [Command("takescreenshot", Alias = "takess")]
+        [Command("takescreenshot", "!{#AFAFAF}[USAGE] takescreenshot (target) (quality = 20) | Quality 20 is default", Alias = "takess")]
         public void cmd_takescreenshot(Player player, Player target, int quality)
         {
             if (!EPlayer.LoggedIn(player)) return;
@@ -1405,8 +1405,46 @@ namespace RNC
 
             target.TriggerEvent("TakeScreenshot", quality, 100, $"adm_{player.Name}");
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has requested {target.Name}'s game screenshot.");
-            player.SendChatMessage("!{#33C446}[>>] !{#FFFFFF}The screenshot will arrive as soon as the uploading is complete. If it fails you will be notified.");
+            player.SendChatMessage("!{#33C446}[>>] !{#FFFFFF}The screenshot will arrive as soon as the uploading is complete. If it fails you will be notified. (Speed/time depends on target's internet)");
             Logs.LogAdmin(player, $"Take {target.Name}'s game screenshot.");
+            return;
+        }
+
+        [Command("takegif", "!{#AFAFAF}[USAGE] takegif (target) (duration in seconds) (fps = 24) | Leave FPS to 24 or it'll be bad")]
+        public void cmd_takegif(Player player, Player target, int duration, int fps = 24)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (EPlayer.GetAccount(player).Admin < 1) return;
+
+            if (!player.Name.Equals(target.Name) && EPlayer.GetAccount(target).Admin > EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher admin level than you.");
+                return;
+            }
+
+            if(target.HasData("GIF_Creating"))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is ALREADY creating a GIF.");
+                return;
+            }
+
+            if (duration < 0 || duration > 300)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your duration is... messed up.");
+                return;
+            }
+            if (fps < 1 || fps > 60)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Dude the target ain't on NASA PC.");
+                return;
+            }
+
+            target.TriggerEvent("TakeGIF", duration, $"adm_{player.Name}", fps);
+            target.SetData("GIF_Creating", player.Name);
+            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has requested {target.Name}'s game GIF.");
+            player.SendChatMessage("!{#33C446}[>>] !{#FFFFFF}The GIF will arrive as soon as the uploading is complete. If it fails you will be notified. (GIF's take A LONG time to upload and it depends on target's net)");
+            Logs.LogAdmin(player, $"Take {target.Name}'s game GIF.");
             return;
         }
 
@@ -6124,7 +6162,7 @@ namespace RNC
                 player.SendChatMessage("[Admin Lv 1]: /(o)mute /(o)unmute /warn /unwarn /setteam /forceautojoin /forceswapseats");
                 player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats /lastlogin /logs /gethp /checkplayer");
                 player.SendChatMessage("[Admin Lv 1]: /(t)freeze /(t)unfreeze /p(ut)i(n)v(ehicle) /view(s)creen(s)hot /take(s)creen(s)hot");
-                player.SendChatMessage("[Admin Lv 1]: /resetclothing /getfps");
+                player.SendChatMessage("[Admin Lv 1]: /resetclothing /getfps /takegif");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {

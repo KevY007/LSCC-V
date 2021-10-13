@@ -2853,11 +2853,44 @@ namespace RNC
                         else
                         {
                             admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The screenshot of !{#FF6347}" + player.Name + "'s !{#FFFFFF}game has failed to upload.");
+                            admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Error Details: " + data);
                         }
                     }
                 }
             }
             NAPI.Util.ConsoleOutput($"{player.Name}'s screenshot result: {result} at: {data} with identifier: {identifier}");
+            return;
+        }
+
+        [RemoteEvent("GIFReceived")]
+        public void OnReceiveGIF(Player player, int result, string data, string identifier)
+        {
+            player.ResetData("GIF_Creating");
+
+            if (!identifier.Equals("null"))
+            {
+                if (identifier.StartsWith("adm_"))
+                {
+                    string adminName = identifier.Replace("adm_", "");
+                    Player admin = Settings.LoggedInPlayers.Find(a => a.Name.Equals(adminName, StringComparison.OrdinalIgnoreCase));
+                    if (admin != null)
+                    {
+                        if (result == 1)
+                        {
+                            admin.SendChatMessage("!{#33C446}[#] !{#FFFFFF}The GIF has been uploaded. To view it use /viewss last or /viewss (id)");
+                            admin.SendChatMessage($"!{{#33C446}}[#] !{{#FFFFFF}}Controls: F4 (Stop viewing), F2 (Toggle cursor) | Metadata for preserving/viewing:");
+                            admin.SendChatMessage($"!{{#FF6347}}ID: {data} | Requestee: {identifier} | Source: {player.Name}");
+                            admin.SetData("LastSSIdentifier", data);
+                        }
+                        else
+                        {
+                            admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The GIF of !{#FF6347}" + player.Name + "'s !{#FFFFFF}game has failed to upload.");
+                            admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Error Details: " + data);
+                        }
+                    }
+                }
+            }
+            NAPI.Util.ConsoleOutput($"{player.Name}'s GIF result: {result} at: {data} with identifier: {identifier}");
             return;
         }
 

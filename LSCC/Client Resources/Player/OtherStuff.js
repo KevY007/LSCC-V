@@ -524,6 +524,141 @@ function checkCamInAir() {
     }
 }
 
+let GIF_FPS = 24;
+let GIF_Duration = 1;
+let GIF_Identifier = "null";
+
+let GIF_CaptureQueue = [];
+let GIF_Captured = [];
+
+let GIF_Browser = null;
+let GIF_FilesProcessed = 0;
+let GIF_Files = [];
+
+let GIF_Start = new Date();
+let GIF_Working = 0;
+
+
+mp.events.add("TakeGIF", (duration, identifier = "null", fps = 24) => {
+    
+    if(GIF_Working != 0) return;
+
+    if(typeof FPS !== 'undefined' && fps >= FPS) fps = Math.round(FPS / 2.0);
+
+    GIF_Captured = [];
+    GIF_CaptureQueue = [];
+
+    GIF_Files = [];
+    GIF_Browser = null;
+    GIF_FilesProcessed = 0;
+
+    GIF_Duration = duration;
+    GIF_FPS = fps;
+    GIF_Identifier = identifier;
+
+    let nextTimeout = 0;
+    for(let i = 0; i < GIF_Duration*GIF_FPS; i++)
+    {
+        GIF_CaptureQueue.push(Date.now() + nextTimeout);
+            
+        nextTimeout = Math.round(nextTimeout + (1000 / GIF_FPS));    
+    }
+
+    GIF_Start = new Date();
+    GIF_Working = 1;
+});
+
+mp.events.add(`GIFUploadResult`, (result, data) => {
+    mp.events.callRemote(`GIFReceived`, result, data, GIF_Identifier);
+
+    GIF_Browser.active = false;
+
+    setTimeout(() => {
+        GIF_Browser.destroy(); // Destroying right after was crashing the client, not sure why.
+        GIF_Working = 0;
+    }, 1000);
+});
+
+mp.events.add(`GIFVerifyFile`, (filename, result) => {
+    GIF_FilesProcessed++;
+    if(result == true) GIF_Files.push(filename);
+});
+
+mp.events.add('render', () => { // GIF::Main()
+
+    if(GIF_Working >= 1)
+    {
+        if(GIF_Working == 1) // Step 1: Take all the screens
+        {
+            if(GIF_CaptureQueue.length > 0) // LEFT TO CAPTURE.
+            {
+                GIF_CaptureQueue.forEach((mark) => {
+                    if(GIF_Captured.indexOf(GIF_CaptureQueue) == -1)
+                    {
+                        if(Date.now() >= mark)
+                        {
+                            let _fname = `${GIF_Start.getDate()}-${GIF_Start.getMonth()}-${GIF_Start.getFullYear()}+${GIF_Start.getHours()};${GIF_Start.getMinutes()};${GIF_Start.getSeconds()}+${Intl.DateTimeFormat().resolvedOptions().timeZone.replaceAll("/", "_")}_${mark}.jpg`;
+                            mp.gui.takeScreenshot(_fname, 0, 7, 99);
+                            GIF_Captured.push(mark);
+                        }
+                    }
+                });
+
+                GIF_Captured.forEach((mark) => {
+                    if(GIF_CaptureQueue.indexOf(mark) != -1) GIF_CaptureQueue.splice(GIF_CaptureQueue.indexOf(mark), 1);
+                });
+            }
+            else GIF_Working = 2; // ALL CAPTURED
+        }
+        
+        if(GIF_Working == 2) // Step 2: Verify and list the screens present
+        {
+            if(GIF_Browser == null)
+            {
+                GIF_Browser = mp.browsers.new(`package://Player/GIFFer.html`);
+        
+                GIF_Captured.forEach(mark => {
+                    let _fname = `${GIF_Start.getDate()}-${GIF_Start.getMonth()}-${GIF_Start.getFullYear()}+${GIF_Start.getHours()};${GIF_Start.getMinutes()};${GIF_Start.getSeconds()}+${Intl.DateTimeFormat().resolvedOptions().timeZone.replaceAll("/", "_")}_${mark}.jpg`;
+                    
+                    GIF_Browser.execute(`
+                        if(fileExists("http://screenshots/${_fname}"))
+                        {
+                            mp.trigger("GIFVerifyFile", "${_fname}", true);
+                        }
+                        else mp.trigger("GIFVerifyFile", "${_fname}", false);
+                    `);
+                });
+            }
+
+            if(GIF_FilesProcessed >= GIF_Captured.length) // Processed only so if some screenshots didn't appear, they'll not jam the OP.
+            {
+                GIF_Working = 3;
+            }
+        }
+
+        if(GIF_Working == 3) // Step 3: Upload the files with the respective identifier
+        {
+            GIF_Browser.execute(`images = [];`);
+            
+            GIF_Files.forEach(name => {
+                GIF_Browser.execute(`
+                    images.push(
+                        {
+                            name: "${name}",
+                            url: "http://screenshots/${name}"
+                        });
+                `);
+            });
+
+            let _gifname = `${GIF_Start.getDate()}-${GIF_Start.getMonth()}-${GIF_Start.getFullYear()}+${GIF_Start.getHours()};${GIF_Start.getMinutes()};${GIF_Start.getSeconds()}+${Intl.DateTimeFormat().resolvedOptions().timeZone.replaceAll("/", "_")}_${GIF_Identifier}.gif`;
+            //  uploadAllImages(uploadUrl, gifName, files, fps = 24)
+            GIF_Browser.execute(`uploadAllImages("http://192.210.243.62/lsccv/gifuploader.php", "${_gifname}", images, ${GIF_FPS})`);
+
+            GIF_Working = 4; // NOW WE WAIT...
+        }
+    }
+});
+
 
 // Screenshotter
 

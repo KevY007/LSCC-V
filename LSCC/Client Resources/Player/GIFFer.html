@@ -1,0 +1,132 @@
+<html>
+<head>
+</head>
+<body>
+<img src="">
+<form id="postForm" method="POST" action="" enctype="multipart/form-data">
+
+<input id="uploader" type="file" name="uploader[]" multiple> 
+<input id="uploadersubmit" type="submit" value = "Upload">
+
+</form>
+</body>
+<script>
+var container = new DataTransfer();
+
+
+function fileExists(url)
+{
+	let req = new XMLHttpRequest();
+	try 
+	{
+		req.open("GET", url, false);
+		req.send();
+	}
+	catch 
+	{
+		return false;
+	}
+	
+	if(req.status >= 200 && req.status < 300) 
+	{
+		return true;
+	} 
+	else 
+	{
+		return false;
+	}
+	return false;
+}
+
+document.getElementById("uploader").hidden = true;
+document.getElementById("uploadersubmit").hidden = true;
+
+/* e.g.
+
+ uploadAllImages("http://127.0.0.1/gifmaker.php", "blablabla_player_admin.gif", 30, 
+		[{name: "pic1.png", url: "http://pi1.png"}, ...]);
+*/
+
+function _internal_LoadImage(files, index, finishCallback)
+{
+	toDataUrl(files[index]["url"], (data) => 
+	{
+		let file = new File([dataURItoBlob(data)], files[index]["name"], 
+				{ type: "image/jpg", lastModified: new Date().getTime() } ); 
+			
+		container.items.add(file);
+			
+		var input = document.createElement("input");
+		input.id = `file${index}`;
+		input.name = `file${index}`;
+		input.hidden = true;
+		input.type = "text";
+		input.value = files[index]["name"];
+		document.getElementById("postForm").appendChild(input);
+
+		index++;
+		if(index !== files.length)
+		{
+			_internal_LoadImage(files, index, finishCallback);
+		}
+		else
+		{
+			finishCallback();
+		}
+	});
+}
+
+function uploadAllImages(uploadUrl, gifName, files, fps = 24) // files = [{name, url}]
+{
+	_internal_LoadImage(files, 0, () => {
+		document.getElementById("postForm").action = `${uploadUrl}?gif=${gifName}&fps=${fps}`;
+		document.getElementById("uploader").files = container.files;
+		document.getElementById("uploadersubmit").click();
+	});
+}
+
+function toDataUrl(url, callback) {
+    
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function() {
+        var reader = new FileReader();
+        reader.onloadend = function() {
+            callback(reader.result);
+        }
+        reader.readAsDataURL(xhr.response);
+    };
+
+    
+    xhr.open('GET', url);
+    xhr.responseType = 'blob';
+    xhr.send();
+}
+
+
+function dataURItoBlob(dataURI) {
+  // convert base64 to raw binary data held in a string
+  // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
+  var byteString = atob(dataURI.split(',')[1]);
+
+  // separate out the mime component
+  var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+
+  // write the bytes of the string to an ArrayBuffer
+  var ab = new ArrayBuffer(byteString.length);
+
+  // create a view into the buffer
+  var ia = new Uint8Array(ab);
+
+  // set the bytes of the buffer to the correct values
+  for (var i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+  }
+
+  // write the ArrayBuffer to a blob, and you're done
+  var blob = new Blob([ab], {type: mimeString});
+  return blob;
+}
+
+</script>
+</html>
+

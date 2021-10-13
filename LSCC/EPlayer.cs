@@ -507,6 +507,8 @@ namespace RNC
                 player.ResetData("TunerNoRefundWarn");
                 player.ResetData("ConvertingType");
                 player.ResetData("ConvertingAmount");
+                player.ResetData("GIF_Creating");
+
                 ResetShotStats(player);
                 player.SetData<long>("JoinTimeUnix", 0);
                 player.SetData("TeamShotWarning", 0);
@@ -657,21 +659,24 @@ namespace RNC
             switch (type)
             {
                 case AdminNote.ANoteType.OnSpectate:
-                    _notes = ContextFactory.Instance.AdminNotes.ToList<AdminNote>().Where(a => a.AccountID == acc.SQL_ID && a.Type == AdminNote.ANoteType.OnSpectate).ToList();
+                    _notes = ContextFactory.Instance.AdminNotes.ToList().Where(a => a.AccountID == acc.SQL_ID && a.Type == AdminNote.ANoteType.OnSpectate).ToList();
                     break;
                 case AdminNote.ANoteType.OnConnect:
-                    _notes = ContextFactory.Instance.AdminNotes.ToList<AdminNote>().Where(a => a.AccountID == acc.SQL_ID && a.Type == AdminNote.ANoteType.OnConnect).ToList();
+                    _notes = ContextFactory.Instance.AdminNotes.ToList().Where(a => a.AccountID == acc.SQL_ID && a.Type == AdminNote.ANoteType.OnConnect).ToList();
                     break;
                 case AdminNote.ANoteType.Both:
-                    _notes = ContextFactory.Instance.AdminNotes.ToList<AdminNote>().Where(a => a.AccountID == acc.SQL_ID && a.Type == AdminNote.ANoteType.Both).ToList();
+                    _notes = ContextFactory.Instance.AdminNotes.ToList().Where(a => a.AccountID == acc.SQL_ID && a.Type == AdminNote.ANoteType.Both).ToList();
                     break;
                 default:
-                    _notes = ContextFactory.Instance.AdminNotes.ToList<AdminNote>().Where(a => a.AccountID == acc.SQL_ID).ToList();
+                    _notes = ContextFactory.Instance.AdminNotes.ToList().Where(a => a.AccountID == acc.SQL_ID).ToList();
                     break;
             }
-            if (_notes == null || (_notes.Count <= 0 && type != AdminNote.ANoteType.OnConnect && type != AdminNote.ANoteType.OnSpectate && type != AdminNote.ANoteType.Both))
+            if (_notes == null || _notes.Count <= 0)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target does not have any admin notes on them!");
+                if (type != AdminNote.ANoteType.OnConnect && type != AdminNote.ANoteType.OnSpectate && type != AdminNote.ANoteType.Both)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target does not have any admin notes on them!");
+                }
                 return;
             }
             if(send_header) player.SendChatMessage($"!{{#ffc852}}====================> !{{#ffffff}}{acc.Username}'s Admin Notes !{{#ffc852}}<====================");
