@@ -4187,7 +4187,7 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            if (EPlayer.GetAccount(player).Admin < 1 && EPlayer.GetAccount(player).Donator < 1)
+            if (EPlayer.GetAccount(player).Admin < 1 && EPlayer.GetAccount(player).DonatorLevel < 1)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
                 return;
@@ -4222,7 +4222,7 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            if (EPlayer.GetAccount(player).Admin < 1 && EPlayer.GetAccount(player).Donator < 1)
+            if (EPlayer.GetAccount(player).Admin < 1 && EPlayer.GetAccount(player).DonatorLevel < 1)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
                 return;
