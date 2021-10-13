@@ -259,6 +259,12 @@ namespace RNC
             player.SetData("ShotStats.LastSync", Environment.TickCount64);
         }
 
+        [RemoteEvent("UpdateFPS")]
+        public static void OnSynchronizeFPS(Player player, int FPS)
+        {
+            player.SetSharedData("FPS", FPS);
+        }
+
         [RemoteEvent("clear_anim")]
         public static void RequestClearAnimation(Player player)
         {

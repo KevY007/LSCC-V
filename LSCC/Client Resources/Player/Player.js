@@ -133,6 +133,7 @@ mp.events.add("OneSecondEvent", () => {
     {
         ShotStats.UpdateInterval = 0;
         mp.events.callRemoteUnreliable("SyncShotStats", ShotStats.TotalFired, ShotStats.HitPlayer, ShotStats.HitVehicle, ShotStats.Missed);
+        mp.events.callRemoteUnreliable("UpdateFPS", FPS);
         mp.events.callRemote("UpdatePacketloss");
     }
 
@@ -612,6 +613,13 @@ mp.keys.bind(0x4A, false, () => {
 
 mp.events.add('render', () => {
 
+    FPS_Frames++;
+    if(Date.now() - FPS_Calc >= 1000)
+    {
+        FPS = FPS_Frames;
+        FPS_Frames = 0;
+        FPS_Calc = Date.now();
+    }
     if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
     {
         mp.game.player.restoreStamina(100);

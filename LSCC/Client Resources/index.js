@@ -34,6 +34,10 @@ var cuffInterval = null;
 
 var disableSprint = false;
 
+var FPS = 0; // This is the actual fps.
+var FPS_Frames = 0;
+var FPS_Calc = Date.now();
+
 mp.players.local.Team = -1;
 mp.players.local.LoggedIn = false;
 mp.game.vehicle.defaultEngineBehaviour = false;

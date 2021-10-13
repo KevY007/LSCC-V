@@ -3524,6 +3524,18 @@ namespace RNC
             return;
         }
 
+        [Command("getfps")]
+        public void cmd_checkfps(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+                return;
+
+            player.SendChatMessage($"!{{#FFFFFF}}{target.Name}'s framerate is !{{#FF6347}}{target.GetSharedData<int>("FPS")}");
+            return;
+        }
+
         [Command("pos")]
         public void cmd_poslog(Player player)
         {
@@ -6112,7 +6124,7 @@ namespace RNC
                 player.SendChatMessage("[Admin Lv 1]: /(o)mute /(o)unmute /warn /unwarn /setteam /forceautojoin /forceswapseats");
                 player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats /lastlogin /logs /gethp /checkplayer");
                 player.SendChatMessage("[Admin Lv 1]: /(t)freeze /(t)unfreeze /p(ut)i(n)v(ehicle) /view(s)creen(s)hot /take(s)creen(s)hot");
-                player.SendChatMessage("[Admin Lv 1]: /resetclothing");
+                player.SendChatMessage("[Admin Lv 1]: /resetclothing /getfps");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
