@@ -1295,7 +1295,7 @@ namespace RNC
 
             EPlayer.Notify(player, "Login successful!", "green", "fas fa-check", false, 2000);
 
-            foreach(Player adm in NAPI.Pools.GetAllPlayers().Where(p => EPlayer.GetAccount(p).Admin > 0)){
+            foreach(Player adm in Settings.LoggedInPlayers.Where(p => EPlayer.GetAccount(p).Admin > 0)){
                 EPlayer.ShowAdminNotes(adm, acc, AdminNote.ANoteType.OnConnect);
                 EPlayer.ShowAdminNotes(adm, acc, AdminNote.ANoteType.Both, false);
             }
