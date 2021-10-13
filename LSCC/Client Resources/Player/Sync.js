@@ -181,7 +181,7 @@ mp.events.addDataHandler("SilentSiren", (entity, value) => {
 // Collision Sync, ffs this took me hours of researching the shitass system but hey I figured it out -kevy
 function ToggleCollisionsForEnt(ent, state)
 {
-    if(ent.handle === 0) return;
+    if(ent === null || ent === undefined|| ent.handle === 0) return;
 
     if(ent.type === 'vehicle')
     { // ITS A VEH
