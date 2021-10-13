@@ -800,7 +800,7 @@ namespace RNC
                     _notes = ContextFactory.Instance.AdminNotes.ToList<AdminNote>().Where(a => a.AccountID == acc.SQL_ID).ToList();
                     break;
             }
-            if (_notes.Count <= 0 && type != AdminNote.ANoteType.OnConnect && type != AdminNote.ANoteType.OnSpectate && type != AdminNote.ANoteType.Both)
+            if (_notes == null || (_notes.Count <= 0 && type != AdminNote.ANoteType.OnConnect && type != AdminNote.ANoteType.OnSpectate && type != AdminNote.ANoteType.Both))
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target does not have any admin notes on them!");
                 return;
