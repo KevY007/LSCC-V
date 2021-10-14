@@ -46,7 +46,7 @@ mp.events.add('render', () => {
     if(chaseMode == 1 && mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true &&
         mp.players.local.getVariable("Team") !== undefined)
     {
-        if(Date.now() - lastBustProgressTime >= 100 && collisionTime == -1) // 100ms passed & unlocked
+        if(Date.now() - lastBustProgressTime >= 100 && collisionTime <= 0) // 100ms passed & unlocked
         {
             lastBustProgressTime = Date.now();
             
