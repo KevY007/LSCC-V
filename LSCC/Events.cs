@@ -355,7 +355,7 @@ namespace RNC
 
             if(keyId == 0x4C)
             {
-                player.SetData("SilentLock", Environment.TickCount);
+                player.SetData("SilentLock", Environment.TickCount64);
                 Commands.cmd_lock(player);
             }
 
