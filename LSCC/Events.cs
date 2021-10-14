@@ -75,7 +75,7 @@ namespace RNC
                 NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking {player.Name} as they're banned. (BANID: {ban.SQL_ID} ACCOUNTID: {ban.AccountSQLID})");
 
                 player.SetData("Kicked", true);
-                NAPI.Task.Run(() => { try { player.KickSilent(); } catch { } }, 1000);
+                NAPI.Task.Run(() => { try { player.Kick(); } catch { } }, 1000);
                 return;
             }
 
@@ -1215,7 +1215,7 @@ namespace RNC
                 NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
 
                 player.SetData("Kicked", true);
-                NAPI.Task.Run(() => { try { player.KickSilent(); } catch { } }, 1000);
+                NAPI.Task.Run(() => { try { player.Kick(); } catch { } }, 1000);
 
                 return;
             }
