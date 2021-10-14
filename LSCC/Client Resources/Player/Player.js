@@ -1904,6 +1904,9 @@ mp.events.add(
     },
 
     "playerReady": (player) => {
+        loginBrowser = mp.browsers.new("package://LoginRegister/index.html"); // Right on connect so it doesn't overlay the notifications.
+        loginBrowser.active = false;
+
         mp.events.callRemote("playerReadyCon");
         mp.game.gxt.set('PM_PAUSE_HDR', 'Race \'N\' Chase'); // Replace map title
 

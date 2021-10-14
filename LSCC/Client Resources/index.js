@@ -38,6 +38,8 @@ var FPS = 0; // This is the actual fps.
 var FPS_Frames = 0;
 var FPS_Calc = Date.now();
 
+var loginBrowser = null;
+
 mp.players.local.Team = -1;
 mp.players.local.LoggedIn = false;
 mp.game.vehicle.defaultEngineBehaviour = false;
@@ -92,9 +94,19 @@ require("./Player/VehicleTuner.js");
 
 traceLastFunc("Main::Init()");
 
+mp.events.add('showLoginBrowser', (state) => {
+    loginBrowser.active = state;
+
+    if(!loginBrowser.active && mp.players.local.getVariable("LoggedIn") == true && loginBrowser != null)
+    {
+        loginBrowser.destroy();
+        loginBrowser = null;
+    }
+});
+
 mp.events.add("onOpenChatbox", (toggle) =>
 {
-    if(mp.players.local.LoggedIn == undefined || mp.players.local.LoggedIn == false)
+    if(mp.players.local.getVariable("LoggedIn") == undefined || mp.players.local.getVariable("LoggedIn") == false)
     {
         mp.gui.chat.activate(false);
         return;

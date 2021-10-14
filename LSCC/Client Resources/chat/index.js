@@ -20,8 +20,8 @@ mp.events.add("InitiateCustomChat", () => {
             }
         }, 2500);
 
-        mp.events.callLocal('RestartHUD');
         mp.events.callLocal('RestartMenu');
+        mp.events.callLocal('RestartHUD');
     }
 });
 
