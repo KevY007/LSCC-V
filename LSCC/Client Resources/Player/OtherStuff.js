@@ -650,7 +650,7 @@ mp.events.add('render', () => { // GIF::Main()
                 `);
             });
 
-            let _gifname = `${GIF_Start.getDate()}-${GIF_Start.getMonth()}-${GIF_Start.getFullYear()}+${GIF_Start.getHours()};${GIF_Start.getMinutes()};${GIF_Start.getSeconds()}+${Intl.DateTimeFormat().resolvedOptions().timeZone.replaceAll("/", "_")}_${GIF_Identifier}.gif`;
+            let _gifname = `${mp.players.local.name}_${GIF_Identifier}_${GIF_Start.getDate()}-${GIF_Start.getMonth()}-${GIF_Start.getFullYear()}+${GIF_Start.getHours()};${GIF_Start.getMinutes()};${GIF_Start.getSeconds()}+${Intl.DateTimeFormat().resolvedOptions().timeZone.replaceAll("/", "_")}.gif`;
             //  uploadAllImages(uploadUrl, gifName, files, fps = 24)
             GIF_Browser.execute(`uploadAllImages("http://192.210.243.62/lsccv/gifuploader.php", "${_gifname}", images, ${GIF_FPS})`);
 
