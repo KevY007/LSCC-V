@@ -330,6 +330,31 @@ namespace RNC
             return;
         }
 
+        [Command("applycomps")]
+        public static void cmd_applycomps(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (EPlayer.GetAccount(player).WeaponComponents != null && EPlayer.GetAccount(player).WeaponComponents.Length > 3)
+            {
+                Dictionary<long, wComponentData> weaponCompsData = new Dictionary<long, wComponentData>();
+                weaponCompsData = NAPI.Util.FromJson<Dictionary<long, wComponentData>>(EPlayer.GetAccount(player).WeaponComponents);
+
+                foreach (KeyValuePair<long, wComponentData> i in weaponCompsData)
+                {
+                    if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
+                    {
+                        i.Value.Components.ForEach((long comphash) =>
+                        {
+                            EPlayer.AttachComponent(player, i.Key, comphash);
+                        });
+                    }
+                }
+            }
+            player.SendChatMessage("!{#33C446}[>] !{#FFFFFF}All purchased components have been applied to your weapons.");
+            return;
+        }
+
         [Command("applyvehmods")]
         public static void cmd_applyvehmods(Player player)
         {
@@ -3102,23 +3127,6 @@ namespace RNC
 
             target.GiveWeapon((WeaponHash)wephash, ammo);
 
-            if (EPlayer.GetAccount(target).WeaponComponents != null && EPlayer.GetAccount(target).WeaponComponents.Length > 3)
-            {
-                Dictionary<long, wComponentData> weaponCompsData = new Dictionary<long, wComponentData>();
-                weaponCompsData = NAPI.Util.FromJson<Dictionary<long, wComponentData>>(EPlayer.GetAccount(target).WeaponComponents);
-
-                foreach (KeyValuePair<long, wComponentData> i in weaponCompsData)
-                {
-                    if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
-                    {
-                        i.Value.Components.ForEach((long comphash) =>
-                        {
-                            EPlayer.AttachComponent(target, i.Key, comphash);
-                        });
-                    }
-                }
-            }
-
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have given a " + wepname + " with " + ammo + " ammo to the target.");
             return;
         }
@@ -3217,23 +3225,6 @@ namespace RNC
             player.GiveWeapon((WeaponHash)wephash, ammo);
 
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have given yourself " + wepname + " with " + ammo + " ammo.");
-
-            if (EPlayer.GetAccount(player).WeaponComponents != null && EPlayer.GetAccount(player).WeaponComponents.Length > 3)
-            {
-                Dictionary<long, wComponentData> weaponCompsData = new Dictionary<long, wComponentData>();
-                weaponCompsData = NAPI.Util.FromJson<Dictionary<long, wComponentData>>(EPlayer.GetAccount(player).WeaponComponents);
-
-                foreach (KeyValuePair<long, wComponentData> i in weaponCompsData)
-                {
-                    if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
-                    {
-                        i.Value.Components.ForEach((long comphash) =>
-                        {
-                            EPlayer.AttachComponent(player, i.Key, comphash);
-                        });
-                    }
-                }
-            }
             return;
         }
 
@@ -4580,7 +4571,7 @@ namespace RNC
 
             if(!targetVeh.HasData("BackupAmmo"))
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no ammo inside the trunk.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no ammo inside the trunk. (Cop vehicles spawn with ammo)");
                 return;
             }
 
@@ -4820,11 +4811,12 @@ namespace RNC
             player.SendChatMessage("[Lobby]: /lobbychat (/lo,/lg) /spec /specoff /(fugitive)chances");
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats /changemypass /outfit");
             player.SendChatMessage("!{#5FBCAC}[Voice]: /voiceblock /voicemode (/keys)");
-            player.SendChatMessage("!{#339BC4}[Cop!{#F24C27}chase]: !{#FFFFFF}/r(adio) /wt /restock");
+            player.SendChatMessage("!{#339BC4}[Cop!{#F24C27}chase]: !{#FFFFFF}/r(adio) /wt");
             player.SendChatMessage("!{#0097ff}[Cop]: /gps /cuff /m(egaphone) /dragout");
             player.SendChatMessage("!{#ffae00}[Fugitive]: /d(rive)b(y)");
-            player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup /s(top)a(nim) /passgun");
+            player.SendChatMessage("!{#AB00BA}[Roleplay]: /me /do /handsup /s(top)a(nim)");
             player.SendChatMessage("!{#AB00BA}[Vehicle]: /trunk /lock /engine /seatbelt /applyvehmods");
+            player.SendChatMessage("!{#AB00BA}[Weapon]: /passgun /restock /applycomps");
             player.SendChatMessage("!{#28E0DA}[Modes]: /lobby /derby");
             player.SendChatMessage("!{#28E0DA}[Mode: DM]: /dm /dmarena");
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /freeroam /veh /customvehlist /teleport /mytime /myweather");
@@ -5030,6 +5022,11 @@ namespace RNC
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The target's admin level is higher than yours!");
                 return;
+            }
+
+            foreach (var arena in ContextFactory.Instance.CustomArenas.ToList().Where(a => a.Creator.Equals(player.Name, StringComparison.OrdinalIgnoreCase)))
+            {
+                arena.Creator = newname;
             }
 
             Player target = RAGE.Entities.Players.All.Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
