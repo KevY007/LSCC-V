@@ -1053,7 +1053,7 @@ namespace RNC
                         }
                     }
                     catch { }
-                }, (wasInGame == true && reason != 696989) ? 15000 : 3000);
+                }, (wasInGame == true && reason != 696989) ? 10000 : 1500);
             }
             catch { }
 
