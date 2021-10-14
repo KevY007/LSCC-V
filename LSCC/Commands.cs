@@ -1404,7 +1404,7 @@ namespace RNC
             }
 
             target.TriggerEvent("TakeScreenshot", quality, 100, $"adm_{player.Name}");
-            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has requested {target.Name}'s game screenshot.");
+            if(EPlayer.GetAccount(player).Admin < 5) EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has requested {target.Name}'s game screenshot.");
             player.SendChatMessage("!{#33C446}[>>] !{#FFFFFF}The screenshot will arrive as soon as the uploading is complete. If it fails you will be notified. (Speed/time depends on target's internet)");
             Logs.LogAdmin(player, $"Take {target.Name}'s game screenshot.");
             return;
@@ -1442,7 +1442,7 @@ namespace RNC
 
             target.TriggerEvent("TakeGIF", duration, $"adm_{player.Name}", fps);
             target.SetData("GIF_Creating", player.Name);
-            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has requested {target.Name}'s game GIF.");
+            if (EPlayer.GetAccount(player).Admin < 5) EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has requested {target.Name}'s game GIF.");
             player.SendChatMessage("!{#33C446}[>>] !{#FFFFFF}The GIF will arrive as soon as the uploading is complete. If it fails you will be notified. (GIF's take A LONG time to upload and it depends on target's net)");
             Logs.LogAdmin(player, $"Take {target.Name}'s game GIF.");
             return;
