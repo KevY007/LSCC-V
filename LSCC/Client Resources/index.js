@@ -96,6 +96,7 @@ traceLastFunc("Main::Init()");
 
 mp.events.add('showLoginBrowser', (state) => {
     loginBrowser.active = state;
+    mp.gui.cursor.show(state, state);
 
     if(!loginBrowser.active && mp.players.local.getVariable("LoggedIn") == true && loginBrowser != null)
     {
