@@ -5651,7 +5651,7 @@ namespace RNC
             return;
         }
 
-        [Command("lobbymode", "!{#AFAFAF}[USAGE] setlobbypassword (lobbyid) (mode)", Alias = "setlobbymode", GreedyArg = true)]
+        [Command("lobbymode", "!{#AFAFAF}[USAGE] setlobbymode (lobbyid) (mode) | Mode = 'standard' or 'busted'", Alias = "setlobbymode", GreedyArg = true)]
         public void cmd_lobbymode(Player player, int lobbyid, string mode)
         {
             if (!EPlayer.LoggedIn(player)) return;
