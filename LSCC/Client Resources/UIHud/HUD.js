@@ -724,7 +724,7 @@ mp.events.add('ScoreboardToggleTyping', (state) => {
 mp.events.callLocal('ScoreboardToggleTyping', false);
 
 mp.events.add("HUDError", (msg, icon) => {
-    if(!showHud && mp.players.local.getVariable("LoggedIn") == true) return;
+    if(!showHud && mp.players.local.getVariable("pLogged") == true) return;
 
     let insertString = `iziToast.error({`;
     insertString += `message: \`${msg}\`, `;
@@ -735,7 +735,7 @@ mp.events.add("HUDError", (msg, icon) => {
 });
 
 mp.events.add("HUDNotify", (msg, color, icon, close, timeout, orientation, displaymode) => {
-    if(!showHud && mp.players.local.getVariable("LoggedIn") == true) return;
+    if(!showHud && mp.players.local.getVariable("pLogged") == true) return;
     
     let insertString = `iziToast.show({`;
     insertString += `message: \`${msg}\`, `;
@@ -751,7 +751,7 @@ mp.events.add("HUDNotify", (msg, color, icon, close, timeout, orientation, displ
 });
 // bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter, center
 mp.events.add("HUDNotify2", (title, msg, orientation, displaymode) => {
-    if(!showHud && mp.players.local.getVariable("LoggedIn") == true) return;
+    if(!showHud && mp.players.local.getVariable("pLogged") == true) return;
     
     let insertString = `iziToast.show({`;
     insertString += `title: \`${title}\`, `;

@@ -41,7 +41,6 @@ var FPS_Calc = Date.now();
 var loginBrowser = null;
 
 mp.players.local.Team = -1;
-mp.players.local.LoggedIn = false;
 mp.game.vehicle.defaultEngineBehaviour = false;
 mp.game.gameplay.enableMpDlcMaps(true);
 mp.game.player.disableVehicleRewards();
@@ -98,7 +97,7 @@ mp.events.add('showLoginBrowser', (state) => {
     loginBrowser.active = state;
     mp.gui.cursor.show(state, state);
 
-    if(!loginBrowser.active && mp.players.local.getVariable("LoggedIn") == true && loginBrowser != null)
+    if(!loginBrowser.active && mp.players.local.getVariable("pLogged") == true && loginBrowser != null)
     {
         loginBrowser.destroy();
         loginBrowser = null;
@@ -107,7 +106,7 @@ mp.events.add('showLoginBrowser', (state) => {
 
 mp.events.add("onOpenChatbox", (toggle) =>
 {
-    if(mp.players.local.getVariable("LoggedIn") == undefined || mp.players.local.getVariable("LoggedIn") == false)
+    if(mp.players.local.getVariable("pLogged") == undefined || mp.players.local.getVariable("pLogged") == false && toggle)
     {
         mp.gui.chat.activate(false);
         return;
