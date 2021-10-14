@@ -130,10 +130,15 @@ namespace RNC
         public string Name { get; set; }
         public int Team { get; set; }
         public int Health { get; set; }
-        public int Armor { get; set; }
+        public int Armour { get; set; }
         public bool Blip { get; set; }
         public int BlipColor { get; set; }
+        public int ColorR { get; set; }
+        public int ColorG { get; set; }
+        public int ColorB { get; set; }
+        public int Alpha { get; set; }
         public int ShowHPBars { get; set; } // 0 = Never, 1 = Always, 2 = On Aim, 3 = Busted!
+        public int SharedSpawns { get; set; }
 
         public string WeaponSets { get; set; }
     }
@@ -160,7 +165,6 @@ namespace RNC
     {
         public DM_WeaponData[] Weapons;
     }
-
     public class MainDatabase : DbContext
     {
         // Base constructor

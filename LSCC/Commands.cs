@@ -4055,6 +4055,46 @@ namespace RNC
             return;
         }
 
+        [Command("realmendm", "!{#AFAFAF}[USAGE] realmendm (arenaid) (teamid)")]
+        public static void cmd_realmendm(Player player, int arenaid, int teamid)
+        {
+            if (arenaid == 666) return;
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).JailTime > 0) return;
+
+            if (player.HasData("Spectating"))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are in spectate mode!");
+                EPlayer.Notify(player, "You are currently spectating.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                return;
+            }
+
+            if (player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("InLobby") != -6)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase!");
+                EPlayer.Notify(player, "You are in a copchase.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                return;
+            }
+
+            var arena = EPlayer.IsValidDMArena(arenaid);
+
+            if (arena.Value == false)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid arena ID!");
+                EPlayer.Notify(player, "That arena is invalid!", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
+                return;
+            }
+
+            player.SetSharedData("InLobby", -6);
+            player.SetSharedData("InDM", arenaid);
+            player.SetSharedData("Team", teamid);
+
+            EPlayer.Spawn(player, false);
+
+            EPlayer.Notify(player, $"Joined <strong>{arena.Key.Name}</strong>", "blue", "fas fa-users", false, 1000, "bottomCenter", "replace");
+            return;
+        }
+
         [Command("dm", "!{#AFAFAF}[USAGE] dm (arenaid)")]
         public static void cmd_dm(Player player, int arenaid)
         {
@@ -6646,8 +6686,8 @@ namespace RNC
             return;
         }
 
-        [Command("createarena", "!{#AFAFAF}[USAGE] createdmthere (name)", GreedyArg = true)]
-        public void cmd_createarena(Player player, string name)
+        [Command("createdmarena", "!{#AFAFAF}[USAGE] createdmarena (name)", GreedyArg = true)]
+        public void cmd_createdmarena(Player player, string name)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -6655,6 +6695,12 @@ namespace RNC
             if (EPlayer.GetAccount(player).Admin < 4)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 4 admin.");
+                return;
+            }
+
+            if(ContextFactory.Instance.CustomArenas.Count(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) > 0)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's already a DM arena with that name!");
                 return;
             }
 
@@ -6673,7 +6719,1009 @@ namespace RNC
             // TO;DO ADDING ALL THE SHIT
             player.SendChatMessage($"!{{#00FF33}}DM Arena '{_new.Name}' SQLID {_new.SQL_ID} has been added to the server and selected.");
             player.SetData("EditingDMArena", _new.SQL_ID);
-            player.SendChatMessage($"!{{#00FF33}}/selectdm, /managedm");
+            player.SendChatMessage($"!{{#00FF33}}/selectdmarena, /editdmarena");
+            return;
+        }
+
+        [Command("selectdmarena", "!{#AFAFAF}[USAGE] selectdmarena (name)", GreedyArg = true)]
+        public void cmd_selectdmarena(Player player, string name)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 4 admin.");
+                return;
+            }
+
+            if (ContextFactory.Instance.CustomArenas.Count(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) == 0)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no DM arena with that name!");
+                return;
+            }
+
+
+            var arena = ContextFactory.Instance.CustomArenas.First(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+            player.SendChatMessage($"!{{#00FF33}}You have selected the arena !{{#FFFFFF}}'{arena.Name}' (creator: {arena.Creator}) SQLID {arena.SQL_ID}!{{#00FF33}}. /editdmarena to edit.");
+            player.SetData("EditingDMArena", arena.SQL_ID);
+            return;
+        }
+
+        [Command("editdmarena", "!{#AFAFAF}[USAGE] editdmarena (help)", GreedyArg = true)]
+        public void cmd_editdmarena(Player player, string options = "help")
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 4 admin.");
+                return;
+            }
+
+            if (!player.HasData("EditingDMArena"))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have not selected any DM arenas. (/selectdmarena)");
+                return;
+            }
+
+
+            var arena = EPlayer.IsValidDMArena(player.GetData<int>("EditingDMArena"));
+            if(!arena.Value)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The arena you were editing has been deleted or is invalid. (/selectdmarena again)");
+                return;
+            }
+
+            string[] args = options.Split(' ');
+            string rebuild = "";
+            foreach (string v in args) rebuild = $"{rebuild} [{args.IndexOf(v)}]{v}";
+            //player.SendChatMessage(options); // only for deboog bpurpoooses
+            //player.SendChatMessage(rebuild); // only for debooog burpooses
+
+            if (args[0].Equals("help", StringComparison.OrdinalIgnoreCase))
+            {
+                if (args.Length <= 1)
+                {
+                    player.SendChatMessage("!{#AFAFAF}[USAGE] editdmarena help (list/add/remove/set) | Choose any one category.");
+                    return;
+                }
+
+                player.SendChatMessage("!{#990000}=============================");
+
+                if (args[1].Equals("list", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (args.Length <= 2)
+                    {
+                        player.SendChatMessage("!{#AFAFAF}editdmarena list teams !{#FFFFFF}| Use 'help list teams' for more.");
+                        player.SendChatMessage("!{#AFAFAF}editdmarena list team !{#FFFFFF}| Use 'help list team' to unload da fuck im tired -kevy.");
+                        return;
+                    }
+
+                    if (args[2].Equals("team"))
+                    {
+                        if (args.Length <= 3)
+                        {
+                            player.SendChatMessage("!{#AFAFAF}editdmarena list team (team id) (stats/weaponsets/spawns/weaponset/spawn) !{#FFFFFF}| Use 'help list team (item)' to get info for the items separately.");
+                            return;
+                        }
+
+                        if (args[3].Equals("stats"))
+                        {
+                            player.SendChatMessage("!{#AFAFAF}editdmarena list team (team id) stats !{#FFFFFF}| Displays the stats of a team and settings such as blip, hp bar type, hp, etc.");
+                        }
+                        else if (args[3].Equals("weaponsets"))
+                        {
+                            player.SendChatMessage("!{#AFAFAF}editdmarena list team (team id) weaponsets !{#FFFFFF}| Displays all the weapon sets for a team with their indexes. (NOTE: index changes when any set is removed)");
+                        }
+                        else if (args[3].Equals("spawns"))
+                        {
+                            player.SendChatMessage("!{#AFAFAF}editdmarena list team (team id) spawns !{#FFFFFF}| Displays all the spawns for a team.");
+                        }
+                        else if (args[3].Equals("weaponset"))
+                        {
+                            player.SendChatMessage("!{#AFAFAF}editdmarena list team (team id) weaponset (index) !{#FFFFFF}| Gives you the specific weapon set at index and lists it as well.");
+                        }
+                        else if (args[3].Equals("spawn"))
+                        {
+                            player.SendChatMessage("!{#AFAFAF}editdmarena list team (team id) spawn (spawn id) !{#FFFFFF}| Teleports you to the specific spawn and lists it's coordinates as well.");
+                        }
+                        else
+                        {
+                            cmd_editdmarena(player, "help list team");
+                        }
+                    }
+                    else if(args[2].Equals("teams"))
+                    {
+                        player.SendChatMessage("!{#AFAFAF}editdmarena list teams !{#FFFFFF}| Shows you the darkest and deepest secrets (quick list) of all teams.");
+                        player.SendChatMessage("!{#FFFFFF}You may want to use 'list team (teamid) stats' to show the proper and full info on a team.");
+                    }
+                    else
+                    {
+                        cmd_editdmarena(player, "help list");
+                    }
+                }
+                else if (args[1].Equals("add", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (args.Length <= 2)
+                    {
+                        player.SendChatMessage("!{#AFAFAF}editdmarena add team (team id) !{#FFFFFF}| Use 'help add team' to show more.");
+                        player.SendChatMessage("!{#AFAFAF}editdmarena add spawn (team id) !{#FFFFFF}| Use 'help add spawn' to show more.");
+                        player.SendChatMessage("!{#AFAFAF}editdmarena add weaponset (team id) !{#FFFFFF}| Use 'help add weaponset' to show more.");
+                        return;
+                    }
+
+                    if (args[2].Equals("team"))
+                    {
+                        player.SendChatMessage("!{#AFAFAF}editdmarena add team (team id) !{#FFFFFF}| Adds a new team with the specified team ID. Below is the more info:");
+                        player.SendChatMessage("!{#FFFFFF}Players on the same team cannot damage each other nor will they be able to 'click' at each other (fire in direct LOS).");
+                        player.SendChatMessage("!{#FFFFFF}The only exception is team ID -1, which is to be used for all Free For All type modes. All spawns for Team ID -1 can be used by other teams as well.");
+                        player.SendChatMessage("!{#FFFFFF}Team ID -1 players can damage each other as well.");
+                    }
+                    else if (args[2].Equals("weaponset"))
+                    {
+                        player.SendChatMessage("!{#AFAFAF}editdmarena add weaponset (team id) !{#FFFFFF}| This basically makes a new weapon set for the team out of the weapons on your player.");
+                        player.SendChatMessage("!{#FFFFFF}It will copy all the weapons, ammo and components of the weapons you have equipped. A weapon will not be detected if it's ammo is less than 1.");
+                    }
+                    else if (args[2].Equals("spawn"))
+                    {
+                        player.SendChatMessage("!{#AFAFAF}editdmarena add spawn (team id) !{#FFFFFF}| Creates a new spawn at your current location for the specified team.");
+                        player.SendChatMessage("!{#FFFFFF}This copies everything from X, Y, Z coordinates to Heading (A).");
+                    }
+                    else
+                    {
+                        cmd_editdmarena(player, "help add");
+                    }
+                }
+                else if (args[1].Equals("remove", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (args.Length <= 2)
+                    {
+                        player.SendChatMessage("!{#AFAFAF}editdmarena remove team (team id) !{#FFFFFF}| Use 'help remove team' for more.");
+                        player.SendChatMessage("!{#AFAFAF}editdmarena remove spawn (spawn id) !{#FFFFFF}| Use 'help remove spawn' for more.");
+                        player.SendChatMessage("!{#AFAFAF}editdmarena remove weaponset (team id) (index) !{#FFFFFF}| Use 'help remove weaponset' for more (important).");
+                        return;
+                    }
+
+                    if (args[2].Equals("team"))
+                    {
+                        player.SendChatMessage("!{#AFAFAF}editdmarena remove team (team id) !{#FFFFFF}| Removes the specified team from the arena, along with all its weapon sets etc.");
+                        player.SendChatMessage("!{#FFFFFF}When a team is removed, all it's spawns, weaponsets and data is deleted.");
+                    }
+                    else if (args[2].Equals("weaponset"))
+                    {
+                        player.SendChatMessage("!{#AFAFAF}editdmarena remove weaponset (team id) (index) !{#FFFFFF}| Removes the weapon set at the specified index of team weapon sets.");
+                        player.SendChatMessage("!{#FFFFFF}The important thing to note here is this unlike spawns and other, the weaponsets work on indexes so when you remove " +
+                            "any weapon set, the indexes of other ones decrease/change so if you want to remove multiple, confirm their indexes after each removal.");
+                    }
+                    else if (args[2].Equals("spawn"))
+                    {
+                        player.SendChatMessage("!{#AFAFAF}editdmarena remove spawn (spawn id) !{#FFFFFF}| Removes the spawn with the specified ID.");
+                    }
+                    else
+                    {
+                        cmd_editdmarena(player, "help remove");
+                    }
+                }
+                else if (args[1].Equals("set", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (args.Length <= 2)
+                    {
+                        player.SendChatMessage("!{#AFAFAF}editdmarena set team  !{#FFFFFF}| Use 'help set team' for more.");
+                        return;
+                    }
+
+                    if(args[2].Equals("team"))
+                    {
+                        if (args.Length <= 3)
+                        {
+                            player.SendChatMessage("!{#AFAFAF}editdmarena set team (team id) health (amount) !{#FFFFFF}| Use 'help set team health' for more.");
+                            player.SendChatMessage("!{#AFAFAF}editdmarena set team (team id) armour (amount) !{#FFFFFF}| Use 'help set team armour' for more.");
+                            player.SendChatMessage("!{#AFAFAF}editdmarena set team (team id) blip (true/false) !{#FFFFFF}| Use 'help set team blip' for more.");
+                            player.SendChatMessage("!{#AFAFAF}editdmarena set team (team id) blipcolor (color id) !{#FFFFFF}| Use 'help set team blipcolor' for more.");
+                            player.SendChatMessage("!{#AFAFAF}editdmarena set team (team id) alpha (0-255) !{#FFFFFF}| Use 'help set team alpha' for more.");
+                            player.SendChatMessage("!{#AFAFAF}editdmarena set team (team id) hpbar (bar type) !{#FFFFFF}| Use 'help set team hpbar' for more.");
+                            player.SendChatMessage("!{#AFAFAF}editdmarena set team (team id) name (name) !{#FFFFFF}| Use 'help set team name' for more.");
+                            player.SendChatMessage("!{#AFAFAF}editdmarena set team (team id) color (r) (g) (b) !{#FFFFFF}| Use 'help set team color' for more.");
+                            player.SendChatMessage("!{#AFAFAF}editdmarena set team (team id) sharedspawns (team id) !{#FFFFFF}| Use 'help set team sharedspawns' for more.");
+                            return;
+                        }
+
+                        if (args[3].Equals("health"))
+                        {
+                            player.SendChatMessage("!{#AFAFAF}editdmarena set team (team id) health (amount) !{#FFFFFF}| Sets the health for the team specified.");
+                            player.SendChatMessage("!{#FFFFFF}The health when a player spawns as that team.");
+                            player.SendChatMessage("!{#AFAFAF}Default: 100");
+                        }
+                        else if (args[3].Equals("armour"))
+                        {
+                            player.SendChatMessage("!{#AFAFAF}editdmarena set team (team id) armour (amount) !{#FFFFFF}| Sets the armour for the team specified.");
+                            player.SendChatMessage("!{#FFFFFF}The armour when a player spawns as that team.");
+                            player.SendChatMessage("!{#AFAFAF}Default: 100");
+                        }
+                        else if (args[3].Equals("blip"))
+                        {
+                            player.SendChatMessage("!{#AFAFAF}editdmarena set team (team id) blip (true/false) !{#FFFFFF}| Toggles the visibility of the team in minimap.");
+                            player.SendChatMessage("!{#AFAFAF}Setting this to true means EVERYONE can see that player on minimap even though he can't.");
+                            player.SendChatMessage("!{#AFAFAF}Default: True");
+                        }
+                        else if (args[3].Equals("blipcolor"))
+                        {
+                            player.SendChatMessage("!{#AFAFAF}editdmarena set team (team id) blipcolor (color id) !{#FFFFFF}| Sets the blip color of a team.");
+                            player.SendChatMessage("!{#AFAFAF}The blip colors are available on RAGE:MP site, the reason why this is not same as normal 'color' is because GTA 5 uses a separate color table for blips");
+                            player.SendChatMessage("!{#AFAFAF}Default: 39");
+                        }
+                        else if (args[3].Equals("alpha"))
+                        {
+                            player.SendChatMessage("!{#AFAFAF}editdmarena set team (team id) alpha (0-255) !{#FFFFFF}| Sets the transparency of a team.");
+                            player.SendChatMessage("!{#AFAFAF}Any transparency level less than 33 will hide the player's nametag. 0 is fully invisible, 255 is opaque.");
+                            player.SendChatMessage("!{#AFAFAF}Default: 255");
+                        }
+                        else if (args[3].Equals("hpbar"))
+                        {
+                            player.SendChatMessage("!{#AFAFAF}editdmarena set team (team id) hpbar (bar type) !{#FFFFFF}| Sets the visibillity of HP bars for the players in the team.");
+                            player.SendChatMessage("!{#AFAFAF}There are currently 3 available hp bar types, 0- Disable, 1- Always Show HP Bars, 2- Show Only On Aiming.");
+                            player.SendChatMessage("!{#AFAFAF}THESE HP BARS ONLY TAKE EFFECT FOR THE PLAYER IN THIS TEAM! NOT FOR PEOPLE WHO LOOK AT THEM!");
+                            player.SendChatMessage("!{#AFAFAF}Default: 2");
+                        }
+                        else if (args[3].Equals("name"))
+                        {
+                            player.SendChatMessage("!{#AFAFAF}editdmarena set team (team id) name (name) !{#FFFFFF}| Sets the name of the team.");
+                            player.SendChatMessage("!{#AFAFAF}The team name is not really used much anywhere except selection and stuff.");
+                            player.SendChatMessage("!{#AFAFAF}Default: nigga...");
+                        }
+                        else if (args[3].Equals("color"))
+                        {
+                            player.SendChatMessage("!{#AFAFAF}editdmarena set team (team id) color (red) (green) (blue) !{#FFFFFF}| Sets the RGB color of the team.");
+                            player.SendChatMessage("!{#AFAFAF}This color is used in kill list and scoreboard.");
+                            player.SendChatMessage("!{#AFAFAF}Default: 179 179 179");
+                        }
+                        else if (args[3].Equals("sharedspawns"))
+                        {
+                            player.SendChatMessage("!{#AFAFAF}editdmarena set team (team id) sharedspawns (target team id) !{#FFFFFF}| Eyes below ->");
+                            player.SendChatMessage("!{#AFAFAF}This means that this team can also spawn at the spawns of the team id you input.");
+                            player.SendChatMessage("!{#AFAFAF}Meaning if you set it's sharedspawns to -1, then this team's players can spawn at team -1's spawns.");
+                            player.SendChatMessage("!{#AFAFAF}But team -1 players cannot spawn on this team's spawns, unless you set their sharedspawns to this team id.");
+                            player.SendChatMessage("!{#AFAFAF}Default: -1");
+                        }
+                        else
+                        {
+                            cmd_editdmarena(player, "help set team");
+                        }
+                    }
+                    else
+                    {
+                        cmd_editdmarena(player, "help set");
+                    }
+                }
+                else
+                {
+                    cmd_editdmarena(player, "help");
+                }
+            }
+            else if (args[0].Equals("list", StringComparison.OrdinalIgnoreCase))
+            {
+                if (args.Length <= 1)
+                {
+                    cmd_editdmarena(player, "help list");
+                    return;
+                }
+
+                if (args[1].Equals("teams", StringComparison.OrdinalIgnoreCase))
+                {
+                    player.SendChatMessage($"!{{#FF6347}}===========| !{{#FFFF00}}{arena.Key.Name} ({arena.Key.SQL_ID}) Teams !{{#FF6347}}|===========");
+                    int count = 0;
+                    foreach (var team in ContextFactory.Instance.CustomArenas_Teams.ToList().Where(a => a.ArenaID == arena.Key.SQL_ID))
+                    {
+                        player.SendChatMessage($"!{{{EPlayer.HexConverter(new Color(team.ColorR, team.ColorG, team.ColorB))}}}" + team.Name + " | ID: " + team.Team);
+                        player.SendChatMessage("!{#69f5a8}     --" + $"Spawn Health: {team.Health} | Spawn Armour: {team.Armour}");
+                        player.SendChatMessage("!{#69f5a8}     --" + $"Blips: {(team.Blip ? "Shown" : "Hidden")} | Blip Color ID: {team.BlipColor}");
+                        player.SendChatMessage("!{#69f5a8}     --" + $"Weapon Sets: {NAPI.Util.FromJson<DM_WeaponSets[]>(team.WeaponSets).Length} " +
+                            $"| Color: {EPlayer.HexConverter(new Color(team.ColorR, team.ColorG, team.ColorB))}");
+
+                        count++;
+                    }
+                    player.SendChatMessage("!{#FFFF00}Total: !{#FFFFFF}" + count + " teams.");
+                }
+                else if (args[1].Equals("team", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (args.Length <= 2)
+                    {
+                        cmd_editdmarena(player, "help list team");
+                        return;
+                    }
+
+                    int teamID = -1;
+                    if(!Int32.TryParse(args[2], out teamID))
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The team ID you have input is invalid/not numeric!");
+                        return;
+                    }
+
+                    var team = EPlayer.IsValidDMTeam(arena.Key.SQL_ID, teamID);
+                    if(team.Value == false)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The team ID you have input does not exist!");
+                        return;
+                    }
+
+                    if (args.Length <= 3)
+                    {
+                        cmd_editdmarena(player, "help list team");
+                        return;
+                    }
+
+                    if(args[3].Equals("stats"))
+                    {
+                        player.SendChatMessage($"!{{{EPlayer.HexConverter(new Color(team.Key.ColorR, team.Key.ColorG, team.Key.ColorB))}}}Team: " + team.Key.Name + " - ID: " + team.Key.Team + 
+                            $" - Color: {EPlayer.HexConverter(new Color(team.Key.ColorR, team.Key.ColorG, team.Key.ColorB))}");
+
+                        player.SendChatMessage("!{#31b55a}HP: " + team.Key.Health + " - Armour: " + team.Key.Armour);
+                        player.SendChatMessage("!{#31b55a}Blips: " + (team.Key.Blip ? "Shown" : "Hidden") + " - Blip Color ID: " + team.Key.BlipColor);
+                        player.SendChatMessage("!{#31b55a}Weapon Sets: " + (NAPI.Util.FromJson<DM_WeaponSets[]>(team.Key.WeaponSets).Length) + " - Transparency/Alpha: " + team.Key.Alpha);
+
+                        string hpBars = "INVALID!!";
+                        switch(team.Key.ShowHPBars)
+                        {
+                            case 0:
+                                hpBars = "Never Show";
+                                break;
+                            case 1:
+                                hpBars = "Always Shown";
+                                break;
+                            case 2:
+                                hpBars = "Show On Aim";
+                                break;
+                            case 3:
+                                hpBars = "BUSTED! (Copchase Reserved)";
+                                break;
+                            default:
+                                hpBars = "Invalid! Please fix!";
+                                break;
+                        }
+
+                        int spawnsTotal = ContextFactory.Instance.CustomArenas_Spawns.Count(a => a.ArenaID == arena.Key.SQL_ID && a.Team == team.Key.Team);
+                        int spawnsTeam = ContextFactory.Instance.CustomArenas_Spawns.Count(a => a.ArenaID == arena.Key.SQL_ID && (a.Team == team.Key.Team || a.Team == team.Key.SharedSpawns));
+                        player.SendChatMessage($"!{{#31b55a}}Spawns: {spawnsTeam} (+{spawnsTotal-spawnsTeam} shared) - HP Bar Types: {hpBars}");
+                    }
+                    else if(args[3].Equals("weaponsets"))
+                    {
+                        DM_WeaponSets[] weaponSets = NAPI.Util.FromJson<DM_WeaponSets[]>(team.Key.WeaponSets);
+
+                        jWeaponData wep = new jWeaponData();
+                        for(int set = 0; set < weaponSets.Length; set++)
+                        {
+                            player.SendChatMessage($"!{{#69f5a8}}Weapon Set @ Index {set} =>");
+                            foreach(var setdata in weaponSets[set].Weapons)
+                            {
+                                if (Settings.WeaponData.TryGetValue(setdata.Weapon, out wep))
+                                {
+                                    if (setdata.Components.Length > 0) player.SendChatMessage("!{#31b55a}     -- " + wep.Name + " | Ammo: " + setdata.Ammo + " @ Attachments:");
+                                    else player.SendChatMessage("!{#31b55a}" + wep.Name + " | Ammo: " + setdata.Ammo);
+
+                                    foreach (long comp in setdata.Components)
+                                    {
+                                        Component compData = new Component();
+                                        if (wep.Components.TryGetValue(comp, out compData))
+                                        {
+                                            player.SendChatMessage("!{#69f5a8}          -- " + compData.Name);
+                                        }
+                                    }
+                                }
+                            }
+                            player.SendChatMessage("---");
+                        }
+                    }
+                    else if(args[3].Equals("spawns"))
+                    {
+                        var spawns = ContextFactory.Instance.CustomArenas_Spawns.ToList().Where(a => a.ArenaID == arena.Key.SQL_ID && (a.Team == team.Key.Team || a.Team == team.Key.SharedSpawns));
+                        foreach(var spawn in spawns)
+                        {
+                            player.SendChatMessage($"!{{#69f5a8}}ID: {spawn.SQL_ID} (Team {spawn.Team}) XYZA: {spawn.X}, {spawn.Y}, {spawn.Z}, {spawn.A}");
+                        }
+                    }
+                    else if(args[3].Equals("weaponset"))
+                    {
+                        if (args.Length <= 4)
+                        {
+                            cmd_editdmarena(player, "help list team weaponset");
+                            return;
+                        }
+
+                        int index = -1;
+                        if(!Int32.TryParse(args[4], out index))
+                        {
+                            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The index you have input is invalid/not numeric!");
+                            return;
+                        }
+
+                        DM_WeaponSets[] weaponSets = NAPI.Util.FromJson<DM_WeaponSets[]>(team.Key.WeaponSets);
+                        var set = weaponSets.ElementAtOrDefault(index);
+                        if(set == null || set == default(DM_WeaponSets))
+                        {
+                            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The index is not valid // There's no weapon set on that index!");
+                            return;
+                        }
+
+                        player.RemoveAllWeapons();
+                        jWeaponData wepdat = new jWeaponData();
+                        player.SendChatMessage($"!{{#69f5a8}}Weapon Set @ Index {index} =>");
+                        foreach (var wep in set.Weapons)
+                        {
+                            if (Settings.WeaponData.TryGetValue(wep.Weapon, out wepdat))
+                            {
+                                player.GiveWeapon((WeaponHash)wep.Weapon, wep.Ammo);
+
+                                if (wep.Components.Length > 0) player.SendChatMessage("!{#31b55a}     -- " + wepdat.Name + " | Ammo: " + wep.Ammo + " @ Attachments:");
+                                else player.SendChatMessage("!{#31b55a}" + wepdat.Name + " | Ammo: " + wep.Ammo);
+
+                                foreach (var comp in wep.Components)
+                                {
+                                    EPlayer.AttachComponent(player, wep.Weapon, comp);
+
+                                    Component compData = new Component();
+                                    if (wepdat.Components.TryGetValue(comp, out compData))
+                                    {
+                                        player.SendChatMessage("!{#69f5a8}          -- " + compData.Name);
+                                    }
+                                }
+                            }
+                        }
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Spawned the weapon set at index " + index + ".");
+                    }
+                    else if(args[3].Equals("spawn"))
+                    {
+                        if (args.Length <= 4)
+                        {
+                            cmd_editdmarena(player, "help list team spawn");
+                            return;
+                        }
+
+                        int sqlid = -1;
+                        if (!Int32.TryParse(args[4], out sqlid))
+                        {
+                            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The ID you have input is invalid/not numeric!");
+                            return;
+                        }
+
+                        var spawn = EPlayer.IsValidDMSpawn(sqlid);
+                        if (spawn.Value == false)
+                        {
+                            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The spawn ID you have input is invalid!");
+                            return;
+                        }
+
+                        player.SendChatMessage($"!{{#69f5a8}}ArenaID: {spawn.Key.ArenaID} | ID: {spawn.Key.SQL_ID} (Team {spawn.Key.Team}) XYZA: {spawn.Key.X}, {spawn.Key.Y}, {spawn.Key.Z}, {spawn.Key.A}");
+                        player.Position = new Vector3(spawn.Key.X, spawn.Key.Y, spawn.Key.Z);
+                        player.Heading = spawn.Key.A;
+                    }
+                    else
+                    {
+                        cmd_editdmarena(player, "help list team");
+                    }
+                }
+                else
+                {
+                    cmd_editdmarena(player, "help list");
+                }
+            }
+            else if (args[0].Equals("add", StringComparison.OrdinalIgnoreCase))
+            {
+                if (args.Length <= 1)
+                {
+                    cmd_editdmarena(player, "help add");
+                    return;
+                }
+
+                if(args[1].Equals("team"))
+                {
+                    if (args.Length <= 2)
+                    {
+                        cmd_editdmarena(player, "help add team");
+                        return;
+                    }
+
+                    int id = -1;
+                    if (!Int32.TryParse(args[2], out id))
+                    {
+                        cmd_editdmarena(player, "help add team");
+                        return;
+                    }
+
+                    var team = EPlayer.IsValidDMTeam(arena.Key.SQL_ID, id);
+                    if(team.Value == true)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This team ID already exists!");
+                        return;
+                    }
+
+                    var _new = new CustomDMArenaTeams
+                    {
+                       ArenaID = arena.Key.SQL_ID,
+                       Name = "changeme",
+                       Team = id,
+                       Health = 100,
+                       Armour = 100,
+                       Blip = true,
+                       BlipColor = 39,
+                       ColorR = 179,
+                       ColorG = 179,
+                       ColorB = 179,
+                       Alpha = 255,
+                       ShowHPBars = 2,
+                       SharedSpawns = -1,
+                       WeaponSets = "[]",
+                    };
+                    ContextFactory.Instance.CustomArenas_Teams.Add(_new);
+                    ContextFactory.Instance.SaveChanges();
+
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have added a new team ID: " + _new.Team);
+                }
+                else if(args[1].Equals("spawn"))
+                {
+                    if (args.Length <= 2)
+                    {
+                        cmd_editdmarena(player, "help add spawn");
+                        return;
+                    }
+
+                    int teamid = -1;
+                    if (!Int32.TryParse(args[2], out teamid))
+                    {
+                        cmd_editdmarena(player, "help add spawn");
+                        return;
+                    }
+
+                    var team = EPlayer.IsValidDMTeam(arena.Key.SQL_ID, teamid);
+                    if (!team.Value == true)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The team ID is invalid/non existent!");
+                        return;
+                    }
+
+                    var _new = new CustomDMArenaSpawns
+                    {
+                        ArenaID = arena.Key.SQL_ID,
+                        Team = team.Key.Team,
+                        X = player.Position.X,
+                        Y = player.Position.Y,
+                        Z = player.Position.Z,
+                        A = player.Heading,
+                    };
+                    ContextFactory.Instance.CustomArenas_Spawns.Add(_new);
+                    ContextFactory.Instance.SaveChanges();
+
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have added a new spawn for the team ID " + _new.Team + ": " + _new.SQL_ID);
+                }
+                else if(args[1].Equals("weaponset"))
+                {
+                    if (args.Length <= 2)
+                    {
+                        cmd_editdmarena(player, "help add weaponset");
+                        return;
+                    }
+
+                    int teamid = -1;
+                    if (!Int32.TryParse(args[2], out teamid))
+                    {
+                        cmd_editdmarena(player, "help add weaponset");
+                        return;
+                    }
+
+                    var team = EPlayer.IsValidDMTeam(arena.Key.SQL_ID, teamid);
+                    if (team.Value == false)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The team ID is invalid/non existent!");
+                        return;
+                    }
+
+                    List<DM_WeaponData> wepDat = new List<DM_WeaponData>();
+
+                    foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
+                    {
+                        if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
+                        {
+                            List<long> components = new List<long>();
+
+                            if (player.HasData("AttachedComponents"))
+                            {
+                                List<KeyValuePair<long, long>> comps = player.GetData<List<KeyValuePair<long, long>>>("AttachedComponents");
+
+                                foreach (var item in comps)
+                                {
+                                    if (item.Key == i.Key)
+                                    {
+                                        components.Add(item.Value);
+                                    }
+                                }
+                            }
+
+                            wepDat.Add(new DM_WeaponData
+                                {
+                                    Weapon = i.Key,
+                                    Ammo = player.GetWeaponAmmo((WeaponHash)i.Key),
+                                    Components = components.ToArray(),
+                                });;
+                        }
+                    }
+
+                    DM_WeaponSets[] weaponSets = NAPI.Util.FromJson<DM_WeaponSets[]>(team.Key.WeaponSets);
+                    
+                    List<DM_WeaponSets> newWeaponSets = new List<DM_WeaponSets>(weaponSets);
+                    newWeaponSets.Add(new DM_WeaponSets
+                    {
+                        Weapons = wepDat.ToArray(),
+                    });
+
+                    team.Key.WeaponSets = NAPI.Util.ToJson(newWeaponSets.ToArray());
+                    ContextFactory.Instance.SaveChanges();
+
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have added a new weapon set at index " + (newWeaponSets.Count-1));
+                }
+                else
+                {
+                    cmd_editdmarena(player, "help add");
+                }
+            }
+            else if (args[0].Equals("remove", StringComparison.OrdinalIgnoreCase))
+            {
+                if (args.Length <= 1)
+                {
+                    cmd_editdmarena(player, "help remove");
+                    return;
+                }
+
+                if (args[1].Equals("team"))
+                {
+                    if (args.Length <= 2)
+                    {
+                        cmd_editdmarena(player, "help remove team");
+                        return;
+                    }
+
+                    int id = -1;
+                    if (!Int32.TryParse(args[2], out id))
+                    {
+                        cmd_editdmarena(player, "help remove team");
+                        return;
+                    }
+
+                    var team = EPlayer.IsValidDMTeam(arena.Key.SQL_ID, id);
+                    if (team.Value == false)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This team ID does not exist!");
+                        return;
+                    }
+
+                    ContextFactory.Instance.CustomArenas_Teams.Remove(team.Key);
+                    ContextFactory.Instance.SaveChanges();
+
+                    ContextFactory.Instance.CustomArenas_Spawns.RemoveRange(ContextFactory.Instance.CustomArenas_Spawns.ToList().Where(a => a.ArenaID == arena.Key.SQL_ID && a.Team == id));
+
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have removed the team ID: " + id + " from arena: " + arena.Key.Name);
+                }
+                else if (args[1].Equals("spawn"))
+                {
+                    if (args.Length <= 2)
+                    {
+                        cmd_editdmarena(player, "help remove spawn");
+                        return;
+                    }
+
+                    int spawnid = -1;
+                    if (!Int32.TryParse(args[2], out spawnid))
+                    {
+                        cmd_editdmarena(player, "help remove spawn");
+                        return;
+                    }
+
+                    var spawn = EPlayer.IsValidDMSpawn(spawnid);
+                    if (!spawn.Value == true) //!.value == true because i am being retarded and i prefer to keep it that way -kevy
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The spawn ID is invalid/non existent!");
+                        return;
+                    }
+
+                    if(spawn.Key.ArenaID != arena.Key.SQL_ID)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This spawn ID does not belong to your arena, you good?!");
+                        return;
+                    }
+
+                    ContextFactory.Instance.CustomArenas_Spawns.Remove(spawn.Key);
+                    ContextFactory.Instance.SaveChanges();
+
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have removed spawn ID " + spawnid);
+                }
+                else if (args[1].Equals("weaponset"))
+                {
+                    if (args.Length <= 2)
+                    {
+                        cmd_editdmarena(player, "help remove weaponset");
+                        return;
+                    }
+
+                    int teamid = -1;
+                    if (!Int32.TryParse(args[2], out teamid))
+                    {
+                        cmd_editdmarena(player, "help remove weaponset");
+                        return;
+                    }
+
+                    var team = EPlayer.IsValidDMTeam(arena.Key.SQL_ID, teamid);
+                    if (team.Value == false)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The team ID is invalid/non existent!");
+                        return;
+                    }
+
+                    if (args.Length <= 3)
+                    {
+                        cmd_editdmarena(player, "help remove weaponset");
+                        return;
+                    }
+
+                    int index = -1;
+                    if (!Int32.TryParse(args[3], out index))
+                    {
+                        cmd_editdmarena(player, "help remove weaponset");
+                        return;
+                    }
+
+                    DM_WeaponSets[] weaponSets = NAPI.Util.FromJson<DM_WeaponSets[]>(team.Key.WeaponSets);
+
+                    var set = weaponSets.ElementAtOrDefault(index);
+                    if (set == null || set == default(DM_WeaponSets))
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The index is not valid // There's no weapon set on that index!");
+                        return;
+                    }
+
+                    List<DM_WeaponSets> newWeaponSets = new List<DM_WeaponSets>(weaponSets);
+                    newWeaponSets.Remove(set);
+
+                    team.Key.WeaponSets = NAPI.Util.ToJson(newWeaponSets.ToArray());
+                    ContextFactory.Instance.SaveChanges();
+
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have removed the weapon set at index " + index);
+                }
+                else
+                {
+                    cmd_editdmarena(player, "help remove");
+                }
+            }
+            else if (args[0].Equals("set", StringComparison.OrdinalIgnoreCase))
+            {
+                if (args.Length <= 1)
+                {
+                    cmd_editdmarena(player, "help set");
+                    return;
+                }
+
+                if(args[1].Equals("team"))
+                {
+                    if(args.Length <= 2 || args.Length <= 3)
+                    {
+                        cmd_editdmarena(player, "help set team");
+                        return;
+                    }
+
+                    int teamid = -1;
+                    if (!Int32.TryParse(args[2], out teamid))
+                    {
+                        cmd_editdmarena(player, "help set team");
+                        return;
+                    }
+
+                    var team = EPlayer.IsValidDMTeam(arena.Key.SQL_ID, teamid);
+                    if(team.Value == false)
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The team ID is invalid!");
+                        return;
+                    }
+
+
+                    if(args[3].Equals("health"))
+                    {
+                        if (args.Length <= 4)
+                        {
+                            cmd_editdmarena(player, "help set team health");
+                            return;
+                        }
+
+                        int health = -1;
+                        if (!Int32.TryParse(args[4], out health))
+                        {
+                            cmd_editdmarena(player, "help set team health");
+                            return;
+                        }
+
+                        team.Key.Health = health;
+                        player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed the {team.Key.Name}'s starting health to {health}.");
+                    }
+                    else if (args[3].Equals("armour") || args[3].Equals("armor"))
+                    {
+                        if (args.Length <= 4)
+                        {
+                            cmd_editdmarena(player, "help set team armour");
+                            return;
+                        }
+
+                        int armour = -1;
+                        if (!Int32.TryParse(args[4], out armour))
+                        {
+                            cmd_editdmarena(player, "help set team armour");
+                            return;
+                        }
+
+                        team.Key.Armour = armour;
+                        player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed the {team.Key.Name}'s starting armour to {armour}.");
+                    }
+                    else if (args[3].Equals("blip"))
+                    {
+                        if (args.Length <= 4)
+                        {
+                            cmd_editdmarena(player, "help set team blip");
+                            return;
+                        }
+
+                        bool state = false;
+                        if (!Boolean.TryParse(args[4], out state))
+                        {
+                            cmd_editdmarena(player, "help set team blip");
+                            return;
+                        }
+
+                        team.Key.Blip = state;
+                        player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed the {team.Key.Name}'s minimap blip visibility to {state}.");
+                    }
+                    else if (args[3].Equals("blipcolor"))
+                    {
+                        if (args.Length <= 4)
+                        {
+                            cmd_editdmarena(player, "help set team blipcolor");
+                            return;
+                        }
+
+                        int blipcol = -1;
+                        if (!Int32.TryParse(args[4], out blipcol))
+                        {
+                            cmd_editdmarena(player, "help set team blipcolor");
+                            return;
+                        }
+
+                        team.Key.BlipColor = blipcol;
+                        player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed the {team.Key.Name}'s blip colour to {blipcol}.");
+                    }
+                    else if (args[3].Equals("alpha"))
+                    {
+                        if (args.Length <= 4)
+                        {
+                            cmd_editdmarena(player, "help set team alpha");
+                            return;
+                        }
+
+                        int alpha = -1;
+                        if (!Int32.TryParse(args[4], out alpha))
+                        {
+                            cmd_editdmarena(player, "help set team alpha");
+                            return;
+                        }
+
+                        team.Key.Alpha = alpha;
+                        player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed the {team.Key.Name}'s alpha to {alpha}.");
+                    }
+                    else if (args[3].Equals("hpbar"))
+                    {
+                        if (args.Length <= 4)
+                        {
+                            cmd_editdmarena(player, "help set team hpbar");
+                            return;
+                        }
+
+                        int num = -1;
+                        if (!Int32.TryParse(args[4], out num))
+                        {
+                            cmd_editdmarena(player, "help set team hpbar");
+                            return;
+                        }
+
+                        team.Key.ShowHPBars = num;
+
+                        string hpBars = "INVALID!!";
+                        switch (team.Key.ShowHPBars)
+                        {
+                            case 0:
+                                hpBars = "Never Show";
+                                break;
+                            case 1:
+                                hpBars = "Always Shown";
+                                break;
+                            case 2:
+                                hpBars = "Show On Aim";
+                                break;
+                            case 3:
+                                hpBars = "BUSTED! (Copchase Reserved)";
+                                break;
+                            default:
+                                hpBars = "Invalid! Please fix!";
+                                break;
+                        }
+
+                        player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed the {team.Key.Name}'s bar type to {hpBars}.");
+                    }
+                    else if (args[3].Equals("name"))
+                    {
+                        if (args.Length <= 4)
+                        {
+                            cmd_editdmarena(player, "help set team name");
+                            return;
+                        }
+
+                        args = options.Split(' ', 5);
+                       
+                        player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed team {team.Key.Name}'s name to {args[4]}.");
+                        team.Key.Name = args[4];
+                    }
+                    else if (args[3].Equals("color"))
+                    {
+                        if (args.Length <= 6)
+                        {
+                            cmd_editdmarena(player, "help set team color");
+                            return;
+                        }
+                        int r = 179;
+                        int g = 179;
+                        int b = 179;
+
+                        if (!Int32.TryParse(args[4], out r) || !Int32.TryParse(args[5], out g) || !Int32.TryParse(args[6], out b))
+                        {
+                            cmd_editdmarena(player, "help set team color");
+                            return;
+                        }
+
+                        team.Key.ColorR = r;
+                        team.Key.ColorG = g;
+                        team.Key.ColorB = b;
+
+                        player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed team {team.Key.Name}'s color to !{{{EPlayer.HexConverter(new Color(r, g, b))}}}this.");
+                    }
+                    else if (args[3].Equals("sharedspawns"))
+                    {
+                        if (args.Length <= 4)
+                        {
+                            cmd_editdmarena(player, "help set team sharedspawns");
+                            return;
+                        }
+
+                        int uhuh = -1;
+                    
+                        if (!Int32.TryParse(args[4], out uhuh))
+                        {
+                            cmd_editdmarena(player, "help set team sharedspawns");
+                            return;
+                        }
+
+                        team.Key.SharedSpawns = uhuh;
+                        player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed team {team.Key.Name}'s shared spawns team id to {uhuh}.");
+                    }
+                    else
+                    {
+                        cmd_editdmarena(player, "help set team");
+                    }
+                }
+                else
+                {
+                    cmd_editdmarena(player, "help set");
+                }
+            }
+            else
+            {
+                player.SendChatMessage("!{#AFAFAF}[USAGE] editdmarena (help/list/add/remove/set) | Choose any one category.");
+            }
+            
             return;
         }
 
@@ -7666,7 +8714,7 @@ namespace RNC
             else
             {
                 target.RemoveAllWeapons();
-
+                target.ResetData("AttachedComponents");
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:removeguns:{target.Name}"); } catch { }
                 Logs.LogAdmin(player, $"Removed {target.Name}'s weapons.");
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has removed {target.Name}'s weapons.");
@@ -7689,6 +8737,7 @@ namespace RNC
                 foreach (Player target in RAGE.Entities.Players.All)
                 {
                     target.RemoveAllWeapons();
+                    target.ResetData("AttachedComponents");
                 }
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:removegunsfromall"); } catch { }
                 Logs.LogAdmin(player, $"Removed weapons from all players.");

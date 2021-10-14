@@ -616,7 +616,60 @@ namespace RNC
                 player.TriggerEvent("SyncServerSettings", Settings.Dynamics.OnfootCollision, Settings.Dynamics.CameraSettingsUpdate);
             }
         }
-        
+
+        #region DM Functions
+        public static KeyValuePair<CustomDMArenas, bool> IsValidDMArena(int arenaID)
+        {
+            var arena = ContextFactory.Instance.CustomArenas.FirstOrDefault(a => a.SQL_ID == arenaID);
+            
+            if(arena == null || arena == default(CustomDMArenas)) return new KeyValuePair<CustomDMArenas, bool>(arena, false);
+            return new KeyValuePair<CustomDMArenas, bool>(arena, true);
+        }
+
+        public static KeyValuePair<CustomDMArenaTeams, bool> IsValidDMTeam(int arenaID, int teamID)
+        {
+            var arena = IsValidDMArena(arenaID);
+
+            if(arena.Value == false) return new KeyValuePair<CustomDMArenaTeams, bool>(null, false);
+
+            var team = ContextFactory.Instance.CustomArenas_Teams.FirstOrDefault(a => a.ArenaID == arenaID && a.Team == teamID);
+
+            if (team == null || team == default(CustomDMArenaTeams)) return new KeyValuePair<CustomDMArenaTeams, bool>(team, false);
+
+            return new KeyValuePair<CustomDMArenaTeams, bool>(team, true);
+        }
+        public static KeyValuePair<CustomDMArenaSpawns, bool> IsValidDMSpawn(int arenaID, int teamID, int spawnID)
+        {
+            var team = IsValidDMTeam(arenaID, teamID);
+            if(team.Value == false) return new KeyValuePair<CustomDMArenaSpawns, bool>(null, false);
+
+            var spawn = ContextFactory.Instance.CustomArenas_Spawns.FirstOrDefault(a => a.ArenaID == arenaID && a.Team == teamID && a.SQL_ID == spawnID);
+
+            if (spawn == null || spawn == default(CustomDMArenaSpawns)) return new KeyValuePair<CustomDMArenaSpawns, bool>(spawn, false);
+
+            return new KeyValuePair<CustomDMArenaSpawns, bool>(spawn, true);
+        }
+        public static KeyValuePair<CustomDMArenaSpawns, bool> IsValidDMSpawn(int spawnID)
+        {
+            var spawn = ContextFactory.Instance.CustomArenas_Spawns.FirstOrDefault(a => a.SQL_ID == spawnID);
+
+            if (spawn == null || spawn == default(CustomDMArenaSpawns)) return new KeyValuePair<CustomDMArenaSpawns, bool>(spawn, false);
+
+            return new KeyValuePair<CustomDMArenaSpawns, bool>(spawn, true);
+        }
+
+        public static KeyValuePair<DM_WeaponSets, bool> IsValidDMWeaponSet(int arenaID, int teamID, int index)
+        {
+            var team = IsValidDMTeam(arenaID, teamID);
+            if (team.Value == false) return new KeyValuePair<DM_WeaponSets, bool>(null, false);
+
+            DM_WeaponSets[] weaponSets = NAPI.Util.FromJson<DM_WeaponSets[]>(team.Key.WeaponSets);
+            if (index >= weaponSets.Length || index < weaponSets.Length - 1 || weaponSets.Length == 0) return new KeyValuePair<DM_WeaponSets, bool>(null, false);
+
+            return new KeyValuePair<DM_WeaponSets, bool>(weaponSets.ElementAt(index), true);
+        }
+        #endregion
+
         public static void ResetPlayerData(Player player)
         {
             lock (player)
@@ -640,6 +693,7 @@ namespace RNC
                 player.ResetData("ConvertingType");
                 player.ResetData("ConvertingAmount");
                 player.ResetData("GIF_Creating");
+                player.ResetData("EditingDMArena");
 
                 ResetShotStats(player);
                 player.SetData<long>("JoinTimeUnix", 0);
@@ -693,7 +747,6 @@ namespace RNC
 
                 player.SetSharedData("InLobby", -1);
                 player.SetSharedData("InDM", -1);
-                player.SetSharedData("CustomDMTeam", -1);
                 player.SetSharedData("DMBlipColor", 39);
 
                 player.SetSharedData("IsTabbed", false);
@@ -1337,7 +1390,7 @@ namespace RNC
 
         public static void LoginBrowserSetup(Player player)
         {
-            player.TriggerEvent("showBrowser", "package://LoginRegister/index.html");
+            player.TriggerEvent("showLoginBrowser", true);
             player.TriggerEvent("InitiateCustomChat");
             player.TriggerEvent("TogglePlayerChat", false);
 
