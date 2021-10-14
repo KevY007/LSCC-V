@@ -6171,7 +6171,7 @@ namespace RNC
             {
                 player.SendChatMessage("[Admin Lv 3]: /givegun(all) /gotopos /bringall /sethpall /(un)freezeall /r(emove)g(uns)f(rom)a(ll)");
                 player.SendChatMessage("[Admin Lv 3]: /givecomp /takecomp /attachcomp /grantfugitive /setspawn (freeroam world)");
-                player.SendChatMessage("[Admin Lv 3]: /getip /gethwid /getsc /motdall /set(car)alpha");
+                player.SendChatMessage("[Admin Lv 3]: /getip /gethwid /getsc /motdall /set(car)alpha /nametags");
             }
             if (EPlayer.GetAccount(player).Admin >= 4)
             {
@@ -8714,6 +8714,32 @@ namespace RNC
             return;
         }
 
+        [Command("nametags")]
+        public void cmd_nametaghack(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Cheese! You got caught in 4K!");
+                return;
+            }
+
+            if (player.HasSharedData("NametagHack"))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Nametag hack has been disabled.");
+                Logs.LogAdmin(player, $"Disabled nametag hack.");
+                player.ResetSharedData("NametagHack");
+            }
+            else
+            {
+                player.SendChatMessage("!{#33C446}[>] !{#FFFFFF}Nametag hack has been enabled.");
+                Logs.LogAdmin(player, $"Enabled nametag hack.");
+                player.SetSharedData("NametagHack", true);
+            }
+            return;
+        }
 
         [Command("spec", "!{#AFAFAF}[USAGE] spec (target)", GreedyArg = true)]
         public void cmd_spec(Player player, Player target)
@@ -8793,8 +8819,12 @@ namespace RNC
 
             player.SendChatMessage($"!{{#33C446}}[>] !{{#FFFFFF}}You are now spectating: !{{#FF6347}}{target.Name}");
 
-            EPlayer.ShowAdminNotes(player, EPlayer.GetAccount(target), AdminNote.ANoteType.OnSpectate);
-            EPlayer.ShowAdminNotes(player, EPlayer.GetAccount(target), AdminNote.ANoteType.Both, false);
+            if (EPlayer.GetAccount(player).Admin > 0)
+            {
+                player.SetSharedData("NametagHack", true);
+                EPlayer.ShowAdminNotes(player, EPlayer.GetAccount(target), AdminNote.ANoteType.OnSpectate);
+                EPlayer.ShowAdminNotes(player, EPlayer.GetAccount(target), AdminNote.ANoteType.Both, false);
+            }
             return;
         }
 
@@ -8818,6 +8848,7 @@ namespace RNC
 
             player.ResetData("Spectating");
             player.ResetData("SpectatingPlayer");
+            player.ResetSharedData("NametagHack");
 
             player.SetSharedData("EntAlpha", 255);
             if (player.HasData("Spec_Pos"))

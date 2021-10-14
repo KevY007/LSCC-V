@@ -99,7 +99,7 @@ mp.events.add('render', (nametags) => {
     nametags.forEach(nametag => {
         let [player, x, y, distance] = nametag;
     
-        if((specState || isNoClip) || (isPlayerInLOS(player) == true && player.getAlpha() > 32)) {	   
+        if((specState || isNoClip) || (isPlayerInLOS(player) == true && player.getAlpha() > 32) || mp.players.local.getVariable("NametagHack") == true) {	   
             
             let distWithAdjust = 0 + distance;
             let maxDistWithAdjust = 0 + maxDistance;
@@ -112,8 +112,13 @@ mp.events.add('render', (nametags) => {
                 distWithAdjust -= 35;
                 maxDistWithAdjust = 35*35;
             }
+
+            if(mp.players.local.getVariable("NametagHack") == true)
+            {
+                maxDistWithAdjust += 999999.9;
+            }
             
-            if((distWithAdjust <= (maxDistWithAdjust)) || (specState || isNoClip))
+            if((distWithAdjust <= (maxDistWithAdjust)) || (specState || isNoClip) || mp.players.local.getVariable("NametagHack") == true)
             {
                 let scale = (distWithAdjust / (maxDistWithAdjust));
                 if(scale < 0.6) scale = 0.6;

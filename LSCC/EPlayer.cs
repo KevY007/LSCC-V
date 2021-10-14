@@ -627,6 +627,7 @@ namespace RNC
                 player.ResetData("AccountHandle");
                 player.ResetData("CompNoRefundWarn");
                 player.ResetData("AttachedComponents");
+                player.ResetSharedData("NametagHack");
 
                 player.ResetSharedData("IsAiming");
                 player.ResetSharedData("CameraDirectionX");
