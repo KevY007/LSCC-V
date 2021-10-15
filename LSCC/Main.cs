@@ -1890,7 +1890,7 @@ namespace RNC
                     if (ContextFactory.Instance.Maps.Count() < 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has no maps added, failed to start"); return false; }
                     crashcheck++;
 
-                    List<Map> mapList = ContextFactory.Instance.Maps.AsQueryable().Where(a => a.Enabled == true).ToList();
+                    List<Map> mapList = ContextFactory.Instance.Maps.ToList().Where(a => a.Enabled == true).ToList();
                     crashcheck++;
 
                     if (mapList.Count < 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has maps but none of them were enabled! Failed to start."); return false; }
@@ -1903,17 +1903,17 @@ namespace RNC
                     if (map == null) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Next (force-set) MapID == null; Failed to start!"); return false; }
                     crashcheck++;
 
-                    NAPI.Util.ConsoleOutput($"[Lobby " + lobbyid + $"] Selected Map [{map.Name}] | Total Spawns: [{ContextFactory.Instance.MapSpawns.AsQueryable().Where(a => a.mapID == map.SQL_ID).Count()}]");
+                    NAPI.Util.ConsoleOutput($"[Lobby " + lobbyid + $"] Selected Map [{map.Name}] | Total Spawns: [{ContextFactory.Instance.MapSpawns.ToList().Where(a => a.mapID == map.SQL_ID).Count()}]");
                     crashcheck++;
 
                     lobby.lastMapId = map.SQL_ID;
 
-                    if (ContextFactory.Instance.MapSpawns.AsQueryable().Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 0).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no fugitive spawns! Abort."); return false; }
-                    if (ContextFactory.Instance.MapSpawns.AsQueryable().Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 1).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no cop spawns! Abort."); return false; }
+                    if (ContextFactory.Instance.MapSpawns.ToList().Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 0).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no fugitive spawns! Abort."); return false; }
+                    if (ContextFactory.Instance.MapSpawns.ToList().Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 1).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no cop spawns! Abort."); return false; }
 
                     crashcheck++;
 
-                    List<MapSpawn> Spawns = ContextFactory.Instance.MapSpawns.AsQueryable().Where(x => x.mapID == map.SQL_ID).ToList();
+                    List<MapSpawn> Spawns = ContextFactory.Instance.MapSpawns.ToList().Where(x => x.mapID == map.SQL_ID).ToList();
                     crashcheck++;
 
                     List<int> UsedSpawns = new List<int>(Spawns.Count + 1);
@@ -2100,7 +2100,7 @@ namespace RNC
                                 // incrementing times this police vehicle was used
                                 if(EPlayer.HasOwnedVehicle(player, carName, 1))
                                 {
-                                    OwnedVehData ownedVeh = ContextFactory.Instance.OwnedVehicles.FirstOrDefault<OwnedVehData>(v => v.AccountSQLID == EPlayer.GetAccount(player).SQL_ID
+                                    OwnedVehData ownedVeh = ContextFactory.Instance.OwnedVehicles.ToList().Find(v => v.AccountSQLID == EPlayer.GetAccount(player).SQL_ID
                                                             && v.Model.Equals(carName, StringComparison.OrdinalIgnoreCase));
                                     if(ownedVeh != null)
                                         ownedVeh.TimesUsed++;
@@ -2346,7 +2346,7 @@ namespace RNC
                             // incrementing times this police vehicle was used
                             if (EPlayer.HasOwnedVehicle(_tempPlayer, carName, 0))
                             {
-                                OwnedVehData ownedVeh = ContextFactory.Instance.OwnedVehicles.FirstOrDefault<OwnedVehData>(v => v.AccountSQLID == EPlayer.GetAccount(_tempPlayer).SQL_ID
+                                OwnedVehData ownedVeh = ContextFactory.Instance.OwnedVehicles.ToList().Find(v => v.AccountSQLID == EPlayer.GetAccount(_tempPlayer).SQL_ID
                                                         && v.Model.Equals(carName, StringComparison.OrdinalIgnoreCase));
                                 if (ownedVeh != null)
                                     ownedVeh.TimesUsed++;

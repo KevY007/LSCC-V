@@ -265,6 +265,7 @@ namespace RNC
                 optionsBuilder.EnableRetryOnFailure();
                 optionsBuilder.CommandTimeout(60); // Default: 30s
                 optionsBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                optionsBuilder.EnableStringComparisonTranslations(true);
             });
 
             return new MainDatabase(builder.Options);

@@ -960,17 +960,15 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.HasSharedData("VehicleDL"))
+            if (player.GetSharedData<bool>("VehicleDL") == true)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}DL (vehicle info displayer) has been disabled.");
-                player.ResetSharedData("VehicleDL");
-                player.TriggerEvent("ToggleVehicleDL", false);
+                player.SetSharedData("VehicleDL", false);
             }
             else
             {
                 player.SendChatMessage("!{#33C446}[>] !{#FFFFFF}DL (vehicle info displayer) has been enabled.");
                 player.SetSharedData("VehicleDL", true);
-                player.TriggerEvent("ToggleVehicleDL", true);
             }
             return;
         }
@@ -3882,7 +3880,7 @@ namespace RNC
                             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Note ID must be a number! Use /anote view to check IDs.");
                             return;
                         };
-                        AdminNote _n = ContextFactory.Instance.AdminNotes.FirstOrDefault(a => a.SQL_ID == nID);
+                        AdminNote _n = ContextFactory.Instance.AdminNotes.ToList().FirstOrDefault(a => a.SQL_ID == nID);
                         if(_n == null)
                         {
                             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}A note with that ID could not be found!");
@@ -3895,7 +3893,7 @@ namespace RNC
                             return;
                         }
 
-                        Account tAcc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.SQL_ID == _n.AccountID);
+                        Account tAcc = ContextFactory.Instance.Accounts.ToList().FirstOrDefault(a => a.SQL_ID == _n.AccountID);
                         string nTargetName = tAcc.Username ?? "[Unknown]";
                         ContextFactory.Instance.AdminNotes.Remove(_n);
                         player.SendChatMessage($"!{{#72ff6b}}You deleted admin {nTargetName}'s admin note with ID {nID}");
@@ -6026,7 +6024,7 @@ namespace RNC
         {
             player.SendChatMessage("!{#fcff99}==========[ LANGUAGES ]==========");
             int _langCount = 0;
-            foreach(Language lang in ContextFactory.Instance.Languages.ToList())
+            foreach(Language lang in ContextFactory.Instance.Languages)
             {
                 player.SendChatMessage("!{#bfffbd} >!{#f5fffe} " + lang.LanguageName);
                 _langCount++;
@@ -6048,7 +6046,7 @@ namespace RNC
 
             int langID = -1;
 
-            Language lang = ContextFactory.Instance.Languages.ToList().Find(l => l.LanguageName == language);
+            Language lang = ContextFactory.Instance.Languages.ToList().Find(l => l.LanguageName.Equals(language, StringComparison.OrdinalIgnoreCase));
             if(lang == null)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}A language with that ID could not be found. Use !{#FFFF00}/languages!{#FFFFFF}.");
@@ -6674,11 +6672,11 @@ namespace RNC
                 return;
             }
 
-            Map map = ContextFactory.Instance.Maps.ToList().Find(a => a.Name == mapname);
+            Map map = ContextFactory.Instance.Maps.ToList().Find(a => a.Name.Equals(mapname, StringComparison.OrdinalIgnoreCase));
             if (map == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}No map with this name exists."); return; }
 
 
-            ContextFactory.Instance.MapSpawns.RemoveRange(ContextFactory.Instance.MapSpawns.AsQueryable().Where(a => a.mapID == map.SQL_ID));
+            ContextFactory.Instance.MapSpawns.RemoveRange(ContextFactory.Instance.MapSpawns.Find(map.SQL_ID));
             ContextFactory.Instance.Maps.Remove(map);
 
             ContextFactory.Instance.SaveChanges();
@@ -6764,7 +6762,7 @@ namespace RNC
                 return;
             }
 
-            if(ContextFactory.Instance.CustomArenas.Count(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) > 0)
+            if(ContextFactory.Instance.CustomArenas.ToList().Count(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) > 0)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's already a DM arena with that name!");
                 return;
@@ -6801,14 +6799,14 @@ namespace RNC
                 return;
             }
 
-            if (ContextFactory.Instance.CustomArenas.Count(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) == 0)
+            if (ContextFactory.Instance.CustomArenas.ToList().Count(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) == 0)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no DM arena with that name!");
                 return;
             }
 
 
-            var arena = ContextFactory.Instance.CustomArenas.First(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            var arena = ContextFactory.Instance.CustomArenas.ToList().Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
 
             player.SendChatMessage($"!{{#00FF33}}You have selected the arena !{{#FFFFFF}}'{arena.Name}' (creator: {arena.Creator}) SQLID {arena.SQL_ID}!{{#00FF33}}. /editdmarena to edit.");
             player.SetData("EditingDMArena", arena.SQL_ID);
@@ -9843,11 +9841,11 @@ namespace RNC
                 return;
             }
 
-            if (player.HasSharedData("NametagHack"))
+            if (player.GetSharedData<bool>("NametagHack") == true)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Nametag hack has been disabled.");
                 Logs.LogAdmin(player, $"Disabled nametag hack.");
-                player.ResetSharedData("NametagHack");
+                player.SetSharedData("NametagHack", false);
             }
             else
             {
