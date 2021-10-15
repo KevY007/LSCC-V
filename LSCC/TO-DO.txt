@@ -4,6 +4,7 @@ cayo perico map (custom code column in maps tab so players can load custom code 
 DM ARENA: IPL/EXTRAS STUFF LEFT -- ADD SAME WITH MAP TOO
 disable lobby while bieng cvuffed
 We should also capture headshot percentage and possibly total report count.
+revert charger handling to old one
 the crashes happen somewhere when a player dies BUT ITS NOT CONFIRMED because its happened sometimes on chase start, connect and other places
 some kind of xp or points on DM
 dop sometihyngh  about ap pistol
