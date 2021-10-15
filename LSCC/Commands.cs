@@ -6226,10 +6226,11 @@ namespace RNC
             {
                 player.SendChatMessage("[Admin Lv 4]: /serveroptions /grantxp /saveserver /dbgplayanim /dbgmaxspeed /dbgdriveforce");
                 player.SendChatMessage("[Admin Lv 4]: /changename (works offline too) /changepass (works offline too) /agivepoints");
+                player.SendChatMessage("[Admin Lv 4]: /maps /deletemap /createmap /addmapspawn /deletemapspawn /mapspawns /createdmarena /selectdmarena /editdmarena");
             }
             if (EPlayer.GetAccount(player).Admin >= 5)
             {
-                player.SendChatMessage("[Admin Lv 5]: /maps /deletemap /createmap /addmapspawn /(o)setdonator /(o)givedonorpoints");
+                player.SendChatMessage("[Admin Lv 5]: /(o)setdonator /(o)givedonorpoints");
                 player.SendChatMessage("[Admin Lv 5]: /dbgteamvar /blipdbg /reloadaccount");
             }
             if (EPlayer.GetAccount(player).Admin >= 6)
@@ -6560,7 +6561,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (EPlayer.GetAccount(player).Admin < 5)
+            if (EPlayer.GetAccount(player).Admin < 4)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 5 admin.");
                 return;
@@ -6605,13 +6606,65 @@ namespace RNC
 
             return;
         }
+
+        [Command("deletemapspawn", "!{#AFAFAF}[USAGE] deletemapspawn (mapid) (spawnid)")]
+        public void cmd_deletemapspawn(Player player, int mapid, int spawnid)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 4 admin.");
+                return;
+            }
+
+            MapSpawn map = ContextFactory.Instance.MapSpawns.ToList().Find(a => a.SQL_ID == spawnid && a.mapID == mapid);
+            if (map == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}No mapspawn with this ID or map ID exists."); return; }
+
+            ContextFactory.Instance.MapSpawns.RemoveRange(ContextFactory.Instance.MapSpawns.ToList().Where(a => a.mapID == mapid && a.SQL_ID == spawnid));
+            ContextFactory.Instance.SaveChanges();
+
+            player.SendChatMessage($"!{{#DAA520}}Removed spawn ID {spawnid} from map ID [{mapid}]");
+
+            return;
+        }
+
+        [Command("mapspawns", "!{#AFAFAF}[USAGE] mapspawns (mapid)")]
+        public void cmd_mapspawns(Player player, int mapid)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 4 admin.");
+                return;
+            }
+
+            Map map = ContextFactory.Instance.Maps.ToList().Find(a => a.SQL_ID == mapid);
+            if (map == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid map ID!"); return; }
+
+            int count = 0;
+            foreach (MapSpawn a in ContextFactory.Instance.MapSpawns.ToList().Where(a => a.mapID == mapid))
+            {
+                player.SendChatMessage($"!{{#DAA520}}Spawn ID [{a.SQL_ID}] | Team: [{a.spawnTeam}] | XYZA: {a.spawnX}, {a.spawnY}, {a.spawnZ}, {a.spawnA}");
+                count++;
+            }
+
+            player.SendChatMessage($"!{{#DAA520}}Total Spawns: {count}");
+
+            return;
+        }
+
+
         [Command("deletemap", "!{#AFAFAF}[USAGE] deletemap (mapname)", GreedyArg = true)]
         public void cmd_delmap(Player player, string mapname)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (EPlayer.GetAccount(player).Admin < 5)
+            if (EPlayer.GetAccount(player).Admin < 4)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
                 return;
@@ -6675,9 +6728,9 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (EPlayer.GetAccount(player).Admin < 5)
+            if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 5 admin.");
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 4 admin.");
                 return;
             }
 
