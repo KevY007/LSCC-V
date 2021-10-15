@@ -3085,7 +3085,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player) || player.GetData<bool>("Tuner_Using") == false) return;
 
             Account acc = EPlayer.GetAccount(player);
-            var tuning = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.AccountSQLID == acc.SQL_ID && a.Model == player.Vehicle.Model);
+            var tuning = player.GetData<PlayerTunings>("Tuner_CurrentItems");
 
             Dictionary<int, int> vMods = NAPI.Util.FromJson<Dictionary<int, int>>(modstring);
             vMods.Remove(11); // Engine

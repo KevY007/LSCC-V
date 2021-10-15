@@ -5086,9 +5086,13 @@ namespace RNC
                 return;
             }
 
-            foreach (var arena in ContextFactory.Instance.CustomArenas.ToList().Where(a => a.Creator.Equals(player.Name, StringComparison.OrdinalIgnoreCase)))
+            foreach (var arena in ContextFactory.Instance.CustomArenas.ToList().Where(a => a.Creator.Equals(name, StringComparison.OrdinalIgnoreCase)))
             {
                 arena.Creator = newname;
+            }
+            foreach (var arena in ContextFactory.Instance.Bans.ToList().Where(a => a.Admin.Equals(name, StringComparison.OrdinalIgnoreCase)))
+            {
+                arena.Admin = newname;
             }
 
             Player target = RAGE.Entities.Players.All.Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
@@ -5151,41 +5155,6 @@ namespace RNC
             Logs.LogAdmin(player, $"Deleted account '{tpAcc.Username}'.");
 
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has deleted account {tpAcc.Username}.");
-
-         /*   if (ContextFactory.Instance.Bans.Count(a => a.AccountSQLID == tpAcc.SQL_ID) > 0)
-            {
-                ContextFactory.Instance.Bans.RemoveRange(ContextFactory.Instance.Bans.ToList().Where(a => a.AccountSQLID == tpAcc.SQL_ID));
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There was an outstanding ban on that account, it has been deleted along with the account.");
-            }
-            if (ContextFactory.Instance.PlayerTunings.Count(a => a.AccountSQLID == tpAcc.SQL_ID) > 0)
-            {
-                ContextFactory.Instance.PlayerTunings.RemoveRange(ContextFactory.Instance.PlayerTunings.ToList().Where(a => a.AccountSQLID == tpAcc.SQL_ID));
-            }
-            if (ContextFactory.Instance.PlayerOutfits.Count(a => a.AccountID == tpAcc.SQL_ID) > 0)
-            {
-                ContextFactory.Instance.PlayerOutfits.RemoveRange(ContextFactory.Instance.PlayerOutfits.ToList().Where(a => a.AccountID == tpAcc.SQL_ID));
-            }
-            if (ContextFactory.Instance.OwnedLoadouts.Count(a => a.AccountSQLID == tpAcc.SQL_ID) > 0)
-            {
-                ContextFactory.Instance.OwnedLoadouts.RemoveRange(ContextFactory.Instance.OwnedLoadouts.ToList().Where(a => a.AccountSQLID == tpAcc.SQL_ID));
-            }
-            if (ContextFactory.Instance.OwnedVehicles.Count(a => a.AccountSQLID == tpAcc.SQL_ID) > 0)
-            {
-                ContextFactory.Instance.OwnedVehicles.RemoveRange(ContextFactory.Instance.OwnedVehicles.ToList().Where(a => a.AccountSQLID == tpAcc.SQL_ID));
-            }
-
-            if (ContextFactory.Instance.Logs_Session.Count(a => a.AccountID == tpAcc.SQL_ID) > 0)
-            {
-                ContextFactory.Instance.Logs_Session.RemoveRange(ContextFactory.Instance.Logs_Session.ToList().Where(a => a.AccountID == tpAcc.SQL_ID));
-            }
-            if (ContextFactory.Instance.Logs_AdminRecords.Count(a => a.AccountID == tpAcc.SQL_ID || a.AdminID == tpAcc.SQL_ID) > 0)
-            {
-                ContextFactory.Instance.Logs_AdminRecords.RemoveRange(ContextFactory.Instance.Logs_AdminRecords.ToList().Where(a => a.AccountID == tpAcc.SQL_ID || a.AdminID == tpAcc.SQL_ID));
-            }
-            if (ContextFactory.Instance.Logs_Admin.Count(a => a.AccountID == tpAcc.SQL_ID) > 0)
-            {
-                ContextFactory.Instance.Logs_Admin.RemoveRange(ContextFactory.Instance.Logs_Admin.ToList().Where(a => a.AccountID == tpAcc.SQL_ID));
-            }*/
 
             ContextFactory.Instance.Accounts.Remove(tpAcc);
             ContextFactory.Instance.SaveChanges();
@@ -5917,25 +5886,22 @@ namespace RNC
             return;
         }
 
-        [Command("reloadallaccounts")]
-        public void cmd_reloadallaccounts(Player player)
-        {
-            if (!EPlayer.LoggedIn(player)) return;
-            if (EPlayer.GetAccount(player).Admin < 6) return;
-
-            ContextFactory.Instance.Entry(ContextFactory.Instance.Accounts).Reload();
-            return;
-        }
-
         [Command("reloadaccount")]
-        public void cmd_reloadaccount(Player player, Player target)
+        public void cmd_reloadaccount(Player player, string accountname)
         {
             if (!EPlayer.LoggedIn(player)) return;
-            if (EPlayer.GetAccount(player).Admin < 6) return;
+            if (EPlayer.GetAccount(player).Admin < 5) return;
 
-            if (!EPlayer.LoggedIn(target)) return;
-            
-            ContextFactory.Instance.Entry(EPlayer.GetAccount(target)).Reload();
+            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(accountname, StringComparison.OrdinalIgnoreCase) == true);
+
+            if (tpAcc == null)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                return;
+            }
+
+            ContextFactory.Instance.Entry(tpAcc).Reload();
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}" + tpAcc.Username + " has been reloaded.");
             return;
         }
 
@@ -6265,7 +6231,7 @@ namespace RNC
             if (EPlayer.GetAccount(player).Admin >= 5)
             {
                 player.SendChatMessage("[Admin Lv 5]: /maps /deletemap /createmap /addmapspawn /(o)setdonator /(o)givedonorpoints");
-                player.SendChatMessage("[Admin Lv 5]: /dbgteamvar /blipdbg");
+                player.SendChatMessage("[Admin Lv 5]: /dbgteamvar /blipdbg /reloadaccount");
             }
             if (EPlayer.GetAccount(player).Admin >= 6)
             {
@@ -7919,6 +7885,8 @@ namespace RNC
                 veh.PearlescentColor = inst.PearlescentColor;
                 veh.WheelColor = inst.WheelColor;
             }
+
+            player.SetData("Tuner_CurrentItems", inst);
 
             player.TriggerEvent("OpenTuner", veh.Id);
             player.Dimension = dim; // FIRST THE TUNER SETTING ID AND THEN LAODING CAR

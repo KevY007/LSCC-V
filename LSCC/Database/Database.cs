@@ -200,12 +200,39 @@ namespace RNC
             // like this poggers
             modelBuilder.Entity<Account>().Property(u => u.Character).IsRequired(false);
 
+
+            modelBuilder.Entity<OwnedLoadoutData>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
+            modelBuilder.Entity<OwnedVehData>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
+
             modelBuilder.Entity<PlayerTunings>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
             modelBuilder.Entity<PlayerOutfit>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
+
+            modelBuilder.Entity<BanData>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
+            // Delete the ban if the account got deleted. What's the point now?
+
+            modelBuilder.Entity<Logs_Session>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
+            modelBuilder.Entity<Logs_Admin>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
+
+            modelBuilder.Entity<Logs_AdminRecord>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
+
+            modelBuilder.Entity<AdminNote>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
+
+            // But if were the admin, don't delete shit and let them suffer... in null. We better add checks for these tho // Oh I just realised ban uses string for admin name, gucci. they remain
+            modelBuilder.Entity<AdminNote>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AdminID).OnDelete(DeleteBehavior.ClientSetNull);
+            modelBuilder.Entity<Logs_AdminRecord>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AdminID).OnDelete(DeleteBehavior.ClientSetNull);
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.LogTo(Console.WriteLine);
+            optionsBuilder.EnableSensitiveDataLogging(true);
+            optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
+            optionsBuilder.EnableServiceProviderCaching(true);
+            optionsBuilder.EnableServiceProviderCaching(true);
+
+            optionsBuilder.LogTo((data) =>
+            {
+                Main.Log("database_errors.txt", $"{DateTime.Now.ToString()}: {data}");
+                Console.WriteLine($"Database Error at {DateTime.Now.ToString()}: {data}\nError has been logged in database_errors.txt as well.");
+            }, Microsoft.Extensions.Logging.LogLevel.Error);
         }
     }
 
@@ -232,7 +259,7 @@ namespace RNC
                 optionsBuilder.CommandTimeout(60); // Default: 30s
                 optionsBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             });
-           
+
             return new MainDatabase(builder.Options);
         }
 
