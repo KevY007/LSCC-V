@@ -18,6 +18,7 @@ var currentMuteTime = 0;
 var lastMuteUpdate = 10;
 var lastFunc = "Init";
 
+var ShowVehicleDL = false;
 var specCam = null;
 var specState = false;
 var specTarget = null;

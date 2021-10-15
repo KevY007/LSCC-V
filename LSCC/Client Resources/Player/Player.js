@@ -1148,7 +1148,7 @@ mp.events.add('render', () => {
                             clickDisable = true; // Disable shooting team-kill car by default
                             var vehicleOccupants = 0;
                             
-                            mp.players.forEach(occupant => {
+                            mp.players.streamed.forEach(occupant => {
                                 if(occupant.isInVehicle(target.handle, false)) {
                                     vehicleOccupants++;
                                     if(occupant.getVariable("Team") != player.getVariable("Team")) 
@@ -1165,7 +1165,7 @@ mp.events.add('render', () => {
                             clickDisable = true; // Disable innocent car shots by default.
                             var vehicleOccupants = 0;
 
-                            mp.players.forEach(occupant => {
+                            mp.players.streamed.forEach(occupant => {
                                 if(occupant.isInVehicle(target.handle, false)) {
                                     vehicleOccupants++;
                                     if(occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true && !occupant.isDead()) {
@@ -1190,7 +1190,7 @@ mp.events.add('render', () => {
                                         clickDisable = false;
                                     }
                                     else {
-                                        mp.players.forEach(occupant => {
+                                        mp.players.streamed.forEach(occupant => {
                                             if(occupant.isInVehicle(target.vehicle.handle, true) && occupant.getVariable("Team") != target.getVariable("Team")) { 
                                                 clickDisable = false; // Member of opposite team in it? Shoot.
                                             }
@@ -1210,7 +1210,7 @@ mp.events.add('render', () => {
                                         clickDisable = false;
                                     }
                                     else {
-                                        mp.players.forEach(occupant => {
+                                        mp.players.streamed.forEach(occupant => {
                                             if(occupant.isInVehicle(target.vehicle.handle, true) && occupant.getVariable("Team") == target.getVariable("Team") && 
                                             occupant.getVariable("HasShot") == true && !occupant.isDead()) {
                                                 clickDisable = false;
@@ -1255,7 +1255,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                 {
                     breakShot = true; // Break team-kill car by default
                     
-                    mp.players.forEach(occupant => {
+                    mp.players.streamed.forEach(occupant => {
                         if(occupant.isInVehicle(targetEntity.handle, false)) {
                             vehicleOccupants++;
                             if(occupant.getVariable("Team") != player.getVariable("Team")) 
@@ -1273,7 +1273,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                 {
                     breakShot = true; // Break innocent car shots by default.
 
-                    mp.players.forEach(occupant => {
+                    mp.players.streamed.forEach(occupant => {
                         if(occupant.isInVehicle(targetEntity.handle, false)) {
                             vehicleOccupants++;
                             if(occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true && !occupant.isDead()) {
@@ -1492,7 +1492,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 {
                     breakShot = true; // Break team-kill car by default
                     
-                    mp.players.forEach(occupant => {
+                    mp.players.streamed.forEach(occupant => {
                         if(occupant.isInVehicle(targetEntity.handle, false)) {
                             vehicleOccupants++;
                             if(occupant.getVariable("Team") != player.getVariable("Team")) {
@@ -1509,7 +1509,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 {
                     breakShot = true; // Break innocent car shots by default.
 
-                    mp.players.forEach(occupant => {
+                    mp.players.streamed.forEach(occupant => {
                         if(occupant.isInVehicle(targetEntity.handle, false)) {
                             vehicleOccupants++;
                             if(occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true && !occupant.isDead()) {

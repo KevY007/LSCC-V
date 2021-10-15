@@ -388,8 +388,24 @@ mp.events.add('ToggleHud', (toggle) => {
     mp.game.ui.displayRadar(showHud);
 });
 
+mp.events.add('ToggleVehicleDL', (toggle) => {
+    ShowVehicleDL = toggle;
+});
+
 mp.keys.bind(0x75, false, () => {
     showReticule = !showReticule;
+});
+
+mp.keys.bind(0x74, false, () => {
+    if(menuToggled !== undefined && menuToggled) return;
+    if(scoreboardToggled == true) return;
+    if(Date.now() - lastChatToggle >= 500 && chatStatus == false && 
+        (mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true))
+    {
+        traceLastFunc(`[Players] Attempt tog /DL`);
+        
+        mp.events.callRemote("OnScriptedKeyPress", 0x74, true);
+    }
 });
 
 mp.events.add('ResetKillFeed', () => {
@@ -763,6 +779,38 @@ mp.events.add("HUDNotify2", (title, msg, orientation, displaymode) => {
     if(UIHud != null) UIHud.execute(insertString);
 });
 
+
+
+function isVehicleInLOS(target, startpos) {
+    if(target === undefined) return false;
+
+    let result = mp.raycasting.testPointToPoint(startpos, target.position, [1, 16]); // now test point to point
+    
+    if(result === undefined)
+    {
+        return true;
+    }
+    else if(result !== undefined)
+    {
+        if(result.entity !== undefined) // Entity is not undefined and might be ped or veh.
+        {
+            if(typeof result.entity.isAPed === 'function' && result.entity.isAPed())
+            {
+                return true;
+            }
+            if(typeof result.entity.isAVehicle === 'function' && result.entity.isAVehicle())
+            {
+                return true;
+            }
+        }
+        else if(result.entity === undefined) // There's no entity, can be a object or building anything.
+        {
+            return false;
+        }
+    }
+    return false;
+}
+
 mp.events.add("render", () => {
     
     mp.game.ui.hideHudComponentThisFrame(7); // area name
@@ -831,32 +879,88 @@ mp.events.add("render", () => {
                 UIHud.execute(`gm.speedo = false;`);
             }
         }
+        else {
+            if(mp.players.local.isInAnyVehicle(false))
+            {
+                if(!speedo)
+                {
+                    UIHud.execute(`gm.speedo = true;`);
+                    speedo = true;
+                }
 
-        if(mp.players.local.isInAnyVehicle(false))
-        {
-            if(!speedo)
-            {
-                UIHud.execute(`gm.speedo = true;`);
-                speedo = true;
+                if(speedoMax != ((mp.game.vehicle.getVehicleModelMaxSpeed(mp.players.local.vehicle.model) * 3.6) + 25).toFixed(0))
+                {
+                    speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(mp.players.local.vehicle.model) * 3.6) + 25).toFixed(0);
+                    UIHud.execute(`gm.$refs.BottomRight.$refs.Speedo.maxspeed = ${speedoMax};`);
+                }
+                if(speedoCur != (mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0))
+                {
+                    speedoCur = (mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0);
+                    UIHud.execute(`gm.$refs.BottomRight.$refs.Speedo.speed = ${speedoCur};`);
+                }
             }
-
-            if(speedoMax != ((mp.game.vehicle.getVehicleModelMaxSpeed(mp.players.local.vehicle.model) * 3.6) + 25).toFixed(0))
+            else if(speedo)
             {
-                speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(mp.players.local.vehicle.model) * 3.6) + 25).toFixed(0);
-                UIHud.execute(`gm.$refs.BottomRight.$refs.Speedo.maxspeed = ${speedoMax};`);
-            }
-            if(speedoCur != (mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0))
-            {
-                speedoCur = (mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0);
-                UIHud.execute(`gm.$refs.BottomRight.$refs.Speedo.speed = ${speedoCur};`);
+                speedo = false;
+                speedoMax = 0;
+                speedoCur = 0;
+                UIHud.execute(`gm.speedo = false;`);
             }
         }
-        else if(speedo)
+    }
+
+    if(ShowVehicleDL == true)
+    {
+        const camera = mp.cameras.new("gameplay");
+
+        let position = mp.players.local.position;
+
+        if(camera !== undefined) position = camera.getCoord();
+        else 
         {
-            speedo = false;
-            speedoMax = 0;
-            speedoCur = 0;
-            UIHud.execute(`gm.speedo = false;`);
+            camera = mp.cameras.new("default");
+
+            if(camera === undefined) position = mp.players.local.position;
+            else position = camera.getCoord();
         }
+        
+        mp.vehicles.streamed.forEach(veh => {
+
+            let dist = calcDist(veh.position, position);
+            if(isVehicleInLOS(veh, position) && dist <= 32.0)
+            {
+                let vehName = mp.game.ui.getLabelText(mp.game.vehicle.getDisplayNameFromVehicleModel(veh.model));
+                let passengers = veh.getNumberOfPassengers();
+                if(veh.getPedInSeat(-1) != 0) passengers++;
+
+                let drawText = `~c~${vehName} (ID: ~w~${veh.remoteId}~c~) (~w~${passengers} Occupants~c~)\n~w~Speed: ~s~${(veh.getSpeed() * 3.6).toFixed(0)} ~w~/ ~s~${(mp.game.vehicle.getVehicleModelMaxSpeed(veh.model) * 3.6).toFixed(0)} ~w~KM/H`;
+
+                let hp = ((veh.getHealth() / 1000) * 100).toFixed(0);
+                if(hp < 35)
+                {
+                    drawText = drawText + `\nHP: ~r~${hp}%`;
+                }
+                else if(hp >= 35 && hp <= 65) 
+                {
+                    drawText = drawText + `\nHP: ~y~${hp}%`;
+                }
+                else if(hp > 65)
+                {
+                    drawText = drawText + `\nHP: ~g~${hp}%`;
+                }
+            
+                let rescale = (dist / 32.0) - 0.60;
+                if(rescale >= 0.40) rescale = (0.40 + (rescale / 10.0));
+                if(rescale <= 0.35) rescale = (0.40 - (rescale / 10.0));
+
+                mp.game.graphics.drawText(drawText, [veh.position.x, veh.position.y, veh.position.z], { 
+                    font: 4, 
+                    color: [255, 255, 255, 216], 
+                    scale: [rescale, rescale], 
+                    outline: true,
+                    centre: true
+                });
+            }
+        });
     }
 });

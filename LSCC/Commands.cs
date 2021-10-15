@@ -954,6 +954,27 @@ namespace RNC
             return;
         }
 
+        [Command("dl", Alias = "vinfo,vehdebug,vehinfo")]
+        public static void cmd_dl(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (player.HasSharedData("VehicleDL"))
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}DL (vehicle info displayer) has been disabled.");
+                player.ResetSharedData("VehicleDL");
+                player.TriggerEvent("ToggleVehicleDL", false);
+            }
+            else
+            {
+                player.SendChatMessage("!{#33C446}[>] !{#FFFFFF}DL (vehicle info displayer) has been enabled.");
+                player.SetSharedData("VehicleDL", true);
+                player.TriggerEvent("ToggleVehicleDL", true);
+            }
+            return;
+        }
+
         [Command("motd", "!{#AFAFAF}[USAGE] motd (player name)(message | 'none' to delete)", GreedyArg = true)]
         public void cmd_motd(Player player, string targetName, string message)
         {
@@ -4669,6 +4690,7 @@ namespace RNC
             player.SendChatMessage("!{#FF6347}[X] !{#FFFFFF}Rapple from a !{#FFFF00}supported !{#FFFFFF}helicopter");
             player.SendChatMessage("!{#FF6347}[F7] !{#FFFFFF}Hide/show HUD & chat (Hold !{#FF0000}SHIFT+F7 !{#FFFFFF}to toggle nametags)");
             player.SendChatMessage("!{#FF6347}[F6] !{#FFFFFF}Toggle weapon crosshair/reticule");
+            player.SendChatMessage("!{#FF6347}[F5] !{#FFFFFF}Toggle vehicle /dl information");
             player.SendChatMessage("!{#FF6347}[B] !{#FFFFFF}Toggle silent siren in !{#0097FF}police !{#FFFFFF}vehicles");
             player.SendChatMessage("!{#FF6347}[H] !{#FFFFFF}Cuff a !{#FFAE00}fugitive");
             player.SendChatMessage("!{#FF6347}[J: OnFoot] !{#FFFFFF}Close/open vehicle's (must be unlocked) !{#FFAE00}trunk/hood");
@@ -4863,7 +4885,7 @@ namespace RNC
             player.SendChatMessage("!{#28E0DA}[Mode: Freeroam]: /togblip /gun /world /godmode /setspawn /tuneveh /afob");
             player.SendChatMessage("!{#A5A8A8}[Misc]: /updaterate /info /fontsize /voicebind /gpsbind /shotstats");
             player.SendChatMessage("!{#A5A8A8}[Misc]: /p(acket)l(oss)");
-            player.SendChatMessage("!{#A5A8A8}[Debug/Test]: /pos /lcmenu");
+            player.SendChatMessage("!{#A5A8A8}[Debug/Test]: /pos /lcmenu /dl");
             
             player.SendChatMessage("!{#d9f288}[Points] /vtuner /convertpoints /m(ed)k(it) /p(ain)k(illers)");
             player.SendChatMessage("!{#faf146}[Donator Points] Weapon Components: /buycomp /mycomps /removecomp");

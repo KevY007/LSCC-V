@@ -7,6 +7,7 @@ We should also capture headshot percentage and possibly total report count.
 revert charger handling to old one
 the crashes happen somewhere when a player dies BUT ITS NOT CONFIRMED because its happened sometimes on chase start, connect and other places
 change other players vehicles with a dbgcargame new version so donators can too get cars
+/dl https://cdn.discordapp.com/attachments/472438651259846656/898379571903234048/kY9kM84.png (convert 3d to 2d and shi)
 some kind of xp or points on DM
 dop sometihyngh  about ap pistol
 interiors vro

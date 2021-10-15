@@ -191,7 +191,7 @@ function ToggleCollisionsForEnt(ent, state)
     }
     //ent.setAlpha(state ? 255 : 200);
 
-    mp.vehicles.forEach(targ => {
+    mp.vehicles.streamed.forEach(targ => {
 
         ent.setNoCollision(targ.handle, state);
         targ.setNoCollision(ent.handle, state);
@@ -202,7 +202,7 @@ function ToggleCollisionsForEnt(ent, state)
             targ.setNoCollision(ent.handle, false);
         }
     });
-    mp.players.forEach(targ => {    
+    mp.players.streamed.forEach(targ => {    
 
         ent.setNoCollision(targ.handle, state);
         targ.setNoCollision(ent.handle, state);

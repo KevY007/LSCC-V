@@ -681,6 +681,7 @@ namespace RNC
                 player.ResetData("CompNoRefundWarn");
                 player.ResetData("AttachedComponents");
                 player.ResetSharedData("NametagHack");
+                player.ResetSharedData("VehicleDL"); // for /DL like in SAMP
 
                 player.ResetSharedData("IsAiming");
                 player.ResetSharedData("CameraDirectionX");
