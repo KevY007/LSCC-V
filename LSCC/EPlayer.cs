@@ -868,7 +868,7 @@ namespace RNC
             if(send_header) player.SendChatMessage($"!{{#ffc852}}====================> !{{#ffffff}}{acc.Username}'s Admin Notes !{{#ffc852}}<====================");
             foreach (AdminNote note in _notes)
             {
-                Account adm = ContextFactory.Instance.Accounts.FirstOrDefault<Account>(a => a.SQL_ID == note.AdminID);
+                Account adm = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.SQL_ID == note.AdminID);
                 string aName = adm.Username ?? "[Unknown]";
                 player.SendChatMessage($"!{{#528bff}}[!{{#91b6ff}}ID:{note.SQL_ID} | {note.Timestamp} | {note.TypeToString()}!{{#528bff}}] !{{#928aff}}{aName}: !{{#ffffff}} {note.Text}");             
             }
@@ -1070,7 +1070,7 @@ namespace RNC
 
                     if (loadout.Weapons.Count() > 0)
                     {
-                        OwnedLoadoutData _ld = ContextFactory.Instance.OwnedLoadouts.FirstOrDefault<OwnedLoadoutData>(l =>
+                        OwnedLoadoutData _ld = ContextFactory.Instance.OwnedLoadouts.FirstOrDefault(l =>
                                                 l.AccountSQLID == EPlayer.GetAccount(player).SQL_ID &&
                                                 l.Name.Equals(EPlayer.GetAccount(player).LoadoutCop, StringComparison.OrdinalIgnoreCase));
                         if (_ld != null)
@@ -1166,9 +1166,9 @@ namespace RNC
                     
                     if (loadout.Weapons.Count() > 0)
                     {
-                        OwnedLoadoutData _ld = ContextFactory.Instance.OwnedLoadouts.FirstOrDefault<OwnedLoadoutData>(l =>
-                        l.AccountSQLID == EPlayer.GetAccount(player).SQL_ID &&
-                        l.Name.Equals(EPlayer.GetAccount(player).LoadoutFugitive, StringComparison.OrdinalIgnoreCase));
+                        OwnedLoadoutData _ld = ContextFactory.Instance.OwnedLoadouts.FirstOrDefault(l =>
+                            l.AccountSQLID == EPlayer.GetAccount(player).SQL_ID &&
+                            l.Name.Equals(EPlayer.GetAccount(player).LoadoutFugitive, StringComparison.OrdinalIgnoreCase));
                         if (_ld != null)
                             _ld.TimesUsed++;
 
@@ -1457,7 +1457,7 @@ namespace RNC
                         if (car.LevelRequired == 0 || car.LevelRequired >= acc.Level) return true;
                     }
                 }*/
-                if (ContextFactory.Instance.OwnedVehicles.Count(a => a.AccountSQLID == acc.SQL_ID && a.Team == team && a.Model.Equals(model, StringComparison.OrdinalIgnoreCase)) > 0) return true;
+                if (ContextFactory.Instance.OwnedVehicles.ToList().Count(a => a.AccountSQLID == acc.SQL_ID && a.Team == team && a.Model.Equals(model, StringComparison.OrdinalIgnoreCase)) > 0) return true;
             }
             return false;
         }
@@ -1505,7 +1505,7 @@ namespace RNC
                         if (car.LevelRequired == 0 || car.LevelRequired >= acc.Level) return true;
                     }
                 }*/
-                if (ContextFactory.Instance.OwnedLoadouts.Count(a => a.AccountSQLID == acc.SQL_ID && a.Team == team && a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) > 0) return true;
+                if (ContextFactory.Instance.OwnedLoadouts.ToList().Count(a => a.AccountSQLID == acc.SQL_ID && a.Team == team && a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) > 0) return true;
             }
             return false;
         }

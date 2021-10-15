@@ -2423,7 +2423,7 @@ namespace RNC
                 return;
             }
 
-            if (ContextFactory.Instance.Accounts.Count(a => a.RegisterHWID.Equals(player.Serial) || a.RegisterRID == player.SocialClubId) >= 2)
+            if (ContextFactory.Instance.Accounts.ToList().Count(a => a.RegisterHWID.Equals(player.Serial) || a.RegisterRID == player.SocialClubId) >= 2)
             {
                 EPlayer.Error(player, "You cannot create any more accounts on the same machine!", "fas fa-user");
                 return;
