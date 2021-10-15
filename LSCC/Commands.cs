@@ -960,17 +960,15 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.HasSharedData("VehicleDL"))
+            if (player.GetSharedData<bool>("VehicleDL") == true)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}DL (vehicle info displayer) has been disabled.");
-                player.ResetSharedData("VehicleDL");
-                player.TriggerEvent("ToggleVehicleDL", false);
+                player.SetSharedData("VehicleDL", false);
             }
             else
             {
                 player.SendChatMessage("!{#33C446}[>] !{#FFFFFF}DL (vehicle info displayer) has been enabled.");
                 player.SetSharedData("VehicleDL", true);
-                player.TriggerEvent("ToggleVehicleDL", true);
             }
             return;
         }
@@ -9839,11 +9837,11 @@ namespace RNC
                 return;
             }
 
-            if (player.HasSharedData("NametagHack"))
+            if (player.GetSharedData<bool>("NametagHack") == true)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Nametag hack has been disabled.");
                 Logs.LogAdmin(player, $"Disabled nametag hack.");
-                player.ResetSharedData("NametagHack");
+                player.SetSharedData("NametagHack", false);
             }
             else
             {

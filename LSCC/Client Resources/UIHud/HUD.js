@@ -388,10 +388,6 @@ mp.events.add('ToggleHud', (toggle) => {
     mp.game.ui.displayRadar(showHud);
 });
 
-mp.events.add('ToggleVehicleDL', (toggle) => {
-    ShowVehicleDL = toggle;
-});
-
 mp.keys.bind(0x75, false, () => {
     showReticule = !showReticule;
 });
@@ -909,7 +905,7 @@ mp.events.add("render", () => {
         }
     }
 
-    if(ShowVehicleDL == true)
+    if(mp.players.local.getVariable("VehicleDL") == true)
     {
         const camera = mp.cameras.new("gameplay");
 

@@ -680,8 +680,8 @@ namespace RNC
                 player.ResetData("AccountHandle");
                 player.ResetData("CompNoRefundWarn");
                 player.ResetData("AttachedComponents");
-                player.ResetSharedData("NametagHack");
-                player.ResetSharedData("VehicleDL"); // for /DL like in SAMP
+                player.SetSharedData("NametagHack", false);
+                player.SetSharedData("VehicleDL", false); // for /DL like in SAMP
 
                 player.ResetSharedData("IsAiming");
                 player.ResetSharedData("CameraDirectionX");
