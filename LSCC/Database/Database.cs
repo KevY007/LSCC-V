@@ -201,6 +201,11 @@ namespace RNC
             modelBuilder.Entity<Account>().Property(u => u.Character).IsRequired(false);
 
             modelBuilder.Entity<PlayerTunings>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
+            modelBuilder.Entity<PlayerOutfit>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
+        }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.LogTo(Console.WriteLine);
         }
     }
 
@@ -220,18 +225,16 @@ namespace RNC
                 LoadConnectionString();
             }
             // Use it to init the connection'
-            builder.UseMySql(_connectionString, ServerVersion.AutoDetect(_connectionString), optionsBuilder => {
+            builder.UseMySql(_connectionString, ServerVersion.AutoDetect(_connectionString), optionsBuilder =>
+            {
                 optionsBuilder.MigrationsAssembly(typeof(MainDatabase).GetTypeInfo().Assembly.GetName().Name);
                 optionsBuilder.EnableRetryOnFailure();
                 optionsBuilder.CommandTimeout(60); // Default: 30s
                 optionsBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             });
-
-            
            
             return new MainDatabase(builder.Options);
         }
-
 
 
         public static MainDatabase Instance

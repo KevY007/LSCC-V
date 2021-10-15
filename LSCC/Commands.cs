@@ -5152,7 +5152,7 @@ namespace RNC
 
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has deleted account {tpAcc.Username}.");
 
-            if (ContextFactory.Instance.Bans.Count(a => a.AccountSQLID == tpAcc.SQL_ID) > 0)
+         /*   if (ContextFactory.Instance.Bans.Count(a => a.AccountSQLID == tpAcc.SQL_ID) > 0)
             {
                 ContextFactory.Instance.Bans.RemoveRange(ContextFactory.Instance.Bans.ToList().Where(a => a.AccountSQLID == tpAcc.SQL_ID));
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There was an outstanding ban on that account, it has been deleted along with the account.");
@@ -5185,7 +5185,7 @@ namespace RNC
             if (ContextFactory.Instance.Logs_Admin.Count(a => a.AccountID == tpAcc.SQL_ID) > 0)
             {
                 ContextFactory.Instance.Logs_Admin.RemoveRange(ContextFactory.Instance.Logs_Admin.ToList().Where(a => a.AccountID == tpAcc.SQL_ID));
-            }
+            }*/
 
             ContextFactory.Instance.Accounts.Remove(tpAcc);
             ContextFactory.Instance.SaveChanges();

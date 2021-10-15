@@ -91,7 +91,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /E &quot;$(OutDir)*&quot; &quot;C:\RAGEMP\server-files\dotnet\resources\RNC\&quot; /Y&#xD;&#xA;&#xD;&#xA;xcopy /E &quot;Client Resources\*&quot; &quot;C:\RAGEMP\server-files\client_packages\&quot; /Y&#xD;&#xA;&#xD;&#xA;xcopy /E &quot;Serverside JS\*&quot; &quot;C:\RAGEMP\server-files\packages\&quot; /Y" />
+    <Exec Command="xcopy /E &quot;$(OutDir)*&quot; &quot;C:\RAGEMP\server-files\dotnet\resources\RNC\&quot; /Y&#xD;&#xA;&#xD;&#xA;xcopy /E &quot;Client Resources\*&quot; &quot;C:\RAGEMP\server-files\client_packages\&quot; /Y&#xD;&#xA;&#xD;&#xA;xcopy /E &quot;Serverside JS\*&quot; &quot;C:\RAGEMP\server-files\packages\&quot; /Y&#xD;&#xA;&#xD;&#xA;del &quot;C:\RAGEMP\server-files\dotnet\runtime\System.Collections.Immutable.dll&quot;&#xD;&#xA;del &quot;C:\RAGEMP\server-files\dotnet\runtime\System.ComponentModel.Annotations.dll&quot;&#xD;&#xA;del &quot;C:\RAGEMP\server-files\dotnet\runtime\System.Diagnostics.DiagnosticSource.dll&quot;&#xD;&#xA;&#xD;&#xA;copy &quot;$(OutDir)\System.Diagnostics.DiagnosticSource.dll&quot; &quot;&quot;C:\RAGEMP\server-files\dotnet\runtime\&quot;&#xD;&#xA;copy &quot;$(OutDir)\System.ComponentModel.Annotations.dll&quot; &quot;&quot;C:\RAGEMP\server-files\dotnet\runtime\&quot;&#xD;&#xA;copy &quot;$(OutDir)\System.Collections.Immutable.dll&quot; &quot;&quot;C:\RAGEMP\server-files\dotnet\runtime\&quot;" />
   </Target>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
