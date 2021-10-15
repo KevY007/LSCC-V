@@ -8,6 +8,8 @@ const player = mp.players.local;
 let localPlayer = mp.players.local;
 const timerBarLib = require("./Player/Bar.js");
 
+player.crawl = false;
+
 let chaseStartVeh = -1;
 let chaseStartSeat = -1;
 
@@ -1393,10 +1395,172 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 {
                     return true;
                 }
+
+                let HP = player.getHealth();
+                if(HP - damage <= 1){
+                    if(player.getVariable("Wounded") == 0){ // if player isn't wounded
+                        setWounded(1);
+                    }
+                    return true;
+                }
             }
         }
     }
-})
+});
+
+mp.events.add("setPlayerWounded", (state) => {setWounded(state)});
+mp.events.add("togglePlayerCrawl", (toggle) => {toggleCrawl(toggle)});
+let woundedState = 0;
+let anim;
+let timeoutAnim;
+let woundedTimer;
+mp.events.add("EX_AfterRagdollSetAnim", (target) => {
+    target.clearTasksImmediately();
+    setTimeout(() => {
+        let cnt = 0;
+        let loadAnimInterval = setInterval(() => {
+            if(mp.game.streaming.hasAnimDictLoaded('move_crawlprone2crawlfront') === 0 && cnt < 250){ // FUCK IIIT
+                mp.game.streaming.requestAnimDict('move_crawlprone2crawlfront');
+                cnt++;
+            }
+            else{clearInterval(loadAnimInterval);}
+        }, 1);   
+        target.taskPlayAnim('move_crawlprone2crawlfront', 'front', 8.0, 0, -1, 2, 0, false, false, false);
+    }, 1);
+
+});
+function setWounded(state){
+    if(state == woundedState) return;
+
+    woundedState = state;
+    if(state == 1){ // state 0 => ragdolling the player and waiting 3 secs before giving ability to crawl
+        mp.events.callRemote("SetPlayerWounded", 1);
+        player.setToRagdoll(4000, 4000, 0, true, true, true);
+        mp.game.graphics.startScreenEffect('DrugsDrivingIn', -1, true);
+        setTimeout(() => {
+            setWounded(2);
+            mp.game.streaming.requestAnimDict('move_crawlprone2crawlfront');
+        }, 4030);
+        return;
+    }
+    else if(state == 2){
+        if(player == null || !mp.players.exists(player)) return;
+        if(player.Team == -1 || player.getVariable("Wounded") != 1) return;
+
+        /*let cnt = 0;
+        let loadAnimInterval = setInterval(() => {
+            if(mp.game.streaming.hasAnimDictLoaded('move_crawlprone2crawlfront') === 0 && cnt < 200){ // FUCK IIIT
+                mp.game.streaming.requestAnimDict('move_crawlprone2crawlfront');
+                cnt++;
+            }
+            else{clearInterval(loadAnimInterval);}
+        }, 10);*/
+        //player.clearTasksImmediately();
+        mp.events.callRemote("EX_ClearRagdollStandupAnim", 0);
+        //player.taskPlayAnim('move_crawlprone2crawlfront', 'front', 8.0, 1000, mp.game.entity.getEntityAnimDuration('move_crawlprone2crawlfront', 'front'), 2, 0, false, false, false);
+
+        toggleCrawl(true);      
+        mp.events.callRemote("SetPlayerWounded", 2);
+    }
+    else if(state == 0){
+        mp.game.graphics.stopScreenEffect('DrugsDrivingIn');
+        toggleCrawl(false);
+
+        mp.events.callRemote("SetPlayerWounded", 0);
+    }
+    else if(state == 3){ // SPECIAL STATE FOR PLAYER REVIVE
+        mp.game.graphics.stopScreenEffect('DrugsDrivingIn');
+        toggleCrawl(false);
+
+        mp.events.callRemote("SetPlayerWounded", 3);
+    }
+    else if(state == 4){ // SPECIAL STATE FOR PLAYER EXECUTION
+        mp.game.graphics.stopScreenEffect('DrugsDrivingIn');
+        //toggleCrawl(false);
+
+        mp.events.callRemote("SetPlayerWounded", 4);    
+    }
+}
+function handleCrawlControls() {
+    if(!player) return;
+    if (!player.crawl) return;
+    if(chatStatus) return;
+    let dict = 'move_crawl';
+    let rotation = player.getRotation(2);
+    mp.game.controls.disableControlAction(0, 32, true);
+    mp.game.controls.disableControlAction(0, 33, true);
+    mp.game.controls.disableControlAction(0, 34, true);
+    mp.game.controls.disableControlAction(0, 35, true);
+    if(mp.game.controls.isDisabledControlPressed(0, 34))
+    {
+        player.setRotation(rotation.x, rotation.y, rotation.z + 0.5, 2, true);
+    }
+    if(mp.game.controls.isDisabledControlPressed(0, 35))
+    {
+    player.setRotation(rotation.x, rotation.y, rotation.z - 0.5, 2, true);
+    }
+    if(mp.game.controls.isDisabledControlPressed(0, 32))
+    {
+        if (anim === ('onfront_fwd' || 'onfront_bwd') || timeoutAnim) return;
+        anim = 'onfront_fwd';
+        let timer = mp.game.entity.getEntityAnimDuration('move_crawl', anim);
+        mp.game.streaming.requestAnimDict(dict);
+        player.taskPlayAnim(dict, anim, 8.0, 1000, -1, 2, 0, false, false, false);
+        timeoutAnim = setTimeout(() => {
+            anim = undefined;
+            timeoutAnim = undefined;
+        }, (timer - 0.1) * 1000);
+    }
+    if(mp.game.controls.isDisabledControlPressed(0, 33))
+    {
+        if (anim === ('onfront_fwd' || 'onfront_bwd') || timeoutAnim) return;
+        anim = 'onfront_bwd';
+        let timer = mp.game.entity.getEntityAnimDuration('move_crawl', anim);
+        mp.game.streaming.requestAnimDict(dict);
+        player.taskPlayAnim(dict, anim, 8.0, 1000, -1, 2, 0, false, false, false);
+        timeoutAnim = setTimeout(() => {
+            anim = undefined;
+            timeoutAnim = undefined;
+        }, (timer - 0.1) * 1000);
+    }
+}
+function toggleCrawl(option){
+    if(option == true){
+        if(player.crawl){
+            player.crawl = false;
+            clearInterval(crawlInterval);
+            player.clearTasks();
+            //player.clearSecondaryTask()
+
+            toggleCrawl(option);
+        }
+        else{
+            crawlInterval = setInterval(handleCrawlControls, 0);
+            player.crawl = true;
+            mp.game.streaming.requestAnimDict('move_crawlprone2crawlfront');
+            player.taskPlayAnim(
+                'move_crawlprone2crawlfront',
+                'front',
+                8.0,
+                1000,
+                -1,
+                2,
+                0,
+                false,
+                false,
+                false
+            );
+        }
+    }
+    else{
+        if(player.crawl){
+            player.crawl = false;
+            clearInterval(crawlInterval);
+            player.clearTasks();
+            //player.clearSecondaryTask()
+        }       
+    }
+}
 
 function isMeleeWeapon(weapon){
     switch(weapon){
@@ -1433,6 +1597,14 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 if(sourceEntity.getVariable("Team") == targetEntity.getVariable("Team"))
                 {
                     return true;
+                }
+
+                if(sourceEntity.Team != targetEntity.Team)
+                {
+                    if(targetEntity.getVariable("Wounded") == 2){
+                        mp.events.callRemote("ExecuteWounded", targetPlayer);
+                        return;
+                    }
                 }
 
                 if(sourceEntity.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && chaseRunning)

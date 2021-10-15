@@ -1782,6 +1782,7 @@ namespace RNC
                     if (i.GetSharedData<int>("InLobby") != lobby.lobbyId) continue;
 
                     i.TriggerEvent("ResetKillFeed");
+                    i.SetSharedData("Wounded", 0);
 
                     if (i.HasData("Spectating") && EPlayer.GetAccount(i).Admin < 1)
                     {
@@ -1865,6 +1866,7 @@ namespace RNC
                         !player.HasData("Spectating"))
                     {
                         player.SetSharedData("InDM", -1);
+                        player.SetSharedData("Wounded", 0);
 
                         pCount++;
                     }
