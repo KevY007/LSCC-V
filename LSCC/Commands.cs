@@ -5130,7 +5130,6 @@ namespace RNC
                 return;
             }
 
-
             Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
 
             if ((tpAcc != null) == false)

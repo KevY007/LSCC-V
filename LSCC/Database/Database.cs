@@ -226,7 +226,6 @@ namespace RNC
             optionsBuilder.EnableSensitiveDataLogging(true);
             optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
             optionsBuilder.EnableServiceProviderCaching(true);
-            optionsBuilder.EnableServiceProviderCaching(true);
 
             optionsBuilder.LogTo((data) =>
             {
@@ -245,7 +244,7 @@ namespace RNC
         public MainDatabase CreateDbContext(string[] args)
         {
             var builder = new DbContextOptionsBuilder<MainDatabase>();
-          
+
             // Load the connection string for the first time
             if (string.IsNullOrEmpty(_connectionString))
             {
@@ -263,7 +262,6 @@ namespace RNC
             return new MainDatabase(builder.Options);
         }
 
-
         public static MainDatabase Instance
         {
             get
@@ -279,9 +277,8 @@ namespace RNC
         {
             if (File.Exists("racenchase/we_are_testing"))
                 _connectionString = "Server=" + Settings.MySQL_Host + ";Database=" + "racenchase_test" + ";Uid=" + Settings.MySQL_User + ";Pwd=" + Settings.MySQL_Password;
-            else 
+            else
                 _connectionString = "Server=" + Settings.MySQL_Host + ";Database=" + Settings.MySQL_Database + ";Uid=" + Settings.MySQL_User + ";Pwd=" + Settings.MySQL_Password;
         }
-
     }
 }

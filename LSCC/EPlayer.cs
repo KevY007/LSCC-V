@@ -620,7 +620,7 @@ namespace RNC
         #region DM Functions
         public static KeyValuePair<CustomDMArenas, bool> IsValidDMArena(int arenaID)
         {
-            var arena = ContextFactory.Instance.CustomArenas.FirstOrDefault(a => a.SQL_ID == arenaID);
+            var arena = ContextFactory.Instance.CustomArenas.Find(arenaID);
             
             if(arena == null || arena == default(CustomDMArenas)) return new KeyValuePair<CustomDMArenas, bool>(arena, false);
             return new KeyValuePair<CustomDMArenas, bool>(arena, true);
