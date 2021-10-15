@@ -5917,6 +5917,28 @@ namespace RNC
             return;
         }
 
+        [Command("reloadallaccounts")]
+        public void cmd_reloadallaccounts(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 6) return;
+
+            ContextFactory.Instance.Entry(ContextFactory.Instance.Accounts).Reload();
+            return;
+        }
+
+        [Command("reloadaccount")]
+        public void cmd_reloadaccount(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 6) return;
+
+            if (!EPlayer.LoggedIn(target)) return;
+            
+            ContextFactory.Instance.Entry(EPlayer.GetAccount(target)).Reload();
+            return;
+        }
+
         [Command("squadmembers", Alias = "partners")]
         public void cmd_squadmembers(Player player)
         {
@@ -6799,7 +6821,7 @@ namespace RNC
 
             string[] args = options.Split(' ');
             string rebuild = "";
-            foreach (string v in args) rebuild = $"{rebuild} [{args.IndexOf(v)}]{v}";
+            for(int i = 0; i < args.Length; i++) rebuild = $"{rebuild} [{i}]{args[i]}";
             //player.SendChatMessage(options); // only for deboog bpurpoooses
             //player.SendChatMessage(rebuild); // only for debooog burpooses
 

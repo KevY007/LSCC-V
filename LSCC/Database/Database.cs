@@ -1,8 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace RNC
@@ -190,6 +193,15 @@ namespace RNC
         public DbSet<CustomDMArenas> CustomArenas { get; set; }
         public DbSet<CustomDMArenaTeams> CustomArenas_Teams { get; set; }
         public DbSet<CustomDMArenaSpawns> CustomArenas_Spawns { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            /* Use these for configuring relationships and properties etc bla bla bla */
+            // like this poggers
+            modelBuilder.Entity<Account>().Property(u => u.Character).IsRequired(false);
+
+            modelBuilder.Entity<PlayerTunings>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
+        }
     }
 
     public class ContextFactory : IDesignTimeDbContextFactory<MainDatabase>
@@ -207,15 +219,20 @@ namespace RNC
             {
                 LoadConnectionString();
             }
-            // Use it to init the connection
-            builder.UseMySql(_connectionString, optionsBuilder => {
+            // Use it to init the connection'
+            builder.UseMySql(_connectionString, ServerVersion.AutoDetect(_connectionString), optionsBuilder => {
                 optionsBuilder.MigrationsAssembly(typeof(MainDatabase).GetTypeInfo().Assembly.GetName().Name);
                 optionsBuilder.EnableRetryOnFailure();
                 optionsBuilder.CommandTimeout(60); // Default: 30s
+                optionsBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             });
+
+            
            
             return new MainDatabase(builder.Options);
         }
+
+
 
         public static MainDatabase Instance
         {
