@@ -172,18 +172,28 @@ namespace RNC
         [RemoteEvent("ExecuteWounded")]
         public void OnExecuteWoundedPlayer(Player player, Player target)
         {
+            NAPI.Chat.SendChatMessageToAll("PLAYER: " + player.Name + " TARGET: " + target.Name + " IN ExecuteWounded");
+
+            if(!target.HasSharedData("Wounded") || !player.HasSharedData("Wounded"))
+            {
+                target.SetSharedData("Wounded", 0);
+                player.SetSharedData("Wounded", 0);
+                return;
+            }
+
             if (target.GetSharedData<int>("Wounded") == 2 || target.GetSharedData<int>("Wounded") == 6)
             {
                 LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
                 if (lobby != null)
                 {
+                    EPlayer.GrantXP(player, 1); // cuz why not :))
                     foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
                     {
                         ay.TriggerEvent("pushToKillFeed", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Executed", target.Name, EPlayer.HexConverter(EPlayer.GetColor(target)));
                     }
                 }
                     
-                target.TriggerEvent("setPlayerWounded", 4); // 4 = special state for executing
+                target.TriggerEvent("setPlayerWoundedCS", 4, player.Id); // 4 = special state for executing
             }
         
         }
@@ -208,27 +218,63 @@ namespace RNC
         }
 
         [RemoteEvent("SetPlayerWounded")]
-        public void OnPlayerWounded(Player player, int state, Player killer = null)
+        public void OnPlayerWounded(Player player, int state, int killerID)
         {
             player.SetSharedData("Wounded", state);
+            Player killer = null;
+            if(killerID != -1)
+            {
+                killer = NAPI.Pools.GetAllPlayers().FirstOrDefault(p => p.Id == killerID);
+                if(killer == null)
+                {
+                    player.SendChatMessage("!{#FF6347}A fatal error has occurred - please contact the devs and tell them this code: " + player.Name + "_D" + player.Id);
+                    return;
+                }
+            }
+
             switch (state)
             {
                 case 0:
                     {
-                        player.SendChatMessage("DEBUG: Wounded state set to 0");
+                        //player.SendChatMessage("DEBUG: Wounded state set to 0");
                         break;
                     }
                 case 1:
                     {
                         player.SendChatMessage("!{#C3A3DB}* You suddenly start losing strength and collapse - you lost too much blood.");
 
-                        #region - Giving XP to killer, handling stats, kill feed
-                        if (killer != null)
+                        if (player.IsInVehicle && player.Vehicle != null)
+                        {
+                            if (player.Vehicle.Class == 15 || player.Vehicle.Class == 16)
+                            {
+                                player.Vehicle.EngineStatus = false;
+                            }
+                        }
+
+                        if (player.GetSharedData<string>("ActionType") != "none")
+                        {
+                            EPlayer.StopPlayerAction(player, 1);
+                        }
+                        foreach (Player pl in NAPI.Pools.GetAllPlayers().Where(p => p.Position.DistanceTo(player.Position) < 10.0f))
+                        {
+                            if (pl.GetSharedData<string>("CuffedBy") == player.Name)
+                            {
+                                player.TriggerEvent("StopCuffing", 12);
+                                break;
+                            }
+                        }
+                        if (player.HasSharedData("ReviveTarget"))
+                        {
+                            player.TriggerEvent("StopReviving", 3);
+                        }
+
+                        #region -> Giving XP to killer, handling stats, kill feed
+                        if (killer != null && killer != player)
                         {
                             LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
                             if (lobby != null)
                             {
-                                string reasonStr;
+                                string reasonStr = null;
                                 jWeaponData wepDat = new jWeaponData();
 
                                 if (Main.WeaponReasons.TryGetValue((long)killer.CurrentWeapon, out reasonStr))
@@ -242,6 +288,18 @@ namespace RNC
                                 else
                                 {
                                     reasonStr = null;
+                                }
+
+                                if (!player.HasSharedData("LastKiller") || player.GetSharedData<Player>("LastKiller") != killer)
+                                {
+                                    EPlayer.GetAccount(killer).Kills++;
+                                    player.SetSharedData("LastKiller", killer);
+                                }
+                                killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 10.0));
+                                EPlayer.GrantXP(killer, 2);
+                                if (lobby.Fugitives.Contains(player) && killer.GetSharedData<int>("Team") == 0)
+                                {
+                                    PlayerRequestShotTag(killer);
                                 }
 
                                 if (reasonStr != null)
@@ -276,16 +334,24 @@ namespace RNC
                         player.Health = 50;
                         player.SendChatMessage("!{#FFFF00}Your wounds have been treated and you gained your strength back.");
                         player.SetSharedData("Wounded", 0);
+                        RequestPlayAnimation(player, "amb@world_human_push_ups@male@exit", "exit", 0);
+                        NAPI.Task.Run(() =>
+                        {
+                            RequestClearAnimation(player); // idk hope it works 
+                            player.TriggerEvent("ResolveJS", "player.clearTasksImmediately();"); // haha xd lmao lol pls dont kill me kevy
+                        }, delayTime: 3800);
                         break;
                     }
                 case 4: // force kill (by another player)
                     {
+                        EPlayer.GetAccount(player).Deaths++;
                         player.Health = 0;
                         player.SendChatMessage("!{#FF6347}You have been executed and are being sent to the lobby...");
                         break;
                     }
                 case 5: // force kill in special vehicle
                     {
+                        EPlayer.GetAccount(player).Deaths++;
                         player.Health = 0;
                         player.SendChatMessage("!{#FF6347}It is too late - you lost way too much blood and cannot be saved.");
                         break;
@@ -301,6 +367,7 @@ namespace RNC
                     }
                 case 7: // force kill BUT by server, not execution
                     {
+                        EPlayer.GetAccount(player).Deaths++;
                         player.Health = 0;
                         player.SendChatMessage("!{#FF6347}You succumbed to your wounds and are being sent to the lobby...");
                         break;
@@ -351,7 +418,7 @@ namespace RNC
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your action was stopped: you are no longer in copchase.");
                     break;
                 case 1: // Death
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your action has failed: you died.");
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your action has failed: you are severely wounded or dead.");
                     break;
                 case 2: // Max HP reached (painkillers)
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your painkillers effect stopped earlier: your HP is full.");
@@ -1120,17 +1187,17 @@ namespace RNC
                         {
                             if (killer != null)
                             {
-                                EPlayer.GetAccount(player).Deaths++;
-                                EPlayer.GetAccount(killer).Kills++;
-                                killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 10.0));
+                                //EPlayer.GetAccount(player).Deaths++;
+                                //EPlayer.GetAccount(killer).Kills++;
+                                //killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 10.0));
                             }
 
                             wasInGame = true;
 
                             if (killer != null && killer.GetSharedData<int>("Team") == 0)
                             {
-                                EPlayer.GrantXP(killer, 2);
-                                Events.PlayerRequestShotTag(killer);
+                                //EPlayer.GrantXP(killer, 2);
+                                //Events.PlayerRequestShotTag(killer);
                             }
 
                             lock (Settings.LoggedInPlayers)
@@ -1368,6 +1435,10 @@ namespace RNC
             player.SetData("LoggedIn", true);
             player.SetData("AccountHandle", acc);
             player.SetSharedData("pLogged", true);
+
+            player.ResetSharedData("LastKiller"); 
+            player.ResetSharedData("BeingRevived");
+            player.ResetSharedData("ReviveTarget");
 
             if (ContextFactory.Instance.Languages.ToList().Find(l => l.SQL_ID == acc.Language) != null && EPlayer.GetAccount(player).Language != -1)
                 player.SetData("Language", ContextFactory.Instance.Languages.ToList().Find(l => l.SQL_ID == acc.Language));
@@ -1795,6 +1866,10 @@ namespace RNC
             player.SetData("LoggedIn", true);
             player.SetData("AccountHandle", acc);
             player.SetSharedData("pLogged", true);
+
+            player.ResetSharedData("LastKiller");
+            player.ResetSharedData("BeingRevived");
+            player.ResetSharedData("ReviveTarget");
 
             player.Name = acc.Username;
 
@@ -2937,6 +3012,46 @@ namespace RNC
             return;
         }
 
+        [RemoteEvent("FinishRevive")]
+        public void OnRevivePlayer(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (player.GetSharedData<int>("Team") != target.GetSharedData<int>("Team")) return;
+
+            target.TriggerEvent("setPlayerWoundedCS", 3, player.Id);
+            player.SendChatMessage($"!{{#2fc900}}[REVIVE] You successfully revived {target.Name} and gained +2XP & 1 point for teamwork!");
+            target.SendChatMessage($"!{{#2fc900}}[REVIVE] You have been revived by {player.Name}.");
+
+            RequestClearAnimation(player);
+            player.ResetSharedData("ReviveTarget");
+            target.ResetSharedData("BeingRevived");
+        }
+
+        [RemoteEvent("AssignReviveTarget")]
+        public void OnAssignReviveTarget(Player player, int remoteId)
+        {
+            Player target = NAPI.Pools.GetAllPlayers().FirstOrDefault(p => p.Id == remoteId);
+            if(target == null)
+            {
+                player.SendChatMessage("target was null rip (id):" + remoteId);
+                return;
+            }
+            player.SendChatMessage("onassigntarget " + target.Name);
+
+            if (!EPlayer.LoggedIn(player)) return;
+            if (player.GetSharedData<int>("Team") != target.GetSharedData<int>("Team")) return;
+            player.SetSharedData("ReviveTarget", target);
+            target.SetSharedData("BeingRevived", player);
+
+            player.SendChatMessage("onassigntarget 2 " + target.Name);
+
+            player.SendChatMessage($"!{{#2fc900}}[REVIVE] You have begun reviving ${target.Name} - keep holding H for 7 seconds.");
+            target.SendChatMessage($"!{{#2fc900}}[REVIVE] You are now being revived by ${player.Name} - it will take 7 seconds.");
+
+            RequestPlayAnimation(player, "missheistfbi3b_ig8_2", "cpr_loop_paramedic", 1);
+            player.TriggerEvent("BeginReviving");
+        }
+
         [RemoteEvent("RequestCuffTarget")]
         public void OnRequestCuffTarget(Player player)
         {
@@ -2976,6 +3091,20 @@ namespace RNC
             target.SetSharedData("CuffedBy", "n/a");
 
             Events.RequestClearAnimation(player);
+        }
+        [RemoteEvent("StopReviving")]
+        public void OnStopReviving(Player player)
+        {
+            if (!player.HasSharedData("ReviveTarget")) return;
+            Player target = player.GetSharedData<Player>("ReviveTarget");
+            if (target == null) return;
+            target.ResetSharedData("BeingRevived");
+            player.ResetSharedData("ReviveTarget");
+
+            if(player.GetSharedData<int>("Wounded") == 0)
+            {
+                Events.RequestClearAnimation(player);
+            }
         }
 
         [RemoteEvent("ScreenshotReceived")]
@@ -3401,6 +3530,7 @@ namespace RNC
             player.SetData("ClimbProtectionProcs", 0);
             player.ResetData("DraggingOut");
             player.TriggerEvent("togglePlayerCrawl", false);
+            player.TriggerEvent("setPlayerWoundedCS", 0, -1);
 
             player.ResetData("_currentlySwappingSeats");
             foreach (Player p in Settings.LoggedInPlayers.Where(a => a.HasData("Spectating") && a.GetData<Player>("SpectatingPlayer") == player))

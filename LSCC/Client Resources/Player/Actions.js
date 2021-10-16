@@ -108,6 +108,98 @@ function MedkitAction(){
     }, 1000);
 }
 
+// ------ H KEY ------ //
+let reviveTarget = null;
+let reviveTime = 7;
+let reviveTimer = null;
+mp.keys.bind(0x48, true, onHoldHkey);
+function onHoldHkey(){
+    if(canRevive())
+    {
+        mp.players.forEach(pl => {
+            if(pl.Team == player.Team && pl.getVariable("Wounded") == 2 && pl.remoteId != player.remoteId){
+
+                let vec1 = player.position;
+                let vec2 = pl.position;
+
+                let distance = vec1.subtract(vec2).length();
+                if(distance < 5){
+                    reviveTarget = pl;
+                    reviveTime = 7;
+                    mp.evets.callRemote("AssignReviveTarget", pl.remoteId);
+                    return;
+                }
+            }
+        });
+    }
+
+    // if no revive target is found, request cuff
+    requestCuffTarget();
+}
+
+// ------ REVIVAL SYSTEM ------ //
+let isReviving = false;
+function canRevive(){
+    if(player.Team == -1 || player.getVariable("Wounded") > 0 || chatStatus || menuToggled || scoreboardToggled || Date.now() - lastChatToggle <= 500) return false; 
+    return true;
+}
+mp.events.add("BeginReviving", () => {
+    if(mp.players.local == null || !mp.players.exists(player)) return;
+    if(reviveTarget == null || !mp.players.exists(reviveTarget)) return;
+
+    mp.gui.chat.push("beginreviving called");
+    reviveTime = 7;
+    isReviving = true;
+    clearInterval(reviveTimer);
+    reviveTimer = setInterval(() => {
+        if(mp.players.local == null || !mp.players.exists(player)){ stopCuffing(69); return; }
+        if(reviveTarget == null || !mp.players.exists(reviveTarget)){ stopCuffing(69); return; }
+        if(player.Team == -1 || player.isDead()){
+            stopReviving(1);
+            return;
+        }       
+        if(reviveTarget.Team == -1 || (player.Team != reviveTarget.Team) || reviveTarget.isDead()){
+            stopReviving(2);
+        }
+        if(!mp.keys.isDown(72)){ 
+            stopReviving(4);
+            return;
+        }
+
+        reviveTime--;
+        if(reviveTime <= 0){
+            mp.events.callRemote("FinishRevive", reviveTarget);
+            mp.gui.chat.push(`TIME REMAINING TO REVIVE ${reviveTarget.name}: ${reviveTime}`);
+            clearInterval(reviveTimer);
+            return;
+        }
+    }, 1000);
+});
+
+mp.events.add("StopReviving", (reason) => stopReviving(reason));
+function stopReviving(reason){
+
+    isReviving = false;
+    clearInterval(reviveTimer);
+    reviveTarget = null;
+
+    mp.events.callRemote("StopReviving");
+
+    switch(reason){
+        case 1:{
+            mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Reviving failed - you are no longer in copchase.");
+            break;
+        }        
+        case 2:{
+            mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Reviving failed - target is no longer on the same team as you or is dead.");
+            break;
+        }
+        case 3:{
+            mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Reviving failed - You are severely injured.");
+            break;           
+        }
+    }
+}
 
 
 // ------ CUFFING SYSTEM ------ //
@@ -121,8 +213,6 @@ function requestCuffTarget(){
 
     mp.events.callRemote("RequestCuffTarget");
 }
-
-mp.keys.bind(0x48, true, requestCuffTarget);
 
 mp.events.add("StopCuffing", (reason) => { stopCuffing(reason); });
 
@@ -194,6 +284,9 @@ function stopCuffing(reason){ // if unsuccessful / force stopped
             break;       
         case 2:
             mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Cuffing failed as you moved too far from the fugitive.");
+            break;
+        case 12: // putting 12 cuz idk the ids anymore fuck this shit im braindead at this point
+            mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Cuffing failed - you are severely injured.");
             break;
     }
 }

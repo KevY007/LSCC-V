@@ -1367,14 +1367,13 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         mp.events.callRemote("GivePlayerShotTag");
     }
 });
-
-
 mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weapon, boneIndex, damage) => {
 
     if(targetEntity !== null && targetEntity !== undefined && targetEntity.type === 'player' && targetEntity == player)
     {
         if(sourceEntity !== null && sourceEntity !== undefined && sourceEntity.type === 'player')
         {
+
             if(weapon == 911657153 && targetEntity.isInAnyVehicle(false)) return true; // Disable stun if in car.
 
             if(targetEntity.getVariable("ClimbProtection") == true || sourceEntity.getVariable("ClimbProtection") == true) return true;
@@ -1397,9 +1396,10 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 }
 
                 let HP = player.getHealth();
-                if(HP - damage <= 1){
+                if(HP - damage <= 5){
                     if(player.getVariable("Wounded") == 0){ // if player isn't wounded
-                        setWounded(1);
+                        mp.game.player.setInvincible(true);
+                        setWounded(1, sourcePlayer);
                     }
                     return true;
                 }
@@ -1408,7 +1408,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
     }
 });
 
-mp.events.add("setPlayerWounded", (state) => {setWounded(state)});
+mp.events.add("setPlayerWoundedCS", (state, killer) => {setWounded(state, killer)});
 mp.events.add("togglePlayerCrawl", (toggle) => {toggleCrawl(toggle)});
 let woundedState = 0;
 let anim;
@@ -1432,10 +1432,11 @@ mp.events.add("EX_AfterRagdollSetAnim", (target) => {
         }, 1);   
         target.taskPlayAnim('move_crawlprone2crawlfront', 'front', 8.0, 0, -1, 2, 0, false, false, false);
     }, 1);
+    mp.game.player.setInvincible(false);
 
 });
 
-function toggleWoundedActions(toggle){
+function toggleDisabledWoundedActions(toggle){
     mp.game.controls.disableControlAction(0, 61, toggle);
     mp.game.controls.disableControlAction(0, 62, toggle);
     mp.game.controls.disableControlAction(0, 63, toggle);
@@ -1467,40 +1468,38 @@ function toggleWoundedActions(toggle){
 mp.events.add('render', () => {
     if(woundedState > 0){
         if(woundedInsideVehicle){ // making sure to disable driveby and vehicle movement completely good RP
-            toggleWoundedActions(true);
+            toggleDisabledWoundedActions(true);
         }
     }
 });
 
-function setWounded(state){
+function setWounded(state, killer){
     if(state == woundedState) return;
 
-    woundedState = state;
     if(state == 1){ // state 0 => ragdolling the player and waiting 3 secs before giving ability to crawl
-        mp.events.callRemote("SetPlayerWounded", 1);
+        mp.events.callRemote("SetPlayerWounded", 1, killer.remoteId);
+        woundedState = 1;
+
         if(woundedTimer) clearInterval(woundedTimer);
         woundedTimeLeft = 60;
+        mp.game.player.setInvincible(true);
         if(!player.vehicle)
         {
             player.setToRagdoll(4000, 4000, 0, true, true, true);
             setTimeout(() => {
-                setWounded(2);
+                setWounded(2, player);
                 mp.game.streaming.requestAnimDict('move_crawlprone2crawlfront');
             }, 4030);
 
             woundedInsideVehicle = false;
+            toggleDisabledWoundedActions(false);
         }
         else{
-            let vehClass = player.vehicle.getClass();
-            if(vehClass == 15 || vehClass == 16 || vehClass == 14){ // heli, planes, boats = just in case :)
-                player.vehicle.setEngineOn(false, true, true);
-
             woundedInsideVehicle = true;
+            toggleDisabledWoundedActions(true);
             setTimeout(() => { 
-                setWounded(6);
-            }, 100);
-                
-            }
+                setWounded(6, player);
+            }, 100);      
         }
         //mp.game.graphics.startScreenEffect('DrugsDrivingIn', -1, true);
         return;
@@ -1508,6 +1507,7 @@ function setWounded(state){
     else if(state == 2){
         if(player == null || !mp.players.exists(player)) return;
         if(player.Team == -1 || player.getVariable("Wounded") != 1) return;
+        woundedState = 2;
 
         /*let cnt = 0;
         let loadAnimInterval = setInterval(() => {
@@ -1522,7 +1522,7 @@ function setWounded(state){
         //player.taskPlayAnim('move_crawlprone2crawlfront', 'front', 8.0, 1000, mp.game.entity.getEntityAnimDuration('move_crawlprone2crawlfront', 'front'), 2, 0, false, false, false);
 
         toggleCrawl(true);      
-        mp.events.callRemote("SetPlayerWounded", 2);
+        mp.events.callRemote("SetPlayerWounded", 2, -1);
 
         woundedTimer = setInterval(() => {
             if(player == null || !mp.players.exists(player)) {
@@ -1535,54 +1535,62 @@ function setWounded(state){
                 woundedTimeLeft--;
             }
             else{
-                setWounded(7);
+                setWounded(7, player);
             }
         }, 1000);
     }
     else if(state == 0){
         if(player == null || !mp.players.exists(player)) return;
+        woundedState = 0;
         mp.game.graphics.stopScreenEffect('DrugsDrivingIn');
         toggleCrawl(false);
 
         if(woundedTimer) clearInterval(woundedTimer);
-        mp.events.callRemote("SetPlayerWounded", 0);
-        toggleWoundedActions(false);
+        mp.events.callRemote("SetPlayerWounded", 0, -1);
     }
     else if(state == 3){ // SPECIAL STATE FOR PLAYER REVIVE
         if(player == null || !mp.players.exists(player)) return;
+        woundedState = 0;
         mp.game.graphics.stopScreenEffect('DrugsDrivingIn');
         toggleCrawl(false);
 
         if(woundedTimer) clearInterval(woundedTimer);
-        mp.events.callRemote("SetPlayerWounded", 3);
-        toggleWoundedActions(false);
+        mp.events.callRemote("SetPlayerWounded", 3, -1);
+        toggleDisabledWoundedActions(false);
+        mp.game.player.setInvincible(false);
     }
     else if(state == 4){ // SPECIAL STATE FOR PLAYER EXECUTION
         if(player == null || !mp.players.exists(player)) return;
         mp.game.graphics.stopScreenEffect('DrugsDrivingIn');
+        woundedState = 0;
         //toggleCrawl(false);
 
         if(woundedTimer) clearInterval(woundedTimer);
-        mp.events.callRemote("SetPlayerWounded", 4);   
-        toggleWoundedActions(false); 
+        mp.events.callRemote("SetPlayerWounded", 4, -1);   
+        toggleDisabledWoundedActions(false); 
+        mp.game.player.setInvincible(false);
     }
     else if(state == 5){ // SPECIAL STATE FOR DEATH IN A FLYING VEHICLE OR BOAT [UNUSED BUT CBA TO CHANGE IDs]
         if(player == null || !mp.players.exists(player)) return;
         mp.game.graphics.stopScreenEffect('DrugsDrivingIn');
+        woundedState = 0;
         //toggleCrawl(false);
 
         if(woundedTimer) clearInterval(woundedTimer);
-        mp.events.callRemote("SetPlayerWounded", 5);     
-        toggleWoundedActions(false);      
+        mp.events.callRemote("SetPlayerWounded", 5, -1);     
+        toggleDisabledWoundedActions(false);      
+        mp.game.player.setInvincible(false);
     }
     else if(state == 6){ // SPECIAL STATE FOR DYING IN LAND VEHICLE | THIS IS NOT FULL DEATH YET!
         if(player == null || !mp.players.exists(player)) return;
         if(!player.vehicle && woundedState > 1){
-            setWounded(2); // setting ground death in case their vehicle is G O N E
+            setWounded(2, player); // setting ground death in case their vehicle is G O N E
             return;
         }
 
-        mp.events.callRemote("SetPlayerWounded", 6);      
+        woundedState = 6;
+        mp.events.callRemote("SetPlayerWounded", 6, -1);     
+        mp.game.player.setInvincible(false); 
 
         mp.game.streaming.requestAnimDict('anim@veh@lowrider@std@ds@arm@base');
         let cnt = 0;
@@ -1607,16 +1615,18 @@ function setWounded(state){
                 woundedTimeLeft--;
             }
             else{
-                setWounded(7);
+                setWounded(7, player);
             }
         }, 1000);
     }
     else if(state == 7){ // SPECIAL STATE FOR FORCING DEATH (if player goes /lobby or time runs out)
         if(player == null || !mp.players.exists(player)) return;
 
+        woundedState = 0;
         if(woundedTimer) clearInterval(woundedTimer);
-        mp.events.callRemote("SetPlayerWounded", 7);     
-        toggleWoundedActions(false); 
+        mp.events.callRemote("SetPlayerWounded", 7, -1);     
+        toggleDisabledWoundedActions(false); 
+        mp.game.player.setInvincible(false);
     }
 }
 function handleCrawlControls() {
