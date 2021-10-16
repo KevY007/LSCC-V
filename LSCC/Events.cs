@@ -172,8 +172,20 @@ namespace RNC
         [RemoteEvent("ExecuteWounded")]
         public void OnExecuteWoundedPlayer(Player player, Player target)
         {
-            if(target.GetSharedData<int>("Wounded") == 2)
+            if (target.GetSharedData<int>("Wounded") == 2 || target.GetSharedData<int>("Wounded") == 6)
+            {
+                LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+                if (lobby != null)
+                {
+                    foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                    {
+                        ay.TriggerEvent("pushToKillFeed", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Executed", target.Name, EPlayer.HexConverter(EPlayer.GetColor(target)));
+                    }
+                }
+                    
                 target.TriggerEvent("setPlayerWounded", 4); // 4 = special state for executing
+            }
+        
         }
         [RemoteEvent("EX_ClearRagdollStandupAnim")]
         public void Execution_ClearRagdollStandupAnim(Player player, int stage)
@@ -189,8 +201,14 @@ namespace RNC
 
         }
 
+        [RemoteEvent("WoundedTimerTick")]
+        public void OnWoundedTimerTick(Player player, int time)
+        {
+
+        }
+
         [RemoteEvent("SetPlayerWounded")]
-        public void OnPlayerWounded(Player player, int state)
+        public void OnPlayerWounded(Player player, int state, Player killer = null)
         {
             player.SetSharedData("Wounded", state);
             switch (state)
@@ -203,6 +221,46 @@ namespace RNC
                 case 1:
                     {
                         player.SendChatMessage("!{#C3A3DB}* You suddenly start losing strength and collapse - you lost too much blood.");
+
+                        #region - Giving XP to killer, handling stats, kill feed
+                        if (killer != null)
+                        {
+                            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+                            if (lobby != null)
+                            {
+                                string reasonStr;
+                                jWeaponData wepDat = new jWeaponData();
+
+                                if (Main.WeaponReasons.TryGetValue((long)killer.CurrentWeapon, out reasonStr))
+                                {
+                                    // oh its already set ^^
+                                }
+                                else if (Settings.WeaponData.TryGetValue((long)killer.CurrentWeapon, out wepDat))
+                                {
+                                    reasonStr = wepDat.Name;
+                                }
+                                else
+                                {
+                                    reasonStr = null;
+                                }
+
+                                if (reasonStr != null)
+                                {
+                                    foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                    {
+                                        ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), $"Downed ({reasonStr})", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                    }
+                                }
+                                else
+                                {
+                                    foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                    {
+                                        ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Downed", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                    }
+                                }
+                            }
+                        }
+                        #endregion
                         break;
                     }
                 case 2:
@@ -220,10 +278,31 @@ namespace RNC
                         player.SetSharedData("Wounded", 0);
                         break;
                     }
-                case 4: // force kill
+                case 4: // force kill (by another player)
                     {
                         player.Health = 0;
                         player.SendChatMessage("!{#FF6347}You have been executed and are being sent to the lobby...");
+                        break;
+                    }
+                case 5: // force kill in special vehicle
+                    {
+                        player.Health = 0;
+                        player.SendChatMessage("!{#FF6347}It is too late - you lost way too much blood and cannot be saved.");
+                        break;
+                    }
+                case 6: // collapse in land vehicle
+                    {
+                        player.Health = 25;
+                        player.SendChatMessage("!{#FF6347}You have been severely injured, but you are not dead yet!");
+                        player.SendChatMessage("!{#FF6347}You are currently in a vehicle & do not have enough strength to exit it.");
+                        player.SendChatMessage("!{#FF6347}A teammate will have to enter the vehicle in order to treat your wounds. [unlock your vehicle]");
+                        player.SendChatMessage("!{#FF6347}You will die in 60 seconds if you are not revived by a teammate. Use (/lobby) to respawn instantly.");
+                        break;
+                    }
+                case 7: // force kill BUT by server, not execution
+                    {
+                        player.Health = 0;
+                        player.SendChatMessage("!{#FF6347}You succumbed to your wounds and are being sent to the lobby...");
                         break;
                     }
             }
@@ -989,14 +1068,14 @@ namespace RNC
                         {
                             if (killer != null)
                             {
-                                EPlayer.GetAccount(player).Deaths++;
-                                EPlayer.GetAccount(killer).Kills++;
-                                killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 10.0));
+                                //EPlayer.GetAccount(player).Deaths++;
+                                //EPlayer.GetAccount(killer).Kills++;
+                                //killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 10.0));
                             }
 
                             wasInGame = true;
 
-                            if (killer != null && killer.GetSharedData<int>("Team") == 1) EPlayer.GrantXP(killer, 2);
+                            //if (killer != null && killer.GetSharedData<int>("Team") == 1) EPlayer.GrantXP(killer, 2);
 
                             lock (Settings.LoggedInPlayers)
                             {

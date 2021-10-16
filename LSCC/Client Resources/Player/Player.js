@@ -1413,8 +1413,13 @@ mp.events.add("togglePlayerCrawl", (toggle) => {toggleCrawl(toggle)});
 let woundedState = 0;
 let anim;
 let timeoutAnim;
+let woundedTimeLeft = 60;
 let woundedTimer;
+let woundedInsideVehicle = false;
 mp.events.add("EX_AfterRagdollSetAnim", (target) => {
+    if(player == null || !mp.players.exists(player)) return;
+    if(target == null || !mp.players.exists(target)) return;
+
     target.clearTasksImmediately();
     setTimeout(() => {
         let cnt = 0;
@@ -1429,18 +1434,75 @@ mp.events.add("EX_AfterRagdollSetAnim", (target) => {
     }, 1);
 
 });
+
+function toggleWoundedActions(toggle){
+    mp.game.controls.disableControlAction(0, 61, toggle);
+    mp.game.controls.disableControlAction(0, 62, toggle);
+    mp.game.controls.disableControlAction(0, 63, toggle);
+    mp.game.controls.disableControlAction(0, 64, toggle);
+    mp.game.controls.disableControlAction(0, 71, toggle);
+    mp.game.controls.disableControlAction(0, 72, toggle);
+    mp.game.controls.disableControlAction(0, 73, toggle);
+    mp.game.controls.disableControlAction(0, 74, toggle);
+    mp.game.controls.disableControlAction(0, 75, toggle);
+    mp.game.controls.disableControlAction(0, 278, toggle);
+    mp.game.controls.disableControlAction(0, 279, toggle);
+
+    mp.game.controls.disableControlAction(0, 76, toggle); 
+    mp.game.controls.disableControlAction(0, 91, toggle);  
+    mp.game.controls.disableControlAction(0, 92, toggle);  
+    mp.game.controls.disableControlAction(0, 24, toggle);   
+    mp.game.controls.disableControlAction(0, 25, toggle); 
+    mp.game.controls.disableControlAction(0, 69, toggle);
+    mp.game.controls.disableControlAction(0, 70, toggle);
+    mp.game.controls.disableControlAction(0, 140, toggle);
+    mp.game.controls.disableControlAction(0, 141, toggle);
+    mp.game.controls.disableControlAction(0, 142, toggle);
+    mp.game.controls.disableControlAction(0, 257, toggle);
+    mp.game.controls.disableControlAction(0, 263, toggle);
+    mp.game.controls.disableControlAction(0, 265, toggle);
+    mp.game.controls.disableControlAction(32, 68, toggle); 
+    mp.game.controls.disableControlAction(32, 70, toggle);    
+}
+mp.events.add('render', () => {
+    if(woundedState > 0){
+        if(woundedInsideVehicle){ // making sure to disable driveby and vehicle movement completely good RP
+            toggleWoundedActions(true);
+        }
+    }
+});
+
 function setWounded(state){
     if(state == woundedState) return;
 
     woundedState = state;
     if(state == 1){ // state 0 => ragdolling the player and waiting 3 secs before giving ability to crawl
         mp.events.callRemote("SetPlayerWounded", 1);
-        player.setToRagdoll(4000, 4000, 0, true, true, true);
-        mp.game.graphics.startScreenEffect('DrugsDrivingIn', -1, true);
-        setTimeout(() => {
-            setWounded(2);
-            mp.game.streaming.requestAnimDict('move_crawlprone2crawlfront');
-        }, 4030);
+        if(woundedTimer) clearInterval(woundedTimer);
+        woundedTimeLeft = 60;
+        if(!player.vehicle)
+        {
+            player.setToRagdoll(4000, 4000, 0, true, true, true);
+            setTimeout(() => {
+                setWounded(2);
+                mp.game.streaming.requestAnimDict('move_crawlprone2crawlfront');
+            }, 4030);
+
+            woundedInsideVehicle = false;
+        }
+        else{
+            let vehClass = player.vehicle.getClass();
+            if(vehClass == 15 || vehClass == 16 || vehClass == 14){ // heli, planes, boats = just in case :)
+                player.vehicle.setEngineOn(false, true, true);
+
+            woundedInsideVehicle = true;
+            setTimeout(() => { 
+                setWounded(6);
+            }, 100);
+                
+            }
+        }
+        //mp.game.graphics.startScreenEffect('DrugsDrivingIn', -1, true);
         return;
     }
     else if(state == 2){
@@ -1461,24 +1523,100 @@ function setWounded(state){
 
         toggleCrawl(true);      
         mp.events.callRemote("SetPlayerWounded", 2);
+
+        woundedTimer = setInterval(() => {
+            if(player == null || !mp.players.exists(player)) {
+                cleatInterval(woundedTimer);
+                return;
+            }
+
+            if(woundedTimeLeft > 0){
+                mp.events.callRemote("WoundedTimerTick", woundedTimeLeft);
+                woundedTimeLeft--;
+            }
+            else{
+                setWounded(7);
+            }
+        }, 1000);
     }
     else if(state == 0){
+        if(player == null || !mp.players.exists(player)) return;
         mp.game.graphics.stopScreenEffect('DrugsDrivingIn');
         toggleCrawl(false);
 
+        if(woundedTimer) clearInterval(woundedTimer);
         mp.events.callRemote("SetPlayerWounded", 0);
+        toggleWoundedActions(false);
     }
     else if(state == 3){ // SPECIAL STATE FOR PLAYER REVIVE
+        if(player == null || !mp.players.exists(player)) return;
         mp.game.graphics.stopScreenEffect('DrugsDrivingIn');
         toggleCrawl(false);
 
+        if(woundedTimer) clearInterval(woundedTimer);
         mp.events.callRemote("SetPlayerWounded", 3);
+        toggleWoundedActions(false);
     }
     else if(state == 4){ // SPECIAL STATE FOR PLAYER EXECUTION
+        if(player == null || !mp.players.exists(player)) return;
         mp.game.graphics.stopScreenEffect('DrugsDrivingIn');
         //toggleCrawl(false);
 
-        mp.events.callRemote("SetPlayerWounded", 4);    
+        if(woundedTimer) clearInterval(woundedTimer);
+        mp.events.callRemote("SetPlayerWounded", 4);   
+        toggleWoundedActions(false); 
+    }
+    else if(state == 5){ // SPECIAL STATE FOR DEATH IN A FLYING VEHICLE OR BOAT [UNUSED BUT CBA TO CHANGE IDs]
+        if(player == null || !mp.players.exists(player)) return;
+        mp.game.graphics.stopScreenEffect('DrugsDrivingIn');
+        //toggleCrawl(false);
+
+        if(woundedTimer) clearInterval(woundedTimer);
+        mp.events.callRemote("SetPlayerWounded", 5);     
+        toggleWoundedActions(false);      
+    }
+    else if(state == 6){ // SPECIAL STATE FOR DYING IN LAND VEHICLE | THIS IS NOT FULL DEATH YET!
+        if(player == null || !mp.players.exists(player)) return;
+        if(!player.vehicle && woundedState > 1){
+            setWounded(2); // setting ground death in case their vehicle is G O N E
+            return;
+        }
+
+        mp.events.callRemote("SetPlayerWounded", 6);      
+
+        mp.game.streaming.requestAnimDict('anim@veh@lowrider@std@ds@arm@base');
+        let cnt = 0;
+        let loadAnimInterval = setInterval(() => {
+            if(mp.game.streaming.hasAnimDictLoaded('anim@veh@lowrider@std@ds@arm@base') === 0 && cnt < 25){ // FUCK IIIT
+                mp.game.streaming.requestAnimDict('anim@veh@lowrider@std@ds@arm@base');
+                cnt++;
+            }
+            else{clearInterval(loadAnimInterval);}
+        }, 50);   
+        player.taskPlayAnim('anim@veh@lowrider@std@ds@arm@base', 'die', 8.0, 0, -1, 2, 0, false, false, false);
+
+        woundedInsideVehicle = true;
+        woundedTimer = setInterval(() => {
+            if(player == null || !mp.players.exists(player)) {
+                cleatInterval(woundedTimer);
+                return;
+            }
+
+            if(woundedTimeLeft > 0){
+                mp.events.callRemote("WoundedTimerTick", woundedTimeLeft);
+                woundedTimeLeft--;
+            }
+            else{
+                setWounded(7);
+            }
+        }, 1000);
+    }
+    else if(state == 7){ // SPECIAL STATE FOR FORCING DEATH (if player goes /lobby or time runs out)
+        if(player == null || !mp.players.exists(player)) return;
+
+        if(woundedTimer) clearInterval(woundedTimer);
+        mp.events.callRemote("SetPlayerWounded", 7);     
+        toggleWoundedActions(false); 
     }
 }
 function handleCrawlControls() {
@@ -1601,7 +1739,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
 
                 if(sourceEntity.Team != targetEntity.Team)
                 {
-                    if(targetEntity.getVariable("Wounded") == 2){
+                    if(targetEntity.getVariable("Wounded") == 2 || targetEntity.getVariable("Wounded") == 6){
                         mp.events.callRemote("ExecuteWounded", targetPlayer);
                         return;
                     }
@@ -1727,6 +1865,12 @@ function resolvePlayAnim(entity, animDictionary, animName, animFlag, speed = 8.0
 {
 	entity.taskPlayAnim(animDictionary, animName, speed, speedMul, duration, animFlag, playbackRate, lockX, lockY, lockZ);
 }
+
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+  }
 
 mp.events.add("entclearanim", (entity, animDictionary, animName) => {
     
