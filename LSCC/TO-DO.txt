@@ -3,6 +3,7 @@
 cayo perico map (custom code column in maps tab so players can load custom code or ipls dk upto me lol)
 DM ARENA: IPL/EXTRAS STUFF LEFT -- ADD SAME WITH MAP TOO
 COQUETTE AND TURISMO FROM GTA 4 BEST RP
+game freeze a
 disable lobby while bieng cvuffed
 INCOMING DAMAGE CHECK FOR RAMM??? if player rams another player (probably receives damage from a car maybeee??) his anim will be reset and he'll be a free man with health not gone
 ability to disable UIHud by doing it UIHud.active = false (reality said it gibv more mmm frames)
