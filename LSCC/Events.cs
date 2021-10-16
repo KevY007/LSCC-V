@@ -169,6 +169,66 @@ namespace RNC
             return;
         }
 
+        [RemoteEvent("ExecuteWounded")]
+        public void OnExecuteWoundedPlayer(Player player, Player target)
+        {
+            if(target.GetSharedData<int>("Wounded") == 2)
+                target.TriggerEvent("setPlayerWounded", 4); // 4 = special state for executing
+        }
+        [RemoteEvent("EX_ClearRagdollStandupAnim")]
+        public void Execution_ClearRagdollStandupAnim(Player player, int stage)
+        {
+            if(stage == 0)
+            {
+                foreach(Player pl in NAPI.Pools.GetAllPlayers().Where<Player>(p => p.Position.DistanceTo(player.Position) < 200.0f)){
+                    if(pl != player)
+                        pl.TriggerEvent("EX_AfterRagdollSetAnim", player);
+                }
+                player.TriggerEvent("EX_AfterRagdollSetAnim", player);
+            }
+
+        }
+
+        [RemoteEvent("SetPlayerWounded")]
+        public void OnPlayerWounded(Player player, int state)
+        {
+            player.SetSharedData("Wounded", state);
+            switch (state)
+            {
+                case 0:
+                    {
+                        player.SendChatMessage("DEBUG: Wounded state set to 0");
+                        break;
+                    }
+                case 1:
+                    {
+                        player.SendChatMessage("!{#C3A3DB}* You suddenly start losing strength and collapse - you lost too much blood.");
+                        break;
+                    }
+                case 2:
+                    {
+                        player.Health = 25;
+                        player.SendChatMessage("!{#FF6347}You have been severely injured, but you are not dead yet!");
+                        player.SendChatMessage("!{#FF6347}You have enough strength to crawl - use it to crawl to safety.");
+                        player.SendChatMessage("!{#FF6347}You will die in 60 seconds if you are not revived by a teammate. Use (/lobby) to respawn instantly.");
+                        break;
+                    }
+                case 3: // revive
+                    {
+                        player.Health = 50;
+                        player.SendChatMessage("!{#FFFF00}Your wounds have been treated and you gained your strength back.");
+                        player.SetSharedData("Wounded", 0);
+                        break;
+                    }
+                case 4: // force kill
+                    {
+                        player.Health = 0;
+                        player.SendChatMessage("!{#FF6347}You have been executed and are being sent to the lobby...");
+                        break;
+                    }
+            }
+        }
+
         [RemoteEvent("SilentSirenSync")]
         public void OnSilentSirenSync(Player player, Vehicle vehicle)
         {
@@ -695,6 +755,7 @@ namespace RNC
             player.ResetData("Seatbelt");
             player.TriggerEvent("ToggleSeatbelt", false);
             player.ResetData("DraggingOut");
+            player.TriggerEvent("togglePlayerCrawl", false);
 
             string reasonStr;
             bool wasInGame = false;
@@ -3260,6 +3321,7 @@ namespace RNC
             player.SetData("LastClimbProtection", Environment.TickCount64-30000);
             player.SetData("ClimbProtectionProcs", 0);
             player.ResetData("DraggingOut");
+            player.TriggerEvent("togglePlayerCrawl", false);
 
             player.ResetData("_currentlySwappingSeats");
             foreach (Player p in Settings.LoggedInPlayers.Where(a => a.HasData("Spectating") && a.GetData<Player>("SpectatingPlayer") == player))
