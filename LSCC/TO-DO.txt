@@ -3,6 +3,7 @@
 cayo perico map (custom code column in maps tab so players can load custom code or ipls dk upto me lol)
 DM ARENA: IPL/EXTRAS STUFF LEFT -- ADD SAME WITH MAP TOO
 disable lobby while bieng cvuffed
+ability to disable UIHud by doing it UIHud.active = false (reality said it gibv more mmm frames)
 SPIKESTRIP (COLSHAPE AND SHIT) AND MAYBE FUGITIVES CAN USE TOO LO
 We should also capture headshot percentage and possibly total report count.
 revert charger handling to old one
