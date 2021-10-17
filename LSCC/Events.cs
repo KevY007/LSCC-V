@@ -3031,7 +3031,7 @@ namespace RNC
         [RemoteEvent("AssignReviveTarget")]
         public void OnAssignReviveTarget(Player player, int remoteId)
         {
-            Player target = NAPI.Pools.GetAllPlayers().FirstOrDefault(p => p.Id == remoteId);
+            Player target = RAGE.Entities.Players.All.Find(p => p.Id == remoteId);
             if(target == null)
             {
                 player.SendChatMessage("target was null rip (id):" + remoteId);
@@ -3039,8 +3039,17 @@ namespace RNC
             }
             player.SendChatMessage("onassigntarget " + target.Name);
 
-            if (!EPlayer.LoggedIn(player)) return;
-            if (player.GetSharedData<int>("Team") != target.GetSharedData<int>("Team")) return;
+            if (!EPlayer.LoggedIn(player) || !EPlayer.LoggedIn(target))
+            {
+                player.SendChatMessage("either not logged in");
+                return;
+            }
+            if (player.GetSharedData<int>("Team") != target.GetSharedData<int>("Team"))
+            {
+                player.SendChatMessage("jebiga snitchman");
+                return;
+            }
+
             player.SetSharedData("ReviveTarget", target);
             target.SetSharedData("BeingRevived", player);
 

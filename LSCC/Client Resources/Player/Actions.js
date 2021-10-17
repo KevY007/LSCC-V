@@ -1,7 +1,6 @@
 let actionInterval = null;
 let actionTime = 0;
 let actionType = "none";
-let player = mp.players.local;
 
 let maxActionTime = 0;
 
@@ -39,14 +38,14 @@ mp.events.add("StopPlayerActions", () => {
 })
 
 function PainkillerAction(){
-    if(mp.players.local == null || mp.players.local.handle == null) return;
+    if(mp.players.local == null || mp.players.local.handle == 0) return;
 
-    if(!player.isInAnyVehicle(true))
+    if(!mp.players.local.isInAnyVehicle(true))
         mp.events.callRemote("play_anim", "mini@sprunk", "plyr_buy_drink_pt2", 0, 8.0, 0.0, -1, 0.0, false, false, false);
 
     actionInterval = setInterval(() => {
 
-        if(mp.players.local == null || mp.players.local.handle == null) return;
+        if(mp.players.local == null || mp.players.local.handle == 0) return;
 
         try{
             mp.events.callRemote("OnPlayerActionTick");
@@ -58,7 +57,7 @@ function PainkillerAction(){
             else{
                 actionTime--;
 
-                if(!player.isInAnyVehicle(true))
+                if(!mp.players.local.isInAnyVehicle(true))
                 {
                     if(actionTime == 39){
                         mp.events.callRemote("play_anim", "mini@sprunk", "plyr_buy_drink_pt3", 0, 8.0, 0.0, -1, 0.0, false, false, false);
@@ -76,7 +75,7 @@ function initiateActionTimer(startTime){
     maxActionTime = startTime;
     UIHud.execute(`gm.$refs.actionBar.maxtime = ${startTime}`);
     UIHud.execute(`gm.$refs.actionBar.time = 0.1`);
-    UIHud.execute(`gm.$refs.actionBar.fugitive = ${(player.getVariable("Team") == 0 ? true : false)}`);
+    UIHud.execute(`gm.$refs.actionBar.fugitive = ${(mp.players.local.getVariable("Team") == 0 ? true : false)}`);
     UIHud.execute(`gm.actionBar = true;`);
 }
 
@@ -117,16 +116,15 @@ function onHoldHkey(){
     if(canRevive())
     {
         mp.players.forEach(pl => {
-            if(pl.Team == player.Team && pl.getVariable("Wounded") == 2 && pl.remoteId != player.remoteId){
-
-                let vec1 = player.position;
-                let vec2 = pl.position;
-
-                let distance = vec1.subtract(vec2).length();
+            if(pl.getVariable("Team") == mp.players.local.getVariable("Team") && pl.getVariable("Wounded") == 2 
+            && pl.remoteId != mp.players.local.remoteId)
+            {
+                let distance = calcDist(mp.players.local.position, pl.position);
                 if(distance < 5){
                     reviveTarget = pl;
                     reviveTime = 7;
-                    mp.evets.callRemote("AssignReviveTarget", pl.remoteId);
+                    mp.events.callRemote("AssignReviveTarget", pl.remoteId);
+                    mp.gui.chat.push(`AssignReviveTarget (call) => ${pl.remoteId}`);
                     return;
                 }
             }
@@ -140,11 +138,11 @@ function onHoldHkey(){
 // ------ REVIVAL SYSTEM ------ //
 let isReviving = false;
 function canRevive(){
-    if(player.Team == -1 || player.getVariable("Wounded") > 0 || chatStatus || menuToggled || scoreboardToggled || Date.now() - lastChatToggle <= 500) return false; 
+    if(mp.players.local.getVariable("Team") == -1 || mp.players.local.getVariable("Wounded") > 0 || chatStatus || menuToggled || scoreboardToggled || Date.now() - lastChatToggle <= 500) return false; 
     return true;
 }
 mp.events.add("BeginReviving", () => {
-    if(mp.players.local == null || !mp.players.exists(player)) return;
+    if(mp.players.local == null || !mp.players.exists(mp.players.local)) return;
     if(reviveTarget == null || !mp.players.exists(reviveTarget)) return;
 
     mp.gui.chat.push("beginreviving called");
@@ -152,13 +150,13 @@ mp.events.add("BeginReviving", () => {
     isReviving = true;
     clearInterval(reviveTimer);
     reviveTimer = setInterval(() => {
-        if(mp.players.local == null || !mp.players.exists(player)){ stopCuffing(69); return; }
+        if(mp.players.local == null || !mp.players.exists(mp.players.local)){ stopCuffing(69); return; }
         if(reviveTarget == null || !mp.players.exists(reviveTarget)){ stopCuffing(69); return; }
-        if(player.Team == -1 || player.isDead()){
+        if(mp.players.local.getVariable("Team") == -1 || mp.players.local.isDead()){
             stopReviving(1);
             return;
         }       
-        if(reviveTarget.Team == -1 || (player.Team != reviveTarget.Team) || reviveTarget.isDead()){
+        if(reviveTarget.getVariable("Team") == -1 || (mp.players.local.getVariable("Team") != reviveTarget.getVariable("Team")) || reviveTarget.isDead()){
             stopReviving(2);
         }
         if(!mp.keys.isDown(72)){ 
@@ -209,7 +207,7 @@ cuffTarget = null;
 cuffInterval = null;
 
 function requestCuffTarget(){
-    if(player.getVariable("Team") != 1 || chatStatus || menuToggled || scoreboardToggled || Date.now() - lastChatToggle <= 500) return;
+    if(mp.players.local.getVariable("Team") != 1 || chatStatus || menuToggled || scoreboardToggled || Date.now() - lastChatToggle <= 500) return;
 
     mp.events.callRemote("RequestCuffTarget");
 }
@@ -219,7 +217,7 @@ mp.events.add("StopCuffing", (reason) => { stopCuffing(reason); });
 mp.events.add("BeginCuffing", (target) => {
 
     if(target == null || !mp.players.exists(target)) return;
-    if(target.getVariable("Team") != 0 || player.getVariable("Team") != 1) return;
+    if(target.getVariable("Team") != 0 || mp.players.local.getVariable("Team") != 1) return;
 
     isCuffing = true;
     cuffTarget = target;
@@ -232,7 +230,7 @@ mp.events.add("BeginCuffing", (target) => {
 
     cuffInterval = setInterval(() => {
 
-        if(cuffTarget == null || !mp.players.exists(cuffTarget) || !mp.players.exists(player)) {
+        if(cuffTarget == null || !mp.players.exists(cuffTarget) || !mp.players.exists(mp.players.local)) {
             stopCuffing(0);
             return;
         }
@@ -240,7 +238,7 @@ mp.events.add("BeginCuffing", (target) => {
             stopCuffing(1);
             return;
         }
-        if(player.getVariable("Team") != 1 || player.isDead()){
+        if(mp.players.local.getVariable("Team") != 1 || mp.players.local.isDead()){
             stopCuffing(3);
             return;
         }
@@ -249,7 +247,7 @@ mp.events.add("BeginCuffing", (target) => {
             return;
         }
 
-        let distance = player.position.subtract(cuffTarget.position).length();
+        let distance = calcDist(mp.players.local.position, cuffTarget.position);
         if(distance > 4.0){
             stopCuffing(2);
             return;
@@ -298,7 +296,7 @@ function finishCuffing(){ // if successful
     cuffTimeLeft = 5;
     cuffInterval = null;
 
-    if(!mp.players.exists(cuffTarget) || !mp.players.exists(player)) { cuffTarget = null; return;} // better safe than sorry :)
+    if(!mp.players.exists(cuffTarget) || !mp.players.exists(mp.players.local)) { cuffTarget = null; return;} // better safe than sorry :)
     mp.events.callRemote("FinishCuffing", cuffTarget);
     cuffTarget = null;
 }

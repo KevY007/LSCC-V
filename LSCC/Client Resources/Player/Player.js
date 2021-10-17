@@ -557,11 +557,6 @@ mp.events.addCommand("bigmap", function (state) {
 
 if(!radioToggle) mp.game.audio.setInitialPlayerStation('OFF');
 
-mp.events.addDataHandler("Wounded", function(entity, value, oldValue){
-    if(entity && entity.type === 'player' && mp.players.exists(entity))
-        entity.Wounded = value;
-});
-
 mp.events.addDataHandler('Team', function (entity, value, oldValue) 
 {
     entity.Team = value;
@@ -1400,9 +1395,9 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                     return true;
                 }
 
-                let HP = player.getHealth();
+                let HP = mp.players.local.getHealth();
                 if(HP - damage <= 10){
-                    if(player.getVariable("Wounded") == 0){ // if player isn't wounded
+                    if(mp.players.local.getVariable("Wounded") == 0){ // if player isn't wounded
                         mp.game.player.setInvincible(true);
                         setWounded(1, sourcePlayer);
                     }
@@ -1488,11 +1483,11 @@ function setWounded(state, killer){
         if(woundedTimer) clearInterval(woundedTimer);
         woundedTimeLeft = 60;
         mp.game.player.setInvincible(true);
-        if(!player.vehicle)
+        if(!mp.players.local.isInAnyVehicle(false))
         {
-            player.setToRagdoll(4000, 4000, 0, true, true, true);
+            mp.players.local.setToRagdoll(4000, 4000, 0, true, true, true);
             setTimeout(() => {
-                setWounded(2, player);
+                setWounded(2, mp.players.local);
                 mp.game.streaming.requestAnimDict('move_crawlprone2crawlfront');
             }, 4030);
 
@@ -1503,15 +1498,15 @@ function setWounded(state, killer){
             woundedInsideVehicle = true;
             toggleDisabledWoundedActions(true);
             setTimeout(() => { 
-                setWounded(6, player);
+                setWounded(6, mp.players.local);
             }, 100);      
         }
         //mp.game.graphics.startScreenEffect('DrugsDrivingIn', -1, true);
         return;
     }
     else if(state == 2){
-        if(player == null || !mp.players.exists(player)) return;
-        if(player.Team == -1 || player.getVariable("Wounded") != 1) return;
+        if(mp.players.local == null || !mp.players.exists(mp.players.local)) return;
+        if(mp.players.local.getVariable("Team") == -1 || mp.players.local.getVariable("Wounded") != 1) return;
         woundedState = 2;
 
         /*let cnt = 0;
@@ -1530,7 +1525,7 @@ function setWounded(state, killer){
         mp.events.callRemote("SetPlayerWounded", 2, -1);
 
         woundedTimer = setInterval(() => {
-            if(player == null || !mp.players.exists(player)) {
+            if(mp.players.local == null || !mp.players.exists(mp.players.local)) {
                 cleatInterval(woundedTimer);
                 return;
             }
@@ -1540,12 +1535,12 @@ function setWounded(state, killer){
                 woundedTimeLeft--;
             }
             else{
-                setWounded(7, player);
+                setWounded(7, mp.players.local);
             }
         }, 1000);
     }
     else if(state == 0){
-        if(player == null || !mp.players.exists(player)) return;
+        if(mp.players.local == null || !mp.players.exists(mp.players.local)) return;
         woundedState = 0;
         mp.game.graphics.stopScreenEffect('DrugsDrivingIn');
         toggleCrawl(false);
@@ -1554,7 +1549,7 @@ function setWounded(state, killer){
         mp.events.callRemote("SetPlayerWounded", 0, -1);
     }
     else if(state == 3){ // SPECIAL STATE FOR PLAYER REVIVE
-        if(player == null || !mp.players.exists(player)) return;
+        if(mp.players.local == null || !mp.players.exists(mp.players.local)) return;
         woundedState = 0;
         mp.game.graphics.stopScreenEffect('DrugsDrivingIn');
         toggleCrawl(false);
@@ -1565,7 +1560,7 @@ function setWounded(state, killer){
         mp.game.player.setInvincible(false);
     }
     else if(state == 4){ // SPECIAL STATE FOR PLAYER EXECUTION
-        if(player == null || !mp.players.exists(player)) return;
+        if(mp.players.local == null || !mp.players.exists(mp.players.local)) return;
         mp.game.graphics.stopScreenEffect('DrugsDrivingIn');
         woundedState = 0;
         //toggleCrawl(false);
@@ -1576,7 +1571,7 @@ function setWounded(state, killer){
         mp.game.player.setInvincible(false);
     }
     else if(state == 5){ // SPECIAL STATE FOR DEATH IN A FLYING VEHICLE OR BOAT [UNUSED BUT CBA TO CHANGE IDs]
-        if(player == null || !mp.players.exists(player)) return;
+        if(mp.players.local == null || !mp.players.exists(mp.players.local)) return;
         mp.game.graphics.stopScreenEffect('DrugsDrivingIn');
         woundedState = 0;
         //toggleCrawl(false);
@@ -1587,9 +1582,9 @@ function setWounded(state, killer){
         mp.game.player.setInvincible(false);
     }
     else if(state == 6){ // SPECIAL STATE FOR DYING IN LAND VEHICLE | THIS IS NOT FULL DEATH YET!
-        if(player == null || !mp.players.exists(player)) return;
-        if(!player.vehicle && woundedState > 1){
-            setWounded(2, player); // setting ground death in case their vehicle is G O N E
+        if(mp.players.local == null || !mp.players.exists(mp.players.local)) return;
+        if(!mp.players.local.vehicle && woundedState > 1){
+            setWounded(2, mp.players.local); // setting ground death in case their vehicle is G O N E
             return;
         }
 
@@ -1606,11 +1601,11 @@ function setWounded(state, killer){
             }
             else{clearInterval(loadAnimInterval);}
         }, 50);   
-        player.taskPlayAnim('anim@veh@lowrider@std@ds@arm@base', 'die', 8.0, 0, -1, 2, 0, false, false, false);
+        mp.players.local.taskPlayAnim('anim@veh@lowrider@std@ds@arm@base', 'die', 8.0, 0, -1, 2, 0, false, false, false);
 
         woundedInsideVehicle = true;
         woundedTimer = setInterval(() => {
-            if(player == null || !mp.players.exists(player)) {
+            if(mp.players.local == null || !mp.players.exists(mp.players.local)) {
                 cleatInterval(woundedTimer);
                 return;
             }
@@ -1620,12 +1615,12 @@ function setWounded(state, killer){
                 woundedTimeLeft--;
             }
             else{
-                setWounded(7, player);
+                setWounded(7, mp.players.local);
             }
         }, 1000);
     }
     else if(state == 7){ // SPECIAL STATE FOR FORCING DEATH (if player goes /lobby or time runs out)
-        if(player == null || !mp.players.exists(player)) return;
+        if(mp.players.local == null || !mp.players.exists(mp.players.local)) return;
 
         woundedState = 0;
         if(woundedTimer) clearInterval(woundedTimer);
@@ -1635,22 +1630,22 @@ function setWounded(state, killer){
     }
 }
 function handleCrawlControls() {
-    if(!player) return;
-    if (!player.crawl) return;
+    if(!mp.players.local) return;
+    if (!mp.players.local.crawl) return;
     if(chatStatus) return;
     let dict = 'move_crawl';
-    let rotation = player.getRotation(2);
+    let rotation = mp.players.local.getRotation(2);
     mp.game.controls.disableControlAction(0, 32, true);
     mp.game.controls.disableControlAction(0, 33, true);
     mp.game.controls.disableControlAction(0, 34, true);
     mp.game.controls.disableControlAction(0, 35, true);
     if(mp.game.controls.isDisabledControlPressed(0, 34))
     {
-        player.setRotation(rotation.x, rotation.y, rotation.z + 0.5, 2, true);
+        mp.players.local.setRotation(rotation.x, rotation.y, rotation.z + 0.5, 2, true);
     }
     if(mp.game.controls.isDisabledControlPressed(0, 35))
     {
-    player.setRotation(rotation.x, rotation.y, rotation.z - 0.5, 2, true);
+    mp.players.local.setRotation(rotation.x, rotation.y, rotation.z - 0.5, 2, true);
     }
     if(mp.game.controls.isDisabledControlPressed(0, 32))
     {
@@ -1658,7 +1653,7 @@ function handleCrawlControls() {
         anim = 'onfront_fwd';
         let timer = mp.game.entity.getEntityAnimDuration('move_crawl', anim);
         mp.game.streaming.requestAnimDict(dict);
-        player.taskPlayAnim(dict, anim, 8.0, 1000, -1, 2, 0, false, false, false);
+        mp.players.local.taskPlayAnim(dict, anim, 8.0, 1000, -1, 2, 0, false, false, false);
         timeoutAnim = setTimeout(() => {
             anim = undefined;
             timeoutAnim = undefined;
@@ -1670,7 +1665,7 @@ function handleCrawlControls() {
         anim = 'onfront_bwd';
         let timer = mp.game.entity.getEntityAnimDuration('move_crawl', anim);
         mp.game.streaming.requestAnimDict(dict);
-        player.taskPlayAnim(dict, anim, 8.0, 1000, -1, 2, 0, false, false, false);
+        mp.players.local.taskPlayAnim(dict, anim, 8.0, 1000, -1, 2, 0, false, false, false);
         timeoutAnim = setTimeout(() => {
             anim = undefined;
             timeoutAnim = undefined;
@@ -1679,19 +1674,19 @@ function handleCrawlControls() {
 }
 function toggleCrawl(option){
     if(option == true){
-        if(player.crawl){
-            player.crawl = false;
+        if(mp.players.local.crawl){
+            mp.players.local.crawl = false;
             clearInterval(crawlInterval);
-            player.clearTasks();
+            mp.players.local.clearTasks();
             //player.clearSecondaryTask()
 
             toggleCrawl(option);
         }
         else{
             crawlInterval = setInterval(handleCrawlControls, 0);
-            player.crawl = true;
+            mp.players.local.crawl = true;
             mp.game.streaming.requestAnimDict('move_crawlprone2crawlfront');
-            player.taskPlayAnim(
+            mp.players.local.taskPlayAnim(
                 'move_crawlprone2crawlfront',
                 'front',
                 8.0,
@@ -1706,10 +1701,10 @@ function toggleCrawl(option){
         }
     }
     else{
-        if(player.crawl){
-            player.crawl = false;
+        if(mp.players.local.crawl){
+            mp.players.local.crawl = false;
             clearInterval(crawlInterval);
-            player.clearTasks();
+            mp.players.local.clearTasks();
             //player.clearSecondaryTask()
         }       
     }
