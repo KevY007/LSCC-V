@@ -2003,13 +2003,18 @@ namespace RNC
             if (player.HasData("_currentlySwappingSeats") || player == target) return;
 
             if(player.HasData("SwapSeating") && player.HasData("SwapSeatingTime") && 
-                Environment.TickCount64 - player.GetData<long>("SwapSeatingTime") <= 5000)
+                Environment.TickCount64 - player.GetData<long>("SwapSeatingTime") <= 7000)
             {
                 try
                 {
                     Player seatingWith = player.GetData<Player>("SwapSeating");
                     if (seatingWith.Exists && seatingWith == target) // They the one who sent requests
                     {
+                        player.ResetData("Seatbelt");
+                        player.TriggerEvent("ToggleSeatbelt", false);
+                        target.ResetData("Seatbelt");
+                        target.TriggerEvent("ToggleSeatbelt", false);
+
                         player.ResetData("SwapSeating");
                         player.ResetData("SwapSeatingTime");
                         target.ResetData("SwapSeating");
@@ -2072,8 +2077,8 @@ namespace RNC
                 catch { }
             }
 
-            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have sent a swapseats request to " + target.Name + ", they have 5s to accept.");
-            target.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have received a swapseats request from " + player.Name + ", you have 5s to accept. (/ss " + player.Name + ")");
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have sent a swapseats request to " + target.Name + ", they have 7s to accept.");
+            target.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have received a swapseats request from " + player.Name + ", you have 7s to accept. (/ss " + player.Name + ")");
 
             player.ResetData("SwapSeating");
             player.ResetData("SwapSeatingTime");
