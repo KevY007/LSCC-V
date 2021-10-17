@@ -1559,7 +1559,7 @@ namespace RNC
             else
             {
                 Events.RequestClearAnimation(player);
-                player.StopAnimation();
+                //player.StopAnimation(); // This is basically clear tasks immediately bruh.
             }
         }
 
