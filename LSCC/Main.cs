@@ -2029,6 +2029,8 @@ namespace RNC
                     
                     foreach (Player player in lobby.Cops.OrderBy(x => Guid.NewGuid()))
                     {
+                        spawnLoc = null;
+
                         foreach(MapSpawn tSpawn in Spawns.Where(a => a.spawnTeam == 1))
                         {
                             if(!UsedSpawns.Contains(tSpawn.SQL_ID))
@@ -2038,9 +2040,38 @@ namespace RNC
                             }
                         }
 
-                        if ((spawnLoc == null) == false)
+                        if(EPlayer.GetAccount(player).CarCop.Equals("polmav", StringComparison.OrdinalIgnoreCase))
                         {
-                            if(!PutInsideCar.Contains(player)) UsedSpawns.Add(spawnLoc.SQL_ID);
+                            spawnLoc = null;
+                            foreach (MapSpawn tSpawn in Spawns.Where(a => a.spawnTeam == 2))
+                            {
+                                if (!UsedSpawns.Contains(tSpawn.SQL_ID))
+                                {
+                                    spawnLoc = tSpawn;
+                                    break;
+                                }
+
+                                if (spawnLoc != null)
+                                {
+                                    if (!PutInsideCar.Contains(player)) UsedSpawns.Add(spawnLoc.SQL_ID);
+                                }
+                                else
+                                {
+                                    pCount++;
+                                    spawnLoc = new MapSpawn();
+
+                                    spawnLoc = Spawns.First(a => a.spawnTeam == 1);
+
+                                    spawnLoc.spawnZ += (pCount * 5); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
+                                    spawnLoc.spawnX += (pCount * 2);
+                                }
+                            }
+                        }
+
+
+                        if (spawnLoc != null)
+                        {
+                            if (!PutInsideCar.Contains(player)) UsedSpawns.Add(spawnLoc.SQL_ID);
                         }
                         else
                         {
@@ -2124,10 +2155,7 @@ namespace RNC
 
                             if (carName.Equals("polmav"))
                             {
-                                if (Spawns.Count(sp => sp.spawnTeam == 2) >= 1)
-                                {
-                                    spawnLoc = Spawns.OrderBy(x => Guid.NewGuid()).First(a => a.spawnTeam == 2);
-                                }
+                              
                             }
 
                             if (carName.Equals("lspdvic")) enginePower = 10.0f;
@@ -2294,6 +2322,7 @@ namespace RNC
                         PutInsideCar.Add(_tempPlayer);
                         iteratedAlready.Add(_tempPlayer);
 
+                        spawnLoc = null;
                         foreach (MapSpawn tSpawn in Spawns.Where(a => a.spawnTeam == 0))
                         {
                             if (!UsedSpawns.Contains(tSpawn.SQL_ID))
