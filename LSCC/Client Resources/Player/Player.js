@@ -557,6 +557,11 @@ mp.events.addCommand("bigmap", function (state) {
 
 if(!radioToggle) mp.game.audio.setInitialPlayerStation('OFF');
 
+mp.events.addDataHandler("Wounded", function(entity, value, oldValue){
+    if(entity && entity.type === 'player' && mp.players.exists(entity))
+        entity.Wounded = value;
+});
+
 mp.events.addDataHandler('Team', function (entity, value, oldValue) 
 {
     entity.Team = value;
@@ -1396,7 +1401,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 }
 
                 let HP = player.getHealth();
-                if(HP - damage <= 5){
+                if(HP - damage <= 10){
                     if(player.getVariable("Wounded") == 0){ // if player isn't wounded
                         mp.game.player.setInvincible(true);
                         setWounded(1, sourcePlayer);
@@ -1749,6 +1754,17 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
 
                 if(sourceEntity.Team != targetEntity.Team)
                 {
+                    if(targetEntity.getVariable("Wounded") == 1){
+                        mp.gui.chat.push("Attempted to hit player in wounded state 1 => denied");
+                        damage = 0;
+                        return;
+                    }
+                    if(targetEntity.getVariable("Wounded") == 0){
+                        let HP = targetPlayer.getHealth();
+                        if(HP-damage < damage){
+                            damage = 0; // idk if this will work
+                        }
+                    }
                     if(targetEntity.getVariable("Wounded") == 2 || targetEntity.getVariable("Wounded") == 6){
                         mp.events.callRemote("ExecuteWounded", targetPlayer);
                         return;

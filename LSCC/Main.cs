@@ -363,10 +363,10 @@ namespace RNC
         public const int DefaultMaxInLobby = 30;
 
         // Connection Settings
-        public const string MySQL_Host = "localhost";
-        public const string MySQL_User = "racenchase";
-        public const string MySQL_Password = "perkovicMatko3035";
-        public const string MySQL_Database = "racenchase";
+        public const string MySQL_Host = "194.163.144.228";
+        public const string MySQL_User = "u19_JV6PPURZ60";
+        public const string MySQL_Password = "YNwgDve+3etKCwLG!63f+.c2";
+        public const string MySQL_Database = "s19_racenchase";
         public const string DCBotToken = "NjAyNTQ1Mzc0MDY1OTgzNTgw.XtaCEQ.clpqVL5c0X_38xkT-mYTr4_N9a4";
 
         // Global Variables (changing accordingly)
@@ -1073,6 +1073,7 @@ namespace RNC
             NAPI.Server.SetGlobalServerChat(false);
             NAPI.Server.SetCommandErrorMessage("!{#FF6347}[!] !{#FFFFFF}This command is invalid, refer to /help for a list.");
 
+            NAPI.Util.ConsoleOutput($"(RnC | STARTUP) Connecting to database => User {Settings.MySQL_User} for db {Settings.MySQL_Database} on host {Settings.MySQL_Host}");
             ContextFactory.Instance.Database.EnsureCreated();
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Connected to database.");
 

@@ -242,6 +242,7 @@ namespace RNC
                 case 1:
                     {
                         player.SendChatMessage("!{#C3A3DB}* You suddenly start losing strength and collapse - you lost too much blood.");
+                        player.Health = 100;
 
                         if (player.IsInVehicle && player.Vehicle != null)
                         {
