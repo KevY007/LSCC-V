@@ -1,7 +1,7 @@
 menuToggled = false;
 let lastMenuToggle = Date.now();
 
-if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.tooltips == "undefined")
+if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD == "undefined")
 {
     mp.storage.data.menu = {};
     mp.storage.data.menu.topRightInfo = true;
@@ -10,6 +10,8 @@ if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.too
     mp.storage.data.menu.alwaysExpandedMap = false;
     mp.storage.data.menu.updateRate = 200;
     mp.storage.data.menu.tooltips = true;
+    mp.storage.data.menu.nametags = true;
+    mp.storage.data.menu.HUD = true;
 
     mp.storage.flush();
 }
@@ -61,6 +63,13 @@ function ToggleMenu()
 
         UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.settings = [
             {
+                id: 9,
+                type: 1,
+                name: "hud",
+                label: "User Interface",
+                description: "Completely disable/enable the HUD."
+            },
+            {
               id: 1,
               type: 1,
               name: "tri",
@@ -94,6 +103,13 @@ function ToggleMenu()
                 name: "tooltips",
                 label: "Tooltips",
                 description: "Enable/disable tooltips."
+            },
+            {
+                id: 10,
+                type: 1,
+                name: "nametags",
+                label: "Nametags",
+                description: "Enable/disable nametags."
             },
             {
               id: 6,
@@ -136,6 +152,8 @@ function ToggleMenu()
         UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.gp.value = ${mp.storage.data.menu.gameProgress};`);
         UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.tooltips.value = ${mp.storage.data.menu.tooltips};`);
         UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.kf.value = ${mp.storage.data.menu.killFeed};`);
+        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.nametags.value = ${mp.storage.data.menu.nametags};`);
+        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.hud.value = ${mp.storage.data.menu.HUD};`);
         UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.bigmap.value = ${mp.storage.data.menu.alwaysExpandedMap};`);
         UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.updr.value = ${mp.storage.data.menu.updateRate};`);
         UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.vcbind.value = "${String.fromCharCode(curVoiceBind)}";`);
@@ -167,6 +185,16 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     if(id == 1)
     {
         mp.storage.data.menu.topRightInfo = value;
+    }
+    else if(id == 9)
+    {
+        mp.storage.data.menu.HUD = value;
+        UIHud.active = value;
+    }
+    else if(id == 10)
+    {
+        mp.storage.data.menu.nametags = value;
+        renderNametags = value;
     }
     else if(id == 2)
     {

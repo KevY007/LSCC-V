@@ -110,11 +110,14 @@ mp.keys.bind(
         if(!chatStatus && 
             !(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false)) 
         {
-            mp.events.callLocal("ToggleHud", !showHud);
-			
 			if (mp.keys.isDown(16) === true) 
             { // Shift is pressed
-                renderNametags = showHud;
+                mp.storage.data.menu.nametags = !mp.storage.data.menu.nametags;
+                renderNametags = mp.storage.data.menu.nametags;
+            }
+            else 
+            {
+                mp.events.callLocal("ToggleHud", !showHud);
             }
         }
     }
@@ -293,6 +296,12 @@ mp.events.add("OneSecondEvent", () => {
             }
         }    
     }
+
+    if(mp.storage.data.menu.HUD == false)
+    {
+        UIHud.active = false;
+    }
+    renderNametags = mp.storage.data.menu.nametags;
 });
 
 mp.events.add('browserDomReady', (browser) => {
@@ -373,6 +382,11 @@ mp.events.add('browserDomReady', (browser) => {
         UIHud.execute(`gm.$refs.MiniHud.$refs.packetloss.show = false;`);
 
         mp.events.callLocal("ToggleTooltips", mp.storage.data.menu.tooltips);
+
+        if(mp.storage.data.menu.HUD == false)
+        {
+            UIHud.active = false;
+        }
     }
 });
 
@@ -381,6 +395,11 @@ mp.events.add('ToggleHud', (toggle) => {
     
     if(UIHud != null)
     {
+        if(mp.storage.data.menu.HUD == false)
+        {
+            UIHud.active = false;
+        }
+
         UIHud.execute(`gm.hud = ${toggle};`);
     }
 

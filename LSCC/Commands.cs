@@ -3734,6 +3734,11 @@ namespace RNC
             {
                 if (elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
                 {
+                    if(elobby.Fugitives.Contains(player) && !player.GetSharedData<string>("CuffedBy").Equals("n/a"))
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently being cuffed, mate.");
+                        return;
+                    }
                     player.Health = 0;
                     return;
                 }
@@ -4604,6 +4609,8 @@ namespace RNC
             Logs.LogAdmin(player, $"Put {target.Name} in {toputin.Name}'s vehicle.");
             target.TriggerEvent("ToggleSeatbelt", false);
             target.ResetData("Seatbelt");
+            target.Position = new Vector3(toputin.Vehicle.Position.X, toputin.Vehicle.Position.Y, toputin.Vehicle.Position.Z + 5f);
+
             target.SetIntoVehicle(toputin.Vehicle, nextseat);
 
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has put {target.Name} in {toputin.Name}'s vehicle.");
