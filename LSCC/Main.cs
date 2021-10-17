@@ -1489,7 +1489,14 @@ namespace RNC
                                     lobby.Time[0]++;
 
                                     lobby.Weather = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 9); // Change weather every hour or so.
-
+                                    if(lobby.Weather == 6 || lobby.Weather == 7 || lobby.Weather == 8)
+                                    {
+                                        lobby.Weather = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 9); // Once again, if it gets rain you are just UNLUCKY.
+                                        if (lobby.Weather == 6 || lobby.Weather == 7 || lobby.Weather == 8)
+                                        {
+                                            lobby.Weather = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 9); // Actually, we all hate rain so.
+                                        }
+                                    }
                                     if (lobby.Time[0] >= 24)
                                     {
                                         lobby.Time[0] = 0;
