@@ -689,6 +689,7 @@ namespace RNC
                 player.ResetSharedData("CameraDirectionZ");
                 player.ResetSharedData("FlashlightEquipped");
                 player.ResetSharedData("UpdateCameraData");
+                player.ResetSharedData("ReviveTarget");
                 player.SetSharedData("Wounded", 0);
 
                 player.ResetData("TunerNoRefundWarn");

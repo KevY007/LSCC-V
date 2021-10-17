@@ -363,10 +363,10 @@ namespace RNC
         public const int DefaultMaxInLobby = 30;
 
         // Connection Settings
-        public const string MySQL_Host = "194.163.144.228";
-        public const string MySQL_User = "u19_JV6PPURZ60";
-        public const string MySQL_Password = "YNwgDve+3etKCwLG!63f+.c2";
-        public const string MySQL_Database = "s19_racenchase";
+        public const string MySQL_Host = "localhost";
+        public const string MySQL_User = "racenchase";
+        public const string MySQL_Password = "perkovicMatko3035";
+        public const string MySQL_Database = "racenchase";
         public const string DCBotToken = "NjAyNTQ1Mzc0MDY1OTgzNTgw.XtaCEQ.clpqVL5c0X_38xkT-mYTr4_N9a4";
 
         // Global Variables (changing accordingly)
@@ -1790,12 +1790,11 @@ namespace RNC
                     if (i.GetSharedData<int>("InLobby") != lobby.lobbyId) continue;
 
                     i.TriggerEvent("ResetKillFeed");
-                    i.SetSharedData("Wounded", 0);
                     i.ResetSharedData("LastKiller");
 
                     i.ResetSharedData("BeingRevived");
                     i.ResetSharedData("ReviveTarget");
-                    i.TriggerEvent("setPlayerWoundedCS", 0, -1);
+
 
                     if (i.HasData("Spectating") && EPlayer.GetAccount(i).Admin < 1)
                     {
@@ -1879,7 +1878,6 @@ namespace RNC
                         !player.HasData("Spectating"))
                     {
                         player.SetSharedData("InDM", -1);
-                        player.SetSharedData("Wounded", 0);
 
                         pCount++;
                     }
@@ -1995,7 +1993,10 @@ namespace RNC
 
                         player.ResetSharedData("LastKiller");
                         player.ResetSharedData("BeingRevived");
-                        player.TriggerEvent("setPlayerWoundedCS", 0, -1);
+
+                        player.SetSharedData("Wounded", 0);
+                        player.TriggerEvent("ResetWounded");
+
                         player.ResetSharedData("ReviveTarget");
                         player.SetSharedData("BustedProgress", 0.0);
                         player.ResetData("BustSupporters");

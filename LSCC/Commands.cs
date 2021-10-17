@@ -1559,6 +1559,7 @@ namespace RNC
             else
             {
                 Events.RequestClearAnimation(player);
+                player.TriggerEvent("ClearTaskNotFalling");
                 //player.StopAnimation(); // This is basically clear tasks immediately bruh.
             }
         }

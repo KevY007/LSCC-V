@@ -168,7 +168,7 @@ namespace RNC
 
             return;
         }
-
+        /*
         [RemoteEvent("ExecuteWounded")]
         public void OnExecuteWoundedPlayer(Player player, Player target)
         {
@@ -193,38 +193,31 @@ namespace RNC
                     }
                 }
                     
-                target.TriggerEvent("setPlayerWoundedCS", 4, player.Id); // 4 = special state for executing
+                target.TriggerEvent("setWounded", 3, -1); // 4 = special state for executing
             }
         
-        }
-        [RemoteEvent("EX_ClearRagdollStandupAnim")]
-        public void Execution_ClearRagdollStandupAnim(Player player, int stage)
-        {
-            if(stage == 0)
-            {
-                foreach(Player pl in NAPI.Pools.GetAllPlayers().Where<Player>(p => p.Position.DistanceTo(player.Position) < 200.0f)){
-                    if(pl != player)
-                        pl.TriggerEvent("EX_AfterRagdollSetAnim", player);
-                }
-                player.TriggerEvent("EX_AfterRagdollSetAnim", player);
-            }
-
-        }
+        }*/
 
         [RemoteEvent("WoundedTimerTick")]
         public void OnWoundedTimerTick(Player player, int time)
         {
-
+            if(time == 0)
+            {
+                player.Health = 0;
+                player.SendChatMessage("!{#FF6347}You succumbed to your injuries and have bled out.");
+            }
         }
 
         [RemoteEvent("SetPlayerWounded")]
         public void OnPlayerWounded(Player player, int state, int killerID)
         {
+            if (player.GetSharedData<int>("Wounded") == state && state != 0) return; // REPEL: Laggers... So it doesn't call twice...
+
             player.SetSharedData("Wounded", state);
             Player killer = null;
             if(killerID != -1)
             {
-                killer = NAPI.Pools.GetAllPlayers().FirstOrDefault(p => p.Id == killerID);
+                killer = RAGE.Entities.Players.All.Find(p => p.Id == killerID);
                 if(killer == null)
                 {
                     player.SendChatMessage("!{#FF6347}A fatal error has occurred - please contact the devs and tell them this code: " + player.Name + "_D" + player.Id);
@@ -237,6 +230,9 @@ namespace RNC
                 case 0:
                     {
                         //player.SendChatMessage("DEBUG: Wounded state set to 0");
+                        Events.RequestClearAnimation(player);
+                        player.StopAnimation();
+                        player.TriggerEvent("ResetWounded");
                         break;
                     }
                 case 1:
@@ -250,13 +246,20 @@ namespace RNC
                             {
                                 player.Vehicle.EngineStatus = false;
                             }
+
+                            player.Health = 25;
+                            player.SendChatMessage("!{#FF6347}You have been severely injured, but you are not dead yet!");
+                            player.SendChatMessage("!{#FF6347}You are currently in a vehicle & do not have enough strength to exit it.");
+                            player.SendChatMessage("!{#FF6347}A teammate will have to enter the vehicle in order to treat your wounds. [unlock your vehicle]");
+                            player.SendChatMessage("!{#FF6347}You will die in 60 seconds if you are not revived by a teammate. Use (/lobby) to respawn instantly.");
                         }
 
                         if (player.GetSharedData<string>("ActionType") != "none")
                         {
                             EPlayer.StopPlayerAction(player, 1);
                         }
-                        foreach (Player pl in NAPI.Pools.GetAllPlayers().Where(p => p.Position.DistanceTo(player.Position) < 10.0f))
+
+                        foreach (Player pl in RAGE.Entities.Players.All.Where(p => p.Position.DistanceTo(player.Position) < 10.0f))
                         {
                             if (pl.GetSharedData<string>("CuffedBy") == player.Name)
                             {
@@ -264,7 +267,8 @@ namespace RNC
                                 break;
                             }
                         }
-                        if (player.HasSharedData("ReviveTarget"))
+
+                        if (player.HasSharedData("ReviveTarget") && player.GetSharedData<Player>("ReviveTarget") != null)
                         {
                             player.TriggerEvent("StopReviving", 3);
                         }
@@ -328,49 +332,6 @@ namespace RNC
                         player.SendChatMessage("!{#FF6347}You have been severely injured, but you are not dead yet!");
                         player.SendChatMessage("!{#FF6347}You have enough strength to crawl - use it to crawl to safety.");
                         player.SendChatMessage("!{#FF6347}You will die in 60 seconds if you are not revived by a teammate. Use (/lobby) to respawn instantly.");
-                        break;
-                    }
-                case 3: // revive
-                    {
-                        player.Health = 50;
-                        player.SendChatMessage("!{#FFFF00}Your wounds have been treated and you gained your strength back.");
-                        player.SetSharedData("Wounded", 0);
-                        RequestPlayAnimation(player, "amb@world_human_push_ups@male@exit", "exit", 0);
-                        NAPI.Task.Run(() =>
-                        {
-                            RequestClearAnimation(player); // idk hope it works 
-                            player.TriggerEvent("ResolveJS", "player.clearTasksImmediately();"); // haha xd lmao lol pls dont kill me kevy
-                        }, delayTime: 3800);
-                        break;
-                    }
-                case 4: // force kill (by another player)
-                    {
-                        EPlayer.GetAccount(player).Deaths++;
-                        player.Health = 0;
-                        player.SendChatMessage("!{#FF6347}You have been executed and are being sent to the lobby...");
-                        break;
-                    }
-                case 5: // force kill in special vehicle
-                    {
-                        EPlayer.GetAccount(player).Deaths++;
-                        player.Health = 0;
-                        player.SendChatMessage("!{#FF6347}It is too late - you lost way too much blood and cannot be saved.");
-                        break;
-                    }
-                case 6: // collapse in land vehicle
-                    {
-                        player.Health = 25;
-                        player.SendChatMessage("!{#FF6347}You have been severely injured, but you are not dead yet!");
-                        player.SendChatMessage("!{#FF6347}You are currently in a vehicle & do not have enough strength to exit it.");
-                        player.SendChatMessage("!{#FF6347}A teammate will have to enter the vehicle in order to treat your wounds. [unlock your vehicle]");
-                        player.SendChatMessage("!{#FF6347}You will die in 60 seconds if you are not revived by a teammate. Use (/lobby) to respawn instantly.");
-                        break;
-                    }
-                case 7: // force kill BUT by server, not execution
-                    {
-                        EPlayer.GetAccount(player).Deaths++;
-                        player.Health = 0;
-                        player.SendChatMessage("!{#FF6347}You succumbed to your wounds and are being sent to the lobby...");
                         break;
                     }
             }
@@ -500,12 +461,21 @@ namespace RNC
             });
         }
 
+        [RemoteEvent("clear_tasks")]
+        public static void ClearTasksSync(Player player, int immediately)
+        {
+            RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a.Position.DistanceTo(player.Position) < 200.0).ToList().ForEach((Player act) =>
+            {
+                act.TriggerEvent("entcleartasks", player, immediately);
+            });
+        }
+
         [RemoteEvent("Sync:DoorShut")]
         public static void OnShutDoorSync(Player player, Vehicle vehicle, int index, bool instantly)
         {
             if (vehicle == null) return;
 
-            RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a.Position.DistanceTo(player.Position) < 500.0).ToList().ForEach((Player act) =>
+            RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a.Position.DistanceTo(player.Position) < 200.0).ToList().ForEach((Player act) =>
             {
                 act.TriggerEvent("Sync:SetDoorShut", vehicle, index, instantly);
             });
@@ -526,7 +496,7 @@ namespace RNC
         {
             if (vehicle == null) return;
 
-            RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a.Position.DistanceTo(player.Position) < 500.0).ToList().ForEach((Player act) =>
+            RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a.Position.DistanceTo(player.Position) < 200.0).ToList().ForEach((Player act) =>
             {
                 act.TriggerEvent("Sync:SetDoorOpen", vehicle, index, loose, instantly);
             });
@@ -3019,7 +2989,28 @@ namespace RNC
             if (!EPlayer.LoggedIn(player)) return;
             if (player.GetSharedData<int>("Team") != target.GetSharedData<int>("Team")) return;
 
-            target.TriggerEvent("setPlayerWoundedCS", 3, player.Id);
+            target.Health = 50;
+            target.SendChatMessage("!{#FFFF00}Your wounds have been treated and you gained your strength back.");
+            
+            //target.StopAnimation();
+            RequestPlayAnimation(target, "amb@world_human_push_ups@male@exit", "exit", 34);
+
+            NAPI.Task.Run(() =>
+            {
+                try
+                {
+                    if (target != null)
+                    {
+                        Events.RequestClearAnimation(target);
+                        //target.StopAnimation();
+                    }
+                }
+                catch { }
+            }, 3800);
+
+            target.SetSharedData("Wounded", 0);
+            target.TriggerEvent("ResetWounded");
+
             player.SendChatMessage($"!{{#2fc900}}[REVIVE] You successfully revived {target.Name} and gained +2XP & 1 point for teamwork!");
             target.SendChatMessage($"!{{#2fc900}}[REVIVE] You have been revived by {player.Name}.");
 
@@ -3034,26 +3025,20 @@ namespace RNC
             Player target = RAGE.Entities.Players.All.Find(p => p.Id == remoteId);
             if(target == null)
             {
-                player.SendChatMessage("target was null rip (id):" + remoteId);
                 return;
             }
-            player.SendChatMessage("onassigntarget " + target.Name);
 
             if (!EPlayer.LoggedIn(player) || !EPlayer.LoggedIn(target))
             {
-                player.SendChatMessage("either not logged in");
                 return;
             }
             if (player.GetSharedData<int>("Team") != target.GetSharedData<int>("Team"))
             {
-                player.SendChatMessage("jebiga snitchman");
                 return;
             }
 
             player.SetSharedData("ReviveTarget", target);
             target.SetSharedData("BeingRevived", player);
-
-            player.SendChatMessage("onassigntarget 2 " + target.Name);
 
             player.SendChatMessage($"!{{#2fc900}}[REVIVE] You have begun reviving ${target.Name} - keep holding H for 7 seconds.");
             target.SendChatMessage($"!{{#2fc900}}[REVIVE] You are now being revived by ${player.Name} - it will take 7 seconds.");
@@ -3106,6 +3091,7 @@ namespace RNC
         public void OnStopReviving(Player player)
         {
             if (!player.HasSharedData("ReviveTarget")) return;
+
             Player target = player.GetSharedData<Player>("ReviveTarget");
             if (target == null) return;
             target.ResetSharedData("BeingRevived");
@@ -3539,8 +3525,8 @@ namespace RNC
             player.SetData("LastClimbProtection", Environment.TickCount64-30000);
             player.SetData("ClimbProtectionProcs", 0);
             player.ResetData("DraggingOut");
-            player.TriggerEvent("togglePlayerCrawl", false);
-            player.TriggerEvent("setPlayerWoundedCS", 0, -1);
+
+            player.TriggerEvent("ResetWounded");
             player.SetSharedData("Wounded", 0);
 
             player.ResetData("_currentlySwappingSeats");
