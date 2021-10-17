@@ -3541,6 +3541,7 @@ namespace RNC
             player.ResetData("DraggingOut");
             player.TriggerEvent("togglePlayerCrawl", false);
             player.TriggerEvent("setPlayerWoundedCS", 0, -1);
+            player.SetSharedData("Wounded", 0);
 
             player.ResetData("_currentlySwappingSeats");
             foreach (Player p in Settings.LoggedInPlayers.Where(a => a.HasData("Spectating") && a.GetData<Player>("SpectatingPlayer") == player))
