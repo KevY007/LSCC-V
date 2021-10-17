@@ -1313,8 +1313,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                         return true; // Stun Gun no shot if more than 10 meters or target in car.
                     }
 
-                    if(player.weapon == 911657153 && 
-                        (BigInt(Math.round((new Date()).getTime() / 1000)) - BigInt(targetEntity.getVariable("LastVehEnterExit"))) <= BigInt(7) 
+                    if(player.weapon == 911657153 && targetEntity.getVariable("LastVehEnterExit") + 5000 >= Date.now()
                         && targetEntity.getVariable("Team") == 0)
                     {
                         mp.game.graphics.notify("~r~Cannot tase! Target exiting vehicle!");
@@ -1389,7 +1388,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
 
             if(targetEntity.getVariable("ClimbProtection") == true || sourceEntity.getVariable("ClimbProtection") == true) return true;
 
-            if(weapon == 911657153 && (BigInt(Math.round((new Date()).getTime() / 1000)) - BigInt(targetEntity.getVariable("LastVehEnterExit"))) <= BigInt(7)) return true;
+            if(weapon == 911657153 && targetEntity.getVariable("LastVehEnterExit") + 5000 >= Date.now()) return true;
 
             if(weapon == 911657153 && targetEntity.getVariable("HasShot") == true && targetEntity.getVariable("Team") == 0 && chaseRunning) return true;
 
@@ -1706,7 +1705,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
 
                         if(chaseTimeCur < 60) return true; // nah not at da start
 
-                        if((BigInt(Math.round((new Date()).getTime() / 1000)) - BigInt(targetEntity.getVariable("LastVehEnterExit"))) <= BigInt(7) 
+                        if(targetEntity.getVariable("LastVehEnterExit") + 5000 >= Date.now() 
                             && targetEntity.getVariable("Team") == 0)
                         {
                             mp.game.graphics.notify("~r~Cannot tase! Target exiting vehicle!");
@@ -2129,6 +2128,7 @@ mp.events.add(
     "playerEnterVehicle": (vehicle, seat) => {
         dbDisabledMsg = false;
         player.seat = seat;
+        mp.events.callRemote("UpdateLastVehEnterExit", Date.now());
         if(vehicle.Collisions == undefined || vehicle.Collisions == true) vehicle.setInvincible(false);
 
         if(!radioToggle && seat == -1) mp.game.invoke('0x1B9C0099CB942AC6', vehicle.handle, 'OFF');
@@ -2148,7 +2148,7 @@ mp.events.add(
 
     "playerLeaveVehicle": (vehicle, seat) => {
         if (vehicle != null) {
-
+            mp.events.callRemote("UpdateLastVehEnterExit", Date.now());
             if(Seatbelt_Enabled == true && vehicle.getClass() != 8 && vehicle.model != mp.game.joaat('policeb'))
             {
                 mp.game.graphics.notify("~r~You cannot leave with seatbelt on.");

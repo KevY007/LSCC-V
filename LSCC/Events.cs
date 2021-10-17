@@ -740,11 +740,16 @@ namespace RNC
             }
             catch { }
 
-            player.SetSharedData("LastVehEnterExit", DateTimeOffset.Now.ToUnixTimeSeconds());
             if (vehicle.HasSharedData("SirenState")) {
                 vehicle.SetSharedData("SirenState", !vehicle.GetSharedData<bool>("SirenState"));
                 vehicle.SetSharedData("SirenState", !vehicle.GetSharedData<bool>("SirenState")); // Revert it to false then true or vice-versa so clients pick a "change" and apply it
             }
+        }
+
+        [RemoteEvent("UpdateLastVehEnterExit")]
+        public void OnUpdateLastEnterExit(Player player, long supposedTime)
+        {
+            player.SetSharedData("LastVehEnterExit", supposedTime);
         }
 
         [ServerEvent(Event.PlayerDisconnected)]
