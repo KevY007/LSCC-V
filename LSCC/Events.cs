@@ -708,7 +708,7 @@ namespace RNC
                 }
             }
 
-            player.SetSharedData("LastVehEnterExit", DateTimeOffset.Now.ToUnixTimeSeconds());
+            player.SetData("LastVehEnterSeat", seatID);
         }
 
         [ServerEvent(Event.PlayerExitVehicle)]
@@ -718,6 +718,16 @@ namespace RNC
             try // Because triggers on disconnection and stuff invalid vehicles etc
             {
                 if (vehicle == null) return;
+
+                if (player.GetData<sbyte>("LastVehEnterSeat") == 0 && player.GetSharedData<int>("InLobby") >= 0 && player.GetSharedData<int>("Team") != -1)
+                {
+                    if(vehicle.Locked || (vehicle.HasSharedData("Locked") && vehicle.GetSharedData<bool>("Locked") == true))
+                    {
+                        EPlayer.Notify(player, "Your vehicle has been left unlocked as you exited it.", "orange", "fas fa-exclamation", false, 1500, "topCenter", "replace");
+                        vehicle.Locked = false;
+                        vehicle.SetSharedData("Locked", false);
+                    }
+                }
 
                 if (Settings.Dynamics.OnfootCollision == false)
                 {

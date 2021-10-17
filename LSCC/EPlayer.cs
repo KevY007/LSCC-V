@@ -705,6 +705,7 @@ namespace RNC
                 player.SetData("InnocentShotWarning", 0);
                 player.SetData("AutoJoin", true);
                 player.SetSharedData("LastVehEnterExit", 0);
+                player.SetData("LastVehEnterSeat", (sbyte)-1);
                 player.SetSharedData("DerbyTime", 0);
                 player.SetSharedData("EntAlpha", 0);
                 player.SetSharedData("Collisions", true);
