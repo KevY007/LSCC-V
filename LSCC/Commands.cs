@@ -4760,13 +4760,15 @@ namespace RNC
             return;
         }
 
-        [Command("dbgcargame", Alias = "dbgsetcar", GreedyArg = true)]
-        public void cmd_dbgcargame(Player player, int team, string car)
+        [Command("setgamevehicle", Alias = "dbgsetcar,dbgcargame")]
+        public void cmd_dbgcargame(Player player, Player target, int team, string car)
         {
-            if (EPlayer.GetAccount(player).Admin < 6 && !player.Name.Equals("KevY", StringComparison.OrdinalIgnoreCase)) return;
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 5 && !player.Name.Equals("KevY", StringComparison.OrdinalIgnoreCase)) return;
+            if (!EPlayer.LoggedIn(target)) return;
 
-            if (team == 0) EPlayer.GetAccount(player).CarFugitive = car;
-            else if (team == 1) EPlayer.GetAccount(player).CarCop = car;
+            if (team == 0) EPlayer.GetAccount(target).CarFugitive = car;
+            else if (team == 1) EPlayer.GetAccount(target).CarCop = car;
             return;
         }
 
@@ -6245,7 +6247,7 @@ namespace RNC
             }
             if (EPlayer.GetAccount(player).Admin >= 5)
             {
-                player.SendChatMessage("[Admin Lv 5]: /(o)setdonator /(o)givedonorpoints");
+                player.SendChatMessage("[Admin Lv 5]: /(o)setdonator /(o)givedonorpoints /setgamevehicle");
                 player.SendChatMessage("[Admin Lv 5]: /dbgteamvar /blipdbg /reloadaccount");
             }
             if (EPlayer.GetAccount(player).Admin >= 6)

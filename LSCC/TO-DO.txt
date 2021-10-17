@@ -9,15 +9,12 @@ SPIKESTRIP (COLSHAPE AND SHIT) AND MAYBE FUGITIVES CAN USE TOO LO
 We should also capture headshot percentage and possibly total report count.
 revert charger handling to old one
 the crashes happen somewhere when a player dies BUT ITS NOT CONFIRMED because its happened sometimes on chase start, connect and other places
-change other players vehicles with a dbgcargame new version so donators can too get cars
 some kind of xp or points on DM
 dop sometihyngh  about ap pistol
 interiors vro
 buyammo with donator points
 
 copy outfits for donors
-#bug reports and other chans sugeestion
-add a linux script that will keep on restarting server if goes off?
 add more clothing using mods
 make donation stuf or page
 allow custom loadout in dm
