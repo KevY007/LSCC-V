@@ -112,19 +112,20 @@ let reviveTarget = null;
 let reviveTime = 7;
 let reviveTimer = null;
 mp.keys.bind(0x48, true, onHoldHkey);
-function onHoldHkey(){
+function onHoldHkey()
+{
     if(canRevive())
     {
         mp.players.forEach(pl => {
             if(pl.getVariable("Team") == mp.players.local.getVariable("Team") && pl.getVariable("Wounded") == 2 
-            && pl.remoteId != mp.players.local.remoteId)
+                && pl.remoteId != mp.players.local.remoteId && pl.getVariable("BeingRevived") == false)
             {
                 let distance = calcDist(mp.players.local.position, pl.position);
-                if(distance < 5){
+                if(distance < 5)
+                {
                     reviveTarget = pl;
                     reviveTime = 7;
                     mp.events.callRemote("AssignReviveTarget", pl.remoteId);
-                    mp.gui.chat.push(`AssignReviveTarget (call) => ${pl.remoteId}`);
                     return;
                 }
             }
@@ -137,6 +138,7 @@ function onHoldHkey(){
 
 // ------ REVIVAL SYSTEM ------ //
 let isReviving = false;
+
 function canRevive(){
     if(mp.players.local.getVariable("Team") == -1 || mp.players.local.getVariable("Wounded") > 0 || chatStatus || menuToggled || scoreboardToggled || Date.now() - lastChatToggle <= 500) return false; 
     return true;
@@ -145,29 +147,31 @@ mp.events.add("BeginReviving", () => {
     if(mp.players.local == null || !mp.players.exists(mp.players.local)) return;
     if(reviveTarget == null || !mp.players.exists(reviveTarget)) return;
 
-    mp.gui.chat.push("beginreviving called");
     reviveTime = 7;
     isReviving = true;
     clearInterval(reviveTimer);
     reviveTimer = setInterval(() => {
         if(mp.players.local == null || !mp.players.exists(mp.players.local)){ stopCuffing(69); return; }
         if(reviveTarget == null || !mp.players.exists(reviveTarget)){ stopCuffing(69); return; }
+
         if(mp.players.local.getVariable("Team") == -1 || mp.players.local.isDead()){
             stopReviving(1);
             return;
         }       
+
         if(reviveTarget.getVariable("Team") == -1 || (mp.players.local.getVariable("Team") != reviveTarget.getVariable("Team")) || reviveTarget.isDead()){
             stopReviving(2);
         }
+
         if(!mp.keys.isDown(72)){ 
             stopReviving(4);
             return;
         }
 
         reviveTime--;
-        if(reviveTime <= 0){
+        if(reviveTime <= 0)
+        {
             mp.events.callRemote("FinishRevive", reviveTarget);
-            mp.gui.chat.push(`TIME REMAINING TO REVIVE ${reviveTarget.name}: ${reviveTime}`);
             clearInterval(reviveTimer);
             return;
         }

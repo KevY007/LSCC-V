@@ -168,35 +168,6 @@ namespace RNC
 
             return;
         }
-        /*
-        [RemoteEvent("ExecuteWounded")]
-        public void OnExecuteWoundedPlayer(Player player, Player target)
-        {
-            NAPI.Chat.SendChatMessageToAll("PLAYER: " + player.Name + " TARGET: " + target.Name + " IN ExecuteWounded");
-
-            if(!target.HasSharedData("Wounded") || !player.HasSharedData("Wounded"))
-            {
-                target.SetSharedData("Wounded", 0);
-                player.SetSharedData("Wounded", 0);
-                return;
-            }
-
-            if (target.GetSharedData<int>("Wounded") == 2 || target.GetSharedData<int>("Wounded") == 6)
-            {
-                LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
-                if (lobby != null)
-                {
-                    EPlayer.GrantXP(player, 1); // cuz why not :))
-                    foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
-                    {
-                        ay.TriggerEvent("pushToKillFeed", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Executed", target.Name, EPlayer.HexConverter(EPlayer.GetColor(target)));
-                    }
-                }
-                    
-                target.TriggerEvent("setWounded", 3, -1); // 4 = special state for executing
-            }
-        
-        }*/
 
         [RemoteEvent("WoundedTimerTick")]
         public void OnWoundedTimerTick(Player player, int time)
@@ -217,7 +188,7 @@ namespace RNC
             Player killer = null;
             if(killerID != -1)
             {
-                killer = RAGE.Entities.Players.All.Find(p => p.Id == killerID);
+                killer = Settings.LoggedInPlayers.Find(p => p.Id == killerID);
                 if(killer == null)
                 {
                     player.SendChatMessage("!{#FF6347}A fatal error has occurred - please contact the devs and tell them this code: " + player.Name + "_D" + player.Id);
@@ -268,7 +239,7 @@ namespace RNC
                             }
                         }
 
-                        if (player.HasSharedData("ReviveTarget") && player.GetSharedData<Player>("ReviveTarget") != null)
+                        if (!player.GetSharedData<string>("ReviveTarget").Equals("n/a"))
                         {
                             player.TriggerEvent("StopReviving", 3);
                         }
@@ -295,13 +266,14 @@ namespace RNC
                                     reasonStr = null;
                                 }
 
-                                if (!player.HasSharedData("LastKiller") || player.GetSharedData<Player>("LastKiller") != killer)
-                                {
-                                    EPlayer.GetAccount(killer).Kills++;
-                                    player.SetSharedData("LastKiller", killer);
-                                }
+                                EPlayer.GetAccount(killer).Kills++;
+                                player.SetSharedData("LastKiller", killer.Name);
+
+                                EPlayer.GetAccount(player).Deaths++;
+                                
                                 killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 10.0));
                                 EPlayer.GrantXP(killer, 2);
+
                                 if (lobby.Fugitives.Contains(player) && killer.GetSharedData<int>("Team") == 0)
                                 {
                                     PlayerRequestShotTag(killer);
@@ -961,7 +933,7 @@ namespace RNC
                         EPlayer.GrantXP(killer, 1);
                     }
 
-                    if (killer.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && player.GetSharedData<int>("Team") != -1)
+                    if (killer.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("InLobby") >= 0)
                     {
                         EPlayer.GrantXP(killer, 1);
 
@@ -1026,7 +998,8 @@ namespace RNC
                     }
 
 
-                    if (reason != 696988 && reason != 696989 && player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("Team") == killer.GetSharedData<int>("Team"))
+                    if (reason != 696988 && reason != 696989 && player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("Team") == killer.GetSharedData<int>("Team") && 
+                        player.GetSharedData<int>("InLobby") >= 0)
                     {
                         if (RAGE.Entities.Players.All.Count(ey => ey.GetSharedData<int>("Team") != -1 && ey.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") &&
                                  ey.Position.DistanceTo(player.Position) < 10.0) == 0)
@@ -1098,6 +1071,12 @@ namespace RNC
                 LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
                 if (lobby != null)
                 {
+                    if (killer == null && player.GetSharedData<int>("Wounded") != 0)
+                    {
+                        killer = Settings.LoggedInPlayers.Find(a => a.Name.Equals(player.GetSharedData<string>("LastKiller")));
+                        reasonStr = "Executed";
+                    }
+
                     if (lobby.gameStatus == 1)
                     {
                         if (lobby.Cops.Contains(player) || lobby.Fugitives.Contains(player)) EPlayer.CreateAmmoBox(player);
@@ -1116,19 +1095,24 @@ namespace RNC
                                 EPlayer.GivePoints(killer, 5);
                                 killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(killer).DonatorLevel + 1.0)));
                             }
+
+                            /////////////////////////////////////
+                            if (player.GetSharedData<int>("Wounded") == 0)
+                            {
+                                EPlayer.GetAccount(killer).Kills++;
+                                EPlayer.GetAccount(player).Deaths++;
+                            }
+                            else
+                            {
+                                killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.05 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 20.0));
+                            }
                         }
+
                         if (lobby.Fugitives.Contains(player))
                         {
-                            if (killer != null)
-                            {
-                                //EPlayer.GetAccount(player).Deaths++;
-                                //EPlayer.GetAccount(killer).Kills++;
-                                //killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 10.0));
-                            }
-
                             wasInGame = true;
 
-                            //if (killer != null && killer.GetSharedData<int>("Team") == 1) EPlayer.GrantXP(killer, 2);
+                            if (killer != null && killer.GetSharedData<int>("Team") == 1) EPlayer.GrantXP(killer, 2);
 
                             lock (Settings.LoggedInPlayers)
                             {
@@ -1138,17 +1122,17 @@ namespace RNC
                                     {
                                         if (reasonStr == null)
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "killed", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                            ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Killed", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
                                         }
                                         else
                                         {
                                             if (reason == 696988)
                                             {
-                                                ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "arrested", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                                ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Arrested", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
                                             }
                                             else if (reason == 696989)
                                             {
-                                                ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "busted", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                                ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Busted", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
                                             }
                                             else ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
                                         }
@@ -1171,19 +1155,11 @@ namespace RNC
 
                         if (lobby.Cops.Contains(player))
                         {
-                            if (killer != null)
-                            {
-                                //EPlayer.GetAccount(player).Deaths++;
-                                //EPlayer.GetAccount(killer).Kills++;
-                                //killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 10.0));
-                            }
-
                             wasInGame = true;
 
                             if (killer != null && killer.GetSharedData<int>("Team") == 0)
                             {
-                                //EPlayer.GrantXP(killer, 2);
-                                //Events.PlayerRequestShotTag(killer);
+                                Events.PlayerRequestShotTag(killer);
                             }
 
                             lock (Settings.LoggedInPlayers)
@@ -1194,7 +1170,7 @@ namespace RNC
                                     {
                                         if (reasonStr == null)
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "killed", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                            ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Killed", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
                                         }
                                         else
                                         {
@@ -1217,6 +1193,10 @@ namespace RNC
 
                             lobby.Cops.Remove(player);
                         }
+
+                        player.TriggerEvent("ResetWounded");
+                        player.SetSharedData("Wounded", 0);
+                        OnStopReviving(player);
                     }
                 }
 
@@ -1421,10 +1401,6 @@ namespace RNC
             player.SetData("LoggedIn", true);
             player.SetData("AccountHandle", acc);
             player.SetSharedData("pLogged", true);
-
-            player.ResetSharedData("LastKiller"); 
-            player.ResetSharedData("BeingRevived");
-            player.ResetSharedData("ReviveTarget");
 
             if (ContextFactory.Instance.Languages.ToList().Find(l => l.SQL_ID == acc.Language) != null && EPlayer.GetAccount(player).Language != -1)
                 player.SetData("Language", ContextFactory.Instance.Languages.ToList().Find(l => l.SQL_ID == acc.Language));
@@ -1852,10 +1828,6 @@ namespace RNC
             player.SetData("LoggedIn", true);
             player.SetData("AccountHandle", acc);
             player.SetSharedData("pLogged", true);
-
-            player.ResetSharedData("LastKiller");
-            player.ResetSharedData("BeingRevived");
-            player.ResetSharedData("ReviveTarget");
 
             player.Name = acc.Username;
 
@@ -3030,8 +3002,9 @@ namespace RNC
             target.SendChatMessage($"!{{#2fc900}}[REVIVE] You have been revived by {player.Name}.");
 
             RequestClearAnimation(player);
-            player.ResetSharedData("ReviveTarget");
-            target.ResetSharedData("BeingRevived");
+            target.SetSharedData("LastKiller", "n/a");
+            target.SetSharedData("BeingRevived", false);
+            player.SetSharedData("ReviveTarget", "n/a");
         }
 
         [RemoteEvent("AssignReviveTarget")]
@@ -3052,11 +3025,11 @@ namespace RNC
                 return;
             }
 
-            player.SetSharedData("ReviveTarget", target);
-            target.SetSharedData("BeingRevived", player);
+            player.SetSharedData("ReviveTarget", target.Name);
+            target.SetSharedData("BeingRevived", false);
 
-            player.SendChatMessage($"!{{#2fc900}}[REVIVE] You have begun reviving ${target.Name} - keep holding H for 7 seconds.");
-            target.SendChatMessage($"!{{#2fc900}}[REVIVE] You are now being revived by ${player.Name} - it will take 7 seconds.");
+            player.SendChatMessage($"!{{#2fc900}}[REVIVE] You have begun reviving {target.Name} - keep holding H for 7 seconds.");
+            target.SendChatMessage($"!{{#2fc900}}[REVIVE] You are now being revived by {player.Name} - it will take 7 seconds.");
 
             RequestPlayAnimation(player, "missheistfbi3b_ig8_2", "cpr_loop_paramedic", 1);
             player.TriggerEvent("BeginReviving");
@@ -3103,16 +3076,19 @@ namespace RNC
             Events.RequestClearAnimation(player);
         }
         [RemoteEvent("StopReviving")]
-        public void OnStopReviving(Player player)
+        public static void OnStopReviving(Player player)
         {
-            if (!player.HasSharedData("ReviveTarget")) return;
+            if (player.GetSharedData<string>("ReviveTarget").Equals("n/a")) return;
 
-            Player target = player.GetSharedData<Player>("ReviveTarget");
+            Player target = RAGE.Entities.Players.All.Find(p => p.Name.Equals(player.GetSharedData<string>("ReviveTarget")));
+
+            player.SetSharedData("ReviveTarget", "n/a");
+
             if (target == null) return;
-            target.ResetSharedData("BeingRevived");
-            player.ResetSharedData("ReviveTarget");
 
-            if(player.GetSharedData<int>("Wounded") == 0)
+            target.SetSharedData("BeingRevived", false);
+
+            if (player.GetSharedData<int>("Wounded") == 0)
             {
                 Events.RequestClearAnimation(player);
             }
@@ -3540,9 +3516,6 @@ namespace RNC
             player.SetData("LastClimbProtection", Environment.TickCount64-30000);
             player.SetData("ClimbProtectionProcs", 0);
             player.ResetData("DraggingOut");
-
-            player.TriggerEvent("ResetWounded");
-            player.SetSharedData("Wounded", 0);
 
             player.ResetData("_currentlySwappingSeats");
             foreach (Player p in Settings.LoggedInPlayers.Where(a => a.HasData("Spectating") && a.GetData<Player>("SpectatingPlayer") == player))

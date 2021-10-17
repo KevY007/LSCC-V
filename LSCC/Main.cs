@@ -1790,10 +1790,6 @@ namespace RNC
                     if (i.GetSharedData<int>("InLobby") != lobby.lobbyId) continue;
 
                     i.TriggerEvent("ResetKillFeed");
-                    i.ResetSharedData("LastKiller");
-
-                    i.ResetSharedData("BeingRevived");
-                    i.ResetSharedData("ReviveTarget");
 
 
                     if (i.HasData("Spectating") && EPlayer.GetAccount(i).Admin < 1)
@@ -1991,15 +1987,11 @@ namespace RNC
                     {
                         if (player.GetData<bool>("AutoJoin") != true) continue;
 
-                        player.ResetSharedData("LastKiller");
-                        player.ResetSharedData("BeingRevived");
-
-                        player.SetSharedData("Wounded", 0);
-                        player.TriggerEvent("ResetWounded");
-
-                        player.ResetSharedData("ReviveTarget");
                         player.SetSharedData("BustedProgress", 0.0);
                         player.ResetData("BustSupporters");
+                        player.ResetSharedData("LastKiller");
+                        player.ResetSharedData("BeingRevived");
+                        player.ResetSharedData("ReviveTarget");
                         player.SetSharedData("ClimbProtection", false);
                         player.SetData("LastClimbProtection", Environment.TickCount64 - 30000);
                         player.SetData("ClimbProtectionProcs", 0);
