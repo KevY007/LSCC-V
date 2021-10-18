@@ -6,6 +6,7 @@ cayo perico map (custom code column in maps tab so players can load custom code 
 DM ARENA: IPL/EXTRAS STUFF LEFT -- ADD SAME WITH MAP TOO
 COQUETTE AND TURISMO FROM GTA 4 BEST RP
 btw i know why the white color bug comes
+on disabled voicemod do disablevoiceto()
 [11:03 PM]
 its because pllayerspawn gets triggered while player is getting ready for cuckchase
 [11:03 PM]
