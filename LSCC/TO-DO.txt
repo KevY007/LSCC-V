@@ -11,6 +11,7 @@ on disabled voicemod do disablevoiceto()
 its because pllayerspawn gets triggered while player is getting ready for cuckchase
 [11:03 PM]
 so it resets the vars
+shot tag at 70%
 add anonymous messages to "an administrator" in warn kick mute etc ban
 INCOMING DAMAGE CHECK FOR RAMM??? if player rams another player (probably receives damage from a car maybeee??) his anim will be reset and he'll be a free man with health not gone
 SPIKESTRIP (COLSHAPE AND SHIT) AND MAYBE FUGITIVES CAN USE TOO LO
