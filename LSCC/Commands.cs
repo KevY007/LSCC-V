@@ -1559,6 +1559,7 @@ namespace RNC
             else
             {
                 Events.RequestClearAnimation(player);
+                player.TriggerEvent("ClearTaskNotFalling");
                 //player.StopAnimation(); // This is basically clear tasks immediately bruh.
             }
         }
@@ -2002,13 +2003,18 @@ namespace RNC
             if (player.HasData("_currentlySwappingSeats") || player == target) return;
 
             if(player.HasData("SwapSeating") && player.HasData("SwapSeatingTime") && 
-                Environment.TickCount64 - player.GetData<long>("SwapSeatingTime") <= 5000)
+                Environment.TickCount64 - player.GetData<long>("SwapSeatingTime") <= 7000)
             {
                 try
                 {
                     Player seatingWith = player.GetData<Player>("SwapSeating");
                     if (seatingWith.Exists && seatingWith == target) // They the one who sent requests
                     {
+                        player.ResetData("Seatbelt");
+                        player.TriggerEvent("ToggleSeatbelt", false);
+                        target.ResetData("Seatbelt");
+                        target.TriggerEvent("ToggleSeatbelt", false);
+
                         player.ResetData("SwapSeating");
                         player.ResetData("SwapSeatingTime");
                         target.ResetData("SwapSeating");
@@ -2071,8 +2077,8 @@ namespace RNC
                 catch { }
             }
 
-            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have sent a swapseats request to " + target.Name + ", they have 5s to accept.");
-            target.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have received a swapseats request from " + player.Name + ", you have 5s to accept. (/ss " + player.Name + ")");
+            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have sent a swapseats request to " + target.Name + ", they have 7s to accept.");
+            target.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have received a swapseats request from " + player.Name + ", you have 7s to accept. (/ss " + player.Name + ")");
 
             player.ResetData("SwapSeating");
             player.ResetData("SwapSeatingTime");
@@ -3728,6 +3734,11 @@ namespace RNC
             {
                 if (elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
                 {
+                    if(elobby.Fugitives.Contains(player) && !player.GetSharedData<string>("CuffedBy").Equals("n/a"))
+                    {
+                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently being cuffed, mate.");
+                        return;
+                    }
                     player.Health = 0;
                     return;
                 }
@@ -4598,6 +4609,8 @@ namespace RNC
             Logs.LogAdmin(player, $"Put {target.Name} in {toputin.Name}'s vehicle.");
             target.TriggerEvent("ToggleSeatbelt", false);
             target.ResetData("Seatbelt");
+            target.Position = new Vector3(toputin.Vehicle.Position.X, toputin.Vehicle.Position.Y, toputin.Vehicle.Position.Z + 5f);
+
             target.SetIntoVehicle(toputin.Vehicle, nextseat);
 
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has put {target.Name} in {toputin.Name}'s vehicle.");
@@ -4747,13 +4760,15 @@ namespace RNC
             return;
         }
 
-        [Command("dbgcargame", Alias = "dbgsetcar", GreedyArg = true)]
-        public void cmd_dbgcargame(Player player, int team, string car)
+        [Command("setgamevehicle", Alias = "dbgsetcar,dbgcargame")]
+        public void cmd_dbgcargame(Player player, Player target, int team, string car)
         {
-            if (EPlayer.GetAccount(player).Admin < 6 && !player.Name.Equals("KevY", StringComparison.OrdinalIgnoreCase)) return;
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 5 && !player.Name.Equals("KevY", StringComparison.OrdinalIgnoreCase)) return;
+            if (!EPlayer.LoggedIn(target)) return;
 
-            if (team == 0) EPlayer.GetAccount(player).CarFugitive = car;
-            else if (team == 1) EPlayer.GetAccount(player).CarCop = car;
+            if (team == 0) EPlayer.GetAccount(target).CarFugitive = car;
+            else if (team == 1) EPlayer.GetAccount(target).CarCop = car;
             return;
         }
 
@@ -6232,7 +6247,7 @@ namespace RNC
             }
             if (EPlayer.GetAccount(player).Admin >= 5)
             {
-                player.SendChatMessage("[Admin Lv 5]: /(o)setdonator /(o)givedonorpoints");
+                player.SendChatMessage("[Admin Lv 5]: /(o)setdonator /(o)givedonorpoints /setgamevehicle");
                 player.SendChatMessage("[Admin Lv 5]: /dbgteamvar /blipdbg /reloadaccount");
             }
             if (EPlayer.GetAccount(player).Admin >= 6)
@@ -8873,7 +8888,7 @@ namespace RNC
             }
             else
             {
-                foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a != player && a.GetSharedData<int>("Team") == teamid))
+                foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a != player && a.GetSharedData<int>("Team") == teamid && a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")))
                 {
                     EPlayer.Freeze(p, true);
                     EPlayer.Notify(p, $"You have been frozen by {player.Name}", "red", "fas fa-iciles", false, 2000);
@@ -8896,7 +8911,7 @@ namespace RNC
             }
             else
             {
-                foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a != player && a.GetSharedData<int>("Team") == teamid))
+                foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a != player && a.GetSharedData<int>("Team") == teamid && a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")))
                 {
                     EPlayer.Freeze(p, false);
                     EPlayer.Notify(p, $"You have been thawed by {player.Name}", "green", "fas fa-walking", false, 2000);

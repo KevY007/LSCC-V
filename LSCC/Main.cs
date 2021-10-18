@@ -363,10 +363,10 @@ namespace RNC
         public const int DefaultMaxInLobby = 30;
 
         // Connection Settings
-        public const string MySQL_Host = "194.163.144.228";
-        public const string MySQL_User = "u19_JV6PPURZ60";
-        public const string MySQL_Password = "YNwgDve+3etKCwLG!63f+.c2";
-        public const string MySQL_Database = "s19_racenchase";
+        public const string MySQL_Host = "localhost";
+        public const string MySQL_User = "racenchase";
+        public const string MySQL_Password = "perkovicMatko3035";
+        public const string MySQL_Database = "racenchase";
         public const string DCBotToken = "NjAyNTQ1Mzc0MDY1OTgzNTgw.XtaCEQ.clpqVL5c0X_38xkT-mYTr4_N9a4";
 
         // Global Variables (changing accordingly)
@@ -1489,7 +1489,14 @@ namespace RNC
                                     lobby.Time[0]++;
 
                                     lobby.Weather = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 9); // Change weather every hour or so.
-
+                                    if(lobby.Weather == 6 || lobby.Weather == 7 || lobby.Weather == 8)
+                                    {
+                                        lobby.Weather = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 9); // Once again, if it gets rain you are just UNLUCKY.
+                                        if (lobby.Weather == 6 || lobby.Weather == 7 || lobby.Weather == 8)
+                                        {
+                                            lobby.Weather = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 9); // Actually, we all hate rain so.
+                                        }
+                                    }
                                     if (lobby.Time[0] >= 24)
                                     {
                                         lobby.Time[0] = 0;
@@ -1783,12 +1790,7 @@ namespace RNC
                     if (i.GetSharedData<int>("InLobby") != lobby.lobbyId) continue;
 
                     i.TriggerEvent("ResetKillFeed");
-                    i.SetSharedData("Wounded", 0);
-                    i.ResetSharedData("LastKiller");
 
-                    i.ResetSharedData("BeingRevived");
-                    i.ResetSharedData("ReviveTarget");
-                    i.TriggerEvent("setPlayerWoundedCS", 0, -1);
 
                     if (i.HasData("Spectating") && EPlayer.GetAccount(i).Admin < 1)
                     {
@@ -1872,7 +1874,6 @@ namespace RNC
                         !player.HasData("Spectating"))
                     {
                         player.SetSharedData("InDM", -1);
-                        player.SetSharedData("Wounded", 0);
 
                         pCount++;
                     }
@@ -1986,12 +1987,11 @@ namespace RNC
                     {
                         if (player.GetData<bool>("AutoJoin") != true) continue;
 
-                        player.ResetSharedData("LastKiller");
-                        player.ResetSharedData("BeingRevived");
-                        player.TriggerEvent("setPlayerWoundedCS", 0, -1);
-                        player.ResetSharedData("ReviveTarget");
                         player.SetSharedData("BustedProgress", 0.0);
                         player.ResetData("BustSupporters");
+                        player.ResetSharedData("LastKiller");
+                        player.ResetSharedData("BeingRevived");
+                        player.ResetSharedData("ReviveTarget");
                         player.SetSharedData("ClimbProtection", false);
                         player.SetData("LastClimbProtection", Environment.TickCount64 - 30000);
                         player.SetData("ClimbProtectionProcs", 0);
@@ -2029,6 +2029,8 @@ namespace RNC
                     
                     foreach (Player player in lobby.Cops.OrderBy(x => Guid.NewGuid()))
                     {
+                        spawnLoc = null;
+
                         foreach(MapSpawn tSpawn in Spawns.Where(a => a.spawnTeam == 1))
                         {
                             if(!UsedSpawns.Contains(tSpawn.SQL_ID))
@@ -2038,9 +2040,38 @@ namespace RNC
                             }
                         }
 
-                        if ((spawnLoc == null) == false)
+                        if(EPlayer.GetAccount(player).CarCop.Equals("polmav", StringComparison.OrdinalIgnoreCase))
                         {
-                            if(!PutInsideCar.Contains(player)) UsedSpawns.Add(spawnLoc.SQL_ID);
+                            spawnLoc = null;
+                            foreach (MapSpawn tSpawn in Spawns.Where(a => a.spawnTeam == 2))
+                            {
+                                if (!UsedSpawns.Contains(tSpawn.SQL_ID))
+                                {
+                                    spawnLoc = tSpawn;
+                                    break;
+                                }
+
+                                if (spawnLoc != null)
+                                {
+                                    if (!PutInsideCar.Contains(player)) UsedSpawns.Add(spawnLoc.SQL_ID);
+                                }
+                                else
+                                {
+                                    pCount++;
+                                    spawnLoc = new MapSpawn();
+
+                                    spawnLoc = Spawns.First(a => a.spawnTeam == 1);
+
+                                    spawnLoc.spawnZ += (pCount * 5); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
+                                    spawnLoc.spawnX += (pCount * 2);
+                                }
+                            }
+                        }
+
+
+                        if (spawnLoc != null)
+                        {
+                            if (!PutInsideCar.Contains(player)) UsedSpawns.Add(spawnLoc.SQL_ID);
                         }
                         else
                         {
@@ -2124,10 +2155,7 @@ namespace RNC
 
                             if (carName.Equals("polmav"))
                             {
-                                if (Spawns.Count(sp => sp.spawnTeam == 2) >= 1)
-                                {
-                                    spawnLoc = Spawns.OrderBy(x => Guid.NewGuid()).First(a => a.spawnTeam == 2);
-                                }
+                              
                             }
 
                             if (carName.Equals("lspdvic")) enginePower = 10.0f;
@@ -2294,6 +2322,7 @@ namespace RNC
                         PutInsideCar.Add(_tempPlayer);
                         iteratedAlready.Add(_tempPlayer);
 
+                        spawnLoc = null;
                         foreach (MapSpawn tSpawn in Spawns.Where(a => a.spawnTeam == 0))
                         {
                             if (!UsedSpawns.Contains(tSpawn.SQL_ID))
