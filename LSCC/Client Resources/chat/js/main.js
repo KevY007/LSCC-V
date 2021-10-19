@@ -306,5 +306,12 @@ $(document).ready(function()
 			//toggleScroll(false);
             enableChatInput(false);
         }
+		else if (event.which == 27 && chat.input != null) // ESCAPE TO EXIT CHAT
+		{
+			chat.currentIndex = 0;
+			$("#chat ul#chat_messages").scrollTop(0); // Scroll all the way to down.
+			//toggleScroll(false);
+            enableChatInput(false);
+        }
     });
 });
