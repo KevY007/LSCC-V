@@ -681,8 +681,8 @@ namespace RNC
             return;
         }
 
-        [Command("aveh", "!{#AFAFAF}[USAGE] aveh (vehicle model name)", Alias = "av")]
-        public void cmd_aveh(Player player, string carname)
+        [Command("aveh", "!{#AFAFAF}[USAGE] aveh (vehicle model) (optional: pri. col) (optional: sec. col)", Alias = "av")]
+        public void cmd_aveh(Player player, string carname, int col1 = -1, int col2 = -1)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -695,7 +695,7 @@ namespace RNC
 
             Random rand = new Random(DateTimeOffset.UtcNow.Millisecond);
 
-            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(160), rand.Next(160), player.Name, 255, false, true, player.Dimension);
+            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, col1 == -1 ? rand.Next(160) : col1, col2 == -1 ? rand.Next(160) : col2, player.Name, 255, false, true, player.Dimension);
             aVehicle.EngineStatus = true;
             aVehicle.SetSharedData("Engine", true);
             aVehicle.SetSharedData("Locked", false);
@@ -725,8 +725,8 @@ namespace RNC
             return;
         }
 
-        [Command("veh", "!{#AFAFAF}[USAGE] veh (vehicle model name)", Alias = "v")]
-        public void cmd_veh(Player player, string carname)
+        [Command("veh", "!{#AFAFAF}[USAGE] veh (vehicle model) (optional: pri. color) (optional: sec. color)", Alias = "v")]
+        public void cmd_veh(Player player, string carname, int col1 = -1, int col2 = -1)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -752,7 +752,7 @@ namespace RNC
 
             //// try { Main.Log("freeroam.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:veh:{carname}"); } catch { }
 
-            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, rand.Next(160), rand.Next(160), player.Name, 255, false, true, player.Dimension);
+            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, (col1 == -1) ? rand.Next(160) : col1, (col2 == -1) ? rand.Next(160) : col2, player.Name, 255, false, true, player.Dimension);
             aVehicle.SetSharedData("Locked", false);
             aVehicle.Locked = false;
             aVehicle.EngineStatus = true;
