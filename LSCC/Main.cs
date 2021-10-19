@@ -2815,7 +2815,7 @@ namespace RNC
                             }
                         }
 
-                        if (lobby.GameProgress >= Convert.ToInt32(0.8 * Settings.GameRunTime) && lobby.gameMode != GameModes.BUSTED)
+                        if (lobby.GameProgress >= Convert.ToInt32(0.7 * Settings.GameRunTime) && lobby.gameMode != GameModes.BUSTED)
                         {
                             foreach (Player fugitive in lobby.Fugitives)
                             {
@@ -2829,12 +2829,13 @@ namespace RNC
                                         fugitive.SetSharedData("VisibleBlip", true);
                                         lobby.FugitiveShowCounter = 29; // Set them to VISIBLE
 
-                                        fugitive.SendChatMessage("!{#FF6347}You have the has shot tag now because the game has progress more than 80%!");
+                                        fugitive.SendChatMessage("!{#FF6347}You can be shot down by cops as the game has progressed to 70%!");
                                     }
                                 }
                                 catch { }
                             }
-                            if (lobby.GameProgress == Convert.ToInt32(0.8 * Settings.GameRunTime) && lobby.gameMode != GameModes.BUSTED)
+
+                            if (lobby.GameProgress == Convert.ToInt32(0.7 * Settings.GameRunTime) && lobby.gameMode != GameModes.BUSTED)
                             {
                                 foreach (Player pl in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
                                 {
@@ -2842,7 +2843,7 @@ namespace RNC
                                     {
                                         if (pl == null) continue;
 
-                                        pl.SendChatMessage("!{#FF6347}[GAME] !{#FFFFFF}80% of the game has elapsed, all fugitives have shot tag now.");
+                                        pl.SendChatMessage("!{#FF6347}[GAME] !{#FFFFFF}70% of the game has elapsed, all fugitives can be shot down now.");
                                         pl.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, -1, (short)lobby.gameMode);
                                     }
                                     catch { }
