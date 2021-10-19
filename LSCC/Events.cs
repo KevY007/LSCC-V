@@ -3504,9 +3504,16 @@ namespace RNC
         [ServerEvent(Event.PlayerSpawn)]
         public static void OnPlayerSpawn(Player player)
         {
+            if (player == null || !player.Exists) return;
+
             if (player.HasData("Kicked")) return;
 
-            if (player == null || !player.Exists) return;
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (lobby != null && lobby.gameStatus != 0 && (lobby.Cops.Contains(player) || lobby.Fugitives.Contains(player)))
+            {
+                return; // WHITE COLOR BUG FYX..
+            }
+
 
             player.SetSharedData("Ping", player.Ping);
             player.SetData("SpawnTick", Environment.TickCount64);
@@ -3571,13 +3578,6 @@ namespace RNC
                 }
 
                 player.SetSharedData("Team", -1);
-
-                LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
-                if (lobby != null)
-                {
-                    if (lobby.Cops.Contains(player)) player.SetSharedData("Team", 1);
-                    else if (lobby.Fugitives.Contains(player)) player.SetSharedData("Team", 0);
-                }
 
                 if (!EPlayer.LoggedIn(player))
                 {
