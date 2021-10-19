@@ -45,8 +45,8 @@ const modTypes = {0: "Spoilers",
     53: "Plate", 
     66: "Primary Colour", // 0-159
     67: "Secondary Colour",  // 0-159
-    // UNOFFICIAL (CUSTOM ADDED, SCRIPT MAPPED):
     68: "Pearlescent Colour", // 0-159
+    56: "Wheel Type", // -1 to 11
     69: "Wheel Colour", // 0-159
 };
 
@@ -89,6 +89,57 @@ mp.events.add('ModRequestComplete', () => {
     }
 });
 
+function getModPartNameHook(slot, item)
+{
+    let name = item.toString();
+
+    if(slot == 56) // Wheels
+    {
+        switch(item)
+        {
+            case -1:
+                name = "Stock";
+                break;
+            case 0:
+                name = "Sports";
+                break;
+            case 1:
+                name = "Muscle";
+                break;
+            case 2:
+                name = "Lowrider";
+                break;
+            case 3:
+                name = "SUV";
+                break;
+            case 4:
+                name = "Offroad";
+                break;
+            case 5:
+                name = "Tuner";
+                break;
+            case 6:
+                name = "Bike Wheels";
+                break;
+            case 7:
+                name = "High End";
+                break;
+            case 8:
+                name = "Benny's Original";
+                break;
+            case 9:
+                name = "Benny's Bespoke";
+            case 10:
+                name = "Open Wheel";
+                break;
+            case 11:
+                name = "Street";
+                break;
+        }
+    }
+    return name;
+}
+
 mp.events.add('OpenTuner', (vid) => {
 
     vTuner_VehicleID = vid;
@@ -117,6 +168,7 @@ mp.events.add('OpenTuner', (vid) => {
         let num = vehicle.getNumMods(Number(slots));
         if(Number(slots) >= 66) num = 160;
 
+        if(Number(slots) == 56) num = 12; // Wheels -1 to 11
         if(Number(slots) == 18 || Number(slots) == 22) num = 1; // Since getNumMods doesn't work in this and ALL cars get Xenon & Turbo
 
         if(vTuner_VehicleID != -1 && (Number(slots) == 11 || Number(slots) == 12 || Number(slots) == 13 || Number(slots) == 16 || 
@@ -138,6 +190,11 @@ mp.events.add('OpenTuner', (vid) => {
                 }
                 else if(Number(slots) >= 66) continue; // Don't want -1 aka "None" in any colours since it does nothing.
 
+                if(Number(slots) == 56)
+                {
+                    name = getModPartNameHook(Number(slots), i);
+                }
+
                 catItems.push(name);
             }
 
@@ -148,6 +205,7 @@ mp.events.add('OpenTuner', (vid) => {
             else if (Number(slots) == 67) cursor = vehicle.getColours(1, 1).colorSecondary;
             else if (Number(slots) == 68) cursor = vehicle.getExtraColours(1, 1).pearlescentColor;
             else if (Number(slots) == 69) cursor = vehicle.getExtraColours(1, 1).wheelColor;
+            //else if (Number(slots) == 56) cursor = vehicle.getWheelType();
             
             let vTuner_Category = new UIMenuListItem(modTypes[slots], "", new ItemsCollection(catItems), cursor);
             
@@ -171,7 +229,8 @@ mp.events.add('OpenTuner', (vid) => {
                     }
                 }
                 if(vTuner_Category.SlotID >= 66) selection += 1;
-                if(vTuner_Category.SlotID == 53 || vTuner_Category.SlotID == 55) vTuner_OtherMods[vTuner_Category.SlotID] = selection;
+                if(vTuner_Category.SlotID == 53 || vTuner_Category.SlotID == 55 || vTuner_Category.SlotID == 56) vTuner_OtherMods[vTuner_Category.SlotID] = selection;
+
                 mp.events.callRemote('RequestVehicleMod', vTuner_Category.SlotID, selection);
             });
 

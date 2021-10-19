@@ -3313,6 +3313,10 @@ namespace RNC
             {
                 veh.WheelColor = mod;
             }
+            else if(slot == 56)
+            {
+                veh.WheelType = mod;
+            }
             else {
                 if (mod == -1) veh.SetMod(slot, -1);
                 else veh.SetMod(slot, mod);

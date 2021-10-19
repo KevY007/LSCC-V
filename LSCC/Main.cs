@@ -2191,6 +2191,7 @@ namespace RNC
                                 foreach (var kvp in NAPI.Util.FromJson<Dictionary<int, int>>(inst.Mods))
                                 {
                                     pVehicle.SetMod(kvp.Key, kvp.Value);
+                                    if(kvp.Key == 56) pVehicle.WheelType = kvp.Value;
                                 }
                                 pVehicle.PearlescentColor = inst.PearlescentColor;
                                 pVehicle.WheelColor = inst.WheelColor;
@@ -2415,6 +2416,7 @@ namespace RNC
                             foreach (var kvp in NAPI.Util.FromJson<Dictionary<int, int>>(inst.Mods))
                             {
                                 pVehicle.SetMod(kvp.Key, kvp.Value);
+                                if(kvp.Key == 56) pVehicle.WheelType = kvp.Value;
                             }
                             pVehicle.PearlescentColor = inst.PearlescentColor;
                             pVehicle.WheelColor = inst.WheelColor;
@@ -2667,6 +2669,7 @@ namespace RNC
                                                 foreach (var kvp in NAPI.Util.FromJson<Dictionary<int, int>>(inst.Mods))
                                                 {
                                                     p.GetData<Vehicle>("ChaseVehicle").SetMod(kvp.Key, kvp.Value);
+                                                    if(kvp.Key == 56) p.GetData<Vehicle>("ChaseVehicle").WheelType = kvp.Value;
                                                 }
                                                 p.GetData<Vehicle>("ChaseVehicle").PearlescentColor = inst.PearlescentColor;
                                                 p.GetData<Vehicle>("ChaseVehicle").WheelColor = inst.WheelColor;
@@ -2715,6 +2718,7 @@ namespace RNC
                                                 foreach (var kvp in NAPI.Util.FromJson<Dictionary<int, int>>(inst.Mods))
                                                 {
                                                     p.GetData<Vehicle>("ChaseVehicle").SetMod(kvp.Key, kvp.Value);
+                                                    if(kvp.Key == 56) p.GetData<Vehicle>("ChaseVVehicle").WheelType = kvp.Value;
                                                 }
                                                 p.GetData<Vehicle>("ChaseVehicle").PearlescentColor = inst.PearlescentColor;
                                                 p.GetData<Vehicle>("ChaseVehicle").WheelColor = inst.WheelColor;
