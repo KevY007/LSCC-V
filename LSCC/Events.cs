@@ -542,6 +542,11 @@ namespace RNC
                         break;
                     case 3:
                         player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Disabled");
+                        foreach(Player p in Settings.LoggedInPlayers)
+                        {
+                            p.DisableVoiceTo(player);
+                            player.DisableVoiceTo(p);
+                        }
                         break;
                 }
 
