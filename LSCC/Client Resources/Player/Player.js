@@ -709,7 +709,7 @@ mp.events.add('render', () => {
         if(clickDisable) 
         { 
             mp.game.controls.disableControlAction(32, 257, true); 
-            mp.game.player.disableFiring(true);
+            //mp.game.player.disableFiring(true);
         }
         else { mp.game.controls.enableControlAction(32, 257, true); }
 
