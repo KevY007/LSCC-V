@@ -30,3 +30,8 @@ to avoid farming however
 not priority, smth for the future: a offense-defense type event where the main focus is shootouts, completely opposite
 of the current busted event
 pistol only rounds etc? bank robbery. 
+
+
+optimisations:
+on render hud calls to be conditional and remove spam
+option to completely destroy/disable some segments of ui
