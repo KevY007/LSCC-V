@@ -2,6 +2,7 @@
 
 LSPD EUP pack only 45mb - https://www.lcpdfr.com/downloads/gta5mods/character/35865-lspd-uniforms-mega-pack/
 
+RUN discord commands in NAPI.Task.Run to get around api thread safe errors
 cayo perico map (custom code column in maps tab so players can load custom code or ipls dk upto me lol)
 DM ARENA: IPL/EXTRAS STUFF LEFT -- ADD SAME WITH MAP TOO
 COQUETTE AND TURISMO FROM GTA 4 BEST RP
