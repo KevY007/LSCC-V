@@ -146,6 +146,13 @@ function ToggleMenu()
               label: "GPS Key",
               description: "This is the key used to toggle GPS."
             },
+            {
+              id: 9,
+              type: 3,
+              name: "bigmapbind",
+              label: "Expanded Minimap",
+              description: "Toggles the larger minimap view."
+            }
           ]`);
           
         UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.tri.value = ${mp.storage.data.menu.topRightInfo};`);
@@ -158,6 +165,7 @@ function ToggleMenu()
         UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.updr.value = ${mp.storage.data.menu.updateRate};`);
         UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.vcbind.value = "${String.fromCharCode(curVoiceBind)}";`);
         UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.gpsbind.value = "${String.fromCharCode(curGPSBind)}";`);
+        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.bigmapbind.value = "${String.fromCharCode(curMapBind)}";`);
     }
 }
 
@@ -227,6 +235,10 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     else if(id == 8)
     {
         mp.events.callLocal("playerCommand", `gpsbind ${value}`);
+    }
+    else if(id == 9)
+    {
+        mp.events.callLocal("playerCommand", `bigmapbind ${value}`);
     }
 
     if(UIHud != null)

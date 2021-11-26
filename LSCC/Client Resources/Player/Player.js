@@ -58,6 +58,9 @@ var lastGPSBind = 0x5A;
 var curGPSBind = 0x5A;
 var radioToggle = 0;
 
+var lastMapBind = 0x4F;
+var curMapBind = 0x4F;
+
 var ServerSettings = [];
 var ShotStats = [];
 
@@ -238,6 +241,11 @@ if(mp.storage.data.gpsbind !== undefined)
     curGPSBind = mp.storage.data.gpsbind;
     lastGPSBind = mp.storage.data.gpsbind;
 }
+if(mp.storage.data.bigmapbind !== undefined)
+{
+    curMapBind = mp.storage.data.bigmapbind;
+    lastMapBind = mp.storage.data.bigmapbind;
+}
 
 if(mp.storage.data.radiotoggle !== undefined)
 {
@@ -245,6 +253,7 @@ if(mp.storage.data.radiotoggle !== undefined)
 }
 
 mp.keys.bind(lastGPSBind, true, TogGPSMode);
+
 
 mp.events.addCommand("gpsbind", function (bind) {
     
@@ -523,7 +532,39 @@ mp.events.addCommand("updaterate", function (rate) {
         1000, "bottomCenter", "replace");
 });
 
-mp.events.addCommand("bigmap", function (state) {
+
+mp.keys.bind(lastMapBind, false, () => {
+    ToggleBigMap(69);
+});
+
+mp.events.addCommand("bigmapbind", function (bind) {
+    
+    bind = Number(bind);
+
+    if (!Number.isInteger(bind)) {
+        mp.gui.chat.push("USAGE: bigmapbind (keycode) --Input a virtual keycode e.g. 0x4F is 'O' (default)");
+        mp.gui.chat.push("https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes");
+        mp.gui.chat.push("Or press 'M' to open the menu and head into the 'Settings' tab to change this.");
+        return;
+    }
+
+    mp.storage.data.bigmapbind = bind;
+
+    mp.storage.flush();
+
+    lastMapBind = curMapBind;
+    curMapBind = bind;
+
+    mp.keys.unbind(lastMapBind, true, ToggleBigMap);
+    mp.keys.bind(curMapBind, true, ToggleBigMap);
+
+    mp.events.callLocal("HUDNotify", `Big Minimap key is now binded to <strong>${String.fromCharCode(curMapBind)}</strong>.`, "blue", "fas fa-check", false, 
+        1000, "bottomCenter", "replace");
+
+    mp.events.callLocal("RemoveTooltip", String.fromCharCode(lastMapBind));
+});
+
+function ToggleBigMap(state){
     state = Number(state);
 
     if (Number.isInteger(state) && (state == 0 || state == 1)) {
@@ -553,6 +594,10 @@ mp.events.addCommand("bigmap", function (state) {
         1000, "bottomCenter", "replace");
     }
     mp.storage.flush();
+}
+
+mp.events.addCommand("bigmap", function (state) {
+    ToggleBigMap(state);
 });
 
 if(!radioToggle) mp.game.audio.setInitialPlayerStation('OFF');
