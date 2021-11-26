@@ -32,6 +32,28 @@ not priority, smth for the future: a offense-defense type event where the main f
 of the current busted event
 pistol only rounds etc? bank robbery. 
 
+cops shouldn't be able to /lobby while in collision phase OR -0.2 fug. chance if they do (anti-rage/lobbying till theyre fugis)
+remove van from fugitive vehicle pool because it's ultra slow and guaranteed L for fugis
+
+extra XP if a cop arrests a fugi that has shot tag
+
+more commands for freeroam like vehicle godmode, more detailed /time (allowing hours and mins to be adjusted),
+interior selection/menu or smth... there's lots of stuff to add to freeroam
+
+happy hours mode like on samp which gives a XP and/or points multiplier -> should be discussed thoroughly before adding,
+although it's safe to say it definitely wouldn't be 2X multiplier like on samp cuz RIP economy :(
+
+some sort of a tutorial page/phase upon registering to show basic features/rules/etc.
+/rules command [if it doesn't exist], or show a rules page to newly-registered players [if /rules does exist]
+
+QoL improvements:
+adjustable "PLAYER HAS SHOT" text label color [probably would require rotx to make RGB selection in his settings menu for that]
+toggleable hitmarker option in the settings -> we should check if there's a setting for this in gta 5 settings or not, OR if there's even
+a native to call to disable it (probably hideHudElement(some index here))
+keybind for expanded map display
+fixing/adding error codes on register/login
+/ogetip for admins to get the last IP a player connected with
+keep player in spectate mode after the target dies instead of disabling spec
 
 optimisations:
 on render hud calls to be conditional and remove spam
