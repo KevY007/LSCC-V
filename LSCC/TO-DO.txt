@@ -50,7 +50,6 @@ QoL improvements:
 adjustable "PLAYER HAS SHOT" text label color [probably would require rotx to make RGB selection in his settings menu for that]
 toggleable hitmarker option in the settings -> we should check if there's a setting for this in gta 5 settings or not, OR if there's even
 a native to call to disable it (probably hideHudElement(some index here))
-keybind for expanded map display
 fixing/adding error codes on register/login
 /ogetip for admins to get the last IP a player connected with
 keep player in spectate mode after the target dies instead of disabling spec
