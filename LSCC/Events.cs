@@ -1572,6 +1572,12 @@ namespace RNC
             pChar.LipstickColor = hairAndCol[7];
             pChar.ChestHairColor = hairAndCol[8];
 
+            pChar.Clothing[0].Clothes[3].Drawable = pChar.Clothing[0].TorsoDrawableTexture.Key;
+            pChar.Clothing[0].Clothes[3].Texture = pChar.Clothing[0].TorsoDrawableTexture.Value;
+
+            pChar.Clothing[1].Clothes[3].Drawable = pChar.Clothing[1].TorsoDrawableTexture.Key;
+            pChar.Clothing[1].Clothes[3].Texture = pChar.Clothing[1].TorsoDrawableTexture.Value;
+
 
             if (player.HasData("cEditClothingData"))
             {

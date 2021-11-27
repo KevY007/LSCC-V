@@ -62,6 +62,7 @@ namespace RNC
         {
             this.Drawable = 0;
             this.Texture = -1;
+
         }
     }
 
@@ -72,10 +73,12 @@ namespace RNC
         public int HatTxt { get; set; }
         public int Glasses { get; set; }
         public int GlassesTxt { get; set; }
+        public KeyValuePair<int, int> TorsoDrawableTexture; // dumb workaround moment for the torso until we fix it somehow
 
         public ClothingData(int teamID = -1)
         {
             this.Clothes = new AccClothData[12];
+            TorsoDrawableTexture = new KeyValuePair<int, int>(0, 0);
 
             for (int i = 0; i < 12; i++)
             {
@@ -91,7 +94,7 @@ namespace RNC
                     case 0:
                         {
                             this.Clothes[4].Drawable = 1;
-                            this.Clothes[4].Texture = 0;
+                            this.Clothes[4].Texture = 0;                            
 
                             this.Clothes[5].Drawable = 82;
                             this.Clothes[5].Texture = 0;
@@ -101,12 +104,14 @@ namespace RNC
 
                             this.Clothes[11].Drawable = 50;
                             this.Clothes[11].Texture = new Random().Next(0, 5);
+                            TorsoDrawableTexture = new KeyValuePair<int, int>(0, 0);
                             break;
                         }
                     case 1:
                         {
                             this.Clothes[3].Drawable = 23;
                             this.Clothes[3].Drawable = 0;
+                            TorsoDrawableTexture = new KeyValuePair<int, int>(23, 0);
 
                             this.Clothes[11].Drawable = 5;
                             int[] possibleTexts = { 0, 1, 2, 7 };
@@ -123,6 +128,7 @@ namespace RNC
                         {
                             this.Clothes[3].Drawable = 1; // torso
                             this.Clothes[3].Drawable = 0;
+                            TorsoDrawableTexture = new KeyValuePair<int, int>(1, 0);
 
                             this.Clothes[11].Drawable = 6; // shirt
                             int[] possibleTexts = { 0, 1, 3, 4, 5, 6, 8, 9, 11 };
@@ -142,6 +148,7 @@ namespace RNC
                         {
                             this.Clothes[3].Drawable = 1; // torso
                             this.Clothes[3].Drawable = 0;
+                            TorsoDrawableTexture = new KeyValuePair<int, int>(1, 0);
 
                             this.Clothes[11].Drawable = 7; // shirt
                             this.Clothes[11].Texture = new Random().Next(0, 16);
@@ -160,6 +167,7 @@ namespace RNC
                         {
                             this.Clothes[3].Drawable = 1; // torso
                             this.Clothes[3].Drawable = 0;
+                            TorsoDrawableTexture = new KeyValuePair<int, int>(1, 0);
 
                             this.Clothes[11].Drawable = 14; // shirt
                             this.Clothes[11].Texture = new Random().Next(0, 16);
@@ -175,6 +183,7 @@ namespace RNC
                         {
                             this.Clothes[3].Drawable = 55; // torso
                             this.Clothes[3].Drawable = 0;
+                            TorsoDrawableTexture = new KeyValuePair<int, int>(55, 0);
 
                             this.Clothes[11].Drawable = 204; // shirt
                             this.Clothes[11].Texture = new Random().Next(0, 13);
@@ -190,6 +199,7 @@ namespace RNC
                         {
                             this.Clothes[3].Drawable = 1; // torso
                             this.Clothes[3].Drawable = 0;
+                            TorsoDrawableTexture = new KeyValuePair<int, int>(1, 0);
 
                             this.Clothes[11].Drawable = 233; // shirt
                             this.Clothes[11].Texture = new Random().Next(0, 10);
@@ -208,6 +218,7 @@ namespace RNC
                         {
                             this.Clothes[4].Drawable = 1;
                             this.Clothes[4].Texture = 0;
+                            TorsoDrawableTexture = new KeyValuePair<int, int>(0, 0);
 
                             this.Clothes[5].Drawable = 82;
                             this.Clothes[5].Texture = 0;
@@ -227,6 +238,7 @@ namespace RNC
                 int defOutfit = new Random().Next(0, 3);
                 this.Clothes[3].Drawable = 0; // torso
                 this.Clothes[3].Texture = 0;
+                TorsoDrawableTexture = new KeyValuePair<int, int>(0, 0);
 
                 this.Clothes[4].Drawable = 126; // pants
                 this.Clothes[4].Texture = 0;
