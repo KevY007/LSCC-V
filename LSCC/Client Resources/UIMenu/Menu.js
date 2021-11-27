@@ -147,7 +147,7 @@ function ToggleMenu()
               description: "This is the key used to toggle GPS."
             },
             {
-              id: 9,
+              id: 11,
               type: 3,
               name: "bigmapbind",
               label: "Expanded Minimap",
@@ -236,7 +236,7 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     {
         mp.events.callLocal("playerCommand", `gpsbind ${value}`);
     }
-    else if(id == 9)
+    else if(id == 11)
     {
         mp.events.callLocal("playerCommand", `bigmapbind ${value}`);
     }

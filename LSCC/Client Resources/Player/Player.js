@@ -58,8 +58,8 @@ var lastGPSBind = 0x5A;
 var curGPSBind = 0x5A;
 var radioToggle = 0;
 
-var lastMapBind = 0x4F;
-var curMapBind = 0x4F;
+var lastMapBind = 0x50;
+var curMapBind = 0x50;
 
 var ServerSettings = [];
 var ShotStats = [];
@@ -263,6 +263,13 @@ mp.events.addCommand("gpsbind", function (bind) {
         mp.gui.chat.push("USAGE: gpsbind (keycode) --Input a virtual keycode e.g. 0x5A is 'Z' (default)");
         mp.gui.chat.push("https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes");
         return;
+    }
+
+    if(mp.storage.data.gpsbind !== undefined){
+        mp.keys.unbind(mp.storage.data.gpsbind, true, TogGPSMode);
+    }
+    else{
+        mp.keys.unbind(0x5A, true, TogGPSMode);
     }
 
     mp.storage.data.gpsbind = bind;
@@ -542,10 +549,18 @@ mp.events.addCommand("bigmapbind", function (bind) {
     bind = Number(bind);
 
     if (!Number.isInteger(bind)) {
-        mp.gui.chat.push("USAGE: bigmapbind (keycode) --Input a virtual keycode e.g. 0x4F is 'O' (default)");
+        mp.gui.chat.push("USAGE: bigmapbind (keycode) --Input a virtual keycode e.g. 0x50 is 'P' (default)");
         mp.gui.chat.push("https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes");
         mp.gui.chat.push("Or press 'M' to open the menu and head into the 'Settings' tab to change this.");
         return;
+    }
+
+    if(mp.storage.data.bigmapbind !== undefined)
+    {
+        mp.keys.unbind(mp.storage.data.bigmapbind, true, ToggleBigMap);
+    }
+    else{
+        mp.keys.unbind(0x50, true, ToggleBigMap);
     }
 
     mp.storage.data.bigmapbind = bind;
@@ -565,12 +580,20 @@ mp.events.addCommand("bigmapbind", function (bind) {
 });
 
 function ToggleBigMap(state){
+
     state = Number(state);
 
     if (Number.isInteger(state) && (state == 0 || state == 1)) {
         mp.storage.data.menu.alwaysExpandedMap = Boolean(state);
     }
     else {
+
+        if(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false) return;
+        if(Date.now() - lastChatToggle <= 500) return;
+        if(menuToggled !== undefined && menuToggled) return;
+        if(chatStatus && !scoreboardToggled) return;
+        if(menuToggled) return;
+
         if(mp.storage.data.menu.alwaysExpandedMap == true)
         {
             mp.storage.data.menu.alwaysExpandedMap = false;
