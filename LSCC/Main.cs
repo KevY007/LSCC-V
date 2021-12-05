@@ -2367,8 +2367,8 @@ namespace RNC
                                     enginePower = 10.0f;
                                     break;
                                 case 2:
-                                    carName = "moonbeam";
-                                    enginePower = 20.0f;
+                                    carName = "premier";
+                                    enginePower = 10.0f;
                                     break;
                                 case 3:
                                     carName = "rancherxl";
