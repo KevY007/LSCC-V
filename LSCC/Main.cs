@@ -1299,7 +1299,8 @@ namespace RNC
             new CarData(0, "Seminole Frontier", "seminole2", "package://Artwork/Vehicles/seminole2.png", "Slow", 1);
             new CarData(0, "Huntley", "huntley", "package://Artwork/Vehicles/huntley.png", "Average", 3);
             new CarData(0, "Tailgater", "tailgater", "package://Artwork/Vehicles/tailgater.png", "Slow", 5);
-            new CarData(0, "Sanchez", "sanchez2", "package://Artwork/Vehicles/sanchez2.png", "Fast", 5, 10);
+            //new CarData(0, "Sanchez", "sanchez2", "package://Artwork/Vehicles/sanchez2.png", "Fast", 5, 10);
+            new CarData(0, "Felon GT", "felon2", "package://Artwork/Vehicles/felon2.png", "Average+", 5);
             new CarData(0, "Huntley IV", "huntley2", "package://Artwork/Vehicles/huntley2.png", "Average", 6);
             new CarData(0, "Blista Classic", "blista2", "package://Artwork/Vehicles/blista2.png", "Average", 10);
             new CarData(0, "Cheburek", "cheburek", "package://Artwork/Vehicles/cheburek.png", "Average", 15, 10);
@@ -2383,6 +2384,19 @@ namespace RNC
                         else
                         {
                             carName = EPlayer.GetAccount(_tempPlayer).CarFugitive;
+                            if(carName == "sanchez")
+                            {
+                                _tempPlayer.SendChatMessage("!{#FF0000}> The Sanchez is no longer a fugitive vehicle.");
+                                _tempPlayer.SendChatMessage("!{#FF0000}> It has been replaced with the !{#FFFFFF}Felon GT!{#FF0000}, which has been added to your inventory.");
+                                EPlayer.UnlockVehicle(_tempPlayer, "felon2", 0);
+                                if(ContextFactory.Instance.OwnedVehicles.FirstOrDefault<OwnedVehData>(v => v.Model == "sanchez" && v.AccountSQLID == EPlayer.GetAccount(_tempPlayer).SQL_ID) != null)
+                                {
+                                    OwnedVehData _d = ContextFactory.Instance.OwnedVehicles.FirstOrDefault<OwnedVehData>(v => v.Model == "sanchez" && v.AccountSQLID == EPlayer.GetAccount(_tempPlayer).SQL_ID);
+                                    ContextFactory.Instance.OwnedVehicles.Remove(_d);
+                                    ContextFactory.Instance.SaveChanges();
+                                }
+                                carName = "felon2";
+                            }
 
                             // incrementing times this police vehicle was used
                             if (EPlayer.HasOwnedVehicle(_tempPlayer, carName, 0))
