@@ -5934,7 +5934,7 @@ namespace RNC
             if (player.HasData("AskedBySquad"))
             {
                 player.SetData("PlayerSquad", player);
-                player.SetSharedData("PlayerSquadID", -1);
+                player.SetSharedData("PlayerSquadID", player.Id);
 
                 Player target = player.GetData<Player>("AskedBySquad");
                 player.ResetData("AskedBySquad");
