@@ -10,6 +10,11 @@ const timerBarLib = require("./Player/Bar.js");
 
 player.crawl = false;
 
+player.canExitVehicle = true;
+mp.events.add("ToggleCanExitVehicle", (toggle) => {
+    player.canExitVehicle = toggle;
+})
+
 let chaseStartVeh = -1;
 let chaseStartSeat = -1;
 
@@ -362,6 +367,10 @@ mp.events.add("AFKDriverCheck", (x,y,z) => {
 });
 
 mp.events.add("render", () => {
+
+    if(!player.canExitVehicle){   
+        mp.game.controls.disableControlAction(0, 75, true);
+    }
 
     // Anti Pistol Whip?
     if (mp.game.invoke('0x475768A975D5AD17', player.handle, 6))

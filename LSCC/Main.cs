@@ -2692,6 +2692,7 @@ namespace RNC
                                         }
 
                                         EPlayer.Freeze(p, false);
+                                        p.TriggerEvent("ToggleCanExitVehicle", false);
                                     }
                                     catch { }
                                 }
@@ -2740,6 +2741,7 @@ namespace RNC
                                             }
                                         }
                                         EPlayer.Freeze(p, true);
+                                        p.TriggerEvent("ToggleCanExitVehicle", false);
                                     }
                                     catch { }
                                 }
@@ -2806,7 +2808,11 @@ namespace RNC
                         {
                             foreach(Player p in lobby.Cops)
                             {
-                                if(p != null) EPlayer.Freeze(p, true);
+                                if (p != null)
+                                {
+                                    EPlayer.Freeze(p, true);
+                                    p.TriggerEvent("ToggleCanExitVehicle", false);
+                                }
                             }
 
                             foreach (Player p in lobby.Fugitives)
@@ -2814,6 +2820,7 @@ namespace RNC
                                 if (p != null)
                                 {
                                     EPlayer.Freeze(p, false);
+                                    p.TriggerEvent("ToggleCanExitVehicle", false);
                                 }
                             }
                         }
@@ -2824,7 +2831,17 @@ namespace RNC
                                 if (p != null)
                                 { 
                                     EPlayer.Freeze(p, false);
+                                    p.SendNotification("~y~You can now exit vehicles.");
                                     p.SendNotification("~b~You may begin the chase now.");
+                                    p.TriggerEvent("ToggleCanExitVehicle", true);
+                                }
+                            }
+                            foreach(Player p in lobby.Fugitives)
+                            {
+                                if (p != null)
+                                {
+                                    p.SendNotification("~y~You can now exit vehicles.");
+                                    p.TriggerEvent("ToggleCanExitVehicle", true);
                                 }
                             }
                         }

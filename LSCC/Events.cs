@@ -1231,7 +1231,7 @@ namespace RNC
 
                         player.TriggerEvent("ResetWounded");
                         player.SetSharedData("Wounded", 0);
-                        OnStopReviving(player);
+                        //OnStopReviving(player);
                     }
                 }
 

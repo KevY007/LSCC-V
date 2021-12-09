@@ -73,8 +73,8 @@ function PainkillerAction(){
 
 function initiateActionTimer(startTime){
     maxActionTime = startTime;
-    UIHud.execute(`gm.$refs.actionBar.maxtime = ${startTime}`);
-    UIHud.execute(`gm.$refs.actionBar.time = 0.1`);
+    UIHud.execute(`gm.$refs.actionBar.maxtime = ${startTime+1}`);
+    UIHud.execute(`gm.$refs.actionBar.time = 1`);
     UIHud.execute(`gm.$refs.actionBar.fugitive = ${(mp.players.local.getVariable("Team") == 0 ? true : false)}`);
     UIHud.execute(`gm.actionBar = true;`);
 }
