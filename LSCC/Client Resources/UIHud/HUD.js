@@ -675,17 +675,14 @@ function updatePlayers()
         ping = 0;
         level = 0;
         squad = -1;
-	
-        if(sb.getVariable("InLobby") == -3) lobbyStr = "F";
-        else if(sb.getVariable("InLobby") == -4) lobbyStr = "D";
-        else if(sb.getVariable("InLobby") > 0) lobbyStr = sb.getVariable("InLobby");
-		
+
+        lobbyStr = sb.getVariable("InLobby");		
+        squad = sb.getVariable("PlayerSquadID");	
 		if(sb.getVariable("Color_R") !== undefined) colr = sb.getVariable("Color_R");
 		if(sb.getVariable("Color_G") !== undefined) colg = sb.getVariable("Color_G");
 		if(sb.getVariable("Color_B") !== undefined) colb = sb.getVariable("Color_B");
 		if(sb.getVariable("Level") !== undefined) level = sb.getVariable("Level");
 		if(sb.getVariable("Ping") !== undefined) ping = sb.getVariable("Ping");
-        squad = sb.getVariable("PlayerSquadID");	
 
         updateString += `{lid: ${lobbyStr}, squad: ${squad},
         color: 'rgb(${colr}, ${colg}, ${colb})', 

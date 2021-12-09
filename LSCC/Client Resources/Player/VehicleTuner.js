@@ -169,6 +169,7 @@ mp.events.add('OpenTuner', (vid) => {
         if(Number(slots) >= 66) num = 160;
 
         if(Number(slots) == 56) num = 12; // Wheels -1 to 11
+        if(Number(slots) == 53) num = 5; // Plates 0 to 5 + none even tho its same as 0
         if(Number(slots) == 18 || Number(slots) == 22) num = 1; // Since getNumMods doesn't work in this and ALL cars get Xenon & Turbo
 
         if(vTuner_VehicleID != -1 && (Number(slots) == 11 || Number(slots) == 12 || Number(slots) == 13 || Number(slots) == 16 || 
@@ -193,6 +194,13 @@ mp.events.add('OpenTuner', (vid) => {
                 if(Number(slots) == 56)
                 {
                     name = getModPartNameHook(Number(slots), i);
+                }
+                if(Number(slots) == 22)
+                {
+                    if(i == 0){
+                        name = "Yes";
+                    }
+                    else name = "No";
                 }
 
                 catItems.push(name);
