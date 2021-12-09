@@ -5934,11 +5934,13 @@ namespace RNC
             if (player.HasData("AskedBySquad"))
             {
                 player.SetData("PlayerSquad", player);
+                player.SetSharedData("PlayerSquadID", -1);
 
                 Player target = player.GetData<Player>("AskedBySquad");
                 player.ResetData("AskedBySquad");
 
                 target.SetData("PlayerSquad", player);
+                target.SetSharedData("PlayerSquadID", player.Id);
 
                 Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player).ToList().ForEach((Player member) =>
                 {
@@ -5963,9 +5965,11 @@ namespace RNC
                 {
                     mem.SendChatMessage("!{#FFAC38}[Partners] Your squad has been disbanded.");
                     mem.ResetData("PlayerSquad");
+                    mem.SetSharedData("PlayerSquadID", -1);
                 }
             }
 
+            player.SetSharedData("PlayerSquadID", -1);
             player.ResetData("PlayerSquad");
             player.ResetData("AskedBySquad");
             return;
@@ -7995,7 +7999,7 @@ namespace RNC
             player.TriggerEvent("CreatePlayerCamera", x, y, z, rx, ry, rz, viewangle);
         }
 
-        [Command("setadmin", "!{#AFAFAF}[USAGE] setadmin (target) (level)")]
+        [Command("setadmin", "!{#AFAFAF}[USAGE] setadmin (target) (level)", Alias = "makeadmin,setstaff")]
         public void cmd_setadmin(Player player, Player target, int level)
         {
             if (!EPlayer.LoggedIn(player))
@@ -8029,6 +8033,7 @@ namespace RNC
             Logs.LogAdmin(player, $"Set {target.Name}'s admin level to {EPlayer.GetAdminLevelName(level)}.");
 
             t_acc.Admin = level;
+            target.SetSharedData("Admin", level);
             player.SendChatMessage($"!{{#00FF33}}You have set {target.Name}'s admin level to {EPlayer.GetAdminLevelName(level, true)} ({level})");
             target.SendChatMessage($"!{{#00FF33}}{player.Name} has set your admin level to {EPlayer.GetAdminLevelName(level, true)} ({level})");
             EPlayer.Save(target);

@@ -625,9 +625,27 @@ mp.events.addCommand("bigmap", function (state) {
 
 if(!radioToggle) mp.game.audio.setInitialPlayerStation('OFF');
 
+function UpdateStatsVars(entity){
+    if(entity !== undefined && UIHud !== undefined){
+        UIHud.execute(`gm.stats = {
+            squad: ${entity.SquadID},
+            lobby: ${entity.Lobby},
+            admin: ${entity.Admin},
+            fugitive: ${entity.Team == 0 ? true : false},
+        }`);
+    }
+}
+mp.events.addDataHandler('PlayerSquadID', function(entity, value, oldValue){
+    entity.SquadID = value;
+
+    UpdateStatsVars(entity);
+});
+
+
 mp.events.addDataHandler('Team', function (entity, value, oldValue) 
 {
     entity.Team = value;
+    UpdateStatsVars(entity);
     
     if(entity.type === 'player' && entity.remoteId == mp.players.local.remoteId)
     {
@@ -661,12 +679,18 @@ mp.events.addDataHandler('Team', function (entity, value, oldValue)
 mp.events.addDataHandler('pLogged', function (entity, value, oldValue) 
 {
     entity.LoggedIn = value;
+    UpdateStatsVars(entity);
 });
 
 mp.events.addDataHandler('InLobby', function (entity, value, oldValue) 
 {
     entity.Lobby = value;
+    UpdateStatsVars(entity);
 });
+mp.events.addDataHandler('Admin', function (entity, value, oldValue){
+    entity.Admin = value;
+    UpdateStatsVars(entity);
+})
 
 
 mp.keys.bind(0x4A, false, () => {

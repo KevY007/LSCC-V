@@ -713,6 +713,8 @@ namespace RNC
                 player.ResetData("GIF_Creating");
                 player.ResetData("EditingDMArena");
 
+                player.SetSharedData("Admin", 0);
+
                 ResetShotStats(player);
                 player.SetData<long>("JoinTimeUnix", 0);
                 player.SetData("TeamShotWarning", 0);
@@ -763,6 +765,7 @@ namespace RNC
 
                 player.ResetData("AskedBySquad");
                 player.ResetData("PlayerSquad");
+                player.SetSharedData("PlayerSquadID", -1);
 
                 player.SetSharedData("InLobby", -1);
                 player.SetSharedData("InDM", -1);

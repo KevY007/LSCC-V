@@ -796,6 +796,7 @@ namespace RNC
                     if (player.HasData("PlayerSquad"))
                     {
                         player.ResetData("PlayerSquad");
+                        player.SetSharedData("PlayerSquadID", -1);
                     }
 
                     lock (Settings.LoggedInPlayers)
@@ -804,6 +805,7 @@ namespace RNC
                         {
                             mem.SendChatMessage("!{#FFAC38}[Partners] This squad has been disbanded as the leader left.");
                             mem.ResetData("PlayerSquad");
+                            mem.SetSharedData("PlayerSquadID", -1);
                         }
                     }
 
@@ -1434,6 +1436,8 @@ namespace RNC
             player.SetData("LoggedIn", true);
             player.SetData("AccountHandle", acc);
             player.SetSharedData("pLogged", true);
+
+            player.SetSharedData("Admin", acc.Admin);
 
             if (ContextFactory.Instance.Languages.ToList().Find(l => l.SQL_ID == acc.Language) != null && EPlayer.GetAccount(player).Language != -1)
                 player.SetData("Language", ContextFactory.Instance.Languages.ToList().Find(l => l.SQL_ID == acc.Language));
