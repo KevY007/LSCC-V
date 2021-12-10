@@ -2249,6 +2249,16 @@ namespace RNC
             Account acc = EPlayer.GetAccount(player);
             LoadoutData loadout = Settings.Loadouts.ToList().Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && a.Team == team);
 
+            if(loadout.Name == "Negotiator")
+            {
+                DiscordData d = NAPI.Util.FromJson<DiscordData>(acc.DiscordInfo);
+                if (d.DiscordID == "n/a")
+                {
+                    EPlayer.Notify(player, $"You must <strong>link your Discord account</strong> to unlock this. <strong>(/verify)</strong>", "red", "fas fa-lock", false, 4000, "bottomCenter", "replace");
+                    return;
+                }
+            }
+
             if (EPlayer.HasOwnedLoadout(player, name, team))
             {
                 if (team == 0)

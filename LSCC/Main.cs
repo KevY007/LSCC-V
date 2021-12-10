@@ -1162,6 +1162,13 @@ namespace RNC
             new LoadoutData(1, "Default")
                 .Add(WeaponHash.Pistol, "package://Artwork/Weapons/Pistol.png", "Beretta M9", 40);
 
+            // Discord-exclusive loadout
+            new LoadoutData(1, "Negotiator")
+                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "M1911", 50)
+                .Add(WeaponHash.Assaultshotgun, "package://Artwork/Weapons/AssaultShotgun.png", "AA-12", 20)
+                .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1);
+            // -------------------------
+
             new LoadoutData(1, "Patrol", 5)
                 .Add(WeaponHash.Combatpistol, "package://Artwork/Weapons/CombatPistol.png", "Glock 17", 30)
                 .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Remington 870", 15);
@@ -1209,6 +1216,13 @@ namespace RNC
 
             new LoadoutData(0, "Default")
                 .Add(WeaponHash.Pistol, "package://Artwork/Weapons/Pistol.png", "Beretta M9", 40);
+
+            // Discord-exclusive loadout
+            new LoadoutData(0, "Negotiator")
+                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "M1911", 50)
+                .Add(WeaponHash.Heavyshotgun, "package://Artwork/Weapons/HeavyShotgun.png", "Benelli M1014", 50)
+                .Add(WeaponHash.Molotov, "package://Artwork/Weapons/Molotov.png", "Molotov", 1);
+            // -------------------------
 
             new LoadoutData(0, "Wannabe", 5)
                 .Add(WeaponHash.Snspistol, "package://Artwork/Weapons/SNSPistol.png", "Makarov", 60)
