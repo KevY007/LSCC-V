@@ -1514,6 +1514,12 @@ namespace RNC
             EPlayer.GetAccount(player).LastSessionMins = 0.0;
 
             EPlayer.Notify(player, "Login successful!", "green", "fas fa-check", false, 2000);
+            DiscordData d = NAPI.Util.FromJson<DiscordData>(EPlayer.GetAccount(player).DiscordInfo);
+            if(d.DiscordID == "n/a")
+            {
+                EPlayer.Notify(player, "We highly recommend you to <strong>link your Discord account</strong> by using <strong>/verify</strong>. You will earn some rewards in return!", "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
+                player.SendChatMessage("!{#5eb9ff}[DISCORD] !{#9ebaff}We recommend you to link your Discord account and win some cool perks! ~y~(/verify)");
+            }
 
             foreach(Player adm in Settings.LoggedInPlayers.Where(p => EPlayer.GetAccount(p).Admin > 0)){
                 EPlayer.ShowAdminNotes(adm, acc, AdminNote.ANoteType.OnConnect);
@@ -1601,9 +1607,12 @@ namespace RNC
             EPlayer.Spawn(player);
 
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can edit your character's clothing with /char clothing.");
-            
-            if(EPlayer.GetAccount(player).Level == 1 && EPlayer.GetAccount(player).XP < 2) 
+
+            if (EPlayer.GetAccount(player).Level == 1 && EPlayer.GetAccount(player).XP < 2)
+            {
                 player.SendChatMessage("!{#FF0000}[!] !{#FFFFFF}Please use /help and /keys to get started. Press M to open menu.");
+                EPlayer.Notify(player, "We highly recommend you to <strong>link your Discord account</strong> by using <strong>/verify</strong>. You will earn some rewards in return!", "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
+            }
         }
 
         [RemoteEvent("creator_Leave")]
@@ -1884,6 +1893,7 @@ namespace RNC
 
             player.SetData<long>("JoinTimeUnix", DateTimeOffset.Now.ToUnixTimeSeconds());
 
+            //player.TriggerEvent("RegisterCharacterChoice");
             EPlayer.ShowCharCreator(player);
 
             // Adding the 5 default characters to the outfits section so he has his own entry in the outfits table bla bla boring
@@ -1901,7 +1911,6 @@ namespace RNC
 
             //EPlayer.Spawn(player);
             EPlayer.Notify(player, "Registration successful!", "green", "fas fa-check", false, 2000);
-            EPlayer.Notify(player, "We highly recommend you to <strong>link your Discord account</strong> by using <strong>/verify</strong>", "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
 
             player.TriggerEvent("showLoginBrowser", false);
         }

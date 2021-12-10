@@ -16,6 +16,10 @@ const creatorCoords = {
     cameraLookAt: new mp.Vector3(402.8664, -996.4108, -98.5)
 };
 
+mp.events.add("RegisterCharacterChoice", () => {
+    
+})
+
 const localPlayer = mp.players.local;
 
 function getRandomInt(min, max) {

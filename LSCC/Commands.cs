@@ -698,7 +698,7 @@ namespace RNC
             player.SendChatMessage("~y~[2]~w~ Head into the !{#0097ff}#bot-commands ~w~channel.");
             player.SendChatMessage("~y~[3]~w~ Use command ~y~/verify !{#a6ffa7}(name)!{#ffa6a6}(code) ~w~to verify.");
             player.SendChatMessage("~w~And that's it! The process is very straight-forward. You, for example, have to enter:");
-            player.SendChatMessage($"~y~/verify !{{#a6ffa7}}{player.Name} !{{#ffa6a6}}{_d.DiscordCode}");
+            player.SendChatMessage($"~y~!verify !{{#a6ffa7}}{player.Name} !{{#ffa6a6}}{_d.DiscordCode}");
             player.SendChatMessage(" ");
             player.SendChatMessage("~y~Your Discord code: ~w~" + _d.DiscordCode);
         }
