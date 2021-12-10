@@ -1901,6 +1901,7 @@ namespace RNC
 
             //EPlayer.Spawn(player);
             EPlayer.Notify(player, "Registration successful!", "green", "fas fa-check", false, 2000);
+            EPlayer.Notify(player, "We highly recommend you to <strong>link your Discord account</strong> by using <strong>/verify</strong>", "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
 
             player.TriggerEvent("showLoginBrowser", false);
         }
