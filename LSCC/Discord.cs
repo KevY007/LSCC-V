@@ -108,29 +108,43 @@ namespace RNC
 
                 if (context.Content.StartsWith("!verify"))
                 {
-                    if (!context.Author.IsBot || context.Author.Id != 854293128126267392) return;
+                    if (context.Author.Id != 854293128126267392 && context.Author.Id != 367360197900894209 && context.Author.Id != 253938879554387969
+                        && context.Author.Id != 319893828142366720) return;
 
                     string[] args = context.Content.Split(' ');
-                    if (args.Count() >= 3)
+                    if (args.Count() >= 4)
                     {
-                        try
-                        {
-                            string vName = args[1];
-                            string vID = args[2];
-                            Account _acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(vName, StringComparison.OrdinalIgnoreCase));
-                            if (_acc == null) return;
-                            DiscordData _d = NAPI.Util.FromJson<DiscordData>(_acc.DiscordInfo);
-                            if (!_d.DiscordID.Equals("n/a")) return; // if already verified just in case to return
-
-                            _d.DiscordID = vID;
-                            _d.LeftDiscord = false;
-                            _d.UsedDiscordPerks = true;
-
-                            _acc.DiscordInfo = NAPI.Util.ToJson(_d);
-
-                            Player _p = Settings.LoggedInPlayers.FirstOrDefault<Player>(p => p.Name.Equals(vName, StringComparison.OrdinalIgnoreCase));
-                            if(_p != null)
+                        NAPI.Task.Run(() => {
+                            try
                             {
+                                string vName = args[1];
+                                string vID = args[2];
+                                string msgID = args[3];
+                                Account _acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(vName, StringComparison.OrdinalIgnoreCase));
+                                if (_acc == null)
+                                {
+                                    context.Channel.SendMessageAsync($"!kuracback {msgID} false An account with that name could not be found!");
+                                    return;
+                                }
+                                DiscordData _d = NAPI.Util.FromJson<DiscordData>(_acc.DiscordInfo);
+                                if (!_d.DiscordID.Equals("n/a")) // if already verified just in case to return
+                                {
+                                    context.Channel.SendMessageAsync($"!kuracback {msgID} false An account with that name is already linked to <@{_d.DiscordID}>!");
+                                    return;
+                                }
+                                Player _p = Settings.LoggedInPlayers.FirstOrDefault<Player>(p => p.Name.Equals(vName, StringComparison.OrdinalIgnoreCase));
+                                if (_p == null) // if the player is not online or logged in
+                                {
+                                    context.Channel.SendMessageAsync($"!kuracback {msgID} false You must be in-game and logged in to link your account!");
+                                    return;
+                                }
+
+                                _d.DiscordID = vID;
+                                _d.LeftDiscord = false;
+                                _d.UsedDiscordPerks = true;
+
+                                _acc.DiscordInfo = NAPI.Util.ToJson(_d);
+
                                 _p.SendChatMessage("!{#83ff75}Congratulations! You successfully linked your Discord account to your Race 'N' Chase account.");
                                 _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You now have access to the !{#ffff00}Negotiator !{#ffffff}loadout for {!#0097ff}cops !{#ffffff}& !{#ffae00}fugitives!{#ffffff}.");
                                 _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You unlocked a new !{#ffae00}fugitive !{#ffffff}vehicle: !{#ffff00}Super Diamond!{#ffffff}.");
@@ -140,13 +154,15 @@ namespace RNC
                                 EPlayer.GivePoints(_p, 13);
                                 EPlayer.UnlockLoadout(_p, "Negotiator", 0);
                                 EPlayer.UnlockLoadout(_p, "Negotiator", 1);
-                                EPlayer.UnlockVehicle(_p, "superd", 0); 
+                                EPlayer.UnlockVehicle(_p, "superd", 0);
                                 _p.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
+
+                                ContextFactory.Instance.SaveChanges(); 
+                                context.Channel.SendMessageAsync($"!kuracback {msgID} true You successfully linked your Discord account to your Race 'N' Chase account! :confetti_ball:");
+                                return;
                             }
-                            ContextFactory.Instance.SaveChanges();
-                            return;
-                        }
-                        catch { }
+                            catch { }
+                        }, 50);
                     }
                     else return;
                 }

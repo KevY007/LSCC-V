@@ -687,9 +687,15 @@ namespace RNC
         public void cmd_verify(Player player)
         {
             DiscordData _d = NAPI.Util.FromJson<DiscordData>(EPlayer.GetAccount(player).DiscordInfo);
+            if(_d.DiscordID != "n/a")
+            {
+                player.SendChatMessage("~y~Your Discord account is already linked.");
+                return;
+            }
+
             player.SendChatMessage("~w~====================> !{#0097ff}HOW TO VERIFY ~w~<====================");
-            player.SendChatMessage("~y~[1]~w~ Join our !{#5865F2}Discord ~y~(discord.gg/y3g2WuR)~w~.");
-            player.SendChatMessage("~y~[2]~w~ Head into the !{#5865F2}#bot-commands ~w~channel.");
+            player.SendChatMessage("~y~[1]~w~ Join our !{#0097ff}Discord ~y~(discord.gg/y3g2WuR)~w~.");
+            player.SendChatMessage("~y~[2]~w~ Head into the !{#0097ff}#bot-commands ~w~channel.");
             player.SendChatMessage("~y~[3]~w~ Use command ~y~/verify !{#a6ffa7}(name)!{#ffa6a6}(code) ~w~to verify.");
             player.SendChatMessage("~w~And that's it! The process is very straight-forward. You, for example, have to enter:");
             player.SendChatMessage($"~y~/verify !{{#a6ffa7}}{player.Name} !{{#ffa6a6}}{_d.DiscordCode}");
