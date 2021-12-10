@@ -106,6 +106,51 @@ namespace RNC
 
                 if (context.Channel.Name != "staff-bot") return;
 
+                if (context.Content.StartsWith("!verify"))
+                {
+                    if (!context.Author.IsBot || context.Author.Id != 854293128126267392) return;
+
+                    string[] args = context.Content.Split(' ');
+                    if (args.Count() >= 3)
+                    {
+                        try
+                        {
+                            string vName = args[1];
+                            string vID = args[2];
+                            Account _acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(vName, StringComparison.OrdinalIgnoreCase));
+                            if (_acc == null) return;
+                            DiscordData _d = NAPI.Util.FromJson<DiscordData>(_acc.DiscordInfo);
+                            if (!_d.DiscordID.Equals("n/a")) return; // if already verified just in case to return
+
+                            _d.DiscordID = vID;
+                            _d.LeftDiscord = false;
+                            _d.UsedDiscordPerks = true;
+
+                            _acc.DiscordInfo = NAPI.Util.ToJson(_d);
+
+                            Player _p = Settings.LoggedInPlayers.FirstOrDefault<Player>(p => p.Name.Equals(vName, StringComparison.OrdinalIgnoreCase));
+                            if(_p != null)
+                            {
+                                _p.SendChatMessage("!{#83ff75}Congratulations! You successfully linked your Discord account to your Race 'N' Chase account.");
+                                _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You now have access to the !{#ffff00}Negotiator !{#ffffff}loadout for {!#0097ff}cops !{#ffffff}& !{#ffae00}fugitives!{#ffffff}.");
+                                _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You unlocked a new !{#ffae00}fugitive !{#ffffff}vehicle: !{#ffff00}Super Diamond!{#ffffff}.");
+                                _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You also received !{#ffff00}13 points & 10XP !{#ffffff}as a bonus.");
+
+                                EPlayer.GrantXP(_p, 10);
+                                EPlayer.GivePoints(_p, 13);
+                                EPlayer.UnlockLoadout(_p, "Negotiator", 0);
+                                EPlayer.UnlockLoadout(_p, "Negotiator", 1);
+                                EPlayer.UnlockVehicle(_p, "superd", 0); 
+                                _p.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
+                            }
+                            ContextFactory.Instance.SaveChanges();
+                            return;
+                        }
+                        catch { }
+                    }
+                    else return;
+                }
+
                 if (context.Content.StartsWith("!getinfo"))
                 {
                     string[] args = context.Content.Split(" ", 2);

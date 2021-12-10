@@ -1294,6 +1294,7 @@ namespace RNC
             // <6.5 = Super
 
             // Fugitives
+            new CarData(0, "Super Diamond", "superd", "package://Artwork/Vehicles/superd.png", "Fast");
             new CarData(0, "Primo", "primo", "package://Artwork/Vehicles/primo.png", "Slow");
             new CarData(0, "Futo GTX", "futo2", "package://Artwork/Vehicles/futo2.png", "Slow", 0, 5);
             new CarData(0, "Seminole Frontier", "seminole2", "package://Artwork/Vehicles/seminole2.png", "Slow", 1);

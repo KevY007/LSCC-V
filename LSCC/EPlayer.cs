@@ -929,7 +929,25 @@ namespace RNC
             DiscordData _d = NAPI.Util.FromJson<DiscordData>(acc.DiscordInfo);
             if (_d.DiscordID.Equals("n/a"))
             {
-                target.SendChatMessage("!{#fa9194}You haven't linked a Discord account yet! !{#ffffff}Please do so in order to activate some cool perks. !{#ffff00}(/discord)");
+                if (EPlayer.GetAccount(target) == acc)
+                {
+                    target.SendChatMessage("!{#fa9194}You haven't linked a Discord account yet! !{#ffffff}Please do so in order to activate some cool perks. !{#ffff00}(/discord, /verify)");
+                }
+                else
+                {
+                    target.SendChatMessage("!{#fa9194}No Discord account is linked to this account.");
+                }
+            }
+            else
+            {
+                if (EPlayer.GetAccount(target) == acc)
+                {
+                    target.SendChatMessage("!{#83ff75}Your Discord account is linked.");
+                }
+                else 
+                {
+                    target.SendChatMessage($"!{{#83ff75}}Discord account is linked! (UID:!{{#ffffff}}{_d.DiscordID}!{{#83ff75}})");
+                }
             }
             
             EPlayer.GrantXP(target, 0);
