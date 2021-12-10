@@ -73,9 +73,9 @@ function PainkillerAction(){
 
 function initiateActionTimer(startTime){
     maxActionTime = startTime;
-    UIHud.execute(`gm.$refs.actionBar.maxtime = ${startTime+1}`);
-    UIHud.execute(`gm.$refs.actionBar.time = 1`);
-    UIHud.execute(`gm.$refs.actionBar.fugitive = ${(mp.players.local.getVariable("Team") == 0 ? true : false)}`);
+    UIHud.execute(`gm.$refs.actionbar.maxtime = ${startTime}`);
+    UIHud.execute(`gm.$refs.actionbar.time = 0`);
+    //UIHud.execute(`gm.$refs.actionbar.fugitive = ${(mp.players.local.getVariable("Team") == 0 ? true : false)}`);
     UIHud.execute(`gm.actionBar = true;`);
 }
 
@@ -94,11 +94,12 @@ function MedkitAction(){
                 mp.events.callRemote("clear_anim");
                 mp.events.callRemote("FinishPlayerAction", actionType);
                 UIHud.execute(`gm.actionBar = false;`);
+                UIHud.execute(`gm.$refs.actionbar.time = 0;`);
                 clearInterval(actionInterval);
             }
             else{
                 actionTime--;           
-                UIHud.execute(`gm.$refs.actionBar.time = ${((maxActionTime - actionTime) == 0 ? 0.1 : (maxActionTime - actionTime))}`);
+                UIHud.execute(`gm.$refs.actionbar.time = ${((maxActionTime - actionTime) == 0 ? 0 : (maxActionTime - actionTime))}`);
                 if(actionTime == 1){
                     mp.events.callRemote("play_anim", "amb@medic@standing@kneel@exit", "exit", 0, 8.0, 0.0, -1, 0.0, false, false, false);
                 }
@@ -260,10 +261,11 @@ mp.events.add("BeginCuffing", (target) => {
         cuffTimeLeft--;
         if(cuffTimeLeft <= 0){
             UIHud.execute(`gm.actionBar = false;`);
+            UIHud.execute(`gm.$refs.actionbar.time = 0;`);
             finishCuffing();
         }
         else{
-            UIHud.execute(`gm.$refs.actionBar.time = ${((maxActionTime - cuffTimeLeft) == 0 ? 0.1 : (maxActionTime - cuffTimeLeft))}`);
+            UIHud.execute(`gm.$refs.actionbar.time = ${((maxActionTime - cuffTimeLeft) == 0 ? 0 : (maxActionTime - cuffTimeLeft))}`);
         }
     }, 1000);
 });

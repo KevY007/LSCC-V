@@ -657,6 +657,9 @@ function ToggleScoreboard()
 
 function updatePlayers()
 {
+    if(mp.players.local !== undefined && mp.players.exists(mp.players.local))
+        UpdateStatsVars(mp.players.local);
+
     let updateString = `gm.$refs.scoreboard.setPlayers([`;
 
     let lobbyStr = '0';

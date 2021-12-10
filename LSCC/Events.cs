@@ -1438,6 +1438,7 @@ namespace RNC
             player.SetSharedData("pLogged", true);
 
             player.SetSharedData("Admin", acc.Admin);
+            player.SetSharedData("PlayerSquadID", -1);
 
             if (ContextFactory.Instance.Languages.ToList().Find(l => l.SQL_ID == acc.Language) != null && EPlayer.GetAccount(player).Language != -1)
                 player.SetData("Language", ContextFactory.Instance.Languages.ToList().Find(l => l.SQL_ID == acc.Language));
@@ -1873,6 +1874,8 @@ namespace RNC
             player.SetSharedData("pLogged", true);
 
             player.Name = acc.Username;
+            player.SetSharedData("Admin", 0);
+            player.SetSharedData("PlayerSquadID", -1);
 
             player.TriggerEvent("DestroyPlayerCamera");
             player.TriggerEvent("TogglePlayerChat", true);
