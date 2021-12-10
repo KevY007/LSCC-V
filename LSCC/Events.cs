@@ -30,7 +30,6 @@ namespace RNC
             if (player.HasData("Kicked")) return;
 
             EPlayer.SetDiscordStatus(player, "Connecting to the server...");
-
             player.SetData("LastCryptAttempt", Environment.TickCount64);
 
             EPlayer.ResetPlayerData(player);
@@ -1272,6 +1271,12 @@ namespace RNC
             player.SetData("Killstreak", 0);
         }
 
+        [RemoteEvent("SetAutoOOC")]
+        public static void SetAutoOOC(Player player, bool toggle)
+        {
+            player.SetSharedData("AutoOOC", toggle);
+        }
+
         [ServerEvent(Event.ChatMessage)]
         public void OnPlayerText(Player player, string message)
         {
@@ -1289,15 +1294,22 @@ namespace RNC
                 return;
             }
 
-            string chatStr = $"{player.Name.Replace("_", " ")} says: {message}";
-            foreach (Player i in RAGE.Entities.Players.All)
+            if (player.GetSharedData<bool>("AutoOOC") == false)
             {
-                if (i.Dimension == player.Dimension)
+                string chatStr = $"{player.Name.Replace("_", " ")} says: {message}";
+                foreach (Player i in RAGE.Entities.Players.All)
                 {
-                    if (i.Position.DistanceTo(player.Position) <= 10.0) i.SendChatMessage($"!{{#D4D4D4}}{chatStr}");
-                    if (i.Position.DistanceTo(player.Position) > 10.0 && i.Position.DistanceTo(player.Position) <= 15.0) i.SendChatMessage($"!{{#B5B5B5}}{chatStr}");
-                    if (i.Position.DistanceTo(player.Position) > 15.0 && i.Position.DistanceTo(player.Position) <= 20.0) i.SendChatMessage($"!{{#999999}}{chatStr}");
+                    if (i.Dimension == player.Dimension)
+                    {
+                        if (i.Position.DistanceTo(player.Position) <= 10.0) i.SendChatMessage($"!{{#D4D4D4}}{chatStr}");
+                        if (i.Position.DistanceTo(player.Position) > 10.0 && i.Position.DistanceTo(player.Position) <= 15.0) i.SendChatMessage($"!{{#B5B5B5}}{chatStr}");
+                        if (i.Position.DistanceTo(player.Position) > 15.0 && i.Position.DistanceTo(player.Position) <= 20.0) i.SendChatMessage($"!{{#999999}}{chatStr}");
+                    }
                 }
+            }
+            else
+            {
+                Commands.cmd_ooc(player, message);
             }
         }
 
@@ -1542,7 +1554,6 @@ namespace RNC
             player.Heading = -185.0f;
         }
 
-
         [RemoteEvent("creator_Save")]
         public void CreatorSave(Player player, byte gender, string parentData, string featureData, string appearanceData, string hairAndColorData)
         {
@@ -1550,6 +1561,7 @@ namespace RNC
 
             CharacterData pChar = new CharacterData();
             pChar.Gender = gender;
+
             ParentData tParentData = NAPI.Util.FromJson<ParentData>(parentData);
 
             pChar.Parents.Father = tParentData.Father;
@@ -1582,6 +1594,15 @@ namespace RNC
             pChar.BlushColor = hairAndCol[6];
             pChar.LipstickColor = hairAndCol[7];
             pChar.ChestHairColor = hairAndCol[8];
+
+            if (EPlayer.GetAccount(player).Level == 1 && EPlayer.GetAccount(player).XP < 2)
+            {
+                if (gender == 1)
+                {
+                    pChar.Clothing[0] = pChar.Clothing[2];
+                    pChar.Clothing[1] = pChar.Clothing[3];
+                }
+            }
 
             pChar.Clothing[0].Clothes[3].Drawable = pChar.Clothing[0].TorsoDrawableTexture.Key;
             pChar.Clothing[0].Clothes[3].Texture = pChar.Clothing[0].TorsoDrawableTexture.Value;
@@ -1893,7 +1914,6 @@ namespace RNC
 
             player.SetData<long>("JoinTimeUnix", DateTimeOffset.Now.ToUnixTimeSeconds());
 
-            //player.TriggerEvent("RegisterCharacterChoice");
             EPlayer.ShowCharCreator(player);
 
             // Adding the 5 default characters to the outfits section so he has his own entry in the outfits table bla bla boring

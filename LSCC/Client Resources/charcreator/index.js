@@ -15,11 +15,6 @@ const creatorCoords = {
     camera: new mp.Vector3(402.8664, -997.5515, -98.5),
     cameraLookAt: new mp.Vector3(402.8664, -996.4108, -98.5)
 };
-
-mp.events.add("RegisterCharacterChoice", () => {
-    
-})
-
 const localPlayer = mp.players.local;
 
 function getRandomInt(min, max) {
@@ -294,7 +289,11 @@ function generateRandomChar(){
     // parents random
     fatherItem.Index = getRandomInt(0, Data.fathers.length - 1);
     motherItem.Index = getRandomInt(0, Data.mothers.length - 1);
-    similarityItem.Index = getRandomInt(0, 100);
+
+    //similarityItem.Index = getRandomInt(0, 100);
+    if(currentGender == 0) similarityItem.Index = 100; // makes males similarity more similar to fathers
+    else similarityItem.Index = 0; // and female similarity more similar to mothers
+
     skinSimilarityItem.Index = getRandomInt(0, 100);
     updateParents();
 
@@ -310,6 +309,11 @@ function generateRandomChar(){
         {
             appearanceItems[i].Index = getRandomInt(0, mp.game.ped.getNumHeadOverlayValues(i) - 1);
             appearanceOpacityItems[i].Index = getRandomInt(0, 100);
+
+            if(i == 1 && currentGender == 1){
+                appearanceItems[i].Index = 0;
+                appearanceOpacityItems[i].Index = 0;
+            }
         }
         else
         {

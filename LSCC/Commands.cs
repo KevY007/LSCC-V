@@ -467,7 +467,6 @@ namespace RNC
 
         }
 
-
         [Command("game", "!{#AFAFAF}[USAGE] game (option: stop, start, autostart, teambalance, mode)", GreedyArg = true)]
         public void cmd_game(Player player, string action)
         {
@@ -3795,7 +3794,7 @@ namespace RNC
             return;
         }
 
-        [Command("clientcmd", Alias = "pagesize,updaterate,lcmenu,fontsize,rappel,rapple,voicebind,noclip_vsm,gpsbind,bigmap,bigmapbind", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
+        [Command("clientcmd", Alias = "pagesize,updaterate,lcmenu,fontsize,rappel,rapple,voicebind,noclip_vsm,autoooc,gpsbind,bigmap,bigmapbind", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
         public void cmd_clientcmd(Player player)
         {
             return;
@@ -8555,7 +8554,7 @@ namespace RNC
         }
 
         [Command("ooc", "!{#AFAFAF}[USAGE] ooc (text)", Alias = "o", GreedyArg = true)]
-        public void cmd_ooc(Player player, string text)
+        public static void cmd_ooc(Player player, string text)
         {
             player.SetData("TUA_LT", 0);
 

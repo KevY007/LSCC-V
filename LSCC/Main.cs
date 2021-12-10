@@ -404,10 +404,10 @@ namespace RNC
 
 
         // Locations
-        public const float LoginCameraX = -1533.5159f;
-        public const float LoginCameraY = -1226.5405f;
-        public const float LoginCameraZ = 2.2699802f;
-        public const float LoginCameraRx = -50;
+        public const float LoginCameraX = -1646.6002f;
+        public const float LoginCameraY = -1123.7172f;
+        public const float LoginCameraZ = 26.576164f;
+        public const float LoginCameraRx = 90;
         public const float LoginCameraRy = 0;
         public const float LoginCameraRz = 0;
         public const float LoginCameraViewAngle = 50;

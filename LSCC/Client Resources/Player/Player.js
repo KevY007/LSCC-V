@@ -241,6 +241,27 @@ function TogGPSMode()
     }
 }
 
+let autoOOC = false;
+if(mp.storage.data.autoooc !== undefined){
+    autoOOC = mp.storage.data.autoooc;
+    mp.events.callRemote("SetAutoOOC", autoOOC);
+}
+else{
+    mp.storage.data.autoooc = autoOOC;
+    mp.events.callRemote("SetAutoOOC", autoOOC);
+}
+mp.events.addCommand("autoooc", () => {
+ 
+    autoOOC = !autoOOC;
+    mp.storage.data.autooc = autoOOC;
+    mp.storage.flush();
+
+    mp.events.callRemote("SetAutoOOC", autoOOC);
+    mp.events.callLocal("HUDNotify", `You will ${autoOOC ? "now" : "no longer"} automatically send messages to OOC chat.`, "blue", "fas fa-check", false, 
+        1000, "bottomCenter", "replace");
+
+});
+
 if(mp.storage.data.gpsbind !== undefined)
 {
     curGPSBind = mp.storage.data.gpsbind;
@@ -258,7 +279,6 @@ if(mp.storage.data.radiotoggle !== undefined)
 }
 
 mp.keys.bind(lastGPSBind, true, TogGPSMode);
-
 
 mp.events.addCommand("gpsbind", function (bind) {
     
