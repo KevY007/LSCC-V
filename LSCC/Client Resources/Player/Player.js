@@ -1521,7 +1521,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
 
             if(targetEntity.getVariable("ClimbProtection") == true || sourceEntity.getVariable("ClimbProtection") == true) return true;
 
-            if(weapon == 911657153 && targetEntity.getVariable("LastVehEnterExit") + 5000 >= Date.now()) return true;
+            if(BigInt(weapon) == BigInt(911657153) && BigInt(targetEntity.getVariable("LastVehEnterExit")) + BigInt(5000) >= BigInt(Date.now())) return true;
 
             if(weapon == 911657153 && targetEntity.getVariable("HasShot") == true && targetEntity.getVariable("Team") == 0 && chaseRunning) return true;
 
@@ -1842,7 +1842,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
 
                         if(chaseTimeCur < 60) return true; // nah not at da start
 
-                        if(targetEntity.getVariable("LastVehEnterExit") + 5000 >= Date.now() 
+                        if(BigInt(targetEntity.getVariable("LastVehEnterExit")) + BigInt(5000) >= BigInt(Date.now())
                             && targetEntity.getVariable("Team") == 0)
                         {
                             mp.game.graphics.notify("~r~Cannot tase! Target exiting vehicle!");
