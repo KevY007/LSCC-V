@@ -287,7 +287,7 @@ namespace RNC
             if (File.Exists("racenchase/we_are_testing"))
                 _connectionString = "Server=" + Settings.MySQL_Host + ";Database=" + "racenchase_test" + ";Uid=" + Settings.MySQL_User + ";Pwd=" + Settings.MySQL_Password;
             else
-                _connectionString = "Server=" + Settings.MySQL_Host + ";Database=" + Settings.MySQL_Database + ";Uid=" + Settings.MySQL_User + ";Pwd=" + Settings.MySQL_Password;
+                _connectionString = "Server=" + Settings.MySQL_Host + ";Database=" + Settings.MySQL_Database + ";Uid=" + Settings.MySQL_User + ";Pwd=" + Settings.MySQL_Password + ";Port=" + Settings.MySQL_Port;
         }
     }
 }

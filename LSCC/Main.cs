@@ -363,10 +363,11 @@ namespace RNC
         public const int DefaultMaxInLobby = 30;
 
         // Connection Settings
-        public const string MySQL_Host = "localhost";
-        public const string MySQL_User = "racenchase";
-        public const string MySQL_Password = "perkovicMatko3035";
+        public const string MySQL_Host = "194.163.144.228";
+        public const string MySQL_User = "dbmandelivery";
+        public const string MySQL_Password = "LLW5HUcpJQZ7g45PmR5rHovh7YUb89";
         public const string MySQL_Database = "racenchase";
+        public const string MySQL_Port = "3369";
         public const string DCBotToken = "NjAyNTQ1Mzc0MDY1OTgzNTgw.XtaCEQ.clpqVL5c0X_38xkT-mYTr4_N9a4";
 
         // Global Variables (changing accordingly)
