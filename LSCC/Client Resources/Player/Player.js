@@ -1446,7 +1446,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                         return true; // Stun Gun no shot if more than 10 meters or target in car.
                     }
 
-                    if(player.weapon == 911657153 && targetEntity.getVariable("LastVehEnterExit") + 5000 >= Date.now()
+                    if(BigInt(player.weapon) == BigInt(911657153) && BigInt(targetEntity.getVariable("LastVehEnterExit")) + BigInt(5000) >= BigInt(Date.now())
                         && targetEntity.getVariable("Team") == 0)
                     {
                         mp.game.graphics.notify("~r~Cannot tase! Target exiting vehicle!");
