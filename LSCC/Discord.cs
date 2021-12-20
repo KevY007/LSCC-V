@@ -108,10 +108,11 @@ namespace RNC
 
                 if (context.Content.StartsWith("!verify"))
                 {
-                    if (context.Author.Id != 854293128126267392 && context.Author.Id != 367360197900894209 && context.Author.Id != 253938879554387969
+                    // first ID is the bot, rest are codename rotx kevy
+                    if (context.Author.Id != 922461597866295397 && context.Author.Id != 367360197900894209 && context.Author.Id != 253938879554387969
                         && context.Author.Id != 319893828142366720) return;
                     string[] args = context.Content.Split(' ');
-                    if (args.Count() >= 6)
+                    if (args.Count() >= 5)
                     {
                         await context.DeleteAsync();
                         NAPI.Task.Run(() => {
@@ -120,35 +121,35 @@ namespace RNC
                                 string vName = args[1];
                                 string vCode = args[2];
                                 string vID = args[3];
-                                string msgID = args[4];
-                                string chanID = args[5];
+                                //string msgID = args[4];
+                                string chanID = args[4];
                                 Account _acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(vName, StringComparison.OrdinalIgnoreCase));
                                 if (_acc == null)
                                 {
-                                    context.Channel.SendMessageAsync($"!kuracback false {msgID} {chanID} An account with that name could not be found!");
+                                    context.Channel.SendMessageAsync($"!kuracback false {chanID} An account with that name could not be found!");
                                     return;
                                 }
                                 DiscordData _d = NAPI.Util.FromJson<DiscordData>(_acc.DiscordInfo);
                                 if (!_d.DiscordID.Equals("n/a")) // if already verified just in case to return
                                 {
-                                    context.Channel.SendMessageAsync($"!kuracback false {msgID} {chanID} An account with that name is already linked to <@{_d.DiscordID}>!");
+                                    context.Channel.SendMessageAsync($"!kuracback false {chanID} An account with that name is already linked to <@{_d.DiscordID}>!");
                                     return;
                                 }
                                 Player _p = Settings.LoggedInPlayers.FirstOrDefault<Player>(p => p.Name.Equals(vName, StringComparison.OrdinalIgnoreCase));
                                 if (_p == null) // if the player is not online or logged in
                                 {
-                                    context.Channel.SendMessageAsync($"!kuracback false {msgID} {chanID} You must be in-game and logged in to link your account!");
+                                    context.Channel.SendMessageAsync($"!kuracback false {chanID} You must be in-game and logged in to link your account!");
                                     return;
                                 }
                                 if (!_d.DiscordCode.Equals(vCode))
                                 {
-                                    context.Channel.SendMessageAsync($"!kuracback false {msgID} {chanID} The code you have entered is invalid! Please use **(/verify)** in-game to check your code.");
+                                    context.Channel.SendMessageAsync($"!kuracback false {chanID} The code you have entered is invalid! Please use **(/verify)** in-game to check your code.");
                                     return;
                                 }
                                 Account _check = ContextFactory.Instance.Accounts.FirstOrDefault<Account>(a => a.DiscordInfo.Contains($"\"DiscordID\":\"{vID}\""));
                                 if(_check != null)
                                 {
-                                    context.Channel.SendMessageAsync($"!kuracback false {msgID} {chanID} This Discord account was already used to verify account **{_check.Username}**!");
+                                    context.Channel.SendMessageAsync($"!kuracback false {chanID} This Discord account was already used to verify account **{_check.Username}**!");
                                     return;
                                 }
 
@@ -171,7 +172,7 @@ namespace RNC
                                 _p.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
 
                                 ContextFactory.Instance.SaveChanges(); 
-                                context.Channel.SendMessageAsync($"!kuracback true {msgID} {chanID} You successfully linked your Discord account to your Race 'N' Chase account!");
+                                context.Channel.SendMessageAsync($"!kuracback true {chanID} You successfully linked your Discord account to your Race 'N' Chase account!");
                                 return;
                             }
                             catch { }
