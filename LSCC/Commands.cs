@@ -1264,6 +1264,72 @@ namespace RNC
             return;
         }
 
+        [Command("claimgift")]
+        public void cmd_claimgift(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Level < 3)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You must be Level 3+ to use this command. (/stats)");
+                return;
+            }
+            Account p = EPlayer.GetAccount(player);
+            if (p.ClaimedGift)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Don't be greedy now! You already claimed your gift.");
+                return;
+            }
+            p.ClaimedGift = true;
+            bool giftLevel = (new Random(DateTimeOffset.UtcNow.Millisecond).Next(10) > 5);
+            if (giftLevel)
+            {
+                int lvl = p.Level;
+                int toGift = 0;
+                if(lvl < 10)
+                {
+                    toGift = new Random(DateTimeOffset.UtcNow.Millisecond).Next(3, 6);
+                }
+                else if(lvl >= 10 && lvl < 30)
+                {
+                    toGift = new Random(DateTimeOffset.UtcNow.Millisecond).Next(5, 8);
+                }
+                else toGift = new Random(DateTimeOffset.UtcNow.Millisecond).Next(7, 11);
+
+                player.SendChatMessage($"!{{#9ceeff}}[XMAS] ~w~You claimed your Christmas gift and received ~y~+{toGift} levels~w~!");
+
+                toGift *= 8; // this should be enough to get them to level they should get?
+                EPlayer.GrantXP(player, toGift);
+            }
+            else
+            {
+                int toGift = new Random(DateTimeOffset.UtcNow.Millisecond).Next(40, 71);
+                EPlayer.GivePoints(player, toGift);
+                player.SendChatMessage($"!{{#9ceeff}}[XMAS] ~w~You claimed your Christmas gift and received ~y~+{toGift} points~w~!");
+            }
+            if(p.DonatorLevel == 0)
+            {
+                player.SendChatMessage($"!{{#9ceeff}}[XMAS] ~w~But it's not over yet! By claiming your gift, you entered the ~y~donator giveaway~w~!");
+                player.SendChatMessage($"!{{#9ceeff}}[XMAS] ~w~The winner of the giveaway will be announced ~y~December 26th~w~ on our ~y~Discord ~w~(/discord).");              
+            }
+            else if(p.DonatorLevel > 0 && p.DonatorLevel < 3)
+            {
+                player.SendChatMessage($"!{{#9ceeff}}[XMAS] ~w~But it's not over yet! By claiming your gift, you entered the ~y~donator giveaway~w~!");
+                player.SendChatMessage($"!{{#9ceeff}}[XMAS] ~w~Since you already have donator, in case you win, you will instead receive a donator rank upgrade.");
+                player.SendChatMessage($"!{{#9ceeff}}[XMAS] ~w~The winner of the giveaway will be announced ~y~December 26th~w~ on our ~y~Discord ~w~(/discord).");
+            }
+            else
+            {
+                player.SendChatMessage($"!{{#9ceeff}}[XMAS] ~w~We are also hosting a donator rank giveaway. Since you are already Gold Donator, you will receive ~y~250 donator points~w~.");
+                p.DonatorPoints += 250;
+                player.SendChatMessage($"!{{#9ceeff}}[XMAS] ~w~In case you win the giveaway, you will get to choose a player to give the rank to instead.");
+            }
+            player.SendChatMessage($"!{{#9ceeff}}The Race 'N' Chase leadership wishes you a Merry Christmas and a Happy New Year.");
+            EPlayer.Save(player);
+            return;
+        }
+
         [Command("noclip", "!{#AFAFAF}[USAGE] noclip", GreedyArg = true)]
         public void cmd_noclip(Player player)
         {

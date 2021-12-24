@@ -27,6 +27,7 @@ namespace RNC
         public string Password { get; set; }
         public string Salt { get; set; }
         public string DiscordInfo { get; set; }
+        public bool ClaimedGift { get; set; }
         public DateTime RegisterDate { get; set; }
         public string RegisterHWID { get; set; }
         public ulong RegisterRID { get; set; }
