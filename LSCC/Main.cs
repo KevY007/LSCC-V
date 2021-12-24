@@ -2107,8 +2107,8 @@ namespace RNC
 
                             spawnLoc = Spawns.First(a => a.spawnTeam == 1);
 
-                            spawnLoc.spawnZ += (pCount * 5); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
-                            spawnLoc.spawnX += (pCount * 2);
+                            //spawnLoc.spawnZ += (pCount * 5); // If no spawns left, stack cars ontop so at least they don't stuck in each other.
+                            //spawnLoc.spawnX += (pCount * 2);
                         }
 
                         Vector3 vecSpawn = new Vector3(spawnLoc.spawnX, spawnLoc.spawnY, spawnLoc.spawnZ);
