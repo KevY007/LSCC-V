@@ -1299,7 +1299,9 @@ namespace RNC
                 else toGift = new Random(DateTimeOffset.UtcNow.Millisecond).Next(7, 11);
 
                 player.SendChatMessage($"!{{#9ceeff}}[XMAS] ~w~You claimed your Christmas gift and received ~y~+{toGift} levels~w~!");
-                p.Level += toGift;
+
+                toGift *= 8; // this should be enough to get them to level they should get?
+                EPlayer.GrantXP(player, toGift);
             }
             else
             {
@@ -1324,7 +1326,6 @@ namespace RNC
                 p.DonatorPoints += 250;
                 player.SendChatMessage($"!{{#9ceeff}}[XMAS] ~w~In case you win the giveaway, you will get to choose a player to give the rank to instead.");
             }
-            player.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
             player.SendChatMessage($"!{{#9ceeff}}The Race 'N' Chase leadership wishes you a Merry Christmas and a Happy New Year.");
             EPlayer.Save(player);
             return;

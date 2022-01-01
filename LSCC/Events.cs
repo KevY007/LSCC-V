@@ -1532,10 +1532,6 @@ namespace RNC
                 EPlayer.Notify(player, "We highly recommend you to <strong>link your Discord account</strong> by using <strong>/verify</strong>. You will earn some rewards in return!", "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
                 player.SendChatMessage("!{#5eb9ff}[DISCORD] !{#9ebaff}We recommend you to link your Discord account and win some cool perks! ~y~(/verify)");
             }
-            if(EPlayer.GetAccount(player).Level >= 3 && EPlayer.GetAccount(player).ClaimedGift == false)
-            {
-                player.SendChatMessage($"!{{#9ceeff}}[XMAS] ~w~You can use ~y~/claimgift~w~ to claim your Christmas gift and enter a giveaway!");
-            }
 
             foreach(Player adm in Settings.LoggedInPlayers.Where(p => EPlayer.GetAccount(p).Admin > 0)){
                 EPlayer.ShowAdminNotes(adm, acc, AdminNote.ANoteType.OnConnect);
