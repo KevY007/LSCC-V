@@ -151,15 +151,7 @@ namespace RNC
             Time[1] = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 59);
             Time[2] = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 59);
 
-            //Weather = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 9);
-            Weather = 13; // setting XMAS weather so snow appears
-            int choice = new Random(DateTimeOffset.UtcNow.Millisecond).Next(100);
-            // Weather 9 is snowflakes, rest are foggy weathers, I made highest chances for snowflakes on purpose :)
-            if (choice < 40) Weather = 9;
-            else
-            {
-                Weather = new Random(DateTimeOffset.UtcNow.Millisecond).Next(3, 6);
-            }
+            Weather = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 9);
 
             lobbyId = -1;
             lastMapId = -1;
@@ -1109,8 +1101,7 @@ namespace RNC
             Settings.DCMentionPlayers = 0;
 
             NAPI.World.SetTime(12, 0, 0);
-            //NAPI.World.SetWeather(Weather.CLOUDS);
-            NAPI.World.SetWeather(Weather.XMAS);
+            NAPI.World.SetWeather(Weather.CLOUDS);
 
             for (int i = 0; i < Settings.MaxLobbies; i++)
             {
