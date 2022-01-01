@@ -2738,7 +2738,6 @@ namespace RNC
                 DerbyWins = 0,
                 Level = 1,
                 Medkits = 0,
-                ClaimedGift = false,
                 Painkillers = 0,
                 Language = -1,
                 XP = 1,

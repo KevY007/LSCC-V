@@ -1264,6 +1264,7 @@ namespace RNC
             return;
         }
 
+<<<<<<< HEAD
         [Command("claimgift")]
         public void cmd_claimgift(Player player)
         {
@@ -1329,6 +1330,8 @@ namespace RNC
             return;
         }
 
+=======
+>>>>>>> parent of 6acf7e9 (Christmas gift system I guess)
         [Command("noclip", "!{#AFAFAF}[USAGE] noclip", GreedyArg = true)]
         public void cmd_noclip(Player player)
         {
