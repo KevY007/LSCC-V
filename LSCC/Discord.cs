@@ -525,6 +525,12 @@ namespace RNC
                                 if (target == null) return; // doesnt hurt to have extra security :)
                                 Account targetAcc = EPlayer.GetAccount(target);
 
+                                if(targetAcc.Admin == 6 || targetAcc.Admin >= aLevel)
+                                {
+                                    context.Channel.SendMessageAsync("**[!]** That player is a higher/equal admin level than you!");
+                                    return;
+                                }
+
                                 target.SetSharedData("Admin", level);
                                 targetAcc.Admin = level;
                                 target.SendChatMessage($"~g~Your admin level has been set to ~y~{level}~g~ by [DC] {context.Author.Username}!");
@@ -537,6 +543,11 @@ namespace RNC
                                 if (targetAcc == null)
                                 {
                                     context.Channel.SendMessageAsync("**[!]** A player with that username could not be found!");
+                                    return;
+                                }
+                                if (targetAcc.Admin == 6 || targetAcc.Admin >= aLevel)
+                                {
+                                    context.Channel.SendMessageAsync("**[!]** That player is a higher/equal admin level than you!");
                                     return;
                                 }
                                 targetAcc.Admin = level;
