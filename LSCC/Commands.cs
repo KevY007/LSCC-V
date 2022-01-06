@@ -6258,7 +6258,7 @@ namespace RNC
             }
             if (EPlayer.GetAccount(player).Admin >= 4)
             {
-                player.SendChatMessage("[Admin Lv 4]: /serveroptions /grantxp /saveserver /dbgplayanim /dbgmaxspeed /dbgdriveforce");
+                player.SendChatMessage("[Admin Lv 4]: /serveroptions /grantxp /saveserver /dbgplayanim /dbgmaxspeed /dbgdriveforce /setadmin [levels 0-3]");
                 player.SendChatMessage("[Admin Lv 4]: /changename (works offline too) /changepass (works offline too) /agivepoints");
                 player.SendChatMessage("[Admin Lv 4]: /maps /deletemap /createmap /addmapspawn /deletemapspawn /mapspawns /createdmarena /selectdmarena /editdmarena");
             }
@@ -8024,7 +8024,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (EPlayer.GetAccount(player).Admin < 6)
+            if (EPlayer.GetAccount(player).Admin < 4)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
                 return;
@@ -8035,12 +8035,22 @@ namespace RNC
 
             Account t_acc = target.GetData<Account>("AccountHandle");
 
-            if (level < 0 || level > 6)
+            if (EPlayer.GetAccount(player).Admin == 6)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed level 6.");
-                return;
+                if (level < 0 || level > 6)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed level 6.");
+                    return;
+                }
             }
-
+            else
+            {
+                if (level < 0 || level > 3)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed level 3 (General Admin).");
+                    return;
+                }
+            }
             if (!player.Name.Equals(target.Name) && EPlayer.GetAccount(target).Admin > EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher admin level than you.");
@@ -8064,7 +8074,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (EPlayer.GetAccount(player).Admin < 6)
+            if (EPlayer.GetAccount(player).Admin < 4)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
@@ -8084,10 +8094,21 @@ namespace RNC
                 return;
             }
 
-            if (level < 0 || level > 6)
+            if (EPlayer.GetAccount(player).Admin == 6)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed level 6.");
-                return;
+                if (level < 0 || level > 6)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed level 6.");
+                    return;
+                }
+            }
+            else
+            {
+                if (level < 0 || level > 6)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed level 3 (General Admin).");
+                    return;
+                }
             }
 
             if (tpAcc.Admin > EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
