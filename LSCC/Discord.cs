@@ -492,6 +492,48 @@ namespace RNC
                     }
                     else await context.Channel.SendMessageAsync("USAGE: !a (text)");
                 }
+                else if (context.Content.StartsWith("!unban"))
+                {
+                    string[] args = context.Content.Split(" ", 2);
+                    if (args.Count() >= 2)
+                    {
+                        lock (RAGE.Entities.Players)
+                        {
+                            BanData ban = null;
+
+                            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(args[1], StringComparison.OrdinalIgnoreCase) == true);
+                            if (tpAcc != null)
+                            {
+                                ban = ContextFactory.Instance.Bans.ToList().Find(a => a.AccountSQLID == tpAcc.SQL_ID);
+                            }
+
+
+                            if ((ban != null) == false)
+                            {
+                                context.Channel.SendMessageAsync("**There is no ban with that name!**");
+                                return;
+                            }
+
+                            string username = "Unregistered Ban";
+                            if (ban.AccountSQLID != -1)
+                            {
+                                Account pAcc = ContextFactory.Instance.Accounts.ToList().Find(acc => acc.SQL_ID == ban.AccountSQLID);
+                                if (pAcc != null)
+                                {
+                                    username = pAcc.Username;
+                                }
+                            }
+
+                            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unban:{username}"); } catch { }
+                            
+                            ContextFactory.Instance.Bans.Remove(ban);
+                            ContextFactory.Instance.SaveChanges();
+                            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}[DC] {context.Author.Username} has unbanned {username}.");
+                            context.Channel.SendMessageAsync($"<@{context.Author.Id}>, you successfully unbanned {tpAcc.Username}!");
+                        }
+                    }
+                    else await context.Channel.SendMessageAsync("USAGE: !unban (name)");
+                }
                 else if (context.Content.StartsWith("!setstaff"))
                 {
                     string[] args = context.Content.Split(" ", 3);
