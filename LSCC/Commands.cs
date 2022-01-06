@@ -833,22 +833,37 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
+            /*if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
                 return;
-            }
+            }*/
 
             if(weatherid < 0 || weatherid > 9)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Weather ID's are between 0-9.");
                 return;
             }
-
-            player.SetData("FreeroamWeather", weatherid);
+            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
+            {
+                player.SetData("FreeroamWeather", weatherid);
+                player.TriggerEvent("SetTimeWeather", player.GetData<int>("FreeroamTime"), 0, 0, player.GetData<int>("FreeroamWeather"));
+            }
+            else
+            {
+                LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
+                if (lobby != null)
+                {
+                    player.TriggerEvent("SetTimeWeather", lobby.Time[0], 0, 0, weatherid);
+                }
+                else
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You must be in a copchase lobby to use this!");
+                    return;
+                }
+            }
             player.SendChatMessage("!{#FF6347}>> !{#FFFFFF}You have set your weather to " + weatherid + ".");
 
-            player.TriggerEvent("SetTimeWeather", player.GetData<int>("FreeroamTime"), 0, 0, player.GetData<int>("FreeroamWeather"));
 
             return;
         }
@@ -8647,6 +8662,11 @@ namespace RNC
                     if (pl.GetData<bool>("OOCState") == true)
                         pl.SendChatMessage($"(( [OOC] {EPlayer.GetAdminLevelName(EPlayer.GetAccount(player).Admin, true)}!{{#FFFFFF}} {player.Name}: {text} ))");
                 });
+            }
+
+            if(text.Contains("weather", StringComparison.OrdinalIgnoreCase))
+            {
+                player.SendChatMessage("~y~[TIP] ~w~You can use ~y~/myweather [ID] ~w~to set your own weather if this one is bothering you!");
             }
 
             Discord.SendTextChannel("staff-bot", $"**(OOC) | {player.Name}**: {text}");
