@@ -497,6 +497,12 @@ namespace RNC
                     string[] args = context.Content.Split(" ", 2);
                     if (args.Count() >= 2)
                     {
+                        int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                        if(aLevel < 2)
+                        {
+                            await context.Channel.SendMessageAsync("You are not authorized to use this!");
+                            return;
+                        }
                         lock (RAGE.Entities.Players)
                         {
                             BanData ban = null;
@@ -856,6 +862,7 @@ namespace RNC
                     builder.AddField("getinfo", "Reports back information about a user.");
                     builder.AddField("ban", "Bans a player. (trial+)");
                     builder.AddField("oban", "Bans an offline player. (trial+)");
+                    builder.AddField("unban", "Bans a player. (trial+)");
                     builder.AddField("kick", "Kicks a player.");
                     builder.AddField("setstaff", "Sets a player's admin level, senior admins+ can use this.");
 
