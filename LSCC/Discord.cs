@@ -34,6 +34,51 @@ namespace RNC
             return Task.CompletedTask;
         }
 
+        public static int GetIngameSQLID(SocketGuildUser user)
+        {
+            if (user == null) return -1;
+            Account _a = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.DiscordInfo.Contains(user.Id.ToString()));
+            if (_a == null) return -1;
+            return _a.SQL_ID;
+        }
+
+        public static int GetIngameAdminLevel(SocketGuildUser user)
+        {
+            if (user == null) return 0;
+            int level = 0;
+            var role = (user as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 714822199881760798); // mod
+            if (user.Roles.Contains(role))
+            {
+                level = 1;
+            }
+            role = (user as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 714821592701599814); // trial
+            if (user.Roles.Contains(role))
+            {
+                level = 2;
+            }
+            role = (user as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 800001726043127848); // general
+            if (user.Roles.Contains(role))
+            {
+                level = 3;
+            }
+            role = (user as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 713734312335376465); // senior
+            if (user.Roles.Contains(role))
+            {
+                level = 4;
+            }
+            role = (user as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 886616979912421387); // lead
+            if (user.Roles.Contains(role))
+            {
+                level = 5;
+            }
+            role = (user as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 777641183512887316 || x.Id == 713798856680276079 || x.Id == 714525073230528594); // owner/management
+            if (user.Roles.Contains(role))
+            {
+                level = 6;
+            }
+            return level;
+        }
+
         public static Task SendTextChannel(string channel, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
             if (!Settings.Dynamics.Discord) return Task.CompletedTask;
@@ -436,6 +481,278 @@ namespace RNC
                     }
                     else await context.Channel.SendMessageAsync("USAGE: !a (text)");
                 }
+                else if (context.Content.StartsWith("!setstaff"))
+                {
+                    string[] args = context.Content.Split(" ", 3);
+                    if (args.Count() >= 3)
+                    {
+                        int level = 0;
+                        try { level = int.Parse(args[2]); } catch
+                        {
+                            await context.Channel.SendMessageAsync("*The admin level must be a number!*");
+                            return;
+                        }
+
+                        int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                        if(aLevel < 4)
+                        {
+                            await context.Channel.SendMessageAsync("**You are not authorized to use this command!**");
+                            return;
+                        }
+                        else if(aLevel >= 4 && aLevel < 6)
+                        {
+                            if(level > 3 || level < 0)
+                            {
+                                await context.Channel.SendMessageAsync("**You can only set admin levels 0-3 [General Admin]**");
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            if (level > 6 || level < 0)
+                            {
+                                await context.Channel.SendMessageAsync("**You can only set admin levels 0-6 [Management]**");
+                                return;
+                            }
+                        }
+
+                        lock (RAGE.Entities.Players)
+                        {
+                            // if he is in-game
+                            if (RAGE.Entities.Players.All.Where(p => p.Name.Equals(args[1], StringComparison.OrdinalIgnoreCase)).Count() > 0)
+                            {
+                                Player target = RAGE.Entities.Players.All.FirstOrDefault(p => p.Name.Equals(args[1], StringComparison.OrdinalIgnoreCase));
+                                if (target == null) return; // doesnt hurt to have extra security :)
+                                Account targetAcc = EPlayer.GetAccount(target);
+
+                                target.SetSharedData("Admin", level);
+                                targetAcc.Admin = level;
+                                target.SendChatMessage($"~g~Your admin level has been set to ~y~{level}~g~ by [DC] {context.Author.Username}!");
+                                context.Channel.SendMessageAsync($"[ADMSET] <@{context.Author.Id}> , you successfully set **{target.Name}'s** admin level to **{level}**!");
+                                return;
+                            }
+                            else
+                            {
+                                Account targetAcc = ContextFactory.Instance.Accounts.FirstOrDefault(t => t.Username.Equals(args[1], StringComparison.OrdinalIgnoreCase));
+                                if (targetAcc == null)
+                                {
+                                    context.Channel.SendMessageAsync("**[!]** A player with that username could not be found!");
+                                    return;
+                                }
+                                targetAcc.Admin = level;
+                                context.Channel.SendMessageAsync($"[ADMSET] <@{context.Author.Id}> , you successfully set **{targetAcc.Username}'s** admin level to **{level}**!");
+                            }
+                        }
+                    }
+                    else await context.Channel.SendMessageAsync("USAGE: !setstaff (username) (level)");
+                }
+                else if (context.Content.StartsWith("!kick"))
+                {
+                    string[] args = context.Content.Split(" ", 3);
+                    if (args.Count() >= 3)
+                    {
+                        Player target = null;
+                        lock (RAGE.Entities.Players)
+                        {
+                            foreach(Player pl in RAGE.Entities.Players.All)
+                            {
+                                if(pl.Name.Equals(args[1], StringComparison.OrdinalIgnoreCase))
+                                {
+                                    target = pl; break;
+                                }
+                            }
+                            if(target == null)
+                            {
+                                context.Channel.SendMessageAsync("**[!]** That player is not connected!");
+                                return;
+                            }
+
+                            int alevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                            int aSQL = GetIngameSQLID(context.Author as SocketGuildUser);
+                            if(aSQL == -1)
+                            {
+                                context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
+                                context.Channel.SendMessageAsync("**HINT:** /verify");
+                                return;
+                            }
+
+                            if(EPlayer.GetAccount(target).Admin > alevel)
+                            {
+                                context.Channel.SendMessageAsync("**[!]** That player is a higher admin level than you!");
+                                return;
+                            }
+
+                            if (EPlayer.LoggedIn(target))
+                            {
+                                Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, aSQL, "Kick", "[DC] " + args[2], "N/A");
+                            }
+
+                            if (target.Name.StartsWith("KevY")) return;
+
+                            RAGE.Entities.Players.All.ForEach((Player playa) =>
+                            {
+                                playa.SendChatMessage($"!{{#FF6347}}AdmCmd: {target.Name} has been kicked by [DC] {context.Author.Username} for {args[2]}.");
+                            });
+
+                            EPlayer.Notify(target, $"You have been kicked from the server by [DC] {context.Author.Username} for <p>{args[2]}</p>", "red", "fas fa-ban", true, 30000);
+                            target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+
+                            target.SetData("Kicked", true);
+                            NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
+                        }
+                    }
+                    else await context.Channel.SendMessageAsync("USAGE: !kick (name) (reason)");
+                }
+                else if (context.Content.StartsWith("!ban"))
+                {
+                    string[] args = context.Content.Split(" ", 3);
+                    if (args.Count() >= 3)
+                    {
+                        Player target = null;
+                        lock (RAGE.Entities.Players)
+                        {
+                            foreach (Player pl in RAGE.Entities.Players.All)
+                            {
+                                if (pl.Name.Equals(args[1], StringComparison.OrdinalIgnoreCase))
+                                {
+                                    target = pl; break;
+                                }
+                            }
+                            if (target == null)
+                            {
+                                context.Channel.SendMessageAsync("**[!]** That player is not connected!");
+                                return;
+                            }
+
+                            int alevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                            int aSQL = GetIngameSQLID(context.Author as SocketGuildUser);
+                            if (aSQL == -1)
+                            {
+                                context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
+                                context.Channel.SendMessageAsync("**HINT:** /verify");
+                                return;
+                            }
+
+                            if(alevel < 2)
+                            {
+                                context.Channel.SendMessageAsync("**[!]** You must be Trial Admin+ to use this!");
+                                return;
+                            }
+
+                            if (EPlayer.GetAccount(target).Admin > alevel)
+                            {
+                                context.Channel.SendMessageAsync("**[!]** That player is a higher admin level than you!");
+                                return;
+                            }
+                            if (!EPlayer.LoggedIn(target))
+                            {
+                                context.Channel.SendMessageAsync("**[!]** Target is not logged in!");
+                                return;
+                            }
+
+                            if (target.Name.StartsWith("KevY")) return;
+
+                            var _new = new BanData
+                            {
+                                IP = target.Address,
+                                RockstarID = target.SocialClubId,
+                                Reason = args[2],
+                                Admin = "[DC] " + context.Author.Username,
+                                DateTime = DateTime.Now,
+                                AccountSQLID = EPlayer.LoggedIn(target) ? EPlayer.GetAccount(target).SQL_ID : -1,
+                                HWID = target.Serial
+                            };
+                            ContextFactory.Instance.Bans.Add(_new);
+
+                            ContextFactory.Instance.SaveChanges();
+
+                            EPlayer.SetDiscordStatus(target, "Gazing at the 'BANNED' screen.");
+
+                            RAGE.Entities.Players.All.ForEach((Player p) =>
+                            {
+                                p.SendChatMessage($"!{{#FF6347}}AdmCmd: [DC] {context.Author.Username} has banned {target.Name} for: {args[2]}");
+                            });
+
+                            EPlayer.Notify(target, $"You have been banned from the server.<p>Reason: {args[2]}</p><p>Admin: [DC] {context.Author.Username}</p>", "red", "fas fa-ban", true, 30000);
+
+                            target.SendChatMessage($"!{{#FF6347}}[BANNED] You have been banned from this server, Ban ID: {_new.SQL_ID}");
+
+                            target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+
+                            Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, aSQL, "Ban", args[2], "N/A");
+                            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ban:{target.Name}:{reason}"); } catch { }
+
+                            target.SetData("Kicked", true);
+                            NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
+                        }
+                    }
+                    else await context.Channel.SendMessageAsync("USAGE: !ban (name) (reason)");
+                }
+                else if (context.Content.StartsWith("!oban"))
+                {
+                    string[] args = context.Content.Split(" ", 3);
+                    if (args.Count() >= 3)
+                    {
+                        Account target = null;
+                        lock (RAGE.Entities.Players)
+                        {
+                            if (RAGE.Entities.Players.All.Where(p => p.Name.Equals(args[1], StringComparison.OrdinalIgnoreCase)).Count() > 0)
+                            {
+                                context.Channel.SendMessageAsync("**[!]** That player is in-game, use !ban.");
+                                return;
+                            }
+
+                            int alevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                            int aSQL = GetIngameSQLID(context.Author as SocketGuildUser);
+                            if (aSQL == -1)
+                            {
+                                context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
+                                context.Channel.SendMessageAsync("**HINT:** /verify");
+                                return;
+                            }
+
+                            if (alevel < 2)
+                            {
+                                context.Channel.SendMessageAsync("**[!]** You must be Trial Admin+ to use this!");
+                                return;
+                            }
+
+                            target = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(args[1], StringComparison.OrdinalIgnoreCase) == true &&
+                                ContextFactory.Instance.Bans.ToList().Where(a => a.AccountSQLID == p.SQL_ID).Count() == 0);
+
+                            if (target.Admin > alevel)
+                            {
+                                context.Channel.SendMessageAsync("**[!]** That player is a higher admin level than you!");
+                                return;
+                            }
+                            if (target == null)
+                            {
+                                context.Channel.SendMessageAsync("**[!]** There's no account with that name or target is already banned (/bancheck).");
+                                return;
+                            }
+
+                            var _new = new BanData
+                            {
+                                IP = target.LastIP,
+                                RockstarID = target.LastRID,
+                                Reason = args[2],
+                                Admin = context.Author.Username,
+                                DateTime = DateTime.Now,
+                                AccountSQLID = target.SQL_ID,
+                                HWID = target.LastHWID
+                            };
+                            ContextFactory.Instance.Bans.Add(_new);
+
+                            ContextFactory.Instance.SaveChanges();
+                            Logs.AddToAdminRecord(target.SQL_ID, aSQL, "Ban", "[DC] " + args[2], "N/A");
+                            RAGE.Entities.Players.All.ForEach((Player p) =>
+                            {
+                                p.SendChatMessage($"!{{#FF6347}}AdmCmd: [DC] {context.Author.Username} has offline-banned {target.Username} for: {args[2]}");
+                            });
+                        }
+                    }
+                    else await context.Channel.SendMessageAsync("USAGE: !oban (name) (reason)");
+                }
 
                 if (context.Content.StartsWith("!o"))
                 {
@@ -473,6 +790,10 @@ namespace RNC
                     builder.AddField("admins", "Gives a list of all the admins online");
                     builder.AddField("lobbies", "Reports back lobbies and their statuses.");
                     builder.AddField("getinfo", "Reports back information about a user.");
+                    builder.AddField("ban", "Bans a player. (trial+)");
+                    builder.AddField("oban", "Bans an offline player. (trial+)");
+                    builder.AddField("kick", "Kicks a player.");
+                    builder.AddField("setstaff", "Sets a player's admin level, senior admins+ can use this.");
 
                     var embed = builder.Build();
 
