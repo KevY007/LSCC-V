@@ -675,6 +675,8 @@ namespace RNC
                                 EPlayer.Notify(target, $"You have been kicked from the server by [DC] {context.Author.Username} for <p>{args[2]}</p>", "red", "fas fa-ban", true, 30000);
                                 target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
+                                context.Channel.SendMessageAsync($"[ADMKICK] <@{context.Author.Id}> , you kicked {target.Name} for {args[2]}!");
+
                                 target.SetData("Kicked", true);
                                 NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
                             }, 10);
@@ -759,6 +761,7 @@ namespace RNC
                                 target.SendChatMessage($"!{{#FF6347}}[BANNED] You have been banned from this server, Ban ID: {_new.SQL_ID}");
 
                                 target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+                                context.Channel.SendMessageAsync($"[ADMBAN] <@{context.Author.Id}> , you banned {target.Name} for {args[2]}!");
 
                                 Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, aSQL, "Ban", args[2], "N/A");
                                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ban:{target.Name}:{reason}"); } catch { }
@@ -829,6 +832,7 @@ namespace RNC
 
                                 ContextFactory.Instance.SaveChanges();
                                 Logs.AddToAdminRecord(target.SQL_ID, aSQL, "Ban", "[DC] " + args[2], "N/A");
+                                context.Channel.SendMessageAsync($"[ADMKICK] <@{context.Author.Id}> , you banned {target.Username} for {args[2]}!");
                                 RAGE.Entities.Players.All.ForEach((Player p) =>
                                 {
                                     p.SendChatMessage($"!{{#FF6347}}AdmCmd: [DC] {context.Author.Username} has offline-banned {target.Username} for: {args[2]}");
@@ -839,7 +843,7 @@ namespace RNC
                     else await context.Channel.SendMessageAsync("USAGE: !oban (name) (reason)");
                 }
 
-                if (context.Content.StartsWith("!o"))
+                if (context.Content.StartsWith("!o "))
                 {
                     string[] args = context.Content.Split(" ", 2);
                     if (args.Count() >= 2)
