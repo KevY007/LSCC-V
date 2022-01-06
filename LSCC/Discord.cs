@@ -71,7 +71,12 @@ namespace RNC
             {
                 level = 5;
             }
-            role = (user as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 777641183512887316 || x.Id == 713798856680276079 || x.Id == 714525073230528594); // owner/management
+            role = (user as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 777641183512887316); // owner/management
+            if (user.Roles.Contains(role))
+            {
+                level = 6;
+            }
+            role = (user as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 713798856680276079); // owner/management
             if (user.Roles.Contains(role))
             {
                 level = 6;
@@ -468,6 +473,12 @@ namespace RNC
                             }
                         }, 10);
                     }
+                }
+                else if (context.Content.StartsWith("!dbgmylevel"))
+                {
+                    int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                    await context.Channel.SendMessageAsync("**Your admin level [according to your role] is:** " + aLevel);
+                    return;
                 }
                 else if (context.Content.StartsWith("!a"))
                 {
