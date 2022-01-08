@@ -902,11 +902,6 @@ namespace RNC
 
                                     NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
                                 }
-                                else
-                                {
-                                    context.Channel.SendMessageAsync("**[!]** There's no account with that name.");
-                                    return;
-                                }
 
                                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:changename:{name}:{newname}"); } catch { }
                                 context.Channel.SendMessageAsync($"**[ADMNAME]** <@{context.Author.Id}> , you changed {name}'s name to {newname}!");

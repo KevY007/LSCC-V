@@ -5152,11 +5152,6 @@ namespace RNC
 
                 NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
             }
-            else
-            {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
-                return;
-            }
 
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:changename:{name}:{newname}"); } catch { }
             Logs.LogAdmin(player, $"Changed {tpAcc.Username}'s username to {newname}.");
