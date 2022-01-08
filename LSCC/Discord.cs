@@ -842,6 +842,85 @@ namespace RNC
                     }
                     else await context.Channel.SendMessageAsync("USAGE: !oban (name) (reason)");
                 }
+                else if (context.Content.StartsWith("!changename"))
+                {
+                    string[] args = context.Content.Split(" ", 3);
+                    if (args.Count() >= 3)
+                    {
+                        string name = args[1];
+                        string newname = args[2];
+                        int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                        lock (RAGE.Entities.Players)
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                if (aLevel < 4)
+                                {
+                                    context.Channel.SendMessageAsync("**[!]** You cannot use this command.");
+                                    return;
+                                }
+
+
+                                Account tpAcc = ContextFactory.Instance.Accounts.ToList().FirstOrDefault(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+
+                                if (tpAcc == null)
+                                {
+                                    context.Channel.SendMessageAsync("**[!]** No account with this name could be found!");
+                                    return;
+                                }
+
+                                if (ContextFactory.Instance.Accounts.ToList().FirstOrDefault(p => p.Username.Equals(newname, StringComparison.OrdinalIgnoreCase) == true) != null)
+                                {
+                                    context.Channel.SendMessageAsync("**[!]** An account with this name already exists!");
+                                    return;
+                                }
+
+                                if (tpAcc.Admin > aLevel)
+                                {
+                                    context.Channel.SendMessageAsync("**[!]** Target is a higher admin level than you!");
+                                    return;
+                                }
+
+                                /*foreach (var arena in ContextFactory.Instance.CustomArenas.ToList().Where(a => a.Creator.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    arena.Creator = newname;
+                                }*/
+                                foreach (var arena in ContextFactory.Instance.Bans.ToList().Where(a => a.Admin.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    arena.Admin = newname;
+                                }
+
+                                Player target = RAGE.Entities.Players.All.FirstOrDefault(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
+                                if (target != null)
+                                {
+                                    target.SendChatMessage("!{#FF6347} Reconnect with your new name: !{#FFFFFF}" + newname);
+                                    EPlayer.Notify(target, $"Please reconnect with your new name: {newname}", "green", "fas fa-check", false, 3000, "center", "replace");
+
+                                    EPlayer.Save(target);
+                                    target.ResetData("AccountHandle");
+                                    target.ResetData("LoggedIn");
+
+                                    NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
+                                }
+                                else
+                                {
+                                    context.Channel.SendMessageAsync("**[!]** There's no account with that name.");
+                                    return;
+                                }
+
+                                // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:changename:{name}:{newname}"); } catch { }
+                                context.Channel.SendMessageAsync($"**[ADMNAME]** <@{context.Author.Id}> , you changed {name}'s name to {newname}!");
+
+                                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}[DC] {context.Author.Username} has changed {tpAcc.Username}'s name to {newname}.");
+
+                                tpAcc.Username = newname;
+                                ContextFactory.Instance.SaveChanges();
+                                return;
+                            }, 10);
+                        }
+                    }
+                    else await context.Channel.SendMessageAsync("USAGE: !changename (name) (newname)");
+                }
 
                 if (context.Content.StartsWith("!o "))
                 {

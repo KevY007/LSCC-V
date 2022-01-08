@@ -5111,15 +5111,15 @@ namespace RNC
             }
 
 
-            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+            Account tpAcc = ContextFactory.Instance.Accounts.FirstOrDefault(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase));
 
-            if ((tpAcc != null) == false)
+            if (tpAcc == null)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
                 return;
             }
 
-            if(ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(newname, StringComparison.OrdinalIgnoreCase) == true) != null)
+            if(ContextFactory.Instance.Accounts.FirstOrDefault(p => p.Username.Equals(newname, StringComparison.OrdinalIgnoreCase) == true) != null)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's already an account with that name!");
                 return;
@@ -5131,16 +5131,16 @@ namespace RNC
                 return;
             }
 
-            foreach (var arena in ContextFactory.Instance.CustomArenas.ToList().Where(a => a.Creator.Equals(name, StringComparison.OrdinalIgnoreCase)))
+            /*foreach (var arena in ContextFactory.Instance.CustomArenas.ToList().Where(a => a.Creator.Equals(name, StringComparison.OrdinalIgnoreCase)))
             {
                 arena.Creator = newname;
-            }
+            }*/
             foreach (var arena in ContextFactory.Instance.Bans.ToList().Where(a => a.Admin.Equals(name, StringComparison.OrdinalIgnoreCase)))
             {
                 arena.Admin = newname;
             }
 
-            Player target = RAGE.Entities.Players.All.Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
+            Player target = RAGE.Entities.Players.All.FirstOrDefault(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
             if(target != null)
             {
                 target.SendChatMessage("!{#FF6347} Reconnect with your new name: !{#FFFFFF}" + newname);
@@ -5151,6 +5151,11 @@ namespace RNC
                 target.ResetData("LoggedIn");
 
                 NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
+            }
+            else
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                return;
             }
 
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:changename:{name}:{newname}"); } catch { }
