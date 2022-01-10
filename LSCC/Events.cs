@@ -42,6 +42,8 @@ namespace RNC
 
             player.TriggerEvent("InitChaseTimer");
 
+            player.SetData<int>("PlayerWeather", -1);
+
             NAPI.Task.Run(() =>
             {
                 try
