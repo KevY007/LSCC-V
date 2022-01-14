@@ -1503,46 +1503,6 @@ namespace RNC
                 EPlayer.Spawn(player);
 
                 EPlayer.Notify(player, "Sorry, your character was reset (possibly due to an update), please create a new one. (<strong>/char</strong>)", "yellow", "fas fa-tshirt", false, 7000);
-                #region | All the shit that CAN happen if someone's clothing is corrupted I guess?
-                if (acc.WeaponComponents == null || acc.WeaponComponents.Length < 4)
-                {
-                    Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
-
-                    wComponentData test = new wComponentData();
-                    test.Components.Add(123456789);
-                    wepItems.Add(123456789, test);
-
-                    acc.WeaponComponents = NAPI.Util.ToJson(wepItems);
-                }
-                EPlayer.GetAccount(player).LastLogin = DateTime.Now;
-                if (ContextFactory.Instance.PlayerOutfits.ToList().Find(o => o.AccountID == acc.SQL_ID) == null)
-                {
-                    CharacterData[] defaultOutfits = new CharacterData[5];
-                    for (int i = 0; i < 5; i++)
-                    {
-                        defaultOutfits[i] = new CharacterData();
-                    }
-                    ContextFactory.Instance.PlayerOutfits.Add(new PlayerOutfit()
-                    {
-                        AccountID = acc.SQL_ID,
-                        OutfitData = NAPI.Util.ToJson(defaultOutfits)
-                    });
-                    ContextFactory.Instance.SaveChanges();
-                }
-
-                player.SetSharedData("Points", EPlayer.GetAccount(player).Points);
-
-                EPlayer.GetAccount(player).LastSessionMins = 0.0;
-
-                foreach (Player adm in Settings.LoggedInPlayers.Where(p => EPlayer.GetAccount(p).Admin > 0))
-                {
-                    EPlayer.ShowAdminNotes(adm, acc, AdminNote.ANoteType.OnConnect);
-                    EPlayer.ShowAdminNotes(adm, acc, AdminNote.ANoteType.Both, false);
-                }
-
-                player.TriggerEvent("showLoginBrowser", false);
-                #endregion
-                return;
             }
 
             if(acc.WeaponComponents == null || acc.WeaponComponents.Length < 4)
