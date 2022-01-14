@@ -24,15 +24,10 @@ mp.events.add('RestartMenu', () => {
     }
 
     UIMenu = mp.browsers.new("package://UIMenu/index.html");
-    UIMenu.execute(`gm.logs.options = [
-        { name: "Sessions", value: "sessions" },
-        { name: "Admin", value: "admin" },
-        { name: "Records", value: "records" },
-      ];`);
     UIMenu.execute(`gm.mainMenu = false;`);
     UIMenu.active = false;
 
-    UIMenu.execute(`gm.logs.options = [
+    UIMenu.execute(`gm.$refs.logs.options = [
         { name: "Sessions", value: "sessions" },
         { name: "Admin", value: "admin" },
         { name: "Records", value: "records" },
@@ -72,7 +67,7 @@ function ToggleMenu()
         mp.gui.chat.activate(!menuToggled);
         //mp.gui.chat.show(!menuToggled);
 
-        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.settings = [
+        UIMenu.execute(`gm.$refs.settings.settings = [
             {
                 id: 9,
                 type: 1,
@@ -166,17 +161,17 @@ function ToggleMenu()
             }
           ]`);
           
-        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.tri.value = ${mp.storage.data.menu.topRightInfo};`);
-        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.gp.value = ${mp.storage.data.menu.gameProgress};`);
-        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.tooltips.value = ${mp.storage.data.menu.tooltips};`);
-        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.kf.value = ${mp.storage.data.menu.killFeed};`);
-        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.nametags.value = ${mp.storage.data.menu.nametags};`);
-        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.hud.value = ${mp.storage.data.menu.HUD};`);
-        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.bigmap.value = ${mp.storage.data.menu.alwaysExpandedMap};`);
-        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.updr.value = ${mp.storage.data.menu.updateRate};`);
-        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.vcbind.value = "${String.fromCharCode(curVoiceBind)}";`);
-        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.gpsbind.value = "${String.fromCharCode(curGPSBind)}";`);
-        UIMenu.execute(`gm.$refs.mainMenu.$refs.settings.$refs.bigmapbind.value = "${String.fromCharCode(curMapBind)}";`);
+        UIMenu.execute(`gm.$refs.settings.$refs.tri.value = ${mp.storage.data.menu.topRightInfo};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.gp.value = ${mp.storage.data.menu.gameProgress};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.tooltips.value = ${mp.storage.data.menu.tooltips};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.kf.value = ${mp.storage.data.menu.killFeed};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.nametags.value = ${mp.storage.data.menu.nametags};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.hud.value = ${mp.storage.data.menu.HUD};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.bigmap.value = ${mp.storage.data.menu.alwaysExpandedMap};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.updr.value = ${mp.storage.data.menu.updateRate};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.vcbind.value = "${String.fromCharCode(curVoiceBind)}";`);
+        UIMenu.execute(`gm.$refs.settings.$refs.gpsbind.value = "${String.fromCharCode(curGPSBind)}";`);
+        UIMenu.execute(`gm.$refs.settings.$refs.bigmapbind.value = "${String.fromCharCode(curMapBind)}";`);
     }
 }
 
@@ -277,13 +272,13 @@ mp.events.add("MenuSelectLoadout", (name, team) => {
 });
 
 mp.events.add("UpdateMenuMinigames", (arenas, currentMinigame) => {
-    UIMenu.execute(`gm.$refs.mainMenu.$refs.minigames.games = [];`);
-    UIMenu.execute(`gm.$refs.mainMenu.$refs.minigames.currentMinigame = ${currentMinigame};`);
+    UIMenu.execute(`gm.$refs.minigames.games = [];`);
+    UIMenu.execute(`gm.$refs.minigames.currentMinigame = ${currentMinigame};`);
     
     let menuItems = JSON.parse(arenas);
     for(let i = 0; i < menuItems.length; i++)
     {
-        let insertString = `gm.$refs.mainMenu.$refs.minigames.games.push({`;
+        let insertString = `gm.$refs.minigames.games.push({`;
         insertString += `"id": ${menuItems[i][0]}, `;
         insertString += `"name": "${menuItems[i][1]}", `;
         insertString += `"background": "${menuItems[i][2]}", `;
@@ -299,10 +294,10 @@ mp.events.add("UpdateMenuMinigames", (arenas, currentMinigame) => {
 });
 
 mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) => {
-    UIMenu.execute(`gm.$refs.mainMenu.$refs.vehicles.$refs.police.vehicles = [];`);
-    UIMenu.execute(`gm.$refs.mainMenu.$refs.vehicles.$refs.fugitive.vehicles = [];`);
-    UIMenu.execute(`gm.$refs.mainMenu.$refs.vehicles.$refs.police.selectedModel = "${currentCopCar}";`);
-    UIMenu.execute(`gm.$refs.mainMenu.$refs.vehicles.$refs.fugitive.selectedModel = "${currentFugiCar}";`);
+    UIMenu.execute(`gm.$refs.vehicles.$refs.police.vehicles = [];`);
+    UIMenu.execute(`gm.$refs.vehicles.$refs.fugitive.vehicles = [];`);
+    UIMenu.execute(`gm.$refs.vehicles.$refs.police.selectedModel = "${currentCopCar}";`);
+    UIMenu.execute(`gm.$refs.vehicles.$refs.fugitive.selectedModel = "${currentFugiCar}";`);
 
     // Vehicle Data
     // Model, Name, Background, Energy, Price, Locked
@@ -310,8 +305,8 @@ mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) =>
     for(let i = 0; i < menuItems.length; i++)
     {
         let insertString = "";
-        if(menuItems[i][0] == 0) insertString = `gm.$refs.mainMenu.$refs.vehicles.$refs.fugitive.vehicles.push({`;
-        else if(menuItems[i][0] == 1) insertString = `gm.$refs.mainMenu.$refs.vehicles.$refs.police.vehicles.push({`;
+        if(menuItems[i][0] == 0) insertString = `gm.$refs.vehicles.$refs.fugitive.vehicles.push({`;
+        else if(menuItems[i][0] == 1) insertString = `gm.$refs.vehicles.$refs.police.vehicles.push({`;
         
         insertString += `"model": "${menuItems[i][1]}", `;
         insertString += `"name": "${menuItems[i][2]}", `;
@@ -326,10 +321,10 @@ mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) =>
 });
 
 mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoadout) => {
-    UIMenu.execute(`gm.$refs.mainMenu.$refs.loadouts.$refs.police.loadouts = [];`);
-    UIMenu.execute(`gm.$refs.mainMenu.$refs.loadouts.$refs.fugitive.loadouts = [];`);
-    UIMenu.execute(`gm.$refs.mainMenu.$refs.loadouts.$refs.police.selectedLoadout = "${(currentCopLoadout == "?" ? "Default" : currentCopLoadout)}";`);
-    UIMenu.execute(`gm.$refs.mainMenu.$refs.loadouts.$refs.fugitive.selectedLoadout = "${(currentFugiLoadout == "?" ? "Default" : currentFugiLoadout)}";`);
+    UIMenu.execute(`gm.$refs.loadouts.$refs.police.loadouts = [];`);
+    UIMenu.execute(`gm.$refs.loadouts.$refs.fugitive.loadouts = [];`);
+    UIMenu.execute(`gm.$refs.loadouts.$refs.police.selectedLoadout = "${(currentCopLoadout == "?" ? "Default" : currentCopLoadout)}";`);
+    UIMenu.execute(`gm.$refs.loadouts.$refs.fugitive.selectedLoadout = "${(currentFugiLoadout == "?" ? "Default" : currentFugiLoadout)}";`);
 
     // Loadout Data
     // Name, Locked, Background, Requirements, Weapons
@@ -337,8 +332,8 @@ mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoa
     for(let i = 0; i < menuItems.length; i++)
     {
         let insertString = "";
-        if(menuItems[i][0] == 0) insertString = `gm.$refs.mainMenu.$refs.loadouts.$refs.fugitive.loadouts.push({`;
-        else if(menuItems[i][0] == 1) insertString = `gm.$refs.mainMenu.$refs.loadouts.$refs.police.loadouts.push({`;
+        if(menuItems[i][0] == 0) insertString = `gm.$refs.loadouts.$refs.fugitive.loadouts.push({`;
+        else if(menuItems[i][0] == 1) insertString = `gm.$refs.loadouts.$refs.police.loadouts.push({`;
         
         insertString += `"name": "${menuItems[i][1]}", `;
         insertString += `"background": "${menuItems[i][2]}", `;
@@ -352,15 +347,15 @@ mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoa
 });
 
 mp.events.add("UpdateMenuLobbies", (lobbies, currentLobby) => {
-    UIMenu.execute(`gm.$refs.mainMenu.$refs.lobbies.lobbies = [];`);
-    UIMenu.execute(`gm.$refs.mainMenu.$refs.lobbies.currentLobby = ${currentLobby};`);
+    UIMenu.execute(`gm.$refs.lobbies.lobbies = [];`);
+    UIMenu.execute(`gm.$refs.lobbies.currentLobby = ${currentLobby};`);
 
     // Lobby Data
     // ID, Name, Background, Gamemode, Password, Players, MaxPlayers, Description
     let menuItems = JSON.parse(lobbies);
     for(let i = 0; i < menuItems.length; i++)
     {
-        let insertString = `gm.$refs.mainMenu.$refs.lobbies.lobbies.push({`;
+        let insertString = `gm.$refs.lobbies.lobbies.push({`;
         insertString += `"id": ${menuItems[i][0]}, `;
         insertString += `"name": "${menuItems[i][1]}", `;
         insertString += `"background": "${menuItems[i][2]}", `;

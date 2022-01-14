@@ -20,6 +20,12 @@ namespace RNC
             EPlayer.ResetPlayerData(player);
         }
 
+        [RemoteEvent("ServerConsoleOutput")]
+        public void ServerConsoleOutput(Player player, string output)
+        {
+            NAPI.Util.ConsoleOutput(output);
+        }
+
         [RemoteEvent("playerReadyCon")]
         public void OnPlayerConnected(Player player)
         {

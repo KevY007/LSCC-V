@@ -26,29 +26,31 @@ mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
     jsonLogs = jsonLogs.replaceAll("{", "[");
     jsonLogs = jsonLogs.replaceAll("}", "]");
 
-    for(let i = 0 ; i < 20 ; i++){
-        if(jsonLogs.includes(`"Item${i}":`)){
-            jsonLogs = jsonLogs.replaceAll(`"Item${i}":`, "");
+    for(let i = 1 ; i < 20 ; i++){
+        let strcheck = `"Item${i}":`;
+        if(jsonLogs.includes(strcheck)){
+            jsonLogs = jsonLogs.replaceAll(strcheck, "");
         }
         else break;
     }
 
     switch(type){
         case 1:{ // admin
-            UIMenu.execute(`gm.logs.rows = ["Timestamp", "Description"];`);
-            UIMenu.execute(`gm.logs.columns = ${jsonLogs}`);
+            UIMenu.execute(`gm.$refs.logs.rows = ["Timestamp", "Description"];`);
+            UIMenu.execute(`gm.$refs.logs.columns = ${jsonLogs}`);
             break;
         }
         case 2:{ // session
-            UIMenu.execute(`gm.logs.rows = ["Join Time", "Leave Time", "Duration", "IP", "HWID"];`);
-            UIMenu.execute(`gm.logs.columns = ${jsonLogs}`);
+            UIMenu.execute(`gm.$refs.logs.rows = ["Join Time", "Leave Time", "Duration", "IP", "HWID"];`);
+            UIMenu.execute(`gm.$refs.logs.columns = ${jsonLogs}`);
             break;
         }
         case 3:{ // admin records
-            UIMenu.execute(`gm.logs.rows = ["Timestamp", "Admin", "Duration", "Reason"];`);
-            UIMenu.execute(`gm.logs.columns = ${jsonLogs}`);
+            UIMenu.execute(`gm.$refs.logs.rows = ["Timestamp", "Admin", "Duration", "Reason"];`);
+            UIMenu.execute(`gm.$refs.logs.columns = ${jsonLogs}`);
             break;
         }
     }
+    mp.events.callRemote("ServerConsoleOutput", jsonLogs);
 
 });

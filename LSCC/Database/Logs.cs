@@ -119,20 +119,30 @@ namespace RNC
                     }
             }
         }
-        */
+        */ // Ignore this shit, old logs
+
 
         
         [RemoteEvent("ReqLogFromSrv")]
         public static void RequestLogsFromServer(Player player, string targetName, int type)
         {
+            if (targetName == "")
+            {
+                EPlayer.Notify(player, $"You must enter a player name! (nice try)",
+                    "red", "fas fa-hand-middle-finger", false, 1500, "topCenter", "replace");
+                return;
+            }
             Account target = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
             if (target == null)
             {
+                EPlayer.Notify(player, $"There is no player with that name in the database!", 
+                    "red", "fas fa-exclamation-triangle", false, 1500, "topCenter", "replace");
                 return;
             }
             if(target.Admin >= EPlayer.GetAccount(player).Admin)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Nice try - that admin is a higher or equal level as you!");
+                EPlayer.Notify(player, $"That player is a higher or equal admin level than you!",
+                    "red", "fas fa-ban", false, 1500, "topCenter", "replace");
                 return;
             }
 
@@ -209,7 +219,7 @@ namespace RNC
                 TimestampLeave = new DateTime(1970, 1, 1, 0, 0, 0, 0).ToLocalTime().AddSeconds(_currentUnix),
                 Duration = _duration,
                 IP = player.Address,
-                HWID = player.Serial
+                HWID = player.Serial.Substring(0, 50)
             };
             ContextFactory.Instance.Logs_Session.Add(_a);
             ContextFactory.Instance.SaveChanges();

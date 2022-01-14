@@ -655,10 +655,13 @@ mp.events.addCommand("bigmap", function (state) {
 if(!radioToggle) mp.game.audio.setInitialPlayerStation('OFF');
 
 function UpdateStatsVars(entity){
+    // yes im double checking the same shit cuz for some reason this shit decided to break for no reason
+    if(UIHud == null || UIHud == undefined || UIMenu == undefined || UIMenu == null) return;
+
     if(entity !== undefined){
         if(mp.players.exists(entity))
         {
-            if(UIHud !== undefined){
+            if(UIHud !== undefined && UIHud != null){
                 UIHud.execute(`gm.stats = {
                     squad: ${entity.SquadID},
                     lobby: ${entity.Lobby},
@@ -666,7 +669,7 @@ function UpdateStatsVars(entity){
                     fugitive: ${entity.Team == 0 ? true : false},
                 }`);
             }
-            if(UIMenu !== undefined){
+            if(UIMenu !== undefined && UIMenu != null){
                 UIMenu.execute(`gm.admin = ${entity.Admin}`);
             }
         }
