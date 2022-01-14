@@ -1489,16 +1489,20 @@ namespace RNC
                 ConvChar = NAPI.Util.FromJson<CharacterData>(acc.Character);
 
                 EPlayer.ApplyCharacter(player, ConvChar, acc.LobbyClothing);
-
+                 
                 EPlayer.Spawn(player);
             }
             catch
             {
                 player.TriggerEvent("DestroyPlayerCamera");
-                player.TriggerEvent("TogglePlayerChat", false);
+                player.TriggerEvent("TogglePlayerChat", true);
 
-                EPlayer.ShowCharCreator(player);
-                EPlayer.Notify(player, "Your character was reset (due to an update), please create a new one.", "yellow", "fas fa-tshirt", false, 7000);
+                CharacterData charp = new CharacterData();
+                EPlayer.GetAccount(player).Character = "{}";
+                EPlayer.ApplyCharacter(player, charp); // Give them the default CHAR.
+                EPlayer.Spawn(player);
+
+                EPlayer.Notify(player, "Sorry, your character was reset (possibly due to an update), please create a new one. (<strong>/char</strong>)", "yellow", "fas fa-tshirt", false, 7000);
                 #region | All the shit that CAN happen if someone's clothing is corrupted I guess?
                 if (acc.WeaponComponents == null || acc.WeaponComponents.Length < 4)
                 {
