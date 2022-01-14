@@ -1,4 +1,4 @@
-require('./Menu.js');
+require("./UIMenu/Menu.js");
 
 function logTextToType(type){
     switch(type){

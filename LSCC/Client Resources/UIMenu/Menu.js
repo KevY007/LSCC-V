@@ -1,5 +1,3 @@
-require('./Logs.js');
-
 menuToggled = false;
 let lastMenuToggle = Date.now();
 
@@ -25,16 +23,20 @@ mp.events.add('RestartMenu', () => {
         UIMenu = null;
     }
 
+    UIMenu = mp.browsers.new("package://UIMenu/index.html");
     UIMenu.execute(`gm.logs.options = [
         { name: "Sessions", value: "sessions" },
         { name: "Admin", value: "admin" },
         { name: "Records", value: "records" },
       ];`);
-
-    UIMenu = mp.browsers.new("package://UIMenu/index.html");
     UIMenu.execute(`gm.mainMenu = false;`);
     UIMenu.active = false;
 
+    UIMenu.execute(`gm.logs.options = [
+        { name: "Sessions", value: "sessions" },
+        { name: "Admin", value: "admin" },
+        { name: "Records", value: "records" },
+      ];`);
 
     mp.events.callLocal("MenuToggleTyping", false);
 });

@@ -285,7 +285,7 @@ namespace RNC
         private static void LoadConnectionString()
         {
             if (File.Exists("racenchase/we_are_testing"))
-                _connectionString = "Server=" + Settings.MySQL_Host + ";Database=" + "racenchase_test" + ";Uid=" + Settings.MySQL_User + ";Pwd=" + Settings.MySQL_Password;
+                _connectionString = "Server=localhost;Database=racenchase_test;Uid=root;Pwd=jyLqRZv37pCThC";
             else
                 _connectionString = "Server=" + Settings.MySQL_Host + ";Database=" + Settings.MySQL_Database + ";Uid=" + Settings.MySQL_User + ";Pwd=" + Settings.MySQL_Password + ";Port=" + Settings.MySQL_Port;
         }
