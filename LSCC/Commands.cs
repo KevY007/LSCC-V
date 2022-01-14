@@ -4254,7 +4254,26 @@ namespace RNC
             player.SetSharedData("InLobby", -3); 
             EPlayer.Spawn(player, false, new Vector3(1061.547f, -720.113f, 56.786f));
             EPlayer.Notify(player, $"Joined <strong>Freeroam</strong>", "blue", "fas fa-check", false, 1000, "bottomCenter", "replace");
+
+            cmd_fcmds(player);
+            player.SendChatMessage(" ");
+            player.SendChatMessage("~g~TIP: You can use ~y~/fcmds~w~ at any time to see a list of freeroam commands.");
             return;
+        }
+        [Command("fcmds")]
+        public static void cmd_fcmds(Player player)
+        {
+            player.SendChatMessage("~y~====================> ~w~FREEROAM ~y~<====================");
+            player.SendChatMessage("In freeroam, you can do anything you want to! Here are some commands:");
+            player.SendChatMessage("~y~> /world [ID 256-512] ~w~-> changes your \"virtual world\", a.k.a you only see entities from the world you set.");
+            player.SendChatMessage("~y~> /mytime [hr 0-23] ~w~-> changes your time of day.");
+            player.SendChatMessage("~y~> /myweather [ID] ~w~-> changes your weather.");
+            player.SendChatMessage("~y~> /gun [ammo][name] ~w~-> gives you a weapon of your choice.");
+            player.SendChatMessage("~y~> /veh [name]<opt:color1><opt:color2> ~w~-> spawns a vehicle of your choice; you can also specify a color if you want to.");
+            player.SendChatMessage("~y~> /teleport ~w~-> teleport to a specific location.");
+            player.SendChatMessage(" ");
+            player.SendChatMessage("~y~> /panim [library][name][flags] ~w~-> play ANY available GTA V animation. ");
+            player.SendChatMessage("~g~TIP: ~b~Flags list: ~w~tiny.cc/anim_flags | ~b~Animations: ~w~alexguirre.github.io/animations-list/");
         }
 
         [Command("derby")]
@@ -4752,9 +4771,11 @@ namespace RNC
         public void cmd_playanim(Player player, string lib, string name, int flags)
         {
             if (!EPlayer.LoggedIn(player)) return;
-            if (EPlayer.GetAccount(player).Admin < 4) return;
-
-            Events.RequestPlayAnimation(player, lib, name, flags);
+            if (EPlayer.GetAccount(player).Admin >= 4 || player.GetSharedData<int>("InLobby") == -3)
+            {
+                Events.RequestPlayAnimation(player, lib, name, flags);
+                player.SendChatMessage("~y~[ANIMATION]~w~ Attempting to play animation ~y~" + name + "~w~.");
+            }
             return;
         }
 
@@ -8638,9 +8659,9 @@ namespace RNC
                 });
             }
 
-            if(text.Contains("weather", StringComparison.OrdinalIgnoreCase))
+            if(text.Contains("weather", StringComparison.OrdinalIgnoreCase) && player.GetSharedData<int>("PlayerWeather") == -1)
             {
-                player.SendChatMessage("~y~[TIP] ~w~You can use ~y~/myweather [ID] ~w~to set your own weather if this one is bothering you!");
+                player.SendChatMessage("~y~[TIP] ~w~Set a custom weather in the ~y~Menu~w~ if the current one is annoying you.");
             }
 
             Discord.SendTextChannel("staff-bot", $"**(OOC) | {player.Name}**: {text}");
