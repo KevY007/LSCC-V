@@ -1527,14 +1527,14 @@ namespace RNC
                                         {
                                             if (player.GetSharedData<int>("InLobby") == lobby.lobbyId)
                                             {
-                                                if (player.GetData<int>("PlayerWeather") == -1)
+                                                if (player.GetSharedData<int>("PlayerWeather") == -1)
                                                 {
                                                     player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);   
                                                     player.SendChatMessage("!{#A8FFAB}[WEATHER FORECAST] " + weatherString);
                                                 }
                                                 else
                                                 {
-                                                    player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], player.GetData<int>("PlayerWeather"));
+                                                    player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], player.GetSharedData<int>("PlayerWeather"));
                                                 }
 
 
@@ -1549,9 +1549,9 @@ namespace RNC
                                     {
                                         if (player.GetSharedData<int>("InLobby") == lobby.lobbyId)
                                         {
-                                            if(player.GetData<int>("PlayerWeather") == -1)
+                                            if(player.GetSharedData<int>("PlayerWeather") == -1)
                                                 player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
-                                            else player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], player.GetData<int>("PlayerWeather"));
+                                            else player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], player.GetSharedData<int>("PlayerWeather"));
                                         }
                                     }
                                 }

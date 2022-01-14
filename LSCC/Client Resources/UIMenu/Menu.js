@@ -9,9 +9,11 @@ if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD
     mp.storage.data.menu.killFeed = true;
     mp.storage.data.menu.alwaysExpandedMap = false;
     mp.storage.data.menu.updateRate = 200;
+    mp.storage.data.menu.myweather = -1;
     mp.storage.data.menu.tooltips = true;
     mp.storage.data.menu.nametags = true;
     mp.storage.data.menu.HUD = true;
+    mp.storage.data.menu.OOCauto = false;
 
     mp.storage.flush();
 }
@@ -158,7 +160,51 @@ function ToggleMenu()
               name: "bigmapbind",
               label: "Expanded Minimap",
               description: "Toggles the larger minimap view."
-            }
+            },
+            {
+              id: 12,
+              type: 2,
+              name: "myweather",
+              label: "Weather",
+              description: "Changes the weather displayed on <strong>your</strong> screen.",
+              options: [
+                {
+                    name: "Dynamic",
+                    value: "-1",
+                },
+                {
+                  name: "Sunny",
+                  value: "0",
+                },
+                {
+                  name: "Cloudy",
+                  value: "2",
+                },
+                {
+                  name: "Foggy",
+                  value: "4",
+                },
+                {
+                    name: "Rain",
+                    value: "6",
+                },
+                {
+                    name: "Thunderstorm",
+                    value: "7",
+                },
+                {
+                    name: "Snowfall",
+                    value: "9",
+                },
+              ]
+            },
+            {
+              id: 13,
+              type: 1,
+              name: "oocauto",
+              label: "Auto OOC",
+              description: "Automatically send all text messages to the global OOC chat, so you don't have to type /o every time."
+            },
           ]`);
           
         UIMenu.execute(`gm.$refs.settings.$refs.tri.value = ${mp.storage.data.menu.topRightInfo};`);
@@ -172,6 +218,8 @@ function ToggleMenu()
         UIMenu.execute(`gm.$refs.settings.$refs.vcbind.value = "${String.fromCharCode(curVoiceBind)}";`);
         UIMenu.execute(`gm.$refs.settings.$refs.gpsbind.value = "${String.fromCharCode(curGPSBind)}";`);
         UIMenu.execute(`gm.$refs.settings.$refs.bigmapbind.value = "${String.fromCharCode(curMapBind)}";`);
+        UIMenu.execute(`gm.$refs.settings.$refs.myweather.value = ${mp.storage.data.menu.myweather};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.oocauto.value = ${mp.storage.data.menu.OOCauto};`);
     }
 }
 
@@ -245,6 +293,16 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     else if(id == 11)
     {
         mp.events.callLocal("playerCommand", `bigmapbind ${value}`);
+    }
+    else if(id == 12)
+    {
+        mp.events.callRemote("SetPlayerPrivateWeather", value);
+    }
+    else if(id == 13)
+    {
+        mp.storage.data.menu.OOCauto = value;
+        autoOOC = mp.storage.data.menu.OOCauto;
+        mp.events.callRemote("SetAutoOOC", autoOOC);
     }
 
     if(UIHud != null)

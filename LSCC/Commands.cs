@@ -833,50 +833,23 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            /*if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
+            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                player.SendChatMessage("~g~HINT:~w~ You can change your weather in the ~y~Menu > Settings~w~.");
                 return;
-            }*/
-
-            if (player.GetSharedData<int>("InLobby") == -3 && player.Dimension >= 256 && player.Dimension <= 512)
-            {
-                if (weatherid < 0 || weatherid > 9)
-                {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Weather ID's are between 0-9.");
-                    return;
-                }
-
-                player.SetData("FreeroamWeather", weatherid);
-                player.TriggerEvent("SetTimeWeather", player.GetData<int>("FreeroamTime"), 0, 0, player.GetData<int>("FreeroamWeather"));
             }
-            else
+
+            if (weatherid < 0 || weatherid > 9)
             {
-                if (weatherid < -1 || weatherid > 9)
-                {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Weather IDs must be between 0 and 9!");
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can use ~y~/myweather -1~w~ to set it to lobby's weather!");
-                    return;
-                }
-
-                LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
-                if (lobby != null)
-                {
-                    if (weatherid != -1)
-                        player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], weatherid);
-                    else player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
-
-                    player.SetData<int>("PlayerWeather", weatherid);
-                }
-                else
-                {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You must be in a copchase lobby to use this!");
-                    return;
-                }
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Weather ID's are between 0-9.");
+                return;
             }
-            if(weatherid != -1)
-                player.SendChatMessage("!{#FF6347}>> !{#FFFFFF}You have set your weather to " + weatherid + ".");
-            else player.SendChatMessage("!{#FF6347}>> !{#FFFFFF}You have set your weather to the lobby weather [changes overtime].");
+
+            player.SetData("FreeroamWeather", weatherid);
+            player.TriggerEvent("SetTimeWeather", player.GetData<int>("FreeroamTime"), 0, 0, player.GetData<int>("FreeroamWeather"));
+
+
 
 
             return;

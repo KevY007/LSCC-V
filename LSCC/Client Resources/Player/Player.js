@@ -242,18 +242,11 @@ function TogGPSMode()
 }
 
 let autoOOC = false;
-if(mp.storage.data.autoooc !== undefined){
-    autoOOC = mp.storage.data.autoooc;
-    mp.events.callRemote("SetAutoOOC", autoOOC);
-}
-else{
-    mp.storage.data.autoooc = autoOOC;
-    mp.events.callRemote("SetAutoOOC", autoOOC);
-}
+
 mp.events.addCommand("autoooc", () => {
  
     autoOOC = !autoOOC;
-    mp.storage.data.autooc = autoOOC;
+    mp.storage.data.menu.OOCauto = autoOOC;
     mp.storage.flush();
 
     mp.events.callRemote("SetAutoOOC", autoOOC);
@@ -2353,4 +2346,20 @@ mp.events.add(
             }
         }, 2000);
     },
+});
+
+mp.events.add("OnPlayerLoginRegister", () => {
+    if(mp.storage.data.menu.OOCauto !== undefined){
+        autoOOC = mp.storage.data.menu.OOCauto;
+        mp.events.callRemote("SetAutoOOC", autoOOC);
+    }
+    else{
+        mp.storage.data.menu.OOCauto = autoOOC;
+        mp.events.callRemote("SetAutoOOC", autoOOC);
+    }
+
+    if(mp.storage.data.menu !== undefined && mp.storage.data.menu.myweather !== undefined)
+    {
+        mp.events.callRemote("SetPlayerPrivateWeather", mp.storage.data.menu.myweather);
+    }
 });

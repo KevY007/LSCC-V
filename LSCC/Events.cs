@@ -48,7 +48,7 @@ namespace RNC
 
             player.TriggerEvent("InitChaseTimer");
 
-            player.SetData<int>("PlayerWeather", -1);
+            player.SetSharedData("PlayerWeather", -1);
 
             NAPI.Task.Run(() =>
             {
@@ -1386,6 +1386,19 @@ namespace RNC
             return;
         }
 
+        [RemoteEvent("SetPlayerPrivateWeather")]
+        public static void SetPrivateWeather(Player player, int weatherid)
+        {
+            LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (lobby != null)
+            {
+                if (weatherid != -1)
+                    player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], weatherid);
+                else player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
+            }
+            player.SetSharedData("PlayerWeather", weatherid);
+        }
+
         [RemoteEvent("SpectateChangeHPAR")]
         public static void SpectateHPARChange(Player player, int health, int armour)
         {
@@ -1586,6 +1599,7 @@ namespace RNC
             }
 
             player.TriggerEvent("showLoginBrowser", false);
+            player.TriggerEvent("OnPlayerLoginRegister");
         }
 
 
@@ -2031,7 +2045,7 @@ namespace RNC
                 }
             }
             EPlayer.Error(player, "Invalid credentials or unable to log-in!", "fas fa-lock");
-
+            player.TriggerEvent("OnPlayerLoginRegister");
         }
 
         [RemoteEvent("RequestLobbySwitch")]
