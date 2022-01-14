@@ -6236,19 +6236,6 @@ namespace RNC
         {
             Logs.GetAutoCompleteNames(player, gej);
         }
-
-        [Command("logs", "!{#AFAFAF}[USAGE] logs")]
-        public void cmd_logs(Player player)
-        {
-            if (!EPlayer.LoggedIn(player)) return;
-            if (EPlayer.GetAccount(player).Admin < 1)
-            {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
-                return;
-            }
-            Logs.ShowLogsPanel(player, true);
-            return;
-        }
         [Command("reqlog")]
         public void cmd_reqlog(Player player, string targetName, int type)
         {

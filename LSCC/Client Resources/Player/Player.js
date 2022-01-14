@@ -666,6 +666,9 @@ function UpdateStatsVars(entity){
                     fugitive: ${entity.Team == 0 ? true : false},
                 }`);
             }
+            if(UIMenu !== undefined){
+                UIMenu.execute(`gm.admin = ${entity.Admin}`);
+            }
         }
     }
 }

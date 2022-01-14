@@ -79,6 +79,7 @@ require('./Player/Actions.js');
 require("./Player/Nametags.js");
 require("./UIHud/HUD.js");
 require("./UIMenu/Menu.js");
+require("./UIMenu/Logs.js");
 require("./charcreator/clotheditor.js")
 require("./charcreator/index.js");
 require("./charcreator/outfitslots.js")

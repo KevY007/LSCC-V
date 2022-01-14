@@ -56,12 +56,6 @@ namespace RNC
             AdminRecord = 3
         };
 
-        [RemoteEvent("ShowLogsPanel")]
-        public static void ShowLogsPanel(Player player, bool toggle)
-        {
-            player.TriggerEvent("ShowLogsCEF", toggle);
-        }
-
         [RemoteEvent("Logs_GetAutoCompleteNames")]
         public static void GetAutoCompleteNames(Player player, string query)
         {
@@ -76,6 +70,7 @@ namespace RNC
 
             player.TriggerEvent("ReturnAutoCompleteNames", jsonShit);
         }
+        /*
         [RemoteEvent("ReqLogFromSrv")]
         public static void RequestLogsFromServer(Player player, string targetName, int type)
         {
@@ -124,8 +119,9 @@ namespace RNC
                     }
             }
         }
+        */
 
-        /*
+        
         [RemoteEvent("ReqLogFromSrv")]
         public static void RequestLogsFromServer(Player player, string targetName, int type)
         {
@@ -145,13 +141,18 @@ namespace RNC
                 case (int)LogType.AdminRecord:
                     {
                         List<Logs_AdminRecord> _logs = ContextFactory.Instance.Logs_AdminRecords.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToList();
+
                         object[] _toSend = new object[_logs.Count];
                         for (int i = 0; i < _logs.Count; i++)
                         {
-                            (string, string, string, string) _toAdd = (_logs[i].Type, _logs[i].Reason, _logs[i].Timestamp.ToString(), _logs[i].Duration);
+                            string aName = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.SQL_ID == _logs[i].AdminID).Username;
+                            if (aName == "null") aName = "UNKNOWN";
+
+                            (string, string, string, string) _toAdd = (_logs[i].Timestamp.ToString(), aName, _logs[i].Duration, _logs[i].Reason);
                             _toSend[i] = _toAdd;
                         }
                         string jsonShit = NAPI.Util.ToJson(_toSend);
+                        NAPI.Util.ConsoleOutput(jsonShit);
                         player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
                         break;
                     }
@@ -161,10 +162,11 @@ namespace RNC
                         object[] _toSend = new object[_logs.Count];
                         for (int i = 0; i < _logs.Count; i++)
                         {
-                            (string, string) _toAdd = (_logs[i].Description, _logs[i].Timestamp.ToString());
+                            (string, string) _toAdd = (_logs[i].Timestamp.ToString(), _logs[i].Description);
                             _toSend[i] = _toAdd;
                         }
                         string jsonShit = NAPI.Util.ToJson(_toSend);
+                        NAPI.Util.ConsoleOutput(jsonShit);
                         player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
                         break;
                     }
@@ -178,6 +180,7 @@ namespace RNC
                             _toSend[i] = _toAdd;
                         }
                         string jsonShit = NAPI.Util.ToJson(_toSend);
+                        NAPI.Util.ConsoleOutput(jsonShit);
                         player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
                         break;
                     }
@@ -186,7 +189,7 @@ namespace RNC
                         return;
                     }
             }
-        }*/
+        }
 
         public static void LogSession(Player player)
         {
