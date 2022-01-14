@@ -166,7 +166,7 @@ function ToggleMenu()
               type: 2,
               name: "myweather",
               label: "Weather",
-              description: "Changes the weather displayed on <strong>your</strong> screen.",
+              description: "Changes the weather displayed only on your screen.",
               options: [
                 {
                     name: "Dynamic",

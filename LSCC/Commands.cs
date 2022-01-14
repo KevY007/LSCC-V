@@ -4265,9 +4265,10 @@ namespace RNC
         {
             player.SendChatMessage("~y~====================> ~w~FREEROAM ~y~<====================");
             player.SendChatMessage("In freeroam, you can do anything you want to! Here are some commands:");
-            player.SendChatMessage("~y~> /world [ID 256-512] ~w~-> changes your \"virtual world\", a.k.a you only see entities from the world you set.");
+            player.SendChatMessage("~y~> /world [ID 0-256] ~w~-> changes your \"virtual world\", a.k.a you only see entities from the world you set.");
             player.SendChatMessage("~y~> /mytime [hr 0-23] ~w~-> changes your time of day.");
             player.SendChatMessage("~y~> /myweather [ID] ~w~-> changes your weather.");
+            player.SendChatMessage("~y~> /godmode ~w~-> toggles freeroam invincibility.");
             player.SendChatMessage("~y~> /gun [ammo][name] ~w~-> gives you a weapon of your choice.");
             player.SendChatMessage("~y~> /veh [name]<opt:color1><opt:color2> ~w~-> spawns a vehicle of your choice; you can also specify a color if you want to.");
             player.SendChatMessage("~y~> /teleport ~w~-> teleport to a specific location.");
