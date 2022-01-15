@@ -120,6 +120,51 @@ function ToggleMenu()
                 description: "Enable/disable nametags."
             },
             {
+                id: 12,
+                type: 4,
+                name: "myweather",
+                label: "Weather",
+                preSelect: "Dynamic",
+                description: "Changes the weather displayed only on your screen.",
+                options: [
+                  {
+                      name: "Dynamic",
+                      value: "-1",
+                  },
+                  {
+                    name: "Sunny",
+                    value: "0",
+                  },
+                  {
+                    name: "Cloudy",
+                    value: "2",
+                  },
+                  {
+                    name: "Foggy",
+                    value: "4",
+                  },
+                  {
+                      name: "Rain",
+                      value: "6",
+                  },
+                  {
+                      name: "Thunderstorm",
+                      value: "7",
+                  },
+                  {
+                      name: "Snowfall",
+                      value: "9",
+                  },
+                ]
+            },
+            {
+                id: 13,
+                type: 1,
+                name: "oocauto",
+                label: "Auto OOC",
+                description: "Automatically send all text messages to the global OOC chat, so you don't have to type /o every time."
+            },
+            {
               id: 6,
               type: 2,
               name: "updr",
@@ -160,50 +205,6 @@ function ToggleMenu()
               name: "bigmapbind",
               label: "Expanded Minimap",
               description: "Toggles the larger minimap view."
-            },
-            {
-              id: 12,
-              type: 2,
-              name: "myweather",
-              label: "Weather",
-              description: "Changes the weather displayed only on your screen.",
-              options: [
-                {
-                    name: "Dynamic",
-                    value: "-1",
-                },
-                {
-                  name: "Sunny",
-                  value: "0",
-                },
-                {
-                  name: "Cloudy",
-                  value: "2",
-                },
-                {
-                  name: "Foggy",
-                  value: "4",
-                },
-                {
-                    name: "Rain",
-                    value: "6",
-                },
-                {
-                    name: "Thunderstorm",
-                    value: "7",
-                },
-                {
-                    name: "Snowfall",
-                    value: "9",
-                },
-              ]
-            },
-            {
-              id: 13,
-              type: 1,
-              name: "oocauto",
-              label: "Auto OOC",
-              description: "Automatically send all text messages to the global OOC chat, so you don't have to type /o every time."
             },
           ]`);
           
