@@ -3792,7 +3792,10 @@ namespace RNC
                 }
 
                 player.TriggerEvent("HideChaseTimer");
-                player.TriggerEvent("SetTimeWeather", 12, 0, 0, -1);
+
+                if(player.GetSharedData<int>("PlayerWeather") == -1)
+                    player.TriggerEvent("SetTimeWeather", 12, 0, 0, -1);
+                else player.TriggerEvent("SetTimeWeather", 12, 0, 0, player.GetSharedData<int>("PlayerWeather"));
 
                 player.SetSharedData("VisibleBlip", false);
 
@@ -3933,7 +3936,9 @@ namespace RNC
 
                     if (lobby != null)
                     {
-                        player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
+                        if (player.GetSharedData<int>("PlayerWeather") == -1)
+                            player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
+                        else player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], player.GetSharedData<int>("PlayerWeather"));
 
                         if (lobby.gameStatus == 1)
                         {
