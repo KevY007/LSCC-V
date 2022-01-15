@@ -680,6 +680,8 @@ mp.events.addDataHandler('PlayerSquadID', function(entity, value, oldValue){
 mp.events.addDataHandler('Team', function (entity, value, oldValue) 
 {
     entity.Team = value; 
+
+    mp.events.callRemote("SetPlayerWounded", 0, -1);
     
     if(entity.type === 'player' && entity.remoteId == mp.players.local.remoteId)
     {
