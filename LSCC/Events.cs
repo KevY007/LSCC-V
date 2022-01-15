@@ -3793,9 +3793,7 @@ namespace RNC
 
                 player.TriggerEvent("HideChaseTimer");
 
-                if(player.GetSharedData<int>("PlayerWeather") == -1)
-                    player.TriggerEvent("SetTimeWeather", 12, 0, 0, -1);
-                else player.TriggerEvent("SetTimeWeather", 12, 0, 0, player.GetSharedData<int>("PlayerWeather"));
+                player.TriggerEvent("SetTimeWeather", 12, 0, 0, 0);
 
                 player.SetSharedData("VisibleBlip", false);
 
