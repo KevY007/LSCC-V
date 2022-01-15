@@ -1539,7 +1539,6 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
 
                 if(chaseRunning)
                 {
-                    /*
                     let HP = mp.players.local.getHealth();
 
                     if(HP - damage <= 10){
@@ -1560,7 +1559,6 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                         mp.game.weapon.cancelCurrentDamageEvent();
                         return true;
                     }
-                    */
                 }
             }
         }
@@ -1574,7 +1572,7 @@ let crawlAnimTimeout;
 
 let woundedTimeLeft = 60;
 let woundedTimer = null;
-/*
+
 mp.events.add('render', () => {
     if(mp.players.local.getVariable("Wounded") > 0){
         if(mp.players.local.isInAnyVehicle(false)){ // making sure to disable driveby and vehicle movement completely good RP
@@ -1673,7 +1671,6 @@ mp.events.add('setWounded', (state, idToPass) =>
                     mp.events.callLocal("setWounded", 2, -1);
                 }
             }, 4030);
-            
         }
         else 
         {
@@ -1701,7 +1698,6 @@ mp.events.add('setWounded', (state, idToPass) =>
 
     mp.events.callRemote("SetPlayerWounded", state, idToPass);
 });
-*/
 
 function handleCrawlControls() 
 {

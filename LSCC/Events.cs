@@ -189,8 +189,6 @@ namespace RNC
         [RemoteEvent("SetPlayerWounded")]
         public void OnPlayerWounded(Player player, int state, int killerID)
         {
-            return;
-
             if (player.GetSharedData<int>("Wounded") == state && state != 0) return; // REPEL: Laggers... So it doesn't call twice...
 
             player.SetSharedData("Wounded", state);
@@ -1087,11 +1085,11 @@ namespace RNC
                 LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
                 if (lobby != null)
                 {
-                    /*if (killer == null && player.GetSharedData<int>("Wounded") != 0)
+                    if (killer == null && player.GetSharedData<int>("Wounded") != 0)
                     {
                         killer = Settings.LoggedInPlayers.Find(a => a.Name.Equals(player.GetSharedData<string>("LastKiller")));
                         reasonStr = "Executed";
-                    }*/
+                    }
 
                     if (lobby.gameStatus == 1)
                     {
@@ -1099,32 +1097,6 @@ namespace RNC
 
                         if (killer != null)
                         {
-                            if (Main.WeaponReasons.TryGetValue((long)killer.CurrentWeapon, out reasonStr))
-                            {
-                                // oh its already set ^^
-                            }
-                            else if (Settings.WeaponData.TryGetValue((long)killer.CurrentWeapon, out wepDat))
-                            {
-                                reasonStr = wepDat.Name;
-                            }
-                            else
-                            {
-                                reasonStr = null;
-                            }
-
-                            EPlayer.GetAccount(killer).Kills++;
-                            player.SetSharedData("LastKiller", killer.Name);
-
-                            EPlayer.GetAccount(player).Deaths++;
-
-                            killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 10.0));
-                            EPlayer.GrantXP(killer, 2);
-
-                            if (lobby.Fugitives.Contains(player) && killer.GetSharedData<int>("Team") == 0)
-                            {
-                                PlayerRequestShotTag(killer);
-                            }
-
                             int killStreak = killer.GetData<int>("Killstreak");
                             killer.SetData("Killstreak", killStreak + 1);
 
@@ -1139,7 +1111,7 @@ namespace RNC
                             }
 
                             /////////////////////////////////////
-                            /*if (player.GetSharedData<int>("Wounded") == 0)
+                            if (player.GetSharedData<int>("Wounded") == 0)
                             {
                                 EPlayer.GetAccount(killer).Kills++;
                                 EPlayer.GetAccount(player).Deaths++;
@@ -1147,7 +1119,7 @@ namespace RNC
                             else
                             {
                                 killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.05 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 20.0));
-                            }*/
+                            }
                         }
 
                         if (lobby.Fugitives.Contains(player))
