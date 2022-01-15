@@ -226,12 +226,16 @@ namespace RNC
         }
         public static void LogAdmin(Player player, string description)
         {
+            LogAdmin(EPlayer.GetAccount(player).SQL_ID, description);
+        }
+        public static void LogAdmin(int aSQLID, string description)
+        {
             description = description.Replace("{", "(");
             description = description.Replace("}", ")");
 
             Logs_Admin _a = new Logs_Admin()
             {
-                AccountID = EPlayer.GetAccount(player).SQL_ID,
+                AccountID = aSQLID,
                 Description = description,
                 Timestamp = DateTime.Now
             };

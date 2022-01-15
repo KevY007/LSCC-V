@@ -9208,7 +9208,7 @@ namespace RNC
                 Logs.LogAdmin(player, $"Unjailed player {target.Name} who had {acc.JailTime} seconds remaining in jail.");
                 acc.JailTime = 0;
                 target.SetSharedData("JailTime", 0);
-                EPlayer.Freeze(player, false);
+                EPlayer.Freeze(target, false);
 
                 //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unjail:{target.Name}"); } catch { }             
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has unjailed {target.Name}.");
