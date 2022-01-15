@@ -158,6 +158,7 @@ mp.events.add("BeginReviving", () => {
 
     reviveTime = 7;
     isReviving = true;
+    initiateActionTimer(reviveTime);
     clearInterval(reviveTimer);
     reviveTimer = setInterval(() => {
         if(mp.players.local == null || !mp.players.exists(mp.players.local)){ stopCuffing(69); return; }
@@ -180,9 +181,15 @@ mp.events.add("BeginReviving", () => {
         reviveTime--;
         if(reviveTime <= 0)
         {
+            UIHud.execute(`gm.actionBar = false;`);
+            UIHud.execute(`gm.$refs.actionbar.time = 0;`);
+            finishCuffing();
             mp.events.callRemote("FinishRevive", reviveTarget);
             clearInterval(reviveTimer);
             return;
+        }
+        else{
+            UIHud.execute(`gm.$refs.actionbar.time = ${((maxActionTime - reviveTime) == 0 ? 0 : (maxActionTime - reviveTime))}`);
         }
     }, 1000);
 });

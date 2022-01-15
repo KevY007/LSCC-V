@@ -173,7 +173,18 @@ mp.events.add('render', (nametags) => {
                         });
                     }
                     
-                    if(player.getVariable("IsTabbed") !== undefined && player.getVariable("IsTabbed") == true)
+                    if(player.getVariable("Wounded") == 1 || player.getVariable("Wounded") == 2)
+                    {
+                        var typingStr = `(( This player is wounded; hold [H] near them begin reviving them. ))`;
+                        mp.game.graphics.drawText(typingStr, [x, y - 0.0250],
+                            {
+                                font: 0,
+                                color: [255, 99, 71, 228],
+                                scale: [0.285, 0.285],
+                                outline: true
+                            });
+                    }
+                    else if(player.getVariable("IsTabbed") !== undefined && player.getVariable("IsTabbed") == true)
                     {
                         var typingStr = "(( TABBED ))";
                         if(timerCount == 0) typingStr = "(( TABBED ))";

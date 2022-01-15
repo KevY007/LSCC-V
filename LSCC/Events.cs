@@ -329,6 +329,55 @@ namespace RNC
                         player.SendChatMessage("!{#FF6347}You have been severely injured, but you are not dead yet!");
                         player.SendChatMessage("!{#FF6347}You have enough strength to crawl - use it to crawl to safety.");
                         player.SendChatMessage("!{#FF6347}You will die in 60 seconds if you are not revived by a teammate. Use (/lobby) to respawn instantly.");
+
+                        if(player.HasSharedData("Team"))
+                        {
+                            LobbyData lobby = Settings.Lobbies.FirstOrDefault(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+                            if (lobby != null)
+                            {
+                                if (player.GetSharedData<int>("Team") == 1)
+                                {
+                                    string chatStr = $"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: Officer {player.Name} is down and needs medical assistance!";
+                                    foreach (Player cop in lobby.Cops.Where(c => c.Position.DistanceTo(player.Position) < 75))
+                                    {
+                                        cop.SendChatMessage(chatStr);
+                                        cop.TriggerEvent("RemoveTooltip", "H");
+                                        cop.TriggerEvent("AddTooltip", "H", "Revive", 1);
+                                    }
+                                }
+                                else
+                                {
+                                    int msgrand = new Random().Next(0, 5);
+                                    string msg = "";
+                                    switch (msgrand)
+                                    {
+                                        case 0: 
+                                            msg = "Fuck, I've been shot badly, need help, quick!";
+                                            break;
+                                        case 1: 
+                                            msg = "I'm bleeding out over here, will somebody fucking help me?";
+                                            break;
+                                        case 2:
+                                            msg = "Need help, quick, I'm bleeding! Please come help me!";
+                                            break;
+                                        case 3:
+                                            msg = "I can't get up, I've got more holes in me than Swiss cheese.";
+                                            break;
+                                        default: 
+                                            msg = "I'm going to die if someone doesn't help me! Please, give me a hand over here!";
+                                            break;
+                                    }
+
+                                    string chatStr = $"!{{#FFEC8B}}** [WT | FREQ: {lobby.lobbyId + 8346}] {player.Name.Replace("_", " ")}: {msg}";
+                                    foreach (Player cop in lobby.Fugitives.Where(c => c.Position.DistanceTo(player.Position) < 75))
+                                    {
+                                        cop.SendChatMessage(chatStr);
+                                        cop.TriggerEvent("RemoveTooltip", "H");
+                                        cop.TriggerEvent("AddTooltip", "H", "Revive", 0);
+                                    }
+                                }
+                            }
+                        }
                         break;
                     }
             }
