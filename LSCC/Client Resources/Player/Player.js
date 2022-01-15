@@ -1545,8 +1545,10 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
 
                         if(mp.players.local.getVariable("Wounded") == 0) 
                         {
+                            mp.game.player.setInvincible(true);
                             mp.players.local.setInvincible(true);
                             mp.events.callLocal("setWounded", 1, sourcePlayer.remoteId);
+                            damage = 0;
                             mp.game.weapon.setCurrentDamageEventAmount(0);
                             mp.game.weapon.cancelCurrentDamageEvent();
                             return true;
@@ -1555,6 +1557,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
 
                     if(mp.players.local.getVariable("Wounded") == 1)
                     {
+                        damage = 0;
                         mp.game.weapon.setCurrentDamageEventAmount(0);
                         mp.game.weapon.cancelCurrentDamageEvent();
                         return true;
@@ -1614,6 +1617,7 @@ mp.events.add("ResetWounded", () => {
     if(chaseRunning && mp.players.local.getVariable("Team") >= 0) 
     {
         mp.players.local.setInvincible(false);
+        mp.game.player.setInvincible(false);
     }
 
     if(woundedTimer != null) 
@@ -1676,7 +1680,7 @@ mp.events.add('setWounded', (state, idToPass) =>
         {
             mp.events.callRemote("play_anim", 'anim@veh@lowrider@std@ds@arm@base', 'die', 2, 8.0, 0, -1, 0, false, false, false);
         }
-        
+        mp.game.player.setInvincible(true);
         mp.events.callRemote("play_anim", "amb@world_human_push_ups@male@exit", "exit", 2, 8.0, 0, -1, 0, false, false, false);
         //mp.game.graphics.startScreenEffect('DrugsDrivingIn', -1, true);
     }
@@ -1685,6 +1689,7 @@ mp.events.add('setWounded', (state, idToPass) =>
         if(mp.players.local.getVariable("Wounded") != 1 || !chaseRunning || mp.players.local.getVariable("Team") < 0) return;
         
         mp.players.local.setInvincible(false);
+        mp.game.player.setInvincible(false);
         mp.players.local.clearDrivebyTaskUnderneathDrivingTask();
         mp.events.callRemote("clear_tasks", 1);
         mp.events.callRemote("play_anim", 'move_crawlprone2crawlfront', 'front', 2, 8.0, 0, -1, 0, false, false, false);
@@ -1872,6 +1877,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 {
                     if(targetEntity.getVariable("Wounded") == 1)
                     {
+                        damage = 0;
                         mp.game.weapon.setCurrentDamageEventAmount(0);
                         mp.game.weapon.cancelCurrentDamageEvent();
                         return true;

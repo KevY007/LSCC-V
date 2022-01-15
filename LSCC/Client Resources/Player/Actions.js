@@ -118,16 +118,24 @@ function onHoldHkey()
     if(canRevive())
     {
         mp.players.forEach(pl => {
-            if(pl.getVariable("Team") == mp.players.local.getVariable("Team") && pl.getVariable("Wounded") == 2 
-                && pl.remoteId != mp.players.local.remoteId && pl.getVariable("BeingRevived") == false)
+            if(pl.getVariable("Team") == mp.players.local.getVariable("Team"))
             {
-                let distance = calcDist(mp.players.local.position, pl.position);
-                if(distance < 5)
+                if(pl.getVariable("Wounded") == 2)
                 {
-                    reviveTarget = pl;
-                    reviveTime = 7;
-                    mp.events.callRemote("AssignReviveTarget", pl.remoteId);
-                    return;
+                    if(pl.remoteId != mp.players.local.remoteId)
+                    {
+                        if(pl.getVariable("BeingRevived") == false)
+                        {
+                            let distance = calcDist(mp.players.local.position, pl.position);
+                            if(distance < 5)
+                            {
+                                reviveTarget = pl;
+                                reviveTime = 7;
+                                mp.events.callRemote("AssignReviveTarget", pl.remoteId);
+                                return;
+                            }
+                        }
+                    }
                 }
             }
         });

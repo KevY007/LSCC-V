@@ -1818,6 +1818,8 @@ namespace RNC
 
                     i.TriggerEvent("ResetKillFeed");
 
+                    Events.OnPlayerWounded(i, 0, -1);
+
 
                     if (i.HasData("Spectating") && EPlayer.GetAccount(i).Admin < 1)
                     {

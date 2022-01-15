@@ -187,11 +187,13 @@ namespace RNC
         }
 
         [RemoteEvent("SetPlayerWounded")]
-        public void OnPlayerWounded(Player player, int state, int killerID)
+        public static void OnPlayerWounded(Player player, int state, int killerID)
         {
             if (player.GetSharedData<int>("Wounded") == state && state != 0) return; // REPEL: Laggers... So it doesn't call twice...
 
             player.SetSharedData("Wounded", state);
+            player.SendChatMessage($"{DateTime.Now.Ticks} => OnPlayerWounded({player.Name}, {state}, {killerID}) called!");
+
             Player killer = null;
             if(killerID != -1)
             {
@@ -211,10 +213,14 @@ namespace RNC
                         Events.RequestClearAnimation(player);
                         player.StopAnimation();
                         player.TriggerEvent("ResetWounded");
+                        player.SetSharedData("ReviveTarget", "n/a");
+                        player.SetSharedData("BeingRevived", false);
                         break;
                     }
                 case 1:
                     {
+                        player.SetSharedData("ReviveTarget", "n/a");
+                        player.SetSharedData("BeingRevived", false);
                         player.SendChatMessage("!{#C3A3DB}* You suddenly start losing strength and collapse - you lost too much blood.");
                         player.Health = 100;
 
@@ -307,6 +313,8 @@ namespace RNC
                     }
                 case 2:
                     {
+                        player.SetSharedData("ReviveTarget", "n/a");
+                        player.SetSharedData("BeingRevived", false);
                         player.Health = 25;
                         player.SendChatMessage("!{#FF6347}You have been severely injured, but you are not dead yet!");
                         player.SendChatMessage("!{#FF6347}You have enough strength to crawl - use it to crawl to safety.");
