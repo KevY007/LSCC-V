@@ -4808,6 +4808,44 @@ namespace RNC
             else if (team == 1) EPlayer.GetAccount(target).CarCop = car;
             return;
         }
+        [Command("resetgamevehicles", Alias = "resetgameveh")]
+        public void cmd_resetgameveh(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] ~w~You are not authorized to use this command!");
+                return;
+            }
+            if (!EPlayer.LoggedIn(target)) return;
+
+            EPlayer.GetAccount(target).CarFugitive = "?";
+            EPlayer.GetAccount(target).CarCop = "police";
+
+            Logs.LogAdmin(player, $"Reset ${target.Name}'s game vehicles to their defaults.");
+            target.SendChatMessage($"!{{#FF6347}}[!] ~w~Admin {player.Name} has reset your game vehicles to the default ones.");
+            player.SendChatMessage($"!{{#FF6347}}[!] ~w~You've set {target.Name}'s game vehicles to the default ones.");
+            return;
+        }
+        [Command("resetcharacter", Alias = "resetchar")]
+        public void cmd_resetcharacter(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 2)
+            {
+                player.SendChatMessage("!{#FF6347}[!] ~w~You are not authorized to use this command!");
+                return;
+            }
+            if (!EPlayer.LoggedIn(target)) return;
+
+            EPlayer.GetAccount(target).Character = "{}";
+            EPlayer.ShowCharCreator(target);
+
+            Logs.LogAdmin(player, $"Reset ${target.Name}'s character & clothing to the defaults.");
+            target.SendChatMessage($"!{{#FF6347}}[!] ~w~Admin {player.Name} has reset your character. Please create a new one.");
+            player.SendChatMessage($"!{{#FF6347}}[!] ~w~You reset {target.Name}'s character.");
+            return;
+        }
 
         [Command("dbgexitlinkmane", Alias = "dbgexitcef", GreedyArg = true)]
         public void cmd_exitdbgcef(Player player)
@@ -6253,13 +6291,13 @@ namespace RNC
                 player.SendChatMessage("[Admin Lv 1]: /(o)mute /(o)unmute /warn /unwarn /setteam /forceautojoin /forceswapseats");
                 player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats /lastlogin /logs /gethp /checkplayer");
                 player.SendChatMessage("[Admin Lv 1]: /(t)freeze /(t)unfreeze /p(ut)i(n)v(ehicle) /view(s)creen(s)hot /take(s)creen(s)hot");
-                player.SendChatMessage("[Admin Lv 1]: /resetclothing /getfps /takegif");
+                player.SendChatMessage("[Admin Lv 1]: /resetclothing /getfps /takegif /resetgameveh(icles)");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
                 player.SendChatMessage("[Admin Lv 2]: /game /ban /unban /createlobby /deletelobby /setlobbypassword /togglemap");
                 player.SendChatMessage("[Admin Lv 2]: /togglelobby /setdimension /r(emove)guns /suspend /unsuspend /(o)checkstats");
-                player.SendChatMessage("[Admin Lv 2]: /ann /vanish /oban /fugitivelist /noclip /motd /togcols /checkbanevaders");
+                player.SendChatMessage("[Admin Lv 2]: /ann /vanish /oban /fugitivelist /noclip /motd /togcols /checkbanevaders /resetchar");
             }
             if (EPlayer.GetAccount(player).Admin >= 3)
             {
