@@ -276,7 +276,7 @@ namespace RNC
                                 }
                                 else if (Settings.WeaponData.TryGetValue((long)killer.CurrentWeapon, out wepDat))
                                 {
-                                    reasonStr = wepDat.Name;
+                                    reasonStr += wepDat.Name;
                                 }
                                 else
                                 {
@@ -3029,6 +3029,21 @@ namespace RNC
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot tase a player that has shot.");
                 }
             }
+            if(target.GetSharedData<int>("Team") >= 0 && target.GetSharedData<int>("Wounded") == 1)
+            {
+                target.Health = 100;
+            }
+            if (target.GetSharedData<int>("Team") >= 0 && target.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && target.GetSharedData<int>("Wounded") == 2)
+            {
+                target.Health = 0;
+            }
+        }
+
+        [RemoteEvent("SetHealth")]
+        public void SetPlayerHealth(Player player, int HP)
+        {
+            if (player == null) return;
+            player.Health = HP;
         }
 
         [RemoteEvent("DerbyIncreaseCount")]

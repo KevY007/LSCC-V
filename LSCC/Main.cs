@@ -110,6 +110,7 @@ namespace RNC
     {
         STANDARD = 0,
         BUSTED = 1,
+        BANKROBBERY = 2,
     }
 
     public class LobbyData
@@ -987,6 +988,10 @@ namespace RNC
                 case GameModes.BUSTED:
                     ret = "Busted";
 					if(colored) ret = "!{#3569DB}" + ret;
+                    break;
+                case GameModes.BANKROBBERY:
+                    ret = "Bank Robbery";
+                    if (colored) ret = "!{#DB6135}" + ret;
                     break;
             }
             return ret;

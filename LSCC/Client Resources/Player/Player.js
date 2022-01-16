@@ -1543,7 +1543,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 {
                     let HP = mp.players.local.getHealth();
 
-                    if(HP - damage <= 10){
+                    if(HP - damage <= 15){
 
                         if(mp.players.local.getVariable("Wounded") == 0) 
                         {
@@ -1882,6 +1882,11 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                         damage = 0;
                         mp.game.weapon.setCurrentDamageEventAmount(0);
                         mp.game.weapon.cancelCurrentDamageEvent();
+                        return true;
+                    }
+                    if(targetEntity.getVariable("Wounded") == 2)
+                    {
+                        mp.events.callRemote("opsp", targetPlayer, boneIndex, mp.players.local.weapon);
                         return true;
                     }
                 }

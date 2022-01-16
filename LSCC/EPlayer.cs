@@ -1447,18 +1447,24 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
+            List<WeaponHash> toNotPut = new List<WeaponHash>();
+            toNotPut.Add(WeaponHash.Bzgas);
+            toNotPut.Add(WeaponHash.Molotov);
 
             Dictionary<string, int> ammoData = new Dictionary<string, int>();
             foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
             {
-                if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
+                if (!toNotPut.Contains((WeaponHash)i.Key))
                 {
-                    if (i.Value.AmmoType != null)
+                    if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
                     {
-                        if (!ammoData.ContainsKey(i.Value.AmmoType)) // IF ammo has not been added before in the box already (If 2 same category guns are there, 2 rifles. They will dupe)
+                        if (i.Value.AmmoType != null)
                         {
-                            ammoData.Add(i.Value.AmmoType, player.GetWeaponAmmo((WeaponHash)i.Key));
-                            player.SetWeaponAmmo((WeaponHash)i.Key, 0);
+                            if (!ammoData.ContainsKey(i.Value.AmmoType)) // IF ammo has not been added before in the box already (If 2 same category guns are there, 2 rifles. They will dupe)
+                            {
+                                ammoData.Add(i.Value.AmmoType, player.GetWeaponAmmo((WeaponHash)i.Key));
+                                player.SetWeaponAmmo((WeaponHash)i.Key, 0);
+                            }
                         }
                     }
                 }
