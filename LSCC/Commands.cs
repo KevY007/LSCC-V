@@ -4714,6 +4714,8 @@ namespace RNC
                 return;
             }
 
+            WeaponHash holding = player.CurrentWeapon; // store weapon which the player was holding
+
             Dictionary<string, int> ammoBox = targetVeh.GetData<Dictionary<string, int>>("BackupAmmo");
             string notificationString = "";
             foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
@@ -4732,9 +4734,9 @@ namespace RNC
                     }
                 }
             }
+            player.GiveWeapon(holding, 1); // equipping them with the weapon they were holding
 
-
-            if(notificationString.Length >= 3)
+            if (notificationString.Length >= 3)
             {
                 targetVeh.SetData("BackupAmmo", ammoBox);
 
