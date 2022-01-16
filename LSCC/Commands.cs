@@ -1107,26 +1107,53 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (EPlayer.GetAccount(player).Admin < 1)
+            if (EPlayer.GetAccount(player).Admin >= 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
-                return;
-            }
+                if (player.IsInVehicle)
+                {
+                    player.Vehicle.Position = target.Position.Around(5.0f);
+                    player.Vehicle.Dimension = target.Dimension;
+                }
+                else
+                {
+                    player.Position = target.Position.Around(3.0f);
+                }
+                player.Dimension = target.Dimension;
 
-            if (player.IsInVehicle)
-            {
-                player.Vehicle.Position = target.Position.Around(5.0f);
-                player.Vehicle.Dimension = target.Dimension;
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has teleported to {target.Name}.");
+                Logs.LogAdmin(player, $"Teleported to {target.Name}.");
+                //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:goto:{target.Name}"); } catch { }
             }
             else
             {
-                player.Position = target.Position.Around(3.0f);
+                if (player.GetSharedData<int>("InLobby") != -3)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] ~w~You must be an admin or in freeroam to use this command!");
+                    return;
+                }
+                if(target.GetSharedData<int>("InLobby") != -3)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] ~w~Target is not in freeroam!");
+                    return;
+                }
+                if(player.Dimension != target.Dimension)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] ~w~You are not in the same world as the target! (/world)");
+                    player.SendChatMessage("!{#FF6347}>> ~w~Please don't bother/troll/grief players if they want to be alone in their world!");
+                    return;
+                }
+                if (player.IsInVehicle)
+                {
+                    player.Vehicle.Position = target.Position.Around(5.0f);
+                    player.Vehicle.Dimension = target.Dimension;
+                }
+                else
+                {
+                    player.Position = target.Position.Around(3.0f);
+                }
+                player.SendChatMessage($"!{{#C9C9C9}}You've teleported to {target.Name}'s position.");
+                target.SendChatMessage($"!{{#C9C9C9}}{player.Name} has teleported to your position.");
             }
-            player.Dimension = target.Dimension;
-
-            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has teleported to {target.Name}.");
-            Logs.LogAdmin(player, $"Teleported to {target.Name}.");
-            //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:goto:{target.Name}"); } catch { }
             return;
         }
 
@@ -4272,6 +4299,7 @@ namespace RNC
             player.SendChatMessage("~y~> /gun [ammo][name] ~w~-> gives you a weapon of your choice.");
             player.SendChatMessage("~y~> /veh [name]<opt:color1><opt:color2> ~w~-> spawns a vehicle of your choice; you can also specify a color if you want to.");
             player.SendChatMessage("~y~> /teleport ~w~-> teleport to a specific location.");
+            player.SendChatMessage("~y~> /goto [player] ~w~-> teleport to a specific player.");
             player.SendChatMessage(" ");
             player.SendChatMessage("~y~> /panim [library][name][flags] ~w~-> play ANY available GTA V animation. ");
             player.SendChatMessage("~g~TIP: ~b~Flags list: ~w~tiny.cc/anim_flags | ~b~Animations: ~w~alexguirre.github.io/animations-list/");
