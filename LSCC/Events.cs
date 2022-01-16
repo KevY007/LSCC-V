@@ -192,7 +192,6 @@ namespace RNC
             if (player.GetSharedData<int>("Wounded") == state && state != 0) return; // REPEL: Laggers... So it doesn't call twice...
 
             player.SetSharedData("Wounded", state);
-            player.SendChatMessage($"{DateTime.Now.Ticks} => OnPlayerWounded({player.Name}, {state}, {killerID}) called!");
 
             Player killer = null;
             if(killerID != -1)
