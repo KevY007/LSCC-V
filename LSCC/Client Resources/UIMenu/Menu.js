@@ -69,144 +69,164 @@ function ToggleMenu()
         mp.gui.chat.activate(!menuToggled);
         //mp.gui.chat.show(!menuToggled);
 
-        UIMenu.execute(`gm.$refs.settings.settings = [
+        UIMenu.execute(`gm.$refs.settings.categories = [
             {
-                id: 9,
-                type: 1,
-                name: "hud",
-                label: "User Interface",
-                description: "Completely disable/enable the HUD."
-            },
-            {
-              id: 1,
-              type: 1,
-              name: "tri",
-              label: "Top Right Info",
-              description: "This includes RnC Logo, Player Count, Current Lobby ID, Clock."
-            },
-            {
-              id: 2,
-              type: 1,
-              name: "kf",
-              label: "Kill Feed",
-              description: "This includes Kill Feed."
-            },
-            {
-              id: 3,
-              type: 1,
-              name: "gp",
-              label: "Game Progress",
-              description: "This includes In-Game Progress Timer."
-            },
-            {
-              id: 4,
-              type: 1,
-              name: "bigmap",
-              label: "Expanded Minimap",
-              description: "Toggle permanently expanded minimap."
-            },
-            {
-                id: 5,
-                type: 1,
-                name: "tooltips",
-                label: "Tooltips",
-                description: "Enable/disable tooltips."
-            },
-            {
-                id: 10,
-                type: 1,
-                name: "nametags",
-                label: "Nametags",
-                description: "Enable/disable nametags."
-            },
-            {
-                id: 12,
-                type: 4,
-                name: "myweather",
-                label: "Weather",
-                preSelect: "Dynamic",
-                description: "Changes the weather displayed only on your screen.",
-                options: [
-                  {
-                      name: "Dynamic",
-                      value: "-1",
-                  },
-                  {
-                    name: "Sunny",
-                    value: "0",
-                  },
-                  {
-                    name: "Cloudy",
-                    value: "2",
-                  },
-                  {
-                    name: "Foggy",
-                    value: "4",
-                  },
-                  {
-                      name: "Rain",
-                      value: "6",
-                  },
-                  {
-                      name: "Thunderstorm",
-                      value: "7",
-                  },
-                  {
-                      name: "Snowfall",
-                      value: "9",
-                  },
+                name: "Game",
+                settings:[
+                    {
+                        id: 12,
+                        type: 4,
+                        name: "myweather",
+                        label: "Weather",
+                        preSelect: "Dynamic",
+                        description: "Changes the weather displayed only on your screen.",
+                        options: [
+                          {
+                              name: "Dynamic",
+                              value: "-1",
+                          },
+                          {
+                            name: "Sunny",
+                            value: "0",
+                          },
+                          {
+                            name: "Cloudy",
+                            value: "2",
+                          },
+                          {
+                            name: "Foggy",
+                            value: "4",
+                          },
+                          {
+                              name: "Rain",
+                              value: "6",
+                          },
+                          {
+                              name: "Thunderstorm",
+                              value: "7",
+                          },
+                          {
+                              name: "Snowfall",
+                              value: "9",
+                          },
+                        ]
+                    }
                 ]
             },
             {
-                id: 13,
-                type: 1,
-                name: "oocauto",
-                label: "Auto OOC",
-                description: "Automatically send all text messages to the global OOC chat, so you don't have to type /o every time."
+                name: "Keybinds",
+                settings: [
+                    {
+                        id: 7,
+                        type: 3,
+                        name: "vcbind",
+                        label: "Push To Talk",
+                        description: "Click to change the push to talk key."
+                      },
+                      {
+                        id: 8,
+                        type: 3,
+                        name: "gpsbind",
+                        label: "GPS Key",
+                        description: "This is the key used to toggle GPS."
+                      },
+                      {
+                        id: 11,
+                        type: 3,
+                        name: "bigmapbind",
+                        label: "Expanded Minimap",
+                        description: "Toggles the larger minimap view."
+                      }
+                ]
             },
             {
-              id: 6,
-              type: 2,
-              name: "updr",
-              label: "Update Rate",
-              description: "How fast should blips & UI segments update.",
-              options: [
-                {
-                  name: "Slow",
-                  value: "1000",
-                },
-                {
-                  name: "Normal",
-                  value: "200",
-                },
-                {
-                  name: "Fast",
-                  value: "10",
-                },
-              ]
+                name: "Display",
+                settings: [
+                    {
+                        id: 9,
+                        type: 1,
+                        name: "hud",
+                        label: "User Interface",
+                        description: "Completely disable/enable the HUD."
+                    },
+                    {
+                      id: 1,
+                      type: 1,
+                      name: "tri",
+                      label: "Top Right Info",
+                      description: "This includes RnC Logo, Player Count, Current Lobby ID, Clock."
+                    },
+                    {
+                      id: 2,
+                      type: 1,
+                      name: "kf",
+                      label: "Kill Feed",
+                      description: "This includes Kill Feed."
+                    },
+                    {
+                      id: 3,
+                      type: 1,
+                      name: "gp",
+                      label: "Game Progress",
+                      description: "This includes In-Game Progress Timer."
+                    },
+                    {
+                      id: 4,
+                      type: 1,
+                      name: "bigmap",
+                      label: "Expanded Minimap",
+                      description: "Toggle permanently expanded minimap."
+                    },
+                    {
+                        id: 5,
+                        type: 1,
+                        name: "tooltips",
+                        label: "Tooltips",
+                        description: "Enable/disable tooltips."
+                    },
+                    {
+                        id: 10,
+                        type: 1,
+                        name: "nametags",
+                        label: "Nametags",
+                        description: "Enable/disable nametags."
+                    },
+                    {
+                        id: 6,
+                        type: 2,
+                        name: "updr",
+                        label: "Update Rate",
+                        description: "How fast should blips & UI segments update.",
+                        options: [
+                          {
+                            name: "Slow",
+                            value: "1000",
+                          },
+                          {
+                            name: "Normal",
+                            value: "200",
+                          },
+                          {
+                            name: "Fast",
+                            value: "10",
+                          },
+                        ]
+                    }
+                ]
             },
             {
-              id: 7,
-              type: 3,
-              name: "vcbind",
-              label: "Push To Talk",
-              description: "Click to change the push to talk key."
-            },
-            {
-              id: 8,
-              type: 3,
-              name: "gpsbind",
-              label: "GPS Key",
-              description: "This is the key used to toggle GPS."
-            },
-            {
-              id: 11,
-              type: 3,
-              name: "bigmapbind",
-              label: "Expanded Minimap",
-              description: "Toggles the larger minimap view."
-            },
-          ]`);
+                name: "Chat",
+                settings: [
+                    {
+                        id: 13,
+                        type: 1,
+                        name: "oocauto",
+                        label: "Auto OOC",
+                        description: "Automatically send all text messages to the global OOC chat, so you don't have to type /o every time."
+                    },
+                ]
+            }
+        ]`);
           
         UIMenu.execute(`gm.$refs.settings.$refs.tri.value = ${mp.storage.data.menu.topRightInfo};`);
         UIMenu.execute(`gm.$refs.settings.$refs.gp.value = ${mp.storage.data.menu.gameProgress};`);
