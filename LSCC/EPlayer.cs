@@ -865,7 +865,9 @@ namespace RNC
                 player.SetSharedData("VehicleDL", false); // for /DL like in SAMP
 
                 player.SetSharedData("AutoOOC", false);
+
                 player.SetData<string>("BankRobberyUnit", "fib");
+                player.SetSharedData("HeistLeader", false);
 
                 player.ResetSharedData("IsAiming");
                 player.ResetSharedData("CameraDirectionX");

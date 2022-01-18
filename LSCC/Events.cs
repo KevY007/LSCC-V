@@ -748,6 +748,28 @@ namespace RNC
 
                     player.SendNotification("~r~You cannot enter a vehicle that has an opposition team driver!");
                 }
+
+                if (player.GetSharedData<int>("Team") == 0)
+                {
+                    LobbyData l = Settings.Lobbies.FirstOrDefault(f => f.lobbyId == player.GetSharedData<int>("InLobby"));
+                    if (l == null) return;
+                    if (l.gameMode == GameModes.BANKROBBERY && l.BankRobbery.HeistLeader.Id == player.Id)
+                    {
+                        BankRobberyData brob = l.BankRobbery;
+                        if (brob.FugitiveVehicles.Contains(vehicle))
+                        {
+                            Events.BankRobbery_SetState(player, 2);
+                        }
+                        else if (brob.PoliceVehicles.Contains(vehicle))
+                        {
+                            foreach (Player f in l.Fugitives)
+                            {
+                                f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {player.Name}: Fuck it! We'll take a police vehicle, who gives a shit if they track us?");
+                            }
+                            Events.BankRobbery_SetState(player, 2);
+                        }
+                    }
+                }
             }
 
             if (Settings.Dynamics.OnfootCollision == false)
@@ -1910,6 +1932,132 @@ namespace RNC
             }
 
             player.SetAccessories(0, drawable, texture);
+        }
+
+        [RemoteEvent("BankRob_ContinueState")]
+        public static void BankRobbery_SetState(Player player, int state)
+        {
+            LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (lobby == null) return;
+
+            lobby.BankRobbery.State = state;
+            lobby.BankRobbery.Hideout = new Random().Next(BankRobberyData.Hideouts.Length);
+            switch (state)
+            {
+                case 0: { return; }
+                case 1: // One minute passed, leader robbed the bank
+                    {
+                        foreach(Player f in lobby.Fugitives)
+                        {
+                            f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {lobby.BankRobbery.HeistLeader.Name}: I took all the cash I can, it's time to move!");
+                            f.SendChatMessage("!{#FF6347}[#] ~w~Escort your heist leader to one of the getaway vehicles. Once they enter one, the heist will proceed.");
+                            f.SendChatMessage("!{#FF6347}[#] ~w~Your hideout is located in ~y~" + BankRobberyData.HideoutNames[lobby.BankRobbery.Hideout] + "~w~ !{#c9c9c9}(a marker will be set when the heist proceeds)!");
+                        }
+                        Player leader = lobby.BankRobbery.HeistLeader;
+                        Account la = EPlayer.GetAccount(leader);
+                        CharacterData cd = NAPI.Util.FromJson<CharacterData>(la.Character);
+                        cd.Clothing[0].Clothes[5].Drawable = 40;
+                        cd.Clothing[0].Clothes[5].Texture = 0;
+                        cd.Clothing[2].Clothes[5].Drawable = 40;
+                        cd.Clothing[2].Clothes[5].Texture = 0;
+                        cd.Clothing[0].Clothes[1].Drawable = 51;
+                        cd.Clothing[0].Clothes[1].Texture = 0;
+                        cd.Clothing[2].Clothes[1].Drawable = 51;
+                        cd.Clothing[2].Clothes[1].Texture = 0;
+                        EPlayer._ApplyCharacter(leader, cd, 0);
+                        EPlayer.Action(leader, "grabs the duffel bag filled with cash and slings it over their shoulder.");
+
+                        //
+                        foreach(Player c in lobby.Cops)
+                        {
+                            c.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: All units, their leader stopped taking the money, they might try to get away soon!");
+                            c.SendChatMessage("!{#FF6347}[#] ~w~You must find the heist leader and neutralize them!");
+                            c.SendChatMessage("!{#FF6347}[#] ~w~Alternatively, you can keep the fugitives trapped inside the bank until the round ends to win.");
+                        }
+                    }
+                    break;
+                case 2:
+                    {
+                        foreach (Player f in lobby.Fugitives)
+                        {
+                            f.TriggerEvent("playerCreateWaypoint", BankRobberyData.Hideouts[lobby.BankRobbery.Hideout]);
+                            f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {lobby.BankRobbery.HeistLeader.Name}: Alright, I'm in the car, let's move, quick!");
+                            if (f.IsInVehicle)
+                            {
+                                if (f.Vehicle.Occupants.Contains(lobby.BankRobbery.HeistLeader))
+                                {
+                                    f.SendChatMessage("!{#FF6347}[#] ~w~Drive the heist leader to the ~y~hideout~w~ marked on your minimap.");
+                                }
+                                else
+                                {
+                                    f.SendChatMessage("!{#FF6347}[#] ~w~Escort your heist leader to the hideout.");
+                                }
+                            }
+                            else f.SendChatMessage("!{#FF6347}[#] ~w~Get in a vehicle and escort the heist leader to the hideout.");
+
+                        }
+                        foreach(Player c in lobby.Cops)
+                        {
+                            c.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: The robbers have made their way with the money into the vehicle.");
+                            c.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: Stop them before they get away!");
+                            c.SendChatMessage("!{#FF6347}[#] ~w~This is your last chance - take down the heist leader, or all the fugitives, before they get to their hideout!");
+                        }
+                    }
+                    break;
+            }
+
+        }
+
+        [RemoteEvent("BankRob_SendMessage")]
+        public void BankRobbery_SendMessage(Player player, int teamID, int msgID)
+        {
+            LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (lobby == null) return;
+            if(teamID == 0)
+            {
+                switch (msgID)
+                {
+                    case 0:
+                        foreach(Player f in lobby.Fugitives)
+                        {
+                            f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: Now that I think about it, those Burritos you left as getaway might be too slow.");
+                            f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: I will take a look around and see if there is anything better you can \"borrow\".");
+                            f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[0].Item1);
+                        }
+                        break;
+                    case 1:
+                        foreach (Player f in lobby.Fugitives)
+                        {
+                            f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: Some famous person pulled up in front of a building down the road with their bodyguards.");
+                            f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: There's a limousine and a bunch of fancy cars... not super fast, but at least you could go out in style!");
+                            f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[4].Item1);
+                        }
+                        break;
+                    case 2:
+                        foreach (Player f in lobby.Fugitives)
+                        {
+                            f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: There's a small parking lot here with a bunch of different rides, they look good enough to me.");
+                            f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: It's located in an alley across the street, anyways, I hear sirens so I'm outta here, see you at the hideout!"); 
+                            f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[11].Item1);
+                        }
+                        break;
+                }
+            }
+            else
+            {
+                switch (msgID)
+                {
+                    case 0:
+                        {
+                            foreach(Player c in lobby.Cops)
+                            {
+                                c.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: All units, CCTV footage suggests that there are {lobby.Fugitives.Count} robbers.");
+                                c.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: They are all armed and dangerous, proceed with caution.");
+                            }
+                        }
+                        break;
+                }
+            }
         }
 
         [RemoteEvent("UpdateTabbedState")]
