@@ -388,6 +388,26 @@ namespace RNC
             { new Vector3(246.8318f, 223.12218f, 106.286736f), 160.70934f }
         };
 
+        public static Tuple<Vector3, float, string>[] FugitiveVehicleData = 
+        {
+            Tuple.Create(new Vector3(300.0705f, 262.5568f, 105.376785f), -105.05242f, "burrito3"),
+            Tuple.Create(new Vector3(294.0118f, 264.40457f, 105.40566f), -110.0321f, "burrito3"),
+            Tuple.Create(new Vector3(287.0754f, 266.7743f, 105.404945f), -108.04021f, "burrito3"),
+            Tuple.Create(new Vector3(308.86548f, 261.9242f, 104.85302f), -85.801796f, "burrito3"),
+
+            Tuple.Create(new Vector3(104.54904f, 246.66824f, 107.74905f), 69.642006f, "stretch"),
+            Tuple.Create(new Vector3(111.98483f, 244.39029f, 107.418335f), 68.90393f, "cognoscenti"),
+            Tuple.Create(new Vector3(123.95057f, 239.9692f, 107.08887f), 69.3799f, "cognoscenti"),
+            Tuple.Create(new Vector3(95.74224f, 250.45674f, 107.93961f), 68.840904f, "cognoscenti"),
+            Tuple.Create(new Vector3(83.43303f, 254.90424f, 108.37654f), 67.456f, "cognoscenti"),
+
+            Tuple.Create(new Vector3(236.19055f, 115.73223f, 102.24549f), -36.028374f, "slamvan3"),
+            Tuple.Create(new Vector3(240.58038f, 129.90594f, 102.196754f), 160.48413f, "glendale2"),
+            Tuple.Create(new Vector3(226.4308f, 118.67955f, 101.97867f), 151.46762f, "impaler"),
+            Tuple.Create(new Vector3(237.09787f, 130.90378f, 102.12132f), 159.22339f, "kalahari"),
+            Tuple.Create(new Vector3(229.15312f, 127.188934f, 102.29818f), -111.604225f, "fugitive"),
+        };
+
         public static readonly object[,] PatrolSpawns =
         {
             { new Vector3(407.99747f, -989.2855f, 28.872591f), 49.752483f },
@@ -2360,8 +2380,77 @@ namespace RNC
                     {
                         if(lobby.gameMode == GameModes.BANKROBBERY)
                         {
+                            for(int i = 0; i < BankRobberyData.PatrolSpawns.Length; i++)
+                            {
+                                Vehicle _v = NAPI.Vehicle.CreateVehicle((uint)VehicleHash.Police, (Vector3)BankRobberyData.PatrolSpawns[i, 0], (float)BankRobberyData.PatrolSpawns[i, 1],
+                                    111, 0, "PATROL");
+                                lobby.BankRobbery.PoliceVehicles.Add(_v);
+                            }
+                            for (int i = 0; i < BankRobberyData.FbiBuffaloSpawns.Length; i++)
+                            {
+                                Vehicle _v = NAPI.Vehicle.CreateVehicle((uint)VehicleHash.Fbi, (Vector3)BankRobberyData.PatrolSpawns[i, 0], (float)BankRobberyData.PatrolSpawns[i, 1],
+                                    0, 0, "FIB");
+                                lobby.BankRobbery.PoliceVehicles.Add(_v);
+                            }
+                            for (int i = 0; i < BankRobberyData.FbiSuvSpawns.Length; i++)
+                            {
+                                Vehicle _v = NAPI.Vehicle.CreateVehicle((uint)VehicleHash.Fbi2, (Vector3)BankRobberyData.PatrolSpawns[i, 0], (float)BankRobberyData.PatrolSpawns[i, 1],
+                                    0, 0, "NOOSE");
+                                lobby.BankRobbery.PoliceVehicles.Add(_v);
+                            }
+                            int currentCar = 0;
+                            List<Vehicle> ccars = lobby.BankRobbery.PoliceVehicles;
+
                             foreach (Player player in lobby.Cops.OrderBy(x => Guid.NewGuid()))
                             {
+                                if(ccars[currentCar].Occupants.Count < ccars[currentCar].MaxOccupants)
+                                {
+                                    int seat = ccars[currentCar].Occupants.Count;
+                                    player.SetIntoVehicle(ccars[currentCar], seat);
+                                }
+                                else
+                                {
+                                    currentCar++;
+                                    if(currentCar >= ccars.Count)
+                                    {
+                                        Vehicle dick = NAPI.Vehicle.CreateVehicle((uint)VehicleHash.Police, ccars[currentCar - 1].Position, ccars[currentCar - 1].Heading, 0, 0);
+                                        player.SetIntoVehicle(dick, 0);
+                                        player.SendChatMessage("~r~Exceeded maximum vehicles, creating a new one for you...");
+                                    }
+                                    else
+                                    {
+                                        int seat = ccars[currentCar].Occupants.Count;
+                                        player.SetIntoVehicle(ccars[currentCar], seat);
+                                    }
+                                }
+                                if(currentCar >= 6) // Special/SWAT/FIB unit 
+                                { 
+                                    player.SetSkin(PedHash.Swat01SMY);
+                                    player.SetData<string>("BankRobberyUnit", "fib");
+                                    player.Health = 100;
+                                    player.Armor = 150;
+
+                                    player.GiveWeapon(WeaponHash.Heavypistol, 100);
+                                    player.GiveWeapon(WeaponHash.Assaultsmg, 200);
+                                    player.GiveWeapon(WeaponHash.Specialcarbine, 500);
+                                    player.GiveWeapon(WeaponHash.Bzgas, 3);
+                                    player.GiveWeapon(WeaponHash.Assaultshotgun, 500);
+                                    player.SendChatMessage("~b~[>] ~w~You've been assigned to the ~y~FIB~w~ unit.");
+                                }
+                                else // patrol unit
+                                {
+                                    player.SetData<string>("BankRobberyUnit", "patrol");
+                                    player.Health = 100;
+                                    player.Armor = 100;
+
+                                    player.GiveWeapon(WeaponHash.Combatpistol, 100);
+                                    player.GiveWeapon(WeaponHash.Smg, 300);
+                                    player.GiveWeapon(WeaponHash.Carbinerifle, 500);
+                                    player.GiveWeapon(WeaponHash.Bzgas, 1);
+                                    player.GiveWeapon(WeaponHash.Pumpshotgun, 72);
+                                    player.SendChatMessage("~b~[>] ~w~You've been assigned to the ~y~PATROL~w~ unit.");
+                                }
+
                                 EPlayer.Freeze(player, true);
 
                                 player.SetData("GPS", false);
@@ -2597,6 +2686,14 @@ namespace RNC
                     {
                         if(lobby.gameMode == GameModes.BANKROBBERY)
                         {
+                            for(int i = 0; i < BankRobberyData.FugitiveVehicleData.Length; i++)
+                            {
+                                Vehicle _v = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(BankRobberyData.FugitiveVehicleData[i].Item3),
+                                    BankRobberyData.FugitiveVehicleData[i].Item1, BankRobberyData.FugitiveVehicleData[i].Item2,
+                                    new Random().Next(128), new Random().Next(128), "fartlol", 255, true);
+                                lobby.BankRobbery.FugitiveVehicles.Add(_v);
+                            }
+
                             foreach (Player player in lobby.Fugitives.OrderBy(x => Guid.NewGuid()))
                             {
                                 EPlayer.Freeze(player, true);
