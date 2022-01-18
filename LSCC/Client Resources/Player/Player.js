@@ -676,6 +676,12 @@ mp.events.addDataHandler('PlayerSquadID', function(entity, value, oldValue){
     }, 500);
 });
 
+mp.events.addDataHandler('AutoJoin', function(entity, value, oldValue){
+    entity.AutoJoin = value;
+    
+    if(entity.type === 'player' && entity.remoteId == mp.players.local.remoteId)
+        mp.storage.data.menu.AutoJoin = value;
+});
 
 mp.events.addDataHandler('Team', function (entity, value, oldValue) 
 {
@@ -2358,6 +2364,15 @@ mp.events.add(
 });
 
 mp.events.add("OnPlayerLoginRegister", () => {
+    setStorageDataVars();
+
+    if(mp.storage.data.menu !== undefined && mp.storage.data.menu.myweather !== undefined)
+    {
+        mp.events.callRemote("SetPlayerPrivateWeather", mp.storage.data.menu.myweather);
+    }
+});
+
+function setStorageDataVars(){
     if(mp.storage.data.menu.OOCauto !== undefined){
         autoOOC = mp.storage.data.menu.OOCauto;
         mp.events.callRemote("SetAutoOOC", autoOOC);
@@ -2367,8 +2382,14 @@ mp.events.add("OnPlayerLoginRegister", () => {
         mp.events.callRemote("SetAutoOOC", autoOOC);
     }
 
-    if(mp.storage.data.menu !== undefined && mp.storage.data.menu.myweather !== undefined)
-    {
-        mp.events.callRemote("SetPlayerPrivateWeather", mp.storage.data.menu.myweather);
+    if(mp.storage.data.menu.AutoJoin !== undefined){
+        mp.players.local.AutoJoin = mp.storage.data.menu.AutoJoin;
+        mp.events.callRemote("SetAutoJoin", mp.players.local.AutoJoin, false);
     }
-});
+    else{
+        mp.storage.data.menu.AutoJoin = ((mp.players.local.AutoJoin) ? mp.players.local.AutoJoin : true);
+        mp.events.callRemote("SetAutoJoin", mp.storage.data.menu.AutoJoin, false);
+    }
+
+    mp.storage.flush();
+}

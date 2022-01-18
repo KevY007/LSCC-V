@@ -2076,6 +2076,24 @@ namespace RNC
             player.TriggerEvent("UpdateMenuMinigames", NAPI.Util.ToJson(Menu_MinigamesData(player)), (player.GetSharedData<int>("InLobby") < 0) ? player.GetSharedData<int>("InLobby") : player.GetSharedData<int>("InDM"));
         }
 
+        [RemoteEvent("SetAutoJoin")]
+        public void OnSetAutoJoin(Player player, bool toggle, bool notify)
+        {
+            player.SetSharedData("AutoJoin", toggle);
+
+            if (notify)
+            {
+                if (toggle)
+                {
+                    EPlayer.Notify(player, $"AutoJoin has been turned <strong>ON</strong>.", "green", "fas fa-check", false, 1500, "bottomCenter", "replace");
+                }
+                else
+                {
+                    EPlayer.Notify(player, $"AutoJoin has been turned <strong>OFF</strong>.", "red", "fas fa-check", false, 1500, "bottomCenter", "replace");
+                }
+            }
+        }
+
         [RemoteEvent("RequestMinigameJoin")]
         public void OnRequestMinigameJoin(Player player, int dmID)
         {
@@ -2118,7 +2136,7 @@ namespace RNC
                     int skipToLobby = player.GetData<int>("DMLobbySkipID");
                     player.ResetData("DMLobbySkipID");
                     Commands.cmd_switchlobby(player, $"{skipToLobby}");
-                    player.SetData("AutoJoin", false);
+                    player.SetSharedData("AutoJoin", false);
                 }
 
                 Commands.cmd_dm(player, dmID);
@@ -3784,7 +3802,7 @@ namespace RNC
                 {
                     EPlayer.SetDiscordStatus(player, $"In jail as {player.Name}");
 
-                    player.SetData("AutoJoin", false);
+                    player.SetSharedData("AutoJoin", false);
                     player.SetSharedData("InLobby", -2);
                     player.SetSharedData("JailTime", acc.JailTime);
                     player.TriggerEvent("SetJailCounter", acc.JailTime);

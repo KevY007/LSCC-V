@@ -891,7 +891,7 @@ namespace RNC
                 player.SetData("TeamShotWarning", 0);
                 player.SetData("UnfairKillSpawn", false);
                 player.SetData("InnocentShotWarning", 0);
-                player.SetData("AutoJoin", true);
+                player.SetSharedData("AutoJoin", true);
                 player.SetSharedData("LastVehEnterExit", 0);
                 player.SetData("LastVehEnterSeat", (sbyte)-1);
                 player.SetSharedData("DerbyTime", 0);
@@ -1856,10 +1856,10 @@ namespace RNC
                 player.ResetData("DerbyVehicle");
             }
 
-            if (forceAutojoin && player.GetData<bool>("AutoJoin") == false)
+            if (forceAutojoin && player.GetSharedData<bool>("AutoJoin") == false)
             {
                 EPlayer.Notify(player, $"AutoJoin has been turned <strong>ON</strong>.", "green", "fas fa-check", false, 1500, "bottomRight", "replace");
-                player.SetData("AutoJoin", true);
+                player.SetSharedData("AutoJoin", true);
             }
 
             if ( ( (player.GetSharedData<int>("InLobby") >= 1 && Settings.Lobbies.Count(lob => lob.lobbyId == player.GetSharedData<int>("InLobby")) == 0) || // IN DELETED/NON EXISTENT LOBBY

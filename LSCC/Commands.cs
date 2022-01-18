@@ -3534,20 +3534,20 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).JailTime > 0)
             {
-                player.SetData("AutoJoin", false);
+                player.SetSharedData("AutoJoin", false);
                 player.SendChatMessage("You are in jail!");
                 return;
             }
 
-            if (player.GetData<bool>("AutoJoin") == true)
+            if (player.GetSharedData<bool>("AutoJoin") == true)
             {
                 EPlayer.Notify(player, $"AutoJoin has been turned <strong>OFF</strong>.", "red", "fas fa-check", false, 1500, "bottomCenter", "replace");
-                player.SetData("AutoJoin", false);
+                player.SetSharedData("AutoJoin", false);
             }
             else
             {
                 EPlayer.Notify(player, $"AutoJoin has been turned <strong>ON</strong>.", "green", "fas fa-check", false, 1500, "bottomCenter", "replace");
-                player.SetData("AutoJoin", true);
+                player.SetSharedData("AutoJoin", true);
             }
         }
 
@@ -9546,22 +9546,22 @@ namespace RNC
 
                 if (EPlayer.GetAccount(target).JailTime > 0)
                 {
-                    target.SetData("AutoJoin", false);
+                    target.SetSharedData("AutoJoin", false);
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is in jail!");
                     return;
                 }
 
-                if (target.GetData<bool>("AutoJoin") == true)
+                if (target.GetSharedData<bool>("AutoJoin") == true)
                 {
                     EPlayer.Notify(target, $"AutoJoin has been turned <strong>OFF</strong> by {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "an administrator" : player.Name)}.", "red", "fas fa-check", false, 1500, "bottomCenter", "replace");
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target's auto join has been turned off!");
-                    target.SetData("AutoJoin", false);
+                    target.SetSharedData("AutoJoin", false);
                 }
                 else
                 {
                     EPlayer.Notify(target, $"AutoJoin has been turned <strong>ON</strong> by {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "an administrator" : player.Name)}.", "green", "fas fa-check", false, 1500, "bottomCenter", "replace");
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target's auto join has been turned on!");
-                    target.SetData("AutoJoin", true);
+                    target.SetSharedData("AutoJoin", true);
                 }
             }
         }

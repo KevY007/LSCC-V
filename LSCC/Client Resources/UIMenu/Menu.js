@@ -110,6 +110,13 @@ function ToggleMenu()
                               value: "9",
                           },
                         ]
+                    },
+                    {
+                        id: 14,
+                        type: 1,
+                        name: "autojoinopt",
+                        label: "Autojoin",
+                        description: "Toggles whether you will be put in copchase rounds or not."
                     }
                 ]
             },
@@ -228,19 +235,21 @@ function ToggleMenu()
             }
         ]`);
           
-        UIMenu.execute(`gm.$refs.settings.$refs.tri.value = ${mp.storage.data.menu.topRightInfo};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.gp.value = ${mp.storage.data.menu.gameProgress};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.tooltips.value = ${mp.storage.data.menu.tooltips};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.kf.value = ${mp.storage.data.menu.killFeed};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.nametags.value = ${mp.storage.data.menu.nametags};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.hud.value = ${mp.storage.data.menu.HUD};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.bigmap.value = ${mp.storage.data.menu.alwaysExpandedMap};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.updr.value = ${mp.storage.data.menu.updateRate};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.vcbind.value = "${String.fromCharCode(curVoiceBind)}";`);
-        UIMenu.execute(`gm.$refs.settings.$refs.gpsbind.value = "${String.fromCharCode(curGPSBind)}";`);
-        UIMenu.execute(`gm.$refs.settings.$refs.bigmapbind.value = "${String.fromCharCode(curMapBind)}";`);
-        UIMenu.execute(`gm.$refs.settings.$refs.myweather.value = ${mp.storage.data.menu.myweather};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.oocauto.value = ${mp.storage.data.menu.OOCauto};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.tri.value = ${mp.storage.data.menu.topRightInfo};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.gp.value = ${mp.storage.data.menu.gameProgress};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.tooltips.value = ${mp.storage.data.menu.tooltips};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.kf.value = ${mp.storage.data.menu.killFeed};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.nametags.value = ${mp.storage.data.menu.nametags};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.hud.value = ${mp.storage.data.menu.HUD};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.bigmap.value = ${mp.storage.data.menu.alwaysExpandedMap};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.updr.value = ${mp.storage.data.menu.updateRate};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Keybinds.$refs.vcbind.value = "${String.fromCharCode(curVoiceBind)}";`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Keybinds.$refs.gpsbind.value = "${String.fromCharCode(curGPSBind)}";`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Keybinds.$refs.bigmapbind.value = "${String.fromCharCode(curMapBind)}";`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Game.$refs.myweather.value = ${mp.storage.data.menu.myweather};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Game.$refs.myweather.preSelect = ${mp.storage.data.menu.myweather};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Game.$refs.autojoinopt.value = ${mp.storage.data.menu.AutoJoin};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.oocauto.value = ${mp.storage.data.menu.OOCauto};`);
     }
 }
 
@@ -324,6 +333,12 @@ mp.events.add("MenuChangeSettings", (id, value) =>
         mp.storage.data.menu.OOCauto = value;
         autoOOC = mp.storage.data.menu.OOCauto;
         mp.events.callRemote("SetAutoOOC", autoOOC);
+    }
+    else if(id == 14)
+    {
+        mp.storage.data.menu.AutoJoin = value;
+        mp.players.local.AutoJoin = value
+        mp.events.callRemote("SetAutoJoin", mp.players.local.AutoJoin, true);
     }
 
     if(UIHud != null)

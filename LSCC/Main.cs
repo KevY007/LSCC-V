@@ -1419,7 +1419,7 @@ namespace RNC
                             {
                                 if (player != null && player.Exists)
                                 {
-                                    if (player.GetSharedData<int>("InLobby") == lobbyid && player.GetData<bool>("AutoJoin") == true)
+                                    if (player.GetSharedData<int>("InLobby") == lobbyid && player.GetSharedData<bool>("AutoJoin") == true)
                                     {
                                         if (time > 0)
                                         {
@@ -1573,7 +1573,7 @@ namespace RNC
                                         {
                                             lock (player)
                                             {
-                                                if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetData<bool>("AutoJoin") == true && !EPlayer.IsAFK(player))
+                                                if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetSharedData<bool>("AutoJoin") == true && !EPlayer.IsAFK(player))
                                                 {
                                                     pCount++;
                                                 }
@@ -1594,7 +1594,7 @@ namespace RNC
                                             {
                                                 lock (player)
                                                 {
-                                                    if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetData<bool>("AutoJoin") == true)
+                                                    if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetSharedData<bool>("AutoJoin") == true)
                                                     {
                                                         if(player.HasData("Spectating"))
                                                         {
@@ -1904,7 +1904,7 @@ namespace RNC
 
                 foreach (Player player in Settings.LoggedInPlayers)
                 {
-                    if (player.GetSharedData<int>("InLobby") == lobbyid && player.GetData<bool>("AutoJoin") == true && !EPlayer.IsAFK(player) && 
+                    if (player.GetSharedData<int>("InLobby") == lobbyid && player.GetSharedData<bool>("AutoJoin") == true && !EPlayer.IsAFK(player) && 
                         !player.HasData("Spectating"))
                     {
                         player.SetSharedData("InDM", -1);
@@ -1960,7 +1960,7 @@ namespace RNC
                     List<int> UsedSpawns = new List<int>(Spawns.Count + 1);
                     crashcheck++;
 
-                    List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && !EPlayer.IsAFK(a) && !a.HasData("Spectating") && a.GetData<bool>("AutoJoin") == true && !a.Dead).OrderBy(c => Guid.NewGuid()).ToList();
+                    List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && !EPlayer.IsAFK(a) && !a.HasData("Spectating") && a.GetSharedData<bool>("AutoJoin") == true && !a.Dead).OrderBy(c => Guid.NewGuid()).ToList();
                     // !a.Dead so the white color bug (OnPlayerSpawn trigger as game start) does not happen -- if it still happens or if you want to enable dead players being taken in game then do it that EPlayer.Spawn is called when selecting players again.
                     crashcheck++;
 
@@ -1979,9 +1979,9 @@ namespace RNC
                     {
                         // FULL RANDOM CHANCE MODE 
                         /*
-                        if (lobbyPlayers.Where(a => a.HasData("GrantFugitive") && !lobby.Fugitives.Contains(a) && a.GetData<bool>("AutoJoin") == true).Count() > 0)
+                        if (lobbyPlayers.Where(a => a.HasData("GrantFugitive") && !lobby.Fugitives.Contains(a) && a.GetSharedData<bool>("AutoJoin") == true).Count() > 0)
                         {
-                            _tempPlayer = lobbyPlayers.Where(a => a.HasData("GrantFugitive") && !lobby.Fugitives.Contains(a) && a.GetData<bool>("AutoJoin") == true).OrderBy(c => Guid.NewGuid()).First();
+                            _tempPlayer = lobbyPlayers.Where(a => a.HasData("GrantFugitive") && !lobby.Fugitives.Contains(a) && a.GetSharedData<bool>("AutoJoin") == true).OrderBy(c => Guid.NewGuid()).First();
                         }
                         else _tempPlayer = lobbyPlayers.OrderBy(c => Guid.NewGuid()).First();
 
@@ -1990,7 +1990,7 @@ namespace RNC
                         // FULL RANDOM CHANCE MODE END
 
                         /* HIGHEST FUGITIVE CHANCE MODE */
-                        var highestFugitives = lobbyPlayers.Where(p => !lobby.Fugitives.Contains(p) && p.GetData<bool>("AutoJoin") == true).OrderByDescending(p => p.HasData("GrantFugitive")).ThenByDescending(p => p.GetSharedData<float>("FugitiveChance"));
+                        var highestFugitives = lobbyPlayers.Where(p => !lobby.Fugitives.Contains(p) && p.GetSharedData<bool>("AutoJoin") == true).OrderByDescending(p => p.HasData("GrantFugitive")).ThenByDescending(p => p.GetSharedData<float>("FugitiveChance"));
 
                         if(highestFugitives.Count() == 0) _tempPlayer = lobbyPlayers.OrderBy(c => Guid.NewGuid()).First();
                         else _tempPlayer = highestFugitives.First();
@@ -1998,7 +1998,7 @@ namespace RNC
 
                         // HIGHEST CHANCE MODE END
 
-                        if (_tempPlayer.GetData<bool>("AutoJoin") == false) continue;
+                        if (_tempPlayer.GetSharedData<bool>("AutoJoin") == false) continue;
 
 
                         if (!lobby.Fugitives.Contains(_tempPlayer))
@@ -2020,7 +2020,7 @@ namespace RNC
 
                     foreach (Player player in lobbyPlayers)
                     {
-                        if (player.GetData<bool>("AutoJoin") != true) continue;
+                        if (player.GetSharedData<bool>("AutoJoin") != true) continue;
 
                         player.SetSharedData("BustedProgress", 0.0);
                         player.ResetData("BustSupporters");
