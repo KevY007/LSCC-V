@@ -57,6 +57,30 @@ mp.events.add("StartBankRobberyTimer", () => {
     }, 1000);
 });
 
+const BR_MUSIC_INTRO = "SOL5_START";
+const BR_MUSIC_FIGHT = "SOL5_FIGHT_BAD_RT";
+
+mp.events.add("BankRob_SetMusic", (musicID) => {
+    if(mp.players.local == null || !mp.players.exists(mp.players.local)) return;
+    if(mp.players.local.EventMusic == false) return;
+
+    switch(musicID){
+        case 0: // beginning
+            mp.game.audio.prepareMusicEvent(BR_MUSIC_INTRO);
+            setTimeout(() => {
+                mp.game.audio.triggerMusicEvent(BR_MUSIC_INTRO);
+            }, 500);
+            break;
+        case 1: // beginning
+            mp.game.audio.prepareMusicEvent(BR_MUSIC_FIGHT);
+            setTimeout(() => {
+                mp.game.audio.triggerMusicEvent(BR_MUSIC_FIGHT);
+            }, 500);
+            break;   
+        default: mp.game.audio.triggerMusicEvent("GLOBAL_KILL_MUSIC");     
+    }
+});
+
 function bankRobEnterColshape(player, shape) {
     if(shape == FinishColshape) 
     {

@@ -2043,6 +2043,7 @@ namespace RNC
                     i.SetSharedData("HeistLeader", false);
                     i.TriggerEvent("BankRob_ClearFugiCarBlips");
                     i.TriggerEvent("BankRob_ClearFinishMarker");
+                    i.TriggerEvent("BankRob_SetMusic", -1);
 
                     Events.OnPlayerWounded(i, 0, -1);
 
@@ -3638,6 +3639,8 @@ namespace RNC
                                         {
                                             if (p != null)
                                             {
+                                                p.TriggerEvent("BankRob_SetMusic", 0);
+
                                                 Account a = EPlayer.GetAccount(p);
                                                 CharacterData cd = NAPI.Util.FromJson<CharacterData>(a.Character);
                                                 cd.Clothing[1].Clothes[11].Drawable = 320;
@@ -3695,6 +3698,7 @@ namespace RNC
                                         {
                                             if (p != null)
                                             {
+                                                p.TriggerEvent("BankRob_SetMusic", 0);
                                                 EPlayer.Freeze(p, false);
                                                 p.SendNotification("~y~The event has started!");
                                                 p.TriggerEvent("ToggleCanExitVehicle", true);

@@ -2391,5 +2391,13 @@ function setStorageDataVars(){
         mp.events.callRemote("SetAutoJoin", mp.storage.data.menu.AutoJoin, false);
     }
 
+    if(mp.storage.data.menu.EventMusic !== undefined){
+        mp.players.local.EventMusic = mp.storage.data.menu.EventMusic;
+    }
+    else{
+        mp.storage.data.menu.EventMusic = true;
+        mp.players.local.EventMusic = true;
+    }
+
     mp.storage.flush();
 }

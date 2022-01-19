@@ -2071,6 +2071,8 @@ namespace RNC
                             f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {lobby.BankRobbery.HeistLeader.Name}: I took all the cash I can, it's time to move!");
                             f.SendChatMessage("!{#FF6347}[#] ~w~Escort your heist leader to one of the getaway vehicles. Once they enter one, the heist will proceed.");
                             f.SendChatMessage("!{#FF6347}[#] ~w~Your hideout is located in ~y~" + BankRobberyData.HideoutNames[lobby.BankRobbery.Hideout] + "~w~ !{#c9c9c9}(a marker will be set when the heist proceeds)!");
+
+                            f.TriggerEvent("BankRob_SetMusic", 1);
                         }
                         Player leader = lobby.BankRobbery.HeistLeader;
                         Account la = EPlayer.GetAccount(leader);
@@ -2092,6 +2094,7 @@ namespace RNC
                             c.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: All units, their leader stopped taking the money, they might try to get away soon!");
                             c.SendChatMessage("!{#FF6347}[#] ~w~You must find the heist leader and neutralize them!");
                             c.SendChatMessage("!{#FF6347}[#] ~w~Alternatively, you can keep the fugitives trapped inside the bank until the round ends to win.");
+                            c.TriggerEvent("BankRob_SetMusic", 1);
                         }
 
                         foreach(Vehicle v in lobby.BankRobbery.FugitiveVehicles)

@@ -14,6 +14,7 @@ if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD
     mp.storage.data.menu.nametags = true;
     mp.storage.data.menu.HUD = true;
     mp.storage.data.menu.OOCauto = false;
+    mp.storage.data.menu.EventMusic = true;
 
     mp.storage.flush();
 }
@@ -117,6 +118,13 @@ function ToggleMenu()
                         name: "autojoinopt",
                         label: "Autojoin",
                         description: "Toggles whether you will be put in copchase rounds or not."
+                    },
+                    {
+                        id: 15,
+                        type: 1,
+                        name: "eventmusic",
+                        label: "Event Music",
+                        description: "Toggles whether background music will play in events or not."
                     }
                 ]
             },
@@ -250,6 +258,7 @@ function ToggleMenu()
         UIMenu.execute(`gm.$refs.settings.$refs.Game.$refs.myweather.preSelect = ${mp.storage.data.menu.myweather};`);
         UIMenu.execute(`gm.$refs.settings.$refs.Game.$refs.autojoinopt.value = ${mp.storage.data.menu.AutoJoin};`);
         UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.oocauto.value = ${mp.storage.data.menu.OOCauto};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.eventmusic.value = ${mp.storage.data.menu.EventMusic};`);
     }
 }
 
@@ -339,6 +348,11 @@ mp.events.add("MenuChangeSettings", (id, value) =>
         mp.storage.data.menu.AutoJoin = value;
         mp.players.local.AutoJoin = value
         mp.events.callRemote("SetAutoJoin", mp.players.local.AutoJoin, true);
+    }
+    else if(id == 15)
+    {
+        mp.storage.data.menu.EventMusic = value;
+        mp.players.local.EventMusic = value;
     }
 
     if(UIHud != null)
