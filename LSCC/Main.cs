@@ -3277,7 +3277,9 @@ namespace RNC
                                 {
                                     List<Vehicle> ccars = new List<Vehicle>();
                                     ccars.AddRange(lobby.BankRobbery.PoliceVehicles);
-                                    int currentCar = 8;
+                                    int currentCar = new Random().Next(ccars.Count);
+                                    List<int> usedCars = new List<int>();
+                                    usedCars.Add(currentCar);
                                     int lobbyid = lobby.lobbyId;
 
                                     foreach (Player player in lobby.Cops.OrderBy(x => Guid.NewGuid()))
@@ -3306,10 +3308,22 @@ namespace RNC
                                         }
                                         else
                                         {
-                                            currentCar++;
-                                            if (currentCar >= ccars.Count)
+                                            currentCar = -1;
+                                            for(int i = 0; i < 50; i++)
                                             {
-                                                Vehicle dick = NAPI.Vehicle.CreateVehicle((uint)VehicleHash.Police, ccars[currentCar - 1].Position, ccars[currentCar - 1].Heading, 0, 0);
+                                                currentCar = new Random().Next(ccars.Count);
+                                                if (usedCars.Contains(currentCar)) { continue; }
+                                                else
+                                                {
+                                                    usedCars.Add(currentCar);
+                                                    break;
+                                                }
+                                            }
+
+                                            if (currentCar == -1)
+                                            {
+                                                currentCar = 1;
+                                                Vehicle dick = NAPI.Vehicle.CreateVehicle((uint)VehicleHash.Police, ccars[currentCar - 1].Position, ccars[currentCar - 1].Heading, 0, 0, "SEX", 255, false, true, player.Dimension);
                                                 player.SetIntoVehicle(dick, 0);
                                             }
                                             else
