@@ -149,15 +149,7 @@ namespace RNC
             Vehicles = new List<Vehicle>();
             Drops = new List<Pickup>();
 
-            BankRobbery = new BankRobberyData()
-            {
-                HeistLeader = null,
-                Sniper = null,
-                FugitiveVehicles = new List<Vehicle>(),
-                PoliceVehicles = new List<Vehicle>(),
-                State = 0,
-                Hideout = 0
-            };
+            BankRobbery = new BankRobberyData();
 
             Time = new int[3];
             Time[0] = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 23);
@@ -444,6 +436,18 @@ namespace RNC
         public Player Sniper = null;
         public int State = 0;
         public int Hideout = 0;
+        public int LeaderLives = 2;
+
+        public BankRobberyData()
+        {
+            HeistLeader = null;
+            Sniper = null;
+            FugitiveVehicles = new List<Vehicle>();
+            PoliceVehicles = new List<Vehicle>();
+            State = 0;
+            Hideout = 0;
+            LeaderLives = 2;
+        }
     }
     public static class Settings
     {
@@ -1865,49 +1869,123 @@ namespace RNC
                         NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FF0000}}The game has been stopped by an administrator.");
                         Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Stopped by an admin.**");
                         break;
-                    case 1:
-                        NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}The fugitives managed to escape from the cops.");
-                        Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives have escaped.**");
-
-                        foreach (Player i in lobby.Fugitives)
+                    case 1: // time run out
+                        if (lobby.gameMode != GameModes.BANKROBBERY)
                         {
-                            if (lobby.GameProgress <= 40) continue;
-                            // Reward
-                            EPlayer.GetAccount(i).Escapes++;
-                            EPlayer.GrantXP(i, 5);
-                            EPlayer.GivePoints(i, 5);
-                            i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.3);
+                            NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}The fugitives managed to escape from the cops.");
+                            Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives have escaped.**");
+
+                            foreach (Player i in lobby.Fugitives)
+                            {
+                                if (lobby.GameProgress <= 40) continue;
+                                // Reward
+                                EPlayer.GetAccount(i).Escapes++;
+                                EPlayer.GrantXP(i, 5);
+                                EPlayer.GivePoints(i, 5);
+                                i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.3);
+                            }
+                        }
+                        else
+                        {
+                            if (lobby.gameMode == GameModes.BANKROBBERY)
+                            {
+                                NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}The fugitives didn't manage to rob the bank in time. Cops win!");
+                                Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives didn't manage to rob the bank in time.**");
+
+                                foreach (Player i in lobby.Cops)
+                                {
+                                    if (lobby.GameProgress <= 40) continue;
+                                    // Reward
+                                    EPlayer.GrantXP(i, 8);
+                                    EPlayer.GivePoints(i, 7);
+                                    i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.5);
+                                }
+                            }
                         }
                         break;
                     case 2:
                         NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{FFFFFF}}All law enforcement units have been taken out by the fugitives.");
                         Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | All cops have been eliminated.**");
 
-                        foreach (Player i in lobby.Fugitives)
+                        if (lobby.gameMode != GameModes.BANKROBBERY)
                         {
-                            if (lobby.GameProgress <= 40) continue;
-                            // Reward
-                            EPlayer.GrantXP(i, 3);
-                            EPlayer.GivePoints(i, 2);
-                            i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.2);
+                            foreach (Player i in lobby.Fugitives)
+                            {
+                                if (lobby.GameProgress <= 40) continue;
+                                // Reward
+                                EPlayer.GrantXP(i, 3);
+                                EPlayer.GivePoints(i, 2);
+                                i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.2);
+                            }
+                        }
+                        else
+                        {
+                            if (lobby.gameMode == GameModes.BANKROBBERY)
+                            {
+                                foreach (Player i in lobby.Fugitives)
+                                {
+                                    // Reward
+                                    EPlayer.GrantXP(i, 8);
+                                    EPlayer.GivePoints(i, 7);
+                                    i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.1);
+                                }
+                            }
                         }
                         break;
                     case 3:
                         NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}The situation has been successfully handled by the police.");
                         Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Police has neutralized all fugitives.**");
 
-                        foreach (Player i in lobby.Cops)
+                        if (lobby.gameMode != GameModes.BANKROBBERY)
                         {
-                            if (lobby.GameProgress <= 40) continue;
-                            // Reward
-                            EPlayer.GrantXP(i, 4);
-                            EPlayer.GivePoints(i, 2);
-                            i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.3);
+                            foreach (Player i in lobby.Cops)
+                            {
+                                if (lobby.GameProgress <= 40) continue;
+                                // Reward
+                                EPlayer.GrantXP(i, 4);
+                                EPlayer.GivePoints(i, 2);
+                                i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.3);
+                            }
+                        }
+                        else
+                        {
+                            if(lobby.gameMode == GameModes.BANKROBBERY)
+                            {
+                                foreach (Player i in lobby.Cops)
+                                {
+                                    // Reward
+                                    EPlayer.GrantXP(i, 8);
+                                    EPlayer.GivePoints(i, 7);
+                                    i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.5);
+                                }
+                            }
                         }
                         break;
                     case 4:
                         NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}Game has ended due to lack of players.");
                         Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Game was ended due to lack of players.**");
+                        break;
+                    case 5: // event cop win
+                        NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}Bank Robbery has ended - there was no one left to replace the heist leader. Cops win!");
+                        Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | No one was left to replace the heist leader.**");
+                        foreach (Player i in lobby.Cops)
+                        {
+                            // Reward
+                            EPlayer.GrantXP(i, 8);
+                            EPlayer.GivePoints(i, 6);
+                            i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.5);
+                        }
+                        break;
+                    case 6: // event fugi win
+                        NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}Bank Robbery has ended - fugitives successfully delivered the money to their hideout!");
+                        Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives successfully delivered the money to their hideout.**");
+                        foreach (Player i in lobby.Fugitives)
+                        {
+                            // Reward
+                            EPlayer.GrantXP(i, 10);
+                            EPlayer.GivePoints(i, 13);
+                            i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.2);
+                        }
                         break;
                 }
 
@@ -1918,6 +1996,9 @@ namespace RNC
                     if (i.GetSharedData<int>("InLobby") != lobby.lobbyId) continue;
 
                     i.TriggerEvent("ResetKillFeed");
+                    i.SetSharedData("HeistLeader", false);
+                    i.TriggerEvent("BankRob_ClearFugiCarBlips");
+                    i.TriggerEvent("BankRob_ClearFinishMarker");
 
                     Events.OnPlayerWounded(i, 0, -1);
 
@@ -1938,6 +2019,17 @@ namespace RNC
                         lobby.Fugitives.Remove(i);
                         EPlayer.Spawn(i);
                     }
+                }
+
+                foreach(Vehicle v in lobby.BankRobbery.PoliceVehicles)
+                {
+                    v.Delete();
+                    lobby.BankRobbery.FugitiveVehicles.Remove(v);
+                }
+                foreach (Vehicle v in lobby.BankRobbery.FugitiveVehicles)
+                {
+                    v.Delete();
+                    lobby.BankRobbery.FugitiveVehicles.Remove(v);
                 }
 
                 for (int i = lobby.Vehicles.Count - 1; i >= 0; i--)
@@ -1978,6 +2070,11 @@ namespace RNC
                 lobby.Fugitives.Clear();
                 lobby.Vehicles.Clear();
                 lobby.Drops.Clear();
+
+                if(lobby.gameMode == GameModes.BANKROBBERY)
+                {
+                    lobby.gameMode = GameModes.STANDARD;
+                }
             }
             else return false;
 
@@ -2395,6 +2492,11 @@ namespace RNC
                     {
                         if(lobby.gameMode == GameModes.BANKROBBERY)
                         {
+                            // clearing the data
+                            lobby.BankRobbery.PoliceVehicles.Clear();
+                            lobby.BankRobbery.FugitiveVehicles.Clear();
+                            lobby.BankRobbery = new BankRobberyData();
+
                             for(int i = 0; i < BankRobberyData.PatrolSpawns.Length; i++)
                             {
                                 Vehicle _v = NAPI.Vehicle.CreateVehicle((uint)VehicleHash.Police, (Vector3)BankRobberyData.PatrolSpawns[i, 0], (float)BankRobberyData.PatrolSpawns[i, 1],
@@ -2751,7 +2853,7 @@ namespace RNC
                                 CharacterData cd = NAPI.Util.FromJson<CharacterData>(_a.Character);
 
 
-                                if (player.Id != _brob.HeistLeader.Id && player.Id != _brob.Sniper.Id)
+                                if (player != _brob.HeistLeader && player != _brob.Sniper)
                                 {
                                     maskid = new Random().Next(rndmasks.Length);
                                     int spid = kevycanusendmefeetpicspls.Next(BankRobberyData.FugitiveSpawns.Length);
@@ -2767,7 +2869,7 @@ namespace RNC
                                 }
                                 else
                                 {
-                                    if(player.Id == _brob.HeistLeader.Id)
+                                    if(player == _brob.HeistLeader)
                                     {
                                         maskid = 2;
                                         player.Position = (Vector3)BankRobberyData.LeaderSpawn[0,0];
@@ -2781,7 +2883,7 @@ namespace RNC
                                         player.GiveWeapon(WeaponHash.Specialcarbine, 250);
                                         player.GiveWeapon(WeaponHash.Molotov, 1);
                                     }
-                                    else if(player.Id == _brob.Sniper.Id)
+                                    else if(player == _brob.Sniper)
                                     {
                                         maskid = new Random().Next(rndmasks.Length);
                                         player.Position = (Vector3)BankRobberyData.SniperSpawn[0, 0];
@@ -3208,7 +3310,7 @@ namespace RNC
                                             p.TriggerEvent("ToggleNametags", true);
 
                                             p.SendChatMessage($"!{{#1E9913}}[!] ATTENTION: You are currently in the Bank Robbery event! This is not a standard chase.");
-                                            if (p.Id == _brob.HeistLeader.Id)
+                                            if (p == _brob.HeistLeader)
                                             {
                                                 if (lobby.Cops.Contains(p)) EPlayer.Notify(p, "You've been selected as the <strong>heist leader</strong>!", "orange", "fas fa-hourglass-start", false, 10000);
                                                 p.SendChatMessage($"~y~!! YOU'VE BEEN SELECTED AS THE HEIST LEADER !!");
@@ -3217,7 +3319,7 @@ namespace RNC
                                                 p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}After that, do anything you can in order to get to the ~y~hideout~w~ with your team.");
                                                 p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Watch out! Your death will significantly decrease your chances of winning the round.");
                                             }
-                                            else if(p.Id == _brob.Sniper.Id)
+                                            else if(p == _brob.Sniper)
                                             {
                                                 p.SendChatMessage($"~y~!! YOU'VE BEEN SELECTED AS THE SNIPER !!");
                                                 p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must rob help your heist leader, ~y~{_brob.HeistLeader.Name}~w~, deliver the money to the hideout..");
@@ -3335,7 +3437,7 @@ namespace RNC
                                             p.SendNotification("~y~The event has started!");
                                             p.TriggerEvent("ToggleCanExitVehicle", true);
 
-                                            if(p.Id == lobby.BankRobbery.HeistLeader.Id)
+                                            if(p == lobby.BankRobbery.HeistLeader)
                                             {
                                                 p.TriggerEvent("StartBankRobberyTimer");
                                                 p.SendChatMessage("!{#FF6347}[#] ~w~You must stay in the vault for 60 seconds to proceed - timer has started!");

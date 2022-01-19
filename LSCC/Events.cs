@@ -753,7 +753,7 @@ namespace RNC
                 {
                     LobbyData l = Settings.Lobbies.FirstOrDefault(f => f.lobbyId == player.GetSharedData<int>("InLobby"));
                     if (l == null) return;
-                    if (l.gameMode == GameModes.BANKROBBERY && l.BankRobbery.HeistLeader.Id == player.Id)
+                    if (l.gameMode == GameModes.BANKROBBERY && l.BankRobbery.HeistLeader == player)
                     {
                         BankRobberyData brob = l.BankRobbery;
                         if (brob.FugitiveVehicles.Contains(vehicle))
@@ -1257,7 +1257,68 @@ namespace RNC
                                     }
                                 }
                             }
+
+                            bool select_new_leader = false;
+                            if (lobby.gameMode == GameModes.BANKROBBERY)
+                            {
+                                if((lobby.Fugitives.Count-1) <= 0) // in case all fugis die 
+                                {
+                                    Main.StopGame(lobby.lobbyId, 3);
+                                }
+
+                                if(lobby.BankRobbery.HeistLeader == player)
+                                {
+                                    lobby.BankRobbery.LeaderLives--;
+                                    if (lobby.BankRobbery.LeaderLives <= 0)
+                                    {
+                                        Main.StopGame(lobby.lobbyId, 5);
+                                    }
+                                    else
+                                    {
+                                        if (killer != null)
+                                        {
+                                            killer.SendChatMessage("~g~[>]~w~ You killed the first heist leader! You receive +2XP as bonus.");
+                                            foreach (Player c in lobby.Cops)
+                                            {
+                                                c.SendChatMessage($"!{{#FF6347}}[>] {killer.Name} has killed the first heist leader!");
+                                            }
+                                            EPlayer.GrantXP(killer, 2);
+                                        }
+                                        select_new_leader = true;
+                                    }
+                                }
+                            }
+
                             lobby.Fugitives.Remove(player);
+                            player.SetSharedData("HeistLeader", false);
+
+                            if (select_new_leader)
+                            {
+                                BankRobberyData _brob = lobby.BankRobbery;
+                                _brob.HeistLeader = null;
+                                int unfuck = 0;
+                                while (_brob.HeistLeader == null)
+                                {
+                                    _brob.HeistLeader = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
+
+                                    unfuck++;
+                                    if (unfuck > 50)
+                                    {
+                                        Main.StopGame(lobby.lobbyId, 5);
+                                        break;
+                                    }
+                                }
+                                _brob.HeistLeader.SetSharedData("HeistLeader", true);
+                                lobby.BankRobbery.HeistLeader = _brob.HeistLeader;
+
+                                foreach (Player f in lobby.Fugitives)
+                                {
+                                    f.SendChatMessage("!{#FF6347}[!] ~w~Your heist leader has been killed! You have one more chance - " + _brob.HeistLeader.Name + " is your new leader.");
+
+                                    f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {_brob.HeistLeader.Name}: Sadly, we lost {player.Name}, but we must keep on going! Let's go!");
+                                }
+                                _brob.HeistLeader.SendChatMessage("!{#FF6347}[!] ~w~You are now the heist leader. If you die, the round is over for your team.");
+                            }
                         }
 
                         if (lobby.Cops.Contains(player))
@@ -2002,6 +2063,11 @@ namespace RNC
                             c.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: Stop them before they get away!");
                             c.SendChatMessage("!{#FF6347}[#] ~w~This is your last chance - take down the heist leader, or all the fugitives, before they get to their hideout!");
                         }
+                    }
+                    break;
+                case 3:
+                    {
+                        Main.StopGame(lobby.lobbyId, 6);
                     }
                     break;
             }

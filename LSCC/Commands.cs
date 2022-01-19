@@ -618,12 +618,16 @@ namespace RNC
                     {
                         lobby.gameMode = GameModes.BUSTED;
                     }
-                    else { player.SendChatMessage("!{#999999}Proper usage: /game mode <lobby id> <mode: 'standard', 'busted'>"); return; }
+                    else if (args[2].Equals("bankrob", StringComparison.OrdinalIgnoreCase))
+                    {
+                        lobby.gameMode = GameModes.BANKROBBERY;
+                    }
+                    else { player.SendChatMessage("!{#999999}Proper usage: /game mode <lobby id> <mode: 'standard', 'busted', 'bankrob'>"); return; }
 
                     Logs.LogAdmin(player, $"Changed lobby {lobby.lobbyId}'s gamemode to {args[2]}");
                     NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set lobby {lobby.lobbyId}'s mode to {Main.ConvertGameMode(lobby.gameMode)}.");
                 }
-                else player.SendChatMessage("!{#999999}Proper usage: /game mode <lobby id> <mode: 'standard', 'busted'>");
+                else player.SendChatMessage("!{#999999}Proper usage: /game mode <lobby id> <mode: 'standard', 'busted', 'bankrob'>");
             }
             else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'start', 'stop', 'autostart', 'teambalance', 'mode'");
 
@@ -3797,7 +3801,11 @@ namespace RNC
             player.ResetData("ForcedData");
 
 
-            if(elobby == null) player.SetSharedData("InLobby", -1);
+            player.SetSharedData("HeistLeader", false);
+            player.TriggerEvent("BankRob_ClearFugiCarBlips");
+            player.TriggerEvent("BankRob_ClearFinishMarker");
+
+            if (elobby == null) player.SetSharedData("InLobby", -1);
 
             EPlayer.Spawn(player);
             EPlayer.Notify(player, $"Joined <strong>Lobby</strong>", "blue", "fas fa-users", false, 1000, "bottomCenter", "replace");
