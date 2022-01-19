@@ -954,455 +954,467 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            player.SetSharedData("Collisions", true); // Reset collision from chase.
-            player.SetSharedData("CuffedBy", "n/a");
-            player.ResetData("FreezeWeapons");
-            player.SetData("Dead", Environment.TickCount64);
-            player.ResetData("Seatbelt");
-            player.TriggerEvent("ToggleSeatbelt", false);
-            player.ResetData("DraggingOut");
-            player.TriggerEvent("togglePlayerCrawl", false);
-
-            string reasonStr;
-            bool wasInGame = false;
-            jWeaponData wepDat = new jWeaponData();
-
-            if (Main.WeaponReasons.TryGetValue(reason, out reasonStr))
-            {
-                // oh its already set ^^
-            }
-            else if(Settings.WeaponData.TryGetValue((long)reason, out wepDat))
-            {
-                reasonStr = wepDat.Name;
-            }
-            else
-            {
-                reasonStr = null;
-            }
-
-            if(player.GetSharedData<string>("ActionType") != "none")
-            {
-                EPlayer.StopPlayerAction(player, 1);
-            }
-
-            if (reason == 696988) reasonStr = "handcuffs";
-            if (reason == 696989) reasonStr = "arrest/busted";
-
-            if (reasonStr != null)
-            {
-                reasonStr.Replace(".", "");
-            }
-
-            if (player.GetSharedData<int>("InLobby") == -4 && Settings.DerbyTimeLeft > 0 && Settings.DerbyTimeLeft != 180 && 
-                player.HasSharedData("DerbyTime"))
-            {
-                if(player.GetSharedData<int>("DerbyTime") >= 5)
-                {
-                    foreach (Player inderby in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
-                    {
-                        inderby.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell down");
-                    }
-                }
-                player.SetSharedData("DerbyTime", 0);
-            }
             try
             {
-                if (killer != null && !killer.IsNull && killer != player)
+                player.SetSharedData("Collisions", true); // Reset collision from chase.
+                player.SetSharedData("CuffedBy", "n/a");
+                player.ResetData("FreezeWeapons");
+                player.SetData("Dead", Environment.TickCount64);
+                player.ResetData("Seatbelt");
+                player.TriggerEvent("ToggleSeatbelt", false);
+                player.ResetData("DraggingOut");
+                player.TriggerEvent("togglePlayerCrawl", false);
+
+                string reasonStr;
+                bool wasInGame = false;
+                jWeaponData wepDat = new jWeaponData();
+
+                if (Main.WeaponReasons.TryGetValue(reason, out reasonStr))
                 {
-                    NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
+                    // oh its already set ^^
+                }
+                else if (Settings.WeaponData.TryGetValue((long)reason, out wepDat))
+                {
+                    reasonStr = wepDat.Name;
+                }
+                else
+                {
+                    reasonStr = null;
+                }
 
-                    if ((killer.GetSharedData<int>("InLobby") == -6 || killer.GetSharedData<int>("InLobby") > -1) && killer.GetSharedData<int>("InDM") > -1)
+                if (player.GetSharedData<string>("ActionType") != "none")
+                {
+                    EPlayer.StopPlayerAction(player, 1);
+                }
+
+                if (reason == 696988) reasonStr = "handcuffs";
+                if (reason == 696989) reasonStr = "arrest/busted";
+
+                if (reasonStr != null)
+                {
+                    reasonStr.Replace(".", "");
+                }
+
+                if (player.GetSharedData<int>("InLobby") == -4 && Settings.DerbyTimeLeft > 0 && Settings.DerbyTimeLeft != 180 &&
+                    player.HasSharedData("DerbyTime"))
+                {
+                    if (player.GetSharedData<int>("DerbyTime") >= 5)
                     {
-                        int arenaID = killer.GetSharedData<int>("InDM");
-
-                        lock (Settings.LoggedInPlayers)
+                        foreach (Player inderby in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
                         {
-                            foreach (Player indm in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == killer.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == arenaID))
+                            inderby.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell down");
+                        }
+                    }
+                    player.SetSharedData("DerbyTime", 0);
+                }
+                try
+                {
+                    if (killer != null && !killer.IsNull && killer != player)
+                    {
+                        NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
+
+                        if ((killer.GetSharedData<int>("InLobby") == -6 || killer.GetSharedData<int>("InLobby") > -1) && killer.GetSharedData<int>("InDM") > -1)
+                        {
+                            int arenaID = killer.GetSharedData<int>("InDM");
+
+                            lock (Settings.LoggedInPlayers)
                             {
-                                if (reasonStr == null)
+                                foreach (Player indm in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == killer.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == arenaID))
                                 {
-                                    indm.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell");
+                                    if (reasonStr == null)
+                                    {
+                                        indm.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell");
+                                    }
+                                    else
+                                    {
+                                        indm.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                    }
                                 }
-                                else
-                                {
-                                    indm.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
-                                }
+                                EPlayer.GetAccount(killer).Kills++;
+                                EPlayer.GetAccount(player).Deaths++;
                             }
-                            EPlayer.GetAccount(killer).Kills++;
-                            EPlayer.GetAccount(player).Deaths++;
+
+                            EPlayer.GrantXP(killer, 1);
                         }
 
-                        EPlayer.GrantXP(killer, 1);
-                    }
-
-                    if (killer.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("InLobby") >= 0)
-                    {
-                        EPlayer.GrantXP(killer, 1);
-
-                        if (reason != 696988 && reason != 696989 && player.GetSharedData<int>("Team") == 0 && killer.GetSharedData<int>("Team") == 1 && player.GetSharedData<bool>("HasShot") == false)
+                        if (killer.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("InLobby") >= 0)
                         {
-                            Vehicle pVeh = null;
-                            int seat = 0;
-                            if (player.IsInVehicle)
+                            EPlayer.GrantXP(killer, 1);
+
+                            if (reason != 696988 && reason != 696989 && player.GetSharedData<int>("Team") == 0 && killer.GetSharedData<int>("Team") == 1 && player.GetSharedData<bool>("HasShot") == false)
                             {
-                                pVeh = player.Vehicle;
-                                seat = player.VehicleSeat;
+                                Vehicle pVeh = null;
+                                int seat = 0;
+                                if (player.IsInVehicle)
+                                {
+                                    pVeh = player.Vehicle;
+                                    seat = player.VehicleSeat;
+                                }
+
+                                if (pVeh == null || RAGE.Entities.Players.All.Count(ey => ey.IsInVehicle && ey.Vehicle == player.Vehicle &&
+                                         ey.GetSharedData<int>("Team") == 0 && ey.GetSharedData<bool>("HasShot") == true) == 0)
+                                {
+
+
+                                    int warnings = 0;
+                                    if (killer.HasData("InnocentShotWarning")) warnings = killer.GetData<int>("InnocentShotWarning");
+
+                                    warnings += 3;
+                                    if (warnings >= 7)
+                                    {
+                                        int xpReduce = EPlayer.GetAccount(killer).XP >= 8 ? -(EPlayer.GetAccount(killer).XP / 4) : -3;
+
+                                        EPlayer.GrantXP(killer, xpReduce);
+                                        RAGE.Entities.Players.All.ForEach((Player ey) =>
+                                        {
+                                            ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by {xpReduce} for killing a fugitive that hasn't shot.");
+                                        });
+
+                                        killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") - 1.0);
+
+                                        //killer.Health = 0;
+                                        killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] Your fugitive chance has been decreased for killing an innocent fugitive.");
+                                        warnings = 0;
+                                    }
+
+                                    killer.SetData<int>("InnocentShotWarning", warnings);
+                                    killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Repeated attacking of fugitive's that haven't shot will result in a jail.");
+                                }
+
+
+                                player.SetData("UnfairKillSpawn", true);
+
+
+
+                                NAPI.Player.SpawnPlayer(player, player.Position);
+
+                                player.Armor = 0;
+                                player.Health = 100;
+                                player.SendChatMessage($"!{{FF6347}}[!] !{{#FFFFFF}}You have been put back in the game as you were killed unfairly.");
+
+                                if (pVeh != null)
+                                {
+                                    player.SetIntoVehicle(pVeh, seat);
+                                }
+
+                                return;
                             }
+                        }
 
-                            if (pVeh == null || RAGE.Entities.Players.All.Count(ey => ey.IsInVehicle && ey.Vehicle == player.Vehicle &&
-                                     ey.GetSharedData<int>("Team") == 0 && ey.GetSharedData<bool>("HasShot") == true) == 0)
+
+                        if (reason != 696988 && reason != 696989 && player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("Team") == killer.GetSharedData<int>("Team") &&
+                            player.GetSharedData<int>("InLobby") >= 0)
+                        {
+                            if (RAGE.Entities.Players.All.Count(ey => ey.GetSharedData<int>("Team") != -1 && ey.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") &&
+                                     ey.Position.DistanceTo(player.Position) < 10.0) == 0)
                             {
-                               
-
                                 int warnings = 0;
-                                if (killer.HasData("InnocentShotWarning")) warnings = killer.GetData<int>("InnocentShotWarning");
+                                if (killer.HasData("TeamShotWarning")) warnings = killer.GetData<int>("TeamShotWarning");
 
                                 warnings += 3;
-                                if (warnings >= 7)
+
+                                if (killer.IsInVehicle == true && killer.Vehicle.Model == NAPI.Util.GetHashKey("polmav"))
                                 {
+                                    killer.Vehicle.Position = new Vector3(killer.Vehicle.Position.X, killer.Vehicle.Position.Y, killer.Vehicle.Position.Z + 20.0f);
+                                    killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Please do not heliblade.");
+                                }
+                                else if (warnings >= 7)
+                                {
+                                    //killer.Health = 0;
+                                    killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] Your fugitive chance has been decreased for team killing.");
+                                    killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") - 1.0);
+
                                     int xpReduce = EPlayer.GetAccount(killer).XP >= 8 ? -(EPlayer.GetAccount(killer).XP / 4) : -3;
 
                                     EPlayer.GrantXP(killer, xpReduce);
                                     RAGE.Entities.Players.All.ForEach((Player ey) =>
                                     {
-                                        ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by {xpReduce} for killing a fugitive that hasn't shot.");
+                                        ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by {xpReduce} for team killing.");
                                     });
 
-                                    killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") - 1.0);
-
-                                    //killer.Health = 0;
-                                    killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] Your fugitive chance has been decreased for killing an innocent fugitive.");
                                     warnings = 0;
                                 }
 
-                                killer.SetData<int>("InnocentShotWarning", warnings);
-                                killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Repeated attacking of fugitive's that haven't shot will result in a jail.");
-                            }
+                                killer.SetData<int>("TeamShotWarning", warnings);
 
+                                killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Repeated team killing will result in a jail.");
+                            }
 
                             player.SetData("UnfairKillSpawn", true);
 
-
-
-                            NAPI.Player.SpawnPlayer(player, player.Position);
-
-                            player.Armor = 0;
-                            player.Health = 100;
-                            player.SendChatMessage($"!{{FF6347}}[!] !{{#FFFFFF}}You have been put back in the game as you were killed unfairly.");
-
-                            if (pVeh != null)
+                            lock (player)
                             {
-                                player.SetIntoVehicle(pVeh, seat);
+                                Vehicle pVeh = null;
+                                int seat = 0;
+                                if (player.IsInVehicle)
+                                {
+                                    pVeh = player.Vehicle;
+                                    seat = player.VehicleSeat;
+                                }
+
+                                NAPI.Player.SpawnPlayer(player, player.Position);
+
+                                player.Armor = 0;
+                                player.Health = 100;
+                                player.SendChatMessage($"!{{FF6347}}[!] !{{#FFFFFF}}You have been put back in the game as you were killed unfairly.");
+
+                                if (pVeh != null)
+                                {
+                                    player.SetIntoVehicle(pVeh, seat);
+                                }
                             }
 
                             return;
                         }
                     }
-
-
-                    if (reason != 696988 && reason != 696989 && player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("Team") == killer.GetSharedData<int>("Team") && 
-                        player.GetSharedData<int>("InLobby") >= 0)
+                    else
                     {
-                        if (RAGE.Entities.Players.All.Count(ey => ey.GetSharedData<int>("Team") != -1 && ey.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") &&
-                                 ey.Position.DistanceTo(player.Position) < 10.0) == 0)
-                        {
-                            int warnings = 0;
-                            if (killer.HasData("TeamShotWarning")) warnings = killer.GetData<int>("TeamShotWarning");
-
-                            warnings += 3;
-
-                            if (killer.IsInVehicle == true && killer.Vehicle.Model == NAPI.Util.GetHashKey("polmav"))
-                            {
-                                killer.Vehicle.Position = new Vector3(killer.Vehicle.Position.X, killer.Vehicle.Position.Y, killer.Vehicle.Position.Z + 20.0f);
-                                killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Please do not heliblade.");
-                            }
-                            else if (warnings >= 7)
-                            {
-                                //killer.Health = 0;
-                                killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] Your fugitive chance has been decreased for team killing.");
-                                killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") - 1.0);
-
-                                int xpReduce = EPlayer.GetAccount(killer).XP >= 8 ? -(EPlayer.GetAccount(killer).XP / 4) : -3;
-
-                                EPlayer.GrantXP(killer, xpReduce);
-                                RAGE.Entities.Players.All.ForEach((Player ey) =>
-                                {
-                                    ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by {xpReduce} for team killing.");
-                                });
-
-                                warnings = 0;
-                            }
-
-                            killer.SetData<int>("TeamShotWarning", warnings);
-
-                            killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Repeated team killing will result in a jail.");
-                        }
-
-                        player.SetData("UnfairKillSpawn", true);
-
-                        lock (player)
-                        {
-                            Vehicle pVeh = null;
-                            int seat = 0;
-                            if (player.IsInVehicle)
-                            {
-                                pVeh = player.Vehicle;
-                                seat = player.VehicleSeat;
-                            }
-
-                            NAPI.Player.SpawnPlayer(player, player.Position);
-
-                            player.Armor = 0;
-                            player.Health = 100;
-                            player.SendChatMessage($"!{{FF6347}}[!] !{{#FFFFFF}}You have been put back in the game as you were killed unfairly.");
-
-                            if (pVeh != null)
-                            {
-                                player.SetIntoVehicle(pVeh, seat);
-                            }
-                        }
-
-                        return;
-                    }
-                }
-                else
-                {
-                    NAPI.Util.ConsoleOutput($"[Death] {player.Name} has died of {(reasonStr == null ? "N/A" : reasonStr)}.");
-                }
-
-                LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
-                if (lobby != null)
-                {
-                    if (killer == null && player.GetSharedData<int>("Wounded") != 0)
-                    {
-                        killer = Settings.LoggedInPlayers.FirstOrDefault(a => a.Name.Equals(player.GetSharedData<string>("LastKiller")));
-                        reasonStr = "Executed";
+                        NAPI.Util.ConsoleOutput($"[Death] {player.Name} has died of {(reasonStr == null ? "N/A" : reasonStr)}.");
                     }
 
-                    if (lobby.gameStatus == 1)
+                    LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+                    if (lobby != null)
                     {
-                        if (lobby.Cops.Contains(player) || lobby.Fugitives.Contains(player)) EPlayer.CreateAmmoBox(player);
-
-                        if (killer != null)
+                        if (killer == null && player.GetSharedData<int>("Wounded") != 0)
                         {
-                            Player lastkilla = Settings.LoggedInPlayers.FirstOrDefault(a => a.Name.Equals(player.GetSharedData<string>("LastKiller")));
-                            if (lastkilla != killer)
+                            killer = Settings.LoggedInPlayers.FirstOrDefault(a => a.Name.Equals(player.GetSharedData<string>("LastKiller")));
+                            reasonStr = "Executed";
+                        }
+
+                        if (lobby.gameStatus == 1)
+                        {
+                            if (lobby.Cops.Contains(player) || lobby.Fugitives.Contains(player)) EPlayer.CreateAmmoBox(player);
+
+                            if (killer != null)
                             {
-                                int killStreak = killer.GetData<int>("Killstreak")+1;
-                                killer.SetData("Killstreak", killStreak);
-
-                                if (killStreak % 4 == 0 && killStreak >= 4 && (lobby.Cops.Contains(killer) || lobby.Fugitives.Contains(killer)))
+                                Player lastkilla = Settings.LoggedInPlayers.FirstOrDefault(a => a.Name.Equals(player.GetSharedData<string>("LastKiller")));
+                                if (lastkilla != killer)
                                 {
-                                    EPlayer.GrantXP(killer, 3);
-                                    EPlayer.SendMessageInLobby(lobby.lobbyId, $"!{{#FF0000}}[KILLSTREAK] !{{#FF6347}}{killer.Name} !{{#FFFFFF}}is on a {killStreak} kills rampage! Someone stop them!");
+                                    int killStreak = killer.GetData<int>("Killstreak") + 1;
+                                    killer.SetData("Killstreak", killStreak);
 
-                                    killer.SendChatMessage("!{#00FF33}[!] !{#FFFFFF}You have earnt 3 XP and 3 points for maintaining a killstreak!");
-                                    EPlayer.GivePoints(killer, 3);
-                                    killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(killer).DonatorLevel + 1.0)));
+                                    if (killStreak % 4 == 0 && killStreak >= 4 && (lobby.Cops.Contains(killer) || lobby.Fugitives.Contains(killer)))
+                                    {
+                                        EPlayer.GrantXP(killer, 3);
+                                        EPlayer.SendMessageInLobby(lobby.lobbyId, $"!{{#FF0000}}[KILLSTREAK] !{{#FF6347}}{killer.Name} !{{#FFFFFF}}is on a {killStreak} kills rampage! Someone stop them!");
+
+                                        killer.SendChatMessage("!{#00FF33}[!] !{#FFFFFF}You have earnt 3 XP and 3 points for maintaining a killstreak!");
+                                        EPlayer.GivePoints(killer, 3);
+                                        killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(killer).DonatorLevel + 1.0)));
+                                    }
+                                }
+
+
+                                /////////////////////////////////////
+                                if (player.GetSharedData<int>("Wounded") == 0)
+                                {
+                                    EPlayer.GetAccount(killer).Kills++;
+                                    EPlayer.GetAccount(player).Deaths++;
+                                }
+                                else
+                                {
+                                    killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.05 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 20.0));
                                 }
                             }
-                        
 
-                            /////////////////////////////////////
-                            if (player.GetSharedData<int>("Wounded") == 0)
+                            if (lobby.Fugitives.Contains(player))
                             {
-                                EPlayer.GetAccount(killer).Kills++;
-                                EPlayer.GetAccount(player).Deaths++;
-                            }
-                            else
-                            {
-                                killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.05 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 20.0));
-                            }
-                        }
+                                wasInGame = true;
 
-                        if (lobby.Fugitives.Contains(player))
-                        {
-                            wasInGame = true;
+                                if (killer != null && killer.GetSharedData<int>("Team") == 1) EPlayer.GrantXP(killer, 2);
 
-                            if (killer != null && killer.GetSharedData<int>("Team") == 1) EPlayer.GrantXP(killer, 2);
-
-                            lock (Settings.LoggedInPlayers)
-                            {
-                                foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                lock (Settings.LoggedInPlayers)
                                 {
-                                    if (killer != null && !killer.IsNull && killer != player)
+                                    foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
                                     {
-                                        if (reasonStr == null)
+                                        if (killer != null && !killer.IsNull && killer != player)
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Killed", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
-                                        }
-                                        else
-                                        {
-                                            if (reason == 696988)
+                                            if (reasonStr == null)
                                             {
-                                                ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Arrested", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                                ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Killed", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
                                             }
-                                            else if (reason == 696989)
+                                            else
                                             {
-                                                ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Busted", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                                if (reason == 696988)
+                                                {
+                                                    ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Arrested", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                                }
+                                                else if (reason == 696989)
+                                                {
+                                                    ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Busted", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                                }
+                                                else ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
                                             }
-                                            else ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (reasonStr == null)
-                                        {
-                                            ay.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell");
                                         }
                                         else
                                         {
-                                            ay.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), reasonStr);
-                                        }
-                                    }
-                                }
-                            }
-
-                            bool select_new_leader = false;
-                            if (lobby.gameMode == GameModes.BANKROBBERY)
-                            {
-                                if((lobby.Fugitives.Count-1) <= 0) // in case all fugis die 
-                                {
-                                    Main.StopGame(lobby.lobbyId, 3);
-                                }
-
-                                if(lobby.BankRobbery.HeistLeader == player)
-                                {
-                                    lobby.BankRobbery.LeaderLives--;
-                                    if (lobby.BankRobbery.LeaderLives <= 0)
-                                    {
-                                        Main.StopGame(lobby.lobbyId, 5);
-                                    }
-                                    else
-                                    {
-                                        if (killer != null)
-                                        {
-                                            killer.SendChatMessage("~g~[>]~w~ You killed the first heist leader! You receive +2XP as bonus.");
-                                            foreach (Player c in lobby.Cops)
+                                            if (reasonStr == null)
                                             {
-                                                c.SendChatMessage($"!{{#FF6347}}[>] {killer.Name} has killed the first heist leader!");
+                                                ay.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell");
                                             }
-                                            EPlayer.GrantXP(killer, 2);
+                                            else
+                                            {
+                                                ay.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), reasonStr);
+                                            }
                                         }
-                                        select_new_leader = true;
                                     }
                                 }
-                            }
 
-                            lobby.Fugitives.Remove(player);
-                            player.SetSharedData("HeistLeader", false);
-
-                            if (select_new_leader)
-                            {
-                                BankRobberyData _brob = lobby.BankRobbery;
-                                _brob.HeistLeader = null;
-                                int unfuck = 0;
-                                while (_brob.HeistLeader == null)
+                                bool select_new_leader = false;
+                                if (lobby.gameMode == GameModes.BANKROBBERY)
                                 {
-                                    _brob.HeistLeader = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
-
-                                    unfuck++;
-                                    if (unfuck > 50)
+                                    if ((lobby.Fugitives.Count - 1) <= 0) // in case all fugis die 
                                     {
-                                        Main.StopGame(lobby.lobbyId, 5);
-                                        break;
+                                        Main.StopGame(lobby.lobbyId, 3);
                                     }
-                                }
-                                _brob.HeistLeader.SetSharedData("HeistLeader", true);
-                                lobby.BankRobbery.HeistLeader = _brob.HeistLeader;
 
-                                foreach (Player f in lobby.Fugitives)
-                                {
-                                    f.SendChatMessage("!{#FF6347}[!] ~w~Your heist leader has been killed! You have one more chance - " + _brob.HeistLeader.Name + " is your new leader.");
-
-                                    f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {_brob.HeistLeader.Name}: Sadly, we lost {player.Name}, but we must keep on going! Let's go!");
-                                }
-                                _brob.HeistLeader.SendChatMessage("!{#FF6347}[!] ~w~You are now the heist leader. If you die, the round is over for your team.");
-                            }
-                        }
-
-                        if (lobby.Cops.Contains(player))
-                        {
-                            wasInGame = true;
-
-                            if (killer != null && killer.GetSharedData<int>("Team") == 0)
-                            {
-                                Events.PlayerRequestShotTag(killer);
-                            }
-
-                            lock (Settings.LoggedInPlayers)
-                            {
-                                foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
-                                {
-                                    if (killer != null && !killer.IsNull && player != killer)
+                                    if (lobby.BankRobbery.HeistLeader == player)
                                     {
-                                        if (reasonStr == null)
+                                        lobby.BankRobbery.LeaderLives--;
+                                        if (lobby.BankRobbery.LeaderLives <= 0)
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Killed", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                            Main.StopGame(lobby.lobbyId, 5);
                                         }
                                         else
                                         {
-                                            ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (reasonStr == null)
-                                        {
-                                            ay.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell");
-                                        }
-                                        else
-                                        {
-                                            ay.TriggerEvent("pushToKillFee2d", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), reasonStr);
+                                            if (killer != null)
+                                            {
+                                                killer.SendChatMessage("~g~[>]~w~ You killed the first heist leader! You receive +2XP as bonus.");
+                                                foreach (Player c in lobby.Cops)
+                                                {
+                                                    c.SendChatMessage($"!{{#FF6347}}[>] {killer.Name} has killed the first heist leader!");
+                                                }
+                                                EPlayer.GrantXP(killer, 2);
+                                            }
+                                            select_new_leader = true;
                                         }
                                     }
                                 }
+
+                                lobby.Fugitives.Remove(player);
+                                player.SetSharedData("HeistLeader", false);
+
+                                if (select_new_leader)
+                                {
+                                    BankRobberyData _brob = lobby.BankRobbery;
+                                    _brob.HeistLeader = null;
+                                    int unfuck = 0;
+                                    while (_brob.HeistLeader == null)
+                                    {
+                                        _brob.HeistLeader = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
+
+                                        unfuck++;
+                                        if (unfuck > 50)
+                                        {
+                                            Main.StopGame(lobby.lobbyId, 5);
+                                            break;
+                                        }
+                                    }
+                                    _brob.HeistLeader.SetSharedData("HeistLeader", true);
+                                    lobby.BankRobbery.HeistLeader = _brob.HeistLeader;
+
+                                    foreach (Player f in lobby.Fugitives)
+                                    {
+                                        f.SendChatMessage("!{#FF6347}[!] ~w~Your heist leader has been killed! You have one more chance - " + _brob.HeistLeader.Name + " is your new leader.");
+
+                                        f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {_brob.HeistLeader.Name}: Sadly, we lost {player.Name}, but we must keep on going! Let's go!");
+                                    }
+                                    _brob.HeistLeader.SendChatMessage("!{#FF6347}[!] ~w~You are now the heist leader. If you die, the round is over for your team.");
+                                }
                             }
 
-                            lobby.Cops.Remove(player);
-                        }
+                            if (lobby.Cops.Contains(player))
+                            {
+                                wasInGame = true;
 
-                        player.TriggerEvent("ResetWounded");
-                        player.SetSharedData("Wounded", 0);
-                        //OnStopReviving(player);
+                                if (killer != null && killer.GetSharedData<int>("Team") == 0)
+                                {
+                                    Events.PlayerRequestShotTag(killer);
+                                }
+
+                                lock (Settings.LoggedInPlayers)
+                                {
+                                    foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                    {
+                                        if (killer != null && !killer.IsNull && player != killer)
+                                        {
+                                            if (reasonStr == null)
+                                            {
+                                                ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Killed", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                            }
+                                            else
+                                            {
+                                                ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (reasonStr == null)
+                                            {
+                                                ay.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell");
+                                            }
+                                            else
+                                            {
+                                                ay.TriggerEvent("pushToKillFee2d", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), reasonStr);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                lobby.Cops.Remove(player);
+
+                                if (lobby.Cops.Count <= 0)
+                                {
+                                    Main.StopGame(lobby.lobbyId, 2);
+                                }
+                            }
+
+                            player.TriggerEvent("ResetWounded");
+                            player.SetSharedData("Wounded", 0);
+                            //OnStopReviving(player);
+                        }
                     }
-                }
 
-                player.RemoveAllWeapons();
+                    player.RemoveAllWeapons();
 
-                NAPI.Task.Run(() =>
-                {
-                    try
+                    NAPI.Task.Run(() =>
                     {
-                        if (player != null && player.Exists)
+                        try
                         {
-                            Random rand = new Random(DateTimeOffset.UtcNow.Millisecond);
-                            Vector3 SpawnArea = Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)];
-                            if (player.GetSharedData<int>("InLobby") == -4) SpawnArea = ((Vector3)Settings.DerbySpawns[0, 0]).Around(2.0f);
-                            if (player.GetSharedData<int>("InLobby") > -1 && lobby != null)
+                            if (player != null && player.Exists)
                             {
-                                int arenaID = player.GetSharedData<int>("InDM");
-                                if (arenaID > -1)
+                                Random rand = new Random(DateTimeOffset.UtcNow.Millisecond);
+                                Vector3 SpawnArea = Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)];
+                                if (player.GetSharedData<int>("InLobby") == -4) SpawnArea = ((Vector3)Settings.DerbySpawns[0, 0]).Around(2.0f);
+                                if (player.GetSharedData<int>("InLobby") > -1 && lobby != null)
                                 {
-                                    int spawnID = rand.Next(Settings.DMSpawns[arenaID].GetLength(0));
-                                    Vector3 dmSpawn = (Vector3)Settings.DMSpawns[arenaID][spawnID, 0];
-                                    SpawnArea = (Vector3)dmSpawn;
+                                    int arenaID = player.GetSharedData<int>("InDM");
+                                    if (arenaID > -1)
+                                    {
+                                        int spawnID = rand.Next(Settings.DMSpawns[arenaID].GetLength(0));
+                                        Vector3 dmSpawn = (Vector3)Settings.DMSpawns[arenaID][spawnID, 0];
+                                        SpawnArea = (Vector3)dmSpawn;
+                                    }
                                 }
-                            }
-                            if (player.GetSharedData<int>("InLobby") == -6)
-                            {
-                                SpawnArea = player.Position; // So that player spawns inside the arena, and is transported whenever he spawns to a new point.
+                                if (player.GetSharedData<int>("InLobby") == -6)
+                                {
+                                    SpawnArea = player.Position; // So that player spawns inside the arena, and is transported whenever he spawns to a new point.
                             }
 
-                            NAPI.Player.SpawnPlayer(player, SpawnArea);
+                                NAPI.Player.SpawnPlayer(player, SpawnArea);
+                            }
                         }
-                    }
-                    catch { }
-                }, (wasInGame == true && reason != 696989) ? 10000 : 1500);
+                        catch { }
+                    }, (wasInGame == true && reason != 696989) ? 10000 : 1500);
+                }
+                catch { }
+
+                player.SetData("Killstreak", 0);
             }
-            catch { }
-
-            player.SetData("Killstreak", 0);
+            catch(Exception ex)
+            {
+                NAPI.Util.ConsoleOutput("[EXCEPTION IN OnPlayerDeath] " + ex.ToString());
+            }
         }
 
         [RemoteEvent("SetAutoOOC")]
@@ -2035,13 +2047,20 @@ namespace RNC
                             c.SendChatMessage("!{#FF6347}[#] ~w~You must find the heist leader and neutralize them!");
                             c.SendChatMessage("!{#FF6347}[#] ~w~Alternatively, you can keep the fugitives trapped inside the bank until the round ends to win.");
                         }
+
+                        foreach(Vehicle v in lobby.BankRobbery.FugitiveVehicles)
+                        {
+                            v.Locked = false;
+                            v.EngineStatus = true;
+                        }
                     }
                     break;
                 case 2:
                     {
+                        Vector3 hp = BankRobberyData.Hideouts[lobby.BankRobbery.Hideout];
                         foreach (Player f in lobby.Fugitives)
                         {
-                            f.TriggerEvent("playerCreateWaypoint", BankRobberyData.Hideouts[lobby.BankRobbery.Hideout]);
+                            f.TriggerEvent("playerCreateWaypoint", hp);
                             f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {lobby.BankRobbery.HeistLeader.Name}: Alright, I'm in the car, let's move, quick!");
                             if (f.IsInVehicle)
                             {
@@ -2055,6 +2074,8 @@ namespace RNC
                                 }
                             }
                             else f.SendChatMessage("!{#FF6347}[#] ~w~Get in a vehicle and escort the heist leader to the hideout.");
+
+                            f.TriggerEvent("BankRob_CreateFinishMarker", hp.X, hp.Y, hp.Z);
 
                         }
                         foreach(Player c in lobby.Cops)
@@ -2088,7 +2109,7 @@ namespace RNC
                         {
                             f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: Now that I think about it, those Burritos you left as getaway might be too slow.");
                             f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: I will take a look around and see if there is anything better you can \"borrow\".");
-                            f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[0].Position);
+                            f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[0].Position.X, BankRobberyData.FugitiveVehicleData[0].Position.Y, BankRobberyData.FugitiveVehicleData[0].Position.Z);
                         }
                         break;
                     case 1:
@@ -2096,7 +2117,7 @@ namespace RNC
                         {
                             f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: Some famous person pulled up in front of a building down the road with their bodyguards.");
                             f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: There's a limousine and a bunch of fancy cars... not super fast, but at least you could go out in style!");
-                            f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[4].Position);
+                            f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[4].Position.X, BankRobberyData.FugitiveVehicleData[4].Position.Y, BankRobberyData.FugitiveVehicleData[4].Position.Z);
                         }
                         break;
                     case 2:
@@ -2104,7 +2125,7 @@ namespace RNC
                         {
                             f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: There's a small parking lot here with a bunch of different rides, they look good enough to me.");
                             f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: It's located in an alley across the street, anyways, I hear sirens so I'm outta here, see you at the hideout!"); 
-                            f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[11].Position);
+                            f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[11].Position.X, BankRobberyData.FugitiveVehicleData[11].Position.Y, BankRobberyData.FugitiveVehicleData[11].Position.Z);
                         }
                         break;
                 }

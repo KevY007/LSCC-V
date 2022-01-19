@@ -29,10 +29,19 @@ mp.events.add("StartBankRobberyTimer", () => {
             clearInterval(robTimer);
             return;
         }
+        if(mp.players.local.getVariable("Team") != 0){
+            clearInterval(robTimer);
+            return;
+        }
+        if(mp.players.local.getVariable("HeistLeader") == false){
+            clearInterval(robTimer);
+            return;
+        }
 
         robTimeLeft--;
         if(robTimeLeft <= 0){
             mp.events.callRemote("BankRob_ContinueState", 1);
+            clearInterval(robTimer);
         }
         else if(robTimeLeft == 45){
             mp.events.callRemote("BankRob_SendMessage", 0, 0);
@@ -51,18 +60,23 @@ mp.events.add("StartBankRobberyTimer", () => {
 function bankRobEnterColshape(player, shape) {
     if(shape == FinishColshape) 
     {
-        if(player.getVariable("HeistLeader") == true)
+        if(player.getVariable("HeistLeader") == true){
             mp.events.callRemote("BankRob_ContinueState", 3);
+        }
         else{
             mp.gui.chat.push("[>] Sorry, the heist leader must enter the marker by themselves in order to win!");
         }
     }
 }
   
-mp.events.add("playerEnterColshape", bankRobEnterColshape);
+mp.events.add("playerEnterColshape", (shape) => {
+    bankRobEnterColshape(mp.players.local, shape);
+});
 
-mp.events.add("BankRob_CreateFinishMarker", (position) => {
-    FinishMarker = mp.markers.new(1, position, 3.0,
+mp.events.add("BankRob_CreateFinishMarker", (x, y, z) => {
+
+    let position = new mp.Vector3(x, y, z);
+    FinishMarker = mp.markers.new(1, position, 10.0,
         {
             color: [255, 78, 51, 255],
             visible: true,
@@ -93,8 +107,8 @@ mp.events.add("BankRob_ClearFugiCarBlips", () => {
     FugiCarBlips = [];
 })
 
-mp.events.add("BankRob_SetFugiCarBlip", (id, position) => {
- 
+mp.events.add("BankRob_SetFugiCarBlip", (id, x, y, z) => {
+    let position = new mp.Vector3(x, y, z);
     switch(id){
         case 0:{
             let _b = mp.blips.new(616, position,
@@ -102,7 +116,8 @@ mp.events.add("BankRob_SetFugiCarBlip", (id, position) => {
                     name: "Getaway #1",
                     scale: 1.0,
                     color: 79,
-                    drawDistance: 100.0
+                    drawDistance: 1000.0,
+                    dimension: mp.players.local.dimension
                 });
             FugiCarBlips.push(_b);
         }
@@ -113,7 +128,8 @@ mp.events.add("BankRob_SetFugiCarBlip", (id, position) => {
                     name: "Getaway #2",
                     scale: 1.0,
                     color: 79,
-                    drawDistance: 100.0
+                    drawDistance: 1000.0,
+                    dimension: mp.players.local.dimension
                 });
             FugiCarBlips.push(_b);
         }
@@ -124,7 +140,8 @@ mp.events.add("BankRob_SetFugiCarBlip", (id, position) => {
                     name: "Getaway #2",
                     scale: 1.0,
                     color: 79,
-                    drawDistance: 100.0
+                    drawDistance: 1000.0,
+                    dimension: mp.players.local.dimension
                 });
             FugiCarBlips.push(_b);
         }
