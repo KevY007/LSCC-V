@@ -286,6 +286,8 @@ namespace RNC
         {
             if (File.Exists("racenchase/we_are_testing"))
                 _connectionString = "Server=localhost;Database=racenchase_test;Uid=root;Pwd=jyLqRZv37pCThC";
+            else if(File.Exists("racenchase/codename_home"))
+                _connectionString = "Server=localhost;Database=racenchase_test;Uid=racenchase;Pwd=12345678";
             else
                 _connectionString = "Server=" + Settings.MySQL_Host + ";Database=" + Settings.MySQL_Database + ";Uid=" + Settings.MySQL_User + ";Pwd=" + Settings.MySQL_Password + ";Port=" + Settings.MySQL_Port;
         }

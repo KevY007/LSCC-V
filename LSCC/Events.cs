@@ -2088,7 +2088,7 @@ namespace RNC
                         {
                             f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: Now that I think about it, those Burritos you left as getaway might be too slow.");
                             f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: I will take a look around and see if there is anything better you can \"borrow\".");
-                            f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[0].Item1);
+                            f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[0].Position);
                         }
                         break;
                     case 1:
@@ -2096,7 +2096,7 @@ namespace RNC
                         {
                             f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: Some famous person pulled up in front of a building down the road with their bodyguards.");
                             f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: There's a limousine and a bunch of fancy cars... not super fast, but at least you could go out in style!");
-                            f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[4].Item1);
+                            f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[4].Position);
                         }
                         break;
                     case 2:
@@ -2104,7 +2104,7 @@ namespace RNC
                         {
                             f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: There's a small parking lot here with a bunch of different rides, they look good enough to me.");
                             f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: It's located in an alley across the street, anyways, I hear sirens so I'm outta here, see you at the hideout!"); 
-                            f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[11].Item1);
+                            f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[11].Position);
                         }
                         break;
                 }

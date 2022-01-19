@@ -1,5 +1,3 @@
-const { clearInterval } = require("timers");
-
 const ROBBERY_TIME = 60;
 
 let robTimeLeft = ROBBERY_TIME;

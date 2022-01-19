@@ -3,7 +3,8 @@
     "LSCC": {
       "commandName": "Executable",
       "executablePath": "C:\\RAGEMP\\server-files\\ragemp-server.exe",
-      "workingDirectory": "C:\\RAGEMP\\server-files\\"
+      "workingDirectory": "C:\\RAGEMP\\server-files\\",
+      "nativeDebugging": false
     }
   }
 }

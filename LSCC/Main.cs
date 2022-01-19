@@ -373,10 +373,12 @@ namespace RNC
 
         public static readonly Vector3 BankCheckpointPos = new Vector3(207.33696f, 194.81523f, 105.56393f);
 
-        public static readonly object[,] SniperSpawn = { { new Vector3(267.78983f, 245.49059f, 138.19551f), 161.013f } };
-        public static readonly object[,] LeaderSpawn = { { new Vector3(263.71643f, 214.61465f, 101.68339f), 72.69729f } };
+        public static readonly Vector3 SniperPos = new Vector3(267.78983f, 245.49059f, 138.19551f);
+        public static readonly float SniperHeading = 161.013f;
+        public static readonly Vector3 LeaderPos = new Vector3(263.71643f, 214.61465f, 101.68339f);
+        public static readonly float LeaderHeading = 72.69729f;
 
-        public static readonly object[,] FugitiveSpawns =
+        public static readonly object[,] FugitiveSpawns = new object[,]
         {
             { new Vector3(250.89134f, 219.42146f, 101.68343f), -48.746826f },
             { new Vector3(260.25327f, 225.47815f, 101.683266f), -108.328705f },
@@ -388,27 +390,38 @@ namespace RNC
             { new Vector3(246.8318f, 223.12218f, 106.286736f), 160.70934f }
         };
 
-        public static Tuple<Vector3, float, string>[] FugitiveVehicleData = 
+        public class BR_FugitiveVehicleData
         {
-            Tuple.Create(new Vector3(300.0705f, 262.5568f, 105.376785f), -105.05242f, "burrito3"),
-            Tuple.Create(new Vector3(294.0118f, 264.40457f, 105.40566f), -110.0321f, "burrito3"),
-            Tuple.Create(new Vector3(287.0754f, 266.7743f, 105.404945f), -108.04021f, "burrito3"),
-            Tuple.Create(new Vector3(308.86548f, 261.9242f, 104.85302f), -85.801796f, "burrito3"),
+            public Vector3 Position;
+            public float Heading;
+            public string Name;
+            public BR_FugitiveVehicleData(Vector3 pos, float head, string name)
+            {
+                this.Position = pos;
+                this.Heading = head;
+                this.Name = name;
+            }
+        }
 
-            Tuple.Create(new Vector3(104.54904f, 246.66824f, 107.74905f), 69.642006f, "stretch"),
-            Tuple.Create(new Vector3(111.98483f, 244.39029f, 107.418335f), 68.90393f, "cognoscenti"),
-            Tuple.Create(new Vector3(123.95057f, 239.9692f, 107.08887f), 69.3799f, "cognoscenti"),
-            Tuple.Create(new Vector3(95.74224f, 250.45674f, 107.93961f), 68.840904f, "cognoscenti"),
-            Tuple.Create(new Vector3(83.43303f, 254.90424f, 108.37654f), 67.456f, "cognoscenti"),
-
-            Tuple.Create(new Vector3(236.19055f, 115.73223f, 102.24549f), -36.028374f, "slamvan3"),
-            Tuple.Create(new Vector3(240.58038f, 129.90594f, 102.196754f), 160.48413f, "glendale2"),
-            Tuple.Create(new Vector3(226.4308f, 118.67955f, 101.97867f), 151.46762f, "impaler"),
-            Tuple.Create(new Vector3(237.09787f, 130.90378f, 102.12132f), 159.22339f, "kalahari"),
-            Tuple.Create(new Vector3(229.15312f, 127.188934f, 102.29818f), -111.604225f, "fugitive"),
+        public static BR_FugitiveVehicleData[] FugitiveVehicleData = 
+        {
+            new BR_FugitiveVehicleData(new Vector3(300.0705f, 262.5568f, 105.376785f), -105.05242f, "burrito3"),
+            new BR_FugitiveVehicleData(new Vector3(294.0118f, 264.40457f, 105.40566f), -110.0321f, "burrito3"),
+            new BR_FugitiveVehicleData(new Vector3(287.0754f, 266.7743f, 105.404945f), -108.04021f, "burrito3"),
+            new BR_FugitiveVehicleData(new Vector3(308.86548f, 261.9242f, 104.85302f), -85.801796f, "burrito3"),
+            new BR_FugitiveVehicleData(new Vector3(104.54904f, 246.66824f, 107.74905f), 69.642006f, "stretch"),
+            new BR_FugitiveVehicleData(new Vector3(111.98483f, 244.39029f, 107.418335f), 68.90393f, "cognoscenti"),
+            new BR_FugitiveVehicleData(new Vector3(123.95057f, 239.9692f, 107.08887f), 69.3799f, "cognoscenti"),
+            new BR_FugitiveVehicleData(new Vector3(95.74224f, 250.45674f, 107.93961f), 68.840904f, "cognoscenti"),
+            new BR_FugitiveVehicleData(new Vector3(83.43303f, 254.90424f, 108.37654f), 67.456f, "cognoscenti"),
+            new BR_FugitiveVehicleData(new Vector3(236.19055f, 115.73223f, 102.24549f), -36.028374f, "slamvan3"),
+            new BR_FugitiveVehicleData(new Vector3(240.58038f, 129.90594f, 102.196754f), 160.48413f, "glendale2"),
+            new BR_FugitiveVehicleData(new Vector3(226.4308f, 118.67955f, 101.97867f), 151.46762f, "impaler"),
+            new BR_FugitiveVehicleData(new Vector3(237.09787f, 130.90378f, 102.12132f), 159.22339f, "kalahari"),
+            new BR_FugitiveVehicleData(new Vector3(229.15312f, 127.188934f, 102.29818f), -111.604225f, "fugitive"),
         };
 
-        public static readonly object[,] PatrolSpawns =
+        public static readonly object[,] PatrolSpawns = new object[,]
         {
             { new Vector3(407.99747f, -989.2855f, 28.872591f), 49.752483f },
             { new Vector3(407.65045f, -997.8775f, 28.872187f), 48.555405f },
@@ -417,13 +430,13 @@ namespace RNC
             { new Vector3(429.78812f, -952.223f, 28.800528f), 88.55487f },
             { new Vector3(399.7428f, -937.24005f, 28.958307f), 179.61603f }
         };
-        public static readonly object[,] FbiSuvSpawns =
+        public static readonly object[,] FbiSuvSpawns = new object[,]
         {
             { new Vector3(452.21127f, -1015.2985f, 28.092287f), 98.04166f },
             { new Vector3(454.08533f, -1023.79486f, 28.091333f), 91.55372f },
             { new Vector3(423.2366f, -1014.0081f, 28.66856f), 116.714745f }
         };
-        public static readonly object[,] FbiBuffaloSpawns =
+        public static readonly object[,] FbiBuffaloSpawns = new object[,]
         {
             { new Vector3(408.27548f, -1007.90894f, 28.913239f), 123.24947f },
             { new Vector3(406.23038f, -1003.2062f, 28.91233f), 125.129906f }
@@ -2119,54 +2132,65 @@ namespace RNC
                 int crashcheck = 0;
                 try
                 {
-                    crashcheck++;
-
-                    if (ContextFactory.Instance.Maps.Count() < 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has no maps added, failed to start"); return false; }
-                    crashcheck++;
-
-                    List<Map> mapList = ContextFactory.Instance.Maps.ToList().Where(a => a.Enabled == true).ToList();
-                    crashcheck++;
-
-                    if (mapList.Count < 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has maps but none of them were enabled! Failed to start."); return false; }
-                    crashcheck++;
-
-                    Map map = mapList.OrderBy(c => Guid.NewGuid()).FirstOrDefault();
-                    if (lobby.NextMapID != -1) map = mapList.Find(a => a.SQL_ID == lobby.NextMapID);
-                    lobby.NextMapID = -1;
-
-                    if (map == null) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Next (force-set) MapID == null; Failed to start!"); return false; }
-                    crashcheck++;
-
-                    NAPI.Util.ConsoleOutput($"[Lobby " + lobbyid + $"] Selected Map [{map.Name}] | Total Spawns: [{ContextFactory.Instance.MapSpawns.ToList().Where(a => a.mapID == map.SQL_ID).Count()}]");
-                    crashcheck++;
-
-                    lobby.lastMapId = map.SQL_ID;
-
-                    if (ContextFactory.Instance.MapSpawns.ToList().Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 0).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no fugitive spawns! Abort."); return false; }
-                    if (ContextFactory.Instance.MapSpawns.ToList().Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 1).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no cop spawns! Abort."); return false; }
-
-                    crashcheck++;
-
-                    List<MapSpawn> Spawns = ContextFactory.Instance.MapSpawns.ToList().Where(x => x.mapID == map.SQL_ID).ToList();
-                    crashcheck++;
-
-                    List<int> UsedSpawns = new List<int>(Spawns.Count + 1);
-                    crashcheck++;
-
-                    List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && !EPlayer.IsAFK(a) && !a.HasData("Spectating") && a.GetSharedData<bool>("AutoJoin") == true && !a.Dead).OrderBy(c => Guid.NewGuid()).ToList();
-                    // !a.Dead so the white color bug (OnPlayerSpawn trigger as game start) does not happen -- if it still happens or if you want to enable dead players being taken in game then do it that EPlayer.Spawn is called when selecting players again.
-                    crashcheck++;
-
-                    List<Player> PutInsideCar = new List<Player>(lobbyPlayers.Count());
-                    crashcheck++;
-
-                    UsedSpawns.Add(-1);
-                    crashcheck++;
-
-
-                    pCount = 0;
+                    List<MapSpawn> Spawns = new List<MapSpawn>();
+                    List<int> UsedSpawns = new List<int>();
+                    List<Player> lobbyPlayers = new List<Player>();
+                    List<Player> PutInsideCar = new List<Player>();
                     Player _tempPlayer;
+                    Map map = null;
                     crashcheck++;
+                    if (lobby.gameMode != GameModes.BANKROBBERY)
+                    {
+                        if (ContextFactory.Instance.Maps.Count() < 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has no maps added, failed to start"); return false; }
+                        crashcheck++;
+
+                        List<Map> mapList = ContextFactory.Instance.Maps.ToList().Where(a => a.Enabled == true).ToList();
+                        crashcheck++;
+
+                        if (mapList.Count < 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has maps but none of them were enabled! Failed to start."); return false; }
+                        crashcheck++;
+
+                        map = mapList.OrderBy(c => Guid.NewGuid()).FirstOrDefault();
+                        if (lobby.NextMapID != -1) map = mapList.Find(a => a.SQL_ID == lobby.NextMapID);
+                        lobby.NextMapID = -1;
+
+                        if (map == null) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Next (force-set) MapID == null; Failed to start!"); return false; }
+                        crashcheck++;
+
+                        NAPI.Util.ConsoleOutput($"[Lobby " + lobbyid + $"] Selected Map [{map.Name}] | Total Spawns: [{ContextFactory.Instance.MapSpawns.ToList().Where(a => a.mapID == map.SQL_ID).Count()}]");
+                        crashcheck++;
+
+                        lobby.lastMapId = map.SQL_ID;
+
+                        if (ContextFactory.Instance.MapSpawns.ToList().Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 0).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no fugitive spawns! Abort."); return false; }
+                        if (ContextFactory.Instance.MapSpawns.ToList().Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 1).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no cop spawns! Abort."); return false; }
+
+                        crashcheck++;
+
+                        Spawns = ContextFactory.Instance.MapSpawns.ToList().Where(x => x.mapID == map.SQL_ID).ToList();
+                        crashcheck++;
+
+                        UsedSpawns = new List<int>(Spawns.Count + 1);
+                        crashcheck++;
+
+                        lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && !EPlayer.IsAFK(a) && !a.HasData("Spectating") && a.GetSharedData<bool>("AutoJoin") == true && !a.Dead).OrderBy(c => Guid.NewGuid()).ToList();
+                        // !a.Dead so the white color bug (OnPlayerSpawn trigger as game start) does not happen -- if it still happens or if you want to enable dead players being taken in game then do it that EPlayer.Spawn is called when selecting players again.
+                        crashcheck++;
+
+                        PutInsideCar = new List<Player>(lobbyPlayers.Count());
+                        crashcheck++;
+
+                        UsedSpawns.Add(-1);
+                        crashcheck++;
+
+
+                        pCount = 0;
+                        crashcheck++;
+                    }
+                    else
+                    {
+                        lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && !EPlayer.IsAFK(a) && !a.HasData("Spectating") && a.GetSharedData<bool>("AutoJoin") == true && !a.Dead).OrderBy(c => Guid.NewGuid()).ToList();
+                    }
 
                     while (fugitives > 0)
                     {
@@ -2496,31 +2520,35 @@ namespace RNC
                             lobby.BankRobbery.PoliceVehicles.Clear();
                             lobby.BankRobbery.FugitiveVehicles.Clear();
                             lobby.BankRobbery = new BankRobberyData();
+                            crashcheck++;
 
-                            for(int i = 0; i < BankRobberyData.PatrolSpawns.Length; i++)
+                            for (int i = 0; i < BankRobberyData.PatrolSpawns.GetLength(0); i++)
                             {
                                 Vehicle _v = NAPI.Vehicle.CreateVehicle((uint)VehicleHash.Police, (Vector3)BankRobberyData.PatrolSpawns[i, 0], (float)BankRobberyData.PatrolSpawns[i, 1],
                                     111, 0, "PATROL");
                                 lobby.BankRobbery.PoliceVehicles.Add(_v);
                             }
-                            for (int i = 0; i < BankRobberyData.FbiBuffaloSpawns.Length; i++)
+                            crashcheck++;
+                            for (int i = 0; i < BankRobberyData.FbiBuffaloSpawns.GetLength(0); i++)
                             {
-                                Vehicle _v = NAPI.Vehicle.CreateVehicle((uint)VehicleHash.Fbi, (Vector3)BankRobberyData.PatrolSpawns[i, 0], (float)BankRobberyData.PatrolSpawns[i, 1],
+                                Vehicle _v = NAPI.Vehicle.CreateVehicle((uint)VehicleHash.Fbi, (Vector3)BankRobberyData.FbiBuffaloSpawns[i, 0], (float)BankRobberyData.FbiBuffaloSpawns[i, 1],
                                     0, 0, "FIB");
                                 lobby.BankRobbery.PoliceVehicles.Add(_v);
                             }
-                            for (int i = 0; i < BankRobberyData.FbiSuvSpawns.Length; i++)
+                            crashcheck++;
+                            for (int i = 0; i < BankRobberyData.FbiSuvSpawns.GetLength(0); i++)
                             {
-                                Vehicle _v = NAPI.Vehicle.CreateVehicle((uint)VehicleHash.Fbi2, (Vector3)BankRobberyData.PatrolSpawns[i, 0], (float)BankRobberyData.PatrolSpawns[i, 1],
+                                Vehicle _v = NAPI.Vehicle.CreateVehicle((uint)VehicleHash.Fbi2, (Vector3)BankRobberyData.FbiSuvSpawns[i, 0], (float)BankRobberyData.FbiSuvSpawns[i, 1],
                                     0, 0, "NOOSE");
                                 lobby.BankRobbery.PoliceVehicles.Add(_v);
                             }
+                            crashcheck++;
                             int currentCar = 0;
                             List<Vehicle> ccars = lobby.BankRobbery.PoliceVehicles;
 
                             foreach (Player player in lobby.Cops.OrderBy(x => Guid.NewGuid()))
                             {
-                                if(ccars[currentCar].Occupants.Count < ccars[currentCar].MaxOccupants)
+                                if (ccars[currentCar].Occupants.Count < ccars[currentCar].MaxOccupants)
                                 {
                                     int seat = ccars[currentCar].Occupants.Count;
                                     player.SetIntoVehicle(ccars[currentCar], seat);
@@ -2806,12 +2834,15 @@ namespace RNC
                             BankRobberyData _brob = lobby.BankRobbery;
                             for(int i = 0; i < BankRobberyData.FugitiveVehicleData.Length; i++)
                             {
-                                Vehicle _v = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(BankRobberyData.FugitiveVehicleData[i].Item3),
-                                    BankRobberyData.FugitiveVehicleData[i].Item1, BankRobberyData.FugitiveVehicleData[i].Item2,
+                                Vehicle _v = NAPI.Vehicle.CreateVehicle(
+                                    NAPI.Util.GetHashKey(BankRobberyData.FugitiveVehicleData[i].Name),
+                                    BankRobberyData.FugitiveVehicleData[i].Position, 
+                                    BankRobberyData.FugitiveVehicleData[i].Heading,
                                     new Random().Next(128), new Random().Next(128), "fartlol", 255, true);
                                 lobby.BankRobbery.FugitiveVehicles.Add(_v);
                             }
                             Random kevycanusendmefeetpicspls = new Random();
+                            crashcheck++;
 
                             _brob.HeistLeader = null;
                             int unfuck = 0;
@@ -2844,6 +2875,7 @@ namespace RNC
                                     break;
                                 }
                             }
+                            crashcheck++;
 
                             int[] rndmasks = { 35, 37, 51, 52, 54};
                             int maskid = 0;
@@ -2856,7 +2888,7 @@ namespace RNC
                                 if (player != _brob.HeistLeader && player != _brob.Sniper)
                                 {
                                     maskid = new Random().Next(rndmasks.Length);
-                                    int spid = kevycanusendmefeetpicspls.Next(BankRobberyData.FugitiveSpawns.Length);
+                                    int spid = kevycanusendmefeetpicspls.Next(BankRobberyData.FugitiveSpawns.GetLength(0));
                                     player.Position = (Vector3)BankRobberyData.FugitiveSpawns[spid, 0];
                                     player.Heading = (float)BankRobberyData.FugitiveSpawns[spid, 1];
                                     player.Health = 100;
@@ -2872,8 +2904,8 @@ namespace RNC
                                     if(player == _brob.HeistLeader)
                                     {
                                         maskid = 2;
-                                        player.Position = (Vector3)BankRobberyData.LeaderSpawn[0,0];
-                                        player.Heading = (float)BankRobberyData.LeaderSpawn[0, 0];
+                                        player.Position = BankRobberyData.LeaderPos;
+                                        player.Heading = BankRobberyData.LeaderHeading;
                                         player.Health = 100;
                                         player.Armor = 150;
 
@@ -2886,8 +2918,8 @@ namespace RNC
                                     else if(player == _brob.Sniper)
                                     {
                                         maskid = new Random().Next(rndmasks.Length);
-                                        player.Position = (Vector3)BankRobberyData.SniperSpawn[0, 0];
-                                        player.Heading = (float)BankRobberyData.SniperSpawn[0, 0];
+                                        player.Position = BankRobberyData.SniperPos;
+                                        player.Heading = BankRobberyData.SniperHeading;
                                         player.Health = 100;
                                         player.Armor = 100;
 
@@ -2921,6 +2953,7 @@ namespace RNC
                                 player.SetSharedData("CuffedBy", "n/a");
                                 player.SetSharedData("HasShot", true);
                             }
+                            crashcheck++;
                         }
                     }
 
@@ -2953,10 +2986,11 @@ namespace RNC
 
 
                     lobby.gameStatus = 1;
-                    NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Mode {ConvertGameMode(lobby.gameMode)} has been started with {lobby.Cops.Count} cops & {lobby.Fugitives.Count} fugitives on map {map.Name}.");
+                    NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Mode {ConvertGameMode(lobby.gameMode)} has been started with {lobby.Cops.Count} cops & {lobby.Fugitives.Count} fugitives on map {(map == null ? "EVENT" : map.Name)}.");
                 }
-                catch {
+                catch(Exception ex) {
                     NAPI.Util.ConsoleOutput("Exception in startgame, ctx: " + crashcheck);
+                    NAPI.Util.ConsoleOutput(ex.Message);
                     return false;
                 }
             }
