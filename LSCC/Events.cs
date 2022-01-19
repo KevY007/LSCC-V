@@ -874,6 +874,46 @@ namespace RNC
                 }
             }
 
+            if (player.GetSharedData<bool>("HeistLeader") == true)
+            {
+                LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
+                if (lobby != null)
+                {
+                    lobby.BankRobbery.LeaderLives--;
+                    if (lobby.BankRobbery.LeaderLives <= 0)
+                    {
+                        Main.StopGame(lobby.lobbyId, 5);
+                    }
+                    else
+                    {
+
+                        BankRobberyData _brob = lobby.BankRobbery;
+                        _brob.HeistLeader = null;
+                        int unfuck = 0;
+                        while (_brob.HeistLeader == null)
+                        {
+                            _brob.HeistLeader = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
+
+                            unfuck++;
+                            if (unfuck > 50)
+                            {
+                                Main.StopGame(lobby.lobbyId, 5);
+                                break;
+                            }
+                        }
+                        _brob.HeistLeader.SetSharedData("HeistLeader", true);
+                        lobby.BankRobbery.HeistLeader = _brob.HeistLeader;
+
+                        foreach (Player f in lobby.Fugitives)
+                        {
+                            f.SendChatMessage("!{#FF6347}[!] ~w~Your heist leader has disconnected! You have one more chance - " + _brob.HeistLeader.Name + " is your new leader.");
+
+                            f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {_brob.HeistLeader.Name}: Sadly, we lost {player.Name}, but we must keep on going! Let's go!");
+                        }
+                        _brob.HeistLeader.SendChatMessage("!{#FF6347}[!] ~w~You are now the heist leader. If you die, the round is over for your team.");
+                    }
+                }
+            }
             lock (player)
             {
                 if (EPlayer.LoggedIn(player))

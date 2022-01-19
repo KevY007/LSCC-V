@@ -2046,6 +2046,13 @@ namespace RNC
 
                     Events.OnPlayerWounded(i, 0, -1);
 
+                    if (lobby.Fugitives.Contains(i))
+                    {
+                        Account a = EPlayer.GetAccount(i);
+                        CharacterData cd = NAPI.Util.FromJson<CharacterData>(a.Character);
+                        EPlayer._ApplyCharacter(i, cd, a.LobbyClothing);
+                    }
+
 
                     if (i.HasData("Spectating") && EPlayer.GetAccount(i).Admin < 1)
                     {
@@ -2549,7 +2556,6 @@ namespace RNC
                                 lobby.BankRobbery = new BankRobberyData();
                                 crashcheck++;
 
-
                                 uint dimension = 100 + (uint)lobby.lobbyId;
                                 for (int i = 0; i < BankRobberyData.PatrolHeadings.Length; i++)
                                 {
@@ -2575,71 +2581,9 @@ namespace RNC
                                     lobby.Vehicles.Add(_v);
                                 }
                                 crashcheck++;
-                                int currentCar = 0;
-                                List<Vehicle> ccars = new List<Vehicle>();
-                                ccars.AddRange(lobby.BankRobbery.PoliceVehicles);
 
                                 foreach (Player player in lobby.Cops.OrderBy(x => Guid.NewGuid()))
                                 {
-                                    player.Dimension = Convert.ToUInt32(lobbyid);
-                                    player.Position = BankRobberyData.FbiSuvPositions[0];
-
-                                    CharacterData ConvChar = new CharacterData();
-
-                                    try
-                                    {
-                                        ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-
-                                        EPlayer.ApplyCharacter(player, ConvChar, 1);
-                                    }
-                                    catch { }
-                                    if (ccars[currentCar].Occupants.Count < ccars[currentCar].MaxOccupants)
-                                    {
-                                        int seat = ccars[currentCar].Occupants.Count;
-                                        player.SetIntoVehicle(ccars[currentCar], seat);
-                                    }
-                                    else
-                                    {
-                                        currentCar++;
-                                        if (currentCar >= ccars.Count)
-                                        {
-                                            Vehicle dick = NAPI.Vehicle.CreateVehicle((uint)VehicleHash.Police, ccars[currentCar - 1].Position, ccars[currentCar - 1].Heading, 0, 0);
-                                            player.SetIntoVehicle(dick, 0);
-                                        }
-                                        else
-                                        {
-                                            int seat = ccars[currentCar].Occupants.Count;
-                                            player.SetIntoVehicle(ccars[currentCar], seat);
-                                        }
-                                    }
-                                    if (currentCar >= 6) // Special/SWAT/FIB unit 
-                                    {
-                                        player.SetSkin(PedHash.Swat01SMY);
-                                        player.SetData<string>("BankRobberyUnit", "fib");
-                                        player.Health = 100;
-                                        player.Armor = 150;
-
-                                        player.GiveWeapon(WeaponHash.Heavypistol, 100);
-                                        player.GiveWeapon(WeaponHash.Assaultsmg, 200);
-                                        player.GiveWeapon(WeaponHash.Specialcarbine, 500);
-                                        player.GiveWeapon(WeaponHash.Bzgas, 3);
-                                        player.GiveWeapon(WeaponHash.Assaultshotgun, 500);
-                                        player.SendChatMessage("~b~[>] ~w~You've been assigned to the ~y~FIB~w~ unit.");
-                                    }
-                                    else // patrol unit
-                                    {
-                                        player.SetData<string>("BankRobberyUnit", "patrol");
-                                        player.Health = 100;
-                                        player.Armor = 100;
-
-                                        player.GiveWeapon(WeaponHash.Combatpistol, 100);
-                                        player.GiveWeapon(WeaponHash.Smg, 300);
-                                        player.GiveWeapon(WeaponHash.Carbinerifle, 500);
-                                        player.GiveWeapon(WeaponHash.Bzgas, 1);
-                                        player.GiveWeapon(WeaponHash.Pumpshotgun, 72);
-                                        player.SendChatMessage("~b~[>] ~w~You've been assigned to the ~y~PATROL~w~ unit.");
-                                    }
-
                                     EPlayer.Freeze(player, true);
 
                                     player.SetData("GPS", false);
@@ -2651,6 +2595,8 @@ namespace RNC
                                     player.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
                                     player.SetSharedData("CuffedBy", "n/a");
                                     player.SetSharedData("Team", 1);
+
+                                    EPlayer.Notify(player, "<strong>Please wait</strong>, Bank Robbery is loading...", "yellow", "fas fa-spinner", false, 15000); 
                                 }
                             }
                         }
@@ -2990,6 +2936,7 @@ namespace RNC
                                     EPlayer.SetColor(player, new Color(255, 174, 0), 0);
 
                                     EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Fugitive as {player.Name}");
+                                    EPlayer.Notify(player, "<strong>Please wait</strong>, Bank Robbery is loading...", "yellow", "fas fa-spinner", false, 15000);
 
                                     player.TriggerEvent("SetActorInvulnerable", false);
                                     player.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
@@ -3370,7 +3317,6 @@ namespace RNC
                                         }
                                         if (currentCar >= 6) // Special/SWAT/FIB unit 
                                         {
-                                            player.SetSkin(PedHash.Swat01SMY);
                                             player.SetData<string>("BankRobberyUnit", "fib");
                                             player.Health = 100;
                                             player.Armor = 150;

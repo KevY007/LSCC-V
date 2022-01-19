@@ -76,13 +76,24 @@ mp.events.add("playerEnterColshape", (shape) => {
 mp.events.add("BankRob_CreateFinishMarker", (x, y, z) => {
 
     let position = new mp.Vector3(x, y, z);
-    FinishMarker = mp.markers.new(1, position, 10.0,
+    FinishMarker = mp.markers.new(1, position, 8.0,
         {
             color: [255, 78, 51, 255],
             visible: true,
             dimension: mp.players.local.dimension
         });
-    FinishColshape = mp.colshapes.newSphere(position.x, position.y, position.z, 4.0, mp.players.local.dimension);
+    FinishColshape = mp.colshapes.newSphere(position.x, position.y, position.z, 9.0, mp.players.local.dimension);
+
+    let hideoutBlip = mp.blips.new(40, position,
+        {
+            name: "Hideout",
+            scale: 1.2,
+            color: 2,
+            alpha: 255,
+            drawDistance: 1000.0,
+            dimension: mp.players.local.dimension
+        });
+    FugiCarBlips.push(_b);
     
 });
 mp.events.add("BankRob_ClearFinishMarker", () => {
@@ -116,6 +127,7 @@ mp.events.add("BankRob_SetFugiCarBlip", (id, x, y, z) => {
                     name: "Getaway #1",
                     scale: 1.0,
                     color: 79,
+                    alpha: 200,
                     drawDistance: 1000.0,
                     dimension: mp.players.local.dimension
                 });
@@ -128,6 +140,7 @@ mp.events.add("BankRob_SetFugiCarBlip", (id, x, y, z) => {
                     name: "Getaway #2",
                     scale: 1.0,
                     color: 79,
+                    alpha: 200,
                     drawDistance: 1000.0,
                     dimension: mp.players.local.dimension
                 });
@@ -137,9 +150,10 @@ mp.events.add("BankRob_SetFugiCarBlip", (id, x, y, z) => {
         case 2:{
             let _b = mp.blips.new(663, position,
                 {
-                    name: "Getaway #2",
+                    name: "Getaway #3",
                     scale: 1.0,
                     color: 79,
+                    alpha: 200,
                     drawDistance: 1000.0,
                     dimension: mp.players.local.dimension
                 });

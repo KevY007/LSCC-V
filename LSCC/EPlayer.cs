@@ -1260,7 +1260,7 @@ namespace RNC
             LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
 
             if (lobby == null) { return; }
-
+            if (lobby.gameMode == GameModes.BANKROBBERY) return;
             if (lobby.gameMode != GameModes.BUSTED)
             {
                 if (EPlayer.GetAccount(player).LoadoutCop.Length >= 2)
@@ -1357,6 +1357,7 @@ namespace RNC
 
             if (lobby == null) { return; }
 
+            if (lobby.gameMode == GameModes.BANKROBBERY) return;
             if (lobby.gameMode != GameModes.BUSTED)
             {
                 if (EPlayer.GetAccount(player).LoadoutFugitive.Length >= 2)
