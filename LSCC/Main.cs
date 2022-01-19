@@ -3062,6 +3062,77 @@ namespace RNC
                                         catch { }
                                     }
                                 }
+
+                                if (lobby.gameMode == GameModes.BANKROBBERY)
+                                {
+                                    foreach (Player p in Settings.LoggedInPlayers.Where(p => lobby.Cops.Contains(p)))
+                                    {
+                                        lock (p)
+                                        {
+                                            try
+                                            {
+                                                if (p == null) continue;
+
+                                                p.TriggerEvent("ResetKillFeed");
+                                                p.TriggerEvent("ToggleNametags", true);
+
+                                                if (lobby.Cops.Contains(p)) EPlayer.Notify(p, "You will be unfreezed in 10 seconds.", "orange", "fas fa-hourglass-start", false, 10000);
+
+                                                p.SendChatMessage($"!{{#1E9913}}[!] ATTENTION: You are currently in the Bank Robbery event! This is not a standard chase.");
+                                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must prevent the fugitives from delivering the money to their hideout.");
+                                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You are allowed to shoot fugitives on sight without them firing first.");
+                                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}The fugitives are currently robbing the ~y~Pacific Standard~w~ bank.");
+                                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Neutralize all the fugitives, or keep slowing them down until the round ends to win!");
+
+                                            }
+                                            catch { }
+                                        }
+                                    }
+                                    BankRobberyData _brob = lobby.BankRobbery;
+
+                                    foreach (Player p in Settings.LoggedInPlayers.Where(p => lobby.Fugitives.Contains(p)))
+                                    {
+                                        lock (p)
+                                        {
+                                            try
+                                            {
+                                                if (p == null) continue;
+
+                                                p.TriggerEvent("ResetKillFeed");
+                                                p.TriggerEvent("ToggleNametags", true);
+
+                                                p.SendChatMessage($"!{{#1E9913}}[!] ATTENTION: You are currently in the Bank Robbery event! This is not a standard chase.");
+                                                if (p == _brob.HeistLeader)
+                                                {
+                                                    if (lobby.Cops.Contains(p)) EPlayer.Notify(p, "You've been selected as the <strong>heist leader</strong>!", "orange", "fas fa-hourglass-start", false, 10000);
+                                                    p.SendChatMessage($"~y~!! YOU'VE BEEN SELECTED AS THE HEIST LEADER !!");
+                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must rob the bank and deliver the money to the hideout.");
+                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You are currently in the vault. Stay here for ~y~one minute ~w~to steal all the money.");
+                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}After that, do anything you can in order to get to the ~y~hideout~w~ with your team.");
+                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Watch out! Your death will significantly decrease your chances of winning the round.");
+                                                }
+                                                else if (p == _brob.Sniper)
+                                                {
+                                                    p.SendChatMessage($"~y~!! YOU'VE BEEN SELECTED AS THE SNIPER !!");
+                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must rob help your heist leader, ~y~{_brob.HeistLeader.Name}~w~, deliver the money to the hideout..");
+                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Due to your excellent marksmanship skills, you were picked to be the \"sniper\".");
+                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You received a special set of weapons, including a sniper. Use it wisely to fend off against the police.");
+                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You can use the ladders to climb up to a higher spot, or back down onto the street - it's entirely your choice.");
+                                                }
+                                                else
+                                                {
+                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must help your heist leader, ~y~{_brob.HeistLeader.Name}~w~, deliver the money to the hideout.");
+                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You are currently in the bank. The heist leader is in the vault, taking the money.");
+                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}After ~y~one minute~w~, you may head with the heist leader to the ~y~hideout~w~.");
+                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Make sure you defend the heist leader! Leader's death significantly decreases your chances of winning.");
+                                                }
+                                                p.SendChatMessage($"!{{#1E9913}}[#] ~y~Work as a TEAM! ~w~You have one minute to plan out your getaway.");
+
+                                            }
+                                            catch { }
+                                        }
+                                    }
+                                }
                             }
                             if (lobby.GameProgress == -5)
                             {
@@ -3503,76 +3574,6 @@ namespace RNC
                                             }
                                         }
                                         catch { }
-                                    }
-                                }
-                                if (lobby.gameMode == GameModes.BANKROBBERY)
-                                {
-                                    foreach (Player p in Settings.LoggedInPlayers.Where(p => lobby.Cops.Contains(p)))
-                                    {
-                                        lock (p)
-                                        {
-                                            try
-                                            {
-                                                if (p == null) continue;
-
-                                                p.TriggerEvent("ResetKillFeed");
-                                                p.TriggerEvent("ToggleNametags", true);
-
-                                                if (lobby.Cops.Contains(p)) EPlayer.Notify(p, "You will be unfreezed in 10 seconds.", "orange", "fas fa-hourglass-start", false, 10000);
-
-                                                p.SendChatMessage($"!{{#1E9913}}[!] ATTENTION: You are currently in the Bank Robbery event! This is not a standard chase.");
-                                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must prevent the fugitives from delivering the money to their hideout.");
-                                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You are allowed to shoot fugitives on sight without them firing first.");
-                                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}The fugitives are currently robbing the ~y~Pacific Standard~w~ bank.");
-                                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Neutralize all the fugitives, or keep slowing them down until the round ends to win!");
-
-                                            }
-                                            catch { }
-                                        }
-                                    }
-                                    BankRobberyData _brob = lobby.BankRobbery;
-
-                                    foreach (Player p in Settings.LoggedInPlayers.Where(p => lobby.Fugitives.Contains(p)))
-                                    {
-                                        lock (p)
-                                        {
-                                            try
-                                            {
-                                                if (p == null) continue;
-
-                                                p.TriggerEvent("ResetKillFeed");
-                                                p.TriggerEvent("ToggleNametags", true);
-
-                                                p.SendChatMessage($"!{{#1E9913}}[!] ATTENTION: You are currently in the Bank Robbery event! This is not a standard chase.");
-                                                if (p == _brob.HeistLeader)
-                                                {
-                                                    if (lobby.Cops.Contains(p)) EPlayer.Notify(p, "You've been selected as the <strong>heist leader</strong>!", "orange", "fas fa-hourglass-start", false, 10000);
-                                                    p.SendChatMessage($"~y~!! YOU'VE BEEN SELECTED AS THE HEIST LEADER !!");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must rob the bank and deliver the money to the hideout.");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You are currently in the vault. Stay here for ~y~one minute ~w~to steal all the money.");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}After that, do anything you can in order to get to the ~y~hideout~w~ with your team.");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Watch out! Your death will significantly decrease your chances of winning the round.");
-                                                }
-                                                else if (p == _brob.Sniper)
-                                                {
-                                                    p.SendChatMessage($"~y~!! YOU'VE BEEN SELECTED AS THE SNIPER !!");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must rob help your heist leader, ~y~{_brob.HeistLeader.Name}~w~, deliver the money to the hideout..");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Due to your excellent marksmanship skills, you were picked to be the \"sniper\".");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You received a special set of weapons, including a sniper. Use it wisely to fend off against the police.");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You can use the ladders to climb up to a higher spot, or back down onto the street - it's entirely your choice.");
-                                                }
-                                                else
-                                                {
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must help your heist leader, ~y~{_brob.HeistLeader.Name}~w~, deliver the money to the hideout.");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You are currently in the bank. The heist leader is in the vault, taking the money.");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}After ~y~one minute~w~, you may head with the heist leader to the ~y~hideout~w~.");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Make sure you defend the heist leader! Leader's death significantly decreases your chances of winning.");
-                                                }
-                                                p.SendChatMessage($"!{{#1E9913}}[#] ~y~Work as a TEAM! ~w~You have one minute to plan out your getaway.");
-
-                                            }
-                                            catch { }
-                                        }
                                     }
                                 }
                             }
