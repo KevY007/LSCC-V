@@ -8,8 +8,12 @@ let FinishMarker = null;
 let FinishColshape = null; // cuz adding OnEnterMarker is so hard... thanks ragemp devs very cool
 
 mp.events.add("BankDoorLocked", (toggle) => {
+    // main doors
     mp.game.object.doorControl(110411286, 232.6054, 214.1584, 106.4049, toggle,  0.0, 50.0, 0);
     mp.game.object.doorControl(110411286, 231.5123, 216.5177, 106.4049, toggle,  0.0, 50.0, 0);
+    // side doors
+    mp.game.object.doorControl(110411286, 260.6432, 203.2052, 106.4049, toggle,  0.0, 50.0, 0);
+    mp.game.object.doorControl(110411286, 258.2022, 204.1005, 106.4049, toggle,  0.0, 50.0, 0);
 })
 
 mp.events.add("StartBankRobberyTimer", () => {

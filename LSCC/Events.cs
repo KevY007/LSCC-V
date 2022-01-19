@@ -886,7 +886,7 @@ namespace RNC
                 if (lobby != null)
                 {
                     lobby.BankRobbery.LeaderLives--;
-                    if (lobby.BankRobbery.LeaderLives <= 0)
+                    if (lobby.BankRobbery.LeaderLives <= 0 || (lobby.Fugitives.Count-1) <= 0)
                     {
                         Main.StopGame(lobby.lobbyId, 5);
                     }

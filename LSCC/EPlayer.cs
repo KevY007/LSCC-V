@@ -1451,6 +1451,15 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
+            LobbyData l = Settings.Lobbies.FirstOrDefault(lb => lb.Cops.Contains(player) || lb.Fugitives.Contains(player));
+            if(l != null)
+            {
+                if(l.gameMode == GameModes.BANKROBBERY)
+                {
+                    return; // no ammo boxes in bank robbery no no big bug
+                }
+            }
+
             List<WeaponHash> toNotPut = new List<WeaponHash>();
             toNotPut.Add(WeaponHash.Bzgas);
             toNotPut.Add(WeaponHash.Molotov);

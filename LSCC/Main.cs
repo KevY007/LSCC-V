@@ -376,7 +376,7 @@ namespace RNC
         public static readonly Vector3 SniperPos = new Vector3(267.78983f, 245.49059f, 138.19551f);
         public static readonly float SniperHeading = 161.013f;
         public static readonly Vector3 LeaderPos = new Vector3(263.71643f, 214.61465f, 101.68339f);
-        public static readonly float LeaderHeading = 72.69729f;
+        public static readonly float LeaderHeading = 252.69729f;
 
         public static readonly object[,] FugitiveSpawns = new object[,]
         {
@@ -2311,7 +2311,7 @@ namespace RNC
                             else if (lobby.gameMode == GameModes.BUSTED)
                                 player.TriggerEvent("showHPBars", 3);
                             else if (lobby.gameMode == GameModes.BANKROBBERY)
-                                player.TriggerEvent("showHPBars", 2); // only on aim
+                                player.TriggerEvent("showHPBars", 2);
 
                             if (!lobby.Fugitives.Contains(player))
                             {
