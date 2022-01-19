@@ -2311,7 +2311,7 @@ namespace RNC
                             else if (lobby.gameMode == GameModes.BUSTED)
                                 player.TriggerEvent("showHPBars", 3);
                             else if (lobby.gameMode == GameModes.BANKROBBERY)
-                                player.TriggerEvent("showHPBars", 1);
+                                player.TriggerEvent("showHPBars", 2); // only on aim
 
                             if (!lobby.Fugitives.Contains(player))
                             {
@@ -3639,6 +3639,7 @@ namespace RNC
                                         {
                                             if (p != null)
                                             {
+                                                p.TriggerEvent("BankDoorLocked", true);
                                                 p.TriggerEvent("BankRob_SetMusic", 0);
 
                                                 Account a = EPlayer.GetAccount(p);
@@ -3698,6 +3699,7 @@ namespace RNC
                                         {
                                             if (p != null)
                                             {
+                                                p.TriggerEvent("BankDoorLocked", true);
                                                 p.TriggerEvent("BankRob_SetMusic", 0);
                                                 EPlayer.Freeze(p, false);
                                                 p.SendNotification("~y~The event has started!");
@@ -3706,7 +3708,10 @@ namespace RNC
                                                 if (p == lobby.BankRobbery.HeistLeader)
                                                 {
                                                     p.TriggerEvent("StartBankRobberyTimer");
-                                                    p.SendChatMessage("!{#FF6347}[#] ~w~You must stay in the vault for 60 seconds to proceed - timer has started!");
+                                                    p.SendChatMessage("!{#FF6347}[#] ~w~You are taking the cash - this will take 60 seconds!");
+
+                                                    Events.RequestPlayAnimation(p, "mp_missheist_ornatebank", "stand_cash_in_bag_loop", 1);
+                                                    EPlayer.Freeze(p, true);
                                                 }
                                                 else
                                                 {

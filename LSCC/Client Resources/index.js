@@ -18,6 +18,8 @@ var currentMuteTime = 0;
 var lastMuteUpdate = 10;
 var lastFunc = "Init";
 
+var BankRobberyOn = false;
+
 var ShowVehicleDL = false;
 var specCam = null;
 var specState = false;

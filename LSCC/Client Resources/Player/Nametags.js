@@ -130,7 +130,7 @@ mp.events.add('render', (nametags) => {
                 y -= scale * (0.005 * (screenRes.y / 1080));
 
                 if(renderNametags == true) {
-                    if(player.getVariable("Team") !== undefined && player.getVariable("Team") == 0 && player.getVariable("HasShot") == true)
+                    if(player.getVariable("Team") !== undefined && player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && !BankRobberyOn)
                     {
                         mp.game.graphics.drawText("(( THIS PLAYER HAS SHOT ))", [x, y - 0.045],
                         {
@@ -278,7 +278,7 @@ mp.events.add('render', (nametags) => {
             }
             else
             {
-                if(player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && renderNametags == true && chaseRunning)
+                if(player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && renderNametags == true && chaseRunning && !BankRobberyOn)
                 {
                     // They out of distance but still try?
                     mp.game.graphics.drawText("(( THIS PLAYER HAS SHOT ))", [x, y],

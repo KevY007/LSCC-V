@@ -7,12 +7,21 @@ let FugiCarBlips = [];
 let FinishMarker = null;
 let FinishColshape = null; // cuz adding OnEnterMarker is so hard... thanks ragemp devs very cool
 
+mp.events.add("BankDoorLocked", (toggle) => {
+    mp.game.object.doorControl(110411286, 232.6054, 214.1584, 106.4049, toggle,  0.0, 50.0, 0);
+    mp.game.object.doorControl(110411286, 231.5123, 216.5177, 106.4049, toggle,  0.0, 50.0, 0);
+})
+
 mp.events.add("StartBankRobberyTimer", () => {
     if(mp.players.local == undefined){
         clearInterval(robTimer);
         return;
     }
     if(!mp.players.exists(mp.players.local)){
+        clearInterval(robTimer);
+        return;
+    }
+    if(mp.players.local.getVariable("HeistLeader") == false){
         clearInterval(robTimer);
         return;
     }
@@ -62,6 +71,10 @@ const BR_MUSIC_FIGHT = "SOL5_FIGHT_BAD_RT";
 
 mp.events.add("BankRob_SetMusic", (musicID) => {
     if(mp.players.local == null || !mp.players.exists(mp.players.local)) return;
+
+    if(musicID == 0 || musicID == 1) BankRobberyOn = true;
+    else BankRobberyOn = false;
+
     if(mp.players.local.EventMusic == false) return;
 
     switch(musicID){
@@ -77,7 +90,9 @@ mp.events.add("BankRob_SetMusic", (musicID) => {
                 mp.game.audio.triggerMusicEvent(BR_MUSIC_FIGHT);
             }, 500);
             break;   
-        default: mp.game.audio.triggerMusicEvent("GLOBAL_KILL_MUSIC");     
+        default: {
+            mp.game.audio.triggerMusicEvent("GLOBAL_KILL_MUSIC");   
+        }
     }
 });
 
