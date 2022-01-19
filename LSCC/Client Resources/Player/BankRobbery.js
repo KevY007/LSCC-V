@@ -93,7 +93,7 @@ mp.events.add("BankRob_CreateFinishMarker", (x, y, z) => {
             drawDistance: 1000.0,
             dimension: mp.players.local.dimension
         });
-    FugiCarBlips.push(_b);
+    FugiCarBlips.push(hideoutBlip);
     
 });
 mp.events.add("BankRob_ClearFinishMarker", () => {

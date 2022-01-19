@@ -340,8 +340,11 @@ namespace RNC
                                     foreach (Player cop in lobby.Cops.Where(c => c.Position.DistanceTo(player.Position) < 75))
                                     {
                                         cop.SendChatMessage(chatStr);
-                                        cop.TriggerEvent("RemoveTooltip", "H");
-                                        cop.TriggerEvent("AddTooltip", "H", "Revive", 1);
+                                        if (cop != player)
+                                        { 
+                                            cop.TriggerEvent("RemoveTooltip", "H");
+                                            cop.TriggerEvent("AddTooltip", "H", "Revive", 1);
+                                        }
                                     }
                                 }
                                 else
@@ -368,11 +371,14 @@ namespace RNC
                                     }
 
                                     string chatStr = $"!{{#FFEC8B}}** [WT | FREQ: {lobby.lobbyId + 8346}] {player.Name.Replace("_", " ")}: {msg}";
-                                    foreach (Player cop in lobby.Fugitives.Where(c => c.Position.DistanceTo(player.Position) < 75))
+                                    foreach (Player fug in lobby.Fugitives.Where(c => c.Position.DistanceTo(player.Position) < 75))
                                     {
-                                        cop.SendChatMessage(chatStr);
-                                        cop.TriggerEvent("RemoveTooltip", "H");
-                                        cop.TriggerEvent("AddTooltip", "H", "Revive", 0);
+                                        fug.SendChatMessage(chatStr);
+                                        if (fug != player)
+                                        {
+                                            fug.TriggerEvent("RemoveTooltip", "H");
+                                            fug.TriggerEvent("AddTooltip", "H", "Revive", 0);
+                                        }
                                     }
                                 }
                             }
@@ -2073,11 +2079,11 @@ namespace RNC
                         cd.Clothing[0].Clothes[5].Texture = 0;
                         cd.Clothing[2].Clothes[5].Drawable = 40;
                         cd.Clothing[2].Clothes[5].Texture = 0;
-                        cd.Clothing[0].Clothes[1].Drawable = 51;
-                        cd.Clothing[0].Clothes[1].Texture = 0;
-                        cd.Clothing[2].Clothes[1].Drawable = 51;
-                        cd.Clothing[2].Clothes[1].Texture = 0;
-                        EPlayer._ApplyCharacter(leader, cd, 0);
+                        cd.Clothing[0].Hat = 62;
+                        cd.Clothing[0].HatTxt = 9;
+                        cd.Clothing[2].Hat = 62;
+                        cd.Clothing[2].HatTxt = 9;
+                        EPlayer.ApplyCharacter(leader, cd, 0);
                         EPlayer.Action(leader, "grabs the duffel bag filled with cash and slings it over their shoulder.");
 
                         //

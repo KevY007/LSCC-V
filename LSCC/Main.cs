@@ -2046,12 +2046,12 @@ namespace RNC
 
                     Events.OnPlayerWounded(i, 0, -1);
 
-                    Account a = EPlayer.GetAccount(i);
-                    CharacterData cd = NAPI.Util.FromJson<CharacterData>(a.Character);
-                    EPlayer._ApplyCharacter(i, cd, a.LobbyClothing);
-                    
-
-
+                    if (lobby.gameMode == GameModes.BANKROBBERY)
+                    {
+                        Account a = EPlayer.GetAccount(i);
+                        CharacterData cd = NAPI.Util.FromJson<CharacterData>(a.Character);
+                        EPlayer.ApplyCharacter(i, cd, a.LobbyClothing);
+                    }
                     if (i.HasData("Spectating") && EPlayer.GetAccount(i).Admin < 1)
                     {
                         Commands.cmd_specoff(i);
@@ -2282,7 +2282,17 @@ namespace RNC
                             player.SetData("ClimbProtectionEnd", Environment.TickCount64);
                             player.SetSharedData("CuffedBy", "n/a");
                             player.TriggerEvent("moveSkyCamera", "up", 1, false);
-                            player.TriggerEvent("moveSkyCamera", "down", 1, false, 5000);
+                            if(lobby.gameMode != GameModes.BANKROBBERY)
+                            {
+                                player.TriggerEvent("moveSkyCamera", "down", 1, false, 5000);
+                            }
+                            else
+                            {
+                                if(lobby.gameMode == GameModes.BANKROBBERY)
+                                {
+                                    player.TriggerEvent("moveSkyCamera", "down", 1, false, 19000);
+                                }
+                            }
                             player.TriggerEvent("ToggleNametags", false);
                             player.SetSharedData("Collisions", false);
                             player.ResetData("Seatbelt");
@@ -2594,7 +2604,7 @@ namespace RNC
                                     player.SetSharedData("CuffedBy", "n/a");
                                     player.SetSharedData("Team", 1);
 
-                                    EPlayer.Notify(player, "<strong>Please wait</strong>, Bank Robbery is loading...", "yellow", "fas fa-spinner", false, 15000); 
+                                    EPlayer.Notify(player, "<strong>Please wait</strong>, Bank Robbery is loading...", "yellow", "fas fa-spinner", false, 19000, "bottomCenter"); 
                                 }
                             }
                         }
@@ -2869,8 +2879,6 @@ namespace RNC
                                 }
                                 crashcheck++;
 
-                                int[] rndmasks = { 35, 37, 51, 52, 54 };
-                                int maskid = 0;
                                 foreach (Player player in lobby.Fugitives.OrderBy(x => Guid.NewGuid()))
                                 {
                                     Account _a = EPlayer.GetAccount(player);
@@ -2879,7 +2887,6 @@ namespace RNC
 
                                     if (player != _brob.HeistLeader && player != _brob.Sniper)
                                     {
-                                        maskid = new Random().Next(rndmasks.Length);
                                         int spid = kevycanusendmefeetpicspls.Next(BankRobberyData.FugitiveSpawns.GetLength(0));
                                         player.Position = (Vector3)BankRobberyData.FugitiveSpawns[spid, 0];
                                         player.Heading = (float)BankRobberyData.FugitiveSpawns[spid, 1];
@@ -2895,7 +2902,6 @@ namespace RNC
                                     {
                                         if (player == _brob.HeistLeader)
                                         {
-                                            maskid = 2;
                                             player.Position = BankRobberyData.LeaderPos;
                                             player.Heading = BankRobberyData.LeaderHeading;
                                             player.Health = 100;
@@ -2909,7 +2915,6 @@ namespace RNC
                                         }
                                         else if (player == _brob.Sniper)
                                         {
-                                            maskid = new Random().Next(rndmasks.Length);
                                             player.Position = BankRobberyData.SniperPos;
                                             player.Heading = BankRobberyData.SniperHeading;
                                             player.Health = 100;
@@ -2922,10 +2927,10 @@ namespace RNC
                                             player.GiveWeapon(WeaponHash.Molotov, 1);
                                         }
                                     }
-                                    cd.Clothing[0].Clothes[1].Drawable = rndmasks[maskid];
-                                    cd.Clothing[0].Clothes[1].Texture = 0;
-                                    cd.Clothing[2].Clothes[1].Drawable = rndmasks[maskid];
-                                    cd.Clothing[2].Clothes[1].Texture = 0;
+                                    cd.Clothing[0].Hat = 62;
+                                    cd.Clothing[0].HatTxt = new Random().Next(0, 10);
+                                    cd.Clothing[2].Hat = 62;
+                                    cd.Clothing[2].HatTxt = new Random().Next(0, 10);
 
                                     EPlayer._ApplyCharacter(player, cd, 0);
 
@@ -2934,7 +2939,7 @@ namespace RNC
                                     EPlayer.SetColor(player, new Color(255, 174, 0), 0);
 
                                     EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Fugitive as {player.Name}");
-                                    EPlayer.Notify(player, "<strong>Please wait</strong>, Bank Robbery is loading...", "yellow", "fas fa-spinner", false, 15000);
+                                    EPlayer.Notify(player, "<strong>Please wait</strong>, Bank Robbery is loading...", "yellow", "fas fa-spinner", false, 19000, "bottomCenter");
 
                                     player.TriggerEvent("SetActorInvulnerable", false);
                                     player.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
@@ -3271,13 +3276,13 @@ namespace RNC
                                 {
                                     List<Vehicle> ccars = new List<Vehicle>();
                                     ccars.AddRange(lobby.BankRobbery.PoliceVehicles);
-                                    int currentCar = 0;
+                                    int currentCar = 8;
                                     int lobbyid = lobby.lobbyId;
 
                                     foreach (Player player in lobby.Cops.OrderBy(x => Guid.NewGuid()))
                                     {
                                         player.Dimension = Convert.ToUInt32(lobbyid);
-                                        player.Position = BankRobberyData.FbiSuvPositions[0];
+                                        player.Position = new Vector3(427.2379f, -979.13336f, 30.709988f).Around(7f);
 
                                         CharacterData ConvChar = new CharacterData();
 
@@ -3291,10 +3296,12 @@ namespace RNC
                                         if (ccars[currentCar].Occupants.Count < ccars[currentCar].MaxOccupants)
                                         {
                                             int seat = ccars[currentCar].Occupants.Count;
-                                            NAPI.Task.Run(() =>
+                                            player.SetData<Vehicle>("BR_UnitVehicle", ccars[currentCar]);
+                                            player.SetData<int>("BR_UnitVehicleSeat", seat);
+                                            /*NAPI.Task.Run(() =>
                                             {
                                                 player.SetIntoVehicle(ccars[currentCar], seat);
-                                            }, 100);
+                                            }, 100);*/
                                         }
                                         else
                                         {
@@ -3306,41 +3313,17 @@ namespace RNC
                                             }
                                             else
                                             {
-                                                int seat = ccars[currentCar].Occupants.Count; 
-                                                NAPI.Task.Run(() =>
+                                                int seat = ccars[currentCar].Occupants.Count;
+                                                player.SetData<Vehicle>("BR_UnitVehicle", ccars[currentCar]);
+                                                player.SetData<int>("BR_UnitVehicleSeat", seat);
+                                                /*NAPI.Task.Run(() =>
                                                 {
                                                     player.SetIntoVehicle(ccars[currentCar], seat);
-                                                }, 100);
+                                                }, 100);*/
                                             }
                                         }
                                         if (currentCar >= 6) // Special/SWAT/FIB unit 
                                         {
-                                            Account a = EPlayer.GetAccount(player);
-                                            CharacterData cd = NAPI.Util.FromJson<CharacterData>(a.Character);
-                                            cd.Clothing[1].Clothes[11].Drawable = 320;
-                                            cd.Clothing[1].Clothes[11].Texture = 0;
-                                            cd.Clothing[3].Clothes[11].Drawable = 331;
-                                            cd.Clothing[3].Clothes[11].Texture = 0;
-
-                                            cd.Clothing[1].Clothes[4].Drawable = 121;
-                                            cd.Clothing[1].Clothes[4].Texture = 0;
-                                            cd.Clothing[3].Clothes[4].Drawable = 127;
-                                            cd.Clothing[3].Clothes[4].Texture = 0;
-
-                                            cd.Clothing[1].Clothes[6].Drawable = 96;
-                                            cd.Clothing[1].Clothes[6].Texture = 0;
-                                            cd.Clothing[3].Clothes[6].Drawable = 100;
-                                            cd.Clothing[3].Clothes[6].Texture = 0;
-
-                                            int msk = new Random().Next(0, 10);
-
-                                            cd.Clothing[1].Clothes[1].Drawable = (msk > 5 ? 57 : 89);
-                                            cd.Clothing[1].Clothes[1].Texture = 0;
-                                            cd.Clothing[3].Clothes[1].Drawable = (msk > 5 ? 57 : 89);
-                                            cd.Clothing[3].Clothes[1].Texture = 0;
-
-                                            EPlayer._ApplyCharacter(player, cd, 1);
-
                                             player.SetData<string>("BankRobberyUnit", "fib");
                                             player.Health = 100;
                                             player.Armor = 150;
@@ -3379,8 +3362,6 @@ namespace RNC
                                         player.SetSharedData("Team", 1);
                                     }
 
-                                    int[] rndmasks = { 35, 37, 51, 52, 54 };
-                                    int maskid = 0;
                                     BankRobberyData _brob = lobby.BankRobbery;
                                     Random kevycanusendmefeetpicspls = new Random();
                                     foreach (Player player in lobby.Fugitives.OrderBy(x => Guid.NewGuid()))
@@ -3391,7 +3372,6 @@ namespace RNC
 
                                         if (player != _brob.HeistLeader && player != _brob.Sniper)
                                         {
-                                            maskid = new Random().Next(rndmasks.Length);
                                             int spid = kevycanusendmefeetpicspls.Next(BankRobberyData.FugitiveSpawns.GetLength(0));
                                             player.Position = (Vector3)BankRobberyData.FugitiveSpawns[spid, 0];
                                             player.Heading = (float)BankRobberyData.FugitiveSpawns[spid, 1];
@@ -3402,12 +3382,16 @@ namespace RNC
                                             player.GiveWeapon(WeaponHash.Pumpshotgun, 50);
                                             player.GiveWeapon(WeaponHash.Microsmg, 200);
                                             player.GiveWeapon(WeaponHash.Assaultrifle, 300);
+
+                                            cd.Clothing[0].Hat = 62;
+                                            cd.Clothing[0].HatTxt = new Random().Next(0, 10);
+                                            cd.Clothing[2].Hat = 62;
+                                            cd.Clothing[2].HatTxt = new Random().Next(0, 10);
                                         }
                                         else
                                         {
                                             if (player == _brob.HeistLeader)
                                             {
-                                                maskid = 2;
                                                 player.Position = BankRobberyData.LeaderPos;
                                                 player.Heading = BankRobberyData.LeaderHeading;
                                                 player.Health = 100;
@@ -3418,10 +3402,14 @@ namespace RNC
                                                 player.GiveWeapon(WeaponHash.Smg, 250);
                                                 player.GiveWeapon(WeaponHash.Specialcarbine, 250);
                                                 player.GiveWeapon(WeaponHash.Molotov, 1);
+
+                                                cd.Clothing[0].Hat = 62;
+                                                cd.Clothing[0].HatTxt = 9;
+                                                cd.Clothing[2].Hat = 62;
+                                                cd.Clothing[2].HatTxt = 9;
                                             }
                                             else if (player == _brob.Sniper)
                                             {
-                                                maskid = new Random().Next(rndmasks.Length);
                                                 player.Position = BankRobberyData.SniperPos;
                                                 player.Heading = BankRobberyData.SniperHeading;
                                                 player.Health = 100;
@@ -3432,14 +3420,15 @@ namespace RNC
                                                 player.GiveWeapon(WeaponHash.Assaultrifle, 90);
                                                 player.GiveWeapon(WeaponHash.Marksmanrifle, 10);
                                                 player.GiveWeapon(WeaponHash.Molotov, 1);
+
+                                                cd.Clothing[0].Hat = 62;
+                                                cd.Clothing[0].HatTxt = new Random().Next(0, 10);
+                                                cd.Clothing[2].Hat = 62;
+                                                cd.Clothing[2].HatTxt = new Random().Next(0, 10);
                                             }
                                         }
-                                        cd.Clothing[0].Clothes[1].Drawable = rndmasks[maskid];
-                                        cd.Clothing[0].Clothes[1].Texture = 0;
-                                        cd.Clothing[2].Clothes[1].Drawable = rndmasks[maskid];
-                                        cd.Clothing[2].Clothes[1].Texture = 0;
 
-                                        EPlayer._ApplyCharacter(player, cd, 0);
+                                        EPlayer.ApplyCharacter(player, cd, 0);
 
                                         EPlayer.Freeze(player, true);
 
@@ -3626,8 +3615,7 @@ namespace RNC
                                     foreach (Player p in lobby.Cops)
                                     {
                                         if (p != null)
-                                        {
-                                            EPlayer.Freeze(p, false);
+                                        {                                            
                                             p.SendNotification("~y~You can now exit vehicles.");
                                             p.SendNotification("~b~You may begin the chase now.");
                                             p.TriggerEvent("ToggleCanExitVehicle", true);
@@ -3650,6 +3638,50 @@ namespace RNC
                                         {
                                             if (p != null)
                                             {
+                                                Account a = EPlayer.GetAccount(p);
+                                                CharacterData cd = NAPI.Util.FromJson<CharacterData>(a.Character);
+                                                cd.Clothing[1].Clothes[11].Drawable = 320;
+                                                cd.Clothing[1].Clothes[11].Texture = 0;
+                                                cd.Clothing[3].Clothes[11].Drawable = 331;
+                                                cd.Clothing[3].Clothes[11].Texture = 0;
+
+                                                cd.Clothing[1].Clothes[4].Drawable = 121;
+                                                cd.Clothing[1].Clothes[4].Texture = 0;
+                                                cd.Clothing[3].Clothes[4].Drawable = 127;
+                                                cd.Clothing[3].Clothes[4].Texture = 0;
+
+                                                cd.Clothing[1].Clothes[6].Drawable = 96;
+                                                cd.Clothing[1].Clothes[6].Texture = 0;
+                                                cd.Clothing[3].Clothes[6].Drawable = 100;
+                                                cd.Clothing[3].Clothes[6].Texture = 0;
+
+                                                bool hasHelmet = (new Random().Next(0, 10) > 5);
+                                                if (hasHelmet)
+                                                {
+                                                    cd.Clothing[1].Hat = 141;
+                                                    cd.Clothing[1].HatTxt = 0;
+                                                    cd.Clothing[3].Hat = 140;
+                                                    cd.Clothing[3].HatTxt = 0;
+                                                }
+
+
+                                                EPlayer.ApplyCharacter(p, cd, 1);
+
+                                                EPlayer.Freeze(p, false);
+                                                if (p.HasData("BR_UnitVehicle") && p.HasData("BR_UnitVehicleSeat"))
+                                                {
+                                                    Vehicle v = p.GetData<Vehicle>("BR_UnitVehicle");
+                                                    int seat = p.GetData<int>("BR_UnitVehicleSeat");
+                                                    if (v != null)
+                                                    {
+                                                        NAPI.Task.Run(() =>
+                                                        {
+                                                            p.SetIntoVehicle(v, seat);
+                                                        }, 100);
+                                                    }
+                                                }
+
+
                                                 EPlayer.Freeze(p, false);
                                                 p.SendNotification("~y~You can now exit vehicles.");
                                                 p.SendNotification("~b~Head to the bank! It has been marked on your GPS.");
