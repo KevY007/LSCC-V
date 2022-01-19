@@ -2046,12 +2046,10 @@ namespace RNC
 
                     Events.OnPlayerWounded(i, 0, -1);
 
-                    if (lobby.Fugitives.Contains(i))
-                    {
-                        Account a = EPlayer.GetAccount(i);
-                        CharacterData cd = NAPI.Util.FromJson<CharacterData>(a.Character);
-                        EPlayer._ApplyCharacter(i, cd, a.LobbyClothing);
-                    }
+                    Account a = EPlayer.GetAccount(i);
+                    CharacterData cd = NAPI.Util.FromJson<CharacterData>(a.Character);
+                    EPlayer._ApplyCharacter(i, cd, a.LobbyClothing);
+                    
 
 
                     if (i.HasData("Spectating") && EPlayer.GetAccount(i).Admin < 1)
@@ -3317,6 +3315,32 @@ namespace RNC
                                         }
                                         if (currentCar >= 6) // Special/SWAT/FIB unit 
                                         {
+                                            Account a = EPlayer.GetAccount(player);
+                                            CharacterData cd = NAPI.Util.FromJson<CharacterData>(a.Character);
+                                            cd.Clothing[1].Clothes[11].Drawable = 320;
+                                            cd.Clothing[1].Clothes[11].Texture = 0;
+                                            cd.Clothing[3].Clothes[11].Drawable = 331;
+                                            cd.Clothing[3].Clothes[11].Texture = 0;
+
+                                            cd.Clothing[1].Clothes[4].Drawable = 121;
+                                            cd.Clothing[1].Clothes[4].Texture = 0;
+                                            cd.Clothing[3].Clothes[4].Drawable = 127;
+                                            cd.Clothing[3].Clothes[4].Texture = 0;
+
+                                            cd.Clothing[1].Clothes[6].Drawable = 96;
+                                            cd.Clothing[1].Clothes[6].Texture = 0;
+                                            cd.Clothing[3].Clothes[6].Drawable = 100;
+                                            cd.Clothing[3].Clothes[6].Texture = 0;
+
+                                            int msk = new Random().Next(0, 10);
+
+                                            cd.Clothing[1].Clothes[1].Drawable = (msk > 5 ? 57 : 89);
+                                            cd.Clothing[1].Clothes[1].Texture = 0;
+                                            cd.Clothing[3].Clothes[1].Drawable = (msk > 5 ? 57 : 89);
+                                            cd.Clothing[3].Clothes[1].Texture = 0;
+
+                                            EPlayer._ApplyCharacter(player, cd, 1);
+
                                             player.SetData<string>("BankRobberyUnit", "fib");
                                             player.Health = 100;
                                             player.Armor = 150;
