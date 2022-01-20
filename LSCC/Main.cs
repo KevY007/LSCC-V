@@ -2861,23 +2861,39 @@ namespace RNC
                                     }
                                 }
                                 _brob.HeistLeader.SetSharedData("HeistLeader", true);
+                                lobby.BankRobbery.HeistLeader = _brob.HeistLeader;
 
                                 _brob.Sniper = null;
                                 unfuck = 0;
-                                while (_brob.Sniper == null)
-                                {
-                                    Player pl = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
-                                    //if (pl != _brob.HeistLeader)
-                                        _brob.Sniper = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
-                                   // else _brob.Sniper = null; // just in case idk
 
-                                    unfuck++;
-                                    if (unfuck > 50)
+                                List<Player> fugis = lobby.Fugitives;
+                                fugis.Remove(_brob.HeistLeader);
+                                if (fugis.Count == 0)
+                                {
+                                    StopGame(lobby.lobbyId, 4);
+                                }
+                                else if (fugis.Count == 1 && fugis[0] != null)
+                                {
+                                    _brob.Sniper = fugis[0];
+                                }
+                                else
+                                {
+                                    while (_brob.Sniper == null)
                                     {
-                                        StopGame(lobby.lobbyId, 4);
-                                        break;
+                                        Player pl = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
+                                        if (pl != _brob.HeistLeader)
+                                            _brob.Sniper = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
+                                        else _brob.Sniper = null; // just in case idk
+
+                                        unfuck++;
+                                        if (unfuck > 50)
+                                        {
+                                            StopGame(lobby.lobbyId, 4);
+                                            break;
+                                        }
                                     }
                                 }
+                                lobby.BankRobbery.Sniper = _brob.Sniper;
                                 crashcheck++;
 
                                 foreach (Player player in lobby.Fugitives.OrderBy(x => Guid.NewGuid()))
@@ -3412,7 +3428,7 @@ namespace RNC
                                         {
                                             player.SetData<string>("BankRobberyUnit", "fib");
                                             player.Health = 100;
-                                            player.Armor = 150;
+                                            player.Armor = 100;
 
                                             player.GiveWeapon(WeaponHash.Heavypistol, 100);
                                             player.GiveWeapon(WeaponHash.Assaultsmg, 200);
@@ -3425,7 +3441,7 @@ namespace RNC
                                         {
                                             player.SetData<string>("BankRobberyUnit", "patrol");
                                             player.Health = 100;
-                                            player.Armor = 100;
+                                            player.Armor = 80;
 
                                             player.GiveWeapon(WeaponHash.Combatpistol, 100);
                                             player.GiveWeapon(WeaponHash.Smg, 300);
@@ -3462,7 +3478,7 @@ namespace RNC
                                             player.Position = (Vector3)BankRobberyData.FugitiveSpawns[spid, 0];
                                             player.Heading = (float)BankRobberyData.FugitiveSpawns[spid, 1];
                                             player.Health = 100;
-                                            player.Armor = 100;
+                                            player.Armor = 50;
 
                                             player.GiveWeapon(WeaponHash.Pistol, 100);
                                             player.GiveWeapon(WeaponHash.Pumpshotgun, 50);
@@ -3481,7 +3497,7 @@ namespace RNC
                                                 player.Position = BankRobberyData.LeaderPos;
                                                 player.Heading = BankRobberyData.LeaderHeading;
                                                 player.Health = 100;
-                                                player.Armor = 150;
+                                                player.Armor = 100;
 
                                                 player.GiveWeapon(WeaponHash.Pistol50, 100);
                                                 player.GiveWeapon(WeaponHash.Heavyshotgun, 50);
@@ -3499,12 +3515,12 @@ namespace RNC
                                                 player.Position = BankRobberyData.SniperPos;
                                                 player.Heading = BankRobberyData.SniperHeading;
                                                 player.Health = 100;
-                                                player.Armor = 100;
+                                                player.Armor = 50;
 
                                                 player.GiveWeapon(WeaponHash.Snspistol, 100);
                                                 player.GiveWeapon(WeaponHash.Sawnoffshotgun, 50);
                                                 player.GiveWeapon(WeaponHash.Assaultrifle, 90);
-                                                player.GiveWeapon(WeaponHash.Marksmanrifle, 10);
+                                                player.GiveWeapon(WeaponHash.Marksmanrifle, 15);
                                                 player.GiveWeapon(WeaponHash.Molotov, 1);
 
                                                 cd.Clothing[0].Hat = 62;
