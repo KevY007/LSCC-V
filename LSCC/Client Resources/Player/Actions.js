@@ -5,6 +5,9 @@ let actionType = "none";
 let maxActionTime = 0;
 
 mp.events.add("StartPlayerAction", (action, time) => {
+    if(mp.players.local.getVariable("Wounded") > 0){
+        return;
+    }
     actionTime = time;
     actionType = action;
     maxActionTime = time;
@@ -40,12 +43,21 @@ mp.events.add("StopPlayerActions", () => {
 function PainkillerAction(){
     if(mp.players.local == null || mp.players.local.handle == 0) return;
 
+    if(mp.players.local.getVariable("Wounded") > 0) return;
+
     if(!mp.players.local.isInAnyVehicle(true))
         mp.events.callRemote("play_anim", "mini@sprunk", "plyr_buy_drink_pt2", 0, 8.0, 0.0, -1, 0.0, false, false, false);
 
     actionInterval = setInterval(() => {
 
-        if(mp.players.local == null || mp.players.local.handle == 0) return;
+        if(mp.players.local == null || mp.players.local.handle == 0){
+            clearInterval(actionInterval);
+            return;
+        }
+        if(mp.players.local.getVariable("Wounded") > 0){
+            clearInterval(actionInterval);
+            return;
+        }
 
         try{
             mp.events.callRemote("OnPlayerActionTick");
@@ -84,10 +96,17 @@ function MedkitAction(){
     mp.events.callRemote("play_anim", "amb@medic@standing@kneel@enter", "enter", 0, 8.0, 0.0, -1, 0.0, false, false, false);
 
     initiateActionTimer(actionTime);
+    if(mp.players.local.getVariable("Wounded") > 0){
+        return;
+    }
 
     actionInterval = setInterval(() => {
 
         if(mp.players.local == null || mp.players.local.handle == null) return;
+        if(mp.players.local.getVariable("Wounded") > 0){
+            clearInterval(actionInterval);
+            return;
+        }
         try{
             mp.events.callRemote("OnPlayerActionTick");
             if(actionTime <= 0){
@@ -115,6 +134,10 @@ let reviveTimer = null;
 mp.keys.bind(0x48, true, onHoldHkey);
 function onHoldHkey()
 {
+    if(mp.players.local.getVariable("Wounded") > 0){
+        return;
+    }
+
     if(canRevive())
     {
         mp.players.forEach(pl => {
@@ -155,6 +178,9 @@ function canRevive(){
 mp.events.add("BeginReviving", () => {
     if(mp.players.local == null || !mp.players.exists(mp.players.local)) return;
     if(reviveTarget == null || !mp.players.exists(reviveTarget)) return;
+    if(mp.players.local.getVariable("Wounded") > 0){
+        return;
+    }
 
     reviveTime = 7;
     isReviving = true;
@@ -202,6 +228,7 @@ function stopReviving(reason){
     reviveTarget = null;
 
     mp.events.callRemote("StopReviving");
+    UIHud.execute(`gm.actionBar = false;`);
 
     switch(reason){
         case 1:{
@@ -238,6 +265,9 @@ mp.events.add("BeginCuffing", (target) => {
 
     if(target == null || !mp.players.exists(target)) return;
     if(target.getVariable("Team") != 0 || mp.players.local.getVariable("Team") != 1) return;
+    if(mp.players.local.getVariable("Wounded") > 0){
+        return;
+    }
 
     isCuffing = true;
     cuffTarget = target;

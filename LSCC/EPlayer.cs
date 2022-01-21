@@ -1860,6 +1860,7 @@ namespace RNC
             player.TriggerEvent("DestroyPlayerCamera");
             player.TriggerEvent("TogglePlayerChat", true);
             player.ResetData("Dead");
+            player.SetSharedData("Wounded", 0);
 
             if (player.HasData("DerbyVehicle"))
             {

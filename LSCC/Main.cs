@@ -2605,7 +2605,7 @@ namespace RNC
                                     player.SetSharedData("CuffedBy", "n/a");
                                     player.SetSharedData("Team", 1);
 
-                                    EPlayer.Notify(player, "<strong>Please wait</strong>, Bank Robbery is loading...", "yellow", "fas fa-spinner", false, 19000, "bottomCenter"); 
+                                    EPlayer.Notify(player, "<strong>Please wait</strong>, Bank Robbery is loading...", "yellow", "fas fa-spinner fa-spin", false, 19000, "bottomCenter"); 
                                 }
                             }
                         }
@@ -2864,19 +2864,28 @@ namespace RNC
 
                                 _brob.Sniper = null;
                                 unfuck = 0;
-                                while (_brob.Sniper == null)
-                                {
-                                    Player pl = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
-                                    //if (pl != _brob.HeistLeader)
-                                        _brob.Sniper = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
-                                   // else _brob.Sniper = null; // just in case idk
 
-                                    unfuck++;
-                                    if (unfuck > 50)
+                                if (lobby.Fugitives.Count > 2)
+                                {
+                                    while (_brob.Sniper == null)
                                     {
-                                        StopGame(lobby.lobbyId, 4);
-                                        break;
+                                        Player pl = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
+                                        if (pl != _brob.HeistLeader)
+                                            _brob.Sniper = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
+                                        else _brob.Sniper = null; // just in case idk
+
+                                        unfuck++;
+                                        if (unfuck > 50)
+                                        {
+                                            //StopGame(lobby.lobbyId, 4);
+                                            break;
+                                        }
                                     }
+                                }
+                                else
+                                {
+                                    if(lobby.Fugitives.Count == 2)
+                                        lobby.BankRobbery.Sniper = lobby.Fugitives.FirstOrDefault(lp => lp.GetSharedData<bool>("HeistLeader") == false);
                                 }
                                 crashcheck++;
 
@@ -2940,7 +2949,7 @@ namespace RNC
                                     EPlayer.SetColor(player, new Color(255, 174, 0), 0);
 
                                     EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Fugitive as {player.Name}");
-                                    EPlayer.Notify(player, "<strong>Please wait</strong>, Bank Robbery is loading...", "yellow", "fas fa-spinner", false, 19000, "bottomCenter");
+                                    EPlayer.Notify(player, "<strong>Please wait</strong>, Bank Robbery is loading...", "yellow", "fas fa-spinner fa-spin", false, 19000, "bottomCenter");
 
                                     player.TriggerEvent("SetActorInvulnerable", false);
                                     player.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
@@ -3380,7 +3389,7 @@ namespace RNC
                                         else
                                         {
                                             currentCar = -1;
-                                            for(int i = 0; i < 50; i++)
+                                            for (int i = 0; i < 50; i++)
                                             {
                                                 currentCar = new Random().Next(ccars.Count);
                                                 if (usedCars.Contains(currentCar)) { continue; }
@@ -3412,7 +3421,7 @@ namespace RNC
                                         {
                                             player.SetData<string>("BankRobberyUnit", "fib");
                                             player.Health = 100;
-                                            player.Armor = 150;
+                                            player.Armor = 100;
 
                                             player.GiveWeapon(WeaponHash.Heavypistol, 100);
                                             player.GiveWeapon(WeaponHash.Assaultsmg, 200);
@@ -3425,7 +3434,7 @@ namespace RNC
                                         {
                                             player.SetData<string>("BankRobberyUnit", "patrol");
                                             player.Health = 100;
-                                            player.Armor = 100;
+                                            player.Armor = 75;
 
                                             player.GiveWeapon(WeaponHash.Combatpistol, 100);
                                             player.GiveWeapon(WeaponHash.Smg, 300);
@@ -3462,7 +3471,7 @@ namespace RNC
                                             player.Position = (Vector3)BankRobberyData.FugitiveSpawns[spid, 0];
                                             player.Heading = (float)BankRobberyData.FugitiveSpawns[spid, 1];
                                             player.Health = 100;
-                                            player.Armor = 100;
+                                            player.Armor = 50;
 
                                             player.GiveWeapon(WeaponHash.Pistol, 100);
                                             player.GiveWeapon(WeaponHash.Pumpshotgun, 50);
@@ -3481,7 +3490,7 @@ namespace RNC
                                                 player.Position = BankRobberyData.LeaderPos;
                                                 player.Heading = BankRobberyData.LeaderHeading;
                                                 player.Health = 100;
-                                                player.Armor = 150;
+                                                player.Armor = 100;
 
                                                 player.GiveWeapon(WeaponHash.Pistol50, 100);
                                                 player.GiveWeapon(WeaponHash.Heavyshotgun, 50);
@@ -3499,7 +3508,7 @@ namespace RNC
                                                 player.Position = BankRobberyData.SniperPos;
                                                 player.Heading = BankRobberyData.SniperHeading;
                                                 player.Health = 100;
-                                                player.Armor = 100;
+                                                player.Armor = 50;
 
                                                 player.GiveWeapon(WeaponHash.Snspistol, 100);
                                                 player.GiveWeapon(WeaponHash.Sawnoffshotgun, 50);
@@ -3631,7 +3640,7 @@ namespace RNC
                                     foreach (Player p in lobby.Cops)
                                     {
                                         if (p != null)
-                                        {                                            
+                                        {
                                             p.SendNotification("~y~You can now exit vehicles.");
                                             p.SendNotification("~b~You may begin the chase now.");
                                             p.TriggerEvent("ToggleCanExitVehicle", true);
@@ -3838,132 +3847,165 @@ namespace RNC
                             {
                                 lock (Settings.LoggedInPlayers)
                                 {
-                                    foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                    if (lobby.gameMode != GameModes.BANKROBBERY)
                                     {
-                                        try
+                                        foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
                                         {
-                                            if (player == null) continue;
-
-                                            player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, 0, (short)lobby.gameMode);
-
-                                            player.SetSharedData("BustedProgress", 0.0);
-
-                                            //////////////////////////////////////////////////////////////////////////////////////////
-                                            ///
-
-                                            if (!lobby.Cops.Contains(player) && !lobby.Fugitives.Contains(player)) continue;
-
-                                            EPlayer.Notify(player, "Collisions have been enabled and weapons issued", "green", "fas fa-car-crash", false, 3000);
-
-                                            player.Health = 100;
-                                            player.Armor = 0;
-
-                                            player.SetSharedData("Collisions", true);
-                                            if (Settings.Dynamics.OnfootCollision == false) player.SetSharedData("Collisions", false);
-
-
-                                            if (lobby.Cops.Contains(player))
+                                            try
                                             {
-                                                player.Armor = 60;
+                                                if (player == null) continue;
 
-                                                EPlayer.GiveCopWeapons(player);
-                                                player.TriggerEvent("SetActorInvulnerable", false);
+                                                player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, 0, (short)lobby.gameMode);
+
+                                                player.SetSharedData("BustedProgress", 0.0);
+
+                                                //////////////////////////////////////////////////////////////////////////////////////////
+                                                ///
+
+                                                if (!lobby.Cops.Contains(player) && !lobby.Fugitives.Contains(player)) continue;
+
+                                                EPlayer.Notify(player, "Collisions have been enabled and weapons issued", "green", "fas fa-car-crash", false, 3000);
+
+                                                player.Health = 100;
+                                                player.Armor = 0;
+
+                                                player.SetSharedData("Collisions", true);
+                                                if (Settings.Dynamics.OnfootCollision == false) player.SetSharedData("Collisions", false);
+
+
+                                                if (lobby.Cops.Contains(player))
+                                                {
+                                                    player.Armor = 60;
+
+                                                    EPlayer.GiveCopWeapons(player);
+                                                    player.TriggerEvent("SetActorInvulnerable", false);
+                                                }
+                                                else if (lobby.Fugitives.Contains(player))
+                                                {
+                                                    EPlayer.GiveFugitiveWeapons(player);
+                                                    player.TriggerEvent("SetActorInvulnerable", false);
+                                                }
                                             }
-                                            else if (lobby.Fugitives.Contains(player))
-                                            {
-                                                EPlayer.GiveFugitiveWeapons(player);
-                                                player.TriggerEvent("SetActorInvulnerable", false);
-                                            }
+                                            catch { }
                                         }
-                                        catch { }
-                                    }
-
-                                    foreach (Vehicle veh in lobby.Vehicles)
-                                    {
-                                        veh.SetSharedData("Collisions", true);
-                                        if (veh.HasSharedData("Team") && veh.GetSharedData<int>("Team") == 0)
-                                        {
-                                            veh.SetSharedData("vMaxSpeed", (float)(155 / 3.6)); // 155 KM/H
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        lock (lobby.Cops)
-                        {
-                            foreach (Player cop in lobby.Cops)
-                            {
-                                try
-                                {
-                                    if (cop == null) continue;
-
-                                    if (cop.GetData<bool>("GPS") == false)
-                                    {
-                                        cop.SetSharedData("VisibleBlip", false);
                                     }
                                     else
                                     {
-                                        cop.SetSharedData("VisibleBlip", true);
-                                    }
+                                        if (lobby.gameMode == GameModes.BANKROBBERY)
+                                        {
+                                            foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                            {
+                                                try
+                                                {
+                                                    if (player == null) continue;
 
-                                    if (cop.GetSharedData<bool>("ClimbProtection") == true && cop.GetData<long>("ClimbProtectionEnd") < Environment.TickCount64)
-                                    {
-                                        cop.SetSharedData("ClimbProtection", false);
+                                                    player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, 0, (short)lobby.gameMode);
+
+                                                    player.SetSharedData("BustedProgress", 0.0);
+
+                                                    //////////////////////////////////////////////////////////////////////////////////////////
+                                                    ///
+
+                                                    if (!lobby.Cops.Contains(player) && !lobby.Fugitives.Contains(player)) continue;
+
+                                                    player.SetSharedData("Collisions", true);
+                                                    if (Settings.Dynamics.OnfootCollision == false) player.SetSharedData("Collisions", false);
+
+                                                    player.TriggerEvent("SetActorInvulnerable", false);
+
+                                                }
+                                                catch { }
+                                            }
+
+                                        }
+
+                                        foreach (Vehicle veh in lobby.Vehicles)
+                                        {
+                                            veh.SetSharedData("Collisions", true);
+                                            if (veh.HasSharedData("Team") && veh.GetSharedData<int>("Team") == 0)
+                                            {
+                                                veh.SetSharedData("vMaxSpeed", (float)(155 / 3.6)); // 155 KM/H
+                                            }
+                                        }
                                     }
                                 }
-                                catch { }
                             }
-                        }
-                        lock (lobby.Fugitives)
-                        {
-                            foreach (Player fugi in lobby.Fugitives)
+
+                            lock (lobby.Cops)
                             {
-                                try
+                                foreach (Player cop in lobby.Cops)
                                 {
-                                    if (fugi == null) continue;
-
-                                    if (fugi.GetSharedData<bool>("ClimbProtection") == true && fugi.GetData<long>("ClimbProtectionEnd") < Environment.TickCount64)
+                                    try
                                     {
-                                        fugi.SetSharedData("ClimbProtection", false);
-                                    }
-                                }
-                                catch { }
-                            }
-                        }
+                                        if (cop == null) continue;
 
-                        if (lobby.FugitiveShowCounter >= 60 && lobby.FugitiveShowCounter < 120)
-                        {
+                                        if (cop.GetData<bool>("GPS") == false)
+                                        {
+                                            cop.SetSharedData("VisibleBlip", false);
+                                        }
+                                        else
+                                        {
+                                            cop.SetSharedData("VisibleBlip", true);
+                                        }
+
+                                        if (cop.GetSharedData<bool>("ClimbProtection") == true && cop.GetData<long>("ClimbProtectionEnd") < Environment.TickCount64)
+                                        {
+                                            cop.SetSharedData("ClimbProtection", false);
+                                        }
+                                    }
+                                    catch { }
+                                }
+                            }
                             lock (lobby.Fugitives)
                             {
                                 foreach (Player fugi in lobby.Fugitives)
                                 {
-                                    fugi.SetSharedData("VisibleBlip", true);
-
-                                    if (lobby.FugitiveShowCounter == 60) EPlayer.Notify(fugi, "You are now visible on the radar.", "red", "fas fa-running", false, 3000);
-                                }
-
-                                if (lobby.FugitiveShowCounter == 60 && lobby.GameProgress >= 60 && lobby.CollisionCounter <= -1)
-                                {
-                                    foreach (Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                    try
                                     {
-                                        p.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, -1, (short)lobby.gameMode);
+                                        if (fugi == null) continue;
+
+                                        if (fugi.GetSharedData<bool>("ClimbProtection") == true && fugi.GetData<long>("ClimbProtectionEnd") < Environment.TickCount64)
+                                        {
+                                            fugi.SetSharedData("ClimbProtection", false);
+                                        }
+                                    }
+                                    catch { }
+                                }
+                            }
+
+                            if (lobby.FugitiveShowCounter >= 60 && lobby.FugitiveShowCounter < 120)
+                            {
+                                lock (lobby.Fugitives)
+                                {
+                                    foreach (Player fugi in lobby.Fugitives)
+                                    {
+                                        fugi.SetSharedData("VisibleBlip", true);
+
+                                        if (lobby.FugitiveShowCounter == 60) EPlayer.Notify(fugi, "You are now visible on the radar.", "red", "fas fa-running", false, 3000);
+                                    }
+
+                                    if (lobby.FugitiveShowCounter == 60 && lobby.GameProgress >= 60 && lobby.CollisionCounter <= -1)
+                                    {
+                                        foreach (Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                        {
+                                            p.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, -1, (short)lobby.gameMode);
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        if (lobby.FugitiveShowCounter >= 120)
-                        {
-                            lobby.FugitiveShowCounter = 0;
-
-                            lock (lobby.Fugitives)
+                            if (lobby.FugitiveShowCounter >= 120)
                             {
-                                foreach (Player fugi in lobby.Fugitives.Where(a => a.GetSharedData<bool>("HasShot") == false))
-                                {
-                                    fugi.SetSharedData("VisibleBlip", false);
+                                lobby.FugitiveShowCounter = 0;
 
-                                    EPlayer.Notify(fugi, "You are no longer visible on the radar", "green", "fas fa-walking", false, 3000);
+                                lock (lobby.Fugitives)
+                                {
+                                    foreach (Player fugi in lobby.Fugitives.Where(a => a.GetSharedData<bool>("HasShot") == false))
+                                    {
+                                        fugi.SetSharedData("VisibleBlip", false);
+
+                                        EPlayer.Notify(fugi, "You are no longer visible on the radar", "green", "fas fa-walking", false, 3000);
+                                    }
                                 }
                             }
                         }

@@ -204,13 +204,12 @@ namespace RNC
                 }
             }
 
+            NAPI.Util.ConsoleOutput("OnPlayerWounded " + player.Name + " " + state + " " + killerID);
+
             switch (state)
             {
                 case 0:
                     {
-                        //player.SendChatMessage("DEBUG: Wounded state set to 0");
-                        Events.RequestClearAnimation(player);
-                        player.StopAnimation();
                         player.TriggerEvent("ResetWounded");
                         player.SetSharedData("ReviveTarget", "n/a");
                         player.SetSharedData("BeingRevived", false);
@@ -325,10 +324,12 @@ namespace RNC
                         player.SetSharedData("ReviveTarget", "n/a");
                         player.SetSharedData("BeingRevived", false);
                         player.Health = 25;
-                        player.SendChatMessage("!{#FF6347}You have been severely injured, but you are not dead yet!");
-                        player.SendChatMessage("!{#FF6347}You have enough strength to crawl - use it to crawl to safety.");
-                        player.SendChatMessage("!{#FF6347}You will die in 60 seconds if you are not revived by a teammate. Use (/lobby) to respawn instantly.");
-
+                        if (player.Vehicle == null && !player.IsInVehicle)
+                        {
+                            player.SendChatMessage("!{#FF6347}You have been severely injured, but you are not dead yet!");
+                            player.SendChatMessage("!{#FF6347}You have enough strength to crawl - use it to crawl to safety.");
+                            player.SendChatMessage("!{#FF6347}You will die in 60 seconds if you are not revived by a teammate. Use (/lobby) to respawn instantly.");
+                        }
                         if(player.HasSharedData("Team"))
                         {
                             LobbyData lobby = Settings.Lobbies.FirstOrDefault(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
@@ -486,6 +487,7 @@ namespace RNC
         [RemoteEvent("clear_anim")]
         public static void RequestClearAnimation(Player player)
         {
+            NAPI.Util.ConsoleOutput("RequestClearAnimation for player " + player.Name);
             RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a.Position.DistanceTo(player.Position) < 200.0).ToList().ForEach((Player act) =>
             {
                 if (player.HasData("LastAnimDict"))
@@ -880,43 +882,46 @@ namespace RNC
                 }
             }
 
-            if (player.GetSharedData<bool>("HeistLeader") == true)
+            if (player.HasSharedData("HeistLeader"))
             {
-                LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
-                if (lobby != null)
+                if (player.GetSharedData<bool>("HeistLeader") == true)
                 {
-                    lobby.BankRobbery.LeaderLives--;
-                    if (lobby.BankRobbery.LeaderLives <= 0 || (lobby.Fugitives.Count-1) <= 0)
+                    LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
+                    if (lobby != null)
                     {
-                        Main.StopGame(lobby.lobbyId, 5);
-                    }
-                    else
-                    {
-
-                        BankRobberyData _brob = lobby.BankRobbery;
-                        _brob.HeistLeader = null;
-                        int unfuck = 0;
-                        while (_brob.HeistLeader == null)
+                        lobby.BankRobbery.LeaderLives--;
+                        if (lobby.BankRobbery.LeaderLives <= 0 || (lobby.Fugitives.Count - 1) <= 0)
                         {
-                            _brob.HeistLeader = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
+                            Main.StopGame(lobby.lobbyId, 5);
+                        }
+                        else
+                        {
 
-                            unfuck++;
-                            if (unfuck > 50)
+                            BankRobberyData _brob = lobby.BankRobbery;
+                            _brob.HeistLeader = null;
+                            int unfuck = 0;
+                            while (_brob.HeistLeader == null)
                             {
-                                Main.StopGame(lobby.lobbyId, 5);
-                                break;
+                                _brob.HeistLeader = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
+
+                                unfuck++;
+                                if (unfuck > 50)
+                                {
+                                    Main.StopGame(lobby.lobbyId, 5);
+                                    break;
+                                }
                             }
-                        }
-                        _brob.HeistLeader.SetSharedData("HeistLeader", true);
-                        lobby.BankRobbery.HeistLeader = _brob.HeistLeader;
+                            _brob.HeistLeader.SetSharedData("HeistLeader", true);
+                            lobby.BankRobbery.HeistLeader = _brob.HeistLeader;
 
-                        foreach (Player f in lobby.Fugitives)
-                        {
-                            f.SendChatMessage("!{#FF6347}[!] ~w~Your heist leader has disconnected! You have one more chance - " + _brob.HeistLeader.Name + " is your new leader.");
+                            foreach (Player f in lobby.Fugitives)
+                            {
+                                f.SendChatMessage("!{#FF6347}[!] ~w~Your heist leader has disconnected! You have one more chance - " + _brob.HeistLeader.Name + " is your new leader.");
 
-                            f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {_brob.HeistLeader.Name}: Sadly, we lost {player.Name}, but we must keep on going! Let's go!");
+                                f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {_brob.HeistLeader.Name}: Sadly, we lost {player.Name}, but we must keep on going! Let's go!");
+                            }
+                            _brob.HeistLeader.SendChatMessage("!{#FF6347}[!] ~w~You are now the heist leader. If you die, the round is over for your team.");
                         }
-                        _brob.HeistLeader.SendChatMessage("!{#FF6347}[!] ~w~You are now the heist leader. If you die, the round is over for your team.");
                     }
                 }
             }
@@ -2058,7 +2063,7 @@ namespace RNC
         {
             LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
             if (lobby == null) return;
-
+            NAPI.Util.ConsoleOutput("Continuing state bank rob for " + player.Name + " state ID " + state);   
             lobby.BankRobbery.State = state;
             lobby.BankRobbery.Hideout = new Random().Next(BankRobberyData.Hideouts.Length);
             switch (state)
@@ -3474,7 +3479,7 @@ namespace RNC
             
             //target.StopAnimation();
             RequestPlayAnimation(target, "amb@world_human_push_ups@male@exit", "exit", 0, 9);
-
+            NAPI.Util.ConsoleOutput("OnRevivePlayer " + player.Name + " " + target.Name);
             NAPI.Task.Run(() =>
             {
                 try
@@ -3568,6 +3573,8 @@ namespace RNC
             if (target == null) return;
             target.SetSharedData("CuffedBy", "n/a");
 
+            NAPI.Util.ConsoleOutput("StopCuffing " + player.Name);
+
             Events.RequestClearAnimation(player);
         }
         [RemoteEvent("StopReviving")]
@@ -3578,6 +3585,8 @@ namespace RNC
             Player target = RAGE.Entities.Players.All.FirstOrDefault(p => p.Name.Equals(player.GetSharedData<string>("ReviveTarget")));
 
             player.SetSharedData("ReviveTarget", "n/a");
+
+            NAPI.Util.ConsoleOutput("OnStopReviving " + player.Name);
 
             if (target != null)
                 target.SetSharedData("BeingRevived", false);
@@ -3654,6 +3663,7 @@ namespace RNC
         public void OnFinishCuffing(Player player, Player target)
         {
             if (target == null) return;
+            NAPI.Util.ConsoleOutput("Called OnFinishCuffing for " + player.Name + " and " + target.Name);
 
             LobbyData lobbye = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedData<int>("InLobby"));
 

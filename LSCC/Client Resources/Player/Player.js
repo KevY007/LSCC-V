@@ -1640,6 +1640,8 @@ mp.events.add('setWounded', (state, idToPass) =>
     if((state == mp.players.local.getVariable("Wounded") || !chaseRunning || mp.players.local.getVariable("Team") < 0) 
         && state != 0) return;
 
+    mp.events.callRemote("ServerConsoleOutput", "setWounded " + state + " id to pass " + idToPass);
+
     if(state == 1) // Pre-wounded (beginning of wounded mode) --ragdolling the player and waiting 3 secs before giving ability to crawl
     {
         if(woundedTimer != null)
@@ -1689,6 +1691,13 @@ mp.events.add('setWounded', (state, idToPass) =>
             mp.events.callRemote("play_anim", 'anim@veh@lowrider@std@ds@arm@base', 'die', 2, 8.0, 0, -1, 0, false, false, false);
         }
         mp.game.player.setInvincible(true);
+        mp.game.player.setInvincible(true);
+        setTimeout(() => {
+            if(chaseRunning && mp.players.local.getVariable("Team") >= 0 && mp.players.local.getVariable("Wounded") != 0)
+            {
+                mp.events.callLocal("setWounded", 2, -1);
+            }
+        }, 2000);
         mp.events.callRemote("play_anim", "amb@world_human_push_ups@male@exit", "exit", 2, 8.0, 0, -1, 0, false, false, false);
         //mp.game.graphics.startScreenEffect('DrugsDrivingIn', -1, true);
     }
@@ -1698,11 +1707,16 @@ mp.events.add('setWounded', (state, idToPass) =>
         
         mp.players.local.setInvincible(false);
         mp.game.player.setInvincible(false);
-        mp.players.local.clearDrivebyTaskUnderneathDrivingTask();
-        mp.events.callRemote("clear_tasks", 1);
-        mp.events.callRemote("play_anim", 'move_crawlprone2crawlfront', 'front', 2, 8.0, 0, -1, 0, false, false, false);
-
-        toggleCrawl(true);      
+        if(!mp.players.local.isInAnyVehicle(false))
+        {
+            mp.players.local.clearDrivebyTaskUnderneathDrivingTask();
+            mp.events.callRemote("clear_tasks", 1);
+            mp.events.callRemote("play_anim", 'move_crawlprone2crawlfront', 'front', 2, 8.0, 0, -1, 0, false, false, false);
+            toggleCrawl(true);   
+        }   
+        else{
+            mp.events.callRemote("play_anim", 'anim@veh@lowrider@std@ds@arm@base', 'die', 2, 8.0, 0, -1, 0, false, false, false);
+        }
     }
     else if(state == 0) // DISABLE WOUNDED
     {
