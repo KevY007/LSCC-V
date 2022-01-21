@@ -3328,7 +3328,7 @@ namespace RNC
                                                         p.GetData<Vehicle>("ChaseVehicle").WheelColor = inst.WheelColor;
                                                     }
                                                 }
-                                                EPlayer.Freeze(p, true);
+                                                EPlayer.Freeze(p, false);
                                                 p.TriggerEvent("ToggleCanExitVehicle", false);
                                             }
                                             catch { }
