@@ -141,6 +141,7 @@ namespace RNC
         public int Weather { get; set; }
         public int NextMapID { get; set; }
         public string Background { get; set; }
+        public KeyValuePair<Player, Player> FirstKill { get; set; }
 
         public LobbyData()
         {
@@ -150,6 +151,8 @@ namespace RNC
             Drops = new List<Pickup>();
 
             BankRobbery = new BankRobberyData();
+
+            FirstKill = new KeyValuePair<Player, Player>(null, null);
 
             Time = new int[3];
             Time[0] = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 23);
@@ -1951,6 +1954,8 @@ namespace RNC
 					Discord.SendTextChannel("staff-bot", $"**(Derby) | Winner: {winner.Name} | XP Gained: {winXP} | Participants: {Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count()}**");
 
                     winner.SetSharedData("FugitiveChance", winner.GetSharedData<float>("FugitiveChance") + 5 + (double)((double)EPlayer.GetAccount(winner).DonatorLevel / 2.0));
+
+                    EPlayer.UnlockAchievement(winner, "first_derby");
                 }
 
                 Settings.DerbyTimeLeft = 180;
@@ -1961,6 +1966,8 @@ namespace RNC
         public static bool StopGame(int lobbyid, int reason)
         {
             LobbyData lobby = Settings.Lobbies.Find(l => l.lobbyId == lobbyid);
+
+            int winnerTeam = -1;
             if (lobby != null && lobby.gameStatus == 1)
             {
                 switch (reason)
@@ -1974,7 +1981,7 @@ namespace RNC
                         {
                             NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}The fugitives managed to escape from the cops.");
                             Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives have escaped.**");
-
+                            winnerTeam = 0;
                             foreach (Player i in lobby.Fugitives)
                             {
                                 if (lobby.GameProgress <= 40) continue;
@@ -1983,12 +1990,23 @@ namespace RNC
                                 EPlayer.GrantXP(i, 5);
                                 EPlayer.GivePoints(i, 5);
                                 i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.3);
+
+                                if (i.GetData<bool>("ShotsFired") == false)
+                                    EPlayer.UnlockAchievement(i, "no_shooting_win");
+
+                                if (lobby.gameMode == GameModes.BUSTED)
+                                {
+                                    EPlayer.UnlockAchievement(i, "first_busted");
+                                }
                             }
+                            EPlayer.UnlockAchievement(lobby.BankRobbery.HeistLeader, "heist_leader_win");
+
                         }
                         else
                         {
                             if (lobby.gameMode == GameModes.BANKROBBERY)
                             {
+                                winnerTeam = 1;
                                 NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}The fugitives didn't manage to rob the bank in time. Cops win!");
                                 Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives didn't manage to rob the bank in time.**");
 
@@ -1999,6 +2017,7 @@ namespace RNC
                                     EPlayer.GrantXP(i, 8);
                                     EPlayer.GivePoints(i, 7);
                                     i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.5);
+                                    EPlayer.UnlockAchievement(i, "first_bankrob_cop");
                                 }
                             }
                         }
@@ -2009,6 +2028,7 @@ namespace RNC
 
                         if (lobby.gameMode != GameModes.BANKROBBERY)
                         {
+                            winnerTeam = 0;
                             foreach (Player i in lobby.Fugitives)
                             {
                                 if (lobby.GameProgress <= 40) continue;
@@ -2022,13 +2042,20 @@ namespace RNC
                         {
                             if (lobby.gameMode == GameModes.BANKROBBERY)
                             {
+                                winnerTeam = 0;
                                 foreach (Player i in lobby.Fugitives)
                                 {
                                     // Reward
                                     EPlayer.GrantXP(i, 8);
                                     EPlayer.GivePoints(i, 7);
                                     i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.1);
+
+                                    EPlayer.UnlockAchievement(i, "first_bankrob_fugitive");
+
+                                    if (i.GetData<bool>("ShotsFired") == false)
+                                        EPlayer.UnlockAchievement(i, "no_shooting_win");
                                 }
+                                EPlayer.UnlockAchievement(lobby.BankRobbery.HeistLeader, "heist_leader_win");
                             }
                         }
                         break;
@@ -2038,6 +2065,7 @@ namespace RNC
 
                         if (lobby.gameMode != GameModes.BANKROBBERY)
                         {
+                            winnerTeam = 1;
                             foreach (Player i in lobby.Cops)
                             {
                                 if (lobby.GameProgress <= 40) continue;
@@ -2051,12 +2079,14 @@ namespace RNC
                         {
                             if(lobby.gameMode == GameModes.BANKROBBERY)
                             {
+                                winnerTeam = 1;
                                 foreach (Player i in lobby.Cops)
                                 {
                                     // Reward
                                     EPlayer.GrantXP(i, 8);
                                     EPlayer.GivePoints(i, 7);
                                     i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.5);
+                                    EPlayer.UnlockAchievement(i, "first_bankrob_cop");
                                 }
                             }
                         }
@@ -2068,28 +2098,54 @@ namespace RNC
                     case 5: // event cop win
                         NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}Bank Robbery has ended - there was no one left to replace the heist leader. Cops win!");
                         Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | No one was left to replace the heist leader.**");
+                        winnerTeam = 1;
                         foreach (Player i in lobby.Cops)
                         {
                             // Reward
                             EPlayer.GrantXP(i, 8);
                             EPlayer.GivePoints(i, 6);
                             i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.5);
+                            EPlayer.UnlockAchievement(i, "first_bankrob_cop");
                         }
                         break;
                     case 6: // event fugi win
-                        NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}Bank Robbery has ended - fugitives successfully delivered the money to their hideout!");
-                        Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives successfully delivered the money to their hideout.**");
-                        foreach (Player i in lobby.Fugitives)
+                        if (lobby.gameMode == GameModes.BANKROBBERY)
                         {
-                            // Reward
-                            EPlayer.GrantXP(i, 10);
-                            EPlayer.GivePoints(i, 13);
-                            i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.2);
+                            winnerTeam = 0;
+                            NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}Bank Robbery has ended - fugitives successfully delivered the money to their hideout!");
+                            Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives successfully delivered the money to their hideout.**");
+                            foreach (Player i in lobby.Fugitives)
+                            {
+                                // Reward
+                                EPlayer.GrantXP(i, 10);
+                                EPlayer.GivePoints(i, 13);
+                                i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.2);
+                                EPlayer.UnlockAchievement(i, "first_bankrob_fugitive");
+
+                                if (i.GetData<bool>("ShotsFired") == false)
+                                    EPlayer.UnlockAchievement(i, "no_shooting_win");
+                            }
+                            EPlayer.UnlockAchievement(lobby.BankRobbery.HeistLeader, "heist_leader_win");
                         }
                         break;
                 }
 
                 lobby.gameStatus = 0;
+
+                lobby.FirstKill = new KeyValuePair<Player, Player>(null, null);
+
+                if(winnerTeam == 0 && lobby.Fugitives.Where(c => c.GetSharedData<int>("Wounded") == 0).ToList().Count == 1)
+                {
+                    Player last = lobby.Fugitives.FirstOrDefault(c => c.GetSharedData<int>("Wounded") == 0);
+                    if (last != null)
+                        EPlayer.UnlockAchievement(last, "last_man_standing");
+                }
+                if (winnerTeam == 1 && lobby.Cops.Where(c => c.GetSharedData<int>("Wounded") == 0).ToList().Count == 1)
+                {
+                    Player last = lobby.Cops.FirstOrDefault(c => c.GetSharedData<int>("Wounded") == 0);
+                    if (last != null)
+                        EPlayer.UnlockAchievement(last, "last_man_standing");
+                }
 
                 foreach (Player i in Settings.LoggedInPlayers)
                 {
@@ -2100,8 +2156,9 @@ namespace RNC
                     i.TriggerEvent("BankRob_ClearFugiCarBlips");
                     i.TriggerEvent("BankRob_ClearFinishMarker");
                     i.TriggerEvent("BankRob_SetMusic", -1);
+                    i.SetData<bool>("ShotsFired", false);
 
-                    if(i.HasSharedData("Wounded"))
+                    if (i.HasSharedData("Wounded"))
                     {
                         if(i.GetSharedData<int>("Wounded") == 2)
                         {
@@ -2925,6 +2982,8 @@ namespace RNC
                                     }
                                 }
                                 _brob.HeistLeader.SetSharedData("HeistLeader", true);
+
+                                EPlayer.UnlockAchievement(_brob.HeistLeader, "heist_leader");
 
                                 _brob.Sniper = null;
                                 unfuck = 0;

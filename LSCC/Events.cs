@@ -285,6 +285,19 @@ namespace RNC
                                     reasonStr = "(" + rez + ")";
                                 }
 
+                                EPlayer.UnlockAchievement(killer, "first_kill");
+
+                                if (killer.Health <= 30)
+                                    EPlayer.UnlockAchievement(killer, "low_hp_kill");
+
+                                if(lobby.FirstKill.Key == null && lobby.FirstKill.Value == null)
+                                {
+                                    lobby.FirstKill = new KeyValuePair<Player, Player>(killer, player);
+
+                                    if(lobby.gameMode == GameModes.BANKROBBERY && lobby.BankRobbery.HeistLeader == player)
+                                        EPlayer.UnlockAchievement(killer, "first_kill_leader");
+                                }
+
                                 EPlayer.GetAccount(killer).Kills++;
                                 player.SetSharedData("LastKiller", killer.Name);
 
@@ -304,6 +317,7 @@ namespace RNC
 
                                 int killStreak = killer.GetData<int>("Killstreak") + 1;
                                 killer.SetData("Killstreak", killStreak);
+                                if (killStreak >= 5) EPlayer.UnlockAchievement(killer, "serial_killer");
 
                                 if (killStreak % 4 == 0 && killStreak >= 4 && (lobby.Cops.Contains(killer) || lobby.Fugitives.Contains(killer)))
                                 {
@@ -1291,6 +1305,7 @@ namespace RNC
                                 {
                                     int killStreak = killer.GetData<int>("Killstreak") + 1;
                                     killer.SetData("Killstreak", killStreak);
+                                    if (killStreak >= 5) EPlayer.UnlockAchievement(killer, "serial_killer");
 
                                     if (killStreak % 4 == 0 && killStreak >= 4 && (lobby.Cops.Contains(killer) || lobby.Fugitives.Contains(killer)))
                                     {
@@ -1799,6 +1814,11 @@ namespace RNC
             foreach(Player adm in Settings.LoggedInPlayers.Where(p => EPlayer.GetAccount(p).Admin > 0)){
                 EPlayer.ShowAdminNotes(adm, acc, AdminNote.ANoteType.OnConnect);
                 EPlayer.ShowAdminNotes(adm, acc, AdminNote.ANoteType.Both, false);
+            }
+
+            if(EPlayer.GetAccount(player).Level >= 100)
+            {
+                EPlayer.UnlockAchievement(player, "reach_level_100");
             }
 
             player.TriggerEvent("showLoginBrowser", false);
@@ -2934,6 +2954,12 @@ namespace RNC
             return;
         }
 
+        [RemoteEvent("SetShotsFired")]
+        public static void SetShotsFired(Player player, bool toggle)
+        {
+            player.SetData<bool>("ShotsFired", toggle);
+        }
+
         [RemoteEvent("GivePlayerShotTag")]
         public static void PlayerRequestShotTag(Player player)
         {
@@ -3550,6 +3576,11 @@ namespace RNC
 
             player.SendChatMessage($"!{{#2fc900}}[REVIVE] You successfully revived {target.Name} and gained +2XP & 1 point for teamwork!");
             target.SendChatMessage($"!{{#2fc900}}[REVIVE] You have been revived by {player.Name}.");
+
+            EPlayer.GrantXP(player, 2);
+            EPlayer.GivePoints(player, 1);
+            EPlayer.UnlockAchievement(player, "first_revive");
+            EPlayer.UnlockAchievement(target, "get_revived");
 
             RequestClearAnimation(player);
             target.SetSharedData("LastKiller", "n/a");

@@ -866,6 +866,8 @@ namespace RNC
 
                 player.SetSharedData("AutoOOC", false);
 
+                player.SetData<bool>("ShotsFired", false);
+
                 player.SetData<string>("BankRobberyUnit", "fib");
                 player.SetSharedData("HeistLeader", false);
 
@@ -1220,8 +1222,7 @@ namespace RNC
         {
             if (EPlayer.GetAccount(player) == null) return;
             Account acc = EPlayer.GetAccount(player);
-            UnlockedAchievement check = ContextFactory.Instance.UnlockedAchievements.FirstOrDefault(a => a.AccountID == acc.SQL_ID && a.Achievement == achievement);
-            if (check != null) return;
+            if (HasUnlockedAchievement(player, achievement)) return;
             Achievement achdata = Settings.Achievements.FirstOrDefault(a => a.Code == achievement);
             if (achdata == null) return;
 
@@ -1762,6 +1763,7 @@ namespace RNC
                 var cars = ContextFactory.Instance.OwnedVehicles.ToList().Where(a => a.AccountSQLID == acc.SQL_ID && a.Team == team);
                 foreach (var item in cars) ownedCars.Add(item.Model);
             }
+
             return ownedCars;
         }
         public static bool UnlockVehicle(Player player, string model, int team)
@@ -1777,6 +1779,11 @@ namespace RNC
                 TimesUsed = 0,
             };
             ContextFactory.Instance.OwnedVehicles.Add(_new);
+
+            EPlayer.UnlockAchievement(player, "first_vehicle");
+
+            if (GetOwnedVehicles(player, 0).Count + GetOwnedVehicles(player, 1).Count >= Settings.Cars.Count)
+                EPlayer.UnlockAchievement(player, "all_vehicles");
 
             ContextFactory.Instance.SaveChanges();
             return true;
@@ -1825,6 +1832,11 @@ namespace RNC
                 TimesUsed = 0
             };
             ContextFactory.Instance.OwnedLoadouts.Add(_new);
+
+            EPlayer.UnlockAchievement(player, "first_loadout");
+
+            if (GetOwnedLoadouts(player, 0).Count + GetOwnedLoadouts(player, 1).Count >= Settings.Loadouts.Count)
+                EPlayer.UnlockAchievement(player, "all_loadouts");
 
             ContextFactory.Instance.SaveChanges();
             return true;
@@ -1906,6 +1918,10 @@ namespace RNC
             }
 
             player.SetSharedData("Level", acc.Level);
+            if(acc.Level >= 100)
+            {
+                EPlayer.UnlockAchievement(player, "reach_level_100");
+            }
         }
         public static void Save(Player player)
         {

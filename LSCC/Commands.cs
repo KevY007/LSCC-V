@@ -437,6 +437,8 @@ namespace RNC
                 EPlayer.Action(player, "fastens the seatbelt.");
                 player.SetData("Seatbelt", true);
                 player.TriggerEvent("ToggleSeatbelt", true);
+
+                EPlayer.UnlockAchievement(player, "first_seatbelt");
             }
 
             return;
@@ -6062,6 +6064,10 @@ namespace RNC
 
                 target.SetData("PlayerSquad", player);
                 target.SetSharedData("PlayerSquadID", player.Id);
+
+                EPlayer.UnlockAchievement(player, "first_squad");
+                EPlayer.UnlockAchievement(target, "first_squad");
+
 
                 Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player).ToList().ForEach((Player member) =>
                 {

@@ -1514,6 +1514,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
     if(mp.players.local.getVariable("HasShot") == false && player.getVariable("Team") == 0 && chaseRunning)
     {
         mp.events.callRemote("GivePlayerShotTag");
+        mp.events.callRemote("SetShotsFired", true);
     }
 });
 
