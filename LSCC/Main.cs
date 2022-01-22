@@ -3420,27 +3420,11 @@ namespace RNC
                                         if (currentCar >= 6) // Special/SWAT/FIB unit 
                                         {
                                             player.SetData<string>("BankRobberyUnit", "fib");
-                                            player.Health = 100;
-                                            player.Armor = 100;
-
-                                            player.GiveWeapon(WeaponHash.Heavypistol, 100);
-                                            player.GiveWeapon(WeaponHash.Assaultsmg, 200);
-                                            player.GiveWeapon(WeaponHash.Specialcarbine, 500);
-                                            player.GiveWeapon(WeaponHash.Bzgas, 3);
-                                            player.GiveWeapon(WeaponHash.Assaultshotgun, 500);
                                             player.SendChatMessage("~b~[>] ~w~You've been assigned to the ~y~FIB~w~ unit.");
                                         }
                                         else // patrol unit
                                         {
                                             player.SetData<string>("BankRobberyUnit", "patrol");
-                                            player.Health = 100;
-                                            player.Armor = 75;
-
-                                            player.GiveWeapon(WeaponHash.Combatpistol, 100);
-                                            player.GiveWeapon(WeaponHash.Smg, 300);
-                                            player.GiveWeapon(WeaponHash.Carbinerifle, 500);
-                                            player.GiveWeapon(WeaponHash.Bzgas, 1);
-                                            player.GiveWeapon(WeaponHash.Pumpshotgun, 72);
                                             player.SendChatMessage("~b~[>] ~w~You've been assigned to the ~y~PATROL~w~ unit.");
                                         }
 
@@ -3470,13 +3454,6 @@ namespace RNC
                                             int spid = kevycanusendmefeetpicspls.Next(BankRobberyData.FugitiveSpawns.GetLength(0));
                                             player.Position = (Vector3)BankRobberyData.FugitiveSpawns[spid, 0];
                                             player.Heading = (float)BankRobberyData.FugitiveSpawns[spid, 1];
-                                            player.Health = 100;
-                                            player.Armor = 50;
-
-                                            player.GiveWeapon(WeaponHash.Pistol, 100);
-                                            player.GiveWeapon(WeaponHash.Pumpshotgun, 50);
-                                            player.GiveWeapon(WeaponHash.Microsmg, 200);
-                                            player.GiveWeapon(WeaponHash.Assaultrifle, 300);
 
                                             cd.Clothing[0].Hat = 62;
                                             cd.Clothing[0].HatTxt = new Random().Next(0, 10);
@@ -3489,14 +3466,6 @@ namespace RNC
                                             {
                                                 player.Position = BankRobberyData.LeaderPos;
                                                 player.Heading = BankRobberyData.LeaderHeading;
-                                                player.Health = 100;
-                                                player.Armor = 100;
-
-                                                player.GiveWeapon(WeaponHash.Pistol50, 100);
-                                                player.GiveWeapon(WeaponHash.Heavyshotgun, 50);
-                                                player.GiveWeapon(WeaponHash.Smg, 250);
-                                                player.GiveWeapon(WeaponHash.Specialcarbine, 250);
-                                                player.GiveWeapon(WeaponHash.Molotov, 1);
 
                                                 cd.Clothing[0].Hat = 62;
                                                 cd.Clothing[0].HatTxt = 9;
@@ -3507,14 +3476,6 @@ namespace RNC
                                             {
                                                 player.Position = BankRobberyData.SniperPos;
                                                 player.Heading = BankRobberyData.SniperHeading;
-                                                player.Health = 100;
-                                                player.Armor = 50;
-
-                                                player.GiveWeapon(WeaponHash.Snspistol, 100);
-                                                player.GiveWeapon(WeaponHash.Sawnoffshotgun, 50);
-                                                player.GiveWeapon(WeaponHash.Assaultrifle, 90);
-                                                player.GiveWeapon(WeaponHash.Marksmanrifle, 10);
-                                                player.GiveWeapon(WeaponHash.Molotov, 1);
 
                                                 cd.Clothing[0].Hat = 62;
                                                 cd.Clothing[0].HatTxt = new Random().Next(0, 10);
@@ -3702,11 +3663,13 @@ namespace RNC
                                                     int seat = p.GetData<int>("BR_UnitVehicleSeat");
                                                     if (v != null)
                                                     {
+                                                        p.SendChatMessage("Putting you in vehicle " + v.Id + " " + v.DisplayName);
                                                         NAPI.Task.Run(() =>
                                                         {
                                                             p.SetIntoVehicle(v, seat);
-                                                        }, 100);
+                                                        }, (((p.Id+1)*100)));
                                                     }
+                                                    p.SendChatMessage("Seat ID to put you in: " + seat);
                                                 }
 
 

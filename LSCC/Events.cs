@@ -321,6 +321,9 @@ namespace RNC
                     }
                 case 2:
                     {
+
+                        LobbyData lobby = Settings.Lobbies.FirstOrDefault(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+
                         player.SetSharedData("ReviveTarget", "n/a");
                         player.SetSharedData("BeingRevived", false);
                         player.Health = 25;
@@ -332,11 +335,21 @@ namespace RNC
                         }
                         if(player.HasSharedData("Team"))
                         {
-                            LobbyData lobby = Settings.Lobbies.FirstOrDefault(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
                             if (lobby != null)
                             {
                                 if (player.GetSharedData<int>("Team") == 1)
                                 {
+                                    if(lobby.Cops.Count <= 1)
+                                    {
+                                        Main.StopGame(lobby.lobbyId, 2);
+                                    }
+                                    else
+                                    {
+                                        Player alive = lobby.Cops.FirstOrDefault(a => a.HasSharedData("Wounded") && a.GetSharedData<int>("Wounded") == 0);
+                                        if(alive == null)
+                                            Main.StopGame(lobby.lobbyId, 2); // if there are no alive cops left = no revive = end round
+                                    }
+
                                     string chatStr = $"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: Officer {player.Name} is down and needs medical assistance!";
                                     foreach (Player cop in lobby.Cops.Where(c => c.Position.DistanceTo(player.Position) < 75))
                                     {
@@ -350,6 +363,17 @@ namespace RNC
                                 }
                                 else
                                 {
+                                    if (lobby.Fugitives.Count <= 1)
+                                    {
+                                        Main.StopGame(lobby.lobbyId, 3);
+                                    }
+                                    else
+                                    {
+                                        Player alive = lobby.Fugitives.FirstOrDefault(a => a.HasSharedData("Wounded") && a.GetSharedData<int>("Wounded") == 0);
+                                        if (alive == null)
+                                            Main.StopGame(lobby.lobbyId, 3); // if there are no alive fugis left = no revive = end round
+                                    }
+
                                     int msgrand = new Random().Next(0, 5);
                                     string msg = "";
                                     switch (msgrand)

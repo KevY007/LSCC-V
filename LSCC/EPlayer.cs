@@ -1260,7 +1260,35 @@ namespace RNC
             LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
 
             if (lobby == null) { return; }
-            if (lobby.gameMode == GameModes.BANKROBBERY) return;
+            if (lobby.gameMode == GameModes.BANKROBBERY)
+            {
+                if (player.HasData("BankRobberyUnit"))
+                {
+                    if(player.GetData<string>("BankRobberyUnit") == "fib")
+                    {
+                        player.Health = 100;
+                        player.Armor = 100;
+
+                        player.GiveWeapon(WeaponHash.Heavypistol, 100);
+                        player.GiveWeapon(WeaponHash.Assaultsmg, 200);
+                        player.GiveWeapon(WeaponHash.Specialcarbine, 500);
+                        player.GiveWeapon(WeaponHash.Bzgas, 3);
+                        player.GiveWeapon(WeaponHash.Assaultshotgun, 500);
+                    }
+                    else
+                    {
+                        player.Health = 100;
+                        player.Armor = 75;
+
+                        player.GiveWeapon(WeaponHash.Combatpistol, 100);
+                        player.GiveWeapon(WeaponHash.Smg, 300);
+                        player.GiveWeapon(WeaponHash.Carbinerifle, 500);
+                        player.GiveWeapon(WeaponHash.Bzgas, 1);
+                        player.GiveWeapon(WeaponHash.Pumpshotgun, 72);
+                    }
+                }
+                return;
+            }
             if (lobby.gameMode != GameModes.BUSTED)
             {
                 if (EPlayer.GetAccount(player).LoadoutCop.Length >= 2)
@@ -1357,7 +1385,42 @@ namespace RNC
 
             if (lobby == null) { return; }
 
-            if (lobby.gameMode == GameModes.BANKROBBERY) return;
+            if (lobby.gameMode == GameModes.BANKROBBERY)
+            {
+                if(lobby.BankRobbery.HeistLeader == player)
+                {
+                    player.Health = 100;
+                    player.Armor = 100;
+
+                    player.GiveWeapon(WeaponHash.Pistol50, 100);
+                    player.GiveWeapon(WeaponHash.Heavyshotgun, 50);
+                    player.GiveWeapon(WeaponHash.Smg, 250);
+                    player.GiveWeapon(WeaponHash.Specialcarbine, 250);
+                    player.GiveWeapon(WeaponHash.Molotov, 1);
+                }
+                else if(lobby.BankRobbery.HeistLeader == player)
+                {
+                    player.Health = 100;
+                    player.Armor = 50;
+
+                    player.GiveWeapon(WeaponHash.Snspistol, 100);
+                    player.GiveWeapon(WeaponHash.Sawnoffshotgun, 50);
+                    player.GiveWeapon(WeaponHash.Assaultrifle, 90);
+                    player.GiveWeapon(WeaponHash.Marksmanrifle, 10);
+                    player.GiveWeapon(WeaponHash.Molotov, 1);
+                }
+                else
+                {
+                    player.Health = 100;
+                    player.Armor = 50;
+
+                    player.GiveWeapon(WeaponHash.Pistol, 100);
+                    player.GiveWeapon(WeaponHash.Pumpshotgun, 50);
+                    player.GiveWeapon(WeaponHash.Microsmg, 200);
+                    player.GiveWeapon(WeaponHash.Assaultrifle, 300);
+                }
+                return;
+            }
             if (lobby.gameMode != GameModes.BUSTED)
             {
                 if (EPlayer.GetAccount(player).LoadoutFugitive.Length >= 2)
