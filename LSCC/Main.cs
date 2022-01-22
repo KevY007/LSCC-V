@@ -3370,59 +3370,8 @@ namespace RNC
                                     {
                                         player.Dimension = Convert.ToUInt32(lobbyid);
                                         player.Position = new Vector3(427.2379f, -979.13336f, 30.709988f).Around(7f);
-
                                         CharacterData ConvChar = new CharacterData();
 
-                                        try
-                                        {
-                                            ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-
-                                            EPlayer.ApplyCharacter(player, ConvChar, 1);
-                                        }
-                                        catch { }
-                                        if (currentCarInfo.Item2 < currentCarInfo.Item3)
-                                        {
-                                            int seat = currentCarInfo.Item2;
-                                            player.SetData<Vehicle>("BR_UnitVehicle", ccars[currentCar]);
-                                            player.SetData<int>("BR_UnitVehicleSeat", seat);
-                                            /*NAPI.Task.Run(() =>
-                                            {
-                                                player.SetIntoVehicle(ccars[currentCar], seat);
-                                            }, 100);*/
-                                            currentCarInfo.Item2++;
-                                        }
-                                        else
-                                        {
-                                            currentCar = -1;
-                                            for (int i = 0; i < 50; i++)
-                                            {
-                                                currentCar = new Random().Next(ccars.Count);
-                                                if (usedCars.Contains(currentCar)) { continue; }
-                                                else
-                                                {
-                                                    usedCars.Add(currentCar);
-                                                    break;
-                                                }
-                                            }
-
-                                            if (currentCar == -1)
-                                            {
-                                                currentCar = 1;
-                                                Vehicle dick = NAPI.Vehicle.CreateVehicle((uint)VehicleHash.Police, ccars[currentCar - 1].Position, ccars[currentCar - 1].Heading, 0, 0, "SEX", 255, false, true, player.Dimension);
-                                                player.SetIntoVehicle(dick, 0);
-                                            }
-                                            else
-                                            {
-                                                currentCarInfo = (currentCar, 0, ccars[currentCar].MaxOccupants);
-                                                int seat = currentCarInfo.Item2;
-                                                player.SetData<Vehicle>("BR_UnitVehicle", ccars[currentCar]);
-                                                player.SetData<int>("BR_UnitVehicleSeat", seat);
-                                                /*NAPI.Task.Run(() =>
-                                                {
-                                                    player.SetIntoVehicle(ccars[currentCar], seat);
-                                                }, 100);*/
-                                            }
-                                        }
                                         if (currentCar >= 6) // Special/SWAT/FIB unit 
                                         {
                                             player.SetData<string>("BankRobberyUnit", "fib");
@@ -3445,7 +3394,47 @@ namespace RNC
                                         player.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
                                         player.SetSharedData("CuffedBy", "n/a");
                                         player.SetSharedData("Team", 1);
-                                    }
+
+                                        try
+                                        {
+                                            ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+
+                                            EPlayer.ApplyCharacter(player, ConvChar, 1);
+                                        }
+                                        catch { }
+
+                                        if (currentCarInfo.Item2 < currentCarInfo.Item3)
+                                        {
+                                            int seat = currentCarInfo.Item2;
+                                            player.SetData<Vehicle>("BR_UnitVehicle", ccars[currentCar]);
+                                            player.SetData<int>("BR_UnitVehicleSeat", seat);
+                                            currentCarInfo.Item2++;
+                                            continue;
+                                        }
+                                        currentCar = -1;
+                                        for (int tries = 0; tries < 50; tries++)
+                                        {
+                                            currentCar = new Random().Next(ccars.Count);
+                                            if (ccars[currentCar].Occupants.Count < ccars[currentCar].MaxOccupants)
+                                            {
+                                                currentCarInfo.Item1 = currentCar;
+                                                currentCarInfo.Item2 = ccars[currentCar].Occupants.Count;
+                                                currentCarInfo.Item3 = ccars[currentCar].MaxOccupants;
+                                            }
+                                            else
+                                            {
+                                                currentCar = -1;
+                                                continue;
+                                            }
+                                        }
+                                        if (currentCar == -1)
+                                        {
+                                            currentCar = 1;
+                                            Vehicle dick = NAPI.Vehicle.CreateVehicle((uint)VehicleHash.Police, ccars[currentCar - 1].Position, ccars[currentCar - 1].Heading, 0, 0, "SEX", 255, false, true, player.Dimension);
+                                            player.SetData<Vehicle>("BR_UnitVehicle", dick);
+                                            player.SetData<int>("BR_UnitVehicleSeat", 0);
+                                        }
+                                    }                                    
 
                                     BankRobberyData _brob = lobby.BankRobbery;
                                     Random kevycanusendmefeetpicspls = new Random();
