@@ -121,7 +121,7 @@ function applyCreatorOutfit() {
 }
 
 function fillHairMenu() {
-    hairItem = new UIMenuListItem("Hair", "Your character's hair.", new ItemsCollection(Data.hairList[currentGender].map(h => h.Name)));
+    hairItem = new UIMenuListItem("Hair", "Your character's hair.", new ItemsCollection(Data.hairList[currentGender].map(h => h.ID.toString())));
     creatorHairMenu.AddItem(hairItem);
 
     hairColorItem = new UIMenuListItem("Hair Color", "Your character's hair color.", new ItemsCollection(hairColors));

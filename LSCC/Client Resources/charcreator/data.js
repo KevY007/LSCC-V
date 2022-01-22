@@ -31,89 +31,484 @@ const appearanceItemNames = [
 ];
 
 const hairList = [
-    // male
     [
-        {ID: 0, Name: "Close Shave", Collection: "mpbeach_overlays", Overlay: "FM_Hair_Fuzz"},
-        {ID: 1, Name: "Buzzcut", Collection: "multiplayer_overlays", Overlay: "NG_M_Hair_001"},
-        {ID: 2, Name: "Faux Hawk", Collection: "multiplayer_overlays", Overlay: "NG_M_Hair_002"},
-        {ID: 3, Name: "Hipster", Collection: "multiplayer_overlays", Overlay: "NG_M_Hair_003"},
-        {ID: 4, Name: "Side Parting", Collection: "multiplayer_overlays", Overlay: "NG_M_Hair_004"},
-        {ID: 5, Name: "Shorter Cut", Collection: "multiplayer_overlays", Overlay: "NG_M_Hair_005"},
-        {ID: 6, Name: "Biker", Collection: "multiplayer_overlays", Overlay: "NG_M_Hair_006"},
-        {ID: 7, Name: "Ponytail", Collection: "multiplayer_overlays", Overlay: "NG_M_Hair_007"},
-        {ID: 8, Name: "Cornrows", Collection: "multiplayer_overlays", Overlay: "NG_M_Hair_008"},
-        {ID: 9, Name: "Slicked", Collection: "multiplayer_overlays", Overlay: "NG_M_Hair_009"},
-        {ID: 10, Name: "Short Brushed", Collection: "multiplayer_overlays", Overlay: "NG_M_Hair_013"},
-        {ID: 11, Name: "Spikey", Collection: "multiplayer_overlays", Overlay: "NG_M_Hair_002"},
-        {ID: 12, Name: "Caesar", Collection: "multiplayer_overlays", Overlay: "NG_M_Hair_011"},
-        {ID: 13, Name: "Chopped", Collection: "multiplayer_overlays", Overlay: "NG_M_Hair_012"},
-        {ID: 14, Name: "Dreads", Collection: "multiplayer_overlays", Overlay: "NG_M_Hair_014"},
-        {ID: 15, Name: "Long Hair", Collection: "multiplayer_overlays", Overlay: "NG_M_Hair_015"},
-        {ID: 16, Name: "Shaggy Curls", Collection: "multiplayer_overlays", Overlay: "NGBea_M_Hair_000"},
-        {ID: 17, Name: "Surfer Dude", Collection: "multiplayer_overlays", Overlay: "NGBea_M_Hair_001"},
-        {ID: 18, Name: "Short Side Part", Collection: "multiplayer_overlays", Overlay: "NGBus_M_Hair_000"},
-        {ID: 19, Name: "High Slicked Sides", Collection: "multiplayer_overlays", Overlay: "NGBus_M_Hair_001"},
-        {ID: 20, Name: "Long Slicked", Collection: "multiplayer_overlays", Overlay: "NGHip_M_Hair_000"},
-        {ID: 21, Name: "Hipster Youth", Collection: "multiplayer_overlays", Overlay: "NGHip_M_Hair_001"},
-        {ID: 22, Name: "Mullet", Collection: "multiplayer_overlays", Overlay: "NGInd_M_Hair_000"},
-        {ID: 24, Name: "Classic Cornrows", Collection: "mplowrider_overlays", Overlay: "LR_M_Hair_000"},
-        {ID: 25, Name: "Palm Cornrows", Collection: "mplowrider_overlays", Overlay: "LR_M_Hair_001"},
-        {ID: 26, Name: "Lightning Cornrows", Collection: "mplowrider_overlays", Overlay: "LR_M_Hair_002"},
-        {ID: 27, Name: "Whipped Cornrows", Collection: "mplowrider_overlays", Overlay: "LR_M_Hair_003"},
-        {ID: 28, Name: "Zig Zag Cornrows", Collection: "mplowrider2_overlays", Overlay: "LR_M_Hair_004"},
-        {ID: 29, Name: "Snail Cornrows", Collection: "mplowrider2_overlays", Overlay: "LR_M_Hair_005"},
-        {ID: 30, Name: "Hightop", Collection: "mplowrider2_overlays", Overlay: "LR_M_Hair_006"},
-        {ID: 31, Name: "Loose Swept Back", Collection: "mpbiker_overlays", Overlay: "MP_Biker_Hair_000_M"},
-        {ID: 32, Name: "Undercut Swept Back", Collection: "mpbiker_overlays", Overlay: "MP_Biker_Hair_001_M"},
-        {ID: 33, Name: "Undercut Swept Side", Collection: "mpbiker_overlays", Overlay: "MP_Biker_Hair_002_M"},
-        {ID: 34, Name: "Spiked Mohawk", Collection: "mpbiker_overlays", Overlay: "MP_Biker_Hair_003_M"},
-        {ID: 35, Name: "Mod", Collection: "mpbiker_overlays", Overlay: "MP_Biker_Hair_004_M"},
-        {ID: 36, Name: "Layered Mod", Collection: "mpbiker_overlays", Overlay: "MP_Biker_Hair_005_M"},
-        {ID: 72, Name: "Flattop", Collection: "mpgunrunning_overlays", Overlay: "MP_Gunrunning_Hair_M_000_M"},
-        {ID: 73, Name: "Military Buzzcut", Collection: "mpgunrunning_overlays", Overlay: "MP_Gunrunning_Hair_M_001_M"}
+       {
+          "ID":0
+       },
+       {
+          "ID":1
+       },
+       {
+          "ID":2
+       },
+       {
+          "ID":3
+       },
+       {
+          "ID":4
+       },
+       {
+          "ID":5
+       },
+       {
+          "ID":6
+       },
+       {
+          "ID":7
+       },
+       {
+          "ID":8
+       },
+       {
+          "ID":9
+       },
+       {
+          "ID":10
+       },
+       {
+          "ID":11
+       },
+       {
+          "ID":12
+       },
+       {
+          "ID":13
+       },
+       {
+          "ID":14
+       },
+       {
+          "ID":15
+       },
+       {
+          "ID":16
+       },
+       {
+          "ID":17
+       },
+       {
+          "ID":18
+       },
+       {
+          "ID":19
+       },
+       {
+          "ID":20
+       },
+       {
+          "ID":21
+       },
+       {
+          "ID":22
+       },
+       {
+          "ID":23
+       },
+       {
+          "ID":24
+       },
+       {
+          "ID":25
+       },
+       {
+          "ID":26
+       },
+       {
+          "ID":27
+       },
+       {
+          "ID":28
+       },
+       {
+          "ID":29
+       },
+       {
+          "ID":30
+       },
+       {
+          "ID":31
+       },
+       {
+          "ID":32
+       },
+       {
+          "ID":33
+       },
+       {
+          "ID":34
+       },
+       {
+          "ID":35
+       },
+       {
+          "ID":36
+       },
+       {
+          "ID":37
+       },
+       {
+          "ID":38
+       },
+       {
+          "ID":39
+       },
+       {
+          "ID":40
+       },
+       {
+          "ID":41
+       },
+       {
+          "ID":42
+       },
+       {
+          "ID":43
+       },
+       {
+          "ID":44
+       },
+       {
+          "ID":45
+       },
+       {
+          "ID":46
+       },
+       {
+          "ID":47
+       },
+       {
+          "ID":48
+       },
+       {
+          "ID":49
+       },
+       {
+          "ID":50
+       },
+       {
+          "ID":51
+       },
+       {
+          "ID":52
+       },
+       {
+          "ID":53
+       },
+       {
+          "ID":54
+       },
+       {
+          "ID":55
+       },
+       {
+          "ID":56
+       },
+       {
+          "ID":57
+       },
+       {
+          "ID":58
+       },
+       {
+          "ID":59
+       },
+       {
+          "ID":60
+       },
+       {
+          "ID":61
+       },
+       {
+          "ID":62
+       },
+       {
+          "ID":63
+       },
+       {
+          "ID":64
+       },
+       {
+          "ID":65
+       },
+       {
+          "ID":66
+       },
+       {
+          "ID":67
+       },
+       {
+          "ID":68
+       },
+       {
+          "ID":69
+       },
+       {
+          "ID":70
+       },
+       {
+          "ID":71
+       },
+       {
+          "ID":72
+       },
+       {
+          "ID":73
+       },
+       {
+          "ID":74
+       },
+       {
+          "ID":75
+       },
+       {
+          "ID":76
+       }
     ],
     // female
     [
-        {ID: 0, Name: "Close Shave", Collection: "mpbeach_overlays", Overlay: "FM_Hair_Fuzz"},
-        {ID: 1, Name: "Short", Collection: "multiplayer_overlays", Overlay: "NG_F_Hair_001"},
-        {ID: 2, Name: "Layered Bob", Collection: "multiplayer_overlays", Overlay: "NG_F_Hair_002"},
-        {ID: 3, Name: "Pigtails", Collection: "multiplayer_overlays", Overlay: "NG_F_Hair_003"},
-        {ID: 4, Name: "Ponytail", Collection: "multiplayer_overlays", Overlay: "NG_F_Hair_004"},
-        {ID: 5, Name: "Braided Mohawk", Collection: "multiplayer_overlays", Overlay: "NG_F_Hair_005"},
-        {ID: 6, Name: "Braids", Collection: "multiplayer_overlays", Overlay: "NG_F_Hair_006"},
-        {ID: 7, Name: "Bob", Collection: "multiplayer_overlays", Overlay: "NG_F_Hair_007"},
-        {ID: 8, Name: "Faux Hawk", Collection: "multiplayer_overlays", Overlay: "NG_F_Hair_008"},
-        {ID: 9, Name: "French Twist", Collection: "multiplayer_overlays", Overlay: "NG_F_Hair_009"},
-        {ID: 10, Name: "Long Bob", Collection: "multiplayer_overlays", Overlay: "NG_F_Hair_010"},
-        {ID: 11, Name: "Loose Tied", Collection: "multiplayer_overlays", Overlay: "NG_F_Hair_011"},
-        {ID: 12, Name: "Pixie", Collection: "multiplayer_overlays", Overlay: "NG_F_Hair_012"},
-        {ID: 13, Name: "Shaved Bangs", Collection: "multiplayer_overlays", Overlay: "NG_F_Hair_013"},
-        {ID: 14, Name: "Top Knot", Collection: "multiplayer_overlays", Overlay: "NG_M_Hair_014"},
-        {ID: 15, Name: "Wavy Bob", Collection: "multiplayer_overlays", Overlay: "NG_M_Hair_015"},
-        {ID: 16, Name: "Messy Bun", Collection: "multiplayer_overlays", Overlay: "NGBea_F_Hair_000"},
-        {ID: 17, Name: "Pin Up Girl", Collection: "multiplayer_overlays", Overlay: "NGBea_F_Hair_001"},
-        {ID: 18, Name: "Tight Bun", Collection: "multiplayer_overlays", Overlay: "NG_F_Hair_007"},
-        {ID: 19, Name: "Twisted Bob", Collection: "multiplayer_overlays", Overlay: "NGBus_F_Hair_000"},
-        {ID: 20, Name: "Flapper Bob", Collection: "multiplayer_overlays", Overlay: "NGBus_F_Hair_001"},
-        {ID: 21, Name: "Big Bangs", Collection: "multiplayer_overlays", Overlay: "NGBea_F_Hair_001"},
-        {ID: 22, Name: "Braided Top Knot", Collection: "multiplayer_overlays", Overlay: "NGHip_F_Hair_000"},
-        {ID: 23, Name: "Mullet", Collection: "multiplayer_overlays", Overlay: "NGInd_F_Hair_000"},
-        {ID: 25, Name: "Pinched Cornrows", Collection: "mplowrider_overlays", Overlay: "LR_F_Hair_000"},
-        {ID: 26, Name: "Leaf Cornrows", Collection: "mplowrider_overlays", Overlay: "LR_F_Hair_001"},
-        {ID: 27, Name: "Zig Zag Cornrows", Collection: "mplowrider_overlays", Overlay: "LR_F_Hair_002"},
-        {ID: 28, Name: "Pigtail Bangs", Collection: "mplowrider2_overlays", Overlay: "LR_F_Hair_003"},
-        {ID: 29, Name: "Wave Braids", Collection: "mplowrider2_overlays", Overlay: "LR_F_Hair_003"},
-        {ID: 30, Name: "Coil Braids", Collection: "mplowrider2_overlays", Overlay: "LR_F_Hair_004"},
-        {ID: 31, Name: "Rolled Quiff", Collection: "mplowrider2_overlays", Overlay: "LR_F_Hair_006"},
-        {ID: 32, Name: "Loose Swept Back", Collection: "mpbiker_overlays", Overlay: "MP_Biker_Hair_000_F"},
-        {ID: 33, Name: "Undercut Swept Back", Collection: "mpbiker_overlays", Overlay: "MP_Biker_Hair_001_F"},
-        {ID: 34, Name: "Undercut Swept Side", Collection: "mpbiker_overlays", Overlay: "MP_Biker_Hair_002_F"},
-        {ID: 35, Name: "Spiked Mohawk", Collection: "mpbiker_overlays", Overlay: "MP_Biker_Hair_003_F"},
-        {ID: 36, Name: "Bandana and Braid", Collection: "multiplayer_overlays", Overlay: "NG_F_Hair_003"},
-        {ID: 37, Name: "Layered Mod", Collection: "mpbiker_overlays", Overlay: "MP_Biker_Hair_006_F"},
-        {ID: 38, Name: "Skinbyrd", Collection: "mpbiker_overlays", Overlay: "MP_Biker_Hair_004_F"},
-        {ID: 76, Name: "Neat Bun", Collection: "mpgunrunning_overlays", Overlay: "MP_Gunrunning_Hair_F_000_F"},
-        {ID: 77, Name: "Short Bob", Collection: "mpgunrunning_overlays", Overlay: "MP_Gunrunning_Hair_F_001_F"}
+        {
+           "ID":0
+        },
+        {
+           "ID":1
+        },
+        {
+           "ID":2
+        },
+        {
+           "ID":3
+        },
+        {
+           "ID":4
+        },
+        {
+           "ID":5
+        },
+        {
+           "ID":6
+        },
+        {
+           "ID":7
+        },
+        {
+           "ID":8
+        },
+        {
+           "ID":9
+        },
+        {
+           "ID":10
+        },
+        {
+           "ID":11
+        },
+        {
+           "ID":12
+        },
+        {
+           "ID":13
+        },
+        {
+           "ID":14
+        },
+        {
+           "ID":15
+        },
+        {
+           "ID":16
+        },
+        {
+           "ID":17
+        },
+        {
+           "ID":18
+        },
+        {
+           "ID":19
+        },
+        {
+           "ID":20
+        },
+        {
+           "ID":21
+        },
+        {
+           "ID":22
+        },
+        {
+           "ID":23
+        },
+        {
+           "ID":24
+        },
+        {
+           "ID":25
+        },
+        {
+           "ID":26
+        },
+        {
+           "ID":27
+        },
+        {
+           "ID":28
+        },
+        {
+           "ID":29
+        },
+        {
+           "ID":30
+        },
+        {
+           "ID":31
+        },
+        {
+           "ID":32
+        },
+        {
+           "ID":33
+        },
+        {
+           "ID":34
+        },
+        {
+           "ID":35
+        },
+        {
+           "ID":36
+        },
+        {
+           "ID":37
+        },
+        {
+           "ID":38
+        },
+        {
+           "ID":39
+        },
+        {
+           "ID":40
+        },
+        {
+           "ID":41
+        },
+        {
+           "ID":42
+        },
+        {
+           "ID":43
+        },
+        {
+           "ID":44
+        },
+        {
+           "ID":45
+        },
+        {
+           "ID":46
+        },
+        {
+           "ID":47
+        },
+        {
+           "ID":48
+        },
+        {
+           "ID":49
+        },
+        {
+           "ID":50
+        },
+        {
+           "ID":51
+        },
+        {
+           "ID":52
+        },
+        {
+           "ID":53
+        },
+        {
+           "ID":54
+        },
+        {
+           "ID":55
+        },
+        {
+           "ID":56
+        },
+        {
+           "ID":57
+        },
+        {
+           "ID":58
+        },
+        {
+           "ID":59
+        },
+        {
+           "ID":60
+        },
+        {
+           "ID":61
+        },
+        {
+           "ID":62
+        },
+        {
+           "ID":63
+        },
+        {
+           "ID":64
+        },
+        {
+           "ID":65
+        },
+        {
+           "ID":66
+        },
+        {
+           "ID":67
+        },
+        {
+           "ID":68
+        },
+        {
+           "ID":69
+        },
+        {
+           "ID":70
+        },
+        {
+           "ID":71
+        },
+        {
+           "ID":72
+        },
+        {
+           "ID":73
+        },
+        {
+           "ID":74
+        },
+        {
+           "ID":75
+        },
+        {
+           "ID":76
+        },
+        {
+           "ID":77
+        },
+        {
+           "ID":78
+        },
+        {
+           "ID":79
+        },
+        {
+           "ID":80
+        }
     ]
 ];
 
