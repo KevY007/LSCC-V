@@ -2045,6 +2045,14 @@ namespace RNC
                     i.TriggerEvent("BankRob_ClearFinishMarker");
                     i.TriggerEvent("BankRob_SetMusic", -1);
 
+                    if(i.HasSharedData("Wounded"))
+                    {
+                        if(i.GetSharedData<int>("Wounded") == 2)
+                        {
+                            Events.RequestClearAnimation(i);
+                            i.StopAnimation();
+                        }
+                    }
                     Events.OnPlayerWounded(i, 0, -1);
 
                     if (lobby.gameMode == GameModes.BANKROBBERY)
@@ -2900,13 +2908,6 @@ namespace RNC
                                         int spid = kevycanusendmefeetpicspls.Next(BankRobberyData.FugitiveSpawns.GetLength(0));
                                         player.Position = (Vector3)BankRobberyData.FugitiveSpawns[spid, 0];
                                         player.Heading = (float)BankRobberyData.FugitiveSpawns[spid, 1];
-                                        player.Health = 100;
-                                        player.Armor = 100;
-
-                                        player.GiveWeapon(WeaponHash.Pistol, 100);
-                                        player.GiveWeapon(WeaponHash.Pumpshotgun, 50);
-                                        player.GiveWeapon(WeaponHash.Microsmg, 200);
-                                        player.GiveWeapon(WeaponHash.Assaultrifle, 300);
                                     }
                                     else
                                     {
@@ -2914,27 +2915,11 @@ namespace RNC
                                         {
                                             player.Position = BankRobberyData.LeaderPos;
                                             player.Heading = BankRobberyData.LeaderHeading;
-                                            player.Health = 100;
-                                            player.Armor = 150;
-
-                                            player.GiveWeapon(WeaponHash.Pistol50, 100);
-                                            player.GiveWeapon(WeaponHash.Heavyshotgun, 50);
-                                            player.GiveWeapon(WeaponHash.Smg, 250);
-                                            player.GiveWeapon(WeaponHash.Specialcarbine, 250);
-                                            player.GiveWeapon(WeaponHash.Molotov, 1);
                                         }
                                         else if (player == _brob.Sniper)
                                         {
                                             player.Position = BankRobberyData.SniperPos;
                                             player.Heading = BankRobberyData.SniperHeading;
-                                            player.Health = 100;
-                                            player.Armor = 100;
-
-                                            player.GiveWeapon(WeaponHash.Snspistol, 100);
-                                            player.GiveWeapon(WeaponHash.Sawnoffshotgun, 50);
-                                            player.GiveWeapon(WeaponHash.Assaultrifle, 90);
-                                            player.GiveWeapon(WeaponHash.Marksmanrifle, 10);
-                                            player.GiveWeapon(WeaponHash.Molotov, 1);
                                         }
                                     }
                                     cd.Clothing[0].Hat = 62;
@@ -3041,107 +3026,123 @@ namespace RNC
 
                             if (lobby.GameProgress == -10)
                             {
-                                MapSpawn fugi = ContextFactory.Instance.MapSpawns.ToList().Find(a => a.mapID == lobby.lastMapId && a.spawnTeam == 0);
-                                MapSpawn cop = ContextFactory.Instance.MapSpawns.ToList().Find(a => a.mapID == lobby.lastMapId && a.spawnTeam == 1);
-
-                                lock (lobby.Fugitives)
+                                if (lobby.gameMode != GameModes.BANKROBBERY)
                                 {
-                                    foreach (var p in lobby.Fugitives)
+                                    MapSpawn fugi = ContextFactory.Instance.MapSpawns.ToList().Find(a => a.mapID == lobby.lastMapId && a.spawnTeam == 0);
+                                    MapSpawn cop = ContextFactory.Instance.MapSpawns.ToList().Find(a => a.mapID == lobby.lastMapId && a.spawnTeam == 1);
+
+                                    lock (lobby.Fugitives)
                                     {
-                                        try
-                                        {
-                                            if (p == null) continue;
-
-                                            p.Position = new Vector3(fugi.spawnX, fugi.spawnY, fugi.spawnZ).Around(30f);
-                                        }
-                                        catch { }
-                                    }
-                                }
-
-                                lock (lobby.Cops)
-                                {
-                                    foreach (var p in lobby.Cops)
-                                    {
-                                        try
-                                        {
-                                            if (p == null) continue;
-
-                                            p.Position = new Vector3(cop.spawnX, cop.spawnY, cop.spawnZ).Around(30f);
-                                        }
-                                        catch { }
-                                    }
-                                }
-
-                                if (lobby.gameMode == GameModes.BANKROBBERY)
-                                {
-                                    foreach (Player p in Settings.LoggedInPlayers.Where(p => lobby.Cops.Contains(p)))
-                                    {
-                                        lock (p)
+                                        foreach (var p in lobby.Fugitives)
                                         {
                                             try
                                             {
                                                 if (p == null) continue;
 
-                                                p.TriggerEvent("ResetKillFeed");
-                                                p.TriggerEvent("ToggleNametags", true);
-
-                                                if (lobby.Cops.Contains(p)) EPlayer.Notify(p, "You will be unfreezed in 10 seconds.", "orange", "fas fa-hourglass-start", false, 10000);
-
-                                                p.SendChatMessage($"!{{#1E9913}}[!] ATTENTION: You are currently in the Bank Robbery event! This is not a standard chase.");
-                                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must prevent the fugitives from delivering the money to their hideout.");
-                                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You are allowed to shoot fugitives on sight without them firing first.");
-                                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}The fugitives are currently robbing the ~y~Pacific Standard~w~ bank.");
-                                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Neutralize all the fugitives, or keep slowing them down until the round ends to win!");
-
+                                                p.Position = new Vector3(fugi.spawnX, fugi.spawnY, fugi.spawnZ).Around(30f);
                                             }
                                             catch { }
                                         }
                                     }
-                                    BankRobberyData _brob = lobby.BankRobbery;
 
-                                    foreach (Player p in Settings.LoggedInPlayers.Where(p => lobby.Fugitives.Contains(p)))
+                                    lock (lobby.Cops)
                                     {
-                                        lock (p)
+                                        foreach (var p in lobby.Cops)
                                         {
                                             try
                                             {
                                                 if (p == null) continue;
 
-                                                p.TriggerEvent("ResetKillFeed");
-                                                p.TriggerEvent("ToggleNametags", true);
-
-                                                p.SendChatMessage($"!{{#1E9913}}[!] ATTENTION: You are currently in the Bank Robbery event! This is not a standard chase.");
-                                                if (p == _brob.HeistLeader)
-                                                {
-                                                    if (lobby.Cops.Contains(p)) EPlayer.Notify(p, "You've been selected as the <strong>heist leader</strong>!", "orange", "fas fa-hourglass-start", false, 10000);
-                                                    p.SendChatMessage($"~y~!! YOU'VE BEEN SELECTED AS THE HEIST LEADER !!");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must rob the bank and deliver the money to the hideout.");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You are currently in the vault. Stay here for ~y~one minute ~w~to steal all the money.");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}After that, do anything you can in order to get to the ~y~hideout~w~ with your team.");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Watch out! Your death will significantly decrease your chances of winning the round.");
-                                                }
-                                                else if (p == _brob.Sniper)
-                                                {
-                                                    p.SendChatMessage($"~y~!! YOU'VE BEEN SELECTED AS THE SNIPER !!");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must rob help your heist leader, ~y~{_brob.HeistLeader.Name}~w~, deliver the money to the hideout..");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Due to your excellent marksmanship skills, you were picked to be the \"sniper\".");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You received a special set of weapons, including a sniper. Use it wisely to fend off against the police.");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You can use the ladders to climb up to a higher spot, or back down onto the street - it's entirely your choice.");
-                                                }
-                                                else
-                                                {
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must help your heist leader, ~y~{_brob.HeistLeader.Name}~w~, deliver the money to the hideout.");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You are currently in the bank. The heist leader is in the vault, taking the money.");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}After ~y~one minute~w~, you may head with the heist leader to the ~y~hideout~w~.");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Make sure you defend the heist leader! Leader's death significantly decreases your chances of winning.");
-                                                }
-                                                p.SendChatMessage($"!{{#1E9913}}[#] ~y~Work as a TEAM! ~w~You have one minute to plan out your getaway.");
-
+                                                p.Position = new Vector3(cop.spawnX, cop.spawnY, cop.spawnZ).Around(30f);
                                             }
                                             catch { }
                                         }
                                     }
                                 }
+                                else
+                                {
+                                    if (lobby.gameMode == GameModes.BANKROBBERY)
+                                    {
+                                        foreach (Player p in Settings.LoggedInPlayers.Where(p => lobby.Cops.Contains(p)))
+                                        {
+                                            lock (p)
+                                            {
+                                                try
+                                                {
+                                                    if (p == null) continue;
+
+                                                    p.TriggerEvent("ResetKillFeed");
+                                                    p.TriggerEvent("ToggleNametags", true);
+
+
+                                                    p.Dimension = Convert.ToUInt32(lobby.lobbyId);
+                                                    p.Position = new Vector3(427.2379f, -979.13336f, 30.709988f).Around(7f);
+
+                                                    p.SendChatMessage($"!{{#1E9913}}[!] ATTENTION: You are currently in the Bank Robbery event! This is not a standard chase.");
+                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must prevent the fugitives from delivering the money to their hideout.");
+                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You are allowed to shoot fugitives on sight without them firing first.");
+                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}The fugitives are currently robbing the ~y~Pacific Standard~w~ bank.");
+                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Neutralize all the fugitives, or keep slowing them down until the round ends to win!");
+
+                                                }
+                                                catch { }
+                                            }
+                                        }
+                                        BankRobberyData _brob = lobby.BankRobbery;
+
+                                        foreach (Player p in Settings.LoggedInPlayers.Where(p => lobby.Fugitives.Contains(p)))
+                                        {
+                                            lock (p)
+                                            {
+                                                try
+                                                {
+                                                    if (p == null) continue;
+
+                                                    p.TriggerEvent("ResetKillFeed");
+                                                    p.TriggerEvent("ToggleNametags", true);
+
+                                                    p.SendChatMessage($"!{{#1E9913}}[!] ATTENTION: You are currently in the Bank Robbery event! This is not a standard chase.");
+                                                    if (p == _brob.HeistLeader)
+                                                    {
+                                                        if (lobby.Cops.Contains(p)) EPlayer.Notify(p, "You've been selected as the <strong>heist leader</strong>!", "orange", "fas fa-hourglass-start", false, 10000);
+                                                        p.SendChatMessage($"~y~!! YOU'VE BEEN SELECTED AS THE HEIST LEADER !!");
+                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must rob the bank and deliver the money to the hideout.");
+                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You are currently in the vault. Stay here for ~y~one minute ~w~to steal all the money.");
+                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}After that, do anything you can in order to get to the ~y~hideout~w~ with your team.");
+                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Watch out! Your death will significantly decrease your chances of winning the round.");
+
+                                                        p.Position = BankRobberyData.LeaderPos;
+                                                        p.Heading = BankRobberyData.LeaderHeading;
+                                                    }
+                                                    else if (p == _brob.Sniper)
+                                                    {
+                                                        p.SendChatMessage($"~y~!! YOU'VE BEEN SELECTED AS THE SNIPER !!");
+                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must rob help your heist leader, ~y~{_brob.HeistLeader.Name}~w~, deliver the money to the hideout..");
+                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Due to your excellent marksmanship skills, you were picked to be the \"sniper\".");
+                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You received a special set of weapons, including a sniper with low ammo. Use it wisely to fend off against the police.");
+                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You can use the ladders to climb up to a higher spot, or back down onto the street - it's entirely your choice.");
+                                                        
+                                                        p.Position = BankRobberyData.SniperPos;
+                                                        p.Heading = BankRobberyData.SniperHeading;
+                                                    }
+                                                    else
+                                                    {
+                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must help your heist leader, ~y~{_brob.HeistLeader.Name}~w~, deliver the money to the hideout.");
+                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You are currently in the bank. The heist leader is in the vault, taking the money.");
+                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}After ~y~one minute~w~, you may head with the heist leader to the ~y~hideout~w~.");
+                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Make sure you defend the heist leader! Leader's death significantly decreases your chances of winning.");
+
+                                                        p.Position = (Vector3)BankRobberyData.FugitiveSpawns[0, 0];
+                                                        p.Heading = (float)BankRobberyData.FugitiveSpawns[0, 1];
+                                                    }
+                                                    p.SendChatMessage($"!{{#1E9913}}[#] ~y~Work as a TEAM! ~w~You have one minute to plan out your getaway.");
+
+                                                }
+                                                catch { }
+                                            }
+                                        }
+                                    }
+                                }                                
                             }
                             if (lobby.GameProgress == -5)
                             {
@@ -3362,6 +3363,9 @@ namespace RNC
                                     usedCars.Add(currentCar);
                                     int lobbyid = lobby.lobbyId;
 
+                                    // currentCar, occupants, maxOccupants
+                                    (int, int, int) currentCarInfo = (currentCar, 0, ccars[currentCar].MaxOccupants);
+
                                     foreach (Player player in lobby.Cops.OrderBy(x => Guid.NewGuid()))
                                     {
                                         player.Dimension = Convert.ToUInt32(lobbyid);
@@ -3376,15 +3380,16 @@ namespace RNC
                                             EPlayer.ApplyCharacter(player, ConvChar, 1);
                                         }
                                         catch { }
-                                        if (ccars[currentCar].Occupants.Count < ccars[currentCar].MaxOccupants)
+                                        if (currentCarInfo.Item2 < currentCarInfo.Item3)
                                         {
-                                            int seat = ccars[currentCar].Occupants.Count;
+                                            int seat = currentCarInfo.Item2;
                                             player.SetData<Vehicle>("BR_UnitVehicle", ccars[currentCar]);
                                             player.SetData<int>("BR_UnitVehicleSeat", seat);
                                             /*NAPI.Task.Run(() =>
                                             {
                                                 player.SetIntoVehicle(ccars[currentCar], seat);
                                             }, 100);*/
+                                            currentCarInfo.Item2++;
                                         }
                                         else
                                         {
@@ -3408,7 +3413,8 @@ namespace RNC
                                             }
                                             else
                                             {
-                                                int seat = ccars[currentCar].Occupants.Count;
+                                                currentCarInfo = (currentCar, 0, ccars[currentCar].MaxOccupants);
+                                                int seat = currentCarInfo.Item2;
                                                 player.SetData<Vehicle>("BR_UnitVehicle", ccars[currentCar]);
                                                 player.SetData<int>("BR_UnitVehicleSeat", seat);
                                                 /*NAPI.Task.Run(() =>
@@ -3602,6 +3608,7 @@ namespace RNC
                                     {
                                         if (p != null)
                                         {
+                                            EPlayer.Freeze(p, false);
                                             p.SendNotification("~y~You can now exit vehicles.");
                                             p.SendNotification("~b~You may begin the chase now.");
                                             p.TriggerEvent("ToggleCanExitVehicle", true);
@@ -3627,34 +3634,40 @@ namespace RNC
                                                 p.TriggerEvent("BankDoorLocked", true);
                                                 p.TriggerEvent("BankRob_SetMusic", 0);
 
-                                                Account a = EPlayer.GetAccount(p);
-                                                CharacterData cd = NAPI.Util.FromJson<CharacterData>(a.Character);
-                                                cd.Clothing[1].Clothes[11].Drawable = 320;
-                                                cd.Clothing[1].Clothes[11].Texture = 0;
-                                                cd.Clothing[3].Clothes[11].Drawable = 331;
-                                                cd.Clothing[3].Clothes[11].Texture = 0;
-
-                                                cd.Clothing[1].Clothes[4].Drawable = 121;
-                                                cd.Clothing[1].Clothes[4].Texture = 0;
-                                                cd.Clothing[3].Clothes[4].Drawable = 127;
-                                                cd.Clothing[3].Clothes[4].Texture = 0;
-
-                                                cd.Clothing[1].Clothes[6].Drawable = 96;
-                                                cd.Clothing[1].Clothes[6].Texture = 0;
-                                                cd.Clothing[3].Clothes[6].Drawable = 100;
-                                                cd.Clothing[3].Clothes[6].Texture = 0;
-
-                                                bool hasHelmet = (new Random().Next(0, 10) > 5);
-                                                if (hasHelmet)
+                                                if(p.HasData("BankRobberyUnit"))
                                                 {
-                                                    cd.Clothing[1].Hat = 141;
-                                                    cd.Clothing[1].HatTxt = 0;
-                                                    cd.Clothing[3].Hat = 140;
-                                                    cd.Clothing[3].HatTxt = 0;
+                                                    if(p.GetData<string>("BankRobberyUnit") == "fib")
+                                                    {
+                                                        Account a = EPlayer.GetAccount(p);
+                                                        CharacterData cd = NAPI.Util.FromJson<CharacterData>(a.Character);
+                                                        cd.Clothing[1].Clothes[11].Drawable = 320;
+                                                        cd.Clothing[1].Clothes[11].Texture = 0;
+                                                        cd.Clothing[3].Clothes[11].Drawable = 331;
+                                                        cd.Clothing[3].Clothes[11].Texture = 0;
+
+                                                        cd.Clothing[1].Clothes[4].Drawable = 121;
+                                                        cd.Clothing[1].Clothes[4].Texture = 0;
+                                                        cd.Clothing[3].Clothes[4].Drawable = 127;
+                                                        cd.Clothing[3].Clothes[4].Texture = 0;
+
+                                                        cd.Clothing[1].Clothes[6].Drawable = 96;
+                                                        cd.Clothing[1].Clothes[6].Texture = 0;
+                                                        cd.Clothing[3].Clothes[6].Drawable = 100;
+                                                        cd.Clothing[3].Clothes[6].Texture = 0;
+
+                                                        bool hasHelmet = (new Random().Next(0, 10) > 5);
+                                                        if (hasHelmet)
+                                                        {
+                                                            cd.Clothing[1].Hat = 141;
+                                                            cd.Clothing[1].HatTxt = 0;
+                                                            cd.Clothing[3].Hat = 140;
+                                                            cd.Clothing[3].HatTxt = 0;
+                                                        }
+
+                                                        EPlayer.ApplyCharacter(p, cd, 1);
+                                                    }
                                                 }
-
-
-                                                EPlayer.ApplyCharacter(p, cd, 1);
+                                                
 
                                                 EPlayer.Freeze(p, false);
                                                 if (p.HasData("BR_UnitVehicle") && p.HasData("BR_UnitVehicleSeat"))
@@ -3663,13 +3676,11 @@ namespace RNC
                                                     int seat = p.GetData<int>("BR_UnitVehicleSeat");
                                                     if (v != null)
                                                     {
-                                                        p.SendChatMessage("Putting you in vehicle " + v.Id + " " + v.DisplayName);
                                                         NAPI.Task.Run(() =>
                                                         {
                                                             p.SetIntoVehicle(v, seat);
-                                                        }, (((p.Id+1)*100)));
+                                                        }, 100);
                                                     }
-                                                    p.SendChatMessage("Seat ID to put you in: " + seat);
                                                 }
 
 
@@ -3876,6 +3887,14 @@ namespace RNC
 
                                                     player.TriggerEvent("SetActorInvulnerable", false);
 
+                                                    if (lobby.Cops.Contains(player))
+                                                    {
+                                                        EPlayer.GiveCopWeapons(player);
+                                                    }
+                                                    else if (lobby.Fugitives.Contains(player))
+                                                    {
+                                                        EPlayer.GiveFugitiveWeapons(player);
+                                                    }
                                                 }
                                                 catch { }
                                             }

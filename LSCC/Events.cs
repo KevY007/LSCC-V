@@ -204,8 +204,6 @@ namespace RNC
                 }
             }
 
-            NAPI.Util.ConsoleOutput("OnPlayerWounded " + player.Name + " " + state + " " + killerID);
-
             switch (state)
             {
                 case 0:
@@ -266,7 +264,7 @@ namespace RNC
                             LobbyData lobby = Settings.Lobbies.FirstOrDefault(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
                             if (lobby != null)
                             {
-                                string reasonStr = "(";
+                                string reasonStr = "";
                                 jWeaponData wepDat = new jWeaponData();
 
                                 if (Main.WeaponReasons.TryGetValue((long)killer.CurrentWeapon, out reasonStr))
@@ -281,8 +279,11 @@ namespace RNC
                                 {
                                     reasonStr = "";
                                 }
-                                if (reasonStr != "") // if it found a death reason, it will add ) so it's (WeaponName), otherwise it wont display any
-                                    reasonStr += ")";
+                                string rez = reasonStr;
+                                if(rez != "")
+                                {
+                                    reasonStr = "(" + rez + ")";
+                                }
 
                                 EPlayer.GetAccount(killer).Kills++;
                                 player.SetSharedData("LastKiller", killer.Name);
@@ -341,13 +342,25 @@ namespace RNC
                                 {
                                     if(lobby.Cops.Count <= 1)
                                     {
-                                        Main.StopGame(lobby.lobbyId, 2);
+                                        NAPI.Task.Run(() =>
+                                        {
+                                            Main.StopGame(lobby.lobbyId, 2);
+                                            Events.RequestClearAnimation(player);
+                                            player.StopAnimation();
+                                        }, 1000);
                                     }
                                     else
                                     {
                                         Player alive = lobby.Cops.FirstOrDefault(a => a.HasSharedData("Wounded") && a.GetSharedData<int>("Wounded") == 0);
-                                        if(alive == null)
-                                            Main.StopGame(lobby.lobbyId, 2); // if there are no alive cops left = no revive = end round
+                                        if (alive == null)
+                                        {
+                                            NAPI.Task.Run(() =>
+                                            {
+                                                Main.StopGame(lobby.lobbyId, 2);
+                                                Events.RequestClearAnimation(player);
+                                                player.StopAnimation();
+                                            }, 1000);
+                                        }
                                     }
 
                                     string chatStr = $"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: Officer {player.Name} is down and needs medical assistance!";
@@ -365,13 +378,25 @@ namespace RNC
                                 {
                                     if (lobby.Fugitives.Count <= 1)
                                     {
-                                        Main.StopGame(lobby.lobbyId, 3);
+                                        NAPI.Task.Run(() =>
+                                        {
+                                            Main.StopGame(lobby.lobbyId, 3);
+                                            Events.RequestClearAnimation(player);
+                                            player.StopAnimation();
+                                        }, 1000);
                                     }
                                     else
                                     {
                                         Player alive = lobby.Fugitives.FirstOrDefault(a => a.HasSharedData("Wounded") && a.GetSharedData<int>("Wounded") == 0);
                                         if (alive == null)
-                                            Main.StopGame(lobby.lobbyId, 3); // if there are no alive fugis left = no revive = end round
+                                        {
+                                            NAPI.Task.Run(() =>
+                                            {
+                                                Main.StopGame(lobby.lobbyId, 3);
+                                                Events.RequestClearAnimation(player);
+                                                player.StopAnimation();
+                                            }, 1000);
+                                        }
                                     }
 
                                     int msgrand = new Random().Next(0, 5);
@@ -511,7 +536,6 @@ namespace RNC
         [RemoteEvent("clear_anim")]
         public static void RequestClearAnimation(Player player)
         {
-            NAPI.Util.ConsoleOutput("RequestClearAnimation for player " + player.Name);
             RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a.Position.DistanceTo(player.Position) < 200.0).ToList().ForEach((Player act) =>
             {
                 if (player.HasData("LastAnimDict"))
@@ -3512,8 +3536,6 @@ namespace RNC
                     {
                         RequestClearAnimation(target);
                         target.StopAnimation();
-
-                        player.SendChatMessage("target anim should stop?");
                     }
                 }
                 catch { }

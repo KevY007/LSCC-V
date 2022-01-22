@@ -1398,7 +1398,7 @@ namespace RNC
                     player.GiveWeapon(WeaponHash.Specialcarbine, 250);
                     player.GiveWeapon(WeaponHash.Molotov, 1);
                 }
-                else if(lobby.BankRobbery.HeistLeader == player)
+                else if(lobby.BankRobbery.Sniper == player)
                 {
                     player.Health = 100;
                     player.Armor = 50;
@@ -1406,7 +1406,7 @@ namespace RNC
                     player.GiveWeapon(WeaponHash.Snspistol, 100);
                     player.GiveWeapon(WeaponHash.Sawnoffshotgun, 50);
                     player.GiveWeapon(WeaponHash.Assaultrifle, 90);
-                    player.GiveWeapon(WeaponHash.Marksmanrifle, 10);
+                    player.GiveWeapon(WeaponHash.Marksmanrifle, 5);
                     player.GiveWeapon(WeaponHash.Molotov, 1);
                 }
                 else
