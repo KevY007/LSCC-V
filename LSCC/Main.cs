@@ -481,6 +481,35 @@ namespace RNC
             LeaderLives = 2;
         }
     }
+
+    public class Achievement
+    {
+        public int ID;
+        public string Code;
+        public string Name;
+        public string Description;
+        public int RewardXP;
+        public int RewardPoints;
+
+        public Achievement(string Code, string Name, string Description, int RewardXP, int RewardPoints)
+        {
+            this.ID = Settings.Achievements.Count;
+            this.Code = Code;
+            this.Name = Name;
+            this.Description = Description;
+            this.RewardXP = RewardXP;
+            this.RewardPoints = RewardPoints;
+            Settings.Achievements.Add(this);
+        }
+        public static void LoadAchievementsForPlayer(Player player)
+        {
+            foreach(Achievement a in Settings.Achievements)
+            {
+                player.TriggerEvent("addAchievement", a.ID, a.Name, a.Description, a.RewardXP, a.RewardPoints);
+            }
+        }
+    }
+
     public static class Settings
     {
         // Static Settings / Const
@@ -501,6 +530,7 @@ namespace RNC
         public static List<LobbyData> Lobbies { get; set; }
         public static List<Player> LoggedInPlayers { get; set; }
         public static List<Vehicle> AdminVehicles { get; set; }
+        public static List<Achievement> Achievements { get; set; }
         public static int NextLobbyID { get; set; }
         public static int DerbyTimeLeft { get; set; }
         public static long LastDerbyTick { get; set; }
@@ -1287,6 +1317,32 @@ namespace RNC
             }
             catch { NAPI.Util.ConsoleOutput("(RnC | STARTUP) Unable to load in weapondata.json! Server will work but it can cause crashes due to component data."); }
             NAPI.Util.ConsoleOutput($"(RnC | STARTUP) Loading in weapondata.json... ({Settings.WeaponData.Count} weapons/entries)");
+
+            /* ACHIEVEMENTS CREATION */
+            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the achievements...");
+
+            new Achievement("first_derby", "Derby Master?", "Win a round in the Derby mode.", 4, 3);
+            new Achievement("first_kill", "First Kill", "Get your first kill in copchase.", 4, 2);
+            new Achievement("serial_killer", "Serial Killer", "Get a 5-kill killstreak.", 7, 3);
+            new Achievement("first_loadout", "Gear up!", "Buy a loadout.", 2, 1);
+            new Achievement("first_vehicle", "Speed is key", "Buy a vehicle.", 2, 1);
+            new Achievement("all_loadouts", "Arms Dealer", "Unlock all loadouts.", 10, 3);
+            new Achievement("all_vehicles", "Grand Theft Auto", "Unlock all vehicles.", 10, 3);
+            new Achievement("first_busted", "Professional Driver", "Win a round of BUSTED! mode as a fugitive.", 5, 3);
+            new Achievement("first_bankrob_fugitive", "Professional Thief", "Win a round of the Bank Robbery event as a fugitive.", 5, 3);
+            new Achievement("first_bankrob_cop", "True Hero", "Win a round of the Bank Robbery event as a cop.", 5, 3);
+            new Achievement("first_revive", "Future Medic?", "Revive a teammate in copchase.", 3, 1);
+            new Achievement("low_hp_kill", "Call an ambulance, but not for me!", "Get a kill in copchase while your HP is lower than 30.", 7, 4);
+            new Achievement("first_seatbelt", "Safety first!", "Buckle your seatbelt in copchase.", 1, 0);
+            new Achievement("first_squad", "Best friends forever", "Squad up with a player.", 3, 0);
+            new Achievement("get_revived", "Back from the dead", "Be revived by another player.", 3, 0);
+            new Achievement("heist_leader", "I'm the boss now!", "Be the first heist leader in the Bank Robbery event.", 3, 0);
+            new Achievement("heist_leader_win", "True Leader", "Win a round of the Bank Robbery event as the heist leader.", 7, 3);
+            new Achievement("reach_level_100", "I'm kinda active...", "Reach level 100.", 15, 5);
+            new Achievement("no_shooting_win", "Peaceful Criminal", "Win a round in copchase as a fugitive without opening fire at all.", 12, 5);
+            new Achievement("first_kill_leader", "Go for the head!", "As a cop, have your first kill be the heist leader in the Bank Robbery event.", 15, 5);
+            new Achievement("last_man_standing", "Last Man Standing", "Win a copchase round as the last person alive in your team.", 8, 3);
+            new Achievement("all_achievements", "Where's my medal?", "Unlock all achievements!", 75, 35);
 
             /* DEFAULT LOADOUTS CREATION */
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the loadouts...");

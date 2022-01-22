@@ -1662,6 +1662,8 @@ namespace RNC
 
             NAPI.Util.ConsoleOutput($"[Login] {player.Name} has logged in as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
+            Achievement.LoadAchievementsForPlayer(player);
+
             acc.LastHWID = player.Serial;
             acc.LastIP = player.Address;
             acc.LastRID = player.SocialClubId;
@@ -2330,6 +2332,8 @@ namespace RNC
             player.ResetData("Language");
 
             player.SetData<long>("JoinTimeUnix", DateTimeOffset.Now.ToUnixTimeSeconds());
+
+            Achievement.LoadAchievementsForPlayer(player);
 
             EPlayer.ShowCharCreator(player);
 

@@ -1209,6 +1209,51 @@ namespace RNC
             }
         }
 
+        public static bool HasUnlockedAchievement(Player player, string achievement)
+        {
+            if (EPlayer.GetAccount(player) == null) return false;
+            UnlockedAchievement a = ContextFactory.Instance.UnlockedAchievements.FirstOrDefault(u => u.AccountID == EPlayer.GetAccount(player).SQL_ID && u.Achievement.Equals(achievement, StringComparison.OrdinalIgnoreCase));
+            if (a == null) return false;
+            else return true;
+        }
+        public static void UnlockAchievement(Player player, string achievement)
+        {
+            if (EPlayer.GetAccount(player) == null) return;
+            Account acc = EPlayer.GetAccount(player);
+            UnlockedAchievement check = ContextFactory.Instance.UnlockedAchievements.FirstOrDefault(a => a.AccountID == acc.SQL_ID && a.Achievement == achievement);
+            if (check != null) return;
+            Achievement achdata = Settings.Achievements.FirstOrDefault(a => a.Code == achievement);
+            if (achdata == null) return;
+
+            UnlockedAchievement ach = new UnlockedAchievement()
+            {
+                AccountID = EPlayer.GetAccount(player).SQL_ID,
+                Achievement = achievement,
+                Time = DateTime.Now
+            };
+            ContextFactory.Instance.UnlockedAchievements.Add(ach);
+
+            if(achdata.RewardXP > 0)
+                EPlayer.GrantXP(player, achdata.RewardXP);
+
+            if(achdata.RewardPoints > 0)
+                EPlayer.GivePoints(player, achdata.RewardPoints);
+
+            // TO-DO: triggering achievement unlock notification, awaiting rotx to make UI for it
+
+            if (achievement != "all_achievements")
+            {
+                if (!HasUnlockedAchievement(player, "all_achievements"))
+                {
+                    // checking if all achievements are unlocked: is the count of player's unlocked achievements higher or equal than server achievement count?
+                    if (ContextFactory.Instance.UnlockedAchievements.AsQueryable().Where(a => a.AccountID == acc.SQL_ID).ToList().Count >= Settings.Achievements.Count)
+                    {
+                        UnlockAchievement(player, "all_achievements");
+                    }
+                }
+            }
+        }
+
         public static void SyncComponents(Player tosyncfor, Player target, long specificWeapon = -1)
         {
             try

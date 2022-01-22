@@ -78,6 +78,14 @@ namespace RNC
         public string Admin { get; set; }
         public DateTime DateTime { get; set; }
     }
+    public class UnlockedAchievement
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public int AccountID { get; set; }
+        public string Achievement { get; set; }
+        public DateTime Time { get; set; }
+    }
     public class PlayerOutfit
     {
         [Key]
@@ -187,6 +195,7 @@ namespace RNC
         public DbSet<OwnedVehData> OwnedVehicles { get; set; }
         public DbSet<OwnedLoadoutData> OwnedLoadouts { get; set; }
         public DbSet<AdminNote> AdminNotes { get; set; }
+        public DbSet<UnlockedAchievement> UnlockedAchievements { get; set; }
         public DbSet<Logs_AdminRecord> Logs_AdminRecords { get; set; }
         public DbSet<Logs_Admin> Logs_Admin { get; set; }
         public DbSet<Logs_Session> Logs_Session { get; set; }
