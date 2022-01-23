@@ -1603,12 +1603,12 @@ namespace RNC
             {
                 return;
             }
-            if (!lobby.Fugitives.Contains(player) && !lobby.Cops.Contains(player)) return;
+            //if (!lobby.Fugitives.Contains(player) && !lobby.Cops.Contains(player)) return;
 
-            if(Environment.TickCount64 - player.GetData<long>("LastClimbProtection") >= 45000)
+            /*if(Environment.TickCount64 - player.GetData<long>("LastClimbProtection") >= 45000)
             {
                 player.SetData("ClimbProtectionProcs", 0);
-            }
+            }*/
 
             int time = 0;
             switch(status)
@@ -1618,12 +1618,12 @@ namespace RNC
                     {
                         player.SetSharedData("ClimbProtection", true);
 
-                        if (player.GetSharedData<int>("Team") == 0) time = 7500;
-                        else time = 15000;
+                        if (player.GetSharedData<int>("Team") == 0) time = 9000;
+                        else time = 18500;
 
-                        player.SetData("ClimbProtectionEnd", Environment.TickCount64 + time);
-                        player.SetData("LastClimbProtection", Environment.TickCount64);
-                        player.SetData("ClimbProtectionProcs", player.GetData<int>("ClimbProtectionProcs")+1);
+                        //player.SetData("ClimbProtectionEnd", Environment.TickCount64 + time);
+                        //player.SetData("LastClimbProtection", Environment.TickCount64);
+                        //player.SetData("ClimbProtectionProcs", player.GetData<int>("ClimbProtectionProcs")+1);
                         EPlayer.Notify(player, "Climb protection...", "green", "fas fa-hourglass", false, time, "topCenter", "replace");
                     }
                     break;
@@ -1633,14 +1633,19 @@ namespace RNC
                     {
                         player.SetSharedData("ClimbProtection", true);
 
-                        if (player.GetSharedData<int>("Team") == 0) time = 1000;
-                        else time = 2000;
+                        if (player.GetSharedData<int>("Team") == 0) time = 2500;
+                        else time = 4000;
 
-                        player.SetData("ClimbProtectionEnd", Environment.TickCount64 + time);
-                        player.SetData("LastClimbProtection", Environment.TickCount64);
+                        //player.SetData("ClimbProtectionEnd", Environment.TickCount64 + time);
+                        //player.SetData("LastClimbProtection", Environment.TickCount64);
                         EPlayer.Notify(player, "Climb protection...", "green", "fas fa-hourglass", false, time, "topCenter", "replace");
                     }
                     break;
+                default:
+                    {
+                        player.SetSharedData("ClimbProtection", false);
+                        break;
+                    }
             }
             return;
         }
