@@ -523,6 +523,13 @@ namespace RNC
                     EPlayer.HasUnlockedAchievement(player, a.Code), a.Background);
             }
             player.TriggerEvent("addAchievementsToMenu");
+
+            Account acc = EPlayer.GetAccount(player);
+            DiscordData discordData = NAPI.Util.FromJson<DiscordData>(acc.DiscordInfo);
+            if (discordData.DiscordID != "n/a")
+            {
+                EPlayer.UnlockAchievement(player, "discord_verify");
+            }
         }
     }
 

@@ -639,6 +639,37 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("SetVoiceMode")]
+        public static void OnSetVoiceMode(Player player, int voiceMode, bool send_msg)
+        {
+            switch (voiceMode)
+            {
+                case 0:
+                    if(send_msg)
+                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Nearby (30m) (All players)");
+                    break;
+                case 1:
+                    if (send_msg)
+                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Team Only (+15m proximity)");
+                    break;
+                case 2:
+                    if (send_msg)
+                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Squad Only (Everyone else gets muted)");
+                    break;
+                case 3:
+                    if (send_msg)
+                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Disabled");
+                    foreach (Player p in Settings.LoggedInPlayers)
+                    {
+                        p.DisableVoiceTo(player);
+                        player.DisableVoiceTo(p);
+                    }
+                    break;
+            }
+
+            player.SetSharedData("VoiceMode", voiceMode);
+        }
+
         [RemoteEvent("OnScriptedKeyPress")]
         public static void OnScriptedKeyPress(Player player, int keyId, bool keyState) // keyState == true? Down
         {
@@ -679,28 +710,8 @@ namespace RNC
 
                 if (voiceMode >= 4) voiceMode = 0;
 
-                switch (voiceMode)
-                {
-                    case 0:
-                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Nearby (30m) (All players)");
-                        break;
-                    case 1:
-                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Team Only (+15m proximity)");
-                        break;
-                    case 2:
-                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Squad Only (Everyone else gets muted)");
-                        break;
-                    case 3:
-                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Disabled");
-                        foreach(Player p in Settings.LoggedInPlayers)
-                        {
-                            p.DisableVoiceTo(player);
-                            player.DisableVoiceTo(p);
-                        }
-                        break;
-                }
-
-                player.SetSharedData("VoiceMode", voiceMode);
+                OnSetVoiceMode(player, voiceMode, true);
+                player.TriggerEvent("setVoiceModeMenu", voiceMode);
             }
 
             if (keyId == 0x4E)
@@ -2935,6 +2946,24 @@ namespace RNC
             };
         }
 
+        [RemoteEvent("SetTaseProtection")]
+        public void OnSetTaseProtection(Player player, bool toggle)
+        {
+            if (player == null) return;
+            if (toggle)
+            {
+                if (player.GetSharedData<int>("Team") != 0) return;
+
+                player.SetSharedData("TaseProtection", true); 
+                EPlayer.Notify(player, "Tase protection...", "yellow", "fas fa-hourglass", false, 5000, "topCenter", "replace");
+            }
+            else
+            {
+                EPlayer.Notify(player, "Tase protection...", "yellow", "fas fa-hourglass", false, 1, "topCenter", "replace");
+                player.SetSharedData("TaseProtection", false);
+            }
+        }
+
         [RemoteEvent("UpdateStreamData")]
         public void OnPlayerUpdateStreamData(Player player)
         {
@@ -3421,7 +3450,7 @@ namespace RNC
                         }
                     }
 
-                    if (target.HasData("TasedTill") && Environment.TickCount64 - (target.GetData<long>("TasedTill") - 18000) >= 2000)
+                    if (target.HasSharedData("TasedTill") && Environment.TickCount64 - (target.GetSharedData<long>("TasedTill") - 18000) >= 2000)
                     {
                         if (lobby.GameProgress < 60)
                         {
@@ -3431,7 +3460,8 @@ namespace RNC
 
                         int time = 18000;
                         target.TriggerEvent("setToRagdoll", time, time * 2, 1, false, false, false);
-                        target.SetData("TasedTill", Environment.TickCount64 + 18000);
+                        target.SetSharedData("TasedTill", Environment.TickCount64 + 18000);
+                        target.TriggerEvent("clearTaseAnims", 18000);
 
                         if (lobby.Fugitives.Contains(target))
                         {

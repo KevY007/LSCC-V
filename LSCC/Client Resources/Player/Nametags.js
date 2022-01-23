@@ -141,8 +141,7 @@ mp.events.add('render', (nametags) => {
                         });
                     }
 
-                    if((BigInt(player.getVariable("LastVehEnterExit")) + BigInt(5000) >= BigInt(Date.now()))
-                        && player.getVariable("Team") == 0 && !player.isInAnyVehicle(false))
+                    if(player.getVariable("Team") == 0 && player.getVariable("TaseProtection") == true)
                     {
                         var typingStr = "(( TASE PROTECTION ))";
                         if(timerCount == 0) typingStr = "(( TASE PROTECTION ))";

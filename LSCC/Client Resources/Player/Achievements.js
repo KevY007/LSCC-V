@@ -72,4 +72,17 @@ mp.events.add("unlockAchievement", (achievementName) => {
 
     achunlock.unlocked = true;
     UIMenu.execute(`gm.$refs.profile.$refs.ProfileTabs.$refs.Achievements.achvs.find(a => a.name === "${achievementName}").unlocked = true`);
+
+    let rewardstr = "";
+    if(achunlock.rewardXP > 0) rewardstr += `+${achunlock.rewardXP} XP`;
+    if(achunlock.rewardPoints > 0){
+        if(rewardstr == "") rewardstr += `+${achunlock.rewardPoints} points`;
+        else rewardstr += `& +${achunlock.rewardPoints} points`;
+    }
+
+    if(UIHud != null && UIHud != undefined){
+        UIHud.execute(`gm.sendAch("${achunlock.name}", "${achunlock.description}", "${achunlock.background}", "${rewardstr}", 6000);`);
+    }
+    mp.game.audio.playSoundFrontend(-1, "PROPERTY_PURCHASE", "HUD_AWARDS", true);
+
 });

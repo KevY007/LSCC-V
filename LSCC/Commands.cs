@@ -1594,7 +1594,7 @@ namespace RNC
             if (player.GetSharedData<int>("Wounded") > 0)
                 { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Nice try - you cannot use this while wounded!"); return; }
 
-            if (player.HasData("TasedTill") && Environment.TickCount64 < player.GetData<long>("TasedTill"))
+            if (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedData<long>("TasedTill"))
                 { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this right now as you're tased."); return; }
 
             if (player.HasData("Cuffed"))
@@ -1670,7 +1670,7 @@ namespace RNC
                 if (player.GetSharedData<string>("ActionType") != "none" || player.GetSharedData<int>("ActionTime") > 0)
                 { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are already performing an action!"); return; }
 
-                if (player.HasData("Cuffed") || (player.HasData("TasedTill") && Environment.TickCount64 < player.GetData<long>("TasedTill")))
+                if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedData<long>("TasedTill")))
                 { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this right now."); return; }
 
                 /*if (player.IsInVehicle)
@@ -1740,7 +1740,7 @@ namespace RNC
                 if (player.GetSharedData<string>("ActionType") != "none" || player.GetSharedData<int>("ActionTime") > 0)
                 { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are already performing an action!"); return; }
 
-                if (player.HasData("Cuffed") || (player.HasData("TasedTill") && Environment.TickCount64 < player.GetData<long>("TasedTill")))
+                if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedData<long>("TasedTill")))
                 { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this right now."); return; }
 
                 if (player.IsInVehicle)
@@ -1773,7 +1773,7 @@ namespace RNC
         [Command("handsup")]
         public void cmd_handsup(Player player)
         {
-            if (player.HasData("Cuffed") || (player.HasData("TasedTill") && Environment.TickCount64 < player.GetData<long>("TasedTill"))) 
+            if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedData<long>("TasedTill"))) 
                 { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this right now."); return; }
 
             if (player.IsInVehicle)

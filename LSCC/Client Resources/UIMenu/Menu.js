@@ -16,6 +16,7 @@ if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD
     mp.storage.data.menu.OOCauto = false;
     mp.storage.data.menu.EventMusic = true;
     mp.storage.data.menu.monitoring = false;
+    mp.storage.data.menu.VoiceMode = 0;
 
     mp.storage.flush();
 }
@@ -247,6 +248,32 @@ function ToggleMenu()
                         label: "Auto OOC",
                         description: "Automatically send all text messages to the global OOC chat, so you don't have to type /o every time."
                     },
+                    {
+                        id: 17,
+                        type: 4,
+                        name: "voicemode",
+                        label: "Voice Mode",
+                        description: "Sets the voice channel in which you speak. (SHORTCUT: N+TAB)",
+                        preSelect: "Nearby",
+                        options: [
+                          {
+                            name: "Nearby",
+                            value: "0",
+                          },
+                          {
+                            name: "Team",
+                            value: "1",
+                          },
+                          {
+                            name: "Squad",
+                            value: "2",
+                          },
+                          {
+                            name: "Disabled",
+                            value: "3",
+                          },
+                        ]
+                    },
                 ]
             }
         ]`);
@@ -268,6 +295,7 @@ function ToggleMenu()
         UIMenu.execute(`gm.$refs.settings.$refs.Game.$refs.autojoinopt.value = ${mp.storage.data.menu.AutoJoin};`);
         UIMenu.execute(`gm.$refs.settings.$refs.Game.$refs.eventmusic.value = ${mp.storage.data.menu.EventMusic};`);
         UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.oocauto.value = ${mp.storage.data.menu.OOCauto};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.voicemode.value = ${mp.storage.data.menu.VoiceMode};`);
     }
 }
 
@@ -367,6 +395,11 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     {
         mp.storage.data.menu.monitoring = value;
         UIHud.execute(`gm.$refs.TopRight.$refs.Info.monitor = ${value}`);
+    }
+    else if(id == 17)
+    {
+        mp.storage.data.menu.VoiceMode = value;
+        mp.events.callRemote("SetVoiceMode", value, true);
     }
 
     if(UIHud != null)

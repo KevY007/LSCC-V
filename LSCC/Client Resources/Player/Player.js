@@ -58,6 +58,9 @@ let climbProtectionStage = 0; // 0 -> no protection | 1 -> protection long while
 let climbingStart = 0; // to prevent protection from being activated on fences
 let lastClimbProtection = 0;
 
+let taseProtectionTimer = null;
+let wasInCar = false;
+
 var themeSoundID = 1;
 
 var checker_lastHealth = 0;
@@ -777,6 +780,15 @@ mp.keys.bind(0x4A, false, () => {
     }
 });
 
+let clearTaseAnimTimer = null;
+mp.events.add("clearTaseAnims", (time) => {
+    clearTimeout(clearTaseAnimTimer);
+    mp.gui.chat.push("[>] You've been tased, the effect will last " + (time/1000) + " seconds before you can get up!");
+    clearTaseAnimTimer = setTimeout(() => {
+        mp.players.local.clearTasksImmediately();
+    }, time);
+});
+
 mp.events.add('render', () => {
 
     FPS_Frames++;
@@ -786,6 +798,42 @@ mp.events.add('render', () => {
         FPS_Frames = 0;
         FPS_Calc = Date.now();
     }
+
+
+    if(mp.players.local.getVariable("Team") == 0){
+        if(mp.players.local.isInAnyVehicle(true)){
+            if(!wasInCar){
+
+                if(mp.players.local.getVariable("TaseProtection") == true){
+                    mp.events.callRemote("SetTaseProtection", false);
+                }
+            }
+            wasInCar = true;
+
+            if(taseProtectionTimer != null)
+            {
+                clearTimeout(taseProtectionTimer);
+                taseProtectionTimer = null;
+            }
+        }
+        else{
+            if(wasInCar == true){
+                wasInCar = false;
+                clearTimeout(taseProtectionTimer);
+
+                mp.events.callRemote("SetTaseProtection", true);
+                taseProtectionTimer = setTimeout(() => {
+                    if(mp.players.local == null || mp.players.local == undefined || !mp.players.exists(mp.players.local)) return;
+
+                    mp.events.callRemote("SetTaseProtection", false);
+                }, 5000);
+            }
+        }
+    }
+    if(mp.players.local.getVariable("TaseProtection") == true && mp.players.local.getVariable("Team") != 0){
+        mp.events.callRemote("SetTaseProtection", false);
+    }
+
     if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
     {
         mp.game.player.restoreStamina(100);
@@ -1548,7 +1596,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                         return true; // Stun Gun no shot if more than 10 meters or target in car.
                     }
 
-                    if(BigInt(player.weapon) == BigInt(911657153) && BigInt(targetEntity.getVariable("LastVehEnterExit")) + BigInt(5000) >= BigInt(Date.now())
+                    if(BigInt(player.weapon) == BigInt(911657153) && targetEntity.getVariable("TaseProtection") == true
                         && targetEntity.getVariable("Team") == 0)
                     {
                         mp.game.graphics.notify("~r~Cannot tase! Target exiting vehicle!");
@@ -1961,8 +2009,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
 
                         if(chaseTimeCur < 60) return true; // nah not at da start
 
-                        if(BigInt(targetEntity.getVariable("LastVehEnterExit")) + BigInt(5000) >= BigInt(Date.now())
-                            && targetEntity.getVariable("Team") == 0)
+                        if(targetEntity.getVariable("TaseProtection") == true && targetEntity.getVariable("Team") == 0)
                         {
                             mp.game.graphics.notify("~r~Cannot tase! Target exiting vehicle!");
                             return true;
@@ -2483,6 +2530,10 @@ mp.events.add("OnPlayerLoginRegister", () => {
     }
 });
 
+mp.events.add("setVoiceModeMenu", (value) => {
+    mp.storage.data.menu.VoiceMode = value;
+});
+
 function setStorageDataVars(){
     if(mp.storage.data.menu.OOCauto !== undefined){
         autoOOC = mp.storage.data.menu.OOCauto;
@@ -2516,6 +2567,15 @@ function setStorageDataVars(){
     else{
         mp.storage.data.menu.monitoring = false;
         UIHud.execute(`gm.$refs.TopRight.$refs.Info.monitor = false;`);
+    }
+
+    if(mp.storage.data.menu.VoiceMode !== undefined){
+        mp.storage.data.menu.VoiceMode = false;
+        mp.events.callRemote("SetVoiceMode", mp.storage.data.menu.VoiceMode, false);
+    }
+    else{
+        mp.storage.data.menu.VoiceMode = 0;
+        mp.events.callRemote("SetVoiceMode", 0, false);
     }
 
     mp.storage.flush();

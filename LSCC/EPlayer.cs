@@ -866,6 +866,8 @@ namespace RNC
 
                 player.SetSharedData("AutoOOC", false);
 
+                player.SetSharedData("TaseProtection", false);
+
                 player.SetData<bool>("ShotsFired", false);
 
                 player.SetSharedData("Level", 0);
@@ -968,7 +970,7 @@ namespace RNC
                 player.SetSharedData("MuteTime", 0);
                 player.ResetData("DraggingOut");
 
-                player.SetData("TasedTill", Environment.TickCount64);
+                player.SetSharedData("TasedTill", Environment.TickCount64);
 
                 player.SetData("TUA_LT", 0);
                 player.SetData("TUA_LP", new Vector3(0.0, 0.0, 0.0)); // AFK CHECKERS
@@ -1250,19 +1252,14 @@ namespace RNC
 
             // TO-DO: triggering achievement unlock notification, awaiting rotx to make UI for it
 
-            player.SendChatMessage("Let's see if u got all achivs nigga");
             if (achievement != "all_achievements")
             {
-                player.SendChatMessage("Let's see if u got all achivs nigga stage 2");
                 if (!HasUnlockedAchievement(player, "all_achievements"))
                 {
-                    player.SendChatMessage("u didnt unlock it good");
                     // checking if all achievements are unlocked: is the count of player's unlocked achievements higher or equal than server achievement count?
                     int playerAchievements = ContextFactory.Instance.UnlockedAchievements.AsQueryable().Where(a => a.AccountID == acc.SQL_ID).ToList().Count;
-                    player.SendChatMessage("You got " + playerAchievements + "/" + (Settings.Achievements.Count-1) + " shittos.");
                     if (playerAchievements >= Settings.Achievements.Count-1)
                     {
-                        player.SendChatMessage("gucci gang");
                         UnlockAchievement(player, "all_achievements");
                     }
                 }
