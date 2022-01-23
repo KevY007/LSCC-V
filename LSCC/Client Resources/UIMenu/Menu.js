@@ -15,6 +15,7 @@ if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD
     mp.storage.data.menu.HUD = true;
     mp.storage.data.menu.OOCauto = false;
     mp.storage.data.menu.EventMusic = true;
+    mp.storage.data.menu.monitoring = false;
 
     mp.storage.flush();
 }
@@ -226,6 +227,13 @@ function ToggleMenu()
                             value: "10",
                           },
                         ]
+                    },
+                    {
+                        id: 16,
+                        type: 1,
+                        name: "monitor",
+                        label: "FPS/Ping Monitoring",
+                        description: "Toggles whether your FPS & ping will be displayed in the top right corner."
                     }
                 ]
             },
@@ -251,6 +259,7 @@ function ToggleMenu()
         UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.hud.value = ${mp.storage.data.menu.HUD};`);
         UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.bigmap.value = ${mp.storage.data.menu.alwaysExpandedMap};`);
         UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.updr.value = ${mp.storage.data.menu.updateRate};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.monitor.value = ${mp.storage.data.menu.monitoring};`);
         UIMenu.execute(`gm.$refs.settings.$refs.Keybinds.$refs.vcbind.value = "${String.fromCharCode(curVoiceBind)}";`);
         UIMenu.execute(`gm.$refs.settings.$refs.Keybinds.$refs.gpsbind.value = "${String.fromCharCode(curGPSBind)}";`);
         UIMenu.execute(`gm.$refs.settings.$refs.Keybinds.$refs.bigmapbind.value = "${String.fromCharCode(curMapBind)}";`);
@@ -354,6 +363,11 @@ mp.events.add("MenuChangeSettings", (id, value) =>
         mp.storage.data.menu.EventMusic = value;
         mp.players.local.EventMusic = value;
     }
+    else if(id == 16)
+    {
+        mp.storage.data.menu.monitoring = value;
+        UIHud.execute(`gm.$refs.TopRight.$refs.Info.monitor = ${value}`);
+    }
 
     if(UIHud != null)
     {
@@ -362,6 +376,12 @@ mp.events.add("MenuChangeSettings", (id, value) =>
 
     mp.storage.flush();
 });
+
+mp.events.add("Menu_UpdateLevelXP", () => {
+    UIMenu.execute(`gm.$refs.profile.xp = ${mp.players.local.getVariable("CurrentXP")};`);
+    UIMenu.execute(`gm.$refs.profile.nextXp = ${mp.players.local.getVariable("NextLevelXP")};`);
+    UIMenu.execute(`gm.stats.level = ${mp.players.local.getVariable("Level")}`);
+})
 
 mp.events.add("PutPlayerInLobby", (lobbyID, password) => {
     mp.events.callRemote("RequestLobbySwitch", lobbyID, password);

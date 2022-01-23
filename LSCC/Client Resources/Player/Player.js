@@ -15,6 +15,8 @@ mp.events.add("ToggleCanExitVehicle", (toggle) => {
     player.canExitVehicle = toggle;
 })
 
+let ping = 69;
+
 let chaseStartVeh = -1;
 let chaseStartSeat = -1;
 
@@ -136,6 +138,11 @@ mp.events.add("ShowHandcuffTooltip", () => {
     HandcuffTooltipShown = true;
 });
 
+mp.events.add('setPing', (pingtoset) => {
+    ping = pingtoset;
+    UIHud.execute(`gm.$refs.TopRight.$refs.Info.fps = ${ping}`);
+})
+
 mp.events.add("OneSecondEvent", () => {
     ShotStats.UpdateInterval++;
 
@@ -145,6 +152,13 @@ mp.events.add("OneSecondEvent", () => {
         mp.events.callRemoteUnreliable("SyncShotStats", ShotStats.TotalFired, ShotStats.HitPlayer, ShotStats.HitVehicle, ShotStats.Missed);
         mp.events.callRemoteUnreliable("UpdateFPS", FPS);
         mp.events.callRemote("UpdatePacketloss");
+
+        UpdateStatsVars(mp.players.local);
+    }
+
+    if(mp.storage.data.menu.monitoring == true){
+        UIHud.execute(`gm.$refs.TopRight.$refs.Info.fps = ${FPS}`);
+        mp.events.callRemote("RequestPlayerPing");
     }
 
     if(HandcuffTooltipShown){
@@ -663,7 +677,11 @@ function UpdateStatsVars(entity){
                 }`);
             }
             if(UIMenu !== undefined && UIMenu != null){
-                UIMenu.execute(`gm.admin = ${entity.Admin}`);
+                UIMenu.execute(`gm.stats = {
+                    name: "${entity.name}",
+                    level: ${entity.getVariable("Level")},
+                    admin: ${entity.getVariable("Admin")}
+                }`);
             }
         }
     }
@@ -1514,8 +1532,9 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
     if(mp.players.local.getVariable("HasShot") == false && player.getVariable("Team") == 0 && chaseRunning)
     {
         mp.events.callRemote("GivePlayerShotTag");
-        mp.events.callRemote("SetShotsFired", true);
     }
+    if(chaseRunning && mp.players.local.Team == 0 || mp.players.local.Team == 1)
+        mp.events.callRemote("SetShotsFired", true);
 });
 
 mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weapon, boneIndex, damage) => {
@@ -2412,6 +2431,14 @@ function setStorageDataVars(){
     else{
         mp.storage.data.menu.EventMusic = true;
         mp.players.local.EventMusic = true;
+    }
+
+    if(mp.storage.data.menu.monitoring !== undefined){
+        UIHud.execute(`gm.$refs.TopRight.$refs.Info.monitor = ${mp.storage.data.menu.monitoring}`);
+    }
+    else{
+        mp.storage.data.menu.monitoring = false;
+        UIHud.execute(`gm.$refs.TopRight.$refs.Info.monitor = false;`);
     }
 
     mp.storage.flush();

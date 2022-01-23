@@ -6816,6 +6816,7 @@ namespace RNC
         public void cmd_makemeadmin(Player player)
         {
             EPlayer.GetAccount(player).Admin = 6;
+            player.SetSharedData("Admin", 6);
         }
 
         [Command("maafkrdekevyko", Alias = "sorrychuttu,achayarachakev")]
@@ -8111,6 +8112,24 @@ namespace RNC
 
             player.TriggerEvent("DestroyPlayerCamera");
             player.TriggerEvent("CreatePlayerCamera", x, y, z, rx, ry, rz, viewangle);
+        }
+
+        [Command("dbgdiscordverify")]
+        public void cmd_dbgdiscordverify(Player player, Player _p)
+        {
+            player.SendChatMessage(">> GIVEN " + _p.Name + " THEIR DISCORD REWARDS");
+
+            _p.SendChatMessage("!{#83ff75}Congratulations! You successfully linked your Discord account to your Race 'N' Chase account.");
+            _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You now have access to the !{#ffff00}Negotiator !{#ffffff}loadout for !{#0097ff}cops !{#ffffff}& !{#ffae00}fugitives!{#ffffff}.");
+            _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You unlocked a new !{#ffae00}fugitive !{#ffffff}vehicle: !{#ffff00}Super Diamond!{#ffffff}.");
+            _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You also received !{#ffff00}13 points & 10XP !{#ffffff}as a bonus.");
+
+            EPlayer.GrantXP(_p, 10);
+            EPlayer.GivePoints(_p, 13);
+            EPlayer.UnlockLoadout(_p, "Negotiator", 0);
+            EPlayer.UnlockLoadout(_p, "Negotiator", 1);
+            EPlayer.UnlockVehicle(_p, "superd", 0);
+            EPlayer.UnlockAchievement(_p, "discord_verify");
         }
 
         [Command("setadmin", "!{#AFAFAF}[USAGE] setadmin (target) (level)", Alias = "makeadmin,setstaff")]

@@ -176,6 +176,13 @@ namespace RNC
             return;
         }
 
+        [RemoteEvent("RequestPlayerPing")]
+        public void OnRequestPlayerPing(Player player)
+        {
+            if (player == null) return;
+            player.TriggerEvent("setPing", player.Ping);
+        }
+
         [RemoteEvent("WoundedTimerTick")]
         public void OnWoundedTimerTick(Player player, int time)
         {
@@ -1677,7 +1684,6 @@ namespace RNC
 
             NAPI.Util.ConsoleOutput($"[Login] {player.Name} has logged in as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
-            Achievement.LoadAchievementsForPlayer(player);
 
             acc.LastHWID = player.Serial;
             acc.LastIP = player.Address;
@@ -1726,6 +1732,11 @@ namespace RNC
 
             player.SetSharedData("Admin", acc.Admin);
             player.SetSharedData("PlayerSquadID", -1);
+
+            player.SetSharedData("Level", acc.Level);
+            player.SetSharedData("CurrentXP", acc.XP);
+            player.SetSharedData("NextLevelXP", EPlayer.GetMaxLevelXP(acc.Level));
+            player.TriggerEvent("Menu_UpdateLevelXP");
 
             if (ContextFactory.Instance.Languages.ToList().Find(l => l.SQL_ID == acc.Language) != null && EPlayer.GetAccount(player).Language != -1)
                 player.SetData("Language", ContextFactory.Instance.Languages.ToList().Find(l => l.SQL_ID == acc.Language));
@@ -1823,6 +1834,7 @@ namespace RNC
 
             player.TriggerEvent("showLoginBrowser", false);
             player.TriggerEvent("OnPlayerLoginRegister");
+            Achievement.LoadAchievementsForPlayer(player);
         }
 
 
@@ -2353,7 +2365,6 @@ namespace RNC
 
             player.SetData<long>("JoinTimeUnix", DateTimeOffset.Now.ToUnixTimeSeconds());
 
-            Achievement.LoadAchievementsForPlayer(player);
 
             EPlayer.ShowCharCreator(player);
 
@@ -2370,10 +2381,16 @@ namespace RNC
             });
             ContextFactory.Instance.SaveChanges();
 
+            player.SetSharedData("Level", acc.Level);
+            player.SetSharedData("CurrentXP", acc.XP);
+            player.SetSharedData("NextLevelXP", EPlayer.GetMaxLevelXP(acc.Level));
+            player.TriggerEvent("Menu_UpdateLevelXP");
+
             //EPlayer.Spawn(player);
             EPlayer.Notify(player, "Registration successful!", "green", "fas fa-check", false, 2000);
 
             player.TriggerEvent("showLoginBrowser", false);
+            Achievement.LoadAchievementsForPlayer(player);
         }
 
         [RemoteEvent("OnPlayerLoginAttempt")]
@@ -2848,6 +2865,7 @@ namespace RNC
                 player.TriggerEvent("UpdateMenuMinigames", NAPI.Util.ToJson(Menu_MinigamesData(player)), (player.GetSharedData<int>("InLobby") < 0) ? player.GetSharedData<int>("InLobby") : player.GetSharedData<int>("InDM"));
                 player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(Menu_VehicleData(player)), EPlayer.GetAccount(player).CarCop, EPlayer.GetAccount(player).CarFugitive);
                 player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(Menu_LoadoutData(player)), EPlayer.GetAccount(player).LoadoutCop, EPlayer.GetAccount(player).LoadoutFugitive);
+                player.TriggerEvent("addAchievementsToMenu");
             }
             else // CLOSE: Anything you want when menu gets closed.
             {

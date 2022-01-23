@@ -221,6 +221,8 @@ namespace RNC
                                 EPlayer.UnlockVehicle(_p, "superd", 0);
                                 _p.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
 
+                                EPlayer.UnlockAchievement(_p, "discord_verify");
+
                                 ContextFactory.Instance.SaveChanges(); 
                                 context.Channel.SendMessageAsync($"!kuracback true {chanID} {vID} You successfully linked your Discord account to your Race 'N' Chase account!");
                                 return;

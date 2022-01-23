@@ -77,6 +77,7 @@ require("./nativeui/index.js");
 require("./chat/index.js");
 
 require('./Player/Player.js');
+require('./Player/Achievements.js');
 require('./Player/BankRobbery.js');
 require('./Player/Actions.js');
 require("./Player/Nametags.js");

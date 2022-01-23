@@ -162,7 +162,6 @@ namespace RNC
                             _toSend[i] = _toAdd;
                         }
                         string jsonShit = NAPI.Util.ToJson(_toSend);
-                        NAPI.Util.ConsoleOutput(jsonShit);
                         player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
                         break;
                     }
@@ -176,7 +175,6 @@ namespace RNC
                             _toSend[i] = _toAdd;
                         }
                         string jsonShit = NAPI.Util.ToJson(_toSend);
-                        NAPI.Util.ConsoleOutput(jsonShit);
                         player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
                         break;
                     }
@@ -190,7 +188,6 @@ namespace RNC
                             _toSend[i] = _toAdd;
                         }
                         string jsonShit = NAPI.Util.ToJson(_toSend);
-                        NAPI.Util.ConsoleOutput(jsonShit);
                         player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
                         break;
                     }

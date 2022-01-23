@@ -868,6 +868,10 @@ namespace RNC
 
                 player.SetData<bool>("ShotsFired", false);
 
+                player.SetSharedData("Level", 0);
+                player.SetSharedData("CurrentXP", 0);
+                player.SetSharedData("NextLevelXP", 0);
+
                 player.SetData<string>("BankRobberyUnit", "fib");
                 player.SetSharedData("HeistLeader", false);
 
@@ -1234,21 +1238,31 @@ namespace RNC
             };
             ContextFactory.Instance.UnlockedAchievements.Add(ach);
 
+            player.TriggerEvent("unlockAchievement", achdata.Name);
+
             if(achdata.RewardXP > 0)
                 EPlayer.GrantXP(player, achdata.RewardXP);
 
             if(achdata.RewardPoints > 0)
                 EPlayer.GivePoints(player, achdata.RewardPoints);
 
+            ContextFactory.Instance.SaveChanges();
+
             // TO-DO: triggering achievement unlock notification, awaiting rotx to make UI for it
 
+            player.SendChatMessage("Let's see if u got all achivs nigga");
             if (achievement != "all_achievements")
             {
+                player.SendChatMessage("Let's see if u got all achivs nigga stage 2");
                 if (!HasUnlockedAchievement(player, "all_achievements"))
                 {
+                    player.SendChatMessage("u didnt unlock it good");
                     // checking if all achievements are unlocked: is the count of player's unlocked achievements higher or equal than server achievement count?
-                    if (ContextFactory.Instance.UnlockedAchievements.AsQueryable().Where(a => a.AccountID == acc.SQL_ID).ToList().Count >= Settings.Achievements.Count)
+                    int playerAchievements = ContextFactory.Instance.UnlockedAchievements.AsQueryable().Where(a => a.AccountID == acc.SQL_ID).ToList().Count;
+                    player.SendChatMessage("You got " + playerAchievements + "/" + (Settings.Achievements.Count-1) + " shittos.");
+                    if (playerAchievements >= Settings.Achievements.Count-1)
                     {
+                        player.SendChatMessage("gucci gang");
                         UnlockAchievement(player, "all_achievements");
                     }
                 }
@@ -1781,11 +1795,15 @@ namespace RNC
             ContextFactory.Instance.OwnedVehicles.Add(_new);
 
             EPlayer.UnlockAchievement(player, "first_vehicle");
+            ContextFactory.Instance.SaveChanges();
 
-            if (GetOwnedVehicles(player, 0).Count + GetOwnedVehicles(player, 1).Count >= Settings.Cars.Count)
+            int totalOwned = GetOwnedVehicles(player, 0).Count + GetOwnedVehicles(player, 1).Count + 2;
+
+            NAPI.Util.ConsoleOutput($"{player.Name} unlocked a {model}, they now have a total of {totalOwned}/{Settings.Cars.Count} vehicles");
+
+            if (totalOwned >= Settings.Cars.Count)
                 EPlayer.UnlockAchievement(player, "all_vehicles");
 
-            ContextFactory.Instance.SaveChanges();
             return true;
         }
         public static bool HasOwnedVehicle(Player player, string model, int team)
@@ -1834,11 +1852,15 @@ namespace RNC
             ContextFactory.Instance.OwnedLoadouts.Add(_new);
 
             EPlayer.UnlockAchievement(player, "first_loadout");
+            ContextFactory.Instance.SaveChanges();
 
-            if (GetOwnedLoadouts(player, 0).Count + GetOwnedLoadouts(player, 1).Count >= Settings.Loadouts.Count)
+            int totalOwned = GetOwnedLoadouts(player, 0).Count + GetOwnedLoadouts(player, 1).Count + 2;
+
+            NAPI.Util.ConsoleOutput($"{player.Name} unlocked loadout {name}, they now have a total of {totalOwned}/{Settings.Loadouts.Count} loadouts.");
+
+            if (totalOwned >= Settings.Loadouts.Count)
                 EPlayer.UnlockAchievement(player, "all_loadouts");
 
-            ContextFactory.Instance.SaveChanges();
             return true;
         }
         public static bool HasOwnedLoadout(Player player, string name, int team)
@@ -1918,10 +1940,17 @@ namespace RNC
             }
 
             player.SetSharedData("Level", acc.Level);
-            if(acc.Level >= 100)
+            player.SetSharedData("CurrentXP", acc.XP);
+            player.SetSharedData("NextLevelXP", EPlayer.GetMaxLevelXP(acc.Level));
+            player.TriggerEvent("Menu_UpdateLevelXP");
+
+            NAPI.Task.Run(() =>
             {
-                EPlayer.UnlockAchievement(player, "reach_level_100");
-            }
+                if(player.GetSharedData<int>("Level") >= 100)
+                {
+                    EPlayer.UnlockAchievement(player, "reach_level_100");                  
+                }
+            }, 1000);
         }
         public static void Save(Player player)
         {

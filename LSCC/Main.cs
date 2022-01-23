@@ -493,8 +493,9 @@ namespace RNC
         public string Description;
         public int RewardXP;
         public int RewardPoints;
+        public string Background;
 
-        public Achievement(string Code, string Name, string Description, int RewardXP, int RewardPoints)
+        public Achievement(string Code, string Name, string Description, int RewardXP, int RewardPoints, bool custom_bg = false)
         {
             this.ID = Settings.Achievements.Count;
             this.Code = Code;
@@ -502,14 +503,26 @@ namespace RNC
             this.Description = Description;
             this.RewardXP = RewardXP;
             this.RewardPoints = RewardPoints;
+
+            if (custom_bg)
+            {
+                this.Background = "package://Artwork/Achievements/" + Code + ".png";
+            }
+            else
+            {
+                this.Background = "package://Artwork/Achievements/default.png";
+            }
+
             Settings.Achievements.Add(this);
         }
         public static void LoadAchievementsForPlayer(Player player)
         {
             foreach(Achievement a in Settings.Achievements)
             {
-                player.TriggerEvent("addAchievement", a.ID, a.Name, a.Description, a.RewardXP, a.RewardPoints);
+                player.TriggerEvent("addAchievement", a.ID, a.Name, a.Description, a.RewardXP, a.RewardPoints, 
+                    EPlayer.HasUnlockedAchievement(player, a.Code), a.Background);
             }
+            player.TriggerEvent("addAchievementsToMenu");
         }
     }
 
@@ -533,7 +546,7 @@ namespace RNC
         public static List<LobbyData> Lobbies { get; set; }
         public static List<Player> LoggedInPlayers { get; set; }
         public static List<Vehicle> AdminVehicles { get; set; }
-        public static List<Achievement> Achievements { get; set; }
+        public static List<Achievement> Achievements = new List<Achievement>();
         public static int NextLobbyID { get; set; }
         public static int DerbyTimeLeft { get; set; }
         public static long LastDerbyTick { get; set; }
@@ -1324,28 +1337,31 @@ namespace RNC
             /* ACHIEVEMENTS CREATION */
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the achievements...");
 
-            new Achievement("first_derby", "Derby Master?", "Win a round in the Derby mode.", 4, 3);
-            new Achievement("first_kill", "First Kill", "Get your first kill in copchase.", 4, 2);
-            new Achievement("serial_killer", "Serial Killer", "Get a 5-kill killstreak.", 7, 3);
-            new Achievement("first_loadout", "Gear up!", "Buy a loadout.", 2, 1);
-            new Achievement("first_vehicle", "Speed is key", "Buy a vehicle.", 2, 1);
-            new Achievement("all_loadouts", "Arms Dealer", "Unlock all loadouts.", 10, 3);
-            new Achievement("all_vehicles", "Grand Theft Auto", "Unlock all vehicles.", 10, 3);
-            new Achievement("first_busted", "Professional Driver", "Win a round of BUSTED! mode as a fugitive.", 5, 3);
-            new Achievement("first_bankrob_fugitive", "Professional Thief", "Win a round of the Bank Robbery event as a fugitive.", 5, 3);
-            new Achievement("first_bankrob_cop", "True Hero", "Win a round of the Bank Robbery event as a cop.", 5, 3);
-            new Achievement("first_revive", "Future Medic?", "Revive a teammate in copchase.", 3, 1);
-            new Achievement("low_hp_kill", "Call an ambulance, but not for me!", "Get a kill in copchase while your HP is lower than 30.", 7, 4);
-            new Achievement("first_seatbelt", "Safety first!", "Buckle your seatbelt in copchase.", 1, 0);
-            new Achievement("first_squad", "Best friends forever", "Squad up with a player.", 3, 0);
-            new Achievement("get_revived", "Back from the dead", "Be revived by another player.", 3, 0);
-            new Achievement("heist_leader", "I'm the boss now!", "Be the first heist leader in the Bank Robbery event.", 3, 0);
-            new Achievement("heist_leader_win", "True Leader", "Win a round of the Bank Robbery event as the heist leader.", 7, 3);
-            new Achievement("reach_level_100", "I'm kinda active...", "Reach level 100.", 15, 5);
-            new Achievement("no_shooting_win", "Peaceful Criminal", "Win a round in copchase as a fugitive without opening fire at all.", 12, 5);
-            new Achievement("first_kill_leader", "Go for the head!", "As a cop, have your first kill be the heist leader in the Bank Robbery event.", 15, 5);
-            new Achievement("last_man_standing", "Last Man Standing", "Win a copchase round as the last person alive in your team.", 8, 3);
-            new Achievement("all_achievements", "Where's my medal?", "Unlock all achievements!", 75, 35);
+            new Achievement("discord_verify", "Social Butterfly", "Link your Discord account to your RnC account. (/verify)", 0, 0, true);
+            new Achievement("first_derby", "Derby Master?", "Win a round in the Derby mode.", 4, 3, true);
+            new Achievement("first_kill", "First Kill", "Get your first kill in copchase.", 4, 2, true);
+            new Achievement("serial_killer", "Serial Killer", "Get a 5-kill killstreak.", 7, 3, true);
+            new Achievement("first_loadout", "Gear up!", "Buy a loadout.", 2, 1, true);
+            new Achievement("first_vehicle", "Speed is key", "Buy a vehicle.", 2, 1, true);
+            new Achievement("all_loadouts", "Arms Dealer", "Unlock all loadouts.", 10, 3, true);
+            new Achievement("all_vehicles", "Grand Theft Auto", "Unlock all vehicles.", 10, 3, true);
+            new Achievement("first_busted", "Professional Driver", "Win a round of BUSTED! mode as a fugitive.", 5, 3, true);
+            new Achievement("first_bankrob_fugitive", "Professional Thief", "Win a round of the Bank Robbery event as a fugitive.", 5, 3, true);
+            new Achievement("first_bankrob_cop", "True Hero", "Win a round of the Bank Robbery event as a cop.", 5, 3, true);
+            new Achievement("first_revive", "Future Medic?", "Revive a teammate in copchase.", 3, 1, true);
+            new Achievement("low_hp_kill", "Call an ambulance, but not for me!", "Get a kill in copchase while your HP is lower than 30.", 7, 4, true);
+            new Achievement("first_seatbelt", "Safety first!", "Buckle your seatbelt in copchase.", 1, 0, true);
+            new Achievement("first_squad", "Best friends forever", "Squad up with a player.", 3, 0, true);
+            new Achievement("get_revived", "Back from the dead", "Be revived by another player.", 3, 0, true);
+            new Achievement("heist_leader", "I'm the boss now!", "Be the first heist leader in the Bank Robbery event.", 3, 0, true);
+            new Achievement("heist_leader_win", "True Leader", "Win a round of the Bank Robbery event as the heist leader.", 7, 3, true);
+            new Achievement("reach_level_100", "I'm kinda active...", "Reach level 100.", 15, 5, true);
+            new Achievement("no_shooting_win", "Peaceful Criminal", "Win a round in copchase as a fugitive without opening fire at all.", 12, 5, true);
+            new Achievement("first_kill_leader", "Go for the head!", "As a cop, have your first kill be the heist leader in the Bank Robbery event.", 15, 5, true);
+            new Achievement("last_man_standing", "Last Man Standing", "Win a copchase round as the last person alive in your team.", 8, 3, true);
+            new Achievement("all_achievements", "Where's my medal?", "Unlock all achievements!", 75, 35, true);
+
+            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Created " + Settings.Achievements.Count + " achievements.");
 
             /* DEFAULT LOADOUTS CREATION */
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the loadouts...");
@@ -1855,7 +1871,7 @@ namespace RNC
                     }
                 }
 
-                if (Settings.Dynamics.Discord && (int)Discord._client.ConnectionState == 2)
+                if (Discord._client != null && Settings.Dynamics.Discord && (int)Discord._client.ConnectionState == 2)
                 {
                     System.Threading.Tasks.Task.Run(() =>
                     {
@@ -1990,14 +2006,6 @@ namespace RNC
                                 EPlayer.GrantXP(i, 5);
                                 EPlayer.GivePoints(i, 5);
                                 i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.3);
-
-                                if (i.GetData<bool>("ShotsFired") == false)
-                                    EPlayer.UnlockAchievement(i, "no_shooting_win");
-
-                                if (lobby.gameMode == GameModes.BUSTED)
-                                {
-                                    EPlayer.UnlockAchievement(i, "first_busted");
-                                }
                             }
                             EPlayer.UnlockAchievement(lobby.BankRobbery.HeistLeader, "heist_leader_win");
 
@@ -2156,6 +2164,19 @@ namespace RNC
                     i.TriggerEvent("BankRob_ClearFugiCarBlips");
                     i.TriggerEvent("BankRob_ClearFinishMarker");
                     i.TriggerEvent("BankRob_SetMusic", -1);
+
+                    if (i.GetData<bool>("ShotsFired") == false)
+                    {
+                        if (lobby.Fugitives.Contains(i) && winnerTeam == 0)
+                        {
+                            EPlayer.UnlockAchievement(i, "no_shooting_win");
+                        }
+                    } 
+                    if(lobby.gameMode == GameModes.BUSTED && winnerTeam == 0 && reason == 1 && lobby.Fugitives.Contains(i))
+                    {
+                        EPlayer.UnlockAchievement(i, "first_busted");
+                    }
+
                     i.SetData<bool>("ShotsFired", false);
 
                     if (i.HasSharedData("Wounded"))
