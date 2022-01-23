@@ -888,11 +888,9 @@ mp.events.add('render', () => {
                 if(Date.now() - climbingStart >= 2500 && climbProtectionStage == 0) // if it's 100% a ladder
                 {
                     climbingStart = curTime;
-                    mp.gui.chat.push("[CP] Ladder climbing detected, attempting to start protection.");
 
                     if(curTime - lastClimbProtection > 45){
                         
-                        mp.gui.chat.push("[CP] Last climb protection was more than 45 seconds ago, starting new one...");
 
                         clearTimeout(climbProtectionTimer);
                         mp.events.callRemote("ClimbProtection", 0);
@@ -903,14 +901,12 @@ mp.events.add('render', () => {
                         
                         let cProtectTime = (mp.players.local.Team == 0 ? 9000 : 18500);
                         
-                        mp.gui.chat.push("[CP] Climb protection should last " + cProtectTime + " seconds.");
         
                         climbProtectionTimer = setTimeout(() => {
                             if(mp.players.local == null || mp.players.local == undefined || !mp.players.exists(mp.players.local)) return;
                             //if(mp.players.local.Team != 0 && mp.players.local.Team != 1) return;
                             if(climbProtectionStage == 2) return; // if the "short ladder protection" is active to prevent turning it off instantly
                             
-                            mp.gui.chat.push("[CP] Climb protection ended while you were on the ladder! Set LastClimbProtection.");
                             lastClimbProtection = Math.round((new Date()).getTime() / 1000);
                         // mp.game.player.setInvincible(false);
                         // mp.players.local.setInvincible(false);        
@@ -925,7 +921,6 @@ mp.events.add('render', () => {
         else if(!mp.players.local.isClimbing()){
             if(isFirstClimb) isFirstClimb = false;
             if(climbProtectionStage == 1){
-                mp.gui.chat.push("[CP] You stopped climbing a ladder while ladder protection was active, ending it now...");
 
                 if(climbProtectionTimer != null){
                     clearInterval(climbProtectionTimer);
@@ -937,7 +932,6 @@ mp.events.add('render', () => {
 
                 //mp.game.player.setInvincible(true);
                 //mp.players.local.setInvincible(true);  
-                mp.gui.chat.push("[CP] Ending protection should last " + cProtectTime + " seconds.");
 
                 climbProtectionTimer = setTimeout(() => {
                     if(mp.players.local == null || mp.players.local == undefined || !mp.players.exists(mp.players.local)) return;
@@ -949,7 +943,6 @@ mp.events.add('render', () => {
                     climbProtectionStage = 0;    
                     lastClimbProtection = Math.round((new Date()).getTime() / 1000);
                     mp.events.callRemote("ClimbProtection", -1);    
-                    mp.gui.chat.push("[CP] Final climb protection ended!");
                 }, cProtectTime);              
             }
 
