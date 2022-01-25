@@ -673,23 +673,23 @@ if(!radioToggle) mp.game.audio.setInitialPlayerStation('OFF');
 function UpdateStatsVars(entity){
     // yes im double checking the same shit cuz for some reason this shit decided to break for no reason
     if(UIHud == null || UIHud == undefined || UIMenu == undefined || UIMenu == null) return;
-
+    entity = mp.players.local;
     if(entity !== undefined){
         if(mp.players.exists(entity))
         {
             if(UIHud !== undefined && UIHud != null){
                 UIHud.execute(`gm.stats = {
-                    squad: ${entity.SquadID},
-                    lobby: ${entity.Lobby},
-                    admin: ${entity.Admin},
-                    fugitive: ${entity.Team == 0 ? true : false},
+                    squad: ${mp.players.local.SquadID},
+                    lobby: ${mp.players.local.Lobby},
+                    admin: ${mp.players.local.Admin},
+                    fugitive: ${mp.players.local.Team == 0 ? true : false},
                 }`);
             }
             if(UIMenu !== undefined && UIMenu != null){
                 UIMenu.execute(`gm.stats = {
-                    name: "${entity.name}",
-                    level: ${entity.getVariable("Level")},
-                    admin: ${entity.getVariable("Admin")}
+                    name: "${mp.players.local.name}",
+                    level: ${mp.players.local.getVariable("Level")},
+                    admin: ${mp.players.local.getVariable("Admin")}
                 }`);
             }
         }

@@ -271,23 +271,24 @@ namespace RNC
                             LobbyData lobby = Settings.Lobbies.FirstOrDefault(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
                             if (lobby != null)
                             {
-                                EPlayer.TryAdvanceChallenge(killer, Challenge.ChallengeType.CopchaseKill, ((uint)killer.CurrentWeapon).ToString());
 
                                 string reasonStr = "";
                                 jWeaponData wepDat = new jWeaponData();
 
-                                if (Main.WeaponReasons.TryGetValue((long)killer.CurrentWeapon, out reasonStr))
-                                {
-                                    // oh its already set ^^
-                                }
-                                else if (Settings.WeaponData.TryGetValue((long)killer.CurrentWeapon, out wepDat))
+                                if (Settings.WeaponData.TryGetValue((long)killer.CurrentWeapon, out wepDat))
                                 {
                                     reasonStr += wepDat.Name;
+                                }
+                                else if (Main.WeaponReasons.TryGetValue((long)killer.CurrentWeapon, out reasonStr))
+                                {
+                                    // oh its already set ^^
                                 }
                                 else
                                 {
                                     reasonStr = "";
                                 }
+                                EPlayer.TryAdvanceChallenge(killer, Challenge.ChallengeType.CopchaseKill, wepDat.Group);
+
                                 string rez = reasonStr;
                                 if(rez != "")
                                 {
@@ -1102,13 +1103,13 @@ namespace RNC
                 bool wasInGame = false;
                 jWeaponData wepDat = new jWeaponData();
 
-                if (Main.WeaponReasons.TryGetValue(reason, out reasonStr))
-                {
-                    // oh its already set ^^
-                }
-                else if (Settings.WeaponData.TryGetValue((long)reason, out wepDat))
+                if (Settings.WeaponData.TryGetValue((long)reason, out wepDat))
                 {
                     reasonStr = wepDat.Name;
+                }
+                else if (Main.WeaponReasons.TryGetValue(reason, out reasonStr))
+                {
+                    // oh its already set ^^
                 }
                 else
                 {
@@ -1145,7 +1146,9 @@ namespace RNC
                     if (killer != null && !killer.IsNull && killer != player)
                     {
                         NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
-                        EPlayer.TryAdvanceChallenge(killer, Challenge.ChallengeType.AnyKill, ((uint)killer.CurrentWeapon).ToString());
+
+                        EPlayer.TryAdvanceChallenge(killer, Challenge.ChallengeType.AnyKill, wepDat.Group);
+
                         if ((killer.GetSharedData<int>("InLobby") == -6 || killer.GetSharedData<int>("InLobby") > -1) && killer.GetSharedData<int>("InDM") > -1)
                         {
                             int arenaID = killer.GetSharedData<int>("InDM");

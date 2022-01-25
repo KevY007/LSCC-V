@@ -257,8 +257,28 @@ namespace RNC
 
         public LoadoutData Add(WeaponHash weapon, string image, string name, int ammo)
         {
-            if(weapon != WeaponHash.Bzgas && weapon != WeaponHash.Molotov && ammo > 10)
-                Challenge.CopchaseWeapons.Add(weapon);
+            #region Adding weapons to challenges list
+            if (name != "Full Armour" && weapon != WeaponHash.Bzgas && weapon != WeaponHash.Molotov && ammo > 10)
+            {
+                jWeaponData wepDat = new jWeaponData();
+                string reasonStr = "";
+
+                if (Settings.WeaponData.TryGetValue((long)weapon, out wepDat))
+                {
+                    reasonStr = wepDat.Group;
+                }
+                else
+                {
+                    NAPI.Util.ConsoleOutput("[WEAPONDATA.JSON HARAM?] Could not find key for weapon " + name + " in 'weapondata.json'. (Hash: " + ((uint)weapon).ToString() + ")");
+                    reasonStr = "Unknown";
+                }
+
+                if (!Challenge.PossibleWeaponGroups.Contains(reasonStr) && reasonStr != "Unknown")
+                {
+                    Challenge.PossibleWeaponGroups.Add(reasonStr);
+                }
+            }
+            #endregion
 
             this.Weapons.Add(new object[] { weapon, image, name, ammo });
             return this;
@@ -774,7 +794,7 @@ namespace RNC
             Win = 4, // Items: 'fugitive', 'cop', 'derby' | Amount of wins
         };
         public static List<string> CopchaseVehicles = new List<string>();
-        public static List<WeaponHash> CopchaseWeapons = new List<WeaponHash>();
+        public static List<string> PossibleWeaponGroups = new List<string>();
         private static string[] possibleWins = { "fugitive", "cop", "derby" };
 
         public static void AddChallengesForPlayer(Player player)
@@ -782,25 +802,28 @@ namespace RNC
             string desc = "";
             Account acc = EPlayer.GetAccount(player);
             List<ChallengeData> cdInfo = NAPI.Util.FromJson<List<ChallengeData>>(acc.ChallengeInfo);
+            if(cdInfo.Count <= 0)
+            {
+                List<ChallengeData> cdList = new List<ChallengeData>();
+                ChallengeData temp = new ChallengeData();
+                foreach (DailyChallenge dc in ContextFactory.Instance.DailyChallenges)
+                {
+                    temp = new ChallengeData();
+                    temp.ChallengeItem = dc.Item;
+                    temp.ChallengeType = dc.Type;
+                    temp.ChallengeProgress = 0;
+                    temp.Completed = false;
+
+                    cdList.Add(temp);
+                }
+                string jData = NAPI.Util.ToJson(cdList);
+                acc.ChallengeInfo = jData;
+                cdInfo = NAPI.Util.FromJson<List<ChallengeData>>(jData);
+                ContextFactory.Instance.SaveChanges();
+            }
 
             player.TriggerEvent("clearDailyChallenges");
 
-            List<ChallengeData> cdList = new List<ChallengeData>();
-            ChallengeData temp = new ChallengeData();
-            foreach (DailyChallenge dc in ContextFactory.Instance.DailyChallenges)
-            {
-                temp = new ChallengeData();
-                temp.ChallengeItem = dc.Item;
-                temp.ChallengeType = dc.Type;
-                temp.ChallengeProgress = 0;
-                temp.Completed = false;
-
-                cdList.Add(temp);
-            }
-            string jData = NAPI.Util.ToJson(cdList);
-            acc.ChallengeInfo = jData;
-            cdInfo = NAPI.Util.FromJson<List<ChallengeData>>(jData);
-            ContextFactory.Instance.SaveChanges();
 
 
             foreach (DailyChallenge c in ContextFactory.Instance.DailyChallenges)
@@ -809,44 +832,28 @@ namespace RNC
                 {
                     case ChallengeType.AnyKill:
                         {
-                            string reasonStr = "";
-                            jWeaponData wepDat = new jWeaponData();
+                            string reasonDisp = "";
+                            if (c.Item.Split("_", 2).Length > 0)
+                                reasonDisp = c.Item.Split("_", 2)[1];
+                            else reasonDisp = c.Item;
 
-                            if (Main.WeaponReasons.TryGetValue(long.Parse(c.Item), out reasonStr))
-                            {
-                                // oh its already set ^^
-                            }
-                            else if (Settings.WeaponData.TryGetValue(long.Parse(c.Item), out wepDat))
-                            {
-                                reasonStr = wepDat.Name;
-                            }
-                            else
-                            {
-                                reasonStr = c.Item;
-                            }
+                            if (reasonDisp == "RIFLE")
+                                reasonDisp = "(ASSAULT) RIFLE";
 
-                            desc = $"Kill {c.Target} players with a(n) {reasonStr} in any mode.";
+                            desc = $"Kill {c.Target} players with a weapon from the {reasonDisp} category in any mode.";
                         }
                         break;
                     case ChallengeType.CopchaseKill:
                         {
-                            string reasonStr = "";
-                            jWeaponData wepDat = new jWeaponData();
+                            string reasonDisp = "";
+                            if (c.Item.Split("_", 2).Length > 0)
+                                reasonDisp = c.Item.Split("_", 2)[1];
+                            else reasonDisp = c.Item;
 
-                            if (Main.WeaponReasons.TryGetValue(long.Parse(c.Item), out reasonStr))
-                            {
-                                // oh its already set ^^
-                            }
-                            else if (Settings.WeaponData.TryGetValue(long.Parse(c.Item), out wepDat))
-                            {
-                                reasonStr = wepDat.Name;
-                            }
-                            else
-                            {
-                                reasonStr = c.Item;
-                            }
+                            if (reasonDisp == "RIFLE")
+                                reasonDisp = "(ASSAULT) RIFLE";
 
-                            desc = $"Kill {c.Target} players with a(n) {reasonStr} in copchase.";
+                            desc = $"Kill {c.Target} players with a weapon from the {reasonDisp} category in copchase.";
                         }
                         break;
                     case ChallengeType.CopchaseRounds:
@@ -915,44 +922,28 @@ namespace RNC
                 {
                     case ChallengeType.AnyKill:
                         {
-                            string reasonStr = "";
-                            jWeaponData wepDat = new jWeaponData();
+                            string reasonDisp = "";
+                            if (c.Item.Split("_", 2).Length > 0)
+                                reasonDisp = c.Item.Split("_", 2)[1];
+                            else reasonDisp = c.Item;
 
-                            if (Main.WeaponReasons.TryGetValue(long.Parse(c.Item), out reasonStr))
-                            {
-                                // oh its already set ^^
-                            }
-                            else if (Settings.WeaponData.TryGetValue(long.Parse(c.Item), out wepDat))
-                            {
-                                reasonStr = wepDat.Name;
-                            }
-                            else
-                            {
-                                reasonStr = c.Item;
-                            }
+                            if (reasonDisp == "RIFLE")
+                                reasonDisp = "(ASSAULT) RIFLE";
 
-                            desc = $"Kill {c.Target} players with a(n) {reasonStr} in any mode.";
+                            desc = $"Kill {c.Target} players with a weapon from the {reasonDisp} category in any mode.";
                         }
                         break;
                     case ChallengeType.CopchaseKill:
                         {
-                            string reasonStr = "";
-                            jWeaponData wepDat = new jWeaponData();
+                            string reasonDisp = "";
+                            if (c.Item.Split("_", 2).Length > 0)
+                                reasonDisp = c.Item.Split("_", 2)[1];
+                            else reasonDisp = c.Item;
 
-                            if (Main.WeaponReasons.TryGetValue(long.Parse(c.Item), out reasonStr))
-                            {
-                                // oh its already set ^^
-                            }
-                            else if (Settings.WeaponData.TryGetValue(long.Parse(c.Item), out wepDat))
-                            {
-                                reasonStr = wepDat.Name;
-                            }
-                            else
-                            {
-                                reasonStr = c.Item;
-                            }
+                            if (reasonDisp == "RIFLE")
+                                reasonDisp = "(ASSAULT) RIFLE";
 
-                            desc = $"Kill {c.Target} players with a(n) {reasonStr} in copchase.";
+                            desc = $"Kill {c.Target} players with a weapon from the {reasonDisp} category in copchase.";
                         }
                         break;
                     case ChallengeType.CopchaseRounds:
@@ -1022,9 +1013,9 @@ namespace RNC
             int target = 20;
             int rXp = 10, rPt = 4;
 
-            while(ContextFactory.Instance.DailyChallenges.ToList().Count < 4)
+            while(ContextFactory.Instance.DailyChallenges.ToList().Count < 10)
             {
-                if (succ >= 5) break;
+                if (succ >= 10) break;
 
                 cntr++;
                 if(cntr >= 500)
@@ -1038,7 +1029,10 @@ namespace RNC
                 {
                     case ChallengeType.CopchaseKill:
                         {
-                            generatedItem = ((uint)CopchaseWeapons[randomizer.Next(CopchaseWeapons.Count)]).ToString();
+                            List<string> ccWeps = PossibleWeaponGroups;
+                            ccWeps.RemoveAll(lol => lol.Contains("SNIPER", StringComparison.OrdinalIgnoreCase));
+
+                            generatedItem = ccWeps[randomizer.Next(ccWeps.Count)];
 
                             target = randomizer.Next(20, 40);
                             if (target % 5 != 0)
@@ -1062,7 +1056,9 @@ namespace RNC
                         break;
                     case ChallengeType.AnyKill:
                         {
-                            generatedItem = ((uint)CopchaseWeapons[randomizer.Next(CopchaseWeapons.Count)]).ToString();
+                            List<string> anyWeps = PossibleWeaponGroups;
+                            anyWeps.Add("GROUP_SNIPER");
+                            generatedItem = anyWeps[randomizer.Next(anyWeps.Count)];
 
                             target = randomizer.Next(50, 100);
                             if (target % 5 != 0)
@@ -1076,7 +1072,7 @@ namespace RNC
                         {
                             generatedItem = "N/A";
 
-                            target = randomizer.Next(15, 36);
+                            target = randomizer.Next(26, 42);
                             if (target % 5 != 0)
                                 target = (5 - target % 5) + target;
 
@@ -1088,7 +1084,7 @@ namespace RNC
                         {
                             generatedItem = possibleWins[randomizer.Next(possibleWins.Length)];
 
-                            target = randomizer.Next(5, 11);
+                            target = randomizer.Next(5, 19);
                             if (target % 5 != 0)
                                 target = (5 - target % 5) + target;
 

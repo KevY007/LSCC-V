@@ -1222,8 +1222,6 @@ namespace RNC
         }
         public static void TryAdvanceChallenge(Player player, int challenge_type, string challenge_item)
         {
-            player.SendChatMessage("attempting to advance cht " + challenge_type + " item " + challenge_item);
-
             if (player == null) return;
             Account acc = EPlayer.GetAccount(player);
             if (acc == null) return;
