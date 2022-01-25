@@ -27,6 +27,7 @@ namespace RNC
         public string Password { get; set; }
         public string Salt { get; set; }
         public string DiscordInfo { get; set; }
+        public string ChallengeInfo { get; set; }
         public DateTime RegisterDate { get; set; }
         public string RegisterHWID { get; set; }
         public ulong RegisterRID { get; set; }
@@ -68,6 +69,22 @@ namespace RNC
         public string MOTD { get; set; }
         public double LastSessionMins { get; set; }
         public string PurchasedAmmo { get; set; }
+    }
+
+    public class ChallengeData
+    {
+        public int ChallengeType;
+        public string ChallengeItem;
+        public int ChallengeProgress;
+        public bool Completed;
+
+        public ChallengeData()
+        {
+            ChallengeType = 0;
+            ChallengeItem = "police";
+            ChallengeProgress = 0;
+            Completed = false;
+        }
     }
 
     public class DiscordData

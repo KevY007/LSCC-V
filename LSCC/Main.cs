@@ -257,6 +257,9 @@ namespace RNC
 
         public LoadoutData Add(WeaponHash weapon, string image, string name, int ammo)
         {
+            if(weapon != WeaponHash.Bzgas && weapon != WeaponHash.Molotov && ammo > 10)
+                Challenge.CopchaseWeapons.Add(weapon);
+
             this.Weapons.Add(new object[] { weapon, image, name, ammo });
             return this;
         }
@@ -285,6 +288,9 @@ namespace RNC
             this.Image = image;
             this.Info = info;
 
+            if(model != "?")
+                Challenge.CopchaseVehicles.Add(name); // adding this model to the list of possible vehicles for a copchase challenge
+            
             Settings.Cars.Add(this);
         }
     };
@@ -756,8 +762,294 @@ namespace RNC
         };
     }
 
+    public static class Challenge
+    {
+        public enum ChallengeType
+        {
+            CopchaseKill = 0, // Items: any firearm from a loadout | Kill in copchase
+            CopchaseVehicle = 1, // Items: any vehicle from copchase | Vehicle used in copchase
+            AnyKill = 2, // Items: any firearm from a loadout or deathmatch | Any kill, meaning DM or CC
+            CopchaseRounds = 3, // Items: N/A | How many copchase rounds played
+            Win = 4, // Items: 'fugitive', 'cop', 'derby' | Amount of wins
+        };
+        public static List<string> CopchaseVehicles = new List<string>();
+        public static List<WeaponHash> CopchaseWeapons = new List<WeaponHash>();
+        private static string[] possibleWins = { "fugitive", "cop", "derby" };
+
+        public static void AddChallengesForPlayer(Player player)
+        {
+            string desc = "";
+            Account acc = EPlayer.GetAccount(player);
+            List<ChallengeData> cdInfo = NAPI.Util.FromJson<List<ChallengeData>>(acc.ChallengeInfo);
+
+            player.TriggerEvent("clearDailyChallenges");
+
+            if(cdInfo.Count == 0)
+            {
+                List<ChallengeData> cdList = new List<ChallengeData>();
+                ChallengeData temp = new ChallengeData();
+                foreach (DailyChallenge dc in ContextFactory.Instance.DailyChallenges)
+                {
+                    temp = new ChallengeData();
+                    temp.ChallengeItem = dc.Item;
+                    temp.ChallengeType = dc.Type;
+                    temp.ChallengeProgress = 0;
+                    temp.Completed = false;
+
+                    cdList.Add(temp);
+                }
+                string jData = NAPI.Util.ToJson(cdList);
+                acc.ChallengeInfo = jData;
+                cdInfo = NAPI.Util.FromJson<List<ChallengeData>>(jData);
+                ContextFactory.Instance.SaveChanges();
+            }
+
+            foreach (DailyChallenge c in ContextFactory.Instance.DailyChallenges)
+            {
+                switch ((ChallengeType)c.Type)
+                {
+                    case ChallengeType.AnyKill:
+                        {
+                            string reasonStr = "";
+                            jWeaponData wepDat = new jWeaponData();
+
+                            if (Main.WeaponReasons.TryGetValue(long.Parse(c.Item), out reasonStr))
+                            {
+                                // oh its already set ^^
+                            }
+                            else if (Settings.WeaponData.TryGetValue(long.Parse(c.Item), out wepDat))
+                            {
+                                reasonStr = wepDat.Name;
+                            }
+                            else
+                            {
+                                reasonStr = c.Item;
+                            }
+
+                            desc = $"Kill {c.Target} players with a(n) {reasonStr} in any mode.";
+                        }
+                        break;
+                    case ChallengeType.CopchaseKill:
+                        {
+                            string reasonStr = "";
+                            jWeaponData wepDat = new jWeaponData();
+
+                            if (Main.WeaponReasons.TryGetValue(long.Parse(c.Item), out reasonStr))
+                            {
+                                // oh its already set ^^
+                            }
+                            else if (Settings.WeaponData.TryGetValue(long.Parse(c.Item), out wepDat))
+                            {
+                                reasonStr = wepDat.Name;
+                            }
+                            else
+                            {
+                                reasonStr = c.Item;
+                            }
+
+                            desc = $"Kill {c.Target} players with a(n) {reasonStr} in copchase.";
+                        }
+                        break;
+                    case ChallengeType.CopchaseRounds:
+                        {
+                            desc = $"Play {c.Target} rounds of copchase.";
+                        }
+                        break;
+                    case ChallengeType.CopchaseVehicle:
+                        {
+                            CarData cdt = Settings.Cars.FirstOrDefault(t => t.Model == c.Item);
+                            string veh = "";
+                            if (cdt == null) { veh = c.Item; }
+                            else veh = cdt.Name;
+
+                            desc = $"Play {c.Target} copchase rounds with >> {c.Item} << set as your vehicle.";
+                        }
+                        break;
+                    case ChallengeType.Win:
+                        {
+                            if (c.Item == "derby")
+                                desc = $"Win {c.Target} rounds of the derby side mode.";
+                            else
+                            {
+                                desc = $"Win {c.Target} copchase rounds as a {c.Item}.";
+                            }
+                        }
+                        break;
+                }
+                  
+                ChallengeData cd = cdInfo.FirstOrDefault(t => (t.ChallengeItem == c.Item && t.ChallengeType == c.Type));
+                bool completed = false;
+                if(cd != null)
+                {
+                    completed = cd.Completed;
+                    TimeSpan sp = new TimeSpan(DateTime.Now.Ticks);
+                    double secs = Math.Ceiling(c.ExpireTimestamp - sp.TotalSeconds);
+                    // (id, desc, rXP, rPts, expireDate, completed, target, progress, type, item)
+                    player.TriggerEvent("addDailyChallenge", c.SQL_ID, desc, c.RewardXP, c.RewardPoints, secs, completed, c.Target, cd.ChallengeProgress, c.Type, c.Item);
+                }
+                else
+                {
+                    TimeSpan sp = new TimeSpan(DateTime.Now.Ticks);
+                    double secs = Math.Ceiling(c.ExpireTimestamp - sp.TotalSeconds);
+                    player.TriggerEvent("addDailyChallenge", c.SQL_ID, desc, c.RewardXP, c.RewardPoints, secs, completed, c.Target, 0, c.Type, c.Item);
+                }
+            }
+            player.TriggerEvent("addChallengesToMenu");
+        }
+        public static void SetNewDailyChallenges()
+        {
+            Random randomizer = new Random();
+
+            int cntr = 0;
+            int succ = 0;
+
+            ContextFactory.Instance.DailyChallenges.RemoveRange(ContextFactory.Instance.DailyChallenges);
+            ContextFactory.Instance.SaveChanges();
+
+            DateTime expiry = DateTime.Now.AddHours(24);
+            TimeSpan sp = new TimeSpan(expiry.Ticks);
+            long expireInSeconds = (long)Math.Ceiling(sp.TotalSeconds);
+
+            List<KeyValuePair<int, string>> generatedChallenges = new List<KeyValuePair<int, string>>();
+
+            int generatedType = 1;
+            string generatedItem = "police";
+            int target = 20;
+            int rXp = 10, rPt = 4;
+
+            while(ContextFactory.Instance.DailyChallenges.ToList().Count < 4)
+            {
+                if (succ >= 5) break;
+
+                cntr++;
+                if(cntr >= 500)
+                {
+                    NAPI.Util.ConsoleOutput("(RnC | CHALLENGE) Reached maximum loop value in SetNewDailyChallenges! Breaking it... (500)");
+                    break;
+                }
+
+                generatedType = randomizer.Next(0, 5);
+                switch ((ChallengeType)generatedType)
+                {
+                    case ChallengeType.CopchaseKill:
+                        {
+                            generatedItem = ((uint)CopchaseWeapons[randomizer.Next(CopchaseWeapons.Count)]).ToString();
+
+                            target = randomizer.Next(20, 40);
+                            if (target % 5 != 0)
+                                target = (5 - target % 5) + target; // rounding to upper multiply of 5
+
+                            rXp = (int)Math.Floor((decimal)target / 4);
+                            rPt = (int)Math.Floor((decimal)target / 6);
+                        }
+                        break;
+                    case ChallengeType.CopchaseVehicle:
+                        {
+                            generatedItem = CopchaseVehicles[randomizer.Next(CopchaseVehicles.Count)];
+
+                            target = randomizer.Next(20, 36);
+                            if (target % 5 != 0)
+                                target = (5 - target % 5) + target;
+
+                            rXp = (int)Math.Floor((decimal)target / 4);
+                            rPt = (int)Math.Floor((decimal)target / 6);
+                        }
+                        break;
+                    case ChallengeType.AnyKill:
+                        {
+                            generatedItem = ((uint)CopchaseWeapons[randomizer.Next(CopchaseWeapons.Count)]).ToString();
+
+                            target = randomizer.Next(50, 100);
+                            if (target % 5 != 0)
+                                target = (5 - target % 5) + target;
+
+                            rXp = (int)Math.Floor((decimal)target / 4);
+                            rPt = 0;
+                        }
+                        break;
+                    case ChallengeType.CopchaseRounds:
+                        {
+                            generatedItem = "N/A";
+
+                            target = randomizer.Next(15, 36);
+                            if (target % 5 != 0)
+                                target = (5 - target % 5) + target;
+
+                            rXp = (int)Math.Floor((decimal)target / 4);
+                            rPt = (int)Math.Floor((decimal)target / 6);
+                        }
+                        break;
+                    case ChallengeType.Win:
+                        {
+                            generatedItem = possibleWins[randomizer.Next(possibleWins.Length)];
+
+                            target = randomizer.Next(5, 11);
+                            if (target % 5 != 0)
+                                target = (5 - target % 5) + target;
+
+                            rXp = target;
+                            rPt = (int)Math.Floor((decimal)target/2);
+                        }
+                        break;
+                }
+                KeyValuePair<int, string> check = new KeyValuePair<int, string>(generatedType, generatedItem);
+                bool exists = generatedChallenges.Exists(c => c.Key == check.Key && c.Value == check.Value);
+                if(exists == false)
+                {
+                    generatedChallenges.Add(check);
+
+                    DailyChallenge c = new DailyChallenge()
+                    {
+                        Type = generatedType,
+                        Target = target,
+                        Item = generatedItem,
+                        ExpireTimestamp = expireInSeconds,
+                        RewardPoints = rPt,
+                        RewardXP = rXp
+                    };
+                    ContextFactory.Instance.DailyChallenges.Add(c);
+                    succ++;
+                    continue;
+                }
+                else
+                {
+                    continue;
+                }
+
+            }
+
+            ContextFactory.Instance.SaveChanges();
+            List<ChallengeData> cdList = new List<ChallengeData>();
+            ChallengeData temp = new ChallengeData();
+            foreach (DailyChallenge dc in ContextFactory.Instance.DailyChallenges)
+            {
+                temp.ChallengeItem = dc.Item;
+                temp.ChallengeType = dc.Type;
+                temp.ChallengeProgress = 0;
+                temp.Completed = false;
+
+                cdList.Add(temp);
+            }
+            string jData = NAPI.Util.ToJson(cdList);
+            foreach (Account acc in ContextFactory.Instance.Accounts)
+            {
+                acc.ChallengeInfo = jData;
+            }
+            foreach(Player pl in NAPI.Pools.GetAllPlayers())
+            {
+                AddChallengesForPlayer(pl);
+            }
+            ContextFactory.Instance.SaveChanges();
+
+            NAPI.Util.ConsoleOutput("(RnC | CHALLENGES) Set up new challenges, total: " + ContextFactory.Instance.DailyChallenges.ToList().Count);
+
+
+        }
+    }
+
     public class Main : Script
     {
+
         public static void DisplayMOTD(Player target, MOTDData motd)
         {
             target.SendChatMessage("!{#2B82FF}========================================");
@@ -1563,7 +1855,10 @@ namespace RNC
             NAPI.TextLabel.CreateTextLabel("Change appearance with /char & /clothing", new Vector3(120.48237f, -726.71735f, 242.15198f), 13.0f, 2.2f, 0, new Color(212, 67, 217, 156), false);
             NAPI.TextLabel.CreateTextLabel("Confused? /help or /helpme", new Vector3(120.84272f, -744.534f, 242.15207f), 13.0f, 2.2f, 0, new Color(255, 255, 255, 156), false);
             NAPI.TextLabel.CreateTextLabel("Want to watch the round? /spec", new Vector3(118.04166f, -757.9125f, 242.15215f), 13.0f, 2.2f, 0, new Color(255, 228, 0, 156), false);
-            
+
+            if (ContextFactory.Instance.DailyChallenges.ToList().Count <= 0)
+                Challenge.SetNewDailyChallenges();
+
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Server startup proceeded:\n");
 
             string admins = "";
@@ -1667,6 +1962,18 @@ namespace RNC
                     NAPI.Util.ConsoleOutput("Server auto-saved => " + DateTime.Now.ToString());
 
                     Settings.AutoSaveTick = Environment.TickCount64;
+
+                    DateTime challengeCheck = DateTime.Now;
+                    TimeSpan sp = new TimeSpan(challengeCheck.Ticks);
+                    long seconds = (long)Math.Ceiling(sp.TotalSeconds);
+
+                    // since they are all set at the time, it's enough that only one of them expired to re-new them
+                    DailyChallenge dc = ContextFactory.Instance.DailyChallenges.FirstOrDefault(c => c.ExpireTimestamp <= seconds);
+                    if (dc != null)
+                    {
+                        Challenge.SetNewDailyChallenges();
+                        NAPI.Chat.SendChatMessageToAll("!{#c387ff}[DAILY CHALLENGES] ~w~New daily challenges are now available! Check ~y~Menu > Profile~w~ for more info.");
+                    }
                 }
 
                 if (Environment.TickCount64 - Settings.LastMessageTick > 90000)
@@ -1979,6 +2286,7 @@ namespace RNC
                     winner.SetSharedData("FugitiveChance", winner.GetSharedData<float>("FugitiveChance") + 5 + (double)((double)EPlayer.GetAccount(winner).DonatorLevel / 2.0));
 
                     EPlayer.UnlockAchievement(winner, "first_derby");
+                    EPlayer.TryAdvanceChallenge(winner, Challenge.ChallengeType.Win, "derby");
                 }
 
                 Settings.DerbyTimeLeft = 180;
@@ -2162,6 +2470,7 @@ namespace RNC
                         EPlayer.UnlockAchievement(last, "last_man_standing");
                 }
 
+
                 foreach (Player i in Settings.LoggedInPlayers)
                 {
                     if (i.GetSharedData<int>("InLobby") != lobby.lobbyId) continue;
@@ -2171,6 +2480,15 @@ namespace RNC
                     i.TriggerEvent("BankRob_ClearFugiCarBlips");
                     i.TriggerEvent("BankRob_ClearFinishMarker");
                     i.TriggerEvent("BankRob_SetMusic", -1);
+
+                    if(lobby.Cops.Contains(i) && winnerTeam == 1)
+                    {
+                        EPlayer.TryAdvanceChallenge(i, Challenge.ChallengeType.Win, "cop");
+                    }
+                    if (lobby.Fugitives.Contains(i) && winnerTeam == 0)
+                    {
+                        EPlayer.TryAdvanceChallenge(i, Challenge.ChallengeType.Win, "fugitive");
+                    }
 
                     if (i.GetData<bool>("ShotsFired") == false)
                     {
@@ -2593,6 +2911,10 @@ namespace RNC
                                                                     && v.Model.Equals(carName, StringComparison.OrdinalIgnoreCase));
                                             if (ownedVeh != null)
                                                 ownedVeh.TimesUsed++;
+
+                                            CarData cardata = Settings.Cars.FirstOrDefault(crd => crd.Model == carName && crd.Team == 1);
+                                            if(cardata != null)
+                                                EPlayer.TryAdvanceChallenge(player, Challenge.ChallengeType.CopchaseVehicle, cardata.Name);
                                         }
 
                                     }
@@ -2908,6 +3230,10 @@ namespace RNC
                                                                 && v.Model.Equals(carName, StringComparison.OrdinalIgnoreCase));
                                         if (ownedVeh != null)
                                             ownedVeh.TimesUsed++;
+
+                                        CarData cardata = Settings.Cars.FirstOrDefault(crd => crd.Model == carName && crd.Team == 1);
+                                        if (cardata != null)
+                                            EPlayer.TryAdvanceChallenge(_tempPlayer, Challenge.ChallengeType.CopchaseVehicle, cardata.Name);
                                     }
                                 }
 
@@ -3740,6 +4066,7 @@ namespace RNC
                                     {
                                         if (p != null)
                                         {
+                                            EPlayer.TryAdvanceChallenge(p, Challenge.ChallengeType.CopchaseRounds, "N/A");                                            
                                             EPlayer.Freeze(p, false);
                                             p.SendNotification("~y~You can now exit vehicles.");
                                             p.SendNotification("~b~You may begin the chase now.");
@@ -3750,6 +4077,7 @@ namespace RNC
                                     {
                                         if (p != null)
                                         {
+                                            EPlayer.TryAdvanceChallenge(p, Challenge.ChallengeType.CopchaseRounds, "N/A");
                                             p.SendNotification("~y~You can now exit vehicles.");
                                             p.TriggerEvent("ToggleCanExitVehicle", true);
                                         }
@@ -3763,6 +4091,7 @@ namespace RNC
                                         {
                                             if (p != null)
                                             {
+                                                EPlayer.TryAdvanceChallenge(p, Challenge.ChallengeType.CopchaseRounds, "N/A");
                                                 p.TriggerEvent("BankDoorLocked", true);
                                                 p.TriggerEvent("BankRob_SetMusic", 0);
 
@@ -3829,6 +4158,7 @@ namespace RNC
                                         {
                                             if (p != null)
                                             {
+                                                EPlayer.TryAdvanceChallenge(p, Challenge.ChallengeType.CopchaseRounds, "N/A");
                                                 p.TriggerEvent("BankDoorLocked", true);
                                                 p.TriggerEvent("BankRob_SetMusic", 0);
                                                 EPlayer.Freeze(p, false);

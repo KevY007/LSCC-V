@@ -78,6 +78,18 @@ namespace RNC
         public string Admin { get; set; }
         public DateTime DateTime { get; set; }
     }
+
+    public class DailyChallenge
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public int Type { get; set; }
+        public string Item { get; set; }
+        public int Target { get; set; }
+        public long ExpireTimestamp { get; set; }
+        public int RewardXP { get; set; }
+        public int RewardPoints { get; set; }
+    }
     public class UnlockedAchievement
     {
         [Key]
@@ -195,6 +207,7 @@ namespace RNC
         public DbSet<OwnedVehData> OwnedVehicles { get; set; }
         public DbSet<OwnedLoadoutData> OwnedLoadouts { get; set; }
         public DbSet<AdminNote> AdminNotes { get; set; }
+        public DbSet<DailyChallenge> DailyChallenges { get; set;}
         public DbSet<UnlockedAchievement> UnlockedAchievements { get; set; }
         public DbSet<Logs_AdminRecord> Logs_AdminRecords { get; set; }
         public DbSet<Logs_Admin> Logs_Admin { get; set; }

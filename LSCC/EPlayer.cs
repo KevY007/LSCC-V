@@ -1216,6 +1216,47 @@ namespace RNC
                 }
             }
         }
+        public static void TryAdvanceChallenge(Player player, Challenge.ChallengeType challenge_type, string challenge_item)
+        {
+            TryAdvanceChallenge(player, (int)challenge_type, challenge_item);
+        }
+        public static void TryAdvanceChallenge(Player player, int challenge_type, string challenge_item)
+        {
+            if (player == null) return;
+            Account acc = EPlayer.GetAccount(player);
+            if (acc == null) return;
+
+            List<ChallengeData> cInfo = NAPI.Util.FromJson<List<ChallengeData>>(acc.ChallengeInfo);
+            if (cInfo == null) return;
+
+            ChallengeData cd = cInfo.FirstOrDefault(c => c.ChallengeType == challenge_type && c.ChallengeItem == challenge_item);
+            if(cd == null) return;
+            if (cd.Completed) return;
+            cInfo.Remove(cd);
+            cd.ChallengeProgress++;
+
+            DailyChallenge dc = ContextFactory.Instance.DailyChallenges.FirstOrDefault(dc => dc.Item == challenge_item && dc.Type == challenge_type);
+            if (dc == null) return;
+
+            if(cd.ChallengeProgress >= dc.Target)
+            {
+                cd.Completed = true;
+                CompleteChallenge(player, dc);
+            }
+            cInfo.Add(cd);
+            string backToJson = NAPI.Util.ToJson(cInfo);
+            acc.ChallengeInfo = backToJson;
+            ContextFactory.Instance.SaveChanges();
+        }
+        public static void CompleteChallenge(Player player, DailyChallenge challenge)
+        {
+            if(challenge.RewardXP > 0)
+                EPlayer.GrantXP(player, challenge.RewardXP);
+            if(challenge.RewardPoints > 0)
+                EPlayer.GivePoints(player, challenge.RewardPoints);
+
+            player.TriggerEvent("unlockChallenge", challenge.Type, challenge.Item);            
+        }
 
         public static bool HasUnlockedAchievement(Player player, string achievement)
         {

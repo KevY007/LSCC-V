@@ -271,6 +271,8 @@ namespace RNC
                             LobbyData lobby = Settings.Lobbies.FirstOrDefault(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
                             if (lobby != null)
                             {
+                                EPlayer.TryAdvanceChallenge(killer, Challenge.ChallengeType.CopchaseKill, ((uint)killer.CurrentWeapon).ToString());
+
                                 string reasonStr = "";
                                 jWeaponData wepDat = new jWeaponData();
 
@@ -1143,7 +1145,7 @@ namespace RNC
                     if (killer != null && !killer.IsNull && killer != player)
                     {
                         NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
-
+                        EPlayer.TryAdvanceChallenge(killer, Challenge.ChallengeType.AnyKill, ((uint)killer.CurrentWeapon).ToString());
                         if ((killer.GetSharedData<int>("InLobby") == -6 || killer.GetSharedData<int>("InLobby") > -1) && killer.GetSharedData<int>("InDM") > -1)
                         {
                             int arenaID = killer.GetSharedData<int>("InDM");
@@ -1851,6 +1853,7 @@ namespace RNC
             player.TriggerEvent("showLoginBrowser", false);
             player.TriggerEvent("OnPlayerLoginRegister");
             Achievement.LoadAchievementsForPlayer(player);
+            Challenge.AddChallengesForPlayer(player);
         }
 
 
@@ -2407,6 +2410,7 @@ namespace RNC
 
             player.TriggerEvent("showLoginBrowser", false);
             Achievement.LoadAchievementsForPlayer(player);
+            Challenge.AddChallengesForPlayer(player);
         }
 
         [RemoteEvent("OnPlayerLoginAttempt")]
@@ -3228,6 +3232,9 @@ namespace RNC
             DiscordData _discordData = new DiscordData();
             string jsonDiscordData = NAPI.Util.ToJson(_discordData);
 
+            List<ChallengeData> challengeData = new List<ChallengeData>();
+            string jsonChallengeData = NAPI.Util.ToJson(challengeData);
+
             var _new = new Account
             {
                 Email = email,
@@ -3235,6 +3242,7 @@ namespace RNC
                 Salt = salt,
                 Username = username,
                 DiscordInfo = jsonDiscordData,
+                ChallengeInfo = jsonChallengeData,
                 Admin = 0,
                 RegisterHWID = player.Serial,
                 RegisterIP = player.Address,

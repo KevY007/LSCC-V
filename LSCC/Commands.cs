@@ -8114,9 +8114,20 @@ namespace RNC
             player.TriggerEvent("CreatePlayerCamera", x, y, z, rx, ry, rz, viewangle);
         }
 
+        [Command("dbgresetchallenges")]
+        public void cmd_dbgresetchallengers(Player player)
+        {
+            if (EPlayer.GetAccount(player).Admin < 6) return;
+
+            NAPI.Chat.SendChatMessageToAll("!{#c387ff}[DAILY CHALLENGES] ~w~New daily challenges are now available! Check ~y~Menu > Profile~w~ for more info.");
+            Challenge.SetNewDailyChallenges();
+        }
+
         [Command("dbgdiscordverify")]
         public void cmd_dbgdiscordverify(Player player, Player _p)
         {
+            if (EPlayer.GetAccount(player).Admin < 6) return;
+
             player.SendChatMessage(">> GIVEN " + _p.Name + " THEIR DISCORD REWARDS");
 
             _p.SendChatMessage("!{#83ff75}Congratulations! You successfully linked your Discord account to your Race 'N' Chase account.");
