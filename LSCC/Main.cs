@@ -539,6 +539,7 @@ namespace RNC
         }
     }
 
+
     public static class Settings
     {
         // Static Settings / Const
@@ -784,25 +785,129 @@ namespace RNC
 
             player.TriggerEvent("clearDailyChallenges");
 
-            if(cdInfo.Count == 0)
+            List<ChallengeData> cdList = new List<ChallengeData>();
+            ChallengeData temp = new ChallengeData();
+            foreach (DailyChallenge dc in ContextFactory.Instance.DailyChallenges)
             {
-                List<ChallengeData> cdList = new List<ChallengeData>();
-                ChallengeData temp = new ChallengeData();
-                foreach (DailyChallenge dc in ContextFactory.Instance.DailyChallenges)
-                {
-                    temp = new ChallengeData();
-                    temp.ChallengeItem = dc.Item;
-                    temp.ChallengeType = dc.Type;
-                    temp.ChallengeProgress = 0;
-                    temp.Completed = false;
+                temp = new ChallengeData();
+                temp.ChallengeItem = dc.Item;
+                temp.ChallengeType = dc.Type;
+                temp.ChallengeProgress = 0;
+                temp.Completed = false;
 
-                    cdList.Add(temp);
-                }
-                string jData = NAPI.Util.ToJson(cdList);
-                acc.ChallengeInfo = jData;
-                cdInfo = NAPI.Util.FromJson<List<ChallengeData>>(jData);
-                ContextFactory.Instance.SaveChanges();
+                cdList.Add(temp);
             }
+            string jData = NAPI.Util.ToJson(cdList);
+            acc.ChallengeInfo = jData;
+            cdInfo = NAPI.Util.FromJson<List<ChallengeData>>(jData);
+            ContextFactory.Instance.SaveChanges();
+
+
+            foreach (DailyChallenge c in ContextFactory.Instance.DailyChallenges)
+            {
+                switch ((ChallengeType)c.Type)
+                {
+                    case ChallengeType.AnyKill:
+                        {
+                            string reasonStr = "";
+                            jWeaponData wepDat = new jWeaponData();
+
+                            if (Main.WeaponReasons.TryGetValue(long.Parse(c.Item), out reasonStr))
+                            {
+                                // oh its already set ^^
+                            }
+                            else if (Settings.WeaponData.TryGetValue(long.Parse(c.Item), out wepDat))
+                            {
+                                reasonStr = wepDat.Name;
+                            }
+                            else
+                            {
+                                reasonStr = c.Item;
+                            }
+
+                            desc = $"Kill {c.Target} players with a(n) {reasonStr} in any mode.";
+                        }
+                        break;
+                    case ChallengeType.CopchaseKill:
+                        {
+                            string reasonStr = "";
+                            jWeaponData wepDat = new jWeaponData();
+
+                            if (Main.WeaponReasons.TryGetValue(long.Parse(c.Item), out reasonStr))
+                            {
+                                // oh its already set ^^
+                            }
+                            else if (Settings.WeaponData.TryGetValue(long.Parse(c.Item), out wepDat))
+                            {
+                                reasonStr = wepDat.Name;
+                            }
+                            else
+                            {
+                                reasonStr = c.Item;
+                            }
+
+                            desc = $"Kill {c.Target} players with a(n) {reasonStr} in copchase.";
+                        }
+                        break;
+                    case ChallengeType.CopchaseRounds:
+                        {
+                            desc = $"Play {c.Target} rounds of copchase.";
+                        }
+                        break;
+                    case ChallengeType.CopchaseVehicle:
+                        {
+                            CarData cdt = Settings.Cars.FirstOrDefault(t => t.Model == c.Item);
+                            string veh = "";
+                            if (cdt == null) { veh = c.Item; }
+                            else veh = cdt.Name;
+
+                            desc = $"Play {c.Target} copchase rounds with >> {c.Item} << set as your vehicle.";
+                        }
+                        break;
+                    case ChallengeType.Win:
+                        {
+                            if (c.Item == "derby")
+                                desc = $"Win {c.Target} rounds of the derby side mode.";
+                            else
+                            {
+                                desc = $"Win {c.Target} copchase rounds as a {c.Item}.";
+                            }
+                        }
+                        break;
+                }
+
+                ChallengeData cd = cdInfo.FirstOrDefault(t => (t.ChallengeItem == c.Item && t.ChallengeType == c.Type));
+                bool completed = false;
+                if (cd != null)
+                {
+                    completed = cd.Completed;
+                    TimeSpan sp = new TimeSpan(DateTime.Now.Ticks);
+                    double secs = Math.Ceiling(c.ExpireTimestamp - sp.TotalSeconds);
+                    // (id, desc, rXP, rPts, expireDate, completed, target, progress, type, item)
+                    player.TriggerEvent("addDailyChallenge", c.SQL_ID, desc, c.RewardXP, c.RewardPoints, secs, completed, c.Target, cd.ChallengeProgress, c.Type, c.Item);
+                }
+                else
+                {
+                    TimeSpan sp = new TimeSpan(DateTime.Now.Ticks);
+                    double secs = Math.Ceiling(c.ExpireTimestamp - sp.TotalSeconds);
+                    player.TriggerEvent("addDailyChallenge", c.SQL_ID, desc, c.RewardXP, c.RewardPoints, secs, completed, c.Target, 0, c.Type, c.Item);
+                }
+            }
+            player.TriggerEvent("addChallengesToMenu");
+        }
+        public static void AddChallengesForPlayer(Player player, List<ChallengeData> cdList)
+        {
+            string desc = "";
+            Account acc = EPlayer.GetAccount(player);
+            List<ChallengeData> cdInfo = NAPI.Util.FromJson<List<ChallengeData>>(acc.ChallengeInfo);
+
+            player.TriggerEvent("clearDailyChallenges");
+
+            string jData = NAPI.Util.ToJson(cdList);
+            acc.ChallengeInfo = jData;
+            cdInfo = NAPI.Util.FromJson<List<ChallengeData>>(jData);
+            ContextFactory.Instance.SaveChanges();
+            
 
             foreach (DailyChallenge c in ContextFactory.Instance.DailyChallenges)
             {
@@ -1023,6 +1128,7 @@ namespace RNC
             ChallengeData temp = new ChallengeData();
             foreach (DailyChallenge dc in ContextFactory.Instance.DailyChallenges)
             {
+                temp = new ChallengeData();
                 temp.ChallengeItem = dc.Item;
                 temp.ChallengeType = dc.Type;
                 temp.ChallengeProgress = 0;
@@ -1037,7 +1143,7 @@ namespace RNC
             }
             foreach(Player pl in NAPI.Pools.GetAllPlayers())
             {
-                AddChallengesForPlayer(pl);
+                AddChallengesForPlayer(pl, cdList);
             }
             ContextFactory.Instance.SaveChanges();
 
@@ -3231,7 +3337,7 @@ namespace RNC
                                         if (ownedVeh != null)
                                             ownedVeh.TimesUsed++;
 
-                                        CarData cardata = Settings.Cars.FirstOrDefault(crd => crd.Model == carName && crd.Team == 1);
+                                        CarData cardata = Settings.Cars.FirstOrDefault(crd => crd.Model == carName && crd.Team == 0);
                                         if (cardata != null)
                                             EPlayer.TryAdvanceChallenge(_tempPlayer, Challenge.ChallengeType.CopchaseVehicle, cardata.Name);
                                     }

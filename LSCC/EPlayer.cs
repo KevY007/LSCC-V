@@ -1222,6 +1222,8 @@ namespace RNC
         }
         public static void TryAdvanceChallenge(Player player, int challenge_type, string challenge_item)
         {
+            player.SendChatMessage("attempting to advance cht " + challenge_type + " item " + challenge_item);
+
             if (player == null) return;
             Account acc = EPlayer.GetAccount(player);
             if (acc == null) return;
@@ -1237,6 +1239,8 @@ namespace RNC
 
             DailyChallenge dc = ContextFactory.Instance.DailyChallenges.FirstOrDefault(dc => dc.Item == challenge_item && dc.Type == challenge_type);
             if (dc == null) return;
+
+            player.TriggerEvent("advanceChallenge", challenge_type, challenge_item, cd.ChallengeProgress);
 
             if(cd.ChallengeProgress >= dc.Target)
             {

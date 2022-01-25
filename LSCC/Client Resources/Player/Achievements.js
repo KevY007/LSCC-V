@@ -80,6 +80,17 @@ mp.events.add("addChallengesToMenu", () => {
     json += "]";
     UIMenu.execute(json);
 });
+mp.events.add("advanceChallenge", (cht, chi, chp) => {
+    let chunlock = DailyChallenges.find(a => a.type == cht && a.item == chi);
+    if(!chunlock) return;
+
+    DailyChallenges.find(a => a.type == cht && a.item == chi).progress = chp;
+
+    UIMenu.execute(`if(gm.$refs.profile.$refs.ProfileTabs.$refs.Challanges.chals.find(chNig => chNig.name == "${chunlock.description}") != null){
+        gm.$refs.profile.$refs.ProfileTabs.$refs.Challanges.chals.find(chNig => chNig.name == "${chunlock.description}").progress = "${chp}/${chunlock.target}";
+    }`);
+});
+
 mp.events.add("unlockChallenge", (cht, chi) => {
     let chunlock = DailyChallenges.find(a => a.type == cht && a.item == chi);
     if(!chunlock) return;
