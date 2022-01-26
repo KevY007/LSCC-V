@@ -4627,9 +4627,9 @@ namespace RNC
 
                 if (team.StartsWith("cop", StringComparison.OrdinalIgnoreCase))
                 {
-                    ConvChar.Clothing[1] = new ClothingData();
+                    ConvChar.Clothing[1] = new ClothingData(1, 0); // Cop MALE
+                    ConvChar.Clothing[3] = new ClothingData(1, 1); // Cop FEMALE
                     EPlayer.GetAccount(target).Character = NAPI.Util.ToJson(ConvChar);
-
 
                     target.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your cop clothing has been reset by an admin.");
 
@@ -4637,7 +4637,8 @@ namespace RNC
                 }
                 else if (team.StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
                 {
-                    ConvChar.Clothing[0] = new ClothingData();
+                    ConvChar.Clothing[0] = new ClothingData(0, 0); // Fugitive MALE
+                    ConvChar.Clothing[2] = new ClothingData(0, 1); // Fugitive FEMALE
                     EPlayer.GetAccount(target).Character = NAPI.Util.ToJson(ConvChar);
 
                     target.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your fugitive clothing has been reset by an admin.");

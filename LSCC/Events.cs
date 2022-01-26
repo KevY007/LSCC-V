@@ -287,7 +287,11 @@ namespace RNC
                                 {
                                     reasonStr = "";
                                 }
-                                EPlayer.TryAdvanceChallenge(killer, Challenge.ChallengeType.CopchaseKill, wepDat.Group);
+                                if (wepDat != null && wepDat != null)
+                                {
+                                    EPlayer.TryAdvanceChallenge(killer, Challenge.ChallengeType.CopchaseKill, wepDat.Group);
+                                    EPlayer.TryAdvanceChallenge(killer, Challenge.ChallengeType.AnyKill, wepDat.Group);
+                                }
 
                                 string rez = reasonStr;
                                 if(rez != "")
@@ -1147,7 +1151,8 @@ namespace RNC
                     {
                         NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
 
-                        EPlayer.TryAdvanceChallenge(killer, Challenge.ChallengeType.AnyKill, wepDat.Group);
+                        if(wepDat != null && wepDat.Group != null)
+                            EPlayer.TryAdvanceChallenge(killer, Challenge.ChallengeType.AnyKill, wepDat.Group);
 
                         if ((killer.GetSharedData<int>("InLobby") == -6 || killer.GetSharedData<int>("InLobby") > -1) && killer.GetSharedData<int>("InDM") > -1)
                         {
@@ -3808,7 +3813,6 @@ namespace RNC
         public void OnFinishCuffing(Player player, Player target)
         {
             if (target == null) return;
-            NAPI.Util.ConsoleOutput("Called OnFinishCuffing for " + player.Name + " and " + target.Name);
 
             LobbyData lobbye = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedData<int>("InLobby"));
 
@@ -3821,12 +3825,20 @@ namespace RNC
 
             EPlayer.SendMessageInLobby(lobbye.lobbyId, $"!{{#ADD8E6}}Cop {player.Name} has apprehended Fugitive {target.Name}.");
 
+            EPlayer.UnlockAchievement(player, "first_arrest");
+
+
             target.SetAccessories(7, 41, 0); // Handcuffs
 
             EPlayer.Handcuff(target, true);
 
             EPlayer.GetAccount(player).Arrests++;
             EPlayer.GivePoints(player, 5);
+
+            if(EPlayer.GetAccount(player).Arrests >= 100)
+            {
+                EPlayer.UnlockAchievement(player, "100_arrests");
+            }
 
             Events.OnPlayerDeath(target, player, 696988); // Reason 696988 = handcuffs.
 

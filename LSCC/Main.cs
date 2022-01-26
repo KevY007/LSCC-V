@@ -1741,6 +1741,9 @@ namespace RNC
             new Achievement("discord_verify", "Social Butterfly", "Link your Discord account to your RnC account. (/verify)", 0, 0, true);
             new Achievement("first_derby", "Derby Master?", "Win a round in the Derby mode.", 4, 3, true);
             new Achievement("first_kill", "First Kill", "Get your first kill in copchase.", 4, 2, true);
+            new Achievement("first_escape", "You'll never catch me!", "Escape as a fugitive in copchase.", 5, 2, true);
+            new Achievement("first_arrest", "Caught Alive", "Arrest a fugitive in copchase.", 5, 2, true);
+            new Achievement("100_arrests", "Where's my promotion?", "Arrest a total of 100 fugitives in copchase.", 14, 5, true);
             new Achievement("serial_killer", "Serial Killer", "Get a 5-kill killstreak.", 7, 3, true);
             new Achievement("first_loadout", "Gear up!", "Buy a loadout.", 2, 1, true);
             new Achievement("first_vehicle", "Speed is key", "Buy a vehicle.", 2, 1, true);
@@ -2409,7 +2412,7 @@ namespace RNC
                         NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FF0000}}The game has been stopped by an administrator.");
                         Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Stopped by an admin.**");
                         break;
-                    case 1: // time run out
+                    case 1: // time run out | fugi escape shit
                         if (lobby.gameMode != GameModes.BANKROBBERY)
                         {
                             NAPI.Chat.SendChatMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}The fugitives managed to escape from the cops.");
@@ -2590,6 +2593,11 @@ namespace RNC
                     if (lobby.Fugitives.Contains(i) && winnerTeam == 0)
                     {
                         EPlayer.TryAdvanceChallenge(i, Challenge.ChallengeType.Win, "fugitive");
+
+                        if(lobby.gameMode != GameModes.BANKROBBERY && reason == 1)
+                        {
+                            EPlayer.TryAdvanceChallenge(i, Challenge.ChallengeType.Win, "first_escape");
+                        }
                     }
 
                     if (i.GetData<bool>("ShotsFired") == false)
