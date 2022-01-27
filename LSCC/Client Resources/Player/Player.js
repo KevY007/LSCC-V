@@ -17,6 +17,8 @@ mp.events.add("ToggleCanExitVehicle", (toggle) => {
 
 let ping = 69;
 
+let customCrosshairOn = false;
+
 let chaseStartVeh = -1;
 let chaseStartSeat = -1;
 
@@ -155,6 +157,8 @@ mp.events.add('setPing', (pingtoset) => {
 mp.events.add("OneSecondEvent", () => {
     ShotStats.UpdateInterval++;
 
+    let currentMilisecond = Math.floor(Date.now()/1000);
+
     if(ShotStats.UpdateInterval >= 10)
     {
         ShotStats.UpdateInterval = 0;
@@ -164,7 +168,6 @@ mp.events.add("OneSecondEvent", () => {
 
         UpdateStatsVars(mp.players.local);
     }
-
     if(mp.storage.data.menu.monitoring == true){
         UIHud.execute(`gm.$refs.TopRight.$refs.Info.fps = ${FPS}`);
         mp.events.callRemote("RequestPlayerPing");
@@ -403,6 +406,32 @@ mp.events.add("AFKDriverCheck", (x,y,z) => {
 });
 
 mp.events.add("render", () => {
+
+    if(mp.game.invoke('0x68EDDA28A5976D07') == 1){
+        if(!customCrosshairOn){
+            customCrosshairOn = true;
+            UIMenu.execute(`gm.crosshair.enabled = true;`);
+        }
+    }
+    else{
+        if(customCrosshairOn){
+            customCrosshairOn = false;
+            UIMenu.execute(`gm.crosshair.enabled = false;`);
+        }
+    }    
+
+    if(mp.game.player.isFreeAiming()){
+        if(!customCrosshairOn){
+            customCrosshairOn = true;
+            UIMenu.execute(`gm.crosshair.enabled = true;`);
+        }
+    }
+    else{
+        if(customCrosshairOn){
+            customCrosshairOn = false;
+            UIMenu.execute(`gm.crosshair.enabled = false;`);
+        }
+    }
 
     if(!player.canExitVehicle){   
         mp.game.controls.disableControlAction(0, 75, true);
@@ -1522,6 +1551,7 @@ mp.events.add('render', () => {
 mp._events.add("playerWeaponShot", (targetPosition, targetEntity) => 
 {
     ShotStats.TotalFired++;
+
 
     if(targetEntity !== null && targetEntity !== undefined)
     {

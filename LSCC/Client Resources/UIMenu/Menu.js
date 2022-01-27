@@ -17,6 +17,7 @@ if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD
     mp.storage.data.menu.EventMusic = true;
     mp.storage.data.menu.monitoring = false;
     mp.storage.data.menu.VoiceMode = 0;
+    mp.storage.data.menu.CrosshairData = "[]";
 
     mp.storage.flush();
 }
@@ -30,7 +31,7 @@ mp.events.add('RestartMenu', () => {
 
     UIMenu = mp.browsers.new("package://UIMenu/index.html");
     UIMenu.execute(`gm.mainMenu = false;`);
-    UIMenu.active = false;
+    UIMenu.active = true;
 
     UIMenu.execute(`gm.$refs.logs.options = [
         { name: "Sessions", value: "sessions" },
@@ -56,14 +57,14 @@ function ToggleMenu()
 
         menuToggled = !menuToggled;
 
-        if(menuToggled == false)
+        /*if(menuToggled == false)
         {
             setTimeout(() => {
                 UIMenu.active = menuToggled;
             }, 750);
         }
         else UIMenu.active = menuToggled;
-
+        */
 
         //if(UIHud != null) UIHud.execute(`gm.miniHud = ${!menuToggled};`);
         UIMenu.execute(`gm.mainMenu = ${menuToggled};`);
@@ -318,6 +319,7 @@ mp.events.add("MenuToggleTyping", (state) => {
     }
 });
 
+// ID 69420 ==> Custom Crosshair Toggle | ID 69421 ==> Always On Crosshair |  ID 69422 ==> Sniper Custom or Default crosshair
 mp.events.add("MenuChangeSettings", (id, value) => 
 {
     if(id == 1)
@@ -528,5 +530,17 @@ mp.events.add("UpdateMenuLobbies", (lobbies, currentLobby) => {
         insertString += "});";
 
         UIMenu.execute(insertString);
+    }
+});
+
+mp.events.add("SaveCrosshair", (crData) => {
+    mp.storage.data.menu.CrosshairData = crData;
+    UIMenu.execute(`gm.crosshair.layers = ${crData}`);
+
+    mp.storage.flush();
+});
+mp.events.add("LoadCrosshair", () => {
+    if(mp.storage.data.menu.CrosshairData !== undefined && mp.storage.data.menu.CrosshairData != "[]"){
+        UIMenu.execute(`gm.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
     }
 });
