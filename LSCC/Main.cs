@@ -1797,6 +1797,7 @@ namespace RNC
             new LoadoutData(1, "CIA", 15, 30)
                 .Add(WeaponHash.Pistol_mk2, "package://Artwork/Weapons/PistolMk2.png", "H&K P30L", 50)
                 .Add(WeaponHash.Assaultshotgun, "package://Artwork/Weapons/AssaultShotgun.png", "AA-12", 20)
+                .Add(WeaponHash.Assaultsmg, "package://Artwork/Weapons/AssaultSMG.png", "FN P90", 80)
                 .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1);
 
             new LoadoutData(1, "SWAT", 20, 50)
@@ -1841,6 +1842,7 @@ namespace RNC
 
             new LoadoutData(0, "Hoodrat", 8, 10)
                 .Add(WeaponHash.Pistol_mk2, "package://Artwork/Weapons/PistolMk2.png", "H&K P30L", 50)
+                .Add(WeaponHash.Compactrifle, "package://Artwork/Weapons/CompactRifle.png", "Mini Draco AK-47", 80)
                 .Add(WeaponHash.Bullpupshotgun, "package://Artwork/Weapons/BullpupShotgun.png", "Kel Tec KSG", 50);
 
             new LoadoutData(0, "Thug", 13, 15)
