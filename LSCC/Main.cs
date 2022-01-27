@@ -792,6 +792,7 @@ namespace RNC
             AnyKill = 2, // Items: any firearm from a loadout or deathmatch | Any kill, meaning DM or CC
             CopchaseRounds = 3, // Items: N/A | How many copchase rounds played
             Win = 4, // Items: 'fugitive', 'cop', 'derby' | Amount of wins
+            Arrest = 5
         };
         public static List<string> CopchaseVehicles = new List<string>();
         public static List<string> PossibleWeaponGroups = new List<string>();
@@ -879,6 +880,11 @@ namespace RNC
                             {
                                 desc = $"Win {c.Target} copchase rounds as a {c.Item}.";
                             }
+                        }
+                        break;
+                    case ChallengeType.Arrest:
+                        {
+                            desc = $"Arrest {c.Target} fugitives.";
                         }
                         break;
                 }
@@ -969,6 +975,11 @@ namespace RNC
                             {
                                 desc = $"Win {c.Target} copchase rounds as a {c.Item}.";
                             }
+                        }
+                        break;
+                    case ChallengeType.Arrest:
+                        {
+                            desc = $"Arrest {c.Target} fugitives.";
                         }
                         break;
                 }
@@ -1090,6 +1101,18 @@ namespace RNC
 
                             rXp = target;
                             rPt = (int)Math.Floor((decimal)target/2);
+                        }
+                        break;
+                    case ChallengeType.Arrest:
+                        {
+                            generatedItem = "N/A";
+
+                            target = randomizer.Next(11, 24);
+                            if (target % 5 != 0)
+                                target = (5 - target % 5) + target;
+
+                            rXp = (int)Math.Floor((decimal)target / 2);
+                            rPt = (int)Math.Floor((decimal)target / 3);
                         }
                         break;
                 }

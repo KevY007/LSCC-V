@@ -3826,6 +3826,7 @@ namespace RNC
             EPlayer.SendMessageInLobby(lobbye.lobbyId, $"!{{#ADD8E6}}Cop {player.Name} has apprehended Fugitive {target.Name}.");
 
             EPlayer.UnlockAchievement(player, "first_arrest");
+            EPlayer.TryAdvanceChallenge(player, Challenge.ChallengeType.Arrest, "N/A");
 
 
             target.SetAccessories(7, 41, 0); // Handcuffs
