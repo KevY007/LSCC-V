@@ -1795,7 +1795,7 @@ namespace RNC
                 .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 2);
 
             new LoadoutData(1, "CIA", 15, 30)
-                .Add(WeaponHash.Appistol, "package://Artwork/Weapons/APPistol.png", "Colt SCAMP", 50)
+                .Add(WeaponHash.Pistol_mk2, "package://Artwork/Weapons/PistolMk2.png", "H&K P30L", 50)
                 .Add(WeaponHash.Assaultshotgun, "package://Artwork/Weapons/AssaultShotgun.png", "AA-12", 20)
                 .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1);
 
@@ -1840,7 +1840,7 @@ namespace RNC
                 .Add(WeaponHash.Sawnoffshotgun, "package://Artwork/Weapons/SawnOffShotgun.png", "Winchester Model 1887", 40);
 
             new LoadoutData(0, "Hoodrat", 8, 10)
-                .Add(WeaponHash.Appistol, "package://Artwork/Weapons/APPistol.png", "Colt SCAMP", 50)
+                .Add(WeaponHash.Pistol_mk2, "package://Artwork/Weapons/PistolMk2.png", "H&K P30L", 50)
                 .Add(WeaponHash.Bullpupshotgun, "package://Artwork/Weapons/BullpupShotgun.png", "Kel Tec KSG", 50);
 
             new LoadoutData(0, "Thug", 13, 15)
