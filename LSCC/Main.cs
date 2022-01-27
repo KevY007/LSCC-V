@@ -1035,7 +1035,7 @@ namespace RNC
                     break;
                 }
 
-                generatedType = randomizer.Next(0, 5);
+                generatedType = randomizer.Next(0, 6);
                 switch ((ChallengeType)generatedType)
                 {
                     case ChallengeType.CopchaseKill:
