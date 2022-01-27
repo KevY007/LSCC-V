@@ -420,19 +420,6 @@ mp.events.add("render", () => {
         }
     }    
 
-    if(mp.game.player.isFreeAiming()){
-        if(!customCrosshairOn){
-            customCrosshairOn = true;
-            UIMenu.execute(`gm.crosshair.enabled = true;`);
-        }
-    }
-    else{
-        if(customCrosshairOn){
-            customCrosshairOn = false;
-            UIMenu.execute(`gm.crosshair.enabled = false;`);
-        }
-    }
-
     if(!player.canExitVehicle){   
         mp.game.controls.disableControlAction(0, 75, true);
     }
