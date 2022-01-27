@@ -26,8 +26,6 @@ var miniHUDVars = {
     packetloss: 0.0,
 };
 
-var showReticule = true;
-
 let speedo = false;
 let speedoMax = 0.0;
 let speedoCur = 0.0;
@@ -842,7 +840,80 @@ mp.events.add("render", () => {
     mp.game.ui.hideHudComponentThisFrame(4); // mp_cash
     mp.game.ui.displayAmmoThisFrame(false); // HIDE AMMO
 
-    if(!showReticule)
+    if(showCustomCrosshair){
+        if(alwaysShowCustomCrosshair == true){
+            if(!customCrosshairOn){
+                if(!mp.game.player.isFreeAiming()){                              
+                    customCrosshairOn = true;
+                    UIMenu.execute(`gm.crosshair.enabled = true;`);
+                }
+                else{
+                    if(isHoldingSniper()){
+                        if(showCustomCrosshairInSniper){
+                            customCrosshairOn = true;
+                            UIMenu.execute(`gm.crosshair.enabled = true;`);                            
+                        }
+                        else{
+                            customCrosshairOn = false;
+                            UIMenu.execute(`gm.crosshair.enabled = false;`);                               
+                        }
+                    }
+                    else{
+                        customCrosshairOn = true;
+                        UIMenu.execute(`gm.crosshair.enabled = true;`);
+                    }
+                }
+            }
+            else{
+                if(mp.game.player.isFreeAiming()){                              
+                    if(isHoldingSniper()){
+                        if(showCustomCrosshairInSniper){
+                            customCrosshairOn = true;
+                            UIMenu.execute(`gm.crosshair.enabled = true;`);                            
+                        }
+                        else{
+                            customCrosshairOn = false;
+                            UIMenu.execute(`gm.crosshair.enabled = false;`);                               
+                        }
+                    }
+                }               
+            }
+        }
+        else{
+            if(mp.game.invoke('0x68EDDA28A5976D07') == 1){
+                if(!customCrosshairOn){
+                    if(!mp.game.player.isFreeAiming()){                              
+                        customCrosshairOn = true;
+                        UIMenu.execute(`gm.crosshair.enabled = true;`);
+                    }
+                    else{
+                        if(isHoldingSniper()){
+                            if(showCustomCrosshairInSniper){
+                                customCrosshairOn = true;
+                                UIMenu.execute(`gm.crosshair.enabled = true;`);                            
+                            }
+                            else{
+                                customCrosshairOn = false;
+                                UIMenu.execute(`gm.crosshair.enabled = false;`);                                   
+                            }
+                        }
+                        else{
+                            customCrosshairOn = true;
+                            UIMenu.execute(`gm.crosshair.enabled = true;`);
+                        }
+                    }
+                }
+            }
+            else{
+                if(customCrosshairOn){
+                    customCrosshairOn = false;
+                    UIMenu.execute(`gm.crosshair.enabled = false;`);
+                }
+            }   
+        }
+    }
+
+    if(!showReticule || customCrosshairOn)
     {
         mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
     }

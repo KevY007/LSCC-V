@@ -17,8 +17,6 @@ mp.events.add("ToggleCanExitVehicle", (toggle) => {
 
 let ping = 69;
 
-let customCrosshairOn = false;
-
 let chaseStartVeh = -1;
 let chaseStartSeat = -1;
 
@@ -406,19 +404,6 @@ mp.events.add("AFKDriverCheck", (x,y,z) => {
 });
 
 mp.events.add("render", () => {
-
-    if(mp.game.invoke('0x68EDDA28A5976D07') == 1){
-        if(!customCrosshairOn){
-            customCrosshairOn = true;
-            UIMenu.execute(`gm.crosshair.enabled = true;`);
-        }
-    }
-    else{
-        if(customCrosshairOn){
-            customCrosshairOn = false;
-            UIMenu.execute(`gm.crosshair.enabled = false;`);
-        }
-    }    
 
     if(!player.canExitVehicle){   
         mp.game.controls.disableControlAction(0, 75, true);
@@ -2594,6 +2579,8 @@ function setStorageDataVars(){
         mp.storage.data.menu.VoiceMode = 0;
         mp.events.callRemote("SetVoiceMode", 0, false);
     }
+
+    mp.events.callLocal("LoadCrosshair");
 
     mp.storage.flush();
 }

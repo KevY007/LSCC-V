@@ -26,6 +26,12 @@ var specState = false;
 var specTarget = null;
 var isNoClip = false;
 
+var showReticule = true;
+var showCustomCrosshair = false;
+var showCustomCrosshairInSniper = false;
+var alwaysShowCustomCrosshair = false;
+var customCrosshairOn = false;
+
 var UIHud = null;
 var UIMenu = null;
 var menuToggled = false;
