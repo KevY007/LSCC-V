@@ -2572,12 +2572,34 @@ function setStorageDataVars(){
     }
 
     if(mp.storage.data.menu.VoiceMode !== undefined){
-        mp.storage.data.menu.VoiceMode = false;
+        //mp.storage.data.menu.VoiceMode = false;
         mp.events.callRemote("SetVoiceMode", mp.storage.data.menu.VoiceMode, false);
     }
     else{
         mp.storage.data.menu.VoiceMode = 0;
         mp.events.callRemote("SetVoiceMode", 0, false);
+    }
+
+    if(mp.storage.data.CustomCrosshair !== undefined){
+        showCustomCrosshair = mp.storage.data.CustomCrosshair;
+    }
+    else{
+        showCustomCrosshair = false;
+        mp.storage.data.CustomCrosshair = false;
+    }
+    if(mp.storage.data.AlwaysOnCrosshair !== undefined){
+        alwaysShowCustomCrosshair = mp.storage.data.AlwaysOnCrosshair;
+    }
+    else{
+        alwaysShowCustomCrosshair = false;
+        mp.storage.data.AlwaysOnCrosshair = false;
+    }
+    if(mp.storage.data.SniperCustomCrosshair !== undefined){
+        showCustomCrosshairInSniper = mp.storage.data.SniperCustomCrosshair;
+    }
+    else{
+        showCustomCrosshairInSniper = false;
+        mp.storage.data.SniperCustomCrosshair = false;
     }
 
     mp.events.callLocal("LoadCrosshair");

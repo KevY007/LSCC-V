@@ -17,7 +17,11 @@ if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD
     mp.storage.data.menu.EventMusic = true;
     mp.storage.data.menu.monitoring = false;
     mp.storage.data.menu.VoiceMode = 0;
+
     mp.storage.data.menu.CrosshairData = "[]";
+    mp.storage.data.menu.CustomCrosshair = false;
+    mp.storage.data.menu.AlwaysOnCrosshair = false;
+    mp.storage.data.menu.SniperCustomCrosshair = false;
 
     mp.storage.flush();
 }
@@ -278,7 +282,8 @@ function ToggleMenu()
                 ]
             }
         ]`);
-          
+        
+
         UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.tri.value = ${mp.storage.data.menu.topRightInfo};`);
         UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.gp.value = ${mp.storage.data.menu.gameProgress};`);
         UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.tooltips.value = ${mp.storage.data.menu.tooltips};`);
@@ -297,6 +302,11 @@ function ToggleMenu()
         UIMenu.execute(`gm.$refs.settings.$refs.Game.$refs.eventmusic.value = ${mp.storage.data.menu.EventMusic};`);
         UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.oocauto.value = ${mp.storage.data.menu.OOCauto};`);
         UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.voicemode.value = ${mp.storage.data.menu.VoiceMode};`);
+
+        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
+        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.settings.enabled = ${mp.storage.data.CustomCrosshair}`);
+        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.settings.alwaysOn = ${mp.storage.data.AlwaysOnCrosshair}`);
+        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.settings.onSnipers = ${mp.storage.data.SniperCustomCrosshair}`);
     }
 }
 
@@ -402,6 +412,18 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     {
         mp.storage.data.menu.VoiceMode = value;
         mp.events.callRemote("SetVoiceMode", value, true);
+    }
+    else if(id == 69420){
+        mp.storage.data.CustomCrosshair = value;
+        showCustomCrosshair = value;
+    }
+    else if(id == 69421){
+        mp.storage.data.AlwaysOnCrosshair = value;
+        alwaysShowCustomCrosshair = value;
+    }
+    else if(id == 69422){
+        mp.storage.data.SniperCustomCrosshair = value;
+        showCustomCrosshairInSniper = value;
     }
 
     if(UIHud != null)
@@ -540,7 +562,8 @@ mp.events.add("SaveCrosshair", (crData) => {
     mp.storage.flush();
 });
 mp.events.add("LoadCrosshair", () => {
-    if(mp.storage.data.menu.CrosshairData !== undefined && mp.storage.data.menu.CrosshairData != "[]"){
+    if(mp.storage.data.menu.CrosshairData !== undefined){
         UIMenu.execute(`gm.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
+        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
     }
 });
