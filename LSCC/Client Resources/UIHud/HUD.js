@@ -843,9 +843,12 @@ mp.events.add("render", () => {
     if(showCustomCrosshair){
         if(alwaysShowCustomCrosshair == true){
             if(!customCrosshairOn){
-                if(!mp.game.player.isFreeAiming()){                              
-                    customCrosshairOn = true;
-                    UIMenu.execute(`gm.crosshair.enabled = true;`);
+                if(!mp.game.player.isFreeAiming()){         
+                    if(!menuToggled)                     
+                    {
+                        customCrosshairOn = true;
+                        UIMenu.execute(`gm.crosshair.enabled = true;`);
+                    }
                 }
                 else{
                     if(isHoldingSniper()){

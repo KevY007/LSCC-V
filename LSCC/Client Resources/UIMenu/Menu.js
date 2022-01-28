@@ -304,9 +304,13 @@ function ToggleMenu()
         UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.voicemode.value = ${mp.storage.data.menu.VoiceMode};`);
 
         UIMenu.execute(`gm.$refs.settings.$refs.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
-        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.settings.enabled = ${mp.storage.data.CustomCrosshair}`);
-        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.settings.alwaysOn = ${mp.storage.data.AlwaysOnCrosshair}`);
-        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.settings.onSnipers = ${mp.storage.data.SniperCustomCrosshair}`);
+        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.settings.enabled = ${mp.storage.data.menu.CustomCrosshair}`);
+        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.settings.alwaysOn = ${mp.storage.data.menu.AlwaysOnCrosshair}`);
+        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.settings.onSnipers = ${mp.storage.data.menu.SniperCustomCrosshair}`);
+
+        showCustomCrosshair = mp.storage.data.menu.CustomCrosshair;
+        alwaysShowCustomCrosshair = mp.storage.data.menu.AlwaysOnCrosshair;
+        showCustomCrosshairInSniper = mp.storage.data.menu.SniperCustomCrosshair;
     }
 }
 
@@ -414,15 +418,15 @@ mp.events.add("MenuChangeSettings", (id, value) =>
         mp.events.callRemote("SetVoiceMode", value, true);
     }
     else if(id == 69420){
-        mp.storage.data.CustomCrosshair = value;
+        mp.storage.data.menu.CustomCrosshair = value;
         showCustomCrosshair = value;
     }
     else if(id == 69421){
-        mp.storage.data.AlwaysOnCrosshair = value;
+        mp.storage.data.menu.AlwaysOnCrosshair = value;
         alwaysShowCustomCrosshair = value;
     }
     else if(id == 69422){
-        mp.storage.data.SniperCustomCrosshair = value;
+        mp.storage.data.menu.SniperCustomCrosshair = value;
         showCustomCrosshairInSniper = value;
     }
 

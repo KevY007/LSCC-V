@@ -2580,26 +2580,26 @@ function setStorageDataVars(){
         mp.events.callRemote("SetVoiceMode", 0, false);
     }
 
-    if(mp.storage.data.CustomCrosshair !== undefined){
-        showCustomCrosshair = mp.storage.data.CustomCrosshair;
+    if(mp.storage.data.menu.CustomCrosshair !== undefined){
+        showCustomCrosshair = mp.storage.data.menu.CustomCrosshair;
     }
     else{
         showCustomCrosshair = false;
-        mp.storage.data.CustomCrosshair = false;
+        mp.storage.data.menu.CustomCrosshair = false;
     }
-    if(mp.storage.data.AlwaysOnCrosshair !== undefined){
-        alwaysShowCustomCrosshair = mp.storage.data.AlwaysOnCrosshair;
+    if(mp.storage.data.menu.AlwaysOnCrosshair !== undefined){
+        alwaysShowCustomCrosshair = mp.storage.data.menu.AlwaysOnCrosshair;
     }
     else{
         alwaysShowCustomCrosshair = false;
         mp.storage.data.AlwaysOnCrosshair = false;
     }
-    if(mp.storage.data.SniperCustomCrosshair !== undefined){
-        showCustomCrosshairInSniper = mp.storage.data.SniperCustomCrosshair;
+    if(mp.storage.data.menu.SniperCustomCrosshair !== undefined){
+        showCustomCrosshairInSniper = mp.storage.data.menu.SniperCustomCrosshair;
     }
     else{
         showCustomCrosshairInSniper = false;
-        mp.storage.data.SniperCustomCrosshair = false;
+        mp.storage.data.menu.SniperCustomCrosshair = false;
     }
 
     mp.events.callLocal("LoadCrosshair");
