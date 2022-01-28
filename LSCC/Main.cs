@@ -121,6 +121,7 @@ namespace RNC
         public List<Pickup> Drops { get; set; }
 
         public BankRobberyData BankRobbery { get; set; }
+        public int NextEventCounter { get; set; }
 
         public int lobbyId { get; set; }
         public int lastMapId { get; set; }
@@ -151,8 +152,10 @@ namespace RNC
             Drops = new List<Pickup>();
 
             BankRobbery = new BankRobberyData();
+            NextEventCounter = 10; // how many rounds left until an event
 
             FirstKill = new KeyValuePair<Player, Player>(null, null);
+
 
             Time = new int[3];
             Time[0] = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 23);
@@ -2731,6 +2734,12 @@ namespace RNC
                 {
                     if (lobby.gameStatus == 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Copchase is already running, failed to start"); return false; }
 
+                    if(lobby.NextEventCounter <= 0)
+                    {
+                        lobby.gameMode = GameModes.BANKROBBERY;
+                        lobby.NextEventCounter = 10;
+                    }
+
                     lobby.gameStatus = 0;
                     int pCount = 0;
 
@@ -3557,7 +3566,11 @@ namespace RNC
 
                         if (lobby.gameMode == GameModes.STANDARD)
                         {
+                            lobby.NextEventCounter--;
                             Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Standard Copchase has been started! Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
+
+                            if (lobby.NextEventCounter == 0)
+                                NAPI.Chat.SendChatMessageToAll("!{#DB6135}[LOBBY -> BANK ROBBERY] ~w~Bank Robbery event will start next round in ~y~lobby #" + lobby.lobbyId + "~w~!");
                         }
                         else if (lobby.gameMode == GameModes.BUSTED)
                         {
