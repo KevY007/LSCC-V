@@ -451,6 +451,7 @@ namespace RNC
             new BR_FugitiveVehicleData(new Vector3(226.4308f, 118.67955f, 101.97867f), 151.46762f, "impaler"),
             new BR_FugitiveVehicleData(new Vector3(237.09787f, 130.90378f, 102.12132f), 159.22339f, "kalahari"),
             new BR_FugitiveVehicleData(new Vector3(229.15312f, 127.188934f, 102.29818f), -111.604225f, "fugitive"),
+            new BR_FugitiveVehicleData(new Vector3(289.6261f, 177.25037f, 103.936134f), 71.79052f, "tourbus")
         };
 
         public static readonly Vector3[] PatrolPositions =
@@ -3187,6 +3188,7 @@ namespace RNC
                                         111, 0, "PATROL", 255, false, true, Convert.ToUInt32(lobbyid));
                                     lobby.BankRobbery.PoliceVehicles.Add(_v);
                                     lobby.Vehicles.Add(_v);
+                                    _v.SetSharedData("Team", 1);
                                 }
                                 crashcheck++;
                                 for (int i = 0; i < BankRobberyData.FbiBuffaloHeadings.Length; i++)
@@ -3195,6 +3197,7 @@ namespace RNC
                                         0, 0, "FIB", 255, false, true, Convert.ToUInt32(lobbyid));
                                     lobby.BankRobbery.PoliceVehicles.Add(_v);
                                     lobby.Vehicles.Add(_v);
+                                    _v.SetSharedData("Team", 1);
                                 }
                                 crashcheck++;
                                 for (int i = 0; i < BankRobberyData.FbiSuvHeadings.Length; i++)
@@ -3203,6 +3206,7 @@ namespace RNC
                                         0, 0, "NOOSE", 255, false, true, Convert.ToUInt32(lobbyid));
                                     lobby.BankRobbery.PoliceVehicles.Add(_v);
                                     lobby.Vehicles.Add(_v);
+                                    _v.SetSharedData("Team", 1);
                                 }
                                 crashcheck++;
 
@@ -3460,6 +3464,7 @@ namespace RNC
                                         BankRobberyData.FugitiveVehicleData[i].Heading,
                                         new Random().Next(128), new Random().Next(128), "fartlol", 255, true, true,
                                         Convert.ToUInt32(lobbyid));
+                                    _v.SetSharedData("Team", 0);
                                     lobby.BankRobbery.FugitiveVehicles.Add(_v);
                                     lobby.Vehicles.Add(_v);
                                 }

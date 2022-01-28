@@ -311,6 +311,16 @@ namespace RNC
                 return;
             }
 
+            LobbyData ld = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
+            if(ld != null)
+            {
+                if(ld.gameMode == GameModes.BANKROBBERY && player.GetSharedData<int>("Team") == 0 && ld.BankRobbery.State < 1)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Nice try, you cannot unlock this vehicle yet! Wait for the leader to take the money first.");
+                    return;
+                }
+            }
+
             targetVeh.Locked = !targetVeh.Locked;
             targetVeh.SetSharedData("Locked", targetVeh.Locked);
 
