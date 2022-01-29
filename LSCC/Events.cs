@@ -222,6 +222,7 @@ namespace RNC
         [RemoteEvent("SetPlayerWounded")]
         public static void OnPlayerWounded(Player player, int state, int killerID)
         {
+            NAPI.Util.ConsoleOutput("[ONPLAYERWOUNDED " + player.Name + " STATE (" + state + ") KILLER ID  (" + killerID + ")");
             try
             {
                 if (!player.HasSharedData("Wounded"))

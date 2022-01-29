@@ -1786,7 +1786,7 @@ let woundedTimer = null;
 
 mp.events.add('render', () => {
     if(mp.players.local.getVariable("Wounded") > 0){
-        if(mp.players.local.isInAnyVehicle(false)){ // making sure to disable driveby and vehicle movement completely good RP
+        //if (mp.players.local.isInAnyVehicle(false)) { // making sure to disable driveby and vehicle movement completely good RP
             mp.game.controls.disableControlAction(0, 61, true);
             mp.game.controls.disableControlAction(0, 62, true);
             mp.game.controls.disableControlAction(0, 63, true);
@@ -1799,11 +1799,11 @@ mp.events.add('render', () => {
             mp.game.controls.disableControlAction(0, 278, true);
             mp.game.controls.disableControlAction(0, 279, true);
 
-            mp.game.controls.disableControlAction(0, 76, true); 
-            mp.game.controls.disableControlAction(0, 91, true);  
-            mp.game.controls.disableControlAction(0, 92, true);  
-            mp.game.controls.disableControlAction(0, 24, true);   
-            mp.game.controls.disableControlAction(0, 25, true); 
+            mp.game.controls.disableControlAction(0, 76, true);
+            mp.game.controls.disableControlAction(0, 91, true);
+            mp.game.controls.disableControlAction(0, 92, true);
+            mp.game.controls.disableControlAction(0, 24, true);
+            mp.game.controls.disableControlAction(0, 25, true);
             mp.game.controls.disableControlAction(0, 69, true);
             mp.game.controls.disableControlAction(0, 70, true);
             mp.game.controls.disableControlAction(0, 140, true);
@@ -1812,9 +1812,18 @@ mp.events.add('render', () => {
             mp.game.controls.disableControlAction(0, 257, true);
             mp.game.controls.disableControlAction(0, 263, true);
             mp.game.controls.disableControlAction(0, 265, true);
-            mp.game.controls.disableControlAction(32, 68, true); 
-            mp.game.controls.disableControlAction(32, 70, true);   
-        }
+            mp.game.controls.disableControlAction(32, 68, true);
+            mp.game.controls.disableControlAction(32, 70, true);
+
+            // MOVEMENT CONTROLS JUMP AND SPRINT
+            mp.game.controls.disableControlAction(0, 22, true);
+            mp.game.controls.disableControlAction(0, 102, true);
+            mp.game.controls.disableControlAction(0, 258, true);
+            mp.game.controls.disableControlAction(0, 259, true);
+            mp.game.controls.disableControlAction(0, 350, true);
+
+            mp.game.controls.disableControlAction(0, 137, true);
+        
     }
 });
 
