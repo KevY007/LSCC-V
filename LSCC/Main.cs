@@ -2850,54 +2850,54 @@ namespace RNC
                         List<Player> PutInsideCar = new List<Player>();
                         Player _tempPlayer;
                         Map map = null;
-                        crashcheck++;
+                        crashcheck = 1;
                         if (lobby.gameMode != GameModes.BANKROBBERY)
                         {
                             if (ContextFactory.Instance.Maps.Count() < 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has no maps added, failed to start"); return false; }
-                            crashcheck++;
+                            crashcheck = 2;
 
                             List<Map> mapList = ContextFactory.Instance.Maps.ToList().Where(a => a.Enabled == true).ToList();
-                            crashcheck++;
+                            crashcheck = 3;
 
                             if (mapList.Count < 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has maps but none of them were enabled! Failed to start."); return false; }
-                            crashcheck++;
+                            crashcheck = 4;
 
                             map = mapList.OrderBy(c => Guid.NewGuid()).FirstOrDefault();
                             if (lobby.NextMapID != -1) map = mapList.Find(a => a.SQL_ID == lobby.NextMapID);
                             lobby.NextMapID = -1;
 
                             if (map == null) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Next (force-set) MapID == null; Failed to start!"); return false; }
-                            crashcheck++;
+                            crashcheck = 5;
 
                             NAPI.Util.ConsoleOutput($"[Lobby " + lobbyid + $"] Selected Map [{map.Name}] | Total Spawns: [{ContextFactory.Instance.MapSpawns.ToList().Where(a => a.mapID == map.SQL_ID).Count()}]");
-                            crashcheck++;
+                            crashcheck = 6;
 
                             lobby.lastMapId = map.SQL_ID;
 
                             if (ContextFactory.Instance.MapSpawns.ToList().Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 0).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no fugitive spawns! Abort."); return false; }
                             if (ContextFactory.Instance.MapSpawns.ToList().Where(a => a.mapID == map.SQL_ID && a.spawnTeam == 1).Count() < 1) { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no cop spawns! Abort."); return false; }
 
-                            crashcheck++;
+                            crashcheck = 7;
 
                             Spawns = ContextFactory.Instance.MapSpawns.ToList().Where(x => x.mapID == map.SQL_ID).ToList();
-                            crashcheck++;
+                            crashcheck = 8;
 
                             UsedSpawns = new List<int>(Spawns.Count + 1);
-                            crashcheck++;
+                            crashcheck = 9;
 
                             lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && !EPlayer.IsAFK(a) && !a.HasData("Spectating") && a.GetSharedData<bool>("AutoJoin") == true && !a.Dead).OrderBy(c => Guid.NewGuid()).ToList();
                             // !a.Dead so the white color bug (OnPlayerSpawn trigger as game start) does not happen -- if it still happens or if you want to enable dead players being taken in game then do it that EPlayer.Spawn is called when selecting players again.
-                            crashcheck++;
+                            crashcheck = 10;
 
                             PutInsideCar = new List<Player>(lobbyPlayers.Count());
-                            crashcheck++;
+                            crashcheck = 11;
 
                             UsedSpawns.Add(-1);
-                            crashcheck++;
+                            crashcheck = 12;
 
 
                             pCount = 0;
-                            crashcheck++;
+                            crashcheck = 13;
                         }
                         else
                         {
@@ -2945,7 +2945,7 @@ namespace RNC
                             }
                         }
                         fugitives = lobby.Fugitives.Count;
-                        crashcheck++;
+                        crashcheck = 14;
 
                         foreach (Player player in lobbyPlayers)
                         {
@@ -3000,7 +3000,7 @@ namespace RNC
                                 player.SetSharedData("FugitiveChance", player.GetSharedData<float>("FugitiveChance") + 1.0);
                             }
                         }
-                        crashcheck++;
+                        crashcheck = 15;
 
                         MapSpawn spawnLoc = null;
                         pCount = 0;
@@ -3258,7 +3258,7 @@ namespace RNC
                                 lobby.BankRobbery.PoliceVehicles.Clear();
                                 lobby.BankRobbery.FugitiveVehicles.Clear();
                                 lobby.BankRobbery = new BankRobberyData();
-                                crashcheck++;
+                                crashcheck = 16;
 
                                 uint dimension = 100 + (uint)lobby.lobbyId;
                                 for (int i = 0; i < BankRobberyData.PatrolHeadings.Length; i++)
@@ -3269,7 +3269,7 @@ namespace RNC
                                     lobby.Vehicles.Add(_v);
                                     _v.SetSharedData("Team", 1);
                                 }
-                                crashcheck++;
+                                crashcheck = 17;
                                 for (int i = 0; i < BankRobberyData.FbiBuffaloHeadings.Length; i++)
                                 {
                                     Vehicle _v = NAPI.Vehicle.CreateVehicle((uint)VehicleHash.Fbi, BankRobberyData.FbiBuffaloPositions[i], BankRobberyData.FbiBuffaloHeadings[i],
@@ -3278,7 +3278,7 @@ namespace RNC
                                     lobby.Vehicles.Add(_v);
                                     _v.SetSharedData("Team", 1);
                                 }
-                                crashcheck++;
+                                crashcheck = 18;
                                 for (int i = 0; i < BankRobberyData.FbiSuvHeadings.Length; i++)
                                 {
                                     Vehicle _v = NAPI.Vehicle.CreateVehicle((uint)VehicleHash.Fbi2, BankRobberyData.FbiSuvPositions[i], BankRobberyData.FbiSuvHeadings[i],
@@ -3287,7 +3287,7 @@ namespace RNC
                                     lobby.Vehicles.Add(_v);
                                     _v.SetSharedData("Team", 1);
                                 }
-                                crashcheck++;
+                                crashcheck = 19;
 
                                 foreach (Player player in lobby.Cops.OrderBy(x => Guid.NewGuid()))
                                 {
@@ -3310,7 +3310,7 @@ namespace RNC
 
                         spawnLoc = null;
                         pCount = 0;
-                        crashcheck++;
+                        crashcheck = 20;
 
                         if (lobby.gameMode != GameModes.BANKROBBERY)
                         {
@@ -3557,7 +3557,7 @@ namespace RNC
                                     lobby.Vehicles.Add(_v);
                                 }
                                 Random kevycanusendmefeetpicspls = new Random();
-                                crashcheck++;
+                                crashcheck = 21;
 
                                 _brob.HeistLeader = null;
                                 int unfuck = 0;
@@ -3601,59 +3601,83 @@ namespace RNC
                                     if(lobby.Fugitives.Count == 2)
                                         lobby.BankRobbery.Sniper = lobby.Fugitives.FirstOrDefault(lp => lp.GetSharedData<bool>("HeistLeader") == false);
                                 }
-                                crashcheck++;
+                                crashcheck = 22;
 
                                 foreach (Player player in lobby.Fugitives.OrderBy(x => Guid.NewGuid()))
                                 {
-                                    Account _a = EPlayer.GetAccount(player);
-                                    CharacterData cd = NAPI.Util.FromJson<CharacterData>(_a.Character);
-
-
-                                    if (player != _brob.HeistLeader && player != _brob.Sniper)
+                                    try
                                     {
-                                        int spid = kevycanusendmefeetpicspls.Next(BankRobberyData.FugitiveSpawns.GetLength(0));
-                                        player.Position = (Vector3)BankRobberyData.FugitiveSpawns[spid, 0];
-                                        player.Heading = (float)BankRobberyData.FugitiveSpawns[spid, 1];
+                                        Account _a = EPlayer.GetAccount(player);
+                                        CharacterData cd = NAPI.Util.FromJson<CharacterData>(_a.Character);
+
+
+                                        if (player != _brob.HeistLeader && player != _brob.Sniper)
+                                        {
+                                            try
+                                            {
+                                                int spid = kevycanusendmefeetpicspls.Next(BankRobberyData.FugitiveSpawns.GetLength(0));
+                                                player.Position = (Vector3)BankRobberyData.FugitiveSpawns[spid, 0];
+                                                player.Heading = (float)BankRobberyData.FugitiveSpawns[spid, 1];
+                                            }
+                                            catch
+                                            {
+                                                player.Position = new Vector3(234.98256f, 225.41786f, 106.28686f);
+                                                player.Heading = -109.99029f;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (player == _brob.HeistLeader)
+                                            {
+                                                player.Position = BankRobberyData.LeaderPos;
+                                                player.Heading = BankRobberyData.LeaderHeading;
+                                            }
+                                            else if (player == _brob.Sniper)
+                                            {
+                                                player.Position = BankRobberyData.SniperPos;
+                                                player.Heading = BankRobberyData.SniperHeading;
+                                            }
+                                        }
+                                        try
+                                        {
+                                            if(cd.Clothing.Length >= 1)
+                                            {
+                                                cd.Clothing[0].Hat = 62;
+                                                cd.Clothing[0].HatTxt = new Random().Next(0, 10);
+                                            }
+                                            if(cd.Clothing.Length >= 3)
+                                            {
+                                                cd.Clothing[2].Hat = 62;
+                                                cd.Clothing[2].HatTxt = new Random().Next(0, 10);
+                                            }
+                                            EPlayer._ApplyCharacter(player, cd, 0);
+                                        }
+                                        catch { }
+
+                                        EPlayer.Freeze(player, true);
+
+                                        EPlayer.SetColor(player, new Color(255, 174, 0), 0);
+
+                                        EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Fugitive as {player.Name}");
+                                        EPlayer.Notify(player, "<strong>Please wait</strong>, Bank Robbery is loading...", "yellow", "fas fa-spinner fa-spin", false, 19000, "bottomCenter");
+
+                                        player.TriggerEvent("SetActorInvulnerable", false);
+                                        player.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
+
+                                        player.SetSharedData("VisibleBlip", true);
+                                        player.ResetData("Handsup");
+                                        player.ResetData("Cuffed");
+                                        player.SetSharedData("Team", 0);
+                                        player.SetSharedData("CuffedBy", "n/a");
+                                        player.SetSharedData("HasShot", true);
+                                        player.Dimension = Convert.ToUInt32(lobbyid);
                                     }
-                                    else
+                                    catch(Exception ex)
                                     {
-                                        if (player == _brob.HeistLeader)
-                                        {
-                                            player.Position = BankRobberyData.LeaderPos;
-                                            player.Heading = BankRobberyData.LeaderHeading;
-                                        }
-                                        else if (player == _brob.Sniper)
-                                        {
-                                            player.Position = BankRobberyData.SniperPos;
-                                            player.Heading = BankRobberyData.SniperHeading;
-                                        }
+                                        NAPI.Util.ConsoleOutput("HELP ME PLEASE IM SUFFERING: " + ex.ToString());
                                     }
-                                    cd.Clothing[0].Hat = 62;
-                                    cd.Clothing[0].HatTxt = new Random().Next(0, 10);
-                                    cd.Clothing[2].Hat = 62;
-                                    cd.Clothing[2].HatTxt = new Random().Next(0, 10);
-
-                                    EPlayer._ApplyCharacter(player, cd, 0);
-
-                                    EPlayer.Freeze(player, true);
-
-                                    EPlayer.SetColor(player, new Color(255, 174, 0), 0);
-
-                                    EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Fugitive as {player.Name}");
-                                    EPlayer.Notify(player, "<strong>Please wait</strong>, Bank Robbery is loading...", "yellow", "fas fa-spinner fa-spin", false, 19000, "bottomCenter");
-
-                                    player.TriggerEvent("SetActorInvulnerable", false);
-                                    player.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
-
-                                    player.SetSharedData("VisibleBlip", true);
-                                    player.ResetData("Handsup");
-                                    player.ResetData("Cuffed");
-                                    player.SetSharedData("Team", 0);
-                                    player.SetSharedData("CuffedBy", "n/a");
-                                    player.SetSharedData("HasShot", true);
-                                    player.Dimension = Convert.ToUInt32(lobbyid);
                                 }
-                                crashcheck++;
+                                crashcheck = 23;
                             }
                         }
 
@@ -3717,16 +3741,22 @@ namespace RNC
         {
             try
             {
-
-                if (Environment.TickCount64 - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
+                try
                 {
-                    //Settings.DerbyTimeLeft--;
-                    Settings.LastDerbyTick = Environment.TickCount64;
-
-                    if (Settings.DerbyTimeLeft <= 0)
+                    if (Environment.TickCount64 - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
                     {
-                        Main.CheckDerbyWinner();
+                        //Settings.DerbyTimeLeft--;
+                        Settings.LastDerbyTick = Environment.TickCount64;
+
+                        if (Settings.DerbyTimeLeft <= 0)
+                        {
+                            Main.CheckDerbyWinner();
+                        }
                     }
+                }
+                catch(Exception ex)
+                {
+                    NAPI.Util.ConsoleOutput("Fucking dyn settings error or smth? " + ex.ToString());
                 }
 
                 lock (Settings.Lobbies)
@@ -4331,99 +4361,131 @@ namespace RNC
                                 {
                                     if (lobby.gameMode == GameModes.BANKROBBERY)
                                     {
-                                        foreach (Player p in lobby.Cops)
+                                        try
                                         {
-                                            if (p != null)
+                                            foreach (Player p in lobby.Cops)
                                             {
-                                                EPlayer.TryAdvanceChallenge(p, Challenge.ChallengeType.CopchaseRounds, "N/A");
-                                                p.TriggerEvent("BankDoorLocked", true);
-                                                p.TriggerEvent("BankRob_SetMusic", 0);
-
-                                                if(p.HasData("BankRobberyUnit"))
+                                                if (p != null)
                                                 {
-                                                    if(p.GetData<string>("BankRobberyUnit") == "fib")
+                                                    EPlayer.TryAdvanceChallenge(p, Challenge.ChallengeType.CopchaseRounds, "N/A");
+                                                    p.TriggerEvent("BankDoorLocked", true);
+                                                    p.TriggerEvent("BankRob_SetMusic", 0);
+
+                                                    if (p.HasData("BankRobberyUnit"))
                                                     {
-                                                        Account a = EPlayer.GetAccount(p);
-                                                        CharacterData cd = NAPI.Util.FromJson<CharacterData>(a.Character);
-                                                        cd.Clothing[1].Clothes[11].Drawable = 320;
-                                                        cd.Clothing[1].Clothes[11].Texture = 0;
-                                                        cd.Clothing[3].Clothes[11].Drawable = 331;
-                                                        cd.Clothing[3].Clothes[11].Texture = 0;
-
-                                                        cd.Clothing[1].Clothes[4].Drawable = 121;
-                                                        cd.Clothing[1].Clothes[4].Texture = 0;
-                                                        cd.Clothing[3].Clothes[4].Drawable = 127;
-                                                        cd.Clothing[3].Clothes[4].Texture = 0;
-
-                                                        cd.Clothing[1].Clothes[6].Drawable = 96;
-                                                        cd.Clothing[1].Clothes[6].Texture = 0;
-                                                        cd.Clothing[3].Clothes[6].Drawable = 100;
-                                                        cd.Clothing[3].Clothes[6].Texture = 0;
-
-                                                        bool hasHelmet = (new Random().Next(0, 10) > 5);
-                                                        if (hasHelmet)
+                                                        if (p.GetData<string>("BankRobberyUnit") == "fib")
                                                         {
-                                                            cd.Clothing[1].Hat = 141;
-                                                            cd.Clothing[1].HatTxt = 0;
-                                                            cd.Clothing[3].Hat = 140;
-                                                            cd.Clothing[3].HatTxt = 0;
+                                                            Account a = EPlayer.GetAccount(p);
+                                                            try
+                                                            {
+                                                                CharacterData cd = NAPI.Util.FromJson<CharacterData>(a.Character);
+                                                                int len = cd.Clothing.Length;
+
+                                                                bool hasHelmet = (new Random().Next(0, 10) > 5);
+                                                                bool set_clothing_successfully = false;
+                                                                if (len >= 2)
+                                                                {
+                                                                    cd.Clothing[1].Clothes[11].Drawable = 320;
+                                                                    cd.Clothing[1].Clothes[11].Texture = 0;
+                                                                    cd.Clothing[1].Clothes[4].Drawable = 121;
+                                                                    cd.Clothing[1].Clothes[4].Texture = 0;
+                                                                    cd.Clothing[1].Clothes[6].Drawable = 96;
+                                                                    cd.Clothing[1].Clothes[6].Texture = 0;
+                                                                
+                                                                    if (hasHelmet)
+                                                                    {
+                                                                        cd.Clothing[1].Hat = 141;
+                                                                        cd.Clothing[1].HatTxt = 0;
+                                                                    }
+                                                                    set_clothing_successfully = true;
+                                                                }
+                                                                if(len >= 4)
+                                                                {
+                                                                    cd.Clothing[3].Clothes[11].Drawable = 331;
+                                                                    cd.Clothing[3].Clothes[11].Texture = 0;
+                                                                    cd.Clothing[3].Clothes[4].Drawable = 127;
+                                                                    cd.Clothing[3].Clothes[4].Texture = 0;
+                                                                    cd.Clothing[3].Clothes[6].Drawable = 100;
+                                                                    cd.Clothing[3].Clothes[6].Texture = 0;
+
+                                                                    if (hasHelmet)
+                                                                    {
+                                                                        cd.Clothing[3].Hat = 140;
+                                                                        cd.Clothing[3].HatTxt = 0;
+                                                                    }
+                                                                    set_clothing_successfully = true;
+                                                                }
+                                                                EPlayer.ApplyCharacter(p, cd, 1);
+                                                            }
+                                                            catch(Exception ex)
+                                                            {
+                                                                NAPI.Util.ConsoleOutput("ZAMN! BANKROB FIB FAIL: " + ex.ToString());
+                                                            }
+                                                        }
+                                                    }
+
+                                                    try
+                                                    {
+                                                        EPlayer.Freeze(p, false);
+                                                        if (p.HasData("BR_UnitVehicle") && p.HasData("BR_UnitVehicleSeat"))
+                                                        {
+                                                            Vehicle v = p.GetData<Vehicle>("BR_UnitVehicle");
+                                                            int seat = p.GetData<int>("BR_UnitVehicleSeat");
+                                                            if (v != null)
+                                                            {
+                                                                NAPI.Task.Run(() =>
+                                                                {
+                                                                    p.SetIntoVehicle(v, seat);
+                                                                }, 100);
+                                                            }
                                                         }
 
-                                                        EPlayer.ApplyCharacter(p, cd, 1);
-                                                    }
-                                                }
-                                                
 
-                                                EPlayer.Freeze(p, false);
-                                                if (p.HasData("BR_UnitVehicle") && p.HasData("BR_UnitVehicleSeat"))
-                                                {
-                                                    Vehicle v = p.GetData<Vehicle>("BR_UnitVehicle");
-                                                    int seat = p.GetData<int>("BR_UnitVehicleSeat");
-                                                    if (v != null)
+                                                        EPlayer.Freeze(p, false);
+                                                        p.SendNotification("~y~You can now exit vehicles.");
+                                                        p.SendNotification("~b~Head to the bank! It has been marked on your GPS.");
+                                                        p.TriggerEvent("ToggleCanExitVehicle", true);
+                                                        p.TriggerEvent("playerCreateWaypoint", BankRobberyData.BankCheckpointPos);
+
+                                                        p.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: All available units, code 3, there's a 211 in progress in the Pacific Standard Bank!");
+                                                    }
+                                                    catch(Exception ex)
                                                     {
-                                                        NAPI.Task.Run(() =>
-                                                        {
-                                                            p.SetIntoVehicle(v, seat);
-                                                        }, 100);
+                                                        NAPI.Util.ConsoleOutput("FAIL IN SECOND STAGE OF THAT SWAT SHIT " + ex.ToString());
                                                     }
                                                 }
+                                            }
+                                            foreach (Player p in lobby.Fugitives)
+                                            {
+                                                if (p != null)
+                                                {
+                                                    EPlayer.TryAdvanceChallenge(p, Challenge.ChallengeType.CopchaseRounds, "N/A");
+                                                    p.TriggerEvent("BankDoorLocked", true);
+                                                    p.TriggerEvent("BankRob_SetMusic", 0);
+                                                    EPlayer.Freeze(p, false);
+                                                    p.SendNotification("~y~The event has started!");
+                                                    p.TriggerEvent("ToggleCanExitVehicle", true);
 
+                                                    if (p == lobby.BankRobbery.HeistLeader)
+                                                    {
+                                                        p.TriggerEvent("StartBankRobberyTimer");
+                                                        p.SendChatMessage("!{#FF6347}[#] ~w~You are taking the cash - this will take 60 seconds!");
 
-                                                EPlayer.Freeze(p, false);
-                                                p.SendNotification("~y~You can now exit vehicles.");
-                                                p.SendNotification("~b~Head to the bank! It has been marked on your GPS.");
-                                                p.TriggerEvent("ToggleCanExitVehicle", true);
-                                                p.TriggerEvent("playerCreateWaypoint", BankRobberyData.BankCheckpointPos);
+                                                        Events.RequestPlayAnimation(p, "mp_missheist_ornatebank", "stand_cash_in_bag_loop", 1);
+                                                        EPlayer.Freeze(p, true);
+                                                    }
+                                                    else
+                                                    {
+                                                        p.SendChatMessage("!{#FF6347}[#] ~w~Law enforcement is on their way, protect the heist leader!");
+                                                    }
 
-                                                p.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: All available units, code 3, there's a 211 in progress in the Pacific Standard Bank!");
+                                                    p.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] SCOUT: Alright ladies and gentlemen, I hear that the cops are on their way. Good luck!");
+                                                }
                                             }
                                         }
-                                        foreach (Player p in lobby.Fugitives)
+                                        catch(Exception ex)
                                         {
-                                            if (p != null)
-                                            {
-                                                EPlayer.TryAdvanceChallenge(p, Challenge.ChallengeType.CopchaseRounds, "N/A");
-                                                p.TriggerEvent("BankDoorLocked", true);
-                                                p.TriggerEvent("BankRob_SetMusic", 0);
-                                                EPlayer.Freeze(p, false);
-                                                p.SendNotification("~y~The event has started!");
-                                                p.TriggerEvent("ToggleCanExitVehicle", true);
-
-                                                if (p == lobby.BankRobbery.HeistLeader)
-                                                {
-                                                    p.TriggerEvent("StartBankRobberyTimer");
-                                                    p.SendChatMessage("!{#FF6347}[#] ~w~You are taking the cash - this will take 60 seconds!");
-
-                                                    Events.RequestPlayAnimation(p, "mp_missheist_ornatebank", "stand_cash_in_bag_loop", 1);
-                                                    EPlayer.Freeze(p, true);
-                                                }
-                                                else
-                                                {
-                                                    p.SendChatMessage("!{#FF6347}[#] ~w~Law enforcement is on their way, protect the heist leader!");
-                                                }
-
-                                                p.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] SCOUT: Alright ladies and gentlemen, I hear that the cops are on their way. Good luck!");
-                                            }
+                                            NAPI.Util.ConsoleOutput("THIS IS ETERNAL SUFFERING " + ex.ToString());
                                         }
                                     }
                                 }

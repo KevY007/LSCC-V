@@ -2014,13 +2014,28 @@ namespace RNC
             player.SetSharedData("NextLevelXP", EPlayer.GetMaxLevelXP(acc.Level));
             player.TriggerEvent("Menu_UpdateLevelXP");
 
-            NAPI.Task.Run(() =>
+            try
             {
-                if(player.GetSharedData<int>("Level") >= 100)
+                NAPI.Task.Run(() =>
                 {
-                    EPlayer.UnlockAchievement(player, "reach_level_100");                  
-                }
-            }, 1000);
+                    try
+                    {
+                        if (player != null)
+                        {
+                            if (player.GetSharedData<int>("Level") >= 100)
+                            {
+                                EPlayer.UnlockAchievement(player, "reach_level_100");
+                            }
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        NAPI.Util.ConsoleOutput("EXCEPTION WHEN UNLOCKING REACH_LEVEL_100 INSIDE RUN(): " + ex.ToString());
+                    }
+                
+                }, 1000);
+            }
+            catch (Exception ex) { NAPI.Util.ConsoleOutput("EXCEPTION WHEN UNLOCKING REACH_LEVEL_100 OUTSIDE RUN(): " + ex.ToString()); }
         }
         public static void Save(Player player)
         {

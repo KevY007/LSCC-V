@@ -18,6 +18,7 @@ namespace RNC
         public void OnPlayerConnected_Old(Player player)
         {
             EPlayer.ResetPlayerData(player);
+            player.SetSharedData("Wounded", 0);
         }
 
         [RemoteEvent("ServerConsoleOutput")]
@@ -221,191 +222,186 @@ namespace RNC
         [RemoteEvent("SetPlayerWounded")]
         public static void OnPlayerWounded(Player player, int state, int killerID)
         {
-            if (player.GetSharedData<int>("Wounded") == state && state != 0) return; // REPEL: Laggers... So it doesn't call twice...
-
-            player.SetSharedData("Wounded", state);
-
-            Player killer = null;
-            if(killerID != -1)
+            try
             {
-                killer = Settings.LoggedInPlayers.Find(p => p.Id == killerID);
-                if(killer == null)
+                if (!player.HasSharedData("Wounded"))
                 {
-                    player.SendChatMessage("!{#FF6347}A fatal error has occurred - please contact the devs and tell them this code: " + player.Name + "_D" + player.Id);
-                    return;
+                    player.SetSharedData("Wounded", state);
                 }
-            }
 
-            switch (state)
-            {
-                case 0:
+                if (player.GetSharedData<int>("Wounded") == state && state != 0) return; // REPEL: Laggers... So it doesn't call twice...
+
+                player.SetSharedData("Wounded", state);
+
+                Player killer = null;
+                if (killerID != -1)
+                {
+                    killer = Settings.LoggedInPlayers.Find(p => p.Id == killerID);
+                    if (killer == null)
                     {
-                        player.TriggerEvent("ResetWounded");
-                        player.SetSharedData("ReviveTarget", "n/a");
-                        player.SetSharedData("BeingRevived", false);
-                        break;
+                        player.SendChatMessage("!{#FF6347}A fatal error has occurred - please contact the devs and tell them this code: " + player.Name + "_D" + player.Id);
+                        return;
                     }
-                case 1:
-                    {
-                        if(player.GetSharedData<string>("ReviveTarget") != "n/a")
-                        {
-                            player.SendChatMessage("!{#FF6347}[!] ~w~Your revive attempt failed due to your death.");
-                            OnStopReviving(player);
-                        }
-                        player.SetSharedData("ReviveTarget", "n/a");
-                        player.SetSharedData("BeingRevived", false);
-                        player.SendChatMessage("!{#C3A3DB}* You suddenly start losing strength and collapse - you lost too much blood.");
-                        player.Health = 100;
+                }
 
-                        if (player.IsInVehicle && player.Vehicle != null)
+                switch (state)
+                {
+                    case 0:
                         {
-                            if (player.Vehicle.Class == 15 || player.Vehicle.Class == 16)
+                            player.TriggerEvent("ResetWounded");
+                            player.SetSharedData("ReviveTarget", "n/a");
+                            player.SetSharedData("BeingRevived", false);
+                            break;
+                        }
+                    case 1:
+                        {
+                            if (player.GetSharedData<string>("ReviveTarget") != "n/a")
                             {
-                                player.Vehicle.EngineStatus = false;
+                                player.SendChatMessage("!{#FF6347}[!] ~w~Your revive attempt failed due to your death.");
+                                OnStopReviving(player);
+                            }
+                            player.SetSharedData("ReviveTarget", "n/a");
+                            player.SetSharedData("BeingRevived", false);
+                            player.SendChatMessage("!{#C3A3DB}* You suddenly start losing strength and collapse - you lost too much blood.");
+                            player.Health = 100;
+
+                            if (player.IsInVehicle && player.Vehicle != null)
+                            {
+                                if (player.Vehicle.Class == 15 || player.Vehicle.Class == 16)
+                                {
+                                    player.Vehicle.EngineStatus = false;
+                                }
+
+                                player.Health = 25;
+                                player.SendChatMessage("!{#FF6347}You have been severely injured, but you are not dead yet!");
+                                player.SendChatMessage("!{#FF6347}You are currently in a vehicle & do not have enough strength to exit it.");
+                                player.SendChatMessage("!{#FF6347}A teammate will have to enter the vehicle in order to treat your wounds. [unlock your vehicle]");
+                                player.SendChatMessage("!{#FF6347}You will die in 60 seconds if you are not revived by a teammate. Use (/lobby) to respawn instantly.");
                             }
 
-                            player.Health = 25;
-                            player.SendChatMessage("!{#FF6347}You have been severely injured, but you are not dead yet!");
-                            player.SendChatMessage("!{#FF6347}You are currently in a vehicle & do not have enough strength to exit it.");
-                            player.SendChatMessage("!{#FF6347}A teammate will have to enter the vehicle in order to treat your wounds. [unlock your vehicle]");
-                            player.SendChatMessage("!{#FF6347}You will die in 60 seconds if you are not revived by a teammate. Use (/lobby) to respawn instantly.");
-                        }
-
-                        if (player.GetSharedData<string>("ActionType") != "none")
-                        {
-                            EPlayer.StopPlayerAction(player, 1);
-                        }
-
-                        foreach (Player pl in RAGE.Entities.Players.All.Where(p => p.Position.DistanceTo(player.Position) < 10.0f))
-                        {
-                            if (pl.GetSharedData<string>("CuffedBy") == player.Name)
+                            if (player.GetSharedData<string>("ActionType") != "none")
                             {
-                                player.TriggerEvent("StopCuffing", 12);
-                                break;
+                                EPlayer.StopPlayerAction(player, 1);
                             }
-                        }
 
-                        if (!player.GetSharedData<string>("ReviveTarget").Equals("n/a"))
-                        {
-                            player.TriggerEvent("StopReviving", 3);
-                        }
-
-                        #region -> Giving XP to killer, handling stats, kill feed
-                        if (killer != null && killer != player)
-                        {
-                            LobbyData lobby = Settings.Lobbies.FirstOrDefault(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
-                            if (lobby != null)
+                            foreach (Player pl in RAGE.Entities.Players.All.Where(p => p.Position.DistanceTo(player.Position) < 10.0f))
                             {
-
-                                string reasonStr = "";
-                                jWeaponData wepDat = new jWeaponData();
-
-                                if (Settings.WeaponData.TryGetValue((long)killer.CurrentWeapon, out wepDat))
+                                if (pl.GetSharedData<string>("CuffedBy") == player.Name)
                                 {
-                                    reasonStr += wepDat.Name;
+                                    player.TriggerEvent("StopCuffing", 12);
+                                    break;
                                 }
-                                else if (Main.WeaponReasons.TryGetValue((long)killer.CurrentWeapon, out reasonStr))
-                                {
-                                    // oh its already set ^^
-                                }
-                                else
-                                {
-                                    reasonStr = "";
-                                }
-                                if (wepDat != null && wepDat != null)
-                                {
-                                    EPlayer.TryAdvanceChallenge(killer, Challenge.ChallengeType.CopchaseKill, wepDat.Group);
-                                    EPlayer.TryAdvanceChallenge(killer, Challenge.ChallengeType.AnyKill, wepDat.Group);
-                                }
-
-                                string rez = reasonStr;
-                                if(rez != "")
-                                {
-                                    reasonStr = "(" + rez + ")";
-                                }
-
-                                EPlayer.UnlockAchievement(killer, "first_kill");
-
-                                if (killer.Health <= 30)
-                                    EPlayer.UnlockAchievement(killer, "low_hp_kill");
-
-                                if(lobby.FirstKill.Key == null && lobby.FirstKill.Value == null)
-                                {
-                                    lobby.FirstKill = new KeyValuePair<Player, Player>(killer, player);
-
-                                    if(lobby.gameMode == GameModes.BANKROBBERY && lobby.BankRobbery.HeistLeader == player)
-                                        EPlayer.UnlockAchievement(killer, "first_kill_leader");
-                                }
-
-                                EPlayer.GetAccount(killer).Kills++;
-                                player.SetSharedData("LastKiller", killer.Name);
-
-                                EPlayer.GetAccount(player).Deaths++;
-
-                                killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 10.0));
-                                EPlayer.GrantXP(killer, 2);
-
-                                if (lobby.Fugitives.Contains(player) && killer.GetSharedData<int>("Team") == 0)
-                                {
-                                    PlayerRequestShotTag(killer);
-                                }
-                                foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
-                                {
-                                    ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), $"Downed {reasonStr}", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
-                                }
-
-                                int killStreak = killer.GetData<int>("Killstreak") + 1;
-                                killer.SetData("Killstreak", killStreak);
-                                if (killStreak >= 5) EPlayer.UnlockAchievement(killer, "serial_killer");
-
-                                if (killStreak % 4 == 0 && killStreak >= 4 && (lobby.Cops.Contains(killer) || lobby.Fugitives.Contains(killer)))
-                                {
-                                    EPlayer.GrantXP(killer, 5);
-                                    EPlayer.SendMessageInLobby(lobby.lobbyId, $"!{{#FF0000}}[KILLSTREAK] !{{#FF6347}}{killer.Name} !{{#FFFFFF}}is on a {killStreak} kills rampage! Someone stop them!");
-
-                                    killer.SendChatMessage("!{#00FF33}[!] !{#FFFFFF}You have earnt 5 XP and 5 points for maintaining a killstreak!");
-                                    EPlayer.GivePoints(killer, 5);
-                                    killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(killer).DonatorLevel + 1.0)));
-                                }
-
                             }
-                        }
-                        #endregion
-                        break;
-                    }
-                case 2:
-                    {
 
-                        LobbyData lobby = Settings.Lobbies.FirstOrDefault(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
-
-                        player.SetSharedData("ReviveTarget", "n/a");
-                        player.SetSharedData("BeingRevived", false);
-                        player.Health = 25;
-                        if (player.Vehicle == null && !player.IsInVehicle)
-                        {
-                            player.SendChatMessage("!{#FF6347}You have been severely injured, but you are not dead yet!");
-                            player.SendChatMessage("!{#FF6347}You have enough strength to crawl - use it to crawl to safety.");
-                            player.SendChatMessage("!{#FF6347}You will die in 60 seconds if you are not revived by a teammate. Use (/lobby) to respawn instantly.");
-                        }
-                        if(player.HasSharedData("Team"))
-                        {
-                            if (lobby != null)
+                            if (!player.GetSharedData<string>("ReviveTarget").Equals("n/a"))
                             {
-                                if (player.GetSharedData<int>("Team") == 1)
+                                player.TriggerEvent("StopReviving", 3);
+                            }
+
+                            #region -> Giving XP to killer, handling stats, kill feed
+                            if (killer != null && killer != player)
+                            {
+                                LobbyData lobby = Settings.Lobbies.FirstOrDefault(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+                                if (lobby != null)
                                 {
-                                    if(lobby.Cops.Count <= 1)
+
+                                    string reasonStr = "";
+                                    jWeaponData wepDat = new jWeaponData();
+
+                                    if (Settings.WeaponData.TryGetValue((long)killer.CurrentWeapon, out wepDat))
                                     {
-                                        NAPI.Task.Run(() =>
-                                        {
-                                            Main.StopGame(lobby.lobbyId, 2);
-                                            Events.RequestClearAnimation(player);
-                                            player.StopAnimation();
-                                        }, 1000);
+                                        reasonStr += wepDat.Name;
+                                    }
+                                    else if (Main.WeaponReasons.TryGetValue((long)killer.CurrentWeapon, out reasonStr))
+                                    {
+                                        // oh its already set ^^
                                     }
                                     else
                                     {
-                                        Player alive = lobby.Cops.FirstOrDefault(a => a.HasSharedData("Wounded") && a.GetSharedData<int>("Wounded") == 0);
-                                        if (alive == null)
+                                        reasonStr = "";
+                                    }
+                                    if (wepDat != null && wepDat != null)
+                                    {
+                                        EPlayer.TryAdvanceChallenge(killer, Challenge.ChallengeType.CopchaseKill, wepDat.Group);
+                                        EPlayer.TryAdvanceChallenge(killer, Challenge.ChallengeType.AnyKill, wepDat.Group);
+                                    }
+
+                                    string rez = reasonStr;
+                                    if (rez != "")
+                                    {
+                                        reasonStr = "(" + rez + ")";
+                                    }
+
+                                    EPlayer.UnlockAchievement(killer, "first_kill");
+
+                                    if (killer.Health <= 30)
+                                        EPlayer.UnlockAchievement(killer, "low_hp_kill");
+
+                                    if (lobby.FirstKill.Key == null && lobby.FirstKill.Value == null)
+                                    {
+                                        lobby.FirstKill = new KeyValuePair<Player, Player>(killer, player);
+
+                                        if (lobby.gameMode == GameModes.BANKROBBERY && lobby.BankRobbery.HeistLeader == player)
+                                            EPlayer.UnlockAchievement(killer, "first_kill_leader");
+                                    }
+
+                                    EPlayer.GetAccount(killer).Kills++;
+                                    player.SetSharedData("LastKiller", killer.Name);
+
+                                    EPlayer.GetAccount(player).Deaths++;
+
+                                    killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 10.0));
+                                    EPlayer.GrantXP(killer, 2);
+
+                                    if (lobby.Fugitives.Contains(player) && killer.GetSharedData<int>("Team") == 0)
+                                    {
+                                        PlayerRequestShotTag(killer);
+                                    }
+                                    foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                    {
+                                        ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), $"Downed {reasonStr}", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                    }
+
+                                    int killStreak = killer.GetData<int>("Killstreak") + 1;
+                                    killer.SetData("Killstreak", killStreak);
+                                    if (killStreak >= 5) EPlayer.UnlockAchievement(killer, "serial_killer");
+
+                                    if (killStreak % 4 == 0 && killStreak >= 4 && (lobby.Cops.Contains(killer) || lobby.Fugitives.Contains(killer)))
+                                    {
+                                        EPlayer.GrantXP(killer, 5);
+                                        EPlayer.SendMessageInLobby(lobby.lobbyId, $"!{{#FF0000}}[KILLSTREAK] !{{#FF6347}}{killer.Name} !{{#FFFFFF}}is on a {killStreak} kills rampage! Someone stop them!");
+
+                                        killer.SendChatMessage("!{#00FF33}[!] !{#FFFFFF}You have earnt 5 XP and 5 points for maintaining a killstreak!");
+                                        EPlayer.GivePoints(killer, 5);
+                                        killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(killer).DonatorLevel + 1.0)));
+                                    }
+
+                                }
+                            }
+                            #endregion
+                            break;
+                        }
+                    case 2:
+                        {
+
+                            LobbyData lobby = Settings.Lobbies.FirstOrDefault(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+
+                            player.SetSharedData("ReviveTarget", "n/a");
+                            player.SetSharedData("BeingRevived", false);
+                            player.Health = 25;
+                            if (player.Vehicle == null && !player.IsInVehicle)
+                            {
+                                player.SendChatMessage("!{#FF6347}You have been severely injured, but you are not dead yet!");
+                                player.SendChatMessage("!{#FF6347}You have enough strength to crawl - use it to crawl to safety.");
+                                player.SendChatMessage("!{#FF6347}You will die in 60 seconds if you are not revived by a teammate. Use (/lobby) to respawn instantly.");
+                            }
+                            if (player.HasSharedData("Team"))
+                            {
+                                if (lobby != null)
+                                {
+                                    if (player.GetSharedData<int>("Team") == 1)
+                                    {
+                                        if (lobby.Cops.Count <= 1)
                                         {
                                             NAPI.Task.Run(() =>
                                             {
@@ -414,34 +410,34 @@ namespace RNC
                                                 player.StopAnimation();
                                             }, 1000);
                                         }
-                                    }
-
-                                    string chatStr = $"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: Officer {player.Name} is down and needs medical assistance!";
-                                    foreach (Player cop in lobby.Cops.Where(c => c.Position.DistanceTo(player.Position) < 75))
-                                    {
-                                        cop.SendChatMessage(chatStr);
-                                        if (cop != player)
-                                        { 
-                                            cop.TriggerEvent("RemoveTooltip", "H");
-                                            cop.TriggerEvent("AddTooltip", "H", "Revive", 1);
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    if (lobby.Fugitives.Count <= 1)
-                                    {
-                                        NAPI.Task.Run(() =>
+                                        else
                                         {
-                                            Main.StopGame(lobby.lobbyId, 3);
-                                            Events.RequestClearAnimation(player);
-                                            player.StopAnimation();
-                                        }, 1000);
+                                            Player alive = lobby.Cops.FirstOrDefault(a => a.HasSharedData("Wounded") && a.GetSharedData<int>("Wounded") == 0);
+                                            if (alive == null)
+                                            {
+                                                NAPI.Task.Run(() =>
+                                                {
+                                                    Main.StopGame(lobby.lobbyId, 2);
+                                                    Events.RequestClearAnimation(player);
+                                                    player.StopAnimation();
+                                                }, 1000);
+                                            }
+                                        }
+
+                                        string chatStr = $"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: Officer {player.Name} is down and needs medical assistance!";
+                                        foreach (Player cop in lobby.Cops.Where(c => c.Position.DistanceTo(player.Position) < 75))
+                                        {
+                                            cop.SendChatMessage(chatStr);
+                                            if (cop != player)
+                                            {
+                                                cop.TriggerEvent("RemoveTooltip", "H");
+                                                cop.TriggerEvent("AddTooltip", "H", "Revive", 1);
+                                            }
+                                        }
                                     }
                                     else
                                     {
-                                        Player alive = lobby.Fugitives.FirstOrDefault(a => a.HasSharedData("Wounded") && a.GetSharedData<int>("Wounded") == 0);
-                                        if (alive == null)
+                                        if (lobby.Fugitives.Count <= 1)
                                         {
                                             NAPI.Task.Run(() =>
                                             {
@@ -450,44 +446,61 @@ namespace RNC
                                                 player.StopAnimation();
                                             }, 1000);
                                         }
-                                    }
-
-                                    int msgrand = new Random().Next(0, 5);
-                                    string msg = "";
-                                    switch (msgrand)
-                                    {
-                                        case 0: 
-                                            msg = "Fuck, I've been shot badly, need help, quick!";
-                                            break;
-                                        case 1: 
-                                            msg = "I'm bleeding out over here, will somebody fucking help me?";
-                                            break;
-                                        case 2:
-                                            msg = "Need help, quick, I'm bleeding! Please come help me!";
-                                            break;
-                                        case 3:
-                                            msg = "I can't get up, I've got more holes in me than Swiss cheese.";
-                                            break;
-                                        default: 
-                                            msg = "I'm going to die if someone doesn't help me! Please, give me a hand over here!";
-                                            break;
-                                    }
-
-                                    string chatStr = $"!{{#FFEC8B}}** [WT | FREQ: {lobby.lobbyId + 8346}] {player.Name.Replace("_", " ")}: {msg}";
-                                    foreach (Player fug in lobby.Fugitives.Where(c => c.Position.DistanceTo(player.Position) < 75))
-                                    {
-                                        fug.SendChatMessage(chatStr);
-                                        if (fug != player)
+                                        else
                                         {
-                                            fug.TriggerEvent("RemoveTooltip", "H");
-                                            fug.TriggerEvent("AddTooltip", "H", "Revive", 0);
+                                            Player alive = lobby.Fugitives.FirstOrDefault(a => a.HasSharedData("Wounded") && a.GetSharedData<int>("Wounded") == 0);
+                                            if (alive == null)
+                                            {
+                                                NAPI.Task.Run(() =>
+                                                {
+                                                    Main.StopGame(lobby.lobbyId, 3);
+                                                    Events.RequestClearAnimation(player);
+                                                    player.StopAnimation();
+                                                }, 1000);
+                                            }
+                                        }
+
+                                        int msgrand = new Random().Next(0, 5);
+                                        string msg = "";
+                                        switch (msgrand)
+                                        {
+                                            case 0:
+                                                msg = "Fuck, I've been shot badly, need help, quick!";
+                                                break;
+                                            case 1:
+                                                msg = "I'm bleeding out over here, will somebody fucking help me?";
+                                                break;
+                                            case 2:
+                                                msg = "Need help, quick, I'm bleeding! Please come help me!";
+                                                break;
+                                            case 3:
+                                                msg = "I can't get up, I've got more holes in me than Swiss cheese.";
+                                                break;
+                                            default:
+                                                msg = "I'm going to die if someone doesn't help me! Please, give me a hand over here!";
+                                                break;
+                                        }
+
+                                        string chatStr = $"!{{#FFEC8B}}** [WT | FREQ: {lobby.lobbyId + 8346}] {player.Name.Replace("_", " ")}: {msg}";
+                                        foreach (Player fug in lobby.Fugitives.Where(c => c.Position.DistanceTo(player.Position) < 75))
+                                        {
+                                            fug.SendChatMessage(chatStr);
+                                            if (fug != player)
+                                            {
+                                                fug.TriggerEvent("RemoveTooltip", "H");
+                                                fug.TriggerEvent("AddTooltip", "H", "Revive", 0);
+                                            }
                                         }
                                     }
                                 }
                             }
+                            break;
                         }
-                        break;
-                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                NAPI.Util.ConsoleOutput("Exception in OnPlayerWounded: " + ex.ToString());
             }
         }
 
@@ -1789,6 +1802,9 @@ namespace RNC
             player.SetSharedData("Admin", acc.Admin);
             player.SetSharedData("PlayerSquadID", -1);
 
+            player.TriggerEvent("BankDoorLocked", false);
+            player.TriggerEvent("BankRob_SetMusic", -1);
+
             player.SetSharedData("Level", acc.Level);
             player.SetSharedData("CurrentXP", acc.XP);
             player.SetSharedData("NextLevelXP", EPlayer.GetMaxLevelXP(acc.Level));
@@ -2206,101 +2222,115 @@ namespace RNC
         [RemoteEvent("BankRob_ContinueState")]
         public static void BankRobbery_SetState(Player player, int state)
         {
-            LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
-            if (lobby == null) return;
-            NAPI.Util.ConsoleOutput("Continuing state bank rob for " + player.Name + " state ID " + state);   
-            lobby.BankRobbery.State = state;
-            lobby.BankRobbery.Hideout = new Random().Next(BankRobberyData.Hideouts.Length);
-            switch (state)
+            try
             {
-                case 0: { return; }
-                case 1: // One minute passed, leader robbed the bank
-                    {
-                        foreach(Player f in lobby.Fugitives)
+                LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
+                if (lobby == null) return;
+                NAPI.Util.ConsoleOutput("Continuing state bank rob for " + player.Name + " state ID " + state);
+                lobby.BankRobbery.State = state;
+                lobby.BankRobbery.Hideout = new Random().Next(BankRobberyData.Hideouts.Length);
+                switch (state)
+                {
+                    case 0: { return; }
+                    case 1: // One minute passed, leader robbed the bank
                         {
-                            f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {lobby.BankRobbery.HeistLeader.Name}: I took all the cash I can, it's time to move!");
-                            f.SendChatMessage("!{#FF6347}[#] ~w~Escort your heist leader to one of the getaway vehicles. Once they enter one, the heist will proceed. Bank doors have been unlocked.");
-                            f.SendChatMessage("!{#FF6347}[#] ~w~Your hideout is located in ~y~" + BankRobberyData.HideoutNames[lobby.BankRobbery.Hideout] + "~w~ !{#c9c9c9}(a marker will be set when the heist proceeds)!");
-
-                            f.TriggerEvent("BankRob_SetMusic", 1);
-                            f.TriggerEvent("BankDoorLocked", false);
-
-                            if(f == lobby.BankRobbery.HeistLeader)
+                            foreach (Player f in lobby.Fugitives)
                             {
-                                Events.RequestClearAnimation(f);
-                                player.TriggerEvent("ClearTaskNotFalling");
-                                EPlayer.Freeze(f, false);
-                            }
-                        }
-                        Player leader = lobby.BankRobbery.HeistLeader;
-                        Account la = EPlayer.GetAccount(leader);
-                        CharacterData cd = NAPI.Util.FromJson<CharacterData>(la.Character);
-                        cd.Clothing[0].Clothes[5].Drawable = 40;
-                        cd.Clothing[0].Clothes[5].Texture = 0;
-                        cd.Clothing[2].Clothes[5].Drawable = 40;
-                        cd.Clothing[2].Clothes[5].Texture = 0;
-                        cd.Clothing[0].Hat = 62;
-                        cd.Clothing[0].HatTxt = 9;
-                        cd.Clothing[2].Hat = 62;
-                        cd.Clothing[2].HatTxt = 9;
-                        EPlayer.ApplyCharacter(leader, cd, 0);
-                        EPlayer.Action(leader, "grabs the duffel bag filled with cash and slings it over their shoulder.");
+                                f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {lobby.BankRobbery.HeistLeader.Name}: I took all the cash I can, it's time to move!");
+                                f.SendChatMessage("!{#FF6347}[#] ~w~Escort your heist leader to one of the getaway vehicles. Once they enter one, the heist will proceed. Bank doors have been unlocked.");
+                                f.SendChatMessage("!{#FF6347}[#] ~w~Your hideout is located in ~y~" + BankRobberyData.HideoutNames[lobby.BankRobbery.Hideout] + "~w~ !{#c9c9c9}(a marker will be set when the heist proceeds)!");
 
-                        //
-                        foreach(Player c in lobby.Cops)
-                        {
-                            c.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: All units, their leader stopped taking the money, they might try to get away soon!");
-                            c.SendChatMessage("!{#FF6347}[#] ~w~You must find the heist leader and neutralize them! The bank doors have been unlocked..");
-                            c.SendChatMessage("!{#FF6347}[#] ~w~Alternatively, you can keep the fugitives trapped inside the bank until the round ends to win.");
-                            c.TriggerEvent("BankRob_SetMusic", 1);
-                            c.TriggerEvent("BankDoorLocked", false);
-                        }
+                                f.TriggerEvent("BankRob_SetMusic", 1);
+                                f.TriggerEvent("BankDoorLocked", false);
 
-                        foreach(Vehicle v in lobby.BankRobbery.FugitiveVehicles)
-                        {
-                            v.Locked = false;
-                            v.EngineStatus = true;
-                        }
-                    }
-                    break;
-                case 2:
-                    {
-                        Vector3 hp = BankRobberyData.Hideouts[lobby.BankRobbery.Hideout];
-                        foreach (Player f in lobby.Fugitives)
-                        {
-                            f.TriggerEvent("playerCreateWaypoint", hp);
-                            f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {lobby.BankRobbery.HeistLeader.Name}: Alright, I'm in the car, let's move, quick!");
-                            if (f.IsInVehicle)
-                            {
-                                if (f.Vehicle.Occupants.Contains(lobby.BankRobbery.HeistLeader))
+                                if (f == lobby.BankRobbery.HeistLeader)
                                 {
-                                    f.SendChatMessage("!{#FF6347}[#] ~w~Drive the heist leader to the ~y~hideout~w~ marked on your minimap.");
-                                }
-                                else
-                                {
-                                    f.SendChatMessage("!{#FF6347}[#] ~w~Escort your heist leader to the hideout.");
+                                    Events.RequestClearAnimation(f);
+                                    player.TriggerEvent("ClearTaskNotFalling");
+                                    EPlayer.Freeze(f, false);
                                 }
                             }
-                            else f.SendChatMessage("!{#FF6347}[#] ~w~Get in a vehicle and escort the heist leader to the hideout.");
+                            Player leader = lobby.BankRobbery.HeistLeader;
+                            Account la = EPlayer.GetAccount(leader);
+                            CharacterData cd = NAPI.Util.FromJson<CharacterData>(la.Character);
 
-                            f.TriggerEvent("BankRob_CreateFinishMarker", hp.X, hp.Y, hp.Z);
+                            if(cd.Clothing.Length >= 1)
+                            {
+                                cd.Clothing[0].Clothes[5].Drawable = 40;
+                                cd.Clothing[0].Clothes[5].Texture = 0;
+                                cd.Clothing[0].Hat = 62;
+                                cd.Clothing[0].HatTxt = 9;
+                            }
+                            if(cd.Clothing.Length >= 3)
+                            {
+                                cd.Clothing[2].Clothes[5].Drawable = 40;
+                                cd.Clothing[2].Clothes[5].Texture = 0;
+                                cd.Clothing[2].Hat = 62;
+                                cd.Clothing[2].HatTxt = 9;
+                            }
 
+                            EPlayer.ApplyCharacter(leader, cd, 0);
+                            EPlayer.Action(leader, "grabs the duffel bag filled with cash and slings it over their shoulder.");
+
+                            //
+                            foreach (Player c in lobby.Cops)
+                            {
+                                c.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: All units, their leader stopped taking the money, they might try to get away soon!");
+                                c.SendChatMessage("!{#FF6347}[#] ~w~You must find the heist leader and neutralize them! The bank doors have been unlocked..");
+                                c.SendChatMessage("!{#FF6347}[#] ~w~Alternatively, you can keep the fugitives trapped inside the bank until the round ends to win.");
+                                c.TriggerEvent("BankRob_SetMusic", 1);
+                                c.TriggerEvent("BankDoorLocked", false);
+                            }
+
+                            foreach (Vehicle v in lobby.BankRobbery.FugitiveVehicles)
+                            {
+                                v.Locked = false;
+                                v.EngineStatus = true;
+                            }
                         }
-                        foreach(Player c in lobby.Cops)
+                        break;
+                    case 2:
                         {
-                            c.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: The robbers have made their way with the money into the vehicle.");
-                            c.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: Stop them before they get away!");
-                            c.SendChatMessage("!{#FF6347}[#] ~w~This is your last chance - take down the heist leader, or all the fugitives, before they get to their hideout!");
+                            Vector3 hp = BankRobberyData.Hideouts[lobby.BankRobbery.Hideout];
+                            foreach (Player f in lobby.Fugitives)
+                            {
+                                f.TriggerEvent("playerCreateWaypoint", hp);
+                                f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {lobby.BankRobbery.HeistLeader.Name}: Alright, I'm in the car, let's move, quick!");
+                                if (f.IsInVehicle)
+                                {
+                                    if (f.Vehicle.Occupants.Contains(lobby.BankRobbery.HeistLeader))
+                                    {
+                                        f.SendChatMessage("!{#FF6347}[#] ~w~Drive the heist leader to the ~y~hideout~w~ marked on your minimap.");
+                                    }
+                                    else
+                                    {
+                                        f.SendChatMessage("!{#FF6347}[#] ~w~Escort your heist leader to the hideout.");
+                                    }
+                                }
+                                else f.SendChatMessage("!{#FF6347}[#] ~w~Get in a vehicle and escort the heist leader to the hideout.");
+
+                                f.TriggerEvent("BankRob_CreateFinishMarker", hp.X, hp.Y, hp.Z);
+
+                            }
+                            foreach (Player c in lobby.Cops)
+                            {
+                                c.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: The robbers have made their way with the money into the vehicle.");
+                                c.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: Stop them before they get away!");
+                                c.SendChatMessage("!{#FF6347}[#] ~w~This is your last chance - take down the heist leader, or all the fugitives, before they get to their hideout!");
+                            }
                         }
-                    }
-                    break;
-                case 3:
-                    {
-                        Main.StopGame(lobby.lobbyId, 6);
-                    }
-                    break;
+                        break;
+                    case 3:
+                        {
+                            Main.StopGame(lobby.lobbyId, 6);
+                        }
+                        break;
+                }
             }
-
+            catch(Exception ex)
+            {
+                NAPI.Util.ConsoleOutput("ERROR IN BANKROB SETSTATE SHOWMEDAWAE.EXE:" + ex.ToString());
+            }
         }
 
         [RemoteEvent("BankRob_SendMessage")]
@@ -2423,6 +2453,9 @@ namespace RNC
 
             player.TriggerEvent("DestroyPlayerCamera");
             player.TriggerEvent("TogglePlayerChat", true);
+
+            player.TriggerEvent("BankDoorLocked", false);
+            player.TriggerEvent("BankRob_SetMusic", -1);
 
             player.ResetData("Language");
 

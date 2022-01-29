@@ -1617,8 +1617,6 @@ namespace RNC
                 { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this while performing an action!"); return; }
 
 
-            NAPI.Util.ConsoleOutput("cmd_sa by " + player.Name);
-
             if (player.HasData("Handsup"))
             {
                 player.TriggerEvent("SetHandsup", false);

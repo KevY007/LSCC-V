@@ -1837,10 +1837,9 @@ mp.events.add("ResetWounded", () => {
 
 mp.events.add('setWounded', (state, idToPass) => 
 {
-    if((state == mp.players.local.getVariable("Wounded") || !chaseRunning || mp.players.local.getVariable("Team") < 0) 
-        && state != 0) return;
-
-    mp.events.callRemote("ServerConsoleOutput", "setWounded " + state + " id to pass " + idToPass);
+    if (state == mp.players.local.getVariable("Wounded") && state != 0) return;
+    if (!chaseRunning && state != 0) return;
+    if ((mp.players.local.getVariable("Team") != 1 && mp.players.local.getVariable("Team") != 0) && state != 0) return;
 
     if(state == 1) // Pre-wounded (beginning of wounded mode) --ragdolling the player and waiting 3 secs before giving ability to crawl
     {
