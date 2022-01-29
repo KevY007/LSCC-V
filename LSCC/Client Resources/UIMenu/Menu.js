@@ -303,7 +303,7 @@ function ToggleMenu()
         UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.oocauto.value = ${mp.storage.data.menu.OOCauto};`);
         UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.voicemode.value = ${mp.storage.data.menu.VoiceMode};`);
 
-        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.layers = JSON.parse("${mp.storage.data.menu.CrosshairData}")`);
+        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
         UIMenu.execute(`gm.$refs.settings.$refs.crosshair.settings.enabled = ${mp.storage.data.menu.CustomCrosshair}`);
         UIMenu.execute(`gm.$refs.settings.$refs.crosshair.settings.alwaysOn = ${mp.storage.data.menu.AlwaysOnCrosshair}`);
         UIMenu.execute(`gm.$refs.settings.$refs.crosshair.settings.onSnipers = ${mp.storage.data.menu.SniperCustomCrosshair}`);
@@ -561,13 +561,18 @@ mp.events.add("UpdateMenuLobbies", (lobbies, currentLobby) => {
 
 mp.events.add("SaveCrosshair", (crData) => {
     mp.storage.data.menu.CrosshairData = crData;
-    UIMenu.execute(`gm.crosshair.layers = JSON.parse("${crData}")`);
+    UIMenu.execute(`gm.crosshair.layers = ${crData}`);
 
     mp.storage.flush();
 });
 mp.events.add("LoadCrosshair", () => {
-    if(mp.storage.data.menu.CrosshairData !== undefined){
-        UIMenu.execute(`gm.crosshair.layers = JSON.parse("${mp.storage.data.menu.CrosshairData}")`);
-        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.layers = JSON.parse("${mp.storage.data.menu.CrosshairData}")`);
+    if (mp.storage.data.menu.CrosshairData !== undefined) {
+        UIMenu.execute(`gm.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
+        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
+    }
+    else {
+        mp.storage.data.menu.CrosshairData = "[]";
+        UIMenu.execute(`gm.crosshair.layers = []`);
+        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.layers = []`);
     }
 });
