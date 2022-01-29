@@ -870,6 +870,9 @@ namespace RNC
 
                 player.SetData<bool>("ShotsFired", false);
 
+                player.ResetData("DragoutVehicle");
+                player.ResetData("ExitedDragoutVehicle");
+
                 player.SetSharedData("Level", 0);
                 player.SetSharedData("CurrentXP", 0);
                 player.SetSharedData("NextLevelXP", 0);

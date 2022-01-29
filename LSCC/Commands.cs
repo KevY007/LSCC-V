@@ -2000,6 +2000,9 @@ namespace RNC
             target.ResetData("Seatbelt");
             EPlayer.Action(player, $"leans towards {target.Name}'s vehicle and tries to open the door to drag them out.");
 
+            target.SetData("DragoutVehicle", target.Vehicle);
+            target.SetData("ExitedDragoutVehicle", false);
+
             player.SetData("DraggingOut", target.Name);
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are now dragging out the target, stay with them for 5 seconds to complete the operation.");
 
@@ -2011,7 +2014,7 @@ namespace RNC
                     {
                         if (player != null && target != null && target.Exists)
                         {
-                            if (target == null || !target.IsInstanceAlive || player == null || !player.IsInstanceAlive || player.Dead)
+                            if (target == null || !target.IsInstanceAlive || player == null || !player.IsInstanceAlive || player.Dead || player.GetSharedData<int>("Wounded") > 0)
                             {
                                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, target or you are no longer alive.");
                                 player.ResetData("DraggingOut");
@@ -2035,6 +2038,25 @@ namespace RNC
                                 return;
                             }
 
+                            if(target.Vehicle != target.GetData<Vehicle>("DragoutVehicle"))
+                            {
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, the player entered another vehicle.");
+                                player.ResetData("DraggingOut");
+
+                                target.ResetData("DragoutVehicle");
+                                target.ResetData("ExitedDragoutVehicle");
+                                return;
+                            }
+                            if (target.GetData<bool>("ExitedDragoutVehicle") == true)
+                            {
+                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, the player exited their vehicle in the middle of the process. Try again!");
+                                player.ResetData("DraggingOut");
+
+                                target.ResetData("DragoutVehicle");
+                                target.ResetData("ExitedDragoutVehicle");
+                                return;
+                            }
+
                             if (player.Position.DistanceTo(target.Position) >= 3.5)
                             {
                                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near the target!");
@@ -2048,6 +2070,8 @@ namespace RNC
                             player.SetSharedData("FugitiveChance", player.GetSharedData<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(player).DonatorLevel + 1.0)));
                             cmd_do(player, $"{target.Name} has been dragged out of the vehicle.");
                             player.ResetData("DraggingOut");
+                            target.ResetData("DragoutVehicle");
+                            target.ResetData("ExitedDragoutVehicle");
 
                             EPlayer.SendMessageInLobby(lobbye.lobbyId, $"!{{#ADD8E6}}Cop {player.Name} has dragged {target.Name} out of the vehicle!");
                             target.TriggerEvent("ThrowFromVehicle");

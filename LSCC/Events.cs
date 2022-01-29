@@ -921,6 +921,11 @@ namespace RNC
                     }
                 }
 
+                if (player.HasData("ExitedDragoutVehicle") && player.HasData("DragoutVehicle"))
+                {
+                    player.SetData<bool>("ExitedDragoutVehicle", true);
+                }
+
                 if (Settings.Dynamics.OnfootCollision == false)
                 {
                     if (player.GetSharedData<int>("Team") == 0 || player.GetSharedData<int>("Team") == 1)

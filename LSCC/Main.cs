@@ -2639,7 +2639,10 @@ namespace RNC
                     i.TriggerEvent("BankRob_ClearFinishMarker");
                     i.TriggerEvent("BankRob_SetMusic", -1);
 
-                    if(lobby.Cops.Contains(i) && winnerTeam == 1)
+                    i.ResetData("DragoutVehicle");
+                    i.ResetData("ExitedDragoutVehicle");
+
+                    if (lobby.Cops.Contains(i) && winnerTeam == 1)
                     {
                         EPlayer.TryAdvanceChallenge(i, Challenge.ChallengeType.Win, "cop");
                     }
@@ -2908,6 +2911,8 @@ namespace RNC
                         {
                             if (player.GetSharedData<bool>("AutoJoin") != true) continue;
 
+                            player.ResetData("DragoutVehicle");
+                            player.ResetData("ExitedDragoutVehicle");
                             player.SetSharedData("BustedProgress", 0.0);
                             player.ResetData("BustSupporters");
                             player.ResetSharedData("LastKiller");
