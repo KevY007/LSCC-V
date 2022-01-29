@@ -3461,6 +3461,28 @@ namespace RNC
             return;
         }
 
+        [Command("fix", Alias = "repair")]
+        public void cmd_fix(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                return;
+            }
+
+            if (!player.IsInVehicle)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in any vehicle!");
+                return;
+            }
+
+            player.Vehicle.Repair();
+            player.SendChatMessage("!{#00FF00}[>] ~w~Vehicle repaired!");
+        }
+
         [Command("afix", "!{#AFAFAF}[USAGE] afix (target)")]
         public void cmd_afix(Player player, Player target)
         {
@@ -4318,6 +4340,7 @@ namespace RNC
             player.SendChatMessage("~y~> /mytime [hr 0-23] ~w~-> changes your time of day.");
             player.SendChatMessage("~y~> /myweather [ID] ~w~-> changes your weather.");
             player.SendChatMessage("~y~> /godmode ~w~-> toggles freeroam invincibility.");
+            player.SendChatMessage("~y~> /fix ~w~-> repairs the vehicle you are inside of.");
             player.SendChatMessage("~y~> /gun [ammo][name] ~w~-> gives you a weapon of your choice.");
             player.SendChatMessage("~y~> /veh [name]<opt:color1><opt:color2> ~w~-> spawns a vehicle of your choice; you can also specify a color if you want to.");
             player.SendChatMessage("~y~> /teleport ~w~-> teleport to a specific location.");
@@ -5002,6 +5025,12 @@ namespace RNC
             player.SendChatMessage("Model 'm3e46' - M3 E46 BMW 2005");
             player.SendChatMessage("Model 'pscout' - Police Scout | 'umkscout' for Unmarked Variant");
             player.SendChatMessage("Model 'impala' - Chevrolet Impala SS '96");
+            player.SendChatMessage("Model 'shegrangerold' - Police Granger Retro");
+            player.SendChatMessage("Model 'shergauntlet' - Police Bravado Gauntlet A/C");
+            player.SendChatMessage("Model 'polbisonf' - Police Bison");
+            player.SendChatMessage("Model 'gresleyh' - Bravado Gresley Hellhound");
+            player.SendChatMessage("Model 'tulip2' - Declasse Tulip SS");
+            player.SendChatMessage("Model 'golfmk6' - Volkswagen Golf Mk6");
             return;
         }
 
