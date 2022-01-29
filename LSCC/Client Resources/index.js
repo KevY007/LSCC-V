@@ -26,6 +26,10 @@ var specState = false;
 var specTarget = null;
 var isNoClip = false;
 
+var LastKeyPress = 0;
+var AFKStage = 0;
+var SecondsSinceLastKeyPress = 0; // using this for nametags
+
 var showReticule = true;
 var showCustomCrosshair = false;
 var showCustomCrosshairInSniper = false;

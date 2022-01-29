@@ -155,7 +155,42 @@ mp.events.add('setPing', (pingtoset) => {
 mp.events.add("OneSecondEvent", () => {
     ShotStats.UpdateInterval++;
 
-    let currentMilisecond = Math.floor(Date.now()/1000);
+    let curSecond = Math.floor(Date.now()/1000);
+    let lastKeyPressSecond = Math.floor(LastKeyPress/1000);
+
+    SecondsSinceLastKeyPress = (curSecond-lastKeyPressSecond);
+    
+    if(SecondsSinceLastKeyPress < 1500){
+        if(SecondsSinceLastKeyPress == 600){ // MAKING SURE IDFK
+            if(AFKStage == 0){ AFKStage = 1;}
+
+            mp.gui.chat.push("!{Red}[ANTI-AFK] !{White}It appears you didn't press any keys for 10 minutes.");
+            mp.gui.chat.push("!{Red}[ANTI-AFK] !{White}If you continue being AFK, you will be kicked in 15 minutes!");
+            mp.gui.chat.push("!{Red}[ANTI-AFK] !{White}Your autojoin has also been turned off, it will be re-enabled if you come back.");
+
+            mp.events.callRemote("SetAutoJoin", false, true);
+        }
+        else if(SecondsSinceLastKeyPress == 900){
+            if(AFKStage == 0){ AFKStage = 1;}
+            mp.gui.chat.push("!{Red}[ANTI-AFK] !{White}You will be kicked from the server in 10 minutes for being AFK too long!");
+        }
+        else if(SecondsSinceLastKeyPress == 1200){
+            if(AFKStage == 0){ AFKStage = 1;}
+            mp.gui.chat.push("!{Red}[ANTI-AFK] !{White}You will be kicked from the server in 5 minutes for being AFK too long!");
+        }
+        else if(SecondsSinceLastKeyPress == 1440){
+            if(AFKStage == 0){ AFKStage = 1;}
+            mp.gui.chat.push("!{Red}[ANTI-AFK] !{White}You will be kicked from the server in 1 minute for being AFK too long!");
+        }
+    }
+    else{
+        if(AFKStage != 2)
+        {
+            AFKStage = 2;
+            mp.gui.chat.push("!{Red}[ANTI-AFK] !{White}You've been kicked from the server for being AFK too long!");
+            mp.events.callRemote("KickPlayer", "AFK", true);
+        }
+    }
 
     if(ShotStats.UpdateInterval >= 10)
     {
@@ -250,6 +285,24 @@ function getPointToBoneOffset(aimX, aimY, aimZ, boneX, boneY, boneZ) {
     let zDif = (aimZ - boneZ) < 0 ? -(aimZ - boneZ) : aimZ - boneZ;
 
     return (xDif + yDif + zDif);
+}
+
+function registerLastKeyPress()
+{
+  LastKeyPress = Date.now();
+
+    if(AFKStage > 0){      
+        mp.events.callRemote("SetAutoJoin", true, true);
+        mp.gui.chat.push("!{Green}[ANTI-AFK] !{White}Welcome back. Please note if you stay idle for more than 25 minutes, you will be kicked!");
+        mp.gui.chat.push("!{Green}[ANTI-AFK] !{White}Your autojoin has been re-enabled.");
+    }
+
+  SecondsSinceLastKeyPress = 0;
+  AFKStage = 0;
+}
+for(let i = 1; i < 255; i++)
+{
+    mp.keys.bind(i, true, registerLastKeyPress);
 }
 
 
@@ -2537,6 +2590,9 @@ mp.events.add("setVoiceModeMenu", (value) => {
 });
 
 function setStorageDataVars(){
+
+    LastKeyPress = Date.now();
+
     if(mp.storage.data.menu.OOCauto !== undefined){
         autoOOC = mp.storage.data.menu.OOCauto;
         mp.events.callRemote("SetAutoOOC", autoOOC);

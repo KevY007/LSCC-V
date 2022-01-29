@@ -141,7 +141,21 @@ mp.events.add('render', (nametags) => {
                         });
                     }
 
-                    if(player.getVariable("Team") == 0 && player.getVariable("TaseProtection") == true)
+                    if(AFKStage > 0){
+                        var typingStr = `(( IDLE [${SecondsSinceLastKeyPress}s/1500s] ))`;
+                        if(timerCount == 0) typingStr = `(( IDLE [${SecondsSinceLastKeyPress}s/1500s] ))`;
+                        else if(timerCount == 1) typingStr = `( IDLE [${SecondsSinceLastKeyPress}s/1500s] )`;
+                        else if(timerCount == 2) timerCount = 0;
+                
+                        mp.game.graphics.drawText(typingStr, [x, y - 0.0250],
+                        {
+                            font: 0,
+                            color: [92, 255, 206, 228],
+                            scale: [0.285, 0.285],
+                            outline: true
+                        });                        
+                    }
+                    else if(player.getVariable("Team") == 0 && player.getVariable("TaseProtection") == true)
                     {
                         var typingStr = "(( TASE PROTECTION ))";
                         if(timerCount == 0) typingStr = "(( TASE PROTECTION ))";
@@ -170,9 +184,8 @@ mp.events.add('render', (nametags) => {
                             scale: [0.285, 0.285],
                             outline: true
                         });
-                    }
-                    
-                    if(player.getVariable("Wounded") == 1 || player.getVariable("Wounded") == 2)
+                    }                   
+                    else if(player.getVariable("Wounded") == 1 || player.getVariable("Wounded") == 2)
                     {
                         var typingStr = `(( This player is wounded; hold [H] near them begin reviving them. ))`;
                         mp.game.graphics.drawText(typingStr, [x, y - 0.0250],

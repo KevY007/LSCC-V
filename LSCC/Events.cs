@@ -26,6 +26,31 @@ namespace RNC
             NAPI.Util.ConsoleOutput(output);
         }
 
+        [RemoteEvent("KickPlayer")]
+        public void KickPlayer(Player player, string reason, bool silent)
+        {
+            if (player.HasData("Kicked")) return;
+
+            player.SetData("Kicked", true);
+            NAPI.Task.Run(() => 
+            {
+                try
+                {
+                    NAPI.Chat.SendChatMessageToAll($"{{#FF6347}}AdmCmd: Player {player.Name} has been kicked by SERVER for staying AFK too long.");
+                    if (silent)
+                    {
+                        player.KickSilent(reason);
+                    }
+                    else
+                    {
+                        player.Kick(reason);
+                    }
+                }
+                catch { } 
+            }, 1000);
+            return;
+        }
+
         [RemoteEvent("playerReadyCon")]
         public void OnPlayerConnected(Player player)
         {
