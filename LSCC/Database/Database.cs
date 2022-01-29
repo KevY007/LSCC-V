@@ -244,9 +244,9 @@ namespace RNC
             modelBuilder.Entity<Logs_AdminRecord>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AdminID).OnDelete(DeleteBehavior.ClientSetNull);
 
             // DM ARENAS
-            modelBuilder.Entity<CustomDMArenaSpawns>().HasOne<CustomDMArenas>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.ArenaID).OnDelete(DeleteBehavior.ClientCascade);
-            modelBuilder.Entity<CustomDMArenaSpawns>().HasOne<CustomDMArenaTeams>().WithMany().HasPrincipalKey(ug => ug.Team).HasForeignKey(u => u.Team).OnDelete(DeleteBehavior.ClientCascade);
-            modelBuilder.Entity<CustomDMArenaTeams>().HasOne<CustomDMArenas>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.ArenaID).OnDelete(DeleteBehavior.ClientCascade);
+            //modelBuilder.Entity<CustomDMArenaSpawns>().HasOne<CustomDMArenas>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.ArenaID).OnDelete(DeleteBehavior.ClientCascade);
+            //modelBuilder.Entity<CustomDMArenaSpawns>().HasOne<CustomDMArenaTeams>().WithMany().HasPrincipalKey(ug => ug.Team).HasForeignKey(u => u.Team).OnDelete(DeleteBehavior.ClientCascade);
+            //modelBuilder.Entity<CustomDMArenaTeams>().HasOne<CustomDMArenas>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.ArenaID).OnDelete(DeleteBehavior.ClientCascade);
 
             // MAP
             modelBuilder.Entity<MapSpawn>().HasOne<Map>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.mapID).OnDelete(DeleteBehavior.ClientCascade);
@@ -312,6 +312,8 @@ namespace RNC
                 _connectionString = "Server=localhost;Database=racenchase_test;Uid=racenchase;Pwd=12345678";
             else
                 _connectionString = "Server=" + Settings.MySQL_Host + ";Database=" + Settings.MySQL_Database + ";Uid=" + Settings.MySQL_User + ";Pwd=" + Settings.MySQL_Password + ";Port=" + Settings.MySQL_Port;
+
+            GTANetworkAPI.NAPI.Util.ConsoleOutput("CONNECTION STRING: " + _connectionString);
         }
     }
 }

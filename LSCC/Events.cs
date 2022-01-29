@@ -1882,6 +1882,7 @@ namespace RNC
                 EPlayer.ShowAdminNotes(adm, acc, AdminNote.ANoteType.OnConnect);
                 EPlayer.ShowAdminNotes(adm, acc, AdminNote.ANoteType.Both, false);
             }
+            // test
 
             if(EPlayer.GetAccount(player).Level >= 100)
             {
