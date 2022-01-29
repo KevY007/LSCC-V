@@ -361,6 +361,9 @@ namespace RNC
         [JsonProperty("Discord_MentionChanID")]
         public ulong DCMentionRoleChan { get; set; }
 
+        [JsonProperty("NextWeekUnix")]
+        public long NextWeekUnix { get; set; }
+
         public DynSet()
         {
             this.WeaponDataURL = "https://gist.githubusercontent.com/root-cause/3f29d38179b12245a003fb4fff615335/raw/7a8804b275fb1b9314cb39418a7415ea8bfd148d/v2189%2520Weapon%2520Data.json";
@@ -374,6 +377,7 @@ namespace RNC
             this.DCServerID = 713731146072064040;
             this.DCMentionRoleID = 796386517525725224;
             this.DCMentionRoleChan = 796389588880588830;
+            this.NextWeekUnix = new DateTimeOffset(DateTime.Now).AddDays(7).ToUnixTimeSeconds();
         }
     }
 
@@ -910,7 +914,7 @@ namespace RNC
                     player.TriggerEvent("addDailyChallenge", c.SQL_ID, desc, c.RewardXP, c.RewardPoints, secs, completed, c.Target, 0, c.Type, c.Item);
                 }
             }
-            player.TriggerEvent("addChallengesToMenu");
+            player.TriggerEvent("addChallengesToMenu", acc.ChallengeStreak, (Settings.Dynamics.NextWeekUnix - new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds()));
         }
         public static void AddChallengesForPlayer(Player player, List<ChallengeData> cdList)
         {
@@ -1005,7 +1009,7 @@ namespace RNC
                     player.TriggerEvent("addDailyChallenge", c.SQL_ID, desc, c.RewardXP, c.RewardPoints, secs, completed, c.Target, 0, c.Type, c.Item);
                 }
             }
-            player.TriggerEvent("addChallengesToMenu");
+            player.TriggerEvent("addChallengesToMenu", acc.ChallengeStreak, (Settings.Dynamics.NextWeekUnix - new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds()));
         }
         public static void SetNewDailyChallenges()
         {
@@ -2029,6 +2033,11 @@ namespace RNC
             }
             if (adminCount == 0) admins = "None";
 
+            string dateFormat = DateTime.Now.ToString("g");
+            NAPI.Util.ConsoleOutput("CURRENT DATE: " + dateFormat);
+            dateFormat = DateTimeOffset.FromUnixTimeSeconds(Settings.Dynamics.NextWeekUnix).ToString("g");
+            NAPI.Util.ConsoleOutput("NEXT WEEKLY CHALLENGE: " + dateFormat);
+
             NAPI.Util.ConsoleOutput("[>===========|Race 'N' Chase|===========<]");
             NAPI.Util.ConsoleOutput("[Version]: " + Settings.Version);
             NAPI.Util.ConsoleOutput("[Developers]: KevY, CodeName420 (jambredrek)");
@@ -2116,11 +2125,6 @@ namespace RNC
             {
                 if (Environment.TickCount64 - Settings.AutoSaveTick >= 300000) // 5 mins
                 {
-                    ContextFactory.Instance.SaveChanges();
-                    NAPI.Util.ConsoleOutput("Server auto-saved => " + DateTime.Now.ToString());
-
-                    Settings.AutoSaveTick = Environment.TickCount64;
-
                     DateTime challengeCheck = DateTime.Now;
                     TimeSpan sp = new TimeSpan(challengeCheck.Ticks);
                     long seconds = (long)Math.Ceiling(sp.TotalSeconds);
@@ -2131,7 +2135,43 @@ namespace RNC
                     {
                         Challenge.SetNewDailyChallenges();
                         NAPI.Chat.SendChatMessageToAll("!{#c387ff}[DAILY CHALLENGES] ~w~New daily challenges are now available! Check ~y~Menu > Profile~w~ for more info.");
+
+                        foreach(Account acc in ContextFactory.Instance.Accounts)
+                        {
+                            acc.CompletedDailyChallenge = false;
+                        }
                     }
+
+                    // if 7 days passed - weekly challenge / weekly check
+                    if (new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() >= Settings.Dynamics.NextWeekUnix)
+                    {
+                        foreach(Account acc in ContextFactory.Instance.Accounts)
+                        {
+                            acc.ChallengeStreak = 0;
+                            acc.CompletedDailyChallenge = false;
+
+                            acc.MOTD = NAPI.Util.ToJson(new MOTDData()
+                            {
+                                AdminName = "SERVER",
+                                Message = "~y~[WEEKLY CHALLENGE] ~w~Seven days have passed and the weekly challenge streak was reset.",
+                                PostedOn = DateTime.Now.ToShortDateString()
+                            });
+                        }
+                        Settings.Dynamics.NextWeekUnix = new DateTimeOffset(DateTime.Now).AddDays(7).ToUnixTimeSeconds();
+
+                        foreach(Player pl in NAPI.Pools.GetAllPlayers())
+                        {
+                            if (EPlayer.LoggedIn(pl) == true)
+                            {
+                                pl.TriggerEvent("addChallengesToMenu", 0, (Settings.Dynamics.NextWeekUnix - new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds()));
+                                pl.SendChatMessage("~y~[WEEKLY CHALLENGE] ~w~Seven days have passed and the weekly challenge streak was reset. Good luck!");
+                            }
+                        }
+                    }
+                    SaveDynamicSettings();
+                    ContextFactory.Instance.SaveChanges();
+                    NAPI.Util.ConsoleOutput("Server auto-saved => " + DateTime.Now.ToString());
+                    Settings.AutoSaveTick = Environment.TickCount64;
                 }
 
                 if (Environment.TickCount64 - Settings.LastMessageTick > 90000)

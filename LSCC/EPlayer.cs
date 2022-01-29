@@ -1241,7 +1241,7 @@ namespace RNC
             DailyChallenge dc = ContextFactory.Instance.DailyChallenges.FirstOrDefault(dc => dc.Item == challenge_item && dc.Type == challenge_type);
             if (dc == null) return;
 
-            player.TriggerEvent("advanceChallenge", challenge_type, challenge_item, cd.ChallengeProgress);
+            player.TriggerEvent("advanceChallenge", 1, challenge_type, challenge_item, cd.ChallengeProgress);
 
             if(cd.ChallengeProgress >= dc.Target)
             {
@@ -1259,6 +1259,33 @@ namespace RNC
                 EPlayer.GrantXP(player, challenge.RewardXP);
             if(challenge.RewardPoints > 0)
                 EPlayer.GivePoints(player, challenge.RewardPoints);
+
+            Account acc = EPlayer.GetAccount(player);
+            if (!acc.CompletedDailyChallenge)
+            {
+                acc.ChallengeStreak++;
+                acc.CompletedDailyChallenge = true;
+
+                if (acc.ChallengeStreak < 7)
+                {
+                    player.TriggerEvent("sendAchievementNotify", "Weekly Challenge", $"Daily Challenge Streak: {acc.ChallengeStreak}/7",
+                        "package://Artwork/Achievements/first_bankrob_fugitive.png", "", 7500, false);
+                    player.TriggerEvent("advanceChallenge", 0, -1, -1, acc.ChallengeStreak);
+                }
+                else if(acc.ChallengeStreak == 7)
+                {
+                    EPlayer.GrantXP(player, 70);
+                    EPlayer.GivePoints(player, 50);
+
+                    player.SendChatMessage("!{#c387ff}[DAILY CHALLENGES] ~w~You successfully completed the weekly challenge! Received ~y~70 XP and 50 points~w~.");
+                    player.TriggerEvent("sendAchievementNotify", "Weekly Challenge", $"Complete at least one daily challenge for 7 days in a row.",
+                    "package://Artwork/Achievements/reach_level_100.png", "+70 XP & +50 points", 10000, true);
+
+                    acc.ChallengeStreak = 7;
+                }
+                player.TriggerEvent("addChallengesToMenu", acc.ChallengeStreak, (Settings.Dynamics.NextWeekUnix - new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds()));
+
+            }
 
             player.TriggerEvent("unlockChallenge", challenge.Type, challenge.Item);            
         }

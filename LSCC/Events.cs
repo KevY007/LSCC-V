@@ -1888,6 +1888,11 @@ namespace RNC
                 EPlayer.UnlockAchievement(player, "reach_level_100");
             }
 
+            int totalOwned = EPlayer.GetOwnedLoadouts(player, 0).Count + EPlayer.GetOwnedLoadouts(player, 1).Count + 2;
+            if (totalOwned >= Settings.Loadouts.Count)
+                EPlayer.UnlockAchievement(player, "all_loadouts");
+
+
             player.TriggerEvent("showLoginBrowser", false);
             player.TriggerEvent("OnPlayerLoginRegister");
             Achievement.LoadAchievementsForPlayer(player);
@@ -3322,6 +3327,8 @@ namespace RNC
                 LastLogin = DateTime.Now,
                 Character = "{}",
                 PurchasedAmmo = "{}",
+                ChallengeStreak = 0,
+                CompletedDailyChallenge = false
             };
             AccountManager.Add(_new);
             OnPlayerRegister(player, _new);

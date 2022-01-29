@@ -8178,6 +8178,13 @@ namespace RNC
             player.TriggerEvent("CreatePlayerCamera", x, y, z, rx, ry, rz, viewangle);
         }
 
+        [Command("dbgunlockchal")]
+        public void cmd_dbgunlockchal(Player player, int type, string item)
+        {
+            if (EPlayer.GetAccount(player).Admin < 6) return;
+            EPlayer.TryAdvanceChallenge(player, type, item);
+        }
+
         [Command("dbgresetchallenges")]
         public void cmd_dbgresetchallengers(Player player)
         {

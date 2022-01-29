@@ -69,6 +69,8 @@ namespace RNC
         public string MOTD { get; set; }
         public double LastSessionMins { get; set; }
         public string PurchasedAmmo { get; set; }
+        public int ChallengeStreak { get; set; }
+        public bool CompletedDailyChallenge { get; set; }
     }
 
     public class ChallengeData

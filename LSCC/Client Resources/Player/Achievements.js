@@ -46,7 +46,7 @@ mp.events.add("addDailyChallenge", (id, desc, rXP, rPts, expireDate, completed, 
     DailyChallenges.push(c);
 });
 mp.events.add("clearDailyChallenges", () => {
-    UIMenu.execute(`gm.$refs.profile.$refs.ProfileTabs.$refs.Challanges.chals = []`);
+    UIMenu.execute(`gm.$refs.profile.$refs.ProfileTabs.$refs.Challenges.chals = []`);
     DailyChallenges = [];
 })
 
@@ -59,51 +59,7 @@ mp.events.add("addWeeklyChallenge", (id, name, desc, rXP, rPts, expireDate) => {
 });
 */
 
-mp.events.add("addChallengesToMenu", () => {
-    let json = `gm.$refs.profile.$refs.ProfileTabs.$refs.Challanges.chals = [`;
-    let chstr = "";   
-    for(let i = 0 ; i < DailyChallenges.length; i++){
-
-        let prog = `${DailyChallenges[i].progress}/${DailyChallenges[i].target}`;
-        let toDispProg = prog;
-        if(DailyChallenges[i].progress >= DailyChallenges[i].target || DailyChallenges[i].completed == true){
-            toDispProg = "Completed!";
-        }
-
-        chstr = `{
-            name: "${DailyChallenges[i].description}",
-            progress: "${toDispProg}",
-            expire: ${DailyChallenges[i].expireDate}
-        },`;
-        json += chstr;
-    }
-    json += "]";
-    UIMenu.execute(json);
-});
-mp.events.add("advanceChallenge", (cht, chi, chp) => {
-    let chunlock = DailyChallenges.find(a => a.type == cht && a.item == chi);
-    if(!chunlock) return;
-
-    DailyChallenges.find(a => a.type == cht && a.item == chi).progress = chp;
-
-    UIMenu.execute(`if(gm.$refs.profile.$refs.ProfileTabs.$refs.Challanges.chals.find(chNig => chNig.name == "${chunlock.description}") != null){
-        gm.$refs.profile.$refs.ProfileTabs.$refs.Challanges.chals.find(chNig => chNig.name == "${chunlock.description}").progress = "${chp}/${chunlock.target}";
-    }`);
-});
-
-mp.events.add("unlockChallenge", (cht, chi) => {
-    let chunlock = DailyChallenges.find(a => a.type == cht && a.item == chi);
-    if(!chunlock) return;
-
-    DailyChallenges.find(a => a.type == cht && a.item == chi).completed = true;
-
-    let rewardstr = "";
-    if(chunlock.rewardXP > 0) rewardstr += `+${chunlock.rewardXP} XP`;
-    if(chunlock.rewardPoints > 0){
-        if(rewardstr == "") rewardstr += `+${chunlock.rewardPoints} points`;
-        else rewardstr += `& +${chunlock.rewardPoints} points`;
-    }
-
+function getchalbackgroundpic(cht){
     let bgshit = "package://Artwork/Achievements/no_shooting_win.png";
     switch(cht){
         case 0:{
@@ -127,13 +83,101 @@ mp.events.add("unlockChallenge", (cht, chi) => {
         }
         break;
     }
+    return bgshit;
+}
+
+let weekChalProg = 0;
+let weekChalUnix = 0;
+
+mp.events.add("addChallengesToMenu", (weekChallengeProgress, weekChallengeUnix) => {
+    let json = `gm.$refs.profile.$refs.ProfileTabs.$refs.Challenges.cats = [`;
+    let chstr = "";   
+    weekChalProg = weekChallengeProgress;
+    weekChalUnix = weekChallengeUnix;
+    json += `
+        {
+            name: "Weekly",
+            timer: ${weekChallengeUnix},
+            chals: 
+            [
+                {
+                    name: "Daily Challenge 7-day streak",
+                    description: "Complete at least one challenge per day for 7 days in a row.",
+                    progress: ${weekChallengeProgress},
+                    goal: 7,
+                    background: "package://Artwork/Achievements/reach_level_100.png"
+                }
+            ]
+       },
+       {
+           name: "Daily",
+           timer: ${DailyChallenges[i].expireDate},
+           chals: [`
+
+
+    for(let i = 0 ; i < DailyChallenges.length; i++){
+        chstr = `{
+            name: "",
+            description: "${DailyChallenges[i].description}",
+            progress: ${DailyChallenges[i].progress},
+            goal: ${DailyChallenges[i].target},
+            background: "${getchalbackgroundpic(DailyChallenges[i].type)}"
+        },`;
+        json += chstr;
+    }
+    json += `]}]`;
+    UIMenu.execute(json);
+});
+mp.events.add("advanceChallenge", (arrayID, cht, chi, chp) => {
+    
+    if(arrayID == 1)
+    {
+        let chunlock = DailyChallenges.find(a => a.type == cht && a.item == chi);
+        if(!chunlock) return;
+
+        DailyChallenges.find(a => a.type == cht && a.item == chi).progress = chp;
+        
+        UIMenu.execute(`if(gm.$refs.profile.$refs.ProfileTabs.$refs.Challenges.cats[${arrayID}].chals.find(chNig => chNig.description == "${chunlock.description}") != null){
+            gm.$refs.profile.$refs.ProfileTabs.$refs.Challenges.cats[${arrayID}].chals.find(chNig => chNig.description == "${chunlock.description}").progress = ${chp};
+        }`);
+    }
+    else{ // weekly
+        UIMenu.execute(`if(gm.$refs.profile.$refs.ProfileTabs.$refs.Challenges.cats[${arrayID}].chals.find(chNig => chNig.name == "Daily Challenge 7-day streak") != null){
+            gm.$refs.profile.$refs.ProfileTabs.$refs.Challenges.cats[${arrayID}].chals.find(chNig => chNig.name == "Daily Challenge 7-day streak").progress = ${chp};
+        }`);
+    }
+});
+
+mp.events.add("unlockChallenge", (cht, chi) => {
+    let chunlock = DailyChallenges.find(a => a.type == cht && a.item == chi);
+    if(!chunlock) return;
+
+    DailyChallenges.find(a => a.type == cht && a.item == chi).completed = true;
+
+    let rewardstr = "";
+    if(chunlock.rewardXP > 0) rewardstr += `+${chunlock.rewardXP} XP`;
+    if(chunlock.rewardPoints > 0){
+        if(rewardstr == "") rewardstr += `+${chunlock.rewardPoints} points`;
+        else rewardstr += `& +${chunlock.rewardPoints} points`;
+    }
+
+    let bgshit = getchalbackgroundpic(cht);
 
     if(UIHud != null && UIHud != undefined){
         UIHud.execute(`gm.sendAch("Challenge completed!", "${chunlock.description}", "${bgshit}", "${rewardstr}", 6000);`);
     }
     mp.game.audio.playSoundFrontend(-1, "PROPERTY_PURCHASE", "HUD_AWARDS", true);
 
-    mp.events.callLocal("addChallengesToMenu");
+    mp.events.callLocal("addChallengesToMenu", weekChalProg, weekChalUnix);
+});
+
+mp.events.add("sendAchievementNotify", (title, description, background, reward, time, playSound) => {
+    if(UIHud != null && UIHud != undefined){
+        UIHud.execute(`gm.sendAch("${title}", "${description}", "${background}", "${reward}", ${time});`);
+    }    
+    if(playSound){
+        mp.game.audio.playSoundFrontend(-1, "PROPERTY_PURCHASE", "HUD_AWARDS", true);
+    }
 });
 
 
