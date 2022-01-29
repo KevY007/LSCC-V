@@ -567,7 +567,7 @@ namespace RNC
     public static class Settings
     {
         // Static Settings / Const
-        public const string Version = "1.1";
+        public const string Version = "1.2";
         public const int GameRunTime = 390; // Game Running Time in Seconds before STOP
         public const int MaxLobbies = 5; // Default/starting lobby num.
         public const int DefaultMaxInLobby = 30;
@@ -1280,6 +1280,24 @@ namespace RNC
                 case "zr350":
                     seats = 2;
                     break;
+                case "shegrangerold":
+                    seats = 4;
+                    break;
+                case "shergauntlet":
+                    seats = 2;
+                    break;
+                case "polbisonf":
+                    seats = 4;
+                    break;
+                case "gresleyh":
+                    seats = 4;
+                    break;
+                case "tulip2":
+                    seats = 2;
+                    break;
+                case "golfmk6":
+                    seats = 4;
+                    break;
             }
             return seats;
         }
@@ -1926,8 +1944,10 @@ namespace RNC
             // Cop
             new CarData(1, "Police Cruiser", "police", "package://Artwork/Vehicles/police.png", "Slow");
             new CarData(1, "Unmarked Cruiser", "police4", "package://Artwork/Vehicles/police4.png", "Slow");
+            new CarData(1, "Granger Retro", "shegrangerold", "package://Artwork/Vehicles/shegrangerold.png", "Slow", 3);
             new CarData(1, "Police Bike", "policeb", "package://Artwork/Vehicles/policeb.png", "Average", 3);
             new CarData(1, "Police Buffalo", "police2", "package://Artwork/Vehicles/police2.png", "Average", 5, 5);
+            new CarData(1, "Police Bison", "polbisonf", "package://Artwork/Vehicles/polbisonf.png", "Average", 6, 10);
             new CarData(1, "Police Scout", "pscout", "package://Artwork/Vehicles/pscout.png", "Average+", 6, 10);
             new CarData(1, "Unmarked Scout", "umkscout", "package://Artwork/Vehicles/umkscout.png", "Average+", 8, 10);
             new CarData(1, "LSPD Crown Vic", "lspdvic", "package://Artwork/Vehicles/lspdvic.png", "Average+", 10, 10);
@@ -1938,6 +1958,7 @@ namespace RNC
             new CarData(1, "Police Chopper", "polmav", "package://Artwork/Vehicles/polmav.png", "N/A", 20, 20);
             new CarData(1, "Unmarked Charger", "lspdunm", "package://Artwork/Vehicles/lspdunm.png", "Fast+", 25, 40);
             new CarData(1, "Unmarked Revolter", "prevolter", "package://Artwork/Vehicles/prevolter.png", "Fast+", 30, 70);
+            new CarData(1, "Sheriff Gauntlet", "shergauntlet", "package://Artwork/Vehicles/shergauntlet.png", "Fast+", 38, 80);
 
             // 0-100's Fugitive
             // >9 second mark = Slow
@@ -1957,6 +1978,7 @@ namespace RNC
             //new CarData(0, "Sanchez", "sanchez2", "package://Artwork/Vehicles/sanchez2.png", "Fast", 5, 10);
             new CarData(0, "Felon GT", "felon2", "package://Artwork/Vehicles/felon2.png", "Average+", 5);
             new CarData(0, "Huntley IV", "huntley2", "package://Artwork/Vehicles/huntley2.png", "Average", 6);
+            new CarData(0, "Gresley Hellhound", "gresleyh", "package://Artwork/Vehicles/gresleyh.png", "Average+", 8, 3);
             new CarData(0, "Blista Classic", "blista2", "package://Artwork/Vehicles/blista2.png", "Average", 10);
             new CarData(0, "Cheburek", "cheburek", "package://Artwork/Vehicles/cheburek.png", "Average", 15, 10);
             new CarData(0, "Exemplar", "exemplar", "package://Artwork/Vehicles/exemplar.png", "Average+", 17, 15);
@@ -1964,11 +1986,13 @@ namespace RNC
             new CarData(0, "Buffalo", "buffalo", "package://Artwork/Vehicles/buffalo.png", "Average", 22, 30);
             new CarData(0, "Tailgater S", "tailgater2", "package://Artwork/Vehicles/tailgater2.png", "Average+", 23, 30);
             new CarData(0, "Sultan", "sultan", "package://Artwork/Vehicles/sultan.png", "Average", 25, 40);
+            new CarData(0, "Tulip SS", "tulip2", "package://Artwork/Vehicles/tulip2.png", "Fast", 30, 50);
             //new CarData(0, "Kuruma", "kuruma", "package://Artwork/Vehicles/kuruma.png", "Fast", 30, 60); KURUMA TEMPORARILY REMOVED UNTIL BULLET PROOF GTA ONLIEN BUG FIX
             new CarData(0, "Dominator GTT", "dominator8", "package://Artwork/Vehicles/dominator8.png", "Fast+", 32, 50);
             new CarData(0, "BMW M3 E46", "m3e46", "package://Artwork/Vehicles/m3e46.png", "Fast", 35, 0, 10);
             new CarData(0, "Sultan Classic", "sultan2", "package://Artwork/Vehicles/sultan2.png", "Fast", 37, 80);
             new CarData(0, "ZR350", "zr350", "package://Artwork/Vehicles/zr350.png", "Fast", 40, 70);
+            new CarData(0, "Golf Mk6", "golfmk6", "package://Artwork/Vehicles/golfmk6.png", "Fast+", 50, 85);
 
             if (Settings.Dynamics.Discord)
             {
@@ -3018,6 +3042,7 @@ namespace RNC
 
                                     float enginePower = 1.0f;
 
+                                    string vehSpeedClass = "Average";
                                     if (EPlayer.GetAccount(player).CarCop.Length < 3)
                                     {
                                         switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 3))
@@ -3058,8 +3083,16 @@ namespace RNC
                                                 ownedVeh.TimesUsed++;
 
                                             CarData cardata = Settings.Cars.FirstOrDefault(crd => crd.Model == carName && crd.Team == 1);
-                                            if(cardata != null)
+                                            if (cardata != null)
+                                            {
                                                 EPlayer.TryAdvanceChallenge(player, Challenge.ChallengeType.CopchaseVehicle, cardata.Name);
+
+                                                vehSpeedClass = cardata.Info;
+                                            }
+                                            else
+                                            {
+                                                vehSpeedClass = "Average";
+                                            }
                                         }
 
                                     }
@@ -3083,6 +3116,7 @@ namespace RNC
                                     pVehicle.SetSharedData("Locked", true);
                                     pVehicle.Locked = true;
                                     pVehicle.SetSharedData("Team", 1);
+                                    pVehicle.SetSharedData("SpeedInfo", vehSpeedClass);
 
                                     pVehicle.SetSharedData("Collisions", false);
                                     if (enginePower > 1.0f) pVehicle.SetSharedData("vInitialDriveForce", enginePower);
@@ -3327,6 +3361,7 @@ namespace RNC
 
                                 float enginePower = 1.0f;
                                 string carName = "washington";
+                                string vehSpeedClass = "Average";
 
                                 if (EPlayer.GetAccount(_tempPlayer).CarFugitive.Length < 3)
                                 {
@@ -3381,7 +3416,14 @@ namespace RNC
 
                                         CarData cardata = Settings.Cars.FirstOrDefault(crd => crd.Model == carName && crd.Team == 0);
                                         if (cardata != null)
+                                        {
                                             EPlayer.TryAdvanceChallenge(_tempPlayer, Challenge.ChallengeType.CopchaseVehicle, cardata.Name);
+                                            vehSpeedClass = cardata.Info;
+                                        }
+                                        else
+                                        {
+                                            vehSpeedClass = "Average";
+                                        }
                                     }
                                 }
 
@@ -3394,6 +3436,7 @@ namespace RNC
                                 pVehicle.SetSharedData("Locked", false);
                                 pVehicle.Locked = false;
                                 pVehicle.SetSharedData("Team", 0);
+                                pVehicle.SetSharedData("SpeedInfo", vehSpeedClass);
                                 lobby.Vehicles.Add(pVehicle);
                                 pVehicle.SetSharedData("Collisions", false);
 
@@ -3592,11 +3635,14 @@ namespace RNC
                         lobby.GameProgress = -13;
                         lobby.CollisionCounter = 48;
 
+                        int gameRunTime = Settings.GameRunTime;
+                        if (lobby.gameMode == GameModes.BANKROBBERY) gameRunTime = 600;
+
                         foreach (Player p in Settings.LoggedInPlayers)
                         {
                             if (p.GetSharedData<int>("InLobby") == lobbyid)
                             {
-                                p.TriggerEvent("StartChaseTimer", -13, Settings.GameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
+                                p.TriggerEvent("StartChaseTimer", -13, gameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
                             }
                         }
 
@@ -4375,7 +4421,9 @@ namespace RNC
                             }
                         }
 
-                        if (lobby.GameProgress >= Settings.GameRunTime)
+                        int gameRunTime = Settings.GameRunTime;
+                        if (lobby.gameMode == GameModes.BANKROBBERY) gameRunTime = 600;
+                        if (lobby.GameProgress >= gameRunTime)
                         {
                             StopGame(lobby.lobbyId, 1);
                         }
@@ -4408,13 +4456,14 @@ namespace RNC
 
                         if (lobby.GameProgress % 5 == 0) // Every 5 seconds/multiple during collision phase
                         {
+
                             foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
                             {
                                 try
                                 {
                                     if (player == null) continue;
 
-                                    player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
+                                    player.TriggerEvent("StartChaseTimer", lobby.GameProgress, gameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
                                 }
                                 catch { }
                             }
@@ -4474,8 +4523,37 @@ namespace RNC
                                                     EPlayer.GiveFugitiveWeapons(player);
                                                     player.TriggerEvent("SetActorInvulnerable", false);
                                                 }
+
+
                                             }
                                             catch { }
+                                        }
+                                        foreach (Vehicle veh in lobby.Vehicles)
+                                        {
+                                            veh.SetSharedData("Collisions", true);
+                                            if (veh.HasSharedData("Team") && veh.GetSharedData<int>("Team") == 0)
+                                            {
+                                                if(veh.HasSharedData("SpeedInfo") && veh.GetSharedData<string>("SpeedInfo").Contains("Fast"))
+                                                {
+                                                    veh.SetSharedData("vMaxSpeed", (float)(175 / 3.6)); // 175 KM/H for fast cars
+                                                }
+                                                else
+                                                {
+                                                    veh.SetSharedData("vMaxSpeed", (float)(163 / 3.6)); // 163 KM/H for avg fugi cars
+                                                }
+
+                                            }
+                                            else if(veh.HasSharedData("Team") && veh.GetSharedData<int>("Team") == 1)
+                                            {
+                                                if (veh.HasSharedData("SpeedInfo") && veh.GetSharedData<string>("SpeedInfo").Contains("Fast"))
+                                                {
+                                                    veh.SetSharedData("vMaxSpeed", (float)(193 / 3.6)); // 193 KM/H for fast cop cars
+                                                }
+                                                else
+                                                {
+                                                    veh.SetSharedData("vMaxSpeed", (float)(183 / 3.6)); // 183 KM/H for avg cc
+                                                }
+                                            }
                                         }
                                     }
                                     else
@@ -4488,7 +4566,7 @@ namespace RNC
                                                 {
                                                     if (player == null) continue;
 
-                                                    player.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, 0, (short)lobby.gameMode);
+                                                    player.TriggerEvent("StartChaseTimer", lobby.GameProgress, 600, 0, (short)lobby.gameMode);
 
                                                     player.SetSharedData("BustedProgress", 0.0);
 
@@ -4585,7 +4663,7 @@ namespace RNC
                                     {
                                         foreach (Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
                                         {
-                                            p.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, -1, (short)lobby.gameMode);
+                                            p.TriggerEvent("StartChaseTimer", lobby.GameProgress, gameRunTime, -1, (short)lobby.gameMode);
                                         }
                                     }
                                 }
