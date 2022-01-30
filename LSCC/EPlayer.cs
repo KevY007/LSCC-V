@@ -2098,7 +2098,12 @@ namespace RNC
             player.TriggerEvent("DestroyPlayerCamera");
             player.TriggerEvent("TogglePlayerChat", true);
             player.ResetData("Dead");
-            player.SetSharedData("Wounded", 0);
+
+            if(player.GetSharedData<int>("Team") == 0)
+            {
+                NAPI.Util.ConsoleOutput("Calling SetPlayerWounded from EPlayer.Spawn (" + player.Name + ", 0, -1);"); 
+                Events.OnPlayerWounded(player, 0, -1);
+            }
 
             if (player.HasData("DerbyVehicle"))
             {

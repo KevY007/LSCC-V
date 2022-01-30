@@ -224,6 +224,12 @@ namespace RNC
         {
             try
             {
+                if(player == null)
+                {
+                    NAPI.Util.ConsoleOutput("OnPlayerWounded - player object was null!? (" + state + ", kID: " + killerID + ")");
+                    return;
+                }
+
                 if (!player.HasSharedData("Wounded"))
                 {
                     player.SetSharedData("Wounded", state);
@@ -260,7 +266,7 @@ namespace RNC
                         }
                     case 1:
                         {
-                            if (player.GetSharedData<string>("ReviveTarget") != "n/a")
+                            if (player.HasSharedData("ReviveTarget") && player.GetSharedData<string>("ReviveTarget") != "n/a")
                             {
                                 player.SendChatMessage("!{#FF6347}[!] ~w~Your revive attempt failed due to your death.");
                                 OnStopReviving(player);
@@ -3806,6 +3812,7 @@ namespace RNC
         [RemoteEvent("StopReviving")]
         public static void OnStopReviving(Player player)
         {
+            if (player == null) return;
             if (player.GetSharedData<string>("ReviveTarget").Equals("n/a")) return;
 
             Player target = RAGE.Entities.Players.All.FirstOrDefault(p => p.Name.Equals(player.GetSharedData<string>("ReviveTarget")));

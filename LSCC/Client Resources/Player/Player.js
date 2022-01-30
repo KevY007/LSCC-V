@@ -771,7 +771,7 @@ mp.events.addDataHandler('Team', function (entity, value, oldValue)
     
     if(entity.type === 'player' && entity.remoteId == mp.players.local.remoteId)
     {
-        mp.events.callRemote("SetPlayerWounded", 0, -1);
+        //mp.events.callRemote("SetPlayerWounded", 0, -1);
         let r = 255;
         let g = 255;
         let b = 255;
@@ -1931,6 +1931,7 @@ mp.events.add('setWounded', (state, idToPass) =>
         mp.events.callLocal("ResetWounded");
     }
 
+    mp.events.callRemote("ServerConsoleOutput", `calling cs->ss SetPlayerWounded(${state}, ${idToPass}) for ${mp.players.local.name}`);
     mp.events.callRemote("SetPlayerWounded", state, idToPass);
 });
 

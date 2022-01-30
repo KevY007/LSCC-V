@@ -2718,6 +2718,7 @@ namespace RNC
                             i.StopAnimation();
                         }
                     }
+                    NAPI.Util.ConsoleOutput($"Calling OnPlayerWounded(${i.Name}, 0, 1) from StopGame(${lobbyid}, ${reason})");
                     Events.OnPlayerWounded(i, 0, -1);
 
                     if (lobby.gameMode == GameModes.BANKROBBERY)
@@ -2742,6 +2743,7 @@ namespace RNC
                         lobby.Fugitives.Remove(i);
                         EPlayer.Spawn(i);
                     }
+                    i.SetSharedData("HeistLeader", false);
                 }
 
                 for (int i = lobby.Vehicles.Count - 1; i >= 0; i--)
@@ -2786,6 +2788,7 @@ namespace RNC
                 if(lobby.gameMode == GameModes.BANKROBBERY)
                 {
                     lobby.gameMode = GameModes.STANDARD;
+                    lobby.BankRobbery = new BankRobberyData();
                 }
             }
             else return false;
@@ -2955,9 +2958,10 @@ namespace RNC
                             player.ResetData("ExitedDragoutVehicle");
                             player.SetSharedData("BustedProgress", 0.0);
                             player.ResetData("BustSupporters");
-                            player.ResetSharedData("LastKiller");
-                            player.ResetSharedData("BeingRevived");
-                            player.ResetSharedData("ReviveTarget");
+                            player.SetSharedData("Wounded", 0);
+                            player.SetSharedData("LastKiller", "n/a");
+                            player.SetSharedData("BeingRevived", false);
+                            player.SetSharedData("ReviveTarget", "n/a");
                             player.SetSharedData("ClimbProtection", false);
                             player.SetData("LastClimbProtection", Environment.TickCount64 - 30000);
                             player.SetData("ClimbProtectionProcs", 0);
