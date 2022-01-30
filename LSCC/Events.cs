@@ -229,17 +229,22 @@ namespace RNC
                     NAPI.Util.ConsoleOutput("OnPlayerWounded - player object was null!? (" + state + ", kID: " + killerID + ")");
                     return;
                 }
+                if (player.HasSharedData("Wounded") && player.GetSharedData<int>("Wounded") == state && state != 0) return; // REPEL: Laggers... So it doesn't call twice...
+
+                // if the player is in copchase, in the ragdoll stage, and it's trying to reset him, return, since it shouldn't be possible
+                // in any logical way
+                if (player.GetSharedData<int>("Team") >= 0 && player.GetSharedData<int>("Wounded") == 1 && state == 0) return;
+                // if it tries to set them wounded but they arent in a team
+                if ((player.GetSharedData<int>("Team") != 0 && player.GetSharedData<int>("Team") != 1) && state != 0) return;
+                if(player.Dead) return;
+
+                // if it tries to set them back to ragdoll state when they're already in crawl/wounded state
+                if (player.GetSharedData<int>("Wounded") == 2 && state == 1) return;
 
                 if (!player.HasSharedData("Wounded"))
                 {
                     player.SetSharedData("Wounded", state);
                 }
-
-                if (player.GetSharedData<int>("Wounded") == state && state != 0) return; // REPEL: Laggers... So it doesn't call twice...
-
-                // if the player is in copchase, in the ragdoll stage, and it's trying to reset him, return, since it shouldn't be possible
-                // in any logical way
-                if (player.GetSharedData<int>("Team") >= 0 && player.GetSharedData<int>("Wounded") == 1 && state == 0) return;
 
                 player.SetSharedData("Wounded", state);
                 NAPI.Util.ConsoleOutput("[ONPLAYERWOUNDED " + player.Name + " STATE (" + state + ") KILLER ID  (" + killerID + ")");
@@ -406,12 +411,14 @@ namespace RNC
                                 player.SendChatMessage("!{#FF6347}You have enough strength to crawl - use it to crawl to safety.");
                                 player.SendChatMessage("!{#FF6347}You will die in 60 seconds if you are not revived by a teammate. Use (/lobby) to respawn instantly.");
                             }
+                            
                             if (player.HasSharedData("Team"))
                             {
                                 if (lobby != null)
                                 {
                                     if (player.GetSharedData<int>("Team") == 1)
                                     {
+                                        /*
                                         if (lobby.Cops.Count <= 1)
                                         {
                                             NAPI.Task.Run(() =>
@@ -421,6 +428,7 @@ namespace RNC
                                                 player.StopAnimation();
                                             }, 1000);
                                         }
+                                        
                                         else
                                         {
                                             Player alive = lobby.Cops.FirstOrDefault(a => a.HasSharedData("Wounded") && a.GetSharedData<int>("Wounded") == 0);
@@ -434,6 +442,7 @@ namespace RNC
                                                 }, 1000);
                                             }
                                         }
+                                        */
 
                                         string chatStr = $"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: Officer {player.Name} is down and needs medical assistance!";
                                         foreach (Player cop in lobby.Cops.Where(c => c.Position.DistanceTo(player.Position) < 75))
@@ -448,6 +457,7 @@ namespace RNC
                                     }
                                     else
                                     {
+                                        /*
                                         if (lobby.Fugitives.Count <= 1)
                                         {
                                             NAPI.Task.Run(() =>
@@ -470,6 +480,7 @@ namespace RNC
                                                 }, 1000);
                                             }
                                         }
+                                        */
 
                                         int msgrand = new Random().Next(0, 5);
                                         string msg = "";
@@ -1489,6 +1500,11 @@ namespace RNC
 
                                 lobby.Fugitives.Remove(player);
                                 player.SetSharedData("HeistLeader", false);
+
+                                if (lobby.Fugitives.Count <= 0)
+                                {
+                                    Main.StopGame(lobby.lobbyId, 3);
+                                }
 
                                 if (select_new_leader)
                                 {

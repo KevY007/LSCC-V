@@ -1753,13 +1753,21 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
 
                         if(mp.players.local.getVariable("Wounded") == 0) 
                         {
-                            mp.game.player.setInvincible(true);
-                            mp.players.local.setInvincible(true);
-                            mp.events.callLocal("setWounded", 1, sourcePlayer.remoteId);
-                            damage = 0;
-                            mp.game.weapon.setCurrentDamageEventAmount(0);
-                            mp.game.weapon.cancelCurrentDamageEvent();
-                            return true;
+                            if(!mp.players.local.isDead()){
+                                mp.game.player.setInvincible(true);
+                                mp.players.local.setInvincible(true);
+                                mp.events.callLocal("setWounded", 1, sourcePlayer.remoteId);
+                                damage = 0;
+                                mp.game.weapon.setCurrentDamageEventAmount(0);
+                                mp.game.weapon.cancelCurrentDamageEvent();
+                                return true;
+                            }
+                            else{
+                                damage = 0;
+                                mp.game.weapon.setCurrentDamageEventAmount(0);
+                                mp.game.weapon.cancelCurrentDamageEvent();
+                                return true;
+                            }
                         }
                     }
 
@@ -1846,9 +1854,14 @@ mp.events.add("ResetWounded", () => {
 
 mp.events.add('setWounded', (state, idToPass) => 
 {
+    // if its trying to set the same state but the state isnt 0 [revive or clearing vars]
     if (state == mp.players.local.getVariable("Wounded") && state != 0) return;
     if (!chaseRunning && state != 0) return;
+    // if the player is no longer in a team and it tries to set them wounded [but not 0]
     if ((mp.players.local.getVariable("Team") != 1 && mp.players.local.getVariable("Team") != 0) && state != 0) return;
+    // if the player is already in crawl mode and it tries to set them to state 1 [ragdoll] return
+    if(mp.players.local.getVariable("Wounded") == 2 && state == 1) return;
+    if(mp.players.local.isDead()) return;
 
     if(state == 1) // Pre-wounded (beginning of wounded mode) --ragdolling the player and waiting 3 secs before giving ability to crawl
     {
@@ -1888,7 +1901,7 @@ mp.events.add('setWounded', (state, idToPass) =>
             mp.players.local.setToRagdoll(4000, 4000 * 2, 0, true, true, true);
 
             setTimeout(() => {
-                if(chaseRunning && mp.players.local.getVariable("Team") >= 0 && mp.players.local.getVariable("Wounded") != 0)
+                if(chaseRunning && mp.players.local.getVariable("Team") >= 0 && mp.players.local.getVariable("Wounded") != 0 && !mp.players.local.isDead())
                 {
                     mp.events.callLocal("setWounded", 2, -1);
                 }
@@ -1901,7 +1914,7 @@ mp.events.add('setWounded', (state, idToPass) =>
         mp.game.player.setInvincible(true);
         mp.game.player.setInvincible(true);
         setTimeout(() => {
-            if(chaseRunning && mp.players.local.getVariable("Team") >= 0 && mp.players.local.getVariable("Wounded") != 0)
+            if(chaseRunning && mp.players.local.getVariable("Team") >= 0 && mp.players.local.getVariable("Wounded") != 0 && !mp.players.local.isDead())
             {
                 mp.events.callLocal("setWounded", 2, -1);
             }
@@ -1911,7 +1924,7 @@ mp.events.add('setWounded', (state, idToPass) =>
     }
     else if(state == 2) // As wounded player goes into wounded state
     {
-        if(mp.players.local.getVariable("Wounded") != 1 || !chaseRunning || mp.players.local.getVariable("Team") < 0) return;
+        if(mp.players.local.getVariable("Wounded") != 1 || !chaseRunning || mp.players.local.getVariable("Team") < 0 || mp.players.local.isDead()) return;
         
         mp.players.local.setInvincible(false);
         mp.game.player.setInvincible(false);

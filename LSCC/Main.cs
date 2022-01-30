@@ -2376,6 +2376,19 @@ namespace RNC
                                         {
                                             StopGame(lobby.lobbyId, 3);
                                         }
+
+                                        int woundedCops = lobby.Cops.Where(c => c.GetSharedData<int>("Wounded") > 0).ToList().Count;
+                                        NAPI.Util.ConsoleOutput("Wounded cops: " + woundedCops + " out of " + lobby.Cops.Count);
+                                        if(woundedCops >= lobby.Cops.Count)
+                                        {
+                                            StopGame(lobby.lobbyId, 2);
+                                        }
+                                        int woundedFugs = lobby.Fugitives.Where(c => c.GetSharedData<int>("Wounded") > 0).ToList().Count;
+                                        NAPI.Util.ConsoleOutput("Wounded fugis: " + woundedFugs + " out of " + lobby.Fugitives.Count);
+                                        if (woundedFugs >= lobby.Fugitives.Count)
+                                        {
+                                            StopGame(lobby.lobbyId, 3);
+                                        }
                                     }
                                 }
                             }
@@ -4490,6 +4503,8 @@ namespace RNC
 
                                                         Events.RequestPlayAnimation(p, "mp_missheist_ornatebank", "stand_cash_in_bag_loop", 1);
                                                         EPlayer.Freeze(p, true);
+
+                                                        EPlayer.Notify(p, "Stealing the money....", "green", "fas fa-hourglass-start", false, 60000, "bottomCenter");
                                                     }
                                                     else
                                                     {

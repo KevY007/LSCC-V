@@ -51,6 +51,5 @@ mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
             break;
         }
     }
-    mp.events.callRemote("ServerConsoleOutput", jsonLogs);
 
 });
