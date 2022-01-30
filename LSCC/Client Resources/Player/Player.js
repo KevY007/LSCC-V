@@ -768,10 +768,10 @@ mp.events.addDataHandler('Team', function (entity, value, oldValue)
 {
     entity.Team = value; 
 
-    mp.events.callRemote("SetPlayerWounded", 0, -1);
     
     if(entity.type === 'player' && entity.remoteId == mp.players.local.remoteId)
     {
+        mp.events.callRemote("SetPlayerWounded", 0, -1);
         let r = 255;
         let g = 255;
         let b = 255;

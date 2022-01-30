@@ -222,7 +222,6 @@ namespace RNC
         [RemoteEvent("SetPlayerWounded")]
         public static void OnPlayerWounded(Player player, int state, int killerID)
         {
-            NAPI.Util.ConsoleOutput("[ONPLAYERWOUNDED " + player.Name + " STATE (" + state + ") KILLER ID  (" + killerID + ")");
             try
             {
                 if (!player.HasSharedData("Wounded"))
@@ -232,7 +231,12 @@ namespace RNC
 
                 if (player.GetSharedData<int>("Wounded") == state && state != 0) return; // REPEL: Laggers... So it doesn't call twice...
 
+                // if the player is in copchase, in the ragdoll stage, and it's trying to reset him, return, since it shouldn't be possible
+                // in any logical way
+                if (player.GetSharedData<int>("Team") >= 0 && player.GetSharedData<int>("Wounded") == 1 && state == 0) return;
+
                 player.SetSharedData("Wounded", state);
+                NAPI.Util.ConsoleOutput("[ONPLAYERWOUNDED " + player.Name + " STATE (" + state + ") KILLER ID  (" + killerID + ")");
 
                 Player killer = null;
                 if (killerID != -1)
