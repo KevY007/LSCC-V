@@ -4541,6 +4541,7 @@ namespace RNC
 
                         lobby.FugitiveShowCounter++;
                         lobby.LastSeenCounter++;
+                        NAPI.Util.ConsoleOutput($"Lobby {lobby.lobbyId} FugitiveShowCounter: {lobby.FugitiveShowCounter}");
 
                         if (lobby.LastSeenCounter >= 20)
                         {
@@ -4563,6 +4564,44 @@ namespace RNC
                                 catch { }
                             }
                             lobby.LastSeenCounter = 0;
+                        }
+                        if (lobby.FugitiveShowCounter >= 60 && lobby.FugitiveShowCounter < 120)
+                        {
+                            NAPI.Util.ConsoleOutput($"Lobby {lobby.lobbyId} FugitiveShowCounter ({lobby.FugitiveShowCounter}) is 60-120");
+                            lock (lobby.Fugitives)
+                            {
+                                if (lobby.Fugitives.Where(fg => fg.HasSharedData("VisibleBlip") && fg.GetSharedData<bool>("VisibleBlip") == false).ToList().Count > 0)
+                                {
+                                    foreach (Player fugi in lobby.Fugitives)
+                                    {
+                                        fugi.SetSharedData("VisibleBlip", true);
+
+                                        if (lobby.FugitiveShowCounter == 60) EPlayer.Notify(fugi, "You are now visible on the radar.", "red", "fas fa-running", false, 3000);
+                                    }
+                                }
+                                if (lobby.FugitiveShowCounter == 60 && lobby.GameProgress >= 60 && lobby.CollisionCounter <= -1)
+                                {
+                                    foreach (Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                    {
+                                        p.TriggerEvent("StartChaseTimer", lobby.GameProgress, gameRunTime, -1, (short)lobby.gameMode);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (lobby.FugitiveShowCounter >= 120)
+                        {
+                            lobby.FugitiveShowCounter = 0;
+
+                            lock (lobby.Fugitives)
+                            {
+                                foreach (Player fugi in lobby.Fugitives.Where(a => a.GetSharedData<bool>("HasShot") == false))
+                                {
+                                    fugi.SetSharedData("VisibleBlip", false);
+
+                                    EPlayer.Notify(fugi, "You are no longer visible on the radar", "green", "fas fa-walking", false, 3000);
+                                }
+                            }
                         }
 
                         if (lobby.GameProgress % 5 == 0) // Every 5 seconds/multiple during collision phase
@@ -4756,42 +4795,6 @@ namespace RNC
                                         }
                                     }
                                     catch { }
-                                }
-                            }
-
-                            if (lobby.FugitiveShowCounter >= 60 && lobby.FugitiveShowCounter < 120)
-                            {
-                                lock (lobby.Fugitives)
-                                {
-                                    foreach (Player fugi in lobby.Fugitives)
-                                    {
-                                        fugi.SetSharedData("VisibleBlip", true);
-
-                                        if (lobby.FugitiveShowCounter == 60) EPlayer.Notify(fugi, "You are now visible on the radar.", "red", "fas fa-running", false, 3000);
-                                    }
-
-                                    if (lobby.FugitiveShowCounter == 60 && lobby.GameProgress >= 60 && lobby.CollisionCounter <= -1)
-                                    {
-                                        foreach (Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
-                                        {
-                                            p.TriggerEvent("StartChaseTimer", lobby.GameProgress, gameRunTime, -1, (short)lobby.gameMode);
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (lobby.FugitiveShowCounter >= 120)
-                            {
-                                lobby.FugitiveShowCounter = 0;
-
-                                lock (lobby.Fugitives)
-                                {
-                                    foreach (Player fugi in lobby.Fugitives.Where(a => a.GetSharedData<bool>("HasShot") == false))
-                                    {
-                                        fugi.SetSharedData("VisibleBlip", false);
-
-                                        EPlayer.Notify(fugi, "You are no longer visible on the radar", "green", "fas fa-walking", false, 3000);
-                                    }
                                 }
                             }
                         }
