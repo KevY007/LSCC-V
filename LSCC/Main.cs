@@ -4343,21 +4343,21 @@ namespace RNC
                                     foreach (Player p in lobby.Cops)
                                     {
                                         if (p != null)
-                                        {
-                                            EPlayer.TryAdvanceChallenge(p, Challenge.ChallengeType.CopchaseRounds, "N/A");                                            
+                                        {                                          
                                             EPlayer.Freeze(p, false);
                                             p.SendNotification("~y~You can now exit vehicles.");
                                             p.SendNotification("~b~You may begin the chase now.");
                                             p.TriggerEvent("ToggleCanExitVehicle", true);
+                                            EPlayer.TryAdvanceChallenge(p, Challenge.ChallengeType.CopchaseRounds, "N/A");
                                         }
                                     }
                                     foreach (Player p in lobby.Fugitives)
                                     {
                                         if (p != null)
                                         {
-                                            EPlayer.TryAdvanceChallenge(p, Challenge.ChallengeType.CopchaseRounds, "N/A");
                                             p.SendNotification("~y~You can now exit vehicles.");
                                             p.TriggerEvent("ToggleCanExitVehicle", true);
+                                            EPlayer.TryAdvanceChallenge(p, Challenge.ChallengeType.CopchaseRounds, "N/A");
                                         }
                                     }
                                 }
