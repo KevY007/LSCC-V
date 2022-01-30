@@ -3745,8 +3745,6 @@ namespace RNC
         {
             try
             {
-                try
-                {
                     if (Environment.TickCount64 - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
                     {
                         //Settings.DerbyTimeLeft--;
@@ -3757,11 +3755,6 @@ namespace RNC
                             Main.CheckDerbyWinner();
                         }
                     }
-                }
-                catch(Exception ex)
-                {
-                    NAPI.Util.ConsoleOutput("Fucking dyn settings error or smth? " + ex.ToString());
-                }
 
                 lock (Settings.Lobbies)
                 {
@@ -4190,43 +4183,56 @@ namespace RNC
                                         Account _a = EPlayer.GetAccount(player);
                                         CharacterData cd = NAPI.Util.FromJson<CharacterData>(_a.Character);
 
-
-                                        if (player != _brob.HeistLeader && player != _brob.Sniper)
+                                        try
                                         {
-                                            int spid = kevycanusendmefeetpicspls.Next(BankRobberyData.FugitiveSpawns.GetLength(0));
-                                            player.Position = (Vector3)BankRobberyData.FugitiveSpawns[spid, 0];
-                                            player.Heading = (float)BankRobberyData.FugitiveSpawns[spid, 1];
-
-                                            cd.Clothing[0].Hat = 62;
-                                            cd.Clothing[0].HatTxt = new Random().Next(0, 10);
-                                            cd.Clothing[2].Hat = 62;
-                                            cd.Clothing[2].HatTxt = new Random().Next(0, 10);
-                                        }
-                                        else
-                                        {
-                                            if (player == _brob.HeistLeader)
+                                            if (player != _brob.HeistLeader && player != _brob.Sniper)
                                             {
-                                                player.Position = BankRobberyData.LeaderPos;
-                                                player.Heading = BankRobberyData.LeaderHeading;
-
-                                                cd.Clothing[0].Hat = 62;
-                                                cd.Clothing[0].HatTxt = 9;
-                                                cd.Clothing[2].Hat = 62;
-                                                cd.Clothing[2].HatTxt = 9;
-                                            }
-                                            else if (player == _brob.Sniper)
-                                            {
-                                                player.Position = BankRobberyData.SniperPos;
-                                                player.Heading = BankRobberyData.SniperHeading;
+                                                int spid = kevycanusendmefeetpicspls.Next(BankRobberyData.FugitiveSpawns.GetLength(0));
+                                                player.Position = (Vector3)BankRobberyData.FugitiveSpawns[spid, 0];
+                                                player.Heading = (float)BankRobberyData.FugitiveSpawns[spid, 1];
 
                                                 cd.Clothing[0].Hat = 62;
                                                 cd.Clothing[0].HatTxt = new Random().Next(0, 10);
                                                 cd.Clothing[2].Hat = 62;
                                                 cd.Clothing[2].HatTxt = new Random().Next(0, 10);
                                             }
-                                        }
+                                            else
+                                            {
+                                                if (player == _brob.HeistLeader)
+                                                {
+                                                    player.Position = BankRobberyData.LeaderPos;
+                                                    player.Heading = BankRobberyData.LeaderHeading;
 
-                                        EPlayer.ApplyCharacter(player, cd, 0);
+                                                    cd.Clothing[0].Hat = 62;
+                                                    cd.Clothing[0].HatTxt = 9;
+                                                    cd.Clothing[2].Hat = 62;
+                                                    cd.Clothing[2].HatTxt = 9;
+                                                }
+                                                else if (player == _brob.Sniper)
+                                                {
+                                                    player.Position = BankRobberyData.SniperPos;
+                                                    player.Heading = BankRobberyData.SniperHeading;
+
+                                                    cd.Clothing[0].Hat = 62;
+                                                    cd.Clothing[0].HatTxt = new Random().Next(0, 10);
+                                                    cd.Clothing[2].Hat = 62;
+                                                    cd.Clothing[2].HatTxt = new Random().Next(0, 10);
+                                                }
+                                            }
+
+                                            EPlayer.ApplyCharacter(player, cd, 0);
+                                        }
+                                        catch(Exception ex)
+                                        {
+                                            try
+                                            {
+                                                CharacterData ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+
+                                                EPlayer.ApplyCharacter(player, ConvChar, 0);
+                                            }
+                                            catch { }
+                                            NAPI.Util.ConsoleOutput("ZAMN! BankRob fugi outfit fail: " + ex.ToString());
+                                        }
 
                                         EPlayer.Freeze(player, true);
 
@@ -4423,6 +4429,13 @@ namespace RNC
                                                             }
                                                             catch(Exception ex)
                                                             {
+                                                                try
+                                                                {
+                                                                    CharacterData ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(p).Character);
+
+                                                                    EPlayer.ApplyCharacter(p, ConvChar, 1);
+                                                                }
+                                                                catch { }
                                                                 NAPI.Util.ConsoleOutput("ZAMN! BANKROB FIB FAIL: " + ex.ToString());
                                                             }
                                                         }
@@ -4541,7 +4554,6 @@ namespace RNC
 
                         lobby.FugitiveShowCounter++;
                         lobby.LastSeenCounter++;
-                        NAPI.Util.ConsoleOutput($"Lobby {lobby.lobbyId} FugitiveShowCounter: {lobby.FugitiveShowCounter}");
 
                         if (lobby.LastSeenCounter >= 20)
                         {
@@ -4567,7 +4579,6 @@ namespace RNC
                         }
                         if (lobby.FugitiveShowCounter >= 60 && lobby.FugitiveShowCounter < 120)
                         {
-                            NAPI.Util.ConsoleOutput($"Lobby {lobby.lobbyId} FugitiveShowCounter ({lobby.FugitiveShowCounter}) is 60-120");
                             lock (lobby.Fugitives)
                             {
                                 if (lobby.Fugitives.Where(fg => fg.HasSharedData("VisibleBlip") && fg.GetSharedData<bool>("VisibleBlip") == false).ToList().Count > 0)

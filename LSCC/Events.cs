@@ -3495,6 +3495,8 @@ namespace RNC
         [RemoteEvent("opsp")] // wont trigger incar btw 
         public void OnPlayerShootPlayer(Player player, Player target, uint bone, Int64 weapon)
         {
+            if (player == null || target == null) return;
+
             if (weapon == (uint)WeaponHash.Stungun)
             {
                 if (player.GetSharedData<int>("InLobby") > -1 && player.GetSharedData<int>("InDM") == 6 && target.GetSharedData<int>("InDM") == 6)
