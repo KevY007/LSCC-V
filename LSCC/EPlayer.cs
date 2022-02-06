@@ -1025,7 +1025,7 @@ namespace RNC
                 Account Acc = EPlayer.GetAccount(player);
                 Acc.JailReason = reason;
                 Acc.JailTime = Acc.JailTime + (minutes * 60);
-                player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been jailed for {minutes} minutes, reason: {reason}.");
+                player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have been jailed for {minutes} minutes, reason: {reason}.");
 
                 lock (Settings.Lobbies)
                 {
@@ -1067,16 +1067,16 @@ namespace RNC
             {
                 if (type != AdminNote.ANoteType.OnConnect && type != AdminNote.ANoteType.OnSpectate && type != AdminNote.ANoteType.Both)
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target does not have any admin notes on them!");
+                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Target does not have any admin notes on them!");
                 }
                 return;
             }
-            if(send_header) player.SendChatMessage($"!{{#ffc852}}====================> !{{#ffffff}}{acc.Username}'s Admin Notes !{{#ffc852}}<====================");
+            if(send_header) player.TriggerEvent("pushMsgToChat", $"!{{#ffc852}}====================> !{{#ffffff}}{acc.Username}'s Admin Notes !{{#ffc852}}<====================");
             foreach (AdminNote note in _notes)
             {
                 Account adm = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.SQL_ID == note.AdminID);
                 string aName = adm.Username ?? "[Unknown]";
-                player.SendChatMessage($"!{{#528bff}}[!{{#91b6ff}}ID:{note.SQL_ID} | {note.Timestamp} | {note.TypeToString()}!{{#528bff}}] !{{#928aff}}{aName}: !{{#ffffff}} {note.Text}");             
+                player.TriggerEvent("pushMsgToChat", $"!{{#528bff}}[!{{#91b6ff}}ID:{note.SQL_ID} | {note.Timestamp} | {note.TypeToString()}!{{#528bff}}] !{{#928aff}}{aName}: !{{#ffffff}} {note.Text}");             
             }
         }
 
@@ -1091,47 +1091,47 @@ namespace RNC
             if (acc.MinutesPlayed == 0.0) acc.MinutesPlayed = 0.1;
             KDR = (double)acc.Kills / (double)acc.Deaths;
 
-            target.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} ({acc.SQL_ID}) at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
+            target.TriggerEvent("pushMsgToChat", $"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} ({acc.SQL_ID}) at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
 
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Account ID: !{{#cbcfc4}}[{acc.SQL_ID}] !{{#ffffff}}| !{{#c7eb7f}}Email: !{{#cbcfc4}}[{acc.Email}] !{{#ffffff}}| !{{#c7eb7f}}Admin Level: !{{#cbcfc4}}[{acc.Admin}]");
+            target.TriggerEvent("pushMsgToChat", $"!{{#ffffff}}| !{{#c7eb7f}}Account ID: !{{#cbcfc4}}[{acc.SQL_ID}] !{{#ffffff}}| !{{#c7eb7f}}Email: !{{#cbcfc4}}[{acc.Email}] !{{#ffffff}}| !{{#c7eb7f}}Admin Level: !{{#cbcfc4}}[{acc.Admin}]");
 
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Register Date: !{{#cbcfc4}}[{acc.RegisterDate.ToString()}] !{{#ffffff}}| !{{#c7eb7f}}Last Login: !{{#cbcfc4}}[{acc.LastLogin.ToString()}] !{{#ffffff}}");
+            target.TriggerEvent("pushMsgToChat", $"!{{#ffffff}}| !{{#c7eb7f}}Register Date: !{{#cbcfc4}}[{acc.RegisterDate.ToString()}] !{{#ffffff}}| !{{#c7eb7f}}Last Login: !{{#cbcfc4}}[{acc.LastLogin.ToString()}] !{{#ffffff}}");
 
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Donator Level: !{{#cbcfc4}}[{acc.DonatorLevel}] !{{#ffffff}}| !{{#c7eb7f}}Donator Points: !{{#cbcfc4}}[{acc.DonatorPoints}] !{{#ffffff}}| !{{#c7eb7f}}Derby Wins: !{{#cbcfc4}}[{acc.DerbyWins}]");
+            target.TriggerEvent("pushMsgToChat", $"!{{#ffffff}}| !{{#c7eb7f}}Donator Level: !{{#cbcfc4}}[{acc.DonatorLevel}] !{{#ffffff}}| !{{#c7eb7f}}Donator Points: !{{#cbcfc4}}[{acc.DonatorPoints}] !{{#ffffff}}| !{{#c7eb7f}}Derby Wins: !{{#cbcfc4}}[{acc.DerbyWins}]");
 
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Level: !{{#cbcfc4}}[{acc.Level}] !{{#ffffff}}| !{{#c7eb7f}}Experience: !{{#cbcfc4}}[{acc.XP}/{EPlayer.GetMaxLevelXP(acc.Level)}] !{{#ffffff}}| !{{#c7eb7f}}Escapes: !{{#cbcfc4}}[{acc.Escapes}]");
+            target.TriggerEvent("pushMsgToChat", $"!{{#ffffff}}| !{{#c7eb7f}}Level: !{{#cbcfc4}}[{acc.Level}] !{{#ffffff}}| !{{#c7eb7f}}Experience: !{{#cbcfc4}}[{acc.XP}/{EPlayer.GetMaxLevelXP(acc.Level)}] !{{#ffffff}}| !{{#c7eb7f}}Escapes: !{{#cbcfc4}}[{acc.Escapes}]");
 
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Kills: !{{#cbcfc4}}[{acc.Kills}] !{{#ffffff}}| !{{#c7eb7f}}Deaths: !{{#cbcfc4}}[{acc.Deaths}] !{{#ffffff}}| !{{#c7eb7f}}K/D Ratio: !{{#cbcfc4}}[{KDR.ToString("N3")}]");
+            target.TriggerEvent("pushMsgToChat", $"!{{#ffffff}}| !{{#c7eb7f}}Kills: !{{#cbcfc4}}[{acc.Kills}] !{{#ffffff}}| !{{#c7eb7f}}Deaths: !{{#cbcfc4}}[{acc.Deaths}] !{{#ffffff}}| !{{#c7eb7f}}K/D Ratio: !{{#cbcfc4}}[{KDR.ToString("N3")}]");
 
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Arrests: !{{#cbcfc4}}[{acc.Arrests}] !{{#ffffff}}| !{{#c7eb7f}}Time Played: !{{#cbcfc4}}[{(acc.MinutesPlayed / 60.0).ToString("N3")} hours] !{{#ffffff}}| !{{#c7eb7f}}Warns: !{{#cbcfc4}}[{acc.Warns}]");
+            target.TriggerEvent("pushMsgToChat", $"!{{#ffffff}}| !{{#c7eb7f}}Arrests: !{{#cbcfc4}}[{acc.Arrests}] !{{#ffffff}}| !{{#c7eb7f}}Time Played: !{{#cbcfc4}}[{(acc.MinutesPlayed / 60.0).ToString("N3")} hours] !{{#ffffff}}| !{{#c7eb7f}}Warns: !{{#cbcfc4}}[{acc.Warns}]");
             
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Points: !{{#cbcfc4}}[{acc.Points}] !{{#ffffff}}| !{{#c7eb7f}}Vehicle (Fugitive): !{{#cbcfc4}}[{acc.CarFugitive}] !{{#ffffff}}| !{{#c7eb7f}}Vehicle (Cop): !{{#cbcfc4}}[{acc.CarCop}]");
+            target.TriggerEvent("pushMsgToChat", $"!{{#ffffff}}| !{{#c7eb7f}}Points: !{{#cbcfc4}}[{acc.Points}] !{{#ffffff}}| !{{#c7eb7f}}Vehicle (Fugitive): !{{#cbcfc4}}[{acc.CarFugitive}] !{{#ffffff}}| !{{#c7eb7f}}Vehicle (Cop): !{{#cbcfc4}}[{acc.CarCop}]");
 
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Last Jail: !{{#cbcfc4}}[{acc.JailReason}] !{{#ffffff}}| !{{#c7eb7f}}Last Warn: !{{#cbcfc4}}[{acc.MuteReason}] !{{#ffffff}}| !{{#c7eb7f}}Weapon Components: !{{#cbcfc4}}[/mycomps]");
+            target.TriggerEvent("pushMsgToChat", $"!{{#ffffff}}| !{{#c7eb7f}}Last Jail: !{{#cbcfc4}}[{acc.JailReason}] !{{#ffffff}}| !{{#c7eb7f}}Last Warn: !{{#cbcfc4}}[{acc.MuteReason}] !{{#ffffff}}| !{{#c7eb7f}}Weapon Components: !{{#cbcfc4}}[/mycomps]");
             
-            target.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} ({acc.SQL_ID}) at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
+            target.TriggerEvent("pushMsgToChat", $"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} ({acc.SQL_ID}) at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
 
             DiscordData _d = NAPI.Util.FromJson<DiscordData>(acc.DiscordInfo);
             if (_d.DiscordID.Equals("n/a"))
             {
                 if (EPlayer.GetAccount(target) == acc)
                 {
-                    target.SendChatMessage("!{#fa9194}You haven't linked a Discord account yet! !{#ffffff}Please do so in order to activate some cool perks. !{#ffff00}(/discord, /verify)");
+                    target.TriggerEvent("pushMsgToChat", "!{#fa9194}You haven't linked a Discord account yet! !{#ffffff}Please do so in order to activate some cool perks. !{#ffff00}(/discord, /verify)");
                 }
                 else
                 {
-                    target.SendChatMessage("!{#fa9194}No Discord account is linked to this account.");
+                    target.TriggerEvent("pushMsgToChat", "!{#fa9194}No Discord account is linked to this account.");
                 }
             }
             else
             {
                 if (EPlayer.GetAccount(target) == acc)
                 {
-                    target.SendChatMessage("!{#83ff75}Your Discord account is linked.");
+                    target.TriggerEvent("pushMsgToChat", "!{#83ff75}Your Discord account is linked.");
                 }
                 else 
                 {
-                    target.SendChatMessage($"!{{#83ff75}}Discord account is linked! (UID:!{{#ffffff}}{_d.DiscordID}!{{#83ff75}})");
+                    target.TriggerEvent("pushMsgToChat", $"!{{#83ff75}}Discord account is linked! (UID:!{{#ffffff}}{_d.DiscordID}!{{#83ff75}})");
                 }
             }
             
@@ -1156,11 +1156,11 @@ namespace RNC
             int Missed = player.GetData<int>("ShotStats.Missed");
             long LastSync = player.GetData<long>("ShotStats.LastSync");
 
-            target.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Shot Statistics of {player.Name} at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
+            target.TriggerEvent("pushMsgToChat", $"!{{#ffffff}}_____| !{{#d1f797}}Shot Statistics of {player.Name} at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
 
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Total Shots Fired: !{{#cbcfc4}}[{TotalFired}] !{{#ffffff}}| !{{#c7eb7f}}Shots Hit Players: !{{#cbcfc4}}[{PlayerHits}] !{{#ffffff}}| !{{#c7eb7f}}Shot Hit Vehicles: !{{#cbcfc4}}[{VehicleHits}]");
+            target.TriggerEvent("pushMsgToChat", $"!{{#ffffff}}| !{{#c7eb7f}}Total Shots Fired: !{{#cbcfc4}}[{TotalFired}] !{{#ffffff}}| !{{#c7eb7f}}Shots Hit Players: !{{#cbcfc4}}[{PlayerHits}] !{{#ffffff}}| !{{#c7eb7f}}Shot Hit Vehicles: !{{#cbcfc4}}[{VehicleHits}]");
 
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Missed/Shots Hit Nothing: !{{#cbcfc4}}[{Missed}] !{{#ffffff}}| !{{#c7eb7f}}Last Updated: !{{#cbcfc4}}[{(Environment.TickCount64 - LastSync) / 1000}s ago]");
+            target.TriggerEvent("pushMsgToChat", $"!{{#ffffff}}| !{{#c7eb7f}}Missed/Shots Hit Nothing: !{{#cbcfc4}}[{Missed}] !{{#ffffff}}| !{{#c7eb7f}}Last Updated: !{{#cbcfc4}}[{(Environment.TickCount64 - LastSync) / 1000}s ago]");
 
             string playerAccuracy = "Unavailable";
             string vehicleAccuracy = "Unavailable";
@@ -1179,7 +1179,7 @@ namespace RNC
                 }
             }
 
-            target.SendChatMessage($"!{{#ffffff}}| !{{#c7eb7f}}Player Accuracy: !{{#cbcfc4}}[{playerAccuracy}] !{{#ffffff}}| !{{#c7eb7f}}Vehicle Accuracy: !{{#cbcfc4}}[{vehicleAccuracy}]");
+            target.TriggerEvent("pushMsgToChat", $"!{{#ffffff}}| !{{#c7eb7f}}Player Accuracy: !{{#cbcfc4}}[{playerAccuracy}] !{{#ffffff}}| !{{#c7eb7f}}Vehicle Accuracy: !{{#cbcfc4}}[{vehicleAccuracy}]");
             return;
         }
 
@@ -1194,13 +1194,13 @@ namespace RNC
 
                 if(Acc.Warns < 10)
                 {
-                    player.SendChatMessage("!{#FF6347}You have been warned, be careful next time. After 10 warns you will receive jailtime on every warn until 20 warns.");
+                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}You have been warned, be careful next time. After 10 warns you will receive jailtime on every warn until 20 warns.");
                 }
                 else
                 {
                     if (Acc.Warns >= 20)
                     {
-                        player.SendChatMessage($"!{{#FF6347}}Mate, you've got like 20 warns, are you on a death route or what? I'm letting you go this time. - KevY");
+                        player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}Mate, you've got like 20 warns, are you on a death route or what? I'm letting you go this time. - KevY");
                         Acc.Warns = 0;
                     }
                     else
@@ -1213,7 +1213,7 @@ namespace RNC
 
                         RAGE.Entities.Players.All.ForEach((Player p) =>
                         {
-                            p.SendChatMessage($"!{{#FF6347}}[AdmCmd] SERVER has jailed {player.Name} for {jailTime} mins, reason: Exceeding {Acc.Warns} warns.");
+                            p.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[AdmCmd] SERVER has jailed {player.Name} for {jailTime} mins, reason: Exceeding {Acc.Warns} warns.");
                         });
                     }
                 }
@@ -1277,7 +1277,7 @@ namespace RNC
                     EPlayer.GrantXP(player, 70);
                     EPlayer.GivePoints(player, 50);
 
-                    player.SendChatMessage("!{#c387ff}[DAILY CHALLENGES] ~w~You successfully completed the weekly challenge! Received ~y~70 XP and 50 points~w~.");
+                    player.TriggerEvent("pushMsgToChat", "!{#c387ff}[DAILY CHALLENGES] ~w~You successfully completed the weekly challenge! Received ~y~70 XP and 50 points~w~.");
                     player.TriggerEvent("sendAchievementNotify", "Weekly Challenge", $"Complete at least one daily challenge for 7 days in a row.",
                     "package://Artwork/Achievements/reach_level_100.png", "+70 XP & +50 points", 10000, true);
 
@@ -1504,7 +1504,7 @@ namespace RNC
 
             player.GiveWeapon(WeaponHash.Stungun, 1);
             player.GiveWeapon(WeaponHash.Nightstick, 1);
-            player.SendChatMessage("!{#FF6347}[TASER] !{#FFFFFF}You have been equipped with a stungun, shoot at a fugitive that hasn't shot to tase them.");
+            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[TASER] !{#FFFFFF}You have been equipped with a stungun, shoot at a fugitive that hasn't shot to tase them.");
             return;
         }
         public static void GiveFugitiveWeapons(Player player)
@@ -1681,6 +1681,11 @@ namespace RNC
             player.TriggerEvent("GetGroundZ", player.Position.X, player.Position.Y, player.Position.Z, player.Dimension, "ReturnAmmoPosZ");
         }
 
+        public static void SendMessage(Player player, string message)
+        {
+            player.TriggerEvent("pushMsgToChat");
+        }
+
         public static void SetDiscordStatus(Player player, string status)
         {
             player.TriggerEvent("SetDiscordStatus", "Race 'N' Chase", status);
@@ -1735,7 +1740,7 @@ namespace RNC
            
             foreach (Player playa in NAPI.Player.GetPlayersInRadiusOfPlayer(40, player))
             {
-                if(player.Dimension == playa.Dimension) playa.SendChatMessage(msg);
+                if(player.Dimension == playa.Dimension) playa.TriggerEvent("pushMsgToChat", msg);
             }
         }
 
@@ -1988,8 +1993,8 @@ namespace RNC
             {
                 RAGE.Entities.Players.All.ForEach((Player pl) =>
                 {
-                    if(lvlDiff > 1) pl.SendChatMessage($"!{{#00BA03}}[LEVEL UP] {player.Name} has levelled up +{lvlDiff} times to {acc.Level}!");
-                    else pl.SendChatMessage($"!{{#00BA03}}[LEVEL UP] {player.Name} has levelled up to {acc.Level}!");
+                    if(lvlDiff > 1) pl.TriggerEvent("pushMsgToChat", $"!{{#00BA03}}[LEVEL UP] {player.Name} has levelled up +{lvlDiff} times to {acc.Level}!");
+                    else pl.TriggerEvent("pushMsgToChat", $"!{{#00BA03}}[LEVEL UP] {player.Name} has levelled up to {acc.Level}!");
                 });
                 EPlayer.Notify(player, $"You have <strong>levelled up</strong> to <strong>{acc.Level}</strong>.", "green", "fas fa-check", false, 1500, "bottomRight", "replace");
 
@@ -2000,8 +2005,8 @@ namespace RNC
             {
                 RAGE.Entities.Players.All.ForEach((Player pl) =>
                 {
-                    if (lvlDiff < -1) pl.SendChatMessage($"!{{#FF6347}}[LEVEL DOWN] {player.Name} has levelled down {lvlDiff} times to {acc.Level}!");
-                    else pl.SendChatMessage($"!{{#FF6347}}[LEVEL DOWN] {player.Name} has levelled down to {acc.Level}!");
+                    if (lvlDiff < -1) pl.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[LEVEL DOWN] {player.Name} has levelled down {lvlDiff} times to {acc.Level}!");
+                    else pl.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[LEVEL DOWN] {player.Name} has levelled down to {acc.Level}!");
                 });
                 EPlayer.Notify(player, $"You have <strong>levelled down</strong> to <strong>{acc.Level}</strong>.", "red", "fas fa-cross", false, 1500, "bottomRight", "replace");
 
@@ -2143,7 +2148,7 @@ namespace RNC
 
                 foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == LobbyToBeIn))
                 {
-                    targ.SendChatMessage($"!{{#FF6347}}[Lobby {LobbyToBeIn}] !{{#BFBFBF}}{player.Name} !{{#FFFFFF}}has joined this lobby.");
+                    targ.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[Lobby {LobbyToBeIn}] !{{#BFBFBF}}{player.Name} !{{#FFFFFF}}has joined this lobby.");
                 }
             }
 
@@ -2185,7 +2190,7 @@ namespace RNC
             {
                 if (player.GetSharedData<int>("InLobby") == lobbyid)
                 {
-                    player.SendChatMessage(message);
+                    player.TriggerEvent("pushMsgToChat", message);
                 }
             }
 
@@ -2201,7 +2206,7 @@ namespace RNC
                 if (EPlayer.LoggedIn(i))
                 {
                     acc = i.GetData<Account>("AccountHandle");
-                    if (acc.Admin > 0) i.SendChatMessage(message);
+                    if (acc.Admin > 0) i.TriggerEvent("pushMsgToChat", message);
                 }
             }
 

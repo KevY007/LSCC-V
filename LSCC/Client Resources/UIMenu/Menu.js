@@ -74,8 +74,8 @@ function ToggleMenu()
         UIMenu.execute(`gm.mainMenu = ${menuToggled};`);
         mp.events.callRemote("OnToggleMenu", menuToggled);
         mp.gui.cursor.show(menuToggled, menuToggled);
-        mp.gui.chat.activate(!menuToggled);
-        //mp.gui.chat.show(!menuToggled);
+        activateChat(!menuToggled);
+        //focusChat(!menuToggled);
 
         UIMenu.execute(`gm.$refs.settings.categories = [
             {

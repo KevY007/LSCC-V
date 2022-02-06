@@ -720,7 +720,7 @@ mp.events.add("toggleCreator", (active, charData) => {
         }
 
         creatorMainMenu.Visible = true;
-        mp.gui.chat.show(false);
+        focusChat(false);
         mp.game.ui.displayRadar(false);
         mp.game.ui.displayHud(false);
         localPlayer.clearTasksImmediately();
@@ -800,7 +800,7 @@ mp.events.add("toggleCreator", (active, charData) => {
         applyCreatorOutfit();
     } else {
         for (let i = 0; i < creatorMenus.length; i++) creatorMenus[i].Visible = false;
-        mp.gui.chat.show(true);
+        focusChat(true);
         mp.game.ui.displayRadar(true);
         mp.game.ui.displayHud(true);
         localPlayer.freezePosition(false);

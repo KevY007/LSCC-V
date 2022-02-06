@@ -107,7 +107,7 @@ function bankRobEnterColshape(player, shape) {
             mp.events.callRemote("BankRob_ContinueState", 3);
         }
         else{
-            mp.gui.chat.push("[>] Sorry, the heist leader must enter the marker by themselves in order to win!");
+            pushMessageToChat("[>] Sorry, the heist leader must enter the marker by themselves in order to win!");
         }
     }
 }

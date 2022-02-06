@@ -134,6 +134,60 @@ mp.events.add('ToggleNametags', (state) => {
       topRight
 */
 
+function activateChat(toggle){
+    if(UIHud == null) return;
+    UIHud.execute(`gm.chat = ${toggle.toString()}`);
+};
+function focusChat(toggle){
+    if(UIHud == null) return;
+    UIHud.execute(`gm.$refs.chat.active = ${toggle.toString()}`);
+
+    mp.gui.cursor.show(toggle, toggle);
+    mp.events.callRemote("onFocusChat", toggle);
+}
+function pushMessageToChat(message){
+    if(UIHud == null) return;
+    UIHud.execute(`gm.$refs.chat.messages.push("${message}")`);
+}
+function clearChat(){
+    if(UIHud == null) return;
+    UIHud.execute(`gm.$refs.chat.messages = [];`);
+}
+let api = {"chat:push": pushMessageToChat, "chat:clear": clearChat, "chat:activate": activateChat, "chat:show": focusChat}; 
+
+mp.events.add("pushMsgToChat", (msg) => {
+    pushMessageToChat(msg);
+})
+
+for(let fn in api)
+{
+    mp.events.add(fn, api[fn]);
+}
+
+mp.events.add("onChatPressEnter", () => {
+    focusChat(false);
+	mp.events.call("onOpenChatbox", false);
+});
+
+mp.events.add("InitiateCustomChat", () => {
+    mp.gui.chat.show(false);
+    setTimeout(() =>{
+        mp.events.callLocal('RestartMenu');
+    }, 1000);
+    setTimeout(() => {
+        mp.events.callLocal('RestartHUD');
+    }, 1000);
+});
+
+mp.keys.bind(0x54, true, function() {
+    focusChat(true);
+	mp.events.call("onOpenChatbox", true);
+});
+
+mp.events.add("TogglePlayerChat", (toggle) => {
+    activateChat(toggle);
+});
+
 mp.events.add('RestartHUD', () => {
     if(UIHud !== null)
     {
@@ -143,6 +197,7 @@ mp.events.add('RestartHUD', () => {
 
     UIHud = mp.browsers.new("package://UIHud/index.html");
     UIHud.execute(`gm.hud = false;`);
+    UIHud.markAsChat();
 });
 
 let createdTooltips = []; // to keep track of created tooltips / preventing duplicates
@@ -405,7 +460,7 @@ mp.events.add('ToggleHud', (toggle) => {
         UIHud.execute(`gm.hud = ${toggle};`);
     }
 
-    mp.gui.chat.show(showHud);
+    focusChat(showHud);
     mp.game.ui.displayRadar(showHud);
 });
 

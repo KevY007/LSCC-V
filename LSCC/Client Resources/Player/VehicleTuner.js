@@ -260,7 +260,7 @@ mp.events.add('OpenTuner', (vid) => {
     vTuner_Main.AddItem(vTuner_Exit);
     vTuner_Items.push(vTuner_Exit);
 
-    mp.gui.chat.show(false);
+    focusChat(false);
 
     vTuner_Main.Open();
     mp.events.callLocal("AddTooltip", "M1", "Switch camera", 0);
@@ -339,7 +339,7 @@ vTuner_Main.MenuClose.on(() => {
     vTuner_VehicleID = -1;
     vTuner_Buy = null;
     vTuner_Exit = null;
-    mp.gui.chat.show(true);
+    focusChat(true);
 
     mp.events.callRemote("OnTunerClose");
     mp.events.callLocal("RemoveTooltip", "M1");

@@ -351,13 +351,13 @@ mp.events.addCommand("noclip_vsm", function (rate) {
     rate = Number(rate);
 
     if (rate < 0.01 || rate > 100.0) {
-        mp.gui.chat.push("Invalid rate, must be between 0.01 - 100.0 (0.10 optimal)");
+        pushMessageToChat("Invalid rate, must be between 0.01 - 100.0 (0.10 optimal)");
         return;
     }
 
     verySlowMult = rate;
 
-    mp.gui.chat.push(`Very slow multiplier (LSHIFT + CTRL together) set to ${verySlowMult}.`);
+    pushMessageToChat(`Very slow multiplier (LSHIFT + CTRL together) set to ${verySlowMult}.`);
 });
 
 mp.events.add("ToggleNoclip", () => {
@@ -488,7 +488,7 @@ function moveFromToAir(moveTo, switchType, showGui, timeout = 1) {
         {
             case 'up':
                     if (showGui == false) {
-                        //mp.gui.chat.show(showGui);
+                        //focusChat(showGui);
                         gui = 'false';
                         UIHud.execute(`gm.hud = false;`);
                     };
@@ -518,7 +518,7 @@ function checkCamInAir() {
     } 
     else 
     {
-        //mp.gui.chat.show(true);
+        //focusChat(true);
         gui = 'true';
         UIHud.execute(`gm.hud = ${showHud};`);
     }

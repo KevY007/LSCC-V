@@ -164,30 +164,30 @@ mp.events.add("OneSecondEvent", () => {
         if(SecondsSinceLastKeyPress == 600){ // MAKING SURE IDFK
             if(AFKStage == 0){ AFKStage = 1;}
 
-            mp.gui.chat.push("!{Red}[ANTI-AFK] !{White}It appears you didn't press any keys for 10 minutes.");
-            mp.gui.chat.push("!{Red}[ANTI-AFK] !{White}If you continue being AFK, you will be kicked in 15 minutes!");
-            mp.gui.chat.push("!{Red}[ANTI-AFK] !{White}Your autojoin has also been turned off, it will be re-enabled if you come back.");
+            pushMessageToChat("!{Red}[ANTI-AFK] !{White}It appears you didn't press any keys for 10 minutes.");
+            pushMessageToChat("!{Red}[ANTI-AFK] !{White}If you continue being AFK, you will be kicked in 15 minutes!");
+            pushMessageToChat("!{Red}[ANTI-AFK] !{White}Your autojoin has also been turned off, it will be re-enabled if you come back.");
 
             mp.events.callRemote("SetAutoJoin", false, true);
         }
         else if(SecondsSinceLastKeyPress == 900){
             if(AFKStage == 0){ AFKStage = 1;}
-            mp.gui.chat.push("!{Red}[ANTI-AFK] !{White}You will be kicked from the server in 10 minutes for being AFK too long!");
+            pushMessageToChat("!{Red}[ANTI-AFK] !{White}You will be kicked from the server in 10 minutes for being AFK too long!");
         }
         else if(SecondsSinceLastKeyPress == 1200){
             if(AFKStage == 0){ AFKStage = 1;}
-            mp.gui.chat.push("!{Red}[ANTI-AFK] !{White}You will be kicked from the server in 5 minutes for being AFK too long!");
+            pushMessageToChat("!{Red}[ANTI-AFK] !{White}You will be kicked from the server in 5 minutes for being AFK too long!");
         }
         else if(SecondsSinceLastKeyPress == 1440){
             if(AFKStage == 0){ AFKStage = 1;}
-            mp.gui.chat.push("!{Red}[ANTI-AFK] !{White}You will be kicked from the server in 1 minute for being AFK too long!");
+            pushMessageToChat("!{Red}[ANTI-AFK] !{White}You will be kicked from the server in 1 minute for being AFK too long!");
         }
     }
     else{
         if(AFKStage != 2)
         {
             AFKStage = 2;
-            mp.gui.chat.push("!{Red}[ANTI-AFK] !{White}You've been kicked from the server for being AFK too long!");
+            pushMessageToChat("!{Red}[ANTI-AFK] !{White}You've been kicked from the server for being AFK too long!");
             mp.events.callRemote("KickPlayer", "AFK", true);
         }
     }
@@ -293,8 +293,8 @@ function registerLastKeyPress()
 
     if(AFKStage > 0){      
         mp.events.callRemote("SetAutoJoin", true, true);
-        mp.gui.chat.push("!{Green}[ANTI-AFK] !{White}Welcome back. Please note if you stay idle for more than 25 minutes, you will be kicked!");
-        mp.gui.chat.push("!{Green}[ANTI-AFK] !{White}Your autojoin has been re-enabled.");
+        pushMessageToChat("!{Green}[ANTI-AFK] !{White}Welcome back. Please note if you stay idle for more than 25 minutes, you will be kicked!");
+        pushMessageToChat("!{Green}[ANTI-AFK] !{White}Your autojoin has been re-enabled.");
     }
 
   SecondsSinceLastKeyPress = 0;
@@ -355,8 +355,8 @@ mp.events.addCommand("gpsbind", function (bind) {
     bind = Number(bind);
 
     if (!Number.isInteger(bind)) {
-        mp.gui.chat.push("USAGE: gpsbind (keycode) --Input a virtual keycode e.g. 0x5A is 'Z' (default)");
-        mp.gui.chat.push("https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes");
+        pushMessageToChat("USAGE: gpsbind (keycode) --Input a virtual keycode e.g. 0x5A is 'Z' (default)");
+        pushMessageToChat("https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes");
         return;
     }
 
@@ -433,7 +433,7 @@ mp.events.add("ReportLastSeen", (name, posx, posy, posz) => {
     zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(posx, posy, posz));
     streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
 
-    mp.gui.chat.push(`!{#FFEC8B}** [RADIO | FREQ: 911] DISPATCH: Felon ${name} last spotted at ${streetName}, ${zoneName}.`);
+    pushMessageToChat(`!{#FFEC8B}** [RADIO | FREQ: 911] DISPATCH: Felon ${name} last spotted at ${streetName}, ${zoneName}.`);
 });
 
 mp.events.add("AFKDriverCheck", (x,y,z) => {
@@ -621,12 +621,12 @@ mp.events.addCommand("updaterate", function (rate) {
     rate = Number(rate);
 
     if (!Number.isInteger(rate)) {
-        mp.gui.chat.push("Invalid rate (must be in numbers & milliseconds)");
+        pushMessageToChat("Invalid rate (must be in numbers & milliseconds)");
         return;
     }
 
     if (rate < 10 || rate > 1000) {
-        mp.gui.chat.push("Invalid rate, must be milliseconds between 10-1000");
+        pushMessageToChat("Invalid rate, must be milliseconds between 10-1000");
         return;
     }
 
@@ -648,9 +648,9 @@ mp.events.addCommand("bigmapbind", function (bind) {
     bind = Number(bind);
 
     if (!Number.isInteger(bind)) {
-        mp.gui.chat.push("USAGE: bigmapbind (keycode) --Input a virtual keycode e.g. 0x50 is 'P' (default)");
-        mp.gui.chat.push("https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes");
-        mp.gui.chat.push("Or press 'M' to open the menu and head into the 'Settings' tab to change this.");
+        pushMessageToChat("USAGE: bigmapbind (keycode) --Input a virtual keycode e.g. 0x50 is 'P' (default)");
+        pushMessageToChat("https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes");
+        pushMessageToChat("Or press 'M' to open the menu and head into the 'Settings' tab to change this.");
         return;
     }
 
@@ -837,7 +837,7 @@ mp.keys.bind(0x4A, false, () => {
 let clearTaseAnimTimer = null;
 mp.events.add("clearTaseAnims", (time) => {
     clearTimeout(clearTaseAnimTimer);
-    mp.gui.chat.push("[>] You've been tased, the effect will last " + (time/1000) + " seconds before you can get up!");
+    pushMessageToChat("[>] You've been tased, the effect will last " + (time/1000) + " seconds before you can get up!");
     clearTaseAnimTimer = setTimeout(() => {
         mp.players.local.clearTasksImmediately();
     }, time);
@@ -910,8 +910,8 @@ mp.events.add('render', () => {
                         if(Date.now() > AFOB_LastMessage)
                         {
                             AFOB_LastMessage = Date.now() + 60000;
-                            mp.gui.chat.push(`!{#FF6347}[!] !{#FFFFFF}Anti Fall Off Bike has put you back in the bike. To exit, press/spam F.`);
-                            //mp.gui.chat.push(`Setting into vehicle as last speed was ${AFOB_LastSpeed} under the limit ${AFOB_SpeedLimit}`);
+                            pushMessageToChat(`!{#FF6347}[!] !{#FFFFFF}Anti Fall Off Bike has put you back in the bike. To exit, press/spam F.`);
+                            //pushMessageToChat(`Setting into vehicle as last speed was ${AFOB_LastSpeed} under the limit ${AFOB_SpeedLimit}`);
                         }
                     }
                 }
@@ -950,7 +950,7 @@ mp.events.add('render', () => {
                     {
                         Seatbelt_LastMessage = Date.now() + 5000;
                         mp.game.graphics.notify("~r~Seatbelt has prevented you from falling out.");
-                        //mp.gui.chat.push(`Setting into vehicle as last speed was ${AFOB_LastSpeed} under the limit ${AFOB_SpeedLimit}`);
+                        //pushMessageToChat(`Setting into vehicle as last speed was ${AFOB_LastSpeed} under the limit ${AFOB_SpeedLimit}`);
                     }
                 }
             }
@@ -1066,7 +1066,7 @@ mp.events.add('render', () => {
         }
         else if(!mp.players.local.isClimbing() && climbingStart != 0)
         {
-            //mp.gui.chat.push(`You were climbing for ${(Date.now() - climbingStart) / 1000}s`);
+            //pushMessageToChat(`You were climbing for ${(Date.now() - climbingStart) / 1000}s`);
             
             if(climbTrigger) mp.events.callRemote("ClimbProtection", 1); // Long time climb stop
 
@@ -1121,7 +1121,7 @@ mp.events.add('render', () => {
                                 {
                                     if(dbDisabledMsgLast < Date.now())
                                     {
-                                        mp.gui.chat.push(`!{#FF6347}[!] !{#FFFFFF}The driver does not want to engage in a driveby. Driver has to use /db to enable it again.`);
+                                        pushMessageToChat(`!{#FF6347}[!] !{#FFFFFF}The driver does not want to engage in a driveby. Driver has to use /db to enable it again.`);
                                         dbDisabledMsgLast = Date.now() + 10000;
                                     }
                                     dbDisabledMsg = true;
@@ -2308,8 +2308,8 @@ mp.events.add(
 
         mp.storage.flush();
 
-        if(!radioToggle) mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Vehicle radio toggled OFF.");
-        else mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Vehicle radio toggled ON.");
+        if(!radioToggle) pushMessageToChat("!{#FF6347}[!] !{#FFFFFF}Vehicle radio toggled OFF.");
+        else pushMessageToChat("!{#FF6347}[!] !{#FFFFFF}Vehicle radio toggled ON.");
     },
     "SetInVehEx": (vehicle, vehseat) => {
         mp.players.local.setIntoVehicle(vehicle.handle, vehseat);

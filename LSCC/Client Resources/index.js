@@ -84,7 +84,6 @@ mp.players.local.position = new mp.Vector3(-1018.55300000, -2731.95600000, 15.70
 traceLastFunc("RequireInit");
 require('mp-commands');
 require("./nativeui/index.js");
-require("./chat/index.js");
 
 require('./Player/Player.js');
 require('./Player/Achievements.js');
@@ -125,11 +124,12 @@ mp.events.add("onOpenChatbox", (toggle) =>
 {
     if(mp.players.local.getVariable("pLogged") == undefined || mp.players.local.getVariable("pLogged") == false && toggle)
     {
-        mp.gui.chat.activate(false);
+        activateChat(false);
         return;
     }
     chatStatus = toggle;
     lastChatToggle = Date.now();
+    focusChat(toggle);
     mp.events.callRemote("UpdateChatState", toggle);
     traceLastFunc(`[Players] ChatBox Toggled ${toggle}`);
 });

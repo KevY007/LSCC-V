@@ -1,34 +1,6 @@
 let chatbox = null;
 let fontsized = false;
 
-mp.events.add("InitiateCustomChat", () => {
-
-    if(chatbox == null) {
-        mp.gui.chat.show(false); 
-
-        chatbox = mp.browsers.new('package://chat/index.html');
-        chatbox.markAsChat();
-
-        setTimeout(() => {
-            if(!fontsized)
-            {
-                if(mp.storage.data.fontsize !== undefined)
-                {
-                    mp.events.callLocal("setFontsize", mp.storage.data.fontsize);
-                }
-                fontsized = true;
-            }
-        }, 2500);
-
-        mp.events.callLocal('RestartMenu');
-        mp.events.callLocal('RestartHUD');
-    }
-});
-
-mp.events.add("TogglePlayerChat", (toggle) => {
-    mp.gui.chat.activate(toggle);
-});
-
 mp.events.add("setFontsize", (size) => {
     if(chatbox != null) 
     {
@@ -55,16 +27,16 @@ mp.events.addCommand("pagesize", function (page) {
 
     if(chatbox == null) 
     {
-        mp.gui.chat.push("Chatbox isn't created yet.");
+        pushMessageToChat("Chatbox isn't created yet.");
         return;
     }
 
     if (!Number.isInteger(page)) {
-        mp.gui.chat.push("[USAGE] /pagesize (number: line count | default: 13)");
+        pushMessageToChat("[USAGE] /pagesize (number: line count | default: 13)");
         return;
     }   
     if(page < 5 || page > 30){
-        mp.gui.chat.push("Page size can be between 5 and 30! (default is 13)");
+        pushMessageToChat("Page size can be between 5 and 30! (default is 13)");
         return;       
     }
 
@@ -81,17 +53,17 @@ mp.events.addCommand("fontsize", function (rate) {
 
     if(chatbox == null) 
     {
-        mp.gui.chat.push("Chatbox isn't created yet.");
+        pushMessageToChat("Chatbox isn't created yet.");
         return;
     }
 
     if (!Number.isInteger(rate)) {
-        mp.gui.chat.push("[USAGE] /fontsize (number: font size | default: 20)");
+        pushMessageToChat("[USAGE] /fontsize (number: font size | default: 20)");
         return;
     }
 
     if(rate < 8 || rate > 28) {
-        mp.gui.chat.push("Fontsize can be between 8-28, default is 20.");
+        pushMessageToChat("Fontsize can be between 8-28, default is 20.");
         return;
     }
 

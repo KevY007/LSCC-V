@@ -74,7 +74,7 @@ namespace RNC
         [RemoteEvent("ReqLogFromSrv")]
         public static void RequestLogsFromServer(Player player, string targetName, int type)
         {
-            player.SendChatMessage("REQUESTED LOGS FOR " + targetName + " TYPE " + type);
+            player.TriggerEvent("pushMsgToChat", "REQUESTED LOGS FOR " + targetName + " TYPE " + type);
 
             Account target = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
             if (target == null)
@@ -83,7 +83,7 @@ namespace RNC
             }
             if (target.Admin >= EPlayer.GetAccount(player).Admin && target != EPlayer.GetAccount(player))
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Nice try - that admin is a higher or equal level as you!");
+                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Nice try - that admin is a higher or equal level as you!");
                 return;
             }
 

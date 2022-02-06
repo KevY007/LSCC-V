@@ -66,7 +66,7 @@ function enableChatInput(enable)
 	mp.events.call("onOpenChatbox", enable);
     if (enable != (chat.input != null))
 	{
-		mp.invoke("focus", enable);
+		/*mp.invoke("focus", enable);
 		mp.invoke("setTypingInChatState", enable);
 
         if (enable)
@@ -89,9 +89,10 @@ function enableChatInput(enable)
 				toggleChatOpacity(false);
 			}, 5000);
         }
+		*/
     }
 }
-
+/*
 var chatAPI =
 {
 	push: (text_) =>
@@ -177,9 +178,9 @@ let api = {"chat:push": chatAPI.push, "chat:clear": chatAPI.clear, "chat:activat
 for(let fn in api)
 {
 	mp.events.add(fn, api[fn]);
-}
+}*/
 
-
+/*
 $(document).ready(function()
 {
 	chat.container = $("#chat ul#chat_messages");
@@ -200,7 +201,7 @@ $(document).ready(function()
 				top: rate,
 				left: 0, 
 				behavior: 'smooth' 
-			});*/
+			});
 
 			// inversely equally scroll
 		}
@@ -315,3 +316,4 @@ $(document).ready(function()
         }
     });
 });
+*/
