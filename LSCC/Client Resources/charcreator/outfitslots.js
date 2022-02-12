@@ -35,7 +35,7 @@ mp.events.add("ShowOutfitsMenu", (team, isDonator, mode) => { // 0 - fug ; 1 - c
         }
     }
 
-    focusChat(false);
+    activateChat(false);
     mp.gui.cursor.visible = false;
     outfitsMainMenu.Open();
 });
@@ -76,7 +76,7 @@ outfitsMainMenu.MenuClose.on(() => {
         }
     }
     outfitsMainMenu.RemoveItem(outfitMenuExit);
-    //focusChat(true);
+    activateChat(true);
     mp.gui.cursor.visible = false;
 
     mp.events.callRemote("RequestSetOutfit", -1, outfitTeam, false);

@@ -488,7 +488,7 @@ function moveFromToAir(moveTo, switchType, showGui, timeout = 1) {
         {
             case 'up':
                     if (showGui == false) {
-                        //focusChat(showGui);
+                        activateChat(showGui);
                         gui = 'false';
                         UIHud.execute(`gm.hud = false;`);
                     };
@@ -518,7 +518,7 @@ function checkCamInAir() {
     } 
     else 
     {
-        //focusChat(true);
+        activateChat(true);
         gui = 'true';
         UIHud.execute(`gm.hud = ${showHud};`);
     }

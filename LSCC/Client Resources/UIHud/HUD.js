@@ -141,10 +141,16 @@ function activateChat(toggle){
 function focusChat(toggle){
     if(UIHud == null) return;
     UIHud.execute(`gm.$refs.chat.active = ${toggle.toString()}`);
-    pushMessageToChat("FocusChat " + toggle.toString());
 
     mp.gui.cursor.show(toggle, toggle);
     mp.events.callRemote("onFocusChat", toggle);
+
+    if(!toggle){
+        activateChat(false);
+        setTimeout(() => {
+            activateChat(true);
+        }, 3);
+    }
 }
 function pushMessageToChat(message){
     if(UIHud == null) return;
@@ -166,7 +172,6 @@ for(let fn in api)
 }
 
 mp.events.add("onChatPressEnter", () => {
-    pushMessageToChat("ENTER STISNUT");
     focusChat(false);
 	mp.events.call("onOpenChatbox", false);
 });
@@ -182,8 +187,11 @@ mp.events.add("InitiateCustomChat", () => {
 });
 
 mp.keys.bind(0x54, true, function() {
-    focusChat(true);
-	mp.events.call("onOpenChatbox", true);
+    if(!chatStatus)
+    {
+        focusChat(true);
+        mp.events.call("onOpenChatbox", true);
+    }
 });
 
 mp.events.add("TogglePlayerChat", (toggle) => {
@@ -462,7 +470,7 @@ mp.events.add('ToggleHud', (toggle) => {
         UIHud.execute(`gm.hud = ${toggle};`);
     }
 
-    focusChat(showHud);
+    activateChat(showHud);
     mp.game.ui.displayRadar(showHud);
 });
 
