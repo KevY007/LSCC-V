@@ -491,7 +491,6 @@ function moveFromToAir(moveTo, switchType, showGui, timeout = 1) {
                         gui = 'false';
                         UIHud.execute(`gm.hud = false;`);
                     };
-                    activateChat(showHud);
                     focusChat(chatStatus);
 
                     mp.game.invoke(Natives.SWITCH_OUT_PLAYER, mp.players.local.handle, 0, parseInt(switchType));
@@ -513,7 +512,7 @@ function moveFromToAir(moveTo, switchType, showGui, timeout = 1) {
 function checkCamInAir() {
     if (mp.game.invoke(Natives.IS_PLAYER_SWITCH_IN_PROGRESS)) 
     {
-        activateChat(showHud);
+        mp.events.callLocal("HideAllElementsExceptChat", false); // hide elements
         focusChat(chatStatus);
         setTimeout(() => 
         {
@@ -522,7 +521,7 @@ function checkCamInAir() {
     } 
     else 
     {
-        activateChat(showHud);
+        mp.events.callLocal("HideAllElementsExceptChat", true); // show em
         gui = 'true';
         UIHud.execute(`gm.hud = ${showHud};`);
     }

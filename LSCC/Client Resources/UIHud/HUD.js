@@ -174,6 +174,25 @@ mp.events.add("chat:show", (toggle) => {
     focusChat(toggle);
 });
 
+mp.events.add("HideAllElementsExceptChat", (value) => {
+    if(value == false){
+        UIHud.execute(
+        `
+            gm.topRightInfo = false; 
+            gm.killFeed = false;
+            gm.chat = ${showHud.toString()};
+        `);
+    }
+    else{
+        UIHud.execute(
+            `
+            gm.topRightInfo = ${mp.storage.data.menu.topRightInfo}; 
+            gm.killFeed = ${mp.storage.data.menu.killFeed};
+                gm.chat = ${showHud.toString()};
+            `);       
+    }
+});
+
 /*
 for(let fn in api)
 {
