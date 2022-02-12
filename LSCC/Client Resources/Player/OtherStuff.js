@@ -488,10 +488,12 @@ function moveFromToAir(moveTo, switchType, showGui, timeout = 1) {
         {
             case 'up':
                     if (showGui == false) {
-                        activateChat(showGui);
                         gui = 'false';
                         UIHud.execute(`gm.hud = false;`);
                     };
+                    activateChat(showHud);
+                    focusChat(chatStatus);
+
                     mp.game.invoke(Natives.SWITCH_OUT_PLAYER, mp.players.local.handle, 0, parseInt(switchType));
                 break;
             case 'down':
@@ -511,6 +513,8 @@ function moveFromToAir(moveTo, switchType, showGui, timeout = 1) {
 function checkCamInAir() {
     if (mp.game.invoke(Natives.IS_PLAYER_SWITCH_IN_PROGRESS)) 
     {
+        activateChat(showHud);
+        focusChat(chatStatus);
         setTimeout(() => 
         {
             checkCamInAir();
@@ -518,7 +522,7 @@ function checkCamInAir() {
     } 
     else 
     {
-        activateChat(true);
+        activateChat(showHud);
         gui = 'true';
         UIHud.execute(`gm.hud = ${showHud};`);
     }

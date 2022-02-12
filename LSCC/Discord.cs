@@ -1428,8 +1428,11 @@ namespace RNC
                     string[] args = context.Content.Split(" ", 2);
                     if (args.Count() >= 2)
                     {
-                        EPlayer.SendMessageToAll($"(( [DOOC] !{{#FF6347}}{context.Author.Username}!{{#FFFFFF}}: {args[1]} ))");
-                        await context.Channel.SendMessageAsync($"**(DOOC) | {context.Author.Username}**: {args[1]}");
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.SendMessageToAll($"(( [DOOC] !{{#FF6347}}{context.Author.Username}!{{#FFFFFF}}: {args[1]} ))");
+                            context.Channel.SendMessageAsync($"**(DOOC) | {context.Author.Username}**: {args[1]}");
+                        }, 100);
                     }
                     else await context.Channel.SendMessageAsync("USAGE: !o (text)");
                 }
