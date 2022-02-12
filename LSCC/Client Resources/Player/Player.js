@@ -733,11 +733,13 @@ function UpdateStatsVars(entity){
         {
             if(UIHud !== undefined && UIHud != null){
                 UIHud.execute(`gm.stats = {
-                    squad: ${mp.players.local.SquadID},
-                    lobby: ${mp.players.local.Lobby},
-                    admin: ${mp.players.local.Admin},
+                    squad: ${mp.players.local.getVariable("PlayerSquadID")},
+                    lobby: ${mp.players.local.getVariable("InLobby")},
+                    admin: ${mp.players.local.getVariable("Admin")},
                     fugitive: ${mp.players.local.Team == 0 ? true : false},
                 }`);
+                let allowedCommands = CommandsDataJSON.filter(cmd => cmd.Admin <= mp.players.local.getVariable("Admin"));
+                UIHud.execute(`gm.$refs.chat.commands = ${JSON.stringify(allowedCommands)}`);
             }
             if(UIMenu !== undefined && UIMenu != null){
                 UIMenu.execute(`gm.stats = {

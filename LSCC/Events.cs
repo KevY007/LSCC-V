@@ -37,7 +37,7 @@ namespace RNC
             {
                 try
                 {
-                    NAPI.Chat.SendChatMessageToAll($"{{#FF6347}}AdmCmd: Player {player.Name} has been kicked by SERVER for staying AFK too long.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: Player {player.Name} has been kicked by SERVER for staying AFK too long.");
                     if (silent)
                     {
                         player.KickSilent(reason);
@@ -1041,39 +1041,51 @@ namespace RNC
                     LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
                     if (lobby != null)
                     {
-                        lobby.BankRobbery.LeaderLives--;
-                        if (lobby.BankRobbery.LeaderLives <= 0 || (lobby.Fugitives.Count - 1) <= 0)
+                        if (lobby.gameMode == GameModes.BANKROBBERY)
                         {
-                            Main.StopGame(lobby.lobbyId, 5);
-                        }
-                        else
-                        {
-
-                            BankRobberyData _brob = lobby.BankRobbery;
-                            _brob.HeistLeader = null;
-                            int unfuck = 0;
-                            while (_brob.HeistLeader == null)
+                            if (lobby.BankRobbery.State > 0)
                             {
-                                _brob.HeistLeader = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
-
-                                unfuck++;
-                                if (unfuck > 50)
+                                lobby.BankRobbery.LeaderLives--;
+                                if (lobby.BankRobbery.LeaderLives <= 0 || (lobby.Fugitives.Count - 1) <= 0)
                                 {
                                     Main.StopGame(lobby.lobbyId, 5);
-                                    break;
+                                }
+                                else
+                                {
+
+                                    BankRobberyData _brob = lobby.BankRobbery;
+                                    _brob.HeistLeader = null;
+                                    int unfuck = 0;
+                                    while (_brob.HeistLeader == null)
+                                    {
+                                        _brob.HeistLeader = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
+
+                                        unfuck++;
+                                        if (unfuck > 50)
+                                        {
+                                            Main.StopGame(lobby.lobbyId, 5);
+                                            break;
+                                        }
+                                    }
+                                    _brob.HeistLeader.SetSharedData("HeistLeader", true);
+                                    lobby.BankRobbery.HeistLeader = _brob.HeistLeader;
+
+                                    foreach (Player f in lobby.Fugitives)
+                                    {
+                                        f.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] ~w~Your heist leader has disconnected! You have one more chance - " + _brob.HeistLeader.Name + " is your new leader.");
+
+                                        f.TriggerEvent("pushMsgToChat", $"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {_brob.HeistLeader.Name}: Sadly, we lost {player.Name}, but we must keep on going! Let's go!");
+                                    }
+                                    _brob.HeistLeader.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] ~w~You are now the heist leader. If you die, the round is over for your team.");
                                 }
                             }
-                            _brob.HeistLeader.SetSharedData("HeistLeader", true);
-                            lobby.BankRobbery.HeistLeader = _brob.HeistLeader;
-
-                            foreach (Player f in lobby.Fugitives)
-                            {
-                                f.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] ~w~Your heist leader has disconnected! You have one more chance - " + _brob.HeistLeader.Name + " is your new leader.");
-
-                                f.TriggerEvent("pushMsgToChat", $"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {_brob.HeistLeader.Name}: Sadly, we lost {player.Name}, but we must keep on going! Let's go!");
+                            else
+                            {   // if leader exits within first minute, fuck his tight little pussy up and stop the game
+                                Main.StopGame(lobby.lobbyId, 5);                               
                             }
-                            _brob.HeistLeader.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] ~w~You are now the heist leader. If you die, the round is over for your team.");
                         }
+
+                        
                     }
                 }
             }
@@ -1132,11 +1144,11 @@ namespace RNC
                     switch (type)
                     {
                         case DisconnectionType.Left:
-                            NAPI.Chat.SendChatMessageToAll("!{#4343FA}[PART] !{#FFFFFF}" + player.Name + " has left the server. !{#4343FA}(Leaving)");
+                            EPlayer.SendMessageToAll("!{#4343FA}[PART] !{#FFFFFF}" + player.Name + " has left the server. !{#4343FA}(Leaving)");
                             break;
 
                         case DisconnectionType.Timeout:
-                            NAPI.Chat.SendChatMessageToAll("!{#4343FA}[PART] !{#FFFFFF}" + player.Name + " has left the server. !{#4343FA}(Kicked/TimedOut)");
+                            EPlayer.SendMessageToAll("!{#4343FA}[PART] !{#FFFFFF}" + player.Name + " has left the server. !{#4343FA}(Kicked/TimedOut)");
                             break;
                     }
 
@@ -2565,11 +2577,7 @@ namespace RNC
                     Account archiveCheck = BackupContextFactory.Instance.Accounts.ToList().Find(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
                     if(archiveCheck != null)
                     {
-                        ContextFactory.Instance.Accounts.Add(archiveCheck);
-                        BackupContextFactory.Instance.Accounts.Remove(archiveCheck);
-                        BackupContextFactory.Instance.SaveChanges();
-                        ContextFactory.Instance.SaveChanges();
-                        NAPI.Util.ConsoleOutput("[ACCOUNT ARCHIVE] " + username + " has been recovered from the archive.");
+                        AccountManager.RecoverAccount(archiveCheck);
 
                         acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
                         if (acc != null)
@@ -2599,11 +2607,7 @@ namespace RNC
                     Account archiveCheck = BackupContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
                     if (archiveCheck != null)
                     {
-                        ContextFactory.Instance.Accounts.Add(archiveCheck);
-                        BackupContextFactory.Instance.Accounts.Remove(archiveCheck);
-                        BackupContextFactory.Instance.SaveChanges();
-                        ContextFactory.Instance.SaveChanges();
-                        NAPI.Util.ConsoleOutput("[ACCOUNT ARCHIVE] " + username + " has been recovered from the archive.");
+                        AccountManager.RecoverAccount(archiveCheck);
 
                         acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
                         if (acc != null)
@@ -2618,8 +2622,8 @@ namespace RNC
                 }
             }
             EPlayer.Notify(player, "Invalid credentials or unable to log-in!", "red", "fas fa-lock", false, 4000, "bottomCenter");
-            EPlayer.Notify(player, "<strong>Notice:</strong> All accounts that've been inactive for over a month have been archived. " +
-                "Try opening a support ticket on our Discord so the staff team check if yours is in the archive too.", "yellow", "fas fa-lock", true, 12000, "bottomCenter");
+            EPlayer.Notify(player, "<strong>Notice:</strong> All accounts that are inactive for more than a month get archived. " +
+                "Try opening a support ticket on our Discord <strong>(racenchase.com)</strong> so the staff team check if yours is in the archive too.", "yellow", "fas fa-lock", true, 12000, "bottomCenter");
             player.TriggerEvent("OnPlayerLoginRegister");
         }
 
@@ -3314,37 +3318,91 @@ namespace RNC
                 }
                 if (new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() >= Settings.Dynamics.NextWeekUnix)
                 {
-                    NAPI.Util.ConsoleOutput("[1 WEEK] All accounts inactive for 1+ months will be archived.");
-                    int archivedAccs = 0;
-                    foreach (Account acc in ContextFactory.Instance.Accounts)
+                    Account cunt = ContextFactory.Instance.Accounts.ToList().FirstOrDefault(a => (new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() - new DateTimeOffset(a.LastLogin).ToUnixTimeSeconds()) > 2629746);
+                    if (cunt != null)
                     {
-                        acc.ChallengeStreak = 0;
-                        acc.CompletedDailyChallenge = false;
+                        EPlayer.SendMessageToAll("~p~[WEEK PASS] ~w~One week has passed. Inactive accounts will now be archived.");
+                        EPlayer.SendMessageToAll("~b~[ACCOUNT ARCHIVE] ~w~This might cause some server lag for a few seconds, please wait...");
+                        EPlayer.SendMessageToAll("~b~[ACCOUNT ARCHIVE] ~w~You will be frozen until the archiving process is over.");
+                        NAPI.Util.ConsoleOutput("[1 WEEK] All accounts inactive for 1+ months will be archived.");
+                        int archivedAccs = 0;
 
-                        acc.MOTD = NAPI.Util.ToJson(new MOTDData()
+                        NAPI.Task.Run(() =>
                         {
-                            AdminName = "SERVER",
-                            Message = "~y~[WEEKLY CHALLENGE] ~w~Seven days have passed and the weekly challenge streak was reset.",
-                            PostedOn = DateTime.Now.ToShortDateString()
-                        });
-                        if ((new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() - new DateTimeOffset(acc.LastLogin).ToUnixTimeSeconds()) > 2629746) // 2,629,746 = 1 month in seconds
-                        {
-                            if (BackupContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username == acc.Username) == null)
+                            foreach (Player pl in NAPI.Pools.GetAllPlayers().Where(p => p.GetSharedData<int>("Team") > 0))
                             {
-                                BackupContextFactory.Instance.Accounts.Add(acc);
+                                EPlayer.Notify(pl, "<strong>Account archiving in process...</strong> This will take a few seconds.", "orange", "fa-regular fa-server", false, 999999999, "center", "replace");
+                                EPlayer.Freeze(pl, true);
+                            }
+                            foreach (Account acc in ContextFactory.Instance.Accounts)
+                            {
+                                acc.ChallengeStreak = 0;
+                                acc.CompletedDailyChallenge = false;
 
-                                ContextFactory.Instance.Accounts.Remove(acc);
-                                archivedAccs++;
+                                if ((new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() - new DateTimeOffset(acc.LastLogin).ToUnixTimeSeconds()) > 2629746) // 2,629,746 = 1 month in seconds
+                                {
+                                    acc.MOTD = NAPI.Util.ToJson(new MOTDData()
+                                    {
+                                        AdminName = "SERVER",
+                                        Message = "~b~[ACCOUNT ARCHIVE]~w~ You've been inactive for over a month, so your account was archived. It has now been recovered automatically.",
+                                        PostedOn = DateTime.Now.ToShortDateString()
+                                    });
 
-                                List<Logs_Session> records = ContextFactory.Instance.Logs_Session.ToList().Where(a => a.AccountID == acc.SQL_ID).ToList();
-                                ContextFactory.Instance.Logs_Session.RemoveRange(records);
+                                    if (BackupContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username == acc.Username) == null)
+                                    {
+                                        BackupContextFactory.Instance.Accounts.Add(acc);
+
+                                        List<OwnedVehData> ownedVehs = ContextFactory.Instance.OwnedVehicles.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
+                                        List<OwnedLoadoutData> ownedLoadouts = ContextFactory.Instance.OwnedLoadouts.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
+                                        List<PlayerOutfit> savedOutfits = ContextFactory.Instance.PlayerOutfits.ToList().Where(v => v.AccountID == acc.SQL_ID).ToList();
+                                        List<PlayerTunings> savedTunings = ContextFactory.Instance.PlayerTunings.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
+                                        List<UnlockedAchievement> unlockedAchievements = ContextFactory.Instance.UnlockedAchievements.ToList().Where(v => v.AccountID == acc.SQL_ID).ToList();
+
+                                        BackupContextFactory.Instance.OwnedLoadouts.AddRange(ownedLoadouts);
+                                        BackupContextFactory.Instance.OwnedVehicles.AddRange(ownedVehs);
+                                        BackupContextFactory.Instance.PlayerOutfits.AddRange(savedOutfits);
+                                        BackupContextFactory.Instance.PlayerTunings.AddRange(savedTunings);
+                                        BackupContextFactory.Instance.UnlockedAchievements.AddRange(unlockedAchievements);
+
+                                        ContextFactory.Instance.PlayerOutfits.RemoveRange(savedOutfits);
+                                        ContextFactory.Instance.OwnedLoadouts.RemoveRange(ownedLoadouts);
+                                        ContextFactory.Instance.OwnedVehicles.RemoveRange(ownedVehs);
+                                        ContextFactory.Instance.PlayerTunings.RemoveRange(savedTunings);
+                                        ContextFactory.Instance.UnlockedAchievements.RemoveRange(unlockedAchievements);
+
+                                        ContextFactory.Instance.Accounts.Remove(acc);
+                                        archivedAccs++;
+
+                                        List<Logs_Session> records = ContextFactory.Instance.Logs_Session.ToList().Where(a => a.AccountID == acc.SQL_ID).ToList();
+                                        ContextFactory.Instance.Logs_Session.RemoveRange(records);
+                                    }
+                                }
+                                else
+                                {
+                                    acc.MOTD = NAPI.Util.ToJson(new MOTDData()
+                                    {
+                                        AdminName = "SERVER",
+                                        Message = "~y~[WEEKLY CHALLENGE] ~w~Seven days have passed and the weekly challenge streak was reset.",
+                                        PostedOn = DateTime.Now.ToShortDateString()
+                                    });
+                                }
                             }
 
-                        }
-                    }
-                    BackupContextFactory.Instance.SaveChanges();
-                    ContextFactory.Instance.SaveChanges();
-                    NAPI.Util.ConsoleOutput($"[ACCOUNT ARCHIVE] {archivedAccs} have been archived. Total accounts in archive: {BackupContextFactory.Instance.Accounts.Count()}");
+                            BackupContextFactory.Instance.SaveChanges();
+                            ContextFactory.Instance.SaveChanges();
+                            NAPI.Util.ConsoleOutput($"[ACCOUNT ARCHIVE] {archivedAccs} have been archived. Total accounts in archive: {BackupContextFactory.Instance.Accounts.Count()}");
+
+                            foreach (Player pl in NAPI.Pools.GetAllPlayers())
+                            {
+                                if (EPlayer.LoggedIn(pl) == true)
+                                {
+                                    EPlayer.Notify(pl, "<strong>Account archiving in process...</strong> This will take a few seconds.", "orange", "fa-regular fa-server", false, 1, "center", "replace");
+                                    EPlayer.Freeze(pl, false);
+                                }
+                            }
+                            EPlayer.SendMessageToAll("~b~[ACCOUNT ARCHIVE] ~w~Account archive process ~g~finished~w~! You've been unfrozen.");
+                        }, 100);
+                    } 
                     Settings.Dynamics.NextWeekUnix = new DateTimeOffset(DateTime.Now).AddDays(7).ToUnixTimeSeconds();
 
                     foreach (Player pl in NAPI.Pools.GetAllPlayers())

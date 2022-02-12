@@ -1685,6 +1685,14 @@ namespace RNC
         {
             player.TriggerEvent("pushMsgToChat", message);
         }
+        public static void SendMessageToAll(string message) { SendMessageAll(message); }
+        public static void SendMessageAll(string message)
+        {
+            foreach(Player pl in NAPI.Pools.GetAllPlayers())
+            {
+                pl.TriggerEvent("pushMsgToChat", message);
+            }
+        }
 
         public static void SetDiscordStatus(Player player, string status)
         {

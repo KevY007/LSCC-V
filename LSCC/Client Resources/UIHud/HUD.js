@@ -1,3 +1,5 @@
+require('./UIHud/CommandsList.js');
+
 const Natives = {
     IS_RADAR_HIDDEN: "0x157F93B036700462",
     IS_RADAR_ENABLED: "0xAF754F20EB5CD51A",
@@ -144,13 +146,6 @@ function focusChat(toggle){
 
     mp.gui.cursor.show(toggle, toggle);
     mp.events.callRemote("onFocusChat", toggle);
-
-    if(!toggle){
-        activateChat(false);
-        setTimeout(() => {
-            activateChat(true);
-        }, 3);
-    }
 }
 function pushMessageToChat(message){
     if(UIHud == null) return;
@@ -166,11 +161,25 @@ mp.events.add("pushMsgToChat", (msg) => {
     pushMessageToChat(msg);
 })
 
+mp.events.add("chat:push", (msg) => {
+    pushMessageToChat(msg);
+});
+mp.events.add("chat:clear", (msg) => {
+    clearChat();
+});
+mp.events.add("chat:activate", (toggle) => {
+    activateChat(toggle);
+});
+mp.events.add("chat:show", (toggle) => {
+    focusChat(toggle);
+});
+
+/*
 for(let fn in api)
 {
     mp.events.add(fn, api[fn]);
 }
-
+*/
 mp.events.add("onChatPressEnter", () => {
     focusChat(false);
 	mp.events.call("onOpenChatbox", false);
@@ -206,8 +215,12 @@ mp.events.add('RestartHUD', () => {
     }
 
     UIHud = mp.browsers.new("package://UIHud/index.html");
+    setTimeout(() => {
+        UIHud.markAsChat();
+        UIHud.execute(`gm.$refs.chat.commands = ${JSON.stringify(CommandsDataJSON)}`);
+    }, 1000);
     UIHud.execute(`gm.hud = false;`);
-    UIHud.markAsChat();
+    
 });
 
 let createdTooltips = []; // to keep track of created tooltips / preventing duplicates

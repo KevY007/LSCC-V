@@ -41,7 +41,7 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Set max players per lobby to {value}.");
-                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has changed max players in a lobby to {value}.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has changed max players in a lobby to {value}.");
                 }
                 else player.TriggerEvent("pushMsgToChat", "!{#999999}Proper usage: /serveroptions maxinlobby <amount>");
             }
@@ -56,7 +56,7 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Changed derby vehicle to {Settings.Dynamics.DerbyVehicle}");
-                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set derby vehicle model to {Settings.Dynamics.DerbyVehicle}.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set derby vehicle model to {Settings.Dynamics.DerbyVehicle}.");
                 }
                 else player.TriggerEvent("pushMsgToChat", "!{#999999}Proper usage: /serveroptions derbyveh <model name>");
             }
@@ -79,7 +79,7 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Set on-foot collisions to {value.ToString()}.");
-                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set copchase onfoot collisions to {value.ToString()}.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set copchase onfoot collisions to {value.ToString()}.");
                 }
                 else player.TriggerEvent("pushMsgToChat", "!{#999999}Proper usage: /serveroptions onfootcollisions <true/false>");
             }
@@ -118,7 +118,7 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Set AFOB Speed Lim to {speed.ToString()}.");
-                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set chase Anti Fall Off Bike max speed limit to {speed.ToString()}.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set chase Anti Fall Off Bike max speed limit to {speed.ToString()}.");
                 }
                 else player.TriggerEvent("pushMsgToChat", "!{#999999}Proper usage: /serveroptions speedafob <max speed>");
             }
@@ -140,7 +140,7 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Set camera update rate to {speed.ToString()}.");
-                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set camera updater rate to {speed.ToString()}.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set camera updater rate to {speed.ToString()}.");
                 }
                 else player.TriggerEvent("pushMsgToChat", "!{#999999}Proper usage: /serveroptions camupdate <flashlight cam update rate>");
             }
@@ -162,7 +162,7 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Set AFOB to {value.ToString()}.");
-                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set Anti Fall Off Bike to {value.ToString()} for chases.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set Anti Fall Off Bike to {value.ToString()} for chases.");
                 }
                 else player.TriggerEvent("pushMsgToChat", "!{#999999}Proper usage: /serveroptions afob <true/false>");
             }
@@ -185,7 +185,7 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Set server Discord integration to {value.ToString()}.");
-                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set server discord integration to {value.ToString()}.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set server discord integration to {value.ToString()}.");
                 }
                 else player.TriggerEvent("pushMsgToChat", "!{#999999}Proper usage: /serveroptions usediscord <true/false>");
             }
@@ -512,7 +512,7 @@ namespace RNC
                     else
                     {
                         Logs.LogAdmin(player, $"Stopped copchase in lobby {value}.");
-                        NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has forcefully stopped the copchase in lobby {value}.");
+                        EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has forcefully stopped the copchase in lobby {value}.");
                     }
                 }
                 else player.TriggerEvent("pushMsgToChat", "!{#999999}Proper usage: /game stop <lobby id>");
@@ -536,7 +536,7 @@ namespace RNC
                     else
                     {
                         Logs.LogAdmin(player, $"Force-started copchase in lobby {value}.");
-                        NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has forcefully started the copchase in lobby {value}.");
+                        EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has forcefully started the copchase in lobby {value}.");
                     }
                 }
                 else player.TriggerEvent("pushMsgToChat", "!{#999999}Proper usage: /game start <lobby id>");
@@ -599,7 +599,7 @@ namespace RNC
                     lobby.FugitivePercent = value;
 
                     Logs.LogAdmin(player, $"Set teambalance in lobby {lobby.lobbyId} to {value}% fugitives.");
-                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set lobby {lobby.lobbyId}'s fugitives percentage to {lobby.FugitivePercent}%.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set lobby {lobby.lobbyId}'s fugitives percentage to {lobby.FugitivePercent}%.");
                 }
                 else player.TriggerEvent("pushMsgToChat", "!{#999999}Proper usage: /game teambalance <lobby id> <percentage of fugitives>");
             }
@@ -637,7 +637,7 @@ namespace RNC
                     else { player.TriggerEvent("pushMsgToChat", "!{#999999}Proper usage: /game mode <lobby id> <mode: 'standard', 'busted', 'bankrob'>"); return; }
 
                     Logs.LogAdmin(player, $"Changed lobby {lobby.lobbyId}'s gamemode to {args[2]}");
-                    NAPI.Chat.SendChatMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set lobby {lobby.lobbyId}'s mode to {Main.ConvertGameMode(lobby.gameMode)}.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set lobby {lobby.lobbyId}'s mode to {Main.ConvertGameMode(lobby.gameMode)}.");
                 }
                 else player.TriggerEvent("pushMsgToChat", "!{#999999}Proper usage: /game mode <lobby id> <mode: 'standard', 'busted', 'bankrob'>");
             }
@@ -1234,6 +1234,99 @@ namespace RNC
 
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has summoned all the players.");
             return;
+        }
+
+        [Command("archiveaccounts")]
+        public void cmd_archiveaccounts(Player player, int inactive_days)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+            if(inactive_days < 3 || inactive_days > 365)
+            {
+                EPlayer.SendMessage(player, "!{#FF6347}[!] ~w~The inactivity days must be between 3 and 365!");
+                return;
+            }
+
+            List<Account> cunt = ContextFactory.Instance.Accounts.ToList().Where(a => (new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() - new DateTimeOffset(a.LastLogin).ToUnixTimeSeconds()) > (inactive_days* 86400)).ToList();
+            if (cunt != null && cunt.Count > 0)
+            {
+                EPlayer.SendMessageToAll($"~b~[ACCOUNT ARCHIVE] ~w~{player.Name} has initiated the account archive process for all accounts inactive for more than {inactive_days} days!");
+                EPlayer.SendMessageToAll("~b~[ACCOUNT ARCHIVE] ~w~There might be some server lag until this process is finished, which should last a few seconds.");         
+
+                NAPI.Task.Run(() =>
+                {
+                    int archivedAccs = 0;
+                    foreach (Player pl in NAPI.Pools.GetAllPlayers().Where(p => p.GetSharedData<int>("Team") > 0))
+                    {
+                        EPlayer.Notify(pl, "<strong>Account archiving in process...</strong> This will take a few seconds.", "orange", "fa-regular fa-server", false, 999999999, "center", "replace");
+                        EPlayer.Freeze(pl, true);
+                    }
+                    foreach (Account acc in cunt)
+                    {
+                        acc.MOTD = NAPI.Util.ToJson(new MOTDData()
+                        {
+                            AdminName = player.Name,
+                            Message = $"~b~[ACCOUNT ARCHIVE]~w~ Your account was archived by an admin because you were inactive for more than {inactive_days} days, but was now recovered.",
+                            PostedOn = DateTime.Now.ToShortDateString()
+                        });
+
+                        if (BackupContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username == acc.Username) == null)
+                        {
+                            BackupContextFactory.Instance.Accounts.Add(acc);
+
+                            List<OwnedVehData> ownedVehs = ContextFactory.Instance.OwnedVehicles.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
+                            List<OwnedLoadoutData> ownedLoadouts = ContextFactory.Instance.OwnedLoadouts.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
+                            List<PlayerOutfit> savedOutfits = ContextFactory.Instance.PlayerOutfits.ToList().Where(v => v.AccountID == acc.SQL_ID).ToList();
+                            List<PlayerTunings> savedTunings = ContextFactory.Instance.PlayerTunings.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
+                            List<UnlockedAchievement> unlockedAchievements = ContextFactory.Instance.UnlockedAchievements.ToList().Where(v => v.AccountID == acc.SQL_ID).ToList();
+
+                            BackupContextFactory.Instance.OwnedLoadouts.AddRange(ownedLoadouts);
+                            BackupContextFactory.Instance.OwnedVehicles.AddRange(ownedVehs);
+                            BackupContextFactory.Instance.PlayerOutfits.AddRange(savedOutfits);
+                            BackupContextFactory.Instance.PlayerTunings.AddRange(savedTunings);
+                            BackupContextFactory.Instance.UnlockedAchievements.AddRange(unlockedAchievements);
+
+                            ContextFactory.Instance.PlayerOutfits.RemoveRange(savedOutfits);
+                            ContextFactory.Instance.OwnedLoadouts.RemoveRange(ownedLoadouts);
+                            ContextFactory.Instance.OwnedVehicles.RemoveRange(ownedVehs);
+                            ContextFactory.Instance.PlayerTunings.RemoveRange(savedTunings);
+                            ContextFactory.Instance.UnlockedAchievements.RemoveRange(unlockedAchievements);
+
+                            ContextFactory.Instance.Accounts.Remove(acc);
+                            archivedAccs++;
+
+                            List<Logs_Session> records = ContextFactory.Instance.Logs_Session.ToList().Where(a => a.AccountID == acc.SQL_ID).ToList();
+                            ContextFactory.Instance.Logs_Session.RemoveRange(records);
+                        }
+                    }
+
+                    BackupContextFactory.Instance.SaveChanges();
+                    ContextFactory.Instance.SaveChanges();
+                    NAPI.Util.ConsoleOutput($"[ACCOUNT ARCHIVE] {archivedAccs} have been archived. Total accounts in archive: {BackupContextFactory.Instance.Accounts.Count()}");
+
+                    foreach (Player pl in NAPI.Pools.GetAllPlayers())
+                    {
+                        if (EPlayer.LoggedIn(pl) == true)
+                        {
+                            EPlayer.Notify(pl, "<strong>Account archiving in process...</strong> This will take a few seconds.", "orange", "fa-regular fa-server", false, 1, "center", "replace");
+                            EPlayer.Freeze(pl, false);
+                        }
+                    }
+                    EPlayer.SendMessageToAll("~b~[ACCOUNT ARCHIVE] ~w~Account archive process ~g~finished~w~! You've been unfrozen.");
+                }, 100);
+                EPlayer.SendMessage(player, "~b~[ACCOUNT ARCHIVE] ~w~A total of ~y~" + cunt.Count + "~w~ accounts have been archived!");
+            }
+            else
+            {
+                EPlayer.SendMessage(player, "~r~[!]~w~ No accounts were found with inactivity days higher than " + inactive_days + "!");
+                return;
+            }
         }
 
         [Command("freezeall")]
@@ -8190,7 +8283,7 @@ namespace RNC
         {
             if (EPlayer.GetAccount(player).Admin < 6) return;
 
-            NAPI.Chat.SendChatMessageToAll("!{#c387ff}[DAILY CHALLENGES] ~w~New daily challenges are now available! Check ~y~Menu > Profile~w~ for more info.");
+            EPlayer.SendMessageToAll("!{#c387ff}[DAILY CHALLENGES] ~w~New daily challenges are now available! Check ~y~Menu > Profile~w~ for more info.");
             Challenge.SetNewDailyChallenges();
         }
 
@@ -8911,9 +9004,9 @@ namespace RNC
             }
 
 
-            NAPI.Chat.SendChatMessageToAll("!{#FF6347}=======================================");
-            NAPI.Chat.SendChatMessageToAll($"(( {EPlayer.GetAdminLevelName(EPlayer.GetAccount(player).Admin, true)}!{{#FFFFFF}} {player.Name}: ))");
-            NAPI.Chat.SendChatMessageToAll("(( " + text + "!{#FFFFFF} ))");
+            EPlayer.SendMessageToAll("!{#FF6347}=======================================");
+            EPlayer.SendMessageToAll($"(( {EPlayer.GetAdminLevelName(EPlayer.GetAccount(player).Admin, true)}!{{#FFFFFF}} {player.Name}: ))");
+            EPlayer.SendMessageToAll("(( " + text + "!{#FFFFFF} ))");
 
             Discord.SendTextChannel("staff-bot", $"**(ANNOUNCEMENT) | {player.Name}**: {text}");
         }

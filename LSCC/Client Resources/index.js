@@ -83,6 +83,7 @@ mp.players.local.position = new mp.Vector3(-1018.55300000, -2731.95600000, 15.70
 
 traceLastFunc("RequireInit");
 require('mp-commands');
+require('./UIHud/CommandsList.js');
 require("./nativeui/index.js");
 
 require('./Player/Player.js');

@@ -328,12 +328,10 @@ namespace RNC
                                 Account existCheck = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(user, StringComparison.OrdinalIgnoreCase));
                                 if (existCheck == null)
                                 {
-                                    ContextFactory.Instance.Accounts.Add(toRecover);
                                     context.Channel.SendMessageAsync($":white_check_mark: **You've successfully recovered {user}'s in-game account! (DBID: {toRecover.SQL_ID})**");
                                     Logs.LogAdmin(aSQLID, $"Recovered {toRecover.Username}'s account.");
 
-                                    BackupContextFactory.Instance.Accounts.Remove(toRecover);
-                                    BackupContextFactory.Instance.SaveChanges();
+                                    AccountManager.RecoverAccount(toRecover);
                                     return;
                                 }
                                 else
@@ -1430,7 +1428,7 @@ namespace RNC
                     string[] args = context.Content.Split(" ", 2);
                     if (args.Count() >= 2)
                     {
-                        NAPI.Chat.SendChatMessageToAll($"(( [DOOC] !{{#FF6347}}{context.Author.Username}!{{#FFFFFF}}: {args[1]} ))");
+                        EPlayer.SendMessageToAll($"(( [DOOC] !{{#FF6347}}{context.Author.Username}!{{#FFFFFF}}: {args[1]} ))");
                         await context.Channel.SendMessageAsync($"**(DOOC) | {context.Author.Username}**: {args[1]}");
                     }
                     else await context.Channel.SendMessageAsync("USAGE: !o (text)");

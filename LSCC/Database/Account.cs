@@ -122,6 +122,35 @@ namespace RNC
             return Crypter.Sha256.Crypt(pass, salt);
         }
 
+        public static void RecoverAccount(Account acc)
+        {
+            ContextFactory.Instance.Accounts.Add(acc);
+
+            List<OwnedVehData> ownedVehs = BackupContextFactory.Instance.OwnedVehicles.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
+            List<OwnedLoadoutData> ownedLoadouts = BackupContextFactory.Instance.OwnedLoadouts.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
+            List<PlayerOutfit> savedOutfits = BackupContextFactory.Instance.PlayerOutfits.ToList().Where(v => v.AccountID == acc.SQL_ID).ToList();
+            List<PlayerTunings> savedTunings = BackupContextFactory.Instance.PlayerTunings.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
+            List<UnlockedAchievement> unlockedAchievements = BackupContextFactory.Instance.UnlockedAchievements.ToList().Where(v => v.AccountID == acc.SQL_ID).ToList();
+
+            ContextFactory.Instance.OwnedLoadouts.AddRange(ownedLoadouts);
+            ContextFactory.Instance.OwnedVehicles.AddRange(ownedVehs);
+            ContextFactory.Instance.PlayerOutfits.AddRange(savedOutfits);
+            ContextFactory.Instance.PlayerTunings.AddRange(savedTunings);
+            ContextFactory.Instance.UnlockedAchievements.AddRange(unlockedAchievements);
+
+            BackupContextFactory.Instance.PlayerOutfits.RemoveRange(savedOutfits);
+            BackupContextFactory.Instance.OwnedLoadouts.RemoveRange(ownedLoadouts);
+            BackupContextFactory.Instance.OwnedVehicles.RemoveRange(ownedVehs);
+            BackupContextFactory.Instance.PlayerTunings.RemoveRange(savedTunings);
+            BackupContextFactory.Instance.UnlockedAchievements.RemoveRange(unlockedAchievements);
+
+            BackupContextFactory.Instance.Accounts.Remove(acc);
+
+            ContextFactory.Instance.SaveChanges();
+            BackupContextFactory.Instance.SaveChanges();
+            NAPI.Util.ConsoleOutput("[ACCOUNT ARCHIVE] " + acc.Username + " has been recovered from the archive.");
+        }
+
         public static void ClearForeignKeys(Account acc)
         {
             List<Logs_Admin> aLogs = ContextFactory.Instance.Logs_Admin.ToList().Where(l => l.AccountID == acc.SQL_ID).ToList();
