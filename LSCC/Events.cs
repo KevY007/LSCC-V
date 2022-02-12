@@ -2560,6 +2560,28 @@ namespace RNC
                         return;
                     }
                 }
+                else
+                {
+                    Account archiveCheck = BackupContextFactory.Instance.Accounts.ToList().Find(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
+                    if(archiveCheck != null)
+                    {
+                        ContextFactory.Instance.Accounts.Add(archiveCheck);
+                        BackupContextFactory.Instance.Accounts.Remove(archiveCheck);
+                        BackupContextFactory.Instance.SaveChanges();
+                        ContextFactory.Instance.SaveChanges();
+                        NAPI.Util.ConsoleOutput("[ACCOUNT ARCHIVE] " + username + " has been recovered from the archive.");
+
+                        acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
+                        if (acc != null)
+                        {
+                            if (AccountManager.Login(acc, password))
+                            {
+                                OnPlayerLogin(player, acc);
+                                return;
+                            }
+                        }
+                    }
+                }
             }
             else
             {
@@ -2572,8 +2594,32 @@ namespace RNC
                         return;
                     }
                 }
+                else
+                {
+                    Account archiveCheck = BackupContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+                    if (archiveCheck != null)
+                    {
+                        ContextFactory.Instance.Accounts.Add(archiveCheck);
+                        BackupContextFactory.Instance.Accounts.Remove(archiveCheck);
+                        BackupContextFactory.Instance.SaveChanges();
+                        ContextFactory.Instance.SaveChanges();
+                        NAPI.Util.ConsoleOutput("[ACCOUNT ARCHIVE] " + username + " has been recovered from the archive.");
+
+                        acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+                        if (acc != null)
+                        {
+                            if (AccountManager.Login(acc, password))
+                            {
+                                OnPlayerLogin(player, acc);
+                                return;
+                            }
+                        }
+                    }
+                }
             }
-            EPlayer.Error(player, "Invalid credentials or unable to log-in!", "fas fa-lock");
+            EPlayer.Notify(player, "Invalid credentials or unable to log-in!", "red", "fas fa-lock", false, 4000, "bottomCenter");
+            EPlayer.Notify(player, "<strong>Notice:</strong> All accounts that've been inactive for over a month have been archived. " +
+                "Try opening a support ticket on our Discord so the staff team check if yours is in the archive too.", "yellow", "fas fa-lock", true, 12000, "bottomCenter");
             player.TriggerEvent("OnPlayerLoginRegister");
         }
 
@@ -3249,6 +3295,75 @@ namespace RNC
             }
         }
 
+        public static void RunWeeklyMonthlyChecks()
+        {
+            try
+            {
+                if (new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() >= Settings.Dynamics.NextMonthUnix)
+                {
+                    List<Logs_Session> seslog = ContextFactory.Instance.Logs_Session.ToList();
+                    ContextFactory.Instance.Logs_Session.RemoveRange(seslog);
+                    List<Logs_Admin> adlog = ContextFactory.Instance.Logs_Admin.ToList();
+                    ContextFactory.Instance.Logs_Admin.RemoveRange(adlog);
+
+                    Settings.Dynamics.NextMonthUnix = new DateTimeOffset(DateTime.Now).AddMonths(1).ToUnixTimeSeconds();
+                    NAPI.Util.ConsoleOutput("[1 MONTH] Server logs [Admin, Session] have been cleared!");
+
+                    ContextFactory.Instance.SaveChanges();
+                    Main.SaveDynamicSettings();
+                }
+                if (new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() >= Settings.Dynamics.NextWeekUnix)
+                {
+                    NAPI.Util.ConsoleOutput("[1 WEEK] All accounts inactive for 1+ months will be archived.");
+                    int archivedAccs = 0;
+                    foreach (Account acc in ContextFactory.Instance.Accounts)
+                    {
+                        acc.ChallengeStreak = 0;
+                        acc.CompletedDailyChallenge = false;
+
+                        acc.MOTD = NAPI.Util.ToJson(new MOTDData()
+                        {
+                            AdminName = "SERVER",
+                            Message = "~y~[WEEKLY CHALLENGE] ~w~Seven days have passed and the weekly challenge streak was reset.",
+                            PostedOn = DateTime.Now.ToShortDateString()
+                        });
+                        if ((new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() - new DateTimeOffset(acc.LastLogin).ToUnixTimeSeconds()) > 2629746) // 2,629,746 = 1 month in seconds
+                        {
+                            if (BackupContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username == acc.Username) == null)
+                            {
+                                BackupContextFactory.Instance.Accounts.Add(acc);
+
+                                ContextFactory.Instance.Accounts.Remove(acc);
+                                archivedAccs++;
+
+                                List<Logs_Session> records = ContextFactory.Instance.Logs_Session.ToList().Where(a => a.AccountID == acc.SQL_ID).ToList();
+                                ContextFactory.Instance.Logs_Session.RemoveRange(records);
+                            }
+
+                        }
+                    }
+                    BackupContextFactory.Instance.SaveChanges();
+                    ContextFactory.Instance.SaveChanges();
+                    NAPI.Util.ConsoleOutput($"[ACCOUNT ARCHIVE] {archivedAccs} have been archived. Total accounts in archive: {BackupContextFactory.Instance.Accounts.Count()}");
+                    Settings.Dynamics.NextWeekUnix = new DateTimeOffset(DateTime.Now).AddDays(7).ToUnixTimeSeconds();
+
+                    foreach (Player pl in NAPI.Pools.GetAllPlayers())
+                    {
+                        if (EPlayer.LoggedIn(pl) == true)
+                        {
+                            pl.TriggerEvent("addChallengesToMenu", 0, (Settings.Dynamics.NextWeekUnix - new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds()));
+                            pl.TriggerEvent("pushMsgToChat", "~y~[WEEKLY CHALLENGE] ~w~Seven days have passed and the weekly challenge streak was reset. Good luck!");
+                        }
+                    }
+                    Main.SaveDynamicSettings();
+                }
+            }
+            catch (Exception ex)
+            {
+                NAPI.Util.ConsoleOutput("Time Checking week/month issue: " + ex.ToString());
+            }
+        }
+
         [RemoteEvent("ReplaceAFKDriver")]
         public static void ReplaceAFKDriver(Player player)
         {
@@ -3295,7 +3410,7 @@ namespace RNC
                 EPlayer.Error(player, "Please wait between each attempt.", "fas fa-lock");
                 return;
             }
-  
+
             if (password.Length < 5)
             {
                 EPlayer.Error(player, "Password does not match requirements!", "fas fa-lock");
@@ -3325,82 +3440,91 @@ namespace RNC
                 return;
             }
 
-            if (ContextFactory.Instance.Accounts.ToList().Count(a => a.RegisterHWID.Equals(player.Serial) || a.RegisterRID == player.SocialClubId) >= 2)
+            try
             {
-                EPlayer.Error(player, "You cannot create any more accounts on the same machine!", "fas fa-user");
-                return;
+                if (ContextFactory.Instance.Accounts.ToList().Where(a => a.RegisterHWID.Equals(player.Serial) || a.RegisterRID == player.SocialClubId).ToList().Count >= 2)
+                {
+                    EPlayer.Error(player, "You cannot create any more accounts on the same machine!", "fas fa-user");
+                    return;
+                }
             }
-
-            player.SetData("LastCryptAttempt", Environment.TickCount64);
-            string salt = AccountManager.GenSalt();
-            string newPass = AccountManager.Crypt(password, salt);
-
-            Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
-
-            wComponentData test = new wComponentData();
-            test.Components.Add(123456789);
-            wepItems.Add(123456789, test);
-
-            DiscordData _discordData = new DiscordData();
-            string jsonDiscordData = NAPI.Util.ToJson(_discordData);
-
-            List<ChallengeData> challengeData = new List<ChallengeData>();
-            string jsonChallengeData = NAPI.Util.ToJson(challengeData);
-
-            var _new = new Account
+            catch(Exception ex) {
+                NAPI.Util.ConsoleOutput("(RnC | REGISTER) Failed the 2+ account check for " + username + "!");
+                NAPI.Util.ConsoleOutput(ex.ToString());
+            }
+            finally
             {
-                Email = email,
-                Password = newPass,
-                Salt = salt,
-                Username = username,
-                DiscordInfo = jsonDiscordData,
-                ChallengeInfo = jsonChallengeData,
-                Admin = 0,
-                RegisterHWID = player.Serial,
-                RegisterIP = player.Address,
-                RegisterRID = player.SocialClubId,
-                RegisterSC = player.SocialClubName,
-                LastHWID = player.Serial,
-                LastIP = player.Address,
-                LastRID = player.SocialClubId,
-                LastSC = player.SocialClubName,
-                MuteTime = 0,
-                MuteReason = "N/A",
-                JailTime = 0,
-                JailReason = "N/A",
-                DerbyWins = 0,
-                Level = 1,
-                Medkits = 0,
-                Painkillers = 0,
-                Language = -1,
-                XP = 1,
-                Escapes = 0,
-                Arrests = 0,
-                Kills = 1,
-                Deaths = 1,
-                MinutesPlayed = 1.0,
-                LastSessionMins = 0.0,
-                DonatorPoints = 0,
-                Points = 10,
-                Warns = 0,
-                Suspended = 0,
-                DonatorLevel = 0,
-                LobbyClothing = 1,
-                LoadoutCop = "?",
-                LoadoutFugitive = "?",
-                CarCop = "?",
-                CarFugitive = "?",
-                WeaponComponents = NAPI.Util.ToJson(wepItems),
-                MOTD = "none",
-                RegisterDate = DateTime.Now,
-                LastLogin = DateTime.Now,
-                Character = "{}",
-                PurchasedAmmo = "{}",
-                ChallengeStreak = 0,
-                CompletedDailyChallenge = false
-            };
-            AccountManager.Add(_new);
-            OnPlayerRegister(player, _new);
+                player.SetData("LastCryptAttempt", Environment.TickCount64);
+                string salt = AccountManager.GenSalt();
+                string newPass = AccountManager.Crypt(password, salt);
+
+                Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
+
+                wComponentData test = new wComponentData();
+                test.Components.Add(123456789);
+                wepItems.Add(123456789, test);
+
+                DiscordData _discordData = new DiscordData();
+                string jsonDiscordData = NAPI.Util.ToJson(_discordData);
+
+                List<ChallengeData> challengeData = new List<ChallengeData>();
+                string jsonChallengeData = NAPI.Util.ToJson(challengeData);
+
+                var _new = new Account
+                {
+                    Email = email,
+                    Password = newPass,
+                    Salt = salt,
+                    Username = username,
+                    DiscordInfo = jsonDiscordData,
+                    ChallengeInfo = jsonChallengeData,
+                    Admin = 0,
+                    RegisterHWID = player.Serial,
+                    RegisterIP = player.Address,
+                    RegisterRID = player.SocialClubId,
+                    RegisterSC = player.SocialClubName,
+                    LastHWID = player.Serial,
+                    LastIP = player.Address,
+                    LastRID = player.SocialClubId,
+                    LastSC = player.SocialClubName,
+                    MuteTime = 0,
+                    MuteReason = "N/A",
+                    JailTime = 0,
+                    JailReason = "N/A",
+                    DerbyWins = 0,
+                    Level = 1,
+                    Medkits = 0,
+                    Painkillers = 0,
+                    Language = -1,
+                    XP = 1,
+                    Escapes = 0,
+                    Arrests = 0,
+                    Kills = 1,
+                    Deaths = 1,
+                    MinutesPlayed = 1.0,
+                    LastSessionMins = 0.0,
+                    DonatorPoints = 0,
+                    Points = 10,
+                    Warns = 0,
+                    Suspended = 0,
+                    DonatorLevel = 0,
+                    LobbyClothing = 1,
+                    LoadoutCop = "?",
+                    LoadoutFugitive = "?",
+                    CarCop = "?",
+                    CarFugitive = "?",
+                    WeaponComponents = NAPI.Util.ToJson(wepItems),
+                    MOTD = "none",
+                    RegisterDate = DateTime.Now,
+                    LastLogin = DateTime.Now,
+                    Character = "{}",
+                    PurchasedAmmo = "{}",
+                    ChallengeStreak = 0,
+                    CompletedDailyChallenge = false
+                };
+                AccountManager.Add(_new);
+                OnPlayerRegister(player, _new);
+            }         
         }
 
         [RemoteEvent("char_ResetEcho")]

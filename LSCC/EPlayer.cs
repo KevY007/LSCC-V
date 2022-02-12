@@ -1683,7 +1683,7 @@ namespace RNC
 
         public static void SendMessage(Player player, string message)
         {
-            player.TriggerEvent("pushMsgToChat");
+            player.TriggerEvent("pushMsgToChat", message);
         }
 
         public static void SetDiscordStatus(Player player, string status)

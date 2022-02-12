@@ -363,6 +363,8 @@ namespace RNC
 
         [JsonProperty("NextWeekUnix")]
         public long NextWeekUnix { get; set; }
+        [JsonProperty("NextMonthUnix")]
+        public long NextMonthUnix { get; set; }
 
         public DynSet()
         {
@@ -378,6 +380,7 @@ namespace RNC
             this.DCMentionRoleID = 796386517525725224;
             this.DCMentionRoleChan = 796389588880588830;
             this.NextWeekUnix = new DateTimeOffset(DateTime.Now).AddDays(7).ToUnixTimeSeconds();
+            this.NextMonthUnix = new DateTimeOffset(DateTime.Now).AddMonths(1).ToUnixTimeSeconds();
         }
     }
 
@@ -1701,8 +1704,9 @@ namespace RNC
             NAPI.Server.SetGlobalServerChat(false);
             NAPI.Server.SetCommandErrorMessage("!{#FF6347}[!] !{#FFFFFF}This command is invalid, refer to /help for a list.");
 
-            NAPI.Util.ConsoleOutput($"(RnC | STARTUP) Connecting to database => User {Settings.MySQL_User} for db {Settings.MySQL_Database} on host {Settings.MySQL_Host}");
+            NAPI.Util.ConsoleOutput($"(RnC | STARTUP) Connecting to database & backup database => User {Settings.MySQL_User} for db {Settings.MySQL_Database} on host {Settings.MySQL_Host}");
             ContextFactory.Instance.Database.EnsureCreated();
+            BackupContextFactory.Instance.Database.EnsureCreated();
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Connected to database.");
 
             Settings.Lobbies = new List<LobbyData>();
@@ -2036,7 +2040,9 @@ namespace RNC
             string dateFormat = DateTime.Now.ToString("g");
             NAPI.Util.ConsoleOutput("CURRENT DATE: " + dateFormat);
             dateFormat = DateTimeOffset.FromUnixTimeSeconds(Settings.Dynamics.NextWeekUnix).ToString("g");
-            NAPI.Util.ConsoleOutput("NEXT WEEKLY CHALLENGE: " + dateFormat);
+            NAPI.Util.ConsoleOutput("NEXT WEEK HIT: " + dateFormat);
+            dateFormat = DateTimeOffset.FromUnixTimeSeconds(Settings.Dynamics.NextMonthUnix).ToString("g");
+            NAPI.Util.ConsoleOutput("NEXT MONTH HIT: " + dateFormat);
 
             NAPI.Util.ConsoleOutput("[>===========|Race 'N' Chase|===========<]");
             NAPI.Util.ConsoleOutput("[Version]: " + Settings.Version);
@@ -2142,32 +2148,8 @@ namespace RNC
                         }
                     }
 
-                    // if 7 days passed - weekly challenge / weekly check
-                    if (new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() >= Settings.Dynamics.NextWeekUnix)
-                    {
-                        foreach(Account acc in ContextFactory.Instance.Accounts)
-                        {
-                            acc.ChallengeStreak = 0;
-                            acc.CompletedDailyChallenge = false;
-
-                            acc.MOTD = NAPI.Util.ToJson(new MOTDData()
-                            {
-                                AdminName = "SERVER",
-                                Message = "~y~[WEEKLY CHALLENGE] ~w~Seven days have passed and the weekly challenge streak was reset.",
-                                PostedOn = DateTime.Now.ToShortDateString()
-                            });
-                        }
-                        Settings.Dynamics.NextWeekUnix = new DateTimeOffset(DateTime.Now).AddDays(7).ToUnixTimeSeconds();
-
-                        foreach(Player pl in NAPI.Pools.GetAllPlayers())
-                        {
-                            if (EPlayer.LoggedIn(pl) == true)
-                            {
-                                pl.TriggerEvent("addChallengesToMenu", 0, (Settings.Dynamics.NextWeekUnix - new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds()));
-                                pl.TriggerEvent("pushMsgToChat", "~y~[WEEKLY CHALLENGE] ~w~Seven days have passed and the weekly challenge streak was reset. Good luck!");
-                            }
-                        }
-                    }
+                    // runweeklymonthlychecks - will check if a week or month has passed and do shit
+                    Events.RunWeeklyMonthlyChecks();
                     SaveDynamicSettings();
                     ContextFactory.Instance.SaveChanges();
                     NAPI.Util.ConsoleOutput("Server auto-saved => " + DateTime.Now.ToString());

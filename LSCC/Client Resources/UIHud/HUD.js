@@ -141,6 +141,7 @@ function activateChat(toggle){
 function focusChat(toggle){
     if(UIHud == null) return;
     UIHud.execute(`gm.$refs.chat.active = ${toggle.toString()}`);
+    pushMessageToChat("FocusChat " + toggle.toString());
 
     mp.gui.cursor.show(toggle, toggle);
     mp.events.callRemote("onFocusChat", toggle);
@@ -165,6 +166,7 @@ for(let fn in api)
 }
 
 mp.events.add("onChatPressEnter", () => {
+    pushMessageToChat("ENTER STISNUT");
     focusChat(false);
 	mp.events.call("onOpenChatbox", false);
 });
@@ -816,10 +818,13 @@ mp.events.callLocal('ScoreboardToggleTyping', false);
 mp.events.add("HUDError", (msg, icon) => {
     if(!showHud && mp.players.local.getVariable("pLogged") == true) return;
 
-    let insertString = `iziToast.error({`;
-    insertString += `message: \`${msg}\`, `;
-    insertString += `icon: "${icon}" `;
-    insertString += "});";
+	let insertString = `iziToast.show({
+		message: "${msg}",
+		icon: "${icon}",
+		color: "red",
+		timeout: 5000,
+		close: true		
+	});`;
 
     if(UIHud != null) UIHud.execute(insertString);
 });

@@ -122,6 +122,28 @@ namespace RNC
             return Crypter.Sha256.Crypt(pass, salt);
         }
 
+        public static void ClearForeignKeys(Account acc)
+        {
+            List<Logs_Admin> aLogs = ContextFactory.Instance.Logs_Admin.ToList().Where(l => l.AccountID == acc.SQL_ID).ToList();
+            ContextFactory.Instance.Logs_Admin.RemoveRange(aLogs);
+            List<Logs_AdminRecord> arLogs = ContextFactory.Instance.Logs_AdminRecords.ToList().Where(l => l.AccountID == acc.SQL_ID || l.AdminID == acc.SQL_ID).ToList();
+            ContextFactory.Instance.Logs_AdminRecords.RemoveRange(arLogs);
+            List<Logs_Session> sLogs = ContextFactory.Instance.Logs_Session.ToList().Where(l => l.AccountID == acc.SQL_ID).ToList();
+            ContextFactory.Instance.Logs_Session.RemoveRange(sLogs);
+            List<OwnedVehData> oVehData = ContextFactory.Instance.OwnedVehicles.ToList().Where(l => l.AccountSQLID == acc.SQL_ID).ToList();
+            ContextFactory.Instance.OwnedVehicles.RemoveRange(oVehData);
+            List<OwnedLoadoutData> oLData = ContextFactory.Instance.OwnedLoadouts.ToList().Where(l => l.AccountSQLID == acc.SQL_ID).ToList();
+            ContextFactory.Instance.OwnedLoadouts.RemoveRange(oLData);
+            List<BanData> bData = ContextFactory.Instance.Bans.ToList().Where(l => l.AccountSQLID == acc.SQL_ID).ToList();
+            ContextFactory.Instance.Bans.RemoveRange(bData);
+            List<AdminNote> anotedata = ContextFactory.Instance.AdminNotes.ToList().Where(l => l.AccountID == acc.SQL_ID || l.AdminID == acc.SQL_ID).ToList();
+            ContextFactory.Instance.AdminNotes.RemoveRange(anotedata);
+            List<PlayerTunings> ptune = ContextFactory.Instance.PlayerTunings.ToList().Where(l => l.AccountSQLID == acc.SQL_ID).ToList();
+            ContextFactory.Instance.PlayerTunings.RemoveRange(ptune);
+            List<PlayerOutfit> pout = ContextFactory.Instance.PlayerOutfits.ToList().Where(l => l.AccountID == acc.SQL_ID).ToList();
+            ContextFactory.Instance.PlayerOutfits.RemoveRange(pout);
+        }
+
         public static bool MatchPass(string a, string b) { if (a.CompareTo(b) == 0) { return true; } return false; }
 
         public static void Add(Account _a)

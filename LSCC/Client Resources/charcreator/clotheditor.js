@@ -757,7 +757,7 @@ mp.events.add("ShowClothesMenu", () =>
             menuClothing.AddItem(menuClothingExit);
         }
         
-        focusChat(false);
+        activateChat(false);
         mp.gui.cursor.visible = false;
     }
 });
@@ -765,6 +765,6 @@ mp.events.add("ShowClothesMenu", () =>
 menuClothing.MenuClose.on(() => {
     menuClothing.RemoveItem(menuClothingExit);
     menuClothingExit = null;
-    focusChat(true);
+    activateChat(true);
     mp.gui.cursor.visible = false;
 });

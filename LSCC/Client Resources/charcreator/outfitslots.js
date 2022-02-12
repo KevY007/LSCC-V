@@ -76,7 +76,7 @@ outfitsMainMenu.MenuClose.on(() => {
         }
     }
     outfitsMainMenu.RemoveItem(outfitMenuExit);
-    focusChat(true);
+    //focusChat(true);
     mp.gui.cursor.visible = false;
 
     mp.events.callRemote("RequestSetOutfit", -1, outfitTeam, false);

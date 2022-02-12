@@ -800,7 +800,7 @@ mp.events.add("toggleCreator", (active, charData) => {
         applyCreatorOutfit();
     } else {
         for (let i = 0; i < creatorMenus.length; i++) creatorMenus[i].Visible = false;
-        focusChat(true);
+        //focusChat(true);
         mp.game.ui.displayRadar(true);
         mp.game.ui.displayHud(true);
         localPlayer.freezePosition(false);

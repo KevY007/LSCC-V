@@ -339,7 +339,7 @@ vTuner_Main.MenuClose.on(() => {
     vTuner_VehicleID = -1;
     vTuner_Buy = null;
     vTuner_Exit = null;
-    focusChat(true);
+    //focusChat(true);
 
     mp.events.callRemote("OnTunerClose");
     mp.events.callLocal("RemoveTooltip", "M1");

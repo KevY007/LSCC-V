@@ -90,7 +90,7 @@ namespace RNC
             if (_client == null) return Task.CompletedTask;
             if (_client.ConnectionState != ConnectionState.Connected) return Task.CompletedTask;
 
-            if(text != null)
+            if (text != null)
             {
                 text = "[" + DateTime.Now.ToString("HH:mm:ss") + "] " + text;
 
@@ -143,7 +143,8 @@ namespace RNC
                     if (Environment.TickCount64 - UpCooldown <= 7000) return;
 
                     await context.DeleteAsync();
-                    await Task.Run(async () => { // WE WANT THE CODE TO EXECUTE SEPARATELY AND NOT BLOCK MESSAGE RECEIVED SO DONT AWAIT THIS SH
+                    await Task.Run(async () =>
+                    { // WE WANT THE CODE TO EXECUTE SEPARATELY AND NOT BLOCK MESSAGE RECEIVED SO DONT AWAIT THIS SH
                         var msg = await context.Channel.SendMessageAsync($":white_check_mark: Server is online with **{RAGE.Entities.Players.Count} players** and **{Settings.Lobbies.Where(l => l.gameStatus == 1).Count()} copchases** active.", false, null, null, null);
                         await Task.Delay(5000);
                         await msg.DeleteAsync();
@@ -156,7 +157,198 @@ namespace RNC
 
                 if (context.Channel.Name != "staff-bot") return;
 
-                if (context.Content.StartsWith("!verify"))
+                if(context.Content.StartsWith("!dbgtimecheck"))
+                {
+                    int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                    if (aLevel < 6)
+                    {
+                        await context.Channel.SendMessageAsync("https://cms.qz.com/wp-content/uploads/2018/06/new-pride-flag-01.jpg");
+                        return;
+                    }
+                    NAPI.Task.Run(() =>
+                    {
+                        Events.RunWeeklyMonthlyChecks();
+                        context.Channel.SendMessageAsync("Done!");
+                    }, 50);
+                }
+                else if (context.Content.StartsWith("!changepass"))
+                {
+                    string[] args = context.Content.Split(' ');
+                    if (args.Count() >= 3)
+                    {
+                        string name = args[1];
+                        string newpass = args[2];
+
+                        int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                        int aSQLID = GetIngameSQLID(context.Author as SocketGuildUser);
+
+                        if (aSQLID == -1)
+                        {
+                            await context.Channel.SendMessageAsync("**[!]** You must link your Discord & RnC account to use this!");
+                            return;
+                        }
+                        if (aLevel < 4)
+                        {
+                            await context.Channel.SendMessageAsync("**[!]** You must be a level 4+ admin to use this!");
+                            return;
+                        }
+                        lock (RAGE.Entities.Players)
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+
+                                if ((tpAcc != null) == false)
+                                {
+                                    context.Channel.SendMessageAsync("**[!]** There's no account with that name.");
+                                    return;
+                                }
+
+                                if (tpAcc.Admin > aLevel)
+                                {
+                                    context.Channel.SendMessageAsync("**[!]** Target's admin level is higher than yours!");
+                                    return;
+                                }
+
+                                Player target = RAGE.Entities.Players.All.Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
+                                if (target != null)
+                                {
+                                    target.TriggerEvent("pushMsgToChat", "!{#FF6347} Your password has been changed to: !{#FFFFFF}" + newpass);
+                                    EPlayer.Notify(target, $"Your password has been changed to <p><strong>{newpass}</strong></p>", "green", "fas fa-check", false, 3000, "center", "replace");
+                                }
+
+                                // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:changepass:{name}"); } catch { }
+                                Logs.LogAdmin(aSQLID, $"Changed player {tpAcc.Username}'s password.");
+
+                                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}[DC] {context.Author.Username} has changed {tpAcc.Username}'s password.");
+
+                                context.Channel.SendMessageAsync($":white_check_mark: **You've successfully changed {name}'s password!**");
+
+                                string salt = AccountManager.GenSalt();
+                                string password = AccountManager.Crypt(newpass, salt);
+                                tpAcc.Salt = salt;
+                                tpAcc.Password = password;
+                                ContextFactory.Instance.SaveChanges();
+                            }, 50);
+                        }
+                    }
+                    else await context.Channel.SendMessageAsync("USAGE: !changepass (username) (new password)");
+                }
+                else if (context.Content.StartsWith("!deleteaccount"))
+                {
+                    string[] args = context.Content.Split(' ');
+                    if (args.Count() >= 2)
+                    {
+                        string name = args[1];
+
+                        int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                        int aSQLID = GetIngameSQLID(context.Author as SocketGuildUser);
+
+                        if (aSQLID == -1)
+                        {
+                            await context.Channel.SendMessageAsync("**[!]** You must link your Discord & RnC account to use this!");
+                            return;
+                        }
+                        if (aLevel < 4)
+                        {
+                            await context.Channel.SendMessageAsync("**[!]** You must be a level 4+ admin to use this!");
+                            return;
+                        }
+                        lock (RAGE.Entities.Players)
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+
+                                if ((tpAcc != null) == false)
+                                {
+                                    context.Channel.SendMessageAsync("[!] There's no account with that name.");
+                                    return;
+                                }
+
+                                if (tpAcc.Admin > aLevel)
+                                {
+                                    context.Channel.SendMessageAsync("[!] Target's admin level is higher than yours!");
+                                    return;
+                                }
+
+                                Player target = RAGE.Entities.Players.All.Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
+                                if (target != null)
+                                {
+                                    context.Channel.SendMessageAsync("[!] Target must be online and logged in!");
+                                    return;
+                                }
+
+                                AccountManager.ClearForeignKeys(tpAcc);
+
+                                Logs.LogAdmin(aSQLID, $"Deleted account '{tpAcc.Username}'.");
+                                context.Channel.SendMessageAsync($":white_check_mark: **You've successfully deleted {name}'s account!**");
+
+                                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}[DC] {context.Author.Username} has deleted account {tpAcc.Username}.");
+
+                                ContextFactory.Instance.Accounts.Remove(tpAcc);
+                                ContextFactory.Instance.SaveChanges();
+                            }, 50);
+                        }
+                    }
+                    else await context.Channel.SendMessageAsync("USAGE: !deleteaccount (username)");
+                }
+                else if (context.Content.StartsWith("!recoveraccount"))
+                {
+                    string[] args = context.Content.Split(' ', 2);
+                    if (args.Count() >= 2)
+                    {
+                        string user = args[1];
+
+                        int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                        int aSQLID = GetIngameSQLID(context.Author as SocketGuildUser);
+
+                        if (aSQLID == -1)
+                        {
+                            await context.Channel.SendMessageAsync("**[!]** You must link your Discord & RnC account to use this!");
+                            return;
+                        }
+                        if (aLevel < 3)
+                        {
+                            await context.Channel.SendMessageAsync("**[!]** You must be a level 3+ admin to use this!");
+                            return;
+                        }
+                        lock (RAGE.Entities.Players)
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                Account toRecover = BackupContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(user, StringComparison.OrdinalIgnoreCase));
+                                
+                                if (toRecover == null)
+                                {
+                                    context.Channel.SendMessageAsync("**[!]** A user with that name could not be found in the archive!");
+                                    return;
+                                }
+
+                                Account existCheck = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(user, StringComparison.OrdinalIgnoreCase));
+                                if (existCheck == null)
+                                {
+                                    ContextFactory.Instance.Accounts.Add(toRecover);
+                                    context.Channel.SendMessageAsync($":white_check_mark: **You've successfully recovered {user}'s in-game account! (DBID: {toRecover.SQL_ID})**");
+                                    Logs.LogAdmin(aSQLID, $"Recovered {toRecover.Username}'s account.");
+
+                                    BackupContextFactory.Instance.Accounts.Remove(toRecover);
+                                    BackupContextFactory.Instance.SaveChanges();
+                                    return;
+                                }
+                                else
+                                {
+                                    context.Channel.SendMessageAsync($"**[!]** This user already exists in the database under DBID: {existCheck.SQL_ID}!");
+                                    context.Channel.SendMessageAsync($"**[>]** Please ensure that this is 100% the account you want to recover [ask the user].");
+                                    context.Channel.SendMessageAsync($"**[>]** If it is, please let a Senior Admin+ know so they can `!deleteaccount {user}` and recover it afterwards.");
+                                    return;
+                                }
+                            }, 50);
+                        }
+                    }
+                    else await context.Channel.SendMessageAsync("USAGE: !recoveraccount (username)");
+                }
+                else if (context.Content.StartsWith("!verify"))
                 {
                     // first ID is the bot, rest are codename rotx kevy
                     if (context.Author.Id != 922461597866295397 && context.Author.Id != 367360197900894209 && context.Author.Id != 253938879554387969

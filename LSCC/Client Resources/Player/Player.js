@@ -2605,6 +2605,10 @@ mp.events.add("OnPlayerLoginRegister", () => {
     {
         mp.events.callRemote("SetPlayerPrivateWeather", mp.storage.data.menu.myweather);
     }
+
+    setTimeout(() => {
+        focusChat(false);
+    }, 250);
 });
 
 mp.events.add("setVoiceModeMenu", (value) => {

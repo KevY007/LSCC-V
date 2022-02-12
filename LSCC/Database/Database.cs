@@ -316,4 +316,137 @@ namespace RNC
             GTANetworkAPI.NAPI.Util.ConsoleOutput("CONNECTION STRING: " + _connectionString);
         }
     }
+
+
+    #region TEMPORARY FIX - ACCOUNT ARCHIVES AND SHIZZ
+    public class BackupDatabase : DbContext
+    {
+        // Base constructor
+        public BackupDatabase(DbContextOptions options) : base(options)
+        {
+
+        }
+
+        // Account model class created somewhere else
+        public DbSet<Account> Accounts { get; set; }
+        public DbSet<Map> Maps { get; set; }
+        public DbSet<Language> Languages { get; set; }
+        public DbSet<MapSpawn> MapSpawns { get; set; }
+        public DbSet<BanData> Bans { get; set; }
+        public DbSet<PlayerOutfit> PlayerOutfits { get; set; }
+        public DbSet<PlayerTunings> PlayerTunings { get; set; }
+        public DbSet<OwnedVehData> OwnedVehicles { get; set; }
+        public DbSet<OwnedLoadoutData> OwnedLoadouts { get; set; }
+        public DbSet<AdminNote> AdminNotes { get; set; }
+        public DbSet<DailyChallenge> DailyChallenges { get; set; }
+        public DbSet<UnlockedAchievement> UnlockedAchievements { get; set; }
+        public DbSet<Logs_AdminRecord> Logs_AdminRecords { get; set; }
+        public DbSet<Logs_Admin> Logs_Admin { get; set; }
+        public DbSet<Logs_Session> Logs_Session { get; set; }
+        public DbSet<CustomDMArenas> CustomArenas { get; set; }
+        public DbSet<CustomDMArenaTeams> CustomArenas_Teams { get; set; }
+        public DbSet<CustomDMArenaSpawns> CustomArenas_Spawns { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            /* Use these for configuring relationships and properties etc bla bla bla */
+            // like this poggers
+            //modelBuilder.Entity<Account>().Property(u => u.Character).IsRequired(false);
+
+            /*
+            modelBuilder.Entity<OwnedLoadoutData>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
+            modelBuilder.Entity<OwnedVehData>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
+
+            modelBuilder.Entity<PlayerTunings>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
+            modelBuilder.Entity<PlayerOutfit>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
+
+            modelBuilder.Entity<BanData>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
+            // Delete the ban if the account got deleted. What's the point now?
+
+            modelBuilder.Entity<Logs_Session>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
+            modelBuilder.Entity<Logs_Admin>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
+
+            modelBuilder.Entity<Logs_AdminRecord>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
+
+            modelBuilder.Entity<AdminNote>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
+
+            // But if were the admin, don't delete shit and let them suffer... in null. We better add checks for these tho // Oh I just realised ban uses string for admin name, gucci. they remain
+            modelBuilder.Entity<AdminNote>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AdminID).OnDelete(DeleteBehavior.ClientSetNull);
+            modelBuilder.Entity<Logs_AdminRecord>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AdminID).OnDelete(DeleteBehavior.ClientSetNull);
+
+            // DM ARENAS
+            //modelBuilder.Entity<CustomDMArenaSpawns>().HasOne<CustomDMArenas>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.ArenaID).OnDelete(DeleteBehavior.ClientCascade);
+            //modelBuilder.Entity<CustomDMArenaSpawns>().HasOne<CustomDMArenaTeams>().WithMany().HasPrincipalKey(ug => ug.Team).HasForeignKey(u => u.Team).OnDelete(DeleteBehavior.ClientCascade);
+            //modelBuilder.Entity<CustomDMArenaTeams>().HasOne<CustomDMArenas>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.ArenaID).OnDelete(DeleteBehavior.ClientCascade);
+
+            // MAP
+            modelBuilder.Entity<MapSpawn>().HasOne<Map>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.mapID).OnDelete(DeleteBehavior.ClientCascade);
+            */
+        }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.EnableSensitiveDataLogging(true);
+            optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
+            optionsBuilder.EnableServiceProviderCaching(true);
+
+            optionsBuilder.LogTo((data) =>
+            {
+                Main.Log("database_errors.txt", $"{DateTime.Now.ToString()}: {data}");
+                Console.WriteLine($"Database Error at {DateTime.Now.ToString()}: {data}\nError has been logged in database_errors.txt as well.");
+            }, Microsoft.Extensions.Logging.LogLevel.Error);
+        }
+    }
+
+    public class BackupContextFactory : IDesignTimeDbContextFactory<BackupDatabase>
+    {
+        private static BackupDatabase _instance;
+
+        private static string _connectionString;
+
+        public BackupDatabase CreateDbContext(string[] args)
+        {
+            var builder = new DbContextOptionsBuilder<BackupDatabase>();
+
+            // Load the connection string for the first time
+            if (string.IsNullOrEmpty(_connectionString))
+            {
+                LoadConnectionString();
+            }
+            // Use it to init the connection'
+            builder.UseMySql(_connectionString, ServerVersion.AutoDetect(_connectionString), optionsBuilder =>
+            {
+                optionsBuilder.MigrationsAssembly(typeof(BackupDatabase).GetTypeInfo().Assembly.GetName().Name);
+                optionsBuilder.EnableRetryOnFailure();
+                optionsBuilder.CommandTimeout(60); // Default: 30s
+                optionsBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                optionsBuilder.EnableStringComparisonTranslations(true);
+            });
+
+            return new BackupDatabase(builder.Options);
+        }
+
+        public static BackupDatabase Instance
+        {
+            get
+            {
+                if (_instance != null) return _instance;
+
+                return _instance = new BackupContextFactory().CreateDbContext(new string[] { });
+            }
+            private set { }
+        }
+
+        private static void LoadConnectionString()
+        {
+            if (File.Exists("racenchase/we_are_testing"))
+                _connectionString = "Server=" + Settings.MySQL_Host + ";Database=" + (Settings.MySQL_Database + "_backup_test") + ";Uid=" + Settings.MySQL_User + ";Pwd=" + Settings.MySQL_Password + ";Port=" + Settings.MySQL_Port;
+            else if (File.Exists("racenchase/codename_home"))
+                _connectionString = "Server=localhost;Database=racenchase_backup_test;Uid=racenchase;Pwd=12345678;";
+            else
+                _connectionString = "Server=" + Settings.MySQL_Host + ";Database=" + (Settings.MySQL_Database + "_backup") + ";Uid=" + Settings.MySQL_User + ";Pwd=" + Settings.MySQL_Password + ";Port=" + Settings.MySQL_Port;
+
+            GTANetworkAPI.NAPI.Util.ConsoleOutput("CONNECTION STRING: " + _connectionString);
+        }
+    }
+    #endregion
 }

@@ -5320,7 +5320,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (EPlayer.GetAccount(player).Admin < 6)
+            if (EPlayer.GetAccount(player).Admin < 4)
             {
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
@@ -5346,6 +5346,8 @@ namespace RNC
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Target is online, duh.");
                 return;
             }
+
+            AccountManager.ClearForeignKeys(tpAcc);
 
             Logs.LogAdmin(player, $"Deleted account '{tpAcc.Username}'.");
 
