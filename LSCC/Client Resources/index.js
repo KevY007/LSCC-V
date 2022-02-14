@@ -111,14 +111,16 @@ require("./Player/VehicleTuner.js");
 traceLastFunc("Main::Init()");
 
 mp.events.add('showLoginBrowser', (state) => {
-    loginBrowser.active = state;
-    mp.gui.cursor.show(state, state);
-
-    if(!loginBrowser.active && mp.players.local.getVariable("pLogged") == true && loginBrowser != null)
-    {
-        loginBrowser.destroy();
-        loginBrowser = null;
-    }
+    setTimeout(() => {
+        loginBrowser.active = state;
+        mp.gui.cursor.show(state, state);
+    
+        if(!loginBrowser.active && mp.players.local.getVariable("pLogged") == true && loginBrowser != null)
+        {
+            loginBrowser.destroy();
+            loginBrowser = null;
+        }
+    }, 500);
 });
 
 mp.events.add("onOpenChatbox", (toggle) =>

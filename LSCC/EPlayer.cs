@@ -1827,9 +1827,12 @@ namespace RNC
 
         public static void LoginBrowserSetup(Player player)
         {
-            player.TriggerEvent("showLoginBrowser", true);
-            player.TriggerEvent("InitiateCustomChat");
-            player.TriggerEvent("TogglePlayerChat", false);
+            NAPI.Task.Run(() =>
+            {
+                player.TriggerEvent("showLoginBrowser", true);
+                player.TriggerEvent("InitiateCustomChat");
+                player.TriggerEvent("TogglePlayerChat", false);
+            }, 500);
 
             SetDiscordStatus(player, "On login screen");
             ResetPlayerData(player);
