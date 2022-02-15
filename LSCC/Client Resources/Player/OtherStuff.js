@@ -489,7 +489,7 @@ function moveFromToAir(moveTo, switchType, showGui, timeout = 1) {
             case 'up':
                     if (showGui == false) {
                         gui = 'false';
-                        UIHud.execute(`gm.hud = false;`);
+                        mp.events.callLocal("HideAllElementsExceptChat", false); // hide elements
                     };
                     focusChat(chatStatus);
 

@@ -9,6 +9,7 @@ var collisionTime = -1;
 var updateRate = 200;
 
 var chatStatus = false;
+var chatStatusLate = false;
 var lastChatToggle = Date.now();
 var streetName = null;
 var zoneName = null;
@@ -123,6 +124,7 @@ mp.events.add('showLoginBrowser', (state) => {
     }, 500);
 });
 
+let chatStatusTimeout = null;
 mp.events.add("onOpenChatbox", (toggle) =>
 {
     if(mp.players.local.getVariable("pLogged") == undefined || mp.players.local.getVariable("pLogged") == false && toggle)
@@ -130,11 +132,22 @@ mp.events.add("onOpenChatbox", (toggle) =>
         activateChat(false);
         return;
     }
+    clearTimeout(chatStatusTimeout);
     chatStatus = toggle;
     lastChatToggle = Date.now();
     focusChat(toggle);
     mp.events.callRemote("UpdateChatState", toggle);
     traceLastFunc(`[Players] ChatBox Toggled ${toggle}`);
+
+    if(toggle == true){
+        chatStatusLate = true;
+    }
+    else{
+        chatStatusTimeout = setTimeout(() =>{
+            chatStatusLate = false;
+        }, 500);
+    }
+
 });
 
 mp.events.add('loginInformationToServer', (username, password) => {

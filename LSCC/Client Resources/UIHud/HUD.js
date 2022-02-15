@@ -214,7 +214,19 @@ mp.events.add("InitiateCustomChat", () => {
     }, 1000);
 });
 
-mp.keys.bind(0x54, true, function() {
+mp.events.add("render", () => {
+    if(chatStatusLate){
+        mp.game.controls.disableControlAction(0, 200, true); // prevent menu from opening when pressing ESC for chat 
+    }    
+});
+mp.keys.bind(0x1B, true, function() { // ESC key
+    if(chatStatus){
+        focusChat(false);
+        mp.events.call("onOpenChatbox", false);       
+    }
+});
+
+mp.keys.bind(0x54, true, function() { // T key
     if(!chatStatus)
     {
         focusChat(true);
