@@ -8,6 +8,8 @@ const Natives = {
 
 let minimap = {};
 
+let chatOpacityTimeout = null;
+
 var resolution = mp.game.graphics.getScreenActiveResolution(0,0);
 let lastSpecHPChange = Date.now();
 
@@ -136,6 +138,20 @@ mp.events.add('ToggleNametags', (state) => {
       topRight
 */
 
+function increaseChatOpacity(time = 4000){
+    if(chatOpacityTimeout != null){
+        clearInterval(chatOpacityTimeout);
+    }
+    UIHud.execute(`gm.$refs.chat.settings.opacity = 1.0`);
+
+    chatOpacityTimeout = setTimeout(() => {
+        if(!chatStatus && UIHud != null && UIHud.active == true){
+            UIHud.execute(`gm.$refs.chat.settings.opacity = 0.5`);
+        }
+    }, time);
+
+}
+
 function activateChat(toggle){
     if(UIHud == null) return;
     UIHud.execute(`gm.chat = ${toggle.toString()}`);
@@ -144,12 +160,20 @@ function focusChat(toggle){
     if(UIHud == null) return;
     UIHud.execute(`gm.$refs.chat.active = ${toggle.toString()}`);
 
+    if(toggle){
+        UIHud.execute(`gm.$refs.chat.settings.opacity = 1.0`);
+    }
+    else{
+        increaseChatOpacity(3000);
+    }
+
     mp.gui.cursor.show(toggle, toggle);
     mp.events.callRemote("onFocusChat", toggle);
 }
 function pushMessageToChat(message){
     if(UIHud == null) return;
     UIHud.execute(`gm.$refs.chat.messages.push("${message}")`);
+    increaseChatOpacity(4000);
 }
 function clearChat(){
     if(UIHud == null) return;
@@ -249,6 +273,11 @@ mp.events.add('RestartHUD', () => {
     setTimeout(() => {
         UIHud.markAsChat();
         UIHud.execute(`gm.$refs.chat.commands = ${JSON.stringify(CommandsDataJSON)}`);
+        UIHud.execute(`gm.$refs.chat.active = false;`)
+        UIHud.execute(`gm.$refs.chat.settings = {
+            opacity: 1,
+            autoScroll: true,
+        }`);
     }, 1000);
     UIHud.execute(`gm.hud = false;`);
     
