@@ -88,6 +88,7 @@ require('./UIHud/CommandsList.js');
 require("./nativeui/index.js");
 
 require('./Player/Player.js');
+require('./Player/SpikesRoadblocks.js');
 require('./Player/Achievements.js');
 require('./Player/BankRobbery.js');
 require('./Player/Actions.js');

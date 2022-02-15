@@ -868,6 +868,8 @@ namespace RNC
 
                 player.SetSharedData("TaseProtection", false);
 
+                player.SetSharedData("PlacingStingers", false);
+
                 player.SetData<bool>("ShotsFired", false);
 
                 player.ResetData("DragoutVehicle");

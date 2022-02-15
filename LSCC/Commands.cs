@@ -1236,6 +1236,45 @@ namespace RNC
             return;
         }
 
+        [Command("placespikes")]
+        public void cmd_placespikes(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (lobby == null) return;
+            /*
+            if (!lobby.Cops.Contains(player))
+            {
+                EPlayer.SendMessage(player, "!{#FF6347}[!] ~w~You are not a cop!");
+                return;
+            }*/
+            Account acc = EPlayer.GetAccount(player);
+            if(acc.Level < 5)
+            {
+                EPlayer.SendMessage(player, "!{#FF6347}[!] ~w~You must be at least level 5 to use this!");
+                return;
+            }
+            if(player.GetSharedData<int>("Wounded") > 0 || player.Dead)
+            {
+                EPlayer.SendMessage(player, "!{#FF6347}[!] ~w~You are wounded or dead!");
+                return;
+            }
+            if(player.GetSharedData<bool>("PlacingStingers") == true)
+            {
+                EPlayer.SendMessage(player, "!{#FF6347}[!] ~w~You are already deploying spikes!");
+                EPlayer.SendMessage(player, "~b~[STINGERS] ~w~Walk to the position where the other end will be placed and press ~y~H~w~ to place them.");
+                return;
+            }
+
+            player.TriggerEvent("Spikes_BeginPlacing");
+            EPlayer.Action(player, "begins deploying stingers...");
+            EPlayer.SendMessage(player, "~b~[STINGERS] ~w~You began the stingers deployment process...");
+            EPlayer.SendMessage(player, "~b~[STINGERS] ~w~The first end of the stinger was set to your current position.");
+            EPlayer.SendMessage(player, "~b~[STINGERS] ~w~Walk to the position where the other end will be placed and press ~y~ H ~w~ to place them.");
+        }
+
         [Command("archiveaccounts")]
         public void cmd_archiveaccounts(Player player, int inactive_days)
         {
