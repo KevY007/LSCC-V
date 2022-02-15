@@ -142,14 +142,34 @@ function increaseChatOpacity(time = 4000){
     if(chatOpacityTimeout != null){
         clearInterval(chatOpacityTimeout);
     }
-    UIHud.execute(`gm.$refs.chat.settings.opacity = 1.0`);
 
+    if(mp.storage.data.menu.ActiveChatOpacity !== undefined){
+        UIHud.execute(`gm.$refs.chat.settings.opacity = ${mp.storage.data.menu.ActiveChatOpacity.toString()}`);
+    }
+    else UIHud.execute(`gm.$refs.chat.settings.opacity = 1.0`);
+
+    // i know this is dumb but idk i cba to fix it it didnt work otherwise
     chatOpacityTimeout = setTimeout(() => {
         if(!chatStatus && UIHud != null && UIHud.active == true){
-            UIHud.execute(`gm.$refs.chat.settings.opacity = 0.5`);
+            if(mp.storage.data.menu.ShowInactiveChat == undefined){
+                if(mp.storage.data.menu.InactiveChatOpacity == undefined){
+                    UIHud.execute(`gm.$refs.chat.settings.opacity = 0.5`);
+                }
+                else UIHud.execute(`gm.$refs.chat.settings.opacity = ${mp.storage.data.menu.InactiveChatOpacity.toString()}`);
+            }
+            else{
+                if(mp.storage.data.menu.ShowInactiveChat == false){
+                    UIHud.execute(`gm.$refs.chat.settings.opacity = 0.0`);
+                }
+                else{
+                    if(mp.storage.data.menu.InactiveChatOpacity == undefined){
+                        UIHud.execute(`gm.$refs.chat.settings.opacity = 0.5`);
+                    }
+                    else UIHud.execute(`gm.$refs.chat.settings.opacity = ${mp.storage.data.menu.InactiveChatOpacity.toString()}`);                    
+                }
+            }
         }
     }, time);
-
 }
 
 function activateChat(toggle){
@@ -161,7 +181,10 @@ function focusChat(toggle){
     UIHud.execute(`gm.$refs.chat.active = ${toggle.toString()}`);
 
     if(toggle){
-        UIHud.execute(`gm.$refs.chat.settings.opacity = 1.0`);
+        if(mp.storage.data.menu.ActiveChatOpacity !== undefined){
+            UIHud.execute(`gm.$refs.chat.settings.opacity = ${mp.storage.data.menu.ActiveChatOpacity.toString()}`);
+        }
+        else UIHud.execute(`gm.$refs.chat.settings.opacity = 1.0`);
     }
     else{
         increaseChatOpacity(3000);

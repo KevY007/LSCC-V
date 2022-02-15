@@ -17,6 +17,9 @@ if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD
     mp.storage.data.menu.EventMusic = true;
     mp.storage.data.menu.monitoring = false;
     mp.storage.data.menu.VoiceMode = 0;
+    mp.storage.data.menu.InactiveChatOpacity = 0.5;
+    mp.storage.data.menu.ActiveChatOpacity = 1.0;
+    mp.storage.data.menu.ShowInactiveChat = true;
 
     mp.storage.data.menu.CrosshairData = "[]";
     mp.storage.data.menu.CustomCrosshair = false;
@@ -279,6 +282,65 @@ function ToggleMenu()
                           },
                         ]
                     },
+                    {
+                        id: 18,
+                        type: 4,
+                        name: "activechatopacity",
+                        label: "Active Chat Opacity",
+                        description: "Changes the opacity of the chat while it's in 'active' state, a.k.a. while typing or receiving messages.",
+                        preSelect: "${(mp.storage.data.menu.ActiveChatOpacity == undefined ? "100" : (mp.storage.data.menu.ActiveChatOpacity*100).toString())}",
+                        options: [
+                          {
+                            name: "100",
+                            value: "1",
+                          },
+                          {
+                            name: "75",
+                            value: "0.75",
+                          },
+                          {
+                            name: "50",
+                            value: "0.5",
+                          },
+                          {
+                            name: "25",
+                            value: "0.25",
+                          },
+                        ]
+                    },
+                    {
+                        id: 19,
+                        type: 4,
+                        name: "inactivechatopacity",
+                        label: "Inactive Chat Opacity",
+                        description: "Changes the opacity of the chat while it's in 'inactive' state, a.k.a. when some time passes without any new messages.",
+                        preSelect: "${(mp.storage.data.menu.InactiveChatOpacity == undefined ? "50" : (mp.storage.data.menu.InactiveChatOpacity*100).toString())}",
+                        options: [
+                          {
+                            name: "100",
+                            value: "1",
+                          },
+                          {
+                            name: "75",
+                            value: "0.75",
+                          },
+                          {
+                            name: "50",
+                            value: "0.5",
+                          },
+                          {
+                            name: "25",
+                            value: "0.25",
+                          },
+                        ]
+                    },
+                    {
+                        id: 20,
+                        type: 1,
+                        name: "showinactivechat",
+                        label: "Show Inactive Chat",
+                        description: "Toggles whether the chat will be visible or not while it's in the 'inactive' state."
+                    },
                 ]
             }
         ]`);
@@ -302,6 +364,10 @@ function ToggleMenu()
         UIMenu.execute(`gm.$refs.settings.$refs.Game.$refs.eventmusic.value = ${mp.storage.data.menu.EventMusic};`);
         UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.oocauto.value = ${mp.storage.data.menu.OOCauto};`);
         UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.voicemode.value = ${mp.storage.data.menu.VoiceMode};`);
+        
+        UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.activechatopacity.value = ${mp.storage.data.menu.ActiveChatOpacity.toString()};`);       
+        UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.inactivechatopacity.value = ${mp.storage.data.menu.InactiveChatOpacity.toString()};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.showinactivechat.value = ${mp.storage.data.menu.ShowInactiveChat.toString()};`);
 
         UIMenu.execute(`gm.$refs.settings.$refs.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
         UIMenu.execute(`gm.$refs.settings.$refs.crosshair.settings.enabled = ${mp.storage.data.menu.CustomCrosshair}`);
@@ -416,6 +482,21 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     {
         mp.storage.data.menu.VoiceMode = value;
         mp.events.callRemote("SetVoiceMode", value, true);
+    }
+    else if(id == 18)
+    {
+        mp.storage.data.menu.ActiveChatOpacity = value;
+        increaseChatOpacity(500);
+    }
+    else if(id == 19)
+    {
+        mp.storage.data.menu.InactiveChatOpacity = value;
+        increaseChatOpacity(500);
+    }
+    else if(id == 20)
+    {
+        mp.storage.data.menu.ShowInactiveChat = value;
+        increaseChatOpacity(500);
     }
     else if(id == 69420){
         mp.storage.data.menu.CustomCrosshair = value;

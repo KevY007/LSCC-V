@@ -2642,6 +2642,16 @@ function setStorageDataVars(){
         mp.events.callRemote("SetAutoJoin", mp.storage.data.menu.AutoJoin, false);
     }
 
+    if(mp.storage.data.menu.InactiveChatOpacity == undefined){
+        mp.storage.data.menu.InactiveChatOpacity = 0.5;
+    }
+    if(mp.storage.data.menu.ActiveChatOpacity == undefined){
+        mp.storage.data.menu.InactiveChatOpacity = 1.0;
+    }
+    if(mp.storage.data.menu.ShowInactiveChat == undefined){
+        mp.storage.data.menu.ShowInactiveChat = true;
+    }
+
     if(mp.storage.data.menu.EventMusic !== undefined){
         mp.players.local.EventMusic = mp.storage.data.menu.EventMusic;
     }
