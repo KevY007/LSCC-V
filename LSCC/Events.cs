@@ -2288,10 +2288,12 @@ namespace RNC
                                     player.TriggerEvent("ClearTaskNotFalling");
                                     EPlayer.Freeze(f, false);
                                 }
+                                EPlayer.GiveFugitiveWeapons(f);
                             }
                             Player leader = lobby.BankRobbery.HeistLeader;
                             Account la = EPlayer.GetAccount(leader);
                             CharacterData cd = NAPI.Util.FromJson<CharacterData>(la.Character);
+
 
                             if(cd.Clothing.Length >= 1)
                             {
@@ -2319,6 +2321,7 @@ namespace RNC
                                 c.TriggerEvent("pushMsgToChat", "!{#FF6347}[#] ~w~Alternatively, you can keep the fugitives trapped inside the bank until the round ends to win.");
                                 c.TriggerEvent("BankRob_SetMusic", 1);
                                 c.TriggerEvent("BankDoorLocked", false);
+                                EPlayer.GiveCopWeapons(c);
                             }
 
                             foreach (Vehicle v in lobby.BankRobbery.FugitiveVehicles)
