@@ -164,31 +164,31 @@ mp.events.add("OneSecondEvent", () => {
         if(SecondsSinceLastKeyPress == 600){ // MAKING SURE IDFK
             if(AFKStage == 0){ AFKStage = 1;}
 
-            pushMessageToChat("!{Red}[ANTI-AFK] !{White}It appears you didn't press any keys for 10 minutes.");
-            pushMessageToChat("!{Red}[ANTI-AFK] !{White}If you continue being AFK, you will be kicked in 15 minutes!");
-            pushMessageToChat("!{Red}[ANTI-AFK] !{White}Your autojoin has also been turned off, it will be re-enabled if you come back.");
+            pushMessageToChat("~r~[ANTI-AFK] ~w~It appears you didn't press any keys for 10 minutes.");
+            pushMessageToChat("~r~[ANTI-AFK] ~w~If you continue being AFK, you will be kicked in 15 minutes!");
+            pushMessageToChat("~r~[ANTI-AFK] ~w~Your autojoin has also been turned off, it will be re-enabled if you come back.");
 
             mp.events.callRemote("SetAutoJoin", false, true);
         }
         else if(SecondsSinceLastKeyPress == 900){
             if(AFKStage == 0){ AFKStage = 1;}
-            pushMessageToChat("!{Red}[ANTI-AFK] !{White}You will be kicked from the server in 10 minutes for being AFK too long!");
+            pushMessageToChat("~r~[ANTI-AFK] ~w~You will be kicked from the server in 10 minutes for being AFK too long!");
         }
         else if(SecondsSinceLastKeyPress == 1200){
             if(AFKStage == 0){ AFKStage = 1;}
-            pushMessageToChat("!{Red}[ANTI-AFK] !{White}You will be kicked from the server in 5 minutes for being AFK too long!");
+            pushMessageToChat("~r~[ANTI-AFK] ~w~You will be kicked from the server in 5 minutes for being AFK too long!");
         }
         else if(SecondsSinceLastKeyPress == 1440){
             if(AFKStage == 0){ AFKStage = 1;}
-            pushMessageToChat("!{Red}[ANTI-AFK] !{White}You will be kicked from the server in 1 minute for being AFK too long!");
+            pushMessageToChat("~r~[ANTI-AFK] ~w~You will be kicked from the server in 1 minute for being AFK too long!");
         }
     }
     else{
         if(AFKStage != 2)
         {
             AFKStage = 2;
-            pushMessageToChat("!{Red}[ANTI-AFK] !{White}You've been kicked from the server for being AFK too long!");
-            mp.events.callRemote("KickPlayer", "AFK", true);
+            pushMessageToChat("~r~[ANTI-AFK] ~w~You've been kicked from the server for being AFK too long!");
+            mp.events.callRemote("KickPlayer", "AFK", false);
         }
     }
 
@@ -293,8 +293,8 @@ function registerLastKeyPress()
 
     if(AFKStage > 0){      
         mp.events.callRemote("SetAutoJoin", true, true);
-        pushMessageToChat("!{Green}[ANTI-AFK] !{White}Welcome back. Please note if you stay idle for more than 25 minutes, you will be kicked!");
-        pushMessageToChat("!{Green}[ANTI-AFK] !{White}Your autojoin has been re-enabled.");
+        pushMessageToChat("~g~[ANTI-AFK] ~w~Welcome back. Please note if you stay idle for more than 25 minutes, you will be kicked!");
+        pushMessageToChat("~g~[ANTI-AFK] ~w~Your autojoin has been re-enabled.");
     }
 
   SecondsSinceLastKeyPress = 0;
@@ -2604,7 +2604,10 @@ mp.events.add(
 });
 
 mp.events.add("OnPlayerLoginRegister", () => {
-    setStorageDataVars();
+
+    setTimeout(() => {
+        setStorageDataVars();
+    }, 550);
 
     if(mp.storage.data.menu !== undefined && mp.storage.data.menu.myweather !== undefined)
     {
@@ -2623,6 +2626,7 @@ mp.events.add("setVoiceModeMenu", (value) => {
 function setStorageDataVars(){
 
     LastKeyPress = Date.now();
+    AFKStage = 0;
 
     if(mp.storage.data.menu.OOCauto !== undefined){
         autoOOC = mp.storage.data.menu.OOCauto;
@@ -2664,11 +2668,13 @@ function setStorageDataVars(){
     }
 
     if(mp.storage.data.menu.monitoring !== undefined){
-        UIHud.execute(`gm.$refs.TopRight.$refs.Info.monitor = ${mp.storage.data.menu.monitoring}`);
+        if(UIHud != undefined && UIHud != null)
+            UIHud.execute(`gm.$refs.TopRight.$refs.Info.monitor = ${mp.storage.data.menu.monitoring}`);
     }
     else{
         mp.storage.data.menu.monitoring = false;
-        UIHud.execute(`gm.$refs.TopRight.$refs.Info.monitor = false;`);
+        if(UIHud != undefined && UIHud != null)
+            UIHud.execute(`gm.$refs.TopRight.$refs.Info.monitor = false;`);
     }
 
     if(mp.storage.data.menu.VoiceMode !== undefined){

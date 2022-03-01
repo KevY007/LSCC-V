@@ -2539,7 +2539,7 @@ namespace RNC
                         }
                         break;
                     case 2:
-                        EPlayer.SendMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{FFFFFF}}All law enforcement units have been taken out by the fugitives.");
+                        EPlayer.SendMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] ~w~All law enforcement units have been taken out by the fugitives.");
                         Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | All cops have been eliminated.**");
 
                         if (lobby.gameMode != GameModes.BANKROBBERY)

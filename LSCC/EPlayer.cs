@@ -1827,11 +1827,13 @@ namespace RNC
             Events.OnStopPlayerAction(player, reason);
         }
 
-        public static void LoginBrowserSetup(Player player)
+        public static void LoginBrowserSetup(Player player, bool show_login = true)
         {
             NAPI.Task.Run(() =>
             {
-                player.TriggerEvent("showLoginBrowser", true);
+                if(show_login)
+                    player.TriggerEvent("showLoginBrowser", true);
+
                 player.TriggerEvent("InitiateCustomChat");
                 player.TriggerEvent("TogglePlayerChat", false);
             }, 500);

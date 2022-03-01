@@ -533,10 +533,12 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     mp.storage.flush();
 });
 
-mp.events.add("Menu_UpdateLevelXP", () => {
-    UIMenu.execute(`gm.$refs.profile.xp = ${mp.players.local.getVariable("CurrentXP")};`);
-    UIMenu.execute(`gm.$refs.profile.nextXp = ${mp.players.local.getVariable("NextLevelXP")};`);
-    UIMenu.execute(`gm.stats.level = ${mp.players.local.getVariable("Level")}`);
+mp.events.add("Menu_UpdateLevelXP", (first_time = false) => {
+    setTimeout(() => {
+        UIMenu.execute(`gm.$refs.profile.xp = ${mp.players.local.getVariable("CurrentXP")};`);
+        UIMenu.execute(`gm.$refs.profile.nextXp = ${mp.players.local.getVariable("NextLevelXP")};`);
+        UIMenu.execute(`gm.stats.level = ${mp.players.local.getVariable("Level")}`);
+    }, (first_time ? 1000 : 1));
 })
 
 mp.events.add("PutPlayerInLobby", (lobbyID, password) => {

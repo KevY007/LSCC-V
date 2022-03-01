@@ -37,7 +37,8 @@ namespace RNC
             {
                 try
                 {
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: Player {player.Name} has been kicked by SERVER for staying AFK too long.");
+                    if(reason == "AFK")
+                        EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: Player {player.Name} has been kicked by SERVER for staying AFK too long.");
                     if (silent)
                     {
                         player.KickSilent(reason);
@@ -92,11 +93,19 @@ namespace RNC
             }
             else
             {
-                autoLoginChecks.Sort((x, y) => y.LastLogin.CompareTo(x.LastLogin)); // sort by date, descending
-                Account toLogin = autoLoginChecks[0];
+                EPlayer.LoginCameraSetup(player);
+                player.TriggerEvent("InitiateCustomChat");
+                player.TriggerEvent("TogglePlayerChat", false);
+                EPlayer.ResetPlayerData(player);
+                NAPI.Task.Run(() =>
+                {
+                    autoLoginChecks.Sort((x, y) => y.LastLogin.CompareTo(x.LastLogin)); // sort by date, descending
+                    Account toLogin = autoLoginChecks[0];
 
-                OnPlayerLoginAttempt(player, toLogin.Username, toLogin.Password, true);
-                EPlayer.SendMessage(player, "~g~[AUTO-LOGIN] ~w~You've been automatically logged in! Welcome back. !{#C9C9C9}(You can turn this off in the settings)");
+                    OnPlayerLogin(player, toLogin);
+                    EPlayer.SendMessage(player, "~g~[AUTO-LOGIN] ~w~You've been automatically logged in! Welcome back. !{#C9C9C9}(You can turn this off in the settings)");
+                }, 550);
+
             }
 
 
@@ -1802,6 +1811,9 @@ namespace RNC
 
         public static void OnPlayerLogin(Player player, Account acc)
         {
+            if (EPlayer.LoggedIn(player)) return;
+            if (player.HasData("Kicked")) return;
+
             player.SetSharedData("EntAlpha", 255);
             player.SetData("PlaytimeTick", Environment.TickCount64);
             Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in as {acc.Username}.*");
@@ -1863,7 +1875,7 @@ namespace RNC
             player.SetSharedData("Level", acc.Level);
             player.SetSharedData("CurrentXP", acc.XP);
             player.SetSharedData("NextLevelXP", EPlayer.GetMaxLevelXP(acc.Level));
-            player.TriggerEvent("Menu_UpdateLevelXP");
+            player.TriggerEvent("Menu_UpdateLevelXP", true);
 
             if (ContextFactory.Instance.Languages.ToList().Find(l => l.SQL_ID == acc.Language) != null && EPlayer.GetAccount(player).Language != -1)
                 player.SetData("Language", ContextFactory.Instance.Languages.ToList().Find(l => l.SQL_ID == acc.Language));
@@ -2557,91 +2569,98 @@ namespace RNC
         }
 
         [RemoteEvent("OnPlayerLoginAttempt")]
-        public static void OnPlayerLoginAttempt(Player player, string username, string password, bool crypted = false)
+        public static void OnPlayerLoginAttempt(Player player, string username, string password)
         {
-            if (EPlayer.LoggedIn(player)) return;
-            if (player.HasData("Kicked")) return;
+            try
+            {
+                if (EPlayer.LoggedIn(player)) return;
+                if (player.HasData("Kicked")) return;
 
-            if ((username == null || username.Length < 2))
-            {
-                EPlayer.Error(player, "Username field is required!", "fas fa-user");
-                return;
-            }
-            if ((password == null || password.Length < 2))
-            {
-                EPlayer.Error(player, "Password field is required!", "fas fa-lock");
-                return;
-            }
-
-            NAPI.Util.ConsoleOutput($"[Login Attempt] Username {username} from {player.Name}");
-            if (Environment.TickCount64 - player.GetData<long>("LastCryptAttempt") < 1000 || EPlayer.LoggedIn(player))
-            {
-                EPlayer.Error(player, "Please wait between each attempt.", "fas fa-lock");
-                return;
-            }
-            player.SetData("LastCryptAttempt", Environment.TickCount64);
-            if (username.Contains("@"))
-            {
-                Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
-                if (acc != null)
+                if ((username == null || username.Length < 2))
                 {
-                    if (AccountManager.Login(acc, password, crypted))
-                    {
-                        OnPlayerLogin(player, acc);
-                        return;
-                    }
+                    EPlayer.Error(player, "Username field is required!", "fas fa-user");
+                    return;
                 }
-                else
+                if ((password == null || password.Length < 2))
                 {
-                    Account archiveCheck = BackupContextFactory.Instance.Accounts.ToList().Find(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
-                    if(archiveCheck != null)
-                    {
-                        AccountManager.RecoverAccount(archiveCheck);
+                    EPlayer.Error(player, "Password field is required!", "fas fa-lock");
+                    return;
+                }
 
-                        acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
-                        if (acc != null)
+                NAPI.Util.ConsoleOutput($"[Login Attempt] Username {username} from {player.Name}");
+                if (Environment.TickCount64 - player.GetData<long>("LastCryptAttempt") < 1000 || EPlayer.LoggedIn(player))
+                {
+                    EPlayer.Error(player, "Please wait between each attempt.", "fas fa-lock");
+                    return;
+                }
+                player.SetData("LastCryptAttempt", Environment.TickCount64);
+                if (username.Contains("@"))
+                {
+                    Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
+                    if (acc != null)
+                    {
+                        if (AccountManager.Login(acc, password))
                         {
-                            if (AccountManager.Login(acc, password, crypted))
+                            OnPlayerLogin(player, acc);
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        Account archiveCheck = BackupContextFactory.Instance.Accounts.ToList().Find(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
+                        if (archiveCheck != null)
+                        {
+                            AccountManager.RecoverAccount(archiveCheck);
+
+                            acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
+                            if (acc != null)
                             {
-                                OnPlayerLogin(player, acc);
-                                return;
+                                if (AccountManager.Login(acc, password))
+                                {
+                                    OnPlayerLogin(player, acc);
+                                    return;
+                                }
                             }
                         }
                     }
                 }
-            }
-            else
-            {
-                Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
-                if (acc != null)
-                {
-                    if (AccountManager.Login(acc, password, crypted))
-                    {
-                        OnPlayerLogin(player, acc);
-                        return;
-                    }
-                }
                 else
                 {
-                    Account archiveCheck = BackupContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
-                    if (archiveCheck != null)
+                    Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+                    if (acc != null)
                     {
-                        AccountManager.RecoverAccount(archiveCheck);
-
-                        acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
-                        if (acc != null)
+                        if (AccountManager.Login(acc, password))
                         {
-                            if (AccountManager.Login(acc, password, crypted))
+                            OnPlayerLogin(player, acc);
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        Account archiveCheck = BackupContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+                        if (archiveCheck != null)
+                        {
+                            AccountManager.RecoverAccount(archiveCheck);
+
+                            acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+                            if (acc != null)
                             {
-                                OnPlayerLogin(player, acc);
-                                return;
+                                if (AccountManager.Login(acc, password))
+                                {
+                                    OnPlayerLogin(player, acc);
+                                    return;
+                                }
                             }
                         }
                     }
                 }
+                EPlayer.Notify(player, "Invalid credentials or unable to log-in!", "red", "fas fa-lock", false, 4000, "bottomCenter");
+                player.TriggerEvent("OnPlayerLoginRegister");
             }
-            EPlayer.Notify(player, "Invalid credentials or unable to log-in!", "red", "fas fa-lock", false, 4000, "bottomCenter");
-            player.TriggerEvent("OnPlayerLoginRegister");
+            catch(Exception ex)
+            {
+                NAPI.Util.ConsoleOutput("CRINGE LOGIN FAIL: " + ex.ToString());
+            }
         }
 
         [RemoteEvent("RequestLobbySwitch")]

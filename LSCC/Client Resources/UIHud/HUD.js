@@ -255,10 +255,10 @@ mp.events.add("InitiateCustomChat", () => {
     mp.gui.chat.show(false);
     setTimeout(() =>{
         mp.events.callLocal('RestartMenu');
-    }, 1000);
+    }, 250);
     setTimeout(() => {
         mp.events.callLocal('RestartHUD');
-    }, 1000);
+    }, 250);
 });
 
 mp.events.add("render", () => {
