@@ -2962,7 +2962,7 @@ namespace RNC
                             player.SetData("ClimbProtectionProcs", 0);
                             player.SetData("ClimbProtectionEnd", Environment.TickCount64);
                             player.SetSharedData("CuffedBy", "n/a");
-                            player.TriggerEvent("moveSkyCamera", "up", 1, false);
+                            player.TriggerEvent("moveSkyCamera", "up", 1, false, 1);
                             if(lobby.gameMode != GameModes.BANKROBBERY)
                             {
                                 player.TriggerEvent("moveSkyCamera", "down", 1, false, 5000);

@@ -472,6 +472,9 @@ const Natives = {
     IS_PLAYER_SWITCH_IN_PROGRESS: '0xD9D2CFFF49FAB35F'
 };
 let gui;
+let camSwitchNativeReturn = undefined;
+
+let canManuallyResetCamera = false;
 
 mp.events.add('moveSkyCamera', (moveTo, switchType, showGui, timeout = 1) => moveFromToAir(moveTo, switchType, showGui, timeout));
 function moveFromToAir(moveTo, switchType, showGui, timeout = 1) {   
@@ -493,13 +496,21 @@ function moveFromToAir(moveTo, switchType, showGui, timeout = 1) {
                     };
                     focusChat(chatStatus);
 
+                    canManuallyResetCamera = false;
+
                     mp.game.invoke(Natives.SWITCH_OUT_PLAYER, mp.players.local.handle, 0, parseInt(switchType));
                 break;
             case 'down':
                     if (gui == 'false') {
                         checkCamInAir();
                     };
-                    mp.game.invoke(Natives.SWITCH_IN_PLAYER, mp.players.local.handle);
+                    camSwitchNativeReturn = mp.game.invoke(Natives.SWITCH_IN_PLAYER, mp.players.local.handle);
+                    
+                    mp.gui.chat.push("~g~[HINT]~w~ If your camera is stuck in the air, you can now ~y~press CapsLock~w~ to manually reset it.");
+                    mp.gui.chat.push("~g~[>]~w~ You have ~y~10 seconds~w~ to do this!");
+                    canManuallyResetCamera = true;
+
+                    setTimeout(() => { canManuallyResetCamera = false; }, 10000);
                 break;
         
             default:
@@ -507,6 +518,23 @@ function moveFromToAir(moveTo, switchType, showGui, timeout = 1) {
         }
     }, timeout);
 }
+mp.keys.bind(0x14, true, function() {
+    if(!chatStatus) return;
+
+    mp.gui.chat.push("~y~Resetting your camera manually....");
+    mp.gui.chat.push("~r~NOTE: ~w~If you were bugged, please notify the developers about this, a log has automatically been sent.");
+    
+    canManuallyResetCamera = false;
+
+    mp.game.invoke(Natives.SWITCH_IN_PLAYER, mp.players.local.handle);
+    mp.events.callLocal("HideAllElementsExceptChat", true); // show em
+    gui = 'true';
+
+    if(UIHud != null && UIHud != undefined)
+        UIHud.execute(`gm.hud = ${showHud};`);
+
+    mp.events.callRemote("DebugLog_SendCameraStuckLog", (camSwitchNativeReturn == undefined ? "undefined" : camSwitchNativeReturn.toString()));
+});
 
 // Checks whether the camera is in the air. If so, then reset the timer
 function checkCamInAir() {
@@ -523,7 +551,9 @@ function checkCamInAir() {
     {
         mp.events.callLocal("HideAllElementsExceptChat", true); // show em
         gui = 'true';
-        UIHud.execute(`gm.hud = ${showHud};`);
+
+        if(UIHud != null && UIHud != undefined)
+            UIHud.execute(`gm.hud = ${showHud};`);
     }
 }
 

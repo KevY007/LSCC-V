@@ -3422,6 +3422,25 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("DebugLog_SendCameraStuckLog")]
+        public static void DebugLog_SendCameraStuck(Player player, string camswitch_native_return)
+        {
+            if (player == null || player.GetSharedData<int>("Team") == -1) return;
+            LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (lobby == null) return;
+
+            var writer = new System.IO.StreamWriter($"racenchase/debug_logs/camera_switch.txt", true);
+
+            writer.WriteLine($"[ {DateTime.Now.ToString()} ]");
+            writer.WriteLine($"PLAYER: {player.Name} (ServerID: {player.Id})");
+            writer.WriteLine($"LOBBY: Lobby #{lobby.lobbyId}, GameMode: {Main.ConvertGameMode(lobby.gameMode)}");
+            writer.WriteLine($"CAM_SWITCH NATIVE RETURNED: {camswitch_native_return}");
+            writer.WriteLine($"[==========> END <==========]");
+            writer.Flush();
+            writer.Close();
+            return;
+        }
+
         [RemoteEvent("ReplaceAFKDriver")]
         public static void ReplaceAFKDriver(Player player)
         {
