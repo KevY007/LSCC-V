@@ -1235,7 +1235,7 @@ namespace RNC
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has summoned all the players.");
             return;
         }
-
+        /*
         [Command("placespikes")]
         public void cmd_placespikes(Player player)
         {
@@ -1244,12 +1244,12 @@ namespace RNC
 
             LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
             if (lobby == null) return;
-            /*
+            
             if (!lobby.Cops.Contains(player))
             {
                 EPlayer.SendMessage(player, "!{#FF6347}[!] ~w~You are not a cop!");
                 return;
-            }*/
+            }
             Account acc = EPlayer.GetAccount(player);
             if(acc.Level < 5)
             {
@@ -1274,6 +1274,7 @@ namespace RNC
             EPlayer.SendMessage(player, "~b~[STINGERS] ~w~The first end of the stinger was set to your current position.");
             EPlayer.SendMessage(player, "~b~[STINGERS] ~w~Walk to the position where the other end will be placed and press ~y~ H ~w~ to place them.");
         }
+        */
 
         [Command("archiveaccounts")]
         public void cmd_archiveaccounts(Player player, int inactive_days)
