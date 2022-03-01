@@ -2651,6 +2651,9 @@ function setStorageDataVars(){
     if(mp.storage.data.menu.ShowInactiveChat == undefined){
         mp.storage.data.menu.ShowInactiveChat = true;
     }
+    if(mp.storage.data.menu.AutoLogin == undefined){
+        mp.storage.data.menu.AutoLogin = true;
+    }
 
     if(mp.storage.data.menu.EventMusic !== undefined){
         mp.players.local.EventMusic = mp.storage.data.menu.EventMusic;

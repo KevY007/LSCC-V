@@ -68,25 +68,41 @@ namespace RNC
             EPlayer.SyncServerSettings(player);
             EPlayer.Freeze(player, true);
 
-            EPlayer.LoginCameraSetup(player);
+            List<Account> autoLoginChecks = ContextFactory.Instance.Accounts.ToList().Where(a => a.LastHWID == player.Serial &&
+                                                                                          a.LastRID == player.SocialClubId &&
+                                                                                          a.LastSC == player.SocialClubName &&
+                                                                                          a.AutoLogin == true).ToList();
+            if(autoLoginChecks.Count <= 0)
+            {
+                EPlayer.LoginCameraSetup(player);
 
-            EPlayer.LoginBrowserSetup(player);
+                EPlayer.LoginBrowserSetup(player);
+
+                NAPI.Task.Run(() =>
+                {
+                    try
+                    {
+                        if (player != null && player.Exists)
+                        {
+                            EPlayer.LoginCameraSetup(player);
+                        }
+                    }
+                    catch { }
+                }, 2000);
+            }
+            else
+            {
+                autoLoginChecks.Sort((x, y) => y.LastLogin.CompareTo(x.LastLogin)); // sort by date, descending
+                Account toLogin = autoLoginChecks[0];
+
+                OnPlayerLoginAttempt(player, toLogin.Username, toLogin.Password, true);
+                EPlayer.SendMessage(player, "~g~[AUTO-LOGIN] ~w~You've been automatically logged in! Welcome back. !{#C9C9C9}(You can turn this off in the settings)");
+            }
+
 
             player.TriggerEvent("InitChaseTimer");
 
             player.SetSharedData("PlayerWeather", -1);
-
-            NAPI.Task.Run(() =>
-            {
-                try
-                {
-                    if (player != null && player.Exists)
-                    {
-                        EPlayer.LoginCameraSetup(player);
-                    }
-                }
-                catch { }
-            }, 2000);
 
             BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.HWID.Equals(player.Serial) || ban.IP.Equals(player.Address) ||
                 ban.RockstarID == player.SocialClubId);
@@ -2541,7 +2557,7 @@ namespace RNC
         }
 
         [RemoteEvent("OnPlayerLoginAttempt")]
-        public static void OnPlayerLoginAttempt(Player player, string username, string password)
+        public static void OnPlayerLoginAttempt(Player player, string username, string password, bool crypted = false)
         {
             if (EPlayer.LoggedIn(player)) return;
             if (player.HasData("Kicked")) return;
@@ -2569,7 +2585,7 @@ namespace RNC
                 Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
                 if (acc != null)
                 {
-                    if (AccountManager.Login(acc, password))
+                    if (AccountManager.Login(acc, password, crypted))
                     {
                         OnPlayerLogin(player, acc);
                         return;
@@ -2585,7 +2601,7 @@ namespace RNC
                         acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
                         if (acc != null)
                         {
-                            if (AccountManager.Login(acc, password))
+                            if (AccountManager.Login(acc, password, crypted))
                             {
                                 OnPlayerLogin(player, acc);
                                 return;
@@ -2599,7 +2615,7 @@ namespace RNC
                 Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
                 if (acc != null)
                 {
-                    if (AccountManager.Login(acc, password))
+                    if (AccountManager.Login(acc, password, crypted))
                     {
                         OnPlayerLogin(player, acc);
                         return;
@@ -2615,7 +2631,7 @@ namespace RNC
                         acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
                         if (acc != null)
                         {
-                            if (AccountManager.Login(acc, password))
+                            if (AccountManager.Login(acc, password, crypted))
                             {
                                 OnPlayerLogin(player, acc);
                                 return;
@@ -2625,8 +2641,6 @@ namespace RNC
                 }
             }
             EPlayer.Notify(player, "Invalid credentials or unable to log-in!", "red", "fas fa-lock", false, 4000, "bottomCenter");
-            EPlayer.Notify(player, "<strong>Notice:</strong> All accounts that are inactive for more than a month get archived. " +
-                "Try opening a support ticket on our Discord <strong>(racenchase.com)</strong> so the staff team check if yours is in the archive too.", "yellow", "fas fa-lock", true, 12000, "bottomCenter");
             player.TriggerEvent("OnPlayerLoginRegister");
         }
 
@@ -3444,6 +3458,19 @@ namespace RNC
             return;
         }
 
+        [RemoteEvent("Server_ToggleAutoLogin")]
+        public static void ToggleAutoLogin(Player player, bool toggle)
+        {
+            Account acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(player.Name, StringComparison.OrdinalIgnoreCase));
+            if(acc == null) return;
+            acc.AutoLogin = toggle;
+
+            if (toggle)
+                EPlayer.Notify(player, "You turned Auto Login on! You will no longer need to enter your login info on this account.", "green", "fa-solid fa-user-check", true, 4000);
+            else
+                EPlayer.Notify(player, "You turned Auto Login off! You will now have to enter your login info when you connect.", "red", "fa-solid fa-user-xmark", true, 4000);
+        }
+
         [RemoteEvent("ReplaceAFKDriver")]
         public static void ReplaceAFKDriver(Player player)
         {
@@ -3558,6 +3585,7 @@ namespace RNC
                     Username = username,
                     DiscordInfo = jsonDiscordData,
                     ChallengeInfo = jsonChallengeData,
+                    AutoLogin = true,
                     Admin = 0,
                     RegisterHWID = player.Serial,
                     RegisterIP = player.Address,

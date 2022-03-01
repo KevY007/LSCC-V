@@ -37,6 +37,7 @@ namespace RNC
         public ulong LastRID { get; set; }
         public string LastIP { get; set; }
         public string LastSC { get; set; }
+        public bool AutoLogin { get; set; }
         public DateTime LastLogin { get; set; }
         public int Admin { get; set; }
         public int Level { get; set; }

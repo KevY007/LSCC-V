@@ -20,6 +20,7 @@ if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD
     mp.storage.data.menu.InactiveChatOpacity = 0.5;
     mp.storage.data.menu.ActiveChatOpacity = 1.0;
     mp.storage.data.menu.ShowInactiveChat = true;
+    mp.storage.data.menu.AutoLogin = true;
 
     mp.storage.data.menu.CrosshairData = "[]";
     mp.storage.data.menu.CustomCrosshair = false;
@@ -135,6 +136,13 @@ function ToggleMenu()
                         name: "eventmusic",
                         label: "Event Music",
                         description: "Toggles whether background music will play in events or not."
+                    },
+                    {
+                        id: 21,
+                        type: 1,
+                        name: "autologintog",
+                        label: "Auto Login",
+                        description: "Automatically log in to this account - eliminates the need to enter your login info."
                     }
                 ]
             },
@@ -362,6 +370,7 @@ function ToggleMenu()
         UIMenu.execute(`gm.$refs.settings.$refs.Game.$refs.myweather.preSelect = ${mp.storage.data.menu.myweather};`);
         UIMenu.execute(`gm.$refs.settings.$refs.Game.$refs.autojoinopt.value = ${mp.storage.data.menu.AutoJoin};`);
         UIMenu.execute(`gm.$refs.settings.$refs.Game.$refs.eventmusic.value = ${mp.storage.data.menu.EventMusic};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Game.$refs.autologintog.value = ${mp.storage.data.menu.AutoLogin};`);
         UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.oocauto.value = ${mp.storage.data.menu.OOCauto};`);
         UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.voicemode.value = ${mp.storage.data.menu.VoiceMode};`);
         
@@ -497,6 +506,11 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     {
         mp.storage.data.menu.ShowInactiveChat = value;
         increaseChatOpacity(500);
+    }
+    else if(id == 21)
+    {
+        mp.storage.data.menu.AutoLogin = value;
+        mp.events.callRemote("Server_ToggleAutoLogin", value);
     }
     else if(id == 69420){
         mp.storage.data.menu.CustomCrosshair = value;
