@@ -4383,7 +4383,17 @@ namespace RNC
                                                             Account a = EPlayer.GetAccount(p);
                                                             try
                                                             {
+                                                                try
+                                                                {
+                                                                    CharacterData ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(p).Character);
+
+                                                                    EPlayer.ApplyCharacter(p, ConvChar, 1);
+                                                                }
+                                                                catch { }
+
+                                                                /*
                                                                 CharacterData cd = NAPI.Util.FromJson<CharacterData>(a.Character);
+                                                                
                                                                 int len = cd.Clothing.Length;
 
                                                                 bool hasHelmet = (new Random().Next(0, 10) > 5);
@@ -4421,8 +4431,9 @@ namespace RNC
                                                                     set_clothing_successfully = true;
                                                                 }
                                                                 EPlayer.ApplyCharacter(p, cd, 1);
+                                                                */
                                                             }
-                                                            catch(Exception ex)
+                                                            catch (Exception ex)
                                                             {
                                                                 try
                                                                 {
