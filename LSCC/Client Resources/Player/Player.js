@@ -159,7 +159,7 @@ mp.events.add("OneSecondEvent", () => {
     let lastKeyPressSecond = Math.floor(LastKeyPress/1000);
 
     SecondsSinceLastKeyPress = (curSecond-lastKeyPressSecond);
-    
+    /*
     if(SecondsSinceLastKeyPress < 1500){
         if(SecondsSinceLastKeyPress == 600){ // MAKING SURE IDFK
             if(AFKStage == 0){ AFKStage = 1;}
@@ -191,6 +191,7 @@ mp.events.add("OneSecondEvent", () => {
             mp.events.callRemote("KickPlayer", "AFK", false);
         }
     }
+	*/
 
     if(ShotStats.UpdateInterval >= 10)
     {
