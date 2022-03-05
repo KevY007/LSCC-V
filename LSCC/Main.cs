@@ -2800,11 +2800,13 @@ namespace RNC
                 {
                     if (lobby.gameStatus == 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Copchase is already running, failed to start"); return false; }
 
+                    /*
                     if(lobby.NextEventCounter <= 0)
                     {
                         lobby.gameMode = GameModes.BANKROBBERY;
                         lobby.NextEventCounter = 10;
                     }
+                    */
 
                     lobby.gameStatus = 0;
                     int pCount = 0;
@@ -4497,7 +4499,7 @@ namespace RNC
                                                         Events.RequestPlayAnimation(p, "mp_missheist_ornatebank", "stand_cash_in_bag_loop", 1);
                                                         EPlayer.Freeze(p, true);
 
-                                                        EPlayer.Notify(p, "Stealing the money....", "green", "fas fa-hourglass-start", false, 60000, "bottomCenter");
+                                                        EPlayer.Notify(p, "Stealing the money....", "green", "fas fa-hourglass-start", false, 40000, "bottomCenter");
                                                     }
                                                     else
                                                     {

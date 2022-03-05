@@ -1,4 +1,4 @@
-const ROBBERY_TIME = 60;
+const ROBBERY_TIME = 40;
 
 let robTimeLeft = ROBBERY_TIME;
 let robTimer = null;
@@ -7,6 +7,7 @@ let FugiCarBlips = [];
 let FinishMarker = null;
 let FinishColshape = null; // cuz adding OnEnterMarker is so hard... thanks ragemp devs very cool
 
+/*
 mp.events.add("BankDoorLocked", (toggle) => {
     // main doors
     mp.game.object.doorControl(110411286, 232.6054, 214.1584, 106.4049, toggle,  0.0, 50.0, 0);
@@ -15,6 +16,7 @@ mp.events.add("BankDoorLocked", (toggle) => {
     mp.game.object.doorControl(110411286, 260.6432, 203.2052, 106.4049, toggle,  0.0, 50.0, 0);
     mp.game.object.doorControl(110411286, 258.2022, 204.1005, 106.4049, toggle,  0.0, 50.0, 0);
 })
+*/
 
 mp.events.add("StartBankRobberyTimer", () => {
     if(mp.players.local == undefined){
@@ -56,15 +58,15 @@ mp.events.add("StartBankRobberyTimer", () => {
             mp.events.callRemote("BankRob_ContinueState", 1);
             clearInterval(robTimer);
         }
-        else if(robTimeLeft == 45){
+        else if(robTimeLeft == 30){
             mp.events.callRemote("BankRob_SendMessage", 0, 0);
         }
-        else if(robTimeLeft == 30){
+        else if(robTimeLeft == 20){
             mp.events.callRemote("BankRob_SendMessage", 0, 1);
             mp.events.callRemote("BankRob_SendMessage", 1, 0);
 
         }
-        else if(robTimeLeft == 15){
+        else if(robTimeLeft == 10){
             mp.events.callRemote("BankRob_SendMessage", 0, 2);
         }
     }, 1000);

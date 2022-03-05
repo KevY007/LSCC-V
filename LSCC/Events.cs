@@ -73,40 +73,36 @@ namespace RNC
                                                                                           a.LastRID == player.SocialClubId &&
                                                                                           a.LastSC == player.SocialClubName &&
                                                                                           a.AutoLogin == true).ToList();
-            if(autoLoginChecks.Count <= 0)
+            EPlayer.LoginCameraSetup(player);
+
+            EPlayer.LoginBrowserSetup(player);
+
+            NAPI.Task.Run(() =>
             {
-                EPlayer.LoginCameraSetup(player);
-
-                EPlayer.LoginBrowserSetup(player);
-
-                NAPI.Task.Run(() =>
+                try
                 {
-                    try
+                    if (player != null && player.Exists)
                     {
-                        if (player != null && player.Exists)
+                        if (autoLoginChecks.Count <= 0)
                         {
                             EPlayer.LoginCameraSetup(player);
                         }
+                        else
+                        {
+                            EPlayer.ResetPlayerData(player);
+                            autoLoginChecks.Sort((x, y) => y.LastLogin.CompareTo(x.LastLogin)); // sort by date, descending
+                            Account toLogin = autoLoginChecks[0];
+
+                            OnPlayerLogin(player, toLogin);
+                            EPlayer.SendMessage(player, "~g~[AUTO-LOGIN] ~w~You've been automatically logged in! Welcome back. !{#C9C9C9}(You can turn this off in the settings)");
+                        }
                     }
-                    catch { }
-                }, 2000);
-            }
-            else
-            {
-                EPlayer.LoginCameraSetup(player);
-                player.TriggerEvent("InitiateCustomChat");
-                player.TriggerEvent("TogglePlayerChat", false);
-                EPlayer.ResetPlayerData(player);
-                NAPI.Task.Run(() =>
-                {
-                    autoLoginChecks.Sort((x, y) => y.LastLogin.CompareTo(x.LastLogin)); // sort by date, descending
-                    Account toLogin = autoLoginChecks[0];
+                }
+                catch { }
+            }, 2000);
 
-                    OnPlayerLogin(player, toLogin);
-                    EPlayer.SendMessage(player, "~g~[AUTO-LOGIN] ~w~You've been automatically logged in! Welcome back. !{#C9C9C9}(You can turn this off in the settings)");
-                }, 550);
 
-            }
+
 
 
             player.TriggerEvent("InitChaseTimer");
