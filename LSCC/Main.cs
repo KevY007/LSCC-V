@@ -1778,6 +1778,8 @@ namespace RNC
 
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) ===== Heading towards final stage of startup =====");
 
+            GenerateRedeemableCodes();
+
             try
             {
                 foreach (KeyValuePair<long, jWeaponData> item in jWeaponData.FromJson(File.ReadAllText("racenchase/weapondata.json")))
@@ -2123,6 +2125,38 @@ namespace RNC
                     }
                 }
             }
+        }
+
+        public void GenerateRedeemableCodes()
+        {
+            if (ContextFactory.Instance.RedeemableCodes.Count() > 0) return;
+
+            // GENERATING NEW DONATION CODES
+            string alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+
+            /* ---Donation Types/Values---
+             * 0 => Bronze [VALUE: how many times it can be redeemed]
+             * 1 => Silver
+             * 2 => Gold
+             * 3 => 100 Donator Points
+             * 4 => Namechange
+             * 5 => 5 namechanges [bundle]
+             */
+            Random rndcode = new Random();
+            int code_length = 7; // how many characters the code is
+            for (int i = 0; i < 6; i++)
+            {
+                for (int j = 0; j < 250; j++)
+                {
+                    string code = (Enumerable.Repeat(alphanumeric, code_length).Select(s => s[rndcode.Next(s.Length)]).ToArray()).ToString();
+                    if (ContextFactory.Instance.RedeemableCodes.ToList().FirstOrDefault(c => c.Code.Equals(code)) == null)
+                    {
+                        // Value is set to "i" because i represents the donation package type's ID [see list above]
+                        ContextFactory.Instance.RedeemableCodes.Add(new RedeemableCode() { Code = code, Uses = 1, Value = i });
+                    }
+                }
+            }
+            ContextFactory.Instance.SaveChanges();
         }
 
         public void TimeUpdate()

@@ -8519,6 +8519,114 @@ namespace RNC
             EPlayer.Save(target);
         }
 
+        [Command("redeem", "!{#AFAFAF}[USAGE] redeem (code)")]
+        public void cmd_redeem(Player player, string code)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            RedeemableCode redeem = ContextFactory.Instance.RedeemableCodes.FirstOrDefault(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+
+            if(redeem == null)
+            {
+                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}This code is invalid! Please ensure you are entering it correctly.");
+                EPlayer.SendMessage(player, "!{#C9C9C9}[HINT] A common mistake made is mixing up the letter 'O' and the number zero (0).");
+                return;
+            }
+            if(redeem.Uses <= 0)
+            {
+                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}This code has been used already! Please ask the management for a new one if you donated and received this one.");
+                ContextFactory.Instance.RedeemableCodes.Remove(redeem);
+                ContextFactory.Instance.SaveChanges();
+                return;
+            }
+
+            /* ---Donation Types/Values---
+             * 0 => Bronze [VALUE: how many times it can be redeemed]
+             * 1 => Silver
+             * 2 => Gold
+             * 3 => 100 Donator Points
+             * 4 => Namechange
+             * 5 => 5 namechanges [bundle]
+             */
+            Account acc = EPlayer.GetAccount(player);
+            switch (redeem.Value)
+            {
+                case 0:
+                    acc.DonatorLevel = 1;
+                    EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(1, true)}~w~!");
+                    break;
+                case 1:
+                    acc.DonatorLevel = 2;
+                    EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(2, true)}~w~!");
+                    break;
+                case 2:
+                    acc.DonatorLevel = 3;
+                    EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(3, true)}~w~!");
+                    break;
+                case 3:
+                    acc.DonatorPoints += 100;
+                    EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed !{{#a8ffb7}}100 Donator Points~w~!");
+                    break;
+                case 4:
+                    acc.Namechanges++;
+                    EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed !{{#a8ffb7}}1 Namechange~w~!");
+                    break;
+                case 5:
+                    acc.Namechanges += 5;
+                    EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed !{{#a8ffb7}}5 Namechanges Bundle~w~!");
+                    break;
+            }
+            EPlayer.SendMessage(player, "~w~Thank you very much for donating! ~r~<3 ~w~-RnC Management");
+
+            ContextFactory.Instance.RedeemableCodes.Remove(redeem);
+            ContextFactory.Instance.SaveChanges();
+            return;
+        }
+
+        [Command("namechange", "!{#AFAFAF}[USAGE] namechange (new name)")]
+        public void cmd_namechange(Player player, string newname)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Namechanges <= 0)
+            {
+                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You don't have any namechanges!");
+                return;
+            }
+
+            if (ContextFactory.Instance.Accounts.FirstOrDefault(p => p.Username.Equals(newname, StringComparison.OrdinalIgnoreCase) == true) != null)
+            {
+                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's already an account with that name!");
+                return;
+            }
+            string name = player.Name;
+
+            /*foreach (var arena in ContextFactory.Instance.CustomArenas.ToList().Where(a => a.Creator.Equals(name, StringComparison.OrdinalIgnoreCase)))
+            {
+                arena.Creator = newname;
+            }*/
+            foreach (var arena in ContextFactory.Instance.Bans.ToList().Where(a => a.Admin.Equals(name, StringComparison.OrdinalIgnoreCase)))
+            {
+                arena.Admin = newname;
+            }
+
+            player.TriggerEvent("pushMsgToChat", "!{#FF6347} Reconnect with your new name: !{#FFFFFF}" + newname);
+            EPlayer.Notify(player, $"Please reconnect with your new name: {newname}", "green", "fas fa-check", false, 3000, "center", "replace");
+            
+            EPlayer.Save(player);
+            player.ResetData("AccountHandle");
+            player.ResetData("LoggedIn");
+            
+            NAPI.Task.Run(() => { try { player.KickSilent(); } catch { } }, 1000);
+            
+            EPlayer.GetAccount(player).Username = newname;
+            EPlayer.GetAccount(player).Namechanges--;
+            ContextFactory.Instance.SaveChanges();
+            return;
+        }
+
         [Command("setdonator", "!{#AFAFAF}[USAGE] setdonator (target) (level)", Alias = "makedonator")]
         public void cmd_setdonator(Player player, Player target, int level)
         {

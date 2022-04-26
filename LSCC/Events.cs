@@ -3350,6 +3350,7 @@ namespace RNC
                 }
                 if (new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() >= Settings.Dynamics.NextWeekUnix)
                 {
+                    // ARCHIVING INACTIVE ACCOUNTS.....
                     Account cunt = ContextFactory.Instance.Accounts.ToList().FirstOrDefault(a => (new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() - new DateTimeOffset(a.LastLogin).ToUnixTimeSeconds()) > 2629746);
                     if (cunt != null)
                     {
@@ -3643,7 +3644,8 @@ namespace RNC
                     Character = "{}",
                     PurchasedAmmo = "{}",
                     ChallengeStreak = 0,
-                    CompletedDailyChallenge = false
+                    CompletedDailyChallenge = false,
+                    Namechanges = 0
                 };
                 AccountManager.Add(_new);
                 OnPlayerRegister(player, _new);

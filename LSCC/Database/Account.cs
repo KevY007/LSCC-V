@@ -72,6 +72,7 @@ namespace RNC
         public string PurchasedAmmo { get; set; }
         public int ChallengeStreak { get; set; }
         public bool CompletedDailyChallenge { get; set; }
+        public int Namechanges { get; set; }
     }
 
     public class ChallengeData

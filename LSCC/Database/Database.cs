@@ -126,6 +126,14 @@ namespace RNC
         public int WheelColor { get; set; }
         public string Mods { get; set; }
     }
+    public class RedeemableCode
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public string Code { get; set; }
+        public int Value { get; set; }
+        public int Uses { get; set; }
+    }
     public class OwnedLoadoutData
     {
         [Key]
@@ -207,7 +215,8 @@ namespace RNC
         public DbSet<OwnedVehData> OwnedVehicles { get; set; }
         public DbSet<OwnedLoadoutData> OwnedLoadouts { get; set; }
         public DbSet<AdminNote> AdminNotes { get; set; }
-        public DbSet<DailyChallenge> DailyChallenges { get; set;}
+        public DbSet<DailyChallenge> DailyChallenges { get; set; }
+        public DbSet<RedeemableCode> RedeemableCodes { get; set; }
         public DbSet<UnlockedAchievement> UnlockedAchievements { get; set; }
         public DbSet<Logs_AdminRecord> Logs_AdminRecords { get; set; }
         public DbSet<Logs_Admin> Logs_Admin { get; set; }
@@ -339,6 +348,7 @@ namespace RNC
         public DbSet<OwnedLoadoutData> OwnedLoadouts { get; set; }
         public DbSet<AdminNote> AdminNotes { get; set; }
         public DbSet<DailyChallenge> DailyChallenges { get; set; }
+        public DbSet<RedeemableCode> RedeemableCodes { get; set; }
         public DbSet<UnlockedAchievement> UnlockedAchievements { get; set; }
         public DbSet<Logs_AdminRecord> Logs_AdminRecords { get; set; }
         public DbSet<Logs_Admin> Logs_Admin { get; set; }
