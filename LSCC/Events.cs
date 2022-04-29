@@ -335,7 +335,7 @@ namespace RNC
                                 player.TriggerEvent("StopReviving", 3);
                             }
 
-                            #region -> Giving XP to killer, handling stats, kill feed
+                            #region -> Giving XP to killer, handling stats, kill feed, clan kill
                             if (killer != null && killer != player)
                             {
                                 LobbyData lobby = Settings.Lobbies.FirstOrDefault(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
@@ -386,6 +386,16 @@ namespace RNC
                                     player.SetSharedData("LastKiller", killer.Name);
 
                                     EPlayer.GetAccount(player).Deaths++;
+
+                                    if (EPlayer.GetAccount(player).ClanID != -1) 
+                                    {
+                                        Clan clan = ContextFactory.Instance.Clans.FirstOrDefault(c => c.SQL_ID == EPlayer.GetAccount(player).ClanID);
+                                        if (clan != null)
+                                        {
+                                            clan.TotalKills++;
+                                            clan.WeekKills++;
+                                        }
+                                    }
 
                                     killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 10.0));
                                     EPlayer.GrantXP(killer, 2);
@@ -3350,6 +3360,36 @@ namespace RNC
                 }
                 if (new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() >= Settings.Dynamics.NextWeekUnix)
                 {
+                    // CHECKING FOR CLAN OF THE WEEK, RESETTING ALL CLANS' WEEKLY KILLS
+                    Clan mostKills = ContextFactory.Instance.Clans.ToList().OrderByDescending(c => c.WeekKills).FirstOrDefault();
+                    foreach(Account account in ContextFactory.Instance.Accounts.ToList().Where(a => a.ClanID != -1))
+                    {
+                        if(account.ClanID == mostKills.SQL_ID)
+                        {
+                            MOTDData motd = new MOTDData() { 
+                                AdminName = "SERVER", 
+                                PostedOn = DateTime.Now.ToShortDateString(),
+                                Message = "~y~[CLAN OF THE WEEK]~w~ Congratulations! Your clan had the most kills this week and you won a reward! All clans' weekly kills have been reset."
+                            };
+                            account.MOTD = NAPI.Util.ToJson(motd);
+
+                            // reward skripts here
+                        }
+                        else
+                        {
+                            MOTDData motd = new MOTDData()
+                            {
+                                AdminName = "SERVER",
+                                PostedOn = DateTime.Now.ToShortDateString(),
+                                Message = $"~r~[CLAN OF THE WEEK]~w~ Clan {mostKills.Name} won clan of the week. All clans' weekly kills have been reset!"
+                            };
+                            account.MOTD = NAPI.Util.ToJson(motd);
+                        }
+                    }
+
+                    EPlayer.SendMessageAll($"~y~[CLAN OF THE WEEK] ~w~Clan ~g~{mostKills.Name} ~w~had the most kills this week! Congratulations!");
+                    EPlayer.SendMessageAll($"~y~[>] ~w~ A new week begins and all clans' weekly kills have been reset.");
+
                     // ARCHIVING INACTIVE ACCOUNTS.....
                     Account cunt = ContextFactory.Instance.Accounts.ToList().FirstOrDefault(a => (new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() - new DateTimeOffset(a.LastLogin).ToUnixTimeSeconds()) > 2629746);
                     if (cunt != null)

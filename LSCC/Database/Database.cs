@@ -79,6 +79,16 @@ namespace RNC
         public DateTime DateTime { get; set; }
     }
 
+    public class Clan
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public string Name { get; set; }
+        public int WeekKills { get; set; } // resets weekly
+        public int TotalKills { get; set; }
+        public int WeekWins { get; set; } // 'Clan Of The Week' - weekly clan with most kills wins the week or w/e
+    }
+
     public class DailyChallenge
     {
         [Key]
@@ -210,6 +220,7 @@ namespace RNC
         public DbSet<Language> Languages { get; set; }
         public DbSet<MapSpawn> MapSpawns { get; set; }
         public DbSet<BanData> Bans { get; set; }
+        public DbSet<Clan> Clans { get; set; }
         public DbSet<PlayerOutfit> PlayerOutfits { get; set; }
         public DbSet<PlayerTunings> PlayerTunings { get; set; }
         public DbSet<OwnedVehData> OwnedVehicles { get; set; }
@@ -342,6 +353,7 @@ namespace RNC
         public DbSet<Language> Languages { get; set; }
         public DbSet<MapSpawn> MapSpawns { get; set; }
         public DbSet<BanData> Bans { get; set; }
+        public DbSet<Clan> Clans { get; set; }
         public DbSet<PlayerOutfit> PlayerOutfits { get; set; }
         public DbSet<PlayerTunings> PlayerTunings { get; set; }
         public DbSet<OwnedVehData> OwnedVehicles { get; set; }

@@ -1701,7 +1701,7 @@ namespace RNC
 
             NAPI.Server.SetAutoRespawnAfterDeath(false);
             NAPI.Server.SetAutoSpawnOnConnect(false);
-            NAPI.Server.SetGlobalServerChat(false);
+            NAPI.Server.SetGlobalServerChat(false); 
             NAPI.Server.SetCommandErrorMessage("!{#FF6347}[!] !{#FFFFFF}This command is invalid, refer to /help for a list.");
 
             NAPI.Util.ConsoleOutput($"(RnC | STARTUP) Connecting to database & backup database => User {Settings.MySQL_User} for db {Settings.MySQL_Database} on host {Settings.MySQL_Host}");

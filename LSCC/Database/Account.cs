@@ -73,6 +73,8 @@ namespace RNC
         public int ChallengeStreak { get; set; }
         public bool CompletedDailyChallenge { get; set; }
         public int Namechanges { get; set; }
+        public int ClanID { get; set; }
+        public int ClanTier { get; set; }
     }
 
     public class ChallengeData

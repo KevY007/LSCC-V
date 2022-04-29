@@ -8519,6 +8519,119 @@ namespace RNC
             EPlayer.Save(target);
         }
 
+        [Command("claninfo")]
+        public void cmd_claninfo(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            Account acc = EPlayer.GetAccount(player);
+            if (acc.ClanID == -1 || acc.ClanTier == -1)
+            {
+                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}You are not part of a clan!");
+                return;
+            }
+            Clan clan = ContextFactory.Instance.Clans.FirstOrDefault(c => c.SQL_ID == acc.ClanID);
+            if (clan == null)
+            {
+                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}A clan with that ID was not found!");
+                return;
+            }
+            EPlayer.SendMessage(player, $"~y~====================> STATISTICS FOR: ~w~{clan.Name} ~y~<====================");
+            EPlayer.SendMessage(player, $"~g~WEEKLY KILLS: ~w~{clan.WeekKills}");
+            EPlayer.SendMessage(player, $"~o~TOTAL KILLS: ~w~{clan.TotalKills}");
+            EPlayer.SendMessage(player, $"~p~MEMBERS: ~w~{ContextFactory.Instance.Accounts.Count(a => a.ClanID == clan.SQL_ID)}");
+            EPlayer.SendMessage(player, " ");
+
+            return;
+        }
+
+        [Command("leaveclan")]
+        public void cmd_leaveclan(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            Account acc = EPlayer.GetAccount(player);
+            if (acc.ClanID == -1 || acc.ClanTier == -1)
+            {
+                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}You are not part of a clan!");
+                return;
+            }
+
+            if(acc.ClanTier == 0)
+            {
+                Clan clan = ContextFactory.Instance.Clans.FirstOrDefault(c => c.SQL_ID == acc.ClanID);
+                if (clan != null)
+                {
+                    ContextFactory.Instance.Clans.Remove(clan);
+                }
+                EPlayer.SendMessage(player, "~r~[CLAN DISBANDED]~w~ You left the clan you were owner of and therefore it has been disbanded & deleted!");
+            }
+            acc.ClanID = -1;
+            acc.ClanTier = -1;
+
+            ContextFactory.Instance.SaveChanges();
+            EPlayer.SendMessage(player, "~r~[CLAN LEAVE] ~w~You successfully left the clan.");
+
+            return;
+        }
+
+        [Command("createclan", "!{#AFAFAF}[USAGE] createclan (clan name)")]
+        public void cmd_createclan(Player player, string clanname)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            Account acc = EPlayer.GetAccount(player);
+            if(acc.ClanID != -1 || acc.ClanTier != -1)
+            {
+                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}You are already in a clan! Please leave your current one first (Menu [M] > Clan > Leave).");
+                return;
+            }
+            if(acc.Points < 300)
+            {
+                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}You need ~y~300 Points~w~ to create a clan!");
+                return;
+            }
+            if(clanname.Length > 32 || clanname.Length < 3)
+            {
+                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}Clan name must be between 3 and 32 characters!");
+                return;
+            }
+            if (!clanname.All(char.IsLetterOrDigit))
+            {
+                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}Clan name must be alphanumeric (A-Z, 0-9)!");
+                return;
+            }
+
+            /*
+             * For testing purposes I am creating a clan this way.
+             * In real scenario there will be a UI with a confirmation window or something along those lines.
+             * Also a warning that a weekly/monthly clan fee will be paid.
+             */
+            Clan clan = new Clan()
+            {
+                Name = clanname,
+                WeekKills = 0,
+                TotalKills = 0,
+                WeekWins = 0
+            };
+            ContextFactory.Instance.Clans.Add(clan);
+
+            acc.ClanTier = 0;
+            acc.ClanID = ContextFactory.Instance.Clans.FirstOrDefault(c => c.Name.Equals(clanname)).SQL_ID;
+
+            ContextFactory.Instance.SaveChanges();
+
+            EPlayer.SendMessage(player, $"~g~[CLAN] ~w~Congratulations! You've successfully created a clan named ~y~{clanname}~w~ for 300 Points!");
+            EPlayer.SendMessage(player, $"~g~[CLAN] ~w~You can manage your clan through the clan panel (Menu [M] > Clan > Manage)");
+            EPlayer.SendMessage(player, $"~g~[CLAN] ~w~If you have any questions, ask the staff team or management.");
+            EPlayer.SendMessage(player, $"~g~[CLAN] ~r~NOTICE: ~w~If you leave your clan, it will automatically be disbanded and deleted.");
+            EPlayer.SendMessage(player, $"~g~[CLAN] ~w~Best of luck!");
+            return;
+        }
+
         [Command("redeem", "!{#AFAFAF}[USAGE] redeem (code)")]
         public void cmd_redeem(Player player, string code)
         {
