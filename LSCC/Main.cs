@@ -18,6 +18,29 @@ using System.Globalization;
 
 namespace RNC
 {
+    public partial class jCarGenData
+    {
+        [JsonProperty("x")]
+        public float X { get; set; }
+        [JsonProperty("y")]
+        public float Y { get; set; }
+        [JsonProperty("z")]
+        public float Z { get; set; }
+        [JsonProperty("heading")]
+        public float Heading { get; set; }
+        [JsonProperty("models")]
+        public string[] Models { get; set; }
+
+        public static List<jCarGenData> FromJson(string json) => JsonConvert.DeserializeObject<List<jCarGenData>>(json, new JsonSerializerSettings
+        {
+            MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+            DateParseHandling = DateParseHandling.None,
+            Converters =
+            {
+                new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
+            },
+        });
+    }
     public partial class jWeaponData
     {
         [JsonProperty("HashKey")]
@@ -119,6 +142,8 @@ namespace RNC
         public List<Player> Fugitives { get; set; }
         public List<Vehicle> Vehicles { get; set; }
         public List<Pickup> Drops { get; set; }
+
+        public List<Vehicle> ParkedVehicles { get; set; }
 
         public BankRobberyData BankRobbery { get; set; }
         public int NextEventCounter { get; set; }
@@ -604,6 +629,7 @@ namespace RNC
         public static List<LoadoutData> Loadouts { get; set; }
         public static List<CarData> Cars { get; set; }
         public static Dictionary<long, jWeaponData> WeaponData { get; set; }
+        public static List<jCarGenData> CarGenData { get; set; }
         public static List<SpawnSet> FreeroamSpawns { get; set; }
 
         // Dyn Settings Global
@@ -630,6 +656,54 @@ namespace RNC
         public const float LoginCameraRy = 0;
         public const float LoginCameraRz = 0;
         public const float LoginCameraViewAngle = 50;
+
+        public static string[] CivilianVehicles =
+        {
+            "panto",
+            "rhapsody",
+            "club",
+            "oracle",
+            "washington",
+            "premier",
+            "cavalcade2",
+            "rancherxl",
+            "faggio",
+            "voodoo2",
+            "bjxl",
+            "dubsta",
+            "asea",
+            "asterope",
+            "stratum",
+            "primo2",
+            "primo",
+            "glendale",
+            "tourbus",
+            "coach",
+            "tornado4",
+            "sadler",
+            "towtruck",
+            "scrap",
+            "surfer",
+            "surfer2",
+            "minivan",
+            "minivan2",
+            "burrito",
+            "burrito2",
+            "burrito3",
+            "burrito4",
+            "camper",
+            "gburrito",
+            "gburrito2",
+            "rumpo",
+            "emperor",
+            "emperor2",
+            "regina",
+            "romero",
+            "virgo2",
+            "virgo3",
+            "virgo",
+            "yosemite"
+        };
 
         public static Vector3[] LobbySpawns = new Vector3[]
         {
@@ -1718,6 +1792,7 @@ namespace RNC
             Settings.FreeroamSpawns = new List<SpawnSet>();
 
             Settings.WeaponData = new Dictionary<long, jWeaponData>();
+            Settings.CarGenData = new List<jCarGenData>();
 
             Settings.Dynamics = new DynSet();
 
@@ -1789,6 +1864,16 @@ namespace RNC
             }
             catch { NAPI.Util.ConsoleOutput("(RnC | STARTUP) Unable to load in weapondata.json! Server will work but it can cause crashes due to component data."); }
             NAPI.Util.ConsoleOutput($"(RnC | STARTUP) Loading in weapondata.json... ({Settings.WeaponData.Count} weapons/entries)");
+
+            try
+            {
+                foreach (jCarGenData item in jCarGenData.FromJson(File.ReadAllText("racenchase/CarGens_NoZoneVehicles.json")))
+                {
+                    Settings.CarGenData.Add(item);
+                }
+            }
+            catch { NAPI.Util.ConsoleOutput("(RnC | STARTUP) Unable to load in CarGens_NoZoneVehicles.json! Server will work but it can cause crashes due to component data."); }
+            NAPI.Util.ConsoleOutput($"(RnC | STARTUP) Loading in CarGens_NoZoneVehicles.json... ({Settings.CarGenData.Count} vehicle spawns/entries)");
 
             /* ACHIEVEMENTS CREATION */
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the achievements...");
@@ -2932,6 +3017,45 @@ namespace RNC
 
                             pCount = 0;
                             crashcheck = 13;
+
+                            if (Settings.CarGenData.Count >= 1500)
+                            {
+                                crashcheck = 694;
+                                List<jCarGenData> randomCars = Settings.CarGenData.OrderBy(x => new Random().Next()).Take(1500).ToList();
+                                crashcheck = 695;
+                                int civiCarCnt = Settings.CivilianVehicles.Count();
+                                foreach (jCarGenData car in randomCars)
+                                {
+                                    Random rnd = new Random();
+                                    int modelsCount = car.Models.Count();
+                                    uint carModel = (uint)VehicleHash.Premier;
+                                    
+                                    if(modelsCount > 0)
+                                    {
+                                        carModel = NAPI.Util.GetHashKey(car.Models[rnd.Next(modelsCount)]);
+                                    }
+                                    else
+                                    {
+                                        carModel = NAPI.Util.GetHashKey(Settings.CivilianVehicles[rnd.Next(civiCarCnt)]);
+                                    }
+
+                                    crashcheck = 666;
+                                    bool locked = rnd.Next(100) > 50;
+                                    Vehicle veh = NAPI.Vehicle.CreateVehicle(carModel, new Vector3(car.X, car.Y, car.Z),
+                                        car.Heading, rnd.Next(100), rnd.Next(100), "", 255, locked, false, Convert.ToUInt32(lobbyid));
+
+                                    crashcheck = 681;
+                                    veh.EngineStatus = false;
+                                    veh.SetSharedData("Engine", false);
+                                    veh.SetSharedData("Locked", locked);
+                                    veh.Locked = locked;
+                                    veh.SetSharedData("Team", 10); // 10 = civilian / parked
+                                    veh.SetSharedData("SpeedInfo", "Average");
+                                    lobby.Vehicles.Add(veh);
+                                    veh.SetSharedData("Collisions", true);
+                                }
+                            }
+                            else { NAPI.Util.ConsoleOutput("Cannot generate 1500 random parked vehicles -> not enough entries!"); }
                         }
                         else
                         {

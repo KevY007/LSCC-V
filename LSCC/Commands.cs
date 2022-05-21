@@ -287,7 +287,7 @@ namespace RNC
                 {
                     if (v.Dimension == player.Dimension && v.Position.DistanceTo(player.Position) <= 3.5)
                     {
-                        if (v.HasSharedData("Team") && v.GetSharedData<int>("Team") != player.GetSharedData<int>("Team")) continue;
+                        if (v.HasSharedData("Team") && v.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && v.GetSharedData<int>("Team") != 10) continue;
 
                         targetVeh = v;
                         break;
@@ -306,7 +306,7 @@ namespace RNC
             if (targetVeh.HasSharedData("Team") && targetVeh.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && 
                 targetVeh.Locked == true)
             {
-                if (!player.HasData("SilentLock")) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot unlock this vehicle!"); }
+                if (!player.HasData("SilentLock")) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot unlock this vehicle - use a lockpick ~y~(/lockpick)~w~!"); }
                 player.ResetData("SilentLock");
                 return;
             }
@@ -402,10 +402,10 @@ namespace RNC
                 return;
             }
 
-            if (player.Vehicle.HasSharedData("Team") && player.Vehicle.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && 
+            if (player.Vehicle.HasSharedData("Team") && (player.Vehicle.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") || player.Vehicle.GetSharedData<int>("Team") == 10) && 
                 player.Vehicle.EngineStatus == false)
             {
-                player.SendNotification("~r~You cannot start this vehicle!");
+                player.SendNotification("~r~You cannot start this vehicle - ~w~you will have to hotwire it! ~y~(/hotwire)");
                 return;
             }
 
