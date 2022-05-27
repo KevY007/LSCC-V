@@ -3341,6 +3341,30 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("UpdateVehicleFuel")]
+        public static void UpdateVehicleFuel(Player player, float fuel, ushort vehicle_id = 65535)
+        {
+            Vehicle vehicle = null;
+            if(vehicle_id == 65535) {
+                if (!player.IsInVehicle) return;
+                vehicle = player.Vehicle;
+            }
+            else
+            {
+                Vehicle target = NAPI.Pools.GetAllVehicles().FirstOrDefault(v => v.Id == vehicle_id);
+                if (target == null) return;
+                vehicle = target;
+            }
+
+            vehicle.SetSharedData("Fuel", fuel);
+
+            if(fuel <= 0.0)
+            {
+                vehicle.EngineStatus = false;
+                vehicle.Health = 0;
+            }
+        }
+
         public static void RunWeeklyMonthlyChecks()
         {
             try

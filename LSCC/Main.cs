@@ -2220,7 +2220,7 @@ namespace RNC
             string alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 
             /* ---Donation Types/Values---
-             * 0 => Bronze [VALUE: how many times it can be redeemed]
+             * 0 => Bronze [VALUE: how many times it can be redeemed | unused?]
              * 1 => Silver
              * 2 => Gold
              * 3 => 100 Donator Points

@@ -99,6 +99,7 @@ require("./UIMenu/Logs.js");
 require("./charcreator/clotheditor.js")
 require("./charcreator/index.js");
 require("./charcreator/outfitslots.js")
+require('./Player/Fuel.js');
 
 require('./camerasManager.js');
 require('./cefBrowser.js');
