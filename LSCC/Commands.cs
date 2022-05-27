@@ -8666,14 +8666,17 @@ namespace RNC
             switch (redeem.Value)
             {
                 case 0:
+                    acc.DonatorPoints += 200;
                     acc.DonatorLevel = 1;
                     EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(1, true)}~w~!");
                     break;
                 case 1:
+                    acc.DonatorPoints += 350;
                     acc.DonatorLevel = 2;
                     EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(2, true)}~w~!");
                     break;
                 case 2:
+                    acc.DonatorPoints += 500;
                     acc.DonatorLevel = 3;
                     EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(3, true)}~w~!");
                     break;
@@ -8727,16 +8730,16 @@ namespace RNC
 
             player.TriggerEvent("pushMsgToChat", "!{#FF6347} Reconnect with your new name: !{#FFFFFF}" + newname);
             EPlayer.Notify(player, $"Please reconnect with your new name: {newname}", "green", "fas fa-check", false, 3000, "center", "replace");
-            
+
+            player.Name = newname;
+            EPlayer.GetAccount(player).Username = newname;
+            EPlayer.GetAccount(player).Namechanges--;
             EPlayer.Save(player);
             player.ResetData("AccountHandle");
             player.ResetData("LoggedIn");
-            
+
             NAPI.Task.Run(() => { try { player.KickSilent(); } catch { } }, 1000);
             
-            EPlayer.GetAccount(player).Username = newname;
-            EPlayer.GetAccount(player).Namechanges--;
-            ContextFactory.Instance.SaveChanges();
             return;
         }
 
