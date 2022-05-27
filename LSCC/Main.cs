@@ -3047,12 +3047,14 @@ namespace RNC
                                     crashcheck = 681;
                                     veh.EngineStatus = false;
                                     veh.SetSharedData("Engine", false);
+                                    veh.SetSharedData("Fuel", 100.0);
                                     veh.SetSharedData("Locked", locked);
                                     veh.Locked = locked;
                                     veh.SetSharedData("Team", 10); // 10 = civilian / parked
                                     veh.SetSharedData("SpeedInfo", "Average");
                                     lobby.Vehicles.Add(veh);
                                     veh.SetSharedData("Collisions", true);
+                                    veh.SetSharedData("Fuel", 100.0);
                                 }
                             }
                             else { NAPI.Util.ConsoleOutput("Cannot generate 1500 random parked vehicles -> not enough entries!"); }
@@ -3317,6 +3319,7 @@ namespace RNC
                                     Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawnLoc.spawnA, col1, col2, player.Name, 255, false, true, Convert.ToUInt32(lobbyid));
                                     pVehicle.EngineStatus = true;
                                     pVehicle.SetSharedData("Engine", true);
+                                    pVehicle.SetSharedData("Fuel", 100.0);
                                     pVehicle.SetSharedData("Locked", true);
                                     pVehicle.Locked = true;
                                     pVehicle.SetSharedData("Team", 1);
@@ -3637,6 +3640,7 @@ namespace RNC
 
                                 pVehicle.EngineStatus = true;
                                 pVehicle.SetSharedData("Engine", true);
+                                pVehicle.SetSharedData("Fuel", 100.0);
                                 pVehicle.SetSharedData("Locked", false);
                                 pVehicle.Locked = false;
                                 pVehicle.SetSharedData("Team", 0);

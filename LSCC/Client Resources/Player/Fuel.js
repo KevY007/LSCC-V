@@ -5,19 +5,20 @@ var vehicleRemoteID = -1;
 var fuelFrameCount = 0;
 
 mp.events.add('render', () => {
+    fuelFrameCount++;
     if(!wasInVehicle) {
-        if(player.getVariable("Team") == 0){
-           if(player.isInAnyVehicle(false) && player.seat == 0){ // if the player was not in any vehicle, set his current vehicle fuel to a new value
+        if(mp.players.local.getVariable("Team") == 0){
+           if(mp.players.local.vehicle && player.seat == -1){ // if the player was not in any vehicle, set his current vehicle fuel to a new value
                 wasInVehicle = true; // this is done so the fuel calculations are done clientside
-                const vehicle = player.vehicle; // the only serverside call is to set the fuel
+                const vehicle = mp.players.local.vehicle; // the only serverside call is to set the fuel
                 currentVehicleFuel = vehicle.getVariable("Fuel");  // fuel is set e.g. when it reaches 0, or the player exits vehicle
                 vehicleRemoteID = vehicle.remoteId;
+                pushMessageToChat("setting wasInVehicle = true");
            }
 
         }
     }
     else{
-        fuelFrameCount++;
         if(fuelFrameCount >= 30){ // fuel handler is called every 30 frames
             HandleFuel();
             fuelFrameCount = 0;
@@ -26,9 +27,10 @@ mp.events.add('render', () => {
 });
 
 function HandleFuel(){
-    if(!mp.players.local || !mp.players.exists(mp.players.local) || !player.vehicle || !player.isInAnyVehicle(false) || player.seat != 0 || player.getVariable("Team") != 0){
+    if(!mp.players.exists(mp.players.local) || !mp.players.local.vehicle || player.seat != -1 || player.getVariable("Team") != 0){
         wasInVehicle = false;
         fuelFrameCount = 0;
+        pushMessageToChat("SEXNIGGA");
         mp.events.callRemote("UpdateVehicleFuel", currentVehicleFuel, vehicleRemoteID);
         return;
     }
