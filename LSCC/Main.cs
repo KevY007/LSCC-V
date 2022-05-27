@@ -2233,7 +2233,7 @@ namespace RNC
             {
                 for (int j = 0; j < 250; j++)
                 {
-                    string code = (Enumerable.Repeat(alphanumeric, code_length).Select(s => s[rndcode.Next(s.Length)]).ToArray()).ToString();
+                    string code = new string(Enumerable.Repeat(alphanumeric, code_length).Select(s => s[rndcode.Next(s.Length)]).ToArray());
                     if (ContextFactory.Instance.RedeemableCodes.ToList().FirstOrDefault(c => c.Code.Equals(code)) == null)
                     {
                         // Value is set to "i" because i represents the donation package type's ID [see list above]
