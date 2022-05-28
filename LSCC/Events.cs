@@ -3386,34 +3386,37 @@ namespace RNC
                 {
                     // CHECKING FOR CLAN OF THE WEEK, RESETTING ALL CLANS' WEEKLY KILLS
                     Clan mostKills = ContextFactory.Instance.Clans.ToList().OrderByDescending(c => c.WeekKills).FirstOrDefault();
-                    foreach(Account account in ContextFactory.Instance.Accounts.ToList().Where(a => a.ClanID != -1))
+                    if (mostKills != null)
                     {
-                        if(account.ClanID == mostKills.SQL_ID)
+                        foreach (Account account in ContextFactory.Instance.Accounts.ToList().Where(a => a.ClanID != -1))
                         {
-                            MOTDData motd = new MOTDData() { 
-                                AdminName = "SERVER", 
-                                PostedOn = DateTime.Now.ToShortDateString(),
-                                Message = "~y~[CLAN OF THE WEEK]~w~ Congratulations! Your clan had the most kills this week and you won a reward! All clans' weekly kills have been reset."
-                            };
-                            account.MOTD = NAPI.Util.ToJson(motd);
-
-                            // reward skripts here
-                        }
-                        else
-                        {
-                            MOTDData motd = new MOTDData()
+                            if (account.ClanID == mostKills.SQL_ID)
                             {
-                                AdminName = "SERVER",
-                                PostedOn = DateTime.Now.ToShortDateString(),
-                                Message = $"~r~[CLAN OF THE WEEK]~w~ Clan {mostKills.Name} won clan of the week. All clans' weekly kills have been reset!"
-                            };
-                            account.MOTD = NAPI.Util.ToJson(motd);
+                                MOTDData motd = new MOTDData()
+                                {
+                                    AdminName = "SERVER",
+                                    PostedOn = DateTime.Now.ToShortDateString(),
+                                    Message = "~y~[CLAN OF THE WEEK]~w~ Congratulations! Your clan had the most kills this week and you won a reward! All clans' weekly kills have been reset."
+                                };
+                                account.MOTD = NAPI.Util.ToJson(motd);
+
+                                // reward skripts here
+                            }
+                            else
+                            {
+                                MOTDData motd = new MOTDData()
+                                {
+                                    AdminName = "SERVER",
+                                    PostedOn = DateTime.Now.ToShortDateString(),
+                                    Message = $"~r~[CLAN OF THE WEEK]~w~ Clan {mostKills.Name} won clan of the week. All clans' weekly kills have been reset!"
+                                };
+                                account.MOTD = NAPI.Util.ToJson(motd);
+                            }
                         }
+
+                        EPlayer.SendMessageAll($"~y~[CLAN OF THE WEEK] ~w~Clan ~g~{mostKills.Name} ~w~had the most kills this week! Congratulations!");
+                        EPlayer.SendMessageAll($"~y~[>] ~w~ A new week begins and all clans' weekly kills have been reset.");
                     }
-
-                    EPlayer.SendMessageAll($"~y~[CLAN OF THE WEEK] ~w~Clan ~g~{mostKills.Name} ~w~had the most kills this week! Congratulations!");
-                    EPlayer.SendMessageAll($"~y~[>] ~w~ A new week begins and all clans' weekly kills have been reset.");
-
                     // ARCHIVING INACTIVE ACCOUNTS.....
                     Account cunt = ContextFactory.Instance.Accounts.ToList().FirstOrDefault(a => (new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() - new DateTimeOffset(a.LastLogin).ToUnixTimeSeconds()) > 2629746);
                     if (cunt != null)
