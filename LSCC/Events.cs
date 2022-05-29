@@ -1731,6 +1731,7 @@ namespace RNC
         public static void OnClimbTrigger(Player player, int status)
         {
             if (!EPlayer.LoggedIn(player)) return;
+            player.SendChatMessage($"[CP - SERVER] OnClimbTrigger {player.Name}, status: {status}.");
 
             LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
             if (lobby == null)
@@ -1778,6 +1779,7 @@ namespace RNC
                 default:
                     {
                         player.SetSharedData("ClimbProtection", false);
+                        player.TriggerEvent("ClearClimbTaseProtection", false);
                         break;
                     }
             }

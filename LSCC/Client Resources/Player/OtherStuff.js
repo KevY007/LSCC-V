@@ -519,7 +519,7 @@ function moveFromToAir(moveTo, switchType, showGui, timeout = 1) {
     }, timeout);
 }
 mp.keys.bind(0x14, true, function() {
-    if(!chatStatus) return;
+    if(chatStatus || !canManuallyResetCamera) return;
 
     pushMessageToChat("~y~Resetting your camera manually....");
     pushMessageToChat("~r~NOTE: ~w~If you were bugged, please notify the developers about this, a log has automatically been sent.");

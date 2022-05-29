@@ -2793,6 +2793,8 @@ namespace RNC
                     i.TriggerEvent("BankRob_ClearFinishMarker");
                     i.TriggerEvent("BankRob_SetMusic", -1);
 
+                    i.TriggerEvent("ClearClimbTaseProtection", true);
+
                     i.ResetData("DragoutVehicle");
                     i.ResetData("ExitedDragoutVehicle");
 
@@ -2942,6 +2944,7 @@ namespace RNC
                             player.SetSharedData("InDM", -1);
 
                             pCount++;
+                            player.TriggerEvent("ClearClimbTaseProtection", true);
                         }
                     }
 

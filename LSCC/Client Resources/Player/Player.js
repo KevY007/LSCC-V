@@ -49,17 +49,15 @@ var targetChecker = Date.now();
 var updateChecker = Date.now();
 var clickDisable = false;
 
-//let climbingStart = 0;
-//let climbTrigger = false;
+var wasClimbingLastFrame = false;
+var checkClimbingDurationTimeout = undefined;
+var climbProtectionState = -1; // -1 = none, 0 = active on ladder, 1 = short protection after ladder
+var climbProtectionTimeout = undefined;
+var shortClimbProtectionTimeout = undefined;
+var lastClimbProtectionTimestamp = 0;
 
-let isFirstClimb = false;
-let climbProtectionTimer = null;
-let climbProtectionStage = 0; // 0 -> no protection | 1 -> protection long while climbing | 2 -> protection short after climbing
-let climbingStart = 0; // to prevent protection from being activated on fences
-let lastClimbProtection = 0;
-
-let taseProtectionTimer = null;
-let wasInCar = false;
+var taseProtectionTimer = null;
+var wasInCar = false;
 
 var themeSoundID = 1;
 
@@ -824,6 +822,18 @@ mp.events.addDataHandler('Admin', function (entity, value, oldValue){
     }, 500);
 })
 
+mp.events.add("ClearClimbTaseProtection", (reset_cooldown) => {
+    if(shortClimbProtectionTimeout){clearTimeout(shortClimbProtectionTimeout); shortClimbProtectionTimeout = undefined;}  
+    if(climbProtectionTimeout){clearTimeout(climbProtectionTimeout); climbProtectionTimeout = undefined;}  
+    if(checkClimbingDurationTimeout){clearTimeout(checkClimbingDurationTimeout); checkClimbingDurationTimeout = undefined;}
+    wasClimbingLastFrame = false;
+
+    climbProtectionState = -1;
+
+    if(reset_cooldown)
+        lastClimbProtectionTimestamp = 0;
+});
+
 
 mp.keys.bind(0x4A, false, () => {
 
@@ -983,74 +993,81 @@ mp.events.add('render', () => {
         else { mp.game.controls.enableControlAction(32, 257, true); }
 
         if(mp.players.local.isClimbing()){
-            if(!isFirstClimb){ // just started climbing a ladder
-                isFirstClimb = true;
+            if(!wasClimbingLastFrame){ // if he was not climbing last frame aka just started climbing
+                wasClimbingLastFrame = true; // it initiates a timeout for 2,5s
+                if(climbProtectionState == -1){
 
-                climbingStart = Date.now();
-            }
-            else{
-                let curTime = Math.round((new Date()).getTime() / 1000);
-                if(Date.now() - climbingStart >= 2500 && climbProtectionStage == 0) // if it's 100% a ladder
-                {
-                    climbingStart = curTime;
+                    let timestampSeconds =Math.floor(Date.now() / 1000);
+                    if(timestampSeconds - lastClimbProtectionTimestamp > 45) // if more than 45 seconds passed
+                    {
+                        if(checkClimbingDurationTimeout){clearTimeout(checkClimbingDurationTimeout); checkClimbingDurationTimeout = undefined;}
 
-                    if(curTime - lastClimbProtection > 45){
-                        
+                        checkClimbingDurationTimeout = setTimeout(() => {
+                            if(!mp.players.local || !mp.players.exists(mp.players.local) || !wasClimbingLastFrame){
+                                clearTimeout(checkClimbingDurationTimeout);
+                                return;
+                            }
 
-                        clearTimeout(climbProtectionTimer);
-                        mp.events.callRemote("ClimbProtection", 0);
-                    // mp.game.player.setInvincible(true);
-                    // mp.players.local.setInvincible(true);
-                        climbProtectionStage = 1;
+                            if(mp.players.local.isClimbing()){ // if still climbing after 2,5s [ladder], start protection
+                                // INITIATE CLIMB PROTECTION
+                                lastClimbProtectionTimestamp = timestampSeconds;
+                                mp.events.callRemote("ClimbProtection", 0);
+                                climbProtectionState = 0;
+                                if(climbProtectionTimeout){clearTimeout(climbProtectionTimeout); climbProtectionTimeout = undefined;}    
 
-                        
-                        let cProtectTime = (mp.players.local.Team == 0 ? 9000 : 18500);
-                        
-        
-                        climbProtectionTimer = setTimeout(() => {
-                            if(mp.players.local == null || mp.players.local == undefined || !mp.players.exists(mp.players.local)) return;
-                            //if(mp.players.local.Team != 0 && mp.players.local.Team != 1) return;
-                            if(climbProtectionStage == 2) return; // if the "short ladder protection" is active to prevent turning it off instantly
-                            
-                            lastClimbProtection = Math.round((new Date()).getTime() / 1000);
-                        // mp.game.player.setInvincible(false);
-                        // mp.players.local.setInvincible(false);        
-                            climbProtectionStage = 0
-                            mp.events.callRemote("ClimbProtection", -1);;        
-                            //mp.events.callRemote("ClimbProtection", 1);   
-                        }, cProtectTime);
+                                let protecttime = (mp.players.local.getVariable("Team") == 0 ? 9000 : 18500);
+                                climbProtectionTimeout = setTimeout(() => {
+                                    if(!mp.players.local || !mp.players.exists(mp.players.local) || !wasClimbingLastFrame){
+                                        clearTimeout(climbProtectionTimeout);
+                                        return;
+                                    }
+
+                                    // If they camp on the ladder, finito, done, stop their godmode
+                                    mp.events.callRemote("ClimbProtection", -1);
+                                    // However, set this to 0 so it can still give them the short protection
+                                    climbProtectionState = 0;    
+
+                                    if(climbProtectionTimeout){clearTimeout(climbProtectionTimeout); climbProtectionTimeout = undefined;}                          
+                                }, protecttime);
+                            }
+                            if(checkClimbingDurationTimeout){clearTimeout(checkClimbingDurationTimeout); checkClimbingDurationTimeout = undefined;}
+                        }, 2500);
                     }
                 }
             }
         }
-        else if(!mp.players.local.isClimbing()){
-            if(isFirstClimb) isFirstClimb = false;
-            if(climbProtectionStage == 1){
+        else{ // if he stops climbing, and he was climbing last frame, clear the timeout immediately
+            if(wasClimbingLastFrame){ // this should hopefully make sure they dont get climb protection for fences and if they get down too soon
+                if(checkClimbingDurationTimeout){clearTimeout(checkClimbingDurationTimeout); checkClimbingDurationTimeout = undefined;}
+                wasClimbingLastFrame = false;
 
-                if(climbProtectionTimer != null){
-                    clearInterval(climbProtectionTimer);
+                if(climbProtectionState == -1){ /* if no climb protection is active do ??*/
                 }
+                else if(climbProtectionState == 0){ // if stage 0 [long protection] is active
+                    // ACTIVATING THE SHORT PROTECTION
+                    // step #1 = clear the long protection timer if there is one
+                    climbProtectionState = 1;
+                    if(climbProtectionTimeout){clearTimeout(climbProtectionTimeout); climbProtectionTimeout = undefined;}  
+                    
+                    // step #2 = activating that shit
+                    mp.events.callRemote("ClimbProtection", 1);
 
-                let cProtectTime = (mp.players.local.Team == 0 ? 2500 : 4000);
-                mp.events.callRemote("ClimbProtection", 1);
-                climbProtectionStage = 2;
+                    if(shortClimbProtectionTimeout){clearTimeout(shortClimbProtectionTimeout); shortClimbProtectionTimeout = undefined;}  
 
-                //mp.game.player.setInvincible(true);
-                //mp.players.local.setInvincible(true);  
+                    let protecttime = (mp.players.local.getVariable("Team") == 0 ? 2500 : 4000);
+                    shortClimbProtectionTimeout = setTimeout(() => {
+                        if(!mp.players.local || !mp.players.exists(mp.players.local)){
+                            clearTimeout(shortClimbProtectionTimeout);
+                            return;
+                        }
 
-                climbProtectionTimer = setTimeout(() => {
-                    if(mp.players.local == null || mp.players.local == undefined || !mp.players.exists(mp.players.local)) return;
-                    //if(mp.players.local.Team != 0 && mp.players.local.Team != 1) return;
-                    if(climbProtectionStage == 1) return; // if long ladder protection is active to prevent activating it again
+                        mp.events.callRemote("ClimbProtection", -1);
+                        climbProtectionState = -1;
 
-                   // mp.game.player.setInvincible(false);
-                   // mp.players.local.setInvincible(false);        
-                    climbProtectionStage = 0;    
-                    lastClimbProtection = Math.round((new Date()).getTime() / 1000);
-                    mp.events.callRemote("ClimbProtection", -1);    
-                }, cProtectTime);              
+                        if(shortClimbProtectionTimeout){clearTimeout(shortClimbProtectionTimeout); shortClimbProtectionTimeout = undefined;}  
+                    }, protecttime);
+                }
             }
-
         }
 
        /* if(mp.players.local.isClimbing())
