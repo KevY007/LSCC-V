@@ -506,8 +506,8 @@ function moveFromToAir(moveTo, switchType, showGui, timeout = 1) {
                     };
                     camSwitchNativeReturn = mp.game.invoke(Natives.SWITCH_IN_PLAYER, mp.players.local.handle);
                     
-                    mp.gui.chat.push("~g~[HINT]~w~ If your camera is stuck in the air, you can now ~y~press CapsLock~w~ to manually reset it.");
-                    mp.gui.chat.push("~g~[>]~w~ You have ~y~10 seconds~w~ to do this!");
+                    pushMessageToChat("~g~[HINT]~w~ If your camera is stuck in the air, you can now ~y~press CapsLock~w~ to manually reset it.");
+                    pushMessageToChat("~g~[>]~w~ You have ~y~10 seconds~w~ to do this!");
                     canManuallyResetCamera = true;
 
                     setTimeout(() => { canManuallyResetCamera = false; }, 10000);
@@ -521,8 +521,8 @@ function moveFromToAir(moveTo, switchType, showGui, timeout = 1) {
 mp.keys.bind(0x14, true, function() {
     if(!chatStatus) return;
 
-    mp.gui.chat.push("~y~Resetting your camera manually....");
-    mp.gui.chat.push("~r~NOTE: ~w~If you were bugged, please notify the developers about this, a log has automatically been sent.");
+    pushMessageToChat("~y~Resetting your camera manually....");
+    pushMessageToChat("~r~NOTE: ~w~If you were bugged, please notify the developers about this, a log has automatically been sent.");
     
     canManuallyResetCamera = false;
 
