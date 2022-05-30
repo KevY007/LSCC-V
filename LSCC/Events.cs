@@ -69,41 +69,9 @@ namespace RNC
             EPlayer.SyncServerSettings(player);
             EPlayer.Freeze(player, true);
 
-            List<Account> autoLoginChecks = ContextFactory.Instance.Accounts.ToList().Where(a => a.LastHWID == player.Serial &&
-                                                                                          a.LastRID == player.SocialClubId &&
-                                                                                          a.LastSC == player.SocialClubName &&
-                                                                                          a.AutoLogin == true).ToList();
             EPlayer.LoginCameraSetup(player);
 
             EPlayer.LoginBrowserSetup(player);
-
-            NAPI.Task.Run(() =>
-            {
-                try
-                {
-                    if (player != null && player.Exists)
-                    {
-                        if (autoLoginChecks.Count <= 0)
-                        {
-                            EPlayer.LoginCameraSetup(player);
-                        }
-                        else
-                        {
-                            EPlayer.ResetPlayerData(player);
-                            autoLoginChecks.Sort((x, y) => y.LastLogin.CompareTo(x.LastLogin)); // sort by date, descending
-                            Account toLogin = autoLoginChecks[0];
-
-                            OnPlayerLogin(player, toLogin);
-                            EPlayer.SendMessage(player, "~g~[AUTO-LOGIN] ~w~You've been automatically logged in! Welcome back. !{#C9C9C9}(You can turn this off in the settings)");
-                        }
-                    }
-                }
-                catch { }
-            }, 2000);
-
-
-
-
 
             player.TriggerEvent("InitChaseTimer");
 
@@ -2576,6 +2544,43 @@ namespace RNC
             Challenge.AddChallengesForPlayer(player);
         }
 
+        [RemoteEvent("OnAutoLoginAttempt")]
+        public static void OnAutoLoginAttempt(Player player, string username)
+        {
+            try
+            {
+                if (EPlayer.LoggedIn(player)) return;
+                if (player.HasData("Kicked")) return;
+
+                Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+                if (acc != null)
+                {
+                    OnPlayerLogin(player, acc);
+                    return;
+                }
+                else EPlayer.Error(player, "A fatal error has occurred, please log in manually.", "fas fa-lock");
+            }
+            catch(Exception ex)
+            {
+                NAPI.Util.ConsoleOutput("[LOGIN ERROR] Error during auto-login: " + ex.ToString());
+            }
+        }
+
+        [RemoteEvent("OnRequestForgotUsername")]
+        public static void OnRequestForgotUsername(Player player)
+        {
+            List<Account> accounts = ContextFactory.Instance.Accounts.ToList().Where(a => a.LastSC == player.SocialClubName || a.LastRID == player.SocialClubId
+                                                                            || a.RegisterRID == player.SocialClubId || a.RegisterSC == player.SocialClubName).ToList();
+
+            string dataToReturn = "[";
+            foreach(Account acc in accounts)
+            {
+                dataToReturn += $"'{acc.Username}',";
+            }
+            dataToReturn += "]";
+            player.TriggerEvent("sendForgotUsernameToBrowser", dataToReturn);
+        }
+
         [RemoteEvent("OnPlayerLoginAttempt")]
         public static void OnPlayerLoginAttempt(Player player, string username, string password)
         {
@@ -3577,6 +3582,27 @@ namespace RNC
                 newDriver.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}{player.Name} is AFK, you are now the new driver.");
             }
             catch { }
+        }
+
+        [RemoteEvent("OnRequestAutoLoginData")]
+        public static void OnRequestAutoLoginData(Player player)
+        {
+            List<Account> autoLoginChecks = ContextFactory.Instance.Accounts.ToList().Where(a => a.LastHWID == player.Serial &&
+                                                                                          a.LastRID == player.SocialClubId &&
+                                                                                          a.LastSC == player.SocialClubName &&
+                                                                                          a.AutoLogin == true).ToList();
+
+            if (autoLoginChecks.Count <= 0)
+            {
+                player.TriggerEvent("sendAutoLoginDataToBrowser", "0");
+            }
+            else
+            {
+                autoLoginChecks.Sort((x, y) => y.LastLogin.CompareTo(x.LastLogin)); // sort by date, descending
+                Account toLogin = autoLoginChecks[0];
+
+                player.TriggerEvent("sendAutoLoginDataToBrowser", toLogin.Username);
+            }
         }
 
         [RemoteEvent("OnPlayerRegisterAttempt")]

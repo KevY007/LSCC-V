@@ -161,3 +161,20 @@ mp.events.add('registerInformationToServer', (email, username, password, allcorr
 
     mp.events.callRemote('OnPlayerRegisterAttempt', email, username, password, allcorrect, rules);
 });
+
+mp.events.add('requestAutoLoginData', () => {
+    mp.events.callRemote("OnRequestAutoLoginData");
+});
+mp.events.add('sendAutoLoginDataToBrowser', (data) => {
+    loginBrowser.execute(`receiveAutoLoginFromServer('${data}')`);
+});
+mp.events.add('autologinToServer', (username) => {
+    mp.events.callRemote("OnAutoLoginAttempt", username);
+});
+
+mp.events.add('requestForgotUsernameServer', () => {
+    mp.events.callRemote("OnRequestForgotUsername");
+});
+mp.events.add('sendForgotUsernameToBrowser', (data) => {
+    loginBrowser.execute(`receiveForgotUsernameData(${data})`);
+});

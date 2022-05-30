@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald&family=Roboto&family=Ubuntu&display=swap');
+
+@keyframes showlogin{
+    from{
+        margin:0px -770px 0px 0px;
+    }
+    to{
+        margin:0px 0px 0px 0px;
+    }
+}
+
+.invisible{
+   opacity:0;
+}
+
+html, body{
+    margin:0;
+    height:100%;
+    overflow:hidden;
+}
+
+.loading_screen{
+    width:100%;
+    height:100%;
+    position:absolute;
+    top:0; left:0;
+    background:#222222;
+    display:flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+.container{
+    display:flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: flex-end;
+    height:100%;
+}
+
+.logreg_root{
+    animation:showlogin;
+    animation-iteration-count: 1;
+    animation-duration:1s;
+
+    background-color: lavender;
+    width:768px; 
+    height:100%;
+
+    display:flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items:center;
+
+    box-shadow: 5px 10px 10px 10px lavender;
+}
+
+h1{
+    font-family: 'Oswald', sans-serif;
+    font-size:64px;
+    margin:-20px 0px;
+
+    background: rgb(6,0,215);
+    background: linear-gradient(90deg, rgba(6,0,215,1) 0%, rgba(236,159,2,1) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none; 
+     -khtml-user-select: none; 
+       -moz-user-select: none; 
+        -ms-user-select: none; 
+            user-select: none;
+}
+p{
+    font-family: 'Roboto', sans-serif; 
+    -webkit-user-select: none; 
+    -khtml-user-select: none; 
+      -moz-user-select: none; 
+       -ms-user-select: none; 
+           user-select: none;
+}
+
+.autologin{
+    display:flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items:center;   
+}
+
+button{
+    margin:5px;
+    border:2px solid black;
+    border-radius:10px;
+    background:white;
+
+    font-family: 'Ubuntu', sans-serif; 
+    font-size: 14px;
+    padding:5px;
+
+    transition:0.3s;
+}
+button:hover{
+    background:beige;
+}
+button:active{
+    background:bisque;
+}
+
+input{
+    margin:5px;
+    font-size: 16px;
+    padding:10px;
+    background:white;
+    font-family: 'Ubuntu', sans-serif; 
+    border: 1px solid black;
+    border-radius: 5px;
+}
+
+.forgot-username-list{
+    display:flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items:center;   
+    font-family: 'Roboto', sans-serif; 
+}

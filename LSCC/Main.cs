@@ -649,13 +649,13 @@ namespace RNC
 
 
         // Locations
-        public const float LoginCameraX = -1646.6002f;
-        public const float LoginCameraY = -1123.7172f;
-        public const float LoginCameraZ = 26.576164f;
-        public const float LoginCameraRx = 90;
+        public const float LoginCameraX = -101.4256f;
+        public const float LoginCameraY = -965.52563f;
+        public const float LoginCameraZ = 297.78546f;
+        public const float LoginCameraRx = 0;
         public const float LoginCameraRy = 0;
         public const float LoginCameraRz = 0;
-        public const float LoginCameraViewAngle = 50;
+        public const float LoginCameraViewAngle = 60;
 
         public static string[] CivilianVehicles =
         {
