@@ -3064,10 +3064,10 @@ namespace RNC
 
                 string requireString = "requirements: [";
 
-                if (loadout.LevelRequired > 0) requireString += $"{{icon: \"fas fa-level-up-alt\", text: \"Level {loadout.LevelRequired}\"}},";
-                if (loadout.PointsRequired > 0) requireString += $"{{icon: \"bx bxs-dollar-circle\", text: \"{loadout.PointsRequired} Points\"}},";
-                if (loadout.DonatorPointsRequired > 0) requireString += $"{{icon: \"fas fa-credit-card\", text: \"{loadout.DonatorPointsRequired} Donator Points\"}},";
-                if (loadout.DonatorLevelRequired > 0) requireString += $"{{icon: \"bx bxs-crown\", text: \"{EPlayer.GetDonatorLevelName(loadout.DonatorLevelRequired)}\"}},";
+                if (loadout.LevelRequired > 0) requireString += $"\"Level {loadout.LevelRequired}\",";
+                if (loadout.PointsRequired > 0) requireString += $"\"{loadout.PointsRequired} Points\",";
+                if (loadout.DonatorPointsRequired > 0) requireString += $"\"{loadout.DonatorPointsRequired} Donator Points\",";
+                if (loadout.DonatorLevelRequired > 0) requireString += $"\"{EPlayer.GetDonatorLevelName(loadout.DonatorLevelRequired)}\",";
 
                 requireString += "],";
 
