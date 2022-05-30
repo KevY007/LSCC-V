@@ -2952,12 +2952,14 @@ namespace RNC
             List<object[]> vehItems = new List<object[]>();
             foreach (var car in Settings.Cars)
             {
-                string price = "";
-                if (car.LevelRequired > 0) price = "Level " + car.LevelRequired.ToString();
-                if (car.PointsRequired > 0) price = price + (price.Length > 3 ? " & " : "") + car.PointsRequired.ToString() + " Points";
-                if (car.DonatorPointsRequired > 0) price = price + (price.Length > 3 ? " & " : "") + car.DonatorPointsRequired.ToString() + " Donator Points";
-                if (car.DonatorLevelRequired > 0) price = price + (price.Length > 3 ? " & " : "") + EPlayer.GetDonatorLevelName(car.DonatorLevelRequired);
-                if (price.Length < 2) price = "Free";
+                string price = "[";
+                if (car.LevelRequired > 0) price += "\"Level " + car.LevelRequired.ToString() + "\",";
+                if (car.PointsRequired > 0) price += "\"" + car.PointsRequired.ToString() + " Points\",";
+                if (car.DonatorPointsRequired > 0) price += "\"" + car.DonatorPointsRequired.ToString() + " Donator Points\",";
+                if (car.DonatorLevelRequired > 0) price += "\"" + EPlayer.GetDonatorLevelName(car.DonatorLevelRequired) + "\"";
+                if (price.Length < 2) price = "[\"Free\"";
+
+                price += "]";
 
                 vehItems.Add(new object[]
                 {
@@ -2965,10 +2967,12 @@ namespace RNC
                     car.Model,
                     car.Name,
                     car.Image,
-                    price,
                     !EPlayer.HasOwnedVehicle(player, car.Model, car.Team),
-                    car.Info
+                    car.Info,
+                    price
                 });
+
+                NAPI.Util.ConsoleOutput($"Car {car.Name}'s price data: " + price);
             }
             
             return vehItems;

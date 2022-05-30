@@ -597,9 +597,9 @@ mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) =>
         insertString += `"model": "${menuItems[i][1]}", `;
         insertString += `"name": "${menuItems[i][2]}", `;
         insertString += `"background": "${menuItems[i][3]}", `;
-        if(menuItems[i][4].length > 1) insertString += `"price": "${menuItems[i][4]}", `;
-        insertString += `"locked": ${menuItems[i][5]}, `;
-        if(menuItems[i][6].length > 1) insertString += `"energy": "${menuItems[i][6]}", `;
+        insertString += `"locked": ${menuItems[i][4]}, `;
+        if(menuItems[i][5].length > 1) insertString += `"energy": "${menuItems[i][5]}", `;
+        if(menuItems[i][6].length > 1) insertString += `"requirements": "${menuItems[i][6]}", `;
         insertString += "});";
 
         UIMenu.execute(insertString);
