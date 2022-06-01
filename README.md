@@ -13,6 +13,8 @@
 
 **KevY - Everything in this script has been written by KevY as an individual, alone without any external or 'partners' in this project except some UI/ problem workarounds & related.**
 
+**codename / domacx3 - Assistant lead developer, server-side and client-side stuff, started helping with the script around June 2021.**
+
 **GTA.World - Some clientside code preferred by players to use with other server's such as their 'G to enter as passenger' code (LSHIFT + G for options) & idea on how to use /spec.**
 
 **RotX - User Interface and some front-end stuff such as HTML based selection menus, displays, progress bar etc.**
