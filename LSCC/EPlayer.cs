@@ -1827,12 +1827,51 @@ namespace RNC
             Events.OnStopPlayerAction(player, reason);
         }
 
+        public static void SendAutoLoginData(Player player)
+        {
+            List<Account> autoLoginChecks = ContextFactory.Instance.Accounts.ToList().Where(a => a.LastHWID == player.Serial &&
+                                                                              a.LastRID == player.SocialClubId &&
+                                                                              a.LastSC == player.SocialClubName &&
+                                                                              a.AutoLogin == true).ToList();
+
+            if (autoLoginChecks.Count <= 0)
+            {
+                player.TriggerEvent("sendAutoLoginDataToBrowser", "");
+                NAPI.Util.ConsoleOutput("Found 0 auto login data");
+            }
+            else
+            {
+                autoLoginChecks.Sort((x, y) => y.LastLogin.CompareTo(x.LastLogin)); // sort by date, descending
+                Account toLogin = autoLoginChecks[0];
+                NAPI.Util.ConsoleOutput("Sending data: " + toLogin.Username);
+
+                player.TriggerEvent("sendAutoLoginDataToBrowser", toLogin.Username);
+            }
+        }
+        public static void SendForgotUsernameData(Player player)
+        {
+            List<Account> accounts = ContextFactory.Instance.Accounts.ToList().Where(a => a.LastSC == player.SocialClubName || a.LastRID == player.SocialClubId
+                                                                || a.RegisterRID == player.SocialClubId || a.RegisterSC == player.SocialClubName).ToList();
+
+            string dataToReturn = "[";
+            foreach (Account acc in accounts)
+            {
+                if(acc != accounts[accounts.Count-1])
+                    dataToReturn += $"\"{acc.Username}\",";
+                else dataToReturn += $"\"{acc.Username}\"";
+            }
+            dataToReturn += "]";
+            player.TriggerEvent("sendForgotUsernameToBrowser", dataToReturn);
+        }
+
         public static void LoginBrowserSetup(Player player, bool show_login = true)
         {
             NAPI.Task.Run(() =>
             {
-                if(show_login)
+                if (show_login)
+                {
                     player.TriggerEvent("showLoginBrowser", true);
+                }
 
                 player.TriggerEvent("InitiateCustomChat");
                 player.TriggerEvent("TogglePlayerChat", false);

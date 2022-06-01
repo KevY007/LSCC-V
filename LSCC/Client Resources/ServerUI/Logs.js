@@ -1,4 +1,4 @@
-require("./UIMenu/Menu.js");
+require("./ServerUI/Menu.js");
 
 function logTextToType(type){
     switch(type){
@@ -36,18 +36,18 @@ mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
 
     switch(type){
         case 1:{ // admin
-            UIMenu.execute(`gm.$refs.logs.rows = ["Timestamp", "Description"];`);
-            UIMenu.execute(`gm.$refs.logs.columns = ${jsonLogs}`);
+            ServerUI.execute(`gm.$refs.logs.rows = ["Timestamp", "Description"];`);
+            ServerUI.execute(`gm.$refs.logs.columns = ${jsonLogs}`);
             break;
         }
         case 2:{ // session
-            UIMenu.execute(`gm.$refs.logs.rows = ["Join Time", "Leave Time", "Duration", "IP", "HWID"];`);
-            UIMenu.execute(`gm.$refs.logs.columns = ${jsonLogs}`);
+            ServerUI.execute(`gm.$refs.logs.rows = ["Join Time", "Leave Time", "Duration", "IP", "HWID"];`);
+            ServerUI.execute(`gm.$refs.logs.columns = ${jsonLogs}`);
             break;
         }
         case 3:{ // admin records
-            UIMenu.execute(`gm.$refs.logs.rows = ["Timestamp", "Admin", "Duration", "Reason"];`);
-            UIMenu.execute(`gm.$refs.logs.columns = ${jsonLogs}`);
+            ServerUI.execute(`gm.$refs.logs.rows = ["Timestamp", "Admin", "Duration", "Reason"];`);
+            ServerUI.execute(`gm.$refs.logs.columns = ${jsonLogs}`);
             break;
         }
     }

@@ -2511,6 +2511,8 @@ namespace RNC
             player.TriggerEvent("BankDoorLocked", false);
             player.TriggerEvent("BankRob_SetMusic", -1);
 
+            player.TriggerEvent("OnPlayerLoginRegister");
+
             player.ResetData("Language");
 
             player.SetData<long>("JoinTimeUnix", DateTimeOffset.Now.ToUnixTimeSeconds());
@@ -2566,19 +2568,11 @@ namespace RNC
             }
         }
 
-        [RemoteEvent("OnRequestForgotUsername")]
-        public static void OnRequestForgotUsername(Player player)
+        [RemoteEvent("requestQuickLoginForgotUsernameData")]
+        public static void OnRequestQuickLoginForgotUsername(Player player)
         {
-            List<Account> accounts = ContextFactory.Instance.Accounts.ToList().Where(a => a.LastSC == player.SocialClubName || a.LastRID == player.SocialClubId
-                                                                            || a.RegisterRID == player.SocialClubId || a.RegisterSC == player.SocialClubName).ToList();
-
-            string dataToReturn = "[";
-            foreach(Account acc in accounts)
-            {
-                dataToReturn += $"'{acc.Username}',";
-            }
-            dataToReturn += "]";
-            player.TriggerEvent("sendForgotUsernameToBrowser", dataToReturn);
+            EPlayer.SendAutoLoginData(player);
+            EPlayer.SendForgotUsernameData(player);
         }
 
         [RemoteEvent("OnPlayerLoginAttempt")]
@@ -2667,8 +2661,8 @@ namespace RNC
                         }
                     }
                 }
-                EPlayer.Notify(player, "Invalid credentials or unable to log-in!", "red", "fas fa-lock", false, 4000, "bottomCenter");
-                player.TriggerEvent("OnPlayerLoginRegister");
+                //EPlayer.Notify(player, "Invalid credentials or unable to log-in!", "red", "fas fa-lock", false, 4000, "bottomCenter");
+                player.TriggerEvent("login_ShowInvalidInfo", true);
             }
             catch(Exception ex)
             {
@@ -3588,27 +3582,6 @@ namespace RNC
             catch { }
         }
 
-        [RemoteEvent("OnRequestAutoLoginData")]
-        public static void OnRequestAutoLoginData(Player player)
-        {
-            List<Account> autoLoginChecks = ContextFactory.Instance.Accounts.ToList().Where(a => a.LastHWID == player.Serial &&
-                                                                                          a.LastRID == player.SocialClubId &&
-                                                                                          a.LastSC == player.SocialClubName &&
-                                                                                          a.AutoLogin == true).ToList();
-
-            if (autoLoginChecks.Count <= 0)
-            {
-                player.TriggerEvent("sendAutoLoginDataToBrowser", "0");
-            }
-            else
-            {
-                autoLoginChecks.Sort((x, y) => y.LastLogin.CompareTo(x.LastLogin)); // sort by date, descending
-                Account toLogin = autoLoginChecks[0];
-
-                player.TriggerEvent("sendAutoLoginDataToBrowser", toLogin.Username);
-            }
-        }
-
         [RemoteEvent("OnPlayerRegisterAttempt")]
         public static void OnPlayerRegisterAttempt(Player player, string email, string username, string password)
         {
@@ -3658,7 +3631,8 @@ namespace RNC
             Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase) == true);
             if (acc != null)
             {
-                EPlayer.Error(player, "An account with this name already exists!", "fas fa-user");
+                //EPlayer.Error(player, "An account with this name already exists!", "fas fa-user");
+                player.TriggerEvent("login_ShowAccountExists", true);
                 return;
             }
 
@@ -3666,7 +3640,8 @@ namespace RNC
             {
                 if (ContextFactory.Instance.Accounts.ToList().Where(a => a.RegisterHWID.Equals(player.Serial) || a.RegisterRID == player.SocialClubId).ToList().Count >= 2)
                 {
-                    EPlayer.Error(player, "You cannot create any more accounts on the same machine!", "fas fa-user");
+                    //EPlayer.Error(player, "You cannot create any more accounts on the same machine!", "fas fa-user");
+                    // ovo treba ubacit
                     return;
                 }
             }

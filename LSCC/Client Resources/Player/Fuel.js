@@ -15,8 +15,8 @@ mp.events.add('render', () => {
                 vehicleRemoteID = vehicle.remoteId;
                 pushMessageToChat("setting wasInVehicle = true");
 
-                if(UIHud){
-                    UIHud.execute(`gm.fuelStatus = true;`);
+                if(ServerUI){
+                    ServerUI.execute(`gm.fuelStatus = true;`);
                 }
            }
 
@@ -34,7 +34,7 @@ function HandleFuel(){
     if(!mp.players.exists(mp.players.local) || !mp.players.local.vehicle || player.seat != -1 || player.getVariable("Team") != 0){
         wasInVehicle = false;
         fuelFrameCount = 0;
-        UIHud.execute(`gm.fuelStatus = false;`);
+        ServerUI.execute(`gm.fuelStatus = false;`);
         mp.events.callRemote("UpdateVehicleFuel", currentVehicleFuel, vehicleRemoteID);
         return;
     }
@@ -62,7 +62,7 @@ function HandleFuel(){
 	var fuelToSubstract = (Math.pow(currentVehicleSpeed, 2)/100000)*distanceEffect;
     currentVehicleFuel -= fuelToSubstract;
 
-    UIHud.execute(`gm.$refs.BottomRight.$refs.FuelStatus.fuel = ${currentVehicleFuel};`);
+    ServerUI.execute(`gm.$refs.BottomRight.$refs.FuelStatus.fuel = ${currentVehicleFuel};`);
 
     if(currentVehicleFuel <= 0.0){
         currentVehicleFuel = 0.0;

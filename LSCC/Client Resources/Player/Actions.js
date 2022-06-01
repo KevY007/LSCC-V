@@ -37,7 +37,7 @@ mp.events.add("StopPlayerActions", () => {
     actionTime = 0;
     maxActionTime = 0;
     actionInterval = null;
-    UIHud.execute(`gm.actionBar = false;`);
+    ServerUI.execute(`gm.actionBar = false;`);
 })
 
 function PainkillerAction(){
@@ -63,7 +63,7 @@ function PainkillerAction(){
             mp.events.callRemote("OnPlayerActionTick");
             if(actionTime <= 0){
                 mp.events.callRemote("FinishPlayerAction", actionType);
-                UIHud.execute(`gm.actionBar = false;`);
+                ServerUI.execute(`gm.actionBar = false;`);
                 clearInterval(actionInterval);
             }
             else{
@@ -85,10 +85,10 @@ function PainkillerAction(){
 
 function initiateActionTimer(startTime){
     maxActionTime = startTime;
-    UIHud.execute(`gm.$refs.actionbar.maxtime = ${startTime}`);
-    UIHud.execute(`gm.$refs.actionbar.time = 0`);
-    //UIHud.execute(`gm.$refs.actionbar.fugitive = ${(mp.players.local.getVariable("Team") == 0 ? true : false)}`);
-    UIHud.execute(`gm.actionBar = true;`);
+    ServerUI.execute(`gm.$refs.actionbar.maxtime = ${startTime}`);
+    ServerUI.execute(`gm.$refs.actionbar.time = 0`);
+    //ServerUI.execute(`gm.$refs.actionbar.fugitive = ${(mp.players.local.getVariable("Team") == 0 ? true : false)}`);
+    ServerUI.execute(`gm.actionBar = true;`);
 }
 
 function MedkitAction(){
@@ -112,13 +112,13 @@ function MedkitAction(){
             if(actionTime <= 0){
                 mp.events.callRemote("clear_anim");
                 mp.events.callRemote("FinishPlayerAction", actionType);
-                UIHud.execute(`gm.actionBar = false;`);
-                UIHud.execute(`gm.$refs.actionbar.time = 0;`);
+                ServerUI.execute(`gm.actionBar = false;`);
+                ServerUI.execute(`gm.$refs.actionbar.time = 0;`);
                 clearInterval(actionInterval);
             }
             else{
                 actionTime--;           
-                UIHud.execute(`gm.$refs.actionbar.time = ${((maxActionTime - actionTime) == 0 ? 0 : (maxActionTime - actionTime))}`);
+                ServerUI.execute(`gm.$refs.actionbar.time = ${((maxActionTime - actionTime) == 0 ? 0 : (maxActionTime - actionTime))}`);
                 if(actionTime == 1){
                     mp.events.callRemote("play_anim", "amb@medic@standing@kneel@exit", "exit", 0, 8.0, 0.0, -1, 0.0, false, false, false);
                 }
@@ -207,15 +207,15 @@ mp.events.add("BeginReviving", () => {
         reviveTime--;
         if(reviveTime <= 0)
         {
-            UIHud.execute(`gm.actionBar = false;`);
-            UIHud.execute(`gm.$refs.actionbar.time = 0;`);
+            ServerUI.execute(`gm.actionBar = false;`);
+            ServerUI.execute(`gm.$refs.actionbar.time = 0;`);
             finishCuffing();
             mp.events.callRemote("FinishRevive", reviveTarget);
             clearInterval(reviveTimer);
             return;
         }
         else{
-            UIHud.execute(`gm.$refs.actionbar.time = ${((maxActionTime - reviveTime) == 0 ? 0 : (maxActionTime - reviveTime))}`);
+            ServerUI.execute(`gm.$refs.actionbar.time = ${((maxActionTime - reviveTime) == 0 ? 0 : (maxActionTime - reviveTime))}`);
         }
     }, 1000);
 });
@@ -228,7 +228,7 @@ function stopReviving(reason){
     reviveTarget = null;
 
     mp.events.callRemote("StopReviving");
-    UIHud.execute(`gm.actionBar = false;`);
+    ServerUI.execute(`gm.actionBar = false;`);
 
     switch(reason){
         case 1:{
@@ -305,12 +305,12 @@ mp.events.add("BeginCuffing", (target) => {
 
         cuffTimeLeft--;
         if(cuffTimeLeft <= 0){
-            UIHud.execute(`gm.actionBar = false;`);
-            UIHud.execute(`gm.$refs.actionbar.time = 0;`);
+            ServerUI.execute(`gm.actionBar = false;`);
+            ServerUI.execute(`gm.$refs.actionbar.time = 0;`);
             finishCuffing();
         }
         else{
-            UIHud.execute(`gm.$refs.actionbar.time = ${((maxActionTime - cuffTimeLeft) == 0 ? 0 : (maxActionTime - cuffTimeLeft))}`);
+            ServerUI.execute(`gm.$refs.actionbar.time = ${((maxActionTime - cuffTimeLeft) == 0 ? 0 : (maxActionTime - cuffTimeLeft))}`);
         }
     }, 1000);
 });
@@ -323,7 +323,7 @@ function stopCuffing(reason){ // if unsuccessful / force stopped
     cuffInterval = null;
     cuffTarget = null;
 
-    UIHud.execute(`gm.actionBar = false;`);
+    ServerUI.execute(`gm.actionBar = false;`);
 
     mp.events.callRemote("StopCuffing");
 

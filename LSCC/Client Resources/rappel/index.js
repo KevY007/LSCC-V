@@ -49,7 +49,7 @@ function rappelPlayer(warningLevel)
 }
 
 mp.events.add('OneSecondEvent', () => {
-    if(mp.storage.data.menu.tooltips == true && UIHud != null)
+    if(mp.storage.data.menu.tooltips == true && ServerUI != null)
     {
         if(mp.players.local.vehicle)
         {

@@ -530,8 +530,8 @@ mp.keys.bind(0x14, true, function() {
     mp.events.callLocal("HideAllElementsExceptChat", true); // show em
     gui = 'true';
 
-    if(UIHud != null && UIHud != undefined)
-        UIHud.execute(`gm.hud = ${showHud};`);
+    if(ServerUI != null && ServerUI != undefined)
+        ServerUI.execute(`gm.hud = ${showHud};`);
 
     mp.events.callRemote("DebugLog_SendCameraStuckLog", (camSwitchNativeReturn == undefined ? "undefined" : camSwitchNativeReturn.toString()));
 });
@@ -552,8 +552,8 @@ function checkCamInAir() {
         mp.events.callLocal("HideAllElementsExceptChat", true); // show em
         gui = 'true';
 
-        if(UIHud != null && UIHud != undefined)
-            UIHud.execute(`gm.hud = ${showHud};`);
+        if(ServerUI != null && ServerUI != undefined)
+            ServerUI.execute(`gm.hud = ${showHud};`);
     }
 }
 

@@ -147,7 +147,7 @@ mp.events.add("ShowHandcuffTooltip", () => {
 
 mp.events.add('setPing', (pingtoset) => {
     ping = pingtoset;
-    UIHud.execute(`gm.$refs.TopRight.$refs.Info.fps = ${ping}`);
+    ServerUI.execute(`gm.$refs.TopRight.$refs.Info.fps = ${ping}`);
 })
 
 mp.events.add("OneSecondEvent", () => {
@@ -201,7 +201,7 @@ mp.events.add("OneSecondEvent", () => {
         UpdateStatsVars(mp.players.local);
     }
     if(mp.storage.data.menu.monitoring == true){
-        UIHud.execute(`gm.$refs.TopRight.$refs.Info.fps = ${FPS}`);
+        ServerUI.execute(`gm.$refs.TopRight.$refs.Info.fps = ${FPS}`);
         mp.events.callRemote("RequestPlayerPing");
     }
 
@@ -725,23 +725,23 @@ if(!radioToggle) mp.game.audio.setInitialPlayerStation('OFF');
 
 function UpdateStatsVars(entity){
     // yes im double checking the same shit cuz for some reason this shit decided to break for no reason
-    if(UIHud == null || UIHud == undefined || UIMenu == undefined || UIMenu == null) return;
+    if(ServerUI == null || ServerUI == undefined || ServerUI == undefined || ServerUI == null) return;
     entity = mp.players.local;
     if(entity !== undefined){
         if(mp.players.exists(entity))
         {
-            if(UIHud !== undefined && UIHud != null){
-                UIHud.execute(`gm.stats = {
+            if(ServerUI !== undefined && ServerUI != null){
+                ServerUI.execute(`gm.stats = {
                     squad: ${mp.players.local.getVariable("PlayerSquadID")},
                     lobby: ${mp.players.local.getVariable("InLobby")},
                     admin: ${mp.players.local.getVariable("Admin")},
                     fugitive: ${mp.players.local.Team == 0 ? true : false},
                 }`);
                 let allowedCommands = CommandsDataJSON.filter(cmd => cmd.Admin <= mp.players.local.getVariable("Admin"));
-                UIHud.execute(`gm.$refs.chat.commands = ${JSON.stringify(allowedCommands)}`);
+                ServerUI.execute(`gm.$refs.chat.commands = ${JSON.stringify(allowedCommands)}`);
             }
-            if(UIMenu !== undefined && UIMenu != null){
-                UIMenu.execute(`gm.stats = {
+            if(ServerUI !== undefined && ServerUI != null){
+                ServerUI.execute(`gm.stats = {
                     name: "${mp.players.local.name}",
                     level: ${mp.players.local.getVariable("Level")},
                     admin: ${mp.players.local.getVariable("Admin")}
@@ -1313,11 +1313,11 @@ mp.events.add('render', () => {
                         derbyText.visible = true;
                     }
 
-                    if(UIHud != null)
+                    if(ServerUI != null)
                     {
-                        UIHud.execute(`gm.gameProgress = ${mp.storage.data.menu.gameProgress};`);
-                        UIHud.execute(`gm.$refs.TopRight.$refs.GameProgress.title = "Derby Time";`);
-                        UIHud.execute(`gm.$refs.TopRight.$refs.GameProgress.time = ${derbyTimeCur};`);
+                        ServerUI.execute(`gm.gameProgress = ${mp.storage.data.menu.gameProgress};`);
+                        ServerUI.execute(`gm.$refs.TopRight.$refs.GameProgress.title = "Derby Time";`);
+                        ServerUI.execute(`gm.$refs.TopRight.$refs.GameProgress.time = ${derbyTimeCur};`);
                     }
 
                     if(derbyCounting)
@@ -1348,7 +1348,7 @@ mp.events.add('render', () => {
 
                 traceLastFunc(`[Players] Update Chase Data1`);
 
-                if(UIHud != null && chaseRunning == true)
+                if(ServerUI != null && chaseRunning == true)
                 {
                     chaseTimeCur += 1;
 
@@ -1374,26 +1374,26 @@ mp.events.add('render', () => {
                     if(chaseTimeCur >= chaseTimeMax || chaseTimeCur <= -1)
                     {
                         chaseRunning = false;
-                        UIHud.execute(`gm.gameProgress = false;`);
+                        ServerUI.execute(`gm.gameProgress = false;`);
                     }
                     else {
-                        UIHud.execute(`gm.gameProgress = ${mp.storage.data.menu.gameProgress};`);
+                        ServerUI.execute(`gm.gameProgress = ${mp.storage.data.menu.gameProgress};`);
                         if(collisionTime > 0)
                         {
-                            UIHud.execute(`gm.$refs.TopRight.$refs.GameProgress.title = "Collisions";`);
-                            UIHud.execute(`gm.$refs.TopRight.$refs.GameProgress.time = ${collisionTime}`);
+                            ServerUI.execute(`gm.$refs.TopRight.$refs.GameProgress.title = "Collisions";`);
+                            ServerUI.execute(`gm.$refs.TopRight.$refs.GameProgress.time = ${collisionTime}`);
                         }
                         else 
                         {
-                            UIHud.execute(`gm.$refs.TopRight.$refs.GameProgress.title = "Time Left";`);
-                            UIHud.execute(`gm.$refs.TopRight.$refs.GameProgress.time = ${chaseTimeMax - chaseTimeCur}`);
+                            ServerUI.execute(`gm.$refs.TopRight.$refs.GameProgress.title = "Time Left";`);
+                            ServerUI.execute(`gm.$refs.TopRight.$refs.GameProgress.time = ${chaseTimeMax - chaseTimeCur}`);
                         }
                     }
                 }
 
                 traceLastFunc(`[Players] Update Chase Data2`);
 
-                if(chaseRunning == true && UIHud != null)
+                if(chaseRunning == true && ServerUI != null)
                 {
                     if(collisionTime > 0)
                     {
@@ -2527,7 +2527,7 @@ mp.events.add(
     },
 
     "HideChaseTimer": () => {
-        if(UIHud != null) UIHud.execute(`gm.gameProgress = false;`);
+        if(ServerUI != null) ServerUI.execute(`gm.gameProgress = false;`);
         chaseRunning = false;
     },
 
@@ -2570,7 +2570,7 @@ mp.events.add(
 
     "InitChaseTimer": () => {
         
-        if(UIHud != null) UIHud.execute(`gm.gameProgress = false;`);
+        if(ServerUI != null) ServerUI.execute(`gm.gameProgress = false;`);
 
         if(derbyText == null)
         {
@@ -2603,8 +2603,12 @@ mp.events.add(
 
     "playerReady": (player) => {
         setTimeout(() => {
+            /*
             loginBrowser = mp.browsers.new("package://LoginRegister/index.html"); // Right on connect so it doesn't overlay the notifications.
             loginBrowser.active = false;
+            */
+            ServerUI = mp.browsers.new("package://ServerUI/index.html");
+            ServerUI.active = false;
         }, 1000);
 
 
@@ -2686,13 +2690,13 @@ function setStorageDataVars(){
     }
 
     if(mp.storage.data.menu.monitoring !== undefined){
-        if(UIHud != undefined && UIHud != null)
-            UIHud.execute(`gm.$refs.TopRight.$refs.Info.monitor = ${mp.storage.data.menu.monitoring}`);
+        if(ServerUI != undefined && ServerUI != null)
+            ServerUI.execute(`gm.$refs.TopRight.$refs.Info.monitor = ${mp.storage.data.menu.monitoring}`);
     }
     else{
         mp.storage.data.menu.monitoring = false;
-        if(UIHud != undefined && UIHud != null)
-            UIHud.execute(`gm.$refs.TopRight.$refs.Info.monitor = false;`);
+        if(ServerUI != undefined && ServerUI != null)
+            ServerUI.execute(`gm.$refs.TopRight.$refs.Info.monitor = false;`);
     }
 
     if(mp.storage.data.menu.VoiceMode !== undefined){

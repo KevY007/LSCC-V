@@ -8132,14 +8132,14 @@ namespace RNC
         [Command("triggerjs", GreedyArg = true)]
         public void cmd_triggerjs(Player player, string eventt)
         {
-            if (!EPlayer.LoggedIn(player))
+            /*if (!EPlayer.LoggedIn(player))
                 return;
 
             if (EPlayer.GetAccount(player).Admin < 6)
             {
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
                 return;
-            }
+            }*/
 
             player.SetData("TriggerJSReturn", player.Name);
             player.TriggerEvent("ResolveJS", eventt);
@@ -8698,6 +8698,14 @@ namespace RNC
             ContextFactory.Instance.RedeemableCodes.Remove(redeem);
             ContextFactory.Instance.SaveChanges();
             return;
+        }
+
+        [Command("forcelogin")]
+        public void cmd_forcelogin(Player player, string username)
+        {
+            Account acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username == username);
+
+            Events.OnPlayerLogin(player, acc);
         }
 
         [Command("namechange", "!{#AFAFAF}[USAGE] namechange (new name)")]

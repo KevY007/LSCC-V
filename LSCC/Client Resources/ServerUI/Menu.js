@@ -31,17 +31,17 @@ if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD
 }
 
 mp.events.add('RestartMenu', () => {
-    if(UIMenu !== null)
+    if(ServerUI !== null)
     {
-        UIMenu.destroy();
-        UIMenu = null;
+        ServerUI.destroy();
+        ServerUI = null;
     }
 
-    UIMenu = mp.browsers.new("package://UIMenu/index.html");
-    UIMenu.execute(`gm.mainMenu = false;`);
-    UIMenu.active = true;
+    ServerUI = mp.browsers.new("package://ServerUI/index.html");
+    ServerUI.execute(`gm.mainMenu = false;`);
+    // UIMenu.active = true; [SERVERUI.TODO] Add function to activate the menu only
 
-    UIMenu.execute(`gm.$refs.logs.options = [
+    ServerUI.execute(`gm.$refs.logs.options = [
         { name: "Sessions", value: "sessions" },
         { name: "Admin", value: "admin" },
         { name: "Records", value: "records" },
@@ -57,7 +57,7 @@ function ToggleMenu()
         ToggleScoreboard();
     }
     
-    if(UIMenu != null && Date.now() - lastChatToggle >= 500 && !chatStatus && mp.players.local.getVariable("pLogged") !== undefined 
+    if(ServerUI != null && Date.now() - lastChatToggle >= 500 && !chatStatus && mp.players.local.getVariable("pLogged") !== undefined 
         && mp.players.local.getVariable("pLogged") == true && Date.now() - lastMenuToggle >= 1000)
     {
         lastMenuToggle = Date.now();
@@ -65,23 +65,14 @@ function ToggleMenu()
 
         menuToggled = !menuToggled;
 
-        /*if(menuToggled == false)
-        {
-            setTimeout(() => {
-                UIMenu.active = menuToggled;
-            }, 750);
-        }
-        else UIMenu.active = menuToggled;
-        */
-
-        //if(UIHud != null) UIHud.execute(`gm.miniHud = ${!menuToggled};`);
-        UIMenu.execute(`gm.mainMenu = ${menuToggled};`);
+        //if(ServerUI != null) ServerUI.execute(`gm.miniHud = ${!menuToggled};`);
+        ServerUI.execute(`gm.mainMenu = ${menuToggled};`);
         mp.events.callRemote("OnToggleMenu", menuToggled);
         mp.gui.cursor.show(menuToggled, menuToggled);
         activateChat(!menuToggled);
         
 
-        UIMenu.execute(`gm.$refs.settings.categories = [
+        ServerUI.execute(`gm.$refs.settings.categories = [
             {
                 name: "Game",
                 settings:[
@@ -354,34 +345,34 @@ function ToggleMenu()
         ]`);
         
 
-        UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.tri.value = ${mp.storage.data.menu.topRightInfo};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.gp.value = ${mp.storage.data.menu.gameProgress};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.tooltips.value = ${mp.storage.data.menu.tooltips};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.kf.value = ${mp.storage.data.menu.killFeed};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.nametags.value = ${mp.storage.data.menu.nametags};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.hud.value = ${mp.storage.data.menu.HUD};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.bigmap.value = ${mp.storage.data.menu.alwaysExpandedMap};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.updr.value = ${mp.storage.data.menu.updateRate};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.Display.$refs.monitor.value = ${mp.storage.data.menu.monitoring};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.Keybinds.$refs.vcbind.value = "${String.fromCharCode(curVoiceBind)}";`);
-        UIMenu.execute(`gm.$refs.settings.$refs.Keybinds.$refs.gpsbind.value = "${String.fromCharCode(curGPSBind)}";`);
-        UIMenu.execute(`gm.$refs.settings.$refs.Keybinds.$refs.bigmapbind.value = "${String.fromCharCode(curMapBind)}";`);
-        UIMenu.execute(`gm.$refs.settings.$refs.Game.$refs.myweather.value = ${mp.storage.data.menu.myweather};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.Game.$refs.myweather.preSelect = ${mp.storage.data.menu.myweather};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.Game.$refs.autojoinopt.value = ${mp.storage.data.menu.AutoJoin};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.Game.$refs.eventmusic.value = ${mp.storage.data.menu.EventMusic};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.Game.$refs.autologintog.value = ${mp.storage.data.menu.AutoLogin};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.oocauto.value = ${mp.storage.data.menu.OOCauto};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.voicemode.value = ${mp.storage.data.menu.VoiceMode};`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Display.$refs.tri.value = ${mp.storage.data.menu.topRightInfo};`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Display.$refs.gp.value = ${mp.storage.data.menu.gameProgress};`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Display.$refs.tooltips.value = ${mp.storage.data.menu.tooltips};`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Display.$refs.kf.value = ${mp.storage.data.menu.killFeed};`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Display.$refs.nametags.value = ${mp.storage.data.menu.nametags};`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Display.$refs.hud.value = ${mp.storage.data.menu.HUD};`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Display.$refs.bigmap.value = ${mp.storage.data.menu.alwaysExpandedMap};`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Display.$refs.updr.value = ${mp.storage.data.menu.updateRate};`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Display.$refs.monitor.value = ${mp.storage.data.menu.monitoring};`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Keybinds.$refs.vcbind.value = "${String.fromCharCode(curVoiceBind)}";`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Keybinds.$refs.gpsbind.value = "${String.fromCharCode(curGPSBind)}";`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Keybinds.$refs.bigmapbind.value = "${String.fromCharCode(curMapBind)}";`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Game.$refs.myweather.value = ${mp.storage.data.menu.myweather};`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Game.$refs.myweather.preSelect = ${mp.storage.data.menu.myweather};`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Game.$refs.autojoinopt.value = ${mp.storage.data.menu.AutoJoin};`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Game.$refs.eventmusic.value = ${mp.storage.data.menu.EventMusic};`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Game.$refs.autologintog.value = ${mp.storage.data.menu.AutoLogin};`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Chat.$refs.oocauto.value = ${mp.storage.data.menu.OOCauto};`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Chat.$refs.voicemode.value = ${mp.storage.data.menu.VoiceMode};`);
         
-        UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.activechatopacity.value = ${mp.storage.data.menu.ActiveChatOpacity.toString()};`);       
-        UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.inactivechatopacity.value = ${mp.storage.data.menu.InactiveChatOpacity.toString()};`);
-        UIMenu.execute(`gm.$refs.settings.$refs.Chat.$refs.showinactivechat.value = ${mp.storage.data.menu.ShowInactiveChat.toString()};`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Chat.$refs.activechatopacity.value = ${mp.storage.data.menu.ActiveChatOpacity.toString()};`);       
+        ServerUI.execute(`gm.$refs.settings.$refs.Chat.$refs.inactivechatopacity.value = ${mp.storage.data.menu.InactiveChatOpacity.toString()};`);
+        ServerUI.execute(`gm.$refs.settings.$refs.Chat.$refs.showinactivechat.value = ${mp.storage.data.menu.ShowInactiveChat.toString()};`);
 
-        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
-        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.settings.enabled = ${mp.storage.data.menu.CustomCrosshair}`);
-        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.settings.alwaysOn = ${mp.storage.data.menu.AlwaysOnCrosshair}`);
-        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.settings.onSnipers = ${mp.storage.data.menu.SniperCustomCrosshair}`);
+        ServerUI.execute(`gm.$refs.settings.$refs.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
+        ServerUI.execute(`gm.$refs.settings.$refs.crosshair.settings.enabled = ${mp.storage.data.menu.CustomCrosshair}`);
+        ServerUI.execute(`gm.$refs.settings.$refs.crosshair.settings.alwaysOn = ${mp.storage.data.menu.AlwaysOnCrosshair}`);
+        ServerUI.execute(`gm.$refs.settings.$refs.crosshair.settings.onSnipers = ${mp.storage.data.menu.SniperCustomCrosshair}`);
 
         showCustomCrosshair = mp.storage.data.menu.CustomCrosshair;
         alwaysShowCustomCrosshair = mp.storage.data.menu.AlwaysOnCrosshair;
@@ -393,7 +384,7 @@ mp.keys.bind(
     0x1B,
     false,
     () => {
-        if(UIMenu != null && menuToggled) ToggleMenu();
+        if(ServerUI != null && menuToggled) ToggleMenu();
     }
 );
 
@@ -418,7 +409,7 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     else if(id == 9)
     {
         mp.storage.data.menu.HUD = value;
-        UIHud.active = value;
+        // UIHud = value; [SERVERUI.TODO] FUNCTION TO DISABLE HUD ELEMENTS ONLY
     }
     else if(id == 10)
     {
@@ -485,7 +476,7 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     else if(id == 16)
     {
         mp.storage.data.menu.monitoring = value;
-        UIHud.execute(`gm.$refs.TopRight.$refs.Info.monitor = ${value}`);
+        ServerUI.execute(`gm.$refs.TopRight.$refs.Info.monitor = ${value}`);
     }
     else if(id == 17)
     {
@@ -525,9 +516,9 @@ mp.events.add("MenuChangeSettings", (id, value) =>
         showCustomCrosshairInSniper = value;
     }
 
-    if(UIHud != null)
+    if(ServerUI != null)
     {
-        UIHud.execute(`gm.topRightInfo = ${mp.storage.data.menu.topRightInfo}; gm.killFeed = ${mp.storage.data.menu.killFeed};`);
+        ServerUI.execute(`gm.topRightInfo = ${mp.storage.data.menu.topRightInfo}; gm.killFeed = ${mp.storage.data.menu.killFeed};`);
     }
 
     mp.storage.flush();
@@ -535,9 +526,9 @@ mp.events.add("MenuChangeSettings", (id, value) =>
 
 mp.events.add("Menu_UpdateLevelXP", (first_time = false) => {
     setTimeout(() => {
-        UIMenu.execute(`gm.$refs.profile.xp = ${mp.players.local.getVariable("CurrentXP")};`);
-        UIMenu.execute(`gm.$refs.profile.nextXp = ${mp.players.local.getVariable("NextLevelXP")};`);
-        UIMenu.execute(`gm.stats.level = ${mp.players.local.getVariable("Level")}`);
+        ServerUI.execute(`gm.$refs.profile.xp = ${mp.players.local.getVariable("CurrentXP")};`);
+        ServerUI.execute(`gm.$refs.profile.nextXp = ${mp.players.local.getVariable("NextLevelXP")};`);
+        ServerUI.execute(`gm.stats.level = ${mp.players.local.getVariable("Level")}`);
     }, (first_time ? 1000 : 1));
 })
 
@@ -558,8 +549,8 @@ mp.events.add("MenuSelectLoadout", (name, team) => {
 });
 
 mp.events.add("UpdateMenuMinigames", (arenas, currentMinigame) => {
-    UIMenu.execute(`gm.$refs.minigames.games = [];`);
-    UIMenu.execute(`gm.$refs.minigames.currentMinigame = ${currentMinigame};`);
+    ServerUI.execute(`gm.$refs.minigames.games = [];`);
+    ServerUI.execute(`gm.$refs.minigames.currentMinigame = ${currentMinigame};`);
     
     let menuItems = JSON.parse(arenas);
     for(let i = 0; i < menuItems.length; i++)
@@ -575,15 +566,15 @@ mp.events.add("UpdateMenuMinigames", (arenas, currentMinigame) => {
         
         insertString += "});";
 
-        UIMenu.execute(insertString);
+        ServerUI.execute(insertString);
     }
 });
 
 mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) => {
-    UIMenu.execute(`gm.$refs.vehicles.$refs.police.vehicles = [];`);
-    UIMenu.execute(`gm.$refs.vehicles.$refs.fugitive.vehicles = [];`);
-    UIMenu.execute(`gm.$refs.vehicles.$refs.police.selectedModel = "${currentCopCar}";`);
-    UIMenu.execute(`gm.$refs.vehicles.$refs.fugitive.selectedModel = "${currentFugiCar}";`);
+    ServerUI.execute(`gm.$refs.vehicles.$refs.police.vehicles = [];`);
+    ServerUI.execute(`gm.$refs.vehicles.$refs.fugitive.vehicles = [];`);
+    ServerUI.execute(`gm.$refs.vehicles.$refs.police.selectedModel = "${currentCopCar}";`);
+    ServerUI.execute(`gm.$refs.vehicles.$refs.fugitive.selectedModel = "${currentFugiCar}";`);
 
     // Vehicle Data
     // Model, Name, Background, Energy, Price, Locked
@@ -602,15 +593,15 @@ mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) =>
         if(menuItems[i][6].length > 1) insertString += `"requirements": "${menuItems[i][6]}", `;
         insertString += "});";
 
-        UIMenu.execute(insertString);
+        ServerUI.execute(insertString);
     }
 });
 
 mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoadout) => {
-    UIMenu.execute(`gm.$refs.loadouts.$refs.police.loadouts = [];`);
-    UIMenu.execute(`gm.$refs.loadouts.$refs.fugitive.loadouts = [];`);
-    UIMenu.execute(`gm.$refs.loadouts.$refs.police.selectedLoadout = "${(currentCopLoadout == "?" ? "Default" : currentCopLoadout)}";`);
-    UIMenu.execute(`gm.$refs.loadouts.$refs.fugitive.selectedLoadout = "${(currentFugiLoadout == "?" ? "Default" : currentFugiLoadout)}";`);
+    ServerUI.execute(`gm.$refs.loadouts.$refs.police.loadouts = [];`);
+    ServerUI.execute(`gm.$refs.loadouts.$refs.fugitive.loadouts = [];`);
+    ServerUI.execute(`gm.$refs.loadouts.$refs.police.selectedLoadout = "${(currentCopLoadout == "?" ? "Default" : currentCopLoadout)}";`);
+    ServerUI.execute(`gm.$refs.loadouts.$refs.fugitive.selectedLoadout = "${(currentFugiLoadout == "?" ? "Default" : currentFugiLoadout)}";`);
 
     // Loadout Data
     // Name, Locked, Background, Requirements, Weapons
@@ -628,13 +619,13 @@ mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoa
         insertString += menuItems[i][5];
         insertString += "});";
 
-        UIMenu.execute(insertString);
+        ServerUI.execute(insertString);
     }
 });
 
 mp.events.add("UpdateMenuLobbies", (lobbies, currentLobby) => {
-    UIMenu.execute(`gm.$refs.lobbies.lobbies = [];`);
-    UIMenu.execute(`gm.$refs.lobbies.currentLobby = ${currentLobby};`);
+    ServerUI.execute(`gm.$refs.lobbies.lobbies = [];`);
+    ServerUI.execute(`gm.$refs.lobbies.currentLobby = ${currentLobby};`);
 
     // Lobby Data
     // ID, Name, Background, Gamemode, Password, Players, MaxPlayers, Description
@@ -652,24 +643,24 @@ mp.events.add("UpdateMenuLobbies", (lobbies, currentLobby) => {
         if(menuItems[i][7].length > 1) insertString += `, "description": "${menuItems[i][7]}"`;
         insertString += "});";
 
-        UIMenu.execute(insertString);
+        ServerUI.execute(insertString);
     }
 });
 
 mp.events.add("SaveCrosshair", (crData) => {
     mp.storage.data.menu.CrosshairData = crData;
-    UIMenu.execute(`gm.crosshair.layers = ${crData}`);
+    ServerUI.execute(`gm.crosshair.layers = ${crData}`);
 
     mp.storage.flush();
 });
 mp.events.add("LoadCrosshair", () => {
     if (mp.storage.data.menu.CrosshairData !== undefined) {
-        UIMenu.execute(`gm.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
-        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
+        ServerUI.execute(`gm.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
+        ServerUI.execute(`gm.$refs.settings.$refs.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
     }
     else {
         mp.storage.data.menu.CrosshairData = "[]";
-        UIMenu.execute(`gm.crosshair.layers = []`);
-        UIMenu.execute(`gm.$refs.settings.$refs.crosshair.layers = []`);
+        ServerUI.execute(`gm.crosshair.layers = []`);
+        ServerUI.execute(`gm.$refs.settings.$refs.crosshair.layers = []`);
     }
 });
