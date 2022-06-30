@@ -2677,6 +2677,9 @@ function setStorageDataVars(){
     if(mp.storage.data.menu.ShowInactiveChat == undefined){
         mp.storage.data.menu.ShowInactiveChat = true;
     }
+    if(mp.storage.data.menu.CameraSwitch == undefined){
+        mp.storage.data.menu.CameraSwitch = true;
+    }
     if(mp.storage.data.menu.AutoLogin == undefined){
         mp.storage.data.menu.AutoLogin = true;
     }

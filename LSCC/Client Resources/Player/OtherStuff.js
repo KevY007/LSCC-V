@@ -478,6 +478,9 @@ let canManuallyResetCamera = false;
 
 mp.events.add('moveSkyCamera', (moveTo, switchType, showGui, timeout = 1) => moveFromToAir(moveTo, switchType, showGui, timeout));
 function moveFromToAir(moveTo, switchType, showGui, timeout = 1) {   
+    if(mp.storage.data.menu.CameraSwitch != undefined && mp.storage.data.menu.CameraSwitch == false){
+        return; // if it's toggled off, dont switch the camera!
+    }
     /*
         switchType: 0 - 3
 

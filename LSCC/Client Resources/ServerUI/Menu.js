@@ -21,6 +21,7 @@ if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD
     mp.storage.data.menu.ActiveChatOpacity = 1.0;
     mp.storage.data.menu.ShowInactiveChat = true;
     mp.storage.data.menu.AutoLogin = true;
+    mp.storage.data.menu.CameraSwitch = true;
 
     mp.storage.data.menu.CrosshairData = "[]";
     mp.storage.data.menu.CustomCrosshair = false;
@@ -134,6 +135,13 @@ function ToggleMenu()
                         name: "autologintog",
                         label: "Auto Login",
                         description: "Automatically log in to this account - eliminates the need to enter your login info."
+                    },
+                    {
+                        id: 22,
+                        type: 1,
+                        name: "cameraswitch",
+                        label: "Camera Switch Animation",
+                        description: "Toggles the GTA V player switch camera animation (going into air) upon round start. Turn this off if your camera gets stuck in the air often."
                     }
                 ]
             },
@@ -362,6 +370,7 @@ function ToggleMenu()
         ServerUI.execute(`gm.$refs.settings.$refs.Game.$refs.autojoinopt.value = ${mp.storage.data.menu.AutoJoin};`);
         ServerUI.execute(`gm.$refs.settings.$refs.Game.$refs.eventmusic.value = ${mp.storage.data.menu.EventMusic};`);
         ServerUI.execute(`gm.$refs.settings.$refs.Game.$refs.autologintog.value = ${mp.storage.data.menu.AutoLogin};`);
+        UIMenu.execute(`gm.$refs.settings.$refs.Game.$refs.cameraswitch.value = ${mp.storage.data.menu.CameraSwitch};`);
         ServerUI.execute(`gm.$refs.settings.$refs.Chat.$refs.oocauto.value = ${mp.storage.data.menu.OOCauto};`);
         ServerUI.execute(`gm.$refs.settings.$refs.Chat.$refs.voicemode.value = ${mp.storage.data.menu.VoiceMode};`);
         
@@ -502,6 +511,10 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     {
         mp.storage.data.menu.AutoLogin = value;
         mp.events.callRemote("Server_ToggleAutoLogin", value);
+    }
+    else if(id == 22)
+    {
+        mp.storage.data.menu.CameraSwitch = value;
     }
     else if(id == 69420){
         mp.storage.data.menu.CustomCrosshair = value;
