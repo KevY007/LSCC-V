@@ -3,6 +3,7 @@
 let camera = null;
 let camera_moveable = false;
 let camera_lastmove = Date.now();
+let moveToCam = null;
 
 const player = mp.players.local;
 let localPlayer = mp.players.local;
@@ -423,6 +424,20 @@ function createCam(x, y, z, rx, ry, rz, viewangle, moveable = false) {
     camera.setActive(true);
     mp.game.cam.renderScriptCams(true, true, 20000000000000000000000000, false, false);
 }
+function moveCam(x, y, z, rx, ry, rz, time, newviewangle){
+    traceLastFunc(`[Players] Move Cam`);
+    if(!camera) return;
+    if(moveToCam != null){
+        moveToCam.setActive(false);
+        moveToCam.destroy();
+        moveToCam = null;
+    }
+    moveToCam = mp.cameras.new("MoveToCam", {x, y, z}, { x: rx, y: ry, z: rz}, newviewangle);
+    setTimeout(() => {
+        camera.setActiveWithInterp(moveToCam.handle, time, 1, 1);
+    }, 100);
+    
+}
 
 mp.events.add("SetVehicleLights", (vehicle, state) => vehicle.setLights(state));
 
@@ -737,8 +752,10 @@ function UpdateStatsVars(entity){
                     admin: ${mp.players.local.getVariable("Admin")},
                     fugitive: ${mp.players.local.Team == 0 ? true : false},
                 }`);
-                let allowedCommands = CommandsDataJSON.filter(cmd => cmd.Admin <= mp.players.local.getVariable("Admin"));
-                ServerUI.execute(`gm.$refs.chat.commands = ${JSON.stringify(allowedCommands)}`);
+                if(CommandsDataJSON){
+                    let allowedCommands = CommandsDataJSON.filter(cmd => cmd.Admin <= mp.players.local.getVariable("Admin"));
+                    ServerUI.execute(`gm.$refs.chat.commands = ${JSON.stringify(allowedCommands)}`);
+                }
             }
             if(ServerUI !== undefined && ServerUI != null){
                 ServerUI.execute(`gm.stats = {
@@ -2595,6 +2612,10 @@ mp.events.add(
 
     "CreatePlayerCamera": (x, y, z, rx, ry, rz, viewangle, moveable = false) => {
         createCam(x, y, z, rx, ry, rz, viewangle, moveable);
+    },
+
+    "MovePlayerCamera": (x, y, z, rx, ry, rz, time, hz1, hz2) => {
+        moveCam(x, y, z, rx, ry, rz, time, hz1, hz2);
     },
 
     "SetDiscordStatus": (serverName, status) => {

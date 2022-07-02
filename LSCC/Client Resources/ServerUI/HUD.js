@@ -194,7 +194,11 @@ function focusChat(toggle){
     mp.events.callRemote("onFocusChat", toggle);
 }
 function pushMessageToChat(message){
-    if(ServerUI == null) return;
+    if(ServerUI == null){return;}
+
+    /* TEST SERVER ONLY FEATURE WHILE THE MAIN CHAT ISN'T DONE YET */
+    mp.gui.chat.push(message);
+
     ServerUI.execute(`gm.$refs.chat.messages.push("${message}")`);
     increaseChatOpacity(4000);
 }

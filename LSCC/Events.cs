@@ -71,8 +71,6 @@ namespace RNC
 
             EPlayer.LoginCameraSetup(player);
 
-            EPlayer.LoginBrowserSetup(player);
-
             player.TriggerEvent("InitChaseTimer");
 
             player.SetSharedData("PlayerWeather", -1);
@@ -4676,7 +4674,6 @@ namespace RNC
                 if (!EPlayer.LoggedIn(player))
                 {
                     EPlayer.LoginCameraSetup(player);
-                    EPlayer.LoginBrowserSetup(player);
                     return;
                 }
 

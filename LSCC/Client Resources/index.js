@@ -113,31 +113,120 @@ traceLastFunc("Main::Init()");
 var loginSceneEntities = [];
 function toggleLoginScene(toggle){
     if(toggle){
-        loginSceneEntities[0] = mp.vehicles.new(mp.game.joaat("police"), new mp.Vector3(240.73251, -1794.3538, 27.502863),
+  
+        /* CREATING THE VEHICLES */
+        loginSceneEntities[0] = mp.vehicles.new(mp.game.joaat("cavalcade"), new mp.Vector3(-694.26056, -1044.3917, 15.728991),
             {
-                heading: 97.76415,
+                heading: -4.97181,
                 numberPlate: 'RNC123',
+                color: [[255, 0, 0], [255, 255, 255]],
+                alpha: 255,
+                engine: false,
                 dimension: mp.players.local.dimension
             });
-        loginSceneEntities[0].setDoorOpen(1, false, true);
-        loginSceneEntities[0].setDoorOpen(0, false, true);
-        loginSceneEntities[1] = mp.vehicles.new(mp.game.joaat("cavalcade2"), new mp.Vector3(236.4917, -1784.2609, 28.601725),
+        loginSceneEntities[1] = mp.vehicles.new(mp.game.joaat("police2"), new mp.Vector3(-688.26843, -1044.1389, 15.873694),
         {
-            heading: 5.697903,
+            heading: 103.21785,
             numberPlate: 'RNC123',
+            color: [[0,0,0], [255, 255, 255]],
+            alpha: 255,
+            engine: false,
             dimension: mp.players.local.dimension
         });
-        loginSceneEntities[1].setDoorOpen(5, false, true);
+        loginSceneEntities[2] = mp.vehicles.new(mp.game.joaat("police"), new mp.Vector3(-696.2687, -1050.3245, 15.12663),
+        {
+            heading: -29.521137,
+            numberPlate: 'RNC123',
+            color: [[0,0,0], [255, 255, 255]],
+            alpha: 255,
+            engine: false,
+            dimension: mp.players.local.dimension
+        });
 
-        loginSceneEntities[2] = mp.peds.new(mp.game.joaat('s_m_y_cop_01'), 
-        new mp.Vector3(236.14717, -1795.1011, 28.029375), -82.156, mp.players.local.dimension);
-        loginSceneEntities[3] = mp.peds.new(mp.game.joaat('s_f_y_cop_01'), 
-        new mp.Vector3(236.59952, -1787.1562, 28.597916), -4.26895, mp.players.local.dimension);
-        loginSceneEntities[4] = mp.peds.new(mp.game.joaat('ig_ramp_gang'), 
-        new mp.Vector3(237.48822, -1794.7585, 27.987871), -85.38175, mp.players.local.dimension);
+        /* APPLYING VEHICLE STUFF [DOORS, COLORS] */
+        setTimeout(() => {
+            loginSceneEntities[0].setLights(2);
+            loginSceneEntities[1].setLights(3);
+            loginSceneEntities[2].setLights(3);
+
+            loginSceneEntities[0].setDamage(-1, 0, 0, 100, 25, true);
+            loginSceneEntities[1].setSiren(true);
+            loginSceneEntities[2].setSiren(true);
+
+            loginSceneEntities[0].setDoorOpen(0, false, true);
+            loginSceneEntities[0].setDoorOpen(3, false, true);
+            loginSceneEntities[1].setDoorOpen(0, false, true);
+            loginSceneEntities[1].setDoorOpen(1, false, true);
+            loginSceneEntities[2].setDoorOpen(0, false, true);
+
+        }, 200);
+
+        /* GENERAL STUFF - TIME OF DAY, ANIM DICTS... */
+
+        mp.game.audio.startAudioScene("CHARACTER_CHANGE_IN_SKY_SCENE");
+        mp.game.time.setClockTime(21, 0, 0);
+        mp.game.gameplay.setWeatherTypeNow('CLEAR');
+
+        mp.game.streaming.requestAnimDict("arrest");
+        mp.game.streaming.requestAnimDict("amb@medic@standing@kneel@base");
+        mp.game.streaming.requestAnimDict("random@arrests@busted");
+        mp.game.streaming.requestAnimDict("combat@damage@writhe");
+
+        /* CREATING THE PEDS */
+        setTimeout(() => {
+            loginSceneEntities[3] = mp.peds.new( // gangster 1 - dead
+                mp.game.joaat('csb_grove_str_dlr'), 
+                new mp.Vector3(-697.9484, -1043.4353, 15.86826),
+                -47.113903,
+                mp.players.local.dimension
+            );
+            loginSceneEntities[4] = mp.peds.new( // gangster 2 - surrendering
+                mp.game.joaat('a_m_m_salton_02'), 
+                new mp.Vector3(-693.20276, -1047.7367, 15.804193),
+                34.280487,
+                mp.players.local.dimension
+            );
+            loginSceneEntities[5] = mp.peds.new( // cop speaking into radio, aiming at gangster 2
+                mp.game.joaat('s_m_y_cop_01'), 
+                new mp.Vector3(-692.4914, -1048.5272, 15.750268),
+                35.93633,
+                mp.players.local.dimension
+            );
+            loginSceneEntities[6] = mp.peds.new( // cop 2 - kneeling next to ded guy
+                mp.game.joaat('s_f_y_cop_01'), 
+                new mp.Vector3(-696.91583, -1044.7444, 15.767713),
+                67.523476,
+                mp.players.local.dimension
+            );
+            loginSceneEntities[7] = mp.peds.new( // cop 3 - idling next to them
+                mp.game.joaat('s_m_y_cop_01'), 
+                new mp.Vector3(-689.9278, -1046.8384, 15.976717),
+                104.24435,
+                mp.players.local.dimension
+            );
+
+        }, 210);
+
+        /* SETTING PED STUFF */
+
+        setTimeout(() => {
+            mp.game.invoke('0xBF0FD6E56C964FCB', loginSceneEntities[5].handle, 1593441988, 0, false, false); // GIVE_WEAPON_TO_PED
+            mp.game.invoke('0xADF692B254977C0C', loginSceneEntities[5].handle, 1593441988, true); // SET_CURRENT_PED_WEAPON  
+          
+            loginSceneEntities[3].applyDamagePack("Explosion_Large", 100, 1);
+            loginSceneEntities[3].taskPlayAnim("combat@damage@writhe", "writhe_loop", 8.0, 1.0, -1, 1, 1.0, false, false, false);    
+            loginSceneEntities[4].taskPlayAnim("random@arrests@busted", "idle_a", 8.0, 1.0, -1, 1, 1.0, false, false, false);     
+            loginSceneEntities[5].taskPlayAnim("arrest", "radio_chatter", 8.0, 1.0, -1, 1, 1.0, false, false, false);      
+            loginSceneEntities[6].taskPlayAnim("amb@medic@standing@kneel@base", "base", 8.0, 1.0, -1, 1, 1.0, false, false, false); 
+            loginSceneEntities[7].setComponentVariation(0, 1, 0, 0);
+            loginSceneEntities[7].setComponentVariation(3, 0, 1, 0);
+            loginSceneEntities[7].taskStartScenarioInPlace('WORLD_HUMAN_COP_IDLES', 0, false);
+        
+        }, 260);
 
     }
     else{
+        mp.game.audio.stopAudioScene("CHARACTER_CHANGE_IN_SKY_SCENE");
         for(let i = 0 ; i < loginSceneEntities.length ; i++){
             loginSceneEntities[i].destroy();
         }

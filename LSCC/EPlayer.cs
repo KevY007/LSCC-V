@@ -1819,6 +1819,13 @@ namespace RNC
  
             player.TriggerEvent("DestroyPlayerCamera");
             player.TriggerEvent("CreatePlayerCamera", Settings.LoginCameraX, Settings.LoginCameraY, Settings.LoginCameraZ, Settings.LoginCameraRx, Settings.LoginCameraRy, Settings.LoginCameraRz, Settings.LoginCameraViewAngle);
+            NAPI.Task.Run(() =>
+            {
+                if (player != null)
+                    player.TriggerEvent("MovePlayerCamera", Settings.LoginCameraXEnd, Settings.LoginCameraYEnd, Settings.LoginCameraZEnd, Settings.LoginCameraRxEnd, Settings.LoginCameraRyEnd, Settings.LoginCameraRzEnd, 120000, Settings.LoginCameraViewAngle); 
+            }, 1000);
+
+            EPlayer.LoginBrowserSetup(player);
         }
 
         public static void StopPlayerAction(Player player, int reason)
