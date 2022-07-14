@@ -739,7 +739,7 @@ mp.events.add('TakeScreenshot', (quality, compression, identifier = "null") =>
         "http://screenshots/${_fname}", 
         "Screenshotter${_fdate.getMilliseconds()}", 
         "${identifier}", 
-        "http://192.210.243.62/lsccv/imguploader.php");`);
+        "https://phpscreenshotserver.ls-cc.info/imguploader.php");`);
 });
 
 mp.events.add("ViewScreenshot", (identifier) => {
@@ -749,7 +749,7 @@ mp.events.add("ViewScreenshot", (identifier) => {
         ssViewCEF = null;
     }
 
-    ssViewCEF = mp.browsers.new(`http://192.210.243.62/lsccv/screenshots/${identifier}`);
+    ssViewCEF = mp.browsers.new(`https://phpscreenshotserver.ls-cc.info/screenshots/${identifier}`);
 });
 
 mp.keys.bind(0x71, true, function() {
