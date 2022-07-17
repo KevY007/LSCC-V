@@ -67,12 +67,12 @@ function ToggleMenu()
         menuToggled = !menuToggled;
 
         //if(ServerUI != null) ServerUI.execute(`gm.miniHud = ${!menuToggled};`);
-        ServerUI.execute(`gm.mainMenu = ${menuToggled};`);
+        ServerUI.execute(`gm._pStores.globals.isMainMenuOpen = ${menuToggled};`);
         mp.events.callRemote("OnToggleMenu", menuToggled);
         mp.gui.cursor.show(menuToggled, menuToggled);
         activateChat(!menuToggled);
         
-
+/*
         ServerUI.execute(`gm.$refs.settings.categories = [
             {
                 name: "Game",
@@ -382,7 +382,7 @@ function ToggleMenu()
         ServerUI.execute(`gm.$refs.settings.$refs.crosshair.settings.enabled = ${mp.storage.data.menu.CustomCrosshair}`);
         ServerUI.execute(`gm.$refs.settings.$refs.crosshair.settings.alwaysOn = ${mp.storage.data.menu.AlwaysOnCrosshair}`);
         ServerUI.execute(`gm.$refs.settings.$refs.crosshair.settings.onSnipers = ${mp.storage.data.menu.SniperCustomCrosshair}`);
-
+*/
         showCustomCrosshair = mp.storage.data.menu.CustomCrosshair;
         alwaysShowCustomCrosshair = mp.storage.data.menu.AlwaysOnCrosshair;
         showCustomCrosshairInSniper = mp.storage.data.menu.SniperCustomCrosshair;
@@ -562,13 +562,13 @@ mp.events.add("MenuSelectLoadout", (name, team) => {
 });
 
 mp.events.add("UpdateMenuMinigames", (arenas, currentMinigame) => {
-    ServerUI.execute(`gm.$refs.minigames.games = [];`);
-    ServerUI.execute(`gm.$refs.minigames.currentMinigame = ${currentMinigame};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.minigamesTab.games = [];`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.minigamesTab.currentMinigame = ${currentMinigame};`);
     
     let menuItems = JSON.parse(arenas);
     for(let i = 0; i < menuItems.length; i++)
     {
-        let insertString = `gm.$refs.minigames.games.push({`;
+        let insertString = `gm.$refs.mainMenu.$refs.minigamesTab.games.push({`;
         insertString += `"id": ${menuItems[i][0]}, `;
         insertString += `"name": "${menuItems[i][1]}", `;
         insertString += `"background": "${menuItems[i][2]}", `;
@@ -637,15 +637,15 @@ mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoa
 });
 
 mp.events.add("UpdateMenuLobbies", (lobbies, currentLobby) => {
-    ServerUI.execute(`gm.$refs.lobbies.lobbies = [];`);
-    ServerUI.execute(`gm.$refs.lobbies.currentLobby = ${currentLobby};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.lobbiesTab.lobbies = [];`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.lobbiesTab.currentLobby = ${currentLobby};`);
 
     // Lobby Data
     // ID, Name, Background, Gamemode, Password, Players, MaxPlayers, Description
     let menuItems = JSON.parse(lobbies);
     for(let i = 0; i < menuItems.length; i++)
     {
-        let insertString = `gm.$refs.lobbies.lobbies.push({`;
+        let insertString = `gm.$refs.mainMenu.$refs.lobbiesTab.lobbies.push({`;
         insertString += `"id": ${menuItems[i][0]}, `;
         insertString += `"name": "${menuItems[i][1]}", `;
         insertString += `"background": "${menuItems[i][2]}", `;
