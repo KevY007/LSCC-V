@@ -8577,7 +8577,7 @@ namespace RNC
             return;
         }
 
-        [Command("createclan", "!{#AFAFAF}[USAGE] createclan (clan name)")]
+        [Command("createclan", "!{#AFAFAF}[USAGE] createclan (clan name)", GreedyArg = true)]
         public void cmd_createclan(Player player, string clanname)
         {
             if (!EPlayer.LoggedIn(player))

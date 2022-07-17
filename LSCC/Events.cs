@@ -2964,7 +2964,6 @@ namespace RNC
                     price
                 });
 
-                NAPI.Util.ConsoleOutput($"Car {car.Name}'s price data: " + price);
             }
             
             return vehItems;
@@ -3045,11 +3044,10 @@ namespace RNC
             if (!EPlayer.LoggedIn(player)) return new List<object[]>();
             // Loadout Data
 
-
             List<object[]> loadoutItems = new List<object[]>();
             foreach (var loadout in Settings.Loadouts)
             {
-                string weaponString = "weapons: [";
+                string weaponString = "\"weapons\": [";
 
                 foreach(var weapon in loadout.Weapons)
                 {
@@ -3058,7 +3056,7 @@ namespace RNC
 
                 weaponString += "],";
 
-                string requireString = "requirements: [";
+                string requireString = "\"requirements\": [";
 
                 if (loadout.LevelRequired > 0) requireString += $"\"Level {loadout.LevelRequired}\",";
                 if (loadout.PointsRequired > 0) requireString += $"\"{loadout.PointsRequired} Points\",";
@@ -3717,7 +3715,9 @@ namespace RNC
                     PurchasedAmmo = "{}",
                     ChallengeStreak = 0,
                     CompletedDailyChallenge = false,
-                    Namechanges = 0
+                    Namechanges = 0,
+                    ClanTier = -1,
+                    ClanID = -1
                 };
                 AccountManager.Add(_new);
                 OnPlayerRegister(player, _new);

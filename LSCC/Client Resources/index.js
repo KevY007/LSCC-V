@@ -159,7 +159,7 @@ function toggleLoginScene(toggle){
             loginSceneEntities[1].setDoorOpen(1, false, true);
             loginSceneEntities[2].setDoorOpen(0, false, true);
 
-        }, 200);
+        }, 350);
 
         /* GENERAL STUFF - TIME OF DAY, ANIM DICTS... */
 
@@ -205,7 +205,7 @@ function toggleLoginScene(toggle){
                 mp.players.local.dimension
             );
 
-        }, 210);
+        }, 550);
 
         /* SETTING PED STUFF */
 
@@ -222,7 +222,7 @@ function toggleLoginScene(toggle){
             loginSceneEntities[7].setComponentVariation(3, 0, 1, 0);
             loginSceneEntities[7].taskStartScenarioInPlace('WORLD_HUMAN_COP_IDLES', 0, false);
         
-        }, 260);
+        }, 750);
 
     }
     else{
@@ -337,6 +337,7 @@ mp.events.add('sendForgotUsernameToBrowser', (data) => {
 });
 
 mp.events.add('autologinToServer', (username) => {
+    ServerUI.execute(`gm.$refs.auth.$refs.panel.authLoading = true;`);
     mp.events.callRemote("OnAutoLoginAttempt", username);
 });
 
