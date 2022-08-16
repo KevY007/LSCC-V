@@ -234,6 +234,8 @@ function toggleLoginScene(toggle){
 }
 
 mp.events.add('showLoginBrowser', (state) => {
+
+
     setTimeout(() => {
         if(ServerUI != null)
         {
@@ -258,16 +260,6 @@ mp.events.add('showLoginBrowser', (state) => {
             mp.events.callRemote("ServerConsoleOutput", `Attempted to show login browser when ServerUI is null!`);
         }
 
-        /*
-        loginBrowser.active = state;
-    
-        if(!loginBrowser.active && mp.players.local.getVariable("pLogged") == true && loginBrowser != null)
-        {
-            loginBrowser.destroy();
-            loginBrowser = null;
-        }
-        */
-       // [SERVERUI.TODO] FUNCTIONS TO TOGGLE THE LOGIN SCREEN ON/OFF WILL BE HERE
     }, 500);
 });
 mp.events.add("login_ShowInvalidInfo", (toggle) => {

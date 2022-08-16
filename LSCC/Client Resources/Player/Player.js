@@ -754,7 +754,7 @@ function UpdateStatsVars(entity){
                 }`);
                 if(CommandsDataJSON){
                     let allowedCommands = CommandsDataJSON.filter(cmd => cmd.Admin <= mp.players.local.getVariable("Admin"));
-                    ServerUI.execute(`gm.$refs.chat.commands = ${JSON.stringify(allowedCommands)}`);
+                    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.commands = ${JSON.stringify(allowedCommands)}`);
                 }
             }
             if(ServerUI !== undefined && ServerUI != null){
@@ -2630,6 +2630,8 @@ mp.events.add(
             */
             ServerUI = mp.browsers.new("package://ServerUI/index.html");
             ServerUI.active = false;
+            mp.gui.chat.show(false);
+            mp.gui.chat.activate(false);
         }, 1000);
 
 
