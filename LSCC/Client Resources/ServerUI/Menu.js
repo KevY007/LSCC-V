@@ -73,7 +73,7 @@ function ToggleMenu()
         activateChat(!menuToggled);
         
 
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.categories = [
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.categories = [
             {
                 name: "Game",
                 settings:[
