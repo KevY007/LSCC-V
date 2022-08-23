@@ -6209,11 +6209,21 @@ namespace RNC
         public void cmd_saveserver(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return;
-            if (EPlayer.GetAccount(player).Admin < 4) return;
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+            EPlayer.SendMessage(player, "You have initiated ~y~saving of all server data~w~!");
+            long startUnix = DateTimeOffset.Now.ToUnixTimeSeconds();
+            NAPI.Task.Run(() =>
+            {
+                if (player == null) return;
+                ContextFactory.Instance.SaveChanges();
+                long currentUnix = DateTimeOffset.Now.ToUnixTimeSeconds();
 
-            ContextFactory.Instance.SaveChanges();
-            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[SERVER] You have saved all the data in the server.");
-            return;
+                EPlayer.SendMessage(player, $"~g~Finished saving data! ~w~(Time: ~y~{(currentUnix - startUnix).ToString()}~w~s)");
+            }, 500);
         }
 
         [Command("reloadaccount")]
