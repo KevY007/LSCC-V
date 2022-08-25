@@ -4143,6 +4143,8 @@ namespace RNC
                             Type = type
                         };
 
+                        player.TriggerEvent("pushMsgToChat", $"!{{#72ff6b}}Successfully added admin note to {target.Name} ({text})!");
+                        Logs.LogAdmin(player, $"Added admin note to {target.Name} of type {_n.TypeToString()} at {_n.Timestamp}");
                         Task.Run(async () =>
                         {
                             using (MainDatabase context = ContextFactory.CreateContext())
@@ -4151,8 +4153,6 @@ namespace RNC
                                 await context.SaveChangesAsync();
                             }
                         });
-                        player.TriggerEvent("pushMsgToChat", $"!{{#72ff6b}}Successfully added admin note to {target.Name} ({text})!");
-                        Logs.LogAdmin(player, $"Added admin note to {target.Name} of type {_n.TypeToString()} at {_n.Timestamp}");
                         break;
                     }
                 case "delete":
@@ -4220,7 +4220,7 @@ namespace RNC
                     }
                 });
             });
-        } 
+        }
         private void anote_FinishDeleteNote(Player player, int nID, string nTargetName)
         {
             NAPI.Task.Run(() =>
@@ -4330,14 +4330,14 @@ namespace RNC
 
             if (lobby.Password.Length > 1 && EPlayer.GetAccount(player).Admin < 1)
             {
-                if(password.Length < 1)
+                if (password.Length < 1)
                 {
                     player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}This lobby has a password, join with /swl (lobby id) (password).");
                     EPlayer.Notify(player, "Lobby requires a password.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                     return;
                 }
 
-                if(!password.Equals(lobby.Password))
+                if (!password.Equals(lobby.Password))
                 {
                     player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Invalid password for the lobby!");
                     EPlayer.Notify(player, "Invalid password.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
@@ -4345,7 +4345,7 @@ namespace RNC
                 }
             }
 
-            if(Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobbyid) >= Settings.Dynamics.MaxInLobby && EPlayer.GetAccount(player).Admin < 1)
+            if (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobbyid) >= Settings.Dynamics.MaxInLobby && EPlayer.GetAccount(player).Admin < 1)
             {
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}That lobby is full!");
                 EPlayer.Notify(player, "Lobby is full.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
@@ -4353,9 +4353,9 @@ namespace RNC
             }
 
             LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
-            if(elobby != null)
+            if (elobby != null)
             {
-                if(elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
+                if (elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
                 {
                     player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot switch lobbies in an ongoing game! (/lobby)");
                     EPlayer.Notify(player, "You are currently in an ongoing game.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
@@ -4371,7 +4371,7 @@ namespace RNC
             }
 
             player.SetSharedData("InLobby", lobbyid);
-     
+
             NAPI.Player.SpawnPlayer(player, Settings.LobbySpawns.OrderBy(c => Guid.NewGuid()).First());
             EPlayer.Notify(player, $"Joined <strong>Lobby {lobbyid}</strong>", "blue", "fas fa-users", false, 1000, "bottomCenter", "replace");
             return;
@@ -4475,7 +4475,7 @@ namespace RNC
                 return;
             }
 
-            if(Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == arenaid) >= 7 + (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")) / 3))
+            if (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == arenaid) >= 7 + (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")) / 3))
             {
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}That arena has maxed out on players.");
                 EPlayer.Notify(player, "Arena is full.", "red", "fas fa-users-slash", false, 1000, "bottomCenter", "replace");
@@ -4486,14 +4486,14 @@ namespace RNC
             if (elobby == null) return;
 
             if (elobby.gameStatus == 2)
-            { 
+            {
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot go into DM while the match is starting!");
                 EPlayer.Notify(player, "Unable to join.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
             if (elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
-            {                    
+            {
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot go into DM while in the copchase! (/lobby)");
                 EPlayer.Notify(player, "You are in a copchase.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
@@ -4547,7 +4547,7 @@ namespace RNC
             }
 
             player.SetSharedData("InDM", -1);
-            player.SetSharedData("InLobby", -3); 
+            player.SetSharedData("InLobby", -3);
             EPlayer.Spawn(player, false, new Vector3(1061.547f, -720.113f, 56.786f));
             EPlayer.Notify(player, $"Joined <strong>Freeroam</strong>", "blue", "fas fa-check", false, 1000, "bottomCenter", "replace");
 
@@ -4633,7 +4633,7 @@ namespace RNC
 
             if (lobby == null) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You are not in a copchase lobby."); return; }
 
-            if(weatherid < 0 || weatherid > 9) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Invalid weather ID! Possible ID's are between 0-9."); return; }
+            if (weatherid < 0 || weatherid > 9) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Invalid weather ID! Possible ID's are between 0-9."); return; }
 
             lobby.Weather = weatherid;
             string weatherString = Main.WeatherToForecast(lobby.Weather);
@@ -4644,8 +4644,8 @@ namespace RNC
                 {
                     eplayer.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
 
-                    if(EPlayer.GetAccount(player).Admin > 0) eplayer.TriggerEvent("pushMsgToChat", "!{#FF6347}AdmCmd: An admin has changed the current lobby weather: !{#A8FFAB} " + weatherString);
-					else eplayer.TriggerEvent("pushMsgToChat", "!{#FF6347}DonatorCmd: " + player.Name + " has changed the current lobby weather: !{#A8FFAB} " + weatherString);
+                    if (EPlayer.GetAccount(player).Admin > 0) eplayer.TriggerEvent("pushMsgToChat", "!{#FF6347}AdmCmd: An admin has changed the current lobby weather: !{#A8FFAB} " + weatherString);
+                    else eplayer.TriggerEvent("pushMsgToChat", "!{#FF6347}DonatorCmd: " + player.Name + " has changed the current lobby weather: !{#A8FFAB} " + weatherString);
                 }
             }
 
@@ -4678,8 +4678,8 @@ namespace RNC
                 {
                     eplayer.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
 
-                    if(EPlayer.GetAccount(player).Admin > 0) eplayer.TriggerEvent("pushMsgToChat", "!{#FF6347}AdmCmd: An admin has changed the current lobbies hour to " + lobby.Time[0]);
-					else eplayer.TriggerEvent("pushMsgToChat", "!{#FF6347}DonatorCmd: " + player.Name + " has changed the current lobbies hour to " + lobby.Time[0]);
+                    if (EPlayer.GetAccount(player).Admin > 0) eplayer.TriggerEvent("pushMsgToChat", "!{#FF6347}AdmCmd: An admin has changed the current lobbies hour to " + lobby.Time[0]);
+                    else eplayer.TriggerEvent("pushMsgToChat", "!{#FF6347}DonatorCmd: " + player.Name + " has changed the current lobbies hour to " + lobby.Time[0]);
                 }
             }
 
@@ -4692,7 +4692,7 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            if(EPlayer.GetAccount(player).Admin < 3)
+            if (EPlayer.GetAccount(player).Admin < 3)
             {
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
                 return;
@@ -4717,7 +4717,7 @@ namespace RNC
 
             if (EPlayer.LoggedIn(target))
             {
-                if(EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && target != player)
+                if (EPlayer.GetAccount(target).Admin >= EPlayer.GetAccount(player).Admin && target != player)
                 {
                     player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Target has higher admin level than you.");
                     return;
@@ -4810,7 +4810,7 @@ namespace RNC
                 return;
             }
 
-            if(target.GetSharedData<int>("InLobby") == -5)
+            if (target.GetSharedData<int>("InLobby") == -5)
             {
                 if (target.GetData<bool>("Creator_Using") == true)
                 {
@@ -4928,7 +4928,7 @@ namespace RNC
                 return;
             }
 
-            if(!toputin.IsInVehicle)
+            if (!toputin.IsInVehicle)
             {
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The player is not in any vehicle!");
                 return;
@@ -4939,7 +4939,7 @@ namespace RNC
             {
                 nextseat++;
             }
-            
+
             Logs.LogAdmin(player, $"Put {target.Name} in {toputin.Name}'s vehicle.");
             target.TriggerEvent("ToggleSeatbelt", false);
             target.ResetData("Seatbelt");
@@ -4955,7 +4955,7 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            if(player.IsInVehicle)
+            if (player.IsInVehicle)
             {
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You are in a vehicle.");
                 return;
@@ -4979,7 +4979,7 @@ namespace RNC
                 return;
             }
 
-            if(!targetVeh.HasData("BackupAmmo"))
+            if (!targetVeh.HasData("BackupAmmo"))
             {
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no ammo inside the trunk. (Cop vehicles spawn with ammo)");
                 return;
@@ -5051,7 +5051,7 @@ namespace RNC
         [Command("teleport", "!{#AFAFAF}[USAGE] teleport (option: chilliad, airport)", Alias = "tp", GreedyArg = true)]
         public void cmd_teleport(Player player, string tp)
         {
-            if(!EPlayer.LoggedIn(player) || player.GetSharedData<int>("InLobby") != -3)
+            if (!EPlayer.LoggedIn(player) || player.GetSharedData<int>("InLobby") != -3)
             {
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You must be in freeroam to use this command!");
                 return;
@@ -5195,7 +5195,7 @@ namespace RNC
         [Command("report", "!{#AFAFAF}[USAGE] report (target) (desc)", GreedyArg = true)]
         public void cmd_report(Player player, Player target, string description)
         {
-            if(Settings.Requests.Count(r => r.Reported == target && r.Reporter == player) > 0)
+            if (Settings.Requests.Count(r => r.Reported == target && r.Reporter == player) > 0)
             {
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You have already reported this guy.");
                 return;
@@ -5285,7 +5285,7 @@ namespace RNC
             player.TriggerEvent("pushMsgToChat", "!{#A5A8A8}[Misc]: /updaterate /info /fontsize /voicebind /gpsbind /shotstats");
             player.TriggerEvent("pushMsgToChat", "!{#A5A8A8}[Misc]: /p(acket)l(oss)");
             player.TriggerEvent("pushMsgToChat", "!{#A5A8A8}[Debug/Test]: /pos /lcmenu /dl");
-            
+
             player.TriggerEvent("pushMsgToChat", "!{#d9f288}[Points] /vtuner /convertpoints /m(ed)k(it) /p(ain)k(illers)");
             player.TriggerEvent("pushMsgToChat", "!{#faf146}[Donator Points] Weapon Components: /buycomp /mycomps /removecomp");
 
@@ -5446,7 +5446,7 @@ namespace RNC
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
                     Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
-
+                    ocheckstats_OnFinishLookup(player, tpAcc);
                 }
             });
             return;
@@ -5464,7 +5464,14 @@ namespace RNC
                 Logs.LogAdmin(player, $"Checked offline player {tpAcc.Username}'s stats.");
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ocheckstats:{tpAcc.Username}"); } catch { }
 
-                EPlayer.ShowStats(player, tpAcc);
+                try
+                {
+                    EPlayer.ShowStats(player, tpAcc);
+                }
+                catch
+                {
+                    EPlayer.SendMessage(player, $"~r~Found the account stats for {tpAcc.Username}, DBID: {tpAcc.SQL_ID}. Cannot display since data is invalid. Inform the dev.");
+                }
             });
         }
 
@@ -5481,22 +5488,38 @@ namespace RNC
                 return;
             }
 
-         
-            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true && 
-            p.Suspended == 1);
 
-            if ((tpAcc != null) == false)
+            Task.Run(async () =>
             {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no suspended account with that name.");
-                return;
-            }
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true &&
+                    p.Suspended == 1);
+                    if (tpAcc != null)
+                    {
+                        tpAcc.Suspended = 0;
+                        await ContextFactory.Instance.SaveChangesAsync();
+                        unsuspend_OnFinishTask(player, tpAcc);
+                    }
+                    else unsuspend_OnFinishTask(player, null);
+                }
+            });
 
-            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unsuspend:{tpAcc.Username}"); } catch { }
-            Logs.LogAdmin(player, $"Lifted suspension from {tpAcc.Username}'s account.");
-            tpAcc.Suspended = 0;
-            ContextFactory.Instance.SaveChanges();
-            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has unsuspended {tpAcc.Username}.");
             return;
+        }
+        private void unsuspend_OnFinishTask(Player player, Account tpAcc)
+        {
+            NAPI.Task.Run(() =>
+            {
+                if (tpAcc == null)
+                {
+                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no suspended account with that name.");
+                    return;
+                }
+
+                Logs.LogAdmin(player, $"Lifted suspension from {tpAcc.Username}'s account.");
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has unsuspended {tpAcc.Username}.");
+            });
         }
 
         [Command("changename", "!{#AFAFAF}[USAGE] changename (account name) (new name)")]
@@ -5511,57 +5534,80 @@ namespace RNC
                 return;
             }
 
-
-            Account tpAcc = ContextFactory.Instance.Accounts.FirstOrDefault(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase));
-
-            if (tpAcc == null)
+            EPlayer.SendMessage(player, "~y~Executing, please wait...");
+            int pAdmin = EPlayer.GetAccount(player).Admin;
+            Task.Run(async () =>
             {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
-                return;
-            }
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase));
 
-            if(ContextFactory.Instance.Accounts.FirstOrDefault(p => p.Username.Equals(newname, StringComparison.OrdinalIgnoreCase) == true) != null)
-            {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's already an account with that name!");
-                return;
-            }
+                    if (tpAcc == null)
+                    {
+                        changename_ReturnErrorTask(player, 0);
+                        return;
+                    }
+                    Account nameCheck = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(newname, StringComparison.OrdinalIgnoreCase));
+                    if (nameCheck != null)
+                    {
+                        changename_ReturnErrorTask(player, 1);
+                        return;
+                    }
+                    if (tpAcc.Admin > pAdmin)
+                    {
+                        changename_ReturnErrorTask(player, 2);
+                        return;
+                    }
 
-            if(tpAcc.Admin > EPlayer.GetAccount(player).Admin)
-            {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The target's admin level is higher than yours!");
-                return;
-            }
-
-            /*foreach (var arena in ContextFactory.Instance.CustomArenas.ToList().Where(a => a.Creator.Equals(name, StringComparison.OrdinalIgnoreCase)))
-            {
-                arena.Creator = newname;
-            }*/
-            foreach (var arena in ContextFactory.Instance.Bans.ToList().Where(a => a.Admin.Equals(name, StringComparison.OrdinalIgnoreCase)))
-            {
-                arena.Admin = newname;
-            }
-
-            Player target = RAGE.Entities.Players.All.FirstOrDefault(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
-            if(target != null)
-            {
-                target.TriggerEvent("pushMsgToChat", "!{#FF6347} Reconnect with your new name: !{#FFFFFF}" + newname);
-                EPlayer.Notify(target, $"Please reconnect with your new name: {newname}", "green", "fas fa-check", false, 3000, "center", "replace");
-
-                EPlayer.Save(target);
-                target.ResetData("AccountHandle");
-                target.ResetData("LoggedIn");
-
-                NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
-            }
-
-            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:changename:{name}:{newname}"); } catch { }
-            Logs.LogAdmin(player, $"Changed {tpAcc.Username}'s username to {newname}.");
-           
-            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has changed {tpAcc.Username}'s name to {newname}.");
-
-            tpAcc.Username = newname;
-            ContextFactory.Instance.SaveChanges();
+                    foreach (var arena in context.Bans.ToListAsync().Result.Where(a => a.Admin.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        arena.Admin = newname;
+                    }
+                    tpAcc.Username = newname;
+                    await context.SaveChangesAsync();
+                    changename_OnSuccessTask(player, name, newname);
+                }
+            });
             return;
+        }
+        private void changename_OnSuccessTask(Player player, string name, string newname)
+        {
+            NAPI.Task.Run(() =>
+            {
+                Player target = RAGE.Entities.Players.All.FirstOrDefault(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
+                if (target != null)
+                {
+                    target.TriggerEvent("pushMsgToChat", "!{#FF6347} Reconnect with your new name: !{#FFFFFF}" + newname);
+                    EPlayer.Notify(target, $"Please reconnect with your new name: {newname}", "green", "fas fa-check", false, 3000, "center", "replace");
+
+                    EPlayer.Save(target);
+                    target.ResetData("AccountHandle");
+                    target.ResetData("LoggedIn");
+
+                    NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
+                }
+
+                // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:changename:{name}:{newname}"); } catch { }
+                Logs.LogAdmin(player, $"Changed {name}'s username to {newname}.");
+
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has changed {name}'s name to {newname}.");
+
+            });
+        }
+        private void changename_ReturnErrorTask(Player player, int code)
+        {
+            NAPI.Task.Run(() =>
+            {
+                switch (code)
+                {
+                    case 0: player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                        break;
+                    case 1: player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's already an account with that name!");
+                        break;
+                    case 2: player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The target's admin level is higher than yours!");
+                        break;
+                }
+            });
         }
 
         [Command("deleteaccount", "!{#AFAFAF}[USAGE] deleteaccount (account name) | THIS WILL DELETE ALL LOGS AND ALL KINDS OF DATA ON THEM")]
@@ -5576,20 +5622,6 @@ namespace RNC
                 return;
             }
 
-            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
-
-            if ((tpAcc != null) == false)
-            {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
-                return;
-            }
-
-            if (tpAcc.Admin > EPlayer.GetAccount(player).Admin)
-            {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The target's admin level is higher than yours!");
-                return;
-            }
-
             Player target = RAGE.Entities.Players.All.Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
             if (target != null)
             {
@@ -5597,15 +5629,55 @@ namespace RNC
                 return;
             }
 
-            AccountManager.ClearForeignKeys(tpAcc);
+            EPlayer.SendMessage(player, "~y~Executing, please wait...");
+            int pAdmin = EPlayer.GetAccount(player).Admin;
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                    if (tpAcc == null)
+                    {
+                        deleteaccount_ReturnErrorTask(player, 0);
+                        return;
+                    }
+                    if (tpAcc.Admin > pAdmin)
+                    {
+                        deleteaccount_ReturnErrorTask(player, 1);
+                        return;
+                    }
 
-            Logs.LogAdmin(player, $"Deleted account '{tpAcc.Username}'.");
+                    AccountManager.ClearForeignKeys(tpAcc);
+                    context.Accounts.Remove(tpAcc);
+                    await ContextFactory.Instance.SaveChangesAsync();
+                    deleteaccount_SuccessTask(player, tpAcc.Username);
+                }
+            });
 
-            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has deleted account {tpAcc.Username}.");
-
-            ContextFactory.Instance.Accounts.Remove(tpAcc);
-            ContextFactory.Instance.SaveChanges();
             return;
+        }
+        private void deleteaccount_SuccessTask(Player player, string deletedUsername)
+        {
+            NAPI.Task.Run(() =>
+            {
+                Logs.LogAdmin(player, $"Deleted account '{deletedUsername}'.");
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has deleted account {deletedUsername}.");
+            });
+        }
+        private void deleteaccount_ReturnErrorTask(Player player, int code)
+        {
+            NAPI.Task.Run(() =>
+            {
+                switch (code)
+                {
+                    case 0:
+                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                        break;
+                    case 1:
+                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The target's admin level is higher than yours!");
+                        break;
+                }
+            });
         }
 
         [Command("changepass", "!{#AFAFAF}[USAGE] changepass (account name) (new password)")]
@@ -5620,39 +5692,53 @@ namespace RNC
                 return;
             }
 
-
-            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
-
-            if ((tpAcc != null) == false)
+            EPlayer.SendMessage(player, "~y~Executing, please wait...");
+            int pAdmin = EPlayer.GetAccount(player).Admin;
+            Task.Run(async () =>
             {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
-                return;
-            }
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                    if (tpAcc == null)
+                    {
+                        // reusing deleteaccount error message function since it's same
+                        deleteaccount_ReturnErrorTask(player, 0);
+                        return;
+                    }
+                    if (tpAcc.Admin > pAdmin)
+                    {
+                        // reusing deleteaccount error message function since it's same
+                        deleteaccount_ReturnErrorTask(player, 1);
+                        return;
+                    }
 
-            if (tpAcc.Admin > EPlayer.GetAccount(player).Admin)
-            {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The target's admin level is higher than yours!");
-                return;
-            }
+                    string salt = AccountManager.GenSalt();
+                    string password = AccountManager.Crypt(newpass, salt);
+                    tpAcc.Salt = salt;
+                    tpAcc.Password = password;
+                    await context.SaveChangesAsync();
 
-            Player target = RAGE.Entities.Players.All.Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
-            if (target != null)
-            {
-                target.TriggerEvent("pushMsgToChat", "!{#FF6347} Your password has been changed to: !{#FFFFFF}" + newpass);
-                EPlayer.Notify(target, $"Your password has been changed to <p><strong>{newpass}</strong></p>", "green", "fas fa-check", false, 3000, "center", "replace");
-            }
-
-            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:changepass:{name}"); } catch { }
-            Logs.LogAdmin(player, $"Changed player {tpAcc.Username}'s password.");
-
-            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has changed {tpAcc.Username}'s password.");
-
-            string salt = AccountManager.GenSalt();
-            string password = AccountManager.Crypt(newpass, salt);
-            tpAcc.Salt = salt;
-            tpAcc.Password = password;
-            ContextFactory.Instance.SaveChanges();
+                    changepass_SuccessTask(player, tpAcc, name, newpass);
+                }
+            });
             return;
+        }
+        private void changepass_SuccessTask(Player player, Account tpAcc, string name, string newpass)
+        {
+            NAPI.Task.Run(() =>
+            {
+                Player target = RAGE.Entities.Players.All.Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
+                if (target != null)
+                {
+                    target.TriggerEvent("pushMsgToChat", "!{#FF6347} Your password has been changed to: !{#FFFFFF}" + newpass);
+                    EPlayer.Notify(target, $"Your password has been changed to <p><strong>{newpass}</strong></p>", "green", "fas fa-check", false, 3000, "center", "replace");
+                }
+
+                // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:changepass:{name}"); } catch { }
+                Logs.LogAdmin(player, $"Changed player {tpAcc.Username}'s password.");
+
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has changed {tpAcc.Username}'s password.");
+            });
         }
 
         [Command("changemypass", "!{#AFAFAF}[USAGE] changemypass (new password)")]
@@ -5681,7 +5767,7 @@ namespace RNC
             string password = AccountManager.Crypt(newpass, salt);
             EPlayer.GetAccount(player).Salt = salt;
             EPlayer.GetAccount(player).Password = password;
-            ContextFactory.Instance.SaveChanges();
+            ContextFactory.SaveDB();
             player.SetData("LastCryptAttempt", Environment.TickCount64);
             return;
         }
@@ -5707,34 +5793,42 @@ namespace RNC
 
             Logs.LogAdmin(player, $"Checked {pAcc.Username}'s accounts.");
 
-            var accounts = EPlayer.GetLinkedAccounts(pAcc); // BONKERS
-
-
-            if (accounts.Count > 1) // Accounts will always be 1 as the main account matches and adds to the list.
+            Task.Run(async () =>
             {
-                player.TriggerEvent("pushMsgToChat", $"!{{#33C446}}[#] !{{#FFFFFF}}Matched !{{#33C446}}{accounts.Count - 1} !{{#FFFFFF}}other accounts with !{{#33C446}}{pAcc.Username} !{{#FFFFFF}}SQLID !{{#33C446}}{pAcc.SQL_ID}!{{#FFFFFF}}:");
-
-                int banCount = 0;
-                accounts.ForEach(acc =>
+                using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    if(ContextFactory.Instance.Bans.ToList().Count(ban => ban.AccountSQLID == acc.SQL_ID) >= 1)
-                    {
-                        player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}{acc.Username} SQLID {acc.SQL_ID} !{{#FF0000}}(/bancheck {acc.Username})");
-                        banCount++;
-                    }
-                    else
-                    {
-                        player.TriggerEvent("pushMsgToChat", $"!{{#33C446}}{acc.Username} SQLID {acc.SQL_ID}");
-                    }
-                });
+                    var accounts = EPlayer.GetLinkedAccounts(pAcc); // BONKERS
 
-                if(banCount > 0)
-                {
-                    player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!!] {pAcc.Username}'s account records are NOT IN GOOD standing. You may tend to the potential ban evader.");
+                    if (accounts.Count > 1)
+                    {
+                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#33C446}}[#] !{{#FFFFFF}}Matched !{{#33C446}}{accounts.Count - 1} !{{#FFFFFF}}other accounts with !{{#33C446}}{pAcc.Username} !{{#FFFFFF}}SQLID !{{#33C446}}{pAcc.SQL_ID}!{{#FFFFFF}}:"); });
+
+                        int banCount = 0;
+                        accounts.ForEach(acc =>
+                        {
+                            if (context.Bans.Count(ban => ban.AccountSQLID == acc.SQL_ID) >= 1)
+                            {
+                                NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}{acc.Username} SQLID {acc.SQL_ID} !{{#FF0000}}(/bancheck {acc.Username})"); });
+                                banCount++;
+                            }
+                            else
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    player.TriggerEvent("pushMsgToChat", $"!{{#33C446}}{acc.Username} SQLID {acc.SQL_ID}");
+                                });
+                            }
+                        });
+
+                        if (banCount > 0)
+                        {
+                            NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!!] {pAcc.Username}'s account records are NOT IN GOOD standing. You may tend to the potential ban evader."); });
+                        }
+                        else NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#33C446}}[>>] {pAcc.Username}'s account records are in good standing. No redflags."); });
+                    }
+                    else NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}No other accounts matched with !{{#FF6347}}{pAcc.Username} !{{#FFFFFF}}SQLID !{{#FF6347}}{pAcc.SQL_ID}!{{#FFFFFF}}."); });
                 }
-                else player.TriggerEvent("pushMsgToChat", $"!{{#33C446}}[>>] {pAcc.Username}'s account records are in good standing. No redflags.");
-            }
-            else player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}No other accounts matched with !{{#FF6347}}{pAcc.Username} !{{#FFFFFF}}SQLID !{{#FF6347}}{pAcc.SQL_ID}!{{#FFFFFF}}.");
+            });
             return;
         }
 

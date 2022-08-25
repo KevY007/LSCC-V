@@ -10,6 +10,7 @@ using GTANetworkAPI;
 using RNC;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System.Threading.Tasks;
 
 namespace RNC
 {
@@ -2116,7 +2117,7 @@ namespace RNC
                 }
                 player.SetData("PlaytimeTick", Environment.TickCount64);
 
-                ContextFactory.Instance.SaveChanges();
+                ContextFactory.SaveDB();
             }
         }
         public static Account GetAccount(Player player)

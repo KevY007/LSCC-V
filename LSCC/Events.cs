@@ -2610,6 +2610,7 @@ namespace RNC
                             return;
                         }
                     }
+                    /*
                     else
                     {
                         Account archiveCheck = BackupContextFactory.Instance.Accounts.ToList().Find(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
@@ -2628,6 +2629,7 @@ namespace RNC
                             }
                         }
                     }
+                    */
                 }
                 else
                 {
@@ -2640,6 +2642,7 @@ namespace RNC
                             return;
                         }
                     }
+                    /*
                     else
                     {
                         Account archiveCheck = BackupContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
@@ -2658,6 +2661,7 @@ namespace RNC
                             }
                         }
                     }
+                    */
                 }
                 //EPlayer.Notify(player, "Invalid credentials or unable to log-in!", "red", "fas fa-lock", false, 4000, "bottomCenter");
                 player.TriggerEvent("login_ShowInvalidInfo", true);

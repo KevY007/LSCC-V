@@ -125,7 +125,7 @@ namespace RNC
         {
             return Crypter.Sha256.Crypt(pass, salt);
         }
-
+        /*
         public static void RecoverAccount(Account acc)
         {
             ContextFactory.Instance.Accounts.Add(acc);
@@ -154,6 +154,7 @@ namespace RNC
             BackupContextFactory.Instance.SaveChanges();
             NAPI.Util.ConsoleOutput("[ACCOUNT ARCHIVE] " + acc.Username + " has been recovered from the archive.");
         }
+        */
 
         public static void ClearForeignKeys(Account acc)
         {

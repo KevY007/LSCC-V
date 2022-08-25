@@ -293,6 +293,7 @@ namespace RNC
                     }
                     else await context.Channel.SendMessageAsync("USAGE: !deleteaccount (username)");
                 }
+                /*
                 else if (context.Content.StartsWith("!recoveraccount"))
                 {
                     string[] args = context.Content.Split(' ', 2);
@@ -346,6 +347,7 @@ namespace RNC
                     }
                     else await context.Channel.SendMessageAsync("USAGE: !recoveraccount (username)");
                 }
+                */
                 else if (context.Content.StartsWith("!verify"))
                 {
                     // first ID is the bot, rest are codename rotx kevy
