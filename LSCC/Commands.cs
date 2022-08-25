@@ -1276,6 +1276,7 @@ namespace RNC
         }
         */
 
+        /*
         [Command("archiveaccounts")]
         public void cmd_archiveaccounts(Player player, int inactive_days)
         {
@@ -1316,37 +1317,9 @@ namespace RNC
                             PostedOn = DateTime.Now.ToShortDateString()
                         });
 
-                        if (BackupContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username == acc.Username) == null)
-                        {
-                            BackupContextFactory.Instance.Accounts.Add(acc);
-
-                            List<OwnedVehData> ownedVehs = ContextFactory.Instance.OwnedVehicles.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
-                            List<OwnedLoadoutData> ownedLoadouts = ContextFactory.Instance.OwnedLoadouts.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
-                            List<PlayerOutfit> savedOutfits = ContextFactory.Instance.PlayerOutfits.ToList().Where(v => v.AccountID == acc.SQL_ID).ToList();
-                            List<PlayerTunings> savedTunings = ContextFactory.Instance.PlayerTunings.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
-                            List<UnlockedAchievement> unlockedAchievements = ContextFactory.Instance.UnlockedAchievements.ToList().Where(v => v.AccountID == acc.SQL_ID).ToList();
-
-                            BackupContextFactory.Instance.OwnedLoadouts.AddRange(ownedLoadouts);
-                            BackupContextFactory.Instance.OwnedVehicles.AddRange(ownedVehs);
-                            BackupContextFactory.Instance.PlayerOutfits.AddRange(savedOutfits);
-                            BackupContextFactory.Instance.PlayerTunings.AddRange(savedTunings);
-                            BackupContextFactory.Instance.UnlockedAchievements.AddRange(unlockedAchievements);
-
-                            ContextFactory.Instance.PlayerOutfits.RemoveRange(savedOutfits);
-                            ContextFactory.Instance.OwnedLoadouts.RemoveRange(ownedLoadouts);
-                            ContextFactory.Instance.OwnedVehicles.RemoveRange(ownedVehs);
-                            ContextFactory.Instance.PlayerTunings.RemoveRange(savedTunings);
-                            ContextFactory.Instance.UnlockedAchievements.RemoveRange(unlockedAchievements);
-
-                            ContextFactory.Instance.Accounts.Remove(acc);
-                            archivedAccs++;
-
-                            List<Logs_Session> records = ContextFactory.Instance.Logs_Session.ToList().Where(a => a.AccountID == acc.SQL_ID).ToList();
-                            ContextFactory.Instance.Logs_Session.RemoveRange(records);
-                        }
+                        AccountManager.ArchiveAccount(acc);
                     }
 
-                    BackupContextFactory.Instance.SaveChanges();
                     ContextFactory.Instance.SaveChanges();
                     NAPI.Util.ConsoleOutput($"[ACCOUNT ARCHIVE] {archivedAccs} have been archived. Total accounts in archive: {BackupContextFactory.Instance.Accounts.Count()}");
 
@@ -1368,6 +1341,7 @@ namespace RNC
                 return;
             }
         }
+        */
 
         [Command("freezeall")]
         public void cmd_freezeall(Player player)

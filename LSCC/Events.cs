@@ -9,6 +9,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices.ComTypes;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Net.Mail;
+using System.Threading.Tasks;
 
 namespace RNC
 {
@@ -1152,10 +1153,14 @@ namespace RNC
                     Logs.LogSession(player);
 
                     EPlayer.Save(player);
+
+                    Account acc = EPlayer.GetAccount(player);
+                    AccountManager.ArchiveAccount(acc);
                 }
 
                 Settings.LoggedInPlayers.Remove(player);
                 EPlayer.ResetPlayerData(player);
+
 
                 Discord.SendTextChannel("staff-bot", $"**{player.Name} has left the server.** *(Total online: {RAGE.Entities.Players.Count - 1})*");
             }
@@ -2573,6 +2578,48 @@ namespace RNC
             EPlayer.SendForgotUsernameData(player);
         }
 
+
+        private async static Task<bool> TryFindAccountAsync(string username, bool isEmail, string password, Player player)
+        {
+            Account acc = null;
+            if (isEmail)
+            {
+                Account archiveCheck = await BackupContextFactory.Instance.Accounts.FirstOrDefaultAsync(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
+                if(archiveCheck != null)
+                {
+                    acc = await AccountManager.RecoverAccount(archiveCheck);
+                }
+                NAPI.Task.Run(() => OnFinishAccountFindTask(acc, password, player, isEmail, username));
+            }
+            else
+            {
+                Account archiveCheck = await BackupContextFactory.Instance.Accounts.FirstOrDefaultAsync(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+                if (archiveCheck != null)
+                {
+                    acc = await AccountManager.RecoverAccount(archiveCheck);
+                }
+                NAPI.Task.Run(() => OnFinishAccountFindTask(acc, password, player, isEmail, username));
+            }
+            return true;
+        }
+        private static void OnFinishAccountFindTask(Account account, string password, Player player, bool wasEmail, string username)
+        {
+            NAPI.Util.ConsoleOutput($"[RnC LOGIN] Finished account lookup for username '{username}'. Found: {(account == null ? "No!" : "Yes!")}");
+            if (account != null)
+            {
+                if (AccountManager.Login(account, password))
+                {
+                    OnPlayerLogin(player, account);
+                    return;
+                }              
+            }
+            else
+            {
+                //EPlayer.Notify(player, "Invalid credentials or unable to log-in!", "red", "fas fa-lock", false, 4000, "bottomCenter");
+                player.TriggerEvent("login_ShowInvalidInfo", true);
+            }
+        }
+
         [RemoteEvent("OnPlayerLoginAttempt")]
         public static void OnPlayerLoginAttempt(Player player, string username, string password)
         {
@@ -2601,66 +2648,14 @@ namespace RNC
                 player.SetData("LastCryptAttempt", Environment.TickCount64);
                 if (username.Contains("@"))
                 {
-                    Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
-                    if (acc != null)
-                    {
-                        if (AccountManager.Login(acc, password))
-                        {
-                            OnPlayerLogin(player, acc);
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        Account archiveCheck = BackupContextFactory.Instance.Accounts.ToList().Find(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
-                        if (archiveCheck != null)
-                        {
-                            AccountManager.RecoverAccount(archiveCheck);
-
-                            acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
-                            if (acc != null)
-                            {
-                                if (AccountManager.Login(acc, password))
-                                {
-                                    OnPlayerLogin(player, acc);
-                                    return;
-                                }
-                            }
-                        }
-                    }
+                    Task.Run(async () => { await TryFindAccountAsync(username, true, password, player); });
+                    NAPI.Util.ConsoleOutput($"[RnC LOGIN] Searching for account with e-mail '{username}' in archive using async.");
                 }
                 else
                 {
-                    Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
-                    if (acc != null)
-                    {
-                        if (AccountManager.Login(acc, password))
-                        {
-                            OnPlayerLogin(player, acc);
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        Account archiveCheck = BackupContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
-                        if (archiveCheck != null)
-                        {
-                            AccountManager.RecoverAccount(archiveCheck);
-
-                            acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
-                            if (acc != null)
-                            {
-                                if (AccountManager.Login(acc, password))
-                                {
-                                    OnPlayerLogin(player, acc);
-                                    return;
-                                }
-                            }
-                        }
-                    }
+                    Task.Run(async () => { await TryFindAccountAsync(username, false, password, player); });
+                    NAPI.Util.ConsoleOutput($"[RnC LOGIN] Searching for account '{username}' in archive using async.");
                 }
-                //EPlayer.Notify(player, "Invalid credentials or unable to log-in!", "red", "fas fa-lock", false, 4000, "bottomCenter");
-                player.TriggerEvent("login_ShowInvalidInfo", true);
             }
             catch(Exception ex)
             {
@@ -3419,6 +3414,7 @@ namespace RNC
                         EPlayer.SendMessageAll($"~y~[>] ~w~ A new week begins and all clans' weekly kills have been reset.");
                     }
                     // ARCHIVING INACTIVE ACCOUNTS.....
+                    /*
                     Account cunt = ContextFactory.Instance.Accounts.ToList().FirstOrDefault(a => (new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() - new DateTimeOffset(a.LastLogin).ToUnixTimeSeconds()) > 2629746);
                     if (cunt != null)
                     {
@@ -3449,34 +3445,7 @@ namespace RNC
                                         PostedOn = DateTime.Now.ToShortDateString()
                                     });
 
-                                    if (BackupContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username == acc.Username) == null)
-                                    {
-                                        BackupContextFactory.Instance.Accounts.Add(acc);
-
-                                        List<OwnedVehData> ownedVehs = ContextFactory.Instance.OwnedVehicles.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
-                                        List<OwnedLoadoutData> ownedLoadouts = ContextFactory.Instance.OwnedLoadouts.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
-                                        List<PlayerOutfit> savedOutfits = ContextFactory.Instance.PlayerOutfits.ToList().Where(v => v.AccountID == acc.SQL_ID).ToList();
-                                        List<PlayerTunings> savedTunings = ContextFactory.Instance.PlayerTunings.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
-                                        List<UnlockedAchievement> unlockedAchievements = ContextFactory.Instance.UnlockedAchievements.ToList().Where(v => v.AccountID == acc.SQL_ID).ToList();
-
-                                        BackupContextFactory.Instance.OwnedLoadouts.AddRange(ownedLoadouts);
-                                        BackupContextFactory.Instance.OwnedVehicles.AddRange(ownedVehs);
-                                        BackupContextFactory.Instance.PlayerOutfits.AddRange(savedOutfits);
-                                        BackupContextFactory.Instance.PlayerTunings.AddRange(savedTunings);
-                                        BackupContextFactory.Instance.UnlockedAchievements.AddRange(unlockedAchievements);
-
-                                        ContextFactory.Instance.PlayerOutfits.RemoveRange(savedOutfits);
-                                        ContextFactory.Instance.OwnedLoadouts.RemoveRange(ownedLoadouts);
-                                        ContextFactory.Instance.OwnedVehicles.RemoveRange(ownedVehs);
-                                        ContextFactory.Instance.PlayerTunings.RemoveRange(savedTunings);
-                                        ContextFactory.Instance.UnlockedAchievements.RemoveRange(unlockedAchievements);
-
-                                        ContextFactory.Instance.Accounts.Remove(acc);
-                                        archivedAccs++;
-
-                                        List<Logs_Session> records = ContextFactory.Instance.Logs_Session.ToList().Where(a => a.AccountID == acc.SQL_ID).ToList();
-                                        ContextFactory.Instance.Logs_Session.RemoveRange(records);
-                                    }
+                                    AccountManager.ArchiveAccount(acc);
                                 }
                                 else
                                 {
@@ -3504,6 +3473,7 @@ namespace RNC
                             EPlayer.SendMessageToAll("~b~[ACCOUNT ARCHIVE] ~w~Account archive process ~g~finished~w~! You've been unfrozen.");
                         }, 100);
                     } 
+                    */
                     Settings.Dynamics.NextWeekUnix = new DateTimeOffset(DateTime.Now).AddDays(7).ToUnixTimeSeconds();
 
                     foreach (Player pl in NAPI.Pools.GetAllPlayers())
