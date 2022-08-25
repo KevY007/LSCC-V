@@ -2581,51 +2581,43 @@ namespace RNC
 
         private async static Task<bool> TryFindAccountAsync(string username, bool isEmail, string password, Player player)
         {
+            Account acc = null;
             if (isEmail)
             {
                 Account archiveCheck = await BackupContextFactory.Instance.Accounts.FirstOrDefaultAsync(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
                 if(archiveCheck != null)
                 {
-                    if (AccountManager.Login(archiveCheck, password))
-                    {
-                        await AccountManager.RecoverAccount(archiveCheck, password, player, isEmail, username);
-                    }
-                    else NAPI.Task.Run(() => player.TriggerEvent("login_ShowInvalidInfo", true));
+                    acc = await AccountManager.RecoverAccount(archiveCheck);
                 }
-                else NAPI.Task.Run(() => player.TriggerEvent("login_ShowInvalidInfo", true));
+                NAPI.Task.Run(() => OnFinishAccountFindTask(acc, password, player, isEmail, username));
             }
             else
             {
                 Account archiveCheck = await BackupContextFactory.Instance.Accounts.FirstOrDefaultAsync(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
                 if (archiveCheck != null)
                 {
-                    if (AccountManager.Login(archiveCheck, password))
-                    {
-                        await AccountManager.RecoverAccount(archiveCheck, password, player, isEmail, username);
-                    }
-                    else NAPI.Task.Run(() => player.TriggerEvent("login_ShowInvalidInfo", true));
+                    acc = await AccountManager.RecoverAccount(archiveCheck);
                 }
-                else NAPI.Task.Run(() => player.TriggerEvent("login_ShowInvalidInfo", true));
+                NAPI.Task.Run(() => OnFinishAccountFindTask(acc, password, player, isEmail, username));
             }
             return true;
         }
-        public static void OnFinishAccountFindTask(Account account, string password, Player player, bool wasEmail, string username)
+        private static void OnFinishAccountFindTask(Account account, string password, Player player, bool wasEmail, string username)
         {
-            NAPI.Task.Run(() =>
+            NAPI.Util.ConsoleOutput($"[RnC LOGIN] Finished account lookup for username '{username}'. Found: {(account == null ? "No!" : "Yes!")}");
+            if (account != null)
             {
-                NAPI.Util.ConsoleOutput($"[RnC LOGIN] Finished account lookup for username '{username}'. Found: {(account == null ? "No!" : "Yes!")}");
-                if (account != null)
+                if (AccountManager.Login(account, password))
                 {
                     OnPlayerLogin(player, account);
                     return;
-                }
-                else
-                {
-                    NAPI.Util.ConsoleOutput($"[RnC LOGIN] Cannot find account {username}!");
-                    //EPlayer.Notify(player, "Invalid credentials or unable to log-in!", "red", "fas fa-lock", false, 4000, "bottomCenter");
-                    player.TriggerEvent("login_ShowInvalidInfo", true);
-                }
-            });            
+                }              
+            }
+            else
+            {
+                //EPlayer.Notify(player, "Invalid credentials or unable to log-in!", "red", "fas fa-lock", false, 4000, "bottomCenter");
+                player.TriggerEvent("login_ShowInvalidInfo", true);
+            }
         }
 
         [RemoteEvent("OnPlayerLoginAttempt")]
