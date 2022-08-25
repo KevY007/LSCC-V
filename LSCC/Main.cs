@@ -15,7 +15,6 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Globalization;
-using Microsoft.EntityFrameworkCore;
 
 namespace RNC
 {

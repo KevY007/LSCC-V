@@ -2583,35 +2583,29 @@ namespace RNC
         {
             if (isEmail)
             {
-                using (BackupDatabase backupContext = new BackupContextFactory().CreateDbContext(new string[] { }))
+                Account archiveCheck = await BackupContextFactory.Instance.Accounts.FirstOrDefaultAsync(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
+                if(archiveCheck != null)
                 {
-                    Account archiveCheck = await backupContext.Accounts.FirstOrDefaultAsync(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
-                    if (archiveCheck != null)
+                    if (AccountManager.Login(archiveCheck, password))
                     {
-                        if (AccountManager.Login(archiveCheck, password))
-                        {
-                            await AccountManager.RecoverAccount(archiveCheck, password, player, isEmail, username);
-                        }
-                        else NAPI.Task.Run(() => player.TriggerEvent("login_ShowInvalidInfo", true));
+                        await AccountManager.RecoverAccount(archiveCheck, password, player, isEmail, username);
                     }
                     else NAPI.Task.Run(() => player.TriggerEvent("login_ShowInvalidInfo", true));
                 }
+                else NAPI.Task.Run(() => player.TriggerEvent("login_ShowInvalidInfo", true));
             }
             else
             {
-                using (BackupDatabase backupContext = new BackupContextFactory().CreateDbContext(new string[] { }))
+                Account archiveCheck = await BackupContextFactory.Instance.Accounts.FirstOrDefaultAsync(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+                if (archiveCheck != null)
                 {
-                    Account archiveCheck = await backupContext.Accounts.FirstOrDefaultAsync(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
-                    if (archiveCheck != null)
+                    if (AccountManager.Login(archiveCheck, password))
                     {
-                        if (AccountManager.Login(archiveCheck, password))
-                        {
-                            await AccountManager.RecoverAccount(archiveCheck, password, player, isEmail, username);
-                        }
-                        else NAPI.Task.Run(() => player.TriggerEvent("login_ShowInvalidInfo", true));
+                        await AccountManager.RecoverAccount(archiveCheck, password, player, isEmail, username);
                     }
                     else NAPI.Task.Run(() => player.TriggerEvent("login_ShowInvalidInfo", true));
                 }
+                else NAPI.Task.Run(() => player.TriggerEvent("login_ShowInvalidInfo", true));
             }
             return true;
         }

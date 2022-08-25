@@ -242,7 +242,7 @@ namespace RNC
             // like this poggers
             //modelBuilder.Entity<Account>().Property(u => u.Character).IsRequired(false);
 
-            /*
+
             modelBuilder.Entity<OwnedLoadoutData>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
             modelBuilder.Entity<OwnedVehData>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
 
@@ -270,7 +270,6 @@ namespace RNC
 
             // MAP
             modelBuilder.Entity<MapSpawn>().HasOne<Map>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.mapID).OnDelete(DeleteBehavior.ClientCascade);
-            */
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -292,8 +291,6 @@ namespace RNC
 
         private static string _connectionString;
 
-        public static DbContextOptions Options;
-
         public MainDatabase CreateDbContext(string[] args)
         {
             var builder = new DbContextOptionsBuilder<MainDatabase>();
@@ -312,7 +309,7 @@ namespace RNC
                 optionsBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                 optionsBuilder.EnableStringComparisonTranslations(true);
             });
-            Options = builder.Options;
+
             return new MainDatabase(builder.Options);
         }
 
@@ -428,8 +425,6 @@ namespace RNC
 
         private static string _connectionString;
 
-        public static DbContextOptions Options;
-
         public BackupDatabase CreateDbContext(string[] args)
         {
             var builder = new DbContextOptionsBuilder<BackupDatabase>();
@@ -448,7 +443,7 @@ namespace RNC
                 optionsBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                 optionsBuilder.EnableStringComparisonTranslations(true);
             });
-            Options = builder.Options;
+
             return new BackupDatabase(builder.Options);
         }
 
