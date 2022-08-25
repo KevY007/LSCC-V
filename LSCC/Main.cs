@@ -2155,12 +2155,6 @@ namespace RNC
 
             Settings.Timers.GameUpdate_Tick = Environment.TickCount64 + 1000;
             Settings.Timers.TimeUpdate_Tick = Environment.TickCount64 + 1000;
-
-            foreach(Account acc in ContextFactory.Instance.Accounts)
-            {
-                // archive all accounts that are left-over in main database [from server crash and stuff?]
-                AccountManager.ArchiveAccount(acc);
-            }
         }
 
         [ServerEvent(Event.Update)]
