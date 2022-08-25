@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace RNC
 {
@@ -1343,112 +1342,6 @@ namespace RNC
             }
         }
         */
-
-
-        [Command("fuckupdb")]
-        public void cmd_fuckupdb(Player player)
-        {
-            if (!EPlayer.LoggedIn(player))
-                return;
-
-            if (EPlayer.GetAccount(player).Admin < 6)
-            {
-                return;
-            }
-
-            EPlayer.SendMessage(player, "~g~[>]~w~ Started adding accounts to back up context.");
-            Task.Run(async () =>
-            {
-                for (int i = 105825; i < 194175; i++)
-                {
-                    var _new = new Account
-                    {
-                        Email = "[]",
-                        Password = "[]",
-                        Salt = "[]",
-                        Username = $"leo_gay_{i}",
-                        DiscordInfo = "[]",
-                        ChallengeInfo = "[]",
-                        AutoLogin = true,
-                        Admin = 0,
-                        RegisterHWID = "[]",
-                        RegisterIP = "[]",
-                        RegisterRID = 69,
-                        RegisterSC = "[]",
-                        LastHWID = "[]",
-                        LastIP = "[]",
-                        LastRID = 69,
-                        LastSC = "[]",
-                        MuteTime = 0,
-                        MuteReason = "N/A",
-                        JailTime = 0,
-                        JailReason = "N/A",
-                        DerbyWins = 0,
-                        Level = 1,
-                        Medkits = 0,
-                        Painkillers = 0,
-                        Language = -1,
-                        XP = 1,
-                        Escapes = 0,
-                        Arrests = 0,
-                        Kills = 1,
-                        Deaths = 1,
-                        MinutesPlayed = 1.0,
-                        LastSessionMins = 0.0,
-                        DonatorPoints = 0,
-                        Points = 10,
-                        Warns = 0,
-                        Suspended = 0,
-                        DonatorLevel = 0,
-                        LobbyClothing = 1,
-                        LoadoutCop = "?",
-                        LoadoutFugitive = "?",
-                        CarCop = "?",
-                        CarFugitive = "?",
-                        WeaponComponents = "[]",
-                        MOTD = "none",
-                        RegisterDate = DateTime.Now,
-                        LastLogin = DateTime.Now,
-                        Character = "{}",
-                        PurchasedAmmo = "{}",
-                        ChallengeStreak = 0,
-                        CompletedDailyChallenge = false,
-                        Namechanges = 0,
-                        ClanTier = -1,
-                        ClanID = -1
-                    };
-                    await BackupContextFactory.Instance.Accounts.AddAsync(_new);
-
-                    var _newVeh = new OwnedVehData
-                    {
-                        AccountSQLID = 2,
-                        Model = $"maserati_dvojka_${i}",
-                        Team = 0,
-                        TimesUsed = 0,
-                    };
-                    await BackupContextFactory.Instance.OwnedVehicles.AddAsync(_newVeh);
-
-                    var _newWep = new OwnedLoadoutData
-                    {
-                        AccountSQLID = 2,
-                        Name = $"kaubojac_{i}",
-                        Team = 0,
-                        TimesUsed = 0
-                    };
-                    await BackupContextFactory.Instance.OwnedLoadouts.AddAsync(_newWep);
-                    await BackupContextFactory.Instance.SaveChangesAsync();
-
-                    if (i % 1000 == 0)
-                        Console.WriteLine($"CURRENTLY ON {i-100000}/100069");
-
-                    if(i == 194174)
-                    {
-                        Console.WriteLine($"FINISHED AND SAVED ALL CHANGES!");
-                    }
-                }
-            });
-            EPlayer.SendMessage(player, "~g~[>]~w~ This is done async so the server shouldn't be frozen??");
-        }
 
         [Command("freezeall")]
         public void cmd_freezeall(Player player)
