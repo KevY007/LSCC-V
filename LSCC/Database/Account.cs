@@ -150,10 +150,12 @@ namespace RNC
 
             List<Logs_Session> records = ContextFactory.Instance.Logs_Session.ToList().Where(a => a.AccountID == acc.SQL_ID).ToList();
             ContextFactory.Instance.Logs_Session.RemoveRange(records);
+            ContextFactory.Instance.SaveChanges();
             NAPI.Util.ConsoleOutput($"[RnC ARCHIVE] Finished archiving account {acc.Username}.");
         }
         public static void ArchiveAccount(Account acc)
         {
+            NAPI.Util.ConsoleOutput($"[RnC ARCHIVE] Called ArchiveAccount({acc.Username})");
             if (BackupContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username == acc.Username) == null)
             {
                 NAPI.Util.ConsoleOutput($"[RnC ARCHIVE] Started archiving account {acc.Username}.");
@@ -172,9 +174,10 @@ namespace RNC
             }
         }
 
-        public async static Task<Account> RecoverAccount(Account acc)
+        public async static Task<bool> RecoverAccount(Account acc, string password, Player player, bool isEmail, string username)
         {
             ContextFactory.Instance.Accounts.Add(acc);
+            BackupContextFactory.Instance.Accounts.Remove(acc);
 
             List<OwnedVehData> ownedVehs = await BackupContextFactory.Instance.OwnedVehicles.AsAsyncEnumerable().Where(v => v.AccountSQLID == acc.SQL_ID).ToListAsync();
             List<OwnedLoadoutData> ownedLoadouts = await BackupContextFactory.Instance.OwnedLoadouts.AsAsyncEnumerable().Where(v => v.AccountSQLID == acc.SQL_ID).ToListAsync();
@@ -197,15 +200,17 @@ namespace RNC
                 BackupContextFactory.Instance.PlayerTunings.RemoveRange(savedTunings);
                 BackupContextFactory.Instance.UnlockedAchievements.RemoveRange(unlockedAchievements);
 
-                BackupContextFactory.Instance.Accounts.Remove(acc);
 
                 ContextFactory.Instance.SaveChanges();
                 NAPI.Util.ConsoleOutput("[ACCOUNT ARCHIVE] " + acc.Username + " has been recovered from the archive.");
 
-                toReturn = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(acc.Username, StringComparison.OrdinalIgnoreCase));         
+                toReturn = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(acc.Username, StringComparison.OrdinalIgnoreCase));
+                NAPI.Util.ConsoleOutput($"[RnC LOGIN - ARCHIVE] Returning account: {toReturn.Username} (DBID:{toReturn.SQL_ID})");
+
+                Events.OnFinishAccountFindTask(toReturn, password, player, isEmail, username);
             });
             await BackupContextFactory.Instance.SaveChangesAsync();
-            return toReturn;
+            return true;
         }
 
         public static void ClearForeignKeys(Account acc)
