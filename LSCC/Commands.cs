@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace RNC
 {
@@ -373,25 +374,37 @@ namespace RNC
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You must be in a vehicle to apply saved mods.");
                 return;
             }
-
-            var inst = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.Model == player.Vehicle.Model && a.AccountSQLID == EPlayer.GetAccount(player).SQL_ID);
-            if (inst != null)
+            using(MainDatabase context = ContextFactory.CreateContext())
             {
-                player.Vehicle.PrimaryColor = inst.PrimaryColor;
-                player.Vehicle.SecondaryColor = inst.SecondaryColor;
-
-                foreach (var kvp in NAPI.Util.FromJson<Dictionary<int, int>>(inst.Mods))
+                Task.Run(async () =>
                 {
-                    player.Vehicle.SetMod(kvp.Key, kvp.Value);
-
-                    if (kvp.Key == 56) player.Vehicle.WheelType = kvp.Value;
-                }
-                player.Vehicle.PearlescentColor = inst.PearlescentColor;
-                player.Vehicle.WheelColor = inst.WheelColor;
-             
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Mods applied!");
+                    PlayerTunings inst = await context.PlayerTunings.FirstOrDefaultAsync(a => a.Model == player.Vehicle.Model && a.AccountSQLID == EPlayer.GetAccount(player).SQL_ID);
+                    applyvehmods_OnFinishTuningsSearch(player, inst);
+                });
             }
             return;
+        }
+        private static void applyvehmods_OnFinishTuningsSearch(Player player, PlayerTunings inst)
+        {
+            NAPI.Task.Run(() =>
+            {
+                if (inst != null)
+                {
+                    player.Vehicle.PrimaryColor = inst.PrimaryColor;
+                    player.Vehicle.SecondaryColor = inst.SecondaryColor;
+
+                    foreach (var kvp in NAPI.Util.FromJson<Dictionary<int, int>>(inst.Mods))
+                    {
+                        player.Vehicle.SetMod(kvp.Key, kvp.Value);
+
+                        if (kvp.Key == 56) player.Vehicle.WheelType = kvp.Value;
+                    }
+                    player.Vehicle.PearlescentColor = inst.PearlescentColor;
+                    player.Vehicle.WheelColor = inst.WheelColor;
+
+                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Mods applied!");
+                }
+            });
         }
 
         [Command("engine")]
@@ -1035,31 +1048,14 @@ namespace RNC
             }
             if(targetPlayer == null)
             {
-                Account targetAcc = ContextFactory.Instance.Accounts.ToList().Find(t => t.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
-                if (targetAcc == null)
+                using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}A player with that username could not be found in the database!");
-                    return;
+                    Task.Run(async () =>
+                    {
+                        Account targetAcc = await context.Accounts.FirstOrDefaultAsync(t => t.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+                        motd_onFinishAccountLookup(player, targetAcc, message);
+                    });
                 }
-
-                if (message.Equals("none"))
-                {
-                    targetAcc.MOTD = "none";
-                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You successfully deleted " + targetAcc.Username + "'s MOTD.");
-                    ContextFactory.Instance.SaveChanges();
-                    return;
-                }
-                MOTDData newMotd = new MOTDData()
-                {
-                    AdminName = player.Name,
-                    PostedOn = DateTime.Now.ToString(),
-                    Message = message
-                };
-                string jsonMotd = NAPI.Util.ToJson(newMotd);
-
-                targetAcc.MOTD = jsonMotd;
-                ContextFactory.Instance.SaveChanges();
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You set a MOTD for " + targetAcc.Username + " & they will see it when they login!");
             }
             else
             {
@@ -1072,6 +1068,37 @@ namespace RNC
                 Main.DisplayMOTD(targetPlayer, newMotd);
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You set a MOTD for " + targetPlayer.Name + " & it has been shown to them!");
             }
+        }
+        private void motd_onFinishAccountLookup(Player player, Account targetAcc, string message)
+        {
+            NAPI.Task.Run(async () =>
+            {
+                if (targetAcc == null)
+                {
+                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}A player with that username could not be found in the database!");
+                    return;
+                }
+
+                if (message.Equals("none"))
+                {
+                    targetAcc.MOTD = "none";
+                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You successfully deleted " + targetAcc.Username + "'s MOTD.");
+                    ContextFactory.SaveDB();
+                    return;
+                }
+                MOTDData newMotd = new MOTDData()
+                {
+                    AdminName = player.Name,
+                    PostedOn = DateTime.Now.ToString(),
+                    Message = message
+                };
+                string jsonMotd = NAPI.Util.ToJson(newMotd);
+
+                targetAcc.MOTD = jsonMotd;
+                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You set a MOTD for " + targetAcc.Username + " & they will see it when they login!");
+                ContextFactory.SaveDB();
+            });
+            
         }
 
         [Command("motdall", "!{#AFAFAF}[USAGE] motdall (message | 'none' to delete)", GreedyArg = true)]
@@ -1093,7 +1120,7 @@ namespace RNC
                     acc.MOTD = "none";
                 }
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You successfully deleted the server message of the day!");
-                ContextFactory.Instance.SaveChanges();
+                ContextFactory.SaveDB();
                 return;
             }
 
@@ -1114,7 +1141,7 @@ namespace RNC
                 Main.DisplayMOTD(pl, newMotd);
             }
             player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You successfully updated the server message of the day!");
-            ContextFactory.Instance.SaveChanges();
+            ContextFactory.SaveDB();
         }
 
         [Command("goto", "!{#AFAFAF}[USAGE] goto (target)")]
@@ -1275,7 +1302,7 @@ namespace RNC
             EPlayer.SendMessage(player, "~b~[STINGERS] ~w~Walk to the position where the other end will be placed and press ~y~ H ~w~ to place them.");
         }
         */
-
+        /*
         [Command("archiveaccounts")]
         public void cmd_archiveaccounts(Player player, int inactive_days)
         {
@@ -1368,6 +1395,7 @@ namespace RNC
                 return;
             }
         }
+        */
 
         [Command("freezeall")]
         public void cmd_freezeall(Player player)
@@ -4108,8 +4136,14 @@ namespace RNC
                             Timestamp = DateTime.Now.ToShortDateString(),
                             Type = type
                         };
-                        ContextFactory.Instance.AdminNotes.Add(_n);
-                        ContextFactory.Instance.SaveChanges();
+                        using(MainDatabase context = ContextFactory.CreateContext())
+                        {
+                            Task.Run(async () =>
+                            {
+                                await context.AdminNotes.AddAsync(_n);
+                                await context.SaveChangesAsync();
+                            });
+                        }
                         player.TriggerEvent("pushMsgToChat", $"!{{#72ff6b}}Successfully added admin note to {target.Name} ({text})!");
                         Logs.LogAdmin(player, $"Added admin note to {target.Name} of type {_n.TypeToString()} at {_n.Timestamp}");
                         break;
@@ -4132,24 +4166,15 @@ namespace RNC
                             player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Note ID must be a number! Use /anote view to check IDs.");
                             return;
                         };
-                        AdminNote _n = ContextFactory.Instance.AdminNotes.ToList().FirstOrDefault(a => a.SQL_ID == nID);
-                        if(_n == null)
+                        EPlayer.SendMessage(player, "~y~Executing, please wait...");
+                        using(MainDatabase context = ContextFactory.CreateContext())
                         {
-                            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}A note with that ID could not be found!");
-                            return;
+                            Task.Run(async () =>
+                            {
+                                AdminNote _n = await ContextFactory.Instance.AdminNotes.FirstOrDefaultAsync(a => a.SQL_ID == nID);
+                                anote_OnFindDeleteNote(player, _n, nID, target);
+                            });
                         }
-                        if(_n.AccountID != EPlayer.GetAccount(target).SQL_ID)
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The note ID you specified does not match any of target's notes.");
-                            player.TriggerEvent("pushMsgToChat", $"!{{#C9C9C9}}[TIP] Use /anote {target.Name} view to check their note IDs.");
-                            return;
-                        }
-
-                        Account tAcc = ContextFactory.Instance.Accounts.ToList().FirstOrDefault(a => a.SQL_ID == _n.AccountID);
-                        string nTargetName = tAcc.Username ?? "[Unknown]";
-                        ContextFactory.Instance.AdminNotes.Remove(_n);
-                        player.TriggerEvent("pushMsgToChat", $"!{{#72ff6b}}You deleted admin {nTargetName}'s admin note with ID {nID}");
-                        Logs.LogAdmin(player, $"Deleted {nTargetName}'s admin note ID {nID}.");
                         break;
                     }
                 default:
@@ -4158,6 +4183,42 @@ namespace RNC
                         return;
                     }
             }
+        }
+        private void anote_OnFindDeleteNote(Player player, AdminNote _n, int nID, Player target)
+        {
+            NAPI.Task.Run(() =>
+            {
+                if (_n == null)
+                {
+                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}A note with that ID could not be found!");
+                    return;
+                }
+                if (_n.AccountID != EPlayer.GetAccount(target).SQL_ID)
+                {
+                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The note ID you specified does not match any of target's notes.");
+                    player.TriggerEvent("pushMsgToChat", $"!{{#C9C9C9}}[TIP] Use /anote {target.Name} view to check their note IDs.");
+                    return;
+                }
+
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Task.Run(async () =>
+                    {
+                        Account tAcc = await context.Accounts.FirstOrDefaultAsync(a => a.SQL_ID == _n.AccountID);
+                        context.AdminNotes.Remove(_n);
+                        string nTargetName = tAcc.Username ?? "[Unknown]";
+                        anote_FinishDeleteNote(player, nID, nTargetName);
+                    });
+                }
+            });
+        }
+        private void anote_FinishDeleteNote(Player player, int nID, string nTargetName)
+        {
+            NAPI.Task.Run(() =>
+            {
+                player.TriggerEvent("pushMsgToChat", $"!{{#72ff6b}}You deleted admin {nTargetName}'s admin note with ID {nID}");
+                Logs.LogAdmin(player, $"Deleted {nTargetName}'s admin note ID {nID}.");
+            });
         }
 
 
@@ -5282,40 +5343,71 @@ namespace RNC
             }
 
             BanData ban = null;
-            
-            if(sqlid != -1) ban = ContextFactory.Instance.Bans.ToList().Find(a => a.SQL_ID == sqlid);
-            else
+            EPlayer.SendMessage(player, "~y~Looking up, please wait...");
+            using(MainDatabase context = ContextFactory.CreateContext())
             {
-                Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(sqlorname, StringComparison.OrdinalIgnoreCase));
-                if(tpAcc != null)
+                Task.Run(async () =>
                 {
-                    ban = ContextFactory.Instance.Bans.ToList().Find(a => a.AccountSQLID == tpAcc.SQL_ID);
-                }
+                    if (sqlid != -1)
+                    {
+                        ban = await context.Bans.FirstOrDefaultAsync(a => a.SQL_ID == sqlid);
+                        bancheck_OnLookupBanData(player, ban);
+                    }
+                    else
+                    {
+                        Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(sqlorname, StringComparison.OrdinalIgnoreCase));
+                        if (tpAcc != null)
+                        {
+                            ban = await context.Bans.FirstOrDefaultAsync(a => a.AccountSQLID == tpAcc.SQL_ID);
+                            bancheck_OnLookupBanData(player, ban);
+                        }
+                        else NAPI.Task.Run(() => { EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}Ban data could not be found!"); });
+                    }
+                });
             }
-
-            if((ban != null) == false)
-            {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no ban with that ID or Name. Try /checkplayer to see any outstanding bans.");
-                return;
-            }
-
-            string username = "Unregistered Ban";
-            if (ban.AccountSQLID != -1)
-            {
-                Account pAcc = ContextFactory.Instance.Accounts.ToList().Find(acc => acc.SQL_ID == ban.AccountSQLID);
-                if (pAcc != null)
-                {
-                    username = pAcc.Username;
-                }
-            }
-
-            player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}Ban ID: {ban.SQL_ID} | Admin: {ban.Admin}");
-            player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}Reason: {ban.Reason} | DateTime: {ban.DateTime}");
-            player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}Name: {username} | SQLID: {ban.AccountSQLID}");
-            player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}IP: {ban.IP}");
-            player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}HWID: {ban.HWID}");
-            player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}Rockstar ID: {ban.RockstarID}");
             return;
+        }
+        private void bancheck_OnLookupBanData(Player player, BanData ban)
+        {
+            NAPI.Task.Run(() =>
+            {
+                if ((ban != null) == false)
+                {
+                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no ban with that ID or Name. Try /checkplayer to see any outstanding bans.");
+                    return;
+                }
+
+                string username = "Unregistered Ban";
+                if (ban.AccountSQLID != -1)
+                {
+                    using(MainDatabase context = ContextFactory.CreateContext())
+                    {
+                        Task.Run(async () =>
+                        {
+                            Account pAcc = await context.Accounts.FirstOrDefaultAsync(acc => acc.SQL_ID == ban.AccountSQLID);
+                            if (pAcc != null)
+                            {
+                                username = pAcc.Username;
+                                bancheck_sendBanInfo(player, ban, username);
+                            }
+                            else bancheck_sendBanInfo(player, ban, username);
+                        });                       
+                    }
+                    
+                }
+            });
+        }
+        private void bancheck_sendBanInfo(Player player, BanData ban, string username)
+        {
+            NAPI.Task.Run(() =>
+            {
+                player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}Ban ID: {ban.SQL_ID} | Admin: {ban.Admin}");
+                player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}Reason: {ban.Reason} | DateTime: {ban.DateTime}");
+                player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}Name: {username} | SQLID: {ban.AccountSQLID}");
+                player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}IP: {ban.IP}");
+                player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}HWID: {ban.HWID}");
+                player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}Rockstar ID: {ban.RockstarID}");
+            });
         }
 
         [Command("ocheckstats", "!{#AFAFAF}[USAGE] ocheckstats (target)", GreedyArg = true)]
@@ -5336,19 +5428,31 @@ namespace RNC
                 return;
             }
 
-            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
-
-            if ((tpAcc != null) == false)
+            EPlayer.SendMessage(player, "~y~Looking up, please wait...");
+            using(MainDatabase context = ContextFactory.CreateContext())
             {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
-                return;
+                Task.Run(async () =>
+                {
+                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                });
             }
-
-            Logs.LogAdmin(player, $"Checked offline player {tpAcc.Username}'s stats.");
-            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ocheckstats:{tpAcc.Username}"); } catch { }
-
-            EPlayer.ShowStats(player, tpAcc);
             return;
+        }
+        private void ocheckstats_OnFinishLookup(Player player, Account tpAcc)
+        {
+            NAPI.Task.Run(() =>
+            {
+                if ((tpAcc != null) == false)
+                {
+                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                    return;
+                }
+
+                Logs.LogAdmin(player, $"Checked offline player {tpAcc.Username}'s stats.");
+                // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ocheckstats:{tpAcc.Username}"); } catch { }
+
+                EPlayer.ShowStats(player, tpAcc);
+            });
         }
 
 
@@ -7146,6 +7250,113 @@ namespace RNC
             player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}You have selected the arena !{{#FFFFFF}}'{arena.Name}' (creator: {arena.Creator}) SQLID {arena.SQL_ID}!{{#00FF33}}. /editdmarena to edit.");
             player.SetData("EditingDMArena", arena.SQL_ID);
             return;
+        }
+
+        [Command("fuckupdb")]
+        public void cmd_fuckupdb(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 6)
+            {
+                return;
+            }
+
+            EPlayer.SendMessage(player, "~g~[>] ~w~You have initiated the process of adding dummy accounts to the database.");
+            using(MainDatabase context = ContextFactory.CreateContext())
+            {
+                Task.Run(async () =>
+                {
+                    int max_id = context.Accounts.Max(a => a.SQL_ID);
+                    for (int i = max_id; i < max_id+100000; i++)
+                    {
+                        var _newAcc = new Account
+                        {
+                            Email = "[]",
+                            Password = "[]",
+                            Salt = "[]",
+                            Username = $"leo_is_gay_{i}",
+                            DiscordInfo = "[]",
+                            ChallengeInfo = "[]",
+                            AutoLogin = true,
+                            Admin = 0,
+                            RegisterHWID = "[]",
+                            RegisterIP = "[]",
+                            RegisterRID = 123123,
+                            RegisterSC = "[]",
+                            LastHWID = "[]",
+                            LastIP = "[]",
+                            LastRID = 123123,
+                            LastSC = "[]",
+                            MuteTime = 0,
+                            MuteReason = "N/A",
+                            JailTime = 0,
+                            JailReason = "N/A",
+                            DerbyWins = 0,
+                            Level = 1,
+                            Medkits = 0,
+                            Painkillers = 0,
+                            Language = -1,
+                            XP = 1,
+                            Escapes = 0,
+                            Arrests = 0,
+                            Kills = 1,
+                            Deaths = 1,
+                            MinutesPlayed = 1.0,
+                            LastSessionMins = 0.0,
+                            DonatorPoints = 0,
+                            Points = 10,
+                            Warns = 0,
+                            Suspended = 0,
+                            DonatorLevel = 0,
+                            LobbyClothing = 1,
+                            LoadoutCop = "?",
+                            LoadoutFugitive = "?",
+                            CarCop = "?",
+                            CarFugitive = "?",
+                            WeaponComponents = "[]",
+                            MOTD = "none",
+                            RegisterDate = DateTime.Now,
+                            LastLogin = DateTime.Now,
+                            Character = "{}",
+                            PurchasedAmmo = "{}",
+                            ChallengeStreak = 0,
+                            CompletedDailyChallenge = false,
+                            Namechanges = 0,
+                            ClanTier = -1,
+                            ClanID = -1
+                        };
+                        await context.Accounts.AddAsync(_newAcc);
+
+                        var _newVeh = new OwnedVehData
+                        {
+                            AccountSQLID = i,
+                            Model = "golf dva",
+                            Team = 0,
+                            TimesUsed = 0,
+                        };
+                        await context.OwnedVehicles.AddAsync(_newVeh);
+
+                        var _newWep = new OwnedLoadoutData
+                        {
+                            AccountSQLID = i,
+                            Name = "rambo",
+                            Team = 1,
+                            TimesUsed = 0
+                        };
+                        await context.OwnedLoadouts.AddAsync(_newWep);
+
+                        await context.SaveChangesAsync();
+                        if(i % 1000 == 0)
+                        {
+                            Console.WriteLine($"[DUMMY ACCOUNTS] Progress: {i}/{max_id + 100000}");
+                        }
+                    }
+                });
+            }
+            EPlayer.SendMessage(player, "~g~[>] ~w~This is done asynchronously so it should not freeze the server [main thread].");
+            EPlayer.SendMessage(player, "~g~[>] ~w~It will probably take a while to add all accounts! It saves database often.");
         }
 
         [Command("editdmarena", "!{#AFAFAF}[USAGE] editdmarena (help)", GreedyArg = true)]

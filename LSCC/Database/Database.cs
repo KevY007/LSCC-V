@@ -291,6 +291,7 @@ namespace RNC
 
         private static string _connectionString;
 
+        public static MainDatabase CreateContext() { return new ContextFactory().CreateDbContext(new string[] { }); }
         public MainDatabase CreateDbContext(string[] args)
         {
             var builder = new DbContextOptionsBuilder<MainDatabase>();
@@ -311,6 +312,14 @@ namespace RNC
             });
 
             return new MainDatabase(builder.Options);
+        }
+
+        public static async void SaveDB()
+        {
+            using(MainDatabase context = CreateContext())
+            {
+                await context.SaveChangesAsync();
+            }
         }
 
         public static MainDatabase Instance
