@@ -2277,7 +2277,7 @@ namespace RNC
                     // runweeklymonthlychecks - will check if a week or month has passed and do shit
                     Events.RunWeeklyMonthlyChecks();
                     SaveDynamicSettings();
-                    ContextFactory.Instance.SaveChanges();
+                    ContextFactory.SaveDB();
                     NAPI.Util.ConsoleOutput("Server auto-saved => " + DateTime.Now.ToString());
                     Settings.AutoSaveTick = Environment.TickCount64;
                 }

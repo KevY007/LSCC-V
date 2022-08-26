@@ -14,6 +14,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices.ComTypes;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Net.Mail;
+using System.Threading.Tasks;
 
 namespace RNC
 {
@@ -150,45 +151,75 @@ namespace RNC
             {
                 case (int)LogType.AdminRecord:
                     {
-                        List<Logs_AdminRecord> _logs = ContextFactory.Instance.Logs_AdminRecords.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToList();
 
-                        object[] _toSend = new object[_logs.Count];
-                        for (int i = 0; i < _logs.Count; i++)
+                        Task.Run(async () =>
                         {
-                            string aName = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.SQL_ID == _logs[i].AdminID).Username;
-                            if (aName == "null") aName = "UNKNOWN";
+                            using (MainDatabase context = ContextFactory.CreateContext())
+                            {
+                                List<Logs_AdminRecord> _logs = await context.Logs_AdminRecords.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToListAsync();
 
-                            (string, string, string, string) _toAdd = (_logs[i].Timestamp.ToString(), aName, _logs[i].Duration, _logs[i].Reason);
-                            _toSend[i] = _toAdd;
-                        }
-                        string jsonShit = NAPI.Util.ToJson(_toSend);
-                        player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
+                                object[] _toSend = new object[_logs.Count];
+                                for (int i = 0; i < _logs.Count; i++)
+                                {
+                                    Account acc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == _logs[i].AdminID);
+                                    string aName = acc.Username;
+                                    if (aName == "null") aName = "UNKNOWN";
+
+                                    (string, string, string, string) _toAdd = (_logs[i].Timestamp.ToString(), aName, _logs[i].Duration, _logs[i].Reason);
+                                    _toSend[i] = _toAdd;
+                                }
+                                NAPI.Task.Run(() =>
+                                {
+                                    string jsonShit = NAPI.Util.ToJson(_toSend);
+                                    player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
+                                });
+                            }
+                        });
                         break;
                     }
                 case (int)LogType.Admin:
                     {
-                        List<Logs_Admin> _logs = ContextFactory.Instance.Logs_Admin.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToList();
-                        object[] _toSend = new object[_logs.Count];
-                        for (int i = 0; i < _logs.Count; i++)
+                        Task.Run(async () =>
                         {
-                            (string, string) _toAdd = (_logs[i].Timestamp.ToString(), _logs[i].Description);
-                            _toSend[i] = _toAdd;
-                        }
-                        string jsonShit = NAPI.Util.ToJson(_toSend);
-                        player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
+                            using (MainDatabase context = ContextFactory.CreateContext())
+                            {
+                                List<Logs_Admin> _logs = await context.Logs_Admin.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToListAsync();
+                                object[] _toSend = new object[_logs.Count];
+                                for (int i = 0; i < _logs.Count; i++)
+                                {
+                                    (string, string) _toAdd = (_logs[i].Timestamp.ToString(), _logs[i].Description);
+                                    _toSend[i] = _toAdd;
+                                }
+                                NAPI.Task.Run(() =>
+                                {
+                                    string jsonShit = NAPI.Util.ToJson(_toSend);
+                                    player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
+                                });
+                            }
+                        });
+       
                         break;
                     }
                 case (int)LogType.Session:
                     {
-                        List<Logs_Session> _logs = ContextFactory.Instance.Logs_Session.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToList();
-                        object[] _toSend = new object[_logs.Count];
-                        for (int i = 0; i < _logs.Count; i++)
+                        Task.Run(async () =>
                         {
-                            (string, string, string, string, string) _toAdd = (_logs[i].TimestampJoin.ToString(), _logs[i].TimestampLeave.ToString(), _logs[i].Duration, _logs[i].IP, _logs[i].HWID);
-                            _toSend[i] = _toAdd;
-                        }
-                        string jsonShit = NAPI.Util.ToJson(_toSend);
-                        player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
+                            using (MainDatabase context = ContextFactory.CreateContext())
+                            {
+                                List<Logs_Session> _logs = await context.Logs_Session.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToListAsync();
+                                object[] _toSend = new object[_logs.Count];
+                                for (int i = 0; i < _logs.Count; i++)
+                                {
+                                    (string, string, string, string, string) _toAdd = (_logs[i].TimestampJoin.ToString(), _logs[i].TimestampLeave.ToString(), _logs[i].Duration, _logs[i].IP, _logs[i].HWID);
+                                    _toSend[i] = _toAdd;
+                                }
+                                NAPI.Task.Run(() =>
+                                {
+                                    string jsonShit = NAPI.Util.ToJson(_toSend);
+                                    player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
+                                });
+                            }
+                        });
                         break;
                     }
                 default:
@@ -218,8 +249,15 @@ namespace RNC
                 IP = player.Address,
                 HWID = player.Serial.Substring(0, 50)
             };
-            ContextFactory.Instance.Logs_Session.Add(_a);
-            ContextFactory.Instance.SaveChanges();
+
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    await context.Logs_Session.AddAsync(_a);
+                    await context.SaveChangesAsync();
+                }
+            });
         }
         public static void LogAdmin(Player player, string description)
         {
@@ -236,17 +274,29 @@ namespace RNC
                 Description = description,
                 Timestamp = DateTime.Now
             };
-            ContextFactory.Instance.Logs_Admin.Add(_a);
-            ContextFactory.Instance.SaveChanges();
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    await context.Logs_Admin.AddAsync(_a);
+                    await context.SaveChangesAsync();
+                }
+            });
         }
 
         public static void RemoveAdminRecord(int recordID)
         {
-            Logs_AdminRecord _rem = ContextFactory.Instance.Logs_AdminRecords.ToList().Find(l => l.SQL_ID == recordID);
-            if (_rem == null) return;
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Logs_AdminRecord _rem = await context.Logs_AdminRecords.AsQueryable().FirstOrDefaultAsync(l => l.SQL_ID == recordID);
+                    if (_rem == null) return;
 
-            ContextFactory.Instance.Logs_AdminRecords.Remove(_rem);
-            ContextFactory.Instance.SaveChanges();
+                    context.Logs_AdminRecords.Remove(_rem);
+                    await context.SaveChangesAsync();
+                }
+            });
         }
         public static void AddToAdminRecord(int accountID, int adminID, string type, string reason, string duration)
         {
@@ -262,8 +312,14 @@ namespace RNC
                 Timestamp = DateTime.Now,
                 Duration = duration
             };
-            ContextFactory.Instance.Logs_AdminRecords.Add(_a);
-            ContextFactory.Instance.SaveChanges();
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    await context.Logs_AdminRecords.AddAsync(_a);
+                    await context.SaveChangesAsync();
+                }
+            });
         }
     }
 }

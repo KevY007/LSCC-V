@@ -5846,6 +5846,7 @@ namespace RNC
 
             Logs.LogAdmin(player, $"Checked all players for ban evade.");
 
+            EPlayer.SendMessage(player, "~y~Checking online players for ban evasion. ~w~If there aren't any, there will be no messages!");
             foreach (Player p in Settings.LoggedInPlayers)
             {
                 Account acc = EPlayer.GetAccount(p);
@@ -5902,6 +5903,7 @@ namespace RNC
 
             BanData ban = null;
 
+            EPlayer.SendMessage(player, "~y~Executing, please wait...");
             Task.Run(async () =>
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
@@ -5931,15 +5933,14 @@ namespace RNC
                             username = pAcc.Username;
                         }
                     }
-
-                    Logs.LogAdmin(player, $"Unbanned player {username}.");
-                    context.Bans.Remove(ban);
-                    await context.SaveChangesAsync();
                     NAPI.Task.Run(() =>
                     {
                         EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has unbanned {username}.");
                         player.TriggerEvent("pushMsgToChat", "!{#33C446}[>>] !{#FFFFFF}You have successfully unbanned the player but you may want to /checkplayer to see if there are any outstanding bans on them.");
                     });
+                    Logs.LogAdmin(player, $"Unbanned player {username}.");
+                    context.Bans.Remove(ban);
+                    await context.SaveChangesAsync();
                 }
             });
             return;
@@ -5965,6 +5966,7 @@ namespace RNC
 
             int pAdmin = EPlayer.GetAccount(player).Admin;
             string pName = player.Name;
+            EPlayer.SendMessage(player, "~y~Executing, please wait...");
             Task.Run(async () =>
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
@@ -5985,7 +5987,13 @@ namespace RNC
                     }
 
                     //if (tpAcc.Username.StartsWith("KevY") || tpAcc.Username.StartsWith("CodeName420")) return;
-
+                    NAPI.Task.Run(() =>
+                    {
+                        RAGE.Entities.Players.All.ForEach((Player p) =>
+                        {
+                            p.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}AdmCmd: {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has offline-banned {tpAcc.Username} for: {reason}");
+                        });
+                    });
                     var _new = new BanData
                     {
                         IP = tpAcc.LastIP,
@@ -6000,13 +6008,6 @@ namespace RNC
                     await context.SaveChangesAsync();
 
                     Logs.LogAdmin(player, $"Offline-banned player {tpAcc.Username} for {reason}.");
-                    NAPI.Task.Run(() =>
-                    {
-                        RAGE.Entities.Players.All.ForEach((Player p) =>
-                        {
-                            p.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}AdmCmd: {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has offline-banned {tpAcc.Username} for: {reason}");
-                        });
-                    });
                 }
             });
             return;
