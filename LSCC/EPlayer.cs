@@ -1786,15 +1786,18 @@ namespace RNC
             return "#" + c.Red.ToString("X2") + c.Green.ToString("X2") + c.Blue.ToString("X2");
         }
 
-        public static List<Account> GetLinkedAccounts(Account pAcc) // Gets all linked accounts to a specific account, will always contain the input account.
+        public async static Task<List<Account>> GetLinkedAccounts(Account pAcc) // Gets all linked accounts to a specific account, will always contain the input account.
         {
-            var accounts = ContextFactory.Instance.Accounts.ToList().Where(acc =>
-                new ulong[] { pAcc.RegisterRID, pAcc.LastRID }.Intersect(new ulong[] { acc.LastRID, acc.RegisterRID }).Any() ||
-                new string[] { pAcc.RegisterIP, pAcc.LastIP }.Intersect(new string[] { acc.RegisterIP, acc.LastIP }).Any() ||
-                new string[] { pAcc.RegisterHWID, pAcc.LastHWID }.Intersect(new string[] { acc.RegisterHWID, acc.LastHWID }).Any() ||
-                (acc.Email != null && acc.Email.Equals(pAcc.Email) && acc.Email.Length >= 5)).ToList(); // BONKERS
+            using (MainDatabase context = ContextFactory.CreateContext())
+            {
+                var accounts = context.Accounts.ToList().Where(acc =>
+                    new ulong[] { pAcc.RegisterRID, pAcc.LastRID }.Intersect(new ulong[] { acc.LastRID, acc.RegisterRID }).Any() ||
+                    new string[] { pAcc.RegisterIP, pAcc.LastIP }.Intersect(new string[] { acc.RegisterIP, acc.LastIP }).Any() ||
+                    new string[] { pAcc.RegisterHWID, pAcc.LastHWID }.Intersect(new string[] { acc.RegisterHWID, acc.LastHWID }).Any() ||
+                    (acc.Email != null && acc.Email.Equals(pAcc.Email) && acc.Email.Length >= 5)).ToList(); // BONKERS
 
-            return accounts;
+                return accounts;
+            }
         }
 
         public static bool LoggedIn(Player player)

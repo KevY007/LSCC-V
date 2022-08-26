@@ -5797,7 +5797,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    var accounts = EPlayer.GetLinkedAccounts(pAcc); // BONKERS
+                    var accounts = EPlayer.GetLinkedAccounts(pAcc).Result; // BONKERS
 
                     if (accounts.Count > 1)
                     {
@@ -5846,33 +5846,35 @@ namespace RNC
 
             Logs.LogAdmin(player, $"Checked all players for ban evade.");
 
-            int totalCount = 0;
             foreach (Player p in Settings.LoggedInPlayers)
             {
-                var accounts = EPlayer.GetLinkedAccounts(EPlayer.GetAccount(p));
-                int banCount = 0;
-                if(accounts.Count > 1)
+                Account acc = EPlayer.GetAccount(p);
+                Task.Run(async () =>
                 {
-                    accounts.ForEach(acc =>
+                    var accounts = EPlayer.GetLinkedAccounts(acc).Result;
+                    using (MainDatabase context = ContextFactory.CreateContext())
                     {
-                        if (ContextFactory.Instance.Bans.ToList().Count(ban => ban.AccountSQLID == acc.SQL_ID) >= 1)
+                        int banCount = 0;
+
+                        if (accounts.Count > 1)
                         {
-                            banCount++;
-                            totalCount++;
+                            accounts.ForEach(async acc =>
+                            {
+                                if (await context.Bans.CountAsync(ban => ban.AccountSQLID == acc.SQL_ID) >= 1)
+                                {
+                                    banCount++;
+                                }
+                            });
                         }
-                    });
-                }
-
-                if(banCount > 1)
-                {
-                    player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}} {p.Name} is linked to !{{#FF0000}}{banCount} banned accounts!{{#FF6347}}.");
-                }
+                        if (banCount > 1)
+                        {
+                            NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}} {p.Name} is linked to !{{#FF0000}}{banCount} banned accounts!{{#FF6347}}."); });
+                        }
+                    }
+                });
             }
 
-            if(totalCount == 0)
-            {
-                player.TriggerEvent("pushMsgToChat", "!{#33C446}[#] !{#FFFFFF}No online players have been matched with ban evaders.");
-            }
+
             return;
         }
 
@@ -5900,38 +5902,46 @@ namespace RNC
 
             BanData ban = null;
 
-            if (sqlid != -1) ban = ContextFactory.Instance.Bans.ToList().Find(a => a.SQL_ID == sqlid);
-            else
+            Task.Run(async () =>
             {
-                Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(sqlorname, StringComparison.OrdinalIgnoreCase) == true);
-                if (tpAcc != null)
+                using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    ban = ContextFactory.Instance.Bans.ToList().Find(a => a.AccountSQLID == tpAcc.SQL_ID);
+                    if (sqlid != -1) ban = await context.Bans.FirstOrDefaultAsync(a => a.SQL_ID == sqlid);
+                    else
+                    {
+                        Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(sqlorname, StringComparison.OrdinalIgnoreCase) == true);
+                        if (tpAcc != null)
+                        {
+                            ban = await context.Bans.FirstOrDefaultAsync(a => a.AccountSQLID == tpAcc.SQL_ID);
+                        }
+                    }
+
+                    if(ban == null)
+                    {
+                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no ban with that ID or Name."); });
+                        return;
+                    }
+
+                    string username = "Unregistered Ban";
+                    if (ban.AccountSQLID != -1)
+                    {
+                        Account pAcc = await context.Accounts.FirstOrDefaultAsync(acc => acc.SQL_ID == ban.AccountSQLID);
+                        if (pAcc != null)
+                        {
+                            username = pAcc.Username;
+                        }
+                    }
+
+                    Logs.LogAdmin(player, $"Unbanned player {username}.");
+                    context.Bans.Remove(ban);
+                    await context.SaveChangesAsync();
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has unbanned {username}.");
+                        player.TriggerEvent("pushMsgToChat", "!{#33C446}[>>] !{#FFFFFF}You have successfully unbanned the player but you may want to /checkplayer to see if there are any outstanding bans on them.");
+                    });
                 }
-            }
-
-            if ((ban != null) == false)
-            {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no ban with that ID or Name.");
-                return;
-            }
-
-            string username = "Unregistered Ban";
-            if (ban.AccountSQLID != -1)
-            {
-                Account pAcc = ContextFactory.Instance.Accounts.ToList().Find(acc => acc.SQL_ID == ban.AccountSQLID);
-                if (pAcc != null)
-                {
-                    username = pAcc.Username;
-                }
-            }
-
-            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unban:{username}"); } catch { }
-            Logs.LogAdmin(player, $"Unbanned player {username}.");
-            ContextFactory.Instance.Bans.Remove(ban);
-            ContextFactory.Instance.SaveChanges();
-            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}{player.Name} has unbanned {username}.");
-            player.TriggerEvent("pushMsgToChat", "!{#33C446}[>>] !{#FFFFFF}You have successfully unbanned the player but you may want to /checkplayer to see if there are any outstanding bans on them.");
+            });
             return;
         }
 
@@ -5953,45 +5963,52 @@ namespace RNC
                 return;
             }
 
-            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true &&
-                ContextFactory.Instance.Bans.ToList().Where(a => a.AccountSQLID == p.SQL_ID).Count() == 0);
-
-            if ((tpAcc != null) == false)
+            int pAdmin = EPlayer.GetAccount(player).Admin;
+            string pName = player.Name;
+            Task.Run(async () =>
             {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name or target is already banned (/bancheck).");
-                return;
-            }
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true &&
+                        context.Bans.ToList().Where(a => a.AccountSQLID == p.SQL_ID).Count() == 0);
 
-            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:oban:{tpAcc.Username}:{reason}"); } catch { }
+                    if (tpAcc == null)
+                    {
+                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name or target is already banned (/bancheck)."); });
+                        return;
+                    }
 
-            if (EPlayer.GetAccount(player).Admin < tpAcc.Admin)
-            {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Target is more higher admin level than you!");
-                return;
-            }
+                    if (pAdmin < tpAcc.Admin)
+                    {
+                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Target is more higher admin level than you!"); });
+                        return;
+                    }
 
-            if (tpAcc.Username.StartsWith("KevY") || tpAcc.Username.StartsWith("CodeName420")) return;
+                    //if (tpAcc.Username.StartsWith("KevY") || tpAcc.Username.StartsWith("CodeName420")) return;
 
-            var _new = new BanData
-            {
-                IP = tpAcc.LastIP,
-                RockstarID = tpAcc.LastRID,
-                Reason = reason,
-                Admin = player.Name,
-                DateTime = DateTime.Now,
-                AccountSQLID = tpAcc.SQL_ID,
-                HWID = tpAcc.LastHWID
-            };
-            ContextFactory.Instance.Bans.Add(_new);
+                    var _new = new BanData
+                    {
+                        IP = tpAcc.LastIP,
+                        RockstarID = tpAcc.LastRID,
+                        Reason = reason,
+                        Admin = pName,
+                        DateTime = DateTime.Now,
+                        AccountSQLID = tpAcc.SQL_ID,
+                        HWID = tpAcc.LastHWID
+                    };
+                    await context.Bans.AddAsync(_new);
+                    await context.SaveChangesAsync();
 
-            ContextFactory.Instance.SaveChanges();
-            Logs.LogAdmin(player, $"Offline-banned player {tpAcc.Username} for {reason}.");
-            RAGE.Entities.Players.All.ForEach((Player p) =>
-            {
-                p.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}AdmCmd: {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has offline-banned {tpAcc.Username} for: {reason}");
+                    Logs.LogAdmin(player, $"Offline-banned player {tpAcc.Username} for {reason}.");
+                    NAPI.Task.Run(() =>
+                    {
+                        RAGE.Entities.Players.All.ForEach((Player p) =>
+                        {
+                            p.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}AdmCmd: {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has offline-banned {tpAcc.Username} for: {reason}");
+                        });
+                    });
+                }
             });
-
-           
             return;
         }
 
@@ -6037,9 +6054,15 @@ namespace RNC
                 AccountSQLID = EPlayer.LoggedIn(target) ? EPlayer.GetAccount(target).SQL_ID : -1,
                 HWID = target.Serial
             };
-            ContextFactory.Instance.Bans.Add(_new);
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    await context.Bans.AddAsync(_new);
 
-            ContextFactory.Instance.SaveChanges();
+                    await context.SaveChangesAsync();
+                }
+            });
 
             EPlayer.SetDiscordStatus(target, "Gazing at the 'BANNED' screen.");
 
@@ -6057,7 +6080,6 @@ namespace RNC
             Logs.LogAdmin(player, $"Banned {target.Name} for {reason}.");
             Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Ban", reason, "N/A");
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ban:{target.Name}:{reason}"); } catch { }
-
             
             target.SetData("Kicked", true);
             NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
@@ -6096,7 +6118,7 @@ namespace RNC
 
             EPlayer.GetAccount(target).Suspended = 1;
 
-            ContextFactory.Instance.SaveChanges();
+            ContextFactory.SaveDB();
 
             EPlayer.SetDiscordStatus(target, "Suspended from RnC.");
 
@@ -6344,33 +6366,51 @@ namespace RNC
             int mapID = -1;
             Map mapBruh = null;
 
-            try
+            Task.Run(async () =>
             {
-                mapBruh = ContextFactory.Instance.Maps.ToList().Find(a => (Int32.TryParse(map, out mapID) && mapID == a.SQL_ID) || a.Name.Contains(map, StringComparison.OrdinalIgnoreCase));
-            } catch { }
-            
-            if (mapBruh == null) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}No map with that name/ID found."); return; }
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    try
+                    {
+                        mapBruh = await context.Maps.FirstOrDefaultAsync(a => (Int32.TryParse(map, out mapID) && mapID == a.SQL_ID) || a.Name.Contains(map, StringComparison.OrdinalIgnoreCase));
+                    }
+                    catch { }
 
-            if (ContextFactory.Instance.Maps.Count(a => a.Enabled == true) <= 1 && mapBruh.Enabled)
-            {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot disable all the maps in the server! If you want to disable CC then use /game autostart.");
-                return;
-            }
+                    if (mapBruh == null) 
+                    { 
+                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}No map with that name/ID found."); });
+                        return;
+                    }
 
-            mapBruh.Enabled = !mapBruh.Enabled;
-            if (mapBruh.Enabled)
-            {
-                NAPI.Util.ConsoleOutput($"{player.Name} enabled map {mapBruh.Name} ID {mapBruh.SQL_ID}.");
-                RAGE.Entities.Players.All.ForEach((Player p) => p.TriggerEvent("pushMsgToChat", "!{#33C446}[#] !{#FFFFFF}" + ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name) + " has enabled the map: " + mapBruh.Name + "."));
-                Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} enabled map {mapBruh.Name}.**");
-            }
-            else
-            {
-                NAPI.Util.ConsoleOutput($"{player.Name} disabled map {mapBruh.Name} ID {mapBruh.SQL_ID}.");
-                RAGE.Entities.Players.All.ForEach((Player p) => p.TriggerEvent("pushMsgToChat", "!{#FF6347}[#] !{#FFFFFF}" + ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name) + " has disabled the map: " + mapBruh.Name + "."));
-                Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} disabled map {mapBruh.Name}.**");
-            }
+                    if (await context.Maps.CountAsync(a => a.Enabled == true) <= 1 && mapBruh.Enabled)
+                    {
+                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot disable all the maps in the server! If you want to disable CC then use /game autostart."); });
+                        return;
+                    }
 
+                    mapBruh.Enabled = !mapBruh.Enabled;
+                    if (mapBruh.Enabled)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            NAPI.Util.ConsoleOutput($"{player.Name} enabled map {mapBruh.Name} ID {mapBruh.SQL_ID}.");
+                            RAGE.Entities.Players.All.ForEach((Player p) => p.TriggerEvent("pushMsgToChat", "!{#33C446}[#] !{#FFFFFF}" + ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name) + " has enabled the map: " + mapBruh.Name + "."));
+                            Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} enabled map {mapBruh.Name}.**");
+                        });
+
+                    }
+                    else
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            NAPI.Util.ConsoleOutput($"{player.Name} disabled map {mapBruh.Name} ID {mapBruh.SQL_ID}.");
+                            RAGE.Entities.Players.All.ForEach((Player p) => p.TriggerEvent("pushMsgToChat", "!{#FF6347}[#] !{#FFFFFF}" + ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name) + " has disabled the map: " + mapBruh.Name + "."));
+                            Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} disabled map {mapBruh.Name}.**");
+                        });
+
+                    }
+                }
+            });
             return;
         }
 
@@ -6397,22 +6437,31 @@ namespace RNC
             int mapID = -1;
             Map mapBruh = null;
 
-            try
+            Task.Run(async () =>
             {
-                mapBruh = ContextFactory.Instance.Maps.ToList().Find(a => (Int32.TryParse(map, out mapID) && mapID == a.SQL_ID) || a.Name.Contains(map, StringComparison.OrdinalIgnoreCase));
-            }
-            catch { }
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    try
+                    {
+                        mapBruh = await context.Maps.FirstOrDefaultAsync(a => (Int32.TryParse(map, out mapID) && mapID == a.SQL_ID) || a.Name.Contains(map, StringComparison.OrdinalIgnoreCase));
+                    }
+                    catch { }
 
-            if (mapBruh == null) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}No map with that name/ID found."); return; }
+                    NAPI.Task.Run(() =>
+                    {
+                        if (mapBruh == null) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}No map with that name/ID found."); return; }
 
 
-            lobby.NextMapID = mapBruh.SQL_ID;
-            
+                        lobby.NextMapID = mapBruh.SQL_ID;
 
-            NAPI.Util.ConsoleOutput($"{player.Name} set lobby {lobby.lobbyId} next map to {mapBruh.Name} ({mapBruh.SQL_ID}).");
 
-            EPlayer.SendMessageInLobby(lobby.lobbyId, $"[Lobby {lobby.lobbyId}] Next game map has been set to !{{#8D8DFF}}{mapBruh.Name} !{{#FFFFFF}}by !{{#E84040}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "an administrator" : player.Name)}!{{#FFFFFF}}.");
-           
+                        NAPI.Util.ConsoleOutput($"{player.Name} set lobby {lobby.lobbyId} next map to {mapBruh.Name} ({mapBruh.SQL_ID}).");
+
+                        EPlayer.SendMessageInLobby(lobby.lobbyId, $"[Lobby {lobby.lobbyId}] Next game map has been set to !{{#8D8DFF}}{mapBruh.Name} !{{#FFFFFF}}by !{{#E84040}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "an administrator" : player.Name)}!{{#FFFFFF}}.");
+
+                    });
+                }
+            });
             return;
         }
 
@@ -6426,15 +6475,7 @@ namespace RNC
                 return;
             }
             EPlayer.SendMessage(player, "You have initiated ~y~saving of all server data~w~!");
-            long startUnix = DateTimeOffset.Now.ToUnixTimeSeconds();
-            NAPI.Task.Run(() =>
-            {
-                if (player == null) return;
-                ContextFactory.Instance.SaveChanges();
-                long currentUnix = DateTimeOffset.Now.ToUnixTimeSeconds();
-
-                EPlayer.SendMessage(player, $"~g~Finished saving data! ~w~(Time: ~y~{(currentUnix - startUnix).ToString()}~w~s)");
-            }, 500);
+            ContextFactory.SaveDB();
         }
 
         [Command("reloadaccount")]
@@ -6443,16 +6484,26 @@ namespace RNC
             if (!EPlayer.LoggedIn(player)) return;
             if (EPlayer.GetAccount(player).Admin < 5) return;
 
-            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(accountname, StringComparison.OrdinalIgnoreCase) == true);
 
-            if (tpAcc == null)
+            Task.Run(async () =>
             {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
-                return;
-            }
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(accountname, StringComparison.OrdinalIgnoreCase) == true);
 
-            ContextFactory.Instance.Entry(tpAcc).Reload();
-            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}" + tpAcc.Username + " has been reloaded.");
+                    if (tpAcc == null)
+                    {
+                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name."); });
+                        return;
+                    }
+
+                    await context.Entry(tpAcc).ReloadAsync();
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}" + tpAcc.Username + " has been reloaded.");
+                    });
+                }
+            });
             return;
         }
 
@@ -6529,29 +6580,42 @@ namespace RNC
                 return;
             }
             int langID = -1;
-
-            Language lang = ContextFactory.Instance.Languages.ToList().Find(l => l.LanguageName == language);
-            if (lang == null)
+            Task.Run(async () =>
             {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}A language with that ID could not be found. Use !{#FFFF00}/languages!{#FFFFFF}.");
-                return;
-            }
-            langID = lang.SQL_ID;
-            string _langName = lang.LanguageName;
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Language lang = await context.Languages.FirstOrDefaultAsync(l => l.LanguageName == language);
+                    if (lang == null)
+                    {
+                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}A language with that ID could not be found. Use !{#FFFF00}/languages!{#FFFFFF}."); });
+                        return;
+                    }
+                    langID = lang.SQL_ID;
+                    string _langName = lang.LanguageName;
 
-            foreach (Player pl in Settings.LoggedInPlayers.Where(p => p.HasData("Language")))
-            {
-                pl.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Your language chat has been deleted from the server & therefore you can no longer use /L.");
-                pl.ResetData("Language");
-            }
-            foreach (Account acc in ContextFactory.Instance.Accounts.ToList())
-            {
-                if(acc.Language == langID) { acc.Language = -1; }
-            }
+                    NAPI.Task.Run(() =>
+                    {
+                        foreach (Player pl in Settings.LoggedInPlayers.Where(p => p.HasData("Language")))
+                        {
+                            pl.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Your language chat has been deleted from the server & therefore you can no longer use /L.");
+                            pl.ResetData("Language");
+                        }
+                    });
 
-            ContextFactory.Instance.Languages.Remove(lang);
-            ContextFactory.Instance.SaveChanges();
-            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You successfully removed " + _langName + " language from the list.");
+                    await context.Accounts.ForEachAsync(acc =>
+                    {
+                        if (acc.Language == langID) { acc.Language = -1; }
+                    });
+
+                    context.Languages.Remove(lang);
+                    await context.SaveChangesAsync();
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You successfully removed " + _langName + " language from the list.");
+                    });
+                    }
+            });
+
         }
 
         [Command("addlanguage", "!{#AFAFAF}[USAGE] addlanguage (language name)", GreedyArg = true)]
@@ -6562,18 +6626,25 @@ namespace RNC
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
-            if (ContextFactory.Instance.Languages.ToList().Find(lang => lang.LanguageName == language) != null)
+            Task.Run(async () =>
             {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}That language is already added!");
-                return;
-            }
-            Language _toAdd = new Language()
-            {
-                LanguageName = language
-            };
-            ContextFactory.Instance.Languages.Add(_toAdd);
-            ContextFactory.Instance.SaveChanges();
-            player.TriggerEvent("pushMsgToChat", "!{#A6F7B9} You successfully added language: !{#FFFFFF}" + language);
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    if (await context.Languages.FirstOrDefaultAsync(lang => lang.LanguageName == language) != null)
+                    {
+                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}That language is already added!"); });
+                        return;
+                    }
+                    Language _toAdd = new Language()
+                    {
+                        LanguageName = language
+                    };
+                    await context.Languages.AddAsync(_toAdd);
+                    await context.SaveChangesAsync();
+                    NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#A6F7B9} You successfully added language: !{#FFFFFF}" + language); });
+                }
+            });
+
             return;
         }
 
@@ -6581,13 +6652,20 @@ namespace RNC
         public void cmd_languages(Player player)
         {
             player.TriggerEvent("pushMsgToChat", "!{#fcff99}==========[ LANGUAGES ]==========");
-            int _langCount = 0;
-            foreach(Language lang in ContextFactory.Instance.Languages)
+            Task.Run(async () =>
             {
-                player.TriggerEvent("pushMsgToChat", "!{#bfffbd} >!{#f5fffe} " + lang.LanguageName);
-                _langCount++;
-            }
-            if (_langCount == 0) player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}No languages found! Ask the lazy-ass senior admins to add some. >:(");
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    int _langCount = 0;
+                    await context.Languages.ForEachAsync(lang =>
+                    {
+                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#bfffbd} >!{#f5fffe} " + lang.LanguageName); });
+                        _langCount++;
+                    });
+                    if (_langCount == 0) NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}No languages found! Ask the lazy-ass senior admins to add some. >:("); });
+                }
+            });
+
             return;
         }
 
@@ -6603,19 +6681,28 @@ namespace RNC
             }
 
             int langID = -1;
-
-            Language lang = ContextFactory.Instance.Languages.ToList().Find(l => l.LanguageName.Equals(language, StringComparison.OrdinalIgnoreCase));
-            if(lang == null)
+            Task.Run(async () =>
             {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}A language with that ID could not be found. Use !{#FFFF00}/languages!{#FFFFFF}.");
-                return;
-            }
-            langID = lang.SQL_ID;
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Language lang = await context.Languages.FirstOrDefaultAsync(l => l.LanguageName.Equals(language, StringComparison.OrdinalIgnoreCase));
+                    if (lang == null)
+                    {
+                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}A language with that ID could not be found. Use !{#FFFF00}/languages!{#FFFFFF}."); });
+                        return;
+                    }
+                    langID = lang.SQL_ID;
 
-            EPlayer.GetAccount(player).Language = langID;
-            player.SetData("Language", lang);
-            player.TriggerEvent("pushMsgToChat", "!{#A6F7B9}[Language] You set your language to !{#FFFF00}" + lang.LanguageName + " !{#A6F7B9}& can now use /LC.");
-            EPlayer.Save(player);
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.GetAccount(player).Language = langID;
+                        player.SetData("Language", lang);
+                        player.TriggerEvent("pushMsgToChat", "!{#A6F7B9}[Language] You set your language to !{#FFFF00}" + lang.LanguageName + " !{#A6F7B9}& can now use /LC.");
+                        EPlayer.Save(player);
+                    });
+                }
+            });
+            
             return;
         }
 

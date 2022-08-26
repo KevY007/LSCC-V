@@ -1814,7 +1814,7 @@ namespace RNC
                 NAPI.Util.ConsoleOutput($"[DISCORD INTEGRATION] {player.Name}'s discord data was invalid, generating them new. This is a one time thing, unless discord data is deleted.");
             }
 
-            var linkedSQLs = EPlayer.GetLinkedAccounts(acc).Select(accs => accs.SQL_ID).ToList(); // BONKERS
+            var linkedSQLs = EPlayer.GetLinkedAccounts(acc).Result.Select(accs => accs.SQL_ID).ToList(); // BONKERS
 
             if(linkedSQLs.Intersect(ContextFactory.Instance.Bans.ToList().Select(bans => bans.AccountSQLID)).Any())
             {
