@@ -1117,12 +1117,18 @@ namespace RNC
 
             if (message.Equals("none"))
             {
-                foreach (Account acc in ContextFactory.Instance.Accounts)
-                {
-                    acc.MOTD = "none";
-                }
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You successfully deleted the server message of the day!");
-                ContextFactory.SaveDB();
+                Task.Run(async () =>
+                {
+                    using (MainDatabase context = ContextFactory.CreateContext())
+                    {
+                        await context.Accounts.ForEachAsync(acc =>
+                        {
+                            acc.MOTD = "none";
+                        });
+                        await context.SaveChangesAsync();
+                    }
+                });
                 return;
             }
 
@@ -1134,16 +1140,22 @@ namespace RNC
             };
             string jsonMotd = NAPI.Util.ToJson(newMotd);
 
-            foreach (Account acc in ContextFactory.Instance.Accounts)
+            Task.Run(async () =>
             {
-                acc.MOTD = jsonMotd;
-            }
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    await context.Accounts.ForEachAsync(acc =>
+                    {
+                        acc.MOTD = jsonMotd;
+                    });
+                    await context.SaveChangesAsync();
+                }
+            });
             foreach (Player pl in Settings.LoggedInPlayers)
             {
                 Main.DisplayMOTD(pl, newMotd);
             }
             player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You successfully updated the server message of the day!");
-            ContextFactory.SaveDB();
         }
 
         [Command("goto", "!{#AFAFAF}[USAGE] goto (target)")]
@@ -4179,7 +4191,7 @@ namespace RNC
                         {
                             using (MainDatabase context = ContextFactory.CreateContext())
                             {
-                                AdminNote _n = await ContextFactory.Instance.AdminNotes.FirstOrDefaultAsync(a => a.SQL_ID == nID);
+                                AdminNote _n = await context.AdminNotes.FirstOrDefaultAsync(a => a.SQL_ID == nID);
                                 anote_OnFindDeleteNote(player, _n, nID, target);
                             }
                         });
@@ -5507,7 +5519,7 @@ namespace RNC
                     if (tpAcc != null)
                     {
                         tpAcc.Suspended = 0;
-                        await ContextFactory.Instance.SaveChangesAsync();
+                        await context.SaveChangesAsync();
                         unsuspend_OnFinishTask(player, tpAcc);
                     }
                     else unsuspend_OnFinishTask(player, null);
@@ -5658,7 +5670,7 @@ namespace RNC
 
                     AccountManager.ClearForeignKeys(tpAcc);
                     context.Accounts.Remove(tpAcc);
-                    await ContextFactory.Instance.SaveChangesAsync();
+                    await context.SaveChangesAsync();
                     deleteaccount_SuccessTask(player, tpAcc.Username);
                 }
             });
@@ -5793,19 +5805,23 @@ namespace RNC
                 return;
             }
 
-            Account pAcc = ContextFactory.Instance.Accounts.ToList().Find(acc => acc.Username.Equals(accountname, StringComparison.OrdinalIgnoreCase));
-            if (pAcc == null)
-            {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Account does not exist. Use exact name. (case-insensitive)");
-                return;
-            }
 
-            Logs.LogAdmin(player, $"Checked {pAcc.Username}'s accounts.");
+
 
             Task.Run(async () =>
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
+                    Account pAcc = await context.Accounts.FirstOrDefaultAsync(acc => acc.Username.Equals(accountname, StringComparison.OrdinalIgnoreCase));
+                    if (pAcc == null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Account does not exist. Use exact name. (case-insensitive)");
+                        });
+                         return;
+                    }
+                    Logs.LogAdmin(player, $"Checked {pAcc.Username}'s accounts.");
                     var accounts = EPlayer.GetLinkedAccounts(pAcc).Result; // BONKERS
 
                     if (accounts.Count > 1)
@@ -8883,29 +8899,38 @@ namespace RNC
             player.TriggerEvent("SetTimeWeather", 12, 0, 0, 0);
 
             EPlayer.Notify(player, $"Now tuning: {vehicleModel}<p>LMB to switch camera, menu keys to select, horn and lights can be used by default keys.</p> <p>DISCLAIMER: Removing components is not refundable.</p>", "green", "fas fa-exclamation", false, 10000, "topCenter");
-           
-            var inst = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.Model == veh.Model && a.AccountSQLID == EPlayer.GetAccount(player).SQL_ID);
-            if (inst != null)
-            {
-                veh.PrimaryColor = inst.PrimaryColor;
-                veh.SecondaryColor = inst.SecondaryColor;
-
-                foreach (var kvp in NAPI.Util.FromJson<Dictionary<int, int>>(inst.Mods))
+            EPlayer.SendMessage(player, "~y~Loading car tunings...");
+            Task.Run(async () => {
+                using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    veh.SetMod(kvp.Key, kvp.Value);
-                    
-                    if (kvp.Key == 56) veh.WheelType = kvp.Value;
+                    var inst = await context.PlayerTunings.FirstOrDefaultAsync(a => a.Model == veh.Model && a.AccountSQLID == EPlayer.GetAccount(player).SQL_ID);
+                    NAPI.Task.Run(() =>
+                    {
+                        if (inst != null)
+                        {
+                            veh.PrimaryColor = inst.PrimaryColor;
+                            veh.SecondaryColor = inst.SecondaryColor;
 
-                    if (kvp.Key == 53 || kvp.Key == 55 || kvp.Key == 56) player.TriggerEvent("SetOtherMods", kvp.Key, kvp.Value);
+                            foreach (var kvp in NAPI.Util.FromJson<Dictionary<int, int>>(inst.Mods))
+                            {
+                                veh.SetMod(kvp.Key, kvp.Value);
+
+                                if (kvp.Key == 56) veh.WheelType = kvp.Value;
+
+                                if (kvp.Key == 53 || kvp.Key == 55 || kvp.Key == 56) player.TriggerEvent("SetOtherMods", kvp.Key, kvp.Value);
+                            }
+                            veh.PearlescentColor = inst.PearlescentColor;
+                            veh.WheelColor = inst.WheelColor;
+                        }
+
+                        player.SetData("Tuner_CurrentItems", inst);
+
+                        player.TriggerEvent("OpenTuner", veh.Id);
+                        player.Dimension = dim; // FIRST THE TUNER SETTING ID AND THEN LAODING CAR
+                    });                    
                 }
-                veh.PearlescentColor = inst.PearlescentColor;
-                veh.WheelColor = inst.WheelColor;
-            }
-
-            player.SetData("Tuner_CurrentItems", inst);
-
-            player.TriggerEvent("OpenTuner", veh.Id);
-            player.Dimension = dim; // FIRST THE TUNER SETTING ID AND THEN LAODING CAR
+            });
+            
         }
 
         [Command("tuneveh")]
