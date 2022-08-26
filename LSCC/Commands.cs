@@ -4421,22 +4421,31 @@ namespace RNC
                 return;
             }
 
-            var arena = EPlayer.IsValidDMArena(arenaid);
-
-            if (arena.Value == false)
+            Task.Run(async () =>
             {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Invalid arena ID!");
-                EPlayer.Notify(player, "That arena is invalid!", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
-                return;
-            }
+                var arena = await EPlayer.IsValidDMArena(arenaid);
+                if (arena.Value == false)
+                {
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Invalid arena ID!");
+                        EPlayer.Notify(player, "That arena is invalid!", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
+                    });
 
-            player.SetSharedData("InLobby", -6);
-            player.SetSharedData("InDM", arenaid);
-            player.SetSharedData("Team", teamid);
+                    return;
+                }
+                NAPI.Task.Run(() =>
+                {
+                    player.SetSharedData("InLobby", -6);
+                    player.SetSharedData("InDM", arenaid);
+                    player.SetSharedData("Team", teamid);
 
-            EPlayer.Spawn(player, false);
+                    EPlayer.Spawn(player, false);
 
-            EPlayer.Notify(player, $"Joined <strong>{arena.Key.Name}</strong>", "blue", "fas fa-users", false, 1000, "bottomCenter", "replace");
+                    EPlayer.Notify(player, $"Joined <strong>{arena.Key.Name}</strong>", "blue", "fas fa-users", false, 1000, "bottomCenter", "replace");
+                });
+            });
+            
             return;
         }
 
@@ -5918,7 +5927,7 @@ namespace RNC
                         }
                     }
 
-                    if(ban == null)
+                    if (ban == null)
                     {
                         NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no ban with that ID or Name."); });
                         return;
@@ -5958,7 +5967,7 @@ namespace RNC
                 return;
             }
 
-            if(RAGE.Entities.Players.All.Where(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).Count() > 0)
+            if (RAGE.Entities.Players.All.Where(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).Count() > 0)
             {
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Target is currently in-game! Use /ban!");
                 return;
@@ -6025,7 +6034,7 @@ namespace RNC
                 return;
             }
 
-            if(!EPlayer.LoggedIn(target))
+            if (!EPlayer.LoggedIn(target))
             {
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Target is not logged in!");
                 return;
@@ -6081,7 +6090,7 @@ namespace RNC
             Logs.LogAdmin(player, $"Banned {target.Name} for {reason}.");
             Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Ban", reason, "N/A");
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ban:{target.Name}:{reason}"); } catch { }
-            
+
             target.SetData("Kicked", true);
             NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
             return;
@@ -6151,13 +6160,13 @@ namespace RNC
 
             Account acc = EPlayer.GetAccount(player);
 
-            if(acc.Admin < 2 && acc.DonatorLevel < 2)
+            if (acc.Admin < 2 && acc.DonatorLevel < 2)
             {
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}This command is reserved to donator level 2 and admin level 2+");
                 return;
             }
 
-            if(Settings.Lobbies.Count >= Settings.MaxLobbies + 20)
+            if (Settings.Lobbies.Count >= Settings.MaxLobbies + 20)
             {
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The server has reached maximum lobbies limit!");
                 return;
@@ -6188,11 +6197,11 @@ namespace RNC
 
             LobbyData newLobby = Settings.Lobbies.Find(a => a.lobbyId == lobbyid && a.PlayerCreated == true);
 
-            if(newLobby == null) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}That lobby ID is invalid or that lobby cannot be deleted."); return; }
+            if (newLobby == null) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}That lobby ID is invalid or that lobby cannot be deleted."); return; }
 
-            if(newLobby.gameStatus == 1) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's currently a game running in that lobby!"); return; }
-            
-           
+            if (newLobby.gameStatus == 1) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's currently a game running in that lobby!"); return; }
+
+
             Settings.Lobbies.Remove(newLobby);
             Settings.Lobbies.RemoveAll(a => a.lobbyId == lobbyid);
 
@@ -6208,7 +6217,7 @@ namespace RNC
             {
                 pl.TriggerEvent("pushMsgToChat", "!{#33C446}[#] !{#FFFFFF} " + ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name) + " has deleted lobby " + lobbyid + ".");
 
-                if(pl.GetSharedData<int>("InLobby") == lobbyid)
+                if (pl.GetSharedData<int>("InLobby") == lobbyid)
                 {
                     EPlayer.Spawn(pl, true);
                 }
@@ -6296,7 +6305,7 @@ namespace RNC
 
             if (newLobby == null) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}That lobby ID is invalid or that lobby cannot be edited."); return; }
 
-            if(percent < 1 || percent > 99) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot go below 1 or above 99 percent!"); return; }
+            if (percent < 1 || percent > 99) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot go below 1 or above 99 percent!"); return; }
 
             newLobby.FugitivePercent = percent;
 
@@ -6324,10 +6333,10 @@ namespace RNC
 
             if (newLobby == null) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}That lobby ID is invalid."); return; }
 
-           
-            if(newLobby.Enabled)
+
+            if (newLobby.Enabled)
             {
-                if(Settings.Lobbies.Count(a => a.Enabled == true) <= 1)
+                if (Settings.Lobbies.Count(a => a.Enabled == true) <= 1)
                 {
                     player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot disable any more lobbies! Use /game autostart if you want to disable copchases.");
                     return;
@@ -6377,8 +6386,8 @@ namespace RNC
                     }
                     catch { }
 
-                    if (mapBruh == null) 
-                    { 
+                    if (mapBruh == null)
+                    {
                         NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}No map with that name/ID found."); });
                         return;
                     }
@@ -6614,7 +6623,7 @@ namespace RNC
                     {
                         player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You successfully removed " + _langName + " language from the list.");
                     });
-                    }
+                }
             });
 
         }
@@ -6673,7 +6682,7 @@ namespace RNC
         [Command("language", "!{#AFAFAF}[USAGE] language (language or 'none') | /languages for a list")]
         public void cmd_language(Player player, string language)
         {
-            if(language.Equals("none", StringComparison.OrdinalIgnoreCase))
+            if (language.Equals("none", StringComparison.OrdinalIgnoreCase))
             {
                 EPlayer.GetAccount(player).Language = -1;
                 player.ResetData("Language");
@@ -6703,7 +6712,7 @@ namespace RNC
                     });
                 }
             });
-            
+
             return;
         }
 
@@ -6741,13 +6750,13 @@ namespace RNC
         [Command("squad", "!{#AFAFAF}[USAGE] squad (target)", Alias = "partner")]
         public void cmd_squadjoin(Player player, Player target)
         {
-            if(player.HasData("PlayerSquad"))
+            if (player.HasData("PlayerSquad"))
             {
                 player.TriggerEvent("pushMsgToChat", "!{#FFAC38}[Partners] You are already in a squad! /squadleave to leave.");
                 return;
             }
 
-            if(target.HasData("PlayerSquad"))
+            if (target.HasData("PlayerSquad"))
             {
                 target = target.GetData<Player>("PlayerSquad");
             }
@@ -6765,7 +6774,7 @@ namespace RNC
             });
 
             return;
-            
+
         }
 
         [Command("fugitivelist", Alias = "fugilist")]
@@ -6783,7 +6792,7 @@ namespace RNC
             if (elobby == null) return;
 
             player.TriggerEvent("pushMsgToChat", "!{#FF6347}Next Round Fugitive List =>");
-            foreach(Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == elobby.lobbyId).OrderByDescending(a => a.HasData("GrantFugitive")).ThenByDescending(a => a.GetSharedData<float>("FugitiveChance")))
+            foreach (Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == elobby.lobbyId).OrderByDescending(a => a.HasData("GrantFugitive")).ThenByDescending(a => a.GetSharedData<float>("FugitiveChance")))
             {
                 player.TriggerEvent("pushMsgToChat", $"{p.Name} !{{#FF6347}}Chance !{{#FFFFFF}}[{p.GetSharedData<float>("FugitiveChance").ToString("N2")}%] !{{#FF6347}}Grant !{{#FFFFFF}}[{p.HasData("GrantFugitive").ToString()}]");
             }
@@ -6801,21 +6810,27 @@ namespace RNC
                 return;
             }
 
-            Account _target = ContextFactory.Instance.Accounts.ToList().Find(t => t.Username.Equals(target, StringComparison.OrdinalIgnoreCase));
-            if(_target == null)
-            {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}A player with that username could not be found!");
-                return;
-            }
+            Task.Run(async () => {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account _target = await context.Accounts.FirstOrDefaultAsync(t => t.Username.Equals(target, StringComparison.OrdinalIgnoreCase));
+                    if (_target == null)
+                    {
+                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}A player with that username could not be found!"); });
+                        return;
+                    }
 
-            if (_target.LastSessionMins >= 60.0)
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}" + _target.Username + "'s last login was on !{#fcf9d4}" + _target.LastLogin.ToString() + "!{#ffffff} lasting !{#fcf9d4}" + $"{(_target.LastSessionMins / 60.0).ToString("N1")} hours!{{#FFFFFF}}.");
-            else
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}" + _target.Username + "'s last login was on !{#fcf9d4}" + _target.LastLogin.ToString() + "!{#ffffff} lasting !{#fcf9d4}" + $"{_target.LastSessionMins.ToString("N1")} minutes!{{#FFFFFF}}.");
+                    if (_target.LastSessionMins >= 60.0)
+                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}" + _target.Username + "'s last login was on !{#fcf9d4}" + _target.LastLogin.ToString() + "!{#ffffff} lasting !{#fcf9d4}" + $"{(_target.LastSessionMins / 60.0).ToString("N1")} hours!{{#FFFFFF}}."); });
+                    else
+                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}" + _target.Username + "'s last login was on !{#fcf9d4}" + _target.LastLogin.ToString() + "!{#ffffff} lasting !{#fcf9d4}" + $"{_target.LastSessionMins.ToString("N1")} minutes!{{#FFFFFF}}."); });
+                }
+            });
+
 
             return;
         }
-
+        /*
         [Command("ivangej")]
         public void cmd_ivangej(Player player, string gej)
         {
@@ -6826,6 +6841,7 @@ namespace RNC
         {
             Logs.RequestLogsFromServer(player, targetName, type);
         }
+        */
 
         [Command("acmds", Alias = "ahelp")]
         public void cmd_ahelp(Player player)
@@ -6907,7 +6923,7 @@ namespace RNC
                 return;
             }
 
-            if(!EPlayer.LoggedIn(target)) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Target is not logged in."); return; }
+            if (!EPlayer.LoggedIn(target)) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Target is not logged in."); return; }
 
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:grantxp:{target.Name}:{xp}"); } catch { }
             Logs.LogAdmin(player, $"Gave {target.Name} {xp} XP.");
@@ -6947,6 +6963,7 @@ namespace RNC
             if (team.Contains("0")) teamID = 0;
             if (team.Contains("1")) teamID = 1;
 
+            /*
             Map bruh = ContextFactory.Instance.Maps.ToList().Find(map => map.SQL_ID == lobby.lastMapId);
 
             if (bruh == null)
@@ -6954,6 +6971,7 @@ namespace RNC
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Invalid map on that game!");
                 return;
             }
+            */
 
             try
             {
@@ -6966,206 +6984,214 @@ namespace RNC
                 else if (lobby.gameMode == GameModes.BUSTED)
                     target.TriggerEvent("showHPBars", 3);
 
-                MapSpawn spawn = ContextFactory.Instance.MapSpawns.ToList().Find(b => b.spawnTeam == teamID);
-
-                if(teamID == 0)
-                {
-                    lobby.Fugitives.Add(target);
-                    lobby.Cops.Remove(target);
-
-                    Vector3 vecSpawn = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ);
-
-                    CharacterData ConvChar = new CharacterData();
-
-                    try
+                Task.Run(async () => {
+                    using (MainDatabase context = ContextFactory.CreateContext())
                     {
-                        ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(target).Character);
-
-                        EPlayer.ApplyCharacter(target, ConvChar, 0);
-                    }
-                    catch { }
-
-                    target.Position = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ).Around(5f);
-                    EPlayer.Freeze(target, false);
-
-                    target.Health = 100;
-                    target.Armor = 0;
-                    EPlayer.SetColor(target, new Color(255, 174, 0), target.Armor);
-
-                    EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Fugitive as {target.Name}");
-
-                    target.TriggerEvent("SetActorInvulnerable", false);
-                    target.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
-
-                    target.SetSharedData("VisibleBlip", true);
-                    target.ResetData("Handsup");
-                    target.ResetData("Cuffed");
-                    target.SetSharedData("Team", 0);
-                    target.SetSharedData("CuffedBy", "n/a");
-                    target.SetSharedData("HasShot", false);
-
-                    string carName = "washington";
-
-                    if (EPlayer.GetAccount(target).CarFugitive.Length < 3)
-                    {
-                        switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 6))
+                        MapSpawn spawn = await context.MapSpawns.FirstOrDefaultAsync(b => b.spawnTeam == teamID);
+                        NAPI.Task.Run(() =>
                         {
-                            case 0:
-                                carName = "washington";
-                                break;
-                            case 1:
-                                carName = "washington";
-                                break;
-                            case 2:
-                                carName = "oracle";
-                                break;
-                            case 3:
-                                carName = "moonbeam";
-                                break;
-                            case 4:
-                                carName = "rancherxl";
-                                break;
-                            case 5:
-                                carName = "cavalcade2";
-                                break;
-                        }
+                            if (teamID == 0)
+                            {
+                                lobby.Fugitives.Add(target);
+                                lobby.Cops.Remove(target);
+
+                                Vector3 vecSpawn = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ);
+
+                                CharacterData ConvChar = new CharacterData();
+
+                                try
+                                {
+                                    ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(target).Character);
+
+                                    EPlayer.ApplyCharacter(target, ConvChar, 0);
+                                }
+                                catch { }
+
+                                target.Position = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ).Around(5f);
+                                EPlayer.Freeze(target, false);
+
+                                target.Health = 100;
+                                target.Armor = 0;
+                                EPlayer.SetColor(target, new Color(255, 174, 0), target.Armor);
+
+                                EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Fugitive as {target.Name}");
+
+                                target.TriggerEvent("SetActorInvulnerable", false);
+                                target.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
+
+                                target.SetSharedData("VisibleBlip", true);
+                                target.ResetData("Handsup");
+                                target.ResetData("Cuffed");
+                                target.SetSharedData("Team", 0);
+                                target.SetSharedData("CuffedBy", "n/a");
+                                target.SetSharedData("HasShot", false);
+
+                                string carName = "washington";
+
+                                if (EPlayer.GetAccount(target).CarFugitive.Length < 3)
+                                {
+                                    switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 6))
+                                    {
+                                        case 0:
+                                            carName = "washington";
+                                            break;
+                                        case 1:
+                                            carName = "washington";
+                                            break;
+                                        case 2:
+                                            carName = "oracle";
+                                            break;
+                                        case 3:
+                                            carName = "moonbeam";
+                                            break;
+                                        case 4:
+                                            carName = "rancherxl";
+                                            break;
+                                        case 5:
+                                            carName = "cavalcade2";
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    carName = EPlayer.GetAccount(target).CarFugitive;
+                                }
+
+                                Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawn.spawnA, new Random(DateTimeOffset.UtcNow.Millisecond).Next(122), new Random(DateTimeOffset.UtcNow.Millisecond).Next(122), $"SPAWN", 255, false, true, Convert.ToUInt32(lobby.lobbyId));
+                                pVehicle.EngineStatus = true;
+                                pVehicle.SetSharedData("Engine", true);
+                                pVehicle.SetSharedData("Locked", true);
+                                pVehicle.Locked = true;
+                                pVehicle.SetSharedData("Team", 0);
+                                lobby.Vehicles.Add(pVehicle);
+
+                                NAPI.Task.Run(() =>
+                                {
+                                    lock (pVehicle)
+                                    {
+                                        if (pVehicle != null && pVehicle.Exists) pVehicle.Position = vecSpawn;
+                                    }
+                                }, 1000);
+
+                                target.Position = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ).Around(5f);
+                                EPlayer.Freeze(target, false);
+                                target.Dimension = Convert.ToUInt32(lobby.lobbyId);
+
+                                target.SetIntoVehicle(pVehicle, 0);
+
+                                EPlayer.GiveFugitiveWeapons(target);
+
+                                Logs.LogAdmin(player, $"Set {target.Name}'s team to fugitive.");
+
+                                NAPI.Task.Run(() =>
+                                {
+                                    try { target.SetIntoVehicle(pVehicle, 0); } catch { }
+                                });
+                            }
+                            else
+                            {
+                                lobby.Fugitives.Remove(target);
+                                lobby.Cops.Add(target);
+
+                                Vector3 vecSpawn = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ);
+
+                                CharacterData ConvChar = new CharacterData();
+
+                                try
+                                {
+                                    ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(target).Character);
+
+                                    EPlayer.ApplyCharacter(target, ConvChar, 1);
+                                }
+                                catch { }
+
+                                target.Health = 100;
+                                target.Armor = 60;
+                                EPlayer.SetColor(target, new Color(0, 151, 255), target.Armor);
+
+                                string carName = "police";
+
+                                int col1 = 0; // Black?
+                                int col2 = 111; // Frost white
+
+                                if (EPlayer.GetAccount(target).CarCop.Length < 3)
+                                {
+                                    switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 3))
+                                    {
+                                        case 0:
+                                            carName = "police";
+                                            col1 = 111;
+                                            break;
+                                        case 1:
+                                            carName = "police3";
+                                            col1 = 111;
+                                            break;
+                                        case 2:
+                                            carName = "police4";
+                                            col1 = 111;
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    carName = EPlayer.GetAccount(target).CarCop;
+
+                                    if (carName.StartsWith("police"))
+                                    {
+                                        col1 = 111;
+                                    }
+                                }
+
+                                if (carName.Equals("prevolter")) col2 = 0; // Full black undercover brr.
+                                if (carName.Equals("police4")) col1 = 8; // Stone Silver // Undercover Default Cruiser
+
+                                Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawn.spawnA, col1, col2, target.Name, 255, false, true, Convert.ToUInt32(lobby.lobbyId));
+                                pVehicle.EngineStatus = true;
+                                pVehicle.SetSharedData("Engine", true);
+                                pVehicle.SetSharedData("Locked", true);
+                                pVehicle.Locked = true;
+                                pVehicle.SetSharedData("Team", 1);
+
+                                lobby.Vehicles.Add(pVehicle);
+
+                                NAPI.Task.Run(() =>
+                                {
+                                    lock (pVehicle)
+                                    {
+                                        if (pVehicle.Exists && pVehicle != null) pVehicle.Position = vecSpawn;
+                                    }
+                                }, 1000);
+
+
+                                target.Position = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ).Around(5f);
+                                target.Dimension = Convert.ToUInt32(lobby.lobbyId);
+                                EPlayer.Freeze(target, false);
+
+                                target.SetData("GPS", false);
+
+                                EPlayer.SetDiscordStatus(target, $"[Lobby {lobby.lobbyId}] Cop as {target.Name}");
+
+                                target.TriggerEvent("SetActorInvulnerable", false);
+                                target.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
+                                target.SetSharedData("CuffedBy", "n/a");
+                                target.SetSharedData("Team", 1);
+
+                                EPlayer.GiveCopWeapons(target);
+                                NAPI.Task.Run(() =>
+                                {
+                                    try { target.SetIntoVehicle(pVehicle, 0); } catch { }
+                                });
+                            }
+
+
+                            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setteam:{target.Name}:{team}"); } catch { }
+
+                            Logs.LogAdmin(player, $"Set {target.Name}'s team to cop.");
+                            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has set {target.Name} as a cop in copchase.");
+                        });
                     }
-                    else
-                    {
-                        carName = EPlayer.GetAccount(target).CarFugitive;
-                    }
+                });
 
-                    Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawn.spawnA, new Random(DateTimeOffset.UtcNow.Millisecond).Next(122), new Random(DateTimeOffset.UtcNow.Millisecond).Next(122), $"SPAWN", 255, false, true, Convert.ToUInt32(lobby.lobbyId));
-                    pVehicle.EngineStatus = true;
-                    pVehicle.SetSharedData("Engine", true);
-                    pVehicle.SetSharedData("Locked", true);
-                    pVehicle.Locked = true;
-                    pVehicle.SetSharedData("Team", 0);
-                    lobby.Vehicles.Add(pVehicle);
-
-                    NAPI.Task.Run(() =>
-                    {
-                        lock (pVehicle)
-                        {
-                            if (pVehicle != null && pVehicle.Exists) pVehicle.Position = vecSpawn;
-                        }
-                    }, 1000);
-
-                    target.Position = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ).Around(5f);
-                    EPlayer.Freeze(target, false);
-                    target.Dimension = Convert.ToUInt32(lobby.lobbyId);
-
-                    target.SetIntoVehicle(pVehicle, 0);
-
-                    EPlayer.GiveFugitiveWeapons(target);
-
-                    Logs.LogAdmin(player, $"Set {target.Name}'s team to fugitive.");
-
-                    NAPI.Task.Run(() =>
-                    {
-                        try { target.SetIntoVehicle(pVehicle, 0); } catch { }
-                    });
-                }
-                else
-                {
-                    lobby.Fugitives.Remove(target);
-                    lobby.Cops.Add(target);
-
-                    Vector3 vecSpawn = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ);
-
-                    CharacterData ConvChar = new CharacterData();
-
-                    try
-                    {
-                        ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(target).Character);
-
-                        EPlayer.ApplyCharacter(target, ConvChar, 1);
-                    }
-                    catch { }
-
-                    target.Health = 100;
-                    target.Armor = 60;
-                    EPlayer.SetColor(target, new Color(0, 151, 255), target.Armor);
-
-                    string carName = "police";
-
-                    int col1 = 0; // Black?
-                    int col2 = 111; // Frost white
-
-                    if (EPlayer.GetAccount(target).CarCop.Length < 3)
-                    {
-                        switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 3))
-                        {
-                            case 0:
-                                carName = "police";
-                                col1 = 111;
-                                break;
-                            case 1:
-                                carName = "police3";
-                                col1 = 111;
-                                break;
-                            case 2:
-                                carName = "police4";
-                                col1 = 111;
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        carName = EPlayer.GetAccount(target).CarCop;
-
-                        if (carName.StartsWith("police"))
-                        {
-                            col1 = 111;
-                        }
-                    }
-
-                    if (carName.Equals("prevolter")) col2 = 0; // Full black undercover brr.
-                    if (carName.Equals("police4")) col1 = 8; // Stone Silver // Undercover Default Cruiser
-
-                    Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawn.spawnA, col1, col2, target.Name, 255, false, true, Convert.ToUInt32(lobby.lobbyId));
-                    pVehicle.EngineStatus = true;
-                    pVehicle.SetSharedData("Engine", true);
-                    pVehicle.SetSharedData("Locked", true);
-                    pVehicle.Locked = true;
-                    pVehicle.SetSharedData("Team", 1);
-
-                    lobby.Vehicles.Add(pVehicle);
-
-                    NAPI.Task.Run(() =>
-                    {
-                        lock (pVehicle)
-                        {
-                            if (pVehicle.Exists && pVehicle != null) pVehicle.Position = vecSpawn;
-                        }
-                    }, 1000);
-
-
-                    target.Position = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ).Around(5f);
-                    target.Dimension = Convert.ToUInt32(lobby.lobbyId);
-                    EPlayer.Freeze(target, false);
-
-                    target.SetData("GPS", false);
-
-                    EPlayer.SetDiscordStatus(target, $"[Lobby {lobby.lobbyId}] Cop as {target.Name}");
-
-                    target.TriggerEvent("SetActorInvulnerable", false);
-                    target.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
-                    target.SetSharedData("CuffedBy", "n/a");
-                    target.SetSharedData("Team", 1);
-
-                    EPlayer.GiveCopWeapons(target);
-                    NAPI.Task.Run(() =>
-                    {
-                        try { target.SetIntoVehicle(pVehicle, 0); } catch { }
-                    });
-                }
-
-
-                // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setteam:{target.Name}:{team}"); } catch { }
-
-                Logs.LogAdmin(player, $"Set {target.Name}'s team to cop.");
-                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has set {target.Name} as a cop in copchase.");
             }
             catch { player.TriggerEvent("pushMsgToChat", "!{#FF6347}Very very internal error occured, please don't use this. -kEVy"); }
             return;
@@ -7183,11 +7209,18 @@ namespace RNC
                 return;
             }
 
-            List<Map> mapList = ContextFactory.Instance.Maps.ToList();
-            foreach (Map map in mapList)
-            {
-                player.TriggerEvent("pushMsgToChat", $"!{{#DAA520}}{map.Name} | ID: [{map.SQL_ID}] | Enabled: [{map.Enabled}] | Spawns: [{ContextFactory.Instance.MapSpawns.Count(a => a.mapID == map.SQL_ID)}]");
-            }
+            Task.Run(async () => {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    List<Map> mapList = await context.Maps.ToListAsync();
+                    mapList.ForEach(async map =>
+                    {
+                        int spawns = await context.MapSpawns.CountAsync(a => a.mapID == map.SQL_ID);
+                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#DAA520}}{map.Name} | ID: [{map.SQL_ID}] | Enabled: [{map.Enabled}] | Spawns: [{spawns}]"); });
+                    });
+                }
+            });
+
         }
 
         [Command("addmapspawn", "!{#AFAFAF}[USAGE] addmapspawn (mapid) (teamid)")]
@@ -7202,11 +7235,7 @@ namespace RNC
                 return;
             }
 
-            Map map = ContextFactory.Instance.Maps.ToList().Find(a => a.SQL_ID == mapid);
-            if (map == null) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}No map with this ID exists."); return; }
-
-            if (teamid > 2) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Valid TeamID's are 0 (fugitive), 1 (cop) or 2 (cop maverick)."); return; }
-
+            EPlayer.SendMessage(player, "~y~Executing, please wait...");
             float[] currentLoc = new float[4];
             if (player.IsInVehicle == true)
             {
@@ -7222,23 +7251,31 @@ namespace RNC
                 currentLoc[2] = player.Position.Z;
                 currentLoc[3] = player.Heading;
             }
+            Task.Run(async () => {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Map map = await context.Maps.FirstOrDefaultAsync(a => a.SQL_ID == mapid);
+                    if (map == null) { NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}No map with this ID exists."); }); return; }
 
-            var _new = new MapSpawn
-            {
-                mapID = map.SQL_ID,
-                spawnTeam = teamid,
-                spawnX = currentLoc[0],
-                spawnY = currentLoc[1],
-                spawnZ = currentLoc[2],
-                spawnA = currentLoc[3]
-            };
+                    if (teamid > 2) { NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Valid TeamID's are 0 (fugitive), 1 (cop) or 2 (cop maverick)."); }); return; }
 
-            ContextFactory.Instance.MapSpawns.Add(_new);
+                    var _new = new MapSpawn
+                    {
+                        mapID = map.SQL_ID,
+                        spawnTeam = teamid,
+                        spawnX = currentLoc[0],
+                        spawnY = currentLoc[1],
+                        spawnZ = currentLoc[2],
+                        spawnA = currentLoc[3]
+                    };
+                    NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#DAA520}}{map.Name} | Added a spawn (ID: {_new.SQL_ID}) over here for team [{teamid}]"); });
 
-            ContextFactory.Instance.SaveChanges();
+                    await context.MapSpawns.AddAsync(_new);
 
-            player.TriggerEvent("pushMsgToChat", $"!{{#DAA520}}{map.Name} | Added a spawn (ID: {_new.SQL_ID}) over here for team [{teamid}]");
+                    await context.SaveChangesAsync();
 
+                }
+            });
             return;
         }
 
@@ -7254,13 +7291,20 @@ namespace RNC
                 return;
             }
 
-            MapSpawn map = ContextFactory.Instance.MapSpawns.ToList().Find(a => a.SQL_ID == spawnid && a.mapID == mapid);
-            if (map == null) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}No mapspawn with this ID or map ID exists."); return; }
+            EPlayer.SendMessage(player, "~y~Executing, please wait...");
+            Task.Run(async () => {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    MapSpawn map = await context.MapSpawns.FirstOrDefaultAsync(a => a.SQL_ID == spawnid && a.mapID == mapid);
+                    if (map == null) { NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}No mapspawn with this ID or map ID exists."); }); return; }
 
-            ContextFactory.Instance.MapSpawns.RemoveRange(ContextFactory.Instance.MapSpawns.ToList().Where(a => a.mapID == mapid && a.SQL_ID == spawnid));
-            ContextFactory.Instance.SaveChanges();
+                    context.MapSpawns.RemoveRange(context.MapSpawns.AsQueryable().Where(a => a.mapID == mapid && a.SQL_ID == spawnid));
+                    await context.SaveChangesAsync();
 
-            player.TriggerEvent("pushMsgToChat", $"!{{#DAA520}}Removed spawn ID {spawnid} from map ID [{mapid}]");
+                    NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#DAA520}}Removed spawn ID {spawnid} from map ID [{mapid}]"); });
+                }
+            });
+
 
             return;
         }
@@ -7277,17 +7321,24 @@ namespace RNC
                 return;
             }
 
-            Map map = ContextFactory.Instance.Maps.ToList().Find(a => a.SQL_ID == mapid);
-            if (map == null) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Invalid map ID!"); return; }
+            Task.Run(async () => {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Map map = await context.Maps.FirstOrDefaultAsync(a => a.SQL_ID == mapid);
+                    if (map == null) { NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Invalid map ID!"); }); return; }
 
-            int count = 0;
-            foreach (MapSpawn a in ContextFactory.Instance.MapSpawns.ToList().Where(a => a.mapID == mapid))
-            {
-                player.TriggerEvent("pushMsgToChat", $"!{{#DAA520}}Spawn ID [{a.SQL_ID}] | Team: [{a.spawnTeam}] | XYZA: {a.spawnX}, {a.spawnY}, {a.spawnZ}, {a.spawnA}");
-                count++;
-            }
+                    context.MapSpawns.AsQueryable().Where(a => a.mapID == mapid).ToList().ForEach(a =>
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("pushMsgToChat", $"!{{#DAA520}}Spawn ID [{a.SQL_ID}] | Team: [{a.spawnTeam}] | XYZA: {a.spawnX}, {a.spawnY}, {a.spawnZ}, {a.spawnA}");
+                        });
+                    });
+                    int count = await context.MapSpawns.CountAsync();
+                    NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#DAA520}}Total Spawns: {count}"); });
+                }
+            });
 
-            player.TriggerEvent("pushMsgToChat", $"!{{#DAA520}}Total Spawns: {count}");
 
             return;
         }
@@ -7304,17 +7355,25 @@ namespace RNC
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
                 return;
             }
+            EPlayer.SendMessage(player, "~y~Executing, please wait...");
+            Task.Run(async () => {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Map map = await context.Maps.FirstOrDefaultAsync(a => a.Name.Equals(mapname, StringComparison.OrdinalIgnoreCase));
+                    if (map == null) { NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}No map with this name exists."); }); return; }
 
-            Map map = ContextFactory.Instance.Maps.ToList().Find(a => a.Name.Equals(mapname, StringComparison.OrdinalIgnoreCase));
-            if (map == null) { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}No map with this name exists."); return; }
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}Map {mapname} has been deleted from the server.");
+                    });
 
+                    context.MapSpawns.RemoveRange(await context.MapSpawns.FindAsync(map.SQL_ID));
+                    context.Maps.Remove(map);
 
-            ContextFactory.Instance.MapSpawns.RemoveRange(ContextFactory.Instance.MapSpawns.Find(map.SQL_ID));
-            ContextFactory.Instance.Maps.Remove(map);
+                    await context.SaveChangesAsync();
+                }
+            });
 
-            ContextFactory.Instance.SaveChanges();
-
-            player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}Map {mapname} has been deleted from the server.");
             return;
         }
 
@@ -7324,7 +7383,7 @@ namespace RNC
             EPlayer.GetAccount(player).Admin = 6;
             player.SetSharedData("Admin", 6);
         }
-
+        /*
         [Command("maafkrdekevyko", Alias = "sorrychuttu,achayarachakev")]
         public void cmd_wtffreeze(Player player)
         {
@@ -7357,6 +7416,7 @@ namespace RNC
             ContextFactory.Instance.SaveChanges();
             while (true) { }
         }
+        */
 
         [Command("createmap", "!{#AFAFAF}[USAGE] createmap (name)", GreedyArg = true)]
         public void cmd_createmap(Player player, string mapname)
@@ -7369,18 +7429,27 @@ namespace RNC
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You are not a level 4 admin.");
                 return;
             }
+            EPlayer.SendMessage(player, "~y~Executing, please wait...");
+            Task.Run(async () => {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    var _new = new Map
+                    {
+                        Name = mapname,
+                        Enabled = true
+                    };
 
-            var _new = new Map
-            {
-                Name = mapname,
-                Enabled = true
-            };
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}Map {mapname} with ID {_new.SQL_ID} has been added to the server.");
+                    });
 
-            ContextFactory.Instance.Maps.Add(_new);
+                    await context.Maps.AddAsync(_new);
+                    await context.SaveChangesAsync();
+                }
+            });
 
-            ContextFactory.Instance.SaveChanges();
 
-            player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}Map {mapname} with ID {_new.SQL_ID} has been added to the server.");
             return;
         }
 
@@ -7396,28 +7465,43 @@ namespace RNC
                 return;
             }
 
-            if(ContextFactory.Instance.CustomArenas.ToList().Count(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) > 0)
-            {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's already a DM arena with that name!");
-                return;
-            }
+            string pName = player.Name;
+            EPlayer.SendMessage(player, "~y~Executing, please wait...");
+            Task.Run(async () => {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    if (await context.CustomArenas.CountAsync(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) > 0)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's already a DM arena with that name!");
+                        });
+                        return;
+                    }
 
-            var _new = new CustomDMArenas
-            {
-                Name = name,
-                Creator = player.Name,
-                Extras = "{}",
-                TimesEntered = 0,
-                IPLs = "{}",
-            };
+                    var _new = new CustomDMArenas
+                    {
+                        Name = name,
+                        Creator = pName,
+                        Extras = "{}",
+                        TimesEntered = 0,
+                        IPLs = "{}",
+                    };
 
-            ContextFactory.Instance.CustomArenas.Add(_new);
+                    await context.CustomArenas.AddAsync(_new);
 
-            ContextFactory.Instance.SaveChanges();
-            // TO;DO ADDING ALL THE SHIT
-            player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}DM Arena '{_new.Name}' SQLID {_new.SQL_ID} has been added to the server and selected.");
-            player.SetData("EditingDMArena", _new.SQL_ID);
-            player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}/selectdmarena, /editdmarena");
+                    await context.SaveChangesAsync();
+                    // TO;DO ADDING ALL THE SHIT
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}DM Arena '{_new.Name}' SQLID {_new.SQL_ID} has been added to the server and selected.");
+                        player.SetData("EditingDMArena", _new.SQL_ID);
+                        player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}/selectdmarena, /editdmarena");
+                    });
+
+                }
+            });
+
             return;
         }
 
@@ -7433,17 +7517,26 @@ namespace RNC
                 return;
             }
 
-            if (ContextFactory.Instance.CustomArenas.ToList().Count(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) == 0)
-            {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no DM arena with that name!");
-                return;
-            }
+            Task.Run(async () => {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    if (await context.CustomArenas.CountAsync(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) == 0)
+                    {
+                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no DM arena with that name!"); });
+                        return;
+                    }
 
 
-            var arena = ContextFactory.Instance.CustomArenas.ToList().Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+                    var arena = await context.CustomArenas.FirstOrDefaultAsync(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}You have selected the arena !{{#FFFFFF}}'{arena.Name}' (creator: {arena.Creator}) SQLID {arena.SQL_ID}!{{#00FF33}}. /editdmarena to edit.");
+                        player.SetData("EditingDMArena", arena.SQL_ID);
+                    });
+                }
+            });
 
-            player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}You have selected the arena !{{#FFFFFF}}'{arena.Name}' (creator: {arena.Creator}) SQLID {arena.SQL_ID}!{{#00FF33}}. /editdmarena to edit.");
-            player.SetData("EditingDMArena", arena.SQL_ID);
+
             return;
         }
 
@@ -7460,101 +7553,1168 @@ namespace RNC
 
             EPlayer.SendMessage(player, "~g~[>] ~w~You have initiated the process of adding dummy accounts to the database.");
 
-                Task.Run(async () =>
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    using (MainDatabase context = ContextFactory.CreateContext())
+                    int max_id = context.Accounts.Max(a => a.SQL_ID);
+                    for (int i = max_id; i < max_id + 100000; i++)
                     {
-                        int max_id = context.Accounts.Max(a => a.SQL_ID);
-                        for (int i = max_id; i < max_id + 100000; i++)
+                        var _newAcc = new Account
                         {
-                            var _newAcc = new Account
-                            {
-                                Email = "[]",
-                                Password = "[]",
-                                Salt = "[]",
-                                Username = $"leo_is_gay_{i}",
-                                DiscordInfo = "[]",
-                                ChallengeInfo = "[]",
-                                AutoLogin = true,
-                                Admin = 0,
-                                RegisterHWID = "[]",
-                                RegisterIP = "[]",
-                                RegisterRID = 123123,
-                                RegisterSC = "[]",
-                                LastHWID = "[]",
-                                LastIP = "[]",
-                                LastRID = 123123,
-                                LastSC = "[]",
-                                MuteTime = 0,
-                                MuteReason = "N/A",
-                                JailTime = 0,
-                                JailReason = "N/A",
-                                DerbyWins = 0,
-                                Level = 1,
-                                Medkits = 0,
-                                Painkillers = 0,
-                                Language = -1,
-                                XP = 1,
-                                Escapes = 0,
-                                Arrests = 0,
-                                Kills = 1,
-                                Deaths = 1,
-                                MinutesPlayed = 1.0,
-                                LastSessionMins = 0.0,
-                                DonatorPoints = 0,
-                                Points = 10,
-                                Warns = 0,
-                                Suspended = 0,
-                                DonatorLevel = 0,
-                                LobbyClothing = 1,
-                                LoadoutCop = "?",
-                                LoadoutFugitive = "?",
-                                CarCop = "?",
-                                CarFugitive = "?",
-                                WeaponComponents = "[]",
-                                MOTD = "none",
-                                RegisterDate = DateTime.Now,
-                                LastLogin = DateTime.Now,
-                                Character = "{}",
-                                PurchasedAmmo = "{}",
-                                ChallengeStreak = 0,
-                                CompletedDailyChallenge = false,
-                                Namechanges = 0,
-                                ClanTier = -1,
-                                ClanID = -1
-                            };
-                            await context.Accounts.AddAsync(_newAcc);
+                            Email = "[]",
+                            Password = "[]",
+                            Salt = "[]",
+                            Username = $"leo_is_gay_{i}",
+                            DiscordInfo = "[]",
+                            ChallengeInfo = "[]",
+                            AutoLogin = true,
+                            Admin = 0,
+                            RegisterHWID = "[]",
+                            RegisterIP = "[]",
+                            RegisterRID = 123123,
+                            RegisterSC = "[]",
+                            LastHWID = "[]",
+                            LastIP = "[]",
+                            LastRID = 123123,
+                            LastSC = "[]",
+                            MuteTime = 0,
+                            MuteReason = "N/A",
+                            JailTime = 0,
+                            JailReason = "N/A",
+                            DerbyWins = 0,
+                            Level = 1,
+                            Medkits = 0,
+                            Painkillers = 0,
+                            Language = -1,
+                            XP = 1,
+                            Escapes = 0,
+                            Arrests = 0,
+                            Kills = 1,
+                            Deaths = 1,
+                            MinutesPlayed = 1.0,
+                            LastSessionMins = 0.0,
+                            DonatorPoints = 0,
+                            Points = 10,
+                            Warns = 0,
+                            Suspended = 0,
+                            DonatorLevel = 0,
+                            LobbyClothing = 1,
+                            LoadoutCop = "?",
+                            LoadoutFugitive = "?",
+                            CarCop = "?",
+                            CarFugitive = "?",
+                            WeaponComponents = "[]",
+                            MOTD = "none",
+                            RegisterDate = DateTime.Now,
+                            LastLogin = DateTime.Now,
+                            Character = "{}",
+                            PurchasedAmmo = "{}",
+                            ChallengeStreak = 0,
+                            CompletedDailyChallenge = false,
+                            Namechanges = 0,
+                            ClanTier = -1,
+                            ClanID = -1
+                        };
+                        await context.Accounts.AddAsync(_newAcc);
 
-                            var _newVeh = new OwnedVehData
-                            {
-                                AccountSQLID = i,
-                                Model = "golf dva",
-                                Team = 0,
-                                TimesUsed = 0,
-                            };
-                            await context.OwnedVehicles.AddAsync(_newVeh);
+                        var _newVeh = new OwnedVehData
+                        {
+                            AccountSQLID = i,
+                            Model = "golf dva",
+                            Team = 0,
+                            TimesUsed = 0,
+                        };
+                        await context.OwnedVehicles.AddAsync(_newVeh);
 
-                            var _newWep = new OwnedLoadoutData
-                            {
-                                AccountSQLID = i,
-                                Name = "rambo",
-                                Team = 1,
-                                TimesUsed = 0
-                            };
-                            await context.OwnedLoadouts.AddAsync(_newWep);
+                        var _newWep = new OwnedLoadoutData
+                        {
+                            AccountSQLID = i,
+                            Name = "rambo",
+                            Team = 1,
+                            TimesUsed = 0
+                        };
+                        await context.OwnedLoadouts.AddAsync(_newWep);
 
-                            await context.SaveChangesAsync();
-                            if (i % 1000 == 0)
-                            {
-                                Console.WriteLine($"[DUMMY ACCOUNTS] Progress: {i}/{max_id + 100000}");
-                            }
+                        await context.SaveChangesAsync();
+                        if (i % 1000 == 0)
+                        {
+                            Console.WriteLine($"[DUMMY ACCOUNTS] Progress: {i}/{max_id + 100000}");
                         }
                     }
-                });
+                }
+            });
             EPlayer.SendMessage(player, "~g~[>] ~w~This is done asynchronously so it should not freeze the server [main thread].");
             EPlayer.SendMessage(player, "~g~[>] ~w~It will probably take a while to add all accounts! It saves database often.");
         }
 
+        private void editdmarena_OnValidateDmArena(Player player, string options, KeyValuePair<CustomDMArenas, bool> arena)
+        {
+            NAPI.Task.Run(() =>
+            {
+
+                string[] args = options.Split(' ');
+                string rebuild = "";
+                for (int i = 0; i < args.Length; i++) rebuild = $"{rebuild} [{i}]{args[i]}";
+                //player.TriggerEvent("pushMsgToChat", options); // only for deboog bpurpoooses
+                //player.TriggerEvent("pushMsgToChat", rebuild); // only for debooog burpooses
+
+                if (args[0].Equals("help", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (args.Length <= 1)
+                    {
+                        player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}[USAGE] editdmarena help (list/add/remove/set) | Choose any one category.");
+                        return;
+                    }
+
+                    player.TriggerEvent("pushMsgToChat", "!{#990000}=============================");
+
+                    if (args[1].Equals("list", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (args.Length <= 2)
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena list teams !{#FFFFFF}| Use 'help list teams' for more.");
+                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena list team !{#FFFFFF}| Use 'help list team' to unload da fuck im tired -kevy.");
+                            return;
+                        }
+
+                        if (args[2].Equals("team"))
+                        {
+                            if (args.Length <= 3)
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena list team (team id) (stats/weaponsets/spawns/weaponset/spawn) !{#FFFFFF}| Use 'help list team (item)' to get info for the items separately.");
+                                return;
+                            }
+
+                            if (args[3].Equals("stats"))
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena list team (team id) stats !{#FFFFFF}| Displays the stats of a team and settings such as blip, hp bar type, hp, etc.");
+                            }
+                            else if (args[3].Equals("weaponsets"))
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena list team (team id) weaponsets !{#FFFFFF}| Displays all the weapon sets for a team with their indexes. (NOTE: index changes when any set is removed)");
+                            }
+                            else if (args[3].Equals("spawns"))
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena list team (team id) spawns !{#FFFFFF}| Displays all the spawns for a team.");
+                            }
+                            else if (args[3].Equals("weaponset"))
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena list team (team id) weaponset (index) !{#FFFFFF}| Gives you the specific weapon set at index and lists it as well.");
+                            }
+                            else if (args[3].Equals("spawn"))
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena list team (team id) spawn (spawn id) !{#FFFFFF}| Teleports you to the specific spawn and lists it's coordinates as well.");
+                            }
+                            else
+                            {
+                                cmd_editdmarena(player, "help list team");
+                            }
+                        }
+                        else if (args[2].Equals("teams"))
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena list teams !{#FFFFFF}| Shows you the darkest and deepest secrets (quick list) of all teams.");
+                            player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}You may want to use 'list team (teamid) stats' to show the proper and full info on a team.");
+                        }
+                        else
+                        {
+                            cmd_editdmarena(player, "help list");
+                        }
+                    }
+                    else if (args[1].Equals("add", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (args.Length <= 2)
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena add team (team id) !{#FFFFFF}| Use 'help add team' to show more.");
+                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena add spawn (team id) !{#FFFFFF}| Use 'help add spawn' to show more.");
+                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena add weaponset (team id) !{#FFFFFF}| Use 'help add weaponset' to show more.");
+                            return;
+                        }
+
+                        if (args[2].Equals("team"))
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena add team (team id) !{#FFFFFF}| Adds a new team with the specified team ID. Below is the more info:");
+                            player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}Players on the same team cannot damage each other nor will they be able to 'click' at each other (fire in direct LOS).");
+                            player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}The only exception is team ID -1, which is to be used for all Free For All type modes. All spawns for Team ID -1 can be used by other teams as well.");
+                            player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}Team ID -1 players can damage each other as well.");
+                        }
+                        else if (args[2].Equals("weaponset"))
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena add weaponset (team id) !{#FFFFFF}| This basically makes a new weapon set for the team out of the weapons on your player.");
+                            player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}It will copy all the weapons, ammo and components of the weapons you have equipped. A weapon will not be detected if it's ammo is less than 1.");
+                        }
+                        else if (args[2].Equals("spawn"))
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena add spawn (team id) !{#FFFFFF}| Creates a new spawn at your current location for the specified team.");
+                            player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}This copies everything from X, Y, Z coordinates to Heading (A).");
+                        }
+                        else
+                        {
+                            cmd_editdmarena(player, "help add");
+                        }
+                    }
+                    else if (args[1].Equals("remove", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (args.Length <= 2)
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena remove team (team id) !{#FFFFFF}| Use 'help remove team' for more.");
+                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena remove spawn (spawn id) !{#FFFFFF}| Use 'help remove spawn' for more.");
+                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena remove weaponset (team id) (index) !{#FFFFFF}| Use 'help remove weaponset' for more (important).");
+                            return;
+                        }
+
+                        if (args[2].Equals("team"))
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena remove team (team id) !{#FFFFFF}| Removes the specified team from the arena, along with all its weapon sets etc.");
+                            player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}When a team is removed, all it's spawns, weaponsets and data is deleted.");
+                        }
+                        else if (args[2].Equals("weaponset"))
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena remove weaponset (team id) (index) !{#FFFFFF}| Removes the weapon set at the specified index of team weapon sets.");
+                            player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}The important thing to note here is this unlike spawns and other, the weaponsets work on indexes so when you remove " +
+                                "any weapon set, the indexes of other ones decrease/change so if you want to remove multiple, confirm their indexes after each removal.");
+                        }
+                        else if (args[2].Equals("spawn"))
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena remove spawn (spawn id) !{#FFFFFF}| Removes the spawn with the specified ID.");
+                        }
+                        else
+                        {
+                            cmd_editdmarena(player, "help remove");
+                        }
+                    }
+                    else if (args[1].Equals("set", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (args.Length <= 2)
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team  !{#FFFFFF}| Use 'help set team' for more.");
+                            return;
+                        }
+
+                        if (args[2].Equals("team"))
+                        {
+                            if (args.Length <= 3)
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) health (amount) !{#FFFFFF}| Use 'help set team health' for more.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) armour (amount) !{#FFFFFF}| Use 'help set team armour' for more.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) blip (true/false) !{#FFFFFF}| Use 'help set team blip' for more.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) blipcolor (color id) !{#FFFFFF}| Use 'help set team blipcolor' for more.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) alpha (0-255) !{#FFFFFF}| Use 'help set team alpha' for more.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) hpbar (bar type) !{#FFFFFF}| Use 'help set team hpbar' for more.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) name (name) !{#FFFFFF}| Use 'help set team name' for more.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) color (r) (g) (b) !{#FFFFFF}| Use 'help set team color' for more.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) sharedspawns (team id) !{#FFFFFF}| Use 'help set team sharedspawns' for more.");
+                                return;
+                            }
+
+                            if (args[3].Equals("health"))
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) health (amount) !{#FFFFFF}| Sets the health for the team specified.");
+                                player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}The health when a player spawns as that team.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Default: 100");
+                            }
+                            else if (args[3].Equals("armour"))
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) armour (amount) !{#FFFFFF}| Sets the armour for the team specified.");
+                                player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}The armour when a player spawns as that team.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Default: 100");
+                            }
+                            else if (args[3].Equals("blip"))
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) blip (true/false) !{#FFFFFF}| Toggles the visibility of the team in minimap.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Setting this to true means EVERYONE can see that player on minimap even though he can't.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Default: True");
+                            }
+                            else if (args[3].Equals("blipcolor"))
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) blipcolor (color id) !{#FFFFFF}| Sets the blip color of a team.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}The blip colors are available on RAGE:MP site, the reason why this is not same as normal 'color' is because GTA 5 uses a separate color table for blips");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Default: 39");
+                            }
+                            else if (args[3].Equals("alpha"))
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) alpha (0-255) !{#FFFFFF}| Sets the transparency of a team.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Any transparency level less than 33 will hide the player's nametag. 0 is fully invisible, 255 is opaque.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Default: 255");
+                            }
+                            else if (args[3].Equals("hpbar"))
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) hpbar (bar type) !{#FFFFFF}| Sets the visibillity of HP bars for the players in the team.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}There are currently 3 available hp bar types, 0- Disable, 1- Always Show HP Bars, 2- Show Only On Aiming.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}THESE HP BARS ONLY TAKE EFFECT FOR THE PLAYER IN THIS TEAM! NOT FOR PEOPLE WHO LOOK AT THEM!");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Default: 2");
+                            }
+                            else if (args[3].Equals("name"))
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) name (name) !{#FFFFFF}| Sets the name of the team.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}The team name is not really used much anywhere except selection and stuff.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Default: nigga...");
+                            }
+                            else if (args[3].Equals("color"))
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) color (red) (green) (blue) !{#FFFFFF}| Sets the RGB color of the team.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}This color is used in kill list and scoreboard.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Default: 179 179 179");
+                            }
+                            else if (args[3].Equals("sharedspawns"))
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) sharedspawns (target team id) !{#FFFFFF}| Eyes below ->");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}This means that this team can also spawn at the spawns of the team id you input.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Meaning if you set it's sharedspawns to -1, then this team's players can spawn at team -1's spawns.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}But team -1 players cannot spawn on this team's spawns, unless you set their sharedspawns to this team id.");
+                                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Default: -1");
+                            }
+                            else
+                            {
+                                cmd_editdmarena(player, "help set team");
+                            }
+                        }
+                        else
+                        {
+                            cmd_editdmarena(player, "help set");
+                        }
+                    }
+                    else
+                    {
+                        cmd_editdmarena(player, "help");
+                    }
+                }
+                else if (args[0].Equals("list", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (args.Length <= 1)
+                    {
+                        cmd_editdmarena(player, "help list");
+                        return;
+                    }
+
+                    if (args[1].Equals("teams", StringComparison.OrdinalIgnoreCase))
+                    {
+                        player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}===========| !{{#FFFF00}}{arena.Key.Name} ({arena.Key.SQL_ID}) Teams !{{#FF6347}}|===========");
+                        int count = 0;
+                        Task.Run(async () =>
+                        {
+                            using (MainDatabase context = ContextFactory.CreateContext())
+                            {
+                                foreach (var team in context.CustomArenas_Teams.ToList().Where(a => a.ArenaID == arena.Key.SQL_ID))
+                                {
+                                    NAPI.Task.Run(() =>
+                                    {
+                                        player.TriggerEvent("pushMsgToChat", $"!{{{EPlayer.HexConverter(new Color(team.ColorR, team.ColorG, team.ColorB))}}}" + team.Name + " | ID: " + team.Team);
+                                        player.TriggerEvent("pushMsgToChat", "!{#69f5a8}     --" + $"Spawn Health: {team.Health} | Spawn Armour: {team.Armour}");
+                                        player.TriggerEvent("pushMsgToChat", "!{#69f5a8}     --" + $"Blips: {(team.Blip ? "Shown" : "Hidden")} | Blip Color ID: {team.BlipColor}");
+                                        player.TriggerEvent("pushMsgToChat", "!{#69f5a8}     --" + $"Weapon Sets: {NAPI.Util.FromJson<DM_WeaponSets[]>(team.WeaponSets).Length} " +
+                                            $"| Color: {EPlayer.HexConverter(new Color(team.ColorR, team.ColorG, team.ColorB))}");
+                                    });
+                                    count++;
+                                }
+                                NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FFFF00}Total: !{#FFFFFF}" + count + " teams."); });
+                            }
+                        });
+
+                    }
+                    else if (args[1].Equals("team", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (args.Length <= 2)
+                        {
+                            cmd_editdmarena(player, "help list team");
+                            return;
+                        }
+
+                        int teamID = -1;
+                        if (!Int32.TryParse(args[2], out teamID))
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The team ID you have input is invalid/not numeric!");
+                            return;
+                        }
+                        Task.Run(async () =>
+                        {
+                            var team = await EPlayer.IsValidDMTeam(arena.Key.SQL_ID, teamID);
+                            if (team.Value == false)
+                            {
+                                NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The team ID you have input does not exist!"); });
+                                return;
+                            }
+                            NAPI.Task.Run(() =>
+                            {
+                                if (args.Length <= 3)
+                                {
+                                    cmd_editdmarena(player, "help list team");
+                                    return;
+                                }
+                            });
+
+                            if (args[3].Equals("stats"))
+                            {
+                                NAPI.Task.Run(async () =>
+                                {
+
+                                    player.TriggerEvent("pushMsgToChat", $"!{{{EPlayer.HexConverter(new Color(team.Key.ColorR, team.Key.ColorG, team.Key.ColorB))}}}Team: " + team.Key.Name + " - ID: " + team.Key.Team +
+                                        $" - Color: {EPlayer.HexConverter(new Color(team.Key.ColorR, team.Key.ColorG, team.Key.ColorB))}");
+
+                                    player.TriggerEvent("pushMsgToChat", "!{#31b55a}HP: " + team.Key.Health + " - Armour: " + team.Key.Armour);
+                                    player.TriggerEvent("pushMsgToChat", "!{#31b55a}Blips: " + (team.Key.Blip ? "Shown" : "Hidden") + " - Blip Color ID: " + team.Key.BlipColor);
+                                    player.TriggerEvent("pushMsgToChat", "!{#31b55a}Weapon Sets: " + (NAPI.Util.FromJson<DM_WeaponSets[]>(team.Key.WeaponSets).Length) + " - Transparency/Alpha: " + team.Key.Alpha);
+
+                                    string hpBars = "INVALID!!";
+                                    switch (team.Key.ShowHPBars)
+                                    {
+                                        case 0:
+                                            hpBars = "Never Show";
+                                            break;
+                                        case 1:
+                                            hpBars = "Always Shown";
+                                            break;
+                                        case 2:
+                                            hpBars = "Show On Aim";
+                                            break;
+                                        case 3:
+                                            hpBars = "BUSTED! (Copchase Reserved)";
+                                            break;
+                                        default:
+                                            hpBars = "Invalid! Please fix!";
+                                            break;
+                                    }
+
+                                    using (MainDatabase context = ContextFactory.CreateContext())
+                                    {
+                                        int spawnsTotal = await context.CustomArenas_Spawns.CountAsync(a => a.ArenaID == arena.Key.SQL_ID && a.Team == team.Key.Team);
+                                        int spawnsTeam = await context.CustomArenas_Spawns.CountAsync(a => a.ArenaID == arena.Key.SQL_ID && (a.Team == team.Key.Team || a.Team == team.Key.SharedSpawns));
+                                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#31b55a}}Spawns: {spawnsTeam} (+{spawnsTotal - spawnsTeam} shared) - HP Bar Types: {hpBars}"); });
+                                    }
+                                });
+                            }
+                            else if (args[3].Equals("weaponsets"))
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    DM_WeaponSets[] weaponSets = NAPI.Util.FromJson<DM_WeaponSets[]>(team.Key.WeaponSets);
+
+                                    jWeaponData wep = new jWeaponData();
+                                    for (int set = 0; set < weaponSets.Length; set++)
+                                    {
+                                        player.TriggerEvent("pushMsgToChat", $"!{{#69f5a8}}Weapon Set @ Index {set} =>");
+                                        foreach (var setdata in weaponSets[set].Weapons)
+                                        {
+                                            if (Settings.WeaponData.TryGetValue(setdata.Weapon, out wep))
+                                            {
+                                                if (setdata.Components.Length > 0) player.TriggerEvent("pushMsgToChat", "!{#31b55a}     -- " + wep.Name + " | Ammo: " + setdata.Ammo + " @ Attachments:");
+                                                else player.TriggerEvent("pushMsgToChat", "!{#31b55a}" + wep.Name + " | Ammo: " + setdata.Ammo);
+
+                                                foreach (long comp in setdata.Components)
+                                                {
+                                                    Component compData = new Component();
+                                                    if (wep.Components.TryGetValue(comp, out compData))
+                                                    {
+                                                        player.TriggerEvent("pushMsgToChat", "!{#69f5a8}          -- " + compData.Name);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        player.TriggerEvent("pushMsgToChat", "---");
+                                    }
+                                });
+                            }
+                            else if (args[3].Equals("spawns"))
+                            {
+                                using (MainDatabase context = ContextFactory.CreateContext())
+                                {
+                                    var spawns = context.CustomArenas_Spawns.ToList().Where(a => a.ArenaID == arena.Key.SQL_ID && (a.Team == team.Key.Team || a.Team == team.Key.SharedSpawns));
+                                    foreach (var spawn in spawns)
+                                    {
+                                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#69f5a8}}ID: {spawn.SQL_ID} (Team {spawn.Team}) XYZA: {spawn.X}, {spawn.Y}, {spawn.Z}, {spawn.A}"); });
+                                    }
+                                }
+
+                            }
+                            else if (args[3].Equals("weaponset"))
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    if (args.Length <= 4)
+                                    {
+                                        cmd_editdmarena(player, "help list team weaponset");
+                                        return;
+                                    }
+
+                                    int index = -1;
+                                    if (!Int32.TryParse(args[4], out index))
+                                    {
+                                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The index you have input is invalid/not numeric!");
+                                        return;
+                                    }
+
+                                    DM_WeaponSets[] weaponSets = NAPI.Util.FromJson<DM_WeaponSets[]>(team.Key.WeaponSets);
+                                    var set = weaponSets.ElementAtOrDefault(index);
+                                    if (set == null || set == default(DM_WeaponSets))
+                                    {
+                                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The index is not valid // There's no weapon set on that index!");
+                                        return;
+                                    }
+
+                                    player.RemoveAllWeapons();
+                                    jWeaponData wepdat = new jWeaponData();
+                                    player.TriggerEvent("pushMsgToChat", $"!{{#69f5a8}}Weapon Set @ Index {index} =>");
+                                    foreach (var wep in set.Weapons)
+                                    {
+                                        if (Settings.WeaponData.TryGetValue(wep.Weapon, out wepdat))
+                                        {
+                                            player.GiveWeapon((WeaponHash)wep.Weapon, wep.Ammo);
+
+                                            if (wep.Components.Length > 0) player.TriggerEvent("pushMsgToChat", "!{#31b55a}     -- " + wepdat.Name + " | Ammo: " + wep.Ammo + " @ Attachments:");
+                                            else player.TriggerEvent("pushMsgToChat", "!{#31b55a}" + wepdat.Name + " | Ammo: " + wep.Ammo);
+
+                                            foreach (var comp in wep.Components)
+                                            {
+                                                EPlayer.AttachComponent(player, wep.Weapon, comp);
+
+                                                Component compData = new Component();
+                                                if (wepdat.Components.TryGetValue(comp, out compData))
+                                                {
+                                                    player.TriggerEvent("pushMsgToChat", "!{#69f5a8}          -- " + compData.Name);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Spawned the weapon set at index " + index + ".");
+                                });
+                            }
+                            else if (args[3].Equals("spawn"))
+                            {
+                                int sqlid = -1;
+                                bool successParse = Int32.TryParse(args[4], out sqlid);
+                                NAPI.Task.Run(() =>
+                                {
+                                    if (args.Length <= 4)
+                                    {
+                                        cmd_editdmarena(player, "help list team spawn");
+                                        return;
+                                    }
+
+                                    if (!successParse)
+                                    {
+                                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The ID you have input is invalid/not numeric!");
+                                        return;
+                                    }
+                                });
+
+                                var spawn = await EPlayer.IsValidDMSpawn(sqlid);
+                                if (spawn.Value == false)
+                                {
+                                    NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The spawn ID you have input is invalid!"); });
+                                    return;
+                                }
+                                NAPI.Task.Run(() =>
+                                {
+                                    player.TriggerEvent("pushMsgToChat", $"!{{#69f5a8}}ArenaID: {spawn.Key.ArenaID} | ID: {spawn.Key.SQL_ID} (Team {spawn.Key.Team}) XYZA: {spawn.Key.X}, {spawn.Key.Y}, {spawn.Key.Z}, {spawn.Key.A}");
+                                    player.Position = new Vector3(spawn.Key.X, spawn.Key.Y, spawn.Key.Z);
+                                    player.Heading = spawn.Key.A;
+                                });
+                            }
+                            else
+                            {
+                                NAPI.Task.Run(() => { cmd_editdmarena(player, "help list team"); });
+                            }
+                        });
+                    }
+                    else
+                    {
+                        cmd_editdmarena(player, "help list");
+                    }
+                }
+                else if (args[0].Equals("add", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (args.Length <= 1)
+                    {
+                        cmd_editdmarena(player, "help add");
+                        return;
+                    }
+
+                    if (args[1].Equals("team"))
+                    {
+                        if (args.Length <= 2)
+                        {
+                            cmd_editdmarena(player, "help add team");
+                            return;
+                        }
+
+                        int id = -1;
+                        if (!Int32.TryParse(args[2], out id))
+                        {
+                            cmd_editdmarena(player, "help add team");
+                            return;
+                        }
+
+                        Task.Run(async () =>
+                        {
+                            var team = await EPlayer.IsValidDMTeam(arena.Key.SQL_ID, id);
+                            if (team.Value == true)
+                            {
+                                NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}This team ID already exists!"); });
+                                return;
+                            }
+
+                            var _new = new CustomDMArenaTeams
+                            {
+                                ArenaID = arena.Key.SQL_ID,
+                                Name = "changeme",
+                                Team = id,
+                                Health = 100,
+                                Armour = 100,
+                                Blip = true,
+                                BlipColor = 39,
+                                ColorR = 179,
+                                ColorG = 179,
+                                ColorB = 179,
+                                Alpha = 255,
+                                ShowHPBars = 2,
+                                SharedSpawns = -1,
+                                WeaponSets = "[]",
+                            };
+                            using (MainDatabase context = ContextFactory.CreateContext())
+                            {
+                                await context.CustomArenas_Teams.AddAsync(_new);
+                                await context.SaveChangesAsync();
+                            }
+                            NAPI.Task.Run(() =>
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You have added a new team ID: " + _new.Team);
+
+                            });
+                        });
+                    }
+                    else if (args[1].Equals("spawn"))
+                    {
+                        if (args.Length <= 2)
+                        {
+                            cmd_editdmarena(player, "help add spawn");
+                            return;
+                        }
+
+                        int teamid = -1;
+                        if (!Int32.TryParse(args[2], out teamid))
+                        {
+                            cmd_editdmarena(player, "help add spawn");
+                            return;
+                        }
+                        Task.Run(async () =>
+                        {
+                            var team = await EPlayer.IsValidDMTeam(arena.Key.SQL_ID, teamid);
+                            if (!team.Value == true)
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The team ID is invalid/non existent!");
+                                });
+                                return;
+                            }
+
+                            NAPI.Task.Run(() =>
+                            {
+                                var _new = new CustomDMArenaSpawns
+                                {
+                                    ArenaID = arena.Key.SQL_ID,
+                                    Team = team.Key.Team,
+                                    X = player.Position.X,
+                                    Y = player.Position.Y,
+                                    Z = player.Position.Z,
+                                    A = player.Heading,
+                                };
+                                Task.Run(async () =>
+                                {
+                                    using (MainDatabase context = ContextFactory.CreateContext())
+                                    {
+                                        await context.CustomArenas_Spawns.AddAsync(_new);
+                                        await context.SaveChangesAsync();
+                                    }
+                                });
+
+                                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You have added a new spawn for the team ID " + _new.Team + ": " + _new.SQL_ID);
+                            });
+
+                        });
+                        
+                    }
+                    else if (args[1].Equals("weaponset"))
+                    {
+                        if (args.Length <= 2)
+                        {
+                            cmd_editdmarena(player, "help add weaponset");
+                            return;
+                        }
+
+                        int teamid = -1;
+                        if (!Int32.TryParse(args[2], out teamid))
+                        {
+                            cmd_editdmarena(player, "help add weaponset");
+                            return;
+                        }
+                        Task.Run(async () =>
+                        {
+                            var team = await EPlayer.IsValidDMTeam(arena.Key.SQL_ID, teamid);
+                            if (team.Value == false)
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The team ID is invalid/non existent!");
+                                });
+                                 return;
+                            }
+                            List<DM_WeaponData> wepDat = new List<DM_WeaponData>();
+                            NAPI.Task.Run(() =>
+                            {
+                                foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
+                                {
+                                    if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
+                                    {
+                                        List<long> components = new List<long>();
+
+                                        if (player.HasData("AttachedComponents"))
+                                        {
+                                            List<KeyValuePair<long, long>> comps = player.GetData<List<KeyValuePair<long, long>>>("AttachedComponents");
+
+                                            foreach (var item in comps)
+                                            {
+                                                if (item.Key == i.Key)
+                                                {
+                                                    components.Add(item.Value);
+                                                }
+                                            }
+                                        }
+
+                                        wepDat.Add(new DM_WeaponData
+                                        {
+                                            Weapon = i.Key,
+                                            Ammo = player.GetWeaponAmmo((WeaponHash)i.Key),
+                                            Components = components.ToArray(),
+                                        }); ;
+                                    }
+                                }
+
+                                DM_WeaponSets[] weaponSets = NAPI.Util.FromJson<DM_WeaponSets[]>(team.Key.WeaponSets);
+
+                                List<DM_WeaponSets> newWeaponSets = new List<DM_WeaponSets>(weaponSets);
+                                newWeaponSets.Add(new DM_WeaponSets
+                                {
+                                    Weapons = wepDat.ToArray(),
+                                });
+
+                                team.Key.WeaponSets = NAPI.Util.ToJson(newWeaponSets.ToArray());
+                                ContextFactory.SaveDB();
+
+                                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You have added a new weapon set at index " + (newWeaponSets.Count - 1));
+                            });
+                        });
+                        
+                    }
+                    else
+                    {
+                        cmd_editdmarena(player, "help add");
+                    }
+                }
+                else if (args[0].Equals("remove", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (args.Length <= 1)
+                    {
+                        cmd_editdmarena(player, "help remove");
+                        return;
+                    }
+
+                    if (args[1].Equals("team"))
+                    {
+                        if (args.Length <= 2)
+                        {
+                            cmd_editdmarena(player, "help remove team");
+                            return;
+                        }
+
+                        int id = -1;
+                        if (!Int32.TryParse(args[2], out id))
+                        {
+                            cmd_editdmarena(player, "help remove team");
+                            return;
+                        }
+
+                        Task.Run(async () =>
+                        {
+                            var team = await EPlayer.IsValidDMTeam(arena.Key.SQL_ID, id);
+                            if (team.Value == false)
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}This team ID does not exist!");
+                                });
+                                return;
+                            }
+                            using (MainDatabase context = ContextFactory.CreateContext())
+                            {
+                                context.CustomArenas_Teams.Remove(team.Key);
+                                context.CustomArenas_Spawns.RemoveRange(context.CustomArenas_Spawns.ToList().Where(a => a.ArenaID == arena.Key.SQL_ID && a.Team == id));
+                                await context.SaveChangesAsync();
+
+                            }
+                            NAPI.Task.Run(() =>
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You have removed the team ID: " + id + " from arena: " + arena.Key.Name);
+                            });
+                        });
+
+                    }
+                    else if (args[1].Equals("spawn"))
+                    {
+                        if (args.Length <= 2)
+                        {
+                            cmd_editdmarena(player, "help remove spawn");
+                            return;
+                        }
+
+                        int spawnid = -1;
+                        if (!Int32.TryParse(args[2], out spawnid))
+                        {
+                            cmd_editdmarena(player, "help remove spawn");
+                            return;
+                        }
+                        Task.Run(async () =>
+                        {
+                            var spawn = await EPlayer.IsValidDMSpawn(spawnid);
+                            if (!spawn.Value == true) //!.value == true because i am being retarded and i prefer to keep it that way -kevy
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The spawn ID is invalid/non existent!");
+                                });
+                                return;
+                            }
+                            if (spawn.Key.ArenaID != arena.Key.SQL_ID)
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}This spawn ID does not belong to your arena, you good?!");
+                                });
+                                return;
+                            }
+                            using (MainDatabase context = ContextFactory.CreateContext())
+                            {
+                                context.CustomArenas_Spawns.Remove(spawn.Key);
+                                await context.SaveChangesAsync();
+                            }
+                            NAPI.Task.Run(() =>
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You have removed spawn ID " + spawnid);
+
+                            });
+                        });
+
+                    }
+                    else if (args[1].Equals("weaponset"))
+                    {
+                        if (args.Length <= 2)
+                        {
+                            cmd_editdmarena(player, "help remove weaponset");
+                            return;
+                        }
+
+                        int teamid = -1;
+                        if (!Int32.TryParse(args[2], out teamid))
+                        {
+                            cmd_editdmarena(player, "help remove weaponset");
+                            return;
+                        }
+                        Task.Run(async () =>
+                        {
+                            var team = await EPlayer.IsValidDMTeam(arena.Key.SQL_ID, teamid);
+                            if (team.Value == false)
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The team ID is invalid/non existent!");
+                                });
+                                return;
+                            }
+
+                            if (args.Length <= 3)
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    cmd_editdmarena(player, "help remove weaponset");
+                                });
+                                return;
+                            }
+
+                            int index = -1;
+                            if (!Int32.TryParse(args[3], out index))
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    cmd_editdmarena(player, "help remove weaponset");
+                                });
+                                return;
+                            }
+
+                            NAPI.Task.Run(() =>
+                            {
+                                DM_WeaponSets[] weaponSets = NAPI.Util.FromJson<DM_WeaponSets[]>(team.Key.WeaponSets);
+
+                                var set = weaponSets.ElementAtOrDefault(index);
+                                if (set == null || set == default(DM_WeaponSets))
+                                {
+                                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The index is not valid // There's no weapon set on that index!");
+                                    return;
+                                }
+
+                                List<DM_WeaponSets> newWeaponSets = new List<DM_WeaponSets>(weaponSets);
+                                newWeaponSets.Remove(set);
+
+                                team.Key.WeaponSets = NAPI.Util.ToJson(newWeaponSets.ToArray());
+                                ContextFactory.SaveDB();
+
+                                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You have removed the weapon set at index " + index);
+                            });
+                        });
+                    }
+                    else
+                    {
+                        cmd_editdmarena(player, "help remove");
+                    }
+                }
+                else if (args[0].Equals("set", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (args.Length <= 1)
+                    {
+                        cmd_editdmarena(player, "help set");
+                        return;
+                    }
+
+                    if (args[1].Equals("team"))
+                    {
+                        if (args.Length <= 2 || args.Length <= 3)
+                        {
+                            cmd_editdmarena(player, "help set team");
+                            return;
+                        }
+
+                        int teamid = -1;
+                        if (!Int32.TryParse(args[2], out teamid))
+                        {
+                            cmd_editdmarena(player, "help set team");
+                            return;
+                        }
+                        Task.Run(async () =>
+                        {
+                            var team = await EPlayer.IsValidDMTeam(arena.Key.SQL_ID, teamid);
+                            if (team.Value == false)
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The team ID is invalid!");
+                                });
+                                return;
+                            }
+
+                            NAPI.Task.Run(() =>
+                            {
+                                if (args[3].Equals("health"))
+                                {
+                                    if (args.Length <= 4)
+                                    {
+                                        cmd_editdmarena(player, "help set team health");
+                                        return;
+                                    }
+
+                                    int health = -1;
+                                    if (!Int32.TryParse(args[4], out health))
+                                    {
+                                        cmd_editdmarena(player, "help set team health");
+                                        return;
+                                    }
+
+                                    team.Key.Health = health;
+                                    player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed the {team.Key.Name}'s starting health to {health}.");
+                                }
+                                else if (args[3].Equals("armour") || args[3].Equals("armor"))
+                                {
+                                    if (args.Length <= 4)
+                                    {
+                                        cmd_editdmarena(player, "help set team armour");
+                                        return;
+                                    }
+
+                                    int armour = -1;
+                                    if (!Int32.TryParse(args[4], out armour))
+                                    {
+                                        cmd_editdmarena(player, "help set team armour");
+                                        return;
+                                    }
+
+                                    team.Key.Armour = armour;
+                                    player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed the {team.Key.Name}'s starting armour to {armour}.");
+                                }
+                                else if (args[3].Equals("blip"))
+                                {
+                                    if (args.Length <= 4)
+                                    {
+                                        cmd_editdmarena(player, "help set team blip");
+                                        return;
+                                    }
+
+                                    bool state = false;
+                                    if (!Boolean.TryParse(args[4], out state))
+                                    {
+                                        cmd_editdmarena(player, "help set team blip");
+                                        return;
+                                    }
+
+                                    team.Key.Blip = state;
+                                    player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed the {team.Key.Name}'s minimap blip visibility to {state}.");
+                                }
+                                else if (args[3].Equals("blipcolor"))
+                                {
+                                    if (args.Length <= 4)
+                                    {
+                                        cmd_editdmarena(player, "help set team blipcolor");
+                                        return;
+                                    }
+
+                                    int blipcol = -1;
+                                    if (!Int32.TryParse(args[4], out blipcol))
+                                    {
+                                        cmd_editdmarena(player, "help set team blipcolor");
+                                        return;
+                                    }
+
+                                    team.Key.BlipColor = blipcol;
+                                    player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed the {team.Key.Name}'s blip colour to {blipcol}.");
+                                }
+                                else if (args[3].Equals("alpha"))
+                                {
+                                    if (args.Length <= 4)
+                                    {
+                                        cmd_editdmarena(player, "help set team alpha");
+                                        return;
+                                    }
+
+                                    int alpha = -1;
+                                    if (!Int32.TryParse(args[4], out alpha))
+                                    {
+                                        cmd_editdmarena(player, "help set team alpha");
+                                        return;
+                                    }
+
+                                    team.Key.Alpha = alpha;
+                                    player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed the {team.Key.Name}'s alpha to {alpha}.");
+                                }
+                                else if (args[3].Equals("hpbar"))
+                                {
+                                    if (args.Length <= 4)
+                                    {
+                                        cmd_editdmarena(player, "help set team hpbar");
+                                        return;
+                                    }
+
+                                    int num = -1;
+                                    if (!Int32.TryParse(args[4], out num))
+                                    {
+                                        cmd_editdmarena(player, "help set team hpbar");
+                                        return;
+                                    }
+
+                                    team.Key.ShowHPBars = num;
+
+                                    string hpBars = "INVALID!!";
+                                    switch (team.Key.ShowHPBars)
+                                    {
+                                        case 0:
+                                            hpBars = "Never Show";
+                                            break;
+                                        case 1:
+                                            hpBars = "Always Shown";
+                                            break;
+                                        case 2:
+                                            hpBars = "Show On Aim";
+                                            break;
+                                        case 3:
+                                            hpBars = "BUSTED! (Copchase Reserved)";
+                                            break;
+                                        default:
+                                            hpBars = "Invalid! Please fix!";
+                                            break;
+                                    }
+
+                                    player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed the {team.Key.Name}'s bar type to {hpBars}.");
+                                }
+                                else if (args[3].Equals("name"))
+                                {
+                                    if (args.Length <= 4)
+                                    {
+                                        cmd_editdmarena(player, "help set team name");
+                                        return;
+                                    }
+
+                                    args = options.Split(' ', 5);
+
+                                    player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed team {team.Key.Name}'s name to {args[4]}.");
+                                    team.Key.Name = args[4];
+                                }
+                                else if (args[3].Equals("color"))
+                                {
+                                    if (args.Length <= 6)
+                                    {
+                                        cmd_editdmarena(player, "help set team color");
+                                        return;
+                                    }
+                                    int r = 179;
+                                    int g = 179;
+                                    int b = 179;
+
+                                    if (!Int32.TryParse(args[4], out r) || !Int32.TryParse(args[5], out g) || !Int32.TryParse(args[6], out b))
+                                    {
+                                        cmd_editdmarena(player, "help set team color");
+                                        return;
+                                    }
+
+                                    team.Key.ColorR = r;
+                                    team.Key.ColorG = g;
+                                    team.Key.ColorB = b;
+
+                                    player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed team {team.Key.Name}'s color to !{{{EPlayer.HexConverter(new Color(r, g, b))}}}this.");
+                                }
+                                else if (args[3].Equals("sharedspawns"))
+                                {
+                                    if (args.Length <= 4)
+                                    {
+                                        cmd_editdmarena(player, "help set team sharedspawns");
+                                        return;
+                                    }
+
+                                    int uhuh = -1;
+
+                                    if (!Int32.TryParse(args[4], out uhuh))
+                                    {
+                                        cmd_editdmarena(player, "help set team sharedspawns");
+                                        return;
+                                    }
+
+                                    team.Key.SharedSpawns = uhuh;
+                                    player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed team {team.Key.Name}'s shared spawns team id to {uhuh}.");
+                                }
+                                else
+                                {
+                                    cmd_editdmarena(player, "help set team");
+                                }
+                            });
+                        });
+                    }
+                    else
+                    {
+                        cmd_editdmarena(player, "help set");
+                    }
+                }
+                else
+                {
+                    player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}[USAGE] editdmarena (help/list/add/remove/set) | Choose any one category.");
+                }
+
+            });
+        } 
         [Command("editdmarena", "!{#AFAFAF}[USAGE] editdmarena (help)", GreedyArg = true)]
         public void cmd_editdmarena(Player player, string options = "help")
         {
@@ -7573,960 +8733,17 @@ namespace RNC
                 return;
             }
 
-
-            var arena = EPlayer.IsValidDMArena(player.GetData<int>("EditingDMArena"));
-            if(!arena.Value)
+            Task.Run(async () =>
             {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The arena you were editing has been deleted or is invalid. (/selectdmarena again)");
-                return;
-            }
-
-            string[] args = options.Split(' ');
-            string rebuild = "";
-            for(int i = 0; i < args.Length; i++) rebuild = $"{rebuild} [{i}]{args[i]}";
-            //player.TriggerEvent("pushMsgToChat", options); // only for deboog bpurpoooses
-            //player.TriggerEvent("pushMsgToChat", rebuild); // only for debooog burpooses
-
-            if (args[0].Equals("help", StringComparison.OrdinalIgnoreCase))
-            {
-                if (args.Length <= 1)
+                var arena = await EPlayer.IsValidDMArena(player.GetData<int>("EditingDMArena"));
+                if (!arena.Value)
                 {
-                    player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}[USAGE] editdmarena help (list/add/remove/set) | Choose any one category.");
+                    NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The arena you were editing has been deleted or is invalid. (/selectdmarena again)"); });
                     return;
                 }
-
-                player.TriggerEvent("pushMsgToChat", "!{#990000}=============================");
-
-                if (args[1].Equals("list", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (args.Length <= 2)
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena list teams !{#FFFFFF}| Use 'help list teams' for more.");
-                        player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena list team !{#FFFFFF}| Use 'help list team' to unload da fuck im tired -kevy.");
-                        return;
-                    }
-
-                    if (args[2].Equals("team"))
-                    {
-                        if (args.Length <= 3)
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena list team (team id) (stats/weaponsets/spawns/weaponset/spawn) !{#FFFFFF}| Use 'help list team (item)' to get info for the items separately.");
-                            return;
-                        }
-
-                        if (args[3].Equals("stats"))
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena list team (team id) stats !{#FFFFFF}| Displays the stats of a team and settings such as blip, hp bar type, hp, etc.");
-                        }
-                        else if (args[3].Equals("weaponsets"))
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena list team (team id) weaponsets !{#FFFFFF}| Displays all the weapon sets for a team with their indexes. (NOTE: index changes when any set is removed)");
-                        }
-                        else if (args[3].Equals("spawns"))
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena list team (team id) spawns !{#FFFFFF}| Displays all the spawns for a team.");
-                        }
-                        else if (args[3].Equals("weaponset"))
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena list team (team id) weaponset (index) !{#FFFFFF}| Gives you the specific weapon set at index and lists it as well.");
-                        }
-                        else if (args[3].Equals("spawn"))
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena list team (team id) spawn (spawn id) !{#FFFFFF}| Teleports you to the specific spawn and lists it's coordinates as well.");
-                        }
-                        else
-                        {
-                            cmd_editdmarena(player, "help list team");
-                        }
-                    }
-                    else if(args[2].Equals("teams"))
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena list teams !{#FFFFFF}| Shows you the darkest and deepest secrets (quick list) of all teams.");
-                        player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}You may want to use 'list team (teamid) stats' to show the proper and full info on a team.");
-                    }
-                    else
-                    {
-                        cmd_editdmarena(player, "help list");
-                    }
-                }
-                else if (args[1].Equals("add", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (args.Length <= 2)
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena add team (team id) !{#FFFFFF}| Use 'help add team' to show more.");
-                        player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena add spawn (team id) !{#FFFFFF}| Use 'help add spawn' to show more.");
-                        player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena add weaponset (team id) !{#FFFFFF}| Use 'help add weaponset' to show more.");
-                        return;
-                    }
-
-                    if (args[2].Equals("team"))
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena add team (team id) !{#FFFFFF}| Adds a new team with the specified team ID. Below is the more info:");
-                        player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}Players on the same team cannot damage each other nor will they be able to 'click' at each other (fire in direct LOS).");
-                        player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}The only exception is team ID -1, which is to be used for all Free For All type modes. All spawns for Team ID -1 can be used by other teams as well.");
-                        player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}Team ID -1 players can damage each other as well.");
-                    }
-                    else if (args[2].Equals("weaponset"))
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena add weaponset (team id) !{#FFFFFF}| This basically makes a new weapon set for the team out of the weapons on your player.");
-                        player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}It will copy all the weapons, ammo and components of the weapons you have equipped. A weapon will not be detected if it's ammo is less than 1.");
-                    }
-                    else if (args[2].Equals("spawn"))
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena add spawn (team id) !{#FFFFFF}| Creates a new spawn at your current location for the specified team.");
-                        player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}This copies everything from X, Y, Z coordinates to Heading (A).");
-                    }
-                    else
-                    {
-                        cmd_editdmarena(player, "help add");
-                    }
-                }
-                else if (args[1].Equals("remove", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (args.Length <= 2)
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena remove team (team id) !{#FFFFFF}| Use 'help remove team' for more.");
-                        player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena remove spawn (spawn id) !{#FFFFFF}| Use 'help remove spawn' for more.");
-                        player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena remove weaponset (team id) (index) !{#FFFFFF}| Use 'help remove weaponset' for more (important).");
-                        return;
-                    }
-
-                    if (args[2].Equals("team"))
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena remove team (team id) !{#FFFFFF}| Removes the specified team from the arena, along with all its weapon sets etc.");
-                        player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}When a team is removed, all it's spawns, weaponsets and data is deleted.");
-                    }
-                    else if (args[2].Equals("weaponset"))
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena remove weaponset (team id) (index) !{#FFFFFF}| Removes the weapon set at the specified index of team weapon sets.");
-                        player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}The important thing to note here is this unlike spawns and other, the weaponsets work on indexes so when you remove " +
-                            "any weapon set, the indexes of other ones decrease/change so if you want to remove multiple, confirm their indexes after each removal.");
-                    }
-                    else if (args[2].Equals("spawn"))
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena remove spawn (spawn id) !{#FFFFFF}| Removes the spawn with the specified ID.");
-                    }
-                    else
-                    {
-                        cmd_editdmarena(player, "help remove");
-                    }
-                }
-                else if (args[1].Equals("set", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (args.Length <= 2)
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team  !{#FFFFFF}| Use 'help set team' for more.");
-                        return;
-                    }
-
-                    if(args[2].Equals("team"))
-                    {
-                        if (args.Length <= 3)
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) health (amount) !{#FFFFFF}| Use 'help set team health' for more.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) armour (amount) !{#FFFFFF}| Use 'help set team armour' for more.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) blip (true/false) !{#FFFFFF}| Use 'help set team blip' for more.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) blipcolor (color id) !{#FFFFFF}| Use 'help set team blipcolor' for more.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) alpha (0-255) !{#FFFFFF}| Use 'help set team alpha' for more.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) hpbar (bar type) !{#FFFFFF}| Use 'help set team hpbar' for more.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) name (name) !{#FFFFFF}| Use 'help set team name' for more.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) color (r) (g) (b) !{#FFFFFF}| Use 'help set team color' for more.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) sharedspawns (team id) !{#FFFFFF}| Use 'help set team sharedspawns' for more.");
-                            return;
-                        }
-
-                        if (args[3].Equals("health"))
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) health (amount) !{#FFFFFF}| Sets the health for the team specified.");
-                            player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}The health when a player spawns as that team.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Default: 100");
-                        }
-                        else if (args[3].Equals("armour"))
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) armour (amount) !{#FFFFFF}| Sets the armour for the team specified.");
-                            player.TriggerEvent("pushMsgToChat", "!{#FFFFFF}The armour when a player spawns as that team.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Default: 100");
-                        }
-                        else if (args[3].Equals("blip"))
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) blip (true/false) !{#FFFFFF}| Toggles the visibility of the team in minimap.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Setting this to true means EVERYONE can see that player on minimap even though he can't.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Default: True");
-                        }
-                        else if (args[3].Equals("blipcolor"))
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) blipcolor (color id) !{#FFFFFF}| Sets the blip color of a team.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}The blip colors are available on RAGE:MP site, the reason why this is not same as normal 'color' is because GTA 5 uses a separate color table for blips");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Default: 39");
-                        }
-                        else if (args[3].Equals("alpha"))
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) alpha (0-255) !{#FFFFFF}| Sets the transparency of a team.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Any transparency level less than 33 will hide the player's nametag. 0 is fully invisible, 255 is opaque.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Default: 255");
-                        }
-                        else if (args[3].Equals("hpbar"))
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) hpbar (bar type) !{#FFFFFF}| Sets the visibillity of HP bars for the players in the team.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}There are currently 3 available hp bar types, 0- Disable, 1- Always Show HP Bars, 2- Show Only On Aiming.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}THESE HP BARS ONLY TAKE EFFECT FOR THE PLAYER IN THIS TEAM! NOT FOR PEOPLE WHO LOOK AT THEM!");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Default: 2");
-                        }
-                        else if (args[3].Equals("name"))
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) name (name) !{#FFFFFF}| Sets the name of the team.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}The team name is not really used much anywhere except selection and stuff.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Default: nigga...");
-                        }
-                        else if (args[3].Equals("color"))
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) color (red) (green) (blue) !{#FFFFFF}| Sets the RGB color of the team.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}This color is used in kill list and scoreboard.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Default: 179 179 179");
-                        }
-                        else if (args[3].Equals("sharedspawns"))
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}editdmarena set team (team id) sharedspawns (target team id) !{#FFFFFF}| Eyes below ->");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}This means that this team can also spawn at the spawns of the team id you input.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Meaning if you set it's sharedspawns to -1, then this team's players can spawn at team -1's spawns.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}But team -1 players cannot spawn on this team's spawns, unless you set their sharedspawns to this team id.");
-                            player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}Default: -1");
-                        }
-                        else
-                        {
-                            cmd_editdmarena(player, "help set team");
-                        }
-                    }
-                    else
-                    {
-                        cmd_editdmarena(player, "help set");
-                    }
-                }
-                else
-                {
-                    cmd_editdmarena(player, "help");
-                }
-            }
-            else if (args[0].Equals("list", StringComparison.OrdinalIgnoreCase))
-            {
-                if (args.Length <= 1)
-                {
-                    cmd_editdmarena(player, "help list");
-                    return;
-                }
-
-                if (args[1].Equals("teams", StringComparison.OrdinalIgnoreCase))
-                {
-                    player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}===========| !{{#FFFF00}}{arena.Key.Name} ({arena.Key.SQL_ID}) Teams !{{#FF6347}}|===========");
-                    int count = 0;
-                    foreach (var team in ContextFactory.Instance.CustomArenas_Teams.ToList().Where(a => a.ArenaID == arena.Key.SQL_ID))
-                    {
-                        player.TriggerEvent("pushMsgToChat", $"!{{{EPlayer.HexConverter(new Color(team.ColorR, team.ColorG, team.ColorB))}}}" + team.Name + " | ID: " + team.Team);
-                        player.TriggerEvent("pushMsgToChat", "!{#69f5a8}     --" + $"Spawn Health: {team.Health} | Spawn Armour: {team.Armour}");
-                        player.TriggerEvent("pushMsgToChat", "!{#69f5a8}     --" + $"Blips: {(team.Blip ? "Shown" : "Hidden")} | Blip Color ID: {team.BlipColor}");
-                        player.TriggerEvent("pushMsgToChat", "!{#69f5a8}     --" + $"Weapon Sets: {NAPI.Util.FromJson<DM_WeaponSets[]>(team.WeaponSets).Length} " +
-                            $"| Color: {EPlayer.HexConverter(new Color(team.ColorR, team.ColorG, team.ColorB))}");
-
-                        count++;
-                    }
-                    player.TriggerEvent("pushMsgToChat", "!{#FFFF00}Total: !{#FFFFFF}" + count + " teams.");
-                }
-                else if (args[1].Equals("team", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (args.Length <= 2)
-                    {
-                        cmd_editdmarena(player, "help list team");
-                        return;
-                    }
-
-                    int teamID = -1;
-                    if(!Int32.TryParse(args[2], out teamID))
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The team ID you have input is invalid/not numeric!");
-                        return;
-                    }
-
-                    var team = EPlayer.IsValidDMTeam(arena.Key.SQL_ID, teamID);
-                    if(team.Value == false)
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The team ID you have input does not exist!");
-                        return;
-                    }
-
-                    if (args.Length <= 3)
-                    {
-                        cmd_editdmarena(player, "help list team");
-                        return;
-                    }
-
-                    if(args[3].Equals("stats"))
-                    {
-                        player.TriggerEvent("pushMsgToChat", $"!{{{EPlayer.HexConverter(new Color(team.Key.ColorR, team.Key.ColorG, team.Key.ColorB))}}}Team: " + team.Key.Name + " - ID: " + team.Key.Team + 
-                            $" - Color: {EPlayer.HexConverter(new Color(team.Key.ColorR, team.Key.ColorG, team.Key.ColorB))}");
-
-                        player.TriggerEvent("pushMsgToChat", "!{#31b55a}HP: " + team.Key.Health + " - Armour: " + team.Key.Armour);
-                        player.TriggerEvent("pushMsgToChat", "!{#31b55a}Blips: " + (team.Key.Blip ? "Shown" : "Hidden") + " - Blip Color ID: " + team.Key.BlipColor);
-                        player.TriggerEvent("pushMsgToChat", "!{#31b55a}Weapon Sets: " + (NAPI.Util.FromJson<DM_WeaponSets[]>(team.Key.WeaponSets).Length) + " - Transparency/Alpha: " + team.Key.Alpha);
-
-                        string hpBars = "INVALID!!";
-                        switch(team.Key.ShowHPBars)
-                        {
-                            case 0:
-                                hpBars = "Never Show";
-                                break;
-                            case 1:
-                                hpBars = "Always Shown";
-                                break;
-                            case 2:
-                                hpBars = "Show On Aim";
-                                break;
-                            case 3:
-                                hpBars = "BUSTED! (Copchase Reserved)";
-                                break;
-                            default:
-                                hpBars = "Invalid! Please fix!";
-                                break;
-                        }
-
-                        int spawnsTotal = ContextFactory.Instance.CustomArenas_Spawns.Count(a => a.ArenaID == arena.Key.SQL_ID && a.Team == team.Key.Team);
-                        int spawnsTeam = ContextFactory.Instance.CustomArenas_Spawns.Count(a => a.ArenaID == arena.Key.SQL_ID && (a.Team == team.Key.Team || a.Team == team.Key.SharedSpawns));
-                        player.TriggerEvent("pushMsgToChat", $"!{{#31b55a}}Spawns: {spawnsTeam} (+{spawnsTotal-spawnsTeam} shared) - HP Bar Types: {hpBars}");
-                    }
-                    else if(args[3].Equals("weaponsets"))
-                    {
-                        DM_WeaponSets[] weaponSets = NAPI.Util.FromJson<DM_WeaponSets[]>(team.Key.WeaponSets);
-
-                        jWeaponData wep = new jWeaponData();
-                        for(int set = 0; set < weaponSets.Length; set++)
-                        {
-                            player.TriggerEvent("pushMsgToChat", $"!{{#69f5a8}}Weapon Set @ Index {set} =>");
-                            foreach(var setdata in weaponSets[set].Weapons)
-                            {
-                                if (Settings.WeaponData.TryGetValue(setdata.Weapon, out wep))
-                                {
-                                    if (setdata.Components.Length > 0) player.TriggerEvent("pushMsgToChat", "!{#31b55a}     -- " + wep.Name + " | Ammo: " + setdata.Ammo + " @ Attachments:");
-                                    else player.TriggerEvent("pushMsgToChat", "!{#31b55a}" + wep.Name + " | Ammo: " + setdata.Ammo);
-
-                                    foreach (long comp in setdata.Components)
-                                    {
-                                        Component compData = new Component();
-                                        if (wep.Components.TryGetValue(comp, out compData))
-                                        {
-                                            player.TriggerEvent("pushMsgToChat", "!{#69f5a8}          -- " + compData.Name);
-                                        }
-                                    }
-                                }
-                            }
-                            player.TriggerEvent("pushMsgToChat", "---");
-                        }
-                    }
-                    else if(args[3].Equals("spawns"))
-                    {
-                        var spawns = ContextFactory.Instance.CustomArenas_Spawns.ToList().Where(a => a.ArenaID == arena.Key.SQL_ID && (a.Team == team.Key.Team || a.Team == team.Key.SharedSpawns));
-                        foreach(var spawn in spawns)
-                        {
-                            player.TriggerEvent("pushMsgToChat", $"!{{#69f5a8}}ID: {spawn.SQL_ID} (Team {spawn.Team}) XYZA: {spawn.X}, {spawn.Y}, {spawn.Z}, {spawn.A}");
-                        }
-                    }
-                    else if(args[3].Equals("weaponset"))
-                    {
-                        if (args.Length <= 4)
-                        {
-                            cmd_editdmarena(player, "help list team weaponset");
-                            return;
-                        }
-
-                        int index = -1;
-                        if(!Int32.TryParse(args[4], out index))
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The index you have input is invalid/not numeric!");
-                            return;
-                        }
-
-                        DM_WeaponSets[] weaponSets = NAPI.Util.FromJson<DM_WeaponSets[]>(team.Key.WeaponSets);
-                        var set = weaponSets.ElementAtOrDefault(index);
-                        if(set == null || set == default(DM_WeaponSets))
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The index is not valid // There's no weapon set on that index!");
-                            return;
-                        }
-
-                        player.RemoveAllWeapons();
-                        jWeaponData wepdat = new jWeaponData();
-                        player.TriggerEvent("pushMsgToChat", $"!{{#69f5a8}}Weapon Set @ Index {index} =>");
-                        foreach (var wep in set.Weapons)
-                        {
-                            if (Settings.WeaponData.TryGetValue(wep.Weapon, out wepdat))
-                            {
-                                player.GiveWeapon((WeaponHash)wep.Weapon, wep.Ammo);
-
-                                if (wep.Components.Length > 0) player.TriggerEvent("pushMsgToChat", "!{#31b55a}     -- " + wepdat.Name + " | Ammo: " + wep.Ammo + " @ Attachments:");
-                                else player.TriggerEvent("pushMsgToChat", "!{#31b55a}" + wepdat.Name + " | Ammo: " + wep.Ammo);
-
-                                foreach (var comp in wep.Components)
-                                {
-                                    EPlayer.AttachComponent(player, wep.Weapon, comp);
-
-                                    Component compData = new Component();
-                                    if (wepdat.Components.TryGetValue(comp, out compData))
-                                    {
-                                        player.TriggerEvent("pushMsgToChat", "!{#69f5a8}          -- " + compData.Name);
-                                    }
-                                }
-                            }
-                        }
-                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Spawned the weapon set at index " + index + ".");
-                    }
-                    else if(args[3].Equals("spawn"))
-                    {
-                        if (args.Length <= 4)
-                        {
-                            cmd_editdmarena(player, "help list team spawn");
-                            return;
-                        }
-
-                        int sqlid = -1;
-                        if (!Int32.TryParse(args[4], out sqlid))
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The ID you have input is invalid/not numeric!");
-                            return;
-                        }
-
-                        var spawn = EPlayer.IsValidDMSpawn(sqlid);
-                        if (spawn.Value == false)
-                        {
-                            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The spawn ID you have input is invalid!");
-                            return;
-                        }
-
-                        player.TriggerEvent("pushMsgToChat", $"!{{#69f5a8}}ArenaID: {spawn.Key.ArenaID} | ID: {spawn.Key.SQL_ID} (Team {spawn.Key.Team}) XYZA: {spawn.Key.X}, {spawn.Key.Y}, {spawn.Key.Z}, {spawn.Key.A}");
-                        player.Position = new Vector3(spawn.Key.X, spawn.Key.Y, spawn.Key.Z);
-                        player.Heading = spawn.Key.A;
-                    }
-                    else
-                    {
-                        cmd_editdmarena(player, "help list team");
-                    }
-                }
-                else
-                {
-                    cmd_editdmarena(player, "help list");
-                }
-            }
-            else if (args[0].Equals("add", StringComparison.OrdinalIgnoreCase))
-            {
-                if (args.Length <= 1)
-                {
-                    cmd_editdmarena(player, "help add");
-                    return;
-                }
-
-                if(args[1].Equals("team"))
-                {
-                    if (args.Length <= 2)
-                    {
-                        cmd_editdmarena(player, "help add team");
-                        return;
-                    }
-
-                    int id = -1;
-                    if (!Int32.TryParse(args[2], out id))
-                    {
-                        cmd_editdmarena(player, "help add team");
-                        return;
-                    }
-
-                    var team = EPlayer.IsValidDMTeam(arena.Key.SQL_ID, id);
-                    if(team.Value == true)
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}This team ID already exists!");
-                        return;
-                    }
-
-                    var _new = new CustomDMArenaTeams
-                    {
-                       ArenaID = arena.Key.SQL_ID,
-                       Name = "changeme",
-                       Team = id,
-                       Health = 100,
-                       Armour = 100,
-                       Blip = true,
-                       BlipColor = 39,
-                       ColorR = 179,
-                       ColorG = 179,
-                       ColorB = 179,
-                       Alpha = 255,
-                       ShowHPBars = 2,
-                       SharedSpawns = -1,
-                       WeaponSets = "[]",
-                    };
-                    ContextFactory.Instance.CustomArenas_Teams.Add(_new);
-                    ContextFactory.Instance.SaveChanges();
-
-                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You have added a new team ID: " + _new.Team);
-                }
-                else if(args[1].Equals("spawn"))
-                {
-                    if (args.Length <= 2)
-                    {
-                        cmd_editdmarena(player, "help add spawn");
-                        return;
-                    }
-
-                    int teamid = -1;
-                    if (!Int32.TryParse(args[2], out teamid))
-                    {
-                        cmd_editdmarena(player, "help add spawn");
-                        return;
-                    }
-
-                    var team = EPlayer.IsValidDMTeam(arena.Key.SQL_ID, teamid);
-                    if (!team.Value == true)
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The team ID is invalid/non existent!");
-                        return;
-                    }
-
-                    var _new = new CustomDMArenaSpawns
-                    {
-                        ArenaID = arena.Key.SQL_ID,
-                        Team = team.Key.Team,
-                        X = player.Position.X,
-                        Y = player.Position.Y,
-                        Z = player.Position.Z,
-                        A = player.Heading,
-                    };
-                    ContextFactory.Instance.CustomArenas_Spawns.Add(_new);
-                    ContextFactory.Instance.SaveChanges();
-
-                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You have added a new spawn for the team ID " + _new.Team + ": " + _new.SQL_ID);
-                }
-                else if(args[1].Equals("weaponset"))
-                {
-                    if (args.Length <= 2)
-                    {
-                        cmd_editdmarena(player, "help add weaponset");
-                        return;
-                    }
-
-                    int teamid = -1;
-                    if (!Int32.TryParse(args[2], out teamid))
-                    {
-                        cmd_editdmarena(player, "help add weaponset");
-                        return;
-                    }
-
-                    var team = EPlayer.IsValidDMTeam(arena.Key.SQL_ID, teamid);
-                    if (team.Value == false)
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The team ID is invalid/non existent!");
-                        return;
-                    }
-
-                    List<DM_WeaponData> wepDat = new List<DM_WeaponData>();
-
-                    foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
-                    {
-                        if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
-                        {
-                            List<long> components = new List<long>();
-
-                            if (player.HasData("AttachedComponents"))
-                            {
-                                List<KeyValuePair<long, long>> comps = player.GetData<List<KeyValuePair<long, long>>>("AttachedComponents");
-
-                                foreach (var item in comps)
-                                {
-                                    if (item.Key == i.Key)
-                                    {
-                                        components.Add(item.Value);
-                                    }
-                                }
-                            }
-
-                            wepDat.Add(new DM_WeaponData
-                                {
-                                    Weapon = i.Key,
-                                    Ammo = player.GetWeaponAmmo((WeaponHash)i.Key),
-                                    Components = components.ToArray(),
-                                });;
-                        }
-                    }
-
-                    DM_WeaponSets[] weaponSets = NAPI.Util.FromJson<DM_WeaponSets[]>(team.Key.WeaponSets);
-                    
-                    List<DM_WeaponSets> newWeaponSets = new List<DM_WeaponSets>(weaponSets);
-                    newWeaponSets.Add(new DM_WeaponSets
-                    {
-                        Weapons = wepDat.ToArray(),
-                    });
-
-                    team.Key.WeaponSets = NAPI.Util.ToJson(newWeaponSets.ToArray());
-                    ContextFactory.Instance.SaveChanges();
-
-                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You have added a new weapon set at index " + (newWeaponSets.Count-1));
-                }
-                else
-                {
-                    cmd_editdmarena(player, "help add");
-                }
-            }
-            else if (args[0].Equals("remove", StringComparison.OrdinalIgnoreCase))
-            {
-                if (args.Length <= 1)
-                {
-                    cmd_editdmarena(player, "help remove");
-                    return;
-                }
-
-                if (args[1].Equals("team"))
-                {
-                    if (args.Length <= 2)
-                    {
-                        cmd_editdmarena(player, "help remove team");
-                        return;
-                    }
-
-                    int id = -1;
-                    if (!Int32.TryParse(args[2], out id))
-                    {
-                        cmd_editdmarena(player, "help remove team");
-                        return;
-                    }
-
-                    var team = EPlayer.IsValidDMTeam(arena.Key.SQL_ID, id);
-                    if (team.Value == false)
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}This team ID does not exist!");
-                        return;
-                    }
-
-                    ContextFactory.Instance.CustomArenas_Teams.Remove(team.Key);
-                    ContextFactory.Instance.SaveChanges();
-
-                    ContextFactory.Instance.CustomArenas_Spawns.RemoveRange(ContextFactory.Instance.CustomArenas_Spawns.ToList().Where(a => a.ArenaID == arena.Key.SQL_ID && a.Team == id));
-
-                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You have removed the team ID: " + id + " from arena: " + arena.Key.Name);
-                }
-                else if (args[1].Equals("spawn"))
-                {
-                    if (args.Length <= 2)
-                    {
-                        cmd_editdmarena(player, "help remove spawn");
-                        return;
-                    }
-
-                    int spawnid = -1;
-                    if (!Int32.TryParse(args[2], out spawnid))
-                    {
-                        cmd_editdmarena(player, "help remove spawn");
-                        return;
-                    }
-
-                    var spawn = EPlayer.IsValidDMSpawn(spawnid);
-                    if (!spawn.Value == true) //!.value == true because i am being retarded and i prefer to keep it that way -kevy
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The spawn ID is invalid/non existent!");
-                        return;
-                    }
-
-                    if(spawn.Key.ArenaID != arena.Key.SQL_ID)
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}This spawn ID does not belong to your arena, you good?!");
-                        return;
-                    }
-
-                    ContextFactory.Instance.CustomArenas_Spawns.Remove(spawn.Key);
-                    ContextFactory.Instance.SaveChanges();
-
-                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You have removed spawn ID " + spawnid);
-                }
-                else if (args[1].Equals("weaponset"))
-                {
-                    if (args.Length <= 2)
-                    {
-                        cmd_editdmarena(player, "help remove weaponset");
-                        return;
-                    }
-
-                    int teamid = -1;
-                    if (!Int32.TryParse(args[2], out teamid))
-                    {
-                        cmd_editdmarena(player, "help remove weaponset");
-                        return;
-                    }
-
-                    var team = EPlayer.IsValidDMTeam(arena.Key.SQL_ID, teamid);
-                    if (team.Value == false)
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The team ID is invalid/non existent!");
-                        return;
-                    }
-
-                    if (args.Length <= 3)
-                    {
-                        cmd_editdmarena(player, "help remove weaponset");
-                        return;
-                    }
-
-                    int index = -1;
-                    if (!Int32.TryParse(args[3], out index))
-                    {
-                        cmd_editdmarena(player, "help remove weaponset");
-                        return;
-                    }
-
-                    DM_WeaponSets[] weaponSets = NAPI.Util.FromJson<DM_WeaponSets[]>(team.Key.WeaponSets);
-
-                    var set = weaponSets.ElementAtOrDefault(index);
-                    if (set == null || set == default(DM_WeaponSets))
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The index is not valid // There's no weapon set on that index!");
-                        return;
-                    }
-
-                    List<DM_WeaponSets> newWeaponSets = new List<DM_WeaponSets>(weaponSets);
-                    newWeaponSets.Remove(set);
-
-                    team.Key.WeaponSets = NAPI.Util.ToJson(newWeaponSets.ToArray());
-                    ContextFactory.Instance.SaveChanges();
-
-                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You have removed the weapon set at index " + index);
-                }
-                else
-                {
-                    cmd_editdmarena(player, "help remove");
-                }
-            }
-            else if (args[0].Equals("set", StringComparison.OrdinalIgnoreCase))
-            {
-                if (args.Length <= 1)
-                {
-                    cmd_editdmarena(player, "help set");
-                    return;
-                }
-
-                if(args[1].Equals("team"))
-                {
-                    if(args.Length <= 2 || args.Length <= 3)
-                    {
-                        cmd_editdmarena(player, "help set team");
-                        return;
-                    }
-
-                    int teamid = -1;
-                    if (!Int32.TryParse(args[2], out teamid))
-                    {
-                        cmd_editdmarena(player, "help set team");
-                        return;
-                    }
-
-                    var team = EPlayer.IsValidDMTeam(arena.Key.SQL_ID, teamid);
-                    if(team.Value == false)
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The team ID is invalid!");
-                        return;
-                    }
-
-
-                    if(args[3].Equals("health"))
-                    {
-                        if (args.Length <= 4)
-                        {
-                            cmd_editdmarena(player, "help set team health");
-                            return;
-                        }
-
-                        int health = -1;
-                        if (!Int32.TryParse(args[4], out health))
-                        {
-                            cmd_editdmarena(player, "help set team health");
-                            return;
-                        }
-
-                        team.Key.Health = health;
-                        player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed the {team.Key.Name}'s starting health to {health}.");
-                    }
-                    else if (args[3].Equals("armour") || args[3].Equals("armor"))
-                    {
-                        if (args.Length <= 4)
-                        {
-                            cmd_editdmarena(player, "help set team armour");
-                            return;
-                        }
-
-                        int armour = -1;
-                        if (!Int32.TryParse(args[4], out armour))
-                        {
-                            cmd_editdmarena(player, "help set team armour");
-                            return;
-                        }
-
-                        team.Key.Armour = armour;
-                        player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed the {team.Key.Name}'s starting armour to {armour}.");
-                    }
-                    else if (args[3].Equals("blip"))
-                    {
-                        if (args.Length <= 4)
-                        {
-                            cmd_editdmarena(player, "help set team blip");
-                            return;
-                        }
-
-                        bool state = false;
-                        if (!Boolean.TryParse(args[4], out state))
-                        {
-                            cmd_editdmarena(player, "help set team blip");
-                            return;
-                        }
-
-                        team.Key.Blip = state;
-                        player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed the {team.Key.Name}'s minimap blip visibility to {state}.");
-                    }
-                    else if (args[3].Equals("blipcolor"))
-                    {
-                        if (args.Length <= 4)
-                        {
-                            cmd_editdmarena(player, "help set team blipcolor");
-                            return;
-                        }
-
-                        int blipcol = -1;
-                        if (!Int32.TryParse(args[4], out blipcol))
-                        {
-                            cmd_editdmarena(player, "help set team blipcolor");
-                            return;
-                        }
-
-                        team.Key.BlipColor = blipcol;
-                        player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed the {team.Key.Name}'s blip colour to {blipcol}.");
-                    }
-                    else if (args[3].Equals("alpha"))
-                    {
-                        if (args.Length <= 4)
-                        {
-                            cmd_editdmarena(player, "help set team alpha");
-                            return;
-                        }
-
-                        int alpha = -1;
-                        if (!Int32.TryParse(args[4], out alpha))
-                        {
-                            cmd_editdmarena(player, "help set team alpha");
-                            return;
-                        }
-
-                        team.Key.Alpha = alpha;
-                        player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed the {team.Key.Name}'s alpha to {alpha}.");
-                    }
-                    else if (args[3].Equals("hpbar"))
-                    {
-                        if (args.Length <= 4)
-                        {
-                            cmd_editdmarena(player, "help set team hpbar");
-                            return;
-                        }
-
-                        int num = -1;
-                        if (!Int32.TryParse(args[4], out num))
-                        {
-                            cmd_editdmarena(player, "help set team hpbar");
-                            return;
-                        }
-
-                        team.Key.ShowHPBars = num;
-
-                        string hpBars = "INVALID!!";
-                        switch (team.Key.ShowHPBars)
-                        {
-                            case 0:
-                                hpBars = "Never Show";
-                                break;
-                            case 1:
-                                hpBars = "Always Shown";
-                                break;
-                            case 2:
-                                hpBars = "Show On Aim";
-                                break;
-                            case 3:
-                                hpBars = "BUSTED! (Copchase Reserved)";
-                                break;
-                            default:
-                                hpBars = "Invalid! Please fix!";
-                                break;
-                        }
-
-                        player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed the {team.Key.Name}'s bar type to {hpBars}.");
-                    }
-                    else if (args[3].Equals("name"))
-                    {
-                        if (args.Length <= 4)
-                        {
-                            cmd_editdmarena(player, "help set team name");
-                            return;
-                        }
-
-                        args = options.Split(' ', 5);
-                       
-                        player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed team {team.Key.Name}'s name to {args[4]}.");
-                        team.Key.Name = args[4];
-                    }
-                    else if (args[3].Equals("color"))
-                    {
-                        if (args.Length <= 6)
-                        {
-                            cmd_editdmarena(player, "help set team color");
-                            return;
-                        }
-                        int r = 179;
-                        int g = 179;
-                        int b = 179;
-
-                        if (!Int32.TryParse(args[4], out r) || !Int32.TryParse(args[5], out g) || !Int32.TryParse(args[6], out b))
-                        {
-                            cmd_editdmarena(player, "help set team color");
-                            return;
-                        }
-
-                        team.Key.ColorR = r;
-                        team.Key.ColorG = g;
-                        team.Key.ColorB = b;
-
-                        player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed team {team.Key.Name}'s color to !{{{EPlayer.HexConverter(new Color(r, g, b))}}}this.");
-                    }
-                    else if (args[3].Equals("sharedspawns"))
-                    {
-                        if (args.Length <= 4)
-                        {
-                            cmd_editdmarena(player, "help set team sharedspawns");
-                            return;
-                        }
-
-                        int uhuh = -1;
-                    
-                        if (!Int32.TryParse(args[4], out uhuh))
-                        {
-                            cmd_editdmarena(player, "help set team sharedspawns");
-                            return;
-                        }
-
-                        team.Key.SharedSpawns = uhuh;
-                        player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have changed team {team.Key.Name}'s shared spawns team id to {uhuh}.");
-                    }
-                    else
-                    {
-                        cmd_editdmarena(player, "help set team");
-                    }
-                }
-                else
-                {
-                    cmd_editdmarena(player, "help set");
-                }
-            }
-            else
-            {
-                player.TriggerEvent("pushMsgToChat", "!{#AFAFAF}[USAGE] editdmarena (help/list/add/remove/set) | Choose any one category.");
-            }
+                editdmarena_OnValidateDmArena(player, options, arena);
+            });
+  
             
             return;
         }

@@ -9,6 +9,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices.ComTypes;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Net.Mail;
+using System.Threading.Tasks;
 
 namespace RNC
 {
@@ -4996,96 +4997,111 @@ namespace RNC
                         }, delayTimeCalc);
                     }
                 }
-                else if(player.GetSharedData<int>("InLobby") == -6)
+                else if (player.GetSharedData<int>("InLobby") == -6)
                 {
                     player.RemoveAllWeapons();
 
                     player.TriggerEvent("SetActorInvulnerable", false);
 
-                    var arena = EPlayer.IsValidDMArena(player.GetSharedData<int>("InDM"));
-
-                    if(arena.Value == false)
+                    Task.Run(async () =>
                     {
-                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The arena you are playing in does not exist.");
-                        player.SetSharedData("InDM", -1);
-                        player.SetSharedData("Team", -1);
+                        var arena = await EPlayer.IsValidDMArena(player.GetSharedData<int>("InDM"));
 
-                        EPlayer.Spawn(player);
-                        return;
-                    }
-
-                    var team = EPlayer.IsValidDMTeam(arena.Key.SQL_ID, player.GetSharedData<int>("Team"));
-
-                    if (team.Value == false)
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The arena you are playing in does not have the team you are set as, resetting...");
-                        player.SetSharedData("InDM", -1);
-                        player.SetSharedData("Team", -1);
-
-                        EPlayer.Spawn(player);
-                        return;
-                    }
-
-
-                    player.TriggerEvent("showHPBars", team.Key.ShowHPBars);
-
-                    var spawn = ContextFactory.Instance.CustomArenas_Spawns.ToList().OrderBy(a => Guid.NewGuid()).FirstOrDefault(a => a.ArenaID == arena.Key.SQL_ID &&
-                        (a.Team == team.Key.SharedSpawns || a.Team == team.Key.Team));
-
-                    if (spawn != null && spawn != default(CustomDMArenaSpawns))
-                    {
-                        player.Health = team.Key.Health;
-                        player.Armor = team.Key.Armour;
-                        player.SetSharedData("VisibleBlip", team.Key.Blip);
-                        player.SetSharedData("DMBlipColor", team.Key.BlipColor);
-                        player.SetSharedData("EntAlpha", team.Key.Alpha);
-                        EPlayer.SetColor(player, new Color(team.Key.ColorR, team.Key.ColorG, team.Key.ColorB), team.Key.Armour);
-
-                        player.Position = new Vector3(spawn.X, spawn.Y, spawn.Z);
-                        player.Heading = spawn.A;
-
-                        EPlayer.SetDiscordStatus(player, $"[Deathmatch] Team {team.Key.Name} in {arena.Key.Name}");
-
-                        int delayTimeCalc = 250 + player.Ping;
-                        NAPI.Task.Run(() =>
+                        if (arena.Value == false)
                         {
-                            try
+                            NAPI.Task.Run(() =>
                             {
-                                if (player != null && player.Exists)
+                                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The arena you are playing in does not exist.");
+                                player.SetSharedData("InDM", -1);
+                                player.SetSharedData("Team", -1);
+
+                                EPlayer.Spawn(player);
+                            });
+                            return;
+                        }
+
+                        var team = await EPlayer.IsValidDMTeam(arena.Key.SQL_ID, player.GetSharedData<int>("Team"));
+
+                        if (team.Value == false)
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The arena you are playing in does not have the team you are set as, resetting...");
+                                player.SetSharedData("InDM", -1);
+                                player.SetSharedData("Team", -1);
+
+                                EPlayer.Spawn(player);
+                            });
+
+                            return;
+                        }
+
+                        NAPI.Task.Run(() => { player.TriggerEvent("showHPBars", team.Key.ShowHPBars); });
+
+                        using (MainDatabase context = ContextFactory.CreateContext())
+                        {
+                            var spawn = context.CustomArenas_Spawns.AsQueryable().OrderBy(a => Guid.NewGuid()).FirstOrDefault(a => a.ArenaID == arena.Key.SQL_ID &&
+                            (a.Team == team.Key.SharedSpawns || a.Team == team.Key.Team));
+
+                            if (spawn != null && spawn != default(CustomDMArenaSpawns))
+                            {
+                                NAPI.Task.Run(() =>
                                 {
-                                    if (team.Key.WeaponSets == null || team.Key.WeaponSets.Length < 5)
+                                    player.Health = team.Key.Health;
+                                    player.Armor = team.Key.Armour;
+                                    player.SetSharedData("VisibleBlip", team.Key.Blip);
+                                    player.SetSharedData("DMBlipColor", team.Key.BlipColor);
+                                    player.SetSharedData("EntAlpha", team.Key.Alpha);
+                                    EPlayer.SetColor(player, new Color(team.Key.ColorR, team.Key.ColorG, team.Key.ColorB), team.Key.Armour);
+
+                                    player.Position = new Vector3(spawn.X, spawn.Y, spawn.Z);
+                                    player.Heading = spawn.A;
+
+                                    EPlayer.SetDiscordStatus(player, $"[Deathmatch] Team {team.Key.Name} in {arena.Key.Name}");
+
+                                    int delayTimeCalc = 250 + player.Ping;
+                                    NAPI.Task.Run(() =>
                                     {
-                                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}This DM arena does not have weapons set for your team " + team.Key.Team);
-                                        return;
-                                    }
-
-                                    DM_WeaponSets[] weaponSets = NAPI.Util.FromJson<DM_WeaponSets[]>(team.Key.WeaponSets);
-                                    var set = weaponSets.OrderBy(a => Guid.NewGuid()).FirstOrDefault();
-
-                                    if (set == null)
-                                    {
-                                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}This DM arena does not have a proper weapons set for your team " + team.Key.Team);
-                                        return;
-                                    }
-
-                                    foreach (var wep in set.Weapons)
-                                    {
-                                        player.GiveWeapon((WeaponHash)wep.Weapon, wep.Ammo);
-
-                                        foreach (var comp in wep.Components)
+                                        try
                                         {
-                                            EPlayer.AttachComponent(player, wep.Weapon, comp);
+                                            if (player != null && player.Exists)
+                                            {
+                                                if (team.Key.WeaponSets == null || team.Key.WeaponSets.Length < 5)
+                                                {
+                                                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}This DM arena does not have weapons set for your team " + team.Key.Team);
+                                                    return;
+                                                }
+
+                                                DM_WeaponSets[] weaponSets = NAPI.Util.FromJson<DM_WeaponSets[]>(team.Key.WeaponSets);
+                                                var set = weaponSets.OrderBy(a => Guid.NewGuid()).FirstOrDefault();
+
+                                                if (set == null)
+                                                {
+                                                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}This DM arena does not have a proper weapons set for your team " + team.Key.Team);
+                                                    return;
+                                                }
+
+                                                foreach (var wep in set.Weapons)
+                                                {
+                                                    player.GiveWeapon((WeaponHash)wep.Weapon, wep.Ammo);
+
+                                                    foreach (var comp in wep.Components)
+                                                    {
+                                                        EPlayer.AttachComponent(player, wep.Weapon, comp);
+                                                    }
+                                                }
+                                            }
                                         }
-                                    }
-                                }
+                                        catch { }
+                                    }, delayTimeCalc);
+                                });
                             }
-                            catch { }
-                        }, delayTimeCalc);
-                    }
-                    else
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The arena you are playing in does not have a spawn for your team id: " + team.Key.Team);
-                    }
+                        }
+                    });
+                }
+                else
+                {
+                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The arena you are playing in does not have a spawn for your team id!");
                 }
             }
         }

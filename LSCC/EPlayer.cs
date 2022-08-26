@@ -800,49 +800,62 @@ namespace RNC
         }
 
         #region DM Functions
-        public static KeyValuePair<CustomDMArenas, bool> IsValidDMArena(int arenaID)
+        public async static Task<KeyValuePair<CustomDMArenas, bool>> IsValidDMArena(int arenaID)
         {
-            var arena = ContextFactory.Instance.CustomArenas.Find(arenaID);
-            
-            if(arena == null || arena == default(CustomDMArenas)) return new KeyValuePair<CustomDMArenas, bool>(arena, false);
-            return new KeyValuePair<CustomDMArenas, bool>(arena, true);
+            using (MainDatabase context = ContextFactory.CreateContext())
+            {
+                var arena = await context.CustomArenas.FindAsync(arenaID);
+
+                if (arena == null || arena == default(CustomDMArenas)) return new KeyValuePair<CustomDMArenas, bool>(arena, false);
+                return new KeyValuePair<CustomDMArenas, bool>(arena, true);
+            }
         }
 
-        public static KeyValuePair<CustomDMArenaTeams, bool> IsValidDMTeam(int arenaID, int teamID)
+        public async static Task<KeyValuePair<CustomDMArenaTeams, bool>> IsValidDMTeam(int arenaID, int teamID)
         {
-            var arena = IsValidDMArena(arenaID);
+            var arena = await IsValidDMArena(arenaID);
 
             if(arena.Value == false) return new KeyValuePair<CustomDMArenaTeams, bool>(null, false);
 
-            var team = ContextFactory.Instance.CustomArenas_Teams.FirstOrDefault(a => a.ArenaID == arenaID && a.Team == teamID);
+            using (MainDatabase context = ContextFactory.CreateContext())
+            {
+                var team = await context.CustomArenas_Teams.FirstOrDefaultAsync(a => a.ArenaID == arenaID && a.Team == teamID);
 
-            if (team == null || team == default(CustomDMArenaTeams)) return new KeyValuePair<CustomDMArenaTeams, bool>(team, false);
+                if (team == null || team == default(CustomDMArenaTeams)) return new KeyValuePair<CustomDMArenaTeams, bool>(team, false);
 
-            return new KeyValuePair<CustomDMArenaTeams, bool>(team, true);
+                return new KeyValuePair<CustomDMArenaTeams, bool>(team, true);
+            }            
         }
-        public static KeyValuePair<CustomDMArenaSpawns, bool> IsValidDMSpawn(int arenaID, int teamID, int spawnID)
+        public async static Task<KeyValuePair<CustomDMArenaSpawns, bool>> IsValidDMSpawn(int arenaID, int teamID, int spawnID)
         {
-            var team = IsValidDMTeam(arenaID, teamID);
+            var team = await IsValidDMTeam(arenaID, teamID);
             if(team.Value == false) return new KeyValuePair<CustomDMArenaSpawns, bool>(null, false);
+           
+            using (MainDatabase context = ContextFactory.CreateContext())
+            {
+                var spawn = await context.CustomArenas_Spawns.FirstOrDefaultAsync(a => a.ArenaID == arenaID && a.Team == teamID && a.SQL_ID == spawnID);
 
-            var spawn = ContextFactory.Instance.CustomArenas_Spawns.FirstOrDefault(a => a.ArenaID == arenaID && a.Team == teamID && a.SQL_ID == spawnID);
+                if (spawn == null || spawn == default(CustomDMArenaSpawns)) return new KeyValuePair<CustomDMArenaSpawns, bool>(spawn, false);
 
-            if (spawn == null || spawn == default(CustomDMArenaSpawns)) return new KeyValuePair<CustomDMArenaSpawns, bool>(spawn, false);
-
-            return new KeyValuePair<CustomDMArenaSpawns, bool>(spawn, true);
+                return new KeyValuePair<CustomDMArenaSpawns, bool>(spawn, true);
+            }
+          
         }
-        public static KeyValuePair<CustomDMArenaSpawns, bool> IsValidDMSpawn(int spawnID)
+        public async static Task<KeyValuePair<CustomDMArenaSpawns, bool>> IsValidDMSpawn(int spawnID)
         {
-            var spawn = ContextFactory.Instance.CustomArenas_Spawns.FirstOrDefault(a => a.SQL_ID == spawnID);
+            using (MainDatabase context = ContextFactory.CreateContext())
+            {
+                var spawn = await context.CustomArenas_Spawns.FirstOrDefaultAsync(a => a.SQL_ID == spawnID);
 
-            if (spawn == null || spawn == default(CustomDMArenaSpawns)) return new KeyValuePair<CustomDMArenaSpawns, bool>(spawn, false);
+                if (spawn == null || spawn == default(CustomDMArenaSpawns)) return new KeyValuePair<CustomDMArenaSpawns, bool>(spawn, false);
 
-            return new KeyValuePair<CustomDMArenaSpawns, bool>(spawn, true);
+                return new KeyValuePair<CustomDMArenaSpawns, bool>(spawn, true);
+            }
         }
 
-        public static KeyValuePair<DM_WeaponSets, bool> IsValidDMWeaponSet(int arenaID, int teamID, int index)
+        public async static Task<KeyValuePair<DM_WeaponSets, bool>> IsValidDMWeaponSet(int arenaID, int teamID, int index)
         {
-            var team = IsValidDMTeam(arenaID, teamID);
+            var team = await IsValidDMTeam(arenaID, teamID);
             if (team.Value == false) return new KeyValuePair<DM_WeaponSets, bool>(null, false);
 
             DM_WeaponSets[] weaponSets = NAPI.Util.FromJson<DM_WeaponSets[]>(team.Key.WeaponSets);
