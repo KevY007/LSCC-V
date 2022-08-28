@@ -9451,7 +9451,7 @@ namespace RNC
             
             return;
         }
-
+        /*
         [Command("forcelogin")]
         public void cmd_forcelogin(Player player, string username)
         {
@@ -9459,7 +9459,7 @@ namespace RNC
 
             Events.OnPlayerLogin(player, acc);
         }
-
+        */
         [Command("namechange", "!{#AFAFAF}[USAGE] namechange (new name)")]
         public void cmd_namechange(Player player, string newname)
         {
@@ -9472,34 +9472,44 @@ namespace RNC
                 return;
             }
 
-            if (ContextFactory.Instance.Accounts.FirstOrDefault(p => p.Username.Equals(newname, StringComparison.OrdinalIgnoreCase) == true) != null)
-            {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's already an account with that name!");
-                return;
-            }
             string name = player.Name;
-
-            /*foreach (var arena in ContextFactory.Instance.CustomArenas.ToList().Where(a => a.Creator.Equals(name, StringComparison.OrdinalIgnoreCase)))
+            Task.Run(async () =>
             {
-                arena.Creator = newname;
-            }*/
-            foreach (var arena in ContextFactory.Instance.Bans.ToList().Where(a => a.Admin.Equals(name, StringComparison.OrdinalIgnoreCase)))
-            {
-                arena.Admin = newname;
-            }
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    if (await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(newname, StringComparison.OrdinalIgnoreCase) == true) != null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's already an account with that name!");
+                        });
+                        return;
+                    }
 
-            player.TriggerEvent("pushMsgToChat", "!{#FF6347} Reconnect with your new name: !{#FFFFFF}" + newname);
-            EPlayer.Notify(player, $"Please reconnect with your new name: {newname}", "green", "fas fa-check", false, 3000, "center", "replace");
+                    /*foreach (var arena in ContextFactory.Instance.CustomArenas.ToList().Where(a => a.Creator.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        arena.Creator = newname;
+                    }*/
+                    foreach (var arena in context.Bans.ToList().Where(a => a.Admin.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        arena.Admin = newname;
+                    }
 
-            player.Name = newname;
-            EPlayer.GetAccount(player).Username = newname;
-            EPlayer.GetAccount(player).Namechanges--;
-            EPlayer.Save(player);
-            player.ResetData("AccountHandle");
-            player.ResetData("LoggedIn");
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("pushMsgToChat", "!{#FF6347} Reconnect with your new name: !{#FFFFFF}" + newname);
+                        EPlayer.Notify(player, $"Please reconnect with your new name: {newname}", "green", "fas fa-check", false, 3000, "center", "replace");
+                        player.Name = newname;
+                        player.ResetData("AccountHandle");
+                        player.ResetData("LoggedIn");
+                    });
 
-            NAPI.Task.Run(() => { try { player.KickSilent(); } catch { } }, 1000);
-            
+                    EPlayer.GetAccount(player).Username = newname;
+                    EPlayer.GetAccount(player).Namechanges--;
+                    EPlayer.Save(player);
+                    NAPI.Task.Run(() => { try { player.KickSilent(); } catch { } }, 1000);
+                }
+            });            
             return;
         }
 
@@ -9552,26 +9562,42 @@ namespace RNC
                 return;
             }
 
-            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
-
-            if ((tpAcc != null) == false)
+            Task.Run(async () =>
             {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
-                return;
-            }
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
 
-            if (level < 0 || level > 3)
-            { // Bronze, Silver, Gold
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed 3.");
-                return;
-            }
+                    if ((tpAcc != null) == false)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                        });
+                         return;
+                    }
 
-            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:osetdonator:{tpAcc.Username}:{level}"); } catch { }
-            Logs.LogAdmin(player, $"Set offline player {tpAcc.Username}'s donator level to {EPlayer.GetDonatorLevelName(level)}.");
-            tpAcc.DonatorLevel = level;
-            player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}You have set {tpAcc.Username}'s donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
+                    if (level < 0 || level > 3)
+                    { // Bronze, Silver, Gold
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed 3.");
+                        });
+                        return;
+                    }
 
-            ContextFactory.Instance.SaveChanges();
+                    // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:osetdonator:{tpAcc.Username}:{level}"); } catch { }
+                    Logs.LogAdmin(player, $"Set offline player {tpAcc.Username}'s donator level to {EPlayer.GetDonatorLevelName(level)}.");
+                    tpAcc.DonatorLevel = level;
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}You have set {tpAcc.Username}'s donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
+                    });
+
+                    await context.SaveChangesAsync();
+                }
+            });
+            
             return;
         }
 
@@ -10385,27 +10411,40 @@ namespace RNC
                 return;
             }
 
-            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
-
-            if ((tpAcc != null) == false)
+            Task.Run(async () =>
             {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
-                return;
-            }
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
 
-            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ojail:{tpAcc.Username}:{minutes}:{reason}"); } catch { }
-            Logs.LogAdmin(player, $"Offline-jailed {tpAcc.Username} for {minutes} minutes, reason: {reason}");
-            Logs.AddToAdminRecord(tpAcc.SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Jail", "(OFF) " + reason, minutes + " minutes.");
+                    if ((tpAcc != null) == false)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                        });
+                        return;
+                    }
 
-            tpAcc.JailReason = reason;
-            tpAcc.JailTime = tpAcc.JailTime + (minutes * 60);
+                    // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ojail:{tpAcc.Username}:{minutes}:{reason}"); } catch { }
+                    Logs.LogAdmin(player, $"Offline-jailed {tpAcc.Username} for {minutes} minutes, reason: {reason}");
+                    Logs.AddToAdminRecord(tpAcc.SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Jail", "(OFF) " + reason, minutes + " minutes.");
 
-            ContextFactory.Instance.SaveChanges();
+                    tpAcc.JailReason = reason;
+                    tpAcc.JailTime = tpAcc.JailTime + (minutes * 60);
 
-            RAGE.Entities.Players.All.ForEach((Player playa) =>
-            {
-                playa.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}AdmCmd: {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has offline jailed {tpAcc.Username} for {minutes} minutes, reason: {reason}.");
+                    await context.SaveChangesAsync();
+
+                    NAPI.Task.Run(() =>
+                    {
+                        RAGE.Entities.Players.All.ForEach((Player playa) =>
+                        {
+                            playa.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}AdmCmd: {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has offline jailed {tpAcc.Username} for {minutes} minutes, reason: {reason}.");
+                        });
+                    });
+                }
             });
+            
 
 
             return;
@@ -10499,21 +10538,34 @@ namespace RNC
                 return;
             }
 
-            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
-
-            if ((tpAcc != null) == false)
+            Task.Run(async () =>
             {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
-                return;
-            }
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
 
-            //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ounjail:{tpAcc.Username}"); } catch { }
-            Logs.LogAdmin(player, $"Unjailed offline player {tpAcc.Username} who had {tpAcc.JailTime} seconds remaining in jail.");
-            tpAcc.JailTime = 0;
+                    if ((tpAcc != null) == false)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                        });
+                        return;
+                    }
 
-            ContextFactory.Instance.SaveChanges();
+                    //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ounjail:{tpAcc.Username}"); } catch { }
+                    Logs.LogAdmin(player, $"Unjailed offline player {tpAcc.Username} who had {tpAcc.JailTime} seconds remaining in jail.");
+                    tpAcc.JailTime = 0;
 
-            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has offline unjailed {tpAcc.Username}.");
+                    await context.SaveChangesAsync();
+
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has offline unjailed {tpAcc.Username}.");
+                    });
+                }
+            });
+            
 
             return;
         }
@@ -10626,26 +10678,39 @@ namespace RNC
                 return;
             }
 
-            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
-
-            if ((tpAcc != null) == false)
+            Task.Run(async () =>
             {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
-                return;
-            }
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
 
-            //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:omute:{tpAcc.Username}:{minutes}:{reason}"); } catch { }
-            Logs.LogAdmin(player, $"Muted offline player {tpAcc.Username} for {minutes} minutes, reason: {reason}.");
-            Logs.AddToAdminRecord(tpAcc.SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Mute", "(OFF) " + reason, minutes + " minutes.");
-            tpAcc.MuteReason = reason;
-            tpAcc.MuteTime = tpAcc.MuteTime + (minutes * 60);
+                    if ((tpAcc != null) == false)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                        });
+                        return;
+                    }
 
-            ContextFactory.Instance.SaveChanges();
+                    //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:omute:{tpAcc.Username}:{minutes}:{reason}"); } catch { }
+                    Logs.LogAdmin(player, $"Muted offline player {tpAcc.Username} for {minutes} minutes, reason: {reason}.");
+                    Logs.AddToAdminRecord(tpAcc.SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Mute", "(OFF) " + reason, minutes + " minutes.");
+                    tpAcc.MuteReason = reason;
+                    tpAcc.MuteTime = tpAcc.MuteTime + (minutes * 60);
 
-            RAGE.Entities.Players.All.ForEach((Player playa) =>
-            {
-                playa.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}AdmCmd: {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has offline muted {tpAcc.Username} for {minutes} minutes, reason: {reason}.");
+                    await context.SaveChangesAsync();
+
+                    NAPI.Task.Run(() =>
+                    {
+                        RAGE.Entities.Players.All.ForEach((Player playa) =>
+                        {
+                            playa.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}AdmCmd: {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has offline muted {tpAcc.Username} for {minutes} minutes, reason: {reason}.");
+                        });
+                    });
+                }
             });
+            
 
 
             return;
@@ -10668,25 +10733,36 @@ namespace RNC
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Target is currently in-game! Use /unmute!");
                 return;
             }
-
-            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
-
-            if ((tpAcc != null) == false)
+            Task.Run(async () =>
             {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
-                return;
-            }
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
 
-            //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ounmute:{tpAcc.Username}"); } catch { }
-            Logs.LogAdmin(player, $"Unmuted offline player {tpAcc.Username}.");
-            tpAcc.MuteTime = 0;
+                    if ((tpAcc != null) == false)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                        });
+                        return;
+                    }
 
-            ContextFactory.Instance.SaveChanges();
+                    //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ounmute:{tpAcc.Username}"); } catch { }
+                    Logs.LogAdmin(player, $"Unmuted offline player {tpAcc.Username}.");
+                    tpAcc.MuteTime = 0;
 
-            RAGE.Entities.Players.All.ForEach((Player playa) =>
-            {
-                playa.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}AdmCmd: {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has offline unmuted {tpAcc.Username}.");
+                    await context.SaveChangesAsync();
+                    NAPI.Task.Run(() =>
+                    {
+                        RAGE.Entities.Players.All.ForEach((Player playa) =>
+                        {
+                            playa.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}AdmCmd: {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has offline unmuted {tpAcc.Username}.");
+                        });
+                    });
+                }
             });
+            
 
 
             return;

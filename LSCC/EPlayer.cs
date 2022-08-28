@@ -2122,19 +2122,22 @@ namespace RNC
         }
         public static void Save(Player player)
         {
-            if (LoggedIn(player))
+            NAPI.Task.Run(() =>
             {
-                if (player.HasData("PlaytimeTick"))
+                if (LoggedIn(player))
                 {
-                    double minsPassed = (Environment.TickCount64 - player.GetData<long>("PlaytimeTick")) / 60000;
+                    if (player.HasData("PlaytimeTick"))
+                    {
+                        double minsPassed = (Environment.TickCount64 - player.GetData<long>("PlaytimeTick")) / 60000;
 
-                    EPlayer.GetAccount(player).MinutesPlayed += minsPassed;
-                    EPlayer.GetAccount(player).LastSessionMins += minsPassed;
+                        EPlayer.GetAccount(player).MinutesPlayed += minsPassed;
+                        EPlayer.GetAccount(player).LastSessionMins += minsPassed;
+                    }
+                    player.SetData("PlaytimeTick", Environment.TickCount64);
+
+                    ContextFactory.SaveDB();
                 }
-                player.SetData("PlaytimeTick", Environment.TickCount64);
-
-                ContextFactory.SaveDB();
-            }
+            });
         }
         public static Account GetAccount(Player player)
         {
