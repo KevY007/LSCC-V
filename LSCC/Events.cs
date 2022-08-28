@@ -77,13 +77,16 @@ namespace RNC
 
             player.SetSharedData("PlayerWeather", -1);
 
+            string pSerial = player.Serial;
+            string pAddress = player.Address;
+            ulong pSCID = player.SocialClubId;
             NAPI.Notification.SendNotificationToPlayer(player, "Welcome to ~y~Race ~w~'n ~b~Chase~w~. Please wait...");
             Task.Run(async () =>
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    BanData ban = await context.Bans.AsQueryable().FirstOrDefaultAsync(ban => ban.HWID.Equals(player.Serial) || ban.IP.Equals(player.Address) ||
-                        ban.RockstarID == player.SocialClubId);
+                    BanData ban = await context.Bans.AsQueryable().FirstOrDefaultAsync(ban => ban.HWID.Equals(pSerial) || ban.IP.Equals(pAddress) ||
+                        ban.RockstarID == pSCID);
 
                     if (ban != null)
                     {

@@ -1866,7 +1866,7 @@ namespace RNC
         {
             using (MainDatabase context = ContextFactory.CreateContext())
             {
-                var accounts = await context.Accounts.AsQueryable().Where(acc =>
+                var accounts = await context.Accounts.AsAsyncEnumerable().Where(acc =>
                     new ulong[] { pAcc.RegisterRID, pAcc.LastRID }.Intersect(new ulong[] { acc.LastRID, acc.RegisterRID }).Any() ||
                     new string[] { pAcc.RegisterIP, pAcc.LastIP }.Intersect(new string[] { acc.RegisterIP, acc.LastIP }).Any() ||
                     new string[] { pAcc.RegisterHWID, pAcc.LastHWID }.Intersect(new string[] { acc.RegisterHWID, acc.LastHWID }).Any() ||
