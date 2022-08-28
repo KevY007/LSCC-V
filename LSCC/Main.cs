@@ -15,6 +15,7 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace RNC
 {
@@ -579,19 +580,31 @@ namespace RNC
         }
         public static void LoadAchievementsForPlayer(Player player)
         {
-            foreach(Achievement a in Settings.Achievements)
-            {
-                player.TriggerEvent("addAchievement", a.ID, a.Name, a.Description, a.RewardXP, a.RewardPoints, 
-                    EPlayer.HasUnlockedAchievement(player, a.Code), a.Background);
-            }
-            player.TriggerEvent("addAchievementsToMenu");
-
             Account acc = EPlayer.GetAccount(player);
-            DiscordData discordData = NAPI.Util.FromJson<DiscordData>(acc.DiscordInfo);
-            if (discordData.DiscordID != "n/a")
+            Task.Run(async () =>
             {
-                EPlayer.UnlockAchievement(player, "discord_verify");
-            }
+                foreach (Achievement a in Settings.Achievements)
+                {
+                    bool hasUnlocked = await EPlayer.HasUnlockedAchievement(acc, a.Code);
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("addAchievement", a.ID, a.Name, a.Description, a.RewardXP, a.RewardPoints,
+                        hasUnlocked, a.Background);
+                    });
+                }
+                NAPI.Task.Run(() =>
+                {
+                    player.TriggerEvent("addAchievementsToMenu");
+
+                    DiscordData discordData = NAPI.Util.FromJson<DiscordData>(acc.DiscordInfo);
+                    if (discordData.DiscordID != "n/a")
+                    {
+                        EPlayer.UnlockAchievement(player, "discord_verify");
+                    }
+                });
+          
+            });
+
         }
     }
 

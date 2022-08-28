@@ -659,7 +659,7 @@ namespace RNC
 
         public static void ApplyCharacter(Player player, CharacterData playerChar, int teamID = 1)
         {
-            if(playerChar == null)
+            if (playerChar == null)
             {
                 playerChar = new CharacterData();
                 NAPI.Util.ConsoleOutput($"{player.Name} has no char, applying default");
@@ -677,7 +677,7 @@ namespace RNC
 
                 player.SetDecoration(deco);
             }
-            
+
 
             player.ClearAccessory(0);
             player.ClearAccessory(1);
@@ -734,7 +734,7 @@ namespace RNC
         public static string GetAdminLevelName(int level, bool colored = false)
         {
             string name = "";
-            switch(level)
+            switch (level)
             {
                 case 1:
                     if (colored) name = "!{#EE9A4D}";
@@ -793,7 +793,7 @@ namespace RNC
 
         public static void SyncServerSettings(Player player)
         {
-            lock(player)
+            lock (player)
             {
                 player.TriggerEvent("SyncServerSettings", Settings.Dynamics.OnfootCollision, Settings.Dynamics.CameraSettingsUpdate);
             }
@@ -815,7 +815,7 @@ namespace RNC
         {
             var arena = await IsValidDMArena(arenaID);
 
-            if(arena.Value == false) return new KeyValuePair<CustomDMArenaTeams, bool>(null, false);
+            if (arena.Value == false) return new KeyValuePair<CustomDMArenaTeams, bool>(null, false);
 
             using (MainDatabase context = ContextFactory.CreateContext())
             {
@@ -824,13 +824,13 @@ namespace RNC
                 if (team == null || team == default(CustomDMArenaTeams)) return new KeyValuePair<CustomDMArenaTeams, bool>(team, false);
 
                 return new KeyValuePair<CustomDMArenaTeams, bool>(team, true);
-            }            
+            }
         }
         public async static Task<KeyValuePair<CustomDMArenaSpawns, bool>> IsValidDMSpawn(int arenaID, int teamID, int spawnID)
         {
             var team = await IsValidDMTeam(arenaID, teamID);
-            if(team.Value == false) return new KeyValuePair<CustomDMArenaSpawns, bool>(null, false);
-           
+            if (team.Value == false) return new KeyValuePair<CustomDMArenaSpawns, bool>(null, false);
+
             using (MainDatabase context = ContextFactory.CreateContext())
             {
                 var spawn = await context.CustomArenas_Spawns.FirstOrDefaultAsync(a => a.ArenaID == arenaID && a.Team == teamID && a.SQL_ID == spawnID);
@@ -839,7 +839,7 @@ namespace RNC
 
                 return new KeyValuePair<CustomDMArenaSpawns, bool>(spawn, true);
             }
-          
+
         }
         public async static Task<KeyValuePair<CustomDMArenaSpawns, bool>> IsValidDMSpawn(int spawnID)
         {
@@ -1024,7 +1024,7 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return true;
 
-            if(player.GetData<int>("TUA_LT") >= 4) // 4 times TimeUpdate has ticked and the player remained stationary / same spot and not chatted.
+            if (player.GetData<int>("TUA_LT") >= 4) // 4 times TimeUpdate has ticked and the player remained stationary / same spot and not chatted.
             {
                 //return true;
             }
@@ -1049,8 +1049,8 @@ namespace RNC
                     {
                         lock (il)
                         {
-                            lock(il.Cops) il.Cops.Remove(player);
-                            lock(il.Fugitives) il.Fugitives.Remove(player);
+                            lock (il.Cops) il.Cops.Remove(player);
+                            lock (il.Fugitives) il.Fugitives.Remove(player);
                         }
                     }
                 }
@@ -1062,38 +1062,50 @@ namespace RNC
 
         public static void ShowAdminNotes(Player player, Account acc, AdminNote.ANoteType type, bool send_header = true)
         {
-            List<AdminNote> _notes = null;
-
-            switch (type)
+            Task.Run(async () =>
             {
-                case AdminNote.ANoteType.OnSpectate:
-                    _notes = ContextFactory.Instance.AdminNotes.ToList().Where(a => a.AccountID == acc.SQL_ID && a.Type == AdminNote.ANoteType.OnSpectate).ToList();
-                    break;
-                case AdminNote.ANoteType.OnConnect:
-                    _notes = ContextFactory.Instance.AdminNotes.ToList().Where(a => a.AccountID == acc.SQL_ID && a.Type == AdminNote.ANoteType.OnConnect).ToList();
-                    break;
-                case AdminNote.ANoteType.Both:
-                    _notes = ContextFactory.Instance.AdminNotes.ToList().Where(a => a.AccountID == acc.SQL_ID && a.Type == AdminNote.ANoteType.Both).ToList();
-                    break;
-                default:
-                    _notes = ContextFactory.Instance.AdminNotes.ToList().Where(a => a.AccountID == acc.SQL_ID).ToList();
-                    break;
-            }
-            if (_notes == null || _notes.Count <= 0)
-            {
-                if (type != AdminNote.ANoteType.OnConnect && type != AdminNote.ANoteType.OnSpectate && type != AdminNote.ANoteType.Both)
+                using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Target does not have any admin notes on them!");
+                    List<AdminNote> _notes = null;
+
+                    switch (type)
+                    {
+                        case AdminNote.ANoteType.OnSpectate:
+                            _notes = context.AdminNotes.ToList().Where(a => a.AccountID == acc.SQL_ID && a.Type == AdminNote.ANoteType.OnSpectate).ToList();
+                            break;
+                        case AdminNote.ANoteType.OnConnect:
+                            _notes = context.AdminNotes.ToList().Where(a => a.AccountID == acc.SQL_ID && a.Type == AdminNote.ANoteType.OnConnect).ToList();
+                            break;
+                        case AdminNote.ANoteType.Both:
+                            _notes = context.AdminNotes.ToList().Where(a => a.AccountID == acc.SQL_ID && a.Type == AdminNote.ANoteType.Both).ToList();
+                            break;
+                        default:
+                            _notes = context.AdminNotes.ToList().Where(a => a.AccountID == acc.SQL_ID).ToList();
+                            break;
+                    }
+                    if (_notes == null || _notes.Count <= 0)
+                    {
+                        if (type != AdminNote.ANoteType.OnConnect && type != AdminNote.ANoteType.OnSpectate && type != AdminNote.ANoteType.Both)
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Target does not have any admin notes on them!");
+                            });
+                        }
+                        return;
+                    }
+                    if (send_header) NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#ffc852}}====================> !{{#ffffff}}{acc.Username}'s Admin Notes !{{#ffc852}}<===================="); });
+                    foreach (AdminNote note in _notes)
+                    {
+                        Account adm = await context.Accounts.FirstOrDefaultAsync(a => a.SQL_ID == note.AdminID);
+                        string aName = adm.Username ?? "[Unknown]";
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("pushMsgToChat", $"!{{#528bff}}[!{{#91b6ff}}ID:{note.SQL_ID} | {note.Timestamp} | {note.TypeToString()}!{{#528bff}}] !{{#928aff}}{aName}: !{{#ffffff}} {note.Text}");
+                        });
+                    }
                 }
-                return;
-            }
-            if(send_header) player.TriggerEvent("pushMsgToChat", $"!{{#ffc852}}====================> !{{#ffffff}}{acc.Username}'s Admin Notes !{{#ffc852}}<====================");
-            foreach (AdminNote note in _notes)
-            {
-                Account adm = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.SQL_ID == note.AdminID);
-                string aName = adm.Username ?? "[Unknown]";
-                player.TriggerEvent("pushMsgToChat", $"!{{#528bff}}[!{{#91b6ff}}ID:{note.SQL_ID} | {note.Timestamp} | {note.TypeToString()}!{{#528bff}}] !{{#928aff}}{aName}: !{{#ffffff}} {note.Text}");             
-            }
+            });
         }
 
         public static void ShowStats(Player target, Account acc)
@@ -1120,11 +1132,11 @@ namespace RNC
             target.TriggerEvent("pushMsgToChat", $"!{{#ffffff}}| !{{#c7eb7f}}Kills: !{{#cbcfc4}}[{acc.Kills}] !{{#ffffff}}| !{{#c7eb7f}}Deaths: !{{#cbcfc4}}[{acc.Deaths}] !{{#ffffff}}| !{{#c7eb7f}}K/D Ratio: !{{#cbcfc4}}[{KDR.ToString("N3")}]");
 
             target.TriggerEvent("pushMsgToChat", $"!{{#ffffff}}| !{{#c7eb7f}}Arrests: !{{#cbcfc4}}[{acc.Arrests}] !{{#ffffff}}| !{{#c7eb7f}}Time Played: !{{#cbcfc4}}[{(acc.MinutesPlayed / 60.0).ToString("N3")} hours] !{{#ffffff}}| !{{#c7eb7f}}Warns: !{{#cbcfc4}}[{acc.Warns}]");
-            
+
             target.TriggerEvent("pushMsgToChat", $"!{{#ffffff}}| !{{#c7eb7f}}Points: !{{#cbcfc4}}[{acc.Points}] !{{#ffffff}}| !{{#c7eb7f}}Vehicle (Fugitive): !{{#cbcfc4}}[{acc.CarFugitive}] !{{#ffffff}}| !{{#c7eb7f}}Vehicle (Cop): !{{#cbcfc4}}[{acc.CarCop}]");
 
             target.TriggerEvent("pushMsgToChat", $"!{{#ffffff}}| !{{#c7eb7f}}Last Jail: !{{#cbcfc4}}[{acc.JailReason}] !{{#ffffff}}| !{{#c7eb7f}}Last Warn: !{{#cbcfc4}}[{acc.MuteReason}] !{{#ffffff}}| !{{#c7eb7f}}Weapon Components: !{{#cbcfc4}}[/mycomps]");
-            
+
             target.TriggerEvent("pushMsgToChat", $"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} ({acc.SQL_ID}) at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
 
             DiscordData _d = NAPI.Util.FromJson<DiscordData>(acc.DiscordInfo);
@@ -1145,12 +1157,12 @@ namespace RNC
                 {
                     target.TriggerEvent("pushMsgToChat", "!{#83ff75}Your Discord account is linked.");
                 }
-                else 
+                else
                 {
                     target.TriggerEvent("pushMsgToChat", $"!{{#83ff75}}Discord account is linked! (UID:!{{#ffffff}}{_d.DiscordID}!{{#83ff75}})");
                 }
             }
-            
+
             EPlayer.GrantXP(target, 0);
             return;
         }
@@ -1181,9 +1193,9 @@ namespace RNC
             string playerAccuracy = "Unavailable";
             string vehicleAccuracy = "Unavailable";
 
-            if (TotalFired > 0) 
+            if (TotalFired > 0)
             {
-                if(PlayerHits > 0)
+                if (PlayerHits > 0)
                 {
                     double calc = (PlayerHits / (double)(TotalFired - VehicleHits)) * 100.0;
                     playerAccuracy = $"{calc.ToString("N1")}%";
@@ -1208,7 +1220,7 @@ namespace RNC
                 Account Acc = EPlayer.GetAccount(player);
                 Acc.Warns++;
 
-                if(Acc.Warns < 10)
+                if (Acc.Warns < 10)
                 {
                     player.TriggerEvent("pushMsgToChat", "!{#FF6347}You have been warned, be careful next time. After 10 warns you will receive jailtime on every warn until 20 warns.");
                 }
@@ -1249,31 +1261,40 @@ namespace RNC
             if (cInfo == null) return;
 
             ChallengeData cd = cInfo.FirstOrDefault(c => c.ChallengeType == challenge_type && c.ChallengeItem == challenge_item);
-            if(cd == null) return;
+            if (cd == null) return;
             if (cd.Completed) return;
             cInfo.Remove(cd);
             cd.ChallengeProgress++;
 
-            DailyChallenge dc = ContextFactory.Instance.DailyChallenges.FirstOrDefault(dc => dc.Item == challenge_item && dc.Type == challenge_type);
-            if (dc == null) return;
-
-            player.TriggerEvent("advanceChallenge", 1, challenge_type, challenge_item, cd.ChallengeProgress);
-
-            if(cd.ChallengeProgress >= dc.Target)
+            Task.Run(async () =>
             {
-                cd.Completed = true;
-                CompleteChallenge(player, dc);
-            }
-            cInfo.Add(cd);
-            string backToJson = NAPI.Util.ToJson(cInfo);
-            acc.ChallengeInfo = backToJson;
-            ContextFactory.Instance.SaveChanges();
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    DailyChallenge dc = await context.DailyChallenges.FirstOrDefaultAsync(dc => dc.Item == challenge_item && dc.Type == challenge_type);
+                    if (dc == null) return;
+
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("advanceChallenge", 1, challenge_type, challenge_item, cd.ChallengeProgress);
+                    });
+                    if (cd.ChallengeProgress >= dc.Target)
+                    {
+                        cd.Completed = true;
+                        CompleteChallenge(player, dc);
+                    }
+                    cInfo.Add(cd);
+                    string backToJson = NAPI.Util.ToJson(cInfo);
+                    acc.ChallengeInfo = backToJson;
+                    await context.SaveChangesAsync();
+                }
+            });
+
         }
         public static void CompleteChallenge(Player player, DailyChallenge challenge)
         {
-            if(challenge.RewardXP > 0)
+            if (challenge.RewardXP > 0)
                 EPlayer.GrantXP(player, challenge.RewardXP);
-            if(challenge.RewardPoints > 0)
+            if (challenge.RewardPoints > 0)
                 EPlayer.GivePoints(player, challenge.RewardPoints);
 
             Account acc = EPlayer.GetAccount(player);
@@ -1288,7 +1309,7 @@ namespace RNC
                         "package://Artwork/Achievements/first_bankrob_fugitive.png", "", 7500, false);
                     player.TriggerEvent("advanceChallenge", 0, -1, -1, acc.ChallengeStreak);
                 }
-                else if(acc.ChallengeStreak == 7)
+                else if (acc.ChallengeStreak == 7)
                 {
                     EPlayer.GrantXP(player, 70);
                     EPlayer.GivePoints(player, 50);
@@ -1303,56 +1324,75 @@ namespace RNC
 
             }
 
-            player.TriggerEvent("unlockChallenge", challenge.Type, challenge.Item);            
+            player.TriggerEvent("unlockChallenge", challenge.Type, challenge.Item);
         }
 
-        public static bool HasUnlockedAchievement(Player player, string achievement)
+        public async static Task<bool> HasUnlockedAchievement(Account account, string achievement)
         {
-            if (EPlayer.GetAccount(player) == null) return false;
-            UnlockedAchievement a = ContextFactory.Instance.UnlockedAchievements.FirstOrDefault(u => u.AccountID == EPlayer.GetAccount(player).SQL_ID && u.Achievement.Equals(achievement, StringComparison.OrdinalIgnoreCase));
-            if (a == null) return false;
-            else return true;
-        }
+            if (account == null) return false;
+
+            using (MainDatabase context = ContextFactory.CreateContext())
+            {
+                UnlockedAchievement a = await context.UnlockedAchievements.FirstOrDefaultAsync(u => u.AccountID == account.SQL_ID && u.Achievement.Equals(achievement, StringComparison.OrdinalIgnoreCase));
+                if (a == null) return false;
+                else return true;
+            }
+        } 
         public static void UnlockAchievement(Player player, string achievement)
         {
-            if (EPlayer.GetAccount(player) == null) return;
-            Account acc = EPlayer.GetAccount(player);
-            if (HasUnlockedAchievement(player, achievement)) return;
-            Achievement achdata = Settings.Achievements.FirstOrDefault(a => a.Code == achievement);
-            if (achdata == null) return;
-
-            UnlockedAchievement ach = new UnlockedAchievement()
+            NAPI.Task.Run(() =>
             {
-                AccountID = EPlayer.GetAccount(player).SQL_ID,
-                Achievement = achievement,
-                Time = DateTime.Now
-            };
-            ContextFactory.Instance.UnlockedAchievements.Add(ach);
-
-            player.TriggerEvent("unlockAchievement", achdata.Name);
-
-            if(achdata.RewardXP > 0)
-                EPlayer.GrantXP(player, achdata.RewardXP);
-
-            if(achdata.RewardPoints > 0)
-                EPlayer.GivePoints(player, achdata.RewardPoints);
-
-            ContextFactory.Instance.SaveChanges();
-
-            // TO-DO: triggering achievement unlock notification, awaiting rotx to make UI for it
-
-            if (achievement != "all_achievements")
-            {
-                if (!HasUnlockedAchievement(player, "all_achievements"))
+                if (EPlayer.GetAccount(player) == null) return;
+                Account acc = EPlayer.GetAccount(player);
+                Task.Run(async () =>
                 {
-                    // checking if all achievements are unlocked: is the count of player's unlocked achievements higher or equal than server achievement count?
-                    int playerAchievements = ContextFactory.Instance.UnlockedAchievements.AsQueryable().Where(a => a.AccountID == acc.SQL_ID).ToList().Count;
-                    if (playerAchievements >= Settings.Achievements.Count-1)
+                    if (await HasUnlockedAchievement(acc, achievement)) return;
+                    Achievement achdata = Settings.Achievements.FirstOrDefault(a => a.Code == achievement);
+                    if (achdata == null) return;
+
+                    using (MainDatabase context = ContextFactory.CreateContext())
                     {
-                        UnlockAchievement(player, "all_achievements");
+                        UnlockedAchievement ach = new UnlockedAchievement()
+                        {
+                            AccountID = acc.SQL_ID,
+                            Achievement = achievement,
+                            Time = DateTime.Now
+                        };
+                        await context.UnlockedAchievements.AddAsync(ach);
+
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("unlockAchievement", achdata.Name);
+                        });
+
+                        if (achdata.RewardXP > 0)
+                            EPlayer.GrantXP(player, achdata.RewardXP);
+
+                        if (achdata.RewardPoints > 0)
+                            EPlayer.GivePoints(player, achdata.RewardPoints);
+
+                        await context.SaveChangesAsync();
+
+                        // TO-DO: triggering achievement unlock notification, awaiting rotx to make UI for it
+
+                        if (achievement != "all_achievements")
+                        {
+                            bool hasUnlockedAllAchievements = await HasUnlockedAchievement(acc, "all_achievements");
+                            if (!hasUnlockedAllAchievements)
+                            {
+                                // checking if all achievements are unlocked: is the count of player's unlocked achievements higher or equal than server achievement count?
+                                int playerAchievements = await context.UnlockedAchievements.CountAsync(a => a.AccountID == acc.SQL_ID);
+                                if (playerAchievements >= Settings.Achievements.Count - 1)
+                                {
+                                    UnlockAchievement(player, "all_achievements");
+                                }
+                            }
+                        }
                     }
-                }
-            }
+                });
+                
+            });
+            
         }
 
         public static void SyncComponents(Player tosyncfor, Player target, long specificWeapon = -1)
