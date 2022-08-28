@@ -1367,10 +1367,13 @@ namespace RNC
                         });
 
                         if (achdata.RewardXP > 0)
-                            EPlayer.GrantXP(player, achdata.RewardXP);
+                            NAPI.Task.Run(() => { EPlayer.GrantXP(player, achdata.RewardXP); });
 
                         if (achdata.RewardPoints > 0)
-                            EPlayer.GivePoints(player, achdata.RewardPoints);
+                            NAPI.Task.Run(() =>
+                            {
+                                EPlayer.GivePoints(player, achdata.RewardPoints);
+                            });
 
                         await context.SaveChangesAsync();
 
@@ -2132,89 +2135,93 @@ namespace RNC
         }
         public static void GrantXP(Player player, int xp)
         {
-            if (!EPlayer.LoggedIn(player)) return;
-
-            Account acc = EPlayer.GetAccount(player); 
-            acc.XP += xp;
-            int lvlDiff = 0;
-               
-            while(acc.XP < 0)
+            NAPI.Task.Run(() =>
             {
-                if (acc.Level > 0)
+                if (!EPlayer.LoggedIn(player)) return;
+
+                Account acc = EPlayer.GetAccount(player);
+                acc.XP += xp;
+                int lvlDiff = 0;
+
+                while (acc.XP < 0)
                 {
-                    acc.Level--;
-
-                    acc.XP += GetMaxLevelXP(acc.Level);
-                    lvlDiff--;
-                }
-                else
-                {
-                    acc.XP = 0;
-                    acc.Level = 0;
-                    break;
-                }
-            }
-
-            while(CheckXPLevelUp(acc.Level, acc.XP) == true)
-            {
-                acc.XP -= GetMaxLevelXP(acc.Level);
-                acc.Level++;
-
-                lvlDiff++;
-            }
-
-            if(lvlDiff > 0)
-            {
-                RAGE.Entities.Players.All.ForEach((Player pl) =>
-                {
-                    if(lvlDiff > 1) pl.TriggerEvent("pushMsgToChat", $"!{{#00BA03}}[LEVEL UP] {player.Name} has levelled up +{lvlDiff} times to {acc.Level}!");
-                    else pl.TriggerEvent("pushMsgToChat", $"!{{#00BA03}}[LEVEL UP] {player.Name} has levelled up to {acc.Level}!");
-                });
-                EPlayer.Notify(player, $"You have <strong>levelled up</strong> to <strong>{acc.Level}</strong>.", "green", "fas fa-check", false, 1500, "bottomRight", "replace");
-
-                player.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
-                try { NAPI.Task.Run(() => player.TriggerEvent("ShakeCam", "VIBRATE_SHAKE", 7.0f, 2000), 1000); } catch { }
-            }
-            else if (lvlDiff < 0)
-            {
-                RAGE.Entities.Players.All.ForEach((Player pl) =>
-                {
-                    if (lvlDiff < -1) pl.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[LEVEL DOWN] {player.Name} has levelled down {lvlDiff} times to {acc.Level}!");
-                    else pl.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[LEVEL DOWN] {player.Name} has levelled down to {acc.Level}!");
-                });
-                EPlayer.Notify(player, $"You have <strong>levelled down</strong> to <strong>{acc.Level}</strong>.", "red", "fas fa-cross", false, 1500, "bottomRight", "replace");
-
-                player.TriggerEvent("PlayMissionComplete", "GENERIC_FAILED");
-                try { NAPI.Task.Run(() => player.TriggerEvent("ShakeCam", "VIBRATE_SHAKE", 3.0f, 1500), 1000); } catch { }
-            }
-
-            player.SetSharedData("Level", acc.Level);
-            player.SetSharedData("CurrentXP", acc.XP);
-            player.SetSharedData("NextLevelXP", EPlayer.GetMaxLevelXP(acc.Level));
-            player.TriggerEvent("Menu_UpdateLevelXP");
-
-            try
-            {
-                NAPI.Task.Run(() =>
-                {
-                    try
+                    if (acc.Level > 0)
                     {
-                        if (player != null)
+                        acc.Level--;
+
+                        acc.XP += GetMaxLevelXP(acc.Level);
+                        lvlDiff--;
+                    }
+                    else
+                    {
+                        acc.XP = 0;
+                        acc.Level = 0;
+                        break;
+                    }
+                }
+
+                while (CheckXPLevelUp(acc.Level, acc.XP) == true)
+                {
+                    acc.XP -= GetMaxLevelXP(acc.Level);
+                    acc.Level++;
+
+                    lvlDiff++;
+                }
+
+                if (lvlDiff > 0)
+                {
+                    RAGE.Entities.Players.All.ForEach((Player pl) =>
+                    {
+                        if (lvlDiff > 1) pl.TriggerEvent("pushMsgToChat", $"!{{#00BA03}}[LEVEL UP] {player.Name} has levelled up +{lvlDiff} times to {acc.Level}!");
+                        else pl.TriggerEvent("pushMsgToChat", $"!{{#00BA03}}[LEVEL UP] {player.Name} has levelled up to {acc.Level}!");
+                    });
+                    EPlayer.Notify(player, $"You have <strong>levelled up</strong> to <strong>{acc.Level}</strong>.", "green", "fas fa-check", false, 1500, "bottomRight", "replace");
+
+                    player.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
+                    try { NAPI.Task.Run(() => player.TriggerEvent("ShakeCam", "VIBRATE_SHAKE", 7.0f, 2000), 1000); } catch { }
+                }
+                else if (lvlDiff < 0)
+                {
+                    RAGE.Entities.Players.All.ForEach((Player pl) =>
+                    {
+                        if (lvlDiff < -1) pl.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[LEVEL DOWN] {player.Name} has levelled down {lvlDiff} times to {acc.Level}!");
+                        else pl.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[LEVEL DOWN] {player.Name} has levelled down to {acc.Level}!");
+                    });
+                    EPlayer.Notify(player, $"You have <strong>levelled down</strong> to <strong>{acc.Level}</strong>.", "red", "fas fa-cross", false, 1500, "bottomRight", "replace");
+
+                    player.TriggerEvent("PlayMissionComplete", "GENERIC_FAILED");
+                    try { NAPI.Task.Run(() => player.TriggerEvent("ShakeCam", "VIBRATE_SHAKE", 3.0f, 1500), 1000); } catch { }
+                }
+
+                player.SetSharedData("Level", acc.Level);
+                player.SetSharedData("CurrentXP", acc.XP);
+                player.SetSharedData("NextLevelXP", EPlayer.GetMaxLevelXP(acc.Level));
+                player.TriggerEvent("Menu_UpdateLevelXP");
+
+                try
+                {
+                    NAPI.Task.Run(() =>
+                    {
+                        try
                         {
-                            if (player.GetSharedData<int>("Level") >= 100)
+                            if (player != null)
                             {
-                                EPlayer.UnlockAchievement(player, "reach_level_100");
+                                if (player.GetSharedData<int>("Level") >= 100)
+                                {
+                                    EPlayer.UnlockAchievement(player, "reach_level_100");
+                                }
                             }
                         }
-                    }
-                    catch(Exception ex)
-                    {
-                        NAPI.Util.ConsoleOutput("EXCEPTION WHEN UNLOCKING REACH_LEVEL_100 INSIDE RUN(): " + ex.ToString());
-                    }
-                
-                }, 1000);
-            }
-            catch (Exception ex) { NAPI.Util.ConsoleOutput("EXCEPTION WHEN UNLOCKING REACH_LEVEL_100 OUTSIDE RUN(): " + ex.ToString()); }
+                        catch (Exception ex)
+                        {
+                            NAPI.Util.ConsoleOutput("EXCEPTION WHEN UNLOCKING REACH_LEVEL_100 INSIDE RUN(): " + ex.ToString());
+                        }
+
+                    }, 1000);
+                }
+                catch (Exception ex) { NAPI.Util.ConsoleOutput("EXCEPTION WHEN UNLOCKING REACH_LEVEL_100 OUTSIDE RUN(): " + ex.ToString()); }
+            });
+            
         }
         public static void Save(Player player)
         {

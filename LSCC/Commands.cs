@@ -5665,7 +5665,7 @@ namespace RNC
                         return;
                     }
 
-                    AccountManager.ClearForeignKeys(tpAcc);
+                    await AccountManager.ClearForeignKeys(tpAcc);
                     context.Accounts.Remove(tpAcc);
                     await context.SaveChangesAsync();
                     deleteaccount_SuccessTask(player, tpAcc.Username);
@@ -8982,7 +8982,9 @@ namespace RNC
             if (EPlayer.GetAccount(player).Admin < 6) return;
 
             EPlayer.SendMessageToAll("!{#c387ff}[DAILY CHALLENGES] ~w~New daily challenges are now available! Check ~y~Menu > Profile~w~ for more info.");
-            Challenge.SetNewDailyChallenges();
+            Task.Run(async () => {
+                Challenge.SetNewDailyChallenges();
+            });
         }
 
         [Command("dbgdiscordverify")]

@@ -157,33 +157,30 @@ namespace RNC
         }
         */
 
-        public static void ClearForeignKeys(Account acc)
+        public async static Task<bool> ClearForeignKeys(Account acc)
         {
-            Task.Run(async () =>
+            using (MainDatabase context = ContextFactory.CreateContext())
             {
-                using (MainDatabase context = ContextFactory.CreateContext())
-                {
-                    List<Logs_Admin> aLogs = context.Logs_Admin.ToList().Where(l => l.AccountID == acc.SQL_ID).ToList();
-                    context.Logs_Admin.RemoveRange(aLogs);
-                    List<Logs_AdminRecord> arLogs = context.Logs_AdminRecords.ToList().Where(l => l.AccountID == acc.SQL_ID || l.AdminID == acc.SQL_ID).ToList();
-                    context.Logs_AdminRecords.RemoveRange(arLogs);
-                    List<Logs_Session> sLogs = context.Logs_Session.ToList().Where(l => l.AccountID == acc.SQL_ID).ToList();
-                    context.Logs_Session.RemoveRange(sLogs);
-                    List<OwnedVehData> oVehData = context.OwnedVehicles.ToList().Where(l => l.AccountSQLID == acc.SQL_ID).ToList();
-                    context.OwnedVehicles.RemoveRange(oVehData);
-                    List<OwnedLoadoutData> oLData = context.OwnedLoadouts.ToList().Where(l => l.AccountSQLID == acc.SQL_ID).ToList();
-                    context.OwnedLoadouts.RemoveRange(oLData);
-                    List<BanData> bData = context.Bans.ToList().Where(l => l.AccountSQLID == acc.SQL_ID).ToList();
-                    context.Bans.RemoveRange(bData);
-                    List<AdminNote> anotedata = context.AdminNotes.ToList().Where(l => l.AccountID == acc.SQL_ID || l.AdminID == acc.SQL_ID).ToList();
-                    context.AdminNotes.RemoveRange(anotedata);
-                    List<PlayerTunings> ptune = context.PlayerTunings.ToList().Where(l => l.AccountSQLID == acc.SQL_ID).ToList();
-                    context.PlayerTunings.RemoveRange(ptune);
-                    List<PlayerOutfit> pout = context.PlayerOutfits.ToList().Where(l => l.AccountID == acc.SQL_ID).ToList();
-                    context.PlayerOutfits.RemoveRange(pout);
-                }
-            });
-
+                List<Logs_Admin> aLogs = await context.Logs_Admin.AsQueryable().Where(l => l.AccountID == acc.SQL_ID).ToListAsync();
+                context.Logs_Admin.RemoveRange(aLogs);
+                List<Logs_AdminRecord> arLogs = await context.Logs_AdminRecords.AsQueryable().Where(l => l.AccountID == acc.SQL_ID || l.AdminID == acc.SQL_ID).ToListAsync();
+                context.Logs_AdminRecords.RemoveRange(arLogs);
+                List<Logs_Session> sLogs = await context.Logs_Session.AsQueryable().Where(l => l.AccountID == acc.SQL_ID).ToListAsync();
+                context.Logs_Session.RemoveRange(sLogs);
+                List<OwnedVehData> oVehData = await context.OwnedVehicles.AsQueryable().Where(l => l.AccountSQLID == acc.SQL_ID).ToListAsync();
+                context.OwnedVehicles.RemoveRange(oVehData);
+                List<OwnedLoadoutData> oLData = await context.OwnedLoadouts.AsQueryable().Where(l => l.AccountSQLID == acc.SQL_ID).ToListAsync();
+                context.OwnedLoadouts.RemoveRange(oLData);
+                List<BanData> bData = await context.Bans.AsQueryable().Where(l => l.AccountSQLID == acc.SQL_ID).ToListAsync();
+                context.Bans.RemoveRange(bData);
+                List<AdminNote> anotedata = await context.AdminNotes.AsQueryable().Where(l => l.AccountID == acc.SQL_ID || l.AdminID == acc.SQL_ID).ToListAsync();
+                context.AdminNotes.RemoveRange(anotedata);
+                List<PlayerTunings> ptune = await context.PlayerTunings.AsQueryable().Where(l => l.AccountSQLID == acc.SQL_ID).ToListAsync();
+                context.PlayerTunings.RemoveRange(ptune);
+                List<PlayerOutfit> pout = await context.PlayerOutfits.AsQueryable().Where(l => l.AccountID == acc.SQL_ID).ToListAsync();
+                context.PlayerOutfits.RemoveRange(pout);
+            }
+            return true;
         }
 
         public static bool MatchPass(string a, string b) { if (a.CompareTo(b) == 0) { return true; } return false; }

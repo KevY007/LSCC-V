@@ -1037,113 +1037,123 @@ namespace RNC
         }
         public static void AddChallengesForPlayer(Player player, List<ChallengeData> cdList)
         {
-            string desc = "";
-            Account acc = EPlayer.GetAccount(player);
-            List<ChallengeData> cdInfo = NAPI.Util.FromJson<List<ChallengeData>>(acc.ChallengeInfo);
-
-            player.TriggerEvent("clearDailyChallenges");
-
-            string jData = NAPI.Util.ToJson(cdList);
-            acc.ChallengeInfo = jData;
-            cdInfo = NAPI.Util.FromJson<List<ChallengeData>>(jData);
-            ContextFactory.SaveDB();
-
-            Task.Run(async () =>
+            try
             {
-                using (MainDatabase context = ContextFactory.CreateContext())
+
+
+                string desc = "";
+                Account acc = EPlayer.GetAccount(player);
+                List<ChallengeData> cdInfo = NAPI.Util.FromJson<List<ChallengeData>>(acc.ChallengeInfo);
+
+                player.TriggerEvent("clearDailyChallenges");
+
+                string jData = NAPI.Util.ToJson(cdList);
+                acc.ChallengeInfo = jData;
+                cdInfo = NAPI.Util.FromJson<List<ChallengeData>>(jData);
+                ContextFactory.SaveDB();
+
+                Task.Run(async () =>
                 {
-                    await context.DailyChallenges.AsQueryable().ForEachAsync(c =>
+                    using (MainDatabase context = ContextFactory.CreateContext())
                     {
-                        switch ((ChallengeType)c.Type)
+                        await context.DailyChallenges.AsQueryable().ForEachAsync(c =>
                         {
-                            case ChallengeType.AnyKill:
-                                {
-                                    string reasonDisp = "";
-                                    if (c.Item.Split("_", 2).Length > 0)
-                                        reasonDisp = c.Item.Split("_", 2)[1];
-                                    else reasonDisp = c.Item;
-
-                                    if (reasonDisp == "RIFLE")
-                                        reasonDisp = "(ASSAULT) RIFLE";
-
-                                    desc = $"Kill {c.Target} players with a weapon from the {reasonDisp} category in any mode.";
-                                }
-                                break;
-                            case ChallengeType.CopchaseKill:
-                                {
-                                    string reasonDisp = "";
-                                    if (c.Item.Split("_", 2).Length > 0)
-                                        reasonDisp = c.Item.Split("_", 2)[1];
-                                    else reasonDisp = c.Item;
-
-                                    if (reasonDisp == "RIFLE")
-                                        reasonDisp = "(ASSAULT) RIFLE";
-
-                                    desc = $"Kill {c.Target} players with a weapon from the {reasonDisp} category in copchase.";
-                                }
-                                break;
-                            case ChallengeType.CopchaseRounds:
-                                {
-                                    desc = $"Play {c.Target} rounds of copchase.";
-                                }
-                                break;
-                            case ChallengeType.CopchaseVehicle:
-                                {
-                                    CarData cdt = Settings.Cars.FirstOrDefault(t => t.Model == c.Item);
-                                    string veh = "";
-                                    if (cdt == null) { veh = c.Item; }
-                                    else veh = cdt.Name;
-
-                                    desc = $"Play {c.Target} copchase rounds with >> {c.Item} << set as your vehicle.";
-                                }
-                                break;
-                            case ChallengeType.Win:
-                                {
-                                    if (c.Item == "derby")
-                                        desc = $"Win {c.Target} rounds of the derby side mode.";
-                                    else
+                            switch ((ChallengeType)c.Type)
+                            {
+                                case ChallengeType.AnyKill:
                                     {
-                                        desc = $"Win {c.Target} copchase rounds as a {c.Item}.";
-                                    }
-                                }
-                                break;
-                            case ChallengeType.Arrest:
-                                {
-                                    desc = $"Arrest {c.Target} fugitives.";
-                                }
-                                break;
-                        }
+                                        string reasonDisp = "";
+                                        if (c.Item.Split("_", 2).Length > 0)
+                                            reasonDisp = c.Item.Split("_", 2)[1];
+                                        else reasonDisp = c.Item;
 
-                        ChallengeData cd = cdInfo.FirstOrDefault(t => (t.ChallengeItem == c.Item && t.ChallengeType == c.Type));
-                        bool completed = false;
-                        if (cd != null)
-                        {
-                            completed = cd.Completed;
-                            TimeSpan sp = new TimeSpan(DateTime.Now.Ticks);
-                            double secs = Math.Ceiling(c.ExpireTimestamp - sp.TotalSeconds);
+                                        if (reasonDisp == "RIFLE")
+                                            reasonDisp = "(ASSAULT) RIFLE";
+
+                                        desc = $"Kill {c.Target} players with a weapon from the {reasonDisp} category in any mode.";
+                                    }
+                                    break;
+                                case ChallengeType.CopchaseKill:
+                                    {
+                                        string reasonDisp = "";
+                                        if (c.Item.Split("_", 2).Length > 0)
+                                            reasonDisp = c.Item.Split("_", 2)[1];
+                                        else reasonDisp = c.Item;
+
+                                        if (reasonDisp == "RIFLE")
+                                            reasonDisp = "(ASSAULT) RIFLE";
+
+                                        desc = $"Kill {c.Target} players with a weapon from the {reasonDisp} category in copchase.";
+                                    }
+                                    break;
+                                case ChallengeType.CopchaseRounds:
+                                    {
+                                        desc = $"Play {c.Target} rounds of copchase.";
+                                    }
+                                    break;
+                                case ChallengeType.CopchaseVehicle:
+                                    {
+                                        CarData cdt = Settings.Cars.FirstOrDefault(t => t.Model == c.Item);
+                                        string veh = "";
+                                        if (cdt == null) { veh = c.Item; }
+                                        else veh = cdt.Name;
+
+                                        desc = $"Play {c.Target} copchase rounds with >> {c.Item} << set as your vehicle.";
+                                    }
+                                    break;
+                                case ChallengeType.Win:
+                                    {
+                                        if (c.Item == "derby")
+                                            desc = $"Win {c.Target} rounds of the derby side mode.";
+                                        else
+                                        {
+                                            desc = $"Win {c.Target} copchase rounds as a {c.Item}.";
+                                        }
+                                    }
+                                    break;
+                                case ChallengeType.Arrest:
+                                    {
+                                        desc = $"Arrest {c.Target} fugitives.";
+                                    }
+                                    break;
+                            }
+
+                            ChallengeData cd = cdInfo.FirstOrDefault(t => (t.ChallengeItem == c.Item && t.ChallengeType == c.Type));
+                            bool completed = false;
+                            if (cd != null)
+                            {
+                                completed = cd.Completed;
+                                TimeSpan sp = new TimeSpan(DateTime.Now.Ticks);
+                                double secs = Math.Ceiling(c.ExpireTimestamp - sp.TotalSeconds);
                             // (id, desc, rXP, rPts, expireDate, completed, target, progress, type, item)
                             NAPI.Task.Run(() =>
+                                {
+                                    player.TriggerEvent("addDailyChallenge", c.SQL_ID, desc, c.RewardXP, c.RewardPoints, secs, completed, c.Target, cd.ChallengeProgress, c.Type, c.Item);
+                                });
+                            }
+                            else
                             {
-                                player.TriggerEvent("addDailyChallenge", c.SQL_ID, desc, c.RewardXP, c.RewardPoints, secs, completed, c.Target, cd.ChallengeProgress, c.Type, c.Item);
-                            });
-                        }
-                        else
+                                TimeSpan sp = new TimeSpan(DateTime.Now.Ticks);
+                                double secs = Math.Ceiling(c.ExpireTimestamp - sp.TotalSeconds);
+                                NAPI.Task.Run(() =>
+                                {
+                                    player.TriggerEvent("addDailyChallenge", c.SQL_ID, desc, c.RewardXP, c.RewardPoints, secs, completed, c.Target, 0, c.Type, c.Item);
+                                });
+                            }
+                        });
+                        NAPI.Task.Run(() =>
                         {
-                            TimeSpan sp = new TimeSpan(DateTime.Now.Ticks);
-                            double secs = Math.Ceiling(c.ExpireTimestamp - sp.TotalSeconds);
-                            NAPI.Task.Run(() =>
-                            {
-                                player.TriggerEvent("addDailyChallenge", c.SQL_ID, desc, c.RewardXP, c.RewardPoints, secs, completed, c.Target, 0, c.Type, c.Item);
-                            });
-                        }
-                    });
-                    NAPI.Task.Run(() =>
-                    {
-                        player.TriggerEvent("addChallengesToMenu", acc.ChallengeStreak, (Settings.Dynamics.NextWeekUnix - new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds()));
-                    });
-                }
-            });
-            
+                            player.TriggerEvent("addChallengesToMenu", acc.ChallengeStreak, (Settings.Dynamics.NextWeekUnix - new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds()));
+                        });
+                    }
+                });
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"[RnC Challenges] Error when adding channelges for player: {ex.ToString()}");
+            }
+
+
         }
         public async static void SetNewDailyChallenges()
         {
@@ -1289,7 +1299,7 @@ namespace RNC
 
                 }
 
-                //await context.SaveChangesAsync();
+                await context.SaveChangesAsync();
                 List<ChallengeData> cdList = new List<ChallengeData>();
                 ChallengeData temp = new ChallengeData();
                 await context.DailyChallenges.AsQueryable().ForEachAsync(dc =>
@@ -1305,16 +1315,20 @@ namespace RNC
                 string jData = NAPI.Util.ToJson(cdList);
                 await context.Accounts.AsQueryable().ForEachAsync(acc =>
                 {
-                    acc.ChallengeInfo = jData;
+                    try { acc.ChallengeInfo = jData; } catch { }
+                    
                 });
                 int cCount = await context.DailyChallenges.AsQueryable().CountAsync();
+                Console.WriteLine("[RnC CHALLENGES] Generated new challenges, count: " + cCount);
                 NAPI.Task.Run(() =>
                 {
                     foreach (Player pl in NAPI.Pools.GetAllPlayers())
                     {
-                        AddChallengesForPlayer(pl, cdList);
+                        if (EPlayer.LoggedIn(pl))
+                        {
+                            AddChallengesForPlayer(pl, cdList);
+                        }
                     }
-                    NAPI.Util.ConsoleOutput("(RnC | CHALLENGES) Set up new challenges, total: " + cCount);
                 });
                 await context.SaveChangesAsync();
             }
@@ -3076,7 +3090,7 @@ namespace RNC
                             {
                                 lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && !EPlayer.IsAFK(a) && !a.HasData("Spectating") && a.GetSharedData<bool>("AutoJoin") == true && !a.Dead).OrderBy(c => Guid.NewGuid()).ToList();
                             });
-                            await NAPI.Task.WaitForMainThread();
+                            //await NAPI.Task.WaitForMainThread();
                             using (MainDatabase context = ContextFactory.CreateContext())
                             {
                                 if (lobby.gameMode != GameModes.BANKROBBERY)
@@ -3106,7 +3120,7 @@ namespace RNC
 
                                     lobby.lastMapId = map.SQL_ID;
 
-                                    if (await context.MapSpawns.AsQueryable().CountAsync(a => a.mapID == map.SQL_ID && a.spawnTeam == 0) < 1) {NAPI.Task.Run(() => { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no fugitive spawns! Abort.");}); return; }
+                                    if (await context.MapSpawns.AsQueryable().CountAsync(a => a.mapID == map.SQL_ID && a.spawnTeam == 0) < 1) { NAPI.Task.Run(() => { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no fugitive spawns! Abort."); }); return; }
                                     if (await context.MapSpawns.AsQueryable().CountAsync(a => a.mapID == map.SQL_ID && a.spawnTeam == 1) < 1) { NAPI.Task.Run(() => { NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Map {map.Name} has no cop spawns! Abort."); }); return; }
 
                                     crashcheck = 7;
@@ -3129,11 +3143,11 @@ namespace RNC
 
                                     pCount = 0;
                                     crashcheck = 13;
-
-                                    if (Settings.CarGenData.Count >= 1500)
+                                    NAPI.Task.Run(() =>
                                     {
-                                        NAPI.Task.Run(() =>
+                                        if (Settings.CarGenData.Count >= 1500)
                                         {
+
                                             crashcheck = 694;
                                             List<jCarGenData> randomCars = Settings.CarGenData.OrderBy(x => new Random().Next()).Take(1500).ToList();
                                             crashcheck = 695;
@@ -3170,9 +3184,13 @@ namespace RNC
                                                 veh.SetSharedData("Collisions", true);
                                                 veh.SetSharedData("Fuel", 100.0);
                                             }
-                                        });
-                                    }
-                                    else { NAPI.Task.Run(() => { NAPI.Util.ConsoleOutput("Cannot generate 1500 random parked vehicles -> not enough entries!"); }); }
+
+                                        }
+                                        else
+                                        {
+                                            { NAPI.Util.ConsoleOutput("Cannot generate 1500 random parked vehicles -> not enough entries!"); }
+                                        }
+                                    });
                                 }
                             }
                             NAPI.Task.Run(() =>
@@ -3219,7 +3237,7 @@ namespace RNC
                                 }
                                 fugitives = lobby.Fugitives.Count;
                             });
-                            await NAPI.Task.WaitForMainThread();
+                            //await NAPI.Task.WaitForMainThread();
                             crashcheck = 14;
 
                             MapSpawn spawnLoc = null;
@@ -3463,11 +3481,13 @@ namespace RNC
                                             ammoTypes.Add("AMMO_BZGAS", 3);
                                             pVehicle.SetData("BackupAmmo", ammoTypes);
 
+                                            Account _a = EPlayer.GetAccount(player);
+                                            uint vehModel = pVehicle.Model;
                                             Task.Run(async () =>
                                             {
                                                 using (MainDatabase context = ContextFactory.CreateContext())
                                                 {
-                                                    var inst = await context.PlayerTunings.AsQueryable().FirstOrDefaultAsync(a => a.Model == pVehicle.Model && a.AccountSQLID == EPlayer.GetAccount(player).SQL_ID);
+                                                    var inst = await context.PlayerTunings.AsQueryable().FirstOrDefaultAsync(a => a.Model == vehModel && a.AccountSQLID == _a.SQL_ID);
                                                     if (inst != null)
                                                     {
                                                         NAPI.Task.Run(() =>
@@ -3604,7 +3624,7 @@ namespace RNC
                                     }
                                 }
                             });
-                            await NAPI.Task.WaitForMainThread();
+                            //await NAPI.Task.WaitForMainThread();
 
                             spawnLoc = null;
                             pCount = 0;
@@ -3787,11 +3807,13 @@ namespace RNC
 
                                         if (enginePower > 1.0f) pVehicle.SetSharedData("vInitialDriveForce", enginePower);
 
+                                        Account _a = EPlayer.GetAccount(_tempPlayer);
+                                        uint vehModel = pVehicle.Model;
                                         Task.Run(async () =>
                                         {
                                             using (MainDatabase context = ContextFactory.CreateContext())
                                             {
-                                                var inst = await context.PlayerTunings.AsQueryable().FirstOrDefaultAsync(a => a.Model == pVehicle.Model && a.AccountSQLID == EPlayer.GetAccount(_tempPlayer).SQL_ID);
+                                                var inst = await context.PlayerTunings.AsQueryable().FirstOrDefaultAsync(a => a.Model == vehModel && a.AccountSQLID == _a.SQL_ID);
                                                 if (inst != null)
                                                 {
                                                     NAPI.Task.Run(() =>
@@ -3991,7 +4013,7 @@ namespace RNC
                                     }
                                 }
                             });
-                            NAPI.Task.WaitForMainThread();
+                            //await NAPI.Task.WaitForMainThread();
 
                             NAPI.Task.Run(() =>
                             {
@@ -4081,38 +4103,48 @@ namespace RNC
                             {
                                 if (lobby.gameMode != GameModes.BANKROBBERY)
                                 {
-                                    /*
-                                    MapSpawn fugi = ContextFactory.Instance.MapSpawns.ToList().Find(a => a.mapID == lobby.lastMapId && a.spawnTeam == 0);
-                                    MapSpawn cop = ContextFactory.Instance.MapSpawns.ToList().Find(a => a.mapID == lobby.lastMapId && a.spawnTeam == 1);
-
-                                    lock (lobby.Fugitives)
+                                    Task.Run(async () =>
                                     {
-                                        foreach (var p in lobby.Fugitives)
+                                        using(MainDatabase context = ContextFactory.CreateContext())
                                         {
-                                            try
+                                            MapSpawn fugi = await context.MapSpawns.AsQueryable().FirstOrDefaultAsync(a => a.mapID == lobby.lastMapId && a.spawnTeam == 0);
+                                            MapSpawn cop = await context.MapSpawns.AsQueryable().FirstOrDefaultAsync(a => a.mapID == lobby.lastMapId && a.spawnTeam == 1);
+
+                                            NAPI.Task.Run(() =>
                                             {
-                                                if (p == null) continue;
+                                                lock (lobby.Fugitives)
+                                                {
+                                                    foreach (var p in lobby.Fugitives)
+                                                    {
+                                                        try
+                                                        {
+                                                            if (p == null) continue;
 
-                                                p.Position = new Vector3(fugi.spawnX, fugi.spawnY, fugi.spawnZ).Around(30f);
-                                            }
-                                            catch { }
+                                                            p.Position = new Vector3(fugi.spawnX, fugi.spawnY, fugi.spawnZ).Around(30f);
+                                                        }
+                                                        catch { }
+                                                    }
+                                                }
+
+                                                lock (lobby.Cops)
+                                                {
+                                                    foreach (var p in lobby.Cops)
+                                                    {
+                                                        try
+                                                        {
+                                                            if (p == null) continue;
+
+                                                            p.Position = new Vector3(cop.spawnX, cop.spawnY, cop.spawnZ).Around(30f);
+                                                        }
+                                                        catch { }
+                                                    }
+                                                }
+                                            });
+                                            
                                         }
-                                    }
-
-                                    lock (lobby.Cops)
-                                    {
-                                        foreach (var p in lobby.Cops)
-                                        {
-                                            try
-                                            {
-                                                if (p == null) continue;
-
-                                                p.Position = new Vector3(cop.spawnX, cop.spawnY, cop.spawnZ).Around(30f);
-                                            }
-                                            catch { }
-                                        }
-                                    }
-                                    */
+                                    });
+                                    
+                                    
                                 }
                                 else
                                 {
@@ -4319,11 +4351,13 @@ namespace RNC
 
                                                 if (p.GetData<int>("ChaseVehicleSeat") == 0)
                                                 {
+                                                    Account _a = EPlayer.GetAccount(p);
+                                                    uint vehModel = p.GetData<Vehicle>("ChaseVehicle").Model;
                                                     Task.Run(async () =>
                                                     {
                                                         using (MainDatabase context = ContextFactory.CreateContext())
                                                         {
-                                                            var inst = await context.PlayerTunings.AsQueryable().FirstOrDefaultAsync(a => a.Model == p.GetData<Vehicle>("ChaseVehicle").Model && a.AccountSQLID == EPlayer.GetAccount(p).SQL_ID);
+                                                            var inst = await context.PlayerTunings.AsQueryable().FirstOrDefaultAsync(a => a.Model == vehModel && a.AccountSQLID == _a.SQL_ID);
                                                             if (inst != null)
                                                             {
                                                                 NAPI.Task.Run(() =>
@@ -4379,11 +4413,13 @@ namespace RNC
 
                                                 if (p.GetData<int>("ChaseVehicleSeat") == 0)
                                                 {
+                                                    Account _a = EPlayer.GetAccount(p);
+                                                    uint vehModel = p.GetData<Vehicle>("ChaseVehicle").Model;
                                                     Task.Run(async () =>
                                                     {
                                                         using (MainDatabase context = ContextFactory.CreateContext())
                                                         {
-                                                            var inst = await context.PlayerTunings.AsQueryable().FirstOrDefaultAsync(a => a.Model == p.GetData<Vehicle>("ChaseVehicle").Model && a.AccountSQLID == EPlayer.GetAccount(p).SQL_ID);
+                                                            var inst = await context.PlayerTunings.AsQueryable().FirstOrDefaultAsync(a => a.Model == vehModel && a.AccountSQLID == _a.SQL_ID);
                                                             if (inst != null)
                                                             {
                                                                 NAPI.Task.Run(() =>
