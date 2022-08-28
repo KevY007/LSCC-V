@@ -1651,6 +1651,7 @@ namespace RNC
                 }
                 catch { }
 
+                EPlayer.Save(player, false);
                 player.SetData("Killstreak", 0);
             }
             catch(Exception ex)
@@ -3025,20 +3026,26 @@ namespace RNC
             {
                 if (await EPlayer.HasOwnedVehicle(acc, model, team))
                 {
-                    NAPI.Task.Run(() =>
+                    if (team == 0)
                     {
-                        if (team == 0)
+                        NAPI.Task.Run(() =>
                         {
                             EPlayer.Notify(player, $"Fugitive vehicle set to <strong>{car.Name}</strong>.", "blue", "fas fa-car", false, 3000, "bottomCenter", "replace");
-                            acc.CarFugitive = car.Model;
-                        }
-                        else
+                        });
+                        acc.CarFugitive = car.Model;
+                    }
+                    else
+                    {
+                        NAPI.Task.Run(() =>
                         {
                             EPlayer.Notify(player, $"Police vehicle set to <strong>{car.Name}</strong>.", "blue", "fas fa-car", false, 3000, "bottomCenter", "replace");
-                            acc.CarCop = car.Model;
-                        }
-
-                        player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(Menu_VehicleData(player)), acc.CarCop, acc.CarFugitive);
+                        });
+                        acc.CarCop = car.Model;
+                    }
+                    List<object[]> vehData = await Menu_VehicleData(acc);
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(vehData), acc.CarCop, acc.CarFugitive);
                     });
                 }
                 else
@@ -3071,22 +3078,24 @@ namespace RNC
                         EPlayer.UnlockVehicle(acc, player, car.Model, car.Team);
                         EPlayer.Notify(player, $"You have unlocked <strong>{car.Name}</strong>. You may select it now.", "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
 
-                        player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(Menu_VehicleData(player)), acc.CarCop, acc.CarFugitive);
+                        Task.Run(async () =>
+                        {
+                            List<object[]> vehData = await Menu_VehicleData(acc);
+                            NAPI.Task.Run(() =>
+                            {
+                                player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(vehData), acc.CarCop, acc.CarFugitive);
+                            });
+                        });
                     });
-                    
+
                 }
             });
             
             return;
         }
 
-        public List<object[]> Menu_VehicleData(Player player)
+        public async Task<List<object[]>> Menu_VehicleData(Account _a)
         {
-            if (!EPlayer.LoggedIn(player)) return new List<object[]>();
-            // Vehicle Data
-
-            Account _a = EPlayer.GetAccount(player);
-
             List<object[]> vehItems = new List<object[]>();
             foreach (var car in Settings.Cars)
             {
@@ -3099,13 +3108,11 @@ namespace RNC
 
                 price += "]";
 
-                Task.Run(async () =>
+
+                bool isOwnedVeh = await EPlayer.HasOwnedVehicle(_a, car.Model, car.Team);
+
+                vehItems.Add(new object[]
                 {
-                    bool isOwnedVeh = await EPlayer.HasOwnedVehicle(_a, car.Model, car.Team);
-                    NAPI.Task.Run(() =>
-                    {
-                        vehItems.Add(new object[]
-                        {
                             car.Team,
                             car.Model,
                             car.Name,
@@ -3113,11 +3120,9 @@ namespace RNC
                             !isOwnedVeh,
                             car.Info,
                             price
-                        });
-                    });
                 });
             }
-            
+
             return vehItems;
         }
 
@@ -3147,20 +3152,26 @@ namespace RNC
             {
                 if (await EPlayer.HasOwnedLoadout(acc, name, team))
                 {
-                    NAPI.Task.Run(() =>
+                    if (team == 0)
                     {
-                        if (team == 0)
+                        NAPI.Task.Run(() =>
                         {
                             EPlayer.Notify(player, $"Fugitive loadout set to <strong>{loadout.Name}</strong>.", "blue", "fas fa-check", false, 3000, "bottomCenter", "replace");
-                            acc.LoadoutFugitive = (loadout.Name.Equals("default", StringComparison.OrdinalIgnoreCase) ? "?" : loadout.Name);
-                        }
-                        else
+                        });
+                        acc.LoadoutFugitive = (loadout.Name.Equals("default", StringComparison.OrdinalIgnoreCase) ? "?" : loadout.Name);
+                    }
+                    else
+                    {
+                        NAPI.Task.Run(() =>
                         {
                             EPlayer.Notify(player, $"Police loadout set to <strong>{loadout.Name}</strong>.", "blue", "fas fa-check", false, 3000, "bottomCenter", "replace");
-                            acc.LoadoutCop = (loadout.Name.Equals("default", StringComparison.OrdinalIgnoreCase) ? "?" : loadout.Name);
-                        }
-
-                        player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(Menu_LoadoutData(player)), acc.LoadoutCop, acc.LoadoutFugitive);
+                        });
+                        acc.LoadoutCop = (loadout.Name.Equals("default", StringComparison.OrdinalIgnoreCase) ? "?" : loadout.Name);
+                    }
+                    List<object[]> loadoutData = await Menu_LoadoutData(acc);
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(loadoutData), acc.LoadoutCop, acc.LoadoutFugitive);
                     });
                 }
                 else
@@ -3193,7 +3204,15 @@ namespace RNC
                         EPlayer.UnlockLoadout(acc, player, loadout.Name, loadout.Team);
                         EPlayer.Notify(player, $"You have unlocked <strong>{loadout.Name}</strong>. You may select it now.", "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
 
-                        player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(Menu_LoadoutData(player)), acc.LoadoutCop, acc.LoadoutFugitive);
+                        Task.Run(async () =>
+                        {
+                            List<object[]> loadoutData = await Menu_LoadoutData(acc);
+                            NAPI.Task.Run(() =>
+                            {
+                                player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(loadoutData), acc.LoadoutCop, acc.LoadoutFugitive);
+
+                            });
+                        });
                     });
                 }
             });
@@ -3201,11 +3220,8 @@ namespace RNC
             return;
         }
 
-        public List<object[]> Menu_LoadoutData(Player player)
+        public async Task<List<object[]>> Menu_LoadoutData(Account acc)
         {
-            if (!EPlayer.LoggedIn(player)) return new List<object[]>();
-            // Loadout Data
-            Account acc = EPlayer.GetAccount(player);
             List<object[]> loadoutItems = new List<object[]>();
             foreach (var loadout in Settings.Loadouts)
             {
@@ -3226,25 +3242,18 @@ namespace RNC
                 if (loadout.DonatorLevelRequired > 0) requireString += $"\"{EPlayer.GetDonatorLevelName(loadout.DonatorLevelRequired)}\",";
 
                 requireString += "],";
-                Task.Run(async () =>
+
+                bool hasOwnedLoadout = await EPlayer.HasOwnedLoadout(acc, loadout.Name, loadout.Team);
+                loadoutItems.Add(new object[]
                 {
-                    bool hasOwnedLoadout = await EPlayer.HasOwnedLoadout(acc, loadout.Name, loadout.Team);
-                    NAPI.Task.Run(() =>
-                    {
-                        loadoutItems.Add(new object[]
-                        {
                             loadout.Team,
                             loadout.Name,
                             loadout.Background,
                             !hasOwnedLoadout,
                             requireString,
                             weaponString
-                        });
-                    });
                 });
-
-            } 
-
+            }
             return loadoutItems;
         }
 
@@ -3252,14 +3261,24 @@ namespace RNC
         public void OnPlayerToggleMenu(Player player, bool status)
         {
             if (!EPlayer.LoggedIn(player)) return;
-
+            Account acc = EPlayer.GetAccount(player);
             if(status == true) // OPEN: Update lobby data and everything else.
             {
-                player.TriggerEvent("UpdateMenuLobbies", NAPI.Util.ToJson(Menu_LobbiesData(player)), player.GetSharedData<int>("InLobby"));
-                player.TriggerEvent("UpdateMenuMinigames", NAPI.Util.ToJson(Menu_MinigamesData(player)), (player.GetSharedData<int>("InLobby") < 0) ? player.GetSharedData<int>("InLobby") : player.GetSharedData<int>("InDM"));
-                player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(Menu_VehicleData(player)), EPlayer.GetAccount(player).CarCop, EPlayer.GetAccount(player).CarFugitive);
-                player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(Menu_LoadoutData(player)), EPlayer.GetAccount(player).LoadoutCop, EPlayer.GetAccount(player).LoadoutFugitive);
-                player.TriggerEvent("addAchievementsToMenu");
+                Task.Run(async () =>
+                {
+                    List<object[]> loadoutData = await Menu_LoadoutData(acc);
+                    List<object[]> vehData = await Menu_VehicleData(acc);
+
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("UpdateMenuLobbies", NAPI.Util.ToJson(Menu_LobbiesData(player)), player.GetSharedData<int>("InLobby"));
+                        player.TriggerEvent("UpdateMenuMinigames", NAPI.Util.ToJson(Menu_MinigamesData(player)), (player.GetSharedData<int>("InLobby") < 0) ? player.GetSharedData<int>("InLobby") : player.GetSharedData<int>("InDM"));
+                        player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(vehData), EPlayer.GetAccount(player).CarCop, EPlayer.GetAccount(player).CarFugitive);
+                        player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(loadoutData), EPlayer.GetAccount(player).LoadoutCop, EPlayer.GetAccount(player).LoadoutFugitive);
+                        player.TriggerEvent("addAchievementsToMenu");
+                    });
+                });
+             
             }
             else // CLOSE: Anything you want when menu gets closed.
             {

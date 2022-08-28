@@ -1826,12 +1826,11 @@ namespace RNC
                 p.TriggerEvent("pushMsgToChat", "!{#FFFFFF}(( !{#FF6347}Server is stopping... !{#FFFFFF}))");
                 p.TriggerEvent("pushMsgToChat", "!{#A9C4E4}Server closed the connection.");
 
+                EPlayer.Save(p);
                 EPlayer.Freeze(p, true);
                 EPlayer.Handcuff(p, true);
                 p.Position = Vector3.RandomXy();
                 EPlayer.Notify(p, "Goodbye", "The server is going offline!");
-
-
 
                 p.KickSilent(); // Sends a "timeout" type disconnection so they can reconnect.
 
@@ -2944,7 +2943,6 @@ namespace RNC
                             i.StopAnimation();
                         }
                     }
-                    NAPI.Util.ConsoleOutput($"Calling OnPlayerWounded(${i.Name}, 0, 1) from StopGame(${lobbyid}, ${reason})");
                     Events.OnPlayerWounded(i, 0, -1);
 
                     if (lobby.gameMode == GameModes.BANKROBBERY)
@@ -2970,6 +2968,7 @@ namespace RNC
                         EPlayer.Spawn(i);
                     }
                     i.SetSharedData("HeistLeader", false);
+                    EPlayer.Save(i);
                 }
 
                 for (int i = lobby.Vehicles.Count - 1; i >= 0; i--)
@@ -3090,7 +3089,7 @@ namespace RNC
                             {
                                 lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && !EPlayer.IsAFK(a) && !a.HasData("Spectating") && a.GetSharedData<bool>("AutoJoin") == true && !a.Dead).OrderBy(c => Guid.NewGuid()).ToList();
                             });
-                            //await NAPI.Task.WaitForMainThread();
+                            await NAPI.Task.WaitForMainThread();
                             using (MainDatabase context = ContextFactory.CreateContext())
                             {
                                 if (lobby.gameMode != GameModes.BANKROBBERY)
@@ -3143,11 +3142,11 @@ namespace RNC
 
                                     pCount = 0;
                                     crashcheck = 13;
-                                    NAPI.Task.Run(() =>
-                                    {
-                                        if (Settings.CarGenData.Count >= 1500)
-                                        {
 
+                                    if (Settings.CarGenData.Count >= 1500)
+                                    {
+                                        NAPI.Task.Run(() =>
+                                        {
                                             crashcheck = 694;
                                             List<jCarGenData> randomCars = Settings.CarGenData.OrderBy(x => new Random().Next()).Take(1500).ToList();
                                             crashcheck = 695;
@@ -3156,15 +3155,17 @@ namespace RNC
                                             {
                                                 Random rnd = new Random();
                                                 int modelsCount = car.Models.Count();
+                                                int randomModel = modelsCount > 0 ? (rnd.Next(modelsCount)) : (rnd.Next(civiCarCnt));
+
                                                 uint carModel = (uint)VehicleHash.Premier;
 
                                                 if (modelsCount > 0)
                                                 {
-                                                    carModel = NAPI.Util.GetHashKey(car.Models[rnd.Next(modelsCount)]);
+                                                    carModel = NAPI.Util.GetHashKey(car.Models[randomModel]);
                                                 }
                                                 else
                                                 {
-                                                    carModel = NAPI.Util.GetHashKey(Settings.CivilianVehicles[rnd.Next(civiCarCnt)]);
+                                                    carModel = NAPI.Util.GetHashKey(Settings.CivilianVehicles[randomModel]);
                                                 }
 
                                                 crashcheck = 666;
@@ -3183,14 +3184,15 @@ namespace RNC
                                                 lobby.Vehicles.Add(veh);
                                                 veh.SetSharedData("Collisions", true);
                                                 veh.SetSharedData("Fuel", 100.0);
-                                            }
 
-                                        }
-                                        else
-                                        {
-                                            { NAPI.Util.ConsoleOutput("Cannot generate 1500 random parked vehicles -> not enough entries!"); }
-                                        }
-                                    });
+                                            }
+                                        });
+                                    }
+                                    else
+                                    {
+                                        { NAPI.Util.ConsoleOutput("Cannot generate 1500 random parked vehicles -> not enough entries!"); }
+                                    }
+
                                 }
                             }
                             NAPI.Task.Run(() =>
@@ -3237,7 +3239,7 @@ namespace RNC
                                 }
                                 fugitives = lobby.Fugitives.Count;
                             });
-                            //await NAPI.Task.WaitForMainThread();
+                            await NAPI.Task.WaitForMainThread();
                             crashcheck = 14;
 
                             MapSpawn spawnLoc = null;
@@ -3624,7 +3626,7 @@ namespace RNC
                                     }
                                 }
                             });
-                            //await NAPI.Task.WaitForMainThread();
+                            await NAPI.Task.WaitForMainThread();
 
                             spawnLoc = null;
                             pCount = 0;
@@ -4013,7 +4015,7 @@ namespace RNC
                                     }
                                 }
                             });
-                            //await NAPI.Task.WaitForMainThread();
+                            await NAPI.Task.WaitForMainThread();
 
                             NAPI.Task.Run(() =>
                             {

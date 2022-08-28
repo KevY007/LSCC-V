@@ -2223,7 +2223,7 @@ namespace RNC
             });
             
         }
-        public static void Save(Player player)
+        public static void Save(Player player, bool save_linked_entries = true)
         {
             NAPI.Task.Run(() =>
             {
@@ -2231,14 +2231,54 @@ namespace RNC
                 {
                     if (player.HasData("PlaytimeTick"))
                     {
+                        Account acc = EPlayer.GetAccount(player);
                         double minsPassed = (Environment.TickCount64 - player.GetData<long>("PlaytimeTick")) / 60000;
+                        Task.Run(async () =>
+                        {
+                            using (MainDatabase context = ContextFactory.CreateContext())
+                            {
+                                acc.MinutesPlayed += minsPassed;
+                                acc.LastSessionMins += minsPassed;
 
-                        EPlayer.GetAccount(player).MinutesPlayed += minsPassed;
-                        EPlayer.GetAccount(player).LastSessionMins += minsPassed;
+                                context.Entry(acc).State = EntityState.Modified;
+                                int savedEntries = 1;
+                                if (save_linked_entries)
+                                {
+                                    List<OwnedVehData> vehs = await context.OwnedVehicles.AsQueryable().Where(v => v.AccountSQLID == acc.SQL_ID).ToListAsync();
+                                    vehs.ForEach(v =>
+                                    {
+                                        context.Entry(v).State = EntityState.Modified;
+                                        savedEntries++;
+                                    });
+                                    List<OwnedLoadoutData> guns = await context.OwnedLoadouts.AsQueryable().Where(v => v.AccountSQLID == acc.SQL_ID).ToListAsync();
+                                    guns.ForEach(v =>
+                                    {
+                                        context.Entry(v).State = EntityState.Modified;
+                                        savedEntries++;
+                                    });
+                                    List<PlayerTunings> tunes = await context.PlayerTunings.AsQueryable().Where(t => t.AccountSQLID == acc.SQL_ID).ToListAsync();
+                                    tunes.ForEach(v =>
+                                    {
+                                        context.Entry(v).State = EntityState.Modified;
+                                        savedEntries++;
+                                    });
+                                    List<PlayerOutfit> fits = await context.PlayerOutfits.AsQueryable().Where(t => t.AccountID == acc.SQL_ID).ToListAsync();
+                                    fits.ForEach(v =>
+                                    {
+                                        context.Entry(v).State = EntityState.Modified;
+                                        savedEntries++;
+                                    });
+                                }
+
+                                await context.SaveChangesAsync();
+                                Console.WriteLine($"[RnC Player Save] Saved {acc.Username} ({acc.SQL_ID})'s server statistics. Total entries modified: {savedEntries}.");
+                            }
+                        });
                     }
                     player.SetData("PlaytimeTick", Environment.TickCount64);
 
-                    ContextFactory.SaveDB();
+                    // unnecessary :/
+                    //ContextFactory.SaveDB();
                 }
             });
         }
@@ -2366,6 +2406,7 @@ namespace RNC
 
             EPlayer.Freeze(player, false);
             EPlayer.SetColor(player, new Color(255, 255, 255, 255));
+            EPlayer.Save(player, false);
         }
 
         public static void SendMessageInLobby(int lobbyid, string message, bool spam = false)

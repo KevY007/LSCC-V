@@ -4030,6 +4030,7 @@ namespace RNC
             player.SetSharedData("InDM", -1);
             player.ResetData("ForcedData");
 
+            EPlayer.Save(player, true);
 
             player.SetSharedData("HeistLeader", false);
             player.TriggerEvent("BankRob_ClearFugiCarBlips");
@@ -6485,6 +6486,25 @@ namespace RNC
                     });
                 }
             });
+            return;
+        }
+
+        [Command("saveplayer")]
+        public void cmd_saveplayer(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+            if (!EPlayer.LoggedIn(target))
+            {
+                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Target is not logged in.");
+                return;
+            }
+            EPlayer.Save(target);
+            EPlayer.SendMessage(player, $"~g~Successfully saved player {target.Name}'s statistics!");
             return;
         }
 
@@ -9006,6 +9026,22 @@ namespace RNC
             EPlayer.UnlockLoadout(a, _p, "Negotiator", 1);
             EPlayer.UnlockVehicle(a, _p, "superd", 0);
             EPlayer.UnlockAchievement(_p, "discord_verify");
+        }
+
+        [Command("unlockitem")]
+        public void cmd_unlockitem(Player player, string type, string name, int team)
+        {
+            if (EPlayer.GetAccount(player).Admin < 6) return;
+            Account acc = EPlayer.GetAccount(player);
+            if (type == "loadout")
+            {
+                EPlayer.UnlockLoadout(acc, player, name, team);
+            }
+            else if (type == "car"){
+                EPlayer.UnlockVehicle(acc, player, name, team);
+            }
+            else EPlayer.SendMessage(player, "~r~/unlockitem [type: loadout/car][loadout name / car model][team 0-fugi or 1-cop]");
+            return;
         }
 
         [Command("setadmin", "!{#AFAFAF}[USAGE] setadmin (target) (level)", Alias = "makeadmin,setstaff")]
