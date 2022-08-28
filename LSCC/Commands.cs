@@ -7225,12 +7225,15 @@ namespace RNC
             Task.Run(async () => {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    List<Map> mapList = await context.Maps.AsQueryable().ToListAsync();
-                    await mapList.AsQueryable().ForEachAsync(async map =>
+                    foreach(Map map in context.Maps)
                     {
                         int spawns = await context.MapSpawns.AsQueryable().CountAsync(a => a.mapID == map.SQL_ID);
-                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#DAA520}}{map.Name} | ID: [{map.SQL_ID}] | Enabled: [{map.Enabled}] | Spawns: [{spawns}]"); });
-                    });
+                        string mName = map.Name;
+                        bool mEnabled = map.Enabled;
+                        int mID = map.SQL_ID;
+                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#DAA520}}{mName} | ID: [{mID}] | Enabled: [{mEnabled}] | Spawns: [{spawns}]"); });
+                        await NAPI.Task.WaitForMainThread();
+                    }
                 }
             });
 
@@ -7281,12 +7284,11 @@ namespace RNC
                         spawnZ = currentLoc[2],
                         spawnA = currentLoc[3]
                     };
-                    NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#DAA520}}{map.Name} | Added a spawn (ID: {_new.SQL_ID}) over here for team [{teamid}]"); });
-
                     await context.MapSpawns.AddAsync(_new);
 
                     await context.SaveChangesAsync();
 
+                    NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#DAA520}}{map.Name} | Added a spawn (ID: {_new.SQL_ID}) over here for team [{teamid}]"); });
                 }
             });
             return;
@@ -7347,7 +7349,7 @@ namespace RNC
                             player.TriggerEvent("pushMsgToChat", $"!{{#DAA520}}Spawn ID [{a.SQL_ID}] | Team: [{a.spawnTeam}] | XYZA: {a.spawnX}, {a.spawnY}, {a.spawnZ}, {a.spawnA}");
                         });
                     });
-                    int count = await context.MapSpawns.AsQueryable().CountAsync();
+                    int count = await context.MapSpawns.AsQueryable().CountAsync(s => s.mapID == mapid);
                     NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#DAA520}}Total Spawns: {count}"); });
                 }
             });
@@ -7452,13 +7454,13 @@ namespace RNC
                         Enabled = true
                     };
 
+                    await context.Maps.AddAsync(_new);
+                    await context.SaveChangesAsync();
+
                     NAPI.Task.Run(() =>
                     {
                         player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}Map {mapname} with ID {_new.SQL_ID} has been added to the server.");
                     });
-
-                    await context.Maps.AddAsync(_new);
-                    await context.SaveChangesAsync();
                 }
             });
 
