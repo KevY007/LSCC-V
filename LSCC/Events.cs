@@ -1947,7 +1947,7 @@ namespace RNC
                 EPlayer.UnlockAchievement(player, "reach_level_100");
             }
 
-            int totalOwned = EPlayer.GetOwnedLoadouts(player, 0).Count + EPlayer.GetOwnedLoadouts(player, 1).Count + 2;
+            int totalOwned = EPlayer.GetOwnedLoadouts(acc, 0).Result.Count + EPlayer.GetOwnedLoadouts(acc, 1).Result.Count + 2;
             if (totalOwned >= Settings.Loadouts.Count)
                 EPlayer.UnlockAchievement(player, "all_loadouts");
 
@@ -2891,52 +2891,62 @@ namespace RNC
                     return;
                 }
             }
-
-            if (EPlayer.HasOwnedVehicle(player, model, team))
+            Task.Run(async () =>
             {
-                if (team == 0)
+                if (await EPlayer.HasOwnedVehicle(acc, model, team))
                 {
-                    EPlayer.Notify(player, $"Fugitive vehicle set to <strong>{car.Name}</strong>.", "blue", "fas fa-car", false, 3000, "bottomCenter", "replace");
-                    acc.CarFugitive = car.Model;
+                    NAPI.Task.Run(() =>
+                    {
+                        if (team == 0)
+                        {
+                            EPlayer.Notify(player, $"Fugitive vehicle set to <strong>{car.Name}</strong>.", "blue", "fas fa-car", false, 3000, "bottomCenter", "replace");
+                            acc.CarFugitive = car.Model;
+                        }
+                        else
+                        {
+                            EPlayer.Notify(player, $"Police vehicle set to <strong>{car.Name}</strong>.", "blue", "fas fa-car", false, 3000, "bottomCenter", "replace");
+                            acc.CarCop = car.Model;
+                        }
+
+                        player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(Menu_VehicleData(player)), acc.CarCop, acc.CarFugitive);
+                    });
                 }
                 else
                 {
-                    EPlayer.Notify(player, $"Police vehicle set to <strong>{car.Name}</strong>.", "blue", "fas fa-car", false, 3000, "bottomCenter", "replace");
-                    acc.CarCop = car.Model;
-                }
+                    NAPI.Task.Run(() =>
+                    {
+                        if (car.LevelRequired != 0 && car.LevelRequired > acc.Level)
+                        {
+                            EPlayer.Notify(player, $"You need to be at least <strong>Level {car.LevelRequired}</strong> for this vehicle.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                            return;
+                        }
+                        if (car.DonatorPointsRequired != 0 && car.DonatorPointsRequired > acc.DonatorPoints)
+                        {
+                            EPlayer.Notify(player, $"You need <strong>{car.DonatorPointsRequired} Donator Points</strong> for this vehicle.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                            return;
+                        }
+                        if (car.PointsRequired != 0 && car.PointsRequired > acc.Points)
+                        {
+                            EPlayer.Notify(player, $"You need <strong>{car.PointsRequired} Points</strong> for this vehicle.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                            return;
+                        }
+                        if (car.DonatorLevelRequired != 0 && car.DonatorLevelRequired > acc.DonatorLevel)
+                        {
+                            EPlayer.Notify(player, $"This vehicle is restricted to <strong>{EPlayer.GetDonatorLevelName(car.DonatorLevelRequired)}</strong>.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                            return;
+                        }
 
-                player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(Menu_VehicleData(player)), acc.CarCop, acc.CarFugitive);
-            }
-            else
-            {
-                if(car.LevelRequired != 0 && car.LevelRequired > acc.Level)
-                {
-                    EPlayer.Notify(player, $"You need to be at least <strong>Level {car.LevelRequired}</strong> for this vehicle.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
-                    return;
-                }
-                if (car.DonatorPointsRequired != 0 && car.DonatorPointsRequired > acc.DonatorPoints)
-                {
-                    EPlayer.Notify(player, $"You need <strong>{car.DonatorPointsRequired} Donator Points</strong> for this vehicle.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
-                    return;
-                }
-                if (car.PointsRequired != 0 && car.PointsRequired > acc.Points)
-                {
-                    EPlayer.Notify(player, $"You need <strong>{car.PointsRequired} Points</strong> for this vehicle.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
-                    return;
-                }
-                if (car.DonatorLevelRequired != 0 && car.DonatorLevelRequired > acc.DonatorLevel)
-                {
-                    EPlayer.Notify(player, $"This vehicle is restricted to <strong>{EPlayer.GetDonatorLevelName(car.DonatorLevelRequired)}</strong>.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
-                    return;
-                }
+                        EPlayer.GivePoints(player, -car.PointsRequired);
+                        acc.DonatorPoints -= car.DonatorPointsRequired;
+                        EPlayer.UnlockVehicle(acc, player, car.Model, car.Team);
+                        EPlayer.Notify(player, $"You have unlocked <strong>{car.Name}</strong>. You may select it now.", "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
 
-                EPlayer.GivePoints(player, -car.PointsRequired);
-                acc.DonatorPoints -= car.DonatorPointsRequired;
-                EPlayer.UnlockVehicle(player, car.Model, car.Team);
-                EPlayer.Notify(player, $"You have unlocked <strong>{car.Name}</strong>. You may select it now.", "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
-
-                player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(Menu_VehicleData(player)), acc.CarCop, acc.CarFugitive);
-            }
+                        player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(Menu_VehicleData(player)), acc.CarCop, acc.CarFugitive);
+                    });
+                    
+                }
+            });
+            
             return;
         }
 
@@ -2945,6 +2955,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player)) return new List<object[]>();
             // Vehicle Data
 
+            Account _a = EPlayer.GetAccount(player);
 
             List<object[]> vehItems = new List<object[]>();
             foreach (var car in Settings.Cars)
@@ -2958,17 +2969,23 @@ namespace RNC
 
                 price += "]";
 
-                vehItems.Add(new object[]
+                Task.Run(async () =>
                 {
-                    car.Team,
-                    car.Model,
-                    car.Name,
-                    car.Image,
-                    !EPlayer.HasOwnedVehicle(player, car.Model, car.Team),
-                    car.Info,
-                    price
+                    bool isOwnedVeh = await EPlayer.HasOwnedVehicle(_a, car.Model, car.Team);
+                    NAPI.Task.Run(() =>
+                    {
+                        vehItems.Add(new object[]
+                        {
+                            car.Team,
+                            car.Model,
+                            car.Name,
+                            car.Image,
+                            !isOwnedVeh,
+                            car.Info,
+                            price
+                        });
+                    });
                 });
-
             }
             
             return vehItems;
@@ -2996,51 +3013,61 @@ namespace RNC
                 }
             }
 
-            if (EPlayer.HasOwnedLoadout(player, name, team))
+            Task.Run(async () =>
             {
-                if (team == 0)
+                if (await EPlayer.HasOwnedLoadout(acc, name, team))
                 {
-                    EPlayer.Notify(player, $"Fugitive loadout set to <strong>{loadout.Name}</strong>.", "blue", "fas fa-check", false, 3000, "bottomCenter", "replace");
-                    acc.LoadoutFugitive = (loadout.Name.Equals("default", StringComparison.OrdinalIgnoreCase) ? "?" : loadout.Name);
+                    NAPI.Task.Run(() =>
+                    {
+                        if (team == 0)
+                        {
+                            EPlayer.Notify(player, $"Fugitive loadout set to <strong>{loadout.Name}</strong>.", "blue", "fas fa-check", false, 3000, "bottomCenter", "replace");
+                            acc.LoadoutFugitive = (loadout.Name.Equals("default", StringComparison.OrdinalIgnoreCase) ? "?" : loadout.Name);
+                        }
+                        else
+                        {
+                            EPlayer.Notify(player, $"Police loadout set to <strong>{loadout.Name}</strong>.", "blue", "fas fa-check", false, 3000, "bottomCenter", "replace");
+                            acc.LoadoutCop = (loadout.Name.Equals("default", StringComparison.OrdinalIgnoreCase) ? "?" : loadout.Name);
+                        }
+
+                        player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(Menu_LoadoutData(player)), acc.LoadoutCop, acc.LoadoutFugitive);
+                    });
                 }
                 else
                 {
-                    EPlayer.Notify(player, $"Police loadout set to <strong>{loadout.Name}</strong>.", "blue", "fas fa-check", false, 3000, "bottomCenter", "replace");
-                    acc.LoadoutCop = (loadout.Name.Equals("default", StringComparison.OrdinalIgnoreCase) ? "?" : loadout.Name);
-                }
+                    NAPI.Task.Run(() =>
+                    {
+                        if (loadout.LevelRequired != 0 && loadout.LevelRequired > acc.Level)
+                        {
+                            EPlayer.Notify(player, $"You need to be at least <strong>Level {loadout.LevelRequired}</strong> for this loadout.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                            return;
+                        }
+                        if (loadout.DonatorPointsRequired != 0 && loadout.DonatorPointsRequired > acc.DonatorPoints)
+                        {
+                            EPlayer.Notify(player, $"You need <strong>{loadout.DonatorPointsRequired} Donator Points</strong> for this loadout.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                            return;
+                        }
+                        if (loadout.PointsRequired != 0 && loadout.PointsRequired > acc.Points)
+                        {
+                            EPlayer.Notify(player, $"You need <strong>{loadout.PointsRequired} Points</strong> for this loadout.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                            return;
+                        }
+                        if (loadout.DonatorLevelRequired != 0 && loadout.DonatorLevelRequired > acc.DonatorLevel)
+                        {
+                            EPlayer.Notify(player, $"This loadout is restricted to <strong>{EPlayer.GetDonatorLevelName(loadout.DonatorLevelRequired)}</strong>.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                            return;
+                        }
 
-                player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(Menu_LoadoutData(player)), acc.LoadoutCop, acc.LoadoutFugitive);
-            }
-            else
-            {
-                if (loadout.LevelRequired != 0 && loadout.LevelRequired > acc.Level)
-                {
-                    EPlayer.Notify(player, $"You need to be at least <strong>Level {loadout.LevelRequired}</strong> for this loadout.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
-                    return;
-                }
-                if (loadout.DonatorPointsRequired != 0 && loadout.DonatorPointsRequired > acc.DonatorPoints)
-                {
-                    EPlayer.Notify(player, $"You need <strong>{loadout.DonatorPointsRequired} Donator Points</strong> for this loadout.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
-                    return;
-                }
-                if (loadout.PointsRequired != 0 && loadout.PointsRequired > acc.Points)
-                {
-                    EPlayer.Notify(player, $"You need <strong>{loadout.PointsRequired} Points</strong> for this loadout.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
-                    return;
-                }
-                if (loadout.DonatorLevelRequired != 0 && loadout.DonatorLevelRequired > acc.DonatorLevel)
-                {
-                    EPlayer.Notify(player, $"This loadout is restricted to <strong>{EPlayer.GetDonatorLevelName(loadout.DonatorLevelRequired)}</strong>.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
-                    return;
-                }
+                        EPlayer.GivePoints(player, -loadout.PointsRequired);
+                        acc.DonatorPoints -= loadout.DonatorPointsRequired;
+                        EPlayer.UnlockLoadout(acc, player, loadout.Name, loadout.Team);
+                        EPlayer.Notify(player, $"You have unlocked <strong>{loadout.Name}</strong>. You may select it now.", "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
 
-                EPlayer.GivePoints(player, -loadout.PointsRequired);
-                acc.DonatorPoints -= loadout.DonatorPointsRequired;
-                EPlayer.UnlockLoadout(player, loadout.Name, loadout.Team);
-                EPlayer.Notify(player, $"You have unlocked <strong>{loadout.Name}</strong>. You may select it now.", "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
-
-                player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(Menu_LoadoutData(player)), acc.LoadoutCop, acc.LoadoutFugitive);
-            }
+                        player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(Menu_LoadoutData(player)), acc.LoadoutCop, acc.LoadoutFugitive);
+                    });
+                }
+            });
+            
             return;
         }
 
@@ -3048,13 +3075,13 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return new List<object[]>();
             // Loadout Data
-
+            Account acc = EPlayer.GetAccount(player);
             List<object[]> loadoutItems = new List<object[]>();
             foreach (var loadout in Settings.Loadouts)
             {
                 string weaponString = "\"weapons\": [";
 
-                foreach(var weapon in loadout.Weapons)
+                foreach (var weapon in loadout.Weapons)
                 {
                     weaponString += "{name: \"" + (string)weapon[2] + "\", img: \"" + (string)weapon[1] + "\", ammo: " + (int)weapon[3] + ",},";
                 }
@@ -3069,17 +3096,24 @@ namespace RNC
                 if (loadout.DonatorLevelRequired > 0) requireString += $"\"{EPlayer.GetDonatorLevelName(loadout.DonatorLevelRequired)}\",";
 
                 requireString += "],";
-
-                loadoutItems.Add(new object[]
+                Task.Run(async () =>
                 {
-                    loadout.Team,
-                    loadout.Name,
-                    loadout.Background,
-                    !EPlayer.HasOwnedLoadout(player, loadout.Name, loadout.Team),
-                    requireString,
-                    weaponString
+                    bool hasOwnedLoadout = await EPlayer.HasOwnedLoadout(acc, loadout.Name, loadout.Team);
+                    NAPI.Task.Run(() =>
+                    {
+                        loadoutItems.Add(new object[]
+                        {
+                            loadout.Team,
+                            loadout.Name,
+                            loadout.Background,
+                            !hasOwnedLoadout,
+                            requireString,
+                            weaponString
+                        });
+                    });
                 });
-            }
+
+            } 
 
             return loadoutItems;
         }

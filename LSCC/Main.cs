@@ -3626,13 +3626,6 @@ namespace RNC
                                     {
                                         _tempPlayer.TriggerEvent("pushMsgToChat", "!{#FF0000}> The Sanchez is no longer a fugitive vehicle.");
                                         _tempPlayer.TriggerEvent("pushMsgToChat", "!{#FF0000}> It has been replaced with the !{#FFFFFF}Felon GT!{#FF0000}, which has been added to your inventory.");
-                                        EPlayer.UnlockVehicle(_tempPlayer, "felon2", 0);
-                                        if (ContextFactory.Instance.OwnedVehicles.FirstOrDefault<OwnedVehData>(v => v.Model == "sanchez" && v.AccountSQLID == EPlayer.GetAccount(_tempPlayer).SQL_ID) != null)
-                                        {
-                                            OwnedVehData _d = ContextFactory.Instance.OwnedVehicles.FirstOrDefault<OwnedVehData>(v => v.Model == "sanchez" && v.AccountSQLID == EPlayer.GetAccount(_tempPlayer).SQL_ID);
-                                            ContextFactory.Instance.OwnedVehicles.Remove(_d);
-                                            ContextFactory.Instance.SaveChanges();
-                                        }
                                         carName = "felon2";
                                     }
 

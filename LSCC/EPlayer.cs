@@ -2011,119 +2011,120 @@ namespace RNC
 
             return (xp >= GetMaxLevelXP(level) ? true : false);
         }
-        public static List<string> GetOwnedVehicles(Player player, int team)
+        public async static Task<List<string>> GetOwnedVehicles(Account acc, int team)
         {
             List<string> ownedCars = new List<string>();
-
-            if(LoggedIn(player))
+            using (MainDatabase context = ContextFactory.CreateContext())
             {
-                Account acc = GetAccount(player);
-                var cars = ContextFactory.Instance.OwnedVehicles.ToList().Where(a => a.AccountSQLID == acc.SQL_ID && a.Team == team);
+                var cars = await context.OwnedVehicles.AsQueryable().Where(a => a.AccountSQLID == acc.SQL_ID && a.Team == team).ToListAsync();
                 foreach (var item in cars) ownedCars.Add(item.Model);
+                return ownedCars;
             }
-
-            return ownedCars;
         }
-        public static bool UnlockVehicle(Player player, string model, int team)
+        public async static Task<bool> UnlockVehicle(Account acc, Player player, string model, int team)
         {
             if (!LoggedIn(player)) return false;
-            if (HasOwnedVehicle(player, model, team)) return false;
 
-            var _new = new OwnedVehData
+            using (MainDatabase context = ContextFactory.CreateContext())
             {
-                AccountSQLID = EPlayer.GetAccount(player).SQL_ID,
-                Model = model,
-                Team = team,
-                TimesUsed = 0,
-            };
-            ContextFactory.Instance.OwnedVehicles.Add(_new);
+                if (await HasOwnedVehicle(acc, model, team)) return false;
 
-            EPlayer.UnlockAchievement(player, "first_vehicle");
-            ContextFactory.Instance.SaveChanges();
+                var _new = new OwnedVehData
+                {
+                    AccountSQLID = acc.SQL_ID,
+                    Model = model,
+                    Team = team,
+                    TimesUsed = 0,
+                };
+                await context.OwnedVehicles.AddAsync(_new);
 
-            int totalOwned = GetOwnedVehicles(player, 0).Count + GetOwnedVehicles(player, 1).Count + 2;
+                EPlayer.UnlockAchievement(player, "first_vehicle");
+                await context.SaveChangesAsync();
 
-            NAPI.Util.ConsoleOutput($"{player.Name} unlocked a {model}, they now have a total of {totalOwned}/{Settings.Cars.Count} vehicles");
+                List<string> ccars = await GetOwnedVehicles(acc, 1);
+                List<string> fcars = await GetOwnedVehicles(acc, 0);
 
-            if (totalOwned >= Settings.Cars.Count)
-                EPlayer.UnlockAchievement(player, "all_vehicles");
+                int totalOwned = ccars.Count + fcars.Count + 2;
 
-            return true;
+                NAPI.Task.Run(() =>
+                {
+                    NAPI.Util.ConsoleOutput($"{player.Name} unlocked a {model}, they now have a total of {totalOwned}/{Settings.Cars.Count} vehicles");
+
+                    if (totalOwned >= Settings.Cars.Count)
+                        EPlayer.UnlockAchievement(player, "all_vehicles");
+                });
+
+
+                return true;
+            }
         }
-        public static bool HasOwnedVehicle(Player player, string model, int team)
+        public async static Task<bool> HasOwnedVehicle(Account acc, string model, int team)
         {
             if (model == "?" || model.Equals("default", StringComparison.OrdinalIgnoreCase)) return true;
 
-            if (LoggedIn(player))
+            using (MainDatabase context = ContextFactory.CreateContext())
             {
-                Account acc = GetAccount(player);
-                /*foreach(var car in Settings.Cars)
-                {
-                    if(car.Model.Equals(model, StringComparison.OrdinalIgnoreCase) && car.Team == team)
-                    {
-                        if (car.LevelRequired == 0 || car.LevelRequired >= acc.Level) return true;
-                    }
-                }*/
-                if (ContextFactory.Instance.OwnedVehicles.ToList().Count(a => a.AccountSQLID == acc.SQL_ID && a.Team == team && a.Model.Equals(model, StringComparison.OrdinalIgnoreCase)) > 0) return true;
+                if (await context.OwnedVehicles.AsQueryable().CountAsync(a => a.AccountSQLID == acc.SQL_ID && a.Team == team && a.Model.Equals(model, StringComparison.OrdinalIgnoreCase)) > 0) return true;
+                return false;
             }
-            return false;
         }
 
-        public static List<string> GetOwnedLoadouts(Player player, int team)
+        public async static Task<List<string>> GetOwnedLoadouts(Account acc, int team)
         {
             List<string> ownedLoadouts = new List<string>();
 
-            if (LoggedIn(player))
+            using (MainDatabase context = ContextFactory.CreateContext())
             {
-                Account acc = GetAccount(player);
-                var loadouts = ContextFactory.Instance.OwnedLoadouts.ToList().Where(a => a.AccountSQLID == acc.SQL_ID && a.Team == team);
+                var loadouts = await context.OwnedLoadouts.AsQueryable().Where(a => a.AccountSQLID == acc.SQL_ID && a.Team == team).ToListAsync();
                 foreach (var item in loadouts) ownedLoadouts.Add(item.Name);
+
+                return ownedLoadouts;
             }
-            return ownedLoadouts;
+      
         }
-        public static bool UnlockLoadout(Player player, string name, int team)
+        public async static Task<bool> UnlockLoadout(Account acc, Player player, string name, int team)
         {
             if (!LoggedIn(player)) return false;
-            if (HasOwnedLoadout(player, name, team)) return false;
 
-            var _new = new OwnedLoadoutData
+            if (await HasOwnedLoadout(acc, name, team)) return false;
+            using (MainDatabase context = ContextFactory.CreateContext())
             {
-                AccountSQLID = EPlayer.GetAccount(player).SQL_ID,
-                Name = name,
-                Team = team,
-                TimesUsed = 0
-            };
-            ContextFactory.Instance.OwnedLoadouts.Add(_new);
+                var _new = new OwnedLoadoutData
+                {
+                    AccountSQLID = acc.SQL_ID,
+                    Name = name,
+                    Team = team,
+                    TimesUsed = 0
+                };
+                await context.OwnedLoadouts.AddAsync(_new);
 
-            EPlayer.UnlockAchievement(player, "first_loadout");
-            ContextFactory.Instance.SaveChanges();
+                EPlayer.UnlockAchievement(player, "first_loadout");
+                await context.SaveChangesAsync();
 
-            int totalOwned = GetOwnedLoadouts(player, 0).Count + GetOwnedLoadouts(player, 1).Count + 2;
+                List<string> cgun = await GetOwnedLoadouts(acc, 1);
+                List<string> fgun = await GetOwnedLoadouts(acc, 0);
+                int totalOwned = cgun.Count + fgun.Count + 2;
 
-            NAPI.Util.ConsoleOutput($"{player.Name} unlocked loadout {name}, they now have a total of {totalOwned}/{Settings.Loadouts.Count} loadouts.");
+                NAPI.Task.Run(() =>
+                {
+                    NAPI.Util.ConsoleOutput($"{player.Name} unlocked loadout {name}, they now have a total of {totalOwned}/{Settings.Loadouts.Count} loadouts.");
 
-            if (totalOwned >= Settings.Loadouts.Count)
-                EPlayer.UnlockAchievement(player, "all_loadouts");
-
-            return true;
+                    if (totalOwned >= Settings.Loadouts.Count)
+                        EPlayer.UnlockAchievement(player, "all_loadouts");
+                });
+                return true;
+            }
         }
-        public static bool HasOwnedLoadout(Player player, string name, int team)
+        public async static Task<bool> HasOwnedLoadout(Account acc, string name, int team)
         {
             if (name == "?" || name.Equals("default", StringComparison.OrdinalIgnoreCase)) return true;
 
-            if (LoggedIn(player))
+            using (MainDatabase context = ContextFactory.CreateContext())
             {
-                Account acc = GetAccount(player);
-                /*foreach(var car in Settings.Cars)
-                {
-                    if(car.Model.Equals(model, StringComparison.OrdinalIgnoreCase) && car.Team == team)
-                    {
-                        if (car.LevelRequired == 0 || car.LevelRequired >= acc.Level) return true;
-                    }
-                }*/
-                if (ContextFactory.Instance.OwnedLoadouts.ToList().Count(a => a.AccountSQLID == acc.SQL_ID && a.Team == team && a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) > 0) return true;
+                if (await context.OwnedLoadouts.AsQueryable().CountAsync(a => a.AccountSQLID == acc.SQL_ID && a.Team == team && a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) > 0) return true;
+                return false;
             }
-            return false;
+
         }
         public static void GrantXP(Player player, int xp)
         {

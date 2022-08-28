@@ -8991,6 +8991,7 @@ namespace RNC
         public void cmd_dbgdiscordverify(Player player, Player _p)
         {
             if (EPlayer.GetAccount(player).Admin < 6) return;
+            Account a = EPlayer.GetAccount(player);
 
             player.TriggerEvent("pushMsgToChat", ">> GIVEN " + _p.Name + " THEIR DISCORD REWARDS");
 
@@ -9001,9 +9002,9 @@ namespace RNC
 
             EPlayer.GrantXP(_p, 10);
             EPlayer.GivePoints(_p, 13);
-            EPlayer.UnlockLoadout(_p, "Negotiator", 0);
-            EPlayer.UnlockLoadout(_p, "Negotiator", 1);
-            EPlayer.UnlockVehicle(_p, "superd", 0);
+            EPlayer.UnlockLoadout(a, _p, "Negotiator", 0);
+            EPlayer.UnlockLoadout(a, _p, "Negotiator", 1);
+            EPlayer.UnlockVehicle(a, _p, "superd", 0);
             EPlayer.UnlockAchievement(_p, "discord_verify");
         }
 

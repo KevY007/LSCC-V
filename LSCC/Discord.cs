@@ -427,9 +427,9 @@ namespace RNC
 
                                         EPlayer.GrantXP(_p, 10);
                                         EPlayer.GivePoints(_p, 13);
-                                        EPlayer.UnlockLoadout(_p, "Negotiator", 0);
-                                        EPlayer.UnlockLoadout(_p, "Negotiator", 1);
-                                        EPlayer.UnlockVehicle(_p, "superd", 0);
+                                        EPlayer.UnlockLoadout(_acc, _p, "Negotiator", 0);
+                                        EPlayer.UnlockLoadout(_acc, _p, "Negotiator", 1);
+                                        EPlayer.UnlockVehicle(_acc, _p, "superd", 0);
                                         _p.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
 
                                         EPlayer.UnlockAchievement(_p, "discord_verify");
