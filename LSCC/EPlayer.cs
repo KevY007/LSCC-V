@@ -11,6 +11,7 @@ using RNC;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace RNC
 {
@@ -819,7 +820,7 @@ namespace RNC
 
             using (MainDatabase context = ContextFactory.CreateContext())
             {
-                var team = await context.CustomArenas_Teams.FirstOrDefaultAsync(a => a.ArenaID == arenaID && a.Team == teamID);
+                var team = await context.CustomArenas_Teams.AsQueryable().FirstOrDefaultAsync(a => a.ArenaID == arenaID && a.Team == teamID);
 
                 if (team == null || team == default(CustomDMArenaTeams)) return new KeyValuePair<CustomDMArenaTeams, bool>(team, false);
 
@@ -833,7 +834,7 @@ namespace RNC
 
             using (MainDatabase context = ContextFactory.CreateContext())
             {
-                var spawn = await context.CustomArenas_Spawns.FirstOrDefaultAsync(a => a.ArenaID == arenaID && a.Team == teamID && a.SQL_ID == spawnID);
+                var spawn = await context.CustomArenas_Spawns.AsQueryable().FirstOrDefaultAsync(a => a.ArenaID == arenaID && a.Team == teamID && a.SQL_ID == spawnID);
 
                 if (spawn == null || spawn == default(CustomDMArenaSpawns)) return new KeyValuePair<CustomDMArenaSpawns, bool>(spawn, false);
 
@@ -845,7 +846,7 @@ namespace RNC
         {
             using (MainDatabase context = ContextFactory.CreateContext())
             {
-                var spawn = await context.CustomArenas_Spawns.FirstOrDefaultAsync(a => a.SQL_ID == spawnID);
+                var spawn = await context.CustomArenas_Spawns.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == spawnID);
 
                 if (spawn == null || spawn == default(CustomDMArenaSpawns)) return new KeyValuePair<CustomDMArenaSpawns, bool>(spawn, false);
 
@@ -1071,16 +1072,16 @@ namespace RNC
                     switch (type)
                     {
                         case AdminNote.ANoteType.OnSpectate:
-                            _notes = context.AdminNotes.ToList().Where(a => a.AccountID == acc.SQL_ID && a.Type == AdminNote.ANoteType.OnSpectate).ToList();
+                            _notes = await context.AdminNotes.AsQueryable().Where(a => a.AccountID == acc.SQL_ID && a.Type == AdminNote.ANoteType.OnSpectate).ToListAsync();
                             break;
                         case AdminNote.ANoteType.OnConnect:
-                            _notes = context.AdminNotes.ToList().Where(a => a.AccountID == acc.SQL_ID && a.Type == AdminNote.ANoteType.OnConnect).ToList();
+                            _notes = await context.AdminNotes.AsQueryable().Where(a => a.AccountID == acc.SQL_ID && a.Type == AdminNote.ANoteType.OnConnect).ToListAsync();
                             break;
                         case AdminNote.ANoteType.Both:
-                            _notes = context.AdminNotes.ToList().Where(a => a.AccountID == acc.SQL_ID && a.Type == AdminNote.ANoteType.Both).ToList();
+                            _notes = await context.AdminNotes.AsQueryable().Where(a => a.AccountID == acc.SQL_ID && a.Type == AdminNote.ANoteType.Both).ToListAsync();
                             break;
                         default:
-                            _notes = context.AdminNotes.ToList().Where(a => a.AccountID == acc.SQL_ID).ToList();
+                            _notes = await context.AdminNotes.AsQueryable().Where(a => a.AccountID == acc.SQL_ID).ToListAsync();
                             break;
                     }
                     if (_notes == null || _notes.Count <= 0)
@@ -1097,7 +1098,7 @@ namespace RNC
                     if (send_header) NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#ffc852}}====================> !{{#ffffff}}{acc.Username}'s Admin Notes !{{#ffc852}}<===================="); });
                     foreach (AdminNote note in _notes)
                     {
-                        Account adm = await context.Accounts.FirstOrDefaultAsync(a => a.SQL_ID == note.AdminID);
+                        Account adm = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == note.AdminID);
                         string aName = adm.Username ?? "[Unknown]";
                         NAPI.Task.Run(() =>
                         {
@@ -1270,7 +1271,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    DailyChallenge dc = await context.DailyChallenges.FirstOrDefaultAsync(dc => dc.Item == challenge_item && dc.Type == challenge_type);
+                    DailyChallenge dc = await context.DailyChallenges.AsQueryable().FirstOrDefaultAsync(dc => dc.Item == challenge_item && dc.Type == challenge_type);
                     if (dc == null) return;
 
                     NAPI.Task.Run(() =>
@@ -1333,7 +1334,7 @@ namespace RNC
 
             using (MainDatabase context = ContextFactory.CreateContext())
             {
-                UnlockedAchievement a = await context.UnlockedAchievements.FirstOrDefaultAsync(u => u.AccountID == account.SQL_ID && u.Achievement.Equals(achievement, StringComparison.OrdinalIgnoreCase));
+                UnlockedAchievement a = await context.UnlockedAchievements.AsQueryable().FirstOrDefaultAsync(u => u.AccountID == account.SQL_ID && u.Achievement.Equals(achievement, StringComparison.OrdinalIgnoreCase));
                 if (a == null) return false;
                 else return true;
             }
@@ -1381,7 +1382,7 @@ namespace RNC
                             if (!hasUnlockedAllAchievements)
                             {
                                 // checking if all achievements are unlocked: is the count of player's unlocked achievements higher or equal than server achievement count?
-                                int playerAchievements = await context.UnlockedAchievements.CountAsync(a => a.AccountID == acc.SQL_ID);
+                                int playerAchievements = await context.UnlockedAchievements.AsQueryable().CountAsync(a => a.AccountID == acc.SQL_ID);
                                 if (playerAchievements >= Settings.Achievements.Count - 1)
                                 {
                                     UnlockAchievement(player, "all_achievements");
@@ -1497,34 +1498,45 @@ namespace RNC
 
                     if (loadout.Weapons.Count() > 0)
                     {
-                        OwnedLoadoutData _ld = ContextFactory.Instance.OwnedLoadouts.FirstOrDefault(l =>
-                                                l.AccountSQLID == EPlayer.GetAccount(player).SQL_ID &&
-                                                l.Name.Equals(EPlayer.GetAccount(player).LoadoutCop, StringComparison.OrdinalIgnoreCase));
-                        if (_ld != null)
-                            _ld.TimesUsed++;
-
-                        loadout.Weapons.ForEach((wepar) =>
+                        Account _a = EPlayer.GetAccount(player);
+                        Task.Run(async () =>
                         {
-                            int extraAmmo = 0;
-                            jWeaponData wepdat;
-                            if (Settings.WeaponData.TryGetValue(Convert.ToInt64((WeaponHash)wepar[0]), out wepdat))
+                            using (MainDatabase context = ContextFactory.CreateContext())
                             {
-                                if (EPlayer.GetAccount(player).PurchasedAmmo.Length >= 4)
+                                OwnedLoadoutData _ld = await context.OwnedLoadouts.AsQueryable().FirstOrDefaultAsync(l =>
+                                                   l.AccountSQLID == _a.SQL_ID &&
+                                                   l.Name.Equals(_a.LoadoutCop, StringComparison.OrdinalIgnoreCase));
+                                if (_ld != null)
+                                    _ld.TimesUsed++;
+
+                                NAPI.Task.Run(() =>
                                 {
-                                    var data = NAPI.Util.FromJson<Dictionary<string, int>>(EPlayer.GetAccount(player).PurchasedAmmo);
-                                    if (wepdat.AmmoType != null && wepdat.AmmoType.Length >= 2)
+                                    loadout.Weapons.ForEach((wepar) =>
                                     {
-                                        if (!data.TryGetValue(wepdat.AmmoType, out extraAmmo)) extraAmmo = 0;
-                                    }
-                                }
+                                        int extraAmmo = 0;
+                                        jWeaponData wepdat;
+                                        if (Settings.WeaponData.TryGetValue(Convert.ToInt64((WeaponHash)wepar[0]), out wepdat))
+                                        {
+                                            if (EPlayer.GetAccount(player).PurchasedAmmo.Length >= 4)
+                                            {
+                                                var data = NAPI.Util.FromJson<Dictionary<string, int>>(EPlayer.GetAccount(player).PurchasedAmmo);
+                                                if (wepdat.AmmoType != null && wepdat.AmmoType.Length >= 2)
+                                                {
+                                                    if (!data.TryGetValue(wepdat.AmmoType, out extraAmmo)) extraAmmo = 0;
+                                                }
+                                            }
+                                        }
+
+                                        if ((WeaponHash)wepar[0] == (WeaponHash)1)
+                                        {
+                                            player.Armor = (int)wepar[3];
+                                        }
+                                        else player.GiveWeapon((WeaponHash)wepar[0], (int)wepar[3] + extraAmmo);
+                                    });
+                                });
                             }
-                            
-                            if((WeaponHash)wepar[0] == (WeaponHash)1)
-                            {
-                                player.Armor = (int)wepar[3];
-                            }
-                            else player.GiveWeapon((WeaponHash)wepar[0], (int)wepar[3]+extraAmmo);
                         });
+                        
                     }
                 }
                 else
@@ -1629,34 +1641,45 @@ namespace RNC
                     
                     if (loadout.Weapons.Count() > 0)
                     {
-                        OwnedLoadoutData _ld = ContextFactory.Instance.OwnedLoadouts.FirstOrDefault(l =>
-                            l.AccountSQLID == EPlayer.GetAccount(player).SQL_ID &&
-                            l.Name.Equals(EPlayer.GetAccount(player).LoadoutFugitive, StringComparison.OrdinalIgnoreCase));
-                        if (_ld != null)
-                            _ld.TimesUsed++;
-
-                        loadout.Weapons.ForEach((wepar) =>
+                        Account _a = EPlayer.GetAccount(player);
+                        Task.Run(async () =>
                         {
-                            int extraAmmo = 0;
-                            jWeaponData wepdat;
-                            if (Settings.WeaponData.TryGetValue(Convert.ToInt64((WeaponHash)wepar[0]), out wepdat))
+                            using (MainDatabase context = ContextFactory.CreateContext())
                             {
-                                if (EPlayer.GetAccount(player).PurchasedAmmo.Length >= 4)
-                                {
-                                    var data = NAPI.Util.FromJson<Dictionary<string, int>>(EPlayer.GetAccount(player).PurchasedAmmo);
-                                    if (wepdat.AmmoType != null && wepdat.AmmoType.Length >= 2)
-                                    {
-                                        if (!data.TryGetValue(wepdat.AmmoType, out extraAmmo)) extraAmmo = 0;
-                                    }
-                                }
-                            }
+                               OwnedLoadoutData _ld = await context.OwnedLoadouts.AsQueryable().FirstOrDefaultAsync(l =>
+                               l.AccountSQLID == _a.SQL_ID &&
+                               l.Name.Equals(_a.LoadoutFugitive, StringComparison.OrdinalIgnoreCase));
+                                if (_ld != null)
+                                    _ld.TimesUsed++;
 
-                            if ((WeaponHash)wepar[0] == (WeaponHash)1)
-                            {
-                                player.Armor = (int)wepar[3];
+                                NAPI.Task.Run(() =>
+                                {
+                                    loadout.Weapons.ForEach((wepar) =>
+                                    {
+                                        int extraAmmo = 0;
+                                        jWeaponData wepdat;
+                                        if (Settings.WeaponData.TryGetValue(Convert.ToInt64((WeaponHash)wepar[0]), out wepdat))
+                                        {
+                                            if (EPlayer.GetAccount(player).PurchasedAmmo.Length >= 4)
+                                            {
+                                                var data = NAPI.Util.FromJson<Dictionary<string, int>>(EPlayer.GetAccount(player).PurchasedAmmo);
+                                                if (wepdat.AmmoType != null && wepdat.AmmoType.Length >= 2)
+                                                {
+                                                    if (!data.TryGetValue(wepdat.AmmoType, out extraAmmo)) extraAmmo = 0;
+                                                }
+                                            }
+                                        }
+
+                                        if ((WeaponHash)wepar[0] == (WeaponHash)1)
+                                        {
+                                            player.Armor = (int)wepar[3];
+                                        }
+                                        else player.GiveWeapon((WeaponHash)wepar[0], (int)wepar[3] + extraAmmo);
+                                    });
+                                });
                             }
-                            else player.GiveWeapon((WeaponHash)wepar[0], (int)wepar[3] + extraAmmo);
                         });
+                        
                     }
                 }
                 else
@@ -1843,11 +1866,11 @@ namespace RNC
         {
             using (MainDatabase context = ContextFactory.CreateContext())
             {
-                var accounts = context.Accounts.ToList().Where(acc =>
+                var accounts = await context.Accounts.AsQueryable().Where(acc =>
                     new ulong[] { pAcc.RegisterRID, pAcc.LastRID }.Intersect(new ulong[] { acc.LastRID, acc.RegisterRID }).Any() ||
                     new string[] { pAcc.RegisterIP, pAcc.LastIP }.Intersect(new string[] { acc.RegisterIP, acc.LastIP }).Any() ||
                     new string[] { pAcc.RegisterHWID, pAcc.LastHWID }.Intersect(new string[] { acc.RegisterHWID, acc.LastHWID }).Any() ||
-                    (acc.Email != null && acc.Email.Equals(pAcc.Email) && acc.Email.Length >= 5)).ToList(); // BONKERS
+                    (acc.Email != null && acc.Email.Equals(pAcc.Email) && acc.Email.Length >= 5)).ToListAsync(); // BONKERS
 
                 return accounts;
             }
@@ -1893,39 +1916,67 @@ namespace RNC
 
         public static void SendAutoLoginData(Player player)
         {
-            List<Account> autoLoginChecks = ContextFactory.Instance.Accounts.ToList().Where(a => a.LastHWID == player.Serial &&
-                                                                              a.LastRID == player.SocialClubId &&
-                                                                              a.LastSC == player.SocialClubName &&
-                                                                              a.AutoLogin == true).ToList();
-
-            if (autoLoginChecks.Count <= 0)
+            string scname = player.SocialClubName;
+            ulong scid = player.SocialClubId;
+            string pserial = player.Serial;
+            Task.Run(async () =>
             {
-                player.TriggerEvent("sendAutoLoginDataToBrowser", "");
-                NAPI.Util.ConsoleOutput("Found 0 auto login data");
-            }
-            else
-            {
-                autoLoginChecks.Sort((x, y) => y.LastLogin.CompareTo(x.LastLogin)); // sort by date, descending
-                Account toLogin = autoLoginChecks[0];
-                NAPI.Util.ConsoleOutput("Sending data: " + toLogin.Username);
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    List<Account> autoLoginChecks = await context.Accounts.AsQueryable().Where(a => a.LastHWID == pserial &&
+                                                                              a.LastRID == scid &&
+                                                                              a.LastSC == scname &&
+                                                                              a.AutoLogin == true).ToListAsync();
 
-                player.TriggerEvent("sendAutoLoginDataToBrowser", toLogin.Username);
-            }
+                    if (autoLoginChecks.Count <= 0)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("sendAutoLoginDataToBrowser", "");
+                            NAPI.Util.ConsoleOutput("Found 0 auto login data");
+                        });
+                    }
+                    else
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            autoLoginChecks.Sort((x, y) => y.LastLogin.CompareTo(x.LastLogin)); // sort by date, descending
+                            Account toLogin = autoLoginChecks[0];
+                            NAPI.Util.ConsoleOutput("Sending data: " + toLogin.Username);
+
+                            player.TriggerEvent("sendAutoLoginDataToBrowser", toLogin.Username);
+                        });
+                    }
+                }
+            });
+            
         }
         public static void SendForgotUsernameData(Player player)
         {
-            List<Account> accounts = ContextFactory.Instance.Accounts.ToList().Where(a => a.LastSC == player.SocialClubName || a.LastRID == player.SocialClubId
-                                                                || a.RegisterRID == player.SocialClubId || a.RegisterSC == player.SocialClubName).ToList();
-
-            string dataToReturn = "[";
-            foreach (Account acc in accounts)
+            string scname = player.SocialClubName;
+            ulong scid = player.SocialClubId;
+            Task.Run(async () =>
             {
-                if(acc != accounts[accounts.Count-1])
-                    dataToReturn += $"\"{acc.Username}\",";
-                else dataToReturn += $"\"{acc.Username}\"";
-            }
-            dataToReturn += "]";
-            player.TriggerEvent("sendForgotUsernameToBrowser", dataToReturn);
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    List<Account> accounts = await context.Accounts.AsQueryable().Where(a => a.LastSC == scname || a.LastRID == scid
+                                                                || a.RegisterRID == scid || a.RegisterSC == scname).ToListAsync();
+
+                    NAPI.Task.Run(() =>
+                    {
+                        string dataToReturn = "[";
+                        foreach (Account acc in accounts)
+                        {
+                            if (acc != accounts[accounts.Count - 1])
+                                dataToReturn += $"\"{acc.Username}\",";
+                            else dataToReturn += $"\"{acc.Username}\"";
+                        }
+                        dataToReturn += "]";
+                        player.TriggerEvent("sendForgotUsernameToBrowser", dataToReturn);
+                    });
+                }
+            });
+            
         }
 
         public static void LoginBrowserSetup(Player player, bool show_login = true)

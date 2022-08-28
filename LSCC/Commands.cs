@@ -1,4 +1,5 @@
 ﻿using GTANetworkAPI;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.Collections.Generic;
@@ -379,7 +380,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    PlayerTunings inst = await context.PlayerTunings.FirstOrDefaultAsync(a => a.Model == player.Vehicle.Model && a.AccountSQLID == EPlayer.GetAccount(player).SQL_ID);
+                    PlayerTunings inst = await context.PlayerTunings.AsQueryable().FirstOrDefaultAsync(a => a.Model == player.Vehicle.Model && a.AccountSQLID == EPlayer.GetAccount(player).SQL_ID);
                     applyvehmods_OnFinishTuningsSearch(player, inst);
                 }
             });
@@ -1054,7 +1055,7 @@ namespace RNC
                 {
                     using (MainDatabase context = ContextFactory.CreateContext())
                     {
-                        Account targetAcc = await context.Accounts.FirstOrDefaultAsync(t => t.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+                        Account targetAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(t => t.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
                         motd_onFinishAccountLookup(player, targetAcc, message);
                     }
                 });
@@ -1122,7 +1123,7 @@ namespace RNC
                 {
                     using (MainDatabase context = ContextFactory.CreateContext())
                     {
-                        await context.Accounts.ForEachAsync(acc =>
+                        await context.Accounts.AsQueryable().AsQueryable().ForEachAsync(acc =>
                         {
                             acc.MOTD = "none";
                         });
@@ -1144,7 +1145,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    await context.Accounts.ForEachAsync(acc =>
+                    await context.Accounts.AsQueryable().ForEachAsync(acc =>
                     {
                         acc.MOTD = jsonMotd;
                     });
@@ -4191,7 +4192,7 @@ namespace RNC
                         {
                             using (MainDatabase context = ContextFactory.CreateContext())
                             {
-                                AdminNote _n = await context.AdminNotes.FirstOrDefaultAsync(a => a.SQL_ID == nID);
+                                AdminNote _n = await context.AdminNotes.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == nID);
                                 anote_OnFindDeleteNote(player, _n, nID, target);
                             }
                         });
@@ -4225,7 +4226,7 @@ namespace RNC
                 {
                     using (MainDatabase context = ContextFactory.CreateContext())
                     {
-                        Account tAcc = await context.Accounts.FirstOrDefaultAsync(a => a.SQL_ID == _n.AccountID);
+                        Account tAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == _n.AccountID);
                         context.AdminNotes.Remove(_n);
                         string nTargetName = tAcc.Username ?? "[Unknown]";
                         anote_FinishDeleteNote(player, nID, nTargetName);
@@ -5381,15 +5382,15 @@ namespace RNC
                 {
                     if (sqlid != -1)
                     {
-                        ban = await context.Bans.FirstOrDefaultAsync(a => a.SQL_ID == sqlid);
+                        ban = await context.Bans.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == sqlid);
                         bancheck_OnLookupBanData(player, ban);
                     }
                     else
                     {
-                        Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(sqlorname, StringComparison.OrdinalIgnoreCase));
+                        Account tpAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(sqlorname, StringComparison.OrdinalIgnoreCase));
                         if (tpAcc != null)
                         {
-                            ban = await context.Bans.FirstOrDefaultAsync(a => a.AccountSQLID == tpAcc.SQL_ID);
+                            ban = await context.Bans.AsQueryable().FirstOrDefaultAsync(a => a.AccountSQLID == tpAcc.SQL_ID);
                             bancheck_OnLookupBanData(player, ban);
                         }
                         else NAPI.Task.Run(() => { EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}Ban data could not be found!"); });
@@ -5417,7 +5418,7 @@ namespace RNC
                     {
                         using (MainDatabase context = ContextFactory.CreateContext())
                         {
-                            Account pAcc = await context.Accounts.FirstOrDefaultAsync(acc => acc.SQL_ID == ban.AccountSQLID);
+                            Account pAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(acc => acc.SQL_ID == ban.AccountSQLID);
                             if (pAcc != null)
                             {
                                 username = pAcc.Username;
@@ -5466,7 +5467,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                    Account tpAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
                     ocheckstats_OnFinishLookup(player, tpAcc);
                 }
             });
@@ -5514,7 +5515,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true &&
+                    Account tpAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true &&
                     p.Suspended == 1);
                     if (tpAcc != null)
                     {
@@ -5561,14 +5562,14 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase));
+                    Account tpAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase));
 
                     if (tpAcc == null)
                     {
                         changename_ReturnErrorTask(player, 0);
                         return;
                     }
-                    Account nameCheck = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(newname, StringComparison.OrdinalIgnoreCase));
+                    Account nameCheck = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(newname, StringComparison.OrdinalIgnoreCase));
                     if (nameCheck != null)
                     {
                         changename_ReturnErrorTask(player, 1);
@@ -5580,7 +5581,7 @@ namespace RNC
                         return;
                     }
 
-                    foreach (var arena in context.Bans.ToListAsync().Result.Where(a => a.Admin.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                    foreach (var arena in await context.Bans.AsQueryable().Where(a => a.Admin.Equals(name, StringComparison.OrdinalIgnoreCase)).ToListAsync())
                     {
                         arena.Admin = newname;
                     }
@@ -5656,7 +5657,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                    Account tpAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
                     if (tpAcc == null)
                     {
                         deleteaccount_ReturnErrorTask(player, 0);
@@ -5719,7 +5720,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                    Account tpAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
                     if (tpAcc == null)
                     {
                         // reusing deleteaccount error message function since it's same
@@ -5812,7 +5813,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Account pAcc = await context.Accounts.FirstOrDefaultAsync(acc => acc.Username.Equals(accountname, StringComparison.OrdinalIgnoreCase));
+                    Account pAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(acc => acc.Username.Equals(accountname, StringComparison.OrdinalIgnoreCase));
                     if (pAcc == null)
                     {
                         NAPI.Task.Run(() =>
@@ -5886,7 +5887,7 @@ namespace RNC
                         {
                             accounts.ForEach(async acc =>
                             {
-                                if (await context.Bans.CountAsync(ban => ban.AccountSQLID == acc.SQL_ID) >= 1)
+                                if (await context.Bans.AsQueryable().CountAsync(ban => ban.AccountSQLID == acc.SQL_ID) >= 1)
                                 {
                                     banCount++;
                                 }
@@ -5933,13 +5934,13 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    if (sqlid != -1) ban = await context.Bans.FirstOrDefaultAsync(a => a.SQL_ID == sqlid);
+                    if (sqlid != -1) ban = await context.Bans.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == sqlid);
                     else
                     {
-                        Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(sqlorname, StringComparison.OrdinalIgnoreCase) == true);
+                        Account tpAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(sqlorname, StringComparison.OrdinalIgnoreCase) == true);
                         if (tpAcc != null)
                         {
-                            ban = await context.Bans.FirstOrDefaultAsync(a => a.AccountSQLID == tpAcc.SQL_ID);
+                            ban = await context.Bans.AsQueryable().FirstOrDefaultAsync(a => a.AccountSQLID == tpAcc.SQL_ID);
                         }
                     }
 
@@ -5952,7 +5953,7 @@ namespace RNC
                     string username = "Unregistered Ban";
                     if (ban.AccountSQLID != -1)
                     {
-                        Account pAcc = await context.Accounts.FirstOrDefaultAsync(acc => acc.SQL_ID == ban.AccountSQLID);
+                        Account pAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(acc => acc.SQL_ID == ban.AccountSQLID);
                         if (pAcc != null)
                         {
                             username = pAcc.Username;
@@ -5996,7 +5997,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true &&
+                    Account tpAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true &&
                         context.Bans.ToList().Where(a => a.AccountSQLID == p.SQL_ID).Count() == 0);
 
                     if (tpAcc == null)
@@ -6398,7 +6399,7 @@ namespace RNC
                 {
                     try
                     {
-                        mapBruh = await context.Maps.FirstOrDefaultAsync(a => (Int32.TryParse(map, out mapID) && mapID == a.SQL_ID) || a.Name.Contains(map, StringComparison.OrdinalIgnoreCase));
+                        mapBruh = await context.Maps.AsQueryable().FirstOrDefaultAsync(a => (Int32.TryParse(map, out mapID) && mapID == a.SQL_ID) || a.Name.Contains(map, StringComparison.OrdinalIgnoreCase));
                     }
                     catch { }
 
@@ -6408,7 +6409,7 @@ namespace RNC
                         return;
                     }
 
-                    if (await context.Maps.CountAsync(a => a.Enabled == true) <= 1 && mapBruh.Enabled)
+                    if (await context.Maps.AsQueryable().CountAsync(a => a.Enabled == true) <= 1 && mapBruh.Enabled)
                     {
                         NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot disable all the maps in the server! If you want to disable CC then use /game autostart."); });
                         return;
@@ -6469,7 +6470,7 @@ namespace RNC
                 {
                     try
                     {
-                        mapBruh = await context.Maps.FirstOrDefaultAsync(a => (Int32.TryParse(map, out mapID) && mapID == a.SQL_ID) || a.Name.Contains(map, StringComparison.OrdinalIgnoreCase));
+                        mapBruh = await context.Maps.AsQueryable().FirstOrDefaultAsync(a => (Int32.TryParse(map, out mapID) && mapID == a.SQL_ID) || a.Name.Contains(map, StringComparison.OrdinalIgnoreCase));
                     }
                     catch { }
 
@@ -6515,7 +6516,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(accountname, StringComparison.OrdinalIgnoreCase) == true);
+                    Account tpAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(accountname, StringComparison.OrdinalIgnoreCase) == true);
 
                     if (tpAcc == null)
                     {
@@ -6610,7 +6611,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Language lang = await context.Languages.FirstOrDefaultAsync(l => l.LanguageName == language);
+                    Language lang = await context.Languages.AsQueryable().FirstOrDefaultAsync(l => l.LanguageName == language);
                     if (lang == null)
                     {
                         NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}A language with that ID could not be found. Use !{#FFFF00}/languages!{#FFFFFF}."); });
@@ -6628,7 +6629,7 @@ namespace RNC
                         }
                     });
 
-                    await context.Accounts.ForEachAsync(acc =>
+                    await context.Accounts.AsQueryable().ForEachAsync(acc =>
                     {
                         if (acc.Language == langID) { acc.Language = -1; }
                     });
@@ -6656,7 +6657,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    if (await context.Languages.FirstOrDefaultAsync(lang => lang.LanguageName == language) != null)
+                    if (await context.Languages.AsQueryable().FirstOrDefaultAsync(lang => lang.LanguageName == language) != null)
                     {
                         NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}That language is already added!"); });
                         return;
@@ -6683,7 +6684,7 @@ namespace RNC
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
                     int _langCount = 0;
-                    await context.Languages.ForEachAsync(lang =>
+                    await context.Languages.AsQueryable().ForEachAsync(lang =>
                     {
                         NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#bfffbd} >!{#f5fffe} " + lang.LanguageName); });
                         _langCount++;
@@ -6711,7 +6712,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Language lang = await context.Languages.FirstOrDefaultAsync(l => l.LanguageName.Equals(language, StringComparison.OrdinalIgnoreCase));
+                    Language lang = await context.Languages.AsQueryable().FirstOrDefaultAsync(l => l.LanguageName.Equals(language, StringComparison.OrdinalIgnoreCase));
                     if (lang == null)
                     {
                         NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}A language with that ID could not be found. Use !{#FFFF00}/languages!{#FFFFFF}."); });
@@ -6829,7 +6830,7 @@ namespace RNC
             Task.Run(async () => {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Account _target = await context.Accounts.FirstOrDefaultAsync(t => t.Username.Equals(target, StringComparison.OrdinalIgnoreCase));
+                    Account _target = await context.Accounts.AsQueryable().FirstOrDefaultAsync(t => t.Username.Equals(target, StringComparison.OrdinalIgnoreCase));
                     if (_target == null)
                     {
                         NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}A player with that username could not be found!"); });
@@ -7003,7 +7004,7 @@ namespace RNC
                 Task.Run(async () => {
                     using (MainDatabase context = ContextFactory.CreateContext())
                     {
-                        MapSpawn spawn = await context.MapSpawns.FirstOrDefaultAsync(b => b.spawnTeam == teamID);
+                        MapSpawn spawn = await context.MapSpawns.AsQueryable().FirstOrDefaultAsync(b => b.spawnTeam == teamID);
                         NAPI.Task.Run(() =>
                         {
                             if (teamID == 0)
@@ -7228,10 +7229,10 @@ namespace RNC
             Task.Run(async () => {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    List<Map> mapList = await context.Maps.ToListAsync();
-                    mapList.ForEach(async map =>
+                    List<Map> mapList = await context.Maps.AsQueryable().ToListAsync();
+                    await mapList.AsQueryable().ForEachAsync(async map =>
                     {
-                        int spawns = await context.MapSpawns.CountAsync(a => a.mapID == map.SQL_ID);
+                        int spawns = await context.MapSpawns.AsQueryable().CountAsync(a => a.mapID == map.SQL_ID);
                         NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#DAA520}}{map.Name} | ID: [{map.SQL_ID}] | Enabled: [{map.Enabled}] | Spawns: [{spawns}]"); });
                     });
                 }
@@ -7270,7 +7271,7 @@ namespace RNC
             Task.Run(async () => {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Map map = await context.Maps.FirstOrDefaultAsync(a => a.SQL_ID == mapid);
+                    Map map = await context.Maps.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == mapid);
                     if (map == null) { NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}No map with this ID exists."); }); return; }
 
                     if (teamid > 2) { NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Valid TeamID's are 0 (fugitive), 1 (cop) or 2 (cop maverick)."); }); return; }
@@ -7311,7 +7312,7 @@ namespace RNC
             Task.Run(async () => {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    MapSpawn map = await context.MapSpawns.FirstOrDefaultAsync(a => a.SQL_ID == spawnid && a.mapID == mapid);
+                    MapSpawn map = await context.MapSpawns.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == spawnid && a.mapID == mapid);
                     if (map == null) { NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}No mapspawn with this ID or map ID exists."); }); return; }
 
                     context.MapSpawns.RemoveRange(context.MapSpawns.AsQueryable().Where(a => a.mapID == mapid && a.SQL_ID == spawnid));
@@ -7340,7 +7341,7 @@ namespace RNC
             Task.Run(async () => {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Map map = await context.Maps.FirstOrDefaultAsync(a => a.SQL_ID == mapid);
+                    Map map = await context.Maps.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == mapid);
                     if (map == null) { NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Invalid map ID!"); }); return; }
 
                     context.MapSpawns.AsQueryable().Where(a => a.mapID == mapid).ToList().ForEach(a =>
@@ -7350,7 +7351,7 @@ namespace RNC
                             player.TriggerEvent("pushMsgToChat", $"!{{#DAA520}}Spawn ID [{a.SQL_ID}] | Team: [{a.spawnTeam}] | XYZA: {a.spawnX}, {a.spawnY}, {a.spawnZ}, {a.spawnA}");
                         });
                     });
-                    int count = await context.MapSpawns.CountAsync();
+                    int count = await context.MapSpawns.AsQueryable().CountAsync();
                     NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#DAA520}}Total Spawns: {count}"); });
                 }
             });
@@ -7375,7 +7376,7 @@ namespace RNC
             Task.Run(async () => {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Map map = await context.Maps.FirstOrDefaultAsync(a => a.Name.Equals(mapname, StringComparison.OrdinalIgnoreCase));
+                    Map map = await context.Maps.AsQueryable().FirstOrDefaultAsync(a => a.Name.Equals(mapname, StringComparison.OrdinalIgnoreCase));
                     if (map == null) { NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}No map with this name exists."); }); return; }
 
                     NAPI.Task.Run(() =>
@@ -7486,7 +7487,7 @@ namespace RNC
             Task.Run(async () => {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    if (await context.CustomArenas.CountAsync(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) > 0)
+                    if (await context.CustomArenas.AsQueryable().CountAsync(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) > 0)
                     {
                         NAPI.Task.Run(() =>
                         {
@@ -7536,14 +7537,14 @@ namespace RNC
             Task.Run(async () => {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    if (await context.CustomArenas.CountAsync(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) == 0)
+                    if (await context.CustomArenas.AsQueryable().CountAsync(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) == 0)
                     {
                         NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no DM arena with that name!"); });
                         return;
                     }
 
 
-                    var arena = await context.CustomArenas.FirstOrDefaultAsync(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+                    var arena = await context.CustomArenas.AsQueryable().FirstOrDefaultAsync(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
                     NAPI.Task.Run(() =>
                     {
                         player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}You have selected the arena !{{#FFFFFF}}'{arena.Name}' (creator: {arena.Creator}) SQLID {arena.SQL_ID}!{{#00FF33}}. /editdmarena to edit.");
@@ -7911,7 +7912,7 @@ namespace RNC
                         {
                             using (MainDatabase context = ContextFactory.CreateContext())
                             {
-                                foreach (var team in context.CustomArenas_Teams.ToList().Where(a => a.ArenaID == arena.Key.SQL_ID))
+                                foreach (var team in await context.CustomArenas_Teams.AsQueryable().Where(a => a.ArenaID == arena.Key.SQL_ID).ToListAsync())
                                 {
                                     NAPI.Task.Run(() =>
                                     {
@@ -7993,8 +7994,8 @@ namespace RNC
 
                                     using (MainDatabase context = ContextFactory.CreateContext())
                                     {
-                                        int spawnsTotal = await context.CustomArenas_Spawns.CountAsync(a => a.ArenaID == arena.Key.SQL_ID && a.Team == team.Key.Team);
-                                        int spawnsTeam = await context.CustomArenas_Spawns.CountAsync(a => a.ArenaID == arena.Key.SQL_ID && (a.Team == team.Key.Team || a.Team == team.Key.SharedSpawns));
+                                        int spawnsTotal = await context.CustomArenas_Spawns.AsQueryable().CountAsync(a => a.ArenaID == arena.Key.SQL_ID && a.Team == team.Key.Team);
+                                        int spawnsTeam = await context.CustomArenas_Spawns.AsQueryable().CountAsync(a => a.ArenaID == arena.Key.SQL_ID && (a.Team == team.Key.Team || a.Team == team.Key.SharedSpawns));
                                         NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#31b55a}}Spawns: {spawnsTeam} (+{spawnsTotal - spawnsTeam} shared) - HP Bar Types: {hpBars}"); });
                                     }
                                 });
@@ -8034,7 +8035,7 @@ namespace RNC
                             {
                                 using (MainDatabase context = ContextFactory.CreateContext())
                                 {
-                                    var spawns = context.CustomArenas_Spawns.ToList().Where(a => a.ArenaID == arena.Key.SQL_ID && (a.Team == team.Key.Team || a.Team == team.Key.SharedSpawns));
+                                    var spawns = await context.CustomArenas_Spawns.AsQueryable().Where(a => a.ArenaID == arena.Key.SQL_ID && (a.Team == team.Key.Team || a.Team == team.Key.SharedSpawns)).ToListAsync();
                                     foreach (var spawn in spawns)
                                     {
                                         NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", $"!{{#69f5a8}}ID: {spawn.SQL_ID} (Team {spawn.Team}) XYZA: {spawn.X}, {spawn.Y}, {spawn.Z}, {spawn.A}"); });
@@ -8364,7 +8365,7 @@ namespace RNC
                             using (MainDatabase context = ContextFactory.CreateContext())
                             {
                                 context.CustomArenas_Teams.Remove(team.Key);
-                                context.CustomArenas_Spawns.RemoveRange(context.CustomArenas_Spawns.ToList().Where(a => a.ArenaID == arena.Key.SQL_ID && a.Team == id));
+                                context.CustomArenas_Spawns.RemoveRange(await context.CustomArenas_Spawns.AsQueryable().Where(a => a.ArenaID == arena.Key.SQL_ID && a.Team == id).ToListAsync());
                                 await context.SaveChangesAsync();
 
                             }
@@ -8903,7 +8904,7 @@ namespace RNC
             Task.Run(async () => {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    var inst = await context.PlayerTunings.FirstOrDefaultAsync(a => a.Model == veh.Model && a.AccountSQLID == EPlayer.GetAccount(player).SQL_ID);
+                    var inst = await context.PlayerTunings.AsQueryable().FirstOrDefaultAsync(a => a.Model == veh.Model && a.AccountSQLID == EPlayer.GetAccount(player).SQL_ID);
                     NAPI.Task.Run(() =>
                     {
                         if (inst != null)
@@ -9079,7 +9080,7 @@ namespace RNC
             {
                 using(MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                    Account tpAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
 
                     if ((tpAcc != null) == false)
                     {
@@ -9153,7 +9154,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                    Account tpAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
 
                     if ((tpAcc != null) == false)
                     {
@@ -9219,7 +9220,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Clan clan = await context.Clans.FirstOrDefaultAsync(c => c.SQL_ID == acc.ClanID);
+                    Clan clan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == acc.ClanID);
                     if (clan == null)
                     {
                         NAPI.Task.Run(() =>
@@ -9228,7 +9229,7 @@ namespace RNC
                         });
                         return;
                     }
-                    int membersCount = await context.Accounts.CountAsync(a => a.ClanID == clan.SQL_ID);
+                    int membersCount = await context.Accounts.AsQueryable().CountAsync(a => a.ClanID == clan.SQL_ID);
                     NAPI.Task.Run(() =>
                     {
                         EPlayer.SendMessage(player, $"~y~====================> STATISTICS FOR: ~w~{clan.Name} ~y~<====================");
@@ -9262,7 +9263,7 @@ namespace RNC
                 {
                     if (acc.ClanTier == 0)
                     {
-                        Clan clan = await context.Clans.FirstOrDefaultAsync(c => c.SQL_ID == acc.ClanID);
+                        Clan clan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == acc.ClanID);
                         if (clan != null)
                         {
                             context.Clans.Remove(clan);
@@ -9335,7 +9336,7 @@ namespace RNC
                     await context.Clans.AddAsync(clan);
 
                     acc.ClanTier = 0;
-                    Clan thaClan = await context.Clans.FirstOrDefaultAsync(c => c.Name.Equals(clanname));
+                    Clan thaClan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.Name.Equals(clanname));
                     acc.ClanID = thaClan.SQL_ID;
 
                     await context.SaveChangesAsync();
@@ -9360,7 +9361,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    RedeemableCode redeem = await context.RedeemableCodes.FirstOrDefaultAsync(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+                    RedeemableCode redeem = await context.RedeemableCodes.AsQueryable().FirstOrDefaultAsync(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
 
                     if (redeem == null)
                     {
@@ -9477,7 +9478,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    if (await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(newname, StringComparison.OrdinalIgnoreCase) == true) != null)
+                    if (await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(newname, StringComparison.OrdinalIgnoreCase) == true) != null)
                     {
                         NAPI.Task.Run(() =>
                         {
@@ -9490,7 +9491,7 @@ namespace RNC
                     {
                         arena.Creator = newname;
                     }*/
-                    foreach (var arena in context.Bans.ToList().Where(a => a.Admin.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                    foreach (var arena in await context.Bans.AsQueryable().Where(a => a.Admin.Equals(name, StringComparison.OrdinalIgnoreCase)).ToListAsync())
                     {
                         arena.Admin = newname;
                     }
@@ -9566,7 +9567,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                    Account tpAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
 
                     if ((tpAcc != null) == false)
                     {
@@ -10415,7 +10416,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                    Account tpAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
 
                     if ((tpAcc != null) == false)
                     {
@@ -10542,7 +10543,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                    Account tpAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
 
                     if ((tpAcc != null) == false)
                     {
@@ -10682,7 +10683,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                    Account tpAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
 
                     if ((tpAcc != null) == false)
                     {
@@ -10737,7 +10738,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                    Account tpAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
 
                     if ((tpAcc != null) == false)
                     {
