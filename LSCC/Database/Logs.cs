@@ -60,16 +60,27 @@ namespace RNC
         [RemoteEvent("Logs_GetAutoCompleteNames")]
         public static void GetAutoCompleteNames(Player player, string query)
         {
-            List<Account> foundaccs = ContextFactory.Instance.Accounts.AsQueryable().Where(t => t.Username.Contains(query, StringComparison.OrdinalIgnoreCase)).Take(5).ToList();
-
-            string jsonShit = "[";
-            foreach(Account acc in foundaccs)
+            Task.Run(async () =>
             {
-                jsonShit += $"{{name: '{acc.Username}'}},";
-            }
-            jsonShit += "]";
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    List<Account> accountsList = await context.Accounts.AsQueryable().ToListAsync();
+                    List<Account> foundaccs = (List<Account>)accountsList.Where(t => t.Username.Contains(query, StringComparison.OrdinalIgnoreCase)).Take(5);
 
-            player.TriggerEvent("ReturnAutoCompleteNames", jsonShit);
+                    string jsonShit = "[";
+                    foreach (Account acc in foundaccs)
+                    {
+                        jsonShit += $"{{name: '{acc.Username}'}},";
+                    }
+                    jsonShit += "]";
+
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("ReturnAutoCompleteNames", jsonShit);
+                    });
+                }
+            });
+  
         }
         /*
         [RemoteEvent("ReqLogFromSrv")]
@@ -133,28 +144,34 @@ namespace RNC
                     "red", "fas fa-hand-middle-finger", false, 1500, "topCenter", "replace");
                 return;
             }
-            Account target = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
-            if (target == null)
+            int pAdmin = EPlayer.GetAccount(player).Admin;
+            Task.Run(async () =>
             {
-                EPlayer.Notify(player, $"There is no player with that name in the database!", 
-                    "red", "fas fa-exclamation-triangle", false, 1500, "topCenter", "replace");
-                return;
-            }
-            if(target.Admin >= EPlayer.GetAccount(player).Admin)
-            {
-                EPlayer.Notify(player, $"That player is a higher or equal admin level than you!",
-                    "red", "fas fa-ban", false, 1500, "topCenter", "replace");
-                return;
-            }
-
-            switch(type)
-            {
-                case (int)LogType.AdminRecord:
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account target = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+                    if (target == null)
                     {
-
-                        Task.Run(async () =>
+                        NAPI.Task.Run(() =>
                         {
-                            using (MainDatabase context = ContextFactory.CreateContext())
+                            EPlayer.Notify(player, $"There is no player with that name in the database!",
+                            "red", "fas fa-exclamation-triangle", false, 1500, "topCenter", "replace");
+                        });
+                        return;
+                    }
+                    if (target.Admin >= pAdmin)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Notify(player, $"That player is a higher or equal admin level than you!",
+                            "red", "fas fa-ban", false, 1500, "topCenter", "replace");
+                        });
+                        return;
+                    }
+
+                    switch (type)
+                    {
+                        case (int)LogType.AdminRecord:
                             {
                                 List<Logs_AdminRecord> _logs = await context.Logs_AdminRecords.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToListAsync();
 
@@ -173,16 +190,11 @@ namespace RNC
                                     string jsonShit = NAPI.Util.ToJson(_toSend);
                                     player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
                                 });
+                                break;
                             }
-                        });
-                        break;
-                    }
-                case (int)LogType.Admin:
-                    {
-                        Task.Run(async () =>
-                        {
-                            using (MainDatabase context = ContextFactory.CreateContext())
+                        case (int)LogType.Admin:
                             {
+
                                 List<Logs_Admin> _logs = await context.Logs_Admin.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToListAsync();
                                 object[] _toSend = new object[_logs.Count];
                                 for (int i = 0; i < _logs.Count; i++)
@@ -195,17 +207,12 @@ namespace RNC
                                     string jsonShit = NAPI.Util.ToJson(_toSend);
                                     player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
                                 });
+
+                                break;
                             }
-                        });
-       
-                        break;
-                    }
-                case (int)LogType.Session:
-                    {
-                        Task.Run(async () =>
-                        {
-                            using (MainDatabase context = ContextFactory.CreateContext())
+                        case (int)LogType.Session:
                             {
+
                                 List<Logs_Session> _logs = await context.Logs_Session.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToListAsync();
                                 object[] _toSend = new object[_logs.Count];
                                 for (int i = 0; i < _logs.Count; i++)
@@ -218,15 +225,15 @@ namespace RNC
                                     string jsonShit = NAPI.Util.ToJson(_toSend);
                                     player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
                                 });
+                                break;
                             }
-                        });
-                        break;
+                        default:
+                            {
+                                return;
+                            }
                     }
-                default:
-                    {
-                        return;
-                    }
-            }
+                }
+            });
         }
 
         public static void LogSession(Player player)

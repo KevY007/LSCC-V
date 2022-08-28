@@ -11,6 +11,7 @@ using Pomelo.EntityFrameworkCore.MySql.Design;
 using System.Reflection;
 using CryptSharp;
 using RNC;
+using System.Threading.Tasks;
 using System.Security.Cryptography;
 using GTANetworkAPI;
 using System.Linq;
@@ -158,33 +159,46 @@ namespace RNC
 
         public static void ClearForeignKeys(Account acc)
         {
-            List<Logs_Admin> aLogs = ContextFactory.Instance.Logs_Admin.ToList().Where(l => l.AccountID == acc.SQL_ID).ToList();
-            ContextFactory.Instance.Logs_Admin.RemoveRange(aLogs);
-            List<Logs_AdminRecord> arLogs = ContextFactory.Instance.Logs_AdminRecords.ToList().Where(l => l.AccountID == acc.SQL_ID || l.AdminID == acc.SQL_ID).ToList();
-            ContextFactory.Instance.Logs_AdminRecords.RemoveRange(arLogs);
-            List<Logs_Session> sLogs = ContextFactory.Instance.Logs_Session.ToList().Where(l => l.AccountID == acc.SQL_ID).ToList();
-            ContextFactory.Instance.Logs_Session.RemoveRange(sLogs);
-            List<OwnedVehData> oVehData = ContextFactory.Instance.OwnedVehicles.ToList().Where(l => l.AccountSQLID == acc.SQL_ID).ToList();
-            ContextFactory.Instance.OwnedVehicles.RemoveRange(oVehData);
-            List<OwnedLoadoutData> oLData = ContextFactory.Instance.OwnedLoadouts.ToList().Where(l => l.AccountSQLID == acc.SQL_ID).ToList();
-            ContextFactory.Instance.OwnedLoadouts.RemoveRange(oLData);
-            List<BanData> bData = ContextFactory.Instance.Bans.ToList().Where(l => l.AccountSQLID == acc.SQL_ID).ToList();
-            ContextFactory.Instance.Bans.RemoveRange(bData);
-            List<AdminNote> anotedata = ContextFactory.Instance.AdminNotes.ToList().Where(l => l.AccountID == acc.SQL_ID || l.AdminID == acc.SQL_ID).ToList();
-            ContextFactory.Instance.AdminNotes.RemoveRange(anotedata);
-            List<PlayerTunings> ptune = ContextFactory.Instance.PlayerTunings.ToList().Where(l => l.AccountSQLID == acc.SQL_ID).ToList();
-            ContextFactory.Instance.PlayerTunings.RemoveRange(ptune);
-            List<PlayerOutfit> pout = ContextFactory.Instance.PlayerOutfits.ToList().Where(l => l.AccountID == acc.SQL_ID).ToList();
-            ContextFactory.Instance.PlayerOutfits.RemoveRange(pout);
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    List<Logs_Admin> aLogs = context.Logs_Admin.ToList().Where(l => l.AccountID == acc.SQL_ID).ToList();
+                    context.Logs_Admin.RemoveRange(aLogs);
+                    List<Logs_AdminRecord> arLogs = context.Logs_AdminRecords.ToList().Where(l => l.AccountID == acc.SQL_ID || l.AdminID == acc.SQL_ID).ToList();
+                    context.Logs_AdminRecords.RemoveRange(arLogs);
+                    List<Logs_Session> sLogs = context.Logs_Session.ToList().Where(l => l.AccountID == acc.SQL_ID).ToList();
+                    context.Logs_Session.RemoveRange(sLogs);
+                    List<OwnedVehData> oVehData = context.OwnedVehicles.ToList().Where(l => l.AccountSQLID == acc.SQL_ID).ToList();
+                    context.OwnedVehicles.RemoveRange(oVehData);
+                    List<OwnedLoadoutData> oLData = context.OwnedLoadouts.ToList().Where(l => l.AccountSQLID == acc.SQL_ID).ToList();
+                    context.OwnedLoadouts.RemoveRange(oLData);
+                    List<BanData> bData = context.Bans.ToList().Where(l => l.AccountSQLID == acc.SQL_ID).ToList();
+                    context.Bans.RemoveRange(bData);
+                    List<AdminNote> anotedata = context.AdminNotes.ToList().Where(l => l.AccountID == acc.SQL_ID || l.AdminID == acc.SQL_ID).ToList();
+                    context.AdminNotes.RemoveRange(anotedata);
+                    List<PlayerTunings> ptune = context.PlayerTunings.ToList().Where(l => l.AccountSQLID == acc.SQL_ID).ToList();
+                    context.PlayerTunings.RemoveRange(ptune);
+                    List<PlayerOutfit> pout = context.PlayerOutfits.ToList().Where(l => l.AccountID == acc.SQL_ID).ToList();
+                    context.PlayerOutfits.RemoveRange(pout);
+                }
+            });
+
         }
 
         public static bool MatchPass(string a, string b) { if (a.CompareTo(b) == 0) { return true; } return false; }
 
         public static void Add(Account _a)
         {
-            ContextFactory.Instance.Accounts.Add(_a);
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    await context.Accounts.AddAsync(_a);
+                    await context.SaveChangesAsync();
+                }
+            });
 
-            ContextFactory.Instance.SaveChanges();
         }
         public static bool Login(Account _target, string password, bool _crypted = false)
         {
