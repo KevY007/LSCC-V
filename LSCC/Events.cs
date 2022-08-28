@@ -2717,6 +2717,10 @@ namespace RNC
                                         OnPlayerLogin(player, acc);
                                         return;
                                     }
+                                    else
+                                    {
+                                        player.TriggerEvent("login_ShowInvalidInfo", true);
+                                    }
                                 });
                             }
                         }
@@ -2759,6 +2763,10 @@ namespace RNC
                                         OnPlayerLogin(player, acc);
                                         return;
                                     }
+                                    else
+                                    {
+                                        player.TriggerEvent("login_ShowInvalidInfo", true);
+                                    }
                                 });
 
                             }
@@ -2787,7 +2795,7 @@ namespace RNC
                     */
                 }
                 //EPlayer.Notify(player, "Invalid credentials or unable to log-in!", "red", "fas fa-lock", false, 4000, "bottomCenter");
-                player.TriggerEvent("login_ShowInvalidInfo", true);
+                
             }
             catch(Exception ex)
             {
@@ -3830,6 +3838,10 @@ namespace RNC
                 email = "N/A";
             }
 
+            ulong pSCID = player.SocialClubId;
+            string pSerial = player.Serial;
+
+            bool reachedAccountLimit = false;
             Task.Run(async () =>
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
@@ -3846,11 +3858,11 @@ namespace RNC
                     }
                     try
                     {
-                        if (await context.Accounts.AsQueryable().CountAsync(a => a.RegisterHWID.Equals(player.Serial) || a.RegisterRID == player.SocialClubId) >= 2)
+                        if (await context.Accounts.AsQueryable().CountAsync(a => a.RegisterHWID.Equals(pSerial) || a.RegisterRID == pSCID) >= 2)
                         {
                             NAPI.Util.ConsoleOutput($"(RnC | REGISTER) {username} attempted to register, they have 2 or more accounts already!");
-                            //EPlayer.Error(player, "You cannot create any more accounts on the same machine!", "fas fa-user");
-                            // ovo treba ubacit
+                        
+                            reachedAccountLimit = true;
                             return;
                         }
                     }
@@ -3861,83 +3873,93 @@ namespace RNC
                     }
                     finally
                     {
-                        NAPI.Task.Run(() =>
+                        if (!reachedAccountLimit)
                         {
-                            player.SetData("LastCryptAttempt", Environment.TickCount64);
-                            string salt = AccountManager.GenSalt();
-                            string newPass = AccountManager.Crypt(password, salt);
-
-                            Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
-
-                            wComponentData test = new wComponentData();
-                            test.Components.Add(123456789);
-                            wepItems.Add(123456789, test);
-
-                            DiscordData _discordData = new DiscordData();
-                            string jsonDiscordData = NAPI.Util.ToJson(_discordData);
-
-                            List<ChallengeData> challengeData = new List<ChallengeData>();
-                            string jsonChallengeData = NAPI.Util.ToJson(challengeData);
-
-                            var _new = new Account
+                            NAPI.Task.Run(() =>
                             {
-                                Email = email,
-                                Password = newPass,
-                                Salt = salt,
-                                Username = username,
-                                DiscordInfo = jsonDiscordData,
-                                ChallengeInfo = jsonChallengeData,
-                                AutoLogin = true,
-                                Admin = 0,
-                                RegisterHWID = player.Serial,
-                                RegisterIP = player.Address,
-                                RegisterRID = player.SocialClubId,
-                                RegisterSC = player.SocialClubName,
-                                LastHWID = player.Serial,
-                                LastIP = player.Address,
-                                LastRID = player.SocialClubId,
-                                LastSC = player.SocialClubName,
-                                MuteTime = 0,
-                                MuteReason = "N/A",
-                                JailTime = 0,
-                                JailReason = "N/A",
-                                DerbyWins = 0,
-                                Level = 1,
-                                Medkits = 0,
-                                Painkillers = 0,
-                                Language = -1,
-                                XP = 1,
-                                Escapes = 0,
-                                Arrests = 0,
-                                Kills = 1,
-                                Deaths = 1,
-                                MinutesPlayed = 1.0,
-                                LastSessionMins = 0.0,
-                                DonatorPoints = 0,
-                                Points = 10,
-                                Warns = 0,
-                                Suspended = 0,
-                                DonatorLevel = 0,
-                                LobbyClothing = 1,
-                                LoadoutCop = "?",
-                                LoadoutFugitive = "?",
-                                CarCop = "?",
-                                CarFugitive = "?",
-                                WeaponComponents = NAPI.Util.ToJson(wepItems),
-                                MOTD = "none",
-                                RegisterDate = DateTime.Now,
-                                LastLogin = DateTime.Now,
-                                Character = "{}",
-                                PurchasedAmmo = "{}",
-                                ChallengeStreak = 0,
-                                CompletedDailyChallenge = false,
-                                Namechanges = 0,
-                                ClanTier = -1,
-                                ClanID = -1
-                            };
-                            AccountManager.Add(_new);
-                            OnPlayerRegister(player, _new);
-                        });
+                                player.SetData("LastCryptAttempt", Environment.TickCount64);
+                                string salt = AccountManager.GenSalt();
+                                string newPass = AccountManager.Crypt(password, salt);
+
+                                Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
+
+                                wComponentData test = new wComponentData();
+                                test.Components.Add(123456789);
+                                wepItems.Add(123456789, test);
+
+                                DiscordData _discordData = new DiscordData();
+                                string jsonDiscordData = NAPI.Util.ToJson(_discordData);
+
+                                List<ChallengeData> challengeData = new List<ChallengeData>();
+                                string jsonChallengeData = NAPI.Util.ToJson(challengeData);
+
+                                var _new = new Account
+                                {
+                                    Email = email,
+                                    Password = newPass,
+                                    Salt = salt,
+                                    Username = username,
+                                    DiscordInfo = jsonDiscordData,
+                                    ChallengeInfo = jsonChallengeData,
+                                    AutoLogin = true,
+                                    Admin = 0,
+                                    RegisterHWID = player.Serial,
+                                    RegisterIP = player.Address,
+                                    RegisterRID = player.SocialClubId,
+                                    RegisterSC = player.SocialClubName,
+                                    LastHWID = player.Serial,
+                                    LastIP = player.Address,
+                                    LastRID = player.SocialClubId,
+                                    LastSC = player.SocialClubName,
+                                    MuteTime = 0,
+                                    MuteReason = "N/A",
+                                    JailTime = 0,
+                                    JailReason = "N/A",
+                                    DerbyWins = 0,
+                                    Level = 1,
+                                    Medkits = 0,
+                                    Painkillers = 0,
+                                    Language = -1,
+                                    XP = 1,
+                                    Escapes = 0,
+                                    Arrests = 0,
+                                    Kills = 1,
+                                    Deaths = 1,
+                                    MinutesPlayed = 1.0,
+                                    LastSessionMins = 0.0,
+                                    DonatorPoints = 0,
+                                    Points = 10,
+                                    Warns = 0,
+                                    Suspended = 0,
+                                    DonatorLevel = 0,
+                                    LobbyClothing = 1,
+                                    LoadoutCop = "?",
+                                    LoadoutFugitive = "?",
+                                    CarCop = "?",
+                                    CarFugitive = "?",
+                                    WeaponComponents = NAPI.Util.ToJson(wepItems),
+                                    MOTD = "none",
+                                    RegisterDate = DateTime.Now,
+                                    LastLogin = DateTime.Now,
+                                    Character = "{}",
+                                    PurchasedAmmo = "{}",
+                                    ChallengeStreak = 0,
+                                    CompletedDailyChallenge = false,
+                                    Namechanges = 0,
+                                    ClanTier = -1,
+                                    ClanID = -1
+                                };
+                                AccountManager.Add(_new);
+                                OnPlayerRegister(player, _new);
+                            });
+                        }
+                        else
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                player.TriggerEvent("login_MaxAccountLimit", true);
+                            });
+                        }
                     }
                 }
             });

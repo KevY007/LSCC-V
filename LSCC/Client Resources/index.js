@@ -262,6 +262,7 @@ mp.events.add('showLoginBrowser', (state) => {
 
     }, 500);
 });
+
 mp.events.add("login_ShowInvalidInfo", (toggle) => {
     if(ServerUI && ServerUI.active){
         ServerUI.execute(`gm.$refs.auth.$refs.panel.authLoading = false;`);
@@ -272,6 +273,13 @@ mp.events.add("login_ShowAccountExists", (toggle) => {
     if(ServerUI && ServerUI.active){
         ServerUI.execute(`gm.$refs.auth.$refs.panel.authLoading = false;`);
         ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.register.usernameAlreadyExists = ${toggle.toString()}`);
+    }
+});
+mp.events.add("login_MaxAccountLimit", (toggle) => {
+    if(ServerUI && ServerUI.active){
+        ServerUI.execute(`gm.$refs.auth.$refs.panel.authLoading = false;`);
+        //ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.register.usernameAlreadyExists = ${toggle.toString()}`);
+        // TO-DO: Add a message that max account limit has been reached!
     }
 });
 
