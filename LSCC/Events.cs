@@ -3732,25 +3732,34 @@ namespace RNC
         [RemoteEvent("Server_ToggleAutoLogin")]
         public static void ToggleAutoLogin(Player player, bool toggle)
         {
-            Task.Run(async () =>
-            {
-                using (MainDatabase context = ContextFactory.CreateContext())
-                {
-                    Account acc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(player.Name, StringComparison.OrdinalIgnoreCase));
-                    if (acc == null) return;
-                    acc.AutoLogin = toggle;
+            Account acc = EPlayer.GetAccount(player);
+            acc.AutoLogin = toggle;
 
-                    NAPI.Task.Run(() =>
+            if (toggle)
+                EPlayer.Notify(player, "You turned Auto Login on! You will no longer need to enter your login info on this account.", "green", "fa-solid fa-user-check", true, 4000);
+            else
+                EPlayer.Notify(player, "You turned Auto Login off! You will now have to enter your login info when you connect.", "red", "fa-solid fa-user-xmark", true, 4000);
+
+                /*
+                Task.Run(async () =>
+                {
+                    using (MainDatabase context = ContextFactory.CreateContext())
                     {
-                        if (toggle)
-                            EPlayer.Notify(player, "You turned Auto Login on! You will no longer need to enter your login info on this account.", "green", "fa-solid fa-user-check", true, 4000);
-                        else
-                            EPlayer.Notify(player, "You turned Auto Login off! You will now have to enter your login info when you connect.", "red", "fa-solid fa-user-xmark", true, 4000);
-                    });
-                }
-            });
-            
-        }
+                        Account acc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(player.Name, StringComparison.OrdinalIgnoreCase));
+                        if (acc == null) return;
+                        acc.AutoLogin = toggle;
+
+                        NAPI.Task.Run(() =>
+                        {
+                            if (toggle)
+                                EPlayer.Notify(player, "You turned Auto Login on! You will no longer need to enter your login info on this account.", "green", "fa-solid fa-user-check", true, 4000);
+                            else
+                                EPlayer.Notify(player, "You turned Auto Login off! You will now have to enter your login info when you connect.", "red", "fa-solid fa-user-xmark", true, 4000);
+                        });
+                    }
+                });
+                */
+            }
 
         [RemoteEvent("ReplaceAFKDriver")]
         public static void ReplaceAFKDriver(Player player)
