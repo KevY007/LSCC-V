@@ -9074,46 +9074,61 @@ namespace RNC
                 return;
             }
 
-            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
-
-            if ((tpAcc != null) == false)
+            int pAdmin = EPlayer.GetAccount(player).Admin;
+            Task.Run(async () =>
             {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
-                return;
-            }
-
-            if (EPlayer.GetAccount(player).Admin == 6)
-            {
-                if (level < 0 || level > 6)
+                using(MainDatabase context = ContextFactory.CreateContext())
                 {
-                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed level 6.");
-                    return;
+                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+
+                    if ((tpAcc != null) == false)
+                    {
+                        NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name."); });
+                        return;
+                    }
+
+                    if (pAdmin == 6)
+                    {
+                        if (level < 0 || level > 6)
+                        {
+                            NAPI.Task.Run(() => { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed level 6."); });
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        if (level < 0 || level > 6)
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed level 3 (General Admin).");
+                            });
+                            return;
+                        }
+                    }
+
+                    if (tpAcc.Admin > pAdmin)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Target has higher admin level than you.");
+                        });
+                        return;
+                    }
+
+
+                    tpAcc.Admin = level;
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}You have set {tpAcc.Username}'s admin level to {EPlayer.GetAdminLevelName(level, true)} ({level})");
+                    });
+                    
+                    Logs.LogAdmin(player, $"Set offline player {tpAcc.Username}'s admin level to {EPlayer.GetAdminLevelName(level)}.");
+
+                    await context.SaveChangesAsync();
                 }
-            }
-            else
-            {
-                if (level < 0 || level > 6)
-                {
-                    player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot preceed level 0 or exceed level 3 (General Admin).");
-                    return;
-                }
-            }
-
-            if (tpAcc.Admin > EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
-            {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Target has higher admin level than you.");
-                return;
-            }
-
-
-            tpAcc.Admin = level;
-            player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}You have set {tpAcc.Username}'s admin level to {EPlayer.GetAdminLevelName(level, true)} ({level})");
+            });
             
-            Logs.LogAdmin(player, $"Set offline player {tpAcc.Username}'s admin level to {EPlayer.GetAdminLevelName(level)}.");
-
-            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:osetadmin:{tpAcc.Username}:{level}"); } catch { }
-            
-            ContextFactory.Instance.SaveChanges();
             return;
         }
 
@@ -9134,22 +9149,32 @@ namespace RNC
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Target is currently in-game! Use /givedonorpoints!");
                 return;
             }
-
-            Account tpAcc = ContextFactory.Instance.Accounts.ToList().Find(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
-
-            if ((tpAcc != null) == false)
+            Task.Run(async () =>
             {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
-                return;
-            }
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account tpAcc = await context.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
 
-            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ogivedonorpoints:{tpAcc.Username}:{points}"); } catch { }
+                    if ((tpAcc != null) == false)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                           player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}There's no account with that name.");
+                        });
+                        return;
+                    }
 
-            Logs.LogAdmin(player, $"Gave offline player {tpAcc.Username} {points} donator points.");
-            tpAcc.DonatorPoints += points;
-            player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}You have given {tpAcc.Username} {points} donator points. (Their total now: {tpAcc.DonatorPoints})");
+                    Logs.LogAdmin(player, $"Gave offline player {tpAcc.Username} {points} donator points.");
+                    tpAcc.DonatorPoints += points;
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}You have given {tpAcc.Username} {points} donator points. (Their total now: {tpAcc.DonatorPoints})");
+                    });
 
-            ContextFactory.Instance.SaveChanges();
+                    await context.SaveChangesAsync();
+                }
+            });
+            
             return;
         }
 
@@ -9190,18 +9215,31 @@ namespace RNC
                 EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}You are not part of a clan!");
                 return;
             }
-            Clan clan = ContextFactory.Instance.Clans.FirstOrDefault(c => c.SQL_ID == acc.ClanID);
-            if (clan == null)
+            Task.Run(async () =>
             {
-                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}A clan with that ID was not found!");
-                return;
-            }
-            EPlayer.SendMessage(player, $"~y~====================> STATISTICS FOR: ~w~{clan.Name} ~y~<====================");
-            EPlayer.SendMessage(player, $"~g~WEEKLY KILLS: ~w~{clan.WeekKills}");
-            EPlayer.SendMessage(player, $"~o~TOTAL KILLS: ~w~{clan.TotalKills}");
-            EPlayer.SendMessage(player, $"~p~MEMBERS: ~w~{ContextFactory.Instance.Accounts.Count(a => a.ClanID == clan.SQL_ID)}");
-            EPlayer.SendMessage(player, " ");
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Clan clan = await context.Clans.FirstOrDefaultAsync(c => c.SQL_ID == acc.ClanID);
+                    if (clan == null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}A clan with that ID was not found!");
+                        });
+                        return;
+                    }
+                    int membersCount = await context.Accounts.CountAsync(a => a.ClanID == clan.SQL_ID);
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.SendMessage(player, $"~y~====================> STATISTICS FOR: ~w~{clan.Name} ~y~<====================");
+                        EPlayer.SendMessage(player, $"~g~WEEKLY KILLS: ~w~{clan.WeekKills}");
+                        EPlayer.SendMessage(player, $"~o~TOTAL KILLS: ~w~{clan.TotalKills}");
+                        EPlayer.SendMessage(player, $"~p~MEMBERS: ~w~{membersCount}");
+                        EPlayer.SendMessage(player, " ");
+                    });
 
+                }
+            });
             return;
         }
 
@@ -9218,20 +9256,34 @@ namespace RNC
                 return;
             }
 
-            if(acc.ClanTier == 0)
+            Task.Run(async () =>
             {
-                Clan clan = ContextFactory.Instance.Clans.FirstOrDefault(c => c.SQL_ID == acc.ClanID);
-                if (clan != null)
+                using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    ContextFactory.Instance.Clans.Remove(clan);
-                }
-                EPlayer.SendMessage(player, "~r~[CLAN DISBANDED]~w~ You left the clan you were owner of and therefore it has been disbanded & deleted!");
-            }
-            acc.ClanID = -1;
-            acc.ClanTier = -1;
+                    if (acc.ClanTier == 0)
+                    {
+                        Clan clan = await context.Clans.FirstOrDefaultAsync(c => c.SQL_ID == acc.ClanID);
+                        if (clan != null)
+                        {
+                            context.Clans.Remove(clan);
+                        }
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.SendMessage(player, "~r~[CLAN DISBANDED]~w~ You left the clan you were owner of and therefore it has been disbanded & deleted!");
 
-            ContextFactory.Instance.SaveChanges();
-            EPlayer.SendMessage(player, "~r~[CLAN LEAVE] ~w~You successfully left the clan.");
+                        });
+                    }
+                    acc.ClanID = -1;
+                    acc.ClanTier = -1;
+
+                    await context.SaveChangesAsync();
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.SendMessage(player, "~r~[CLAN LEAVE] ~w~You successfully left the clan.");
+                    });
+                }
+            });
+            
 
             return;
         }
@@ -9276,12 +9328,19 @@ namespace RNC
                 TotalKills = 0,
                 WeekWins = 0
             };
-            ContextFactory.Instance.Clans.Add(clan);
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    await context.Clans.AddAsync(clan);
 
-            acc.ClanTier = 0;
-            acc.ClanID = ContextFactory.Instance.Clans.FirstOrDefault(c => c.Name.Equals(clanname)).SQL_ID;
+                    acc.ClanTier = 0;
+                    Clan thaClan = await context.Clans.FirstOrDefaultAsync(c => c.Name.Equals(clanname));
+                    acc.ClanID = thaClan.SQL_ID;
 
-            ContextFactory.Instance.SaveChanges();
+                    await context.SaveChangesAsync();
+                }
+            });
 
             EPlayer.SendMessage(player, $"~g~[CLAN] ~w~Congratulations! You've successfully created a clan named ~y~{clanname}~w~ for 300 Points!");
             EPlayer.SendMessage(player, $"~g~[CLAN] ~w~You can manage your clan through the clan panel (Menu [M] > Clan > Manage)");
@@ -9297,65 +9356,99 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            RedeemableCode redeem = ContextFactory.Instance.RedeemableCodes.FirstOrDefault(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
-
-            if(redeem == null)
+            Task.Run(async () =>
             {
-                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}This code is invalid! Please ensure you are entering it correctly.");
-                EPlayer.SendMessage(player, "!{#C9C9C9}[HINT] A common mistake made is mixing up the letter 'O' and the number zero (0).");
-                return;
-            }
-            if(redeem.Uses <= 0)
-            {
-                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}This code has been used already! Please ask the management for a new one if you donated and received this one.");
-                ContextFactory.Instance.RedeemableCodes.Remove(redeem);
-                ContextFactory.Instance.SaveChanges();
-                return;
-            }
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    RedeemableCode redeem = await context.RedeemableCodes.FirstOrDefaultAsync(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
 
-            /* ---Donation Types/Values---
-             * 0 => Bronze [VALUE: how many times it can be redeemed]
-             * 1 => Silver
-             * 2 => Gold
-             * 3 => 100 Donator Points
-             * 4 => Namechange
-             * 5 => 5 namechanges [bundle]
-             */
-            Account acc = EPlayer.GetAccount(player);
-            switch (redeem.Value)
-            {
-                case 0:
-                    acc.DonatorPoints += 200;
-                    acc.DonatorLevel = 1;
-                    EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(1, true)}~w~!");
-                    break;
-                case 1:
-                    acc.DonatorPoints += 350;
-                    acc.DonatorLevel = 2;
-                    EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(2, true)}~w~!");
-                    break;
-                case 2:
-                    acc.DonatorPoints += 500;
-                    acc.DonatorLevel = 3;
-                    EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(3, true)}~w~!");
-                    break;
-                case 3:
-                    acc.DonatorPoints += 100;
-                    EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed !{{#a8ffb7}}100 Donator Points~w~!");
-                    break;
-                case 4:
-                    acc.Namechanges++;
-                    EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed !{{#a8ffb7}}1 Namechange~w~!");
-                    break;
-                case 5:
-                    acc.Namechanges += 5;
-                    EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed !{{#a8ffb7}}5 Namechanges Bundle~w~!");
-                    break;
-            }
-            EPlayer.SendMessage(player, "~w~Thank you very much for donating! ~r~<3 ~w~-RnC Management");
+                    if (redeem == null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}This code is invalid! Please ensure you are entering it correctly.");
+                            EPlayer.SendMessage(player, "!{#C9C9C9}[HINT] A common mistake made is mixing up the letter 'O' and the number zero (0).");
+                        });
+                        return;
+                    }
+                    if (redeem.Uses <= 0)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}This code has been used already! Please ask the management for a new one if you donated and received this one.");
+                        });
+                        context.RedeemableCodes.Remove(redeem);
+                        await context.SaveChangesAsync();
+                        return;
+                    }
 
-            ContextFactory.Instance.RedeemableCodes.Remove(redeem);
-            ContextFactory.Instance.SaveChanges();
+                    /* ---Donation Types/Values---
+                     * 0 => Bronze [VALUE: how many times it can be redeemed]
+                     * 1 => Silver
+                     * 2 => Gold
+                     * 3 => 100 Donator Points
+                     * 4 => Namechange
+                     * 5 => 5 namechanges [bundle]
+                     */
+                    Account acc = EPlayer.GetAccount(player);
+                    switch (redeem.Value)
+                    {
+                        case 0:
+                            acc.DonatorPoints += 200;
+                            acc.DonatorLevel = 1;
+                            NAPI.Task.Run(() =>
+                            {
+                                EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(1, true)}~w~!");
+                            });
+                            break;
+                        case 1:
+                            acc.DonatorPoints += 350;
+                            acc.DonatorLevel = 2;
+                            NAPI.Task.Run(() =>
+                            {
+                                EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(2, true)}~w~!");
+                            });
+                            break;
+                        case 2:
+                            acc.DonatorPoints += 500;
+                            acc.DonatorLevel = 3;
+                            NAPI.Task.Run(() =>
+                            {
+                                EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(3, true)}~w~!");
+                            });
+                            break;
+                        case 3:
+                            acc.DonatorPoints += 100;
+                            NAPI.Task.Run(() =>
+                            {
+                                EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed !{{#a8ffb7}}100 Donator Points~w~!");
+                            });
+                            break;
+                        case 4:
+                            acc.Namechanges++;
+                            NAPI.Task.Run(() =>
+                            {
+                                EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed !{{#a8ffb7}}1 Namechange~w~!");
+                            });
+                            break;
+                        case 5:
+                            acc.Namechanges += 5;
+                            NAPI.Task.Run(() =>
+                            {
+                                EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed !{{#a8ffb7}}5 Namechanges Bundle~w~!");
+                            });
+                            break;
+                    }
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.SendMessage(player, "~w~Thank you very much for donating! ~r~<3 ~w~-RnC Management");
+                    });
+
+                    context.RedeemableCodes.Remove(redeem);
+                    await context.SaveChangesAsync();
+                }
+            });
+            
             return;
         }
 
