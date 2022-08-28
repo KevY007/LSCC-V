@@ -544,15 +544,11 @@ namespace RNC
                         return;
                     }
 
-                    if (!Main.StartGame(value))
-                    {
-                        player.TriggerEvent("pushMsgToChat", "!{#FF0000}Failed to start game! Is there enough players or a game running already?");
-                    }
-                    else
-                    {
-                        Logs.LogAdmin(player, $"Force-started copchase in lobby {value}.");
-                        EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has forcefully started the copchase in lobby {value}.");
-                    }
+                    Main.StartGame(value);
+                    EPlayer.SendMessage(player, "~y~Attempting to start copchase. ~w~If it doesn't start, it could be due to ~y~lack of (autojoin-active) players~w~ or a ~y~round is already active~w~!");
+                    Logs.LogAdmin(player, $"Attempted to force-start copchase in lobby {value}.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has attempted to force-start copchase in lobby {value}.");
+                    
                 }
                 else player.TriggerEvent("pushMsgToChat", "!{#999999}Proper usage: /game start <lobby id>");
             }
