@@ -10,6 +10,7 @@ using System.Runtime.InteropServices.ComTypes;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace RNC
 {
@@ -76,31 +77,40 @@ namespace RNC
 
             player.SetSharedData("PlayerWeather", -1);
 
-            BanData ban = ContextFactory.Instance.Bans.ToList().Find(ban => ban.HWID.Equals(player.Serial) || ban.IP.Equals(player.Address) ||
-                ban.RockstarID == player.SocialClubId);
-
-            if (ban != null)
+            NAPI.Notification.SendNotificationToPlayer(player, "Welcome to ~y~Race ~w~'n ~b~Chase~w~. Please wait...");
+            Task.Run(async () =>
             {
-                EPlayer.SetDiscordStatus(player, "Gazing at the 'BANNED' screen.");
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    BanData ban = await context.Bans.AsQueryable().FirstOrDefaultAsync(ban => ban.HWID.Equals(player.Serial) || ban.IP.Equals(player.Address) ||
+                        ban.RockstarID == player.SocialClubId);
 
-                player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[BANNED] You are not allowed to play on this server, Ban ID: {ban.SQL_ID}");
+                    if (ban != null)
+                    {
+                        Account evadeAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == ban.AccountSQLID);
+                        string evadeAccountName = evadeAcc.Username;
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.SetDiscordStatus(player, "Gazing at the 'BANNED' screen.");
 
-                player.TriggerEvent("pushMsgToChat", "!{#A9C4E4}Server closed the connection.");
+                            player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[BANNED] You are not allowed to play on this server, Ban ID: {ban.SQL_ID}");
 
-                EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Your ban ID is {ban.SQL_ID}.</p>", "red", "fas fa-ban", true, 30000);
+                            player.TriggerEvent("pushMsgToChat", "!{#A9C4E4}Server closed the connection.");
 
-                string evadeAccountName = ContextFactory.Instance.Accounts.First(a => a.SQL_ID == ban.AccountSQLID).Username;
-
-                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {player.Name} for ban evading as {evadeAccountName}.");
-                NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking {player.Name} as they're banned. (BANID: {ban.SQL_ID} ACCOUNTID: {ban.AccountSQLID})");
-
-                player.SetData("Kicked", true);
-                NAPI.Task.Run(() => { try { player.Kick(); } catch { } }, 1000);
-                return;
-            }
+                            EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Your ban ID is {ban.SQL_ID}.</p>", "red", "fas fa-ban", true, 30000);
 
 
-            NAPI.Notification.SendNotificationToPlayer(player, "Welcome to ~y~Race ~w~'n ~b~Chase");
+                            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {player.Name} for ban evading as {evadeAccountName}.");
+                            NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking {player.Name} as they're banned. (BANID: {ban.SQL_ID} ACCOUNTID: {ban.AccountSQLID})");
+
+                            player.SetData("Kicked", true);
+                            NAPI.Task.Run(() => { try { player.Kick(); } catch { } }, 1000);
+                        });
+                        return;
+                    }
+                }
+            });
+            
         }
 
         [RemoteEvent("UpdateAimingState")]
@@ -356,12 +366,19 @@ namespace RNC
 
                                     if (EPlayer.GetAccount(player).ClanID != -1) 
                                     {
-                                        Clan clan = ContextFactory.Instance.Clans.FirstOrDefault(c => c.SQL_ID == EPlayer.GetAccount(player).ClanID);
-                                        if (clan != null)
+                                        Task.Run(async () =>
                                         {
-                                            clan.TotalKills++;
-                                            clan.WeekKills++;
-                                        }
+                                            using (MainDatabase context = ContextFactory.CreateContext())
+                                            {
+                                                Clan clan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == EPlayer.GetAccount(player).ClanID);
+                                                if (clan != null)
+                                                {
+                                                    clan.TotalKills++;
+                                                    clan.WeekKills++;
+                                                }
+                                            }
+                                        });
+                                 
                                     }
 
                                     killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 10.0));
@@ -1815,147 +1832,182 @@ namespace RNC
                 NAPI.Util.ConsoleOutput($"[DISCORD INTEGRATION] {player.Name}'s discord data was invalid, generating them new. This is a one time thing, unless discord data is deleted.");
             }
 
-            var linkedSQLs = EPlayer.GetLinkedAccounts(acc).Result.Select(accs => accs.SQL_ID).ToList(); // BONKERS
-
-            if(linkedSQLs.Intersect(ContextFactory.Instance.Bans.ToList().Select(bans => bans.AccountSQLID)).Any())
+            Task.Run(async () =>
             {
-                EPlayer.SetDiscordStatus(player, "Gazing at the 'BANNED' screen.");
+                List<Account> linkedAccs = await EPlayer.GetLinkedAccounts(acc);
+                var linkedSQLs = linkedAccs.Select(accs => accs.SQL_ID).ToList(); // BONKERS
 
-                player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[BANNED] You are not allowed to play on this server.");
-
-                EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Use your account name as a reference.</p>", "red", "fas fa-ban", true, 30000);
-
-                player.TriggerEvent("pushMsgToChat", "!{#A9C4E4}Server closed the connection.");
-
-                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {acc.Username} for ban evading/outstanding bans.");
-                NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
-
-                player.SetData("Kicked", true);
-                NAPI.Task.Run(() => { try { player.Kick(); } catch { } }, 1000);
-
-                return;
-            }
-
-            player.Name = acc.Username;
-            player.SetData("LoggedIn", true);
-            player.SetData("AccountHandle", acc);
-            player.SetSharedData("pLogged", true);
-
-            player.SetSharedData("Admin", acc.Admin);
-            player.SetSharedData("PlayerSquadID", -1);
-
-            player.TriggerEvent("BankDoorLocked", false);
-            player.TriggerEvent("BankRob_SetMusic", -1);
-
-            player.SetSharedData("Level", acc.Level);
-            player.SetSharedData("CurrentXP", acc.XP);
-            player.SetSharedData("NextLevelXP", EPlayer.GetMaxLevelXP(acc.Level));
-            player.TriggerEvent("Menu_UpdateLevelXP", true);
-
-            if (ContextFactory.Instance.Languages.ToList().Find(l => l.SQL_ID == acc.Language) != null && EPlayer.GetAccount(player).Language != -1)
-                player.SetData("Language", ContextFactory.Instance.Languages.ToList().Find(l => l.SQL_ID == acc.Language));
-            else
-                player.ResetData("Language");
-
-            player.SetData<long>("JoinTimeUnix", DateTimeOffset.Now.ToUnixTimeSeconds());
-
-            CharacterData ConvChar = new CharacterData();
-
-            try
-            {
-                if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata-8 sending to creation."));
-
-                ConvChar = NAPI.Util.FromJson<CharacterData>(acc.Character);
-
-                EPlayer.ApplyCharacter(player, ConvChar, acc.LobbyClothing);
-                 
-                EPlayer.Spawn(player);
-            }
-            catch
-            {
-                player.TriggerEvent("DestroyPlayerCamera");
-                player.TriggerEvent("TogglePlayerChat", true);
-
-                CharacterData charp = new CharacterData();
-                EPlayer.GetAccount(player).Character = "{}";
-                EPlayer.ApplyCharacter(player, charp); // Give them the default CHAR.
-                EPlayer.Spawn(player);
-
-                EPlayer.Notify(player, "Sorry, your character was reset (possibly due to an update), please create a new one. (<strong>/char</strong>)", "yellow", "fas fa-tshirt", false, 7000);
-            }
-
-            if(acc.WeaponComponents == null || acc.WeaponComponents.Length < 4)
-            {
-                Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
-
-                wComponentData test = new wComponentData();
-                test.Components.Add(123456789);
-                wepItems.Add(123456789, test);
-
-                acc.WeaponComponents = NAPI.Util.ToJson(wepItems);
-            }
-
-            if (EPlayer.GetAccount(player).MOTD != null && !EPlayer.GetAccount(player).MOTD.Equals("none"))
-            {
-                MOTDData motdToShow = NAPI.Util.FromJson<MOTDData>(EPlayer.GetAccount(player).MOTD);
-                Main.DisplayMOTD(player, motdToShow);
-            }
-
-            player.TriggerEvent("pushMsgToChat", "!{#a6a6a6}Your last login was on !{#c2c1b6}" + EPlayer.GetAccount(player).LastLogin.ToString());
-            EPlayer.GetAccount(player).LastLogin = DateTime.Now;
-
-            if (EPlayer.GetAccount(player).LastSessionMins >= 60.0) 
-                player.TriggerEvent("pushMsgToChat", $"!{{#a6a6a6}}Last session lasted !{{#c2c1b6}}{(EPlayer.GetAccount(player).LastSessionMins / 60.0).ToString("N1")} hours.");
-            else
-                player.TriggerEvent("pushMsgToChat", $"!{{#a6a6a6}}Last session lasted !{{#c2c1b6}}{(EPlayer.GetAccount(player).LastSessionMins).ToString("N1")} minutes.");
-
-            if(ContextFactory.Instance.PlayerOutfits.ToList().Find(o => o.AccountID == acc.SQL_ID) == null)
-            {
-                CharacterData[] defaultOutfits = new CharacterData[5];
-                for(int i = 0; i < 5; i++)
+                using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    defaultOutfits[i] = new CharacterData();
+                    if (linkedSQLs.Intersect(context.Bans.AsQueryable().Select(bans => bans.AccountSQLID)).Any())
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.SetDiscordStatus(player, "Gazing at the 'BANNED' screen.");
+
+                            player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[BANNED] You are not allowed to play on this server.");
+
+                            EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Use your account name as a reference.</p>", "red", "fas fa-ban", true, 30000);
+
+                            player.TriggerEvent("pushMsgToChat", "!{#A9C4E4}Server closed the connection.");
+
+                            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {acc.Username} for ban evading/outstanding bans.");
+                            NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
+
+                            player.SetData("Kicked", true);
+                            NAPI.Task.Run(() => { try { player.Kick(); } catch { } }, 1000);
+                        });
+                        return;
+                    }
                 }
-                ContextFactory.Instance.PlayerOutfits.Add(new PlayerOutfit()
+                NAPI.Task.Run(() =>
                 {
-                    AccountID = acc.SQL_ID,
-                    OutfitData = NAPI.Util.ToJson(defaultOutfits)
+                    player.Name = acc.Username;
+                    player.SetData("LoggedIn", true);
+                    player.SetData("AccountHandle", acc);
+                    player.SetSharedData("pLogged", true);
+
+                    player.SetSharedData("Admin", acc.Admin);
+                    player.SetSharedData("PlayerSquadID", -1);
+
+                    player.TriggerEvent("BankDoorLocked", false);
+                    player.TriggerEvent("BankRob_SetMusic", -1);
+
+                    player.SetSharedData("Level", acc.Level);
+                    player.SetSharedData("CurrentXP", acc.XP);
+                    player.SetSharedData("NextLevelXP", EPlayer.GetMaxLevelXP(acc.Level));
+                    player.TriggerEvent("Menu_UpdateLevelXP", true);
                 });
-                ContextFactory.Instance.SaveChanges();
-            }
-
-            player.SetSharedData("Points", EPlayer.GetAccount(player).Points);
-
-            EPlayer.GetAccount(player).LastSessionMins = 0.0;
-
-            EPlayer.Notify(player, "Login successful!", "green", "fas fa-check", false, 2000);
-            DiscordData d = NAPI.Util.FromJson<DiscordData>(EPlayer.GetAccount(player).DiscordInfo);
-            if(d.DiscordID == "n/a")
-            {
-                EPlayer.Notify(player, "We highly recommend you to <strong>link your Discord account</strong> by using <strong>/verify</strong>. You will earn some rewards in return!", "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
-                player.TriggerEvent("pushMsgToChat", "!{#5eb9ff}[DISCORD] !{#9ebaff}We recommend you to link your Discord account and win some cool perks! ~y~(/verify)");
-            }
-
-            foreach(Player adm in Settings.LoggedInPlayers.Where(p => EPlayer.GetAccount(p).Admin > 0)){
-                EPlayer.ShowAdminNotes(adm, acc, AdminNote.ANoteType.OnConnect);
-                EPlayer.ShowAdminNotes(adm, acc, AdminNote.ANoteType.Both, false);
-            }
-            // test
-
-            if(EPlayer.GetAccount(player).Level >= 100)
-            {
-                EPlayer.UnlockAchievement(player, "reach_level_100");
-            }
-
-            int totalOwned = EPlayer.GetOwnedLoadouts(acc, 0).Result.Count + EPlayer.GetOwnedLoadouts(acc, 1).Result.Count + 2;
-            if (totalOwned >= Settings.Loadouts.Count)
-                EPlayer.UnlockAchievement(player, "all_loadouts");
+                await NAPI.Task.WaitForMainThread();
 
 
-            player.TriggerEvent("showLoginBrowser", false);
-            player.TriggerEvent("OnPlayerLoginRegister");
-            Achievement.LoadAchievementsForPlayer(player);
-            Challenge.AddChallengesForPlayer(player);
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Language lang = await context.Languages.AsQueryable().FirstOrDefaultAsync(l => l.SQL_ID == acc.Language);
+                    if (lang != null && acc.Language != -1)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.SetData("Language", lang);
+                        });
+                    }
+                    else
+                        NAPI.Task.Run(() => { player.ResetData("Language"); });
+                }
+
+                NAPI.Task.Run(() =>
+                {
+                    player.SetData<long>("JoinTimeUnix", DateTimeOffset.Now.ToUnixTimeSeconds());
+
+                    CharacterData ConvChar = new CharacterData();
+
+                    try
+                    {
+                        if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata-8 sending to creation."));
+
+                        ConvChar = NAPI.Util.FromJson<CharacterData>(acc.Character);
+
+                        EPlayer.ApplyCharacter(player, ConvChar, acc.LobbyClothing);
+
+                        EPlayer.Spawn(player);
+                    }
+                    catch
+                    {
+                        player.TriggerEvent("DestroyPlayerCamera");
+                        player.TriggerEvent("TogglePlayerChat", true);
+
+                        CharacterData charp = new CharacterData();
+                        EPlayer.GetAccount(player).Character = "{}";
+                        EPlayer.ApplyCharacter(player, charp); // Give them the default CHAR.
+                        EPlayer.Spawn(player);
+
+                        EPlayer.Notify(player, "Sorry, your character was reset (possibly due to an update), please create a new one. (<strong>/char</strong>)", "yellow", "fas fa-tshirt", false, 7000);
+                    }
+
+                    if (acc.WeaponComponents == null || acc.WeaponComponents.Length < 4)
+                    {
+                        Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
+
+                        wComponentData test = new wComponentData();
+                        test.Components.Add(123456789);
+                        wepItems.Add(123456789, test);
+
+                        acc.WeaponComponents = NAPI.Util.ToJson(wepItems);
+                    }
+
+                    if (EPlayer.GetAccount(player).MOTD != null && !EPlayer.GetAccount(player).MOTD.Equals("none"))
+                    {
+                        MOTDData motdToShow = NAPI.Util.FromJson<MOTDData>(EPlayer.GetAccount(player).MOTD);
+                        Main.DisplayMOTD(player, motdToShow);
+                    }
+
+                    player.TriggerEvent("pushMsgToChat", "!{#a6a6a6}Your last login was on !{#c2c1b6}" + EPlayer.GetAccount(player).LastLogin.ToString());
+                    EPlayer.GetAccount(player).LastLogin = DateTime.Now;
+
+                    if (EPlayer.GetAccount(player).LastSessionMins >= 60.0)
+                        player.TriggerEvent("pushMsgToChat", $"!{{#a6a6a6}}Last session lasted !{{#c2c1b6}}{(EPlayer.GetAccount(player).LastSessionMins / 60.0).ToString("N1")} hours.");
+                    else
+                        player.TriggerEvent("pushMsgToChat", $"!{{#a6a6a6}}Last session lasted !{{#c2c1b6}}{(EPlayer.GetAccount(player).LastSessionMins).ToString("N1")} minutes.");
+                });
+
+
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    if (await context.PlayerOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == acc.SQL_ID) == null)
+                    {
+                        CharacterData[] defaultOutfits = new CharacterData[5];
+                        for (int i = 0; i < 5; i++)
+                        {
+                            defaultOutfits[i] = new CharacterData();
+                        }
+                        await context.PlayerOutfits.AddAsync(new PlayerOutfit()
+                        {
+                            AccountID = acc.SQL_ID,
+                            OutfitData = NAPI.Util.ToJson(defaultOutfits)
+                        });
+                        await context.SaveChangesAsync();
+                    }
+                }
+
+                List<string> cLoadouts = await EPlayer.GetOwnedLoadouts(acc, 1);
+                List<string> fLoadouts = await EPlayer.GetOwnedLoadouts(acc, 0);
+                int totalOwned = cLoadouts.Count + fLoadouts.Count + 2;
+                if (totalOwned >= Settings.Loadouts.Count)
+                    EPlayer.UnlockAchievement(player, "all_loadouts");
+
+                NAPI.Task.Run(() =>
+                {
+                    player.SetSharedData("Points", EPlayer.GetAccount(player).Points);
+
+                    EPlayer.GetAccount(player).LastSessionMins = 0.0;
+
+                    EPlayer.Notify(player, "Login successful!", "green", "fas fa-check", false, 2000);
+                    DiscordData d = NAPI.Util.FromJson<DiscordData>(EPlayer.GetAccount(player).DiscordInfo);
+                    if (d.DiscordID == "n/a")
+                    {
+                        EPlayer.Notify(player, "We highly recommend you to <strong>link your Discord account</strong> by using <strong>/verify</strong>. You will earn some rewards in return!", "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
+                        player.TriggerEvent("pushMsgToChat", "!{#5eb9ff}[DISCORD] !{#9ebaff}We recommend you to link your Discord account and win some cool perks! ~y~(/verify)");
+                    }
+
+                    foreach (Player adm in Settings.LoggedInPlayers.Where(p => EPlayer.GetAccount(p).Admin > 0))
+                    {
+                        EPlayer.ShowAdminNotes(adm, acc, AdminNote.ANoteType.OnConnect);
+                        EPlayer.ShowAdminNotes(adm, acc, AdminNote.ANoteType.Both, false);
+                    }
+                    // test
+
+                    if (EPlayer.GetAccount(player).Level >= 100)
+                    {
+                        EPlayer.UnlockAchievement(player, "reach_level_100");
+                    }
+                    player.TriggerEvent("showLoginBrowser", false);
+                    player.TriggerEvent("OnPlayerLoginRegister");
+                    Achievement.LoadAchievementsForPlayer(player);
+                    Challenge.AddChallengesForPlayer(player);
+                });
+                
+            });
+            
         }
 
 
@@ -2094,23 +2146,38 @@ namespace RNC
             }
             if (slot == -1) return;
 
-            string jsonReceived = ContextFactory.Instance.PlayerOutfits.ToList().Find(o => o.AccountID == EPlayer.GetAccount(player).SQL_ID).OutfitData;
-
-            try
+            Task.Run(async () =>
             {
-                List<CharacterData> outfits = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CharacterData>>(jsonReceived);
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    PlayerOutfit fit = await context.PlayerOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == acc.SQL_ID);
+                    string jsonReceived = fit.OutfitData;
 
-                outfits[slot] = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-                ContextFactory.Instance.PlayerOutfits.ToList().Find(o => o.AccountID == EPlayer.GetAccount(player).SQL_ID).OutfitData = NAPI.Util.ToJson(outfits);
+                    try
+                    {
+                        List<CharacterData> outfits = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CharacterData>>(jsonReceived);
 
-                ContextFactory.Instance.SaveChanges();
+                        outfits[slot] = NAPI.Util.FromJson<CharacterData>(acc.Character);
+                        fit.OutfitData = NAPI.Util.ToJson(outfits);
 
-                player.TriggerEvent("pushMsgToChat", "!{#00FF00}You successfully saved your current outfit to slot " + (slot+1) + ".");
-            }
-            catch
-            {
-                player.SendNotification("~r~Error fetching outfits! Please try to relog or contact the devs.");
-            }
+                        await context.SaveChangesAsync();
+
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#00FF00}You successfully saved your current outfit to slot " + (slot + 1) + ".");
+                        });
+                    }
+                    catch
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.SendNotification("~r~Error fetching outfits! Please try to relog or contact the devs.");
+
+                        });
+                    }
+                }
+            });
+            
         }
 
         [RemoteEvent("RequestSetOutfit")]
@@ -2127,25 +2194,40 @@ namespace RNC
 
             if (slot != -1)
             {
-                try
-                {
-                    string jsonReceived = jsonReceived = ContextFactory.Instance.PlayerOutfits.ToList().Find(o => o.AccountID == EPlayer.GetAccount(player).SQL_ID).OutfitData;
-
-                    List<CharacterData> outfits = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CharacterData>>(jsonReceived);
-
-                    EPlayer.ApplyCharacter(player, outfits[slot], team);
-
-                    if (save == true)
+            
+                    Task.Run(async () =>
                     {
-                        acc.Character = NAPI.Util.ToJson(outfits[slot]);
-                        EPlayer.Save(player);
-                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You selected your outfit on slot " + (slot + 1) + ".");
-                    }
-                }
-                catch
-                {
-                    player.SendNotification("~r~Error fetching outfits! Please try to relog or contact the devs.");
-                }
+                        using (MainDatabase context = ContextFactory.CreateContext())
+                        {
+                            try
+                            {
+                                PlayerOutfit fit = await context.PlayerOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == EPlayer.GetAccount(player).SQL_ID);
+                                string jsonReceived = fit.OutfitData;
+
+                                List<CharacterData> outfits = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CharacterData>>(jsonReceived);
+
+                                NAPI.Task.Run(() =>
+                                {
+                                    EPlayer.ApplyCharacter(player, outfits[slot], team);
+
+                                    if (save == true)
+                                    {
+                                        acc.Character = NAPI.Util.ToJson(outfits[slot]);
+                                        EPlayer.Save(player);
+                                        player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You selected your outfit on slot " + (slot + 1) + ".");
+                                    }
+                                });
+                            }
+                            catch
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    player.SendNotification("~r~Error fetching outfits! Please try to relog or contact the devs.");
+                                });
+                            }
+
+                        }
+                    });
             }
             else
             {
@@ -2525,12 +2607,18 @@ namespace RNC
             {
                 defaultOutfits[i] = new CharacterData();
             }
-            ContextFactory.Instance.PlayerOutfits.Add(new PlayerOutfit()
+            Task.Run(async () =>
             {
-                AccountID = acc.SQL_ID,
-                OutfitData = NAPI.Util.ToJson(defaultOutfits)
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    await context.PlayerOutfits.AddAsync(new PlayerOutfit()
+                    {
+                        AccountID = acc.SQL_ID,
+                        OutfitData = NAPI.Util.ToJson(defaultOutfits)
+                    });
+                    //ContextFactory.Instance.SaveChanges();
+                }
             });
-            ContextFactory.Instance.SaveChanges();
 
             player.SetSharedData("Level", acc.Level);
             player.SetSharedData("CurrentXP", acc.XP);
@@ -2553,13 +2641,23 @@ namespace RNC
                 if (EPlayer.LoggedIn(player)) return;
                 if (player.HasData("Kicked")) return;
 
-                Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
-                if (acc != null)
+                Task.Run(async () =>
                 {
-                    OnPlayerLogin(player, acc);
-                    return;
-                }
-                else EPlayer.Error(player, "A fatal error has occurred, please log in manually.", "fas fa-lock");
+                    using (MainDatabase context = ContextFactory.CreateContext())
+                    {
+                        Account acc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+                        if (acc != null)
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                OnPlayerLogin(player, acc);
+                            });
+                            return;
+                        }
+                        else NAPI.Task.Run(() => { EPlayer.Error(player, "A fatal error has occurred, please log in manually.", "fas fa-lock"); });
+                    }
+                });
+
             }
             catch(Exception ex)
             {
@@ -2602,15 +2700,25 @@ namespace RNC
                 player.SetData("LastCryptAttempt", Environment.TickCount64);
                 if (username.Contains("@"))
                 {
-                    Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
-                    if (acc != null)
+                    Task.Run(async () =>
                     {
-                        if (AccountManager.Login(acc, password))
+                        using (MainDatabase context = ContextFactory.CreateContext())
                         {
-                            OnPlayerLogin(player, acc);
-                            return;
+                            Account acc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
+                            if (acc != null)
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    if (AccountManager.Login(acc, password))
+                                    {
+                                        OnPlayerLogin(player, acc);
+                                        return;
+                                    }
+                                });
+                            }
                         }
-                    }
+                    });
+                
                     /*
                     else
                     {
@@ -2634,15 +2742,26 @@ namespace RNC
                 }
                 else
                 {
-                    Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
-                    if (acc != null)
+                    Task.Run(async () =>
                     {
-                        if (AccountManager.Login(acc, password))
+                        using (MainDatabase context = ContextFactory.CreateContext())
                         {
-                            OnPlayerLogin(player, acc);
-                            return;
+                            Account acc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+                            if (acc != null)
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    if (AccountManager.Login(acc, password))
+                                    {
+                                        OnPlayerLogin(player, acc);
+                                        return;
+                                    }
+                                });
+
+                            }
                         }
-                    }
+                    });
+
                     /*
                     else
                     {
@@ -3411,53 +3530,78 @@ namespace RNC
             {
                 if (new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() >= Settings.Dynamics.NextMonthUnix)
                 {
-                    List<Logs_Session> seslog = ContextFactory.Instance.Logs_Session.ToList();
-                    ContextFactory.Instance.Logs_Session.RemoveRange(seslog);
-                    List<Logs_Admin> adlog = ContextFactory.Instance.Logs_Admin.ToList();
-                    ContextFactory.Instance.Logs_Admin.RemoveRange(adlog);
+                    Task.Run(async () =>
+                    {
+                        using (MainDatabase context = ContextFactory.CreateContext())
+                        {
+                            List<Logs_Session> seslog = await context.Logs_Session.AsQueryable().ToListAsync();
+                            context.Logs_Session.RemoveRange(seslog);
+                            List<Logs_Admin> adlog = await context.Logs_Admin.AsQueryable().ToListAsync();
+                            context.Logs_Admin.RemoveRange(adlog);
 
-                    Settings.Dynamics.NextMonthUnix = new DateTimeOffset(DateTime.Now).AddMonths(1).ToUnixTimeSeconds();
-                    NAPI.Util.ConsoleOutput("[1 MONTH] Server logs [Admin, Session] have been cleared!");
 
-                    ContextFactory.Instance.SaveChanges();
-                    Main.SaveDynamicSettings();
+                            await context.SaveChangesAsync();
+                            NAPI.Task.Run(() =>
+                            {
+                                Settings.Dynamics.NextMonthUnix = new DateTimeOffset(DateTime.Now).AddMonths(1).ToUnixTimeSeconds();
+                                NAPI.Util.ConsoleOutput("[1 MONTH] Server logs [Admin, Session] have been cleared!");
+                                Main.SaveDynamicSettings();
+                            });
+                        }
+                    });
+                    
                 }
                 if (new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() >= Settings.Dynamics.NextWeekUnix)
                 {
                     // CHECKING FOR CLAN OF THE WEEK, RESETTING ALL CLANS' WEEKLY KILLS
-                    Clan mostKills = ContextFactory.Instance.Clans.ToList().OrderByDescending(c => c.WeekKills).FirstOrDefault();
-                    if (mostKills != null)
+                    Task.Run(async () =>
                     {
-                        foreach (Account account in ContextFactory.Instance.Accounts.ToList().Where(a => a.ClanID != -1))
+                        using (MainDatabase context = ContextFactory.CreateContext())
                         {
-                            if (account.ClanID == mostKills.SQL_ID)
+                            int mostKill = await context.Clans.AsQueryable().MaxAsync(c => c.WeekKills);
+                            Clan mostKills = null;
+                            if(mostKill > 0)
                             {
-                                MOTDData motd = new MOTDData()
-                                {
-                                    AdminName = "SERVER",
-                                    PostedOn = DateTime.Now.ToShortDateString(),
-                                    Message = "~y~[CLAN OF THE WEEK]~w~ Congratulations! Your clan had the most kills this week and you won a reward! All clans' weekly kills have been reset."
-                                };
-                                account.MOTD = NAPI.Util.ToJson(motd);
-
-                                // reward skripts here
+                                mostKills = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.WeekKills == mostKill);
                             }
-                            else
+                            if (mostKills != null)
                             {
-                                MOTDData motd = new MOTDData()
+                                foreach (Account account in await context.Accounts.AsQueryable().Where(a => a.ClanID != -1).ToListAsync())
                                 {
-                                    AdminName = "SERVER",
-                                    PostedOn = DateTime.Now.ToShortDateString(),
-                                    Message = $"~r~[CLAN OF THE WEEK]~w~ Clan {mostKills.Name} won clan of the week. All clans' weekly kills have been reset!"
-                                };
-                                account.MOTD = NAPI.Util.ToJson(motd);
+                                    if (account.ClanID == mostKills.SQL_ID)
+                                    {
+                                        MOTDData motd = new MOTDData()
+                                        {
+                                            AdminName = "SERVER",
+                                            PostedOn = DateTime.Now.ToShortDateString(),
+                                            Message = "~y~[CLAN OF THE WEEK]~w~ Congratulations! Your clan had the most kills this week and you won a reward! All clans' weekly kills have been reset."
+                                        };
+                                        account.MOTD = NAPI.Util.ToJson(motd);
+
+                                        // reward skripts here
+                                    }
+                                    else
+                                    {
+                                        MOTDData motd = new MOTDData()
+                                        {
+                                            AdminName = "SERVER",
+                                            PostedOn = DateTime.Now.ToShortDateString(),
+                                            Message = $"~r~[CLAN OF THE WEEK]~w~ Clan {mostKills.Name} won clan of the week. All clans' weekly kills have been reset!"
+                                        };
+                                        account.MOTD = NAPI.Util.ToJson(motd);
+                                    }
+                                }
+                                NAPI.Task.Run(() =>
+                                {
+                                    EPlayer.SendMessageAll($"~y~[CLAN OF THE WEEK] ~w~Clan ~g~{mostKills.Name} ~w~had the most kills this week! Congratulations!");
+                                    EPlayer.SendMessageAll($"~y~[>] ~w~ A new week begins and all clans' weekly kills have been reset.");
+                                });
                             }
                         }
-
-                        EPlayer.SendMessageAll($"~y~[CLAN OF THE WEEK] ~w~Clan ~g~{mostKills.Name} ~w~had the most kills this week! Congratulations!");
-                        EPlayer.SendMessageAll($"~y~[>] ~w~ A new week begins and all clans' weekly kills have been reset.");
-                    }
+                    });
+                    
                     // ARCHIVING INACTIVE ACCOUNTS.....
+                    /*
                     Account cunt = ContextFactory.Instance.Accounts.ToList().FirstOrDefault(a => (new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() - new DateTimeOffset(a.LastLogin).ToUnixTimeSeconds()) > 2629746);
                     if (cunt != null)
                     {
@@ -3543,6 +3687,7 @@ namespace RNC
                             EPlayer.SendMessageToAll("~b~[ACCOUNT ARCHIVE] ~w~Account archive process ~g~finished~w~! You've been unfrozen.");
                         }, 100);
                     } 
+                    */
                     Settings.Dynamics.NextWeekUnix = new DateTimeOffset(DateTime.Now).AddDays(7).ToUnixTimeSeconds();
 
                     foreach (Player pl in NAPI.Pools.GetAllPlayers())
@@ -3584,14 +3729,24 @@ namespace RNC
         [RemoteEvent("Server_ToggleAutoLogin")]
         public static void ToggleAutoLogin(Player player, bool toggle)
         {
-            Account acc = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(player.Name, StringComparison.OrdinalIgnoreCase));
-            if(acc == null) return;
-            acc.AutoLogin = toggle;
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account acc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(player.Name, StringComparison.OrdinalIgnoreCase));
+                    if (acc == null) return;
+                    acc.AutoLogin = toggle;
 
-            if (toggle)
-                EPlayer.Notify(player, "You turned Auto Login on! You will no longer need to enter your login info on this account.", "green", "fa-solid fa-user-check", true, 4000);
-            else
-                EPlayer.Notify(player, "You turned Auto Login off! You will now have to enter your login info when you connect.", "red", "fa-solid fa-user-xmark", true, 4000);
+                    NAPI.Task.Run(() =>
+                    {
+                        if (toggle)
+                            EPlayer.Notify(player, "You turned Auto Login on! You will no longer need to enter your login info on this account.", "green", "fa-solid fa-user-check", true, 4000);
+                        else
+                            EPlayer.Notify(player, "You turned Auto Login off! You will now have to enter your login info when you connect.", "red", "fa-solid fa-user-xmark", true, 4000);
+                    });
+                }
+            });
+            
         }
 
         [RemoteEvent("ReplaceAFKDriver")]
@@ -3663,104 +3818,117 @@ namespace RNC
                 email = "N/A";
             }
 
-            Account acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase) == true);
-            if (acc != null)
+            Task.Run(async () =>
             {
-                //EPlayer.Error(player, "An account with this name already exists!", "fas fa-user");
-                player.TriggerEvent("login_ShowAccountExists", true);
-                return;
-            }
-
-            try
-            {
-                if (ContextFactory.Instance.Accounts.ToList().Where(a => a.RegisterHWID.Equals(player.Serial) || a.RegisterRID == player.SocialClubId).ToList().Count >= 2)
+                using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    //EPlayer.Error(player, "You cannot create any more accounts on the same machine!", "fas fa-user");
-                    // ovo treba ubacit
-                    return;
+                    Account acc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase) == true);
+                    if (acc != null)
+                    {
+                        //EPlayer.Error(player, "An account with this name already exists!", "fas fa-user");
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("login_ShowAccountExists", true);
+                        });
+                        return;
+                    }
+                    try
+                    {
+                        if (await context.Accounts.AsQueryable().CountAsync(a => a.RegisterHWID.Equals(player.Serial) || a.RegisterRID == player.SocialClubId) >= 2)
+                        {
+                            NAPI.Util.ConsoleOutput($"(RnC | REGISTER) {username} attempted to register, they have 2 or more accounts already!");
+                            //EPlayer.Error(player, "You cannot create any more accounts on the same machine!", "fas fa-user");
+                            // ovo treba ubacit
+                            return;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        NAPI.Util.ConsoleOutput("(RnC | REGISTER) Failed the 2+ account check for " + username + "!");
+                        NAPI.Util.ConsoleOutput(ex.ToString());
+                    }
+                    finally
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.SetData("LastCryptAttempt", Environment.TickCount64);
+                            string salt = AccountManager.GenSalt();
+                            string newPass = AccountManager.Crypt(password, salt);
+
+                            Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
+
+                            wComponentData test = new wComponentData();
+                            test.Components.Add(123456789);
+                            wepItems.Add(123456789, test);
+
+                            DiscordData _discordData = new DiscordData();
+                            string jsonDiscordData = NAPI.Util.ToJson(_discordData);
+
+                            List<ChallengeData> challengeData = new List<ChallengeData>();
+                            string jsonChallengeData = NAPI.Util.ToJson(challengeData);
+
+                            var _new = new Account
+                            {
+                                Email = email,
+                                Password = newPass,
+                                Salt = salt,
+                                Username = username,
+                                DiscordInfo = jsonDiscordData,
+                                ChallengeInfo = jsonChallengeData,
+                                AutoLogin = true,
+                                Admin = 0,
+                                RegisterHWID = player.Serial,
+                                RegisterIP = player.Address,
+                                RegisterRID = player.SocialClubId,
+                                RegisterSC = player.SocialClubName,
+                                LastHWID = player.Serial,
+                                LastIP = player.Address,
+                                LastRID = player.SocialClubId,
+                                LastSC = player.SocialClubName,
+                                MuteTime = 0,
+                                MuteReason = "N/A",
+                                JailTime = 0,
+                                JailReason = "N/A",
+                                DerbyWins = 0,
+                                Level = 1,
+                                Medkits = 0,
+                                Painkillers = 0,
+                                Language = -1,
+                                XP = 1,
+                                Escapes = 0,
+                                Arrests = 0,
+                                Kills = 1,
+                                Deaths = 1,
+                                MinutesPlayed = 1.0,
+                                LastSessionMins = 0.0,
+                                DonatorPoints = 0,
+                                Points = 10,
+                                Warns = 0,
+                                Suspended = 0,
+                                DonatorLevel = 0,
+                                LobbyClothing = 1,
+                                LoadoutCop = "?",
+                                LoadoutFugitive = "?",
+                                CarCop = "?",
+                                CarFugitive = "?",
+                                WeaponComponents = NAPI.Util.ToJson(wepItems),
+                                MOTD = "none",
+                                RegisterDate = DateTime.Now,
+                                LastLogin = DateTime.Now,
+                                Character = "{}",
+                                PurchasedAmmo = "{}",
+                                ChallengeStreak = 0,
+                                CompletedDailyChallenge = false,
+                                Namechanges = 0,
+                                ClanTier = -1,
+                                ClanID = -1
+                            };
+                            AccountManager.Add(_new);
+                            OnPlayerRegister(player, _new);
+                        });
+                    }
                 }
-            }
-            catch(Exception ex) {
-                NAPI.Util.ConsoleOutput("(RnC | REGISTER) Failed the 2+ account check for " + username + "!");
-                NAPI.Util.ConsoleOutput(ex.ToString());
-            }
-            finally
-            {
-                player.SetData("LastCryptAttempt", Environment.TickCount64);
-                string salt = AccountManager.GenSalt();
-                string newPass = AccountManager.Crypt(password, salt);
-
-                Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
-
-                wComponentData test = new wComponentData();
-                test.Components.Add(123456789);
-                wepItems.Add(123456789, test);
-
-                DiscordData _discordData = new DiscordData();
-                string jsonDiscordData = NAPI.Util.ToJson(_discordData);
-
-                List<ChallengeData> challengeData = new List<ChallengeData>();
-                string jsonChallengeData = NAPI.Util.ToJson(challengeData);
-
-                var _new = new Account
-                {
-                    Email = email,
-                    Password = newPass,
-                    Salt = salt,
-                    Username = username,
-                    DiscordInfo = jsonDiscordData,
-                    ChallengeInfo = jsonChallengeData,
-                    AutoLogin = true,
-                    Admin = 0,
-                    RegisterHWID = player.Serial,
-                    RegisterIP = player.Address,
-                    RegisterRID = player.SocialClubId,
-                    RegisterSC = player.SocialClubName,
-                    LastHWID = player.Serial,
-                    LastIP = player.Address,
-                    LastRID = player.SocialClubId,
-                    LastSC = player.SocialClubName,
-                    MuteTime = 0,
-                    MuteReason = "N/A",
-                    JailTime = 0,
-                    JailReason = "N/A",
-                    DerbyWins = 0,
-                    Level = 1,
-                    Medkits = 0,
-                    Painkillers = 0,
-                    Language = -1,
-                    XP = 1,
-                    Escapes = 0,
-                    Arrests = 0,
-                    Kills = 1,
-                    Deaths = 1,
-                    MinutesPlayed = 1.0,
-                    LastSessionMins = 0.0,
-                    DonatorPoints = 0,
-                    Points = 10,
-                    Warns = 0,
-                    Suspended = 0,
-                    DonatorLevel = 0,
-                    LobbyClothing = 1,
-                    LoadoutCop = "?",
-                    LoadoutFugitive = "?",
-                    CarCop = "?",
-                    CarFugitive = "?",
-                    WeaponComponents = NAPI.Util.ToJson(wepItems),
-                    MOTD = "none",
-                    RegisterDate = DateTime.Now,
-                    LastLogin = DateTime.Now,
-                    Character = "{}",
-                    PurchasedAmmo = "{}",
-                    ChallengeStreak = 0,
-                    CompletedDailyChallenge = false,
-                    Namechanges = 0,
-                    ClanTier = -1,
-                    ClanID = -1
-                };
-                AccountManager.Add(_new);
-                OnPlayerRegister(player, _new);
-            }         
+            });
         }
 
         [RemoteEvent("char_ResetEcho")]
@@ -3854,7 +4022,7 @@ namespace RNC
                 {
                     EPlayer.Freeze(player, false);
                     EPlayer.Spawn(player);
-                    ContextFactory.Instance.SaveChanges();
+                    ContextFactory.SaveDB();
                     player.TriggerEvent("pushMsgToChat", "!{#00FF33}You have been unjailed as you have served your time.");
                 }
             }
@@ -3869,7 +4037,7 @@ namespace RNC
 
                 if (currentTime <= 0)
                 {
-                    ContextFactory.Instance.SaveChanges();
+                    ContextFactory.SaveDB();
                     player.TriggerEvent("pushMsgToChat", "!{#00FF33}You have been unmuted as you have served your time.");
                 }
             }
@@ -4522,114 +4690,149 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player) || player.GetData<bool>("Tuner_Using") == false) return;
 
+            uint vmodel = player.Vehicle.Model;
             Account acc = EPlayer.GetAccount(player);
-            var tuning = ContextFactory.Instance.PlayerTunings.ToList().Find(a => a.AccountSQLID == acc.SQL_ID && a.Model == player.Vehicle.Model);
-
-            Dictionary<int, int> vMods = NAPI.Util.FromJson<Dictionary<int, int>>(modstring);
-            vMods.Remove(11); // Engine
-            vMods.Remove(12); // Brakes
-            vMods.Remove(13); // Transmission
-            vMods.Remove(16); // Armor
-            vMods.Remove(18); // Turbo
-
-            if (vMods.Count < 1)
+            Task.Run(async () =>
             {
-                if (tuning != null)
+                using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    if (!player.HasData("TunerNoRefundWarn"))
-                    {
-                        player.SetData("TunerNoRefundWarn", true);
-                        EPlayer.Notify(player, "Removing all components! <p>THIS ACTION IS IRREVERSIBLE AND NON REFUNDABLE, USE AGAIN TO PROCEED.</p>", "red", "fas fa-exclamation", false, 2500, "topCenter", "replace");
-                        return;
-                    }
+                    var tuning = await context.PlayerTunings.AsQueryable().FirstOrDefaultAsync(a => a.AccountSQLID == acc.SQL_ID && a.Model == player.Vehicle.Model);
 
-                    ContextFactory.Instance.PlayerTunings.Remove(tuning);
-                }
-            }
-            else
-            {
-                if (tuning == null)
-                {
-                    if (vMods.Keys.Count >= 3)
+                    Dictionary<int, int> vMods = NAPI.Util.FromJson<Dictionary<int, int>>(modstring);
+                    vMods.Remove(11); // Engine
+                    vMods.Remove(12); // Brakes
+                    vMods.Remove(13); // Transmission
+                    vMods.Remove(16); // Armor
+                    vMods.Remove(18); // Turbo
+
+                    if (vMods.Count < 1)
                     {
-                        if (acc.DonatorPoints < (vMods.Keys.Count * 10))
+                        if (tuning != null)
                         {
-                            EPlayer.Notify(player, $"You need {(vMods.Keys.Count * 10) - acc.DonatorPoints} more donator points for this upgrade! <p>You can only purchase max 2 components with standard points.</p>", "red", "fas fa-lock", false, 2500, "topCenter", "replace");
-                            return;
+                            NAPI.Task.Run(() =>
+                            {
+                                if (!player.HasData("TunerNoRefundWarn"))
+                                {
+                                    player.SetData("TunerNoRefundWarn", true);
+                                    EPlayer.Notify(player, "Removing all components! <p>THIS ACTION IS IRREVERSIBLE AND NON REFUNDABLE, USE AGAIN TO PROCEED.</p>", "red", "fas fa-exclamation", false, 2500, "topCenter", "replace");
+                                    return;
+                                }
+                            });                
+                            context.PlayerTunings.Remove(tuning);
                         }
-                        acc.DonatorPoints -= (vMods.Keys.Count * 10);
                     }
                     else
                     {
-                        if (acc.Points < (vMods.Keys.Count * 50))
+                        if (tuning == null)
                         {
-                            EPlayer.Notify(player, $"You need {(vMods.Keys.Count * 50) - acc.Points} more points for this upgrade!", "red", "fas fa-lock", false, 2500, "topCenter", "replace");
-                            return;
-                        }
-                        EPlayer.GivePoints(player, -(vMods.Keys.Count * 50));
-                    }
-                    EPlayer.Notify(player, $"Modifications saved!", "green", "fas fa-check", false, 2500, "topCenter");
+                            if (vMods.Keys.Count >= 3)
+                            {
+                                if (acc.DonatorPoints < (vMods.Keys.Count * 10))
+                                {
+                                    NAPI.Task.Run(() =>
+                                    {
+                                        EPlayer.Notify(player, $"You need {(vMods.Keys.Count * 10) - acc.DonatorPoints} more donator points for this upgrade! <p>You can only purchase max 2 components with standard points.</p>", "red", "fas fa-lock", false, 2500, "topCenter", "replace");
+                                    });
+                                    return;
+                                }
+                                acc.DonatorPoints -= (vMods.Keys.Count * 10);
+                            }
+                            else
+                            {
+                                if (acc.Points < (vMods.Keys.Count * 50))
+                                {
+                                    NAPI.Task.Run(() =>
+                                    {
+                                        EPlayer.Notify(player, $"You need {(vMods.Keys.Count * 50) - acc.Points} more points for this upgrade!", "red", "fas fa-lock", false, 2500, "topCenter", "replace");
+                                    });
+                                    return;
+                                }
+                                NAPI.Task.Run(() =>
+                                {
+                                    EPlayer.GivePoints(player, -(vMods.Keys.Count * 50));
+                                });
+                            }
+                            NAPI.Task.Run(() =>
+                            {
+                                EPlayer.Notify(player, $"Modifications saved!", "green", "fas fa-check", false, 2500, "topCenter");
+                            });
 
-                    tuning = new PlayerTunings
+                            tuning = new PlayerTunings
+                            {
+                                AccountSQLID = acc.SQL_ID,
+                                Model = vmodel,
+                                PrimaryColor = priCol,
+                                SecondaryColor = secCol,
+                                PearlescentColor = pearlCol,
+                                WheelColor = wheelCol,
+                                Mods = NAPI.Util.ToJson(vMods),
+                            };
+                            await context.PlayerTunings.AddAsync(tuning);
+                        }
+                        else
+                        {
+                            var oldMods = NAPI.Util.FromJson<Dictionary<int, int>>(tuning.Mods);
+                            int changes = 0;
+
+                            foreach (var key1 in vMods)
+                            {
+                                int oldVal = -1;
+                                if (oldMods.TryGetValue(key1.Key, out oldVal))
+                                {
+                                    if (key1.Value != oldVal && oldVal != -1 && key1.Value != -1) changes++;
+                                }
+                                else if (key1.Value != -1) changes++;
+                            }
+
+                            if (changes >= 3)
+                            {
+                                if (acc.DonatorPoints < (changes * 10))
+                                {
+                                    NAPI.Task.Run(() =>
+                                    {
+                                        EPlayer.Notify(player, $"You need {(changes * 10) - acc.DonatorPoints} more donator points for this upgrade! <p>You can only purchase max 2 components with standard points.</p>", "red", "fas fa-lock", false, 2500, "topCenter", "replace");
+                                    });
+                                    return;
+                                }
+                                acc.DonatorPoints -= (changes * 10);
+                            }
+                            else
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    if (acc.Points < (changes * 50))
+                                    {
+
+                                        EPlayer.Notify(player, $"You need {(changes * 50) - acc.Points} more points for this upgrade!", "red", "fas fa-lock", false, 2500, "topCenter", "replace");
+                                        return;
+                                    }
+                                    EPlayer.GivePoints(player, -(changes * 50));
+                                });
+                            }
+
+                            if (changes > 0)
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    EPlayer.Notify(player, $"Modifications saved!", "green", "fas fa-check", false, 2500, "topCenter");
+                                });                           
+                                tuning.PrimaryColor = priCol;
+                                tuning.SecondaryColor = secCol;
+                                tuning.PearlescentColor = pearlCol;
+                                tuning.WheelColor = wheelCol;
+                                tuning.Mods = NAPI.Util.ToJson(vMods);
+                            }
+                        }
+                    }
+                    NAPI.Task.Run(() =>
                     {
-                        AccountSQLID = acc.SQL_ID,
-                        Model = player.Vehicle.Model,
-                        PrimaryColor = priCol,
-                        SecondaryColor = secCol,
-                        PearlescentColor = pearlCol,
-                        WheelColor = wheelCol,
-                        Mods = NAPI.Util.ToJson(vMods),
-                    };
-                    ContextFactory.Instance.PlayerTunings.Add(tuning);
+                        player.TriggerEvent("CloseTuner");
+                    });
+                    await NAPI.Task.WaitForMainThread();
+                    await context.SaveChangesAsync();
                 }
-                else
-                {
-                    var oldMods = NAPI.Util.FromJson<Dictionary<int, int>>(tuning.Mods);
-                    int changes = 0;
-
-                    foreach (var key1 in vMods)
-                    {
-                        int oldVal = -1;
-                        if (oldMods.TryGetValue(key1.Key, out oldVal))
-                        {
-                            if (key1.Value != oldVal && oldVal != -1 && key1.Value != -1) changes++;
-                        }
-                        else if (key1.Value != -1) changes++;
-                    }
-
-                    if (changes >= 3)
-                    {
-                        if (acc.DonatorPoints < (changes * 10))
-                        {
-                            EPlayer.Notify(player, $"You need {(changes * 10) - acc.DonatorPoints} more donator points for this upgrade! <p>You can only purchase max 2 components with standard points.</p>", "red", "fas fa-lock", false, 2500, "topCenter", "replace");
-                            return;
-                        }
-                        acc.DonatorPoints -= (changes * 10);
-                    }
-                    else
-                    {
-                        if (acc.Points < (changes * 50))
-                        {
-                            EPlayer.Notify(player, $"You need {(changes * 50) - acc.Points} more points for this upgrade!", "red", "fas fa-lock", false, 2500, "topCenter", "replace");
-                            return;
-                        }
-                        EPlayer.GivePoints(player, -(changes * 50));
-                    }
-
-                    if (changes > 0)
-                    {
-                        EPlayer.Notify(player, $"Modifications saved!", "green", "fas fa-check", false, 2500, "topCenter");
-
-                        tuning.PrimaryColor = priCol;
-                        tuning.SecondaryColor = secCol;
-                        tuning.PearlescentColor = pearlCol;
-                        tuning.WheelColor = wheelCol;
-                        tuning.Mods = NAPI.Util.ToJson(vMods);
-                    }
-                }
-            }
-            player.TriggerEvent("CloseTuner");
-            ContextFactory.Instance.SaveChanges();
+            });
+            
         }
 
         [ServerEvent(Event.PlayerSpawn)]

@@ -1997,9 +1997,13 @@ namespace RNC
         }
         public static void GivePoints(Player player, int points)
         {
-            EPlayer.GetAccount(player).Points += points;
-            player.SetSharedData("Points", EPlayer.GetAccount(player).Points);
-            EPlayer.Save(player);
+            NAPI.Task.Run(() =>
+            {
+                EPlayer.GetAccount(player).Points += points;
+                player.SetSharedData("Points", EPlayer.GetAccount(player).Points);
+                EPlayer.Save(player);
+            });
+
         }
         public static int GetMaxLevelXP(int level)
         {
