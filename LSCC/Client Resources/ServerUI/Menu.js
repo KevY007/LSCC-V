@@ -549,10 +549,12 @@ mp.events.add("Menu_UpdateLevelXP", (first_time = false) => {
 
 mp.events.add("PutPlayerInLobby", (lobbyID, password) => {
     mp.events.callRemote("RequestLobbySwitch", lobbyID, password);
+    ToggleMenu();
 });
 
 mp.events.add("RequestJoinMinigame", (ID) => {
     mp.events.callRemote("RequestMinigameJoin", ID);
+    ToggleMenu();
 });
 
 mp.events.add("MenuSelectVehicle", (model, team) => {
