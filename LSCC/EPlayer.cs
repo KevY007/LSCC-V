@@ -1361,9 +1361,10 @@ namespace RNC
                         };
                         await context.UnlockedAchievements.AddAsync(ach);
 
-                        NAPI.Task.Run(() =>
-                        {
-                            player.TriggerEvent("unlockAchievement", achdata.Name);
+                        NAPI.Task.Run(() => { 
+                            if(achdata == null) { achdata = Settings.Achievements.FirstOrDefault(a => a.Code == achievement); }                            
+                            if(achdata != null)
+                                player.TriggerEvent("unlockAchievement", achdata.Name);
                         });
 
                         if (achdata.RewardXP > 0)
@@ -2448,7 +2449,23 @@ namespace RNC
         }
         public static void Notify(Player player, string msg, string color, string icon, bool close, int timeout, string alignment = "", string displaymode = "")
         {
-            player.TriggerEvent("HUDNotify", msg, color, icon, close, timeout, alignment, displaymode);
+            string type = "none";
+            switch (color)
+            {
+                case "red": type = "error";
+                    break;
+                case "blue": type = "info";
+                    break;
+                case "orange": type = "warning";
+                    break;
+                case "yellow": type = "warning";
+                    break;
+                case "green": type = "success";
+                    break;
+                default: type = "none";
+                    break;
+            }
+            player.TriggerEvent("HUDNotify", msg, type, icon, close, timeout, alignment, displaymode);
         }
     }
 }

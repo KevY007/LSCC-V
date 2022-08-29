@@ -627,6 +627,7 @@ namespace RNC
         public const string DCBotToken = "NjAyNTQ1Mzc0MDY1OTgzNTgw.XtaCEQ.clpqVL5c0X_38xkT-mYTr4_N9a4";
 
         // Global Variables (changing accordingly)
+        public static bool SpawnParkedVehicles { get; set; } // for debug purposes whether to spawn random cars
         public static List<LobbyData> Lobbies { get; set; }
         public static List<Player> LoggedInPlayers { get; set; }
         public static List<Vehicle> AdminVehicles { get; set; }
@@ -3143,56 +3144,58 @@ namespace RNC
                                     pCount = 0;
                                     crashcheck = 13;
 
-                                    if (Settings.CarGenData.Count >= 1500)
+                                    if (Settings.SpawnParkedVehicles)
                                     {
-                                        NAPI.Task.Run(() =>
+                                        if (Settings.CarGenData.Count >= 1500)
                                         {
-                                            crashcheck = 694;
-                                            List<jCarGenData> randomCars = Settings.CarGenData.OrderBy(x => new Random().Next()).Take(1500).ToList();
-                                            crashcheck = 695;
-                                            int civiCarCnt = Settings.CivilianVehicles.Count();
-                                            foreach (jCarGenData car in randomCars)
+                                            NAPI.Task.Run(() =>
                                             {
-                                                Random rnd = new Random();
-                                                int modelsCount = car.Models.Count();
-                                                int randomModel = modelsCount > 0 ? (rnd.Next(modelsCount)) : (rnd.Next(civiCarCnt));
-
-                                                uint carModel = (uint)VehicleHash.Premier;
-
-                                                if (modelsCount > 0)
+                                                crashcheck = 694;
+                                                List<jCarGenData> randomCars = Settings.CarGenData.OrderBy(x => new Random().Next()).Take(1500).ToList();
+                                                crashcheck = 695;
+                                                int civiCarCnt = Settings.CivilianVehicles.Count();
+                                                foreach (jCarGenData car in randomCars)
                                                 {
-                                                    carModel = NAPI.Util.GetHashKey(car.Models[randomModel]);
+                                                    Random rnd = new Random();
+                                                    int modelsCount = car.Models.Count();
+                                                    int randomModel = modelsCount > 0 ? (rnd.Next(modelsCount)) : (rnd.Next(civiCarCnt));
+
+                                                    uint carModel = (uint)VehicleHash.Premier;
+
+                                                    if (modelsCount > 0)
+                                                    {
+                                                        carModel = NAPI.Util.GetHashKey(car.Models[randomModel]);
+                                                    }
+                                                    else
+                                                    {
+                                                        carModel = NAPI.Util.GetHashKey(Settings.CivilianVehicles[randomModel]);
+                                                    }
+
+                                                    crashcheck = 666;
+                                                    bool locked = rnd.Next(100) > 50;
+                                                    Vehicle veh = NAPI.Vehicle.CreateVehicle(carModel, new Vector3(car.X, car.Y, car.Z),
+                                                        car.Heading, rnd.Next(100), rnd.Next(100), "", 255, locked, false, Convert.ToUInt32(lobbyid));
+
+                                                    crashcheck = 681;
+                                                    veh.EngineStatus = false;
+                                                    veh.SetSharedData("Engine", false);
+                                                    veh.SetSharedData("Fuel", 100.0);
+                                                    veh.SetSharedData("Locked", locked);
+                                                    veh.Locked = locked;
+                                                    veh.SetSharedData("Team", 10); // 10 = civilian / parked
+                                                    veh.SetSharedData("SpeedInfo", "Average");
+                                                    lobby.Vehicles.Add(veh);
+                                                    veh.SetSharedData("Collisions", true);
+                                                    veh.SetSharedData("Fuel", 100.0);
+
                                                 }
-                                                else
-                                                {
-                                                    carModel = NAPI.Util.GetHashKey(Settings.CivilianVehicles[randomModel]);
-                                                }
-
-                                                crashcheck = 666;
-                                                bool locked = rnd.Next(100) > 50;
-                                                Vehicle veh = NAPI.Vehicle.CreateVehicle(carModel, new Vector3(car.X, car.Y, car.Z),
-                                                    car.Heading, rnd.Next(100), rnd.Next(100), "", 255, locked, false, Convert.ToUInt32(lobbyid));
-
-                                                crashcheck = 681;
-                                                veh.EngineStatus = false;
-                                                veh.SetSharedData("Engine", false);
-                                                veh.SetSharedData("Fuel", 100.0);
-                                                veh.SetSharedData("Locked", locked);
-                                                veh.Locked = locked;
-                                                veh.SetSharedData("Team", 10); // 10 = civilian / parked
-                                                veh.SetSharedData("SpeedInfo", "Average");
-                                                lobby.Vehicles.Add(veh);
-                                                veh.SetSharedData("Collisions", true);
-                                                veh.SetSharedData("Fuel", 100.0);
-
-                                            }
-                                        });
+                                            });
+                                        }
+                                        else
+                                        {
+                                            { NAPI.Util.ConsoleOutput("Cannot generate 1500 random parked vehicles -> not enough entries!"); }
+                                        }
                                     }
-                                    else
-                                    {
-                                        { NAPI.Util.ConsoleOutput("Cannot generate 1500 random parked vehicles -> not enough entries!"); }
-                                    }
-
                                 }
                             }
                             NAPI.Task.Run(() =>
@@ -3262,6 +3265,7 @@ namespace RNC
                                     player.SetData("ClimbProtectionProcs", 0);
                                     player.SetData("ClimbProtectionEnd", Environment.TickCount64);
                                     player.SetSharedData("CuffedBy", "n/a");
+                                    /*
                                     player.TriggerEvent("moveSkyCamera", "up", 1, false, 1);
                                     if (lobby.gameMode != GameModes.BANKROBBERY)
                                     {
@@ -3274,6 +3278,8 @@ namespace RNC
                                             player.TriggerEvent("moveSkyCamera", "down", 1, false, 19000);
                                         }
                                     }
+                                    */
+                                    player.TriggerEvent("startLoadingScreen", -1);
                                     player.TriggerEvent("ToggleNametags", false);
                                     player.SetSharedData("Collisions", false);
                                     player.ResetData("Seatbelt");
@@ -4162,6 +4168,7 @@ namespace RNC
 
                                                     p.TriggerEvent("ResetKillFeed");
                                                     p.TriggerEvent("ToggleNametags", true);
+                                                    p.TriggerEvent("stopLoadingScreen");
 
 
                                                     p.Dimension = Convert.ToUInt32(lobby.lobbyId);
@@ -4189,6 +4196,7 @@ namespace RNC
 
                                                     p.TriggerEvent("ResetKillFeed");
                                                     p.TriggerEvent("ToggleNametags", true);
+                                                    p.TriggerEvent("stopLoadingScreen");
 
                                                     p.TriggerEvent("pushMsgToChat", $"!{{#1E9913}}[!] ATTENTION: You are currently in the Bank Robbery event! This is not a standard chase.");
                                                     if (p == _brob.HeistLeader)
@@ -4249,6 +4257,7 @@ namespace RNC
                                                 p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
                                                 p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
                                                 EPlayer.Freeze(p, true);
+                                                p.TriggerEvent("stopLoadingScreen");
                                             }
                                             catch { }
                                         }
@@ -4266,6 +4275,7 @@ namespace RNC
                                                 p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
                                                 p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
                                                 EPlayer.Freeze(p, true);
+                                                p.TriggerEvent("stopLoadingScreen");
                                             }
                                             catch { }
                                         }

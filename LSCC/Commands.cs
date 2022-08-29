@@ -47,6 +47,11 @@ namespace RNC
                 }
                 else player.TriggerEvent("pushMsgToChat", "!{#999999}Proper usage: /serveroptions maxinlobby <amount>");
             }
+            else if(action.StartsWith("parkedvehs"))
+            {
+                Settings.SpawnParkedVehicles = !Settings.SpawnParkedVehicles;
+                EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has toggled random parked vehicles in copchase {(Settings.SpawnParkedVehicles ? "ON" : "OFF")}.");
+            }
 
             else if (action.StartsWith("derbyveh", StringComparison.OrdinalIgnoreCase))
             {

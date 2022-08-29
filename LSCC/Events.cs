@@ -5293,9 +5293,10 @@ namespace RNC
 
                     player.TriggerEvent("SetActorInvulnerable", false);
 
+                    int dmarena = player.GetSharedData<int>("InDM");
                     Task.Run(async () =>
                     {
-                        var arena = await EPlayer.IsValidDMArena(player.GetSharedData<int>("InDM"));
+                        var arena = await EPlayer.IsValidDMArena(dmarena);
 
                         if (arena.Value == false)
                         {

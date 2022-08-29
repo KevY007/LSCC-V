@@ -172,6 +172,18 @@ function increaseChatOpacity(time = 4000){
     }, time);
 }
 
+mp.events.add("startLoadingScreen", (time) => {
+    if(time == -1){
+        ServerUI.execute('gm.$refs.loadingScreen.show(true);');
+    }
+    else{
+        ServerUI.execute(`gm.$refs.loadingScreen.show(${time});`);
+    }
+});
+mp.events.add("stopLoadingScreen", () => {
+    ServerUI.execute('gm.$refs.loadingScreen.hide();');
+});
+
 function activateChat(toggle){
     if(ServerUI == null) return;
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.enabled = ${toggle.toString()}`);
@@ -924,7 +936,7 @@ mp.events.callLocal('ScoreboardToggleTyping', false);
 
 mp.events.add("HUDError", (msg, icon) => {
     if(!showHud && mp.players.local.getVariable("pLogged") == true) return;
-
+    /*
 	let insertString = `iziToast.show({
 		message: "${msg}",
 		icon: "${icon}",
@@ -932,13 +944,15 @@ mp.events.add("HUDError", (msg, icon) => {
 		timeout: 5000,
 		close: true		
 	});`;
-
+    */
+    let insertString = `toast('', '${msg}', 'error', 5000);`;
     if(ServerUI != null) ServerUI.execute(insertString);
 });
 
-mp.events.add("HUDNotify", (msg, color, icon, close, timeout, orientation, displaymode) => {
+mp.events.add("HUDNotify", (msg, type, icon, close, timeout, orientation, displaymode) => {
     if(!showHud && mp.players.local.getVariable("pLogged") == true) return;
     
+    /*
     let insertString = `iziToast.show({`;
     insertString += `message: \`${msg}\`, `;
     insertString += `color: "${color}", `;
@@ -948,20 +962,23 @@ mp.events.add("HUDNotify", (msg, color, icon, close, timeout, orientation, displ
     if(orientation.length > 1) insertString += `position: \`${orientation}\`, `;
     if(displaymode.length > 1) insertString += `displayMode: \`${displaymode}\`, `;
     insertString += "});";
-
+    */
+    let insertString = `toast('', '${msg}', '${type}', ${timeout});`;
     if(ServerUI != null) ServerUI.execute(insertString);
 });
 // bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter, center
 mp.events.add("HUDNotify2", (title, msg, orientation, displaymode) => {
     if(!showHud && mp.players.local.getVariable("pLogged") == true) return;
     
+    /*
     let insertString = `iziToast.show({`;
     insertString += `title: \`${title}\`, `;
     insertString += `message: \`${msg}\`, `;
     if(orientation.length > 1) insertString += `position: \`${orientation}\`, `;
     if(displaymode.length > 1) insertString += `displayMode: \`${displaymode}\`, `;
     insertString += "});";
-
+    */
+    let insertString = `toast('${title}', '${msg}', 'nothing', 5000);`;
     if(ServerUI != null) ServerUI.execute(insertString);
 });
 
