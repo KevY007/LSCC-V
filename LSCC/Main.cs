@@ -4168,7 +4168,6 @@ namespace RNC
 
                                                     p.TriggerEvent("ResetKillFeed");
                                                     p.TriggerEvent("ToggleNametags", true);
-                                                    p.TriggerEvent("stopLoadingScreen");
 
 
                                                     p.Dimension = Convert.ToUInt32(lobby.lobbyId);
@@ -4196,7 +4195,6 @@ namespace RNC
 
                                                     p.TriggerEvent("ResetKillFeed");
                                                     p.TriggerEvent("ToggleNametags", true);
-                                                    p.TriggerEvent("stopLoadingScreen");
 
                                                     p.TriggerEvent("pushMsgToChat", $"!{{#1E9913}}[!] ATTENTION: You are currently in the Bank Robbery event! This is not a standard chase.");
                                                     if (p == _brob.HeistLeader)
@@ -4864,6 +4862,7 @@ namespace RNC
                                                             }
                                                         }
 
+                                                        p.TriggerEvent("stopLoadingScreen");
 
                                                         EPlayer.Freeze(p, false);
                                                         p.SendNotification("~y~You can now exit vehicles.");
@@ -4904,6 +4903,7 @@ namespace RNC
                                                     {
                                                         p.TriggerEvent("pushMsgToChat", "!{#FF6347}[#] ~w~Law enforcement is on their way, protect the heist leader!");
                                                     }
+                                                    p.TriggerEvent("stopLoadingScreen");
 
                                                     p.TriggerEvent("pushMsgToChat", $"!{{#FFEC8B}}** [RADIO | FREQ: 69420] SCOUT: Alright ladies and gentlemen, I hear that the cops are on their way. Good luck!");
                                                 }
