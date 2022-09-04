@@ -1870,6 +1870,7 @@ namespace RNC
                     player.SetData("LoggedIn", true);
                     player.SetData("AccountHandle", acc);
                     player.SetSharedData("pLogged", true);
+                    player.SetSharedData("RegisterDate", acc.RegisterDate.ToString("F"));
 
                     player.SetSharedData("Admin", acc.Admin);
                     player.SetSharedData("PlayerSquadID", -1);
@@ -2589,6 +2590,8 @@ namespace RNC
             player.Name = acc.Username;
             player.SetSharedData("Admin", 0);
             player.SetSharedData("PlayerSquadID", -1);
+
+            player.SetSharedData("RegisterDate", acc.RegisterDate.ToString("F"));
 
             player.TriggerEvent("DestroyPlayerCamera");
             player.TriggerEvent("TogglePlayerChat", true);

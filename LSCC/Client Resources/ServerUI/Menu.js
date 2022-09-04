@@ -1,3 +1,5 @@
+const { Server } = require("tls");
+
 menuToggled = false;
 let lastMenuToggle = Date.now();
 
@@ -72,6 +74,8 @@ function ToggleMenu()
         mp.gui.cursor.show(menuToggled, menuToggled);
         activateChat(!menuToggled);
         
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.name = ${mp.players.local.name}`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.createdAt = ${mp.players.getVariable("RegisterDate")}`);
 
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.categories = [
             {
