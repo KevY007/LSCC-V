@@ -1,5 +1,3 @@
-const { Server } = require("tls");
-
 menuToggled = false;
 let lastMenuToggle = Date.now();
 
