@@ -2670,6 +2670,8 @@ mp.events.add("setVoiceModeMenu", (value) => {
 
 function setStorageDataVars(){
 
+    if(mp.storage.data.menu == undefined) mp.storage.data.menu = {};
+
     LastKeyPress = Date.now();
     AFKStage = 0;
 
