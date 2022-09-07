@@ -1838,11 +1838,21 @@ namespace RNC
 
             Task.Run(async () =>
             {
-                List<Account> linkedAccs = await EPlayer.GetLinkedAccounts(acc);
+                string pClanName = "";
+                string pClanCreated = "NULL";
+
+                List <Account> linkedAccs = await EPlayer.GetLinkedAccounts(acc);
                 var linkedSQLs = linkedAccs.Select(accs => accs.SQL_ID).ToList(); // BONKERS
 
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
+                    Clan pClan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == acc.ClanID);
+                    if(pClan != null)
+                    {
+                        pClanName = pClan.Name;
+                        //pClanCreated = pClan.CreationDate.ToString();
+                    }
+
                     if (linkedSQLs.Intersect(context.Bans.AsQueryable().Select(bans => bans.AccountSQLID)).Any())
                     {
                         NAPI.Task.Run(() =>
@@ -1872,6 +1882,9 @@ namespace RNC
                     player.SetSharedData("pLogged", true);
                     player.SetSharedData("RegisterDate", acc.RegisterDate.ToString("F"));
 
+                    player.SetSharedData("ClanName", pClanName);
+                    player.SetSharedData("ClanCreated", pClanCreated);
+
                     player.SetSharedData("Admin", acc.Admin);
                     player.SetSharedData("PlayerSquadID", -1);
 
@@ -1882,6 +1895,7 @@ namespace RNC
                     player.SetSharedData("CurrentXP", acc.XP);
                     player.SetSharedData("NextLevelXP", EPlayer.GetMaxLevelXP(acc.Level));
                     player.TriggerEvent("Menu_UpdateLevelXP", true);
+
                 });
                 await NAPI.Task.WaitForMainThread();
 
@@ -2007,6 +2021,7 @@ namespace RNC
                     }
                     player.TriggerEvent("showLoginBrowser", false);
                     player.TriggerEvent("OnPlayerLoginRegister");
+                    player.TriggerEvent("LoadCrosshairProfiles", acc.CrosshairProfiles, acc.ActiveCrosshairProfile);
                     Achievement.LoadAchievementsForPlayer(player);
                     Challenge.AddChallengesForPlayer(player);
                 });
@@ -2600,6 +2615,7 @@ namespace RNC
             player.TriggerEvent("BankRob_SetMusic", -1);
 
             player.TriggerEvent("OnPlayerLoginRegister");
+            player.TriggerEvent("LoadCrosshairProfiles", acc.CrosshairProfiles, acc.ActiveCrosshairProfile);
 
             player.ResetData("Language");
 
@@ -3002,6 +3018,41 @@ namespace RNC
             }
 
             return dmItems;
+        }
+
+        [RemoteEvent("Menu_RequestClansList")]
+        public void OnMenuRequestClansList(Player player)
+        {
+            if (player == null) return;
+            NAPI.Util.ConsoleOutput($"Requested clans list from {player.Name}");
+            Task.Run(async () =>
+            {
+                using(MainDatabase context = ContextFactory.CreateContext())
+                {
+                    await context.Clans.AsQueryable().ForEachAsync(clan =>
+                    {
+                        string clanName = clan.Name;
+                        string tag = "TBA"; // to add
+                        string desc = "To Be Added"; // to add
+                        string banner = "default"; // to add
+                        bool isOpen = false; // to add
+                        int maxPlayers = 20; // to add
+                        int players = context.Accounts.AsQueryable().Count(a => a.ClanID == clan.SQL_ID);
+                        int totalKills = clan.TotalKills;
+                        int totalDeaths = clan.WeekKills; // temp
+                        int COTW_Wins = clan.WeekWins;
+
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("Menu_AddClan", clanName, tag, desc, banner, isOpen, players,
+                                                                maxPlayers, totalKills, totalDeaths, COTW_Wins);
+
+                            NAPI.Util.ConsoleOutput($"Adding clan to menu: {clanName} ({players}/{maxPlayers})");
+                        });
+                        NAPI.Task.WaitForMainThread();
+                    });
+                }
+            });
         }
 
         [RemoteEvent("MenuSelectedVehicle")]
@@ -3969,7 +4020,9 @@ namespace RNC
                                     CompletedDailyChallenge = false,
                                     Namechanges = 0,
                                     ClanTier = -1,
-                                    ClanID = -1
+                                    ClanID = -1,
+                                    CrosshairProfiles = "[]",
+                                    ActiveCrosshairProfile = "{}",
                                 };
                                 AccountManager.Add(_new);
                                 OnPlayerRegister(player, _new);
@@ -3985,6 +4038,21 @@ namespace RNC
                     }
                 }
             });
+        }
+
+        [RemoteEvent("Crosshair_SetProfile")]
+        public void OnSetCrosshairProfile(Player player, string profileID)
+        {
+            NAPI.Util.ConsoleOutput($"Setan profile: {profileID}");
+            EPlayer.GetAccount(player).ActiveCrosshairProfile = profileID;
+            EPlayer.Save(player, false);
+        }
+        [RemoteEvent("Crosshair_SaveProfiles")]
+        public void OnSaveCrosshairProfiles(Player player, string profileData)
+        {
+            NAPI.Util.ConsoleOutput($"Updetan profil novi data: {profileData}");
+            EPlayer.GetAccount(player).CrosshairProfiles = profileData;
+            EPlayer.Save(player, false);
         }
 
         [RemoteEvent("char_ResetEcho")]

@@ -1314,11 +1314,11 @@ namespace RNC
                     cdList.Add(temp);
                 });
                 string jData = NAPI.Util.ToJson(cdList);
-                await context.Accounts.AsQueryable().ForEachAsync(acc =>
+                foreach(Account acc in context.Accounts)
                 {
                     try { acc.ChallengeInfo = jData; } catch { }
-                    
-                });
+                }
+         
                 int cCount = await context.DailyChallenges.AsQueryable().CountAsync();
                 Console.WriteLine("[RnC CHALLENGES] Generated new challenges, count: " + cCount);
                 NAPI.Task.Run(() =>

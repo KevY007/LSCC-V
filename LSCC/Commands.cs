@@ -8806,14 +8806,14 @@ namespace RNC
         [Command("triggerjs", GreedyArg = true)]
         public void cmd_triggerjs(Player player, string eventt)
         {
-            /*if (!EPlayer.LoggedIn(player))
+            if (!EPlayer.LoggedIn(player))
                 return;
 
             if (EPlayer.GetAccount(player).Admin < 6)
             {
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
                 return;
-            }*/
+            }
 
             player.SetData("TriggerJSReturn", player.Name);
             player.TriggerEvent("ResolveJS", eventt);
@@ -9353,7 +9353,13 @@ namespace RNC
                 EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}Clan name must be between 3 and 32 characters!");
                 return;
             }
-            if (!clanname.All(char.IsLetterOrDigit))
+            string nameCheck = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 ";
+            bool isNameGood = true;
+            for(int i = 0; i < clanname.Length; i++)
+            {
+                if (!nameCheck.Contains(clanname[i])) { isNameGood = false; break; }
+            }
+            if (!isNameGood)
             {
                 EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}Clan name must be alphanumeric (A-Z, 0-9)!");
                 return;
@@ -9364,6 +9370,7 @@ namespace RNC
              * In real scenario there will be a UI with a confirmation window or something along those lines.
              * Also a warning that a weekly/monthly clan fee will be paid.
              */
+            EPlayer.SendMessage(player, "~y~Creating clan...");
             Clan clan = new Clan()
             {
                 Name = clanname,
@@ -9376,20 +9383,25 @@ namespace RNC
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
                     await context.Clans.AddAsync(clan);
+                    await context.SaveChangesAsync();
+                    Clan thaClan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.Name == clanname);
 
                     acc.ClanTier = 0;
-                    Clan thaClan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.Name.Equals(clanname));
                     acc.ClanID = thaClan.SQL_ID;
+                    EPlayer.Save(player, false);
 
-                    await context.SaveChangesAsync();
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.SendMessage(player, $"~g~[CLAN] ~w~Congratulations! You've successfully created a clan named ~y~{clanname}~w~ for 300 Points!");
+                        EPlayer.SendMessage(player, $"~g~[CLAN] ~w~You can manage your clan through the clan panel (Menu [M] > Clan > Manage)");
+                        EPlayer.SendMessage(player, $"~g~[CLAN] ~w~If you have any questions, ask the staff team or management.");
+                        EPlayer.SendMessage(player, $"~g~[CLAN] ~r~NOTICE: ~w~If you leave your clan, it will automatically be disbanded and deleted.");
+                        EPlayer.SendMessage(player, $"~g~[CLAN] ~w~Best of luck!");
+                    });
                 }
             });
 
-            EPlayer.SendMessage(player, $"~g~[CLAN] ~w~Congratulations! You've successfully created a clan named ~y~{clanname}~w~ for 300 Points!");
-            EPlayer.SendMessage(player, $"~g~[CLAN] ~w~You can manage your clan through the clan panel (Menu [M] > Clan > Manage)");
-            EPlayer.SendMessage(player, $"~g~[CLAN] ~w~If you have any questions, ask the staff team or management.");
-            EPlayer.SendMessage(player, $"~g~[CLAN] ~r~NOTICE: ~w~If you leave your clan, it will automatically be disbanded and deleted.");
-            EPlayer.SendMessage(player, $"~g~[CLAN] ~w~Best of luck!");
+
             return;
         }
 

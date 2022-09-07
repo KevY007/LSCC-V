@@ -1,5 +1,6 @@
 require("./ServerUI/Menu.js");
 
+
 function logTextToType(type){
     switch(type){
         case "records": return 3;
@@ -17,9 +18,12 @@ function logTypeToText(type){
     }
 }
 
-
 mp.events.add("RequestLogsFromServer", (type, username) => {
-    mp.events.callRemote("ReqLogFromSrv", username, logTextToType(type));
+    ServerUI.execute('gm.$refs.mainMenu.$refs.logsTab.isLoading = true;');
+    mp.events.callRemote("ReqLogFromSrv", username, type);
+});
+mp.events.add("Menu_SetLogsTabLoading", (toggle) => {
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.isLoading = ${toggle};`);
 });
 mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
 
@@ -36,20 +40,21 @@ mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
 
     switch(type){
         case 1:{ // admin
-            ServerUI.execute(`gm.$refs.logs.rows = ["Timestamp", "Description"];`);
-            ServerUI.execute(`gm.$refs.logs.columns = ${jsonLogs}`);
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Timestamp", "Description"];`);
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.cols = ${jsonLogs}`);
             break;
         }
         case 2:{ // session
-            ServerUI.execute(`gm.$refs.logs.rows = ["Join Time", "Leave Time", "Duration", "IP", "HWID"];`);
-            ServerUI.execute(`gm.$refs.logs.columns = ${jsonLogs}`);
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Join Time", "Leave Time", "Duration", "IP", "HWID"];`);
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.cols = ${jsonLogs}`);
             break;
         }
         case 3:{ // admin records
-            ServerUI.execute(`gm.$refs.logs.rows = ["Timestamp", "Admin", "Duration", "Reason"];`);
-            ServerUI.execute(`gm.$refs.logs.columns = ${jsonLogs}`);
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Timestamp", "Admin", "Duration", "Reason"];`);
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.cols = ${jsonLogs}`);
             break;
         }
     }
+    ServerUI.execute('gm.$refs.mainMenu.$refs.logsTab.isLoading = false;');
 
 });

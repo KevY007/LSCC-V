@@ -142,6 +142,7 @@ namespace RNC
             {
                 EPlayer.Notify(player, $"You must enter a player name! (nice try)",
                     "red", "fas fa-hand-middle-finger", false, 1500, "topCenter", "replace");
+                player.TriggerEvent("Menu_SetLogsTabLoading", false);
                 return;
             }
             int pAdmin = EPlayer.GetAccount(player).Admin;
@@ -156,6 +157,7 @@ namespace RNC
                         {
                             EPlayer.Notify(player, $"There is no player with that name in the database!",
                             "red", "fas fa-exclamation-triangle", false, 1500, "topCenter", "replace");
+                            player.TriggerEvent("Menu_SetLogsTabLoading", false);
                         });
                         return;
                     }
@@ -165,6 +167,7 @@ namespace RNC
                         {
                             EPlayer.Notify(player, $"That player is a higher or equal admin level than you!",
                             "red", "fas fa-ban", false, 1500, "topCenter", "replace");
+                            player.TriggerEvent("Menu_SetLogsTabLoading", false);
                         });
                         return;
                     }

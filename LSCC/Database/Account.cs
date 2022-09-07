@@ -76,6 +76,9 @@ namespace RNC
         public int Namechanges { get; set; }
         public int ClanID { get; set; }
         public int ClanTier { get; set; }
+
+        public string ActiveCrosshairProfile { get; set; }
+        public string CrosshairProfiles { get; set; }
     }
 
     public class ChallengeData

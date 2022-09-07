@@ -101,8 +101,8 @@ mp.events.add("addChallengesToMenu", (weekChallengeProgress, weekChallengeUnix) 
             challenges: 
             [
                 {
-                    name: "Daily Challenge 7-day streak",
-                    description: "Complete at least one challenge per day for 7 days in a row.",
+                    name: "7-day Streak",
+                    description: 'Complete at least one daily challenge per day for 7 days in a row.',
                     progress: ${weekChallengeProgress},
                     goal: 7,
                     background: "package://Artwork/Achievements/reach_level_100.png"
@@ -118,7 +118,7 @@ mp.events.add("addChallengesToMenu", (weekChallengeProgress, weekChallengeUnix) 
     for(let i = 0 ; i < DailyChallenges.length; i++){
         chstr = `{
             name: "",
-            description: "${DailyChallenges[i].description}",
+            description: '${DailyChallenges[i].description}',
             progress: ${DailyChallenges[i].progress},
             goal: ${DailyChallenges[i].target},
             background: "${getchalbackgroundpic(DailyChallenges[i].type)}"
@@ -192,7 +192,7 @@ mp.events.add("addAchievementsToMenu", () => {
     for(let i = 0 ; i < Achievements.length; i++){
         achstr = `{
             "name":"${Achievements[i].name}", 
-            "description":"${Achievements[i].description}", 
+            "description":'${Achievements[i].description}', 
             "unlocked":${Achievements[i].unlocked},
             "background":"${Achievements[i].background}"
         },`;

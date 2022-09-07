@@ -41,13 +41,46 @@ mp.events.add('RestartMenu', () => {
     ServerUI = mp.browsers.new("package://ServerUI/index.html");
     ServerUI.execute(`gm.isMainMenuOpen = false;`);
 
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.logs.options = [
-        { name: "Sessions", value: "sessions" },
-        { name: "Admin", value: "admin" },
-        { name: "Records", value: "records" },
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.logTypes = [
+        { label: "Sessions", value: 2 },
+        { label: "Admin", value: 1 },
+        { label: "Admin Records", value: 3 },
       ];`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.filterType = {label: "Admin Records", value: 3};`);
 
     mp.events.callLocal("MenuToggleTyping", false);
+});
+
+mp.events.add("setSelectedProfile", (profileID) => {
+    mp.events.callRemote("Crosshair_SetProfile", profileID);
+});
+mp.events.add("saveCrosshairProfiles", (profileData) => {
+    mp.events.callRemote("Crosshair_SaveProfiles", profileData);
+});
+
+mp.events.add("LoadCrosshairProfiles", (profileData, activeProfile) => {
+    //ServerUI.execute(`gm.$refs.helpers.$refs.states.setCrosshair('profiles', ${profileData});`);
+    ServerUI.execute(`gm.$refs.helpers.$refs.states.setCrosshair('selectedProfile', '${activeProfile}');`);
+});
+
+mp.events.add("Menu_AddClan", (cname, tag, desc, banner, isOpen, players, maxPlayers, kills, deaths, wins) => {
+    
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.clansList.clans.push(
+        {
+            name: "${cname}",
+            tag: "${tag}",
+            description: "${desc}",
+            banner:
+              "${banner == "default" ? "https://www.igta5.com/images/official-artwork-blitz-play.jpg" : banner}",
+            open: ${isOpen.toString()},
+            players: ${players},
+            maxplayers: ${maxPlayers},
+            stats: {
+              kills: ${kills},
+              deaths: ${deaths},
+              wins: ${wins},
+            },
+        });`);
 });
 
 function ToggleMenu()
@@ -71,9 +104,18 @@ function ToggleMenu()
         mp.events.callRemote("OnToggleMenu", menuToggled);
         mp.gui.cursor.show(menuToggled, menuToggled);
         activateChat(!menuToggled);
+
+        ServerUI.execute('gm.$refs.mainMenu.$refs.logsTab.isLoading = false;');
+
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.clansList.clans = [];`);
+        mp.events.callRemote("Menu_RequestClansList");
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.name = "${mp.players.local.getVariable("ClanName")}"`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.createdAt = "${mp.players.local.getVariable("ClanCreated")}"`);
+
+
         
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.name = ${mp.players.local.name}`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.createdAt = ${mp.players.getVariable("RegisterDate")}`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.name = '${mp.players.local.name}'`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.createdAt = '${mp.players.local.getVariable("RegisterDate")}'`);
 
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.categories = [
             {
@@ -379,12 +421,12 @@ function ToggleMenu()
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Chat.$refs.activechatopacity.value = ${mp.storage.data.menu.ActiveChatOpacity.toString()};`);       
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Chat.$refs.inactivechatopacity.value = ${mp.storage.data.menu.InactiveChatOpacity.toString()};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Chat.$refs.showinactivechat.value = ${mp.storage.data.menu.ShowInactiveChat.toString()};`);
-
+/*
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.crosshair.settings.enabled = ${mp.storage.data.menu.CustomCrosshair}`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.crosshair.settings.alwaysOn = ${mp.storage.data.menu.AlwaysOnCrosshair}`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.crosshair.settings.onSnipers = ${mp.storage.data.menu.SniperCustomCrosshair}`);
-
+*/
         showCustomCrosshair = mp.storage.data.menu.CustomCrosshair;
         alwaysShowCustomCrosshair = mp.storage.data.menu.AlwaysOnCrosshair;
         showCustomCrosshairInSniper = mp.storage.data.menu.SniperCustomCrosshair;
