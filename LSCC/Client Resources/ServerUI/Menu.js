@@ -26,11 +26,6 @@ if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD
     mp.storage.data.menu.AutoLogin = true;
     mp.storage.data.menu.CameraSwitch = true;
 
-    mp.storage.data.menu.CrosshairData = "[]";
-    mp.storage.data.menu.CustomCrosshair = false;
-    mp.storage.data.menu.AlwaysOnCrosshair = false;
-    mp.storage.data.menu.SniperCustomCrosshair = false;
-
     mp.storage.flush();
 }
 
@@ -62,18 +57,23 @@ mp.events.add("setSelectedProfile", (profileID, settings) => {
 });
 mp.events.add("saveCrosshairProfiles", (profileData) => {
     mp.events.callRemote("Crosshair_SaveProfiles", profileData);
+
     let prData = JSON.parse(profileData);
-
-    pushMessageToChat(`Searching for profile with UUID: ${ActiveCrosshairProfileUUID}`);
-
-    let currentProfile = prData.find(({pr}) => {pr.uuid == ActiveCrosshairProfileUUID});
+    let currentProfile = undefined;
+    for(let i = 0 ; i < prData.length; i++){
+        if(prData[i].uuid == ActiveCrosshairProfileUUID){
+            currentProfile = prData[i];
+            break;
+        }
+    }
     if(currentProfile){
-        pushMessageToChat(`Found a profile! `);
+        mp.events.callRemote("ServerConsoleOutput", "CROSSHAIR Found profile!");
+        
         alwaysShowCustomCrosshair = currentProfile.settings.alwaysOn;
         showCustomCrosshairInSniper = currentProfile.settings.onSnipers;
         showCustomCrosshair = currentProfile.settings.enabled;
     }
-    else pushMessageToChat(`didnt find profile rip cringe`);
+    else mp.events.callRemote("ServerConsoleOutput", "cringe didnt find CROSSHAIR PROFILE");
 });
 
 mp.events.add("LoadCrosshairProfiles", (profileData, activeProfile) => {
@@ -439,15 +439,6 @@ function ToggleMenu()
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.activechatopacity[0].value = ${mp.storage.data.menu.ActiveChatOpacity.toString()};`);       
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.inactivechatopacity[0].value = ${mp.storage.data.menu.InactiveChatOpacity.toString()};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.showinactivechat[0].value = ${mp.storage.data.menu.ShowInactiveChat.toString()};`);
-/*
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.crosshair.settings.enabled = ${mp.storage.data.menu.CustomCrosshair}`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.crosshair.settings.alwaysOn = ${mp.storage.data.menu.AlwaysOnCrosshair}`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.crosshair.settings.onSnipers = ${mp.storage.data.menu.SniperCustomCrosshair}`);
-*/
-        showCustomCrosshair = mp.storage.data.menu.CustomCrosshair;
-        alwaysShowCustomCrosshair = mp.storage.data.menu.AlwaysOnCrosshair;
-        showCustomCrosshairInSniper = mp.storage.data.menu.SniperCustomCrosshair;
     }
 }
 
@@ -579,18 +570,6 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     else if(id == 22)
     {
         mp.storage.data.menu.CameraSwitch = value;
-    }
-    else if(id == 69420){
-        mp.storage.data.menu.CustomCrosshair = value;
-        showCustomCrosshair = value;
-    }
-    else if(id == 69421){
-        mp.storage.data.menu.AlwaysOnCrosshair = value;
-        alwaysShowCustomCrosshair = value;
-    }
-    else if(id == 69422){
-        mp.storage.data.menu.SniperCustomCrosshair = value;
-        showCustomCrosshairInSniper = value;
     }
 
     if(ServerUI != null)

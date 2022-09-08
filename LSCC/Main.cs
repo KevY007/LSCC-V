@@ -910,12 +910,30 @@ namespace RNC
             string desc = "";
             Account acc = EPlayer.GetAccount(player);
             List<ChallengeData> cdInfo = NAPI.Util.FromJson<List<ChallengeData>>(acc.ChallengeInfo);
-            if(cdInfo.Count <= 0)
+
+            Task.Run(async () =>
             {
-                Task.Run(async () =>
+                bool areChallengesUpToDate = true;
+                using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    using (MainDatabase context = ContextFactory.CreateContext())
+                    List<DailyChallenge> serverChallenges = await context.DailyChallenges.AsQueryable().ToListAsync();
+                    for (int i = 0; i < serverChallenges.Count; i++)
                     {
+                        if (cdInfo.Count == i) break; // to prevent array index out of bounds
+                        if (serverChallenges[i].Type != cdInfo[i].ChallengeType)
+                        {
+                            areChallengesUpToDate = false;
+                            break;
+                        }
+                        if (serverChallenges[i].Item != cdInfo[i].ChallengeItem)
+                        {
+                            areChallengesUpToDate = false;
+                            break;
+                        }
+                    }
+                    if (!areChallengesUpToDate)
+                    {
+                        NAPI.Util.ConsoleOutput($"Challenges are not up to date for account {acc.Username}!");
                         List<ChallengeData> cdList = new List<ChallengeData>();
                         ChallengeData temp = new ChallengeData();
                         await context.DailyChallenges.AsQueryable().ForEachAsync(dc =>
@@ -930,117 +948,145 @@ namespace RNC
                         });
                         string jData = NAPI.Util.ToJson(cdList);
                         acc.ChallengeInfo = jData;
-                        cdInfo = NAPI.Util.FromJson<List<ChallengeData>>(jData);
-                        await context.SaveChangesAsync();
+                        NAPI.Util.ConsoleOutput($"Set up new challenges for {acc.Username} and saving their account now!");
+                        EPlayer.Save(player, false);
                     }
-                });
 
-            }
-
-            player.TriggerEvent("clearDailyChallenges");
-
-            Task.Run(async () =>
-            {
-                using (MainDatabase context = ContextFactory.CreateContext())
-                {
-                    await context.DailyChallenges.AsQueryable().ForEachAsync(c =>
-                    {
-                        switch ((ChallengeType)c.Type)
-                        {
-                            case ChallengeType.AnyKill:
-                                {
-                                    string reasonDisp = "";
-                                    if (c.Item.Split("_", 2).Length > 0)
-                                        reasonDisp = c.Item.Split("_", 2)[1];
-                                    else reasonDisp = c.Item;
-
-                                    if (reasonDisp == "RIFLE")
-                                        reasonDisp = "(ASSAULT) RIFLE";
-
-                                    desc = $"Kill {c.Target} players with a weapon from the {reasonDisp} category in any mode.";
-                                }
-                                break;
-                            case ChallengeType.CopchaseKill:
-                                {
-                                    string reasonDisp = "";
-                                    if (c.Item.Split("_", 2).Length > 0)
-                                        reasonDisp = c.Item.Split("_", 2)[1];
-                                    else reasonDisp = c.Item;
-
-                                    if (reasonDisp == "RIFLE")
-                                        reasonDisp = "(ASSAULT) RIFLE";
-
-                                    desc = $"Kill {c.Target} players with a weapon from the {reasonDisp} category in copchase.";
-                                }
-                                break;
-                            case ChallengeType.CopchaseRounds:
-                                {
-                                    desc = $"Play {c.Target} rounds of copchase.";
-                                }
-                                break;
-                            case ChallengeType.CopchaseVehicle:
-                                {
-                                    CarData cdt = Settings.Cars.FirstOrDefault(t => t.Model == c.Item);
-                                    string veh = "";
-                                    if (cdt == null) { veh = c.Item; }
-                                    else veh = cdt.Name;
-
-                                    desc = $"Play {c.Target} copchase rounds with >> {c.Item} << set as your vehicle.";
-                                }
-                                break;
-                            case ChallengeType.Win:
-                                {
-                                    if (c.Item == "derby")
-                                        desc = $"Win {c.Target} rounds of the derby side mode.";
-                                    else
-                                    {
-                                        desc = $"Win {c.Target} copchase rounds as a {c.Item}.";
-                                    }
-                                }
-                                break;
-                            case ChallengeType.Arrest:
-                                {
-                                    desc = $"Arrest {c.Target} fugitives.";
-                                }
-                                break;
-                        }
-
-                        ChallengeData cd = cdInfo.FirstOrDefault(t => (t.ChallengeItem == c.Item && t.ChallengeType == c.Type));
-                        bool completed = false;
-                        if (cd != null)
-                        {
-                            completed = cd.Completed;
-                            TimeSpan sp = new TimeSpan(DateTime.Now.Ticks);
-                            double secs = Math.Ceiling(c.ExpireTimestamp - sp.TotalSeconds);
-                            // (id, desc, rXP, rPts, expireDate, completed, target, progress, type, item)
-                            NAPI.Task.Run(() =>
-                            {
-                                player.TriggerEvent("addDailyChallenge", c.SQL_ID, desc, c.RewardXP, c.RewardPoints, secs, completed, c.Target, cd.ChallengeProgress, c.Type, c.Item);
-                            });
-                        }
-                        else
-                        {
-                            TimeSpan sp = new TimeSpan(DateTime.Now.Ticks);
-                            double secs = Math.Ceiling(c.ExpireTimestamp - sp.TotalSeconds);
-                            NAPI.Task.Run(() =>
-                            {
-                                player.TriggerEvent("addDailyChallenge", c.SQL_ID, desc, c.RewardXP, c.RewardPoints, secs, completed, c.Target, 0, c.Type, c.Item);
-                            });
-                        }
-                    });
                     NAPI.Task.Run(() =>
                     {
-                        player.TriggerEvent("addChallengesToMenu", acc.ChallengeStreak, (Settings.Dynamics.NextWeekUnix - new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds()));
+                        if (cdInfo.Count <= 0)
+                        {
+                            Task.Run(async () =>
+                            {
+                                using (MainDatabase context = ContextFactory.CreateContext())
+                                {
+                                    List<ChallengeData> cdList = new List<ChallengeData>();
+                                    ChallengeData temp = new ChallengeData();
+                                    await context.DailyChallenges.AsQueryable().ForEachAsync(dc =>
+                                    {
+                                        temp = new ChallengeData();
+                                        temp.ChallengeItem = dc.Item;
+                                        temp.ChallengeType = dc.Type;
+                                        temp.ChallengeProgress = 0;
+                                        temp.Completed = false;
+
+                                        cdList.Add(temp);
+                                    });
+                                    string jData = NAPI.Util.ToJson(cdList);
+                                    acc.ChallengeInfo = jData;
+                                    cdInfo = NAPI.Util.FromJson<List<ChallengeData>>(jData);
+                                    await context.SaveChangesAsync();
+                                }
+                            });
+
+                        }
+
+                        player.TriggerEvent("clearDailyChallenges");
+
+                        Task.Run(async () =>
+                        {
+                            using (MainDatabase context = ContextFactory.CreateContext())
+                            {
+                                await context.DailyChallenges.AsQueryable().ForEachAsync(async c =>
+                                {
+                                    NAPI.Task.Run(() =>
+                                    {
+                                        switch ((ChallengeType)c.Type)
+                                        {
+                                            case ChallengeType.AnyKill:
+                                                {
+                                                    string reasonDisp = "";
+                                                    if (c.Item.Split("_", 2).Length > 0)
+                                                        reasonDisp = c.Item.Split("_", 2)[1];
+                                                    else reasonDisp = c.Item;
+
+                                                    if (reasonDisp == "RIFLE")
+                                                        reasonDisp = "(ASSAULT) RIFLE";
+
+                                                    desc = $"Kill {c.Target} players with a weapon from the {reasonDisp} category in any mode.";
+                                                }
+                                                break;
+                                            case ChallengeType.CopchaseKill:
+                                                {
+                                                    string reasonDisp = "";
+                                                    if (c.Item.Split("_", 2).Length > 0)
+                                                        reasonDisp = c.Item.Split("_", 2)[1];
+                                                    else reasonDisp = c.Item;
+
+                                                    if (reasonDisp == "RIFLE")
+                                                        reasonDisp = "(ASSAULT) RIFLE";
+
+                                                    desc = $"Kill {c.Target} players with a weapon from the {reasonDisp} category in copchase.";
+                                                }
+                                                break;
+                                            case ChallengeType.CopchaseRounds:
+                                                {
+                                                    desc = $"Play {c.Target} rounds of copchase.";
+                                                }
+                                                break;
+                                            case ChallengeType.CopchaseVehicle:
+                                                {
+                                                    CarData cdt = Settings.Cars.FirstOrDefault(t => t.Model == c.Item);
+                                                    string veh = "";
+                                                    if (cdt == null) { veh = c.Item; }
+                                                    else veh = cdt.Name;
+
+                                                    desc = $"Play {c.Target} copchase rounds with >> {c.Item} << set as your vehicle.";
+                                                }
+                                                break;
+                                            case ChallengeType.Win:
+                                                {
+                                                    if (c.Item == "derby")
+                                                        desc = $"Win {c.Target} rounds of the derby side mode.";
+                                                    else
+                                                    {
+                                                        desc = $"Win {c.Target} copchase rounds as a {c.Item}.";
+                                                    }
+                                                }
+                                                break;
+                                            case ChallengeType.Arrest:
+                                                {
+                                                    desc = $"Arrest {c.Target} fugitives.";
+                                                }
+                                                break;
+                                        }
+
+                                        ChallengeData cd = cdInfo.FirstOrDefault(t => (t.ChallengeItem == c.Item && t.ChallengeType == c.Type));
+                                        bool completed = false;
+                                        if (cd != null)
+                                        {
+                                            completed = cd.Completed;
+                                            TimeSpan sp = new TimeSpan(DateTime.Now.Ticks);
+                                            double secs = Math.Ceiling(c.ExpireTimestamp - sp.TotalSeconds);
+                                            // (id, desc, rXP, rPts, expireDate, completed, target, progress, type, item)
+
+                                            player.TriggerEvent("addDailyChallenge", c.SQL_ID, desc, c.RewardXP, c.RewardPoints, secs, completed, c.Target, cd.ChallengeProgress, c.Type, c.Item);
+
+                                        }
+                                        else
+                                        {
+                                            TimeSpan sp = new TimeSpan(DateTime.Now.Ticks);
+                                            double secs = Math.Ceiling(c.ExpireTimestamp - sp.TotalSeconds);
+
+                                            player.TriggerEvent("addDailyChallenge", c.SQL_ID, desc, c.RewardXP, c.RewardPoints, secs, completed, c.Target, 0, c.Type, c.Item);
+
+                                        }
+                                    });
+                                });
+                                NAPI.Task.Run(() =>
+                                {
+                                    player.TriggerEvent("addChallengesToMenu", acc.ChallengeStreak, (Settings.Dynamics.NextWeekUnix - new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds()));
+                                });
+                            }
+                        });
                     });
                 }
             });
-            
         }
         public static void AddChallengesForPlayer(Player player, List<ChallengeData> cdList)
         {
             try
             {
-
 
                 string desc = "";
                 Account acc = EPlayer.GetAccount(player);
@@ -1051,7 +1097,7 @@ namespace RNC
                 string jData = NAPI.Util.ToJson(cdList);
                 acc.ChallengeInfo = jData;
                 cdInfo = NAPI.Util.FromJson<List<ChallengeData>>(jData);
-                ContextFactory.SaveDB();
+                EPlayer.Save(player, false);
 
                 Task.Run(async () =>
                 {
@@ -1059,88 +1105,90 @@ namespace RNC
                     {
                         await context.DailyChallenges.AsQueryable().ForEachAsync(c =>
                         {
-                            switch ((ChallengeType)c.Type)
-                            {
-                                case ChallengeType.AnyKill:
-                                    {
-                                        string reasonDisp = "";
-                                        if (c.Item.Split("_", 2).Length > 0)
-                                            reasonDisp = c.Item.Split("_", 2)[1];
-                                        else reasonDisp = c.Item;
-
-                                        if (reasonDisp == "RIFLE")
-                                            reasonDisp = "(ASSAULT) RIFLE";
-
-                                        desc = $"Kill {c.Target} players with a weapon from the {reasonDisp} category in any mode.";
-                                    }
-                                    break;
-                                case ChallengeType.CopchaseKill:
-                                    {
-                                        string reasonDisp = "";
-                                        if (c.Item.Split("_", 2).Length > 0)
-                                            reasonDisp = c.Item.Split("_", 2)[1];
-                                        else reasonDisp = c.Item;
-
-                                        if (reasonDisp == "RIFLE")
-                                            reasonDisp = "(ASSAULT) RIFLE";
-
-                                        desc = $"Kill {c.Target} players with a weapon from the {reasonDisp} category in copchase.";
-                                    }
-                                    break;
-                                case ChallengeType.CopchaseRounds:
-                                    {
-                                        desc = $"Play {c.Target} rounds of copchase.";
-                                    }
-                                    break;
-                                case ChallengeType.CopchaseVehicle:
-                                    {
-                                        CarData cdt = Settings.Cars.FirstOrDefault(t => t.Model == c.Item);
-                                        string veh = "";
-                                        if (cdt == null) { veh = c.Item; }
-                                        else veh = cdt.Name;
-
-                                        desc = $"Play {c.Target} copchase rounds with >> {c.Item} << set as your vehicle.";
-                                    }
-                                    break;
-                                case ChallengeType.Win:
-                                    {
-                                        if (c.Item == "derby")
-                                            desc = $"Win {c.Target} rounds of the derby side mode.";
-                                        else
-                                        {
-                                            desc = $"Win {c.Target} copchase rounds as a {c.Item}.";
-                                        }
-                                    }
-                                    break;
-                                case ChallengeType.Arrest:
-                                    {
-                                        desc = $"Arrest {c.Target} fugitives.";
-                                    }
-                                    break;
-                            }
-
-                            ChallengeData cd = cdInfo.FirstOrDefault(t => (t.ChallengeItem == c.Item && t.ChallengeType == c.Type));
-                            bool completed = false;
-                            if (cd != null)
-                            {
-                                completed = cd.Completed;
-                                TimeSpan sp = new TimeSpan(DateTime.Now.Ticks);
-                                double secs = Math.Ceiling(c.ExpireTimestamp - sp.TotalSeconds);
-                            // (id, desc, rXP, rPts, expireDate, completed, target, progress, type, item)
                             NAPI.Task.Run(() =>
-                                {
-                                    player.TriggerEvent("addDailyChallenge", c.SQL_ID, desc, c.RewardXP, c.RewardPoints, secs, completed, c.Target, cd.ChallengeProgress, c.Type, c.Item);
-                                });
-                            }
-                            else
                             {
-                                TimeSpan sp = new TimeSpan(DateTime.Now.Ticks);
-                                double secs = Math.Ceiling(c.ExpireTimestamp - sp.TotalSeconds);
-                                NAPI.Task.Run(() =>
+                                switch ((ChallengeType)c.Type)
                                 {
+                                    case ChallengeType.AnyKill:
+                                        {
+                                            string reasonDisp = "";
+                                            if (c.Item.Split("_", 2).Length > 0)
+                                                reasonDisp = c.Item.Split("_", 2)[1];
+                                            else reasonDisp = c.Item;
+
+                                            if (reasonDisp == "RIFLE")
+                                                reasonDisp = "(ASSAULT) RIFLE";
+
+                                            desc = $"Kill {c.Target} players with a weapon from the {reasonDisp} category in any mode.";
+                                        }
+                                        break;
+                                    case ChallengeType.CopchaseKill:
+                                        {
+                                            string reasonDisp = "";
+                                            if (c.Item.Split("_", 2).Length > 0)
+                                                reasonDisp = c.Item.Split("_", 2)[1];
+                                            else reasonDisp = c.Item;
+
+                                            if (reasonDisp == "RIFLE")
+                                                reasonDisp = "(ASSAULT) RIFLE";
+
+                                            desc = $"Kill {c.Target} players with a weapon from the {reasonDisp} category in copchase.";
+                                        }
+                                        break;
+                                    case ChallengeType.CopchaseRounds:
+                                        {
+                                            desc = $"Play {c.Target} rounds of copchase.";
+                                        }
+                                        break;
+                                    case ChallengeType.CopchaseVehicle:
+                                        {
+                                            CarData cdt = Settings.Cars.FirstOrDefault(t => t.Model == c.Item);
+                                            string veh = "";
+                                            if (cdt == null) { veh = c.Item; }
+                                            else veh = cdt.Name;
+
+                                            desc = $"Play {c.Target} copchase rounds with >> {c.Item} << set as your vehicle.";
+                                        }
+                                        break;
+                                    case ChallengeType.Win:
+                                        {
+                                            if (c.Item == "derby")
+                                                desc = $"Win {c.Target} rounds of the derby side mode.";
+                                            else
+                                            {
+                                                desc = $"Win {c.Target} copchase rounds as a {c.Item}.";
+                                            }
+                                        }
+                                        break;
+                                    case ChallengeType.Arrest:
+                                        {
+                                            desc = $"Arrest {c.Target} fugitives.";
+                                        }
+                                        break;
+                                }
+
+                                ChallengeData cd = cdInfo.FirstOrDefault(t => (t.ChallengeItem == c.Item && t.ChallengeType == c.Type));
+                                bool completed = false;
+                                if (cd != null)
+                                {
+                                    completed = cd.Completed;
+                                    TimeSpan sp = new TimeSpan(DateTime.Now.Ticks);
+                                    double secs = Math.Ceiling(c.ExpireTimestamp - sp.TotalSeconds);
+                                    // (id, desc, rXP, rPts, expireDate, completed, target, progress, type, item)
+
+                                    player.TriggerEvent("addDailyChallenge", c.SQL_ID, desc, c.RewardXP, c.RewardPoints, secs, completed, c.Target, cd.ChallengeProgress, c.Type, c.Item);
+
+                                }
+                                else
+                                {
+                                    TimeSpan sp = new TimeSpan(DateTime.Now.Ticks);
+                                    double secs = Math.Ceiling(c.ExpireTimestamp - sp.TotalSeconds);
+
                                     player.TriggerEvent("addDailyChallenge", c.SQL_ID, desc, c.RewardXP, c.RewardPoints, secs, completed, c.Target, 0, c.Type, c.Item);
-                                });
-                            }
+
+                                }
+                            });
+                            
                         });
                         NAPI.Task.Run(() =>
                         {
@@ -1149,7 +1197,7 @@ namespace RNC
                     }
                 });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine($"[RnC Challenges] Error when adding channelges for player: {ex.ToString()}");
             }
@@ -1190,7 +1238,7 @@ namespace RNC
                         {
                             NAPI.Util.ConsoleOutput("(RnC | CHALLENGE) Reached maximum loop value in SetNewDailyChallenges! Breaking it... (500)");
                         });
-                         break;
+                        break;
                     }
 
                     generatedType = randomizer.Next(0, 6);
@@ -1301,6 +1349,7 @@ namespace RNC
                 }
 
                 await context.SaveChangesAsync();
+
                 List<ChallengeData> cdList = new List<ChallengeData>();
                 ChallengeData temp = new ChallengeData();
                 await context.DailyChallenges.AsQueryable().ForEachAsync(dc =>
@@ -1313,12 +1362,14 @@ namespace RNC
 
                     cdList.Add(temp);
                 });
+                /*
                 string jData = NAPI.Util.ToJson(cdList);
                 foreach(Account acc in context.Accounts)
                 {
                     try { acc.ChallengeInfo = jData; } catch { }
                 }
-         
+                */
+
                 int cCount = await context.DailyChallenges.AsQueryable().CountAsync();
                 Console.WriteLine("[RnC CHALLENGES] Generated new challenges, count: " + cCount);
                 NAPI.Task.Run(() =>
@@ -1331,7 +1382,7 @@ namespace RNC
                         }
                     }
                 });
-                await context.SaveChangesAsync();
+                //await context.SaveChangesAsync();
             }
         }
     }
