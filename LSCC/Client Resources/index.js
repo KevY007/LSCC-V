@@ -240,6 +240,9 @@ mp.events.add('showLoginBrowser', (state) => {
         if(ServerUI != null)
         {
             if(!ServerUI.active) ServerUI.active = true;
+            ServerUI.execute(`gm.$refs.hud.enabled = false;`);
+            ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
+            ServerUI.execute(`gm.isMainMenuOpen = false;`);
             if(state){
                 ServerUI.execute(`gm.$refs.auth.startLoading(5);`); // initiate the fake loading screen to allow CEF sounds and shit duhh
                 toggleLoginScene(true);
@@ -252,6 +255,7 @@ mp.events.add('showLoginBrowser', (state) => {
 
                     ServerUI.execute(`gm.$refs.auth.authPanel = false;`);
                     toggleLoginScene(false);
+                    ServerUI.execute(`gm.$refs.hud.enabled = true;`);
                 }, 1000);
             }
             mp.gui.cursor.show(state, state);

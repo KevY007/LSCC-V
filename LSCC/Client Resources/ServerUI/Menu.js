@@ -1,4 +1,7 @@
 menuToggled = false;
+
+var ActiveCrosshairProfileUUID = "";
+
 let lastMenuToggle = Date.now();
 
 if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD == "undefined")
@@ -51,16 +54,33 @@ mp.events.add('RestartMenu', () => {
     mp.events.callLocal("MenuToggleTyping", false);
 });
 
-mp.events.add("setSelectedProfile", (profileID) => {
+mp.events.add("setSelectedProfile", (profileID, settings) => {
+    //settings.enable , settings.alwaysOn , settings.onSnipers
+    ActiveCrosshairProfileUUID = profileID;
+
     mp.events.callRemote("Crosshair_SetProfile", profileID);
 });
 mp.events.add("saveCrosshairProfiles", (profileData) => {
     mp.events.callRemote("Crosshair_SaveProfiles", profileData);
+    let prData = JSON.parse(profileData);
+
+    pushMessageToChat(`Searching for profile with UUID: ${ActiveCrosshairProfileUUID}`);
+
+    let currentProfile = prData.find(({pr}) => {pr.uuid == ActiveCrosshairProfileUUID});
+    if(currentProfile){
+        pushMessageToChat(`Found a profile! `);
+        alwaysShowCustomCrosshair = currentProfile.settings.alwaysOn;
+        showCustomCrosshairInSniper = currentProfile.settings.onSnipers;
+        showCustomCrosshair = currentProfile.settings.enabled;
+    }
+    else pushMessageToChat(`didnt find profile rip cringe`);
 });
 
 mp.events.add("LoadCrosshairProfiles", (profileData, activeProfile) => {
     ServerUI.execute(`gm.$refs.helpers.$refs.states.setCrosshair('profiles', ${profileData});`);
     ServerUI.execute(`gm.$refs.helpers.$refs.states.setCrosshair('selectedProfile', '${activeProfile}');`);
+
+    ActiveCrosshairProfileUUID = activeProfile;
 });
 
 mp.events.add("Menu_AddClan", (cname, tag, desc, banner, isOpen, players, maxPlayers, kills, deaths, wins) => {

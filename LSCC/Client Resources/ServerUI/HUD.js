@@ -339,7 +339,7 @@ mp.events.add('AddTooltip', (key, action, team) => {
 
     createdTooltips.push(key);
 
-    ServerUI.execute(`gm.$refs.TopRight.$refs.Tooltips.tips.push({
+    ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.push({
         key: "${key}",
         action: "${action}",
         color: "${color}"
@@ -349,8 +349,8 @@ mp.events.add('RemoveTooltip', (key) => {
     if(ServerUI == null) return;
     if(createdTooltips.indexOf(key) == -1) return;
 
-    ServerUI.execute(`if(gm.$refs.TopRight.$refs.Tooltips.tips.indexOf(gm.$refs.TopRight.$refs.Tooltips.tips.filter(function(el){return el.key == "${key}"})[0]) != -1){
-        gm.$refs.TopRight.$refs.Tooltips.tips.splice(gm.$refs.TopRight.$refs.Tooltips.tips.indexOf(gm.$refs.TopRight.$refs.Tooltips.tips.filter(function(el){return el.key == "${key}"})[0]), 1);        
+    ServerUI.execute(`if(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.indexOf(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.filter(function(el){return el.key == "${key}"})[0]) != -1){
+        gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.splice(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.indexOf(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.filter(function(el){return el.key == "${key}"})[0]), 1);        
     }`);
     createdTooltips.splice(createdTooltips.indexOf(key), 1);
 });
@@ -369,8 +369,8 @@ mp.events.add('ToggleTooltips', (status) =>
     else {
 
         createdTooltips.forEach(key => {
-            ServerUI.execute(`if(gm.$refs.TopRight.$refs.Tooltips.tips.indexOf(gm.$refs.TopRight.$refs.Tooltips.tips.filter(function(el){return el.key == "${key}"})[0]) != -1){
-                gm.$refs.TopRight.$refs.Tooltips.tips.splice(gm.$refs.TopRight.$refs.Tooltips.tips.indexOf(gm.$refs.TopRight.$refs.Tooltips.tips.filter(function(el){return el.key == "${key}"})[0]), 1);        
+            ServerUI.execute(`if(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.indexOf(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.filter(function(el){return el.key == "${key}"})[0]) != -1){
+                gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.splice(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.indexOf(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.filter(function(el){return el.key == "${key}"})[0]), 1);        
             }`);
         });
 
@@ -485,7 +485,7 @@ mp.events.add('browserDomReady', (browser) => {
     if(ServerUI != null && browser == ServerUI)
     {
         // Set vars that aren't reset on login and shit. Basically init().
-        ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.enabled = ${mp.storage.data.menu.topRightInfo}; gm.killFeed = ${mp.storage.data.menu.killFeed};`);
+        ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.enabled = ${mp.storage.data.menu.topRightInfo}; gm.$refs.hud.$refs.topRight.$refs.killFeed.enabled = ${mp.storage.data.menu.killFeed};`);
         ServerUI.execute(`gm.$refs.hud.$refs.miniHud.enabled = true;`);
         ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items = [];`);
 
@@ -604,17 +604,17 @@ mp.keys.bind(0x74, false, () => {
 mp.events.add('ResetKillFeed', () => {
     if(ServerUI != null)
     {
-        ServerUI.execute(`gm.killFeed = false;`);
-        ServerUI.execute(`gm.killFeed = ${mp.storage.data.menu.killFeed};`);
+        ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.killFeed.enabled = false;`);
+        ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.killFeed.enabled = ${mp.storage.data.menu.killFeed};`);
     }
 });
 
 mp.events.add("pushToKillFeed", (killer, killerColor, weapon, victim, victimColor) => {
-    if(ServerUI != null) ServerUI.execute(`gm.$refs.TopRight.$refs.KillFeed.add('${killer}', '${killerColor}', '${weapon}', '${victim}', '${victimColor}');`)
+    if(ServerUI != null) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.killFeed.add('${killer}', '${killerColor}', '${weapon}', '${victim}', '${victimColor}');`)
 });
 
 mp.events.add("pushToKillFeed2", (victim, color, cause) => {
-    if(ServerUI != null) ServerUI.execute(`gm.$refs.TopRight.$refs.KillFeed.add("${victim}", "${color}", "${cause}");`)
+    if(ServerUI != null) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.killFeed.add("${victim}", "${color}", "${cause}");`)
 });
 
 mp.events.add("UpdateRateEvent", () => {
@@ -1031,23 +1031,23 @@ mp.events.add("render", () => {
                     if(!menuToggled)                     
                     {
                         customCrosshairOn = true;
-                        ServerUI.execute(`gm.crosshair.enabled = true;`);
+                        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);
                     }
                 }
                 else{
                     if(isHoldingSniper()){
                         if(showCustomCrosshairInSniper){
                             customCrosshairOn = true;
-                            ServerUI.execute(`gm.crosshair.enabled = true;`);                            
+                            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);                            
                         }
                         else{
                             customCrosshairOn = false;
-                            ServerUI.execute(`gm.crosshair.enabled = false;`);                               
+                            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);                               
                         }
                     }
                     else{
                         customCrosshairOn = true;
-                        ServerUI.execute(`gm.crosshair.enabled = true;`);
+                        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);
                     }
                 }
             }
@@ -1056,11 +1056,11 @@ mp.events.add("render", () => {
                     if(isHoldingSniper()){
                         if(showCustomCrosshairInSniper){
                             customCrosshairOn = true;
-                            ServerUI.execute(`gm.crosshair.enabled = true;`);                            
+                            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);                            
                         }
                         else{
                             customCrosshairOn = false;
-                            ServerUI.execute(`gm.crosshair.enabled = false;`);                               
+                            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);                               
                         }
                     }
                 }               
@@ -1071,22 +1071,22 @@ mp.events.add("render", () => {
                 if(!customCrosshairOn){
                     if(!mp.game.player.isFreeAiming()){                              
                         customCrosshairOn = true;
-                        ServerUI.execute(`gm.crosshair.enabled = true;`);
+                        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);
                     }
                     else{
                         if(isHoldingSniper()){
                             if(showCustomCrosshairInSniper){
                                 customCrosshairOn = true;
-                                ServerUI.execute(`gm.crosshair.enabled = true;`);                            
+                                ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);                            
                             }
                             else{
                                 customCrosshairOn = false;
-                                ServerUI.execute(`gm.crosshair.enabled = false;`);                                   
+                                ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);                                   
                             }
                         }
                         else{
                             customCrosshairOn = true;
-                            ServerUI.execute(`gm.crosshair.enabled = true;`);
+                            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);
                         }
                     }
                 }
@@ -1094,7 +1094,7 @@ mp.events.add("render", () => {
             else{
                 if(customCrosshairOn){
                     customCrosshairOn = false;
-                    ServerUI.execute(`gm.crosshair.enabled = false;`);
+                    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);
                 }
             }   
         }
@@ -1135,19 +1135,19 @@ mp.events.add("render", () => {
             {
                 if(!speedo)
                 {
-                    ServerUI.execute(`gm.speedo = true;`);
+                    ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = true;`);
                     speedo = true;
                 }
 
                 if(speedoMax != ((mp.game.vehicle.getVehicleModelMaxSpeed(specTarget.vehicle.model) * 3.6) + 25).toFixed(0))
                 {
                     speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(specTarget.vehicle.model) * 3.6) + 25).toFixed(0);
-                    ServerUI.execute(`gm.$refs.BottomRight.$refs.Speedometer.maxspeed = ${speedoMax};`);
+                    ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.maxspeed = ${speedoMax};`);
                 }
                 if(speedoCur != (specTarget.vehicle.getSpeed() * 3.6).toFixed(0))
                 {
                     speedoCur = (specTarget.vehicle.getSpeed() * 3.6).toFixed(0);
-                    ServerUI.execute(`gm.$refs.BottomRight.$refs.Speedometer.speed = ${speedoCur};`);
+                    ServerUI.execute(`gm.$refs.BottomRight.$refs.speedo.speed = ${speedoCur};`);
                 }
             }
             else if(speedo)
@@ -1155,7 +1155,7 @@ mp.events.add("render", () => {
                 speedo = false;
                 speedoMax = 0;
                 speedoCur = 0;
-                ServerUI.execute(`gm.speedo = false;`);
+                ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = false;`);
             }
         }
         else {
@@ -1163,19 +1163,19 @@ mp.events.add("render", () => {
             {
                 if(!speedo)
                 {
-                    ServerUI.execute(`gm.speedo = true;`);
+                    ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = true;`);
                     speedo = true;
                 }
 
                 if(speedoMax != ((mp.game.vehicle.getVehicleModelMaxSpeed(mp.players.local.vehicle.model) * 3.6) + 25).toFixed(0))
                 {
                     speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(mp.players.local.vehicle.model) * 3.6) + 25).toFixed(0);
-                    ServerUI.execute(`gm.$refs.BottomRight.$refs.Speedo.maxspeed = ${speedoMax};`);
+                    ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.maxspeed = ${speedoMax};`);
                 }
                 if(speedoCur != (mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0))
                 {
                     speedoCur = (mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0);
-                    ServerUI.execute(`gm.$refs.BottomRight.$refs.Speedo.speed = ${speedoCur};`);
+                    ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.speed = ${speedoCur};`);
                 }
             }
             else if(speedo)
@@ -1183,7 +1183,7 @@ mp.events.add("render", () => {
                 speedo = false;
                 speedoMax = 0;
                 speedoCur = 0;
-                ServerUI.execute(`gm.speedo = false;`);
+                ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = false;`);
             }
         }
     }

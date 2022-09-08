@@ -4043,14 +4043,12 @@ namespace RNC
         [RemoteEvent("Crosshair_SetProfile")]
         public void OnSetCrosshairProfile(Player player, string profileID)
         {
-            NAPI.Util.ConsoleOutput($"Setan profile: {profileID}");
             EPlayer.GetAccount(player).ActiveCrosshairProfile = profileID;
             EPlayer.Save(player, false);
         }
         [RemoteEvent("Crosshair_SaveProfiles")]
         public void OnSaveCrosshairProfiles(Player player, string profileData)
         {
-            NAPI.Util.ConsoleOutput($"Updetan profil novi data: {profileData}");
             EPlayer.GetAccount(player).CrosshairProfiles = profileData;
             EPlayer.Save(player, false);
         }
