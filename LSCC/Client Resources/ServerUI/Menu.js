@@ -59,7 +59,7 @@ mp.events.add("saveCrosshairProfiles", (profileData) => {
 });
 
 mp.events.add("LoadCrosshairProfiles", (profileData, activeProfile) => {
-    //ServerUI.execute(`gm.$refs.helpers.$refs.states.setCrosshair('profiles', ${profileData});`);
+    ServerUI.execute(`gm.$refs.helpers.$refs.states.setCrosshair('profiles', ${profileData});`);
     ServerUI.execute(`gm.$refs.helpers.$refs.states.setCrosshair('selectedProfile', '${activeProfile}');`);
 });
 
@@ -107,15 +107,15 @@ function ToggleMenu()
 
         ServerUI.execute('gm.$refs.mainMenu.$refs.logsTab.isLoading = false;');
 
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.clansList.clans = [];`);
-        mp.events.callRemote("Menu_RequestClansList");
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.name = "${mp.players.local.getVariable("ClanName")}"`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.createdAt = "${mp.players.local.getVariable("ClanCreated")}"`);
-
-
+        if(menuToggled){
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.clansList.clans = [];`);
+            mp.events.callRemote("Menu_RequestClansList");
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.name = "${mp.players.local.getVariable("ClanName")}"`);
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.createdAt = "${mp.players.local.getVariable("ClanCreated")}"`);
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.name = '${mp.players.local.name}'`);
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.createdAt = '${mp.players.local.getVariable("RegisterDate")}'`);
+        }
         
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.name = '${mp.players.local.name}'`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.createdAt = '${mp.players.local.getVariable("RegisterDate")}'`);
 
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.categories = [
             {
@@ -126,35 +126,34 @@ function ToggleMenu()
                         type: 4,
                         name: "myweather",
                         label: "Weather",
-                        default: "Dynamic",
                         description: "Changes the weather displayed only on your screen.",
                         options: [
                           {
-                              name: "Dynamic",
+                              label: "Dynamic",
                               value: "-1",
                           },
                           {
-                            name: "Sunny",
+                            label: "Sunny",
                             value: "0",
                           },
                           {
-                            name: "Cloudy",
+                            label: "Cloudy",
                             value: "2",
                           },
                           {
-                            name: "Foggy",
+                            label: "Foggy",
                             value: "4",
                           },
                           {
-                              name: "Rain",
+                            label: "Rain",
                               value: "6",
                           },
                           {
-                              name: "Thunderstorm",
+                            label: "Thunderstorm",
                               value: "7",
                           },
                           {
-                              name: "Snowfall",
+                            label: "Snowfall",
                               value: "9",
                           },
                         ]
@@ -316,19 +315,19 @@ function ToggleMenu()
                         default: "Nearby",
                         options: [
                           {
-                            name: "Nearby",
+                            label: "Nearby",
                             value: "0",
                           },
                           {
-                            name: "Team",
+                            label: "Team",
                             value: "1",
                           },
                           {
-                            name: "Squad",
+                            label: "Squad",
                             value: "2",
                           },
                           {
-                            name: "Disabled",
+                            label: "Disabled",
                             value: "3",
                           },
                         ]
@@ -342,19 +341,19 @@ function ToggleMenu()
                         default: "${(mp.storage.data.menu.ActiveChatOpacity == undefined ? "100" : (mp.storage.data.menu.ActiveChatOpacity*100).toString())}",
                         options: [
                           {
-                            name: "100",
+                            label: "100",
                             value: "1",
                           },
                           {
-                            name: "75",
+                            label: "75",
                             value: "0.75",
                           },
                           {
-                            name: "50",
+                            label: "50",
                             value: "0.5",
                           },
                           {
-                            name: "25",
+                            label: "25",
                             value: "0.25",
                           },
                         ]
@@ -368,19 +367,19 @@ function ToggleMenu()
                         default: "${(mp.storage.data.menu.InactiveChatOpacity == undefined ? "50" : (mp.storage.data.menu.InactiveChatOpacity*100).toString())}",
                         options: [
                           {
-                            name: "100",
+                            label: "100",
                             value: "1",
                           },
                           {
-                            name: "75",
+                            label: "75",
                             value: "0.75",
                           },
                           {
-                            name: "50",
+                            label: "50",
                             value: "0.5",
                           },
                           {
-                            name: "25",
+                            label: "25",
                             value: "0.25",
                           },
                         ]
@@ -397,30 +396,29 @@ function ToggleMenu()
         ]`);
         
 
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Display.$refs.tri.value = ${mp.storage.data.menu.topRightInfo};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Display.$refs.gp.value = ${mp.storage.data.menu.gameProgress};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Display.$refs.tooltips.value = ${mp.storage.data.menu.tooltips};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Display.$refs.kf.value = ${mp.storage.data.menu.killFeed};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Display.$refs.nametags.value = ${mp.storage.data.menu.nametags};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Display.$refs.hud.value = ${mp.storage.data.menu.HUD};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Display.$refs.bigmap.value = ${mp.storage.data.menu.alwaysExpandedMap};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Display.$refs.updr.value = ${mp.storage.data.menu.updateRate};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Display.$refs.monitor.value = ${mp.storage.data.menu.monitoring};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Keybinds.$refs.vcbind.value = "${String.fromCharCode(curVoiceBind)}";`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Keybinds.$refs.gpsbind.value = "${String.fromCharCode(curGPSBind)}";`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Keybinds.$refs.bigmapbind.value = "${String.fromCharCode(curMapBind)}";`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Game.$refs.myweather.value = ${mp.storage.data.menu.myweather};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Game.$refs.myweather.default = ${mp.storage.data.menu.myweather};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Game.$refs.autojoinopt.value = ${mp.storage.data.menu.AutoJoin};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Game.$refs.eventmusic.value = ${mp.storage.data.menu.EventMusic};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Game.$refs.autologintog.value = ${mp.storage.data.menu.AutoLogin};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Game.$refs.cameraswitch.value = ${mp.storage.data.menu.CameraSwitch};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Chat.$refs.oocauto.value = ${mp.storage.data.menu.OOCauto};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Chat.$refs.voicemode.value = ${mp.storage.data.menu.VoiceMode};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.tri[0].value = ${mp.storage.data.menu.topRightInfo}`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.gp[0].value = ${mp.storage.data.menu.gameProgress};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.tooltips[0].value = ${mp.storage.data.menu.tooltips};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.kf[0].value = ${mp.storage.data.menu.killFeed};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.nametags[0].value = ${mp.storage.data.menu.nametags};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.hud[0].value = ${mp.storage.data.menu.HUD};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.bigmap[0].value = ${mp.storage.data.menu.alwaysExpandedMap};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.updr[0].value = ${mp.storage.data.menu.updateRate};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.monitor[0].value = ${mp.storage.data.menu.monitoring};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.vcbind[0].value = "${String.fromCharCode(curVoiceBind)}";`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.gpsbind[0].value = "${String.fromCharCode(curGPSBind)}";`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.bigmapbind[0].value = "${String.fromCharCode(curMapBind)}";`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.myweather[0].value = ${(mp.storage.data.menu.myweather == -1 ? 0 : mp.storage.data.menu.myweather)};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autojoinopt[0].value = ${mp.storage.data.menu.AutoJoin};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.eventmusic[0].value = ${mp.storage.data.menu.EventMusic};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autologintog[0].value = ${mp.storage.data.menu.AutoLogin};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.cameraswitch[0].value = ${mp.storage.data.menu.CameraSwitch};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.oocauto[0].value = ${mp.storage.data.menu.OOCauto};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.voicemode[0].value = ${mp.storage.data.menu.VoiceMode};`);
         
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Chat.$refs.activechatopacity.value = ${mp.storage.data.menu.ActiveChatOpacity.toString()};`);       
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Chat.$refs.inactivechatopacity.value = ${mp.storage.data.menu.InactiveChatOpacity.toString()};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.Chat.$refs.showinactivechat.value = ${mp.storage.data.menu.ShowInactiveChat.toString()};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.activechatopacity[0].value = ${mp.storage.data.menu.ActiveChatOpacity.toString()};`);       
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.inactivechatopacity[0].value = ${mp.storage.data.menu.InactiveChatOpacity.toString()};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.showinactivechat[0].value = ${mp.storage.data.menu.ShowInactiveChat.toString()};`);
 /*
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.crosshair.settings.enabled = ${mp.storage.data.menu.CustomCrosshair}`);
