@@ -2036,6 +2036,26 @@ namespace RNC
 
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Created " + Settings.Achievements.Count + " achievements.");
 
+            /* PRE-SET STINGERS CREATION */
+            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the pre-set stingers...");
+
+            new Stinger(1, "Vinewood Hills", "Los Santos Freeway");
+            new Stinger(2, "Grand Senora Desert", "Route 68");
+            new Stinger(3, "Braddock Pass", "Senora Freeway");
+            new Stinger(4, "Paleto Bay", "Procopio Drive");
+            new Stinger(5, "Chilliad Mountain State Wilderness", "Freeway");
+            new Stinger(6, "North Chumash", "Freeway");
+            new Stinger(7, "Chumash", "Braham Canyon Drive");
+            new Stinger(8, "Del Perro", "Bay City Incline");
+            new Stinger(9, "Downtown", "Del Perro Freeway");
+            new Stinger(10, "El Burro Heights", "Del Perro Freeway");
+            new Stinger(11, "Elysian Island", "Elysian Fields Freeway");
+            new Stinger(12, "La Puerta", "Olympic Freeway");
+            new Stinger(13, "Downtown", "Integrity Way");
+            new Stinger(14, "Palomino Highlands", "Olympic Freeway");
+            new Stinger(15, "Tataviam Mountains", "Olympic Freeway");
+
+            NAPI.Util.ConsoleOutput($"(RnC | STARTUP) Finished creating pre-set stingers, total: {Stinger.Stingers.Count}");
             /* DEFAULT LOADOUTS CREATION */
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the loadouts...");
 
