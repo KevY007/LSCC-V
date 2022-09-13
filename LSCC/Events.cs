@@ -929,6 +929,132 @@ namespace RNC
             // GameUpdate() will then handle the deployment timer and create new objects if necessary.
         }
 
+        [RemoteEvent("Clan_OnRequestChangeTier")]
+        public void Clan_OnRequestChangeTier(Player player, int targetSQLID, int tier)
+        {
+
+        }
+
+        [RemoteEvent("Clan_OnRequestKickPlayer")]
+        public void Clan_OnRequestKickPlayer(Player player, int targetSQLID)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            Account pAcc = EPlayer.GetAccount(player);
+            if(player.GetSharedData<int>("ClanID") == -1)
+            {
+                EPlayer.Error(player, "You are not in any clan!");
+                return;
+            }
+            if(player.GetSharedData<int>("ClanTier") > 1)
+            {
+                EPlayer.Error(player, "You do not have the authority to kick clan members!");
+                return;
+            }
+            int pClanTier = player.GetSharedData<int>("ClanTier");
+            int pClanID = player.GetSharedData<int>("ClanID");
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account tAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == targetSQLID);
+                    if(tAcc == null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Error(player, "FATAL ERROR: That account does not exist in the database!");
+                        });
+                        return;
+                    }
+                    if(tAcc.ClanID != pClanID)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Error(player, "FATAL ERROR: That player is not in your clan!");
+                        });
+                        return;
+                    }
+                    if(tAcc.ClanTier <= pClanTier)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Error(player, "That player is a tier higher than/equal to yours! You cannot kick them.");
+                        });
+                        return;
+                    }
+
+                    tAcc.ClanID = -1;
+                    tAcc.ClanTier = -1;
+                    await context.SaveChangesAsync();
+
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.Notify(player, $"You've successfully kicked {tAcc.Username} from the clan!", "orange", "", false, 3000);
+
+                        Player target = Settings.LoggedInPlayers.FirstOrDefault(t => EPlayer.GetAccount(t).SQL_ID == tAcc.SQL_ID);
+                        if(target != null)
+                        {
+                            EPlayer.Notify(player, $"You have been <strong>kicked</strong> from the clan!", "orange", "", false, 5000);
+                        }
+                    });
+                }
+            });
+        }
+
+        [RemoteEvent("OnRequestLeaveClan")]
+        public void OnRequestLeaveClan(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            Account acc = EPlayer.GetAccount(player);
+            if (acc.ClanID == -1 || acc.ClanTier == -1)
+            {
+                EPlayer.Error(player, "You are not part of any clan!");
+                return;
+            }
+
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    if (acc.ClanTier == 0)
+                    {
+                        Clan clan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == acc.ClanID);
+                        if (clan != null)
+                        {
+                            context.Clans.Remove(clan);
+                        }
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Notify(player, "Clan Disbanded", "You left the clan you were owner of and therefore it has been disbanded (deleted)!");                           
+                        });
+                    }
+                    Account accnt = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == acc.SQL_ID);
+                    accnt.ClanID = -1;
+                    accnt.ClanTier = -1;
+                    acc.ClanID = -1;
+                    acc.ClanTier = -1;
+
+                    await context.SaveChangesAsync();
+                    NAPI.Task.Run(() =>
+                    {
+                        player.SetSharedData("ClanID", -1);
+                        player.SetSharedData("ClanTier", -1);
+                        player.SetSharedData("ClanName", "N/A");
+                        player.SetSharedData("ClanCreated", "N/A");
+                        EPlayer.GetAccount(player).ClanID = -1;
+                        EPlayer.GetAccount(player).ClanTier = -1;
+                        EPlayer.Save(player, false);
+                        EPlayer.Notify(player, "You successfully left the clan!", "green", "", false, 3000);
+
+                        EPlayer.UpdateUIVars(player);
+                    });
+                }
+            });
+        }
+
         [RemoteEvent("OnRequestCreateClan")]
         public void OnRequestCreateClan(Player player, string clanname, string tag, string desc)
         {
@@ -1006,6 +1132,7 @@ namespace RNC
                         EPlayer.SendMessage(player, $"~g~[CLAN] ~w~Best of luck!");
 
                         player.TriggerEvent("UpdateMenuClanTab");
+                        EPlayer.UpdateUIVars(player);
                     });
                 }
             });
@@ -2135,24 +2262,6 @@ namespace RNC
                 if (totalOwned >= Settings.Loadouts.Count)
                     EPlayer.UnlockAchievement(player, "all_loadouts");
 
-                using (MainDatabase context = ContextFactory.CreateContext())
-                {
-                    Clan playerClan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == acc.ClanID);
-                    if (playerClan != null)
-                    {
-                        List<Account> clanAccounts = await context.Accounts.AsQueryable().Where(a => a.ClanID == pClan.SQL_ID).ToListAsync();
-                        NAPI.Task.Run(() =>
-                        {
-                            player.TriggerEvent("Menu_ClearClanMembers");
-                            foreach (Account accnt in clanAccounts)
-                            {
-                                NAPI.Util.ConsoleOutput($"Adding account {accnt.Username} [tier {accnt.ClanTier}] to clan list.");
-                                player.TriggerEvent("Menu_AddClanMember", accnt.SQL_ID, accnt.Username, accnt.Level, accnt.ClanTier);
-                            }
-                            player.TriggerEvent("Menu_UpdateClanStats", playerClan.WeekKills, playerClan.TotalKills, playerClan.WeekWins);
-                        });
-                    }
-                }
                 NAPI.Task.Run(() =>
                 {
                     player.SetSharedData("Points", EPlayer.GetAccount(player).Points);
@@ -3183,6 +3292,33 @@ namespace RNC
             }
 
             return dmItems;
+        }
+
+        [RemoteEvent("Menu_InitializeMyClanTab")]
+        public void OnRequestMyClanTabInit(Player player)
+        {
+            Account acc = EPlayer.GetAccount(player);
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Clan playerClan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == acc.ClanID);
+                    if (playerClan != null)
+                    {
+                        List<Account> clanAccounts = await context.Accounts.AsQueryable().Where(a => a.ClanID == playerClan.SQL_ID).ToListAsync();
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("Menu_ClearClanMembers");
+                            foreach (Account accnt in clanAccounts)
+                            {
+                                NAPI.Util.ConsoleOutput($"Adding account {accnt.Username} [tier {accnt.ClanTier}] to clan list.");
+                                player.TriggerEvent("Menu_AddClanMember", accnt.SQL_ID, accnt.Username, accnt.ClanTier, accnt.Level);
+                            }
+                            player.TriggerEvent("Menu_UpdateClanStats", playerClan.WeekKills, playerClan.TotalKills, playerClan.WeekWins);
+                        });
+                    }
+                }
+            });
         }
 
         [RemoteEvent("Menu_RequestClansList")]

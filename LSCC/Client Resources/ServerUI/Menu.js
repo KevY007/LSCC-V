@@ -1,5 +1,7 @@
 menuToggled = false;
 
+var FirstTimeMenuOpen = true;
+
 var ActiveCrosshairProfileUUID = "";
 
 let lastMenuToggle = Date.now();
@@ -102,6 +104,9 @@ mp.events.add("Menu_AddClan", (cname, tag, desc, banner, isOpen, players, maxPla
             },
         });`);
 });
+mp.events.add("kickClanMember", (memberSQLID) => {
+    mp.events.callRemote("Clan_OnRequestKickPlayer", memberSQLID);
+});
 mp.events.add("Menu_AddClanMember", (memberID, memberName, memberTier, memberLevel) => {
 
     ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.push(
@@ -167,6 +172,8 @@ function ToggleMenu()
         mp.gui.cursor.show(menuToggled, menuToggled);
         activateChat(!menuToggled);
 
+        UpdateStatsVars(mp.players.local);
+
         ServerUI.execute('gm.$refs.mainMenu.$refs.logsTab.isLoading = false;');
 
         if(menuToggled){
@@ -176,6 +183,12 @@ function ToggleMenu()
             ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.createdAt = "${mp.players.local.getVariable("ClanCreated")}"`);
             ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.name = '${mp.players.local.name}'`);
             ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.createdAt = '${mp.players.local.getVariable("RegisterDate")}'`);
+
+            if(FirstTimeMenuOpen){
+                FirstTimeMenuOpen = false;
+
+                mp.events.callRemote("Menu_InitializeMyClanTab");
+            }
         }
         
 

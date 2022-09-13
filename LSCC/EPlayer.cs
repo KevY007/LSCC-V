@@ -2439,6 +2439,11 @@ namespace RNC
             Discord.SendTextChannel("staff-bot", $"(ADM) |** {message}**");
         }
 
+        public static void UpdateUIVars(Player player)
+        {
+            player.TriggerEvent("CS_UpdateStatsVars");
+        }
+
         public static void Notify(Player player, string title, string message, string alignment = "", string displaymode = "")
         {
             player.TriggerEvent("HUDNotify2", title, message, alignment, displaymode);

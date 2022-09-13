@@ -749,6 +749,10 @@ mp.events.addCommand("bigmap", function (state) {
 
 if(!radioToggle) mp.game.audio.setInitialPlayerStation('OFF');
 
+mp.events.add("CS_UpdateStatsVars", () => {
+    UpdateStatsVars(player);
+});
+
 function UpdateStatsVars(entity){
     // yes im double checking the same shit cuz for some reason this shit decided to break for no reason
     if(ServerUI == null || ServerUI == undefined || ServerUI == undefined || ServerUI == null) return;
