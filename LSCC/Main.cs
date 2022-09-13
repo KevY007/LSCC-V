@@ -4315,6 +4315,10 @@ namespace RNC
                             if (stinger.TimeElapsed == 15)
                             {
                                 stinger.Stage = 2;
+                                foreach(Player pl in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                {
+                                    pl.TriggerEvent("MDC:UpdateSpike", stinger.ID, stinger.Stage);
+                                }
 
                                 Stinger stdata = Stinger.Stingers.FirstOrDefault(s => s.ID == stinger.ID);
                                 if (stdata != null)
@@ -4330,6 +4334,10 @@ namespace RNC
                             else if (stinger.TimeElapsed == 30)
                             {
                                 stinger.Stage = 3;
+                                foreach (Player pl in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                {
+                                    pl.TriggerEvent("MDC:UpdateSpike", stinger.ID, stinger.Stage);
+                                }
 
                                 Stinger stdata = Stinger.Stingers.FirstOrDefault(s => s.ID == stinger.ID);
                                 if (stdata != null)

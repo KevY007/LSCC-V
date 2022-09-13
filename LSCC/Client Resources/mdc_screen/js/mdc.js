@@ -9,6 +9,7 @@ var StingerScreenDOM;
 var StingerArea;
 var StingerStreet;
 var StingerPage;
+var StingerHelp;
 
 
 var last104sound = 1;
@@ -66,15 +67,18 @@ document.addEventListener("DOMContentLoaded", () => {
     StingerArea = document.getElementById("stinger_area");
     StingerStreet = document.getElementById("stinger_street");
     StingerPage = document.getElementById("stinger_location_pages");
+    StingerHelp = document.getElementById("stinger_help");
 })
 
 function UpdateStingerDisplay(id){
-    StingerScreenDOM.style.backgroundImage = `url('./img/spikes/sp${currentSpikeNumber}.png')`;
-    let stinger = GetStinger(currentSpikeNumber);
+    StingerScreenDOM.style.backgroundImage = `url('./img/spikes/sp${id}.png')`;
+    let stinger = GetStinger(id);
     if(stinger.id != -1){
         StingerStreet.innerHTML = stinger.street;
         StingerArea.innerHTML = stinger.area;
-        StingerPage.innerHTML = `${currentSpikeNumber}/${Stingers.length}`;
+        StingerPage.innerHTML = `${id}/${Stingers.length}`;
+
+        StingerHelp.innerHTML = `Press <strong>[ENTER]</strong> to request deployment.`;
     }
 }
 
@@ -83,14 +87,7 @@ document.addEventListener("keydown", function(e){
     switch(e.keyCode){
         case 13: 
 
-        if(last104sound == 1){
-            TenFourSound2.play();
-            last104sound = 2;
-        }
-        else if(last104sound == 2){
-            TenFourSound.play();
-            last104sound = 1;            
-        }
+        mp.trigger("mdcRequestDeployStinger", currentSpikeNumber);
 
         break;   
         case 37:
@@ -185,8 +182,8 @@ function getPictureCoords(x, y){
 
 function setBlipPosition(element, x, y){ 
     var coords = getPictureCoords(x, y);
-    element.style.top = (coords.y-248) + 'px';
-    element.style.left = (coords.x-278) + 'px';
+    element.style.top = (coords.y-247) + 'px';
+    element.style.left = (coords.x-280) + 'px';
 }
 
 function updateMapBlipScales(zoom_level){
@@ -362,7 +359,7 @@ function UpdateBlip(ID, type, xPos, yPos){
 function AddBlip(ID, type){
     let blip = `${type}_${ID}`;
     if(document.getElementById(blip)){
-        document.getElementById(blip).remove();
+        return;
     }
     let blipData = {
         sourceName: "n/a",
@@ -391,7 +388,7 @@ function AddBlip(ID, type){
 function AddSpikeBlip(ID, stage){
     let blip = `spike_${ID}`;
     if(document.getElementById(blip)){
-        document.getElementById(blip).remove();
+        return;
     }
     let blipData = {
         sourceName: `spikes_stage${stage}.png`,
@@ -428,6 +425,23 @@ function UpdateMiniscreenStatus(item, value){
         OFFICER: ${PlayerName}<br>
         SUSPECTS: ${SuspectsCount}
     `;
+}
+
+function SetStingerError(msg){
+    StingerHelp.innerHTML = msg;
+}
+function SetStingerSuccess(id, msg){
+    if(last104sound == 1){
+        TenFourSound2.play();
+        last104sound = 2;
+    }
+    else if(last104sound == 2){
+        TenFourSound.play();
+        last104sound = 1;            
+    }
+    StingerHelp.innerHTML = msg;
+
+    AddSpikeBlip(id, 1);
 }
 
 var Stingers = [

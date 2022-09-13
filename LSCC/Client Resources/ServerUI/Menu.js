@@ -109,8 +109,7 @@ function ToggleMenu()
     {
         ToggleScoreboard();
     }
-    
-    if(ServerUI != null && Date.now() - lastChatToggle >= 500 && !chatStatus && mp.players.local.getVariable("pLogged") !== undefined 
+    if(ServerUI != null && Date.now() - lastChatToggle >= 500 && chatStatus == false && mp.players.local.getVariable("pLogged") !== undefined 
         && mp.players.local.getVariable("pLogged") == true && Date.now() - lastMenuToggle >= 1000)
     {
         lastMenuToggle = Date.now();

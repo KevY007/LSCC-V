@@ -907,16 +907,24 @@ namespace RNC
         public static void OnRequestDeployStinger(Player player, int spikeID)
         {
             Stinger sg = Stinger.Stingers.FirstOrDefault(s => s.ID == spikeID);
-            if (sg == null) { return; }
+            if (sg == null) 
+            {
+                player.TriggerEvent("MDC:StingerFail", "No backup unit is available to deploy right now!");
+                return; 
+            }
 
             LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
             if (lobby.Stingers.FirstOrDefault(s => s.ID == spikeID) != null)
             {
-                EPlayer.SendMessage(player, $"This stinger is already being deployed!");
+                player.TriggerEvent("MDC:StingerFail", "This stinger has already been deployed!");
+                return;
             }
 
             Lobby_StingerData lobbyStinger = new Lobby_StingerData() { ID = spikeID };
             lobby.Stingers.Add(lobbyStinger);
+            player.TriggerEvent("MDC:StingerSuccess", spikeID, "Success - a backup unit was dispatched to deploy the stingers.");
+            player.TriggerEvent("MDC:UpdateBlip", spikeID, "spike", sg.StingerObjects[0].Position.X, sg.StingerObjects[0].Position.Y);
+            
             // Stinger is added to the lobby stingers array.
             // GameUpdate() will then handle the deployment timer and create new objects if necessary.
         }
