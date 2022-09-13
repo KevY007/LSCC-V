@@ -22,7 +22,6 @@ var lastFunc = "Init";
 var BankRobberyOn = false;
 
 var ShowVehicleDL = false;
-var specCam = null;
 var specState = false;
 var specTarget = null;
 var isNoClip = false;

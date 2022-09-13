@@ -752,7 +752,7 @@ mp.events.add("UpdateRateEvent", () => {
             ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.jail[0].show = ${miniHUDVars["jailed"]};`);
         }
 
-        if (specState == true && specCam !== null && specTarget != null && mp.players.exists(specTarget)) 
+        if (specState == true && specTarget != null && mp.players.exists(specTarget)) 
         {
             if(miniHUDVars["spec"] == false)
             {
@@ -1122,7 +1122,7 @@ mp.events.add("render", () => {
             mp.game.ui.setRadarBigmapEnabled(true, false);
         }
         
-        if (specState == true && specCam !== null && specTarget != null && mp.players.exists(specTarget)) 
+        if (specState == true && specTarget != null && mp.players.exists(specTarget)) 
         {
             if((mp.players.local.getHealth() != specTarget.getHealth() || mp.players.local.getArmour() != specTarget.getArmour()) && 
                 Date.now() - lastSpecHPChange >= 500)

@@ -1248,9 +1248,11 @@ namespace RNC
                 if (shape.HasData("LinkedStingerObject") && shape.HasData("StingerID"))
                 {
                     LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+                    if (lobby == null) return;
                     string stingerKey = shape.GetData<string>("LinkedStingerObject");
                     int stingerID = shape.GetData<int>("StingerID");
                     Lobby_StingerData stinger = lobby.Stingers.FirstOrDefault(s => s.ID == stingerID);
+                    if (stinger == null) return;
                     if (stinger.StingerColshapes.Contains(shape))
                     {
                         player.TriggerEvent("PopVehicleTires");

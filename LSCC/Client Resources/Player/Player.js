@@ -126,6 +126,7 @@ mp.keys.bind(0x46, true, function () {
 });
 
 function ToggleMDC(){
+    return;
      MDCActive = !MDCActive;
      MDC_DOM.active = MDCActive;
 }
@@ -568,59 +569,22 @@ mp.events.add("render", () => {
 
     // Spectate Things
     
-    if (specState == true && specCam !== null && specTarget != null) 
+    if (specState == true && specTarget != null) 
     {
         // Automatically stop spec if target goes woosh
         if (mp.players.exists(specTarget)) 
         {
-            specCam.detach();
-            specCam.attachTo(specTarget.handle, 0, -5, 1, true);
-            specCam.setRot(0, 0, specTarget.getHeading(), 2);
+            // something if spec player is online
         }
         else 
         {
             traceLastFunc(`[Players] Stop Spec (target handle)`);
 
-            specCam.setActive(false); 
+            //specCam.setActive(false); 
             specState = false;
             mp.events.callLocal("StopSpectating");
         }
 
-        // Move spectate camera
-        if(specCam.isActive() && specCam.isRendering() && mp.players.exists(specTarget) && !chatStatus)
-        {
-            
-            mp.game.controls.disableAllControlActions(2);
-
-            let x = (mp.game.controls.getDisabledControlNormal(7, 1) * mouseSensitivity);
-            let y = (mp.game.controls.getDisabledControlNormal(7, 2) * mouseSensitivity);
-            let zoomIn = (mp.game.controls.getDisabledControlNormal(2, 40) * zoomSpeed);
-            let zoomOut = (mp.game.controls.getDisabledControlNormal(2, 41) * zoomSpeed);
-
-            //let currentRot = specCam.getRot(2);
-            let currentRot = new mp.Vector3(0, 0, specTarget.getHeading())
-            moveRotX += y;
-            moveRotZ += x;
-            currentRot = new mp.Vector3(currentRot.x - moveRotX, moveRotY, currentRot.z - moveRotZ);
-
-            specCam.setRot(currentRot.x, currentRot.y, currentRot.z, 2);
-
-            if (zoomIn > 0)
-            {
-                let currentFov = specCam.getFov();
-                currentFov -= zoomIn;
-                if (currentFov < minZoom)
-                    currentFov = minZoom;
-                specCam.setFov(currentFov);
-            } else if (zoomOut > 0)
-            {
-                let currentFov = specCam.getFov();
-                currentFov += zoomOut;
-                if (currentFov > maxZoom)
-                    currentFov = maxZoom;
-                specCam.setFov(currentFov);
-            }
-        }
     }
 
 
@@ -902,6 +866,15 @@ mp.events.add('render', () => {
         FPS_Calc = Date.now();
     }
 
+    if(specState == true && specTarget != null){
+        if (mp.players.exists(specTarget)) 
+        {
+            mp.game.invoke("0x8BBACBF51DA047A8", specTarget.handle); //NETWORK_SET_IN_SPECTATOR_MODE
+        }
+        else{
+            mp.events.callLocal("StopSpectating");
+        }
+    }
 
     if(mp.players.local.getVariable("Team") == 0){
         if(mp.players.local.isInAnyVehicle(true)){
@@ -1309,7 +1282,7 @@ mp.events.add('render', () => {
                     }
                 });
 
-                if (specState == true && specCam !== null && specTarget !== null) {
+                if (specState == true && specTarget !== null) {
 
                     if (mp.players.exists(specTarget)) 
                     {
@@ -1329,7 +1302,6 @@ mp.events.add('render', () => {
                     }
                     else 
                     {
-                        specCam.setActive(false); 
                         specState = false;
                         mp.events.callLocal("StopSpectating");
                     }
@@ -2492,24 +2464,8 @@ mp.events.add(
         }
     },
     "SpectatePlayer": (target) => {
-
-        if(specCam != null)
-        {
-            specCam.setActive(false);
-            specCam.destroy();
-            specCam = null;
-        }
-
-        specTarget = target;
-
-        mp.game.cam.renderScriptCams(false, false, 0, true, false);
-
-        specCam = mp.cameras.new('default', target.position, new mp.Vector3(0, 0, target.getHeading()), target.isInAnyVehicle(false) ? 80 : 60);
-        specCam.attachTo(target.handle, 0, target.isInAnyVehicle(false) ? -6 : -5, target.isInAnyVehicle(false) ? 3 : 1, true);
-        specCam.setActive(true);
-
-        mp.game.cam.renderScriptCams(true, false, 0, true, false);
-
+     
+        specTarget = target;   
         specState = true;
     },
 
@@ -2525,18 +2481,9 @@ mp.events.add(
     },
 
     "StopSpectating": () => {
-
+        mp.game.invoke("0x423DE3854BB50894", false, mp.players.local.handle); //NETWORK_SET_IN_SPECTATOR_MODE
         specTarget = null;
         specState = false;
-
-        mp.game.cam.renderScriptCams(false, false, 0, true, false);
-
-        if(specCam != null)
-        {
-            specCam.setActive(false);
-            specCam.destroy();
-            specCam = null;
-        }
     },
 
     "setToRagdoll": (time1, time2, ragdollType, p4, p5, p6) => {
