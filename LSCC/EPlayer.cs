@@ -2443,7 +2443,7 @@ namespace RNC
         {
             player.TriggerEvent("HUDNotify2", title, message, alignment, displaymode);
         }
-        public static void Error(Player player, string message, string icon)
+        public static void Error(Player player, string message, string icon = "")
         {
             player.TriggerEvent("HUDError", message, icon);
         }

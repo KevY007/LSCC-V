@@ -929,6 +929,88 @@ namespace RNC
             // GameUpdate() will then handle the deployment timer and create new objects if necessary.
         }
 
+        [RemoteEvent("OnRequestCreateClan")]
+        public void OnRequestCreateClan(Player player, string clanname, string tag, string desc)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            Account acc = EPlayer.GetAccount(player);
+            if (player.GetSharedData<int>("ClanID") != -1 || player.GetSharedData<int>("ClanTier") != -1)
+            {
+                EPlayer.Error(player, "You are already in a clan! Please leave your current one first <strong>(Menu [M] > Clan > Leave)</strong>.", "sex");
+                return;
+            }
+            if (acc.Points < 300)
+            {
+                EPlayer.Error(player, "You need <strong>300 Points</strong> to create a clan!", "sex");
+                return;
+            }
+            if (clanname.Length > 32 || clanname.Length < 3)
+            {
+                EPlayer.Error(player, "Clan name must be between 3 and 32 characters!", "sex");
+                return;
+            }
+            string nameCheck = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 ";
+            bool isNameGood = true;
+            for (int i = 0; i < clanname.Length; i++)
+            {
+                if (!nameCheck.Contains(clanname[i])) { isNameGood = false; break; }
+            }
+            if (!isNameGood)
+            {
+                EPlayer.Error(player, "Clan name must be alphanumeric (A-Z, 0-9)!", "sex");
+                return;
+            }
+
+            /*
+             * For testing purposes I am creating a clan this way.
+             * In real scenario there will be a UI with a confirmation window or something along those lines.
+             * Also a warning that a weekly/monthly clan fee will be paid.
+             */
+            EPlayer.SendMessage(player, "~y~Creating clan...");
+            Clan clan = new Clan()
+            {
+                Name = clanname,
+                WeekKills = 0,
+                TotalKills = 0,
+                WeekWins = 0,
+                Description = desc,
+                Tag = tag,
+                CreatedOn = DateTime.Now.ToString("F")
+            };
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    await context.Clans.AddAsync(clan);
+                    await context.SaveChangesAsync();
+                    Clan thaClan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.Name == clanname);
+
+                    acc.ClanTier = 0;
+                    acc.ClanID = thaClan.SQL_ID;
+                    EPlayer.GivePoints(player, -300);
+                    EPlayer.Save(player, false);
+                    int cID = thaClan.SQL_ID;
+                    NAPI.Task.Run(() =>
+                    {
+                        player.SetSharedData("ClanID", cID);
+                        player.SetSharedData("ClanTier", 0);
+                        player.SetSharedData("ClanName", clanname);
+                        player.SetSharedData("ClanCreated", DateTime.Now.ToString("F"));
+                        EPlayer.Notify(player, "Clan successfully created! Read chat for more information.", "green", "", false, 3000);
+                        EPlayer.SendMessage(player, $"~g~[CLAN] ~w~Congratulations! You've successfully created a clan named ~y~{clanname}~w~ for 300 Points!");
+                        EPlayer.SendMessage(player, $"~g~[CLAN] ~w~You can manage your clan through the clan panel (Menu [M] > Clan > Manage)");
+                        EPlayer.SendMessage(player, $"~g~[CLAN] ~w~If you have any questions, ask the staff team or management.");
+                        EPlayer.SendMessage(player, $"~g~[CLAN] ~r~NOTICE: ~w~If you leave your clan, it will automatically be disbanded and deleted.");
+                        EPlayer.SendMessage(player, $"~g~[CLAN] ~w~Best of luck!");
+
+                        player.TriggerEvent("UpdateMenuClanTab");
+                    });
+                }
+            });
+        }
+
         [ServerEvent(Event.PlayerEnterColshape)]
         public void OnPlayerEnterColshape(ColShape shape, Player player)
         {
@@ -1898,13 +1980,14 @@ namespace RNC
                 List <Account> linkedAccs = await EPlayer.GetLinkedAccounts(acc);
                 var linkedSQLs = linkedAccs.Select(accs => accs.SQL_ID).ToList(); // BONKERS
 
+                Clan pClan = null;
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Clan pClan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == acc.ClanID);
+                    pClan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == acc.ClanID);
                     if(pClan != null)
                     {
                         pClanName = pClan.Name;
-                        //pClanCreated = pClan.CreationDate.ToString();
+                        pClanCreated = pClan.CreatedOn;                  
                     }
 
                     if (linkedSQLs.Intersect(context.Bans.AsQueryable().Select(bans => bans.AccountSQLID)).Any())
@@ -1935,7 +2018,12 @@ namespace RNC
                     player.SetData("AccountHandle", acc);
                     player.SetSharedData("pLogged", true);
                     player.SetSharedData("RegisterDate", acc.RegisterDate.ToString("F"));
+                    
+                    player.SetSharedData("Donator", acc.DonatorLevel);
+                    player.SetSharedData("ScreenshotServerAPI", $"{acc.Password}@{acc.Salt}");
 
+                    player.SetSharedData("ClanID", acc.ClanID);
+                    player.SetSharedData("ClanTier", acc.ClanTier);
                     player.SetSharedData("ClanName", pClanName);
                     player.SetSharedData("ClanCreated", pClanCreated);
 
@@ -1949,7 +2037,6 @@ namespace RNC
                     player.SetSharedData("CurrentXP", acc.XP);
                     player.SetSharedData("NextLevelXP", EPlayer.GetMaxLevelXP(acc.Level));
                     player.TriggerEvent("Menu_UpdateLevelXP", true);
-
                 });
                 await NAPI.Task.WaitForMainThread();
 
@@ -2048,6 +2135,24 @@ namespace RNC
                 if (totalOwned >= Settings.Loadouts.Count)
                     EPlayer.UnlockAchievement(player, "all_loadouts");
 
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Clan playerClan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == acc.ClanID);
+                    if (playerClan != null)
+                    {
+                        List<Account> clanAccounts = await context.Accounts.AsQueryable().Where(a => a.ClanID == pClan.SQL_ID).ToListAsync();
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("Menu_ClearClanMembers");
+                            foreach (Account accnt in clanAccounts)
+                            {
+                                NAPI.Util.ConsoleOutput($"Adding account {accnt.Username} [tier {accnt.ClanTier}] to clan list.");
+                                player.TriggerEvent("Menu_AddClanMember", accnt.SQL_ID, accnt.Username, accnt.Level, accnt.ClanTier);
+                            }
+                            player.TriggerEvent("Menu_UpdateClanStats", playerClan.WeekKills, playerClan.TotalKills, playerClan.WeekWins);
+                        });
+                    }
+                }
                 NAPI.Task.Run(() =>
                 {
                     player.SetSharedData("Points", EPlayer.GetAccount(player).Points);
@@ -2078,8 +2183,7 @@ namespace RNC
                     player.TriggerEvent("LoadCrosshairProfiles", acc.CrosshairProfiles, acc.ActiveCrosshairProfile);
                     Achievement.LoadAchievementsForPlayer(player);
                     Challenge.AddChallengesForPlayer(player);
-                });
-                
+                });                
             });
             
         }
@@ -2656,9 +2760,16 @@ namespace RNC
             player.SetData("AccountHandle", acc);
             player.SetSharedData("pLogged", true);
 
+            player.SetSharedData("Donator", acc.DonatorLevel);
+
             player.Name = acc.Username;
             player.SetSharedData("Admin", 0);
             player.SetSharedData("PlayerSquadID", -1);
+
+            player.SetSharedData("ClanID", acc.ClanID);
+            player.SetSharedData("ClanTier", acc.ClanTier);
+
+            player.SetSharedData("ScreenshotServerAPI", $"{acc.Password}@{acc.Salt}");
 
             player.SetSharedData("RegisterDate", acc.RegisterDate.ToString("F"));
 
@@ -3078,7 +3189,6 @@ namespace RNC
         public void OnMenuRequestClansList(Player player)
         {
             if (player == null) return;
-            NAPI.Util.ConsoleOutput($"Requested clans list from {player.Name}");
             Task.Run(async () =>
             {
                 using(MainDatabase context = ContextFactory.CreateContext())
@@ -3086,8 +3196,8 @@ namespace RNC
                     await context.Clans.AsQueryable().ForEachAsync(clan =>
                     {
                         string clanName = clan.Name;
-                        string tag = "TBA"; // to add
-                        string desc = "To Be Added"; // to add
+                        string tag = clan.Tag; // to add
+                        string desc = clan.Description; // to add
                         string banner = "default"; // to add
                         bool isOpen = false; // to add
                         int maxPlayers = 20; // to add
@@ -3101,7 +3211,6 @@ namespace RNC
                             player.TriggerEvent("Menu_AddClan", clanName, tag, desc, banner, isOpen, players,
                                                                 maxPlayers, totalKills, totalDeaths, COTW_Wins);
 
-                            NAPI.Util.ConsoleOutput($"Adding clan to menu: {clanName} ({players}/{maxPlayers})");
                         });
                         NAPI.Task.WaitForMainThread();
                     });

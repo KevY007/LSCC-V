@@ -102,6 +102,49 @@ mp.events.add("Menu_AddClan", (cname, tag, desc, banner, isOpen, players, maxPla
             },
         });`);
 });
+mp.events.add("Menu_AddClanMember", (memberID, memberName, memberTier, memberLevel) => {
+
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.push(
+        {
+            id: ${memberID},
+            name: '${memberName}',
+            level: ${memberLevel},
+            tier: ${memberTier}
+        });`);
+});
+mp.events.add("Menu_ClearClanMembers", () => {
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members = [];`);
+});
+
+mp.events.add("Menu_UpdateClanStats", (weekKills, totalKills, weekWins) => {
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.statsTab.stats = [
+        {
+            icon: "fa-crosshairs",
+            title: "Week Kills",
+            value: ${weekKills}
+        },
+        {
+            icon: "fa-skull",
+            title: "Total Kills",
+            value: ${totalKills}
+        },
+        {
+            icon: "fa-trophy",
+            title: "COTW Wins",
+            value: ${weekWins}
+        }
+    ]`);
+});
+
+mp.events.add("createClan", (cname, tag, desc) => {
+    mp.events.callRemote("OnRequestCreateClan", cname, tag, desc);
+});
+mp.events.add("UpdateMenuClanTab", () => {
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.clansList.clans = [];`);
+    mp.events.callRemote("Menu_RequestClansList");
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.name = "${mp.players.local.getVariable("ClanName")}"`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.createdAt = "${mp.players.local.getVariable("ClanCreated")}"`);
+});
 
 function ToggleMenu()
 {
