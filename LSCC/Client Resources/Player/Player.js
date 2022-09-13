@@ -757,23 +757,27 @@ function UpdateStatsVars(entity){
         if(mp.players.exists(entity))
         {
             if(ServerUI !== undefined && ServerUI != null){
-                ServerUI.execute(`gm.stats = {
-                    squad: ${mp.players.local.getVariable("PlayerSquadID")},
-                    lobby: ${mp.players.local.getVariable("InLobby")},
-                    admin: ${mp.players.local.getVariable("Admin")},
-                    fugitive: ${mp.players.local.Team == 0 ? true : false},
-                }`);
+
+                ServerUI.execute(`gm.$refs.helpers.$refs.states.setUser(["stats"], {
+                    name: "${player.name}",
+                    level: ${player.getVariable("Level")},
+                    xp: ${player.getVariable("CurrentXP")},
+                    nextLevelXp: ${player.getVariable("NextLevelXP")},
+                    createdAt: "${player.getVariable("RegisterDate")}",
+                    tokens: ${player.getVariable("Points")},
+                    admin: ${player.getVariable("Admin")},
+                    donator: ${player.getVariable("Donator")},
+                    api: "${player.getVariable("ScreenshotServerAPI")}"
+                })`);
+                ServerUI.execute(`gm.$refs.helpers.$refs.states.setUser(["clan"], {
+                    id: ${player.getVariable("ClanID")},
+                    tier: ${player.getVariable("ClanTier")}
+                })`);
+            
                 if(CommandsDataJSON){
                     let allowedCommands = CommandsDataJSON.filter(cmd => cmd.Admin <= mp.players.local.getVariable("Admin"));
                     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.commands = ${JSON.stringify(allowedCommands)}`);
                 }
-            }
-            if(ServerUI !== undefined && ServerUI != null){
-                ServerUI.execute(`gm.stats = {
-                    name: "${mp.players.local.name}",
-                    level: ${mp.players.local.getVariable("Level")},
-                    admin: ${mp.players.local.getVariable("Admin")}
-                }`);
             }
         }
     }

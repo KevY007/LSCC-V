@@ -87,6 +87,9 @@ namespace RNC
         public int WeekKills { get; set; } // resets weekly
         public int TotalKills { get; set; }
         public int WeekWins { get; set; } // 'Clan Of The Week' - weekly clan with most kills wins the week or w/e
+        public string Tag { get; set; }
+        public string Description { get; set; }
+        public string CreatedOn { get; set; }
     }
 
     public class DailyChallenge

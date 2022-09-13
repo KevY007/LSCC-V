@@ -9351,7 +9351,7 @@ namespace RNC
                 EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}You are not part of a clan!");
                 return;
             }
-
+            
             Task.Run(async () =>
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
@@ -9369,91 +9369,25 @@ namespace RNC
 
                         });
                     }
+                    Account accnt = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == acc.SQL_ID);
+                    accnt.ClanID = -1;
+                    accnt.ClanTier = -1;
                     acc.ClanID = -1;
                     acc.ClanTier = -1;
 
                     await context.SaveChangesAsync();
                     NAPI.Task.Run(() =>
                     {
+                        player.SetSharedData("ClanID", -1);
+                        player.SetSharedData("ClanTier", -1);
+                        EPlayer.GetAccount(player).ClanID = -1;
+                        EPlayer.GetAccount(player).ClanTier = -1;
+                        EPlayer.Save(player, false);
                         EPlayer.SendMessage(player, "~r~[CLAN LEAVE] ~w~You successfully left the clan.");
                     });
                 }
             });
             
-
-            return;
-        }
-
-        [Command("createclan", "!{#AFAFAF}[USAGE] createclan (clan name)", GreedyArg = true)]
-        public void cmd_createclan(Player player, string clanname)
-        {
-            if (!EPlayer.LoggedIn(player))
-                return;
-
-            Account acc = EPlayer.GetAccount(player);
-            if(acc.ClanID != -1 || acc.ClanTier != -1)
-            {
-                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}You are already in a clan! Please leave your current one first (Menu [M] > Clan > Leave).");
-                return;
-            }
-            if(acc.Points < 300)
-            {
-                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}You need ~y~300 Points~w~ to create a clan!");
-                return;
-            }
-            if(clanname.Length > 32 || clanname.Length < 3)
-            {
-                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}Clan name must be between 3 and 32 characters!");
-                return;
-            }
-            string nameCheck = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 ";
-            bool isNameGood = true;
-            for(int i = 0; i < clanname.Length; i++)
-            {
-                if (!nameCheck.Contains(clanname[i])) { isNameGood = false; break; }
-            }
-            if (!isNameGood)
-            {
-                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}Clan name must be alphanumeric (A-Z, 0-9)!");
-                return;
-            }
-
-            /*
-             * For testing purposes I am creating a clan this way.
-             * In real scenario there will be a UI with a confirmation window or something along those lines.
-             * Also a warning that a weekly/monthly clan fee will be paid.
-             */
-            EPlayer.SendMessage(player, "~y~Creating clan...");
-            Clan clan = new Clan()
-            {
-                Name = clanname,
-                WeekKills = 0,
-                TotalKills = 0,
-                WeekWins = 0
-            };
-            Task.Run(async () =>
-            {
-                using (MainDatabase context = ContextFactory.CreateContext())
-                {
-                    await context.Clans.AddAsync(clan);
-                    await context.SaveChangesAsync();
-                    Clan thaClan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.Name == clanname);
-
-                    acc.ClanTier = 0;
-                    acc.ClanID = thaClan.SQL_ID;
-                    EPlayer.Save(player, false);
-
-                    NAPI.Task.Run(() =>
-                    {
-                        EPlayer.SendMessage(player, $"~g~[CLAN] ~w~Congratulations! You've successfully created a clan named ~y~{clanname}~w~ for 300 Points!");
-                        EPlayer.SendMessage(player, $"~g~[CLAN] ~w~You can manage your clan through the clan panel (Menu [M] > Clan > Manage)");
-                        EPlayer.SendMessage(player, $"~g~[CLAN] ~w~If you have any questions, ask the staff team or management.");
-                        EPlayer.SendMessage(player, $"~g~[CLAN] ~r~NOTICE: ~w~If you leave your clan, it will automatically be disbanded and deleted.");
-                        EPlayer.SendMessage(player, $"~g~[CLAN] ~w~Best of luck!");
-                    });
-                }
-            });
-
 
             return;
         }
@@ -9504,6 +9438,7 @@ namespace RNC
                         case 0:
                             acc.DonatorPoints += 200;
                             acc.DonatorLevel = 1;
+                            player.SetSharedData("Donator", acc.DonatorLevel);
                             NAPI.Task.Run(() =>
                             {
                                 EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(1, true)}~w~!");
@@ -9512,6 +9447,7 @@ namespace RNC
                         case 1:
                             acc.DonatorPoints += 350;
                             acc.DonatorLevel = 2;
+                            player.SetSharedData("Donator", acc.DonatorLevel);
                             NAPI.Task.Run(() =>
                             {
                                 EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(2, true)}~w~!");
@@ -9520,6 +9456,7 @@ namespace RNC
                         case 2:
                             acc.DonatorPoints += 500;
                             acc.DonatorLevel = 3;
+                            player.SetSharedData("Donator", acc.DonatorLevel);
                             NAPI.Task.Run(() =>
                             {
                                 EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(3, true)}~w~!");
@@ -9647,6 +9584,7 @@ namespace RNC
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setdonator:{target.Name}:{level}"); } catch { }
             Logs.LogAdmin(player, $"Set {target.Name}'s donator level to {EPlayer.GetDonatorLevelName(level)}.");
             t_acc.DonatorLevel = level;
+            target.SetSharedData("Donator", level);
             player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}You have set {target.Name}'s donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
             target.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}{player.Name} has set your donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
             EPlayer.Save(target);
