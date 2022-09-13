@@ -1,5 +1,7 @@
 ﻿"use strict"
 
+let MDCActive = false;
+
 let camera = null;
 let camera_moveable = false;
 let camera_lastmove = Date.now();
@@ -121,6 +123,11 @@ mp.keys.bind(0x46, true, function () {
         AFOB_LastVeh = null;
         AFOB_LastSpeed = 0;
     }
+});
+
+mp.keys.bind(0x4B, true, function() {
+    MDCActive = !MDCActive;
+    MDC_DOM.active = MDCActive;
 });
 
 mp.events.add('entityStreamIn', (entity) => {
@@ -2672,6 +2679,10 @@ mp.events.add("OnPlayerLoginRegister", () => {
     {
         mp.events.callRemote("SetPlayerPrivateWeather", mp.storage.data.menu.myweather);
     }
+
+    MDC_DOM = mp.browsers.new("package://mdc_screen/index.html");
+    MDCActive = false;
+    MDC_DOM.active = false;
 
     setTimeout(() => {
         focusChat(false);

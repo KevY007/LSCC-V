@@ -903,15 +903,48 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("RequestDeployStinger")]
+        public static void OnRequestDeployStinger(Player player, int spikeID)
+        {
+            Stinger sg = Stinger.Stingers.FirstOrDefault(s => s.ID == spikeID);
+            if (sg == null) { return; }
+
+            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (lobby.Stingers.FirstOrDefault(s => s.ID == spikeID) != null)
+            {
+                EPlayer.SendMessage(player, $"This stinger is already being deployed!");
+            }
+
+            Lobby_StingerData lobbyStinger = new Lobby_StingerData() { ID = spikeID };
+            lobby.Stingers.Add(lobbyStinger);
+            // Stinger is added to the lobby stingers array.
+            // GameUpdate() will then handle the deployment timer and create new objects if necessary.
+        }
+
         [ServerEvent(Event.PlayerEnterColshape)]
         public void OnPlayerEnterColshape(ColShape shape, Player player)
         {
             if (player.IsInVehicle)
             {
-                if (Stinger.StingerCols.Contains(shape))
+                if (shape.HasData("LinkedStingerObject") && shape.HasData("StingerID"))
                 {
-                    player.TriggerEvent("PopVehicleTires");
-                    EPlayer.SendMessage(player, $"~r~You drove over a stinger and your tires have been popped!");
+                    LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+                    string stingerKey = shape.GetData<string>("LinkedStingerObject");
+                    int stingerID = shape.GetData<int>("StingerID");
+                    Lobby_StingerData stinger = lobby.Stingers.FirstOrDefault(s => s.ID == stingerID);
+                    if (stinger.StingerColshapes.Contains(shape))
+                    {
+                        player.TriggerEvent("PopVehicleTires");
+                        EPlayer.SendMessage(player, $"~r~You drove over a stinger and your tires have been popped!");
+
+                        if (stinger == null) return;
+                        GTANetworkAPI.Object stingerObj = stinger.StingerObjects.FirstOrDefault(s => s.GetData<string>("StingerObjectKey") == stingerKey);
+                        if (stingerObj == null) return;
+
+                        stingerObj.Delete();
+                        shape.Delete();
+                        stinger.Stage = 4;
+                    }
                 }
             }
         }

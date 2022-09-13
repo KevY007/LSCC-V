@@ -1,0 +1,263 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron&family=Poppins&display=swap');
+
+body{
+    margin: 0px;
+    height: 100%;
+    
+    -webkit-user-select:none;
+    -moz-user-select:-moz-none;
+    -ms-user-select:none;
+    user-select:none
+}
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+.mdc-panel{
+    border-radius:25px;
+    height:756px;
+    width:1024px;
+    background-color: #141414;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ==========> MDC BUTTONS <========== */
+.mdc-buttons{
+    height:100%;
+    width:330px;
+
+    display: flex;
+    align-items: center;
+    padding:65px 0px 0px 0px;
+    flex-direction: column;
+}
+.mdc-button-pressed {
+    margin:5px;
+    background-color: #433A3F;
+    top: 4px;
+  
+    width:300px;
+    height:50px;
+    border:1px solid black;
+
+    border-radius: 6px;
+    color: #A19199;
+    font-family: 'Poppins', sans-serif;
+    font-size:20px;
+
+    position: relative;
+    text-align: center;
+}
+.mdc-button{
+    margin:5px;
+    width:300px;
+    height:50px;
+    border:1px solid black;
+
+    background-color: #433A3F;
+    border-radius: 6px;
+    box-shadow: 0 0 0 1px #372F33 inset,0 0 0 2px rgba(255, 255, 255, 0.15) inset,0 4px 0 0      #372F33,0 4px 0 1px rgba(0, 0, 0, 0.4),0 4px 4px 1px rgba(0, 0, 0, 0.5);
+    color: #A19199;
+    font-family: 'Poppins', sans-serif;
+    font-size:20px;
+
+    position: relative;
+    text-align: center;
+}
+.mdc-button-pressed > p{ margin:10px 0px 0px 0px;}
+.mdc-button > p{ margin:10px 0px 0px 0px;}
+
+/* ==========> MDC SCREEN => MAP <========== */
+.mdc-screen-map{
+    border-radius:25px;
+    margin: 20px;
+    height:650px;
+    width:650px;
+
+    display: flex;
+    background-color:#0FA8D2;
+    overflow: hidden;
+    position:relative;
+}
+.mdc-content{
+    overflow: hidden;
+    transform:scale(1.0);
+    width:100%;
+    height:100%;
+}
+
+/* ==========> MDC SCREEN => ROADBLOCK DEPLOYMENT <========== */
+.mdc-screen-stinger{
+    border-radius:25px;
+    margin: 20px;
+    height:650px;
+    width:650px;
+
+    display: flex;
+    align-items: flex-end;
+    background-color:black;
+    overflow: hidden;
+    position:relative;
+
+    background-image:url('https://media.discordapp.net/attachments/901764108989378580/1017205915948171416/unknown.png?width=676&height=676');
+    background-size: cover;
+}
+.stinger-info-panel{
+    width:100%;
+    height:128px;
+    background-color:rgba(0,0,0,0.8);
+    display:flex;
+    flex-direction: column;
+}
+.stinger-location{
+    font-size:25px;
+    font-family: 'Inter', sans-serif;
+    color:white;
+}
+.stinger-street{
+    font-size:25px;
+    font-family: 'Inter', sans-serif;
+    color:white;  
+}
+.stinger-controls{
+    margin:-10px 0px 15px 10px;
+    font-size:20px;
+    font-family: 'Inter', sans-serif;
+    color:white;    
+}
+
+/* ==========> MDC SCREEN => MINI SCREEN <========== */
+.mdc-miniscreen{
+    border-radius:5px;
+    margin: 20px;
+    height:150px;
+    width:300px;
+
+    background-color:rgb(8, 8, 8);
+}
+.miniscreen-status{
+    color:white;
+    font-family: 'Orbitron', sans-serif;
+    padding:0px 0px 0px 10px;
+    font-size:19px;
+}
+.miniscreen-description{
+    color:white;
+    font-family: 'Orbitron', sans-serif;
+    font-size:14px;
+    text-align: center;
+}
+
+/* ==========> OTHER SCREEN ELEMENTS <========== */
+.help-panel{
+    position:absolute;
+    top:520px;
+    left:10px;
+    height:120px;
+    width:200px;
+    border-radius: 20px;
+    background-color: rgba(0, 0, 0, 0.782);
+
+    text-align: center;
+}
+.help-panel > p{
+    margin:7px;
+    list-style: none;
+    font-family: 'Inter', sans-serif;
+    color:white;
+}
+/* UNUSED FOR NOW - NEED TO FIGURE OUT HOW TO CHECK IF DIV IS TOUCHING ANOTHER DIV OR SMTH IDK
+.map-crosshair-display{
+    position:absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);    
+    opacity: 0.5;
+}
+*/
+
+.map-views{
+    position:absolute;
+    top:10px;
+    left:470px;
+    height:90px;
+    width:150px;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.782);    
+
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    padding:0px 10px 0px 10px;
+}
+.map-view{
+    width:65px;
+    height:65px;
+    overflow:hidden;
+
+    filter:grayscale(100%);
+
+    border: 3px solid black;
+    border-radius: 10px;
+}
+.map-view-selected{
+    width:65px;
+    height:65px;
+    overflow:hidden;
+
+    border: 3px solid white;
+    border-radius: 10px;
+}
+.map-view-icon{
+    width:65px;
+    height:65px;
+}
+
+/* ==========> MAP & MAP CONTENT <========== */
+.map{    
+    position:relative;
+    left:0px;
+    top:0px;
+
+    width:100%;
+    height:100%;
+
+    flex-shrink: 0;
+    min-width: 100%;
+    min-height: 100%;
+    transform:scale(1.0);
+}
+.map-content{
+    position:absolute;
+    width:100%;
+    height:100%;
+    top:0px;
+    left:0px;
+}
+
+/* ==========> MAP BLIPS <========== */
+.blip-police{
+    transform:scale(0.005);
+    position:absolute;
+    top:-60px;
+    left:-200px;
+}
+.blip-spike{
+    transform:scale(0.01);
+    position:absolute;
+    top:-60px;
+    left:-200px;
+}
+
+.fugi-circle{
+    transform:scale(0.085);
+    position:absolute;
+    top:-60px;
+    left:-200px;
+}

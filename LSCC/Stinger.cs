@@ -30,7 +30,6 @@ namespace RNC
         }
 
         public static List<Stinger> Stingers = new List<Stinger>();
-        public static List<ColShape> StingerCols = new List<ColShape>();
     }
     public class StingerInfo : Script
     {

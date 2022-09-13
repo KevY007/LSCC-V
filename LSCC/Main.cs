@@ -138,6 +138,25 @@ namespace RNC
         BANKROBBERY = 2,
     }
 
+    public class Lobby_StingerData
+    {
+        public int ID;
+        public List<GTANetworkAPI.Object> StingerObjects = new List<GTANetworkAPI.Object>();
+        public List<ColShape> StingerColshapes = new List<ColShape>();
+
+        /*
+        SPIKE STAGES:
+        1 => White Icon => Spikes have just been placed down.
+        2 => Yellow Icon => 15 seconds have passed, police peds are spawned next to the spikes.
+        3 => Green Icon => Spikes are currently deployed at that location.
+        4 => Dark-red Icon => Spikes were destroyed, probably because suspects' vehicle drove over them.
+        */
+        public int Stage = 1;
+        public int TimeElapsed = 0;
+
+        public Lobby_StingerData() { }
+    }
+
     public class LobbyData
     {
         public List<Player> Cops { get; set; }
@@ -171,6 +190,8 @@ namespace RNC
         public string Background { get; set; }
         public KeyValuePair<Player, Player> FirstKill { get; set; }
 
+        public List<Lobby_StingerData> Stingers { get; set; }
+
         public LobbyData()
         {
             Cops = new List<Player>();
@@ -183,6 +204,7 @@ namespace RNC
 
             FirstKill = new KeyValuePair<Player, Player>(null, null);
 
+            Stingers = new List<Lobby_StingerData>();
 
             Time = new int[3];
             Time[0] = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 23);
@@ -2194,7 +2216,7 @@ namespace RNC
                 .Add(WeaponHash.Pistol50, "package://Artwork/Weapons/Pistol50.png", "Desert Eagle", 40)
                 .Add(WeaponHash.Bullpupshotgun, "package://Artwork/Weapons/BullpupShotgun.png", "Kel Tec KSG", 28)
                 .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 2);
-
+            
             new LoadoutData(1, "CIA", 15, 30)
                 .Add(WeaponHash.Pistol_mk2, "package://Artwork/Weapons/PistolMk2.png", "H&K P30L", 50)
                 .Add(WeaponHash.Assaultshotgun, "package://Artwork/Weapons/AssaultShotgun.png", "AA-12", 20)
@@ -4284,6 +4306,61 @@ namespace RNC
 
                 lock (Settings.Lobbies)
                 {
+                    // TEST PURPOSES
+                    foreach(LobbyData lobby in Settings.Lobbies)
+                    {
+                        foreach (Lobby_StingerData stinger in lobby.Stingers)
+                        {
+                            stinger.TimeElapsed++;
+                            if (stinger.TimeElapsed == 15)
+                            {
+                                stinger.Stage = 2;
+
+                                Stinger stdata = Stinger.Stingers.FirstOrDefault(s => s.ID == stinger.ID);
+                                if (stdata != null)
+                                {
+                                    foreach (StingerInfo sgobject in stdata.StingerObjects.Where(s => s.IsNPC))
+                                    {
+                                        bool female = new Random().Next(0, 10) > 5;
+                                        NAPI.Ped.CreatePed(female ? PedHash.Cop01SFY : PedHash.Cop01SMY, sgobject.Position, sgobject.Rotation.Z, Convert.ToUInt32(lobby.lobbyId));
+
+                                    }
+                                }
+                            }
+                            else if (stinger.TimeElapsed == 30)
+                            {
+                                stinger.Stage = 3;
+
+                                Stinger stdata = Stinger.Stingers.FirstOrDefault(s => s.ID == stinger.ID);
+                                if (stdata != null)
+                                {
+                                    foreach (StingerInfo sgobject in stdata.StingerObjects.Where(s => !s.IsNPC))
+                                    {
+                                        GTANetworkAPI.Object obj = NAPI.Object.CreateObject(NAPI.Util.GetHashKey("p_stinger_04"),
+                                        sgobject.Position, sgobject.Rotation, 255, Convert.ToUInt32(lobby.lobbyId));
+
+                                        obj.SetData<string>("StingerObjectKey", $"{stdata.ID}_{stdata.StingerObjects.IndexOf(sgobject)}");
+                                        stinger.StingerObjects.Add(obj);
+
+                                        float offsetY = 1.75f; // forward = offset by 1.5f so it's in center of spike
+                                        float offsetX = 0.0f;
+
+                                        Vector3 newPos = sgobject.Position;
+                                        float angle = sgobject.Rotation.Z + 180f;
+                                        angle = (float)((angle * Math.PI) / 180f);
+
+                                        newPos.X += (float)(offsetX * Math.Cos(angle) - offsetY * Math.Sin(angle));
+                                        newPos.Y += (float)(offsetX * Math.Sin(angle) + offsetY * Math.Cos(angle));
+
+                                        ColShape col = NAPI.ColShape.CreateSphereColShape(newPos, 1.5f, Convert.ToUInt32(lobby.lobbyId));
+                                        col.SetData<string>("LinkedStingerObject", $"{stdata.ID}_{stdata.StingerObjects.IndexOf(sgobject)}");
+                                        col.SetData<int>("StingerID", stdata.ID);
+                                        stinger.StingerColshapes.Add(col);
+                                    }
+                                }
+                            }
+                        }
+                    }
                     foreach (LobbyData lobby in Settings.Lobbies.Where(l => l.gameStatus == 1))
                     {
                         lock (lobby)
@@ -5132,6 +5209,60 @@ namespace RNC
                                             pl.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, -1, (short)lobby.gameMode);
                                         }
                                         catch { }
+                                    }
+                                }
+                            }
+                        }
+
+                        foreach(Lobby_StingerData stinger in lobby.Stingers)
+                        {
+                            stinger.TimeElapsed++;
+                            if(stinger.TimeElapsed == 15)
+                            {
+                                EPlayer.SendMessageAll($"STINGER {stinger.ID} IS NOW STAGE 2 = COPS SPAWNED.");
+                                stinger.Stage = 2;
+
+                                Stinger stdata = Stinger.Stingers.FirstOrDefault(s => s.ID == stinger.ID);
+                                if(stdata != null)
+                                {
+                                    foreach(StingerInfo sgobject in stdata.StingerObjects.Where(s => s.IsNPC))
+                                    {
+                                        bool female = new Random().Next(0, 10) > 5;
+                                        NAPI.Ped.CreatePed(female ? PedHash.Cop01SFY : PedHash.Cop01SMY, sgobject.Position, sgobject.Rotation.Z, Convert.ToUInt32(lobby.lobbyId));
+
+                                    }
+                                }
+                            }
+                            else if(stinger.TimeElapsed == 30)
+                            {
+                                stinger.Stage = 3;
+                                EPlayer.SendMessageAll($"STINGER {stinger.ID} IS NOW STAGE 3 = STINGERS DEPLOYED.");
+
+                                Stinger stdata = Stinger.Stingers.FirstOrDefault(s => s.ID == stinger.ID);
+                                if (stdata != null)
+                                {
+                                    foreach (StingerInfo sgobject in stdata.StingerObjects.Where(s => !s.IsNPC))
+                                    {
+                                        GTANetworkAPI.Object obj = NAPI.Object.CreateObject(NAPI.Util.GetHashKey("p_stinger_04"),
+                                        sgobject.Position, sgobject.Rotation, 255, Convert.ToUInt32(lobby.lobbyId));
+
+                                        obj.SetData<string>("StingerObjectKey", $"{stdata.ID}_{stdata.StingerObjects.IndexOf(sgobject)}");
+                                        stinger.StingerObjects.Add(obj);
+
+                                        float offsetY = 1.75f; // forward = offset by 1.5f so it's in center of spike
+                                        float offsetX = 0.0f;
+
+                                        Vector3 newPos = sgobject.Position;
+                                        float angle = sgobject.Rotation.Z + 180f;
+                                        angle = (float)((angle * Math.PI) / 180f);
+
+                                        newPos.X += (float)(offsetX * Math.Cos(angle) - offsetY * Math.Sin(angle));
+                                        newPos.Y += (float)(offsetX * Math.Sin(angle) + offsetY * Math.Cos(angle));
+
+                                        ColShape col = NAPI.ColShape.CreateSphereColShape(newPos, 1.5f, Convert.ToUInt32(lobby.lobbyId));
+                                        col.SetData<string>("LinkedStingerObject", $"{stdata.ID}_{stdata.StingerObjects.IndexOf(sgobject)}");
+                                        col.SetData<int>("StingerID", stdata.ID);
+                                        stinger.StingerColshapes.Add(col);
                                     }
                                 }
                             }

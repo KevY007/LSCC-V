@@ -42,6 +42,8 @@ var menuToggled = false;
 var scoreboardToggled = false;
 var scoreboardCursor = false;
 
+var MDC_DOM = null;
+
 var cuffTarget = null;
 var cuffInterval = null;
 
@@ -96,6 +98,7 @@ require("./ServerUI/Logs.js");
 require("./charcreator/clotheditor.js")
 require("./charcreator/index.js");
 require("./charcreator/outfitslots.js")
+require('./mdc_screen/index.js');
 require('./Player/Fuel.js');
 
 require('./camerasManager.js');

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css"/>
+        <script src="./js/mdc.js" defer></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="mdc-panel">
+                
+                <div id="mdc_map" class="mdc-screen-map">
+                    <div id="mdc-content" class="mdc-content">
+                        <img id="map_display" class="map" src="./img/atlas_map.png"/>
+                        <div id="map_content" class="map-content">
+                            <!--
+                            <img class="fugi-circle" src="./img/fugitive_circle.gif"/>
+                            <img class="blip-police" src="./img/police_blip.gif"/>
+                            -->
+                        </div>
+                    </div>
+                    <div id="help_panel" class="help-panel">
+                            <p><strong>Pan</strong> - Arrow Keys</p>
+                            <p><strong>Zoom In</strong> - Shift</p>
+                            <p><strong>Zoom Out</strong> - Ctrl</p>
+                            <p><strong>Switch View</strong> - Enter</p>
+                    </div>
+                    <!--
+                    <div class="map-crosshair-display">
+                        <img src="./img/map_crosshair.png"/>
+                    </div>
+                    -->
+                    <div class="map-views">
+                        <div id="view-atlas" class="map-view-selected">
+                            <img class="map-view-icon" src="./img/icon_atlas.png"/>
+                        </div>
+                        <div id="view-satellite" class="map-view">
+                            <img class="map-view-icon" src="./img/icon_satellite.png"/>
+                        </div>
+                    </div>
+                </div>
+                -
+                <div style="display:none;" id="mdc_stinger" class="mdc-screen-stinger">
+                    <div class="stinger-info-panel" style="position:absolute;">
+                        <div style="position:absolute; right:25px; bottom:68px;">
+                            <p class="stinger-controls" id="stinger_location_pages">1/10</p>
+                        </div>
+                        <div style="display:flex; align-items:center; margin:0px 0px 0px 10px; height:64px;">
+                            <h1 class="stinger-location" id="stinger_area">
+                                Little Seoul
+                            </h1>
+                            <p class="stinger-street">&nbsp—&nbsp</p>
+                            <p class="stinger-street" id="stinger_street">
+                            La Puerta Fway
+                            </p>
+                        </div>
+                        <p class="stinger-controls">
+                            Press <strong>[ENTER]</strong> to request deployment.
+                        </p>
+                        <p class="stinger-controls">
+                            Use the <strong>Left & Right Arrows</strong> to scroll through locations.
+                        </p>
+                    </div>
+                </div>
+                <div class="mdc-buttons">
+                    <div class="mdc-miniscreen">
+                        <p id="miniscreen_status" class="miniscreen-status">
+                            SIGNAL: [///]<br>
+                            OFFICER: codename<br>
+                            SUSPECTS: 5
+                        </p>
+                        <p id="miniscreen_desc" class="miniscreen-description">
+                            Approximate suspects' location & active stingers are displayed.
+                        </p>
+                    </div>
+                    <div class="mdc-button-pressed" id="option_map_view">
+                        <p>MAP VIEW [M]</p>
+                    </div>
+                    <div class="mdc-button" id="option_stinger">
+                        <p>STINGER DEPLOYMENT [R]</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body> 
+</html>

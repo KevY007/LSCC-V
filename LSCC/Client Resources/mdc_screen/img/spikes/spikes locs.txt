@@ -1,0 +1,77 @@
+var stingerData = [
+    {
+        id: 1,
+        area: "Vinewood Hills",
+        street: "Los Santos Freeway"
+    },
+    {
+        id: 2,
+        area: "Grand Senora Desert",
+        street: "Route 68"
+    }, 
+    {
+        id: 3,
+        area: "Braddock Pass",
+        street: "Senora Freeway"
+    },     
+    {
+        id: 4,
+        area: "Paleto Bay",
+        street: "Procopio Drive"
+    },      
+    {
+        id: 5,
+        area: "Chiliad Mountain State Wilderness",
+        street: "Freeway"
+    },      
+    {
+        id: 6,
+        area: "North Chumash",
+        street: "Freeway"
+    },         
+    {
+        id: 7,
+        area: "Chumash",
+        street: "Braham Canyon Drive"
+    },           
+    {
+        id: 8,
+        area: "Del Perro",
+        street: "Bay City Incline"
+    },            
+    {
+        id: 9,
+        area: "Downtown",
+        street: "Del Perro Freeway"
+    },           
+    {
+        id: 10,
+        area: "El Burro Heights",
+        street: "Del Perro Freeway"
+    },          
+    {
+        id: 11,
+        area: "Elysian Island",
+        street: "Elysian Fields Freeway"
+    },       
+    {
+        id: 12,
+        area: "La Puerta",
+        street: "Olympic Freeway"
+    },     
+    {
+        id: 13,
+        area: "Downtown",
+        street: "Integrity Way"
+    },    
+    {
+        id: 14,
+        area: "Palomino Highlands",
+        street: "Olympic Freeway"
+    },    
+    {
+        id: 15,
+        area: "Tataviam Mountains",
+        street: "Olympic Freeway"
+    }, 
+];

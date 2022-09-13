@@ -8982,6 +8982,34 @@ namespace RNC
             player.TriggerEvent("OpenTuner", -1);
         }
 
+        [Command("forward")]
+        public void cmd_forward(Player player, int offset)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                return;
+            }
+
+            float offsetY = offset; // forward = offset by 1.5f so it's in center of spike
+            float offsetX = 0.0f;
+
+            Vector3 newPos = player.Position;
+            float angle = player.Rotation.Z;
+            if (angle < 0) angle += 360f;
+            angle += 180f;
+            angle = (float)((player.Heading * Math.PI) / 180f);
+
+            newPos.X += (float)(offsetX * Math.Cos(angle) - offsetY * Math.Sin(angle));
+            newPos.Y += (float)(offsetX * Math.Sin(angle) + offsetY * Math.Cos(angle));
+
+            player.Position = newPos;
+            EPlayer.SendMessage(player, "!{#C9C9C9}Teleported you to position in front of you.");
+        }
+
         [Command("testspike")]
         public void cmd_testspike(Player player, int spikeID)
         {
@@ -8994,34 +9022,13 @@ namespace RNC
                 return;
             }
 
-            Stinger sg = Stinger.Stingers.FirstOrDefault(s => s.ID == spikeID);
-            if(sg == null) { EPlayer.SendMessage(player, $"Fuck off, that spike ID does not exist."); return; }
-            foreach(StingerInfo sgobject in sg.StingerObjects)
-            {
-                if (!sgobject.IsNPC)
-                {
-                    NAPI.Object.CreateObject(NAPI.Util.GetHashKey("p_stinger_04"),
-                        sgobject.Position, sgobject.Rotation, 255, player.Dimension);
-
-                    // NEEDS FIXING RIP
-                    float angle = (sgobject.Rotation.Z + 180f)*(-1);
-
-                    double colX = sgobject.Position.X, colY = sgobject.Position.Y;
-                    colX += 1.5 * Math.Sin(angle);
-                    colY += 1.5 * -Math.Cos(angle);
-
-                    ColShape col = NAPI.ColShape.CreateSphereColShape(new Vector3(colX, colY, sgobject.Position.Z), 1.5f, player.Dimension);
-                    NAPI.Marker.CreateMarker(MarkerType.DebugSphere, new Vector3(colX, colY, sgobject.Position.Z), new Vector3(colX, colY, sgobject.Position.Z), new Vector3(colX, colY, sgobject.Position.Z), 1.5f, new Color(0, 0, 255, 128));
-                    Stinger.StingerCols.Add(col);
-                }
-                else
-                {
-                    bool female = new Random().Next(0, 10) > 5;
-                    NAPI.Ped.CreatePed(female ? PedHash.Cop01SFY : PedHash.Cop01SMY, sgobject.Position, sgobject.Rotation.Z, player.Dimension);
-                }
-            }
-            player.Position = sg.StingerObjects[0].Position.Around(5f);
-            EPlayer.SendMessage(player, $"Created stinger ID {spikeID} [{sg.Area} - {sg.Street}] | Objects: {sg.StingerObjects.Count}");
+            Events.OnRequestDeployStinger(player, spikeID);
+            Stinger st = Stinger.Stingers.FirstOrDefault(s => s.ID == spikeID);
+            if(st == null) { EPlayer.SendMessage(player, "no exist :("); return; }
+            player.Position = st.StingerObjects[0].Position;
+            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+            player.Dimension = Convert.ToUInt32(lobby.lobbyId);
+            EPlayer.SendMessage(player, $"~y~You have requested stinger deployment at location: ~w~{st.Area} - {st.Street}.");
         }
 
         [Command("cameraset")]
