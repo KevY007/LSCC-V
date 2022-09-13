@@ -107,6 +107,9 @@ mp.events.add("Menu_AddClan", (cname, tag, desc, banner, isOpen, players, maxPla
 mp.events.add("kickClanMember", (memberSQLID) => {
     mp.events.callRemote("Clan_OnRequestKickPlayer", memberSQLID);
 });
+mp.events.add("setClanRank", (memberSQLID, tier) => {
+    mp.events.callRemote("Clan_OnRequestChangeTier", memberSQLID, tier);
+});
 mp.events.add("Menu_AddClanMember", (memberID, memberName, memberTier, memberLevel) => {
 
     ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.push(

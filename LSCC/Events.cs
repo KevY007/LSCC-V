@@ -932,7 +932,84 @@ namespace RNC
         [RemoteEvent("Clan_OnRequestChangeTier")]
         public void Clan_OnRequestChangeTier(Player player, int targetSQLID, int tier)
         {
+            if (!EPlayer.LoggedIn(player))
+                return;
 
+            Account pAcc = EPlayer.GetAccount(player);
+            if (player.GetSharedData<int>("ClanID") == -1)
+            {
+                EPlayer.Error(player, "You are not in any clan!");
+                return;
+            }
+            if (player.GetSharedData<int>("ClanTier") > 0)
+            {
+                EPlayer.Error(player, "You do not have the authority to promote/demote clan members!");
+                return;
+            }
+            if(tier == 0)
+            {
+                EPlayer.Error(player, "You cannot promote anyone to the <strong>Leader</strong> rank! Only you can have it.");
+                return;
+            }
+            int pClanTier = player.GetSharedData<int>("ClanTier");
+            int pClanID = player.GetSharedData<int>("ClanID");
+
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account tAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == targetSQLID);
+                    if (tAcc == null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Error(player, "FATAL ERROR: That account does not exist in the database!");
+                        });
+                        return;
+                    }
+                    if (tAcc.ClanID != pClanID)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Error(player, "FATAL ERROR: That player is not in your clan!");
+                        });
+                        return;
+                    }
+                    if (tAcc.ClanTier <= pClanTier)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Error(player, "That player is a tier higher than/equal to yours! You cannot promote/demote them.");
+                        });
+                        return;
+                    }
+
+                    string text = (tAcc.ClanTier > tier) ? "demoted" : "promoted";
+                    tAcc.ClanTier = tier;
+                    await context.SaveChangesAsync();
+
+                    NAPI.Task.Run(() =>
+                    {
+                        string rank = "";
+                        switch (tier)
+                        {
+                            case 1: rank = "Officer (1)";
+                                break;
+                            case 2: rank = "Member (2)";
+                                break;
+                        }
+
+                        EPlayer.Notify(player, $"You successfully <strong>{text}</strong> {tAcc.Username} to <strong>{rank}</strong>!", "green", "", false, 3000);
+
+                        Player target = Settings.LoggedInPlayers.FirstOrDefault(t => EPlayer.GetAccount(t).SQL_ID == tAcc.SQL_ID);
+                        if (target != null)
+                        {
+                            target.SetSharedData("ClanTier", tier);
+                            EPlayer.Notify(player, $"You have been <strong>{text}</strong> in your clan to <strong>{rank}</strong>!", (text == "demoted" ? "orange" : "green"), "", false, 5000);
+                        }
+                    });
+                }
+            });
         }
 
         [RemoteEvent("Clan_OnRequestKickPlayer")]
@@ -990,11 +1067,15 @@ namespace RNC
 
                     NAPI.Task.Run(() =>
                     {
-                        EPlayer.Notify(player, $"You've successfully kicked {tAcc.Username} from the clan!", "orange", "", false, 3000);
+                        EPlayer.Notify(player, $"You've successfully kicked {tAcc.Username} from the clan!", "green", "", false, 3000);
 
                         Player target = Settings.LoggedInPlayers.FirstOrDefault(t => EPlayer.GetAccount(t).SQL_ID == tAcc.SQL_ID);
                         if(target != null)
                         {
+                            target.SetSharedData("ClanID", -1);
+                            target.SetSharedData("ClanTier", -1);
+                            target.SetSharedData("ClanName", "N/A");
+                            target.SetSharedData("ClanCreated", "N/A");
                             EPlayer.Notify(player, $"You have been <strong>kicked</strong> from the clan!", "orange", "", false, 5000);
                         }
                     });
