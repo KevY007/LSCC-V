@@ -2306,6 +2306,20 @@ mp.events.add('native:call', (nativeName, args, hasCallback) => {
     }
 });
 
+mp.events.add("PopVehicleTires", () => {
+    let vehicle = mp.players.local.vehicle;
+    if(!vehicle) return;
+    vehicle.setTyreBurst(0, false, 1000);
+    vehicle.setTyreBurst(1, false, 1000);
+    vehicle.setTyreBurst(4, false, 1000);
+    vehicle.setTyreBurst(5, false, 1000);
+    // vehicle.setBurnout(true);
+    // setTimeout(_ => {
+    //     if(vehicle)
+    //         vehicle.setBurnout(false);
+    // }, 500);
+});
+
 mp.events.add(
 {
     "GetGroundZ": (px, py, pz, dimension, returnEvent) => {

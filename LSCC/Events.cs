@@ -903,6 +903,19 @@ namespace RNC
             }
         }
 
+        [ServerEvent(Event.PlayerEnterColshape)]
+        public void OnPlayerEnterColshape(ColShape shape, Player player)
+        {
+            if (player.IsInVehicle)
+            {
+                if (Stinger.StingerCols.Contains(shape))
+                {
+                    player.TriggerEvent("PopVehicleTires");
+                    EPlayer.SendMessage(player, $"~r~You drove over a stinger and your tires have been popped!");
+                }
+            }
+        }
+
         [ServerEvent(Event.PlayerEnterVehicle)]
         public void OnPlayerEnterVehicle(Player player, Vehicle vehicle, sbyte seatID)
         {

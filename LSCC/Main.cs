@@ -1904,7 +1904,7 @@ namespace RNC
 
             NAPI.Server.SetAutoRespawnAfterDeath(false);
             NAPI.Server.SetAutoSpawnOnConnect(false);
-            NAPI.Server.SetGlobalServerChat(false); 
+            NAPI.Server.SetGlobalServerChat(false);
             NAPI.Server.SetCommandErrorMessage("!{#FF6347}[!] !{#FFFFFF}This command is invalid, refer to /help for a list.");
 
             NAPI.Util.ConsoleOutput($"(RnC | STARTUP) Connecting to database & backup database => User {Settings.MySQL_User} for db {Settings.MySQL_Database} on host {Settings.MySQL_Host}");
@@ -2039,21 +2039,133 @@ namespace RNC
             /* PRE-SET STINGERS CREATION */
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the pre-set stingers...");
 
-            new Stinger(1, "Vinewood Hills", "Los Santos Freeway");
-            new Stinger(2, "Grand Senora Desert", "Route 68");
-            new Stinger(3, "Braddock Pass", "Senora Freeway");
-            new Stinger(4, "Paleto Bay", "Procopio Drive");
-            new Stinger(5, "Chilliad Mountain State Wilderness", "Freeway");
-            new Stinger(6, "North Chumash", "Freeway");
-            new Stinger(7, "Chumash", "Braham Canyon Drive");
-            new Stinger(8, "Del Perro", "Bay City Incline");
-            new Stinger(9, "Downtown", "Del Perro Freeway");
-            new Stinger(10, "El Burro Heights", "Del Perro Freeway");
-            new Stinger(11, "Elysian Island", "Elysian Fields Freeway");
-            new Stinger(12, "La Puerta", "Olympic Freeway");
-            new Stinger(13, "Downtown", "Integrity Way");
-            new Stinger(14, "Palomino Highlands", "Olympic Freeway");
-            new Stinger(15, "Tataviam Mountains", "Olympic Freeway");
+            new Stinger(1, "Vinewood Hills", "Los Santos Freeway")
+                .Add(new Vector3(864.457458, 104.437248, 69.017662), new Vector3(-3.99996424, 7.74004316, -126.800285), false)
+                .Add(new Vector3(868.037231, 101.380112, 68.6703796), new Vector3(-5.00000238, 7.74004602, -130.525909), false)
+                .Add(new Vector3(860.004333, 107.840805, 69.2920532), new Vector3(-1.99996078, 7.7400341, -125.932564), false)
+                .Add(new Vector3(855.60553, 111.016136, 69.3830948), new Vector3(-1.99995077, 7.74003124, -128.789978), false)
+                .Add(new Vector3(849.903442, 115.229126, 69.5843048), new Vector3(-4.99994087, 7.74002695, -123.418114), false)
+                .Add(new Vector3(842.170959, 120.748032, 70.139534), new Vector3(-2.9999454, 7.73997259, -124.023514), false)
+                .Add(new Vector3(846.066345, 117.960052, 69.9208679), new Vector3(-3.99994087, 7.74001884, -123.244217), false)
+                .Add(new Vector3(838.105347, 123.878937, 70.2356415), new Vector3(-0.999967813, 7.7399683, -123.417183), false)
+                .Add(new Vector3(868.605225, 100.659203, 69.5594177), new Vector3(0, 0, 37.5658493), true)
+                .Add(new Vector3(834.803467, 125.96109, 71.2073212), new Vector3(0, -0, -142.016968), true);
+            new Stinger(2, "Grand Senora Desert", "Route 68")
+                .Add(new Vector3(2224.20386, 2741.32983, 44.4980011), new Vector3(-0.999999821, -0, -142.383636), false)
+                .Add(new Vector3(2220.97827, 2745.30518, 44.5816536), new Vector3(8.34464913e-07, 1.06737957e-07, -142.989487), false)
+                .Add(new Vector3(2217.93848, 2749.14063, 44.5730858), new Vector3(8.34456557e-07, 1.06735975e-07, -137.704315), false)
+                .Add(new Vector3(2209.45532, 2760.54541, 44.496563), new Vector3(7.74860439e-07, 1.12074838e-06, -154.766357), false)
+                .Add(new Vector3(2206.87427, 2764.88818, 44.5330009), new Vector3(7.74859643e-07, 1.12074849e-06, -141.600708), false)
+                .Add(new Vector3(2203.13843, 2769.43115, 44.4885025), new Vector3(7.74855039e-07, 1.12074645e-06, -137.961624), false)
+                .Add(new Vector3(2212.03735, 2750.4126, 45.6890831), new Vector3(0, -0, -115.353119), true)
+                .Add(new Vector3(2208.9292, 2754.23828, 45.723278), new Vector3(0, 0, 11.9699469), true);
+            new Stinger(3, "Braddock Pass", "Senora Freeway")
+                .Add(new Vector3(2457.21069, 5659.93799, 44.0309181), new Vector3(-0.99999994, 2.66844893e-08, 114.096939), false)
+                .Add(new Vector3(2461.46411, 5661.81543, 44.0759163), new Vector3(-0.999997079, 2.66844893e-07, 107.598099), false)
+                .Add(new Vector3(2465.94019, 5663.06982, 44.0672264), new Vector3(-0.999995589, 2.40160375e-07, 108.896149), false)
+                .Add(new Vector3(2439.80786, 5650.24902, 44.0841599), new Vector3(-0.999997675, 2.13475914e-07, 121.97596), false)
+                .Add(new Vector3(2435.18311, 5648.24854, 44.083992), new Vector3(-0.999997616, 6.93796721e-07, 109.762627), false)
+                .Add(new Vector3(2431.36719, 5645.89014, 44.0596313), new Vector3(-0.999995112, 1.17411753e-06, 123.273232), false)
+                .Add(new Vector3(2445.32251, 5651.67285, 44.9679985), new Vector3(0, 0, 71.1312256), true)
+                .Add(new Vector3(2455.64795, 5659.46094, 45.0228004), new Vector3(-0, -0, -68.5768204), true);
+            new Stinger(4, "Paleto Bay", "Procopio Drive")
+                .Add(new Vector3(149.713669, 6508.15625, 30.5366707), new Vector3(-0.15400061, -3.33506449e-08, -135.700516), false)
+                .Add(new Vector3(145.890289, 6511.95117, 30.5634766), new Vector3(-0.15400365, -1.20062325e-07, -137.605225), false)
+                .Add(new Vector3(142.026657, 6516.42822, 30.5839539), new Vector3(-0.154006004, 7.47054571e-07, -141.502258), false)
+                .Add(new Vector3(138.492798, 6520.68896, 30.6014023), new Vector3(-0.154008195, 1.69421298e-06, -140.462143), false)
+                .Add(new Vector3(135.24118, 6524.80762, 30.6457195), new Vector3(-0.154011637, 1.54079999e-06, -139.161865), false)
+                .Add(new Vector3(131.531219, 6528.2666, 31.4761162), new Vector3(0, -0, -122.195518), true)
+                .Add(new Vector3(151.796249, 6508.33887, 31.5315285), new Vector3(0, -0, 48.0318222), true);
+            new Stinger(5, "Chilliad Mountain State Wilderness", "Freeway")
+                .Add(new Vector3(-1514.46912, 4977.00537, 61.545269), new Vector3(0, -0, -132.189255), false)
+                .Add(new Vector3(-1519.02454, 4980.96533, 61.5092201), new Vector3(0, -0, -130.629471), false)
+                .Add(new Vector3(-1523.27197, 4984.71924, 61.5214119), new Vector3(2.54444361e-14, 4.66321922e-07, -134.439362), false)
+                .Add(new Vector3(-1527.37207, 4988.83398, 61.5525398), new Vector3(5.08888721e-14, 4.66321922e-07, -132.879608), false)
+                .Add(new Vector3(-1530.24573, 4991.30078, 62.488884), new Vector3(0, -0, -127.170448), true)
+                .Add(new Vector3(-1513.81091, 4976.24756, 62.540863), new Vector3(0, 0, 44.7893028), true);
+            new Stinger(6, "North Chumash", "Freeway")
+                .Add(new Vector3(-2479.62964, 3624.20532, 13.0303288), new Vector3(-0.50000006, -2.00110843e-08, 80.9697876), false)
+                .Add(new Vector3(-2474.46704, 3623.42651, 13.0659523), new Vector3(-0.499998569, 3.46858769e-07, 82.0080719), false)
+                .Add(new Vector3(-2468.65039, 3622.49976, 13.0622196), new Vector3(-0.499999493, -2.66814464e-08, 76.638588), false)
+                .Add(new Vector3(-2486.57275, 3625.57153, 13.0318298), new Vector3(-0.499999583, 9.33850401e-08, 78.9773941), false)
+                .Add(new Vector3(-2492.24268, 3626.68555, 13.0596399), new Vector3(-0.499999315, -2.73484801e-07, 80.2763519), false)
+                .Add(new Vector3(-2496.99585, 3627.37134, 13.0581608), new Vector3(-0.499999493, -5.06947345e-07, 83.5672607), false)
+                .Add(new Vector3(-2464.12939, 3621.66553, 14.0353832), new Vector3(0, 0, 80.6171722), true)
+                .Add(new Vector3(-2497.479, 3627.66089, 14.0366983), new Vector3(0, -0, -105.027687), true);
+            new Stinger(7, "Chumash", "Braham Canyon Drive")
+                .Add(new Vector3(-3135.90405, 1047.28992, 18.9112473), new Vector3(0, 0, 71.4114304), false)
+                .Add(new Vector3(-3131.33862, 1045.73242, 18.9060917), new Vector3(0, 0, 69.5920105), false)
+                .Add(new Vector3(-3126.02515, 1043.71851, 18.8783131), new Vector3(0, 0, 67.5993042), false)
+                .Add(new Vector3(-3121.22461, 1041.95837, 18.8624325), new Vector3(-1.00000012, -2.66844893e-08, 76.3466721), false)
+                .Add(new Vector3(-3116.56934, 1040.77893, 18.9025059), new Vector3(-0.399999291, -2.80151312e-07, 67.8580933), false)
+                .Add(new Vector3(-3111.04956, 1039.20215, 19.8973217), new Vector3(0, 0, 72.7090454), true)
+                .Add(new Vector3(-3136.52075, 1047.70605, 19.9158516), new Vector3(0, -0, -119.487709), true);
+            new Stinger(8, "Del Perro", "Bay City Incline")
+                .Add(new Vector3(-1873.98242, -573.478333, 10.6292706), new Vector3(0, -0, 137.21962), false)
+                .Add(new Vector3(-1870.05371, -569.218323, 10.6286602), new Vector3(0, -0, 134.013748), false)
+                .Add(new Vector3(-1866.02002, -565.142151, 10.6267757), new Vector3(0, -0, 135.658279), false)
+                .Add(new Vector3(-1859.60217, -557.949158, 10.6270981), new Vector3(0, -0, 143.019257), false)
+                .Add(new Vector3(-1856.05835, -553.419312, 10.6265841), new Vector3(0, -0, 133.750412), false)
+                .Add(new Vector3(-1852.39807, -549.512817, 10.626915), new Vector3(0, -0, 142.411026), false)
+                .Add(new Vector3(-1849.45105, -545.578125, 11.6357021), new Vector3(0, -0, 141.360046), true)
+                .Add(new Vector3(-1874.77954, -574.08844, 11.6253786), new Vector3(-0, -0, -48.0632362), true);
+            new Stinger(9, "Downtown", "Del Perro Freeway")
+                .Add(new Vector3(234.38826, -536.193176, 32.8832474), new Vector3(-1.90000117, 2.00213268e-08, 178.898361), false)
+                .Add(new Vector3(234.486755, -530.66925, 33.0870056), new Vector3(-1.89999783, -1.93539492e-07, 177.945099), false)
+                .Add(new Vector3(234.505707, -525.444336, 33.0470772), new Vector3(-1.36000121, -9.34077988e-08, 172.227478), false)
+                .Add(new Vector3(235.098328, -516.142273, 32.9900703), new Vector3(1.66999674, 6.6729406e-08, 177.943008), false)
+                .Add(new Vector3(234.808716, -520.276733, 33.0710716), new Vector3(-1.89999652, 1.60170623e-06, 167.374725), false)
+                .Add(new Vector3(235.570282, -506.213562, 32.9310493), new Vector3(-1.89999807, 1.33475515e-08, 177.511246), false)
+                .Add(new Vector3(235.790405, -500.535522, 33.0644073), new Vector3(-1.89999378, 7.11174266e-08, -179.976547), false)
+                .Add(new Vector3(235.710281, -494.570587, 33.0574646), new Vector3(-1.89999402, 3.3368881e-08, 178.20369), false)
+                .Add(new Vector3(235.864166, -488.991943, 33.0237579), new Vector3(-1.89999413, 9.34328668e-08, 177.423462), false)
+                .Add(new Vector3(235.003235, -537.083374, 33.8183784), new Vector3(0, 0, 42.9004402), true)
+                .Add(new Vector3(235.123032, -483.120911, 33.8356438), new Vector3(0, -0, -122.532112), true);
+            new Stinger(10, "El Burro Heights", "Del Perro Freeway")
+                .Add(new Vector3(1217.78455, -2042.31616, 43.1598511), new Vector3(-1.99999988, -0, 112.153732), false)
+                .Add(new Vector3(1223.01575, -2040.51404, 43.3536491), new Vector3(-1.99999928, 9.61080673e-07, 104.011246), false)
+                .Add(new Vector3(1229.12683, -2038.55579, 43.398613), new Vector3(-1.99999833, 6.40720543e-07, 106.868874), false)
+                .Add(new Vector3(1238.27332, -2035.29749, 43.3516464), new Vector3(-1.99999821, 7.47507272e-07, 107.387886), false)
+                .Add(new Vector3(1249.26611, -2031.55603, 43.3414154), new Vector3(1.00000393, 1.46764683e-06, 109.550652), false)
+                .Add(new Vector3(1243.93164, -2033.22839, 43.3508568), new Vector3(-1.99999642, 5.87327122e-07, 107.386009), false)
+                .Add(new Vector3(1214.74988, -2043.18506, 44.2154427), new Vector3(-0, -0, -71.4681854), true)
+                .Add(new Vector3(1255.46912, -2029.19788, 44.2202759), new Vector3(0, -0, 108.430885), true);
+            new Stinger(11, "Elysian Island", "Elysian Fields Freeway")
+                .Add(new Vector3(-470.615723, -2300.28662, 61.8680038), new Vector3(0, -0, 143.997528), false)
+                .Add(new Vector3(-466.76886, -2294.84448, 61.8686485), new Vector3(0, -0, 145.295471), false)
+                .Add(new Vector3(-462.407654, -2288.81226, 61.871048), new Vector3(0, -0, 144.773941), false)
+                .Add(new Vector3(-459.048828, -2283.94263, 61.8701477), new Vector3(0, -0, 147.890656), false)
+                .Add(new Vector3(-456.533173, -2279.86304, 63.0619659), new Vector3(0, -0, 141.527161), true)
+                .Add(new Vector3(-471.166107, -2301.00879, 63.06493), new Vector3(-0, -0, -33.0876427), true);
+            new Stinger(12, "La Puerta", "Olympic Freeway")
+                .Add(new Vector3(-427.332275, -1413.20557, 37.4033699), new Vector3(0, -0, 98.654541), false)
+                .Add(new Vector3(-417.428894, -1412.20862, 37.4408646), new Vector3(-2.00000048, 8.34271485e-10, 90.2518845), false)
+                .Add(new Vector3(-411.006653, -1412.35266, 37.5516548), new Vector3(-0.999993324, 4.13609627e-07, 88.9522705), false)
+                .Add(new Vector3(-400.705048, -1412.79565, 37.4484062), new Vector3(-1.9999913, 5.33933751e-08, 83.754982), false)
+                .Add(new Vector3(-394.801544, -1413.354, 37.5613976), new Vector3(1.01923933e-05, -3.33558781e-09, 87.7389755), false)
+                .Add(new Vector3(-388.997894, -1413.42212, 38.3984985), new Vector3(0, -0, 91.293602), true)
+                .Add(new Vector3(-428.316162, -1413.14014, 38.3985176), new Vector3(0, -0, -91.7226715), true);
+            new Stinger(13, "Downtown", "Integrity Way")
+                .Add(new Vector3(131.923889, -535.307617, 42.1809769), new Vector3(-1.99999964, -1.0678675e-07, -109.102646), false)
+                .Add(new Vector3(124.845146, -532.420288, 42.2503815), new Vector3(-1.99999821, 4.27147e-07, -118.023193), false)
+                .Add(new Vector3(118.52803, -529.531433, 42.2256737), new Vector3(-0.999995887, 4.53636318e-07, -117.76284), false)
+                .Add(new Vector3(111.909256, -525.881897, 42.2281647), new Vector3(5.0663939e-06, 6.40427686e-07, -111.006363), false)
+                .Add(new Vector3(105.690163, -523.344421, 43.1842804), new Vector3(0, -0, -116.978622), true)
+                .Add(new Vector3(133.88591, -536.137146, 43.2901878), new Vector3(0, 0, 65.8080444), true);
+            new Stinger(14, "Palomino Highlands", "Olympic Freeway")
+                .Add(new Vector3(1553.37244, -979.971863, 58.0622787), new Vector3(-3.00000024, 2.13736342e-07, 30.8056431), false)
+                .Add(new Vector3(1556.27795, -985.244507, 58.2351265), new Vector3(2.54444361e-14, 7.47165643e-07, 21.3645229), false)
+                .Add(new Vector3(1560.3252, -993.956787, 58.0739975), new Vector3(-2.99999928, 1.28241788e-06, 35.4824295), false)
+                .Add(new Vector3(1563.55103, -999.126221, 58.2181778), new Vector3(5.24520783e-06, 1.01401054e-06, 19.4585514), false)
+                .Add(new Vector3(1566.18738, -1005.19189, 59.0160332), new Vector3(0, 0, 25.7860851), true)
+                .Add(new Vector3(1550.68091, -979.448486, 58.9455185), new Vector3(0, -0, -136.38591), true);
+            new Stinger(15, "Tataviam Mountains", "Olympic Freeway")
+                .Add(new Vector3(2403.79761, 1036.41675, 83.1021576), new Vector3(-3.00000024, 1.06868171e-07, -50.0246048), false)
+                .Add(new Vector3(2399.05737, 1032.45215, 83.270668), new Vector3(2.00000596, -2.135735e-07, -57.8197899), false)
+                .Add(new Vector3(2387.38794, 1023.61346, 83.1945267), new Vector3(2.0000062, -6.407206e-07, -51.3233681), false)
+                .Add(new Vector3(2391.22632, 1026.96741, 83.1070404), new Vector3(-1.99999416, -9.61080673e-07, -49.7645073), false)
+                .Add(new Vector3(2405.11353, 1037.63586, 84.0974884), new Vector3(0, -0, 148.877441), true)
+                .Add(new Vector3(2383.35547, 1020.03998, 84.0156479), new Vector3(-0, -0, -47.421257), true);
 
             NAPI.Util.ConsoleOutput($"(RnC | STARTUP) Finished creating pre-set stingers, total: {Stinger.Stingers.Count}");
             /* DEFAULT LOADOUTS CREATION */
@@ -2266,7 +2378,7 @@ namespace RNC
                         Challenge.SetNewDailyChallenges();
                 }
             });
-      
+
 
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Server startup proceeded:\n");
 
@@ -2308,10 +2420,10 @@ namespace RNC
 
                         Settings.Timers.GameUpdate_Tick = Environment.TickCount64 + 1000;
                         Settings.Timers.TimeUpdate_Tick = Environment.TickCount64 + 1000;
-                    });                 
+                    });
                 }
             });
-            
+
         }
 
         [ServerEvent(Event.Update)]

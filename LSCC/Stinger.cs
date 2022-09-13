@@ -12,7 +12,7 @@ namespace RNC
         public string Street;
         public bool IsDeployed;
         public List<StingerInfo> StingerObjects;
-
+        public Stinger() { }
         public Stinger(int id, string area, string street)
         {
             ID = id;
@@ -29,7 +29,8 @@ namespace RNC
             return this;
         }
 
-        public static List<Stinger> Stingers;
+        public static List<Stinger> Stingers = new List<Stinger>();
+        public static List<ColShape> StingerCols = new List<ColShape>();
     }
     public class StingerInfo : Script
     {
