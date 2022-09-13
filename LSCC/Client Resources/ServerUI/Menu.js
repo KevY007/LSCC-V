@@ -110,6 +110,27 @@ mp.events.add("kickClanMember", (memberSQLID) => {
 mp.events.add("setClanRank", (memberSQLID, tier) => {
     mp.events.callRemote("Clan_OnRequestChangeTier", memberSQLID, tier);
 });
+
+mp.events.add("Menu_RemoveClanMember", (memberID) => {
+    ServerUI.execute(`
+        if(gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.find(m => m.id == ${memberID})){
+            gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.splice(gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.indexOf(gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.find(m => m.id == ${memberID})), 1);
+        }
+    `);
+});
+mp.events.add("Menu_UpdateClanMember", (memberID, memberName, memberTier, memberLevel) => {
+    ServerUI.execute(`
+        if(gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.find(m => m.id == ${memberID})){
+            gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members[gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.indexOf(gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.find(m => m.id == ${memberID}))] = {
+                id: ${memberID},
+                name: '${memberName}',
+                level: ${memberLevel},
+                tier: ${memberTier}
+            }
+        }
+
+    `);
+});
 mp.events.add("Menu_AddClanMember", (memberID, memberName, memberTier, memberLevel) => {
 
     ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.push(

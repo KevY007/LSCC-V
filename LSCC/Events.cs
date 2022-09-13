@@ -975,6 +975,14 @@ namespace RNC
                         });
                         return;
                     }
+                    if(tAcc.ClanTier == tier)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Error(player, $"That player is already tier {tier} in your clan!");
+                        });
+                        return;
+                    }
                     if (tAcc.ClanTier <= pClanTier)
                     {
                         NAPI.Task.Run(() =>
@@ -984,9 +992,12 @@ namespace RNC
                         return;
                     }
 
-                    string text = (tAcc.ClanTier > tier) ? "demoted" : "promoted";
+                    string text = (tAcc.ClanTier < tier) ? "demoted" : "promoted";
                     tAcc.ClanTier = tier;
                     await context.SaveChangesAsync();
+
+                    string targetname = tAcc.Username;
+                    int targetlevel = tAcc.Level;
 
                     NAPI.Task.Run(() =>
                     {
@@ -1000,6 +1011,11 @@ namespace RNC
                         }
 
                         EPlayer.Notify(player, $"You successfully <strong>{text}</strong> {tAcc.Username} to <strong>{rank}</strong>!", "green", "", false, 3000);
+
+                        foreach (Player clanMember in Settings.LoggedInPlayers.Where(m => EPlayer.GetAccount(m).ClanID == pClanID))
+                        {
+                            clanMember.TriggerEvent("Menu_UpdateClanMember", targetSQLID, targetname, tier, targetlevel);
+                        }
 
                         Player target = Settings.LoggedInPlayers.FirstOrDefault(t => EPlayer.GetAccount(t).SQL_ID == tAcc.SQL_ID);
                         if (target != null)
@@ -1064,10 +1080,15 @@ namespace RNC
                     tAcc.ClanID = -1;
                     tAcc.ClanTier = -1;
                     await context.SaveChangesAsync();
-
+                    string user = tAcc.Username;
                     NAPI.Task.Run(() =>
                     {
-                        EPlayer.Notify(player, $"You've successfully kicked {tAcc.Username} from the clan!", "green", "", false, 3000);
+                        EPlayer.Notify(player, $"You successfully kicked {user} from the clan!", "green", "", false, 3000);
+
+                        foreach (Player clanMember in Settings.LoggedInPlayers.Where(m => EPlayer.GetAccount(m).ClanID == pClanID))
+                        {
+                            clanMember.TriggerEvent("Menu_RemoveClanMember", targetSQLID);
+                        }
 
                         Player target = Settings.LoggedInPlayers.FirstOrDefault(t => EPlayer.GetAccount(t).SQL_ID == tAcc.SQL_ID);
                         if(target != null)
