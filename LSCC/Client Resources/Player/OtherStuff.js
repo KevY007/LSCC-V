@@ -534,7 +534,7 @@ mp.keys.bind(0x14, true, function() {
     gui = 'true';
 
     if(ServerUI != null && ServerUI != undefined)
-        ServerUI.execute(`gm.hud = ${showHud};`);
+        ServerUI.execute(`gm.$refs.hud.enabled = ${showHud};`);
 
     mp.events.callRemote("DebugLog_SendCameraStuckLog", (camSwitchNativeReturn == undefined ? "undefined" : camSwitchNativeReturn.toString()));
 });
@@ -556,7 +556,7 @@ function checkCamInAir() {
         gui = 'true';
 
         if(ServerUI != null && ServerUI != undefined)
-            ServerUI.execute(`gm.hud = ${showHud};`);
+            ServerUI.execute(`gm.$refs.hud.enabled = ${showHud};`);
     }
 }
 
