@@ -3484,7 +3484,7 @@ namespace RNC
                                         }
                                     }
                                     */
-                                    player.TriggerEvent("startLoadingScreen", -1);
+                                    player.TriggerEvent("startLoadingScreen", -1, "Loading copchase match...");
                                     player.TriggerEvent("ToggleNametags", false);
                                     player.SetSharedData("Collisions", false);
                                     player.ResetData("Seatbelt");

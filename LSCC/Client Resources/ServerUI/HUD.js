@@ -172,12 +172,18 @@ function increaseChatOpacity(time = 4000){
     }, time);
 }
 
-mp.events.add("startLoadingScreen", (time) => {
+mp.events.add("startLoadingScreen", (time, message) => {
     if(time == -1){
         ServerUI.execute('gm.$refs.loadingScreen.show(true);');
+        if(message != "none")
+            ServerUI.execute(`gm.$refs.loadingScreen.loadingText = "${message}"`);
+        else ServerUI.execute(`gm.$refs.loadingScreen.loadingText = ""`);
     }
     else{
         ServerUI.execute(`gm.$refs.loadingScreen.show(${time});`);
+        if(message != "none")
+            ServerUI.execute(`gm.$refs.loadingScreen.loadingText = "${message}"`);
+        else ServerUI.execute(`gm.$refs.loadingScreen.loadingText = ""`);
     }
 });
 mp.events.add("stopLoadingScreen", () => {
