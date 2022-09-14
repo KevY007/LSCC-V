@@ -4940,7 +4940,9 @@ namespace RNC
                         else
                         {
                             admin.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}The screenshot of !{#FF6347}" + player.Name + "'s !{#FFFFFF}game has failed to upload.");
-                            admin.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Error Details: " + data);
+                            if(data != "0")
+                                admin.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Error Details: " + data);
+                            else admin.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Error Details: Screenshot server cannot be reached!");
                         }
                     }
                 }

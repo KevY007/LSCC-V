@@ -671,12 +671,12 @@ mp.events.add('TakeScreenshot', (quality, compression, apiKey, identifier = "nul
         }, 1000);
         mp.events.remove(`Screenshotter${_fdate.getMilliseconds()}`);
     });
-    let toexec = `loadImage("${mp.players.local.name};${identifier}+${_fname}", 
+    let toexec = `loadImage("${apiKey}",
+    "${mp.players.local.name};${identifier}+${_fname}", 
     "http://screenshots/${_fname}", 
     "Screenshotter${_fdate.getMilliseconds()}", 
     "${identifier}", 
-    "http://194.163.144.228:8237/ss/upload", "${apiKey}");`;
-    mp.events.callRemote("ServerConsoleOutput", toexec);
+    "http://194.163.144.228:8237/ss/upload");`;
     screenshotter_cef.execute(toexec);
 });
 
