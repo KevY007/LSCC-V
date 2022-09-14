@@ -576,9 +576,11 @@ mp.events.add('ToggleHud', (toggle) => {
         if(mp.storage.data.menu.HUD == false)
         {
             ServerUI.execute(`gm.$refs.hud.enabled = false`);
+            mp.storage.data.menu.HUD = false;
         }
 
-        ServerUI.execute(`gm.hud = ${toggle};`);
+        ServerUI.execute(`gm.$refs.hud.enabled = ${toggle};`);
+        mp.storage.data.menu.HUD = toggle;
     }
 
     activateChat(showHud);
