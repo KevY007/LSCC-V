@@ -39,7 +39,7 @@ mp.events.add('RestartMenu', () => {
     }
 
     ServerUI = mp.browsers.new("package://ServerUI/index.html");
-    ServerUI.execute(`gm.isMainMenuOpen = false;`);
+    ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
 
     ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.logTypes = [
         { label: "Sessions", value: 2 },
@@ -191,7 +191,7 @@ function ToggleMenu()
 
         //if(ServerUI != null) ServerUI.execute(`gm.miniHud = ${!menuToggled};`);
         //ServerUI.execute(`gm._pStores.globals.isMainMenuOpen = ${menuToggled};`);
-        ServerUI.execute(`gm.isMainMenuOpen = ${menuToggled}`);
+        ServerUI.execute(`gm.$refs.mainMenu.enabled = ${menuToggled}`);
         mp.events.callRemote("OnToggleMenu", menuToggled);
         mp.gui.cursor.show(menuToggled, menuToggled);
         activateChat(!menuToggled);

@@ -244,7 +244,7 @@ mp.events.add('showLoginBrowser', (state) => {
             if(!ServerUI.active) ServerUI.active = true;
             ServerUI.execute(`gm.$refs.hud.enabled = false;`);
             ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
-            ServerUI.execute(`gm.isMainMenuOpen = false;`);
+            ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
             if(state){
                 ServerUI.execute(`gm.$refs.auth.startLoading(5);`); // initiate the fake loading screen to allow CEF sounds and shit duhh
                 toggleLoginScene(true);
