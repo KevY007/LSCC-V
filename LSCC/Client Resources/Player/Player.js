@@ -2697,6 +2697,47 @@ mp.events.add("setVoiceModeMenu", (value) => {
     mp.storage.data.menu.VoiceMode = value;
 });
 
+const animDict = "MP_SUICIDE";
+const fireActionHash = mp.game.joaat("Fire");
+
+let animCheckerHandle = undefined;
+let shotFired = false;
+
+function destroyAnimChecker() {
+    animCheckerHandle.destroy();
+    animCheckerHandle = undefined;
+}
+
+mp.events.add("Suicide_ApplyAnimation", (animName, animTime) => {
+    if (player.handle) {
+        mp.game.streaming.requestAnimDict(animDict);
+        while (!mp.game.streaming.hasAnimDictLoaded(animDict)) mp.game.wait(0);
+        player.taskPlayAnim(animDict, animName, 8.0, 0.0, -1, 0, 0.0, false, false, false);
+  
+        shotFired = false;
+        if (animCheckerHandle) destroyAnimChecker();
+
+        animCheckerHandle = new mp.Event("render", () => {
+            if (player.isPlayingAnim(animDict, animName, 3)) {
+                if (animName === "PISTOL" && !shotFired && player.hasAnimEventFired(fireActionHash)) {
+                    shotFired = true;
+                    mp.players.forEachInRange(player.position, 100.0, (pl) => {
+                        pl.invoke("0x96A05E4FB321B1BA", player, 0.0, 0.0, 0.0, false); // SET_PED_SHOOTS_AT_COORD
+                    });
+                }
+
+                if (player.getAnimCurrentTime(animDict, animName) >= animTime) {
+                    destroyAnimChecker();
+                    mp.events.callRemote("Suicide_Kill");
+                }
+            } else {
+                destroyAnimChecker();
+            }
+        });
+        
+    }
+});
+
 function setStorageDataVars(){
 
     if(mp.storage.data.menu == undefined) mp.storage.data.menu = {};

@@ -1549,6 +1549,17 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("Suicide_Kill")]
+        public void OnSuicideShoot(Player player)
+        {
+            if (player == null) return;
+            if (player.Health == 0 || player.Dead)
+            {
+               return;
+            }
+            player.Health = 0;
+        }
+
         [ServerEvent(Event.PlayerDeath)]
         public static void OnPlayerDeath(Player player, Player killer, uint reason)
         {

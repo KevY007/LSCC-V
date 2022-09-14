@@ -3934,8 +3934,33 @@ namespace RNC
                 EPlayer.Notify(player, "Please wait to respawn.", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
                 return;
             }
+            WeaponHash[] pistols = new WeaponHash[] { WeaponHash.Pistol, WeaponHash.Combatpistol, WeaponHash.Appistol, WeaponHash.Pistol50,
+            WeaponHash.Revolver, WeaponHash.Snspistol, WeaponHash.Heavypistol, WeaponHash.Doubleaction, WeaponHash.Revolver_mk2, WeaponHash.Snspistol_mk2,
+            WeaponHash.Pistol_mk2, WeaponHash.Vintagepistol, WeaponHash.Marksmanpistol};
+            WeaponHash gunToUse = WeaponHash.Knife;
 
-            player.Health = 0;
+            string animName = "";
+            float animTime = 0.0f;
+            if(player.CurrentWeapon != null)
+            {
+                if (pistols.Contains(player.CurrentWeapon)) gunToUse = player.CurrentWeapon;
+                else gunToUse = WeaponHash.Pistol;
+            }
+            if(gunToUse != WeaponHash.Knife)
+            {
+                player.GiveWeapon(gunToUse, 1);
+                animName = "PISTOL";
+                animTime = 0.365f;
+            }
+            else
+            {
+                animName = "PILL";
+                animTime = 0.536f;
+            }
+            NAPI.Task.Run(() =>
+            {
+                player.TriggerEvent("Suicide_ApplyAnimation", animName, animTime);
+            }, 500);
             return;
         }
 
