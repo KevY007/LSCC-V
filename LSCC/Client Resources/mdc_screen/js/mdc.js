@@ -87,7 +87,7 @@ document.addEventListener("keydown", function(e){
     switch(e.keyCode){
         case 13: 
 
-        mp.trigger("mdcRequestDeployStinger", currentSpikeNumber);
+        //mp.trigger("mdcRequestDeployStinger", currentSpikeNumber);
 
         break;   
         case 37:

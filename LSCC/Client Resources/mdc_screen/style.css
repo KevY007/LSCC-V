@@ -5,6 +5,8 @@ body{
     margin: 0px;
     height: 100%;
     
+    background-image: url('https://i.ytimg.com/vi/PonqBUgq9Lc/maxresdefault.jpg');
+    background-size: cover;
     -webkit-user-select:none;
     -moz-user-select:-moz-none;
     -ms-user-select:none;
@@ -16,12 +18,28 @@ body{
     align-items: center;
     min-height: 100vh;
 }
+.mdc-edge{
+    position:relative;
+    background: linear-gradient(180deg, rgba(18,18,18,1) 0%, rgba(18,18,18,1) 90%, rgba(40,40,40,1) 100%);
+    padding:10px;
+    border-radius: 50px; -moz-border-radius: 50px; -webkit-border-radius: 5px;
+    overflow:hidden;
+}
+.mdc-taskbar{
+    position:absolute;
+    bottom:10px;
+    height:48px;
+    width:1024px;
+    background: rgb(238,238,238);
+    background: linear-gradient(180deg, rgba(238,238,238,1) 0%, rgba(255,255,255,1) 5%, rgba(195,199,203,1) 6%, rgba(195,199,203,1) 100%);
+}
 .mdc-panel{
-    border-radius:25px;
+    overflow:hidden;
     height:756px;
     width:1024px;
     background-color: #141414;
-
+    background-image: url('./img/desktop_background.png');
+    background-size: cover;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -75,7 +93,6 @@ body{
 
 /* ==========> MDC SCREEN => MAP <========== */
 .mdc-screen-map{
-    border-radius:25px;
     margin: 20px;
     height:650px;
     width:650px;
