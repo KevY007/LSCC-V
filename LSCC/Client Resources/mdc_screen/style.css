@@ -28,10 +28,54 @@ body{
 .mdc-taskbar{
     position:absolute;
     bottom:10px;
-    height:48px;
+    height:54px;
     width:1024px;
     background: rgb(238,238,238);
     background: linear-gradient(180deg, rgba(238,238,238,1) 0%, rgba(255,255,255,1) 5%, rgba(195,199,203,1) 6%, rgba(195,199,203,1) 100%);
+
+    display:flex;
+    align-items: center;
+}
+.mdc-taskbar-time{
+    top:3px;
+    right:10px;
+    position:absolute;
+    height:54px;
+    line-height: 0px;
+    text-justify: center;
+    text-align: center;
+    font-family: Sans-serif;
+}
+.mdc-taskbar-buttons{
+    top:2px;
+    position:absolute;
+    height:54px;
+    display:flex;
+    align-items: center;
+}
+.mdc-taskbar-button{
+    height:40px;
+    width:128px;
+    margin: 10px;
+    border-top: 2px solid white;
+    border-left: 2px solid white;
+    border-bottom: 2px solid black;
+    border-right: 2px solid black;
+
+    display:flex;
+    align-items: center;
+}
+.mdc-taskbar-button-pressed{
+    height:40px;
+    width:128px;
+    margin: 10px;
+    border-top: 2px solid black;
+    border-left: 2px solid black;
+    border-bottom: 2px solid white;
+    border-right: 2px solid white;
+    background:rgba(180, 180, 180,1);
+    display:flex;
+    align-items: center;
 }
 .mdc-panel{
     overflow:hidden;
@@ -40,9 +84,10 @@ body{
     background-color: #141414;
     background-image: url('./img/desktop_background.png');
     background-size: cover;
-    display: flex;
+
+    /* display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: center; */
 }
 
 /* ==========> MDC BUTTONS <========== */

@@ -8,18 +8,31 @@
         <div class="container">
             <div class="mdc-edge">
                 <div class="mdc-taskbar">
-                    
+                    <div class="mdc-taskbar-buttons">
+                        <div class="mdc-taskbar-button">
+                            <img src="./img/win98_logo.png" style="width:40px; height: auto; margin:10px;"/>
+                            <p style="font-family: Helvetica, sans-serif; font-size:24px; font-weight: bold;">Start</p>
+                        </div>
+                        <!-- Separator -->
+                        <div style="height:80%; width:3px; background-color:white; border-right:1px solid black; border-bottom: 1px solid black;">
+                        </div>
+                        <div class="mdc-taskbar-button-pressed">
+                            <img src="./img/lspd.png" style="width:32px; height: auto; margin:10px;"/>
+                            <p style="font-family: Helvetica, sans-serif; font-size:20px; font-weight:400;">LSPD...</p>
+                        </div>
+                    </div>
+                    <div class="mdc-taskbar-time">
+                        <p id="taskbar_time">18:25</p>
+                        <p id="taskbar_date">14.9.2022.</p>
+                    </div>
                 </div>
                 <div class="mdc-panel">
-                
+                    <!--
                     <div id="mdc_map" class="mdc-screen-map">
                         <div id="mdc-content" class="mdc-content">
                             <img id="map_display" class="map" src="./img/atlas_map.png"/>
                             <div id="map_content" class="map-content">
-                                <!--
-                                <img class="fugi-circle" src="./img/fugitive_circle.gif"/>
-                                <img class="blip-police" src="./img/police_blip.gif"/>
-                                -->
+                                
                             </div>
                         </div>
                         <div id="help_panel" class="help-panel">
@@ -28,11 +41,7 @@
                                 <p><strong>Zoom Out</strong> - Ctrl</p>
                                 <p><strong>Switch View</strong> - Enter</p>
                         </div>
-                        <!--
-                        <div class="map-crosshair-display">
-                            <img src="./img/map_crosshair.png"/>
-                        </div>
-                        -->
+                 
                         <div class="map-views">
                             <div id="view-atlas" class="map-view-selected">
                                 <img class="map-view-icon" src="./img/icon_atlas.png"/>
@@ -83,9 +92,19 @@
                             <p>STINGER DEPLOYMENT [R]</p>
                         </div>
                     </div>
+                    -->
                 </div>
             </div>
             
         </div>
+        <script>
+            setInterval(() => {
+                let datetime = new Date();
+                let timeToDisplay = (datetime.getHours() >= 10 ? datetime.getHours() : `0${datetime.getHours()}`);
+                let minToDisplay = (datetime.getMinutes() >= 10 ? datetime.getMinutes() : `0${datetime.getMinutes()}`);
+                document.getElementById("taskbar_time").innerHTML = timeToDisplay + ":" + minToDisplay;
+                document.getElementById("taskbar_date").innerHTML = `${datetime.getDate()}.${datetime.getMonth()+1}.${datetime.getFullYear()}`;
+            }, 1000);
+        </script>
     </body> 
 </html>
