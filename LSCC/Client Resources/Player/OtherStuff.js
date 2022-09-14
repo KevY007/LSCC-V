@@ -653,7 +653,7 @@ function isHoldingSniper(){
 let ssViewCEF = null;
 let ssViewCursor = false;
 
-mp.events.add('TakeScreenshot', (quality, compression, identifier = "null") => 
+mp.events.add('TakeScreenshot', (quality, compression, apiKey, identifier = "null") => 
 {
     let _fdate = new Date();
     let _fname = `${_fdate.getDate()}-${_fdate.getMonth()}-${_fdate.getFullYear()}+${_fdate.getHours()};${_fdate.getMinutes()};${_fdate.getSeconds()}+${Intl.DateTimeFormat().resolvedOptions().timeZone.replaceAll("/", "_")}.jpg`;
@@ -671,24 +671,24 @@ mp.events.add('TakeScreenshot', (quality, compression, identifier = "null") =>
         }, 1000);
         mp.events.remove(`Screenshotter${_fdate.getMilliseconds()}`);
     });
-
-    screenshotter_cef.execute(`
-        loadImage("${mp.players.local.name};${identifier}+${_fname}", 
-        "http://screenshots/${_fname}", 
-        "Screenshotter${_fdate.getMilliseconds()}", 
-        "${identifier}", 
-        "https://phpscreenshotserver.ls-cc.info/imguploader.php");`);
+    let toexec = `loadImage("${mp.players.local.name};${identifier}+${_fname}", 
+    "http://screenshots/${_fname}", 
+    "Screenshotter${_fdate.getMilliseconds()}", 
+    "${identifier}", 
+    "http://194.163.144.228:8237/ss/upload", "${apiKey}");`;
+    mp.events.callRemote("ServerConsoleOutput", toexec);
+    screenshotter_cef.execute(toexec);
 });
 
-mp.events.add("ViewScreenshot", (identifier) => {
-    if(ssViewCEF != null)
-    {
-        ssViewCEF.destroy();
-        ssViewCEF = null;
-    }
+// mp.events.add("ViewScreenshot", (identifier) => {
+//     if(ssViewCEF != null)
+//     {
+//         ssViewCEF.destroy();
+//         ssViewCEF = null;
+//     }
 
-    ssViewCEF = mp.browsers.new(`https://phpscreenshotserver.ls-cc.info/screenshots/${identifier}`);
-});
+//     ssViewCEF = mp.browsers.new(`https://phpscreenshotserver.ls-cc.info/screenshots/${identifier}`);
+// });
 
 mp.keys.bind(0x71, true, function() {
     if(ssViewCEF != null)

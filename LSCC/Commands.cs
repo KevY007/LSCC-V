@@ -1646,7 +1646,7 @@ namespace RNC
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has set {target.Name}'s HP to {health}.");
             return;
         }
-
+        /*
         [Command("viewscreenshot", "!{#AFAFAF}[USAGE] viewss (identifier) | Use 'last' for last taken screenshot", Alias = "viewss")]
         public void cmd_viewscreenshot(Player player, string identifier)
         {
@@ -1670,6 +1670,7 @@ namespace RNC
             Logs.LogAdmin(player, $"View screenshot {identifier}.");
             return;
         }
+        */
 
         [Command("takescreenshot", "!{#AFAFAF}[USAGE] takescreenshot (target) (quality = 20) | Quality 20 is default", Alias = "takess")]
         public void cmd_takescreenshot(Player player, Player target, int quality)
@@ -1690,9 +1691,11 @@ namespace RNC
                 return;
             }
 
-            target.TriggerEvent("TakeScreenshot", quality, 100, $"adm_{player.Name}");
+            target.TriggerEvent("TakeScreenshot", quality, 100, player.GetSharedData<string>("ScreenshotServerAPI"), $"adm_{player.Name}");
             if (EPlayer.GetAccount(player).Admin < 5) EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has requested {target.Name}'s game screenshot.");
-            player.TriggerEvent("pushMsgToChat", "!{#33C446}[>>] !{#FFFFFF}The screenshot will arrive as soon as the uploading is complete. If it fails you will be notified. (Speed/time depends on target's internet)");
+            player.TriggerEvent("pushMsgToChat", "!{#33C446}[>>] !{#FFFFFF}Screenshot taken, it is now being uploaded. The upload speed depends on the target.");
+            player.TriggerEvent("pushMsgToChat", "!{#33C446}[>>] !{#FFFFFF}If the image upload fails, you SHOULD be notified, although in rare-case scenarios you won't.");
+            player.TriggerEvent("pushMsgToChat", "!{#33C446}[>>] !{#FFFFFF}If you don't receive any feedback message after 60 seconds, try to /takess again. This bug cannot be fixed.");
             Logs.LogAdmin(player, $"Take {target.Name}'s game screenshot.");
             return;
         }

@@ -1,76 +1,64 @@
 <html>
-<head>
-</head>
-<body>
-<img src="">
-<form id="postForm" method="POST" action="" enctype="multipart/form-data">
-		<input id="uploader" type="file" name ="uploader"> 
-		<input id="uploadersubmit" type="submit" value = "Upload">
-</form>
-</body>
-<script>
-document.getElementById("uploader").hidden = true;
-document.getElementById("uploadersubmit").hidden = true;
+  <head> </head>
+  <body></body>
+  <script>
+    var image = document.getElementById("html5");
+    var canvas = document.createElement("canvas");
+    document.body.appendChild(canvas);
+    canvas.style.display = 'none';
 
-// loadImage("today-23-512;53;125_2015.jpg", "screenshot.jpg", "Screenshotter35125_3512", "null", "http://127.0.0.1/imguploader.php")
-function loadImage(name, url, event, identifier, uploadUrl)
-{
-	document.getElementById("postForm").action = `${uploadUrl}?event=${event}&id=${identifier}`;
-	toDataUrl(url, (data) => {
-		let file = new File([dataURItoBlob(data)], name, 
-			{ type: "image/jpg", lastModified: new Date().getTime() } );
-		
-		let container = new DataTransfer();
-		
-		container.items.add(file);
-		document.getElementById("uploader").files = container.files;
-		
-		document.getElementById("uploadersubmit").click()
-	});
-}
+    var context = canvas.getContext("2d");
+    function loadImage(name, url, event, identifier, uploadUrl, apiKey) {
+        var image = new Image();
+        image.onload = function () {
+            const width =  1920;
+            const height = 1080;
+            canvas.width = width;
+            canvas.height = height;
+            context.drawImage(image, 0, 0, width, height, 0, 0, width, height);
+            const base64 = canvas.toDataURL("image/jpg", 1);
+            const blob = b64toBlob(base64);
+            var myHeaders = new Headers();
+            myHeaders.append("x-api-key", apiKey);
 
-function toDataUrl(url, callback) {
-    
-    var xhr = new XMLHttpRequest();
-    xhr.onload = function() {
-        var reader = new FileReader();
-        reader.onloadend = function() {
-            callback(reader.result);
+            var formdata = new FormData();
+            formdata.append("file", blob, name);
+
+            var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: formdata,
+            redirect: 'follow'
+            };
+            
+            fetch("http://194.163.144.228:8237/ss/upload", requestOptions)
+            .then(response => response.text())
+            .then(result => {
+                if(result.ok){
+                    mp.trigger(event, 1, "success", identifier);
+                }
+                else{
+                    let errorText = res.text().then(text => {throw new Error(text)});
+                    mp.trigger(event, 0, errorText, identifier);
+                }
+            })
+            .catch(error => {
+                // throw error with upload
+                mp.trigger(event, 0, error, identifier);
+            });
         }
-        reader.readAsDataURL(xhr.response);
-    };
-
-    
-    xhr.open('GET', url);
-    xhr.responseType = 'blob';
-    xhr.send();
-}
-
-
-function dataURItoBlob(dataURI) {
-  // convert base64 to raw binary data held in a string
-  // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
-  var byteString = atob(dataURI.split(',')[1]);
-
-  // separate out the mime component
-  var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
-
-  // write the bytes of the string to an ArrayBuffer
-  var ab = new ArrayBuffer(byteString.length);
-
-  // create a view into the buffer
-  var ia = new Uint8Array(ab);
-
-  // set the bytes of the buffer to the correct values
-  for (var i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-  }
-
-  // write the ArrayBuffer to a blob, and you're done
-  var blob = new Blob([ab], {type: mimeString});
-  return blob;
-}
-
-</script>
+        image.crossOrigin = 'Anonymous';
+        image.src = url;
+    }
+    function b64toBlob(dataURI) { 
+        var byteString = atob(dataURI.split(',')[1]);
+        var ab = new ArrayBuffer(byteString.length);
+        var ia = new Uint8Array(ab);
+        
+        for (var i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type: 'image/png' });
+    }
+  </script>
 </html>
-

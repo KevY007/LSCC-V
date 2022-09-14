@@ -2721,9 +2721,7 @@ mp.events.add("Suicide_ApplyAnimation", (animName, animTime) => {
             if (player.isPlayingAnim(animDict, animName, 3)) {
                 if (animName === "PISTOL" && !shotFired && player.hasAnimEventFired(fireActionHash)) {
                     shotFired = true;
-                    mp.players.forEachInRange(player.position, 100.0, (pl) => {
-                        pl.invoke("0x96A05E4FB321B1BA", player, 0.0, 0.0, 0.0, false); // SET_PED_SHOOTS_AT_COORD
-                    });
+                    mp.game.invoke("0x96A05E4FB321B1BA", player.handle, 0.0, 0.0, 0.0, false); // SET_PED_SHOOTS_AT_COORD
                 }
 
                 if (player.getAnimCurrentTime(animDict, animName) >= animTime) {

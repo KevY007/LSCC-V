@@ -4933,9 +4933,8 @@ namespace RNC
                     {
                         if (result == 1)
                         {
-                            admin.TriggerEvent("pushMsgToChat", "!{#33C446}[#] !{#FFFFFF}The screenshot has been uploaded. To view it use /viewss last or /viewss (id)");
-                            admin.TriggerEvent("pushMsgToChat", $"!{{#33C446}}[#] !{{#FFFFFF}}Controls: F4 (Stop viewing), F2 (Toggle cursor) | Metadata for preserving/viewing:");
-                            admin.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}ID: {data} | Requestee: {identifier} | Source: {player.Name}");
+                            admin.TriggerEvent("pushMsgToChat", "!{#33C446}[#] !{#FFFFFF}The screenshot has been uploaded. You can view it in the menu's staff section.");
+                            admin.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}Requestee: {adminName} | Source: {player.Name}");
                             admin.SetData("LastSSIdentifier", data);
                         }
                         else
