@@ -191,6 +191,7 @@ function ToggleMenu()
 
         //if(ServerUI != null) ServerUI.execute(`gm.miniHud = ${!menuToggled};`);
         //ServerUI.execute(`gm._pStores.globals.isMainMenuOpen = ${menuToggled};`);
+        ServerUI.execute(`gm.$refs.hud.enabled = ${menuToggled ? 'false' : mp.storage.data.menu.HUD.toString()};`);
         ServerUI.execute(`gm.$refs.mainMenu.enabled = ${menuToggled}`);
         mp.events.callRemote("OnToggleMenu", menuToggled);
         mp.gui.cursor.show(menuToggled, menuToggled);

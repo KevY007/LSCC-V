@@ -294,7 +294,10 @@ mp.keys.bind(0x54, true, function() { // T key
         mp.events.call("onOpenChatbox", true);
     }
 });
-
+mp.events.add("closeChat", () => {         
+    focusChat(false);
+    mp.events.call("onOpenChatbox", false);  
+});
 mp.events.add("TogglePlayerChat", (toggle) => {
     activateChat(toggle);
 });

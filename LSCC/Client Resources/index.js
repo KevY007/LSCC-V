@@ -144,25 +144,7 @@ function toggleLoginScene(toggle){
             engine: false,
             dimension: mp.players.local.dimension
         });
-
-        /* APPLYING VEHICLE STUFF [DOORS, COLORS] */
-        setTimeout(() => {
-            loginSceneEntities[0].setLights(2);
-            loginSceneEntities[1].setLights(3);
-            loginSceneEntities[2].setLights(3);
-
-            loginSceneEntities[0].setDamage(-1, 0, 0, 100, 25, true);
-            loginSceneEntities[1].setSiren(true);
-            loginSceneEntities[2].setSiren(true);
-
-            loginSceneEntities[0].setDoorOpen(0, false, true);
-            loginSceneEntities[0].setDoorOpen(3, false, true);
-            loginSceneEntities[1].setDoorOpen(0, false, true);
-            loginSceneEntities[1].setDoorOpen(1, false, true);
-            loginSceneEntities[2].setDoorOpen(0, false, true);
-
-        }, 350);
-
+        
         /* GENERAL STUFF - TIME OF DAY, ANIM DICTS... */
 
         mp.game.audio.startAudioScene("CHARACTER_CHANGE_IN_SKY_SCENE");
@@ -208,24 +190,6 @@ function toggleLoginScene(toggle){
             );
 
         }, 550);
-
-        /* SETTING PED STUFF */
-
-        setTimeout(() => {
-            mp.game.invoke('0xBF0FD6E56C964FCB', loginSceneEntities[5].handle, 1593441988, 0, false, false); // GIVE_WEAPON_TO_PED
-            mp.game.invoke('0xADF692B254977C0C', loginSceneEntities[5].handle, 1593441988, true); // SET_CURRENT_PED_WEAPON  
-          
-            loginSceneEntities[3].applyDamagePack("Explosion_Large", 100, 1);
-            loginSceneEntities[3].taskPlayAnim("combat@damage@writhe", "writhe_loop", 8.0, 1.0, -1, 1, 1.0, false, false, false);    
-            loginSceneEntities[4].taskPlayAnim("random@arrests@busted", "idle_a", 8.0, 1.0, -1, 1, 1.0, false, false, false);     
-            loginSceneEntities[5].taskPlayAnim("arrest", "radio_chatter", 8.0, 1.0, -1, 1, 1.0, false, false, false);      
-            loginSceneEntities[6].taskPlayAnim("amb@medic@standing@kneel@base", "base", 8.0, 1.0, -1, 1, 1.0, false, false, false); 
-            loginSceneEntities[7].setComponentVariation(0, 1, 0, 0);
-            loginSceneEntities[7].setComponentVariation(3, 0, 1, 0);
-            loginSceneEntities[7].taskStartScenarioInPlace('WORLD_HUMAN_COP_IDLES', 0, false);
-        
-        }, 750);
-
     }
     else{
         mp.game.audio.stopAudioScene("CHARACTER_CHANGE_IN_SKY_SCENE");
