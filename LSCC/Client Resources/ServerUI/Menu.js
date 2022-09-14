@@ -26,7 +26,7 @@ if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD
     mp.storage.data.menu.ActiveChatOpacity = 1.0;
     mp.storage.data.menu.ShowInactiveChat = true;
     mp.storage.data.menu.AutoLogin = true;
-    mp.storage.data.menu.CameraSwitch = true;
+    mp.storage.data.menu.RealtimeSpeedo = false;
 
     mp.storage.flush();
 }
@@ -282,9 +282,9 @@ function ToggleMenu()
                     {
                         id: 22,
                         type: 1,
-                        name: "cameraswitch",
-                        label: "Camera Switch Animation",
-                        description: "Toggles the GTA V player switch camera animation (going into air) upon round start. Turn this off if your camera gets stuck in the air often."
+                        name: "realtimespeedo",
+                        label: "Real-time Speedometer Updates",
+                        description: "If toggled on, the speedometer will update in real-time (every frame). This option might have a bad effect on your performance."
                     }
                 ]
             },
@@ -512,7 +512,7 @@ function ToggleMenu()
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autojoinopt[0].value = ${mp.storage.data.menu.AutoJoin};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.eventmusic[0].value = ${mp.storage.data.menu.EventMusic};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autologintog[0].value = ${mp.storage.data.menu.AutoLogin};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.cameraswitch[0].value = ${mp.storage.data.menu.CameraSwitch};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.realtimespeedp[0].value = ${mp.storage.data.menu.RealtimeSpeedo};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.oocauto[0].value = ${mp.storage.data.menu.OOCauto};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.voicemode[0].value = ${mp.storage.data.menu.VoiceMode};`);
         
@@ -620,7 +620,7 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     else if(id == 16)
     {
         mp.storage.data.menu.monitoring = value;
-        ServerUI.execute(`gm.$refs.TopRight.$refs.Info.monitor = ${value}`);
+        ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.monitorEnabled = ${value}`);
     }
     else if(id == 17)
     {
@@ -649,7 +649,7 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     }
     else if(id == 22)
     {
-        mp.storage.data.menu.CameraSwitch = value;
+        mp.storage.data.menu.RealtimeSpeedo = value;
     }
 
     if(ServerUI != null)

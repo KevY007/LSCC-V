@@ -383,6 +383,64 @@ mp.events.add('ToggleTooltips', (status) =>
 
 mp.events.add("OneSecondEvent", () => {
 
+    if(mp.storage.data.menu.RealtimeSpeedo == false){
+        if (specState == true && specTarget != null && mp.players.exists(specTarget)) 
+        {
+            if(specTarget.isInAnyVehicle(false))
+            {
+                if(!speedo)
+                {
+                    ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = true;`);
+                    speedo = true;
+                }
+                if(speedoMax != ((mp.game.vehicle.getVehicleModelMaxSpeed(specTarget.vehicle.model) * 3.6) + 25).toFixed(0))
+                {
+                    speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(specTarget.vehicle.model) * 3.6) + 25).toFixed(0);
+                    ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.maxspeed = ${speedoMax};`);
+                }
+                if(speedoCur != (specTarget.vehicle.getSpeed() * 3.6).toFixed(0))
+                {
+                    speedoCur = (specTarget.vehicle.getSpeed() * 3.6).toFixed(0);
+                    ServerUI.execute(`gm.$refs.BottomRight.$refs.speedo.speed = ${speedoCur};`);
+                }
+            }
+            else if(speedo)
+            {
+                speedo = false;
+                speedoMax = 0;
+                speedoCur = 0;
+                ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = false;`);
+            }
+        }
+        else {
+            if(mp.players.local.isInAnyVehicle(false))
+            {
+                if(!speedo)
+                {
+                    ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = true;`);
+                    speedo = true;
+                }
+                if(speedoMax != ((mp.game.vehicle.getVehicleModelMaxSpeed(mp.players.local.vehicle.model) * 3.6) + 25).toFixed(0))
+                {
+                    speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(mp.players.local.vehicle.model) * 3.6) + 25).toFixed(0);
+                    ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.maxspeed = ${speedoMax};`);
+                }
+                if(speedoCur != (mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0))
+                {
+                    speedoCur = (mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0);
+                    ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.speed = ${speedoCur};`);
+                }
+            }
+            else if(speedo)
+            {
+                speedo = false;
+                speedoMax = 0;
+                speedoCur = 0;
+                ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = false;`);
+            }
+        }
+    }
+    
     if(mp.storage.data.menu.tooltips == true)
     {
         if(mp.players.local.Team != 0 && mp.players.local.Team != 1){
@@ -1143,17 +1201,19 @@ mp.events.add("render", () => {
                     ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = true;`);
                     speedo = true;
                 }
-
-                if(speedoMax != ((mp.game.vehicle.getVehicleModelMaxSpeed(specTarget.vehicle.model) * 3.6) + 25).toFixed(0))
-                {
-                    speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(specTarget.vehicle.model) * 3.6) + 25).toFixed(0);
-                    ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.maxspeed = ${speedoMax};`);
+                if(mp.storage.data.menu.RealtimeSpeedo == true){
+                    if(speedoMax != ((mp.game.vehicle.getVehicleModelMaxSpeed(specTarget.vehicle.model) * 3.6) + 25).toFixed(0))
+                    {
+                        speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(specTarget.vehicle.model) * 3.6) + 25).toFixed(0);
+                        ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.maxspeed = ${speedoMax};`);
+                    }
+                    if(speedoCur != (specTarget.vehicle.getSpeed() * 3.6).toFixed(0))
+                    {
+                        speedoCur = (specTarget.vehicle.getSpeed() * 3.6).toFixed(0);
+                        ServerUI.execute(`gm.$refs.BottomRight.$refs.speedo.speed = ${speedoCur};`);
+                    }
                 }
-                if(speedoCur != (specTarget.vehicle.getSpeed() * 3.6).toFixed(0))
-                {
-                    speedoCur = (specTarget.vehicle.getSpeed() * 3.6).toFixed(0);
-                    ServerUI.execute(`gm.$refs.BottomRight.$refs.speedo.speed = ${speedoCur};`);
-                }
+         
             }
             else if(speedo)
             {
@@ -1171,16 +1231,17 @@ mp.events.add("render", () => {
                     ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = true;`);
                     speedo = true;
                 }
-
-                if(speedoMax != ((mp.game.vehicle.getVehicleModelMaxSpeed(mp.players.local.vehicle.model) * 3.6) + 25).toFixed(0))
-                {
-                    speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(mp.players.local.vehicle.model) * 3.6) + 25).toFixed(0);
-                    ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.maxspeed = ${speedoMax};`);
-                }
-                if(speedoCur != (mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0))
-                {
-                    speedoCur = (mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0);
-                    ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.speed = ${speedoCur};`);
+                if(mp.storage.data.menu.RealtimeSpeedo == true){
+                    if(speedoMax != ((mp.game.vehicle.getVehicleModelMaxSpeed(mp.players.local.vehicle.model) * 3.6) + 25).toFixed(0))
+                    {
+                        speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(mp.players.local.vehicle.model) * 3.6) + 25).toFixed(0);
+                        ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.maxspeed = ${speedoMax};`);
+                    }
+                    if(speedoCur != (mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0))
+                    {
+                        speedoCur = (mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0);
+                        ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.speed = ${speedoCur};`);
+                    }
                 }
             }
             else if(speedo)

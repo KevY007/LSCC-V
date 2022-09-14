@@ -476,68 +476,6 @@ let camSwitchNativeReturn = undefined;
 
 let canManuallyResetCamera = false;
 
-mp.events.add('moveSkyCamera', (moveTo, switchType, showGui, timeout = 1) => moveFromToAir(moveTo, switchType, showGui, timeout));
-function moveFromToAir(moveTo, switchType, showGui, timeout = 1) {   
-    if(mp.storage.data.menu.CameraSwitch != undefined && mp.storage.data.menu.CameraSwitch == false){
-        return; // if it's toggled off, dont switch the camera!
-    }
-    /*
-        switchType: 0 - 3
-
-        0: 1 step towards ped
-        1: 3 steps out from ped (Recommended)
-        2: 1 step out from ped
-        3: 1 step towards ped
-    */
-   setTimeout(() => {
-        switch (moveTo) 
-        {
-            case 'up':
-                    if (showGui == false) {
-                        gui = 'false';
-                        mp.events.callLocal("HideAllElementsExceptChat", false); // hide elements
-                    };
-                    focusChat(chatStatus);
-
-                    canManuallyResetCamera = false;
-
-                    mp.game.invoke(Natives.SWITCH_OUT_PLAYER, mp.players.local.handle, 0, parseInt(switchType));
-                break;
-            case 'down':
-                    if (gui == 'false') {
-                        checkCamInAir();
-                    };
-                    camSwitchNativeReturn = mp.game.invoke(Natives.SWITCH_IN_PLAYER, mp.players.local.handle);
-                    
-                    pushMessageToChat("~g~[HINT]~w~ If your camera is stuck in the air, you can now ~y~press CapsLock~w~ to manually reset it.");
-                    pushMessageToChat("~g~[>]~w~ You have ~y~10 seconds~w~ to do this!");
-                    canManuallyResetCamera = true;
-
-                    setTimeout(() => { canManuallyResetCamera = false; }, 10000);
-                break;
-        
-            default:
-                break;
-        }
-    }, timeout);
-}
-mp.keys.bind(0x14, true, function() {
-    if(chatStatus || !canManuallyResetCamera) return;
-
-    pushMessageToChat("~y~Resetting your camera manually....");
-    pushMessageToChat("~r~NOTE: ~w~If you were bugged, please notify the developers about this, a log has automatically been sent.");
-    
-    canManuallyResetCamera = false;
-
-    mp.game.invoke(Natives.SWITCH_IN_PLAYER, mp.players.local.handle);
-    mp.events.callLocal("HideAllElementsExceptChat", true); // show em
-    gui = 'true';
-
-    if(ServerUI != null && ServerUI != undefined)
-        ServerUI.execute(`gm.$refs.hud.enabled = ${showHud};`);
-
-    mp.events.callRemote("DebugLog_SendCameraStuckLog", (camSwitchNativeReturn == undefined ? "undefined" : camSwitchNativeReturn.toString()));
-});
 
 // Checks whether the camera is in the air. If so, then reset the timer
 function checkCamInAir() {

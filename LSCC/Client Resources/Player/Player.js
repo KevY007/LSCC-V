@@ -197,7 +197,7 @@ mp.events.add("ShowHandcuffTooltip", () => {
 
 mp.events.add('setPing', (pingtoset) => {
     ping = pingtoset;
-    ServerUI.execute(`gm.$refs.TopRight.$refs.Info.fps = ${ping}`);
+    ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.ping = ${ping}`);
 })
 
 mp.events.add("OneSecondEvent", () => {
@@ -253,7 +253,7 @@ mp.events.add("OneSecondEvent", () => {
         UpdateStatsVars(mp.players.local);
     }
     if(mp.storage.data.menu.monitoring == true){
-        ServerUI.execute(`gm.$refs.TopRight.$refs.Info.fps = ${FPS}`);
+        ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.fps = ${FPS}`);
         mp.events.callRemote("RequestPlayerPing");
     }
 
@@ -2731,11 +2731,11 @@ function setStorageDataVars(){
     if(mp.storage.data.menu.ShowInactiveChat == undefined){
         mp.storage.data.menu.ShowInactiveChat = true;
     }
-    if(mp.storage.data.menu.CameraSwitch == undefined){
-        mp.storage.data.menu.CameraSwitch = true;
-    }
     if(mp.storage.data.menu.AutoLogin == undefined){
         mp.storage.data.menu.AutoLogin = true;
+    }
+    if(mp.storage.data.menu.RealtimeSpeedo == undefined){
+        mp.storage.data.menu.RealtimeSpeedo = false;
     }
 
     if(mp.storage.data.menu.EventMusic !== undefined){
@@ -2748,12 +2748,12 @@ function setStorageDataVars(){
 
     if(mp.storage.data.menu.monitoring !== undefined){
         if(ServerUI != undefined && ServerUI != null)
-            ServerUI.execute(`gm.$refs.TopRight.$refs.Info.monitor = ${mp.storage.data.menu.monitoring}`);
+            ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.monitorEnabled = ${mp.storage.data.menu.monitoring}`);
     }
     else{
         mp.storage.data.menu.monitoring = false;
         if(ServerUI != undefined && ServerUI != null)
-            ServerUI.execute(`gm.$refs.TopRight.$refs.Info.monitor = false;`);
+            ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.monitorEnabled = false;`);
     }
 
     if(mp.storage.data.menu.VoiceMode !== undefined){
