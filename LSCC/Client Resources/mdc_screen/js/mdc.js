@@ -1,9 +1,9 @@
 var SuspectsCount = 0;
 var PlayerName = "codename";
 
-const Scale = 19.2755403;
-const ZeroY = 188;
-const ZeroX = 78;
+const Scale = 20.1789759578;
+const ZeroY = 416;
+const ZeroX = 283;
 
 var StingerScreenDOM;
 var StingerArea;
@@ -176,14 +176,13 @@ document.addEventListener("keydown", function(e){
 function getPictureCoords(x, y){
     x = x/Scale;
     y = y/Scale;
-
-    return {x: ZeroX + x , y: ZeroY - y};
+    return {x: (ZeroX + x)-500 , y: (ZeroY - y)-500};
 }
 
 function setBlipPosition(element, x, y){ 
     var coords = getPictureCoords(x, y);
-    element.style.top = (coords.y-247) + 'px';
-    element.style.left = (coords.x-280) + 'px';
+    element.style.top = (coords.y) + 'px';
+    element.style.left = (coords.x) + 'px';
 }
 
 function updateMapBlipScales(zoom_level){
@@ -212,8 +211,8 @@ document.addEventListener("keypress", function(e){
     switch(key){
         case "r": // Roadblock View
         if(CurrentOption != "stinger"){
-            stingerButton.className = "mdc-button-pressed";
-            mapViewButton.className = "mdc-button";
+            stingerButton.className = "program-tab-pressed";
+            mapViewButton.className = "program-tab";
             CurrentOption = "stinger";
 
             document.getElementById("miniscreen_desc").innerHTML = "Request stingers to be deployed at a location.\
@@ -227,8 +226,8 @@ document.addEventListener("keypress", function(e){
         break;
         case "m": // Map View
         if(CurrentOption != "map"){
-            mapViewButton.className = "mdc-button-pressed";
-            stingerButton.className = "mdc-button";
+            mapViewButton.className = "program-tab-pressed";
+            stingerButton.className = "program-tab";
             CurrentOption = "map";
 
             document.getElementById("miniscreen_desc").innerHTML = "Approximate suspects' location & active stingers are displayed."; 

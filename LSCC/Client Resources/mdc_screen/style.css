@@ -1,5 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Orbitron&family=Poppins&display=swap');
+@font-face {
+    font-family: 'windowsregular';
+    src: url('./font/windows_regular-webfont.woff2') format('woff2'),
+         url('/font/windows_regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
 
 body{
     margin: 0px;
@@ -28,7 +33,7 @@ body{
 .mdc-taskbar{
     position:absolute;
     bottom:10px;
-    height:54px;
+    height:40px;
     width:1024px;
     background: rgb(238,238,238);
     background: linear-gradient(180deg, rgba(238,238,238,1) 0%, rgba(255,255,255,1) 5%, rgba(195,199,203,1) 6%, rgba(195,199,203,1) 100%);
@@ -37,10 +42,10 @@ body{
     align-items: center;
 }
 .mdc-taskbar-time{
-    top:3px;
+    bottom:2px;
     right:10px;
     position:absolute;
-    height:54px;
+    height:40px;
     line-height: 0px;
     text-justify: center;
     text-align: center;
@@ -49,12 +54,12 @@ body{
 .mdc-taskbar-buttons{
     top:2px;
     position:absolute;
-    height:54px;
+    height:40px;
     display:flex;
     align-items: center;
 }
-.mdc-taskbar-button{
-    height:40px;
+.mdc-start-button{
+    height:30px;
     width:128px;
     margin: 10px;
     border-top: 2px solid white;
@@ -65,9 +70,22 @@ body{
     display:flex;
     align-items: center;
 }
+.mdc-taskbar-button{
+    height:28px;
+    width:180px;
+    margin: -5px;
+    border-top: 2px solid white;
+    border-left: 2px solid white;
+    border-bottom: 2px solid black;
+    border-right: 2px solid black;
+
+    display:flex;
+    align-items: center;
+    font-family: "windowsregular", sans-serif; font-size:16px;
+}
 .mdc-taskbar-button-pressed{
-    height:40px;
-    width:128px;
+    height:28px;
+    width:180px;
     margin: 10px;
     border-top: 2px solid black;
     border-left: 2px solid black;
@@ -76,6 +94,7 @@ body{
     background:rgba(180, 180, 180,1);
     display:flex;
     align-items: center;
+    font-family: "windowsregular", sans-serif; font-size:16px; font-weight:600;
 }
 .mdc-panel{
     overflow:hidden;
@@ -88,6 +107,88 @@ body{
     /* display: flex;
     justify-content: space-between;
     align-items: center; */
+}
+.mdc-program{
+    margin:10px;
+    height:680px;
+    width:618px;
+    border: 3px solid rgb(50,50,50,1);
+    background-color: rgba(195,199,203,1);
+}
+.mdc-program-top{
+    position: relative;
+    width:100%;
+    height:35px;
+    background: rgb(1,0,77);
+    background: linear-gradient(90deg, rgba(1,0,77,1) 30%, rgba(10,0,201,1) 100%);  
+
+    display: flex;
+    justify-content: space-between;
+}
+.program-top-title{
+    height:100%;
+    display:flex;
+    align-items: center;
+}
+.program-top-buttons{
+    display:flex;
+    align-items: center;
+}
+.top-button{
+    border-top: 2px solid rgb(180,180,180,1);
+    border-left: 2px solid rgb(180,180,180,1);
+    border-bottom: 2px solid rgb(120,120,120,1);
+    border-right: 2px solid rgb(120,120,120,1);
+    background-color: rgba(195,199,203,1);
+
+    height:20px;
+    width:20px;
+    margin:3px;
+    display:flex;
+    text-justify: center;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-family: "windowsregular",Helvetica;
+    font-size:13px;
+}
+
+.mdc-program-tabs{
+    width:100%;
+    height:25px;
+    border-bottom: 2px solid rgb(120,120,120,1);
+    display:flex;
+}
+.program-tab-pressed{
+    margin-top:1px;
+    height:19px;
+    width:150px;
+    border-top: 2px solid black;
+    border-left: 2px solid black;
+    border-bottom: 2px solid white;
+    border-right: 2px solid white;
+    background:rgba(180, 180, 180,1);
+
+    display:flex;
+    align-items: center;  
+
+    font-family: "windowsregular",Helvetica;
+    font-size: 14px;
+    font-weight: bold;
+}
+.program-tab{
+    margin-top:1px;
+    height:20px;
+    width:150px;
+    border-top: 2px solid white;
+    border-left: 2px solid white;
+    border-bottom: 2px solid black;
+    border-right: 2px solid black;
+
+    display:flex;
+    align-items: center;  
+    font-family: "windowsregular",Helvetica;
+    font-size: 14px;
 }
 
 /* ==========> MDC BUTTONS <========== */
@@ -138,9 +239,8 @@ body{
 
 /* ==========> MDC SCREEN => MAP <========== */
 .mdc-screen-map{
-    margin: 20px;
-    height:650px;
-    width:650px;
+    height:618px;
+    width:618px;
 
     display: flex;
     background-color:#0FA8D2;
@@ -219,20 +319,26 @@ body{
 /* ==========> OTHER SCREEN ELEMENTS <========== */
 .help-panel{
     position:absolute;
-    top:520px;
+    bottom:10px;
     left:10px;
-    height:120px;
+    height:100px;
     width:200px;
-    border-radius: 20px;
-    background-color: rgba(0, 0, 0, 0.782);
+    
+    border-top: 2px solid rgb(180,180,180,1);
+    border-left: 2px solid rgb(180,180,180,1);
+    border-bottom: 2px solid rgb(120,120,120,1);
+    border-right: 2px solid rgb(120,120,120,1);
+    background-color: rgba(195,199,203,1);
 
     text-align: center;
 }
 .help-panel > p{
     margin:7px;
     list-style: none;
-    font-family: 'Inter', sans-serif;
-    color:white;
+    font-family: "windowsregular",Helvetica;
+    line-height: 15px;
+    font-size:18px;
+    color:black;
 }
 /* UNUSED FOR NOW - NEED TO FIGURE OUT HOW TO CHECK IF DIV IS TOUCHING ANOTHER DIV OR SMTH IDK
 .map-crosshair-display{
@@ -247,11 +353,14 @@ body{
 .map-views{
     position:absolute;
     top:10px;
-    left:470px;
+    right:10px;
     height:90px;
     width:150px;
-    border-radius: 10px;
-    background-color: rgba(0, 0, 0, 0.782);    
+    border-top: 2px solid rgb(180,180,180,1);
+    border-left: 2px solid rgb(180,180,180,1);
+    border-bottom: 2px solid rgb(120,120,120,1);
+    border-right: 2px solid rgb(120,120,120,1);
+    background-color: rgba(195,199,203,1);
 
     display:flex;
     justify-content: space-between;
@@ -307,19 +416,19 @@ body{
 .blip-police{
     transform:scale(0.005);
     position:absolute;
-    top:-60px;
-    left:-200px;
+    top:-84px;
+    left:-217px;
 }
 .blip-spike{
     transform:scale(0.01);
     position:absolute;
-    top:-60px;
-    left:-200px;
+    top:-84px;
+    left:-217px;
 }
 
 .fugi-circle{
     transform:scale(0.085);
     position:absolute;
-    top:-60px;
-    left:-200px;
+    top:-84px;
+    left:-217px;
 }

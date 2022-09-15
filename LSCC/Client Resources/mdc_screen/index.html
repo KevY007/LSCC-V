@@ -9,16 +9,16 @@
             <div class="mdc-edge">
                 <div class="mdc-taskbar">
                     <div class="mdc-taskbar-buttons">
-                        <div class="mdc-taskbar-button">
-                            <img src="./img/win98_logo.png" style="width:40px; height: auto; margin:10px;"/>
+                        <div class="mdc-start-button">
+                            <img src="./img/win98_logo.png" style="width:30px; height: auto; margin:10px;"/>
                             <p style="font-family: Helvetica, sans-serif; font-size:24px; font-weight: bold;">Start</p>
                         </div>
                         <!-- Separator -->
-                        <div style="height:80%; width:3px; background-color:white; border-right:1px solid black; border-bottom: 1px solid black;">
+                        <div style="height:70%; width:2px; background-color:white; border-right:1px solid black; border-bottom: 1px solid black;">
                         </div>
                         <div class="mdc-taskbar-button-pressed">
-                            <img src="./img/lspd.png" style="width:32px; height: auto; margin:10px;"/>
-                            <p style="font-family: Helvetica, sans-serif; font-size:20px; font-weight:400;">LSPD...</p>
+                            <img src="./img/lspd.png" style="width:24px; height: auto; margin:10px;"/>
+                            <p>Los Santos Police D...</p>
                         </div>
                     </div>
                     <div class="mdc-taskbar-time">
@@ -27,72 +27,94 @@
                     </div>
                 </div>
                 <div class="mdc-panel">
-                    <!--
-                    <div id="mdc_map" class="mdc-screen-map">
-                        <div id="mdc-content" class="mdc-content">
-                            <img id="map_display" class="map" src="./img/atlas_map.png"/>
-                            <div id="map_content" class="map-content">
-                                
+                    <div class="mdc-program">
+                        <div class="mdc-program-top">
+                            <div class="program-top-title">
+                                <img src="./img/lspd.png" style="width:24px; height: auto; margin:10px;"/>
+                                <p style="font-family: Helvetica, sans-serif; margin-top:19px; font-size:18px; font-weight:bold; color:white;">
+                                    Los Santos Police Department
+                                </p>                                
+                            </div>
+                            <div class="program-top-buttons">
+                                <div class="top-button">
+                                    🗕
+                                </div>
+                                <div class="top-button">
+                                    X
+                                </div>
                             </div>
                         </div>
-                        <div id="help_panel" class="help-panel">
-                                <p><strong>Pan</strong> - Arrow Keys</p>
-                                <p><strong>Zoom In</strong> - Shift</p>
-                                <p><strong>Zoom Out</strong> - Ctrl</p>
-                                <p><strong>Switch View</strong> - Enter</p>
-                        </div>
-                 
-                        <div class="map-views">
-                            <div id="view-atlas" class="map-view-selected">
-                                <img class="map-view-icon" src="./img/icon_atlas.png"/>
+                        <div class="mdc-program-tabs">
+                            <div class="program-tab-pressed" id="option_map_view">
+                                <img src="./img/icon_map.png" style="width:16px; height:auto; margin:0px 5px 0px 5px;"/>
+                                <p>Map View</p>
                             </div>
-                            <div id="view-satellite" class="map-view">
-                                <img class="map-view-icon" src="./img/icon_satellite.png"/>
+                            <div class="program-tab" id="option_stinger">
+                                <img src="./img/stinger_icon.png" style="width:16px; height:auto; margin:0px 3px 0px 5px;"/>
+                                <p>Stinger Deploy...</p>
                             </div>
                         </div>
-                    </div>
-                    -
-                    <div style="display:none;" id="mdc_stinger" class="mdc-screen-stinger">
-                        <div class="stinger-info-panel" style="position:absolute;">
-                            <div style="position:absolute; right:25px; bottom:68px;">
-                                <p class="stinger-controls" id="stinger_location_pages">1/10</p>
+                        <div id="mdc_map" class="mdc-screen-map">
+                            <div id="mdc-content" class="mdc-content">
+                                <img id="map_display" class="map" src="./img/atlas_map.png"/>
+                                <div id="map_content" class="map-content">
+                                    
+                                </div>
                             </div>
-                            <div style="display:flex; align-items:center; margin:0px 0px 0px 10px; height:64px;">
-                                <h1 class="stinger-location" id="stinger_area">
-                                    Little Seoul
-                                </h1>
-                                <p class="stinger-street">&nbsp—&nbsp</p>
-                                <p class="stinger-street" id="stinger_street">
-                                La Puerta Fway
+                            <div id="help_panel" class="help-panel">
+                                    <p><strong>Pan</strong> - Arrow Keys</p>
+                                    <p><strong>Zoom In</strong> - Shift</p>
+                                    <p><strong>Zoom Out</strong> - Ctrl</p>
+                                    <p><strong>Switch View</strong> - Enter</p>
+                            </div>
+                     
+                            <div class="map-views">
+                                <div id="view-atlas" class="map-view-selected">
+                                    <img class="map-view-icon" src="./img/icon_atlas.png"/>
+                                </div>
+                                <div id="view-satellite" class="map-view">
+                                    <img class="map-view-icon" src="./img/icon_satellite.png"/>
+                                </div>
+                            </div>
+                        </div>
+                        -
+                        <div style="display:none;" id="mdc_stinger" class="mdc-screen-stinger">
+                            <div class="stinger-info-panel" style="position:absolute;">
+                                <div style="position:absolute; right:25px; bottom:68px;">
+                                    <p class="stinger-controls" id="stinger_location_pages">1/10</p>
+                                </div>
+                                <div style="display:flex; align-items:center; margin:0px 0px 0px 10px; height:64px;">
+                                    <h1 class="stinger-location" id="stinger_area">
+                                        Little Seoul
+                                    </h1>
+                                    <p class="stinger-street">&nbsp—&nbsp</p>
+                                    <p class="stinger-street" id="stinger_street">
+                                    La Puerta Fway
+                                    </p>
+                                </div>
+                                <p class="stinger-controls" id="stinger_help">
+                                    Press <strong>[ENTER]</strong> to request deployment.
+                                </p>
+                                <p class="stinger-controls">
+                                    Use the <strong>Left & Right Arrows</strong> to scroll through locations.
                                 </p>
                             </div>
-                            <p class="stinger-controls" id="stinger_help">
-                                Press <strong>[ENTER]</strong> to request deployment.
-                            </p>
-                            <p class="stinger-controls">
-                                Use the <strong>Left & Right Arrows</strong> to scroll through locations.
-                            </p>
+                        </div>
+                        <div class="mdc-buttons">
+                            <div class="mdc-miniscreen">
+                                <p id="miniscreen_status" class="miniscreen-status">
+                                    SIGNAL: [///]<br>
+                                    OFFICER: codename<br>
+                                    SUSPECTS: 5
+                                </p>
+                                <p id="miniscreen_desc" class="miniscreen-description">
+                                    Approximate suspects' location & active stingers are displayed.
+                                </p>
+                            </div>
                         </div>
                     </div>
-                    <div class="mdc-buttons">
-                        <div class="mdc-miniscreen">
-                            <p id="miniscreen_status" class="miniscreen-status">
-                                SIGNAL: [///]<br>
-                                OFFICER: codename<br>
-                                SUSPECTS: 5
-                            </p>
-                            <p id="miniscreen_desc" class="miniscreen-description">
-                                Approximate suspects' location & active stingers are displayed.
-                            </p>
-                        </div>
-                        <div class="mdc-button-pressed" id="option_map_view">
-                            <p>MAP VIEW [M]</p>
-                        </div>
-                        <div class="mdc-button" id="option_stinger">
-                            <p>STINGER DEPLOYMENT [R]</p>
-                        </div>
-                    </div>
-                    -->
+                    
+            
                 </div>
             </div>
             
