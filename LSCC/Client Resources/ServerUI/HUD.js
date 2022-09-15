@@ -172,6 +172,20 @@ function increaseChatOpacity(time = 4000){
     }, time);
 }
 
+mp.events.add("spawner_spawnVehicle", (modelname) => {
+    ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.enabled = false;`);
+    mp.events.callRemote("Spawner_SpawnVehicle", modelname);
+    mp.gui.cursor.show(false, false);
+});
+mp.events.add("spawner_close", () => {
+    ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.enabled = false;`);
+    mp.gui.cursor.show(false, false);
+});
+mp.events.add("OpenVehicleSpawner", (carname) => {
+    ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.openSpawner('${carname}')`);
+    mp.gui.cursor.show(true, true);
+});
+
 mp.events.add("startLoadingScreen", (time, message) => {
     if(time == -1){
         ServerUI.execute('gm.$refs.loadingScreen.show(true);');

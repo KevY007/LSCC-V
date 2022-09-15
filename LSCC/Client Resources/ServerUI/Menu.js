@@ -85,10 +85,11 @@ mp.events.add("LoadCrosshairProfiles", (profileData, activeProfile) => {
     ActiveCrosshairProfileUUID = activeProfile;
 });
 
-mp.events.add("Menu_AddClan", (cname, tag, desc, banner, isOpen, players, maxPlayers, kills, deaths, wins) => {
+mp.events.add("Menu_AddClan", (clanID, cname, tag, desc, banner, isOpen, players, maxPlayers, kills, deaths, wins) => {
     
     ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.clansList.clans.push(
         {
+            id: ${clanID},
             name: "${cname}",
             tag: "${tag}",
             description: "${desc}",
@@ -104,11 +105,33 @@ mp.events.add("Menu_AddClan", (cname, tag, desc, banner, isOpen, players, maxPla
             },
         });`);
 });
+mp.events.add("joinClan", (clanSQLID) => {
+    mp.events.callRemote("Clan_OnRequestJoinClan", clanSQLID);
+});
 mp.events.add("kickClanMember", (memberSQLID) => {
     mp.events.callRemote("Clan_OnRequestKickPlayer", memberSQLID);
 });
 mp.events.add("setClanRank", (memberSQLID, tier) => {
     mp.events.callRemote("Clan_OnRequestChangeTier", memberSQLID, tier);
+});
+
+mp.events.add("invitePlayerToClan", (playerName) => {
+    mp.events.callRemote("Clan_OnRequestInvitePlayer", playerName);
+});
+/*
+    CLAN SETTING IDs and VALUES
+
+    [1] => Clan Access
+    (VALUES) => 0 - Invite-only ; 1 - Public
+    [2] => Force Clan Tag
+    (VALUES) => true/false
+    [3] => Copchase Partnering
+    (VALUES) => true/false
+*/
+mp.events.add("changeClanSettings", (settingID, value) => {
+    switch(settingID){
+
+    }
 });
 
 mp.events.add("Menu_RemoveClanMember", (memberID) => {

@@ -734,8 +734,8 @@ namespace RNC
             player.TriggerEvent("pushMsgToChat", "~y~Your Discord code: ~w~" + _d.DiscordCode);
         }
 
-        [Command("aveh", "!{#AFAFAF}[USAGE] aveh (vehicle model) (optional: pri. col) (optional: sec. col)", Alias = "av")]
-        public void cmd_aveh(Player player, string carname, int col1 = -1, int col2 = -1)
+        [Command("aveh", "!{#AFAFAF}[USAGE] aveh (optional: vehicle model) (optional: pri. col) (optional: sec. col)", Alias = "av")]
+        public void cmd_aveh(Player player, string carname = "", int col1 = -1, int col2 = -1)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -745,41 +745,14 @@ namespace RNC
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
                 return;
             }
-
-            Random rand = new Random(DateTimeOffset.UtcNow.Millisecond);
-
-            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, col1 == -1 ? rand.Next(160) : col1, col2 == -1 ? rand.Next(160) : col2, player.Name, 255, false, true, player.Dimension);
-            aVehicle.EngineStatus = true;
-            aVehicle.SetSharedData("Engine", true);
-            aVehicle.SetSharedData("Locked", false);
-            aVehicle.Locked = false;
-            aVehicle.SetSharedData("Team", -1);
-
-            Settings.AdminVehicles.Add(aVehicle);
-
-            NAPI.Task.Run(() =>
-            {
-                lock (player)
-                {
-                    if (player != null && player.Exists)
-                    {
-                        if (!aVehicle.IsNull && aVehicle.Exists) player.SetIntoVehicle(aVehicle, 0);
-                    }
-                }
-            }, 1000);
-
-            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
-            if (lobby.Fugitives.Contains(player) || lobby.Cops.Contains(player))
-            {
-                Logs.LogAdmin(player, "Spawned a vehicle while in copchase: " + carname.ToUpper());
-            }
-            else Logs.LogAdmin(player, "Spawned a vehicle: " + carname.ToUpper());
-            //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:aveh:{carname.Replace(":", "|")}"); } catch { }
+            // Vehicle spawner automatically grabs the car and spawns it if it's found.
+            player.TriggerEvent("OpenVehicleSpawner", carname);
             return;
+
         }
 
         [Command("veh", "!{#AFAFAF}[USAGE] veh (vehicle model) (optional: pri. color) (optional: sec. color)", Alias = "v")]
-        public void cmd_veh(Player player, string carname, int col1 = -1, int col2 = -1)
+        public void cmd_veh(Player player, string carname = "", int col1 = -1, int col2 = -1)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -800,36 +773,8 @@ namespace RNC
                 veh.Delete();
                 player.SendNotification("~r~You had too many freeroam vehicles, removed the least recent.");
             }
-
-            Random rand = new Random(DateTimeOffset.UtcNow.Millisecond);
-
-            //// try { Main.Log("freeroam.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:veh:{carname}"); } catch { }
-
-            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5.0f), player.Heading, (col1 == -1) ? rand.Next(160) : col1, (col2 == -1) ? rand.Next(160) : col2, player.Name, 255, false, true, player.Dimension);
-            aVehicle.SetSharedData("Locked", false);
-            aVehicle.Locked = false;
-            aVehicle.EngineStatus = true;
-            aVehicle.SetSharedData("Engine", true);
-
-            aVehicle.SetSharedData("Team", -1);
-
-            freeroamVehs.Add(aVehicle);
-
-            player.SetData("FreeroamVehicles", freeroamVehs);
-
-            player.TriggerEvent("pushMsgToChat", "!{#FF6347}>> !{#FFFFFF}You have spawned a " + carname + " at your current location.");
-
-            NAPI.Task.Run(() =>
-            {
-                lock (player)
-                {
-                    if (player != null && player.Exists)
-                    {
-                        if (!aVehicle.IsNull && aVehicle.Exists) player.SetIntoVehicle(aVehicle, 0);
-                    }
-                }
-            }, 1000);
-
+            // Vehicle spawner automatically grabs the car and spawns it if it's found.
+            player.TriggerEvent("OpenVehicleSpawner", carname);
             return;
         }
 

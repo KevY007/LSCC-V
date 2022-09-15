@@ -4335,7 +4335,7 @@ namespace RNC
                                 {
                                     Task.Run(async () =>
                                     {
-                                        using(MainDatabase context = ContextFactory.CreateContext())
+                                        using (MainDatabase context = ContextFactory.CreateContext())
                                         {
                                             MapSpawn fugi = await context.MapSpawns.AsQueryable().FirstOrDefaultAsync(a => a.mapID == lobby.lastMapId && a.spawnTeam == 0);
                                             MapSpawn cop = await context.MapSpawns.AsQueryable().FirstOrDefaultAsync(a => a.mapID == lobby.lastMapId && a.spawnTeam == 1);
@@ -4370,11 +4370,11 @@ namespace RNC
                                                     }
                                                 }
                                             });
-                                            
+
                                         }
                                     });
-                                    
-                                    
+
+
                                 }
                                 else
                                 {
@@ -4438,7 +4438,7 @@ namespace RNC
                                                         p.TriggerEvent("pushMsgToChat", $"!{{#1E9913}}[#] !{{#FFFFFF}}Due to your excellent marksmanship skills, you were picked to be the \"sniper\".");
                                                         p.TriggerEvent("pushMsgToChat", $"!{{#1E9913}}[#] !{{#FFFFFF}}You received a special set of weapons, including a sniper with low ammo. Use it wisely to fend off against the police.");
                                                         p.TriggerEvent("pushMsgToChat", $"!{{#1E9913}}[#] !{{#FFFFFF}}You can use the ladders to climb up to a higher spot, or back down onto the street - it's entirely your choice.");
-                                                        
+
                                                         p.Position = BankRobberyData.SniperPos;
                                                         p.Heading = BankRobberyData.SniperHeading;
                                                     }
@@ -4459,7 +4459,7 @@ namespace RNC
                                             }
                                         }
                                     }
-                                }                                
+                                }
                             }
                             if (lobby.GameProgress == -5)
                             {
@@ -4608,7 +4608,7 @@ namespace RNC
                                                             }
                                                         }
                                                     });
-                                                    
+
                                                 }
 
                                                 EPlayer.Freeze(p, false);
@@ -4667,11 +4667,11 @@ namespace RNC
                                                                     p.GetData<Vehicle>("ChaseVehicle").PearlescentColor = inst.PearlescentColor;
                                                                     p.GetData<Vehicle>("ChaseVehicle").WheelColor = inst.WheelColor;
                                                                 });
-         
+
                                                             }
                                                         }
                                                     });
-                                                    
+
                                                 }
                                                 EPlayer.Freeze(p, false);
                                                 p.TriggerEvent("ToggleCanExitVehicle", false);
@@ -4778,7 +4778,7 @@ namespace RNC
                                             player.SetData<Vehicle>("BR_UnitVehicle", dick);
                                             player.SetData<int>("BR_UnitVehicleSeat", 0);
                                         }
-                                    }                                    
+                                    }
 
                                     BankRobberyData _brob = lobby.BankRobbery;
                                     Random kevycanusendmefeetpicspls = new Random();
@@ -4826,7 +4826,7 @@ namespace RNC
 
                                             EPlayer.ApplyCharacter(player, cd, 0);
                                         }
-                                        catch(Exception ex)
+                                        catch (Exception ex)
                                         {
                                             try
                                             {
@@ -4880,7 +4880,7 @@ namespace RNC
                                         });
                                     }
                                 });
-                               
+
 
 
                                 foreach (Player p in Settings.LoggedInPlayers.Where(p => lobby.Cops.Contains(p) || lobby.Fugitives.Contains(p)))
@@ -4965,7 +4965,7 @@ namespace RNC
                                     foreach (Player p in lobby.Cops)
                                     {
                                         if (p != null)
-                                        {                                          
+                                        {
                                             EPlayer.Freeze(p, false);
                                             p.SendNotification("~y~You can now exit vehicles.");
                                             p.SendNotification("~b~You may begin the chase now.");
@@ -5094,7 +5094,7 @@ namespace RNC
 
                                                         p.TriggerEvent("pushMsgToChat", $"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: All available units, code 3, there's a 211 in progress in the Pacific Standard Bank!");
                                                     }
-                                                    catch(Exception ex)
+                                                    catch (Exception ex)
                                                     {
                                                         NAPI.Util.ConsoleOutput("FAIL IN SECOND STAGE OF THAT SWAT SHIT " + ex.ToString());
                                                     }
@@ -5131,7 +5131,7 @@ namespace RNC
                                                 }
                                             }
                                         }
-                                        catch(Exception ex)
+                                        catch (Exception ex)
                                         {
                                             NAPI.Util.ConsoleOutput("THIS IS ETERNAL SUFFERING " + ex.ToString());
                                         }
@@ -5182,7 +5182,7 @@ namespace RNC
                             if (stinger.TimeElapsed == 15)
                             {
                                 stinger.Stage = 2;
-                                foreach (Player pl in lobby.Cops))
+                                foreach (Player pl in lobby.Cops)
                                 {
                                     pl.TriggerEvent("MDC:AddSpikeBlip", stinger.ID, stinger.Stage);
                                     pl.TriggerEvent("MDC:UpdateSpike", stinger.ID, stinger.Stage);
@@ -5202,7 +5202,7 @@ namespace RNC
                             else if (stinger.TimeElapsed == 30)
                             {
                                 stinger.Stage = 3;
-                                foreach (Player pl in lobby.Cops))
+                                foreach (Player pl in lobby.Cops)
                                 {
                                     pl.TriggerEvent("MDC:AddSpikeBlip", stinger.ID, stinger.Stage);
                                     pl.TriggerEvent("MDC:UpdateSpike", stinger.ID, stinger.Stage);
@@ -5237,7 +5237,6 @@ namespace RNC
                                 }
                             }
                         }
-                    }
 
                         int gameRunTime = Settings.GameRunTime;
                         if (lobby.gameMode == GameModes.BANKROBBERY) gameRunTime = 600;
@@ -5388,7 +5387,7 @@ namespace RNC
                                             veh.SetSharedData("Collisions", true);
                                             if (veh.HasSharedData("Team") && veh.GetSharedData<int>("Team") == 0)
                                             {
-                                                if(veh.HasSharedData("SpeedInfo") && veh.GetSharedData<string>("SpeedInfo").Contains("Fast"))
+                                                if (veh.HasSharedData("SpeedInfo") && veh.GetSharedData<string>("SpeedInfo").Contains("Fast"))
                                                 {
                                                     veh.SetSharedData("vMaxSpeed", (float)(175 / 3.6)); // 175 KM/H for fast cars
                                                 }
@@ -5398,7 +5397,7 @@ namespace RNC
                                                 }
 
                                             }
-                                            else if(veh.HasSharedData("Team") && veh.GetSharedData<int>("Team") == 1)
+                                            else if (veh.HasSharedData("Team") && veh.GetSharedData<int>("Team") == 1)
                                             {
                                                 if (veh.HasSharedData("SpeedInfo") && veh.GetSharedData<string>("SpeedInfo").Contains("Fast"))
                                                 {

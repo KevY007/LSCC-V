@@ -1156,6 +1156,89 @@ namespace RNC
                 }
             });
         }
+        [RemoteEvent("Clan_OnRequestInvitePlayer")]
+        public void Clan_OnRequestInvitePlayer(Player player, string playerName)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            Account acc = EPlayer.GetAccount(player);
+            if (player.GetSharedData<int>("ClanID") == -1 || player.GetSharedData<int>("ClanTier") > 0)
+            {
+                EPlayer.Error(player, "You are not in a clan or don't have permissions to invite players!", "sex");
+                return;
+            }
+
+            Player target = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase));
+            if(target == null)
+            {
+                EPlayer.Error(player, $"Player <strong>{playerName}</strong> is not online! Please enter the <strong>full player name!</strong>", "sex");
+                return;
+            }
+            if(target.GetSharedData<int>("ClanID") != -1)
+            {
+                EPlayer.Error(player, $"Player {playerName} is already in a clan! They'll have to leave before being able to join yours.", "sex");
+                return;
+            }
+        }
+        [RemoteEvent("Clan_OnRequestJoinClan")]
+        public void Clan_OnRequestJoinClan(Player player, int clanSQLID)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            Account acc = EPlayer.GetAccount(player);
+            if (player.GetSharedData<int>("ClanID") != -1 || player.GetSharedData<int>("ClanTier") != -1)
+            {
+                EPlayer.Error(player, "You are already in a clan! Please leave your current one first <strong>(Menu [M] > Clan > Leave)</strong>.", "sex");
+                return;
+            }
+
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Clan clan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == acc.ClanID);
+                    if (clan == null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Error(player, "That clan does not exist anymore!");
+                            return;
+                        });
+                    }
+                 
+                    Account accnt = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == acc.SQL_ID);
+                    accnt.ClanID = clan.SQL_ID;
+                    accnt.ClanTier = 2;
+                    acc.ClanID = clan.SQL_ID;
+                    acc.ClanTier = 2;
+
+                    int clanID = clan.SQL_ID;
+                    string cName = clan.Name;
+                    string cCreated = clan.CreatedOn;
+                    await context.SaveChangesAsync();
+                    NAPI.Task.Run(() =>
+                    {
+                        player.SetSharedData("ClanID", clanID);
+                        player.SetSharedData("ClanTier", 2);
+                        player.SetSharedData("ClanName", cName);
+                        player.SetSharedData("ClanCreated", cCreated);
+                        EPlayer.GetAccount(player).ClanID = clanID;
+                        EPlayer.GetAccount(player).ClanTier = 2;
+                        EPlayer.Save(player, false);
+                        EPlayer.Notify(player, $"You successfully joined the clan: <strong>{cName}</strong>", "green", "", false, 3000);
+
+                        EPlayer.UpdateUIVars(player);
+
+                        foreach(Player pl in Settings.LoggedInPlayers.Where(p => EPlayer.GetAccount(p).ClanID == clanID))
+                        {
+                            EPlayer.Notify(pl, $"<strong>{player.Name}</strong> has joined your clan!", "green", "", false, 3000);
+                        }
+                    });
+                }
+            });
+        }
 
         [RemoteEvent("OnRequestCreateClan")]
         public void OnRequestCreateClan(Player player, string clanname, string tag, string desc)
@@ -1233,11 +1316,61 @@ namespace RNC
                         EPlayer.SendMessage(player, $"~g~[CLAN] ~r~NOTICE: ~w~If you leave your clan, it will automatically be disbanded and deleted.");
                         EPlayer.SendMessage(player, $"~g~[CLAN] ~w~Best of luck!");
 
+                        player.TriggerEvent("Menu_ClearClanMembers");
+                        player.TriggerEvent("Menu_AddClanMember", acc.SQL_ID, acc.Username, 0, acc.Level);
+                        player.TriggerEvent("Menu_UpdateClanStats", 0, 0, 0);
                         player.TriggerEvent("UpdateMenuClanTab");
                         EPlayer.UpdateUIVars(player);
                     });
                 }
             });
+        }
+
+        [RemoteEvent("Spawner_SpawnVehicle")]
+        public void OnSpawnerRequestVehicle(Player player, string carname)
+        {
+            if(EPlayer.GetAccount(player).Admin < 1)
+            {
+                if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
+                {
+                    return;
+                }
+            }
+
+            VehicleHash? toSpawn = NAPI.Util.VehicleNameToModel(carname);
+            if(toSpawn == null)
+            {
+                player.TriggerEvent("Spawner_InvalidVehicle", carname);
+                return;
+            }
+
+            Random rand = new Random(DateTimeOffset.UtcNow.Millisecond);
+
+            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle((uint)toSpawn, player.Position.Around(5.0f), player.Heading, rand.Next(160), rand.Next(160), player.Name, 255, false, true, player.Dimension);
+            aVehicle.EngineStatus = true;
+            aVehicle.SetSharedData("Engine", true);
+            aVehicle.SetSharedData("Locked", false);
+            aVehicle.Locked = false;
+            aVehicle.SetSharedData("Team", -1);
+
+            Settings.AdminVehicles.Add(aVehicle);
+
+            NAPI.Task.Run(() =>
+            {
+                lock (player)
+                {
+                    if (player != null && player.Exists)
+                    {
+                        if (!aVehicle.IsNull && aVehicle.Exists) player.SetIntoVehicle(aVehicle, 0);
+                    }
+                }
+            }, 1000);
+
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (lobby.Fugitives.Contains(player) || lobby.Cops.Contains(player))
+            {
+                Logs.LogAdmin(player, "Spawned a vehicle while in copchase: " + carname.ToUpper());
+            }
         }
 
         [ServerEvent(Event.PlayerEnterColshape)]
@@ -3430,7 +3563,6 @@ namespace RNC
                             player.TriggerEvent("Menu_ClearClanMembers");
                             foreach (Account accnt in clanAccounts)
                             {
-                                NAPI.Util.ConsoleOutput($"Adding account {accnt.Username} [tier {accnt.ClanTier}] to clan list.");
                                 player.TriggerEvent("Menu_AddClanMember", accnt.SQL_ID, accnt.Username, accnt.ClanTier, accnt.Level);
                             }
                             player.TriggerEvent("Menu_UpdateClanStats", playerClan.WeekKills, playerClan.TotalKills, playerClan.WeekWins);
@@ -3450,6 +3582,7 @@ namespace RNC
                 {
                     await context.Clans.AsQueryable().ForEachAsync(clan =>
                     {
+                        int clanID = clan.SQL_ID;
                         string clanName = clan.Name;
                         string tag = clan.Tag; // to add
                         string desc = clan.Description; // to add
@@ -3463,7 +3596,7 @@ namespace RNC
 
                         NAPI.Task.Run(() =>
                         {
-                            player.TriggerEvent("Menu_AddClan", clanName, tag, desc, banner, isOpen, players,
+                            player.TriggerEvent("Menu_AddClan", clanID, clanName, tag, desc, banner, isOpen, players,
                                                                 maxPlayers, totalKills, totalDeaths, COTW_Wins);
 
                         });
