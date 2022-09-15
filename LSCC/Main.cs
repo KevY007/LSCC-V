@@ -2794,16 +2794,33 @@ namespace RNC
                                         }
 
                                         int woundedCops = lobby.Cops.Where(c => c.GetSharedData<int>("Wounded") > 0).ToList().Count;
-                                        NAPI.Util.ConsoleOutput("Wounded cops: " + woundedCops + " out of " + lobby.Cops.Count);
                                         if(woundedCops >= lobby.Cops.Count)
                                         {
                                             StopGame(lobby.lobbyId, 2);
                                         }
                                         int woundedFugs = lobby.Fugitives.Where(c => c.GetSharedData<int>("Wounded") > 0).ToList().Count;
-                                        NAPI.Util.ConsoleOutput("Wounded fugis: " + woundedFugs + " out of " + lobby.Fugitives.Count);
                                         if (woundedFugs >= lobby.Fugitives.Count)
                                         {
                                             StopGame(lobby.lobbyId, 3);
+                                        }
+
+                                        if(lobby.Fugitives.Count > 0)
+                                        {
+                                            List<Player> driverFugis = lobby.Fugitives.Where(f => f.IsInVehicle && f.VehicleSeat == 0).ToList();
+                                            if (driverFugis.Count <= 0) { driverFugis.Add(lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)]); }
+
+                                            foreach (Player cop in lobby.Cops)
+                                            {
+                                                cop.TriggerEvent("MDC:RemoveBlipsOfType", "fugitivezone");
+                                                foreach (Player driver in driverFugis)
+                                                {
+                                                    Vector3 randomPos = driver.Position;
+                                                    randomPos.X += new Random().Next(-500, 500);
+                                                    randomPos.Y += new Random().Next(-500, 500);
+                                                    cop.TriggerEvent("MDC:AddBlip", driver.Id, "fugitivezone");
+                                                    cop.TriggerEvent("MDC:UpdateBlip", driver.Id, "fugitivezone", randomPos.X, randomPos.Y);
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -4306,69 +4323,6 @@ namespace RNC
 
                 lock (Settings.Lobbies)
                 {
-                    // TEST PURPOSES
-                    foreach(LobbyData lobby in Settings.Lobbies)
-                    {
-                        foreach (Lobby_StingerData stinger in lobby.Stingers)
-                        {
-                            stinger.TimeElapsed++;
-                            if (stinger.TimeElapsed == 15)
-                            {
-                                stinger.Stage = 2;
-                                foreach(Player pl in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
-                                {
-                                    pl.TriggerEvent("MDC:UpdateSpike", stinger.ID, stinger.Stage);
-                                }
-
-                                Stinger stdata = Stinger.Stingers.FirstOrDefault(s => s.ID == stinger.ID);
-                                if (stdata != null)
-                                {
-                                    foreach (StingerInfo sgobject in stdata.StingerObjects.Where(s => s.IsNPC))
-                                    {
-                                        bool female = new Random().Next(0, 10) > 5;
-                                        NAPI.Ped.CreatePed(female ? PedHash.Cop01SFY : PedHash.Cop01SMY, sgobject.Position, sgobject.Rotation.Z, Convert.ToUInt32(lobby.lobbyId));
-
-                                    }
-                                }
-                            }
-                            else if (stinger.TimeElapsed == 30)
-                            {
-                                stinger.Stage = 3;
-                                foreach (Player pl in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
-                                {
-                                    pl.TriggerEvent("MDC:UpdateSpike", stinger.ID, stinger.Stage);
-                                }
-
-                                Stinger stdata = Stinger.Stingers.FirstOrDefault(s => s.ID == stinger.ID);
-                                if (stdata != null)
-                                {
-                                    foreach (StingerInfo sgobject in stdata.StingerObjects.Where(s => !s.IsNPC))
-                                    {
-                                        GTANetworkAPI.Object obj = NAPI.Object.CreateObject(NAPI.Util.GetHashKey("p_stinger_04"),
-                                        sgobject.Position, sgobject.Rotation, 255, Convert.ToUInt32(lobby.lobbyId));
-
-                                        obj.SetData<string>("StingerObjectKey", $"{stdata.ID}_{stdata.StingerObjects.IndexOf(sgobject)}");
-                                        stinger.StingerObjects.Add(obj);
-
-                                        float offsetY = 1.75f; // forward = offset by 1.5f so it's in center of spike
-                                        float offsetX = 0.0f;
-
-                                        Vector3 newPos = sgobject.Position;
-                                        float angle = sgobject.Rotation.Z + 180f;
-                                        angle = (float)((angle * Math.PI) / 180f);
-
-                                        newPos.X += (float)(offsetX * Math.Cos(angle) - offsetY * Math.Sin(angle));
-                                        newPos.Y += (float)(offsetX * Math.Sin(angle) + offsetY * Math.Cos(angle));
-
-                                        ColShape col = NAPI.ColShape.CreateSphereColShape(newPos, 1.5f, Convert.ToUInt32(lobby.lobbyId));
-                                        col.SetData<string>("LinkedStingerObject", $"{stdata.ID}_{stdata.StingerObjects.IndexOf(sgobject)}");
-                                        col.SetData<int>("StingerID", stdata.ID);
-                                        stinger.StingerColshapes.Add(col);
-                                    }
-                                }
-                            }
-                        }
-                    }
                     foreach (LobbyData lobby in Settings.Lobbies.Where(l => l.gameStatus == 1))
                     {
                         lock (lobby)
@@ -5222,18 +5176,22 @@ namespace RNC
                             }
                         }
 
-                        foreach(Lobby_StingerData stinger in lobby.Stingers)
+                        foreach (Lobby_StingerData stinger in lobby.Stingers)
                         {
                             stinger.TimeElapsed++;
-                            if(stinger.TimeElapsed == 15)
+                            if (stinger.TimeElapsed == 15)
                             {
-                                EPlayer.SendMessageAll($"STINGER {stinger.ID} IS NOW STAGE 2 = COPS SPAWNED.");
                                 stinger.Stage = 2;
+                                foreach (Player pl in lobby.Cops))
+                                {
+                                    pl.TriggerEvent("MDC:AddSpikeBlip", stinger.ID, stinger.Stage);
+                                    pl.TriggerEvent("MDC:UpdateSpike", stinger.ID, stinger.Stage);
+                                }
 
                                 Stinger stdata = Stinger.Stingers.FirstOrDefault(s => s.ID == stinger.ID);
-                                if(stdata != null)
+                                if (stdata != null)
                                 {
-                                    foreach(StingerInfo sgobject in stdata.StingerObjects.Where(s => s.IsNPC))
+                                    foreach (StingerInfo sgobject in stdata.StingerObjects.Where(s => s.IsNPC))
                                     {
                                         bool female = new Random().Next(0, 10) > 5;
                                         NAPI.Ped.CreatePed(female ? PedHash.Cop01SFY : PedHash.Cop01SMY, sgobject.Position, sgobject.Rotation.Z, Convert.ToUInt32(lobby.lobbyId));
@@ -5241,10 +5199,14 @@ namespace RNC
                                     }
                                 }
                             }
-                            else if(stinger.TimeElapsed == 30)
+                            else if (stinger.TimeElapsed == 30)
                             {
                                 stinger.Stage = 3;
-                                EPlayer.SendMessageAll($"STINGER {stinger.ID} IS NOW STAGE 3 = STINGERS DEPLOYED.");
+                                foreach (Player pl in lobby.Cops))
+                                {
+                                    pl.TriggerEvent("MDC:AddSpikeBlip", stinger.ID, stinger.Stage);
+                                    pl.TriggerEvent("MDC:UpdateSpike", stinger.ID, stinger.Stage);
+                                }
 
                                 Stinger stdata = Stinger.Stingers.FirstOrDefault(s => s.ID == stinger.ID);
                                 if (stdata != null)
@@ -5275,6 +5237,7 @@ namespace RNC
                                 }
                             }
                         }
+                    }
 
                         int gameRunTime = Settings.GameRunTime;
                         if (lobby.gameMode == GameModes.BANKROBBERY) gameRunTime = 600;

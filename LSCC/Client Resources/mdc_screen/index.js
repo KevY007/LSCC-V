@@ -14,6 +14,10 @@ mp.events.add("MDC:RemoveBlip", (id, type) => {
     if(MDC_DOM == null) return;
     MDC_DOM.execute(`RemoveBlip(${id}, '${type}');`);
 });
+mp.events.add("MDC:RemoveBlipsOfType", (type) => {
+    if(MDC_DOM == null) return;
+    MDC_DOM.execute(`RemoveBlipsOfType('${type}');`);
+});
 mp.events.add("MDC:RemoveAllBlips", () => {
     if(MDC_DOM == null) return;
     MDC_DOM.execute(`RemoveAllBlips();`);
@@ -53,6 +57,8 @@ function InitializeMDC(){
     MDC_DOM.active = false;
 }
 function ToggleMDC(){
+    if(mp.players.local.getVariable("Admin") < 6) return;
+
     MDCActive = !MDCActive;
     MDC_DOM.active = MDCActive;
 

@@ -349,6 +349,22 @@ function RemoveAllBlips(){
     MapContentDOM.innerHTML = "";
 }
 
+function RemoveBlipsOfType(type){
+    let blips = [];
+    switch(type){
+        case "police":
+            blips = document.getElementsByClassName("blip-police");
+            break;
+        case "fugitivezone":
+            blips = document.getElementsByClassName("fugi-circle");
+            break;
+    }
+    if(blips.length <= 0) return;
+    for(let i = 0 ; i < blips.length ; i++){
+        blips[i].remove();
+    }
+}
+
 function UpdateBlip(ID, type, xPos, yPos){
     let blipElement = document.getElementById(`${type}_${ID}`);
     if(blipElement){

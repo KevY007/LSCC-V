@@ -2332,6 +2332,7 @@ mp.events.add("PopVehicleTires", () => {
     vehicle.setTyreBurst(1, false, 1000);
     vehicle.setTyreBurst(4, false, 1000);
     vehicle.setTyreBurst(5, false, 1000);
+    mp.game.audio.playSoundFrontend(-1, 'Drill_Pin_Break', 'DLC_HEIST_FLEECA_SOUNDSET', true);
     // vehicle.setBurnout(true);
     // setTimeout(_ => {
     //     if(vehicle)
