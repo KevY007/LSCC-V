@@ -126,9 +126,8 @@ mp.keys.bind(0x46, true, function () {
 });
 
 function ToggleMDC(){
-    return;
-     MDCActive = !MDCActive;
-     MDC_DOM.active = MDCActive;
+    MDCActive = !MDCActive;
+    MDC_DOM.active = MDCActive;
 }
 
 mp.keys.bind(0x4B, true, ToggleMDC);

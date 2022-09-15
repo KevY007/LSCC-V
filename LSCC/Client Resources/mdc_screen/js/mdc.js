@@ -1,4 +1,3 @@
-var SuspectsCount = 0;
 var PlayerName = "codename";
 
 const Scale = 20.1789759578;
@@ -116,34 +115,28 @@ document.addEventListener("keydown", function(e){
         break;
     }
 });
-document.addEventListener("keydown", function(e){    
-    switch(e.keyCode){
-        case 18:
-            e.preventDefault();
-            if(CurrentOption == "map"){
-                stingerButton.className = "program-tab-pressed";
-                mapViewButton.className = "program-tab";
-                CurrentOption = "stinger";
-    
-                document.getElementById("miniscreen_desc").innerHTML = "Request stingers to be deployed at a location.\
-                Takes 30s to deploy.";
-    
-                document.getElementById("mdc_map").style.display = "none";
-                document.getElementById("mdc_stinger").style.display = "flex";
-                UpdateStingerDisplay(currentSpikeNumber);
-                SelectSound.play();
-            }
-            else if(CurrentOption == "stinger"){
-                mapViewButton.className = "program-tab-pressed";
-                stingerButton.className = "program-tab";
-                CurrentOption = "map";
-    
-                document.getElementById("miniscreen_desc").innerHTML = "Approximate suspects' location & active stingers are displayed."; 
-                document.getElementById("mdc_stinger").style.display = "none";          
-                document.getElementById("mdc_map").style.display = "flex";
-                SelectSound.play();
-            }
-        break;
+document.addEventListener("keypress", function(e){
+    let key = e.key.toLowerCase();
+    if(key == "l"){
+        if(CurrentOption == "map"){
+            stingerButton.className = "program-tab-pressed";
+            mapViewButton.className = "program-tab";
+            CurrentOption = "stinger";
+
+            document.getElementById("mdc_map").style.display = "none";
+            document.getElementById("mdc_stinger").style.display = "flex";
+            UpdateStingerDisplay(currentSpikeNumber);
+            SelectSound.play();
+        }
+        else if(CurrentOption == "stinger"){
+            mapViewButton.className = "program-tab-pressed";
+            stingerButton.className = "program-tab";
+            CurrentOption = "map";
+
+            document.getElementById("mdc_stinger").style.display = "none";          
+            document.getElementById("mdc_map").style.display = "flex";
+            SelectSound.play();
+        }
     }
 });
 document.addEventListener("keydown", function(e){    
@@ -422,16 +415,9 @@ function UpdateMiniscreenStatus(item, value){
     switch(item){
         case "name": PlayerName = value;
         break;
-        case "suspects": SuspectsCount = value;
-        break;
     }
 
-    document.getElementById("miniscreen_status").innerHTML = 
-    `
-        SIGNAL: [///]<br>
-        OFFICER: ${PlayerName}<br>
-        SUSPECTS: ${SuspectsCount}
-    `;
+    document.getElementById("mdc_top_name").innerHTML = `Los Santos Police Department — ${value}`;
 }
 
 function SetStingerError(msg){
