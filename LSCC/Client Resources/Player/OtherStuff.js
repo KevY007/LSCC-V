@@ -656,28 +656,30 @@ let ssViewCursor = false;
 mp.events.add('TakeScreenshot', (quality, compression, apiKey, identifier = "null") => 
 {
     let _fdate = new Date();
-    let _fname = `${_fdate.getDate()}-${_fdate.getMonth()}-${_fdate.getFullYear()}+${_fdate.getHours()};${_fdate.getMinutes()};${_fdate.getSeconds()}+${Intl.DateTimeFormat().resolvedOptions().timeZone.replaceAll("/", "_")}.jpg`;
+    let _fname = `${_fdate.getDate()}-${_fdate.getMonth()+1}-${_fdate.getFullYear()}+${_fdate.getHours()};${_fdate.getMinutes()};${_fdate.getSeconds()}+${Intl.DateTimeFormat().resolvedOptions().timeZone.replaceAll("/", "_")}.jpg`;
     mp.gui.takeScreenshot(_fname, 0, quality, compression);
-    let screenshotter_cef = mp.browsers.new("package://Player/Screenshotter.html");
-    // function loadImage(name, url, event, identifier, uploadUrl)
-
-    mp.events.add(`Screenshotter${_fdate.getMilliseconds()}`, (result, data, identifier) => {
-        mp.events.callRemote(`ScreenshotReceived`, result, data, identifier);
-
-        screenshotter_cef.active = false;
-
-        setTimeout(() => {
-            screenshotter_cef.destroy(); // Destroying right after was crashing the client, not sure why.
-        }, 1000);
-        mp.events.remove(`Screenshotter${_fdate.getMilliseconds()}`);
-    });
-    let toexec = `loadImage("${apiKey}",
-    "${mp.players.local.name};${identifier}+${_fname}", 
-    "http://screenshots/${_fname}", 
-    "Screenshotter${_fdate.getMilliseconds()}", 
-    "${identifier}", 
-    "http://194.163.144.228:8237/ss/upload");`;
-    screenshotter_cef.execute(toexec);
+    setTimeout(() => { // Waiting two seconds so the image fully loads before it gets uploaded.
+        let screenshotter_cef = mp.browsers.new("package://Player/Screenshotter.html");
+        // function loadImage(name, url, event, identifier, uploadUrl)
+    
+        mp.events.add(`Screenshotter${_fdate.getMilliseconds()}`, (result, data, identifier) => {
+            mp.events.callRemote(`ScreenshotReceived`, result, data, identifier);
+    
+            screenshotter_cef.active = false;
+    
+            setTimeout(() => {
+                screenshotter_cef.destroy(); // Destroying right after was crashing the client, not sure why.
+            }, 1000);
+            mp.events.remove(`Screenshotter${_fdate.getMilliseconds()}`);
+        });
+        let toexec = `loadImage("${apiKey}",
+        "${mp.players.local.name};${identifier}+${_fname}", 
+        "http://screenshots/${_fname}", 
+        "Screenshotter${_fdate.getMilliseconds()}", 
+        "${identifier}", 
+        "http://194.163.144.228:8237/ss/upload");`;
+        screenshotter_cef.execute(toexec);
+    }, 2000);
 });
 
 // mp.events.add("ViewScreenshot", (identifier) => {
