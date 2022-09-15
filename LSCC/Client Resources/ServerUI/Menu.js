@@ -200,6 +200,9 @@ mp.events.add("UpdateMenuClanTab", () => {
 
 function ToggleMenu()
 {
+    if(MDCActive !== undefined && MDCActive == true){
+        ToggleMDC();
+    }
     if(scoreboardToggled)
     {
         ToggleScoreboard();

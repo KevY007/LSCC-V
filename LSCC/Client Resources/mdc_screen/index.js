@@ -47,7 +47,6 @@ mp.events.add("mdcRequestDeployStinger", (stingerID) => {
 });
 
 /* RAGE:MP STUFF */
-let MDCActive = false;
 function InitializeMDC(){
     MDC_DOM = mp.browsers.new("package://mdc_screen/index.html");
 
@@ -58,18 +57,26 @@ function InitializeMDC(){
 }
 function ToggleMDC(){
     if(mp.players.local.getVariable("Admin") < 6) return;
+    if(menuToggled == true || chatStatus == true) return;
 
+    if(scoreboardToggled)
+    {
+        ToggleScoreboard();
+    }
     MDCActive = !MDCActive;
     MDC_DOM.active = MDCActive;
 
     if(MDCActive){
         mp.events.callLocal("MDC:UpdateMiniscreen", "name", mp.players.local.name);
     }
+    
 }
 
 mp.keys.bind(0x4B, true, ToggleMDC);
 
 mp.events.add("OneSecondEvent", () => {
+    if(mp.players.local.getVariable("Team") != 1) return;
+
     mp.events.callLocal("MDC:AddBlip", mp.players.local.remoteId, "police");
     mp.events.callLocal("MDC:UpdateBlip", mp.players.local.remoteId, "police", mp.players.local.position.x, mp.players.local.position.y);
     /* Adding streamed in police officers to the MDC */

@@ -1180,6 +1180,9 @@ namespace RNC
                 EPlayer.Error(player, $"Player {playerName} is already in a clan! They'll have to leave before being able to join yours.", "sex");
                 return;
             }
+            EPlayer.Notify(player, $"You've invited that player to your clan. They have 20 seconds to accept.", "green", "", false, 3000);
+            target.TriggerEvent("SendClanInvite", player.GetSharedData<string>("ClanName"), player.GetSharedData<int>("ClanID"), player.Name);
+            
         }
         [RemoteEvent("Clan_OnRequestJoinClan")]
         public void Clan_OnRequestJoinClan(Player player, int clanSQLID)
@@ -1198,7 +1201,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Clan clan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == acc.ClanID);
+                    Clan clan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == clanSQLID);
                     if (clan == null)
                     {
                         NAPI.Task.Run(() =>

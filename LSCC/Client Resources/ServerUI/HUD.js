@@ -186,6 +186,10 @@ mp.events.add("OpenVehicleSpawner", (carname) => {
     mp.gui.cursor.show(true, true);
 });
 
+mp.events.add("SendClanInvite", (clanName, clanID, senderName) => {
+    ServerUI.execute(`clanInvite("Clan Invitation", "You have been invited to <strong>${clanName}</strong> by ${senderName}.", 20000, ${clanID});`);
+});
+
 mp.events.add("startLoadingScreen", (time, message) => {
     if(time == -1){
         ServerUI.execute('gm.$refs.loadingScreen.show(true);');
@@ -206,10 +210,19 @@ mp.events.add("stopLoadingScreen", () => {
 
 function activateChat(toggle){
     if(ServerUI == null) return;
+    if(menuToggled){
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.enabled = false;`);
+        return;
+    }
+
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.enabled = ${toggle.toString()}`);
 };
 function focusChat(toggle){
     if(ServerUI == null) return;
+    if(menuToggled){
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = false;`);
+        return;
+    }
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = ${toggle.toString()}`);
 
     if(toggle){

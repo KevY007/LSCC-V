@@ -42,6 +42,7 @@ var scoreboardToggled = false;
 var scoreboardCursor = false;
 
 var MDC_DOM = null;
+var MDCActive = false;
 
 var cuffTarget = null;
 var cuffInterval = null;
