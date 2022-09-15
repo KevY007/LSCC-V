@@ -10,6 +10,7 @@ var StingerArea;
 var StingerStreet;
 var StingerPage;
 var StingerHelp;
+var StingersList;
 
 
 var last104sound = 1;
@@ -63,21 +64,26 @@ function UpdateMapSource(){
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    StingerScreenDOM = document.getElementById("mdc_stinger");
-    StingerArea = document.getElementById("stinger_area");
-    StingerStreet = document.getElementById("stinger_street");
-    StingerPage = document.getElementById("stinger_location_pages");
+    StingerScreenDOM = document.getElementById("mdc_stinger_display");
     StingerHelp = document.getElementById("stinger_help");
+    StingersList = document.getElementById("stinger_locations_list");
+
+    for(let i = 0 ; i < Stingers.length ; i++){
+        let stg = `
+        <div class="stinger-location" id="stinger_location_${Stingers[i].id}">
+            <p><strong>${Stingers[i].area}</strong></p>
+            <p style="margin-top:-26px;">${Stingers[i].street}</p>
+        </div>  
+        `;
+        StingersList.innerHTML += stg;
+    }
+    document.getElementById(`stinger_location_${Stingers[0].id}`).className = "stinger-location-pressed";
 })
 
 function UpdateStingerDisplay(id){
     StingerScreenDOM.style.backgroundImage = `url('./img/spikes/sp${id}.png')`;
     let stinger = GetStinger(id);
     if(stinger.id != -1){
-        StingerStreet.innerHTML = stinger.street;
-        StingerArea.innerHTML = stinger.area;
-        StingerPage.innerHTML = `${id}/${Stingers.length}`;
-
         StingerHelp.innerHTML = `Press <strong>[ENTER]</strong> to request deployment.`;
     }
 }
@@ -87,20 +93,54 @@ document.addEventListener("keydown", function(e){
     switch(e.keyCode){
         case 13: 
 
-        //mp.trigger("mdcRequestDeployStinger", currentSpikeNumber);
+        mp.trigger("mdcRequestDeployStinger", currentSpikeNumber);
 
         break;   
-        case 37:
+        case 38:
             {
+                document.getElementById(`stinger_location_${currentSpikeNumber}`).className = "stinger-location";
                 (currentSpikeNumber > 1 ? currentSpikeNumber-- : currentSpikeNumber = 15);
+                document.getElementById(`stinger_location_${currentSpikeNumber}`).className = "stinger-location-pressed";
                 UpdateStingerDisplay(currentSpikeNumber);
                 SelectSound.play();
             }
         break;
-        case 39:
+        case 40:
             {
+                document.getElementById(`stinger_location_${currentSpikeNumber}`).className = "stinger-location";
                 (currentSpikeNumber < 15 ? currentSpikeNumber++ : currentSpikeNumber = 1);
+                document.getElementById(`stinger_location_${currentSpikeNumber}`).className = "stinger-location-pressed";
                 UpdateStingerDisplay(currentSpikeNumber);
+                SelectSound.play();
+            }
+        break;
+    }
+});
+document.addEventListener("keydown", function(e){    
+    switch(e.keyCode){
+        case 18:
+            e.preventDefault();
+            if(CurrentOption == "map"){
+                stingerButton.className = "program-tab-pressed";
+                mapViewButton.className = "program-tab";
+                CurrentOption = "stinger";
+    
+                document.getElementById("miniscreen_desc").innerHTML = "Request stingers to be deployed at a location.\
+                Takes 30s to deploy.";
+    
+                document.getElementById("mdc_map").style.display = "none";
+                document.getElementById("mdc_stinger").style.display = "flex";
+                UpdateStingerDisplay(currentSpikeNumber);
+                SelectSound.play();
+            }
+            else if(CurrentOption == "stinger"){
+                mapViewButton.className = "program-tab-pressed";
+                stingerButton.className = "program-tab";
+                CurrentOption = "map";
+    
+                document.getElementById("miniscreen_desc").innerHTML = "Approximate suspects' location & active stingers are displayed."; 
+                document.getElementById("mdc_stinger").style.display = "none";          
+                document.getElementById("mdc_map").style.display = "flex";
                 SelectSound.play();
             }
         break;
@@ -206,38 +246,6 @@ document.addEventListener("DOMContentLoaded", () => {
     stingerButton = document.getElementById("option_stinger");
 });
 
-document.addEventListener("keypress", function(e){    
-    let key = e.key.toLowerCase();
-    switch(key){
-        case "r": // Roadblock View
-        if(CurrentOption != "stinger"){
-            stingerButton.className = "program-tab-pressed";
-            mapViewButton.className = "program-tab";
-            CurrentOption = "stinger";
-
-            document.getElementById("miniscreen_desc").innerHTML = "Request stingers to be deployed at a location.\
-            Takes 30s to deploy.";
-
-            document.getElementById("mdc_map").style.display = "none";
-            document.getElementById("mdc_stinger").style.display = "flex";
-            UpdateStingerDisplay(currentSpikeNumber);
-            SelectSound.play();
-        }
-        break;
-        case "m": // Map View
-        if(CurrentOption != "map"){
-            mapViewButton.className = "program-tab-pressed";
-            stingerButton.className = "program-tab";
-            CurrentOption = "map";
-
-            document.getElementById("miniscreen_desc").innerHTML = "Approximate suspects' location & active stingers are displayed."; 
-            document.getElementById("mdc_stinger").style.display = "none";          
-            document.getElementById("mdc_map").style.display = "flex";
-            SelectSound.play();
-        }
-        break;
-    }
-});
 document.addEventListener("keyup", function(e){
     if(CurrentOption != "map") return;
     switch(e.keyCode){
@@ -466,7 +474,7 @@ var Stingers = [
     },      
     {
         id: 5,
-        area: "Chiliad Mountain State Wilderness",
+        area: "Chiliad Mountain",
         street: "Freeway"
     },      
     {

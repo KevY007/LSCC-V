@@ -20,6 +20,10 @@
                             <img src="./img/lspd.png" style="width:24px; height: auto; margin:10px;"/>
                             <p>Los Santos Police D...</p>
                         </div>
+                        <div class="mdc-taskbar-button">
+                            <img src="./img/notepad.png" style="width:24px; height: auto; margin:10px;"/>
+                            <p>hotkeys.txt - Notepad</p>
+                        </div>
                     </div>
                     <div class="mdc-taskbar-time">
                         <p id="taskbar_time">18:25</p>
@@ -77,27 +81,24 @@
                                 </div>
                             </div>
                         </div>
-                        -
                         <div style="display:none;" id="mdc_stinger" class="mdc-screen-stinger">
-                            <div class="stinger-info-panel" style="position:absolute;">
-                                <div style="position:absolute; right:25px; bottom:68px;">
-                                    <p class="stinger-controls" id="stinger_location_pages">1/10</p>
-                                </div>
-                                <div style="display:flex; align-items:center; margin:0px 0px 0px 10px; height:64px;">
-                                    <h1 class="stinger-location" id="stinger_area">
-                                        Little Seoul
-                                    </h1>
-                                    <p class="stinger-street">&nbsp—&nbsp</p>
-                                    <p class="stinger-street" id="stinger_street">
-                                    La Puerta Fway
+                            <div class="mdc-stinger-display" id="mdc_stinger_display"></div>
+                            <div class="stinger-locations-list" id="stinger_locations_list">
+                            </div>
+                            <div class="stinger-info-panel">     
+                                <div style="display:flex; flex-direction: column; margin-top:15px;">
+                                    <p class="stinger-controls" style="font-size:17px; font-weight:bold;">
+                                        There are several pre-defined stinger positions in San Andreas.
+                                        You can request for a backup unit to deploy a stinger at a specific
+                                        location. It takes about 30 seconds to fully deploy a stinger.
+                                    </p>
+                                    <p class="stinger-controls" id="stinger_help">
+                                        Press <strong>[ENTER]</strong> to request deployment.
+                                    </p>
+                                    <p class="stinger-controls">
+                                        Use the <strong>Up & Down Arrows</strong> to scroll through locations.
                                     </p>
                                 </div>
-                                <p class="stinger-controls" id="stinger_help">
-                                    Press <strong>[ENTER]</strong> to request deployment.
-                                </p>
-                                <p class="stinger-controls">
-                                    Use the <strong>Left & Right Arrows</strong> to scroll through locations.
-                                </p>
                             </div>
                         </div>
                         <div class="mdc-buttons">
@@ -113,7 +114,30 @@
                             </div>
                         </div>
                     </div>
-                    
+                    <div class="mdc-program" style="position:absolute; right:20px; top:50px; width:350px; height:200px; background:white;">
+                        <div class="mdc-program-top-unfocused">
+                            <div class="program-top-title">
+                                <img src="./img/notepad.png" style="width:24px; height: auto; margin:10px;"/>
+                                <p style="font-family: Helvetica, sans-serif; margin-top:19px; font-size:18px; font-weight:bold; color:white;">
+                                    hotkeys.txt - Notepad
+                                </p>                                
+                            </div>
+                            <div class="program-top-buttons">
+                                <div class="top-button">
+                                    🗕
+                                </div>
+                                <div class="top-button">
+                                    X
+                                </div>
+                            </div>
+                        </div>
+                        <div class="notepad-top">
+                            <p>File</p> <p>Edit</p> <p>Format</p> <p>Help</p>
+                        </div>
+                        <div class="notepad-body">
+                            &nbsp;Alt - Switch Tabs
+                        </div>
+                    </div>
             
                 </div>
             </div>
