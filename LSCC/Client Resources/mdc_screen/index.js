@@ -62,3 +62,15 @@ function ToggleMDC(){
 }
 
 mp.keys.bind(0x4B, true, ToggleMDC);
+
+mp.events.add("OneSecondEvent", () => {
+    mp.events.callLocal("MDC:AddBlip", mp.players.local.remoteId, "police");
+    mp.events.callLocal("MDC:UpdateBlip", mp.players.local.remoteId, "police", mp.players.local.position.x, mp.players.local.position.y);
+    /* Adding streamed in police officers to the MDC */
+    mp.players.forEachInStreamRange((cplayer, id) => {
+        if(cplayer.getVariable("Team") == 1){
+            mp.events.callLocal("MDC:AddBlip", cplayer.remoteId, "police");
+            mp.events.callLocal("MDC:UpdateBlip", cplayer.remoteId, "police", cplayer.position.x, cplayer.position.y);
+        }
+    });
+});

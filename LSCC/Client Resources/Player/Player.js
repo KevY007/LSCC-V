@@ -192,8 +192,6 @@ mp.events.add('setPing', (pingtoset) => {
 })
 
 mp.events.add("OneSecondEvent", () => {
-    mp.events.callLocal("MDC:UpdateBlip", localPlayer.remoteId, "police", localPlayer.position.x, localPlayer.position.y);
-
     ShotStats.UpdateInterval++;
 
     let curSecond = Math.floor(Date.now()/1000);

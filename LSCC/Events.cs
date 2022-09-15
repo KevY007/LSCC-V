@@ -1265,6 +1265,10 @@ namespace RNC
                         stingerObj.Delete();
                         shape.Delete();
                         stinger.Stage = 4;
+                        foreach(Player pl in Settings.LoggedInPlayers)
+                        {
+                            pl.TriggerEvent("MDC:UpdateSpike", stinger.ID, 4);
+                        }
                     }
                 }
             }
