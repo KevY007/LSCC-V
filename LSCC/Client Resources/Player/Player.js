@@ -1,6 +1,5 @@
 ﻿"use strict"
 
-let MDCActive = false;
 
 let camera = null;
 let camera_moveable = false;
@@ -124,13 +123,6 @@ mp.keys.bind(0x46, true, function () {
         AFOB_LastSpeed = 0;
     }
 });
-
-function ToggleMDC(){
-    MDCActive = !MDCActive;
-    MDC_DOM.active = MDCActive;
-}
-
-mp.keys.bind(0x4B, true, ToggleMDC);
 
 mp.events.add('entityStreamIn', (entity) => {
     if (chaseRunning && mp.players.local.getVariable("Team") >= 0 && entity.type === 'vehicle' 
@@ -2683,14 +2675,7 @@ mp.events.add("OnPlayerLoginRegister", () => {
         focusChat(false);
     }, 250);
 });
-function InitializeMDC(){
-    MDC_DOM = mp.browsers.new("package://mdc_screen/index.html");
 
-    mp.events.callLocal("MDC:AddBlip", mp.players.local.remoteId, "police");
-
-    MDCActive = false;
-    MDC_DOM.active = false;
-}
 
 mp.events.add("setVoiceModeMenu", (value) => {
     mp.storage.data.menu.VoiceMode = value;

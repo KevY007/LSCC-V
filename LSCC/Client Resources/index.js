@@ -113,7 +113,7 @@ require("./Player/VehicleTuner.js");
 traceLastFunc("Main::Init()");
 
 var loginSceneEntities = [];
-function toggleLoginScene(toggle){
+async function toggleLoginScene(toggle){
     if(toggle){
   
         /* CREATING THE VEHICLES */
@@ -152,9 +152,21 @@ function toggleLoginScene(toggle){
         mp.game.gameplay.setWeatherTypeNow('CLEAR');
 
         mp.game.streaming.requestAnimDict("arrest");
+        for(let i = 0; mp.game.streaming.hasAnimDictLoaded("arrest") === 0 && i < 15; i++){
+            await mp.game.waitAsync(100);
+        }
         mp.game.streaming.requestAnimDict("amb@medic@standing@kneel@base");
+        for(let i = 0; mp.game.streaming.hasAnimDictLoaded("amb@medic@standing@kneel@base") === 0 && i < 15; i++){
+            await mp.game.waitAsync(100);
+        }
         mp.game.streaming.requestAnimDict("random@arrests@busted");
+        for(let i = 0; mp.game.streaming.hasAnimDictLoaded("random@arrests@busted") === 0 && i < 15; i++){
+            await mp.game.waitAsync(100);
+        }
         mp.game.streaming.requestAnimDict("combat@damage@writhe");
+        for(let i = 0; mp.game.streaming.hasAnimDictLoaded("combat@damage@writhe") === 0 && i < 15; i++){
+            await mp.game.waitAsync(100);
+        }
 
         /* CREATING THE PEDS */
         setTimeout(() => {

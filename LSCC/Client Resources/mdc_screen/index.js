@@ -41,3 +41,24 @@ mp.events.add("MDC:StingerSuccess", (id, message) => {
 mp.events.add("mdcRequestDeployStinger", (stingerID) => {
     mp.events.callRemote("RequestDeployStinger", stingerID);
 });
+
+/* RAGE:MP STUFF */
+let MDCActive = false;
+function InitializeMDC(){
+    MDC_DOM = mp.browsers.new("package://mdc_screen/index.html");
+
+    mp.events.callLocal("MDC:AddBlip", mp.players.local.remoteId, "police");
+
+    MDCActive = false;
+    MDC_DOM.active = false;
+}
+function ToggleMDC(){
+    MDCActive = !MDCActive;
+    MDC_DOM.active = MDCActive;
+
+    if(MDCActive){
+        mp.events.callLocal("MDC:UpdateMiniscreen", "name", mp.players.local.name);
+    }
+}
+
+mp.keys.bind(0x4B, true, ToggleMDC);
