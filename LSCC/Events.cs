@@ -903,11 +903,191 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("WeaponEditor:onExit")]
+        public static void WeaponEditor_Exit(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            EPlayer.Spawn(player);
+        }
+
+        [RemoteEvent("WeaponEditor:onRequestRemoveAttachment")]
+        public static void WeaponEditor_RequestRemoveAttachment(Player player, Int64 chash, int price)
+        {
+            Int64 comphash = chash;
+            Int64 wephash = (Int64)player.CurrentWeapon;
+            bool found = false;
+            jWeaponData itemData = new jWeaponData();
+
+            foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
+            {
+                if (wephash != 0)
+                {
+                    if (i.Key == wephash)
+                    {
+                        found = true;
+                        itemData = i.Value;
+                    }
+                }
+            }
+
+            if (found == false)
+            {
+                EPlayer.Error(player, $"<strong>FATAL ERROR</strong>: That weapon is not compatible! (Hash: ${wephash} - send this to devs)");
+                return;
+            }
+
+            found = false;
+            Component comp = new Component();
+
+            foreach (var item in itemData.Components)
+            {
+                if (item.Key == comphash)
+                {
+                    found = true;
+                    comp = item.Value;
+                    break;
+                }
+            }
+
+            if (found == false)
+            {
+                EPlayer.Error(player, $"<strong>FATAL ERROR</strong>: Component is not valid! Report this on our Discord with details of what you were doing.");
+                return;
+            }
+
+
+            Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
+
+            Account acc = EPlayer.GetAccount(player);
+            try
+            {
+                if (acc.WeaponComponents == null || acc.WeaponComponents.Length < 4) throw (new System.Exception("Invalid weapon component > going to new."));
+
+                wepItems = NAPI.Util.FromJson<Dictionary<long, wComponentData>>(acc.WeaponComponents);
+            }
+            catch
+            {
+                wepItems = new Dictionary<long, wComponentData>();
+
+                wComponentData test = new wComponentData();
+                test.Components.Add(123456789);
+                wepItems.Add(123456789, test);
+            }
+
+            bool alreadyHas = false;
+            Dictionary<long, wComponentData> newWepData = new Dictionary<long, wComponentData>();
+
+            foreach (KeyValuePair<long, wComponentData> i in wepItems)
+            {
+                wComponentData newDataTwo = new wComponentData();
+
+                newDataTwo = i.Value;
+                if (i.Key == wephash)
+                {
+                    if (i.Value.Components.Contains(comphash))
+                    {
+                        alreadyHas = true;
+                        newDataTwo.Components.Remove(comphash);
+                    }
+                }
+
+                newWepData.Add(i.Key, newDataTwo);
+            }
+
+            if (!alreadyHas)
+            {
+                EPlayer.Error(player, $"You do not have that attachment! Re-enter the menu if it's bugged.");
+                return;
+            }
+
+            EPlayer.GetAccount(player).WeaponComponents = NAPI.Util.ToJson(newWepData);
+            EPlayer.GetAccount(player).Points += price;
+            EPlayer.Notify(player, $"You successfully removed/sold the attachment and have been refunded <strong>{price} Points</strong>.", "green", "", false, 3000);
+            
+            // try { Main.Log("currency.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:removecomp:{itemData.Name}:{comp.Name}"); } catch { }
+            EPlayer.Save(player);
+            player.TriggerEvent("WeaponEditor:sendRemoveResponse", comphash);
+        }
+
+        [RemoteEvent("WeaponEditor:onRequestPurchaseAttachment")]
+        public static void WeaponEditor_RequestPurchaseAttachment(Player player, Int64 comphash, int price)
+        {
+            if (EPlayer.GetAccount(player).Points < price)
+            {
+                EPlayer.Error(player, $"You do not have enough Points to purchase this! You need <strong>{price - EPlayer.GetAccount(player).Points}</strong> more points.");
+                return;
+            }
+
+            long wephash = (long)player.CurrentWeapon;
+            EPlayer.AttachComponentPrivate(player, wephash, comphash);
+
+            Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
+
+            Account acc = EPlayer.GetAccount(player);
+            try
+            {
+                if (acc.WeaponComponents == null || acc.WeaponComponents.Length < 4) throw (new System.Exception("Invalid weapon component > going to new."));
+
+                wepItems = NAPI.Util.FromJson<Dictionary<long, wComponentData>>(acc.WeaponComponents);
+            }
+            catch
+            {
+                wepItems = new Dictionary<long, wComponentData>();
+
+                wComponentData test = new wComponentData();
+                test.Components.Add(123456789);
+                wepItems.Add(123456789, test);
+            }
+
+            bool alreadyHas = false;
+            Dictionary<long, wComponentData> newWepData = new Dictionary<long, wComponentData>();
+
+            foreach (KeyValuePair<long, wComponentData> i in wepItems)
+            {
+                wComponentData newDataTwo = new wComponentData();
+
+                newDataTwo = i.Value;
+                if (i.Key == wephash)
+                {
+                    if (!i.Value.Components.Contains(comphash)) newDataTwo.Components.Add(comphash);
+                    else
+                    {
+                        alreadyHas = true;
+                    }
+                }
+
+                newWepData.Add(i.Key, newDataTwo);
+            }
+
+            if (alreadyHas)
+            {
+                EPlayer.Error(player, $"You already purchased this attachment!");
+                return;
+            }
+
+
+            if (!newWepData.ContainsKey(wephash))
+            {
+                wComponentData newDataTwo = new wComponentData();
+
+                newDataTwo.Components.Add(comphash);
+
+                newWepData.Add(wephash, newDataTwo);
+            }
+            EPlayer.GetAccount(player).Points -= price;
+            EPlayer.GetAccount(player).WeaponComponents = NAPI.Util.ToJson(newWepData);
+            EPlayer.Save(player);
+            EPlayer.Notify(player, $"You successfully purchased the weapon attachment for {price} Points!", "green", "", false, 3000);
+            player.TriggerEvent("WeaponEditor:sendPurchaseResponse", comphash);
+        }
+
         [RemoteEvent("WeaponEditor:onRequestAttachmentPreview")]
         public static void WeaponEditor_RequestAttachmentPreview(Player player, Int64 comphash)
         {
             long weapon = (long)player.CurrentWeapon;
-            EPlayer.AttachComponentPrivate(player, weapon, comphash);
+            EPlayer.SyncComponents(player, player, weapon);
+            player.TriggerEvent("AttachWeaponComponent", player, weapon, comphash);
             player.TriggerEvent("WeaponEditor:sendAttachmentPreview");
         }
 
@@ -940,10 +1120,58 @@ namespace RNC
                 return;
             }
 
+            Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
+
+            Account acc = EPlayer.GetAccount(player);
+            try
+            {
+                if (acc.WeaponComponents == null || acc.WeaponComponents.Length < 4) throw (new System.Exception("Invalid weapon component > going to new."));
+
+                wepItems = NAPI.Util.FromJson<Dictionary<long, wComponentData>>(acc.WeaponComponents);
+            }
+            catch
+            {
+                wepItems = new Dictionary<long, wComponentData>();
+
+                wComponentData test = new wComponentData();
+                test.Components.Add(123456789);
+                wepItems.Add(123456789, test);
+            }
+
             string jData = "[";
             foreach(var component in itemData.Components)
             {
-                jData += $"{{\"name\":\"{component.Value.Name}\", \"hash\":\"{component.Key}\"}},";
+                bool alreadyHas = false;
+                foreach (KeyValuePair<long, wComponentData> i in wepItems)
+                {
+                    if (i.Key == wephash)
+                    {
+                        if (i.Value.Components.Contains(component.Key))
+                        {
+                            alreadyHas = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (alreadyHas)
+                {
+                    EPlayer.AttachComponentPrivate(player, wephash, component.Key);
+                }
+
+                int price = 6969;
+                if (component.Value.Name.Contains("Flashlight")) price = 10;
+                else if (component.Value.Name.Contains("Suppressor")) price = 50;
+                else if (component.Value.Name.Contains("Grip")) price = 75;
+                else if (component.Value.Name.Contains("Brake") || component.Value.Name.Contains("Compensator")) price = 100;
+                else if (component.Value.Name.Contains("Scope")) price = 125;
+                else if (component.Value.Name.Contains("Extended") || component.Value.Name.Contains("Box") ||
+                    component.Value.Name.Contains("Drum")) price = 200;
+                else if (component.Value.Name.Contains("Finish") || component.Value.Name.Contains("Variant")) price = 1000; // yes its expensive
+                else if (component.Value.Name.EndsWith("Rounds") || component.Value.Name.EndsWith("Shells") || 
+                    component.Value.Name.Contains("Default Clip")) continue;
+
+                jData += $"{{\"name\":\"{component.Value.Name}\", \"hash\":\"{component.Key}\", \"price\":{price}, \"attached\":{alreadyHas.ToString().ToLower()}}},";
             }
             jData += "]";
             player.GiveWeapon((WeaponHash)wephash, 1);
@@ -2721,6 +2949,7 @@ namespace RNC
 
             EPlayer.Spawn(player);
         }
+
 
         [RemoteEvent("RequestSaveOutfit")]
         public void OnRequestSaveOutfit(Player player, int slot)

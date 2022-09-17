@@ -69,13 +69,11 @@ mp.events.add("saveCrosshairProfiles", (profileData) => {
         }
     }
     if(currentProfile){
-        mp.events.callRemote("ServerConsoleOutput", "CROSSHAIR Found profile!");
         
         alwaysShowCustomCrosshair = currentProfile.settings.alwaysOn;
         showCustomCrosshairInSniper = currentProfile.settings.onSnipers;
         showCustomCrosshair = currentProfile.settings.enabled;
     }
-    else mp.events.callRemote("ServerConsoleOutput", "cringe didnt find CROSSHAIR PROFILE");
 });
 
 mp.events.add("LoadCrosshairProfiles", (profileData, activeProfile) => {

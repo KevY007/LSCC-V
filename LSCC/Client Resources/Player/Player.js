@@ -2000,7 +2000,6 @@ mp.events.add('setWounded', (state, idToPass) =>
         mp.events.callLocal("ResetWounded");
     }
 
-    mp.events.callRemote("ServerConsoleOutput", `calling cs->ss SetPlayerWounded(${state}, ${idToPass}) for ${mp.players.local.name}`);
     mp.events.callRemote("SetPlayerWounded", state, idToPass);
 });
 

@@ -267,6 +267,8 @@ mp.events.add("login_MaxAccountLimit", (toggle) => {
     }
 });
 
+mp.events.add("browser_ServerConsole", (msg) => mp.events.callRemote("ServerConsoleOutput", msg));
+
 let chatStatusTimeout = null;
 mp.events.add("onOpenChatbox", (toggle) =>
 {
