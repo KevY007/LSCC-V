@@ -1,8 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Condensed&display=swap');
 
 body{
-    background-image:url('https://preview.redd.it/hk5xsuldjaax.jpg?auto=webp&s=0e9d2f40f373c3495a6feba85835b22a3a41b3ff');
-    background-size:cover;
     margin: 0px;
     height: 100%;
     -webkit-user-select:none;

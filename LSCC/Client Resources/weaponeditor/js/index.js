@@ -99,14 +99,36 @@ function openWeapon(name){
             </div>
         </div>
     `;
+    let weapon = weaponData.find(w => w.Name == name)
+    let hashNumber = weapon.Hash;
+    let numero = Number(hashNumber);
+    let wtype = weapon.Type;
+    mp.trigger("WeaponEditor:requestComponentList", numero, wtype);
 
     /* Add Weapon Attachments Here */
     /*
-                    <div class="attachment-item">
-                    Suppressor
-                </div>
+           
                 <div class="attachment-item-selected">
                     Grip
                 </div>
     */
+}   
+
+function selectAttachment(name, hash){
+    if(document.getElementsByClassName("attachment-item-selected").length > 0)
+        document.getElementsByClassName("attachment-item-selected")[0].className = "attachment-item";
+
+    document.getElementById(name).className = "attachment-item-selected";
+    mp.trigger("WeaponEditor:requestAttachmentPreview", hash);
+}
+
+function setComponentList(array){
+    for(let i = 0; i < array.length; i++){
+        if(array[i].name == "") continue;
+        ItemsHolder.innerHTML += `
+            <div class="attachment-item" id="${array[i].name}" onclick="selectAttachment('${array[i].name}', '${array[i].hash}')">
+                ${array[i].name}
+            </div>
+        `;
+    }
 }

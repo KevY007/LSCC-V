@@ -97,8 +97,9 @@ require("./ServerUI/Menu.js");
 require("./ServerUI/Logs.js");
 require("./charcreator/clotheditor.js")
 require("./charcreator/index.js");
-require("./charcreator/outfitslots.js")
+require("./charcreator/outfitslots.js");
 require('./mdc_screen/index.js');
+require('./weaponeditor/index.js');
 require('./Player/Fuel.js');
 
 require('./camerasManager.js');

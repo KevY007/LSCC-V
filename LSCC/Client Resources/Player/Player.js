@@ -2668,7 +2668,12 @@ mp.events.add("OnPlayerLoginRegister", () => {
         mp.events.callRemote("SetPlayerPrivateWeather", mp.storage.data.menu.myweather);
     }
 
-    InitializeMDC();
+    setTimeout(() => {
+        InitializeMDC();
+    }, 300);
+    setTimeout(() => {
+        InitializeWeaponEditor();
+    }, 350);
 
     setTimeout(() => {
         focusChat(false);

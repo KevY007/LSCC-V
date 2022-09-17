@@ -903,6 +903,53 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("WeaponEditor:onRequestAttachmentPreview")]
+        public static void WeaponEditor_RequestAttachmentPreview(Player player, Int64 comphash)
+        {
+            long weapon = (long)player.CurrentWeapon;
+            EPlayer.AttachComponentPrivate(player, weapon, comphash);
+            player.TriggerEvent("WeaponEditor:sendAttachmentPreview");
+        }
+
+        [RemoteEvent("WeaponEditor:onRequestComponentList")]
+        public static void WeaponEditor_RequestComponentList(Player player, Int64 hash)
+        {
+            Int64 wephash = hash;
+            if(wephash < 0)
+            {
+                wephash += 4294967296;
+            }
+
+            jWeaponData itemData = new jWeaponData();
+            bool found = false;
+            foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
+            {
+                if (wephash != 0)
+                {
+                    if (i.Key == wephash)
+                    {
+                        found = true;
+                        itemData = i.Value;
+                    }
+                }
+            }
+
+            if (found == false)
+            {
+                EPlayer.Error(player, $"That weapon does not have any compatible attachments!");
+                return;
+            }
+
+            string jData = "[";
+            foreach(var component in itemData.Components)
+            {
+                jData += $"{{\"name\":\"{component.Value.Name}\", \"hash\":\"{component.Key}\"}},";
+            }
+            jData += "]";
+            player.GiveWeapon((WeaponHash)wephash, 1);
+            player.TriggerEvent("WeaponEditor:sendComponentList", jData);
+        }
+
         [RemoteEvent("RequestDeployStinger")]
         public static void OnRequestDeployStinger(Player player, int spikeID)
         {

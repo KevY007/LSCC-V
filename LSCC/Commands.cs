@@ -2663,6 +2663,20 @@ namespace RNC
             return;
         }
 
+        [Command("weaponeditor")]
+        public void cmd_weaponeditor(Player player)
+        {
+            EPlayer.SendMessage(player, $"Loading editor...");
+            foreach(KeyValuePair<long, string> weapon in Main.WeaponReasons)
+            {
+                player.GiveWeapon((WeaponHash)weapon.Key, 1);
+            }
+            player.Dimension = (uint)(player.Id + 69);
+            player.Position = new Vector3(461.8967f, -980.518f, 30.689589f);
+            player.Heading = 177.42824f;
+            player.TriggerEvent("WeaponEditor:show");
+        }
+
         [Command("attachcomp", "!{#AFAFAF}[USAGE] attachcomp (target) (component/hash)", GreedyArg = true)]
         public void cmd_attachcomp(Player player, Player target, string component)
         {
@@ -2677,6 +2691,7 @@ namespace RNC
 
 
             Int64 wephash = (Int64)target.CurrentWeapon;
+            EPlayer.SendMessage(player, $"Weapon Hash: ${wephash}");
             bool found = false;
             jWeaponData itemData = new jWeaponData();
 

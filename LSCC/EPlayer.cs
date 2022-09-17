@@ -1421,6 +1421,20 @@ namespace RNC
             }
             return;
         }
+        public static void AttachComponentPrivate(Player target, long weaponhash, long componenthash)
+        {
+            List<KeyValuePair<long, long>> comps = new List<KeyValuePair<long, long>>();
+            if (target.HasData("AttachedComponents"))
+            {
+                comps = target.GetData<List<KeyValuePair<long, long>>>("AttachedComponents");
+            }
+
+            comps.Add(new KeyValuePair<long, long>(weaponhash, componenthash));
+            target.SetData("AttachedComponents", comps);
+
+            target.SetSharedData("ComponentSyncTrigger", new Random(DateTimeOffset.UtcNow.Millisecond).Next());
+            SyncComponents(target, target, weaponhash);
+        }
         public static void AttachComponent(Player target, long weaponhash, long componenthash)
         {
             List<KeyValuePair<long, long>> comps = new List<KeyValuePair<long, long>>();
