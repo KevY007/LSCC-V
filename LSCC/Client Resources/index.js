@@ -100,6 +100,7 @@ require("./charcreator/index.js");
 require("./charcreator/outfitslots.js");
 require('./mdc_screen/index.js');
 require('./weaponeditor/index.js');
+require('./tips_test/index.js');
 require('./Player/Fuel.js');
 
 require('./camerasManager.js');
