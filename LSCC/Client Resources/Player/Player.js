@@ -757,6 +757,7 @@ function UpdateStatsVars(entity){
                 ServerUI.execute(`gm.$refs.helpers.$refs.states.setUser(["stats"], {
                     name: "${player.name}",
                     level: ${player.getVariable("Level")},
+                    fugitive: ${(player.getVariable("Team") == 0).toString()},
                     xp: ${player.getVariable("CurrentXP")},
                     nextLevelXp: ${player.getVariable("NextLevelXP")},
                     createdAt: "${player.getVariable("RegisterDate")}",
