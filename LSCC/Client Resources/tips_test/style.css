@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Condensed&display=swap');
 
 .float-tip{
-    height:48px;
+    height:38px;
 
     background: rgba(0,0,0, 0.5);
     border-radius: 50px;
@@ -13,21 +13,29 @@
     justify-content: center;
 }
 .float-tip > h1{
-    margin: 10px;
+    margin-left: 10px;
     font-family: 'Bebas Neue', cursive;
+    font-size:24px;
     color:white;
 }
 .float-tip > p{
-    margin: 10px 10px 10px 5px;
+    margin-left: 5px;
+    margin-right: 10px;
     font-family: 'Roboto Condensed', sans-serif;
     color:white;
-    font-size:24px;
+    font-size:16px;
 }
 body{
     margin:0px;
     height: 100%;
+    overflow:hidden;
+    -webkit-user-select:none;
+    -moz-user-select:-moz-none;
+    -ms-user-select:none;
+    user-select:none;
 }
 .container{
     position:relative;
     height: 100%;
+    width: 100%;
 }
