@@ -166,6 +166,10 @@ mp.events.add("Menu_ClearClanMembers", () => {
     ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members = [];`);
 });
 
+mp.events.add("Menu_DisableClanCreatorLoading", () => {
+    ServerUI.execute()
+});
+
 mp.events.add("Menu_UpdateClanStats", (weekKills, totalKills, weekWins) => {
     ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.statsTab.stats = [
         {
@@ -195,6 +199,18 @@ mp.events.add("UpdateMenuClanTab", () => {
     ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.name = "${mp.players.local.getVariable("ClanName")}"`);
     ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.createdAt = "${mp.players.local.getVariable("ClanCreated")}"`);
 });
+
+mp.events.add("render", () => {
+    if(menuToggled == true){
+        mp.game.controls.disableControlAction(0, 200, true); // prevent menu from opening when pressing ESC for chat 
+    }    
+});
+mp.keys.bind(0x1B, true, function() { // ESC key
+    if(menuToggled == true){
+        ToggleMenu();     
+    }
+});
+
 
 function ToggleMenu()
 {
