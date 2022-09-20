@@ -2792,6 +2792,14 @@ function setStorageDataVars(){
         mp.events.callRemote("SetVoiceMode", 0, false);
     }
 
+    if(mp.storage.data.menu.tooltips !== undefined){
+        ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.enabled = ${mp.storage.data.menu.tooltips.toString()}`);
+    }
+    else{
+        ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.enabled = true`);
+        mp.storage.data.menu.tooltips = true;
+    }
+
     mp.events.callLocal("LoadCrosshair");
 
     mp.storage.flush();

@@ -396,6 +396,7 @@ let keyTrunk = true; // true = key trunk, false = key seatbelt displayed
 mp.events.add('ToggleTooltips', (status) =>
 {
     mp.storage.data.menu.tooltips = status;
+    ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.enabled = ${status.toString()}`);
 
     if(status)
     {
