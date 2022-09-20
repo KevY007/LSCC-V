@@ -145,7 +145,7 @@ mp.events.add("actionMenu:addItem", (id, action, color, icon) => {
 mp.events.add("actionMenu:removeItem", (id) => {
     ServerUI.execute(`
         if(gm.$refs.hud.$refs.base.$refs.actionMenu.items.find(i => i.id == ${id})){
-            gm.$refs.hud.$refs.base.$refs.actionMenu.items.splice(gm.$refs.hud.$refs.$base.$refs.actionMenu.items.indexOf(gm.$refs.hud.$refs.base.$refs.actionMenu.items.find(i => i.id == ${id})), 1);
+            gm.$refs.hud.$refs.base.$refs.actionMenu.items.splice(gm.$refs.hud.$refs.base.$refs.actionMenu.items.indexOf(gm.$refs.hud.$refs.base.$refs.actionMenu.items.find(i => i.id == ${id})), 1);
         }
     `);
 });
@@ -158,13 +158,42 @@ mp.events.add('actionMenu:close', () => {
     mp.gui.cursor.show(false, false);
 });
 mp.events.add('actionMenu:open', () => {
+    mp.events.callLocal("actionMenu:removeAllItems");
+    actionMenu_vehicleCheck();
+
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.enabled = true;`);
     mp.gui.cursor.show(true, true);
 });
 mp.events.add('actionMenu:clickItem', (actionID) => {
     mp.events.callLocal("actionMenu:close");
 
+    switch(actionID){
+        case 0: // Vehicle lock toggle - invokes the /lock command simply
+        {
+            mp.events.callRemote("OnScriptedKeyPress", 0x4C, true);
+            break;
+        }
+    }
 });
+
+// This function checks for nearby vehicle OR if player is in vehicle. If yes, it will add a LOCK option.
+function actionMenu_vehicleCheck(){
+    if(mp.players.local.isInAnyVehicle(false)){
+        let vehicle = mp.players.local.vehicle;
+        if(vehicle.getVariable("Locked") == true)
+            mp.events.callLocal("actionMenu:addItem", 0, "Unlock", "#a3e635", "fa-lock-keyhole-open");
+        else mp.events.callLocal("actionMenu:addItem", 0, "Lock", "#f87171", "fa-lock-keyhole");
+
+    }
+    else{
+        mp.vehicles.forEachInRange(mp.players.local.position, 3.5, (vehicle) => {
+            if(vehicle.getVariable("Locked") == true)
+                mp.events.callLocal("actionMenu:addItem", 0, "Unlock", "#a3e635", "fa-lock-keyhole-open");
+            else mp.events.callLocal("actionMenu:addItem", 0, "Lock", "#f87171", "fa-lock-keyhole");
+            return;
+        });
+    }
+}
 
 mp.events.add('ToggleNametags', (state) => {
     renderNametags = state;
