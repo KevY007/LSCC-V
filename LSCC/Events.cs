@@ -3632,7 +3632,7 @@ namespace RNC
             }
         }
 
-        [RemoteEvent("RequestLobbySwitch")]
+        [RemoteEvent("Server_RequestLobbySwitch")]
         public void OnRequestLobbySwitch(Player player, int lobbyID, string password)
         {
             if (!EPlayer.LoggedIn(player)) return;
@@ -3671,7 +3671,7 @@ namespace RNC
             }
         }
 
-        [RemoteEvent("RequestMinigameJoin")]
+        [RemoteEvent("Server_RequestMinigameJoin")]
         public void OnRequestMinigameJoin(Player player, int dmID)
         {
             if (!EPlayer.LoggedIn(player)) return;

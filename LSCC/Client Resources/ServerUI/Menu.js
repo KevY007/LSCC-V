@@ -691,12 +691,12 @@ mp.events.add("Menu_UpdateLevelXP", (first_time = false) => {
 })
 
 mp.events.add("PutPlayerInLobby", (lobbyID, password) => {
-    mp.events.callRemote("RequestLobbySwitch", lobbyID, password);
+    mp.events.callRemote("Server_RequestLobbySwitch", lobbyID, password);
     ToggleMenu();
 });
 
 mp.events.add("RequestJoinMinigame", (ID) => {
-    mp.events.callRemote("RequestMinigameJoin", ID);
+    mp.events.callRemote("Server_RequestMinigameJoin", ID);
     ToggleMenu();
 });
 
