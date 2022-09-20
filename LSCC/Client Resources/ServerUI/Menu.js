@@ -201,6 +201,11 @@ function ToggleMenu()
     if(MDCActive !== undefined && MDCActive == true){
         ToggleMDC();
     }
+    if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
+        (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
+        (ActionMenuActive !== undefined && ActionMenuActive == true)){
+        return;
+    }
     if(scoreboardToggled)
     {
         ToggleScoreboard();

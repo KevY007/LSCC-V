@@ -34,6 +34,7 @@ function moveCam(x, y, z, rx, ry, rz, time, newviewangle){
 }
 
 mp.events.add("WeaponEditor:exit", () => {
+    WeaponEditorActive = false;
     WeaponEditorDOM.execute(`resetWeaponEditor();`);
     mp.events.callRemote("WeaponEditor:onExit");
 
@@ -78,6 +79,7 @@ mp.events.add("WeaponEditor:playSound", (type) => {
 });
 
 mp.events.add("WeaponEditor:show", () => {
+    WeaponEditorActive = true;
     ServerUI.execute(`gm.$refs.hud.enabled = false;`);
     mp.players.local.setAlpha(0);
     mp.players.local.freezePosition(true);

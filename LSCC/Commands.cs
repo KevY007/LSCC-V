@@ -285,7 +285,7 @@ namespace RNC
         }
 
         [Command("lockpick")]
-        public void cmd_lockpick(Player player)
+        public static void cmd_lockpick(Player player)
         {
             Vehicle targetVeh = null;
             if(player.Vehicle != null || player.IsInVehicle)
@@ -1806,7 +1806,7 @@ namespace RNC
             player.SetSharedData("VisibleBlip", !player.GetSharedData<bool>("VisibleBlip"));
         }
         [Command("painkillers", "!{#AFAFAF}[USAGE] pk (option: buy/use/inv)", Alias = "pk")]
-        public void cmd_painkillers(Player player, string option)
+        public static void cmd_painkillers(Player player, string option)
         {
             if (option == "buy")
             {
@@ -1876,7 +1876,7 @@ namespace RNC
         }
 
         [Command("medkit", "!{#AFAFAF}[USAGE] mk (option: buy/use/inv)", Alias = "mk")]
-        public void cmd_medkit(Player player, string option)
+        public static void cmd_medkit(Player player, string option)
         {
             if (option == "buy")
             {

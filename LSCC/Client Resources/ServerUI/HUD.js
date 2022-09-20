@@ -131,6 +131,9 @@ mp.keys.bind(0x45, true, () => {
 });
 // When 'E' key is let go, close the menu - toggleable though.
 mp.keys.bind(0x45, false, () => {
+    if(chatStatus == true || menuToggled == true || MDCActive == true || scoreboardToggled == true
+        || VehicleSpawnerActive == true || WeaponEditorActive == true) return;
+
     mp.events.callLocal("actionMenu:close"); 
  });
 
@@ -154,12 +157,18 @@ mp.events.add("actionMenu:removeAllItems", () => {
 });
 
 mp.events.add('actionMenu:close', () => {
+    ActionMenuActive = false;
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.enabled = false;`);
     mp.gui.cursor.show(false, false);
 });
 mp.events.add('actionMenu:open', () => {
+    if(chatStatus == true || menuToggled == true || MDCActive == true || scoreboardToggled == true
+        || VehicleSpawnerActive == true || WeaponEditorActive == true) return;
+
+    ActionMenuActive = true;
     mp.events.callLocal("actionMenu:removeAllItems");
     actionMenu_vehicleCheck();
+    actionMenu_teamCheck();
 
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.enabled = true;`);
     mp.gui.cursor.show(true, true);
@@ -170,12 +179,65 @@ mp.events.add('actionMenu:clickItem', (actionID) => {
     switch(actionID){
         case 0: // Vehicle lock toggle - invokes the /lock command simply
         {
-            mp.events.callRemote("OnScriptedKeyPress", 0x4C, true);
+            mp.events.callRemote("actionMenu_SelectedItem", actionID);
+            break;
+        }
+        case 1: // Seatbelt toggle - invokes /seatbelt
+        {
+            mp.events.callRemote("actionMenu_SelectedItem", actionID);
+            break;
+        }
+        case 2: // Medkit
+        {
+            mp.events.callRemote("actionMenu_SelectedItem", actionID);
+            break;
+        }
+        case 3: // Painkiller
+        {
+            mp.events.callRemote("actionMenu_SelectedItem", actionID);
+            break;
+        }
+        case 4: // Lockpick
+        {
+            mp.events.callRemote("actionMenu_SelectedItem", actionID);
+            break;
+        }
+        case 5: // GPS Beacon
+        {
+            mp.events.callRemote("actionMenu_SelectedItem", actionID);
             break;
         }
     }
 });
 
+function actionMenu_teamCheck(){
+    let team = mp.players.local.getVariable("Team");
+    if(team >= 0){
+        mp.events.callLocal("actionMenu:addItem", 3, "Painkiller", "#22c55e", "fa-pills");    
+        
+        if(team == 0){
+            if(!mp.players.local.isInAnyVehicle(true)){
+                mp.events.callLocal("actionMenu:addItem", 2, "Medkit", "#fb7185", "fa-kit-medical");      
+                let isFound = false;
+                mp.vehicles.forEachInRange(mp.players.local.position, 3.5, (vehicle) => {
+                    if(!isFound)
+                    {
+                        if(vehicle.getVariable("Locked") == true && vehicle.getVariable("Team") != team){   
+                            mp.events.callLocal("actionMenu:addItem", 4, "Lockpick", "#facc15", "fa-signature-lock");    
+                            isFound = true;
+                        }
+                    }
+                });
+            }
+        }
+        else{
+            mp.events.callLocal("actionMenu:addItem", 5, "GPS Beacon", "#60a5fa", "fa-location-dot");   
+            if(!mp.players.local.isInAnyVehicle(true)){
+                mp.events.callLocal("actionMenu:addItem", 2, "Medkit", "#fb7185", "fa-kit-medical");    
+            }
+        }
+    }
+}
 // This function checks for nearby vehicle OR if player is in vehicle. If yes, it will add a LOCK option.
 function actionMenu_vehicleCheck(){
     if(mp.players.local.isInAnyVehicle(false)){
@@ -184,13 +246,17 @@ function actionMenu_vehicleCheck(){
             mp.events.callLocal("actionMenu:addItem", 0, "Unlock", "#a3e635", "fa-lock-keyhole-open");
         else mp.events.callLocal("actionMenu:addItem", 0, "Lock", "#f87171", "fa-lock-keyhole");
 
+        mp.events.callLocal("actionMenu:addItem", 1, "Seatbelt", "#fb923c", "fa-shield-slash");
     }
     else{
         mp.vehicles.forEachInRange(mp.players.local.position, 3.5, (vehicle) => {
-            if(vehicle.getVariable("Locked") == true)
-                mp.events.callLocal("actionMenu:addItem", 0, "Unlock", "#a3e635", "fa-lock-keyhole-open");
-            else mp.events.callLocal("actionMenu:addItem", 0, "Lock", "#f87171", "fa-lock-keyhole");
-            return;
+            if(vehicle.getVariable("Team") == mp.players.local.getVariable("Team"))
+            {
+                if(vehicle.getVariable("Locked") == true)
+                    mp.events.callLocal("actionMenu:addItem", 0, "Unlock", "#a3e635", "fa-lock-keyhole-open");
+                else mp.events.callLocal("actionMenu:addItem", 0, "Lock", "#f87171", "fa-lock-keyhole");
+                return;
+            }
         });
     }
 }
@@ -290,6 +356,12 @@ function activateChat(toggle){
 function focusChat(toggle){
     if(ServerUI == null) return;
     if(menuToggled){
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = false;`);
+        return;
+    }
+    if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
+    (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
+    (ActionMenuActive !== undefined && ActionMenuActive == true)){
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = false;`);
         return;
     }
@@ -471,6 +543,7 @@ mp.events.add('ToggleTooltips', (status) =>
     if(status)
     {
         mp.events.callLocal("AddTooltip", "M", "Menu", -1);
+        mp.events.callLocal("AddTooltip", "E", "Quick-Action", -1);
         mp.events.callLocal("AddTooltip", String.fromCharCode(curVoiceBind), "Voice Chat", -1);
     }
     else {

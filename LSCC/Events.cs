@@ -755,6 +755,38 @@ namespace RNC
             player.SetSharedData("VoiceMode", voiceMode);
         }
 
+        [RemoteEvent("actionMenu_SelectedItem")]
+        public static void OnActionMenuSelectedItem(Player player, int actionID)
+        {
+            switch (actionID)
+            {
+                case 0:
+                    {
+                        Commands.cmd_lock(player);
+                        player.SetData("SilentLock", Environment.TickCount64);
+                    }
+                    break;
+                case 1:
+                    Commands.cmd_seatbelt(player);
+                    break;
+                case 2:
+                    Commands.cmd_medkit(player, "use");
+                    break;
+                case 3:
+                    Commands.cmd_painkillers(player, "use");
+                    break;
+                case 4:
+                    Commands.cmd_lockpick(player);
+                    break;
+                case 5:
+                    Commands.cmd_gps(player);
+                    break;
+                default:
+                    EPlayer.Error(player, $"Invalid quick-action attempt, ID: {actionID}. Report this to the developers!");
+                    break;
+            }
+        }
+
         [RemoteEvent("OnScriptedKeyPress")]
         public static void OnScriptedKeyPress(Player player, int keyId, bool keyState) // keyState == true? Down
         {

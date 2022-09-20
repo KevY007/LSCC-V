@@ -46,6 +46,8 @@ var MDCActive = false;
 var isLockpicking = false;
 
 var ActionMenuActive = false;
+var VehicleSpawnerActive = false;
+var WeaponEditorActive = false;
 
 var cuffTarget = null;
 var cuffInterval = null;
@@ -278,6 +280,11 @@ mp.events.add("browser_ServerConsole", (msg) => mp.events.callRemote("ServerCons
 let chatStatusTimeout = null;
 mp.events.add("onOpenChatbox", (toggle) =>
 {
+    if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
+    (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
+    (ActionMenuActive !== undefined && ActionMenuActive == true)){
+        return;
+    }
     if(mp.players.local.getVariable("pLogged") == undefined || mp.players.local.getVariable("pLogged") == false && toggle)
     {
         activateChat(false);
