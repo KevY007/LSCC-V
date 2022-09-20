@@ -871,9 +871,21 @@ namespace RNC
             if (!EPlayer.LoggedIn(player)) return;
 
             Account acc = EPlayer.GetAccount(player);
-            player.TriggerEvent("AddMenuItem", "Medkit", "medkit", acc.Medkits);
-            player.TriggerEvent("AddMenuItem", "Painkiller", "painkiller", acc.Painkillers);
-            player.TriggerEvent("AddMenuItem", "Lockpick", "lockpick", acc.Lockpicks);
+            foreach(ItemData item in ItemData.Items)
+            {
+                int owned = 0;
+                switch (item.Type)
+                {
+                    case "medkit": owned = acc.Medkits;
+                        break;
+                    case "painkiller": owned = acc.Painkillers;
+                        break;
+                    case "lockpick": owned = acc.Lockpicks;
+                        break;
+                }
+
+                player.TriggerEvent("AddMenuItem", item.Name, item.Type, owned, item.Price, item.Description);
+            }
         }
         public static void Menu_UpdateItem(Player player, string type, int owned)
         {

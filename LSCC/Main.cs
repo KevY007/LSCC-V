@@ -251,6 +251,26 @@ namespace RNC
         }
     };
 
+    public class ItemData
+    {
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public int Price { get; set; }
+        public string Description { get; set; }
+
+        public ItemData(string name, string type, int price, string description)
+        {
+            Name = name;
+            Type = type;
+            Price = price;
+            Description = description;
+
+            Items.Add(this);
+        }
+
+        public static List<ItemData> Items = new List<ItemData>();
+    }
+
     public class RequestData
     {
         public int RequestID { get; set; }
@@ -2058,6 +2078,12 @@ namespace RNC
 
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Created " + Settings.Achievements.Count + " achievements.");
 
+
+            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the items...");
+            new ItemData("Medkit", "medkit", 10, "Replenishes 60 HP, takes 10 seconds to fully use.");
+            new ItemData("Painkiller", "painkiller", 6, "Replenishes 1 HP/second for 40 seconds; you are free to move around.");
+            new ItemData("Lockpick", "lockpick", 10, "Allows you to break into locked vehicles; only fugitives can use this item.");
+
             /* PRE-SET STINGERS CREATION */
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the pre-set stingers...");
 
@@ -2189,7 +2215,6 @@ namespace RNC
                 .Add(new Vector3(2405.11353, 1037.63586, 84.0974884), new Vector3(0, -0, 148.877441), true)
                 .Add(new Vector3(2383.35547, 1020.03998, 84.0156479), new Vector3(-0, -0, -47.421257), true);
 
-            NAPI.Util.ConsoleOutput($"(RnC | STARTUP) Finished creating pre-set stingers, total: {Stinger.Stingers.Count}");
             /* DEFAULT LOADOUTS CREATION */
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the loadouts...");
 

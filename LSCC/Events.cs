@@ -5283,69 +5283,47 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            int price = -1;
-            string type = "";
+            ItemData item = ItemData.Items.FirstOrDefault(i => i.Name == name);
+            if(item == null)
+            {
+                EPlayer.Error(player, $"Invalid item: <strong>{name}</strong>! Report this to the devs.");
+                return;
+            }
+
+            int price = item.Price;
+            string type = item.Type;
+            if (EPlayer.GetAccount(player).Points < price)
+            {
+                EPlayer.Error(player, $"You do not have enough points to purchase a {name}! The price is <strong>{price} Points</strong>!");
+                return;
+            }
+            EPlayer.GivePoints(player, -price);
+            EPlayer.Notify(player, $"You successfully purchased a <strong>{name}</strong> for <strong>{price} Points</strong>!", "green", "fas fa-check", false, 3000, "bottomCenter", "replace");
             switch (name)
             {
                 case "Medkit":
                     {
-                        type = "medkit";
-                        price = 10;
-                        if (EPlayer.GetAccount(player).Points < price)
-                        {
-                            EPlayer.Error(player, $"You do not have enough points to purchase a {name}! The price is <strong>{price} Points</strong>!");
-                            return;
-                        }
-
                         EPlayer.GetAccount(player).Medkits++;
-                        EPlayer.GetAccount(player).Points -= price;
                         EPlayer.Save(player, false);
-                        player.TriggerEvent("UpdateMenuItem", type, EPlayer.GetAccount(player).Medkits);
-                        EPlayer.Notify(player, $"You've successfully purchased a <strong>{name}</strong> for <strong>{price} Points</strong>!", "green",
-                            "", false, 3000);
+                        player.TriggerEvent("UpdateMenuItem", type, EPlayer.GetAccount(player).Medkits);                   
                         break;
                     }
                 case "Painkiller":
-                    {
-                        type = "painkiller";
-                        price = 6;
-                        if (EPlayer.GetAccount(player).Points < price)
-                        {
-                            EPlayer.Error(player, $"You do not have enough points to purchase a {name}! The price is <strong>{price} Points</strong>!");
-                            return;
-                        }
+                    {      
                         EPlayer.GetAccount(player).Painkillers++;
-                        EPlayer.GetAccount(player).Points -= price;
                         EPlayer.Save(player, false);
                         player.TriggerEvent("UpdateMenuItem", type, EPlayer.GetAccount(player).Painkillers);
-                        EPlayer.Notify(player, $"You've successfully purchased a <strong>{name}</strong> for <strong>{price} Points</strong>!", "green",
-                            "", false, 3000);
                         break;
                     }
                 case "Lockpick":
                     {
-                        type = "lockpick";
-                        price = 10;
-                        if (EPlayer.GetAccount(player).Points < price)
-                        {
-                            EPlayer.Error(player, $"You do not have enough points to purchase a {name}! The price is <strong>{price} Points</strong>!");
-                            return;
-                        }
                         EPlayer.GetAccount(player).Lockpicks++;
-                        EPlayer.GetAccount(player).Points -= price;
                         EPlayer.Save(player, false);
-                        player.TriggerEvent("UpdateMenuItem", type, EPlayer.GetAccount(player).Lockpicks);
-                        EPlayer.Notify(player, $"You've successfully purchased a <strong>{name}</strong> for <strong>{price} Points</strong>!", "green",
-                            "", false, 3000);
+                        player.TriggerEvent("UpdateMenuItem", type, EPlayer.GetAccount(player).Lockpicks);              
                         break;
                     }
-                default:
-                    {
-                        EPlayer.Error(player, $"Invalid item: <strong>{name}</strong>! Report this to the devs.");
-                        break;
-                    }
+       
             }
-            NAPI.Util.ConsoleOutput($"wat the fuck switch case finished {name}");
             return;
         }
 

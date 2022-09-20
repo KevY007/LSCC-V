@@ -730,11 +730,13 @@ mp.events.add("UpdateMenuMinigames", (arenas, currentMinigame) => {
     }
 });
 
-mp.events.add("AddMenuItem", (name, type, owned) => {
+mp.events.add("AddMenuItem", (name, type, owned, price, description) => {
     ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.items.push({
         name: "${name}",
         type: "${type}",
-        owned: ${owned}
+        owned: ${owned},
+        price: ${price},
+        description: "${description}"
     });`);
 });
 
