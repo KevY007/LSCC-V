@@ -761,7 +761,7 @@ function UpdateStatsVars(entity){
                     xp: ${player.getVariable("CurrentXP")},
                     nextLevelXp: ${player.getVariable("NextLevelXP")},
                     createdAt: "${player.getVariable("RegisterDate")}",
-                    tokens: ${player.getVariable("Points")},
+                    points: ${player.getVariable("Points")},
                     admin: ${player.getVariable("Admin")},
                     donator: ${player.getVariable("Donator")},
                     api: "${player.getVariable("ScreenshotServerAPI")}"
