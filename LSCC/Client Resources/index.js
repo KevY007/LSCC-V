@@ -45,6 +45,8 @@ var MDC_DOM = null;
 var MDCActive = false;
 var isLockpicking = false;
 
+var ActionMenuActive = false;
+
 var cuffTarget = null;
 var cuffInterval = null;
 
@@ -230,6 +232,7 @@ mp.events.add('showLoginBrowser', (state) => {
                 toggleLoginScene(true);
                 mp.events.callRemote("requestQuickLoginForgotUsernameData"); // yes
                 ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.items = [];`);
+                mp.events.callLocal("actionMenu:removeAllItems");
             }
             else{
                 ServerUI.execute(`gm.$refs.auth.$refs.panel.authSuccess = true;`);

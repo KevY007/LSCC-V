@@ -125,6 +125,47 @@ mp.keys.bind(
     }
 );
 
+// When 'E' key is held down, open the menu
+mp.keys.bind(0x45, true, () => {
+   mp.events.callLocal("actionMenu:open"); 
+});
+// When 'E' key is let go, close the menu - toggleable though.
+mp.keys.bind(0x45, false, () => {
+    mp.events.callLocal("actionMenu:close"); 
+ });
+
+mp.events.add("actionMenu:addItem", (id, action, color, icon) => {
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.items.push({
+        id: ${id},
+        name: "${action}",
+        color: "${color}",
+        icon: "${icon}"
+    });`);
+});
+mp.events.add("actionMenu:removeItem", (id) => {
+    ServerUI.execute(`
+        if(gm.$refs.hud.$refs.base.$refs.actionMenu.items.find(i => i.id == ${id})){
+            gm.$refs.hud.$refs.base.$refs.actionMenu.items.splice(gm.$refs.hud.$refs.$base.$refs.actionMenu.items.indexOf(gm.$refs.hud.$refs.base.$refs.actionMenu.items.find(i => i.id == ${id})), 1);
+        }
+    `);
+});
+mp.events.add("actionMenu:removeAllItems", () => {
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.items = [];`);
+});
+
+mp.events.add('actionMenu:close', () => {
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.enabled = false;`);
+    mp.gui.cursor.show(true, false);
+});
+mp.events.add('actionMenu:open', () => {
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.enabled = true;`);
+    mp.gui.cursor.show(true, true);
+});
+mp.events.add('actionMenu:clickItem', (actionID) => {
+    mp.events.callLocal("actionMenu:close");
+
+});
+
 mp.events.add('ToggleNametags', (state) => {
     renderNametags = state;
 });
@@ -575,6 +616,8 @@ mp.events.add("OneSecondEvent", () => {
     }
     renderNametags = mp.storage.data.menu.nametags;
 });
+
+
 
 mp.events.add('browserDomReady', (browser) => {
     if(ServerUI != null && browser == ServerUI)
