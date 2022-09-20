@@ -155,7 +155,7 @@ mp.events.add("actionMenu:removeAllItems", () => {
 
 mp.events.add('actionMenu:close', () => {
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.enabled = false;`);
-    mp.gui.cursor.show(true, false);
+    mp.gui.cursor.show(false, false);
 });
 mp.events.add('actionMenu:open', () => {
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.enabled = true;`);
