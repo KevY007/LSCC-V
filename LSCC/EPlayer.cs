@@ -866,6 +866,20 @@ namespace RNC
         }
         #endregion
 
+        public static void Menu_AddItems(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Account acc = EPlayer.GetAccount(player);
+            player.TriggerEvent("AddMenuItem", "Medkit", "medkit", acc.Medkits);
+            player.TriggerEvent("AddMenuItem", "Painkiller", "painkiller", acc.Painkillers);
+            player.TriggerEvent("AddMenuItem", "Lockpick", "lockpick", acc.Lockpicks);
+        }
+        public static void Menu_UpdateItem(Player player, string type, int owned)
+        {
+            player.TriggerEvent("UpdateMenuItem", type, owned);
+        }
+
         public static void ResetPlayerData(Player player)
         {
             lock (player)

@@ -730,6 +730,31 @@ mp.events.add("UpdateMenuMinigames", (arenas, currentMinigame) => {
     }
 });
 
+mp.events.add("AddMenuItem", (name, type, owned) => {
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.items.push({
+        name: "${name}",
+        type: "${type}",
+        owned: ${owned}
+    });`);
+});
+
+mp.events.add("UpdateMenuItem", (type, owned) => {
+    pushMessageToChat(`updating: ${type} ${owned}`);
+    ServerUI.execute(`
+        if(gm.$refs.mainMenu.$refs.inventoryTab.items.find(i => i.type == "${type}") != undefined){
+            gm.$refs.mainMenu.$refs.inventoryTab.items.find(i => i.type == "${type}").owned = ${owned};
+        }
+        else{
+            console.log("Failed to find item of type ${type} in the menu!");
+        }
+    `);
+});
+// called by menu:
+mp.events.add("MenuBuyItem", (name) => {
+    mp.events.callRemote("Menu_RequestBuyItem", name);
+});
+// --------------------
+
 mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) => {
     ServerUI.execute(`gm.$refs.mainMenu.$refs.vehiclesTab.$refs.police.vehicles = [];`);
     ServerUI.execute(`gm.$refs.mainMenu.$refs.vehiclesTab.$refs.fugitive.vehicles = [];`);

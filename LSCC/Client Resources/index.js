@@ -229,6 +229,7 @@ mp.events.add('showLoginBrowser', (state) => {
                 ServerUI.execute(`gm.$refs.auth.startLoading(5);`); // initiate the fake loading screen to allow CEF sounds and shit duhh
                 toggleLoginScene(true);
                 mp.events.callRemote("requestQuickLoginForgotUsernameData"); // yes
+                ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.items = [];`);
             }
             else{
                 ServerUI.execute(`gm.$refs.auth.$refs.panel.authSuccess = true;`);

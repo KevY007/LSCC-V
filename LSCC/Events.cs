@@ -2820,6 +2820,8 @@ namespace RNC
                     player.TriggerEvent("showLoginBrowser", false);
                     player.TriggerEvent("OnPlayerLoginRegister");
                     player.TriggerEvent("LoadCrosshairProfiles", acc.CrosshairProfiles, acc.ActiveCrosshairProfile);
+
+                    EPlayer.Menu_AddItems(player);
                     Achievement.LoadAchievementsForPlayer(player);
                     Challenge.AddChallengesForPlayer(player);
                 });                
@@ -3457,6 +3459,8 @@ namespace RNC
             EPlayer.Notify(player, "Registration successful!", "green", "fas fa-check", false, 2000);
 
             player.TriggerEvent("showLoginBrowser", false);
+
+            EPlayer.Menu_AddItems(player);
             Achievement.LoadAchievementsForPlayer(player);
             Challenge.AddChallengesForPlayer(player);
         }
@@ -5272,6 +5276,77 @@ namespace RNC
 
             RequestPlayAnimation(player, "missheistfbi3b_ig8_2", "cpr_loop_paramedic", 1);
             player.TriggerEvent("BeginReviving");
+        }
+
+        [RemoteEvent("Menu_RequestBuyItem")]
+        public void OnRequestBuyItem(Player player, string name)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            int price = -1;
+            string type = "";
+            switch (name)
+            {
+                case "Medkit":
+                    {
+                        type = "medkit";
+                        price = 10;
+                        if (EPlayer.GetAccount(player).Points < price)
+                        {
+                            EPlayer.Error(player, $"You do not have enough points to purchase a {name}! The price is <strong>{price} Points</strong>!");
+                            return;
+                        }
+
+                        EPlayer.GetAccount(player).Medkits++;
+                        EPlayer.GetAccount(player).Points -= price;
+                        EPlayer.Save(player, false);
+                        player.TriggerEvent("UpdateMenuItem", type, EPlayer.GetAccount(player).Medkits);
+                        EPlayer.Notify(player, $"You've successfully purchased a <strong>{name}</strong> for <strong>{price} Points</strong>!", "green",
+                            "", false, 3000);
+                        break;
+                    }
+                case "Painkiller":
+                    {
+                        type = "painkiller";
+                        price = 6;
+                        if (EPlayer.GetAccount(player).Points < price)
+                        {
+                            EPlayer.Error(player, $"You do not have enough points to purchase a {name}! The price is <strong>{price} Points</strong>!");
+                            return;
+                        }
+                        EPlayer.GetAccount(player).Painkillers++;
+                        EPlayer.GetAccount(player).Points -= price;
+                        EPlayer.Save(player, false);
+                        player.TriggerEvent("UpdateMenuItem", type, EPlayer.GetAccount(player).Painkillers);
+                        EPlayer.Notify(player, $"You've successfully purchased a <strong>{name}</strong> for <strong>{price} Points</strong>!", "green",
+                            "", false, 3000);
+                        break;
+                    }
+                case "Lockpick":
+                    {
+                        type = "lockpick";
+                        price = 10;
+                        if (EPlayer.GetAccount(player).Points < price)
+                        {
+                            EPlayer.Error(player, $"You do not have enough points to purchase a {name}! The price is <strong>{price} Points</strong>!");
+                            return;
+                        }
+                        EPlayer.GetAccount(player).Lockpicks++;
+                        EPlayer.GetAccount(player).Points -= price;
+                        EPlayer.Save(player, false);
+                        player.TriggerEvent("UpdateMenuItem", type, EPlayer.GetAccount(player).Lockpicks);
+                        EPlayer.Notify(player, $"You've successfully purchased a <strong>{name}</strong> for <strong>{price} Points</strong>!", "green",
+                            "", false, 3000);
+                        break;
+                    }
+                default:
+                    {
+                        EPlayer.Error(player, $"Invalid item: <strong>{name}</strong>! Report this to the devs.");
+                        break;
+                    }
+            }
+            NAPI.Util.ConsoleOutput($"wat the fuck switch case finished {name}");
+            return;
         }
 
         [RemoteEvent("onLockpickAttempt")]
