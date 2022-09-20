@@ -126,11 +126,11 @@ mp.keys.bind(
 );
 
 // When 'E' key is held down, open the menu
-mp.keys.bind(0x45, true, () => {
+mp.keys.bind(0x59, true, () => {
    mp.events.callLocal("actionMenu:open"); 
 });
 // When 'E' key is let go, close the menu - toggleable though.
-mp.keys.bind(0x45, false, () => {
+mp.keys.bind(0x59, false, () => {
     if(chatStatus == true || menuToggled == true || MDCActive == true || scoreboardToggled == true
         || VehicleSpawnerActive == true || WeaponEditorActive == true) return;
 
