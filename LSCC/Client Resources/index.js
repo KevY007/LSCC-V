@@ -43,6 +43,7 @@ var scoreboardCursor = false;
 
 var MDC_DOM = null;
 var MDCActive = false;
+var isLockpicking = false;
 
 var cuffTarget = null;
 var cuffInterval = null;

@@ -4,6 +4,7 @@ let actionType = "none";
 
 let maxActionTime = 0;
 
+
 mp.events.add("StartPlayerAction", (action, time) => {
     if(mp.players.local.getVariable("Wounded") > 0){
         return;
@@ -351,3 +352,46 @@ function finishCuffing(){ // if successful
     mp.events.callRemote("FinishCuffing", cuffTarget);
     cuffTarget = null;
 }
+
+
+/* LOCKPICKING */
+mp.events.add("startLockpicking", (donorLevel) => {
+    isLockpicking = true;
+    let rangeSize = 10;
+    rangeSize += (donorLevel*10);
+    let rangePos = 0;
+    do{
+        rangePos = getRandomInt(0, 180);
+    }
+    while(rangePos+rangeSize >= 180);
+
+    ServerUI.execute(`
+        gm.$refs.hud.$refs.base.$refs.quickAction.rangeLocation = ${rangePos};
+        gm.$refs.hud.$refs.base.$refs.quickAction.range = ${rangeSize};
+        
+        gm.$refs.hud.$refs.base.$refs.quickAction.enabled = true;
+    `);
+});
+
+// true = success ; false = fail
+mp.events.add("sendLockpickResult", (result) => {
+    isLockpicking = false;
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.quickAction.enabled = false;`);   
+    mp.events.callRemote("onLockpickAttempt", result); 
+});
+mp.events.add("lockpick_vehicleAlarm", (veh, isLockpickPlayer, isSuccess) => {
+    mp.game.invoke('0xCDE5E70C1DDB954C', veh.handle, true);
+    setTimeout(() => {
+        mp.game.invoke('0xB8FF7AB45305C345', veh.handle);
+    }, 100);
+
+    if(isLockpickPlayer && isSuccess){
+        mp.players.local.taskEnterVehicle(veh.handle, 200, -1, 2.0, 1, 0);
+    }
+});
+
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+  }

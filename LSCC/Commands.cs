@@ -284,6 +284,45 @@ namespace RNC
             return;
         }
 
+        [Command("lockpick")]
+        public void cmd_lockpick(Player player)
+        {
+            Vehicle targetVeh = null;
+            if(player.Vehicle != null || player.IsInVehicle)
+            {
+                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}You are already in a vehicle!");
+                return;
+            }
+
+            foreach (Vehicle v in RAGE.Entities.Vehicles.All)
+            {
+                if (v.Dimension == player.Dimension && v.Position.DistanceTo(player.Position) <= 3.5)
+                {
+                    if (v.HasSharedData("Team") && v.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && v.GetSharedData<int>("Team") != 10
+                        && v.GetSharedData<bool>("Locked") == true) continue;
+
+                    targetVeh = v;
+                    break;
+                }
+            }
+            if(targetVeh == null)
+            {
+                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}You are not within 3.5 meters of any locked vehicle!");
+                return;
+            }
+            if(EPlayer.GetAccount(player).Lockpicks <= 0)
+            {
+                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}You do not have a Lockpick! Buy one in the menu.");
+                return;
+            }
+
+            Events.RequestPlayAnimation(player, "mp_arresting", "a_uncuff", 31); // 31 = upper body only
+            EPlayer.SendMessage(player, "~y~[LOCKPICKING]~w~ Hit ~y~SPACE~w~ when the ~b~blue~w~ dot is in the ~g~green zone~w~.");
+            player.TriggerEvent("startLockpicking", EPlayer.GetAccount(player).DonatorLevel);
+            player.SetData<Vehicle>("LockpickTarget", targetVeh);
+            EPlayer.GetAccount(player).Lockpicks--;
+        }
+
         [Command("lock")]
         public static void cmd_lock(Player player)
         {
@@ -414,6 +453,8 @@ namespace RNC
             });
         }
 
+        
+
         [Command("engine")]
         public static void cmd_engine(Player player)
         {
@@ -424,6 +465,11 @@ namespace RNC
 
             if (player.Vehicle.HasSharedData("Team") && (player.Vehicle.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") || player.Vehicle.GetSharedData<int>("Team") == 10) &&
                 player.Vehicle.EngineStatus == false)
+            {
+                player.SendNotification("~r~You cannot start this vehicle - ~w~you will have to hotwire it! ~y~(/hotwire)");
+                return;
+            }
+            if(player.Vehicle.GetSharedData<int>("Team") == 10 && player.Vehicle.EngineStatus == false)
             {
                 player.SendNotification("~r~You cannot start this vehicle - ~w~you will have to hotwire it! ~y~(/hotwire)");
                 return;

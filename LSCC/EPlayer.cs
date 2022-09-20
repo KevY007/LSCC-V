@@ -883,6 +883,7 @@ namespace RNC
 
                 player.SetSharedData("TaseProtection", false);
 
+                player.ResetData("LockpickTarget");
                 player.SetSharedData("PlacingStingers", false);
 
                 player.SetData<bool>("ShotsFired", false);

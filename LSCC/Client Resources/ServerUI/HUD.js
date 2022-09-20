@@ -1120,7 +1120,7 @@ mp.events.add("render", () => {
     mp.game.ui.hideHudComponentThisFrame(4); // mp_cash
     mp.game.ui.displayAmmoThisFrame(false); // HIDE AMMO
 
-    if(showCustomCrosshair){
+    if(showCustomCrosshair && !isLockpicking){
         if(alwaysShowCustomCrosshair == true){
             if(!customCrosshairOn){
                 if(!mp.game.player.isFreeAiming()){         
@@ -1196,7 +1196,7 @@ mp.events.add("render", () => {
         }
     }
 
-    if(!showReticule || customCrosshairOn)
+    if(!showReticule || customCrosshairOn || isLockpicking)
     {
         mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
     }

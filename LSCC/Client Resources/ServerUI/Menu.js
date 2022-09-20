@@ -686,9 +686,7 @@ mp.events.add("MenuChangeSettings", (id, value) =>
 
 mp.events.add("Menu_UpdateLevelXP", (first_time = false) => {
     setTimeout(() => {
-        ServerUI.execute(`gm.$refs.profile.xp = ${mp.players.local.getVariable("CurrentXP")};`);
-        ServerUI.execute(`gm.$refs.profile.nextXp = ${mp.players.local.getVariable("NextLevelXP")};`);
-        ServerUI.execute(`gm.stats.level = ${mp.players.local.getVariable("Level")}`);
+        UpdateStatsVars();
     }, (first_time ? 1000 : 1));
 })
 
@@ -809,20 +807,20 @@ mp.events.add("UpdateMenuLobbies", (lobbies, currentLobby) => {
     }
 });
 
-mp.events.add("SaveCrosshair", (crData) => {
-    mp.storage.data.menu.CrosshairData = crData;
-    ServerUI.execute(`gm.crosshair.layers = ${crData}`);
+// mp.events.add("SaveCrosshair", (crData) => {
+//     mp.storage.data.menu.CrosshairData = crData;
+//     ServerUI.execute(`gm.crosshair.layers = ${crData}`);
 
-    mp.storage.flush();
-});
-mp.events.add("LoadCrosshair", () => {
-    if (mp.storage.data.menu.CrosshairData !== undefined) {
-        ServerUI.execute(`gm.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
-    }
-    else {
-        mp.storage.data.menu.CrosshairData = "[]";
-        ServerUI.execute(`gm.crosshair.layers = []`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.crosshair.layers = []`);
-    }
-});
+//     mp.storage.flush();
+// });
+// mp.events.add("LoadCrosshair", () => {
+//     if (mp.storage.data.menu.CrosshairData !== undefined) {
+//         ServerUI.execute(`gm.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
+//         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
+//     }
+//     else {
+//         mp.storage.data.menu.CrosshairData = "[]";
+//         ServerUI.execute(`gm.crosshair.layers = []`);
+//         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.crosshair.layers = []`);
+//     }
+// });

@@ -3401,14 +3401,13 @@ namespace RNC
                                                     crashcheck = 681;
                                                     veh.EngineStatus = false;
                                                     veh.SetSharedData("Engine", false);
-                                                    veh.SetSharedData("Fuel", 100.0);
                                                     veh.SetSharedData("Locked", locked);
                                                     veh.Locked = locked;
                                                     veh.SetSharedData("Team", 10); // 10 = civilian / parked
                                                     veh.SetSharedData("SpeedInfo", "Average");
                                                     lobby.Vehicles.Add(veh);
                                                     veh.SetSharedData("Collisions", true);
-                                                    veh.SetSharedData("Fuel", 100.0);
+                                                    veh.SetSharedData("Fuel", new Random().NextDouble() * 100);
 
                                                 }
                                             });

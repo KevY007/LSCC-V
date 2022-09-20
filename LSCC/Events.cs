@@ -4827,6 +4827,7 @@ namespace RNC
                                     Escapes = 0,
                                     Arrests = 0,
                                     Kills = 1,
+                                    Lockpicks = 0,
                                     Deaths = 1,
                                     MinutesPlayed = 1.0,
                                     LastSessionMins = 0.0,
@@ -5271,6 +5272,40 @@ namespace RNC
 
             RequestPlayAnimation(player, "missheistfbi3b_ig8_2", "cpr_loop_paramedic", 1);
             player.TriggerEvent("BeginReviving");
+        }
+
+        [RemoteEvent("onLockpickAttempt")]
+        public void OnLockpickAttempt(Player player, bool result)
+        {
+            Events.RequestClearAnimation(player);
+            Vehicle veh = player.GetData<Vehicle>("LockpickTarget");
+            if (veh == null || veh.IsNull || !veh.IsInstanceAlive)
+            {
+                EPlayer.SendMessage(player, "~r~Lockpicking failed ~w~- the target vehicle no longer exists!");
+                return;
+            }
+            if(veh.Locked == false || veh.GetSharedData<bool>("Locked") == false)
+            {
+                EPlayer.SendMessage(player, "~r~Lockpicking failed ~w~- the target vehicle is no longer locked!");
+                return;
+            }
+
+            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+            foreach (Player playa in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId)){
+                playa.TriggerEvent("lockpick_vehicleAlarm", veh, (playa.Id == player.Id), result);
+            }
+            veh.EngineStatus = false;
+            veh.SetSharedData("Engine", false);
+            if(result == true)
+            {
+                veh.Locked = false;
+                veh.SetSharedData("Locked", false);
+                EPlayer.SendMessage(player, "~g~Lockpicking successful ~w~- you can now enter the vehicle!");
+            }
+            else
+            {
+                EPlayer.SendMessage(player, "~r~Lockpicking failed ~w~- you failed the minigame!");
+            }
         }
 
         [RemoteEvent("RequestCuffTarget")]

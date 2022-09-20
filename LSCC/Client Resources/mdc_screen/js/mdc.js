@@ -237,6 +237,10 @@ function updateMapBlipScales(zoom_level){
 document.addEventListener("DOMContentLoaded", () => {
     mapViewButton = document.getElementById("option_map_view");
     stingerButton = document.getElementById("option_stinger");
+
+    SelectSound.volume = 0.5;
+    TenFourSound.volume = 0.4;
+    TenFourSound2.volume = 0.4;
 });
 
 document.addEventListener("keyup", function(e){
