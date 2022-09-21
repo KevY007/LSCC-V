@@ -1268,7 +1268,8 @@ namespace RNC
                     }
                     switch (settingID)
                     {
-                        case 0: // Clan Access
+                        // Setting ID 0 is reserved for clan invites in the settings.
+                        case 1: // Clan Access
                             {
                                 pClan.ClanAccess = value;
                                 await context.SaveChangesAsync();
@@ -1279,7 +1280,7 @@ namespace RNC
                                 });
                                 break;
                             }
-                        case 1: // Clan Tag
+                        case 2: // Clan Tag
                             {
                                 pClan.ForceTag = (value == 1);
                                 await context.SaveChangesAsync();
@@ -1290,7 +1291,7 @@ namespace RNC
                                 });
                                 break;
                             }
-                        case 2: // Copchase Partnering
+                        case 3: // Copchase Partnering
                             {
                                 pClan.CopchasePartnering = (value == 1);
                                 await context.SaveChangesAsync();
