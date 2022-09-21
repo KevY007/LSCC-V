@@ -212,12 +212,16 @@ mp.events.add('actionMenu:clickItem', (actionID) => {
         }
         case 6: // Weapon Editor
         {
-            mp.events.callRemote("actionMenu_SelectedItem", actionID);
+            setTimeout(() => {
+                mp.events.callRemote("actionMenu_SelectedItem", actionID);                
+            }, 100);
             break;
         }
         case 7: // Vehicle Tuner [freeroam only cuz copchase vtune requires param inputs]
         {
-            mp.events.callRemote("actionMenu_SelectedItem", actionID);
+            setTimeout(() => {
+                mp.events.callRemote("actionMenu_SelectedItem", actionID);                
+            }, 100);
             break;
         }
         case 8: // Back To Lobby
@@ -227,7 +231,9 @@ mp.events.add('actionMenu:clickItem', (actionID) => {
         }
         case 9: // Freeroam vehicle spawning
         {
-            mp.events.callRemote("actionMenu_SelectedItem", actionID);
+            setTimeout(() => {
+                mp.events.callRemote("actionMenu_SelectedItem", actionID);                
+            }, 100);
             break;
         }
         case 10: // Freeroam fix vehicle
