@@ -558,7 +558,7 @@ mp.events.add('ToggleTooltips', (status) =>
     }
 });
 
-mp.events.add("OneSecondEvent", () => {
+mp.events.add("TwoSecondsEvent", () => {
 
     if(mp.storage.data.menu.RealtimeSpeedo == false){
         if (specState == true && specTarget != null && mp.players.exists(specTarget)) 
@@ -1359,10 +1359,10 @@ mp.events.add("render", () => {
             ServerUI.execute(`gm.$refs.hud.$refs.miniHud.left = "${miniHUDVars["left"]}px";`);
             ServerUI.execute(`gm.$refs.hud.$refs.miniHud.bottom = "${miniHUDVars["bottom"]}px";`);  
         }
-        if (mp.storage.data.menu.alwaysExpandedMap == true)
-        {
-            mp.game.ui.setRadarBigmapEnabled(true, false);
-        }
+        // if (mp.storage.data.menu.alwaysExpandedMap == true)
+        // {
+        //     mp.game.ui.setRadarBigmapEnabled(true, false);
+        // }
         
         if (specState == true && specTarget != null && mp.players.exists(specTarget)) 
         {

@@ -701,6 +701,7 @@ function ToggleBigMap(state){
 
     if (Number.isInteger(state) && (state == 0 || state == 1)) {
         mp.storage.data.menu.alwaysExpandedMap = Boolean(state);
+        mp.game.ui.setRadarBigmapEnabled(mp.storage.data.menu.alwaysExpandedMap, false);
     }
     else {
 
@@ -718,6 +719,7 @@ function ToggleBigMap(state){
         {
             mp.storage.data.menu.alwaysExpandedMap = true;
         }
+        mp.game.ui.setRadarBigmapEnabled(mp.storage.data.menu.alwaysExpandedMap, false);
     }
 
     if(mp.storage.data.menu.alwaysExpandedMap == true)

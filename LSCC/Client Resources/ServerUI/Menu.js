@@ -216,6 +216,40 @@ mp.keys.bind(0x1B, true, function() { // ESC key
     }
 });
 
+function menuSetting_getOptionNameFromValue(type, value){
+    switch(type){
+        case "weather":{
+            switch(Number(value)){
+                case -1: return "Dynamic";
+                case 0: return "Sunny";
+                case 2: return "Cloudy";
+                case 4: return "Foggy";
+                case 6: return "Rain";
+                case 7: return "Thunderstorm";
+                case 9: return "Snowfall";
+                default: return "Unknown";
+            }
+            break;
+        }
+        case "voicemode":{
+            switch(Number(value)){
+                case 0: return "Nearby";
+                case 1: return "Team";
+                case 2: return "Squad";
+                case 3: return "Disabled";
+            }         
+            break;   
+        }
+        case "activechatopacity":{
+            return `${Number(value)*100}`;      
+            break;   
+        }
+        case "inactivechatopacity":{
+            return `${Number(value)*100}`;      
+            break;   
+        }
+    }
+}
 
 function ToggleMenu()
 {
@@ -550,7 +584,6 @@ function ToggleMenu()
                 ]
             }
         ]`);
-        
 
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.tri[0].value = ${mp.storage.data.menu.topRightInfo}`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.gp[0].value = ${mp.storage.data.menu.gameProgress};`);
@@ -564,16 +597,16 @@ function ToggleMenu()
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.vcbind[0].value = "${String.fromCharCode(curVoiceBind)}";`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.gpsbind[0].value = "${String.fromCharCode(curGPSBind)}";`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.bigmapbind[0].value = "${String.fromCharCode(curMapBind)}";`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.myweather[0].value = ${(mp.storage.data.menu.myweather == -1 ? 0 : mp.storage.data.menu.myweather)};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.myweather[0].value = "${menuSetting_getOptionNameFromValue("weather", mp.storage.data.menu.myweather)}";`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autojoinopt[0].value = ${mp.storage.data.menu.AutoJoin};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.eventmusic[0].value = ${mp.storage.data.menu.EventMusic};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autologintog[0].value = ${mp.storage.data.menu.AutoLogin};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.realtimespeedp[0].value = ${mp.storage.data.menu.RealtimeSpeedo};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.realtimespeedo[0].value = ${mp.storage.data.menu.RealtimeSpeedo};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.oocauto[0].value = ${mp.storage.data.menu.OOCauto};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.voicemode[0].value = ${mp.storage.data.menu.VoiceMode};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.voicemode[0].value = "${menuSetting_getOptionNameFromValue("voicemode", mp.storage.data.menu.VoiceMode)}";`);
         
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.activechatopacity[0].value = ${mp.storage.data.menu.ActiveChatOpacity.toString()};`);       
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.inactivechatopacity[0].value = ${mp.storage.data.menu.InactiveChatOpacity.toString()};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.activechatopacity[0].value = "${menuSetting_getOptionNameFromValue("activechatopacity", mp.storage.data.menu.ActiveChatOpacity)}";`);       
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.inactivechatopacity[0].value = "${menuSetting_getOptionNameFromValue("inactivechatopacity", mp.storage.data.menu.InactiveChatOpacity)}";`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.showinactivechat[0].value = ${mp.storage.data.menu.ShowInactiveChat.toString()};`);
     }
 }
@@ -626,8 +659,9 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     }
     else if(id == 4)
     {
-        mp.events.callLocal("playerCommand", `bigmap ${value}`);
-        //mp.storage.data.menu.alwaysExpandedMap = value;
+        //mp.events.callLocal("playerCommand", `bigmap ${value}`);
+        mp.storage.data.menu.alwaysExpandedMap = value;
+        mp.game.ui.setRadarBigmapEnabled(value, false);
     }
     else if(id == 5)
     {
@@ -654,6 +688,7 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     }
     else if(id == 12)
     {
+        mp.storage.data.menu.myweather = value;
         mp.events.callRemote("SetPlayerPrivateWeather", value);
     }
     else if(id == 13)
