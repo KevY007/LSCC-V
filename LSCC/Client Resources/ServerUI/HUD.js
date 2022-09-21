@@ -213,7 +213,7 @@ mp.events.add('actionMenu:clickItem', (actionID) => {
         case 6: // Weapon Editor
         {
             setTimeout(() => {
-                mp.events.callRemote("actionMenu_SelectedItem", actionID);                
+                mp.events.callRemote("actionMenu_SelectedItem", actionID); 
             }, 100);
             break;
         }
@@ -409,10 +409,12 @@ mp.events.add("spawner_spawnVehicle", (modelname) => {
     mp.gui.cursor.show(false, false);
 });
 mp.events.add("spawner_close", () => {
+    VehicleSpawnerActive = false;
     ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.enabled = false;`);
     mp.gui.cursor.show(false, false);
 });
 mp.events.add("OpenVehicleSpawner", (carname) => {
+    VehicleSpawnerActive = true;
     ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.openSpawner('${carname}')`);
     mp.gui.cursor.show(true, true);
 });
