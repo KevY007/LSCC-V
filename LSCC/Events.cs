@@ -1271,6 +1271,7 @@ namespace RNC
                         case 0: // Clan Access
                             {
                                 pClan.ClanAccess = value;
+                                await context.SaveChangesAsync();
                                 NAPI.Task.Run(() =>
                                 {
                                     EPlayer.Notify(player, $"You've set your clan access to <strong>{(value == 0 ? "Invite-Only" : "Public")}</strong>!", "success", "fa-success", false, 3000);
@@ -1281,6 +1282,7 @@ namespace RNC
                         case 1: // Clan Tag
                             {
                                 pClan.ForceTag = (value == 1);
+                                await context.SaveChangesAsync();
                                 NAPI.Task.Run(() =>
                                 {
                                     EPlayer.Notify(player, $"You will {(value == 1 ? "now" : "no longer")} force your clan members to have the clan tag before their name!", "success", "fa-success", false, 3000);
@@ -1291,6 +1293,7 @@ namespace RNC
                         case 2: // Copchase Partnering
                             {
                                 pClan.CopchasePartnering = (value == 1);
+                                await context.SaveChangesAsync();
                                 NAPI.Task.Run(() =>
                                 {
                                     EPlayer.Notify(player, $"Your clan members will {(value == 1 ? "now" : "no longer")} spawn together in police vehicles as cops!", "success", "fa-success", false, 3000);
