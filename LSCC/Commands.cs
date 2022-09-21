@@ -775,7 +775,7 @@ namespace RNC
             player.TriggerEvent("pushMsgToChat", "~y~[2]~w~ Head into the !{#0097ff}#bot-commands ~w~channel.");
             player.TriggerEvent("pushMsgToChat", "~y~[3]~w~ Use command ~y~/verify !{#a6ffa7}(name)!{#ffa6a6}(code) ~w~to verify.");
             player.TriggerEvent("pushMsgToChat", "~w~And that's it! The process is very straight-forward. You, for example, have to enter:");
-            player.TriggerEvent("pushMsgToChat", $"~y~!verify !{{#a6ffa7}}{player.Name} !{{#ffa6a6}}{_d.DiscordCode}");
+            player.TriggerEvent("pushMsgToChat", $"~y~/verify !{{#a6ffa7}}{player.Name} !{{#ffa6a6}}{_d.DiscordCode}");
             player.TriggerEvent("pushMsgToChat", " ");
             player.TriggerEvent("pushMsgToChat", "~y~Your Discord code: ~w~" + _d.DiscordCode);
         }

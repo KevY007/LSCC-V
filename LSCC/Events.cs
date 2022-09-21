@@ -1236,6 +1236,74 @@ namespace RNC
             // GameUpdate() will then handle the deployment timer and create new objects if necessary.
         }
 
+        [RemoteEvent("Clan_OnRequestChangeSetting")]
+        public void Clan_OnRequestChangeSetting(Player player, int settingID, int value)
+        {
+            Account pAcc = EPlayer.GetAccount(player);
+            if (player.GetSharedData<int>("ClanID") == -1)
+            {
+                EPlayer.Error(player, "You are not in any clan!");
+                return;
+            }
+            if (player.GetSharedData<int>("ClanTier") > 0)
+            {
+                EPlayer.Error(player, "You do not have the authority to change clan settings!");
+                return;
+            }
+            int pClanID = player.GetSharedData<int>("ClanID");
+
+            int playerSQLID = pAcc.SQL_ID;
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Clan pClan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == pClanID);
+                    if(pClan == null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Error(player, "Your clan no longer exists!");
+                            return;
+                        });
+                    }
+                    switch (settingID)
+                    {
+                        case 0: // Clan Access
+                            {
+                                pClan.ClanAccess = value;
+                                NAPI.Task.Run(() =>
+                                {
+                                    EPlayer.Notify(player, $"You've set your clan access to <strong>{(value == 0 ? "Invite-Only" : "Public")}</strong>!", "success", "fa-success", false, 3000);
+                                    player.TriggerEvent("UpdateMenuClanTab");
+                                });
+                                break;
+                            }
+                        case 1: // Clan Tag
+                            {
+                                pClan.ForceTag = (value == 1);
+                                NAPI.Task.Run(() =>
+                                {
+                                    EPlayer.Notify(player, $"You will {(value == 1 ? "now" : "no longer")} force your clan members to have the clan tag before their name!", "success", "fa-success", false, 3000);
+                                    player.TriggerEvent("UpdateMenuClanTab");
+                                });
+                                break;
+                            }
+                        case 2: // Copchase Partnering
+                            {
+                                pClan.CopchasePartnering = (value == 1);
+                                NAPI.Task.Run(() =>
+                                {
+                                    EPlayer.Notify(player, $"Your clan members will {(value == 1 ? "now" : "no longer")} spawn together in police vehicles as cops!", "success", "fa-success", false, 3000);
+                                    player.TriggerEvent("UpdateMenuClanTab");
+                                });
+                                break;
+                            }
+                    }
+                }
+            });
+      
+        }
+
         [RemoteEvent("Clan_OnRequestChangeTier")]
         public void Clan_OnRequestChangeTier(Player player, int targetSQLID, int tier)
         {
@@ -1598,7 +1666,10 @@ namespace RNC
                 WeekWins = 0,
                 Description = desc,
                 Tag = tag,
-                CreatedOn = DateTime.Now.ToString("F")
+                CreatedOn = DateTime.Now.ToString("F"),
+                ClanAccess = 0,
+                ForceTag = true,
+                CopchasePartnering = true
             };
             Task.Run(async () =>
             {
@@ -1621,7 +1692,7 @@ namespace RNC
                         player.SetSharedData("ClanCreated", DateTime.Now.ToString("F"));
                         EPlayer.Notify(player, "Clan successfully created! Read chat for more information.", "green", "", false, 3000);
                         EPlayer.SendMessage(player, $"~g~[CLAN] ~w~Congratulations! You've successfully created a clan named ~y~{clanname}~w~ for 300 Points!");
-                        EPlayer.SendMessage(player, $"~g~[CLAN] ~w~You can manage your clan through the clan panel (Menu [M] > Clan > Manage)");
+                        EPlayer.SendMessage(player, $"~g~[CLAN] ~w~You can manage your clan through the clan panel (Menu [M] > Clans > My Clan)");
                         EPlayer.SendMessage(player, $"~g~[CLAN] ~w~If you have any questions, ask the staff team or management.");
                         EPlayer.SendMessage(player, $"~g~[CLAN] ~r~NOTICE: ~w~If you leave your clan, it will automatically be disbanded and deleted.");
                         EPlayer.SendMessage(player, $"~g~[CLAN] ~w~Best of luck!");
@@ -3927,10 +3998,10 @@ namespace RNC
                         NAPI.Util.ConsoleOutput($"ADDING CLAN: {clan.Name} [{clan.SQL_ID}] to MENU");
                         int clanID = clan.SQL_ID;
                         string clanName = clan.Name;
-                        string tag = clan.Tag; // to add
-                        string desc = clan.Description; // to add
+                        string tag = clan.Tag;
+                        string desc = clan.Description;
                         string banner = "default"; // to add
-                        bool isOpen = false; // to add
+                        bool isOpen = (clan.ClanAccess == 1);
                         int maxPlayers = 20; // to add
                         int players = context.Accounts.AsQueryable().Count(a => a.ClanID == clan.SQL_ID);
                         int totalKills = clan.TotalKills;

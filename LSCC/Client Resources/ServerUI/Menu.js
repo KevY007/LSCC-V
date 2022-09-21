@@ -127,9 +127,9 @@ mp.events.add("invitePlayerToClan", (playerName) => {
     (VALUES) => true/false
 */
 mp.events.add("changeClanSettings", (settingID, value) => {
-    switch(settingID){
+    let numValue = Number(value); // be careful in the future if a setting isn't bool nor number
 
-    }
+    mp.events.callRemote("Clan_OnRequestChangeSetting", settingID, numValue);
 });
 
 mp.events.add("Menu_RemoveClanMember", (memberID) => {
@@ -204,8 +204,9 @@ mp.events.add("UpdateMenuClanTab", () => {
 
 });
 
+
 mp.events.add("render", () => {
-    if(menuToggled == true){
+    if(menuToggledLate == true){
         mp.game.controls.disableControlAction(0, 200, true); // prevent menu from opening when pressing ESC for chat 
     }    
 });
@@ -265,6 +266,10 @@ function ToggleMenu()
                 FirstTimeMenuOpen = false;
 
             }
+            menuToggledLate = true;
+        }
+        else{
+            setTimeout(() => {menuToggledLate = false;}, 500);
         }
         
 

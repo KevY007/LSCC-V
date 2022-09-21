@@ -10,6 +10,7 @@ var updateRate = 200;
 
 var chatStatus = false;
 var chatStatusLate = false;
+var menuToggledLate = false;
 var lastChatToggle = Date.now();
 var streetName = null;
 var zoneName = null;
