@@ -405,6 +405,7 @@ function increaseChatOpacity(time = 4000){
 }
 
 mp.events.add("spawner_spawnVehicle", (modelname) => {
+    VehicleSpawnerActive = false;
     ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.enabled = false;`);
     mp.events.callRemote("Spawner_SpawnVehicle", modelname);
     mp.gui.cursor.show(false, false);
