@@ -781,6 +781,24 @@ namespace RNC
                 case 5:
                     Commands.cmd_gps(player);
                     break;
+                case 6:
+                    Commands.cmd_weaponeditor(player);
+                    break;
+                case 7:
+                    Commands.cmd_tuneveh(player);
+                    break;
+                case 8:
+                    Commands.cmd_lobby(player);
+                    break;
+                case 9:
+                    Commands.cmd_veh(player);
+                    break;
+                case 10:
+                    Commands.cmd_fix(player);
+                    break;
+                case 11:
+                    Commands.cmd_dragout(player);
+                    break;
                 default:
                     EPlayer.Error(player, $"Invalid quick-action attempt, ID: {actionID}. Report this to the developers!");
                     break;

@@ -798,7 +798,7 @@ namespace RNC
         }
 
         [Command("veh", "!{#AFAFAF}[USAGE] veh (vehicle model) (optional: pri. color) (optional: sec. color)", Alias = "v")]
-        public void cmd_veh(Player player, string carname = "", int col1 = -1, int col2 = -1)
+        public static void cmd_veh(Player player, string carname = "", int col1 = -1, int col2 = -1)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -2111,7 +2111,7 @@ namespace RNC
         */
 
         [Command("dragout", "!{#AFAFAF}[USAGE] dragout (optional:target)")]
-        public void cmd_dragout(Player player, Player target = null)
+        public static void cmd_dragout(Player player, Player target = null)
         {
             LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
             if (lobby == null)
@@ -2123,7 +2123,7 @@ namespace RNC
             float nearest = 9999.0f;
             if (target == null)
             {
-                foreach (Player fugi in lobby.Fugitives.Where<Player>(t => t.Position.DistanceTo(player.Position) <= 3.0))
+                foreach (Player fugi in lobby.Fugitives.Where<Player>(t => t.Position.DistanceTo(player.Position) <= 3.5))
                 {
                     if (player.Position.DistanceTo(fugi.Position) < nearest)
                     {
@@ -2710,8 +2710,14 @@ namespace RNC
         }
 
         [Command("weaponeditor")]
-        public void cmd_weaponeditor(Player player)
+        public static void cmd_weaponeditor(Player player)
         {
+            if(player.GetSharedData<int>("Team") > -1 || player.GetSharedData<int>("inDM") > -1 || player.GetSharedData<int>("inLobby") < 0)
+            {
+                EPlayer.Error(player, $"You must be in the lobby to use the weapon editor!");
+                return;
+            }
+
             foreach(KeyValuePair<long, string> weapon in Main.WeaponReasons)
             {
                 player.GiveWeapon((WeaponHash)weapon.Key, 1);
@@ -3664,7 +3670,7 @@ namespace RNC
         }
 
         [Command("fix", Alias = "repair")]
-        public void cmd_fix(Player player)
+        public static void cmd_fix(Player player)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -8992,7 +8998,7 @@ namespace RNC
         }
 
         [Command("tuneveh")]
-        public void cmd_tuneveh(Player player)
+        public static void cmd_tuneveh(Player player)
         {
             if (!EPlayer.LoggedIn(player))
                 return;

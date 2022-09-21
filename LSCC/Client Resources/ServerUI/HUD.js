@@ -167,6 +167,7 @@ mp.events.add('actionMenu:open', () => {
 
     ActionMenuActive = true;
     mp.events.callLocal("actionMenu:removeAllItems");
+    actionMenu_lobbyCheck();
     actionMenu_vehicleCheck();
     actionMenu_teamCheck();
 
@@ -176,6 +177,8 @@ mp.events.add('actionMenu:open', () => {
 mp.events.add('actionMenu:clickItem', (actionID) => {
     mp.events.callLocal("actionMenu:close");
 
+    // yes it's a long switch case with same action - this is for future in case some clientside stuff needs to be done too!
+    // i could've done it better but eh we can easily change it if needed haha
     switch(actionID){
         case 0: // Vehicle lock toggle - invokes the /lock command simply
         {
@@ -207,14 +210,83 @@ mp.events.add('actionMenu:clickItem', (actionID) => {
             mp.events.callRemote("actionMenu_SelectedItem", actionID);
             break;
         }
+        case 6: // Weapon Editor
+        {
+            mp.events.callRemote("actionMenu_SelectedItem", actionID);
+            break;
+        }
+        case 7: // Vehicle Tuner [freeroam only cuz copchase vtune requires param inputs]
+        {
+            mp.events.callRemote("actionMenu_SelectedItem", actionID);
+            break;
+        }
+        case 8: // Back To Lobby
+        {
+            mp.events.callRemote("actionMenu_SelectedItem", actionID);
+            break;
+        }
+        case 9: // Freeroam vehicle spawning
+        {
+            mp.events.callRemote("actionMenu_SelectedItem", actionID);
+            break;
+        }
+        case 10: // Freeroam fix vehicle
+        {
+            mp.events.callRemote("actionMenu_SelectedItem", actionID);
+            break;
+        }
+        case 11: // Dragout command
+        {
+            mp.events.callRemote("actionMenu_SelectedItem", actionID);
+            break;
+        }
+        case 12: // Handcuff/revive message tip sends them to hold 'H'
+        {
+            ServerUI.execute(`toast('Hotkey Help', 'You must <strong>hold down "H"</strong> to perform that action!', 'warning', 3000);`);
+            break;
+        }
     }
 });
-
+function actionMenu_lobbyCheck(){
+    let dmID = mp.players.local.getVariable("inDM");
+    if(dmID != -1){
+        mp.events.callLocal("actionMenu:addItem", 8, "Go to lobby", "#f87171", "fa-door-open");  
+        return;
+    }
+    let lobbyID = mp.players.local.getVariable("InLobby");
+    if(lobbyID > -1){ // copchase lobby
+        mp.events.callLocal("actionMenu:addItem", 6, "Weapon Upgrades", "#38bdf8", "fa-gun");   
+        mp.events.callLocal("actionMenu:addItem", 7, "Vehicle Tuning", "#a78bfa", "fa-car-wrench");   
+    }
+    else if(lobbyID == -4){ // derby
+        mp.events.callLocal("actionMenu:addItem", 8, "Go to lobby", "#f87171", "fa-door-open");  
+    }
+    else if(lobbyID == -3){ // freeroam
+        mp.events.callLocal("actionMenu:addItem", 9, "Spawn Vehicle", "#4ade80", "fa-car");   
+        if(mp.players.local.isInAnyVehicle(true)){
+            mp.events.callLocal("actionMenu:addItem", 7, "Vehicle Tuning", "#a78bfa", "fa-car-wrench");  
+            mp.events.callLocal("actionMenu:addItem", 10, "Repair Vehicle", "#c084fc", "fa-car-bolt");  
+        } 
+        mp.events.callLocal("actionMenu:addItem", 8, "Go to lobby", "#f87171", "fa-door-open");  
+    }
+}
+// This function checks what team the player is in, and adds options for each team.
 function actionMenu_teamCheck(){
     let team = mp.players.local.getVariable("Team");
     if(team >= 0){
         mp.events.callLocal("actionMenu:addItem", 3, "Painkiller", "#22c55e", "fa-pills");    
         
+        let foundReviveTarget = false;
+        mp.players.forEachInRange(mp.players.local.position, 5, (playa) => {
+            if(!foundReviveTarget){
+                if(playa.remoteId != mp.players.local.remoteId && playa.getVariable("Wounded") == 2 && 
+                playa.getVariable("BeingRevived") == false && playa.getVariable("Team") == team){
+                    foundReviveTarget = true;
+                    mp.events.callLocal("actionMenu:addItem", 12, "Revive", "#fb923c", "fa-hand-holding-medical");  
+                }
+            }
+        });
+
         if(team == 0){
             if(!mp.players.local.isInAnyVehicle(true)){
                 mp.events.callLocal("actionMenu:addItem", 2, "Medkit", "#fb7185", "fa-kit-medical");      
@@ -233,7 +305,25 @@ function actionMenu_teamCheck(){
         else{
             mp.events.callLocal("actionMenu:addItem", 5, "GPS Beacon", "#60a5fa", "fa-location-dot");   
             if(!mp.players.local.isInAnyVehicle(true)){
-                mp.events.callLocal("actionMenu:addItem", 2, "Medkit", "#fb7185", "fa-kit-medical");    
+                mp.events.callLocal("actionMenu:addItem", 2, "Medkit", "#fb7185", "fa-kit-medical");  
+                
+                let foundDragoutTarget = false;
+                let foundCuffTarget = false;
+                mp.players.forEachInRange(mp.players.local.position, 3.5, (playa) => {
+                    if(!foundDragoutTarget)
+                    {
+                        if(playa.getVariable("Team") == 0 && playa.isInAnyVehicle(true)){
+                            mp.events.callLocal("actionMenu:addItem", 11, "Drag out", "#22d3ee", "fa-person-through-window");  
+                            foundDragoutTarget = true;
+                        }
+                    }
+                    if(!foundCuffTarget && !foundReviveTarget){
+                        if(playa.getVariable("Team") == 0 && !playa.isInAnyVehicle(true)){
+                            mp.events.callLocal("actionMenu:addItem", 12, "Arrest", "#fb923c", "fa-handcuffs");  
+                            foundCuffTarget = true;
+                        }
+                    }
+                });
             }
         }
     }
