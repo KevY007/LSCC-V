@@ -2712,7 +2712,7 @@ namespace RNC
         [Command("weaponeditor")]
         public static void cmd_weaponeditor(Player player)
         {
-            if(player.GetSharedData<int>("Team") > -1 || player.GetSharedData<int>("inDM") > -1 || player.GetSharedData<int>("inLobby") < 0)
+            if(player.GetSharedData<int>("Team") > -1 || player.GetSharedData<int>("InDM") > -1 || player.GetSharedData<int>("InLobby") < 0)
             {
                 EPlayer.Error(player, $"You must be in the lobby to use the weapon editor!");
                 return;

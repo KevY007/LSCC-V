@@ -248,15 +248,14 @@ mp.events.add('actionMenu:clickItem', (actionID) => {
     }
 });
 function actionMenu_lobbyCheck(){
-    let dmID = mp.players.local.getVariable("inDM");
+    let dmID = mp.players.local.getVariable("InDM");
     if(dmID != -1){
         mp.events.callLocal("actionMenu:addItem", 8, "Go to lobby", "#f87171", "fa-door-open");  
         return;
     }
     let lobbyID = mp.players.local.getVariable("InLobby");
     if(lobbyID > -1){ // copchase lobby
-        mp.events.callLocal("actionMenu:addItem", 6, "Weapon Upgrades", "#38bdf8", "fa-gun");   
-        mp.events.callLocal("actionMenu:addItem", 7, "Vehicle Tuning", "#a78bfa", "fa-car-wrench");   
+        mp.events.callLocal("actionMenu:addItem", 6, "Edit Weapons", "#38bdf8", "fa-gun");   
     }
     else if(lobbyID == -4){ // derby
         mp.events.callLocal("actionMenu:addItem", 8, "Go to lobby", "#f87171", "fa-door-open");  
