@@ -1630,6 +1630,7 @@ namespace RNC
                         player.TriggerEvent("Menu_AddClanMember", acc.SQL_ID, acc.Username, 0, acc.Level);
                         player.TriggerEvent("Menu_UpdateClanStats", 0, 0, 0);
                         player.TriggerEvent("UpdateMenuClanTab");
+
                         EPlayer.UpdateUIVars(player);
                     });
                 }
@@ -3862,9 +3863,10 @@ namespace RNC
         }
 
         [RemoteEvent("Menu_InitializeMyClanTab")]
-        public void OnRequestMyClanTabInit(Player player)
+        public static void RequestClanTabUpdate(Player player)
         {
             Account acc = EPlayer.GetAccount(player);
+            NAPI.Util.ConsoleOutput($"Requesting clan tab update for {player.Name} [CID: {acc.ClanID}|{acc.ClanTier}]");
             Task.Run(async () =>
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
@@ -3875,12 +3877,37 @@ namespace RNC
                         List<Account> clanAccounts = await context.Accounts.AsQueryable().Where(a => a.ClanID == playerClan.SQL_ID).ToListAsync();
                         NAPI.Task.Run(() =>
                         {
+                            player.SetSharedData("ClanID", playerClan.SQL_ID);
+                            player.SetSharedData("ClanTier", acc.ClanTier);
+                            player.SetSharedData("ClanName", playerClan.Name);
+                            player.SetSharedData("ClanCreated", playerClan.CreatedOn);
+
+
                             player.TriggerEvent("Menu_ClearClanMembers");
                             foreach (Account accnt in clanAccounts)
                             {
                                 player.TriggerEvent("Menu_AddClanMember", accnt.SQL_ID, accnt.Username, accnt.ClanTier, accnt.Level);
                             }
                             player.TriggerEvent("Menu_UpdateClanStats", playerClan.WeekKills, playerClan.TotalKills, playerClan.WeekWins);
+
+                            EPlayer.UpdateUIVars(player);
+                        });
+                    }
+                    else
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            if(EPlayer.GetAccount(player).ClanID != -1 || player.GetSharedData<int>("ClanID") != -1)
+                            {
+                                EPlayer.Error(player, $"Server was unable to find your clan <strong>({player.GetSharedData<string>("ClanName")})</strong>, it might've been deleted!");
+                                player.SetSharedData("ClanID", -1);
+                                player.SetSharedData("ClanTier", -1);
+                                player.SetSharedData("ClanName", "NULL");
+                                player.SetSharedData("ClanCreated", "NULL");
+                                EPlayer.GetAccount(player).ClanID = -1;
+                                EPlayer.GetAccount(player).ClanTier = -1;
+                                EPlayer.UpdateUIVars(player);
+                            }                    
                         });
                     }
                 }
@@ -3897,6 +3924,7 @@ namespace RNC
                 {
                     await context.Clans.AsQueryable().ForEachAsync(clan =>
                     {
+                        NAPI.Util.ConsoleOutput($"ADDING CLAN: {clan.Name} [{clan.SQL_ID}] to MENU");
                         int clanID = clan.SQL_ID;
                         string clanName = clan.Name;
                         string tag = clan.Tag; // to add

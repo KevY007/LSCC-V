@@ -195,9 +195,13 @@ mp.events.add("createClan", (cname, tag, desc) => {
 });
 mp.events.add("UpdateMenuClanTab", () => {
     ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.clansList.clans = [];`);
-    mp.events.callRemote("Menu_RequestClansList");
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.name = "${mp.players.local.getVariable("ClanName")}"`);
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.createdAt = "${mp.players.local.getVariable("ClanCreated")}"`);
+    setTimeout(() => {
+        mp.events.callRemote("Menu_RequestClansList");
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.name = "${mp.players.local.getVariable("ClanName")}"`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.createdAt = "${mp.players.local.getVariable("ClanCreated")}"`);
+        mp.events.callRemote("Menu_InitializeMyClanTab");  
+    }, 100);
+
 });
 
 mp.events.add("render", () => {
@@ -254,10 +258,12 @@ function ToggleMenu()
             ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.name = '${mp.players.local.name}'`);
             ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.createdAt = '${mp.players.local.getVariable("RegisterDate")}'`);
 
+            // Testing for now, loads all clan data such as members, clan kills, etc.
+            mp.events.callRemote("Menu_InitializeMyClanTab");
+
             if(FirstTimeMenuOpen){
                 FirstTimeMenuOpen = false;
 
-                mp.events.callRemote("Menu_InitializeMyClanTab");
             }
         }
         
