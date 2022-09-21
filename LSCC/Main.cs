@@ -2758,6 +2758,10 @@ namespace RNC
                                                             {
                                                                 Commands.cmd_specoff(player);
                                                             }
+                                                            if (player.GetSharedData<bool>("WeaponEditorActive"))
+                                                            {
+                                                                player.TriggerEvent("WeaponEditor:exit");
+                                                            }
                                                             player.SetSharedData("InDM", -1);
 
                                                             EPlayer.Spawn(player);
@@ -2765,7 +2769,6 @@ namespace RNC
 
                                                             if (player.GetSharedData<bool>("IsTabbed") == true || EPlayer.IsAFK(player))
                                                             {
-
                                                                 player.TriggerEvent("SendNotification", "AFK Check", "Chase is starting in 10 seconds",
                                                                     "Race 'N' Chase", 10);
                                                             }
@@ -3293,16 +3296,19 @@ namespace RNC
                     lobby.Fugitives.Clear();
                     lobby.GameProgress = 0;
 
+                    // DECIDING WHO GETS PUT IN COPCHASE LOBBY AND WHO DOESN'T!
+                    List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && 
+                    !EPlayer.IsAFK(a) && 
+                    !a.HasData("Spectating") && 
+                    a.GetSharedData<bool>("AutoJoin") == true && 
+                    !a.Dead &&
+                    !a.GetSharedData<bool>("WeaponEditorActive")).OrderBy(c => Guid.NewGuid()).ToList();
+                    pCount = lobbyPlayers.Count;
+
                     foreach (Player player in Settings.LoggedInPlayers)
                     {
-                        if (player.GetSharedData<int>("InLobby") == lobbyid && player.GetSharedData<bool>("AutoJoin") == true && !EPlayer.IsAFK(player) &&
-                            !player.HasData("Spectating"))
-                        {
-                            player.SetSharedData("InDM", -1);
-
-                            pCount++;
-                            player.TriggerEvent("ClearClimbTaseProtection", true);
-                        }
+                        player.TriggerEvent("MDC:RemoveAllBlips");
+                        player.TriggerEvent("ClearClimbTaseProtection", true);
                     }
 
                     if (pCount < 2) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Total players less than two, failed to start"); return; }
@@ -3327,16 +3333,11 @@ namespace RNC
                         {
                             List<MapSpawn> Spawns = new List<MapSpawn>();
                             List<int> UsedSpawns = new List<int>();
-                            List<Player> lobbyPlayers = new List<Player>();
                             List<Player> PutInsideCar = new List<Player>();
                             Player _tempPlayer;
                             Map map = null;
                             crashcheck = 1;
 
-                            NAPI.Task.Run(() =>
-                            {
-                                lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && !EPlayer.IsAFK(a) && !a.HasData("Spectating") && a.GetSharedData<bool>("AutoJoin") == true && !a.Dead).OrderBy(c => Guid.NewGuid()).ToList();
-                            });
                             await NAPI.Task.WaitForMainThread();
                             using (MainDatabase context = ContextFactory.CreateContext())
                             {

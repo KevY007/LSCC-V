@@ -935,12 +935,21 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("WeaponEditor:onOpen")]
+        public static void WeaponEditor_Open(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            player.SetSharedData("WeaponEditorActive", true);
+        }
+
         [RemoteEvent("WeaponEditor:onExit")]
         public static void WeaponEditor_Exit(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
             EPlayer.Spawn(player);
+            player.SetSharedData("WeaponEditorActive", false);
         }
 
         [RemoteEvent("WeaponEditor:onRequestRemoveAttachment")]
@@ -6186,15 +6195,13 @@ namespace RNC
                 player.SetSharedData("VisibleBlip", false);
 
                 if (player.GetSharedData<int>("InDM") == -1) player.TriggerEvent("SetActorInvulnerable", true);
+          
                 player.TriggerEvent("ToggleAFOB", false, 0);
                 player.TriggerEvent("showHPBars", 0); // Never show HP Bars.
 
                 EPlayer.SetColor(player, new Color(255, 255, 255, 255));
 
-
                 player.TriggerEvent("ToggleHud", true);
-
-
 
                 if (player.GetSharedData<int>("InLobby") == -3) // Freeroam
                 {

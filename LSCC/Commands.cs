@@ -2712,7 +2712,6 @@ namespace RNC
         [Command("weaponeditor")]
         public void cmd_weaponeditor(Player player)
         {
-            EPlayer.SendMessage(player, $"Loading editor...");
             foreach(KeyValuePair<long, string> weapon in Main.WeaponReasons)
             {
                 player.GiveWeapon((WeaponHash)weapon.Key, 1);
@@ -4538,12 +4537,12 @@ namespace RNC
             LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
             if (elobby == null) return;
 
-            if (elobby.gameStatus == 2)
+            /*if (elobby.gameStatus == 2)
             {
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot go into DM while the match is starting!");
                 EPlayer.Notify(player, "Unable to join.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
-            }
+            }*/
 
             if (elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
             {
@@ -4582,13 +4581,14 @@ namespace RNC
                 LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
                 if (elobby != null)
                 {
-
+                    /*
                     if (elobby.gameStatus == 2)
                     {
                         player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot go into freeroam while the match is starting!");
                         EPlayer.Notify(player, "You cannot go into freeroam while copchase is starting!", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
                         return;
                     }
+                    */
 
                     if (elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
                     {
@@ -4645,13 +4645,14 @@ namespace RNC
             {
                 LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
                 if (elobby == null) return;
-
+                /*
                 if (elobby.gameStatus == 2)
                 {
                     player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot go into derby while the match is starting!");
                     EPlayer.Notify(player, "You cannot join derby while the copchase is starting!", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
                     return;
                 }
+                */
             }
 
             if (player.HasData("DerbyVehicle"))

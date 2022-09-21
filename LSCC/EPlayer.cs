@@ -892,6 +892,7 @@ namespace RNC
             player.TriggerEvent("UpdateMenuItem", type, owned);
         }
 
+
         public static void ResetPlayerData(Player player)
         {
             lock (player)
@@ -912,6 +913,7 @@ namespace RNC
                 player.ResetData("LockpickTarget");
                 player.SetSharedData("PlacingStingers", false);
 
+                player.SetSharedData("WeaponEditorActive", false);
                 player.SetData<bool>("ShotsFired", false);
 
                 player.ResetData("DragoutVehicle");
