@@ -165,6 +165,7 @@ mp.events.add('actionMenu:open', () => {
     if(chatStatus == true || menuToggled == true || MDCActive == true || scoreboardToggled == true
         || VehicleSpawnerActive == true || WeaponEditorActive == true) return;
 
+    mp.game.invoke("0xFC695459D4D0E219", 0.5, 0.5); // SET CURSOR POSITION TO CENTER [x,y = 0.5,0.5]
     ActionMenuActive = true;
     mp.events.callLocal("actionMenu:removeAllItems");
     actionMenu_lobbyCheck();
