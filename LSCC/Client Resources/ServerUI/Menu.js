@@ -152,14 +152,40 @@ mp.events.add("Menu_UpdateClanMember", (memberID, memberName, memberTier, member
 
     `);
 });
-mp.events.add("Menu_AddClanMember", (memberID, memberName, memberTier, memberLevel) => {
+
+mp.events.add("Menu_InitClanSettings", (clanAccess, copchasePartnering, forceTag) => {
+    ServerUI.execute(`
+        gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.settingsTab.copchasePartnering = ${copchasePartnering.toString()};   
+        gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.settingsTab.forceClanTag = ${forceTag.toString()};    
+        gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.settingsTab.clanAccess = "${clanAccess}";   
+    `);
+});
+mp.events.add("Menu_UpdateClanSetting", (type, value) => {
+    switch(type){
+        case "access":{ 
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.settingsTab.clanAccess = "${value}";`);
+            break;
+        }
+        case "partnering":{ 
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.settingsTab.copchasePartnering = ${value.toString()};`);
+            break;
+        }
+        case "forcetag":{ 
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.settingsTab.forceClanTag = ${value.toString()};`);
+            break;
+        }
+    }
+});
+
+mp.events.add("Menu_AddClanMember", (memberID, memberName, memberTier, memberLevel, isOnline) => {
 
     ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.push(
         {
             id: ${memberID},
             name: '${memberName}',
             level: ${memberLevel},
-            tier: ${memberTier}
+            tier: ${memberTier},
+            online: ${isOnline.toString()}
         });`);
 });
 mp.events.add("Menu_ClearClanMembers", () => {
@@ -299,6 +325,7 @@ function ToggleMenu()
             if(FirstTimeMenuOpen){
                 FirstTimeMenuOpen = false;
 
+                mp.events.callRemote("Menu_RequestClanSettings");
             }
             menuToggledLate = true;
         }

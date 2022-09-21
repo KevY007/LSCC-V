@@ -1236,6 +1236,43 @@ namespace RNC
             // GameUpdate() will then handle the deployment timer and create new objects if necessary.
         }
 
+        [RemoteEvent("Menu_RequestClanSettings")]
+        public void Clan_OnRequestSettings(Player player)
+        {
+            Account pAcc = EPlayer.GetAccount(player);
+            if (player.GetSharedData<int>("ClanID") == -1)
+            {
+                return;
+            }
+            if (player.GetSharedData<int>("ClanTier") > 0)
+            {
+                return;
+            }
+            int pClanID = player.GetSharedData<int>("ClanID");
+
+            int playerSQLID = pAcc.SQL_ID;
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Clan pClan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == pClanID);
+                    if (pClan == null)
+                    {
+                        return;
+                    }
+                    int cAccess = pClan.ClanAccess;
+                    bool cForceTag = pClan.ForceTag;
+                    bool cPartnering = pClan.CopchasePartnering;
+                    NAPI.Task.Run(() =>
+                    {
+                        string accStr = "Invite-Only";
+                        if (cAccess == 1) accStr = "Public";
+                        player.TriggerEvent("Menu_InitClanSettings", accStr, cPartnering, cForceTag);
+                    });
+                }
+            });
+        }
+
         [RemoteEvent("Clan_OnRequestChangeSetting")]
         public void Clan_OnRequestChangeSetting(Player player, int settingID, int value)
         {
@@ -1275,6 +1312,10 @@ namespace RNC
                                 await context.SaveChangesAsync();
                                 NAPI.Task.Run(() =>
                                 {
+                                    string accString = "Invite-Only";
+                                    if (value == 1) accString = "Public";
+
+                                    player.TriggerEvent("Menu_UpdateClanSetting", "access", accString);
                                     EPlayer.Notify(player, $"You've set your clan access to <strong>{(value == 0 ? "Invite-Only" : "Public")}</strong>!", "success", "fa-success", false, 3000);
                                     player.TriggerEvent("UpdateMenuClanTab");
                                 });
@@ -1286,6 +1327,7 @@ namespace RNC
                                 await context.SaveChangesAsync();
                                 NAPI.Task.Run(() =>
                                 {
+                                    player.TriggerEvent("Menu_UpdateClanSetting", "forcetag", (value == 1));
                                     EPlayer.Notify(player, $"You will {(value == 1 ? "now" : "no longer")} force your clan members to have the clan tag before their name!", "success", "fa-success", false, 3000);
                                     player.TriggerEvent("UpdateMenuClanTab");
                                 });
@@ -1297,6 +1339,7 @@ namespace RNC
                                 await context.SaveChangesAsync();
                                 NAPI.Task.Run(() =>
                                 {
+                                    player.TriggerEvent("Menu_UpdateClanSetting", "partnering", (value == 1));
                                     EPlayer.Notify(player, $"Your clan members will {(value == 1 ? "now" : "no longer")} spawn together in police vehicles as cops!", "success", "fa-success", false, 3000);
                                     player.TriggerEvent("UpdateMenuClanTab");
                                 });
@@ -1702,7 +1745,7 @@ namespace RNC
                         EPlayer.SendMessage(player, $"~g~[CLAN] ~w~Best of luck!");
 
                         player.TriggerEvent("Menu_ClearClanMembers");
-                        player.TriggerEvent("Menu_AddClanMember", acc.SQL_ID, acc.Username, 0, acc.Level);
+                        player.TriggerEvent("Menu_AddClanMember", acc.SQL_ID, acc.Username, 0, acc.Level, true);
                         player.TriggerEvent("Menu_UpdateClanStats", 0, 0, 0);
                         player.TriggerEvent("UpdateMenuClanTab");
 
@@ -3961,7 +4004,9 @@ namespace RNC
                             player.TriggerEvent("Menu_ClearClanMembers");
                             foreach (Account accnt in clanAccounts)
                             {
-                                player.TriggerEvent("Menu_AddClanMember", accnt.SQL_ID, accnt.Username, accnt.ClanTier, accnt.Level);
+                                bool isOnline = (Settings.LoggedInPlayers.FirstOrDefault(p => EPlayer.GetAccount(player).SQL_ID == accnt.SQL_ID) != null);
+
+                                player.TriggerEvent("Menu_AddClanMember", accnt.SQL_ID, accnt.Username, accnt.ClanTier, accnt.Level, isOnline);
                             }
                             player.TriggerEvent("Menu_UpdateClanStats", playerClan.WeekKills, playerClan.TotalKills, playerClan.WeekWins);
 
