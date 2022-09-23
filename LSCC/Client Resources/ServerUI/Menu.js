@@ -287,7 +287,8 @@ function ToggleMenu()
     }
     if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
         (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
-        (ActionMenuActive !== undefined && ActionMenuActive == true)){
+        (ActionMenuActive !== undefined && ActionMenuActive == true) ||
+        (isHotwiring !== undefined && isHotwiring == true)){
         return;
     }
     if(scoreboardToggled)
@@ -698,6 +699,7 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     else if(id == 2)
     {
         mp.storage.data.menu.killFeed = value;
+        ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.killFeed.enabled = ${value.toString()}`);
     }
     else if(id == 3)
     {

@@ -3155,7 +3155,8 @@ namespace RNC
                     i.TriggerEvent("BankRob_ClearFugiCarBlips");
                     i.TriggerEvent("BankRob_ClearFinishMarker");
                     i.TriggerEvent("BankRob_SetMusic", -1);
-
+                    i.TriggerEvent("StopHotwire");
+                    i.TriggerEvent("stopLockpicking");
                     i.TriggerEvent("ClearClimbTaseProtection", true);
 
                     i.ResetData("DragoutVehicle");

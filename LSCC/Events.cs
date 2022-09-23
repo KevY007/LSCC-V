@@ -755,6 +755,29 @@ namespace RNC
             player.SetSharedData("VoiceMode", voiceMode);
         }
 
+        [RemoteEvent("OnHotwireResult")]
+        public static void OnHotwireResult(Player player, bool success)
+        {
+            if(!player.IsInVehicle || player.Vehicle == null || player.VehicleSeat != 0)
+            {
+                EPlayer.Error(player, $"Hotwire failed - your vehicle no longer exists or you are not the driver!");
+                player.TriggerEvent("StopHotwire");
+                return;
+            }
+
+            if (!success)
+            {
+                EPlayer.Error(player, $"You failed the hotwire minigame! Please try again...");
+                player.TriggerEvent("StopHotwire");
+            }
+            else
+            {
+                player.Vehicle.EngineStatus = true;
+                player.Vehicle.SetSharedData("Engine", true);
+                EPlayer.Action(player, "turns the vehicle's engine on.");         
+            }
+        }
+
         [RemoteEvent("actionMenu_SelectedItem")]
         public static void OnActionMenuSelectedItem(Player player, int actionID)
         {
@@ -798,6 +821,12 @@ namespace RNC
                     break;
                 case 11:
                     Commands.cmd_dragout(player);
+                    break;
+                case 13:
+                    Commands.cmd_engine(player);
+                    break;
+                case 14:
+                    Commands.cmd_hotwire(player);
                     break;
                 default:
                     EPlayer.Error(player, $"Invalid quick-action attempt, ID: {actionID}. Report this to the developers!");
@@ -1950,6 +1979,9 @@ namespace RNC
                         player.TriggerEvent("ToggleCollisionsForEnt", player, false);
                     }
                 }
+
+                player.TriggerEvent("StopHotwire");
+                player.TriggerEvent("stopLockpicking");
 
                 if (vehicle.HasSharedData("Engine"))
                 {

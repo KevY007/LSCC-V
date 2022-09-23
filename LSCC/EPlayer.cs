@@ -2423,7 +2423,8 @@ namespace RNC
                     }
                 }
 
-
+                player.TriggerEvent("StopHotwire");
+                player.TriggerEvent("stopLockpicking");
 
                 foreach (LobbyData lobby in Settings.Lobbies)
                 {

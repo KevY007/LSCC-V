@@ -5836,6 +5836,26 @@ namespace RNC
             return;
         }
 
+        [Command("hotwire")]
+        public static void cmd_hotwire(Player player)
+        {
+            if(!player.IsInVehicle || player.Vehicle == null || player.Vehicle.EngineStatus == true)
+            {
+                return;
+            }
+
+            if (player.Vehicle.HasSharedData("Team") && (player.Vehicle.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") || player.Vehicle.GetSharedData<int>("Team") == 10) &&
+            player.Vehicle.EngineStatus == false)
+            {
+                EPlayer.SendMessage(player, $"~y~[HOTWIRE]~w~ You are now hotwiring the vehicle. Press the correct arrow keys.");
+                player.TriggerEvent("StartHotwire");
+            }
+            else
+            {
+                EPlayer.SendMessage(player, "!{#FF6347}[!] ~w~You have the keys for this vehicle, no need to hotwire it!");
+            }
+        }
+
         [Command("checkplayer", "!{#AFAFAF}[USAGE] checkplayer (account name) | Checks & gets all associated accounts with a player")]
         public void cmd_checkplayer(Player player, string accountname)
         {

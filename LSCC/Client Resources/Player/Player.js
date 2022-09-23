@@ -2751,6 +2751,9 @@ mp.events.add("OnPlayerLoginRegister", () => {
     setTimeout(() => {
         InitializeWeaponEditor();
     }, 350);
+    setTimeout(() => {
+        InitializeHotwireDOM();
+    }, 400);
 
     setTimeout(() => {
         focusChat(false);

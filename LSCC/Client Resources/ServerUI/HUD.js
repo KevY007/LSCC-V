@@ -153,7 +153,7 @@ mp.events.add('actionMenu:close', () => {
 });
 mp.events.add('actionMenu:open', () => {
     if(chatStatus == true || menuToggled == true || MDCActive == true || scoreboardToggled == true
-        || VehicleSpawnerActive == true || WeaponEditorActive == true) return;
+        || VehicleSpawnerActive == true || WeaponEditorActive == true || isHotwiring == true) return;
 
     mp.game.invoke("0xFC695459D4D0E219", 0.5, 0.5); // SET CURSOR POSITION TO CENTER [x,y = 0.5,0.5]
     ActionMenuActive = true;
@@ -240,6 +240,16 @@ mp.events.add('actionMenu:clickItem', (actionID) => {
         case 12: // Handcuff/revive message tip sends them to hold 'H'
         {
             ServerUI.execute(`toast('Hotkey Help', 'You must <strong>hold down "H"</strong> to perform that action!', 'warning', 3000);`);
+            break;
+        }
+        case 13: // Engine command
+        {
+            mp.events.callRemote("actionMenu_SelectedItem", actionID);
+            break;
+        }
+        case 14: // Hotwire command
+        {
+            mp.events.callRemote("actionMenu_SelectedItem", actionID);
             break;
         }
     }
@@ -333,6 +343,16 @@ function actionMenu_vehicleCheck(){
         else mp.events.callLocal("actionMenu:addItem", 0, "Lock", "#f87171", "fa-lock-keyhole");
 
         mp.events.callLocal("actionMenu:addItem", 1, "Seatbelt", "#fb923c", "fa-shield-slash");
+
+        if(vehicle.engine == true){
+            mp.events.callLocal("actionMenu:addItem", 13, "Engine", "#60a5fa", "fa-engine");
+        }
+        else{
+            if(vehicle.getVariable("Team") != mp.players.local.getVariable("Team")){
+                mp.events.callLocal("actionMenu:addItem", 14, "Hotwire", "#60a5fa", "fa-bolt");
+            }
+            else mp.events.callLocal("actionMenu:addItem", 13, "Engine", "#60a5fa", "fa-engine");
+        }
     }
     else{
         mp.vehicles.forEachInRange(mp.players.local.position, 3.5, (vehicle) => {
@@ -450,7 +470,8 @@ function focusChat(toggle){
     }
     if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
     (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
-    (ActionMenuActive !== undefined && ActionMenuActive == true)){
+    (ActionMenuActive !== undefined && ActionMenuActive == true) || 
+    (isHotwiring !== undefined && isHotwiring == true)){
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = false;`);
         return;
     }
@@ -552,6 +573,22 @@ mp.keys.bind(0x1B, true, function() { // ESC key
 });
 
 mp.keys.bind(0x54, true, function() { // T key
+    if(ServerUI == null) return;
+    if(menuToggled){
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = false;`);
+        return;
+    }
+    if(mp.storage.data.menu.HUD !== undefined && mp.storage.data.menu.HUD == false){
+        return;
+    }
+    if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
+    (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
+    (ActionMenuActive !== undefined && ActionMenuActive == true) || 
+    (isHotwiring !== undefined && isHotwiring == true)){
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = false;`);
+        return;
+    }
+
     if(!chatStatus)
     {
         focusChat(true);

@@ -374,6 +374,10 @@ mp.events.add("startLockpicking", (donorLevel) => {
 });
 
 // true = success ; false = fail
+mp.events.add("stopLockpicking", () => {
+    isLockpicking = false;
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.quickAction.enabled = false;`);   
+});
 mp.events.add("sendLockpickResult", (result) => {
     isLockpicking = false;
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.quickAction.enabled = false;`);   
