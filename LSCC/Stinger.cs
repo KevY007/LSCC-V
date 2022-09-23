@@ -30,6 +30,31 @@ namespace RNC
         }
 
         public static List<Stinger> Stingers = new List<Stinger>();
+
+        public static void ClearStingers(int lobbyID)
+        {
+            LobbyData _l = Settings.Lobbies.Find(l => l.lobbyId == lobbyID);
+            if (_l != null) ClearStingers(_l);
+        }
+        public static void ClearStingers(LobbyData lobby)
+        {
+            foreach(Lobby_StingerData lobbyStinger in lobby.Stingers)
+            {
+                foreach(GTANetworkAPI.Object stingerObject in lobbyStinger.StingerObjects)
+                {
+                    stingerObject.Delete();
+                }
+                foreach(ColShape stingerShape in lobbyStinger.StingerColshapes)
+                {
+                    stingerShape.Delete();
+                }
+                foreach(Ped stingerPed in lobbyStinger.StingerPeds)
+                {
+                    stingerPed.Delete();
+                }
+            }
+            lobby.Stingers.Clear();
+        }
     }
     public class StingerInfo : Script
     {

@@ -143,6 +143,7 @@ namespace RNC
         public int ID;
         public List<GTANetworkAPI.Object> StingerObjects = new List<GTANetworkAPI.Object>();
         public List<ColShape> StingerColshapes = new List<ColShape>();
+        public List<Ped> StingerPeds = new List<Ped>();
 
         /*
         SPIKE STAGES:
@@ -2969,6 +2970,7 @@ namespace RNC
         public static bool StopGame(int lobbyid, int reason)
         {
             LobbyData lobby = Settings.Lobbies.Find(l => l.lobbyId == lobbyid);
+            Stinger.ClearStingers(lobby);
 
             int winnerTeam = -1;
             if (lobby != null && lobby.gameStatus == 1)
@@ -3147,6 +3149,7 @@ namespace RNC
                 {
                     if (i.GetSharedData<int>("InLobby") != lobby.lobbyId) continue;
 
+                    i.TriggerEvent("MDC:RemoveAllBlips");
                     i.TriggerEvent("ResetKillFeed");
                     i.SetSharedData("HeistLeader", false);
                     i.TriggerEvent("BankRob_ClearFugiCarBlips");
@@ -3291,6 +3294,7 @@ namespace RNC
 
                     lobby.gameStatus = 0;
                     int pCount = 0;
+                    Stinger.ClearStingers(lobby);
 
                     lobby.Cops.Clear();
                     lobby.Fugitives.Clear();
@@ -3305,7 +3309,7 @@ namespace RNC
                     !a.GetSharedData<bool>("WeaponEditorActive")).OrderBy(c => Guid.NewGuid()).ToList();
                     pCount = lobbyPlayers.Count;
 
-                    foreach (Player player in Settings.LoggedInPlayers)
+                    foreach (Player player in lobbyPlayers)
                     {
                         player.TriggerEvent("MDC:RemoveAllBlips");
                         player.TriggerEvent("ClearClimbTaseProtection", true);
@@ -5219,8 +5223,8 @@ namespace RNC
                                     foreach (StingerInfo sgobject in stdata.StingerObjects.Where(s => s.IsNPC))
                                     {
                                         bool female = new Random().Next(0, 10) > 5;
-                                        NAPI.Ped.CreatePed(female ? PedHash.Cop01SFY : PedHash.Cop01SMY, sgobject.Position, sgobject.Rotation.Z, Convert.ToUInt32(lobby.lobbyId));
-
+                                        Ped stPed = NAPI.Ped.CreatePed(female ? PedHash.Cop01SFY : PedHash.Cop01SMY, sgobject.Position, sgobject.Rotation.Z, Convert.ToUInt32(lobby.lobbyId));
+                                        stinger.StingerPeds.Add(stPed);
                                     }
                                 }
                             }
