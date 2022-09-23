@@ -56,6 +56,7 @@ namespace RNC
         public int Deaths { get; set; }
         public int Arrests { get; set; }
         public int Escapes { get; set; }
+        public bool FinishedTutorial { get; set; }
         public int Lockpicks { get; set; }
         public int DerbyWins { get; set; }
         public int DonatorPoints { get; set; }

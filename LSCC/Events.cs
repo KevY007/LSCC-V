@@ -2758,6 +2758,39 @@ namespace RNC
             player.SetSharedData("PlayerWeather", weatherid);
         }
 
+        [RemoteEvent("Server_FinishTutorial")]
+        public static void OnFinishTutorial(Player player, bool useVoice, string language)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            int voiceMode = (useVoice ? 0 : 4);
+            OnSetVoiceMode(player, voiceMode, false);
+            player.TriggerEvent("setVoiceModeMenu", voiceMode);
+
+            string realLanguage = language.Substring(0, language.IndexOf('/'));
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Language lang = await context.Languages.AsQueryable().FirstOrDefaultAsync(l => l.LanguageName.Equals(realLanguage));
+                    int lID = lang.SQL_ID;
+                    NAPI.Task.Run(() =>
+                    {
+                        if(lang == null)
+                        {
+                            EPlayer.GetAccount(player).Language = -1;
+                        }
+                        else
+                        {
+                            EPlayer.GetAccount(player).Language = lID;
+                        }
+
+                        EPlayer.ShowCharCreator(player);
+                    });
+                }
+            });
+        }
+
         [RemoteEvent("SpectateChangeHPAR")]
         public static void SpectateHPARChange(Player player, int health, int armour)
         {
@@ -2903,21 +2936,39 @@ namespace RNC
                         ConvChar = NAPI.Util.FromJson<CharacterData>(acc.Character);
 
                         EPlayer.ApplyCharacter(player, ConvChar, acc.LobbyClothing);
-
-                        EPlayer.Spawn(player);
+                        if (acc.FinishedTutorial)
+                        {
+                            EPlayer.Spawn(player);
+                        }
+                        else
+                        {
+                            player.TriggerEvent("TogglePlayerChat", false);
+                            player.TriggerEvent("ShowTutorial");
+                            EPlayer.Error(player, $"It appears you haven't gone through the setup & tutorial yet! Showing it now...");
+                        }
                     }
                     catch
                     {
-                        player.TriggerEvent("DestroyPlayerCamera");
-                        player.TriggerEvent("TogglePlayerChat", true);
-
                         CharacterData charp = new CharacterData();
                         EPlayer.GetAccount(player).Character = "{}";
                         EPlayer.ApplyCharacter(player, charp); // Give them the default CHAR.
-                        EPlayer.Spawn(player);
+                        if (acc.FinishedTutorial)
+                        {
+                            player.TriggerEvent("DestroyPlayerCamera");
+                            player.TriggerEvent("TogglePlayerChat", true);
 
-                        EPlayer.Notify(player, "Sorry, your character was reset (possibly due to an update), please create a new one. (<strong>/char</strong>)", "yellow", "fas fa-tshirt", false, 7000);
+                         
+                            EPlayer.Spawn(player);
+
+                            EPlayer.Notify(player, "Sorry, your character was reset (possibly due to an update), please create a new one. (<strong>/char</strong>)", "yellow", "fas fa-tshirt", false, 7000);
+                        }
+                        else
+                        {
+                            player.TriggerEvent("ShowTutorial");
+                            EPlayer.Error(player, $"It appears you haven't gone through the setup & tutorial yet! Showing it now...");
+                        }
                     }
+                       
 
                     if (acc.WeaponComponents == null || acc.WeaponComponents.Length < 4)
                     {
@@ -3606,8 +3657,8 @@ namespace RNC
 
             player.SetData<long>("JoinTimeUnix", DateTimeOffset.Now.ToUnixTimeSeconds());
 
+            //EPlayer.ShowCharCreator(player);
 
-            EPlayer.ShowCharCreator(player);
 
             // Adding the 5 default characters to the outfits section so he has his own entry in the outfits table bla bla boring
             CharacterData[] defaultOutfits = new CharacterData[5];
@@ -3637,6 +3688,7 @@ namespace RNC
             EPlayer.Notify(player, "Registration successful!", "green", "fas fa-check", false, 2000);
 
             player.TriggerEvent("showLoginBrowser", false);
+            player.TriggerEvent("StartTutorial");
 
             EPlayer.Menu_AddItems(player);
             Achievement.LoadAchievementsForPlayer(player);
@@ -5030,6 +5082,7 @@ namespace RNC
                                     JailTime = 0,
                                     JailReason = "N/A",
                                     DerbyWins = 0,
+                                    FinishedTutorial = false,
                                     Level = 1,
                                     Medkits = 0,
                                     Painkillers = 0,
