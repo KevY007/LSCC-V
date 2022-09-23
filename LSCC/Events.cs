@@ -828,15 +828,15 @@ namespace RNC
                 Commands.cmd_lock(player);
             }
 
-            if (keyId == 0x59)
-            {
-                Commands.cmd_engine(player);
-            }
+            // if (keyId == 0x59)
+            // {
+            //     Commands.cmd_engine(player);
+            // }
 
-            if(keyId == 0x4A && player.IsInVehicle)
-            {
-                Commands.cmd_seatbelt(player);
-            }
+            // if(keyId == 0x4A && player.IsInVehicle)
+            // {
+            //     Commands.cmd_seatbelt(player);
+            // }
 
             if (keyId == 0x09)
             {

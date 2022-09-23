@@ -20,6 +20,11 @@ var currentMuteTime = 0;
 var lastMuteUpdate = 10;
 var lastFunc = "Init";
 
+var curMDCBind = 0x4B;
+var lastMDCBind = 0x4B;
+var curActionMenuBind = 0x59;
+var lastActionMenuBind = 0x59;
+
 var BankRobberyOn = false;
 
 var ShowVehicleDL = false;

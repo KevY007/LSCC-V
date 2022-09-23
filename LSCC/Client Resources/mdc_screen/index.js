@@ -72,8 +72,6 @@ function ToggleMDC(){
     
 }
 
-mp.keys.bind(0x4B, true, ToggleMDC);
-
 mp.events.add("OneSecondEvent", () => {
     if(mp.players.local.getVariable("Team") != 1) return;
 

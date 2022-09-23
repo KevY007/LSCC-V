@@ -387,7 +387,82 @@ if(mp.storage.data.radiotoggle !== undefined)
 {
     radioToggle = mp.storage.data.radiotoggle;
 }
+if(mp.storage.data.actionmenubind !== undefined){
+    curActionMenuBind = mp.storage.data.actionmenubind;
+    lastActionMenuBind = mp.storage.data.actionmenubind;
+}
+if(mp.storage.data.mdcbind !== undefined){
+    curMDCBind = mp.storage.data.mdcbind;
+    lastMDCBind = mp.storage.data.mdcbind;
+}
 
+function changeActionMenuBind(bind){
+    bind = Number(bind);
+
+    if (!Number.isInteger(bind)) {
+        return;
+    }
+
+    if(mp.storage.data.actionmenubind !== undefined){
+        mp.keys.unbind(mp.storage.data.actionmenubind, true, actionMenuOpen);
+        mp.keys.unbind(mp.storage.data.actionmenubind, false, actionMenuClose);
+    }
+    else{
+        mp.keys.unbind(0x59, true, actionMenuOpen);
+        mp.keys.unbind(0x59, false, actionMenuClose);
+    }
+
+    mp.storage.data.actionmenubind = bind;
+
+    mp.storage.flush();
+
+    lastActionMenuBind = curActionMenuBind;
+    curActionMenuBind = bind;
+
+    mp.keys.unbind(lastActionMenuBind, true, actionMenuOpen);
+    mp.keys.unbind(lastActionMenuBind, false, actionMenuClose);
+    mp.keys.bind(curActionMenuBind, true, actionMenuOpen);
+    mp.keys.bind(curActionMenuBind, false, actionMenuClose);
+
+    mp.events.callLocal("HUDNotify", `MDC key is now binded to <strong>${String.fromCharCode(curActionMenuBind)}</strong>.`, "blue", "fas fa-check", false, 
+        1000, "bottomCenter", "replace");
+
+    mp.events.callLocal("RemoveTooltip", String.fromCharCode(lastActionMenuBind));
+}
+
+function changeMdcBind(bind){
+    bind = Number(bind);
+
+    if (!Number.isInteger(bind)) {
+        return;
+    }
+
+    if(mp.storage.data.mdcbind !== undefined){
+        mp.keys.unbind(mp.storage.data.mdcbind, true, ToggleMDC);
+    }
+    else{
+        mp.keys.unbind(0x4B, true, ToggleMDC);
+    }
+
+    mp.storage.data.mdcbind = bind;
+
+    mp.storage.flush();
+
+    lastMDCBind = curMDCBind;
+    curMDCBind = bind;
+
+    mp.keys.unbind(lastMDCBind, true, ToggleMDC);
+    mp.keys.bind(curMDCBind, true, ToggleMDC);
+
+    mp.events.callLocal("HUDNotify", `MDC key is now binded to <strong>${String.fromCharCode(curMDCBind)}</strong>.`, "blue", "fas fa-check", false, 
+        1000, "bottomCenter", "replace");
+
+    mp.events.callLocal("RemoveTooltip", String.fromCharCode(lastMDCBind));
+}
+
+mp.keys.bind(lastActionMenuBind, true, actionMenuOpen);
+mp.keys.bind(lastActionMenuBind, false, actionMenuClose);
+mp.keys.bind(lastMDCBind, true, ToggleMDC);
 mp.keys.bind(lastGPSBind, true, TogGPSMode);
 
 mp.events.addCommand("gpsbind", function (bind) {
@@ -433,15 +508,15 @@ mp.keys.bind(0x4C, false, function() {
     }
 });
 
-mp.keys.bind(0x59, false, function() {
-    if(menuToggled !== undefined && menuToggled) return;
-    if(Date.now() - lastChatToggle >= 500 && chatStatus == false)
-    {
-        traceLastFunc(`[Players] Attempt Y key/engine`);
+// mp.keys.bind(0x59, false, function() {
+//     if(menuToggled !== undefined && menuToggled) return;
+//     if(Date.now() - lastChatToggle >= 500 && chatStatus == false)
+//     {
+//         traceLastFunc(`[Players] Attempt Y key/engine`);
 
-        mp.events.callRemote("OnScriptedKeyPress", 0x59, true);
-    }
-});
+//         mp.events.callRemote("OnScriptedKeyPress", 0x59, true);
+//     }
+// });
 
 mp.keys.bind(0x42, true, _ => {
     if(menuToggled !== undefined && menuToggled) return;
@@ -866,17 +941,17 @@ mp.events.add("ClearClimbTaseProtection", (reset_cooldown) => {
 });
 
 
-mp.keys.bind(0x4A, false, () => {
+// mp.keys.bind(0x4A, false, () => {
 
-    if (mp.players.local.isInAnyVehicle(false) && chatStatus == false && Date.now() - lastChatToggle >= 500 && 
-        !menuToggled && !scoreboardToggled)
-    {
-        if(mp.players.local.vehicle.getClass() != 8 && mp.players.local.vehicle.model != mp.game.joaat('policeb')) 
-        { // NO BIKE FUCKERS ALLOWED CUZ YALL GOT "ANTI FALL OFF BIKE" SMH
-            mp.events.callRemote("OnScriptedKeyPress", 0x4A, true); // For toggling da sseeaattbbelltt
-        }
-    }
-});
+//     if (mp.players.local.isInAnyVehicle(false) && chatStatus == false && Date.now() - lastChatToggle >= 500 && 
+//         !menuToggled && !scoreboardToggled)
+//     {
+//         if(mp.players.local.vehicle.getClass() != 8 && mp.players.local.vehicle.model != mp.game.joaat('policeb')) 
+//         { // NO BIKE FUCKERS ALLOWED CUZ YALL GOT "ANTI FALL OFF BIKE" SMH
+//             mp.events.callRemote("OnScriptedKeyPress", 0x4A, true); // For toggling da sseeaattbbelltt
+//         }
+//     }
+// });
 
 let clearTaseAnimTimer = null;
 mp.events.add("clearTaseAnims", (time) => {

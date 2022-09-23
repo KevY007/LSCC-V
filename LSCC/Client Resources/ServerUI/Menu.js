@@ -428,6 +428,20 @@ function ToggleMenu()
                         name: "bigmapbind",
                         label: "Expanded Minimap",
                         description: "Toggles the larger minimap view."
+                      },
+                      {
+                        id: 23,
+                        type: 3,
+                        name: "actionmenubind",
+                        label: "Quick-Action Menu",
+                        description: "Opens the quick-action menu when held down, closes it when key is let go."
+                      },
+                      {
+                        id: 24,
+                        type: 3,
+                        name: "mdcbind",
+                        label: "Police MDC",
+                        description: "Toggles the police Mobile Data Computer."
                       }
                 ]
             },
@@ -624,6 +638,8 @@ function ToggleMenu()
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.vcbind[0].value = "${String.fromCharCode(curVoiceBind)}";`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.gpsbind[0].value = "${String.fromCharCode(curGPSBind)}";`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.bigmapbind[0].value = "${String.fromCharCode(curMapBind)}";`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.actionmenubind[0].value = "${String.fromCharCode(curActionMenuBind)}";`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.mdcbind[0].value = "${String.fromCharCode(curMDCBind)}";`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.myweather[0].value = "${menuSetting_getOptionNameFromValue("weather", mp.storage.data.menu.myweather)}";`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autojoinopt[0].value = ${mp.storage.data.menu.AutoJoin};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.eventmusic[0].value = ${mp.storage.data.menu.EventMusic};`);
@@ -768,6 +784,14 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     else if(id == 22)
     {
         mp.storage.data.menu.RealtimeSpeedo = value;
+    }
+    else if(id == 23)
+    {
+        changeActionMenuBind(value);
+    }
+    else if(id == 24)
+    {
+        changeMDCBind(value);
     }
 
     if(ServerUI != null)
