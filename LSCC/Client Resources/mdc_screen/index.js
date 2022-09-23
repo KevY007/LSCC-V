@@ -56,8 +56,8 @@ function InitializeMDC(){
     MDC_DOM.active = false;
 }
 function ToggleMDC(){
-    if(mp.players.local.getVariable("Admin") < 6) return;
-    if(menuToggled == true || chatStatus == true) return;
+    if(mp.players.local.getVariable("Team") != 1 || mp.players.local.getVariable("Wounded") > 0) return;
+    if(menuToggled == true || chatStatus == true || ActionMenuActive == true) return;
 
     if(scoreboardToggled)
     {
