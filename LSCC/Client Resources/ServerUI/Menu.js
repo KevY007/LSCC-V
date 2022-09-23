@@ -116,6 +116,10 @@ mp.events.add("setClanRank", (memberSQLID, tier) => {
 mp.events.add("invitePlayerToClan", (playerName) => {
     mp.events.callRemote("Clan_OnRequestInvitePlayer", playerName);
 });
+
+mp.events.add("requestLeaveClan", () => {
+    mp.events.callRemote("OnRequestLeaveClan");
+});
 /*
     CLAN SETTING IDs and VALUES
 

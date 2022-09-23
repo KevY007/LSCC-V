@@ -2773,19 +2773,23 @@ namespace RNC
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
                     Language lang = await context.Languages.AsQueryable().FirstOrDefaultAsync(l => l.LanguageName.Equals(realLanguage));
-                    int lID = lang.SQL_ID;
+                    int lID = -1;
+                    if(lang == null)
+                    {
+                        lID = -1;
+                    }
+                    else
+                    {
+                        lID = lang.SQL_ID;
+                    }
                     NAPI.Task.Run(() =>
                     {
-                        if(lang == null)
-                        {
-                            EPlayer.GetAccount(player).Language = -1;
-                        }
-                        else
-                        {
-                            EPlayer.GetAccount(player).Language = lID;
-                        }
-
+                        player.TriggerEvent("DestroyPlayerCamera");
+                        EPlayer.GetAccount(player).Language = lID;
+                        player.TriggerEvent("DestroyLoginScene");
                         EPlayer.ShowCharCreator(player);
+                        EPlayer.GetAccount(player).FinishedTutorial = true;
+                        EPlayer.Save(player);
                     });
                 }
             });
@@ -2939,11 +2943,12 @@ namespace RNC
                         if (acc.FinishedTutorial)
                         {
                             EPlayer.Spawn(player);
+                            player.TriggerEvent("DestroyLoginScene");
                         }
                         else
                         {
                             player.TriggerEvent("TogglePlayerChat", false);
-                            player.TriggerEvent("ShowTutorial");
+                            player.TriggerEvent("StartTutorial");
                             EPlayer.Error(player, $"It appears you haven't gone through the setup & tutorial yet! Showing it now...");
                         }
                     }
@@ -2959,12 +2964,13 @@ namespace RNC
 
                          
                             EPlayer.Spawn(player);
+                            player.TriggerEvent("DestroyLoginScene");
 
                             EPlayer.Notify(player, "Sorry, your character was reset (possibly due to an update), please create a new one. (<strong>/char</strong>)", "yellow", "fas fa-tshirt", false, 7000);
                         }
                         else
                         {
-                            player.TriggerEvent("ShowTutorial");
+                            player.TriggerEvent("StartTutorial");
                             EPlayer.Error(player, $"It appears you haven't gone through the setup & tutorial yet! Showing it now...");
                         }
                     }

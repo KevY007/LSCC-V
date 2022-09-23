@@ -125,17 +125,7 @@ mp.keys.bind(
     }
 );
 
-// When 'E' key is held down, open the menu
-function actionMenuOpen(){
-    mp.events.callLocal("actionMenu:open"); 
-}
-// When 'E' key is let go, close the menu - toggleable though.
-function actionMenuClose(){
-    if(chatStatus == true || menuToggled == true || MDCActive == true || scoreboardToggled == true
-        || VehicleSpawnerActive == true || WeaponEditorActive == true) return;
 
-    mp.events.callLocal("actionMenu:close"); 
-}
 
 mp.events.add("actionMenu:addItem", (id, action, color, icon) => {
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.items.push({

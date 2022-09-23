@@ -58,6 +58,8 @@ var WeaponEditorActive = false;
 var cuffTarget = null;
 var cuffInterval = null;
 
+var IsInTutorial = false;
+
 var disableSprint = false;
 
 var FPS = 0; // This is the actual fps.
@@ -223,8 +225,10 @@ async function toggleLoginScene(toggle){
         for(let i = 0 ; i < loginSceneEntities.length ; i++){
             loginSceneEntities[i].destroy();
         }
+        loginSceneEntities = [];
     }
 }
+mp.events.add("DestroyLoginScene", () => toggleLoginScene(false));
 
 mp.events.add('showLoginBrowser', (state) => {
 
@@ -249,11 +253,12 @@ mp.events.add('showLoginBrowser', (state) => {
                     if(!mp.players.local || !mp.players.exists(mp.players.local)) return;
 
                     ServerUI.execute(`gm.$refs.auth.authPanel = false;`);
-                    toggleLoginScene(false);
-                    ServerUI.execute(`gm.$refs.hud.enabled = true;`);
+                    if(!IsInTutorial)
+                        ServerUI.execute(`gm.$refs.hud.enabled = true;`);
                 }, 1000);
             }
-            mp.gui.cursor.show(state, state);
+            if(!IsInTutorial)
+                mp.gui.cursor.show(state, state);
         }
         else{
             mp.events.callRemote("ServerConsoleOutput", `Attempted to show login browser when ServerUI is null!`);
@@ -350,3 +355,32 @@ mp.events.add('autologinToServer', (username) => {
 mp.events.add('requestForgotUsernameServer', () => {
     mp.events.callRemote("OnRequestForgotUsername");
 });
+
+
+// When 'E' key is held down, open the menu
+function actionMenuOpen(){
+    mp.events.callLocal("actionMenu:open"); 
+}
+// When 'E' key is let go, close the menu - toggleable though.
+function actionMenuClose(){
+    if(chatStatus == true || menuToggled == true || MDCActive == true || scoreboardToggled == true
+        || VehicleSpawnerActive == true || WeaponEditorActive == true) return;
+
+    mp.events.callLocal("actionMenu:close"); 
+}
+function ToggleMDC(){
+    if(mp.players.local.getVariable("Team") != 1 || mp.players.local.getVariable("Wounded") > 0) return;
+    if(menuToggled == true || chatStatus == true || ActionMenuActive == true) return;
+
+    if(scoreboardToggled)
+    {
+        ToggleScoreboard();
+    }
+    MDCActive = !MDCActive;
+    MDC_DOM.active = MDCActive;
+
+    if(MDCActive){
+        mp.events.callLocal("MDC:UpdateMiniscreen", "name", mp.players.local.name);
+    }
+    
+}

@@ -55,22 +55,6 @@ function InitializeMDC(){
     MDCActive = false;
     MDC_DOM.active = false;
 }
-function ToggleMDC(){
-    if(mp.players.local.getVariable("Team") != 1 || mp.players.local.getVariable("Wounded") > 0) return;
-    if(menuToggled == true || chatStatus == true || ActionMenuActive == true) return;
-
-    if(scoreboardToggled)
-    {
-        ToggleScoreboard();
-    }
-    MDCActive = !MDCActive;
-    MDC_DOM.active = MDCActive;
-
-    if(MDCActive){
-        mp.events.callLocal("MDC:UpdateMiniscreen", "name", mp.players.local.name);
-    }
-    
-}
 
 mp.events.add("OneSecondEvent", () => {
     if(mp.players.local.getVariable("Team") != 1) return;
