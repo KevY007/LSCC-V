@@ -1600,6 +1600,8 @@ namespace RNC
                         EPlayer.Save(player, false);
                         EPlayer.Notify(player, "You successfully left the clan!", "green", "", false, 3000);
 
+                        player.TriggerEvent("UpdateMenuClanTab");
+
                         EPlayer.UpdateUIVars(player);
                     });
                 }
@@ -1681,9 +1683,10 @@ namespace RNC
                         EPlayer.Save(player, false);
                         EPlayer.Notify(player, $"You successfully joined the clan: <strong>{cName}</strong>", "green", "", false, 3000);
 
+                        player.TriggerEvent("UpdateMenuClanTab");
                         EPlayer.UpdateUIVars(player);
 
-                        foreach(Player pl in Settings.LoggedInPlayers.Where(p => EPlayer.GetAccount(p).ClanID == clanID))
+                        foreach (Player pl in Settings.LoggedInPlayers.Where(p => EPlayer.GetAccount(p).ClanID == clanID))
                         {
                             EPlayer.Notify(pl, $"<strong>{player.Name}</strong> has joined your clan!", "green", "", false, 3000);
                         }
@@ -2787,7 +2790,17 @@ namespace RNC
                         player.TriggerEvent("DestroyPlayerCamera");
                         EPlayer.GetAccount(player).Language = lID;
                         player.TriggerEvent("DestroyLoginScene");
-                        EPlayer.ShowCharCreator(player);
+
+                        CharacterData ConvChar = new CharacterData();
+                        try
+                        {
+                            ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+
+                            player.SetData("cEditClothingData", ConvChar.Clothing);
+                            EPlayer.ShowCharCreator(player, ConvChar);
+                        }
+                        catch { EPlayer.ShowCharCreator(player); }
+
                         EPlayer.GetAccount(player).FinishedTutorial = true;
                         EPlayer.Save(player);
                     });
@@ -4127,7 +4140,7 @@ namespace RNC
             {
                 using(MainDatabase context = ContextFactory.CreateContext())
                 {
-                    await context.Clans.AsQueryable().ForEachAsync(clan =>
+                    await context.Clans.AsQueryable().ForEachAsync(async clan =>
                     {
                         NAPI.Util.ConsoleOutput($"ADDING CLAN: {clan.Name} [{clan.SQL_ID}] to MENU");
                         int clanID = clan.SQL_ID;
@@ -4148,7 +4161,7 @@ namespace RNC
                                                                 maxPlayers, totalKills, totalDeaths, COTW_Wins);
 
                         });
-                        NAPI.Task.WaitForMainThread();
+                        await NAPI.Task.WaitForMainThread();
                     });
                 }
             });

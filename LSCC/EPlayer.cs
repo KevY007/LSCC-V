@@ -2343,114 +2343,124 @@ namespace RNC
         }
         public static void Spawn(Player player, bool forceAutojoin = true, Vector3 spawn = default(Vector3))
         {
-            if (player.HasData("Kicked")) return;
-            if (!LoggedIn(player)) return;
-
-            player.ResetData("Seatbelt");
-            player.TriggerEvent("ToggleSeatbelt", false);
-
-            if (player.HasData("Spectating"))
-            {
-                Commands.cmd_specoff(player);
-            }
-
-            if (!Settings.LoggedInPlayers.Contains(player)) Settings.LoggedInPlayers.Add(player);
-
-            CharacterData ConvChar = new CharacterData();
-
             try
             {
-                ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-               
-                EPlayer.ApplyCharacter(player, ConvChar, EPlayer.GetAccount(player).LobbyClothing);
-            }
-            catch { }
+                if (player == null) return;
+                if (player.HasData("Kicked")) return;
+                if (!LoggedIn(player)) return;
 
-            Vector3 SpawnArea = Settings.LobbySpawns.OrderBy(c => Guid.NewGuid()).First();
+                player.ResetData("Seatbelt");
+                player.TriggerEvent("ToggleSeatbelt", false);
 
-            player.TriggerEvent("DestroyPlayerCamera");
-            player.TriggerEvent("TogglePlayerChat", true);
-            player.ResetData("Dead");
+                if (player.HasData("Spectating"))
+                {
+                    Commands.cmd_specoff(player);
+                }
 
-            if(player.GetSharedData<int>("Team") == 0)
-            {
-                NAPI.Util.ConsoleOutput("Calling SetPlayerWounded from EPlayer.Spawn (" + player.Name + ", 0, -1);"); 
-                Events.OnPlayerWounded(player, 0, -1);
-            }
+                if (!Settings.LoggedInPlayers.Contains(player)) Settings.LoggedInPlayers.Add(player);
 
-            if (player.HasData("DerbyVehicle"))
-            {
-                try { player.GetData<Vehicle>("DerbyVehicle").Delete(); }
+                CharacterData ConvChar = new CharacterData();
+
+                try
+                {
+                    ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+
+                    EPlayer.ApplyCharacter(player, ConvChar, EPlayer.GetAccount(player).LobbyClothing);
+                }
                 catch { }
 
-                player.ResetData("DerbyVehicle");
-            }
+                Vector3 SpawnArea = Settings.LobbySpawns.OrderBy(c => Guid.NewGuid()).First();
 
-            if (forceAutojoin && player.GetSharedData<bool>("AutoJoin") == false)
-            {
-                EPlayer.Notify(player, $"AutoJoin has been turned <strong>ON</strong>.", "green", "fas fa-check", false, 1500, "bottomRight", "replace");
-                player.SetSharedData("AutoJoin", true);
-            }
+                player.TriggerEvent("DestroyPlayerCamera");
+                player.TriggerEvent("TogglePlayerChat", true);
+                player.ResetData("Dead");
 
-            if ( ( (player.GetSharedData<int>("InLobby") >= 1 && Settings.Lobbies.Count(lob => lob.lobbyId == player.GetSharedData<int>("InLobby")) == 0) || // IN DELETED/NON EXISTENT LOBBY
-                player.GetSharedData<int>("InLobby") == -1 ||  // IN INVALID LOBBY PT2
-                (player.GetSharedData<int>("InLobby") == -5 && player.GetData<bool>("Creator_Using") == false && player.GetData<bool>("Tuner_Using") == false) ||  // IN CUSTOMIZER & DONE
-                (player.GetSharedData<int>("InLobby") == -6 && player.GetSharedData<int>("InDM") == -1) ) && // IN CUSTOM ARENAS BUT NOT IN ANY ARENA
-                EPlayer.GetAccount(player).JailTime < 1) // NOT IN JAIL
-            {
-                player.SetSharedData("InDM", -1);
-                int LobbyToBeIn = Settings.MaxLobbies;
-                foreach (LobbyData lobby in Settings.Lobbies.OrderByDescending(l => Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == l.lobbyId)))
+                if (player.GetSharedData<int>("Team") == 0)
                 {
-                    if (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId) >= Settings.Dynamics.MaxInLobby)
+                    NAPI.Util.ConsoleOutput("Calling SetPlayerWounded from EPlayer.Spawn (" + player.Name + ", 0, -1);");
+                    Events.OnPlayerWounded(player, 0, -1);
+                }
+
+                if (player.HasData("DerbyVehicle"))
+                {
+                    try { player.GetData<Vehicle>("DerbyVehicle").Delete(); }
+                    catch { }
+
+                    player.ResetData("DerbyVehicle");
+                }
+
+                if (forceAutojoin && player.GetSharedData<bool>("AutoJoin") == false)
+                {
+                    EPlayer.Notify(player, $"AutoJoin has been turned <strong>ON</strong>.", "green", "fas fa-check", false, 1500, "bottomRight", "replace");
+                    player.SetSharedData("AutoJoin", true);
+                }
+
+                if (((player.GetSharedData<int>("InLobby") >= 1 && Settings.Lobbies.Count(lob => lob.lobbyId == player.GetSharedData<int>("InLobby")) == 0) || // IN DELETED/NON EXISTENT LOBBY
+                    player.GetSharedData<int>("InLobby") == -1 ||  // IN INVALID LOBBY PT2
+                    (player.GetSharedData<int>("InLobby") == -5 && player.GetData<bool>("Creator_Using") == false && player.GetData<bool>("Tuner_Using") == false) ||  // IN CUSTOMIZER & DONE
+                    (player.GetSharedData<int>("InLobby") == -6 && player.GetSharedData<int>("InDM") == -1)) && // IN CUSTOM ARENAS BUT NOT IN ANY ARENA
+                    EPlayer.GetAccount(player).JailTime < 1) // NOT IN JAIL
+                {
+                    player.SetSharedData("InDM", -1);
+                    int LobbyToBeIn = Settings.MaxLobbies;
+                    foreach (LobbyData lobby in Settings.Lobbies.OrderByDescending(l => Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == l.lobbyId)))
                     {
-                        continue;
+                        if (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId) >= Settings.Dynamics.MaxInLobby)
+                        {
+                            continue;
+                        }
+                        if ((lobby.PlayerCreated && lobby.Password.Length > 1) || !lobby.Enabled) continue;
+
+                        LobbyToBeIn = lobby.lobbyId;
+                        break;
                     }
-                    if ((lobby.PlayerCreated && lobby.Password.Length > 1) || !lobby.Enabled) continue;
 
-                    LobbyToBeIn = lobby.lobbyId;
-                    break;
+                    player.SetSharedData("InLobby", LobbyToBeIn);
+
+                    foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == LobbyToBeIn))
+                    {
+                        targ.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[Lobby {LobbyToBeIn}] !{{#BFBFBF}}{player.Name} !{{#FFFFFF}}has joined this lobby.");
+                    }
                 }
 
-                player.SetSharedData("InLobby", LobbyToBeIn);
 
-                foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == LobbyToBeIn))
+
+                foreach (LobbyData lobby in Settings.Lobbies)
                 {
-                    targ.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[Lobby {LobbyToBeIn}] !{{#BFBFBF}}{player.Name} !{{#FFFFFF}}has joined this lobby.");
+                    if (lobby.gameStatus == 1)
+                    {
+                        if (lobby.Fugitives.Contains(player))
+                        {
+                            lobby.Fugitives.Remove(player);
+                        }
+                        else if (lobby.Cops.Contains(player))
+                        {
+                            lobby.Cops.Remove(player);
+                        }
+                    }
                 }
-            }
+                player.SetSharedData("Team", -1);
 
+                player.TriggerEvent("ToggleHud", true);
+
+                Vector3 VecSpawn = new Vector3(SpawnArea.X, SpawnArea.Y, SpawnArea.Z);
+                if (spawn != default(Vector3))
+                {
+                    VecSpawn = spawn;
+                }
+
+                NAPI.Player.SpawnPlayer(player, VecSpawn);
+
+                EPlayer.Freeze(player, false);
+                EPlayer.SetColor(player, new Color(255, 255, 255, 255));
+                EPlayer.Save(player, false);
+
+            }
+            catch(Exception ex)
+            {
+                NAPI.Util.ConsoleOutput($"EPLAYER.SPAWN EXCEPTION: {ex.ToString()}");
+            }
             
-
-            foreach (LobbyData lobby in Settings.Lobbies)
-            {
-                if (lobby.gameStatus == 1)
-                {
-                    if (lobby.Fugitives.Contains(player))
-                    {
-                        lobby.Fugitives.Remove(player);
-                    }
-                    else if (lobby.Cops.Contains(player))
-                    {
-                        lobby.Cops.Remove(player);
-                    }
-                }
-            }
-            player.SetSharedData("Team", -1);
-
-            player.TriggerEvent("ToggleHud", true);
-
-            Vector3 VecSpawn = new Vector3(SpawnArea.X, SpawnArea.Y, SpawnArea.Z);
-            if(spawn != default(Vector3))
-            {
-                VecSpawn = spawn;
-            }
-
-            NAPI.Player.SpawnPlayer(player, VecSpawn);
-
-            EPlayer.Freeze(player, false);
-            EPlayer.SetColor(player, new Color(255, 255, 255, 255));
-            EPlayer.Save(player, false);
         }
 
         public static void SendMessageInLobby(int lobbyid, string message, bool spam = false)
