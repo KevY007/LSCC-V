@@ -1898,6 +1898,14 @@ namespace RNC
         [ServerEvent(Event.PlayerEnterVehicle)]
         public void OnPlayerEnterVehicle(Player player, Vehicle vehicle, sbyte seatID)
         {
+            if(vehicle.GetSharedData<int>("Team") == 10)
+            {
+                if(vehicle.GetSharedData<bool>("Engine") == false)
+                {
+                    vehicle.EngineStatus = false;
+                }
+            }
+
             player.SetSharedData("Ping", player.Ping);
             vehicle.SetSharedData("Engine", vehicle.EngineStatus);
 
