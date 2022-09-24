@@ -191,16 +191,57 @@ mp.events.add('setPing', (pingtoset) => {
     ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.ping = ${ping}`);
 })
 
+var tasePreview = false;
+mp.events.add("render", () => {
+    if(player.getVariable("Team") == 1){  
+        if(player.weapon == 911657153){
+            tasePreview = true;
+            mp.players.forEachInRange(player.position, 70.0, (fugitive) => {
+                const vec1 = player.position;
+                const vec2 = fugitive.position;
+                const distance = vec1.subtract(vec2).length();
+
+                if((fugitive.getVariable("Team") == 0 && !fugitive.isInAnyVehicle(false) && fugitive.getVariable("TaseProtection") == false
+                    && distance < 7.5) || fugitive.remoteId == player.remoteId){
+                        fugitive.setAlpha(255);
+                }
+                else{
+                    fugitive.setAlpha(180);
+                }
+            });
+        }
+    }
+
+});
 mp.events.add("OneSecondEvent", () => {
     ShotStats.UpdateInterval++;
 
+    // taser range: 7.5m
+    if(player.getVariable("Team") == 1){  
+        if(player.weapon != 911657153){
+            if(tasePreview == true){
+                tasePreview = false;
+                mp.players.forEachInStreamRange((playa, id) => {
+                    playa.setAlpha(255);
+                });
+            }
+        }
+    }
+    else{
+        if(tasePreview == true){
+            tasePreview = false;
+            mp.players.forEachInStreamRange((playa, id) => {
+                playa.setAlpha(255);
+            });
+        }
+    }
 
 
     let curSecond = Math.floor(Date.now()/1000);
     let lastKeyPressSecond = Math.floor(LastKeyPress/1000);
 
     SecondsSinceLastKeyPress = (curSecond-lastKeyPressSecond);
-    
+    /*
     if(SecondsSinceLastKeyPress < 1500){
         if(SecondsSinceLastKeyPress == 600){ // MAKING SURE IDFK
             if(AFKStage == 0){ AFKStage = 1;}
@@ -232,6 +273,7 @@ mp.events.add("OneSecondEvent", () => {
             mp.events.callRemote("KickPlayer", "AFK", false);
         }
     }
+    */
 	
 
     if(ShotStats.UpdateInterval >= 10)
@@ -945,6 +987,7 @@ mp.events.add("ClearClimbTaseProtection", (reset_cooldown) => {
         lastClimbProtectionTimestamp = 0;
 });
 // TASE PROTECTION
+var exitCarTime = 0;
 mp.events.add("playerEnterVehicle", (vehicle, seat) => {
     if(player.getVariable("Team") == 0){
         if(taseProtectionTimer !== undefined){
@@ -957,6 +1000,7 @@ mp.events.add("playerEnterVehicle", (vehicle, seat) => {
     }
 });
 mp.events.add("playerLeaveVehicle", (vehicle, seat) => {
+    exitCarTime = Math.floor(Date.now() / 1000);
     if(player.getVariable("Team") == 0){
         if(taseProtectionTimer !== undefined){
             clearTimeout(taseProtectionTimer);
@@ -966,9 +1010,22 @@ mp.events.add("playerLeaveVehicle", (vehicle, seat) => {
             mp.events.callRemote("SetTaseProtection", true);
             taseProtectionTimer = setTimeout(() => {
                 if(mp.players.local == null || mp.players.local == undefined || !mp.players.exists(mp.players.local)) return;
-
+           
                 mp.events.callRemote("SetTaseProtection", false);
+                clearTimeout(taseProtectionTimer);
+                taseProtectionTimer = undefined;
             }, 5000);
+        }
+    }
+});
+// backup plan for tase protection to check 5s timer
+mp.events.add("OneSecondEvent", () => {
+    if(!player.isInAnyVehicle(false) && player.getVariable("Team") == 0 && player.getVariable("TaseProtection") == true){
+        let currentTimestamp = Math.floor(Date.now() / 1000);
+        if(currentTimestamp - exitCarTime >= 5){
+            mp.events.callRemote("SetTaseProtection", false);
+            clearTimeout(taseProtectionTimer);
+            taseProtectionTimer = undefined;
         }
     }
 });
