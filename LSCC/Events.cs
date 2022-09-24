@@ -4576,7 +4576,7 @@ namespace RNC
             }
             else
             {
-                EPlayer.Notify(player, "Tase protection...", "yellow", "fas fa-hourglass", false, 1, "topCenter", "replace");
+                //EPlayer.Notify(player, "Tase protection...", "yellow", "fas fa-hourglass", false, 1, "topCenter", "replace");
                 player.SetSharedData("TaseProtection", false);
             }
         }

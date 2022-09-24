@@ -932,14 +932,44 @@ mp.events.add("ClearClimbTaseProtection", (reset_cooldown) => {
     if(shortClimbProtectionTimeout){clearTimeout(shortClimbProtectionTimeout); shortClimbProtectionTimeout = undefined;}  
     if(climbProtectionTimeout){clearTimeout(climbProtectionTimeout); climbProtectionTimeout = undefined;}  
     if(checkClimbingDurationTimeout){clearTimeout(checkClimbingDurationTimeout); checkClimbingDurationTimeout = undefined;}
+    
+    if(taseProtectionTimer !== undefined){clearTimeout(taseProtectionTimer); taseProtectionTimer = undefined;}
+
+    mp.events.callRemote("SetTaseProtection", false);
+
     wasClimbingLastFrame = false;
-
     climbProtectionState = -1;
-
     if(reset_cooldown)
         lastClimbProtectionTimestamp = 0;
 });
+// TASE PROTECTION
+mp.events.add("playerEnterVehicle", (vehicle, seat) => {
+    if(player.getVariable("Team") == 0){
+        if(taseProtectionTimer !== undefined){
+            clearTimeout(taseProtectionTimer);
+            taseProtectionTimer = undefined;
+        }
+        if(player.getVariable("TaseProtection") == true){
+            mp.events.callRemote("SetTaseProtection", false);
+        }
+    }
+});
+mp.events.add("playerLeaveVehicle", (vehicle, seat) => {
+    if(player.getVariable("Team") == 0){
+        if(taseProtectionTimer !== undefined){
+            clearTimeout(taseProtectionTimer);
+            taseProtectionTimer = undefined;
+        }
+        if(player.getVariable("TaseProtection") == false){
+            mp.events.callRemote("SetTaseProtection", true);
+            taseProtectionTimer = setTimeout(() => {
+                if(mp.players.local == null || mp.players.local == undefined || !mp.players.exists(mp.players.local)) return;
 
+                mp.events.callRemote("SetTaseProtection", false);
+            }, 5000);
+        }
+    }
+});
 
 // mp.keys.bind(0x4A, false, () => {
 
@@ -980,40 +1010,6 @@ mp.events.add('render', () => {
         else{
             mp.events.callLocal("StopSpectating");
         }
-    }
-
-    if(mp.players.local.getVariable("Team") == 0){
-        if(mp.players.local.isInAnyVehicle(true)){
-            if(!wasInCar){
-
-                if(mp.players.local.getVariable("TaseProtection") == true){
-                    mp.events.callRemote("SetTaseProtection", false);
-                }
-            }
-            wasInCar = true;
-
-            if(taseProtectionTimer != null)
-            {
-                clearTimeout(taseProtectionTimer);
-                taseProtectionTimer = null;
-            }
-        }
-        else{
-            if(wasInCar == true){
-                wasInCar = false;
-                clearTimeout(taseProtectionTimer);
-
-                mp.events.callRemote("SetTaseProtection", true);
-                taseProtectionTimer = setTimeout(() => {
-                    if(mp.players.local == null || mp.players.local == undefined || !mp.players.exists(mp.players.local)) return;
-
-                    mp.events.callRemote("SetTaseProtection", false);
-                }, 5000);
-            }
-        }
-    }
-    if(mp.players.local.getVariable("TaseProtection") == true && mp.players.local.getVariable("Team") != 0){
-        mp.events.callRemote("SetTaseProtection", false);
     }
 
     if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
