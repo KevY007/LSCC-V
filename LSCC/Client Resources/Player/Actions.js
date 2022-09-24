@@ -357,8 +357,8 @@ function finishCuffing(){ // if successful
 /* LOCKPICKING */
 mp.events.add("startLockpicking", (donorLevel) => {
     isLockpicking = true;
-    let rangeSize = 10;
-    rangeSize += (donorLevel*10);
+    let rangeSize = 15;
+    rangeSize += (donorLevel*8);
     let rangePos = 0;
     do{
         rangePos = getRandomInt(0, 180);
