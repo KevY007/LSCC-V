@@ -1227,7 +1227,7 @@ namespace RNC
             }
 
             string jData = "[";
-            foreach(var component in itemData.Components)
+            foreach (var component in itemData.Components)
             {
                 bool alreadyHas = false;
                 foreach (KeyValuePair<long, wComponentData> i in wepItems)
@@ -1255,7 +1255,11 @@ namespace RNC
                 else if (component.Value.Name.Contains("Scope")) price = 125;
                 else if (component.Value.Name.Contains("Extended") || component.Value.Name.Contains("Box") ||
                     component.Value.Name.Contains("Drum")) price = 200;
-                else if (component.Value.Name.Contains("Finish") || component.Value.Name.Contains("Variant")) price = 1000; // yes its expensive
+                else if (component.Value.Name.Contains("Finish") || component.Value.Name.Contains("Variant"))
+                {
+                    if (EPlayer.GetAccount(player).DonatorLevel < 2) continue;
+                    else price = 1000;
+                }
                 else if (component.Value.Name.EndsWith("Rounds") || component.Value.Name.EndsWith("Shells") || 
                     component.Value.Name.Contains("Default Clip")) continue;
 
