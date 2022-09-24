@@ -3015,6 +3015,7 @@ namespace RNC
                         {
                             EPlayer.Spawn(player);
                             player.TriggerEvent("DestroyLoginScene");
+                            player.TriggerEvent("login_StopMusic");
                         }
                         else
                         {
@@ -3032,8 +3033,8 @@ namespace RNC
                         {
                             player.TriggerEvent("DestroyPlayerCamera");
                             player.TriggerEvent("TogglePlayerChat", true);
+                            player.TriggerEvent("login_StopMusic");
 
-                         
                             EPlayer.Spawn(player);
                             player.TriggerEvent("DestroyLoginScene");
 
@@ -3721,7 +3722,7 @@ namespace RNC
 
             player.SetSharedData("RegisterDate", acc.RegisterDate.ToString("F"));
 
-            player.TriggerEvent("DestroyPlayerCamera");
+            //player.TriggerEvent("DestroyPlayerCamera");
             player.TriggerEvent("TogglePlayerChat", true);
 
             player.TriggerEvent("BankDoorLocked", false);

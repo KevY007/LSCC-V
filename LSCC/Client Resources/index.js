@@ -265,7 +265,12 @@ mp.events.add('showLoginBrowser', (state) => {
                 mp.gui.cursor.show(state, state);
         }
         else{
-            mp.events.callRemote("ServerConsoleOutput", `Attempted to show login browser when ServerUI is null!`);
+            mp.events.callRemote("ServerConsoleOutput", `Attempted to show login browser to ${mp.players.local.name} while it's null! Trying again...`);
+            ServerUI = mp.browsers.new("package://ServerUI/index.html");
+            ServerUI.active = true;
+            setTimeout(() => {
+                mp.events.callLocal("showLoginBrowser", state);
+            }, 1000);
         }
 
     }, 500);
@@ -391,4 +396,8 @@ function ToggleMDC(){
 mp.events.add("hideMDC", () => {
     MDCActive = false;
     MDC_DOM.active = false;
+});
+
+mp.events.add("login_StopMusic", () => {
+    ServerUI.execute(`gm.$refs.auth.$refs.panel.stop();`);
 });
