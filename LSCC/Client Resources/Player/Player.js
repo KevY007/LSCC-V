@@ -932,7 +932,7 @@ mp.events.add("ClearClimbTaseProtection", (reset_cooldown) => {
     if(shortClimbProtectionTimeout){clearTimeout(shortClimbProtectionTimeout); shortClimbProtectionTimeout = undefined;}  
     if(climbProtectionTimeout){clearTimeout(climbProtectionTimeout); climbProtectionTimeout = undefined;}  
     if(checkClimbingDurationTimeout){clearTimeout(checkClimbingDurationTimeout); checkClimbingDurationTimeout = undefined;}
-    
+
     if(taseProtectionTimer !== undefined){clearTimeout(taseProtectionTimer); taseProtectionTimer = undefined;}
 
     mp.events.callRemote("SetTaseProtection", false);
@@ -1854,6 +1854,43 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
         if(sourceEntity !== null && sourceEntity !== undefined && sourceEntity.type === 'player')
         {
 
+            if(weapon == 3800352039){ // assault shotgun nerf
+                const vec1 = sourceEntity.position;
+                const vec2 = targetEntity.position;
+
+                const distance = vec1.subtract(vec2).length();
+                if(distance < 9.2681523185659){
+                    damage = 25;
+                    mp.game.weapon.setCurrentDamageEventAmount(25);
+                }
+                else if(distance > 9.2681523185659 && distance < 19.267101852897){
+                    damage = 10;
+                    mp.game.weapon.setCurrentDamageEventAmount(10);
+                }
+                else{
+                    damage = 0;
+                    mp.game.weapon.setCurrentDamageEventAmount(0);
+                }
+            }
+            else if(weapon == 984333226){  // heavy shotgun nerf - shoots 1 pellet so it gets more dmg
+                const vec1 = sourceEntity.position;
+                const vec2 = targetEntity.position;
+
+                const distance = vec1.subtract(vec2).length();
+                if(distance < 9.2681523185659){
+                    damage = 55;
+                    mp.game.weapon.setCurrentDamageEventAmount(55);
+                }
+                else if(distance > 9.2681523185659 && distance < 19.267101852897){
+                    damage = 32;
+                    mp.game.weapon.setCurrentDamageEventAmount(32);
+                }
+                else{
+                    damage = 0;
+                    mp.game.weapon.setCurrentDamageEventAmount(0);
+                }
+            }
+
             if(weapon == 911657153 && targetEntity.isInAnyVehicle(false)) return true; // Disable stun if in car.
 
             if(targetEntity.getVariable("ClimbProtection") == true || sourceEntity.getVariable("ClimbProtection") == true) return true;
@@ -2199,6 +2236,43 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
         if(targetEntity !== undefined && targetEntity !== null && targetEntity.type === 'player')
         {
             if(sourceEntity.getVariable("ClimbProtection") == true || targetEntity.getVariable("ClimbProtection") == true) return true;
+
+            if(weapon == 3800352039){ // assault shotgun nerf
+                const vec1 = sourceEntity.position;
+                const vec2 = targetEntity.position;
+
+                const distance = vec1.subtract(vec2).length();
+                if(distance < 9.2681523185659){
+                    damage = 25;
+                    mp.game.weapon.setCurrentDamageEventAmount(25);
+                }
+                else if(distance > 9.2681523185659 && distance < 19.267101852897){
+                    damage = 10;
+                    mp.game.weapon.setCurrentDamageEventAmount(10);
+                }
+                else{
+                    damage = 0;
+                    mp.game.weapon.setCurrentDamageEventAmount(0);
+                }
+            }
+            else if(weapon == 984333226){  // heavy shotgun nerf - shoots 1 pellet so it gets more dmg
+                const vec1 = sourceEntity.position;
+                const vec2 = targetEntity.position;
+
+                const distance = vec1.subtract(vec2).length();
+                if(distance < 9.2681523185659){
+                    damage = 55;
+                    mp.game.weapon.setCurrentDamageEventAmount(55);
+                }
+                else if(distance > 9.2681523185659 && distance < 19.267101852897){
+                    damage = 32;
+                    mp.game.weapon.setCurrentDamageEventAmount(32);
+                }
+                else{
+                    damage = 0;
+                    mp.game.weapon.setCurrentDamageEventAmount(0);
+                }
+            }
 
             if(targetEntity.getVariable("Team") != -1 && player.getVariable("Team") != -1)
             {
