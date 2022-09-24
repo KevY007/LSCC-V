@@ -4575,13 +4575,11 @@ namespace RNC
             {
                 if (player.GetSharedData<int>("Team") != 0) return;
 
-                EPlayer.SendMessageAll("SETTING TASE PROTECTION FOR " + player.Name + " ON");
                 player.SetSharedData("TaseProtection", true); 
                 EPlayer.Notify(player, "Tase protection...", "yellow", "fas fa-hourglass", false, 5000, "topCenter", "replace");
             }
             else
             {
-                EPlayer.SendMessageAll("SETTING TASE PROTECTION FOR " + player.Name + " OFF");
                 //EPlayer.Notify(player, "Tase protection...", "yellow", "fas fa-hourglass", false, 1, "topCenter", "replace");
                 player.SetSharedData("TaseProtection", false);
             }
