@@ -6487,7 +6487,9 @@ namespace RNC
                         }
                     }
 
+                    
                     int arenaID = player.GetSharedData<int>("InDM");
+                    /*
                     if (arenaID > -1 && lobby != null && lobby.gameStatus == 2)
                     {
                         arenaID = -1;
@@ -6495,6 +6497,7 @@ namespace RNC
                         EPlayer.Spawn(player, false);
                         player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You have been removed from DM as it's locked while copchase starts.");
                     }
+                    */
 
                     if (arenaID > -1 && lobby != null && lobby.gameStatus != 2) // DM
                     {
