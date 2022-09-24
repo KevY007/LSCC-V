@@ -1913,18 +1913,19 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
         if(sourceEntity !== null && sourceEntity !== undefined && sourceEntity.type === 'player')
         {
 
+       
             if(weapon == 3800352039){ // assault shotgun nerf
                 const vec1 = sourceEntity.position;
                 const vec2 = targetEntity.position;
 
                 const distance = vec1.subtract(vec2).length();
                 if(distance < 9.2681523185659){
-                    damage = 25;
-                    mp.game.weapon.setCurrentDamageEventAmount(25);
-                }
-                else if(distance > 9.2681523185659 && distance < 19.267101852897){
                     damage = 10;
                     mp.game.weapon.setCurrentDamageEventAmount(10);
+                }
+                else if(distance > 9.2681523185659 && distance < 19.267101852897){
+                    damage = 7;
+                    mp.game.weapon.setCurrentDamageEventAmount(7);
                 }
                 else{
                     damage = 0;
@@ -1937,12 +1938,12 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
 
                 const distance = vec1.subtract(vec2).length();
                 if(distance < 9.2681523185659){
-                    damage = 55;
-                    mp.game.weapon.setCurrentDamageEventAmount(55);
+                    damage = 37;
+                    mp.game.weapon.setCurrentDamageEventAmount(37);
                 }
                 else if(distance > 9.2681523185659 && distance < 19.267101852897){
-                    damage = 32;
-                    mp.game.weapon.setCurrentDamageEventAmount(32);
+                    damage = 28;
+                    mp.game.weapon.setCurrentDamageEventAmount(28);
                 }
                 else{
                     damage = 0;
@@ -2302,12 +2303,12 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
 
                 const distance = vec1.subtract(vec2).length();
                 if(distance < 9.2681523185659){
-                    damage = 25;
-                    mp.game.weapon.setCurrentDamageEventAmount(25);
-                }
-                else if(distance > 9.2681523185659 && distance < 19.267101852897){
                     damage = 10;
                     mp.game.weapon.setCurrentDamageEventAmount(10);
+                }
+                else if(distance > 9.2681523185659 && distance < 19.267101852897){
+                    damage = 7;
+                    mp.game.weapon.setCurrentDamageEventAmount(7);
                 }
                 else{
                     damage = 0;
@@ -2320,12 +2321,12 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
 
                 const distance = vec1.subtract(vec2).length();
                 if(distance < 9.2681523185659){
-                    damage = 55;
-                    mp.game.weapon.setCurrentDamageEventAmount(55);
+                    damage = 37;
+                    mp.game.weapon.setCurrentDamageEventAmount(37);
                 }
                 else if(distance > 9.2681523185659 && distance < 19.267101852897){
-                    damage = 32;
-                    mp.game.weapon.setCurrentDamageEventAmount(32);
+                    damage = 28;
+                    mp.game.weapon.setCurrentDamageEventAmount(28);
                 }
                 else{
                     damage = 0;
