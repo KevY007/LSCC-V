@@ -13,6 +13,8 @@ mp.events.add("StopHotwire", () => {
     isHotwiring = false;
 });
 mp.events.add("CS_HotwireResult", (success) => {
+    if(!isHotwiring) return;
+
     isHotwiring = false;
     if(success){
         setTimeout(() => {
