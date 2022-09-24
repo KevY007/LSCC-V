@@ -1284,12 +1284,24 @@ namespace RNC
                 player.TriggerEvent("MDC:StingerFail", "This stinger has already been deployed!");
                 return;
             }
+            if(lobby.Stingers.Where(s => s.Stage < 3).Count() >= 2) // if 2+ stingers are are in deployment phase, dont allow for balancing
+            {
+                player.TriggerEvent("MDC:StingerFail", "No backup units are available to deploy right now!");
+                EPlayer.Error(player, "A maximum of <strong>two</strong> stingers can be in deployment at once.");
+                return;
+            }
 
             Lobby_StingerData lobbyStinger = new Lobby_StingerData() { ID = spikeID };
             lobby.Stingers.Add(lobbyStinger);
             player.TriggerEvent("MDC:StingerSuccess", spikeID, "Success - a backup unit was dispatched to deploy the stingers.");
             player.TriggerEvent("MDC:UpdateBlip", spikeID, "spike", sg.StingerObjects[0].Position.X, sg.StingerObjects[0].Position.Y);
-            
+
+            string chatStr = $"!{{#FFEC8B}}** [RADIO | FREQ: 911] {player.Name.Replace("_", " ")}: Dispatch, requesting a stinger deployment at {sg.Street}, {sg.Area}, over!";
+            foreach (Player i in lobby.Cops)
+            {
+                i.TriggerEvent("pushMsgToChat", chatStr);
+            }
+
             // Stinger is added to the lobby stingers array.
             // GameUpdate() will then handle the deployment timer and create new objects if necessary.
         }
