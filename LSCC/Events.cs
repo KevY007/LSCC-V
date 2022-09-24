@@ -1517,7 +1517,7 @@ namespace RNC
                         if (target != null)
                         {
                             target.SetSharedData("ClanTier", tier);
-                            EPlayer.Notify(player, $"You have been <strong>{text}</strong> in your clan to <strong>{rank}</strong>!", (text == "demoted" ? "orange" : "green"), "", false, 5000);
+                            EPlayer.Notify(target, $"You have been <strong>{text}</strong> in your clan to <strong>{rank}</strong>!", (text == "demoted" ? "orange" : "green"), "", false, 5000);
                         }
                     });
                 }
