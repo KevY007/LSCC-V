@@ -1269,6 +1269,7 @@ namespace RNC
         [RemoteEvent("RequestDeployStinger")]
         public static void OnRequestDeployStinger(Player player, int spikeID)
         {
+            if (player.GetSharedData<int>("Team") != 1) return;
             Stinger sg = Stinger.Stingers.FirstOrDefault(s => s.ID == spikeID);
             if (sg == null) 
             {
@@ -1277,6 +1278,7 @@ namespace RNC
             }
 
             LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (lobby.gameStatus != 1) return;
             if (lobby.Stingers.FirstOrDefault(s => s.ID == spikeID) != null)
             {
                 player.TriggerEvent("MDC:StingerFail", "This stinger has already been deployed!");

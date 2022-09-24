@@ -388,3 +388,7 @@ function ToggleMDC(){
     }
     
 }
+mp.events.add("hideMDC", () => {
+    MDCActive = false;
+    MDC_DOM.active = false;
+});

@@ -2844,8 +2844,8 @@ namespace RNC
                                                 foreach (Player driver in driverFugis)
                                                 {
                                                     Vector3 randomPos = driver.Position;
-                                                    randomPos.X += new Random().Next(-500, 500);
-                                                    randomPos.Y += new Random().Next(-500, 500);
+                                                    randomPos.X += new Random().Next(-250, 250);
+                                                    randomPos.Y += new Random().Next(-250, 250);
                                                     cop.TriggerEvent("MDC:AddBlip", driver.Id, "fugitivezone");
                                                     cop.TriggerEvent("MDC:UpdateBlip", driver.Id, "fugitivezone", randomPos.X, randomPos.Y);
                                                 }
@@ -3157,6 +3157,7 @@ namespace RNC
                     i.TriggerEvent("BankRob_SetMusic", -1);
                     i.TriggerEvent("StopHotwire");
                     i.TriggerEvent("stopLockpicking");
+                    i.TriggerEvent("hideMDC");
                     i.TriggerEvent("ClearClimbTaseProtection", true);
 
                     i.ResetData("DragoutVehicle");
