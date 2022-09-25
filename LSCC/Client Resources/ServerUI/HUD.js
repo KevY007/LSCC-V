@@ -669,7 +669,7 @@ mp.events.add('ToggleTooltips', (status) =>
     if(status)
     {
         mp.events.callLocal("AddTooltip", "M", "Menu", -1);
-        mp.events.callLocal("AddTooltip", "E", "Quick-Action", -1);
+        mp.events.callLocal("AddTooltip", "E", String.fromCharCode(curActionMenuBind), -1);
         mp.events.callLocal("AddTooltip", String.fromCharCode(curVoiceBind), "Voice Chat", -1);
     }
     else {
@@ -865,59 +865,59 @@ mp.events.add('browserDomReady', (browser) => {
         // SPECTATE VARS
         ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({ 
             name: "ping",
-            icon: "fa-solid fa-stopwatch",
+            icon: "fa-stopwatch",
             init: "0 ms",
-            color: "#ff8084"
+            color: "#fbbf24"
         });`);
 
         ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({ 
             name: "packetloss",
-            icon: "fa-solid fa-minus",
+            icon: "fa-minus",
             init: "0.0%",
-            color: "#f7aa45"
+            color: "#fb923c"
         });`);
         //
         
         ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
             name: "jail",
-            icon: "fa-solid fa-ban",
+            icon: "fa-ban",
             init: "N/A",
-            color: "#c73228"
+            color: "#fb7185"
         });`);
 
         ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
             name: "visible",
-            icon: "fa-solid fa-globe",
+            icon: "fa-globe",
             init: "Visible",
-            color: "#65e9fa"
+            color: "#60a5fa"
         });`);
 
         ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
             name: "voice",
-            icon: "fa-solid fa-microphone",
+            icon: "fa-microphone",
             init: "Standby",
-            color: "#c365fa"
+            color: "#818cf8"
         });`);
 
         ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
             name: "direction",
-            icon: "fa-solid fa-compass",
+            icon: "fa-compass",
             init: "N/A",
-            color: "#c3fa65"
+            color: "#a3e635"
         });`);
 
         ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
             name: "street",
-            icon: "fa-solid fa-location-dot",
+            icon: "fa-location-dot",
             init: "N/A",
-            color: "#fae165"
+            color: "#4ade80"
         });`);
 
         ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
             name: "zone",
-            icon: "fa-solid fa-location-crosshairs",
+            icon: "fa-location-crosshairs",
             init: "N/A",
-            color: "#fa65b0"
+            color: "#34d399"
         });`);
 
         ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.jail[0].show = ${miniHUDVars["jailed"]};`);
