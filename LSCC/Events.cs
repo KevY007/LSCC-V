@@ -1782,23 +1782,42 @@ namespace RNC
              * Also a warning that a weekly/monthly clan fee will be paid.
              */
             EPlayer.SendMessage(player, "~y~Creating clan...");
-            Clan clan = new Clan()
-            {
-                Name = clanname,
-                WeekKills = 0,
-                TotalKills = 0,
-                WeekWins = 0,
-                Description = desc,
-                Tag = tag,
-                CreatedOn = DateTime.Now.ToString("F"),
-                ClanAccess = 0,
-                ForceTag = true,
-                CopchasePartnering = true
-            };
             Task.Run(async () =>
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
+                    Clan nameCheck = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.Name == clanname);
+                    if(nameCheck != null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Error(player, "A clan with that name already exists!", "sex");
+                        });
+                        return;
+                    }
+                    Clan tagCheck = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.Tag == tag);
+                    if (tagCheck != null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Error(player, "A clan with that tag already exists! Please choose a unique 3 or 4-character tag.", "sex");
+                        });
+                        return;
+                    }
+                    Clan clan = new Clan()
+                    {
+                        Name = clanname,
+                        WeekKills = 0,
+                        TotalKills = 0,
+                        WeekWins = 0,
+                        Description = desc,
+                        Tag = tag,
+                        CreatedOn = DateTime.Now.ToString("F"),
+                        ClanAccess = 0,
+                        ForceTag = true,
+                        CopchasePartnering = true
+                    };
+
                     await context.Clans.AddAsync(clan);
                     await context.SaveChangesAsync();
                     Clan thaClan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.Name == clanname);
