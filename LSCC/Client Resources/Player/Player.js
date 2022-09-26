@@ -1068,7 +1068,8 @@ mp.events.add('render', () => {
     }
 
     if(mp.players.local.getVariable("Team") == 0){
-        if(mp.players.local.isInAnyVehicle(true) && (mp.players.local.vehicle.getPedInSeat(-1) == mp.players.local.handle)){
+        if(mp.players.local.isInAnyVehicle(false) && mp.players.local.vehicle != null
+         && (mp.players.local.vehicle.getPedInSeat(-1) == mp.players.local.handle)){
             if(mp.players.local.vehicle.getVariable("Team") == 10 && mp.players.local.vehicle.getVariable("Engine") == false){
                 mp.players.local.vehicle.setEngineOn(false, true, true);
             }
