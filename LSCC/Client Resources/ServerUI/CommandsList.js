@@ -1,7 +1,7 @@
 // update this when adding new commands
 var CommandsDataJSON = [
   {
-    "Name": "serveroptions",
+    "CommandText": "serveroptions",
     "Usage": "[USAGE] serveroptions (option) | use 'help' to get all options",
     "Admin": 4,
     "Donator": 0,
@@ -11,84 +11,84 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "dbgcreatepickup",
+    "CommandText": "dbgcreatepickup",
     "Usage": "",
     "Admin": 1,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "dbgcreateammo",
+    "CommandText": "dbgcreateammo",
     "Usage": "",
     "Admin": 6,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "dbgcreateammocar",
+    "CommandText": "dbgcreateammocar",
     "Usage": "",
     "Admin": 6,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "trunk",
+    "CommandText": "trunk",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "lockpick",
+    "CommandText": "lockpick",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "lock",
+    "CommandText": "lock",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "applycomps",
+    "CommandText": "applycomps",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "applyvehmods",
+    "CommandText": "applyvehmods",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "engine",
+    "CommandText": "engine",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "seatbelt",
+    "CommandText": "seatbelt",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "time",
+    "CommandText": "time",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "game",
+    "CommandText": "game",
     "Usage": "[USAGE] game (option: stop, start, autostart, teambalance, mode)",
     "Admin": 2,
     "Donator": 0,
@@ -97,7 +97,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "tog",
+    "CommandText": "tog",
     "Usage": "[USAGE] tog (option: hud, pm, radio, ooc)",
     "Admin": 0,
     "Donator": 0,
@@ -106,21 +106,21 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "info",
+    "CommandText": "info",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "verify",
+    "CommandText": "verify",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "aveh",
+    "CommandText": "aveh",
     "Usage": "[USAGE] aveh (optional: vehicle model) (optional: pri. col) (optional: sec. col)",
     "Admin": 1,
     "Donator": 0,
@@ -131,7 +131,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "veh",
+    "CommandText": "veh",
     "Usage": "[USAGE] veh (vehicle model) (optional: pri. color) (optional: sec. color)",
     "Admin": 0,
     "Donator": 0,
@@ -142,7 +142,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "mytime",
+    "CommandText": "mytime",
     "Usage": "[USAGE] mytime (hour)",
     "Admin": 0,
     "Donator": 0,
@@ -151,7 +151,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "myweather",
+    "CommandText": "myweather",
     "Usage": "[USAGE] myweather (weatherid)",
     "Admin": 0,
     "Donator": 0,
@@ -160,49 +160,49 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "togblip",
+    "CommandText": "togblip",
     "Usage": "",
     "Admin": 3,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "godmode",
+    "CommandText": "godmode",
     "Usage": "",
     "Admin": 3,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "afob",
+    "CommandText": "afob",
     "Usage": "",
     "Admin": 3,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "setspawn",
+    "CommandText": "setspawn",
     "Usage": "",
     "Admin": 3,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "gps",
+    "CommandText": "gps",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "dl",
+    "CommandText": "dl",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "motd",
+    "CommandText": "motd",
     "Usage": "[USAGE] motd (player name)(message | 'none' to delete)",
     "Admin": 2,
     "Donator": 0,
@@ -212,7 +212,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "motdall",
+    "CommandText": "motdall",
     "Usage": "[USAGE] motdall (message | 'none' to delete)",
     "Admin": 3,
     "Donator": 0,
@@ -221,7 +221,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "goto",
+    "CommandText": "goto",
     "Usage": "[USAGE] goto (target)",
     "Admin": 0,
     "Donator": 0,
@@ -230,7 +230,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "bring",
+    "CommandText": "bring",
     "Usage": "[USAGE] bring (target)",
     "Admin": 1,
     "Donator": 0,
@@ -239,42 +239,42 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "bringall",
+    "CommandText": "bringall",
     "Usage": "",
     "Admin": 3,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "placespikes",
+    "CommandText": "placespikes",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "archiveaccounts",
+    "CommandText": "archiveaccounts",
     "Usage": "",
     "Admin": 4,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "freezeall",
+    "CommandText": "freezeall",
     "Usage": "",
     "Admin": 3,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "unfreezeall",
+    "CommandText": "unfreezeall",
     "Usage": "",
     "Admin": 3,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "sethpall",
+    "CommandText": "sethpall",
     "Usage": "[USAGE] sethpall (health) (armor)",
     "Admin": 3,
     "Donator": 0,
@@ -284,14 +284,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "noclip",
+    "CommandText": "noclip",
     "Usage": "[USAGE] noclip",
     "Admin": 2,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "setalpha",
+    "CommandText": "setalpha",
     "Usage": "[USAGE] setalpha (target) (0-255)",
     "Admin": 3,
     "Donator": 0,
@@ -301,7 +301,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "setcaralpha",
+    "CommandText": "setcaralpha",
     "Usage": "[USAGE] setcaralpha (target) (0-255)",
     "Admin": 3,
     "Donator": 0,
@@ -311,14 +311,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "chances",
+    "CommandText": "chances",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "togcols",
+    "CommandText": "togcols",
     "Usage": "[USAGE] togcols (target)",
     "Admin": 2,
     "Donator": 0,
@@ -327,7 +327,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "sethp",
+    "CommandText": "sethp",
     "Usage": "[USAGE] sethp (target) (health)",
     "Admin": 1,
     "Donator": 0,
@@ -337,7 +337,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "viewscreenshot",
+    "CommandText": "viewscreenshot",
     "Usage": "[USAGE] viewss (identifier) | Use 'last' for last taken screenshot",
     "Admin": 1,
     "Donator": 0,
@@ -347,7 +347,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "takescreenshot",
+    "CommandText": "takescreenshot",
     "Usage": "[USAGE] takescreenshot (target) (quality = 20) | Quality 20 is default",
     "Admin": 5,
     "Donator": 0,
@@ -358,7 +358,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "takegif",
+    "CommandText": "takegif",
     "Usage": "[USAGE] takegif (target) (duration in seconds) (fps = 24) | Leave FPS to 24 or it'll be bad",
     "Admin": 5,
     "Donator": 0,
@@ -370,7 +370,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "setinv",
+    "CommandText": "setinv",
     "Usage": "[USAGE] setinv(ulnerable) (target) (0 or 1)",
     "Admin": 1,
     "Donator": 0,
@@ -381,7 +381,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "setar",
+    "CommandText": "setar",
     "Usage": "[USAGE] setar(mor) (target) (armor)",
     "Admin": 1,
     "Donator": 0,
@@ -392,21 +392,21 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "stopanim",
+    "CommandText": "stopanim",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "blipdbg",
+    "CommandText": "blipdbg",
     "Usage": "",
     "Admin": 5,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "painkillers",
+    "CommandText": "painkillers",
     "Usage": "[USAGE] pk (option: buy/use/inv)",
     "Admin": 0,
     "Donator": 0,
@@ -415,7 +415,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "medkit",
+    "CommandText": "medkit",
     "Usage": "[USAGE] mk (option: buy/use/inv)",
     "Admin": 0,
     "Donator": 0,
@@ -424,14 +424,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "handsup",
+    "CommandText": "handsup",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "cuff",
+    "CommandText": "cuff",
     "Usage": "[USAGE] cuff (optional:target)",
     "Admin": 0,
     "Donator": 0,
@@ -440,7 +440,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "dragout",
+    "CommandText": "dragout",
     "Usage": "[USAGE] dragout (optional:target)",
     "Admin": 0,
     "Donator": 0,
@@ -449,7 +449,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "switchseats",
+    "CommandText": "switchseats",
     "Usage": "[USAGE] switchseats (target)",
     "Admin": 0,
     "Donator": 0,
@@ -458,7 +458,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "forceswitchseats",
+    "CommandText": "forceswitchseats",
     "Usage": "[USAGE] forceswitchseats (player) (target)",
     "Admin": 1,
     "Donator": 0,
@@ -468,7 +468,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "takecomp",
+    "CommandText": "takecomp",
     "Usage": "[USAGE] takecomp (target) (weapon/hash) (component/hash)",
     "Admin": 3,
     "Donator": 0,
@@ -479,14 +479,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "rules",
+    "CommandText": "rules",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "givecomp",
+    "CommandText": "givecomp",
     "Usage": "[USAGE] givecomp (target) (weapon/hash) (component/hash)",
     "Admin": 3,
     "Donator": 0,
@@ -497,14 +497,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "weaponeditor",
+    "CommandText": "weaponeditor",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "attachcomp",
+    "CommandText": "attachcomp",
     "Usage": "[USAGE] attachcomp (target) (component/hash)",
     "Admin": 3,
     "Donator": 0,
@@ -514,7 +514,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "removecomp",
+    "CommandText": "removecomp",
     "Usage": "[USAGE] removecomp (component/hash - hold weapon and use 'help' to list available)",
     "Admin": 0,
     "Donator": 0,
@@ -523,7 +523,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "convertpoints",
+    "CommandText": "convertpoints",
     "Usage": "[USAGE] convertpoints (amount) (standard to donator | donator to standard)",
     "Admin": 0,
     "Donator": 0,
@@ -533,21 +533,21 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "mycomps",
+    "CommandText": "mycomps",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "givegundbg",
+    "CommandText": "givegundbg",
     "Usage": "",
     "Admin": 5,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "givegun",
+    "CommandText": "givegun",
     "Usage": "[USAGE] givegun (target) (ammo) (weapon)",
     "Admin": 3,
     "Donator": 0,
@@ -558,7 +558,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "gun",
+    "CommandText": "gun",
     "Usage": "[USAGE] gun (ammo) (weapon)",
     "Admin": 0,
     "Donator": 0,
@@ -568,7 +568,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "world",
+    "CommandText": "world",
     "Usage": "[USAGE] world (number/id, 0 is default)",
     "Admin": 0,
     "Donator": 0,
@@ -577,7 +577,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "givegunall",
+    "CommandText": "givegunall",
     "Usage": "[USAGE] givegunall (ammo) (wep)",
     "Admin": 3,
     "Donator": 0,
@@ -587,14 +587,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "fix",
+    "CommandText": "fix",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "afix",
+    "CommandText": "afix",
     "Usage": "[USAGE] afix (target)",
     "Admin": 1,
     "Donator": 0,
@@ -603,14 +603,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "flip",
+    "CommandText": "flip",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "aflip",
+    "CommandText": "aflip",
     "Usage": "[USAGE] aflip (target)",
     "Admin": 1,
     "Donator": 0,
@@ -619,70 +619,70 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "removeavehs",
+    "CommandText": "removeavehs",
     "Usage": "",
     "Admin": 1,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "autojoin",
+    "CommandText": "autojoin",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "driveby",
+    "CommandText": "driveby",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "stats",
+    "CommandText": "stats",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "checkstats",
+    "CommandText": "checkstats",
     "Usage": "",
     "Admin": 2,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "gethp",
+    "CommandText": "gethp",
     "Usage": "",
     "Admin": 1,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "getfps",
+    "CommandText": "getfps",
     "Usage": "",
     "Admin": 1,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "pos",
+    "CommandText": "pos",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "voicemode",
+    "CommandText": "voicemode",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "voiceblock",
+    "CommandText": "voiceblock",
     "Usage": "[USAGE] voiceblock (target)",
     "Admin": 0,
     "Donator": 0,
@@ -691,49 +691,49 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "kill",
+    "CommandText": "kill",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "lobby",
+    "CommandText": "lobby",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "mylobby",
+    "CommandText": "mylobby",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "clientcmd",
+    "CommandText": "clientcmd",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "packetloss",
+    "CommandText": "packetloss",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "restartmenu",
+    "CommandText": "restartmenu",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "anotes",
+    "CommandText": "anotes",
     "Usage": "[USAGE] anote (target) [add|view|delete]",
     "Admin": 1,
     "Donator": 0,
@@ -750,14 +750,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "lobbies",
+    "CommandText": "lobbies",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "switchlobby",
+    "CommandText": "switchlobby",
     "Usage": "[USAGE] switchlobby (lobbyid) (optional: password)",
     "Admin": 1,
     "Donator": 0,
@@ -767,14 +767,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "dmarenas",
+    "CommandText": "dmarenas",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "realmendm",
+    "CommandText": "realmendm",
     "Usage": "[USAGE] realmendm (arenaid) (teamid)",
     "Admin": 0,
     "Donator": 0,
@@ -784,7 +784,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "dm",
+    "CommandText": "dm",
     "Usage": "[USAGE] dm (arenaid)",
     "Admin": 0,
     "Donator": 0,
@@ -793,28 +793,28 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "freeroam",
+    "CommandText": "freeroam",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "fcmds",
+    "CommandText": "fcmds",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "derby",
+    "CommandText": "derby",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "setweather",
+    "CommandText": "setweather",
     "Usage": "[USAGE] setweather (weatherid)",
     "Admin": 1,
     "Donator": 1,
@@ -823,7 +823,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "settime",
+    "CommandText": "settime",
     "Usage": "[USAGE] settime (hour)",
     "Admin": 1,
     "Donator": 1,
@@ -832,7 +832,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "gotopos",
+    "CommandText": "gotopos",
     "Usage": "[USAGE] gotopos (x) (y) (z) (optional: heading)",
     "Admin": 3,
     "Donator": 0,
@@ -844,7 +844,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "getip",
+    "CommandText": "getip",
     "Usage": "[USAGE] getip (target)",
     "Admin": 3,
     "Donator": 0,
@@ -853,7 +853,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "getsc",
+    "CommandText": "getsc",
     "Usage": "[USAGE] getsc (target)",
     "Admin": 3,
     "Donator": 0,
@@ -862,7 +862,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "gethwid",
+    "CommandText": "gethwid",
     "Usage": "[USAGE] gethwid (target)",
     "Admin": 3,
     "Donator": 0,
@@ -871,7 +871,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "setdimension",
+    "CommandText": "setdimension",
     "Usage": "[USAGE] setdimension (target) (vw)",
     "Admin": 2,
     "Donator": 0,
@@ -881,7 +881,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "sendtolobby",
+    "CommandText": "sendtolobby",
     "Usage": "[USAGE] sendtolobby (target)",
     "Admin": 1,
     "Donator": 0,
@@ -890,7 +890,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "resetclothing",
+    "CommandText": "resetclothing",
     "Usage": "[USAGE] resetclothing (target) (cop/fugitive)",
     "Admin": 1,
     "Donator": 0,
@@ -900,7 +900,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "putinveh",
+    "CommandText": "putinveh",
     "Usage": "[USAGE] putinveh (target) (player) (optional: seatid) | \\",
     "Admin": 1,
     "Donator": 0,
@@ -912,21 +912,21 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "restock",
+    "CommandText": "restock",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "keys",
+    "CommandText": "keys",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "teleport",
+    "CommandText": "teleport",
     "Usage": "[USAGE] teleport (option: chilliad, airport)",
     "Admin": 0,
     "Donator": 0,
@@ -935,77 +935,77 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "dbgplayanim",
+    "CommandText": "dbgplayanim",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "dbglinkmane",
+    "CommandText": "dbglinkmane",
     "Usage": "",
     "Admin": 6,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "dbgsetcol",
+    "CommandText": "dbgsetcol",
     "Usage": "",
     "Admin": 6,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "setgamevehicle",
+    "CommandText": "setgamevehicle",
     "Usage": "",
     "Admin": 5,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "resetgamevehicles",
+    "CommandText": "resetgamevehicles",
     "Usage": "",
     "Admin": 1,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "resetcharacter",
+    "CommandText": "resetcharacter",
     "Usage": "",
     "Admin": 2,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "dbgexitlinkmane",
+    "CommandText": "dbgexitlinkmane",
     "Usage": "",
     "Admin": 6,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "dbgteamvar",
+    "CommandText": "dbgteamvar",
     "Usage": "",
     "Admin": 5,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "dbgmaxspeed",
+    "CommandText": "dbgmaxspeed",
     "Usage": "",
     "Admin": 4,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "dbgdriveforce",
+    "CommandText": "dbgdriveforce",
     "Usage": "",
     "Admin": 4,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "report",
+    "CommandText": "report",
     "Usage": "[USAGE] report (target) (desc)",
     "Admin": 0,
     "Donator": 0,
@@ -1015,7 +1015,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "helpme",
+    "CommandText": "helpme",
     "Usage": "[USAGE] helpme (desc)",
     "Admin": 0,
     "Donator": 0,
@@ -1024,35 +1024,35 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "car",
+    "CommandText": "car",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "customvehlist",
+    "CommandText": "customvehlist",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "cmds",
+    "CommandText": "cmds",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "purchaseammo",
+    "CommandText": "purchaseammo",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "bancheck",
+    "CommandText": "bancheck",
     "Usage": "[USAGE] bancheck (target name or ban id)",
     "Admin": 1,
     "Donator": 0,
@@ -1061,7 +1061,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "ocheckstats",
+    "CommandText": "ocheckstats",
     "Usage": "[USAGE] ocheckstats (target)",
     "Admin": 2,
     "Donator": 0,
@@ -1070,7 +1070,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "unsuspend",
+    "CommandText": "unsuspend",
     "Usage": "[USAGE] unsuspend (account name)",
     "Admin": 2,
     "Donator": 0,
@@ -1079,7 +1079,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "changename",
+    "CommandText": "changename",
     "Usage": "[USAGE] changename (account name) (new name)",
     "Admin": 4,
     "Donator": 0,
@@ -1089,7 +1089,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "deleteaccount",
+    "CommandText": "deleteaccount",
     "Usage": "[USAGE] deleteaccount (account name) | THIS WILL DELETE ALL LOGS AND ALL KINDS OF DATA ON THEM",
     "Admin": 4,
     "Donator": 0,
@@ -1099,7 +1099,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "changepass",
+    "CommandText": "changepass",
     "Usage": "[USAGE] changepass (account name) (new password)",
     "Admin": 4,
     "Donator": 0,
@@ -1109,7 +1109,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "changemypass",
+    "CommandText": "changemypass",
     "Usage": "[USAGE] changemypass (new password)",
     "Admin": 0,
     "Donator": 0,
@@ -1118,14 +1118,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "hotwire",
+    "CommandText": "hotwire",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "checkplayer",
+    "CommandText": "checkplayer",
     "Usage": "[USAGE] checkplayer (account name) | Checks & gets all associated accounts with a player",
     "Admin": 1,
     "Donator": 0,
@@ -1135,14 +1135,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "checkbanevaders",
+    "CommandText": "checkbanevaders",
     "Usage": "",
     "Admin": 2,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "unban",
+    "CommandText": "unban",
     "Usage": "[USAGE] unban (banid or name)",
     "Admin": 2,
     "Donator": 0,
@@ -1151,7 +1151,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "oban",
+    "CommandText": "oban",
     "Usage": "[USAGE] oban (target name) (reason)",
     "Admin": 2,
     "Donator": 0,
@@ -1161,17 +1161,17 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "ban",
+    "CommandText": "ban",
     "Usage": "[USAGE] ban (name) (reason)",
     "Admin": 2,
     "Donator": 0,
     "Parameters": [
-      "name",
+      "CommandText",
       "reason"
     ]
   },
   {
-    "Name": "suspend",
+    "CommandText": "suspend",
     "Usage": "[USAGE] suspend (target)",
     "Admin": 2,
     "Donator": 0,
@@ -1180,14 +1180,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "createlobby",
+    "CommandText": "createlobby",
     "Usage": "",
     "Admin": 2,
     "Donator": 2,
     "Parameters": []
   },
   {
-    "Name": "deletelobby",
+    "CommandText": "deletelobby",
     "Usage": "[USAGE] deletelobby (lobbyid)",
     "Admin": 2,
     "Donator": 2,
@@ -1196,7 +1196,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "setlobbypassword",
+    "CommandText": "setlobbypassword",
     "Usage": "[USAGE] setlobbypassword (lobbyid) (password)",
     "Admin": 2,
     "Donator": 2,
@@ -1206,7 +1206,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "lobbymode",
+    "CommandText": "lobbymode",
     "Usage": "[USAGE] setlobbymode (lobbyid) (mode) | Mode = 'standard' or 'busted'",
     "Admin": 2,
     "Donator": 2,
@@ -1217,7 +1217,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "setlobbyfugitivepercent",
+    "CommandText": "setlobbyfugitivepercent",
     "Usage": "[USAGE] setlobbyfugitivepercent (lobbyid) (percent)",
     "Admin": 2,
     "Donator": 2,
@@ -1227,7 +1227,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "togglelobby",
+    "CommandText": "togglelobby",
     "Usage": "[USAGE] toglobby (lobbyid)",
     "Admin": 2,
     "Donator": 0,
@@ -1236,7 +1236,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "togglemap",
+    "CommandText": "togglemap",
     "Usage": "[USAGE] togmap (map id/name)",
     "Admin": 2,
     "Donator": 0,
@@ -1245,7 +1245,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "nextmap",
+    "CommandText": "nextmap",
     "Usage": "[USAGE] nextmap (map ID or name)",
     "Admin": 1,
     "Donator": 0,
@@ -1254,49 +1254,49 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "saveplayer",
+    "CommandText": "saveplayer",
     "Usage": "",
     "Admin": 4,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "saveserver",
+    "CommandText": "saveserver",
     "Usage": "",
     "Admin": 4,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "reloadaccount",
+    "CommandText": "reloadaccount",
     "Usage": "",
     "Admin": 5,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "squadmembers",
+    "CommandText": "squadmembers",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "squadaccept",
+    "CommandText": "squadaccept",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "squadleave",
+    "CommandText": "squadleave",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "removelanguage",
+    "CommandText": "removelanguage",
     "Usage": "[USAGE] removelanguage (language) | /languages for a list",
     "Admin": 4,
     "Donator": 0,
@@ -1306,7 +1306,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "addlanguage",
+    "CommandText": "addlanguage",
     "Usage": "[USAGE] addlanguage (language name)",
     "Admin": 4,
     "Donator": 0,
@@ -1315,14 +1315,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "languages",
+    "CommandText": "languages",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "language",
+    "CommandText": "language",
     "Usage": "[USAGE] language (language or 'none') | /languages for a list",
     "Admin": 0,
     "Donator": 0,
@@ -1332,7 +1332,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "languagechat",
+    "CommandText": "languagechat",
     "Usage": "[USAGE] languagechat (/lc) (text)",
     "Admin": 0,
     "Donator": 0,
@@ -1342,7 +1342,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "squadchat",
+    "CommandText": "squadchat",
     "Usage": "[USAGE] squadchat (sc) (text)",
     "Admin": 0,
     "Donator": 0,
@@ -1352,7 +1352,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "squad",
+    "CommandText": "squad",
     "Usage": "[USAGE] squad (target)",
     "Admin": 0,
     "Donator": 0,
@@ -1361,14 +1361,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "fugitivelist",
+    "CommandText": "fugitivelist",
     "Usage": "",
     "Admin": 2,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "lastlogin",
+    "CommandText": "lastlogin",
     "Usage": "[USAGE] lastlogin (full username)",
     "Admin": 1,
     "Donator": 0,
@@ -1377,28 +1377,28 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "ivangej",
+    "CommandText": "ivangej",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "reqlog",
+    "CommandText": "reqlog",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "acmds",
+    "CommandText": "acmds",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "agivepoints",
+    "CommandText": "agivepoints",
     "Usage": "[USAGE] agivepoints (target) (points)",
     "Admin": 4,
     "Donator": 0,
@@ -1408,7 +1408,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "grantxp",
+    "CommandText": "grantxp",
     "Usage": "[USAGE] grantxp (target) (xp)",
     "Admin": 4,
     "Donator": 0,
@@ -1418,7 +1418,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "setteam",
+    "CommandText": "setteam",
     "Usage": "[USAGE] setteam (target) (team)",
     "Admin": 1,
     "Donator": 0,
@@ -1428,14 +1428,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "maps",
+    "CommandText": "maps",
     "Usage": "",
     "Admin": 5,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "addmapspawn",
+    "CommandText": "addmapspawn",
     "Usage": "[USAGE] addmapspawn (mapid) (teamid)",
     "Admin": 4,
     "Donator": 0,
@@ -1445,7 +1445,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "deletemapspawn",
+    "CommandText": "deletemapspawn",
     "Usage": "[USAGE] deletemapspawn (mapid) (spawnid)",
     "Admin": 4,
     "Donator": 0,
@@ -1455,7 +1455,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "mapspawns",
+    "CommandText": "mapspawns",
     "Usage": "[USAGE] mapspawns (mapid)",
     "Admin": 4,
     "Donator": 0,
@@ -1464,7 +1464,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "deletemap",
+    "CommandText": "deletemap",
     "Usage": "[USAGE] deletemap (mapname)",
     "Admin": 4,
     "Donator": 0,
@@ -1473,34 +1473,34 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "createmap",
+    "CommandText": "createmap",
     "Usage": "[USAGE] createmap (name)",
     "Admin": 4,
     "Donator": 0,
     "Parameters": [
-      "name"
+      "CommandText"
     ]
   },
   {
-    "Name": "createdmarena",
+    "CommandText": "createdmarena",
     "Usage": "[USAGE] createdmarena (name)",
     "Admin": 4,
     "Donator": 0,
     "Parameters": [
-      "name"
+      "CommandText"
     ]
   },
   {
-    "Name": "selectdmarena",
+    "CommandText": "selectdmarena",
     "Usage": "[USAGE] selectdmarena (name)",
     "Admin": 4,
     "Donator": 0,
     "Parameters": [
-      "name"
+      "CommandText"
     ]
   },
   {
-    "Name": "editdmarena",
+    "CommandText": "editdmarena",
     "Usage": "[USAGE] editdmarena (help)",
     "Admin": 4,
     "Donator": 0,
@@ -1509,35 +1509,35 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "triggerevent",
+    "CommandText": "triggerevent",
     "Usage": "",
     "Admin": 6,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "triggerjs",
+    "CommandText": "triggerjs",
     "Usage": "",
     "Admin": 6,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "triggerjsall",
+    "CommandText": "triggerjsall",
     "Usage": "",
     "Admin": 6,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "triggerjsplayer",
+    "CommandText": "triggerjsplayer",
     "Usage": "",
     "Admin": 6,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "vtuner",
+    "CommandText": "vtuner",
     "Usage": "[USAGE] vtuner (cop / fugitive / help)",
     "Admin": 0,
     "Donator": 0,
@@ -1548,63 +1548,63 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "tuneveh",
+    "CommandText": "tuneveh",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "forward",
+    "CommandText": "forward",
     "Usage": "",
     "Admin": 1,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "testspike",
+    "CommandText": "testspike",
     "Usage": "",
     "Admin": 6,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "cameraset",
+    "CommandText": "cameraset",
     "Usage": "",
     "Admin": 6,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "dbgunlockchal",
+    "CommandText": "dbgunlockchal",
     "Usage": "",
     "Admin": 6,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "dbgresetchallenges",
+    "CommandText": "dbgresetchallenges",
     "Usage": "",
     "Admin": 6,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "dbgdiscordverify",
+    "CommandText": "dbgdiscordverify",
     "Usage": "",
     "Admin": 6,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "unlockitem",
+    "CommandText": "unlockitem",
     "Usage": "",
     "Admin": 6,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "setadmin",
+    "CommandText": "setadmin",
     "Usage": "[USAGE] setadmin (target) (level)",
     "Admin": 4,
     "Donator": 0,
@@ -1614,7 +1614,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "osetadmin",
+    "CommandText": "osetadmin",
     "Usage": "[USAGE] osetadmin (target) (level)",
     "Admin": 4,
     "Donator": 0,
@@ -1624,7 +1624,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "ogivedonorpoints",
+    "CommandText": "ogivedonorpoints",
     "Usage": "[USAGE] ogivedonorpoints (target) (points)",
     "Admin": 5,
     "Donator": 0,
@@ -1634,7 +1634,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "givedonorpoints",
+    "CommandText": "givedonorpoints",
     "Usage": "[USAGE] givedonorpoints (target) (points)",
     "Admin": 5,
     "Donator": 0,
@@ -1644,7 +1644,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "redeem",
+    "CommandText": "redeem",
     "Usage": "[USAGE] redeem (code)",
     "Admin": 0,
     "Donator": 0,
@@ -1653,14 +1653,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "forcelogin",
+    "CommandText": "forcelogin",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "namechange",
+    "CommandText": "namechange",
     "Usage": "[USAGE] namechange (new name)",
     "Admin": 0,
     "Donator": 0,
@@ -1669,7 +1669,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "setdonator",
+    "CommandText": "setdonator",
     "Usage": "[USAGE] setdonator (target) (level)",
     "Admin": 5,
     "Donator": 0,
@@ -1679,7 +1679,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "osetdonator",
+    "CommandText": "osetdonator",
     "Usage": "[USAGE] osetdonator (target) (level)",
     "Admin": 5,
     "Donator": 0,
@@ -1689,7 +1689,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "dc",
+    "CommandText": "dc",
     "Usage": "[USAGE] donatorchat (text)",
     "Admin": 0,
     "Donator": 1,
@@ -1698,7 +1698,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "id",
+    "CommandText": "id",
     "Usage": "[USAGE] id (Id/PartOfName)",
     "Admin": 0,
     "Donator": 0,
@@ -1707,14 +1707,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "afk",
+    "CommandText": "afk",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "adminchat",
+    "CommandText": "adminchat",
     "Usage": "[USAGE] adminchat (text)",
     "Admin": 1,
     "Donator": 0,
@@ -1723,7 +1723,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "looc",
+    "CommandText": "looc",
     "Usage": "[USAGE] looc (text)",
     "Admin": 0,
     "Donator": 0,
@@ -1732,7 +1732,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "low",
+    "CommandText": "low",
     "Usage": "[USAGE] low (text)",
     "Admin": 0,
     "Donator": 0,
@@ -1741,7 +1741,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "cw",
+    "CommandText": "cw",
     "Usage": "[USAGE] carwhisper (text)",
     "Admin": 0,
     "Donator": 0,
@@ -1750,7 +1750,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "s",
+    "CommandText": "s",
     "Usage": "[USAGE] shout (text)",
     "Admin": 0,
     "Donator": 0,
@@ -1759,7 +1759,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "m",
+    "CommandText": "m",
     "Usage": "[USAGE] megaphone (text)",
     "Admin": 0,
     "Donator": 0,
@@ -1768,7 +1768,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "r",
+    "CommandText": "r",
     "Usage": "[USAGE] radio (text)",
     "Admin": 0,
     "Donator": 0,
@@ -1777,14 +1777,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "admins",
+    "CommandText": "admins",
     "Usage": "",
     "Admin": 3,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "ooc",
+    "CommandText": "ooc",
     "Usage": "[USAGE] ooc (text)",
     "Admin": 1,
     "Donator": 1,
@@ -1793,7 +1793,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "lobbychat",
+    "CommandText": "lobbychat",
     "Usage": "[USAGE] lobbychat (text)",
     "Admin": 1,
     "Donator": 1,
@@ -1802,7 +1802,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "ann",
+    "CommandText": "ann",
     "Usage": "[USAGE] ann (text)",
     "Admin": 2,
     "Donator": 0,
@@ -1811,14 +1811,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "anonymous",
+    "CommandText": "anonymous",
     "Usage": "",
     "Admin": 2,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "pm",
+    "CommandText": "pm",
     "Usage": "[USAGE] pm (target) (text)",
     "Admin": 0,
     "Donator": 0,
@@ -1828,7 +1828,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "passgun",
+    "CommandText": "passgun",
     "Usage": "[USAGE] passgun (target)",
     "Admin": 0,
     "Donator": 0,
@@ -1837,7 +1837,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "removeguns",
+    "CommandText": "removeguns",
     "Usage": "[USAGE] removeguns (target)",
     "Admin": 2,
     "Donator": 0,
@@ -1846,14 +1846,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "removegunsfromall",
+    "CommandText": "removegunsfromall",
     "Usage": "",
     "Admin": 3,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "freeze",
+    "CommandText": "freeze",
     "Usage": "[USAGE] freeze (target)",
     "Admin": 1,
     "Donator": 0,
@@ -1862,7 +1862,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "rfreeze",
+    "CommandText": "rfreeze",
     "Usage": "[USAGE] rfreeze (range)",
     "Admin": 1,
     "Donator": 0,
@@ -1871,7 +1871,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "tfreeze",
+    "CommandText": "tfreeze",
     "Usage": "[USAGE] tfreeze (team 0 = fugitive, 1 = cop)",
     "Admin": 1,
     "Donator": 0,
@@ -1880,7 +1880,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "tunfreeze",
+    "CommandText": "tunfreeze",
     "Usage": "[USAGE] tunfreeze (team 0 = fugitive, 1 = cop)",
     "Admin": 1,
     "Donator": 0,
@@ -1889,7 +1889,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "runfreeze",
+    "CommandText": "runfreeze",
     "Usage": "[USAGE] runfreeze (range)",
     "Admin": 1,
     "Donator": 0,
@@ -1898,7 +1898,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "unfreeze",
+    "CommandText": "unfreeze",
     "Usage": "[USAGE] unfreeze (target)",
     "Admin": 1,
     "Donator": 0,
@@ -1907,7 +1907,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "kick",
+    "CommandText": "kick",
     "Usage": "[USAGE] kick (target) (reason)",
     "Admin": 1,
     "Donator": 0,
@@ -1917,7 +1917,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "ojail",
+    "CommandText": "ojail",
     "Usage": "[USAGE] ojail (target) (minutes) (reason)",
     "Admin": 1,
     "Donator": 0,
@@ -1928,7 +1928,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "jail",
+    "CommandText": "jail",
     "Usage": "[USAGE] jail (target) (minutes) (reason)",
     "Admin": 1,
     "Donator": 0,
@@ -1939,7 +1939,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "unjail",
+    "CommandText": "unjail",
     "Usage": "[USAGE] unjail (target)",
     "Admin": 1,
     "Donator": 0,
@@ -1948,7 +1948,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "ounjail",
+    "CommandText": "ounjail",
     "Usage": "[USAGE] ojail (target)",
     "Admin": 1,
     "Donator": 0,
@@ -1957,7 +1957,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "warn",
+    "CommandText": "warn",
     "Usage": "[USAGE] warn (target) (reason)",
     "Admin": 1,
     "Donator": 0,
@@ -1967,7 +1967,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "unwarn",
+    "CommandText": "unwarn",
     "Usage": "[USAGE] unwarn (target)",
     "Admin": 1,
     "Donator": 0,
@@ -1976,7 +1976,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "mute",
+    "CommandText": "mute",
     "Usage": "[USAGE] mute (target) (mins) (reason)",
     "Admin": 1,
     "Donator": 0,
@@ -1987,7 +1987,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "omute",
+    "CommandText": "omute",
     "Usage": "[USAGE] omute (target) (minutes) (reason)",
     "Admin": 1,
     "Donator": 0,
@@ -1998,7 +1998,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "ounmute",
+    "CommandText": "ounmute",
     "Usage": "[USAGE] ounmute (target)",
     "Admin": 1,
     "Donator": 0,
@@ -2007,7 +2007,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "unmute",
+    "CommandText": "unmute",
     "Usage": "[USAGE] unmute (target)",
     "Admin": 1,
     "Donator": 0,
@@ -2016,7 +2016,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "me",
+    "CommandText": "me",
     "Usage": "[USAGE] me (action)",
     "Admin": 0,
     "Donator": 0,
@@ -2025,7 +2025,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "do",
+    "CommandText": "do",
     "Usage": "[USAGE] do (action)",
     "Admin": 0,
     "Donator": 0,
@@ -2034,7 +2034,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "forceautojoin",
+    "CommandText": "forceautojoin",
     "Usage": "[USAGE] forceautojoin (target)",
     "Admin": 1,
     "Donator": 0,
@@ -2043,7 +2043,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "slap",
+    "CommandText": "slap",
     "Usage": "[USAGE] slap (target)",
     "Admin": 1,
     "Donator": 0,
@@ -2052,7 +2052,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "showshotstats",
+    "CommandText": "showshotstats",
     "Usage": "[USAGE] showshotstats (target)",
     "Admin": 1,
     "Donator": 0,
@@ -2061,7 +2061,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "resetshotstats",
+    "CommandText": "resetshotstats",
     "Usage": "[USAGE] resetshotstats (target)",
     "Admin": 1,
     "Donator": 0,
@@ -2070,14 +2070,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "shotstats",
+    "CommandText": "shotstats",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "grantfugitive",
+    "CommandText": "grantfugitive",
     "Usage": "[USAGE] grantfugitive (target)",
     "Admin": 3,
     "Donator": 0,
@@ -2086,7 +2086,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "outfit",
+    "CommandText": "outfit",
     "Usage": "[USAGE] outfit (option: save, select)",
     "Admin": 0,
     "Donator": 0,
@@ -2095,7 +2095,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "clothing",
+    "CommandText": "clothing",
     "Usage": "[USAGE] clothing (option: reset, cop, fugitive)",
     "Admin": 0,
     "Donator": 0,
@@ -2104,14 +2104,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "dbgsetclothing",
+    "CommandText": "dbgsetclothing",
     "Usage": "",
     "Admin": 5,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "char",
+    "CommandText": "char",
     "Usage": "[USAGE] character (option: reset, edit, help, [reset]clothing, lobbyteam)",
     "Admin": 0,
     "Donator": 0,
@@ -2120,14 +2120,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "requests",
+    "CommandText": "requests",
     "Usage": "",
     "Admin": 1,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "acceptreport",
+    "CommandText": "acceptreport",
     "Usage": "[USAGE] acceptreport (requestid)",
     "Admin": 1,
     "Donator": 0,
@@ -2136,7 +2136,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "denyreport",
+    "CommandText": "denyreport",
     "Usage": "[USAGE] denyreport (requestid) (reason)",
     "Admin": 1,
     "Donator": 0,
@@ -2146,14 +2146,14 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "nametags",
+    "CommandText": "nametags",
     "Usage": "",
     "Admin": 3,
     "Donator": 0,
     "Parameters": []
   },
   {
-    "Name": "spec",
+    "CommandText": "spec",
     "Usage": "[USAGE] spec (target)",
     "Admin": 1,
     "Donator": 0,
@@ -2162,7 +2162,7 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "Name": "loadout",
+    "CommandText": "loadout",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
