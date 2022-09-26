@@ -35,6 +35,7 @@ var isNoClip = false;
 var LastKeyPress = 0;
 var AFKStage = 0;
 var SecondsSinceLastKeyPress = 0; // using this for nametags
+var antiAFKActive = false;
 
 var showReticule = true;
 var showCustomCrosshair = false;

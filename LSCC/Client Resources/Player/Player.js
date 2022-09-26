@@ -237,43 +237,45 @@ mp.events.add("OneSecondEvent", () => {
     }
 
 
-    let curSecond = Math.floor(Date.now()/1000);
-    let lastKeyPressSecond = Math.floor(LastKeyPress/1000);
+    if(antiAFKActive == true){
+        let curSecond = Math.floor(Date.now()/1000);
+        let lastKeyPressSecond = Math.floor(LastKeyPress/1000);
 
-    SecondsSinceLastKeyPress = (curSecond-lastKeyPressSecond);
-    /*
-    if(SecondsSinceLastKeyPress < 1500){
-        if(SecondsSinceLastKeyPress == 600){ // MAKING SURE IDFK
-            if(AFKStage == 0){ AFKStage = 1;}
+        SecondsSinceLastKeyPress = (curSecond-lastKeyPressSecond);
+        
+        if(SecondsSinceLastKeyPress < 1500){
+            if(SecondsSinceLastKeyPress == 600){ // MAKING SURE IDFK
+                if(AFKStage == 0){ AFKStage = 1;}
 
-            pushMessageToChat("~r~[ANTI-AFK] ~w~It appears you didn't press any keys for 10 minutes.");
-            pushMessageToChat("~r~[ANTI-AFK] ~w~If you continue being AFK, you will be kicked in 15 minutes!");
-            pushMessageToChat("~r~[ANTI-AFK] ~w~Your autojoin has also been turned off, it will be re-enabled if you come back.");
+                pushMessageToChat("~r~[ANTI-AFK] ~w~It appears you didn't press any keys for 10 minutes.");
+                pushMessageToChat("~r~[ANTI-AFK] ~w~If you continue being AFK, you will be kicked in 15 minutes!");
+                pushMessageToChat("~r~[ANTI-AFK] ~w~Your autojoin has also been turned off, it will be re-enabled if you come back.");
 
-            mp.events.callRemote("SetAutoJoin", false, true);
+                mp.events.callRemote("SetAutoJoin", false, true);
+            }
+            else if(SecondsSinceLastKeyPress == 900){
+                if(AFKStage == 0){ AFKStage = 1;}
+                pushMessageToChat("~r~[ANTI-AFK] ~w~You will be kicked from the server in 10 minutes for being AFK too long!");
+            }
+            else if(SecondsSinceLastKeyPress == 1200){
+                if(AFKStage == 0){ AFKStage = 1;}
+                pushMessageToChat("~r~[ANTI-AFK] ~w~You will be kicked from the server in 5 minutes for being AFK too long!");
+            }
+            else if(SecondsSinceLastKeyPress == 1440){
+                if(AFKStage == 0){ AFKStage = 1;}
+                pushMessageToChat("~r~[ANTI-AFK] ~w~You will be kicked from the server in 1 minute for being AFK too long!");
+            }
         }
-        else if(SecondsSinceLastKeyPress == 900){
-            if(AFKStage == 0){ AFKStage = 1;}
-            pushMessageToChat("~r~[ANTI-AFK] ~w~You will be kicked from the server in 10 minutes for being AFK too long!");
-        }
-        else if(SecondsSinceLastKeyPress == 1200){
-            if(AFKStage == 0){ AFKStage = 1;}
-            pushMessageToChat("~r~[ANTI-AFK] ~w~You will be kicked from the server in 5 minutes for being AFK too long!");
-        }
-        else if(SecondsSinceLastKeyPress == 1440){
-            if(AFKStage == 0){ AFKStage = 1;}
-            pushMessageToChat("~r~[ANTI-AFK] ~w~You will be kicked from the server in 1 minute for being AFK too long!");
+        else{
+            if(AFKStage != 2)
+            {
+                AFKStage = 2;
+                pushMessageToChat("~r~[ANTI-AFK] ~w~You've been kicked from the server for being AFK too long!");
+                mp.events.callRemote("KickPlayer", "AFK", false);
+            }
         }
     }
-    else{
-        if(AFKStage != 2)
-        {
-            AFKStage = 2;
-            pushMessageToChat("~r~[ANTI-AFK] ~w~You've been kicked from the server for being AFK too long!");
-            mp.events.callRemote("KickPlayer", "AFK", false);
-        }
-    }
-    */
+    
 	
 
     if(ShotStats.UpdateInterval >= 10)
@@ -2846,6 +2848,9 @@ mp.events.add(
             */
             ServerUI = mp.browsers.new("package://ServerUI/index.html");
             ServerUI.active = false;
+            LastKeyPress = Date.now();
+            AFKStage = 0;
+            antiAFKActive = false;
             mp.gui.chat.show(false);
             mp.gui.chat.activate(false);
         }, 1000);
@@ -2940,6 +2945,7 @@ function setStorageDataVars(){
 
     LastKeyPress = Date.now();
     AFKStage = 0;
+    antiAFKActive = true;
 
     if(mp.storage.data.menu.OOCauto !== undefined){
         autoOOC = mp.storage.data.menu.OOCauto;

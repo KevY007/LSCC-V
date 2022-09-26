@@ -670,7 +670,7 @@ namespace RNC
         public const string DCBotToken = "NjAyNTQ1Mzc0MDY1OTgzNTgw.XtaCEQ.clpqVL5c0X_38xkT-mYTr4_N9a4";
 
         // Global Variables (changing accordingly)
-        public static bool SpawnParkedVehicles { get; set; } // for debug purposes whether to spawn random cars
+        public static bool SpawnParkedVehicles { get; set; } = true; // for debug purposes whether to spawn random cars
         public static List<LobbyData> Lobbies { get; set; }
         public static List<Player> LoggedInPlayers { get; set; }
         public static List<Vehicle> AdminVehicles { get; set; }
@@ -3315,6 +3315,7 @@ namespace RNC
                     {
                         player.TriggerEvent("MDC:RemoveAllBlips");
                         player.TriggerEvent("ClearClimbTaseProtection", true);
+                        player.TriggerEvent("startLoadingScreen", -1, "Loading copchase match...");
                     }
 
                     if (pCount < 2) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Total players less than two, failed to start"); return; }
@@ -3532,7 +3533,6 @@ namespace RNC
                                         }
                                     }
                                     */
-                                    player.TriggerEvent("startLoadingScreen", -1, "Loading copchase match...");
                                     player.TriggerEvent("ToggleNametags", false);
                                     player.SetSharedData("Collisions", false);
                                     player.ResetData("Seatbelt");
