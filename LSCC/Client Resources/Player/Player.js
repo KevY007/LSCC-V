@@ -999,6 +999,10 @@ mp.events.add("playerEnterVehicle", (vehicle, seat) => {
         if(player.getVariable("TaseProtection") == true){
             mp.events.callRemote("SetTaseProtection", false);
         }
+
+        if(vehicle.getVariable("Team") == 10 && vehicle.getVariable("Engine") == false){
+            vehicle.setEngineOn(false, true, true);
+        }
     }
 });
 mp.events.add("playerLeaveVehicle", (vehicle, seat) => {
@@ -1061,6 +1065,14 @@ mp.events.add('render', () => {
         FPS = FPS_Frames;
         FPS_Frames = 0;
         FPS_Calc = Date.now();
+    }
+
+    if(mp.players.local.getVariable("Team") == 0){
+        if(mp.players.local.isInAnyVehicle(true) && (mp.players.local.vehicle.getPedInSeat(-1) == mp.players.local.handle)){
+            if(mp.players.local.vehicle.getVariable("Team") == 10 && mp.players.local.vehicle.getVariable("Engine") == false){
+                mp.players.local.vehicle.setEngineOn(false, true, true);
+            }
+        }
     }
 
     if(specState == true && specTarget != null){
