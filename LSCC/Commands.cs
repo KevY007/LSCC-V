@@ -2823,10 +2823,12 @@ namespace RNC
             target.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}Temporarily attached '{comp.Name}' on '{itemData.Name}' by {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "an administrator" : player.Name)}.");
             return;
         }
-
+        /*
         [Command("removecomp", "!{#AFAFAF}[USAGE] removecomp (component/hash - hold weapon and use 'help' to list available)", GreedyArg = true)]
         public void cmd_removecomp(Player player, string component)
         {
+            return;
+
             if (!EPlayer.LoggedIn(player))
                 return;
 
@@ -2961,6 +2963,7 @@ namespace RNC
             EPlayer.Save(player);
             return;
         }
+        */
 
         [Command("convertpoints", "!{#AFAFAF}[USAGE] convertpoints (amount) (standard to donator | donator to standard)", GreedyArg = true)]
         public void cmd_convertpoints(Player player, int amount, string type)
@@ -3118,6 +3121,7 @@ namespace RNC
             return;
         }
 
+        /*
         [Command("buycomp", "!{#AFAFAF}[USAGE] buycomp (component/hash - hold weapon and use 'help' to list available)", GreedyArg = true)]
         public void cmd_buycomp(Player player, string component)
         {
@@ -3278,6 +3282,7 @@ namespace RNC
             EPlayer.Save(player);
             return;
         }
+        */
 
         [Command("mycomps", GreedyArg = true)]
         public void cmd_mycomps(Player player)
