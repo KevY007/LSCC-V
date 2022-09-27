@@ -1499,10 +1499,15 @@ mp.events.add("render", () => {
         }
     }
 
-    if(!showReticule || customCrosshairOn || isLockpicking || ActionMenuActive)
+    if(!showReticule || customCrosshairOn)
     {
         mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);
+    }
+    if(isLockpicking == true || ActionMenuActive == true){
+        mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
+        
+        if(ServerUI != null)
+            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);
     }
 
     if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
