@@ -11023,8 +11023,10 @@ namespace RNC
                         int gender = Convert.ToInt32(ConvChar.Gender);
                         string genderChar = "M";
                         if (gender == 1) genderChar = "F";
-                        NAPI.Util.ConsoleOutput($"Is gender 1? {(gender == 1).ToString()} and gender char is {genderChar}");
-                        player.TriggerEvent("ClothingEditor:show", 1, genderChar);
+
+                        int clothingDataID = (gender == 1 ? 3 : 1);
+                        string clothingInfo = NAPI.Util.ToJson(ConvChar.Clothing[clothingDataID]);
+                        player.TriggerEvent("ClothingEditor:show", 1, genderChar, clothingInfo);
                     }
                     else if (args[1].StartsWith("donatorcop", StringComparison.OrdinalIgnoreCase))
                     {

@@ -8,14 +8,44 @@ mp.events.add("ClothingEditor:exit", (save) => {
 
     mp.events.callRemote("ClothingEditor:onExit", save, editorTeam);
 });
-mp.events.add("ClothingEditor:show", (team, gender) => {
+mp.events.add("ClothingEditor:show", (team, gender, clothingData) => {
+    let cData = JSON.parse(clothingData);
+    let toSend = {
+        "Shirt":[cData.Clothes[11].Drawable, cData.Clothes[11].Texture],
+        "Undershirt":[cData.Clothes[8].Drawable, cData.Clothes[8].Texture],
+        "Pants":[cData.Clothes[4].Drawable, cData.Clothes[4].Texture],
+        "Shoes":[cData.Clothes[6].Drawable, cData.Clothes[6].Texture],
+        "Accessory 1":[cData.Clothes[5].Drawable, cData.Clothes[5].Texture],
+        "Accessory 2":[cData.Clothes[7].Drawable, cData.Clothes[7].Texture],
+        "Armor":[cData.Clothes[9].Drawable, cData.Clothes[9].Texture],
+        "Handwear":[cData.TorsoDrawableTexture.Key, cData.TorsoDrawableTexture.Value],
+        "Hats":[cData.Hat, cData.HatTxt],
+        "Glasses":[cData.Glasses, cData.GlassesTxt],
+    }
+    let toSendStr = JSON.stringify(toSend);
+
     editorTeam = team;
     ServerUI.execute(`gm.$refs.hud.enabled = false;`);
     mp.gui.cursor.show(true, true);
 
-    ClothingEditorDOM.execute(`ShowClothingEditor(${team}, '${gender}');`);
+    ClothingEditorDOM.execute(`ShowClothingEditor(${team}, '${gender}', ${toSendStr});`);
     ClothingEditorDOM.active = true;
     ClothingEditorActive = true;
+});
+mp.events.add("ClothingEditor:updateClothingManual", (componentIndex, drawable, texture) => {
+    let isProp = (componentIndex < 3);
+    if(!isProp){
+        mp.events.callRemote('RequestSetClothes', componentIndex, drawable, texture);
+        mp.players.local.setComponentVariation(componentIndex, drawable, texture, 0);
+    }
+    else{
+        if(componentIndex == 1){
+    		mp.events.callRemote('RequestSetGlasses', drawable, texture);
+        }
+        else{
+    		mp.events.callRemote('RequestSetHat', drawable, texture);
+        }
+    }
 });
 mp.events.add("ClothingEditor:updateClothing", (clothingName, drawable, texture) => {
     let isProp = false, componentIndex = 0;

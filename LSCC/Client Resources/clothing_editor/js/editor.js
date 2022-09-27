@@ -11,8 +11,7 @@ var CurrentShirt = "JacketOpen";
 var AcceptedItems = [];
 
 
-
-function ShowClothingEditor(team, gender){
+function ShowClothingEditor(team, gender, cData){
     Team = team;
     Gender = gender;
     selectedShirtType = 0;
@@ -23,6 +22,7 @@ function ShowClothingEditor(team, gender){
 
     UpdateContent();
     updateCurrentClothingData();
+    setCurrentClothingData(cData);
 }
 function ExitClothingEditor(){
     mp.trigger("ClothingEditor:exit", false);
@@ -195,8 +195,24 @@ function scrollShirtType(right){
     }
     UpdateContent();
     updateCurrentClothingData();
+    updateOnPageSwitch();
 }
+function setCurrentClothingData(data){
+    var keys = [];
+    for(var key in data){
+        keys.push(key);
+    }
+    for(let i = 0 ; i < keys.length ; i++){
+        let clothing = data[keys[i]][0];
+        let texture = data[keys[i]][1];
 
+        let clothingElement = document.getElementById(keys[i]);
+        if(clothingElement != undefined){
+            clothingElement.innerHTML = clothing;
+            document.getElementById(keys[i] + "_texture").innerHTML = texture;
+        }
+    }
+}
 function updateCurrentClothingData(){
     var currentClothing = "{";
     for(let i = 0 ; i < AcceptedItems.length ; i++){
@@ -208,5 +224,18 @@ function updateCurrentClothingData(){
         
     }
     currentClothing += "}";
+    console.log(currentClothing);
     //mp.trigger("ClothingEditor:updateClothing", currentClothing);
+}
+
+function updateOnPageSwitch(){
+    for(let i = 0 ; i <= 11 ; i++){
+        mp.trigger("ClothingEditor:updateClothingManual", i, -1, -1);
+    }
+    for(let i = 0 ; i < AcceptedItems.length ; i++){
+        let currentIdx = Number(document.getElementById(AcceptedItems[i].name).innerHTML);
+        let texture = Number(document.getElementById(AcceptedItems[i].name + "_texture").innerHTML);
+
+        mp.trigger("ClothingEditor:updateClothing", AcceptedItems[i].name, currentIdx, texture);        
+    }
 }

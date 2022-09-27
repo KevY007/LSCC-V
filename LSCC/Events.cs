@@ -3402,6 +3402,8 @@ namespace RNC
                 if (player.HasData("CharacterBeforeEdit"))
                 {
                     EPlayer.ApplyCharacter(player, player.GetData<CharacterData>("CharacterBeforeEdit"), team);
+                    EPlayer.GetAccount(player).Character = NAPI.Util.ToJson(player.GetData<CharacterData>("CharacterBeforeEdit"));
+                    EPlayer.Save(player, false);
                 }
             }
         }
