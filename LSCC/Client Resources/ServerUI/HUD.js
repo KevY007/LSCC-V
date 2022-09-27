@@ -1499,9 +1499,10 @@ mp.events.add("render", () => {
         }
     }
 
-    if(!showReticule || customCrosshairOn || isLockpicking)
+    if(!showReticule || customCrosshairOn || isLockpicking || ActionMenuActive)
     {
         mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);
     }
 
     if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
