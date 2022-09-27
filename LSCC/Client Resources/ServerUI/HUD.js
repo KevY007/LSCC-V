@@ -155,7 +155,7 @@ mp.events.add('actionMenu:close', () => {
 });
 mp.events.add('actionMenu:open', () => {
     if(chatStatus == true || menuToggled == true || MDCActive == true || scoreboardToggled == true
-        || VehicleSpawnerActive == true || WeaponEditorActive == true || isHotwiring == true) return;
+        || VehicleSpawnerActive == true || WeaponEditorActive == true || isHotwiring == true || ClothingEditorActive == true) return;
 
     mp.game.invoke("0xFC695459D4D0E219", 0.5, 0.5); // SET CURSOR POSITION TO CENTER [x,y = 0.5,0.5]
     ActionMenuActive = true;
@@ -473,6 +473,7 @@ function focusChat(toggle){
     if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
     (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
     (ActionMenuActive !== undefined && ActionMenuActive == true) || 
+    (ClothingEditorActive !== undefined && ClothingEditorActive == true) ||
     (isHotwiring !== undefined && isHotwiring == true)){
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = false;`);
         return;
@@ -585,6 +586,7 @@ mp.keys.bind(0x54, true, function() { // T key
     }
     if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
     (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
+    (ClothingEditorActive !== undefined && ClothingEditorActive == true) ||
     (ActionMenuActive !== undefined && ActionMenuActive == true) || 
     (isHotwiring !== undefined && isHotwiring == true)){
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = false;`);

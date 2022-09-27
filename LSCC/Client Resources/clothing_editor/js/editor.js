@@ -25,7 +25,10 @@ function ShowClothingEditor(team, gender){
     updateCurrentClothingData();
 }
 function ExitClothingEditor(){
-    mp.trigger("ClothingEditor:exit");
+    mp.trigger("ClothingEditor:exit", false);
+}
+function SaveClothingEditor(){
+    mp.trigger("ClothingEditor:exit", true);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -99,7 +102,7 @@ function UpdateContent(){
             break;
             case "Accessory 2": acceptedCheck = realType.accepted.Accessories;
             break;
-            case "Armored": acceptedCheck = realType.accepted.Armor;
+            case "Armor": acceptedCheck = realType.accepted.Armor;
             break;
             case "Handwear": acceptedCheck = realType.accepted.Torso;
             break;
@@ -158,6 +161,10 @@ function scrollTexture(clothingName, value){
     if(currentID > 17) currentID = 0;
     if(currentID < 0) currentID = 16;
     document.getElementById(elementID).innerHTML = currentID;
+
+    let currentClothing = Number(document.getElementById(clothingName).innerHTML);
+    mp.trigger("ClothingEditor:updateClothing", clothingName, currentClothing, currentID);
+
     updateCurrentClothingData();
 }
 
@@ -171,6 +178,8 @@ function scrollItem(clothingName, value){
     if(currentIdx < 0) currentIdx = acceptedItem.items.length-1;
 
     document.getElementById(clothingName).innerHTML = acceptedItem.items[currentIdx];
+    document.getElementById(clothingName + "_texture").innerHTML = "0";
+    mp.trigger("ClothingEditor:updateClothing", clothingName, acceptedItem.items[currentIdx], 0);
     updateCurrentClothingData();
 }
 
@@ -199,5 +208,5 @@ function updateCurrentClothingData(){
         
     }
     currentClothing += "}";
-    mp.trigger("ClothingEditor:updateClothing", currentClothing);
+    //mp.trigger("ClothingEditor:updateClothing", currentClothing);
 }

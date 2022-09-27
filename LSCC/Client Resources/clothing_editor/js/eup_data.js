@@ -175,7 +175,7 @@ const MaleClothing = [
     {
         clothing: "Undershirt",
         type: "KevlarUS",
-        items: [214, 220]
+        items: [-1, 214, 220]
     },
     {
         clothing: "Pants",
@@ -200,22 +200,22 @@ const MaleClothing = [
     {
         clothing: "Accessory 1",
         type: "Tie",
-        items: [115, 114]
+        items: [-1, 115, 114]
     },
     {
         clothing: "Accessory 2",
         type: "HipHolster",
-        items: [170, 171]
+        items: [-1, 170, 171]
     },
     {
         clothing: "Armor",
         type: "KevlarArmor",
-        items: [63, 68, 70, 71, 77, 80, 82]
+        items: [-1, 63, 68, 70, 71, 77, 80, 82]
     },
     {
         clothing: "Armor",
         type: "HeavyArmor",
-        items: [62, 75]
+        items: [-1, 62, 75]
     },
     {
         clothing: "Handwear",
@@ -230,12 +230,12 @@ const MaleClothing = [
     {
         clothing: "Hats",
         type: "HatNormal",
-        items: [46, 142]
+        items: [-1, 46, 142]
     },
     {
         clothing: "Hats",
         type: "HatHeavy",
-        items: [141]
+        items: [-1, 141]
     },
 ]
 

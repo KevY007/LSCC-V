@@ -11017,6 +11017,22 @@ namespace RNC
                             EPlayer.ApplyCharacter(player, ConvChar, 1);
                         }
                         catch { return; }
+                        player.SetData<CharacterData>("CharacterBeforeEdit", ConvChar);
+                        player.SetData("EditingClothing", 1);
+                        player.SetData("LastEditedClothingTeam", 1);
+                        int gender = Convert.ToInt32(ConvChar.Gender);
+                        string genderChar = "M";
+                        if (gender == 1) genderChar = "F";
+                        NAPI.Util.ConsoleOutput($"Is gender 1? {(gender == 1).ToString()} and gender char is {genderChar}");
+                        player.TriggerEvent("ClothingEditor:show", 1, genderChar);
+                    }
+                    else if (args[1].StartsWith("donatorcop", StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
+                        {
+                            EPlayer.ApplyCharacter(player, ConvChar, 1);
+                        }
+                        catch { return; }
 
                         player.SetData("EditingClothing", 1);
                         player.SetData("LastEditedClothingTeam", 1);

@@ -122,6 +122,7 @@ require("./charcreator/outfitslots.js");
 require('./mdc_screen/index.js');
 require('./hotwire_game/index.js');
 require('./weaponeditor/index.js');
+require('./clothing_editor/index.js');
 require('./tips_test/index.js');
 require('./Player/Fuel.js');
 
@@ -377,13 +378,13 @@ function actionMenuOpen(){
 // When 'E' key is let go, close the menu - toggleable though.
 function actionMenuClose(){
     if(chatStatus == true || menuToggled == true || MDCActive == true || scoreboardToggled == true
-        || VehicleSpawnerActive == true || WeaponEditorActive == true || isHotwiring == true) return;
+        || VehicleSpawnerActive == true || WeaponEditorActive == true || isHotwiring == true || ClothingEditorActive == true) return;
 
     mp.events.callLocal("actionMenu:close"); 
 }
 function ToggleMDC(){
     if(mp.players.local.getVariable("Team") != 1 || mp.players.local.getVariable("Wounded") > 0) return;
-    if(menuToggled == true || chatStatus == true || ActionMenuActive == true || isHotwiring == true) return;
+    if(menuToggled == true || chatStatus == true || ActionMenuActive == true || isHotwiring == true || ClothingEditorActive == true) return;
 
     if(scoreboardToggled)
     {

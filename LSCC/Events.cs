@@ -3388,6 +3388,24 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("ClothingEditor:onExit")]
+        public void OnExitClothingEditor(Player player, bool save, int team)
+        {
+            if (save)
+            {
+                EPlayer.Save(player, false);
+                EPlayer.Notify(player, "You have successfully saved your uniform!", "green", "fas fa-check", false, 1500, "bottomRight", "replace");
+            }
+            else
+            {
+                EPlayer.Error(player, "You exited the clothing editor without saving your changes.");
+                if (player.HasData("CharacterBeforeEdit"))
+                {
+                    EPlayer.ApplyCharacter(player, player.GetData<CharacterData>("CharacterBeforeEdit"), team);
+                }
+            }
+        }
+
         [RemoteEvent("RequestSetClothes")]
         public void OnRequestSetClothes(Player player, int slot, int drawable, int texture)
         {

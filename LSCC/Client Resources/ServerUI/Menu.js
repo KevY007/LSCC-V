@@ -288,6 +288,7 @@ function ToggleMenu()
     if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
         (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
         (ActionMenuActive !== undefined && ActionMenuActive == true) ||
+        (ClothingEditorActive !== undefined && ClothingEditorActive == true) ||
         (isHotwiring !== undefined && isHotwiring == true)){
         return;
     }

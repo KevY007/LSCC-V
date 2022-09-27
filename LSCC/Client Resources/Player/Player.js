@@ -2902,6 +2902,9 @@ mp.events.add("OnPlayerLoginRegister", () => {
     setTimeout(() => {
         InitializeHotwireDOM();
     }, 400);
+    setTimeout(() => {
+        InitializeClothingEditorDOM();
+    }, 450);
 
     setTimeout(() => {
         focusChat(false);
