@@ -55,6 +55,9 @@ var isLockpicking = false;
 var isHotwiring = false;
 var HotwireDOM = false;
 
+var ClothingEditorDOM = null;
+var ClothingEditorActive = false;
+
 var ActionMenuActive = false;
 var VehicleSpawnerActive = false;
 var WeaponEditorActive = false;

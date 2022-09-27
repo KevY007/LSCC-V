@@ -83,8 +83,44 @@ body{
     justify-content: center;
 
     color:white;
-    font-size: 40px;
+    font-size: 30px;
     font-family: 'Roboto Condensed', sans-serif;
+}
+.texture-select{
+    position:absolute;
+    display:flex;
+    bottom:-22px;
+    font-size:23px;
+    
+}
+
+.texture-left{
+    width:32px;
+    height:32px;
+    background:rgba(0,0,0,0.5);
+    font-size:28px;
+    position:absolute;
+    bottom:23px;
+    left: -50px;
+    cursor: pointer;
+    transition:0.3s;
+}
+.texture-left:hover{
+    background:rgba(255,255,255,0.5);
+}
+.texture-right:hover{
+    background:rgba(255,255,255,0.5);
+}
+.texture-right{
+    width:32px;
+    height:32px;
+    background:rgba(0,0,0,0.5);
+    font-size:28px;
+    position:absolute;
+    bottom:23px;
+    right: -50px;
+    cursor: pointer;
+    transition:0.3s;
 }
 
 .item-left{

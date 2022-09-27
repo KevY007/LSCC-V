@@ -10,6 +10,8 @@ var ClothingData;
 var CurrentShirt = "JacketOpen";
 var AcceptedItems = [];
 
+
+
 function ShowClothingEditor(team, gender){
     Team = team;
     Gender = gender;
@@ -71,6 +73,16 @@ function UpdateContent(){
         <p id="Shirt">
         ${clothingData.items[0]}
         </p>
+        <div class="texture-select">
+        <div class="texture-left" onclick="scrollTexture('Shirt', -1)">&#60;</div>
+        <div class="texture-right" onclick="scrollTexture('Shirt', 1)">></div>
+            <p>
+            Texture:&nbsp;
+            </p>
+            <p id="Shirt_texture">
+            0
+            </p>
+        </div>
     </div>
     `;
     let realType = LinkedTypes.find(l => l.type == CurrentShirt);
@@ -122,10 +134,31 @@ function UpdateContent(){
                 <p id="${ClothingData[i].clothing}">
                 ${ClothingData[i].items[0]}
                 </p>
+                <div class="texture-select">
+                <div class="texture-left" onclick="scrollTexture('${ClothingData[i].clothing}', -1)">&#60;</div>
+                <div class="texture-right" onclick="scrollTexture('${ClothingData[i].clothing}', 1)">></div>
+                <p>
+                Texture:&nbsp;
+                </p>
+                <p id="${ClothingData[i].clothing}_texture">
+                0
+                </p>
+            </div>
             </div>
             `;
         }
     }
+}
+
+function scrollTexture(clothingName, value){
+    let elementID = `${clothingName}_texture`;
+    let currentID = Number(document.getElementById(elementID).innerHTML);
+    
+    currentID += value;
+    if(currentID > 17) currentID = 0;
+    if(currentID < 0) currentID = 16;
+    document.getElementById(elementID).innerHTML = currentID;
+    updateCurrentClothingData();
 }
 
 function scrollItem(clothingName, value){
@@ -159,8 +192,9 @@ function updateCurrentClothingData(){
     var currentClothing = "{";
     for(let i = 0 ; i < AcceptedItems.length ; i++){
         let currentIdx = Number(document.getElementById(AcceptedItems[i].name).innerHTML);
+        let texture = Number(document.getElementById(AcceptedItems[i].name + "_texture").innerHTML);
 
-        currentClothing += `"${AcceptedItems[i].name}":${currentIdx}`;
+        currentClothing += `"${AcceptedItems[i].name}":[${currentIdx},${texture}]`;
         if(i != AcceptedItems.length-1) currentClothing += ",";
         
     }
