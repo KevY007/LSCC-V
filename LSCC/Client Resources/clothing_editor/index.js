@@ -27,6 +27,7 @@ mp.events.add("ClothingEditor:show", (team, gender, clothingData) => {
     editorTeam = team;
     ServerUI.execute(`gm.$refs.hud.enabled = false;`);
     mp.gui.cursor.show(true, true);
+    mp.game.invoke("0xFC695459D4D0E219", 0.5, 0.5); // SET CURSOR POSITION TO CENTER [x,y = 0.5,0.5]
 
     ClothingEditorDOM.execute(`ShowClothingEditor(${team}, '${gender}', ${toSendStr});`);
     ClothingEditorDOM.active = true;
@@ -78,4 +79,19 @@ function InitializeClothingEditorDOM(){
     ClothingEditorDOM = mp.browsers.new("package://clothing_editor/index.html");
     ClothingEditorDOM.active = false;
     ClothingEditorActive = false;
+}
+
+mp.keys.bind(0x20, true, function() {clothingEditor_CameraMovement(true); });
+mp.keys.bind(0x20, false, function() {clothingEditor_CameraMovement(false); });
+
+function clothingEditor_CameraMovement(toggle){
+    if(!ClothingEditorActive) return;
+
+    if(toggle)
+        mp.gui.cursor.show(false, false);
+    else{
+        mp.game.invoke("0xFC695459D4D0E219", 0.5, 0.5); // SET CURSOR POSITION TO CENTER [x,y = 0.5,0.5]
+        mp.gui.cursor.show(true, true);
+    }
+
 }
