@@ -6,6 +6,8 @@ const Natives = {
     SET_TEXT_OUTLINE: "0x2513DFB0FB8400FE"
 };
 
+var wasCustomCrosshairOn = false;
+
 let minimap = {};
 
 let chatOpacityTimeout = null;
@@ -1430,23 +1432,19 @@ mp.events.add("render", () => {
                     if(!menuToggled)                     
                     {
                         customCrosshairOn = true;
-                        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);
                     }
                 }
                 else{
                     if(isHoldingSniper()){
                         if(showCustomCrosshairInSniper){
-                            customCrosshairOn = true;
-                            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);                            
+                            customCrosshairOn = true;                           
                         }
                         else{
-                            customCrosshairOn = false;
-                            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);                               
+                            customCrosshairOn = false;                           
                         }
                     }
                     else{
                         customCrosshairOn = true;
-                        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);
                     }
                 }
             }
@@ -1454,12 +1452,10 @@ mp.events.add("render", () => {
                 if(mp.game.player.isFreeAiming()){                              
                     if(isHoldingSniper()){
                         if(showCustomCrosshairInSniper){
-                            customCrosshairOn = true;
-                            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);                            
+                            customCrosshairOn = true;                          
                         }
                         else{
-                            customCrosshairOn = false;
-                            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);                               
+                            customCrosshairOn = false;                            
                         }
                     }
                 }               
@@ -1470,22 +1466,18 @@ mp.events.add("render", () => {
                 if(!customCrosshairOn){
                     if(!mp.game.player.isFreeAiming()){                              
                         customCrosshairOn = true;
-                        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);
                     }
                     else{
                         if(isHoldingSniper()){
                             if(showCustomCrosshairInSniper){
-                                customCrosshairOn = true;
-                                ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);                            
+                                customCrosshairOn = true;                          
                             }
                             else{
-                                customCrosshairOn = false;
-                                ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);                                   
+                                customCrosshairOn = false;                                  
                             }
                         }
                         else{
                             customCrosshairOn = true;
-                            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);
                         }
                     }
                 }
@@ -1493,21 +1485,32 @@ mp.events.add("render", () => {
             else{
                 if(customCrosshairOn){
                     customCrosshairOn = false;
-                    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);
                 }
             }   
         }
     }
 
-    if(!showReticule || customCrosshairOn)
+    if(!showReticule)
     {
         mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
+        customCrosshairOn = false;
     }
     if(isLockpicking == true || ActionMenuActive == true){
         mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
-        
-        if(ServerUI != null)
+        customCrosshairOn = false;
+    }
+    if(customCrosshairOn == true){
+        if(!wasCustomCrosshairOn){
+            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);
+            wasCustomCrosshairOn = true;
+        }
+        mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
+    }
+    else{
+        if(wasCustomCrosshairOn == true){
             ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);
+            wasCustomCrosshairOn = false;
+        }
     }
 
     if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
