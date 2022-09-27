@@ -168,7 +168,6 @@ mp.events.add('actionMenu:open', () => {
     mp.gui.cursor.show(true, true);
 });
 mp.events.add('actionMenu:clickItem', (actionID) => {
-    mp.events.callRemote("ServerConsoleOutput", `${mp.players.local.name} called actionMenu:ClickItem on ${actionID}`);
     mp.events.callLocal("actionMenu:close");
 
     // yes it's a long switch case with same action - this is for future in case some clientside stuff needs to be done too!
