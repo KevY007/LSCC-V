@@ -22,9 +22,7 @@
     AnkleHigh
 
     BAGS:
-    Radio
     Tie
-    KevlarPiece
 
     SHOES:
     High
@@ -41,7 +39,90 @@
     HatHeavy
 */
 
-const Clothing = [
+// female shirt 405-439 crashes game
+// female shoes 90-111 crash the game
+// female bags 89-110 crash the game
+// bags 137 female = kevlar
+const FemaleClothing = [
+    {
+        type: "JacketOpen",
+        items: [467, 466, 464, 463, 462, 461, 458, 456, 454, 453, 447]
+    },
+    {
+        type: "ShortSleeves",
+        items: [465, 455, 444, 442, 441]
+    },
+    {
+        type: "LongSleeves",
+        items: [470, 460, 443]
+    },
+    {
+        type: "Armored",
+        items: [450]
+    },
+    {
+        type: "InsideShirt",
+        items: [242]
+    },
+    {
+        type: "DutyBelt",
+        items: [243, 241, 238, 237, 236]
+    },
+    {
+        type: "KevlarUS",
+        items: []
+    },
+    {
+        type: "Normal",
+        items: [163, 161]
+    },
+    {
+        type: "AnkleHigh",
+        items: [162, 160, 159, 158]
+    },
+    {
+        type: "Low",
+        items: [27]
+    },
+    {
+        type: "High",
+        items: [25]
+    },
+    {
+        type: "Tie",
+        items: [115, 114]
+    },
+    {
+        type: "HipHolster",
+        items: [127, 126]
+    },
+    {
+        type: "KevlarArmor",
+        items: [58, 59, 62, 66, 69, 76]
+    },
+    {
+        type: "HeavyArmor",
+        items: [57, 61, 70, 74, 81]
+    },
+    {
+        type: "Hands",
+        items: [3, 26, 36]
+    },
+    {
+        type: "Elbows",
+        items: [0, 20, 35]
+    },
+    {
+        type: "HatNormal",
+        items: [45, 141]
+    },
+    {
+        type: "HatHeavy",
+        items: [140]
+    },
+]
+
+const MaleClothing = [
     {
         type: "JacketOpen",
         items: [468, 462, 455, 453, 444, 439, 438, 437, 434, 433, 431, 430, 428, 427, 426, 425, 424, 422]
@@ -64,7 +145,7 @@ const Clothing = [
     },
     {
         type: "DutyBelt",
-        items: [227, 226, 225, 224, 219, 218, 217, 216, 212, 211, 210, 206, 205, 202, 201, 199, 198, 197, ]
+        items: [227, 226, 225, 224, 219, 218, 217, 216, 212, 211, 210, 206, 205, 202, 201, 199, 198, 197]
     },
     {
         type: "KevlarUS",
