@@ -9339,6 +9339,7 @@ namespace RNC
                 return;
             }
 
+            int accID = EPlayer.GetAccount(player).SQL_ID;
             string name = player.Name;
             Task.Run(async () =>
             {
@@ -9361,6 +9362,10 @@ namespace RNC
                     {
                         arena.Admin = newname;
                     }
+                    Account toChange = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == accID);
+                    toChange.Username = newname;
+                    toChange.Namechanges--;
+                    await context.SaveChangesAsync();
 
                     NAPI.Task.Run(() =>
                     {
@@ -9370,10 +9375,7 @@ namespace RNC
                         player.ResetData("AccountHandle");
                         player.ResetData("LoggedIn");
                     });
-
-                    EPlayer.GetAccount(player).Username = newname;
-                    EPlayer.GetAccount(player).Namechanges--;
-                    EPlayer.Save(player);
+                    await NAPI.Task.WaitForMainThread();
                     NAPI.Task.Run(() => { try { player.KickSilent(); } catch { } }, 1000);
                 }
             });            
