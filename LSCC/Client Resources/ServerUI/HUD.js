@@ -1425,7 +1425,7 @@ mp.events.add("render", () => {
         }
     }
 
-    if(showCustomCrosshair && !isLockpicking){
+    if(showCustomCrosshair){
         if(alwaysShowCustomCrosshair == true){
             if(!customCrosshairOn){
                 if(!mp.game.player.isFreeAiming()){         
