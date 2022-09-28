@@ -38,7 +38,7 @@ let MasksDrawable = [];
 for (i = 0; i < player.getNumberOfDrawableVariations(1) + 1; i++) MasksDrawable.push(i.toString());
 
 
-let numMasksInstalled = 3; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+let numMasksInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
 MasksDrawable.splice(MasksDrawable.length-141+numMasksInstalled);
 
 let MasksTextureArray = [];
@@ -159,7 +159,7 @@ let JacketsDrawable = [];
 for (i = 0; i < player.getNumberOfDrawableVariations(11) + 1; i++) JacketsDrawable.push(i.toString());
 
 
-let numJacketsInstalled = 58; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+let numJacketsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
 JacketsDrawable.splice(JacketsDrawable.length-141+numJacketsInstalled);
 
 // Texture
@@ -215,7 +215,7 @@ let ShirtsDrawable = [];
 for (i = 0; i < player.getNumberOfDrawableVariations(8) + 1; i++) ShirtsDrawable.push(i.toString());
 
 
-let numShirtsInstalled = 52; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+let numShirtsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
 ShirtsDrawable.splice(ShirtsDrawable.length-160+numShirtsInstalled);
 
 let ShirtsTextureArray = [];
@@ -270,7 +270,7 @@ let PantsDrawable = [];
 for (i = 0; i < player.getNumberOfDrawableVariations(4) + 1; i++) PantsDrawable.push(i.toString());
 
 
-let numPantsInstalled = 16; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+let numPantsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
 PantsDrawable.splice(PantsDrawable.length-161+numPantsInstalled);
 
 let PantsTextureArray = [];
@@ -324,7 +324,7 @@ menuClothingPants.ItemSelect.on((item, index) => {
 let ShoesDrawable = [];
 for (i = 0; i < player.getNumberOfDrawableVariations(6) + 1; i++) ShoesDrawable.push(i.toString());
 
-let numShoesInstalled = 3; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+let numShoesInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
 ShoesDrawable.splice(ShoesDrawable.length-151+numShoesInstalled);
 
 let ShoesTextureArray = [];
@@ -490,7 +490,7 @@ let AccessoriesDrawable = [];
 for (i = 0; i < player.getNumberOfDrawableVariations(7) + 1; i++) AccessoriesDrawable.push(i.toString());
 
 
-let numAccessoriesInstalled = 18; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+let numAccessoriesInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
 AccessoriesDrawable.splice(AccessoriesDrawable.length-161+numAccessoriesInstalled);
 
 let AccessoriesTextureArray = [];
@@ -545,7 +545,7 @@ let BagsDrawable = [];
 for (i = 0; i < player.getNumberOfDrawableVariations(5) + 1; i++) BagsDrawable.push(i.toString());
 
 
-let numBagsInstalled = 35; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+let numBagsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
 BagsDrawable.splice(BagsDrawable.length-151+numBagsInstalled);
 
 let BagsTextureArray = [];
