@@ -184,7 +184,6 @@ function scrollItem(clothingName, value){
 }
 
 function scrollShirtType(right){
-    console.log(LinkedTypes);
     if(right){
         selectedShirtType++;
         if(selectedShirtType >= LinkedTypes.length) selectedShirtType = 0;
@@ -224,7 +223,6 @@ function updateCurrentClothingData(){
         
     }
     currentClothing += "}";
-    console.log(currentClothing);
     //mp.trigger("ClothingEditor:updateClothing", currentClothing);
 }
 
