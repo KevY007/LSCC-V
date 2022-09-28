@@ -6,10 +6,10 @@ var ClothingIDs = [];
 var Team = 1;
 var Gender = "M";
 var ClothingData;
+var LinkedTypesReal;
 
 var CurrentShirt = "JacketOpen";
 var AcceptedItems = [];
-
 
 function ShowClothingEditor(team, gender, cData){
     Team = team;
@@ -18,6 +18,7 @@ function ShowClothingEditor(team, gender, cData){
     AcceptedItems = [];
     CurrentShirt = "JacketOpen";
     ClothingData = [];
+    LinkedTypesReal = [];
     ClothingIDs = [];
 
     UpdateContent();
@@ -37,6 +38,21 @@ document.addEventListener("DOMContentLoaded", () => {
     UpdateContent();
 });
 function UpdateContent(){
+
+    if(Team == 1){
+        if(Gender == "M") ClothingData = MaleClothing;
+        else ClothingData = FemaleClothing;
+        LinkedTypesReal = LinkedTypes;
+        document.getElementById("topteam").innerHTML = "POLICE UNIFORM";
+    }
+    else{
+        if(Gender == "M") ClothingData = FugitiveMaleClothing;
+        else ClothingData = FugitiveFemaleClothing;
+        LinkedTypesReal = FugitiveLinkedTypes;
+        document.getElementById("topteam").innerHTML = "FUGITIVE OUTFIT";
+    }
+ 
+
     AcceptedItems = [];
     Content.innerHTML = "";
     Content.innerHTML += `
@@ -48,14 +64,11 @@ function UpdateContent(){
             >
         </div>
         <p id="shirttype">
-        ${LinkedTypes[selectedShirtType].type}
+        ${LinkedTypesReal[selectedShirtType].type}
         </p>
     </div>
     `;
-    CurrentShirt = LinkedTypes[selectedShirtType].type;
-
-    if(Gender == "M") ClothingData = MaleClothing;
-    else ClothingData = FemaleClothing;
+    CurrentShirt = LinkedTypesReal[selectedShirtType].type;
 
     let clothingData = ClothingData.find(c => c.type == CurrentShirt);
     AcceptedItems.push({ 
@@ -88,7 +101,7 @@ function UpdateContent(){
         </div>
     </div>
     `;
-    let realType = LinkedTypes.find(l => l.type == CurrentShirt);
+    let realType = LinkedTypesReal.find(l => l.type == CurrentShirt);
     for(let i = 0 ; i < ClothingData.length ; i++){
         let acceptedCheck = [];
         switch(ClothingData[i].clothing){
@@ -186,11 +199,11 @@ function scrollItem(clothingName, value){
 function scrollShirtType(right){
     if(right){
         selectedShirtType++;
-        if(selectedShirtType >= LinkedTypes.length) selectedShirtType = 0;
+        if(selectedShirtType >= LinkedTypesReal.length) selectedShirtType = 0;
     }
     else{
         selectedShirtType--;
-        if(selectedShirtType < 0) selectedShirtType = LinkedTypes.length-1;
+        if(selectedShirtType < 0) selectedShirtType = LinkedTypesReal.length-1;
     }
     UpdateContent();
     updateCurrentClothingData();

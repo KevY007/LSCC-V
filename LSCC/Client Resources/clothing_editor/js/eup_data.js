@@ -6,8 +6,10 @@
     Hands
     Elbows
     Shoulders
+    ShouldersTorso
 
     SHIRT TYPES:
+    TankTop
     JacketOpen
     ShortSleeves
     LongSleeves
@@ -23,6 +25,7 @@
 
     BAGS:
     Tie
+    Bag
 
     SHOES:
     High
@@ -33,11 +36,239 @@
 
     ACCESSORIES:
     HipHolster
+    Necklace
+    TieAccessory
 
     HATS:
     HatNormal,
     HatHeavy
 */
+
+const FugitiveMaleClothing = [
+    {
+        clothing: "Shirt",
+        type: "TankTop",
+        items: [17, 36, 205, 207, 223, 237, 238]
+    },
+    {
+        clothing: "Shirt",
+        type: "VestTop",
+        items: [25, 21, 40, 120, 176, 290]
+    },
+    {
+        clothing: "Shirt",
+        type: "JacketOpen",
+        items: [3, 4, 6, 7, 10, 20, 23, 29, 30, 31, 32, 35, 37, 60, 64, 68, 69, 70, 72, 88, 118, 122, 172]
+    },
+    {
+        clothing: "Shirt",
+        type: "ShortSleeves",
+        items: [0, 1, 9, 16, 22, 33, 34, 39, 44, 56, 73, 83, 93, 94, 105]
+    },
+    {
+        clothing: "Shirt",
+        type: "LongSleeves",
+        items: [12, 14, 41, 50, 52, 57, 75, 78, 79, 84, 86, 87, 90, 110, 203, 204, 217, 218, 262, 263]
+    },
+    {
+        clothing: "Undershirt",
+        type: "InsideShirt",
+        items: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 21, 22, 29, 30, 31, 32, 34, 35]
+    },
+    {
+        clothing: "Pants",
+        type: "Normal",
+        items: [0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 15, 16, 17, 19, 20, 22, 23, 24, 25, 26, 27, 28, 29, 42, 43, 45, 46, 47, 48, 49,
+                50, 55, 58, 60, 62, 63, 64]
+    },
+    {
+        clothing: "Shoes",
+        type: "Low",
+        items: [1, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 15, 16, 18, 19, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30, 31, 32, 35, 36]
+    },
+    {
+        clothing: "Accessory 1",
+        type: "Bag",
+        items: [-1, 1, 32, 40, 41, 81, 82]
+    },
+    {
+        clothing: "Accessory 2",
+        type: "Necklace",
+        items: [-1, 16, 17, 30, 31, 42, 43, 44, 45, 78]
+    },
+    {
+        clothing: "Accessory 2",
+        type: "TieAccessory",
+        items: [-1, 10, 11, 12, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+    },
+    {
+        clothing: "Handwear",
+        type: "Hands",
+        items: [4, 20, 35]
+    },
+    {
+        clothing: "Handwear",
+        type: "Elbows",
+        items: [0, 19, 30]
+    },
+    {
+        clothing: "Handwear",
+        type: "Shoulders",
+        items: [5, 23, 34]
+    },  
+    {
+        clothing: "Handwear",
+        type: "ShouldersTorso",
+        items: [15, 29, 40]
+    },
+    {
+        clothing: "Hats",
+        type: "HatNormal",
+        items: [-1, 2, 4, 172, 5, 6, 7, 12, 14, 20, 21, 26, 28, 44, 45, 54, 56, 76, 96, 151, 152]
+    },
+]
+
+const FugitiveFemaleClothing = [
+    {
+        clothing: "Shirt",
+        type: "TankTop",
+        items: [5, 11, 13, 16, 22, 32, 33, 36, 37]
+    },
+    {
+        clothing: "Shirt",
+        type: "VestTop",
+        items: [26, 28]
+    },
+    {
+        clothing: "Shirt",
+        type: "JacketOpen",
+        items: [1, 6, 7, 8, 10, 24, 25, 31, 34, 35, 51, 52, 53, 54, 58, 62, 63, 64, 69, 70, 77]
+    },
+    {
+        clothing: "Shirt",
+        type: "ShortSleeves",
+        items: [0, 9, 14, 17, 23, 27, 49, 68, 84, 85]
+    },
+    {
+        clothing: "Shirt",
+        type: "LongSleeves",
+        items: [3, 43, 45, 50, 55, 72, 78, 80]
+    },
+    {
+        clothing: "Undershirt",
+        type: "InsideShirt",
+        items: [0, 1, 2, 5, 11, 13, 15, 16, 17, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30, 31, 37, 38, 39, 40, 41, 44, 45,
+                46, 52, 55, 56, 58, 59, 66, 67, ]
+    },
+    {
+        clothing: "Pants",
+        type: "Normal",
+        items: [0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 16, 18, 23, 24, 25, 26, 27, 29, 30, 31, 33, 34, 35, 36, 37, 38, 41, 42]
+    },
+    {
+        clothing: "Shoes",
+        type: "Low",
+        items: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 18, 19, 20, 21, 25, 26, 27, 32, 33, 47]
+    },
+    {
+        clothing: "Accessory 1",
+        type: "Bag",
+        items: [-1, 1, 32, 40, 41, 81, 82]
+    },
+    {
+        clothing: "Accessory 2",
+        type: "Necklace",
+        items: [-1, 3, 5, 6, 7, 9, 10, 11, 12, 31, 32, 33, 34, 35]
+    },
+    {
+        clothing: "Accessory 2",
+        type: "TieAccessory",
+        items: [-1, 19, 20, 21, 22, 23, 26, 27, 28]
+    },
+    {
+        clothing: "Handwear",
+        type: "Hands",
+        items: [3, 23, 36]
+    },
+    {
+        clothing: "Handwear",
+        type: "Elbows",
+        items: [0, 20, 33]
+    },
+    {
+        clothing: "Handwear",
+        type: "Shoulders",
+        items: [4, 24, 37]
+    },  
+    {
+        clothing: "Handwear",
+        type: "ShouldersTorso",
+        items: [12, 30, 43]
+    },
+    {
+        clothing: "Hats",
+        type: "HatNormal",
+        items: [-1, 4, 5, 7, 9, 12, 13, 14, 20, 21, 22, 26, 28, 29, 43, 44, 56, 76, 95, 108, 109]
+    },
+]
+
+const FugitiveLinkedTypes = [
+    {
+        type: "TankTop",
+        accepted:{
+            Undershirts: [],
+            Pants: ["Normal"],
+            Shoes: ["Low"],
+            Accessories: ["Necklace"],
+            Armor: [], Bags: ["Bag"],
+            Torso: ["Shoulders"], Hats: ["HatNormal"]
+        }
+    },
+    {
+        type: "VestTop",
+        accepted:{
+            Undershirts: [],
+            Pants: ["Normal"],
+            Shoes: ["Low"],
+            Accessories: ["Necklace"],
+            Armor: [], Bags: ["Bag"],
+            Torso: ["ShouldersTorso"], Hats: ["HatNormal"]
+        }
+    },
+    {
+        type: "JacketOpen",
+        accepted:{
+            Undershirts: ["InsideShirt"],
+            Pants: ["Normal"],
+            Shoes: ["Low"],
+            Accessories: ["TieAccessory"],
+            Armor: [], Bags: ["Bag"],
+            Torso: ["Hands"], Hats: ["HatNormal"]
+        }
+    },
+    {
+        type: "ShortSleeves",
+        accepted:{
+            Undershirts: [],
+            Pants: ["Normal"],
+            Shoes: ["Low"],
+            Accessories: ["Necklace"],
+            Armor: ["KevlarArmor"], Bags: ["Bag"],
+            Torso: ["Elbows"], Hats: ["HatNormal"]
+        }
+    },
+    {
+        type: "LongSleeves",
+        accepted:{
+            Undershirts: [],
+            Pants: ["Normal"],
+            Shoes: ["Low"],
+            Accessories: ["Necklace"],
+            Armor: ["KevlarArmor"], Bags: ["Bag"],
+            Torso: ["Hands"], Hats: ["HatNormal"]
+        }
+    },
+];
 
 // female shirt 405-439 crashes game
 // female shoes 90-111 crash the game

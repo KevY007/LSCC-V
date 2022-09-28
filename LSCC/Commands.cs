@@ -11028,6 +11028,24 @@ namespace RNC
                         string clothingInfo = NAPI.Util.ToJson(ConvChar.Clothing[clothingDataID]);
                         player.TriggerEvent("ClothingEditor:show", 1, genderChar, clothingInfo);
                     }
+                    else if (args[1].StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
+                        {
+                            EPlayer.ApplyCharacter(player, ConvChar, 0);
+                        }
+                        catch { return; }
+                        player.SetData<CharacterData>("CharacterBeforeEdit", ConvChar);
+                        player.SetData("EditingClothing", 0);
+                        player.SetData("LastEditedClothingTeam", 0);
+                        int gender = Convert.ToInt32(ConvChar.Gender);
+                        string genderChar = "M";
+                        if (gender == 1) genderChar = "F";
+
+                        int clothingDataID = (gender == 1 ? 2 : 0);
+                        string clothingInfo = NAPI.Util.ToJson(ConvChar.Clothing[clothingDataID]);
+                        player.TriggerEvent("ClothingEditor:show", 0, genderChar, clothingInfo);
+                    }
                     else if (args[1].StartsWith("donatorcop", StringComparison.OrdinalIgnoreCase))
                     {
                         try
@@ -11040,7 +11058,7 @@ namespace RNC
                         player.SetData("LastEditedClothingTeam", 1);
                         player.TriggerEvent("ShowClothesMenu");
                     }
-                    else if (args[1].StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
+                    else if (args[1].StartsWith("donatorfugitive", StringComparison.OrdinalIgnoreCase))
                     {
                         try
                         {
