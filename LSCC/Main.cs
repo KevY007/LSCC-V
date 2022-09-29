@@ -1642,6 +1642,7 @@ namespace RNC
 	        {4256991824, "Smoke Grenade"},
 	        {1233104067, "Flare"},
 	        {615608432, "Molotov"},
+            {3520460075, "Service Rifle"},
 	        {741814745, "Sticky Bomb"},
 	        {2874559379, "Proximity Mine"},
 	        {126349499, "Snowball"},
@@ -3311,15 +3312,10 @@ namespace RNC
                     !a.Dead &&
                     !a.GetSharedData<bool>("WeaponEditorActive")).OrderBy(c => Guid.NewGuid()).ToList();
                     pCount = lobbyPlayers.Count;
-
-                    foreach (Player player in lobbyPlayers)
-                    {
-                        player.TriggerEvent("MDC:RemoveAllBlips");
-                        player.TriggerEvent("ClearClimbTaseProtection", true);
-                        player.TriggerEvent("startLoadingScreen", -1, "Loading copchase match...");
-                    }
-
                     if (pCount < 2) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Total players less than two, failed to start"); return; }
+
+             
+
 
                     decimal perc = (decimal)0;
                     if(lobby.gameMode != GameModes.BANKROBBERY) perc = (decimal)pCount * ((decimal)lobby.FugitivePercent / (decimal)100);
@@ -3333,6 +3329,14 @@ namespace RNC
                     if (fugitives < 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Fugitives count is zero, failed to start"); return; }
 
                     if (fugitives == pCount) fugitives--; // There will ALWAYS be AT LEAST one COP.
+
+                    foreach (Player player in lobbyPlayers)
+                    {
+                        player.TriggerEvent("hideMDC");
+                        player.TriggerEvent("MDC:RemoveAllBlips");
+                        player.TriggerEvent("ClearClimbTaseProtection", true);
+                        player.TriggerEvent("startLoadingScreen", -1, "Loading copchase match...");
+                    }
 
                     int crashcheck = 0;
                     try
@@ -3351,20 +3355,39 @@ namespace RNC
                             {
                                 if (lobby.gameMode != GameModes.BANKROBBERY)
                                 {
-                                    if (await context.Maps.AsQueryable().CountAsync() < 1) { NAPI.Task.Run(() => { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has no maps added, failed to start"); }); return; }
+                                    if (await context.Maps.AsQueryable().CountAsync() < 1) { NAPI.Task.Run(() => { 
+                                        NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has no maps added, failed to start"); });   
+                                        foreach(Player pl in lobbyPlayers)
+                                        {
+                                            pl.TriggerEvent("stopLoadingScreen");
+                                        }
+                                        return; 
+                                    }
                                     crashcheck = 2;
 
                                     List<Map> mapList = await context.Maps.AsQueryable().Where(a => a.Enabled == true).ToListAsync();
                                     crashcheck = 3;
 
-                                    if (mapList.Count < 1) { NAPI.Task.Run(() => { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has maps but none of them were enabled! Failed to start."); }); return; }
+                                    if (mapList.Count < 1) { NAPI.Task.Run(() => { 
+                                        NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has maps but none of them were enabled! Failed to start."); });
+                                        foreach (Player pl in lobbyPlayers)
+                                        {
+                                            pl.TriggerEvent("stopLoadingScreen");
+                                        }
+                                        return; 
+                                    }
                                     crashcheck = 4;
 
                                     map = mapList.OrderBy(c => Guid.NewGuid()).FirstOrDefault();
                                     if (lobby.NextMapID != -1) map = mapList.Find(a => a.SQL_ID == lobby.NextMapID);
                                     lobby.NextMapID = -1;
 
-                                    if (map == null) { NAPI.Task.Run(() => { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Next (force-set) MapID == null; Failed to start!"); }); return; }
+                                    if (map == null) { NAPI.Task.Run(() => {
+                                        foreach (Player pl in lobbyPlayers)
+                                        {
+                                            pl.TriggerEvent("stopLoadingScreen");
+                                        }
+                                         NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Next (force-set) MapID == null; Failed to start!"); }); return; }
                                     crashcheck = 5;
 
                                     int spawnsCount = await context.MapSpawns.AsQueryable().CountAsync(a => a.mapID == map.SQL_ID);

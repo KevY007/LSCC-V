@@ -1320,6 +1320,7 @@ namespace RNC
             });
 
         }
+
         public static void CompleteChallenge(Player player, DailyChallenge challenge)
         {
             if (challenge.RewardXP > 0)

@@ -3767,17 +3767,21 @@ namespace RNC
         }
 
         [Command("voiceblock", "!{#AFAFAF}[USAGE] voiceblock (target)", GreedyArg = true)]
-        public void cmd_vblock(Player player, Player target)
+        public static void cmd_vblock(Player player, Player target)
         {
-            if (player.HasData($"VoiceMute{target.Name}"))
+            if (!player.HasSharedData($"VoiceMute{target.Name}"))
             {
-                player.ResetData($"VoiceMute{target.Name}");
-                player.TriggerEvent("pushMsgToChat", $"!{{#33C446}}[#] !{{#FFFFFF}}You have unmuted {target.Name} on voice chat.");
+                player.SetSharedData($"VoiceMute{target.Name}", false);
             }
-            else
+            if (player.GetSharedData<bool>($"VoiceMute{target.Name}") == true)
             {
-                player.SetData($"VoiceMute{target.Name}", true);
-                player.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have muted {target.Name} on voice chat, use this command again to unmute them.");
+                player.SetSharedData($"VoiceMute{target.Name}", false);
+                EPlayer.Notify(player, $"You have unmuted player {target.Name}!", "green", "", false, 3000);
+            }
+            else if (player.GetSharedData<bool>($"VoiceMute{target.Name}") == false)
+            {
+                player.SetSharedData($"VoiceMute{target.Name}", true);
+                EPlayer.Error(player, $"You have muted player {target.Name}!");
             }
             return;
         }

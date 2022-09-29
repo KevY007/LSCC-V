@@ -1208,6 +1208,11 @@ function ToggleScoreboard()
     return;
 }
 
+mp.events.add("scoreboard:clickAction", (actionID, playerName) => {
+    mp.events.callRemote("ServerConsoleOutput", `scoreboard action ${actionID} on player ${playerName}`);
+    mp.events.callRemote("Scoreboard_OnAction", actionID, playerName);
+});
+
 function updatePlayers()
 {
     if(mp.players.local !== undefined && mp.players.exists(mp.players.local))
@@ -1240,13 +1245,29 @@ function updatePlayers()
 		if(sb.getVariable("Level") !== undefined) level = sb.getVariable("Level");
 		if(sb.getVariable("Ping") !== undefined) ping = sb.getVariable("Ping");
 
+        let mutedVar = `VoiceMute${sb.name}`;
+        let mutedTog = mp.players.local.getVariable(mutedVar);
+        if(mutedTog == undefined) mutedTog = false;
+
         updateString += `{lid: ${lobbyStr}, squad: ${squad},
         color: 'rgb(${colr}, ${colg}, ${colb})', 
-        name: '${sb.name}', level: ${level}, ping: ${ping}},`;
+        name: '${sb.name}', level: ${level}, ping: ${ping}, 
+        showMute:true, muted: ${mutedTog.toString()}},`;
     });
 
     updateString += `]);`;
 
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.$refs.global.actions = [
+        {
+            id: 1,
+            name: "Mute",
+            icon: "fa-volume-xmark",
+            disabledName: "Unmute",
+            disabledIcon: "fa-volume",
+            disableKey: "muted",
+            showKey: "showMute",
+        },
+    ]`);
     if(ServerUI != null) ServerUI.execute(updateString);
     return;
 }

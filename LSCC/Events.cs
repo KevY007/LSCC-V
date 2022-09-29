@@ -934,7 +934,7 @@ namespace RNC
 
                     foreach (Player t in listeners)
                     {
-                        if (t.HasData($"VoiceMute{player.Name}"))
+                        if (t.HasSharedData($"VoiceMute{player.Name}") && t.GetSharedData<bool>($"VoiceMute{player.Name}") == true)
                         {
                             continue;
                         }
@@ -2836,6 +2836,25 @@ namespace RNC
                 else player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
             }
             player.SetSharedData("PlayerWeather", weatherid);
+        }
+
+        [RemoteEvent("Scoreboard_OnAction")]
+        public static void OnScoreboardAction(Player player, int action, string targetName)
+        {
+            Player target = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+            if(target == null)
+            {
+                EPlayer.Error(player, $"That player is no longer connected!");
+                return;
+            }
+            switch (action)
+            {
+                case 1:
+                    {
+                        Commands.cmd_vblock(player, target);
+                        break;
+                    }
+            }
         }
 
         [RemoteEvent("Server_FinishTutorial")]
