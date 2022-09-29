@@ -89,6 +89,7 @@ namespace RNC
         public string ChallengeItem;
         public int ChallengeProgress;
         public bool Completed;
+        public long Expire;
 
         public ChallengeData()
         {
@@ -96,6 +97,7 @@ namespace RNC
             ChallengeItem = "police";
             ChallengeProgress = 0;
             Completed = false;
+            Expire = 0;
         }
     }
 

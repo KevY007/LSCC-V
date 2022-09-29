@@ -957,23 +957,20 @@ namespace RNC
             Task.Run(async () =>
             {
                 bool areChallengesUpToDate = true;
+                if (cdInfo.Count > 0)
+                {
+                    if (cdInfo[0].Expire < DateTimeOffset.Now.ToUnixTimeSeconds())
+                    {
+                        areChallengesUpToDate = false;
+                    }
+                }
+                else areChallengesUpToDate = false;
+
+
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
                     List<DailyChallenge> serverChallenges = await context.DailyChallenges.AsQueryable().ToListAsync();
-                    for (int i = 0; i < serverChallenges.Count; i++)
-                    {
-                        if (cdInfo.Count == i) break; // to prevent array index out of bounds
-                        if (serverChallenges[i].Type != cdInfo[i].ChallengeType)
-                        {
-                            areChallengesUpToDate = false;
-                            break;
-                        }
-                        if (serverChallenges[i].Item != cdInfo[i].ChallengeItem)
-                        {
-                            areChallengesUpToDate = false;
-                            break;
-                        }
-                    }
+                    
                     if (!areChallengesUpToDate)
                     {
                         NAPI.Util.ConsoleOutput($"Challenges are not up to date for account {acc.Username}!");
@@ -986,9 +983,11 @@ namespace RNC
                             temp.ChallengeType = dc.Type;
                             temp.ChallengeProgress = 0;
                             temp.Completed = false;
+                            temp.Expire = dc.ExpireTimestamp;
 
                             cdList.Add(temp);
                         });
+                        cdInfo = cdList;
                         string jData = NAPI.Util.ToJson(cdList);
                         acc.ChallengeInfo = jData;
                         NAPI.Util.ConsoleOutput($"Set up new challenges for {acc.Username} and saving their account now!");
@@ -1012,13 +1011,14 @@ namespace RNC
                                         temp.ChallengeType = dc.Type;
                                         temp.ChallengeProgress = 0;
                                         temp.Completed = false;
+                                        temp.Expire = dc.ExpireTimestamp;
 
                                         cdList.Add(temp);
                                     });
+                                    cdInfo = cdList;
                                     string jData = NAPI.Util.ToJson(cdList);
                                     acc.ChallengeInfo = jData;
-                                    cdInfo = NAPI.Util.FromJson<List<ChallengeData>>(jData);
-                                    await context.SaveChangesAsync();
+                                    EPlayer.Save(player, false);
                                 }
                             });
 
@@ -1402,6 +1402,7 @@ namespace RNC
                     temp.ChallengeType = dc.Type;
                     temp.ChallengeProgress = 0;
                     temp.Completed = false;
+                    temp.Expire = dc.ExpireTimestamp;
 
                     cdList.Add(temp);
                 });
