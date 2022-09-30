@@ -3812,34 +3812,84 @@ namespace RNC
                                             int maxseats = pVehicle.MaxOccupants;
                                             if (overridemaxseats != 0) maxseats = overridemaxseats;
 
-                                            if (player.HasData("PlayerSquad"))
+                                            bool hasClanPartnering = false;
+                                            if(player.HasSharedData("ClanID") && player.GetSharedData<int>("ClanID") != -1)
                                             {
-                                                foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player.GetData<Player>("PlayerSquad") && lobby.Cops.Contains(p) && p.Id != player.Id))
+                                                Task.Run(async () =>
                                                 {
-                                                    if (seat < maxseats)
+                                                    using(MainDatabase context = ContextFactory.CreateContext())
                                                     {
-                                                        if (carName.Equals("polmav"))
+                                                        Clan clan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == player.GetSharedData<int>("ClanID"));
+                                                        if(clan != null && clan.CopchasePartnering == true)
                                                         {
-                                                            // 4 - seat
-                                                            // 4-1, 3
-                                                            // 4-2, 2
-                                                            // 4-3, 1
-                                                            mem.TriggerEvent("SetChaseVehicle", pVehicle.Id, maxseats - seat);
-                                                            mem.SetData("ChaseVehicle", pVehicle);
-                                                            mem.SetData("ChaseVehicleSeat", maxseats - seat);
+                                                            int clanSQLID = clan.SQL_ID;
+                                                            NAPI.Task.Run(() =>
+                                                            {
+                                                                hasClanPartnering = true;
+                                                                foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasSharedData("ClanID") && p.GetSharedData<int>("ClanID") == clanSQLID && lobby.Cops.Contains(p) && p.Id != player.Id))
+                                                                {
+                                                                    if (seat < maxseats)
+                                                                    {
+                                                                        if (carName.Equals("polmav"))
+                                                                        {
+                                                                            // 4 - seat
+                                                                            // 4-1, 3
+                                                                            // 4-2, 2
+                                                                            // 4-3, 1
+                                                                            mem.TriggerEvent("SetChaseVehicle", pVehicle.Id, maxseats - seat);
+                                                                            mem.SetData("ChaseVehicle", pVehicle);
+                                                                            mem.SetData("ChaseVehicleSeat", maxseats - seat);
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            // 0 + 1, 2, 3
+                                                                            mem.TriggerEvent("SetChaseVehicle", pVehicle.Id, 0 + seat);
+                                                                            mem.SetData("ChaseVehicle", pVehicle);
+                                                                            mem.SetData("ChaseVehicleSeat", 0 + seat);
+                                                                        }
+
+                                                                        PutInsideCar.Add(mem);
+                                                                        mem.TriggerEvent("pushMsgToChat", "!{#FFAC38}[Clan Partners] You are being paired with " + player.Name + " this chase.");
+
+                                                                        seat++;
+                                                                    }
+                                                                }
+                                                            });
                                                         }
-                                                        else
+                                                    }
+                                                });
+                                            }
+                                            if (!hasClanPartnering)
+                                            {
+                                                if (player.HasData("PlayerSquad"))
+                                                {
+                                                    foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player.GetData<Player>("PlayerSquad") && lobby.Cops.Contains(p) && p.Id != player.Id))
+                                                    {
+                                                        if (seat < maxseats)
                                                         {
-                                                            // 0 + 1, 2, 3
-                                                            mem.TriggerEvent("SetChaseVehicle", pVehicle.Id, 0 + seat);
-                                                            mem.SetData("ChaseVehicle", pVehicle);
-                                                            mem.SetData("ChaseVehicleSeat", 0 + seat);
+                                                            if (carName.Equals("polmav"))
+                                                            {
+                                                                // 4 - seat
+                                                                // 4-1, 3
+                                                                // 4-2, 2
+                                                                // 4-3, 1
+                                                                mem.TriggerEvent("SetChaseVehicle", pVehicle.Id, maxseats - seat);
+                                                                mem.SetData("ChaseVehicle", pVehicle);
+                                                                mem.SetData("ChaseVehicleSeat", maxseats - seat);
+                                                            }
+                                                            else
+                                                            {
+                                                                // 0 + 1, 2, 3
+                                                                mem.TriggerEvent("SetChaseVehicle", pVehicle.Id, 0 + seat);
+                                                                mem.SetData("ChaseVehicle", pVehicle);
+                                                                mem.SetData("ChaseVehicleSeat", 0 + seat);
+                                                            }
+
+                                                            PutInsideCar.Add(mem);
+                                                            mem.TriggerEvent("pushMsgToChat", "!{#FFAC38}[Partners] You are being paired with " + player.Name + " this chase.");
+
+                                                            seat++;
                                                         }
-
-                                                        PutInsideCar.Add(mem);
-                                                        mem.TriggerEvent("pushMsgToChat", "!{#FFAC38}[Partners] You are being paired with " + player.Name + " this chase.");
-
-                                                        seat++;
                                                     }
                                                 }
                                             }
