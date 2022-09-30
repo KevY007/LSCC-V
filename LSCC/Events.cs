@@ -1627,9 +1627,9 @@ namespace RNC
                 return;
 
             Account acc = EPlayer.GetAccount(player);
+            NAPI.Util.ConsoleOutput($"Player is {acc.Username} {player.Name} | tier {acc.ClanTier} for iD {acc.ClanID}");
             if (acc.ClanID == -1 || acc.ClanTier == -1)
             {
-                EPlayer.Error(player, "You are not part of any clan!");
                 return;
             }
 
@@ -1638,12 +1638,15 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
+                    bool isClanDisbanded = false;
                     if (acc.ClanTier == 0)
                     {
                         Clan clan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == acc.ClanID);
                         if (clan != null)
                         {
                             context.Clans.Remove(clan);
+                            isClanDisbanded = true;
+                            await context.SaveChangesAsync();
                         }
                         NAPI.Task.Run(() =>
                         {
@@ -1680,23 +1683,34 @@ namespace RNC
 
                         EPlayer.UpdateUIVars(player);
 
-                        foreach(Player clanMember in Settings.LoggedInPlayers.Where(pl => pl.HasSharedData("ClanID") && pl.GetSharedData<int>("ClanID") == clanToSee))
+                        if(isClanDisbanded)
                         {
-                            clanMember.SetSharedData("ClanID", -1);
-                            clanMember.SetSharedData("ClanTier", -1);
-                            clanMember.SetSharedData("ClanName", "N/A");
-                            clanMember.SetSharedData("ClanCreated", "N/A");
-                            clanMember.SetSharedData("ClanPartnering", false);
-                            clanMember.SetSharedData("ClanTag", "");
-                            EPlayer.GetAccount(clanMember).ClanID = -1;
-                            EPlayer.GetAccount(clanMember).ClanTier = -1;
-                            EPlayer.Save(clanMember, false);
-                            EPlayer.Notify(clanMember, "Your clan leader has disbanded the clan!", "yellow", "", false, 3000);
+                            foreach (Player clanMember in Settings.LoggedInPlayers.Where(pl => pl.HasSharedData("ClanID") && pl.GetSharedData<int>("ClanID") == clanToSee))
+                            {
+                                clanMember.SetSharedData("ClanID", -1);
+                                clanMember.SetSharedData("ClanTier", -1);
+                                clanMember.SetSharedData("ClanName", "N/A");
+                                clanMember.SetSharedData("ClanCreated", "N/A");
+                                clanMember.SetSharedData("ClanPartnering", false);
+                                clanMember.SetSharedData("ClanTag", "");
+                                EPlayer.GetAccount(clanMember).ClanID = -1;
+                                EPlayer.GetAccount(clanMember).ClanTier = -1;
+                                EPlayer.Save(clanMember, false);
+                                EPlayer.Notify(clanMember, $"Your clan leader, {player.Name}, has disbanded the clan!", "yellow", "", false, 3000);
 
-                            clanMember.TriggerEvent("UpdateMenuClanTab");
+                                clanMember.TriggerEvent("UpdateMenuClanTab");
 
-                            EPlayer.UpdateUIVars(clanMember);
+                                EPlayer.UpdateUIVars(clanMember);
+                            }
                         }
+                        else
+                        {
+                            foreach (Player clanMember in Settings.LoggedInPlayers.Where(pl => pl.HasSharedData("ClanID") && pl.GetSharedData<int>("ClanID") == clanToSee))
+                            {
+                                EPlayer.Notify(clanMember, $"Player {player.Name} has left the clan.", "yellow", "", false, 3000);
+                            }
+                        }
+               
                     });
                 }
             });
@@ -1844,7 +1858,7 @@ namespace RNC
              * Also a warning that a weekly/monthly clan fee will be paid.
              */
 
-            string realDesc = $"[OWNER: {player.Name} ({acc.SQL_ID})] {desc}";
+            string realDesc = desc;
 
             EPlayer.SendMessage(player, "~y~Creating clan...");
             Task.Run(async () =>
@@ -3946,7 +3960,14 @@ namespace RNC
                             });
                             return;
                         }
-                        else NAPI.Task.Run(() => { EPlayer.Error(player, "A fatal error has occurred, please log in manually.", "fas fa-lock"); });
+                        else
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                NAPI.Util.ConsoleOutput($"Error during login from player with username {username}.");
+                                player.TriggerEvent("login_ShowInvalidInfo", true);
+                            });
+                        }
                     }
                 });
 
@@ -4012,6 +4033,14 @@ namespace RNC
                                     }
                                 });
                             }
+                            else
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    NAPI.Util.ConsoleOutput($"Error during login from player with username {username}.");
+                                    player.TriggerEvent("login_ShowInvalidInfo", true);
+                                });
+                            }
                         }
                     });
                 
@@ -4058,6 +4087,14 @@ namespace RNC
                                     }
                                 });
 
+                            }
+                            else
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    NAPI.Util.ConsoleOutput($"Error during login from player with username {username}.");
+                                    player.TriggerEvent("login_ShowInvalidInfo", true);
+                                });
                             }
                         }
                     });

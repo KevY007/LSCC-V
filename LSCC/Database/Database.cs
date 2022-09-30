@@ -441,6 +441,7 @@ namespace RNC
 
         private static string _connectionString;
 
+        public static BackupDatabase CreateContext() { return new BackupContextFactory().CreateDbContext(new string[] { }); }
         public BackupDatabase CreateDbContext(string[] args)
         {
             var builder = new DbContextOptionsBuilder<BackupDatabase>();

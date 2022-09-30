@@ -343,12 +343,12 @@ const FemaleClothing = [
     {
         clothing: "Armor",
         type: "KevlarArmor",
-        items: [58, 59, 62, 66, 69, 76]
+        items: [-1, 58, 59, 62, 66, 69, 76]
     },
     {
         clothing: "Armor",
         type: "HeavyArmor",
-        items: [57, 61, 70, 74, 81]
+        items: [-1, 57, 61, 70, 74, 81]
     },
     {
         clothing: "Handwear",
@@ -358,17 +358,17 @@ const FemaleClothing = [
     {
         clothing: "Handwear",
         type: "Elbows",
-        items: [0, 20, 35]
+        items: [0, 20, 33]
     },
     {
         clothing: "Hats",
         type: "HatNormal",
-        items: [45, 141]
+        items: [-1, 45, 141]
     },
     {
         clothing: "Hats",
         type: "HatHeavy",
-        items: [140]
+        items: [-1, 140]
     },
 ]
 

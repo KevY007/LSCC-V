@@ -111,7 +111,7 @@ mp.events.add("addChallengesToMenu", (weekChallengeProgress, weekChallengeUnix) 
        },
        {
            name: "Daily",
-           timeLeft: ${DailyChallenges[i].expireDate},
+           timeLeft: ${(DailyChallenges[i] != undefined ? DailyChallenges[i].expireDate : 999999999)},
            challenges: [`
     for(let i = 0 ; i < DailyChallenges.length; i++){
         chstr = `{

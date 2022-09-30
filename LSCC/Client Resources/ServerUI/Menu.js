@@ -61,18 +61,20 @@ mp.events.add("saveCrosshairProfiles", (profileData) => {
     mp.events.callRemote("Crosshair_SaveProfiles", profileData);
 
     let prData = JSON.parse(profileData);
-    let currentProfile = undefined;
-    for(let i = 0 ; i < prData.length; i++){
-        if(prData[i].uuid == ActiveCrosshairProfileUUID){
-            currentProfile = prData[i];
-            break;
+    if(prData != undefined){
+        let currentProfile = undefined;
+        for(let i = 0 ; i < prData.length; i++){
+            if(prData[i].uuid == ActiveCrosshairProfileUUID){
+                currentProfile = prData[i];
+                break;
+            }
         }
-    }
-    if(currentProfile){
-        
-        alwaysShowCustomCrosshair = currentProfile.settings.alwaysOn;
-        showCustomCrosshairInSniper = currentProfile.settings.onSnipers;
-        showCustomCrosshair = currentProfile.settings.enabled;
+        if(currentProfile){
+            
+            alwaysShowCustomCrosshair = currentProfile.settings.alwaysOn;
+            showCustomCrosshairInSniper = currentProfile.settings.onSnipers;
+            showCustomCrosshair = currentProfile.settings.enabled;
+        }
     }
 });
 

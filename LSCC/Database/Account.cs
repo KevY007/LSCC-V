@@ -134,36 +134,43 @@ namespace RNC
         {
             return Crypter.Sha256.Crypt(pass, salt);
         }
-        /*
-        public static void RecoverAccount(Account acc)
+
+        public async static Task<bool> RecoverAccount(Account acc)
         {
-            ContextFactory.Instance.Accounts.Add(acc);
+            using (MainDatabase context = ContextFactory.CreateContext())
+            {
+                await context.Accounts.AddAsync(acc);
+                using (BackupDatabase backup = BackupContextFactory.CreateContext())
+                {
+                    List<OwnedVehData> ownedVehs = await backup.OwnedVehicles.AsQueryable().Where(v => v.AccountSQLID == acc.SQL_ID).ToListAsync();
+                    List<OwnedLoadoutData> ownedLoadouts = await backup.OwnedLoadouts.AsQueryable().Where(v => v.AccountSQLID == acc.SQL_ID).ToListAsync();
+                    List<PlayerOutfit> savedOutfits = await backup.PlayerOutfits.AsQueryable().Where(v => v.AccountID == acc.SQL_ID).ToListAsync();
+                    List<PlayerTunings> savedTunings = await backup.PlayerTunings.AsQueryable().Where(v => v.AccountSQLID == acc.SQL_ID).ToListAsync();
+                    List<UnlockedAchievement> unlockedAchievements = await backup.UnlockedAchievements.AsQueryable().Where(v => v.AccountID == acc.SQL_ID).ToListAsync();
 
-            List<OwnedVehData> ownedVehs = BackupContextFactory.Instance.OwnedVehicles.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
-            List<OwnedLoadoutData> ownedLoadouts = BackupContextFactory.Instance.OwnedLoadouts.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
-            List<PlayerOutfit> savedOutfits = BackupContextFactory.Instance.PlayerOutfits.ToList().Where(v => v.AccountID == acc.SQL_ID).ToList();
-            List<PlayerTunings> savedTunings = BackupContextFactory.Instance.PlayerTunings.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
-            List<UnlockedAchievement> unlockedAchievements = BackupContextFactory.Instance.UnlockedAchievements.ToList().Where(v => v.AccountID == acc.SQL_ID).ToList();
+                    await context.OwnedLoadouts.AddRangeAsync(ownedLoadouts);
+                    await context.OwnedVehicles.AddRangeAsync(ownedVehs);
+                    await context.PlayerOutfits.AddRangeAsync(savedOutfits);
+                    await context.PlayerTunings.AddRangeAsync(savedTunings);
+                    await context.UnlockedAchievements.AddRangeAsync(unlockedAchievements);
 
-            ContextFactory.Instance.OwnedLoadouts.AddRange(ownedLoadouts);
-            ContextFactory.Instance.OwnedVehicles.AddRange(ownedVehs);
-            ContextFactory.Instance.PlayerOutfits.AddRange(savedOutfits);
-            ContextFactory.Instance.PlayerTunings.AddRange(savedTunings);
-            ContextFactory.Instance.UnlockedAchievements.AddRange(unlockedAchievements);
+                    backup.PlayerOutfits.RemoveRange(savedOutfits);
+                    backup.OwnedLoadouts.RemoveRange(ownedLoadouts);
+                    backup.OwnedVehicles.RemoveRange(ownedVehs);
+                    backup.PlayerTunings.RemoveRange(savedTunings);
+                    backup.UnlockedAchievements.RemoveRange(unlockedAchievements);
+                    backup.Accounts.Remove(acc);
 
-            BackupContextFactory.Instance.PlayerOutfits.RemoveRange(savedOutfits);
-            BackupContextFactory.Instance.OwnedLoadouts.RemoveRange(ownedLoadouts);
-            BackupContextFactory.Instance.OwnedVehicles.RemoveRange(ownedVehs);
-            BackupContextFactory.Instance.PlayerTunings.RemoveRange(savedTunings);
-            BackupContextFactory.Instance.UnlockedAchievements.RemoveRange(unlockedAchievements);
+                    await context.SaveChangesAsync();
+                    await backup.SaveChangesAsync();
 
-            BackupContextFactory.Instance.Accounts.Remove(acc);
+                    NAPI.Util.ConsoleOutput("[ACCOUNT ARCHIVE] " + acc.Username + " has been recovered from the archive.");
+                }
 
-            ContextFactory.Instance.SaveChanges();
-            BackupContextFactory.Instance.SaveChanges();
-            NAPI.Util.ConsoleOutput("[ACCOUNT ARCHIVE] " + acc.Username + " has been recovered from the archive.");
+            }
+            return true;
         }
-        */
+        
 
         public async static Task<bool> ClearForeignKeys(Account acc)
         {

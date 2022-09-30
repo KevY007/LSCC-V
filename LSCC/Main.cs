@@ -2230,7 +2230,7 @@ namespace RNC
             // Discord-exclusive loadout
             new LoadoutData(1, "Negotiator")
                 .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "M1911", 50)
-                .Add(WeaponHash.Assaultshotgun, "package://Artwork/Weapons/AssaultShotgun.png", "AA-12", 20)
+                .Add(WeaponHash.Heavyshotgun, "package://Artwork/Weapons/HeavyShotgun.png", "AA-12", 20)
                 .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1);
             // -------------------------
 
@@ -2250,7 +2250,7 @@ namespace RNC
             
             new LoadoutData(1, "CIA", 15, 30)
                 .Add(WeaponHash.Pistol_mk2, "package://Artwork/Weapons/PistolMk2.png", "H&K P30L", 50)
-                .Add(WeaponHash.Assaultshotgun, "package://Artwork/Weapons/AssaultShotgun.png", "AA-12", 20)
+                .Add(WeaponHash.Heavyshotgun, "package://Artwork/Weapons/HeavyShotgun.png", "AA-12", 20)
                 .Add(WeaponHash.Assaultsmg, "package://Artwork/Weapons/AssaultSMG.png", "FN P90", 80)
                 .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1);
 
@@ -2268,7 +2268,7 @@ namespace RNC
 
             new LoadoutData(1, "Navy Seal", 35, 100)
                 .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "M1911", 30)
-                .Add(WeaponHash.Assaultshotgun, "package://Artwork/Weapons/AssaultShotgun.png", "AA-12", 20)
+                .Add(WeaponHash.Heavyshotgun, "package://Artwork/Weapons/HeavyShotgun.png", "AA-12", 20)
                 .Add(WeaponHash.Specialcarbine, "package://Artwork/Weapons/SpecialCarbine.png", "SCAR-H", 70)
                 .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1);
 
@@ -2366,7 +2366,8 @@ namespace RNC
             new CarData(1, "FBI Buffalo A/C", "fbibufac", "package://Artwork/Vehicles/fbibufac.png", "Fast", 17, 20);
             new CarData(1, "Police Chopper", "polmav", "package://Artwork/Vehicles/polmav.png", "N/A", 20, 20);
             new CarData(1, "Unmarked Charger", "lspdunm", "package://Artwork/Vehicles/lspdunm.png", "Fast+", 25, 40);
-            new CarData(1, "Unmarked Revolter", "prevolter", "package://Artwork/Vehicles/prevolter.png", "Fast+", 30, 70);
+            new CarData(1, "Lenco Bearcat: Centurion", "centurionlspd", "package://Artwork/Vehicles/centurionlspd.png", "Slow", 69, 100);
+            new CarData(1, "Chevrolet Caprice PPV", "bcso2slick", "package://Artwork/Vehicles/bcso2slick.png", "Fast+", 30, 70);
             new CarData(1, "Sheriff Gauntlet", "shergauntlet", "package://Artwork/Vehicles/shergauntlet.png", "Fast+", 38, 80);
 
             // 0-100's Fugitive
@@ -2441,39 +2442,46 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    List<Account> adminsList = await context.Accounts.AsQueryable().Where(a => a.Admin > 0).ToListAsync();
-                    foreach (Account acc in adminsList)
+                    try
                     {
-                        if (adminCount != 0) admins += ", ";
-                        admins += $"{acc.Username} [{acc.SQL_ID}]";
-                        adminCount++;
+                        List<Account> adminsList = await context.Accounts.AsQueryable().Where(a => a.Admin > 0).ToListAsync();
+                        foreach (Account acc in adminsList)
+                        {
+                            if (adminCount != 0) admins += ", ";
+                            admins += $"{acc.Username} [{acc.SQL_ID}]";
+                            adminCount++;
+                        }
+                        if (adminCount == 0) admins = "None";
+                        int accountsCnt = await context.Accounts.AsQueryable().CountAsync();
+                        NAPI.Task.Run(() =>
+                        {
+                            string dateFormat = DateTime.Now.ToString("g");
+                            NAPI.Util.ConsoleOutput("CURRENT DATE: " + dateFormat);
+                            dateFormat = DateTimeOffset.FromUnixTimeSeconds(Settings.Dynamics.NextWeekUnix).ToString("g");
+                            NAPI.Util.ConsoleOutput("NEXT WEEK HIT: " + dateFormat);
+                            dateFormat = DateTimeOffset.FromUnixTimeSeconds(Settings.Dynamics.NextMonthUnix).ToString("g");
+                            NAPI.Util.ConsoleOutput("NEXT MONTH HIT: " + dateFormat);
+
+                            NAPI.Util.ConsoleOutput("[>===========|Race 'N' Chase|===========<]");
+                            NAPI.Util.ConsoleOutput("[Version]: " + Settings.Version);
+                            NAPI.Util.ConsoleOutput("[Developers]: KevY, CodeName420 (jambredrek)");
+                            NAPI.Util.ConsoleOutput($"[Accounts]: {accountsCnt}");
+                            NAPI.Util.ConsoleOutput($"[Admins]: {admins}");
+                            NAPI.Util.ConsoleOutput("[>===========|Race 'N' Chase|===========<]");
+
+                            // After all the stuff is set.
+                            SaveDynamicSettings();
+
+                            ///////////////////////////////////////////////////////////////////////////////
+
+                            Settings.Timers.GameUpdate_Tick = Environment.TickCount64 + 1000;
+                            Settings.Timers.TimeUpdate_Tick = Environment.TickCount64 + 1000;
+                        });
                     }
-                    if (adminCount == 0) admins = "None";
-                    int accountsCnt = await context.Accounts.AsQueryable().CountAsync();
-                    NAPI.Task.Run(() =>
+                    catch(Exception ex)
                     {
-                        string dateFormat = DateTime.Now.ToString("g");
-                        NAPI.Util.ConsoleOutput("CURRENT DATE: " + dateFormat);
-                        dateFormat = DateTimeOffset.FromUnixTimeSeconds(Settings.Dynamics.NextWeekUnix).ToString("g");
-                        NAPI.Util.ConsoleOutput("NEXT WEEK HIT: " + dateFormat);
-                        dateFormat = DateTimeOffset.FromUnixTimeSeconds(Settings.Dynamics.NextMonthUnix).ToString("g");
-                        NAPI.Util.ConsoleOutput("NEXT MONTH HIT: " + dateFormat);
-
-                        NAPI.Util.ConsoleOutput("[>===========|Race 'N' Chase|===========<]");
-                        NAPI.Util.ConsoleOutput("[Version]: " + Settings.Version);
-                        NAPI.Util.ConsoleOutput("[Developers]: KevY, CodeName420 (jambredrek)");
-                        NAPI.Util.ConsoleOutput($"[Accounts]: {accountsCnt}");
-                        NAPI.Util.ConsoleOutput($"[Admins]: {admins}");
-                        NAPI.Util.ConsoleOutput("[>===========|Race 'N' Chase|===========<]");
-
-                        // After all the stuff is set.
-                        SaveDynamicSettings();
-
-                        ///////////////////////////////////////////////////////////////////////////////
-
-                        Settings.Timers.GameUpdate_Tick = Environment.TickCount64 + 1000;
-                        Settings.Timers.TimeUpdate_Tick = Environment.TickCount64 + 1000;
-                    });
+                        NAPI.Util.ConsoleOutput("GAY " + ex.ToString());
+                    }
                 }
             });
 

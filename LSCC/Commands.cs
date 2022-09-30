@@ -1302,6 +1302,36 @@ namespace RNC
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has summoned all the players.");
             return;
         }
+
+        [Command("recoverall")]
+        public void cmd_recoverall(Player player)
+        {
+            Task.Run(async () =>
+            {
+                using(MainDatabase context = ContextFactory.CreateContext())
+                {
+                    using(BackupDatabase backup = BackupContextFactory.CreateContext())
+                    {
+                        List<Account> accounts = await backup.Accounts.AsQueryable().ToListAsync();
+                        foreach (Account account in accounts)
+                        {
+                            Account _nameCheck = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(account.Username, StringComparison.OrdinalIgnoreCase) ||
+                            a.SQL_ID == account.SQL_ID);
+                            if(_nameCheck == null)
+                            {
+                                await AccountManager.RecoverAccount(account);
+                                NAPI.Util.ConsoleOutput($"Recovering {account.Username}...");
+                            }
+                            else
+                            {
+                                NAPI.Util.ConsoleOutput($"Account {account.Username} {account.SQL_ID} exists in main database! {_nameCheck.Username} {_nameCheck.SQL_ID}");
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         /*
         [Command("placespikes")]
         public void cmd_placespikes(Player player)
@@ -11088,6 +11118,12 @@ namespace RNC
                     }
                     else if (args[1].StartsWith("donatorcop", StringComparison.OrdinalIgnoreCase))
                     {
+                        if(EPlayer.GetAccount(player).DonatorLevel < 3)
+                        {
+                            EPlayer.SendMessage(player, "!{#FF6347}[!] ~w~You are not a Gold Donator!");
+                            return;
+                        }
+
                         try
                         {
                             EPlayer.ApplyCharacter(player, ConvChar, 1);
@@ -11100,6 +11136,12 @@ namespace RNC
                     }
                     else if (args[1].StartsWith("donatorfugitive", StringComparison.OrdinalIgnoreCase))
                     {
+                        if (EPlayer.GetAccount(player).DonatorLevel < 3)
+                        {
+                            EPlayer.SendMessage(player, "!{#FF6347}[!] ~w~You are not a Gold Donator!");
+                            return;
+                        }
+
                         try
                         {
                             EPlayer.ApplyCharacter(player, ConvChar, 0);
@@ -11110,7 +11152,7 @@ namespace RNC
                         player.SetData("LastEditedClothingTeam", 0);
                         player.TriggerEvent("ShowClothesMenu");
                     }
-                    else player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Invalid team, clothings can only be set for 'fugitive' or 'cop' team.");
+                    else player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Invalid team, clothings can only be set for 'fugitive' or 'cop' team. Use 'donatorcop' or 'donatorfugitive' for unrestricted menu.");
                 }
                 else player.TriggerEvent("pushMsgToChat", "!{#999999}Proper usage: /char clothing (team), teams: cop OR fugitive");
             }

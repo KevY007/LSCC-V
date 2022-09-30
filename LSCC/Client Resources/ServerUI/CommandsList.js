@@ -2121,7 +2121,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "option: reset, cop, fugitive"
+      "option: reset, cop, fugitive, donatorcop, donatorfugitive"
     ]
   },
   {
