@@ -254,6 +254,11 @@ mp.events.add('actionMenu:clickItem', (actionID) => {
             mp.events.callRemote("actionMenu_SelectedItem", actionID);
             break;
         }
+        case 15: // Autojoin command
+        {
+            mp.events.callRemote("actionMenu_SelectedItem", actionID);
+            break;
+        }
     }
 });
 function actionMenu_lobbyCheck(){
@@ -265,6 +270,9 @@ function actionMenu_lobbyCheck(){
     let lobbyID = mp.players.local.getVariable("InLobby");
     if(lobbyID > -1 && mp.players.local.getVariable("Team") < 0){ // copchase lobby
         mp.events.callLocal("actionMenu:addItem", 6, "Edit Weapons", "#38bdf8", "fa-gun");   
+        let color = "#a3e635";
+        if(mp.players.local.getVariable("AutoJoin") == false) color = "#f87171";
+        mp.events.callLocal("actionMenu:addItem", 15, "Autojoin", color, "fa-joystick");   
     }
     else if(lobbyID == -4){ // derby
         mp.events.callLocal("actionMenu:addItem", 8, "Go to lobby", "#f87171", "fa-door-open");  
@@ -837,10 +845,12 @@ mp.events.add("TwoSecondsEvent", () => {
             {
                 mp.events.callLocal("RemoveTooltip", "J");
                 
+                /*
                 if(mp.players.local.vehicle.getClass() != 8 && mp.players.local.vehicle.model != mp.game.joaat('policeb'))
                 {
                     mp.events.callLocal("AddTooltip", "J", "Seatbelt", -1);
                 }
+                */
 
                 keyTrunk = false;
             }

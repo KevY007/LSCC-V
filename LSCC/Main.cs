@@ -1418,12 +1418,9 @@ namespace RNC
                 Console.WriteLine("[RnC CHALLENGES] Generated new challenges, count: " + cCount);
                 NAPI.Task.Run(() =>
                 {
-                    foreach (Player pl in NAPI.Pools.GetAllPlayers())
+                    foreach (Player pl in Settings.LoggedInPlayers)
                     {
-                        if (EPlayer.LoggedIn(pl))
-                        {
-                            AddChallengesForPlayer(pl, cdList);
-                        }
+                        AddChallengesForPlayer(pl, cdList);                     
                     }
                 });
                 //await context.SaveChangesAsync();

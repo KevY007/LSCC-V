@@ -3658,7 +3658,7 @@ namespace RNC
         }
 
         [Command("autojoin")]
-        public void cmd_autojoin(Player player)
+        public static void cmd_autojoin(Player player)
         {
             if (!EPlayer.LoggedIn(player))
                 return;

@@ -827,6 +827,9 @@ namespace RNC
                 case 14:
                     Commands.cmd_hotwire(player);
                     break;
+                case 15:
+                    Commands.cmd_autojoin(player);
+                    break;
                 default:
                     EPlayer.Error(player, $"Invalid quick-action attempt, ID: {actionID}. Report this to the developers!");
                     break;
