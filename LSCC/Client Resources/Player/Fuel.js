@@ -73,7 +73,7 @@ function HandleFuel(){
 }
 
 mp.events.add("render", () => {
-    if(mp.players.local.isInAnyVehicle(false) && mp.players.local.vehicle != undefined){
+    if(mp.players.local.isInAnyVehicle(false) && mp.players.local.vehicle != undefined && mp.players.local.vehicle.getVariable("Team") == 0){
         if(mp.players.local.vehicle.getVariable("Engine") == false || currentVehicleFuel <= 0.0){
             mp.players.local.vehicle.setEngineOn(false, true, true);
         }

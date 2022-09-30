@@ -3339,6 +3339,8 @@ namespace RNC
                         player.TriggerEvent("MDC:RemoveAllBlips");
                         player.TriggerEvent("ClearClimbTaseProtection", true);
                         player.TriggerEvent("startLoadingScreen", -1, "Loading copchase match...");
+
+                        player.SetData("IsClanPartnered", false);
                     }
 
                     int crashcheck = 0;
@@ -3359,11 +3361,12 @@ namespace RNC
                                 if (lobby.gameMode != GameModes.BANKROBBERY)
                                 {
                                     if (await context.Maps.AsQueryable().CountAsync() < 1) { NAPI.Task.Run(() => { 
-                                        NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has no maps added, failed to start"); });   
-                                        foreach(Player pl in lobbyPlayers)
-                                        {
-                                            pl.TriggerEvent("stopLoadingScreen");
-                                        }
+                                            NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has no maps added, failed to start");
+                                            foreach (Player pl in lobbyPlayers)
+                                            {
+                                                pl.TriggerEvent("stopLoadingScreen");
+                                            }
+                                        });        
                                         return; 
                                     }
                                     crashcheck = 2;
@@ -3372,11 +3375,13 @@ namespace RNC
                                     crashcheck = 3;
 
                                     if (mapList.Count < 1) { NAPI.Task.Run(() => { 
-                                        NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has maps but none of them were enabled! Failed to start."); });
+                                        NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has maps but none of them were enabled! Failed to start.");
                                         foreach (Player pl in lobbyPlayers)
                                         {
                                             pl.TriggerEvent("stopLoadingScreen");
                                         }
+                                        });
+                                                            
                                         return; 
                                     }
                                     crashcheck = 4;
@@ -3593,6 +3598,7 @@ namespace RNC
                                 {
                                     foreach (Player player in lobby.Cops.OrderBy(x => Guid.NewGuid()))
                                     {
+                          
                                         spawnLoc = null;
                                         Account pAcc = EPlayer.GetAccount(player);
 
@@ -3791,6 +3797,7 @@ namespace RNC
                                                             pVehicle.PearlescentColor = inst.PearlescentColor;
                                                             pVehicle.WheelColor = inst.WheelColor;
                                                         });
+                                                        await NAPI.Task.WaitForMainThread();
                                                     }
                                                 }
                                             });
@@ -3810,51 +3817,39 @@ namespace RNC
                                             if (overridemaxseats != 0) maxseats = overridemaxseats;
 
                                             bool hasClanPartnering = false;
-                                            if(player.HasSharedData("ClanID") && player.GetSharedData<int>("ClanID") != -1)
+                                            if(player.HasSharedData("ClanID") && player.GetSharedData<int>("ClanID") != -1 
+                                            && player.HasSharedData("ClanPartnering") && player.GetSharedData<bool>("ClanPartnering") == true)
                                             {
-                                                Task.Run(async () =>
+                                                int clanSQLID = player.GetSharedData<int>("ClanID");
+                                                foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasSharedData("ClanID") && p.GetSharedData<int>("ClanID") == clanSQLID && lobby.Cops.Contains(p) && p.Id != player.Id))
                                                 {
-                                                    using(MainDatabase context = ContextFactory.CreateContext())
+                                                    if (seat < maxseats)
                                                     {
-                                                        Clan clan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == player.GetSharedData<int>("ClanID"));
-                                                        if(clan != null && clan.CopchasePartnering == true)
+                                                        if (carName.Equals("polmav"))
                                                         {
-                                                            int clanSQLID = clan.SQL_ID;
-                                                            NAPI.Task.Run(() =>
-                                                            {
-                                                                hasClanPartnering = true;
-                                                                foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasSharedData("ClanID") && p.GetSharedData<int>("ClanID") == clanSQLID && lobby.Cops.Contains(p) && p.Id != player.Id))
-                                                                {
-                                                                    if (seat < maxseats)
-                                                                    {
-                                                                        if (carName.Equals("polmav"))
-                                                                        {
-                                                                            // 4 - seat
-                                                                            // 4-1, 3
-                                                                            // 4-2, 2
-                                                                            // 4-3, 1
-                                                                            mem.TriggerEvent("SetChaseVehicle", pVehicle.Id, maxseats - seat);
-                                                                            mem.SetData("ChaseVehicle", pVehicle);
-                                                                            mem.SetData("ChaseVehicleSeat", maxseats - seat);
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            // 0 + 1, 2, 3
-                                                                            mem.TriggerEvent("SetChaseVehicle", pVehicle.Id, 0 + seat);
-                                                                            mem.SetData("ChaseVehicle", pVehicle);
-                                                                            mem.SetData("ChaseVehicleSeat", 0 + seat);
-                                                                        }
-
-                                                                        PutInsideCar.Add(mem);
-                                                                        mem.TriggerEvent("pushMsgToChat", "!{#FFAC38}[Clan Partners] You are being paired with " + player.Name + " this chase.");
-
-                                                                        seat++;
-                                                                    }
-                                                                }
-                                                            });
+                                                            // 4 - seat
+                                                            // 4-1, 3
+                                                            // 4-2, 2
+                                                            // 4-3, 1
+                                                            mem.TriggerEvent("SetChaseVehicle", pVehicle.Id, maxseats - seat);
+                                                            mem.SetData("ChaseVehicle", pVehicle);
+                                                            mem.SetData("ChaseVehicleSeat", maxseats - seat);
                                                         }
+                                                        else
+                                                        {
+                                                            // 0 + 1, 2, 3
+                                                            mem.TriggerEvent("SetChaseVehicle", pVehicle.Id, 0 + seat);
+                                                            mem.SetData("ChaseVehicle", pVehicle);
+                                                            mem.SetData("ChaseVehicleSeat", 0 + seat);
+                                                        }
+
+                                                        PutInsideCar.Add(mem);
+                                                        hasClanPartnering = true;
+                                                        mem.TriggerEvent("pushMsgToChat", "!{#FFAC38}[Clan Partners] You are being paired with " + player.Name + " this chase.");
+
+                                                        seat++;
                                                     }
-                                                });
+                                                }
                                             }
                                             if (!hasClanPartnering)
                                             {

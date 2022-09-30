@@ -173,7 +173,7 @@ let lastActionMenuClick = 0;
 mp.events.add('actionMenu:clickItem', (actionID) => {
     if(Date.now() - lastActionMenuClick < 100) return;
     lastActionMenuClick = Date.now();
-    
+
     mp.events.callLocal("actionMenu:close");
 
     // yes it's a long switch case with same action - this is for future in case some clientside stuff needs to be done too!
@@ -359,15 +359,17 @@ function actionMenu_vehicleCheck(){
         else mp.events.callLocal("actionMenu:addItem", 0, "Lock", "#f87171", "fa-lock-keyhole");
 
         mp.events.callLocal("actionMenu:addItem", 1, "Seatbelt", "#fb923c", "fa-shield-slash");
-
-        if(vehicle.engine == true){
-            mp.events.callLocal("actionMenu:addItem", 13, "Engine", "#60a5fa", "fa-engine");
-        }
-        else{
-            if(vehicle.getVariable("Team") != mp.players.local.getVariable("Team")){
-                mp.events.callLocal("actionMenu:addItem", 14, "Hotwire", "#60a5fa", "fa-bolt");
+    
+        if(vehicle.getVariable("Fuel") == undefined || vehicle.getVariable("Fuel") > 0.0){
+            if(vehicle.engine == true){
+                mp.events.callLocal("actionMenu:addItem", 13, "Engine", "#60a5fa", "fa-engine");
             }
-            else mp.events.callLocal("actionMenu:addItem", 13, "Engine", "#60a5fa", "fa-engine");
+            else{
+                if(vehicle.getVariable("Team") != mp.players.local.getVariable("Team")){
+                    mp.events.callLocal("actionMenu:addItem", 14, "Hotwire", "#60a5fa", "fa-bolt");
+                }
+                else mp.events.callLocal("actionMenu:addItem", 13, "Engine", "#60a5fa", "fa-engine");
+            }
         }
     }
     else{

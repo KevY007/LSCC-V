@@ -463,6 +463,12 @@ namespace RNC
                 return;
             }
 
+            if(player.Vehicle.HasSharedData("Fuel") && player.Vehicle.GetSharedData<double>("Fuel") <= 0.0)
+            {
+                EPlayer.Error(player, $"Your car has no fuel, what are you trying to pull off here, buddy?");
+                return;
+            }
+
             if (player.Vehicle.HasSharedData("Team") && (player.Vehicle.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") || player.Vehicle.GetSharedData<int>("Team") == 10) &&
                 player.Vehicle.EngineStatus == false)
             {
