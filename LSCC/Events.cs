@@ -4896,6 +4896,9 @@ namespace RNC
                             }
                             if (mostKills != null)
                             {
+                                int accNumber = await context.Accounts.AsQueryable().CountAsync(a => a.ClanID == mostKills.SQL_ID);
+                                int prize = (int)Math.Floor((decimal)(350 / accNumber));
+                                mostKills.WeekWins += 1;
                                 foreach (Account account in await context.Accounts.AsQueryable().Where(a => a.ClanID != -1).ToListAsync())
                                 {
                                     if (account.ClanID == mostKills.SQL_ID)
@@ -4909,6 +4912,22 @@ namespace RNC
                                         account.MOTD = NAPI.Util.ToJson(motd);
 
                                         // reward skripts here
+                                        bool isPlayerOnline = false;
+                                        NAPI.Task.Run(() =>
+                                        {
+                                            Player check = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name == account.Username);
+                                            if (check != null)
+                                            {
+                                                isPlayerOnline = true;
+                                                EPlayer.GivePoints(check, prize);
+                                                EPlayer.SendMessage(check, $"~y~You've received ~w~{prize} Points ~y~as reward for being clan of the week.");
+                                            }
+                                        });
+                                        await NAPI.Task.WaitForMainThread();
+                                        if (!isPlayerOnline)
+                                        {
+                                            account.Points += prize;
+                                        }
                                     }
                                     else
                                     {
@@ -4927,6 +4946,7 @@ namespace RNC
                                     EPlayer.SendMessageAll($"~y~[>] ~w~ A new week begins and all clans' weekly kills have been reset.");
                                 });
                             }
+                            await context.SaveChangesAsync();
                         }
                     });
                     
