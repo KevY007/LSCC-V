@@ -1772,7 +1772,10 @@ namespace RNC
             for (int i = 0; i < clanname.Length; i++)
             {
                 if (!nameCheck.Contains(clanname[i])) { isNameGood = false; break; }
-                if (!nameCheck.Contains(tag[i])) { isTagGood = false; break; }
+            }
+            for(int i = 0; i < tag.Length; i++)
+            {
+                if (!nameCheck.Contains(tag[i])) { isTagGood = false; break; }          
             }
             if (!isNameGood)
             {

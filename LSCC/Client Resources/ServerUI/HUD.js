@@ -167,7 +167,13 @@ mp.events.add('actionMenu:open', () => {
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.enabled = true;`);
     mp.gui.cursor.show(true, true);
 });
+
+let lastActionMenuClick = 0;
+
 mp.events.add('actionMenu:clickItem', (actionID) => {
+    if(Date.now() - lastActionMenuClick < 100) return;
+    lastActionMenuClick = Date.now();
+    
     mp.events.callLocal("actionMenu:close");
 
     // yes it's a long switch case with same action - this is for future in case some clientside stuff needs to be done too!
