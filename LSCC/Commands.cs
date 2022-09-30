@@ -6709,6 +6709,30 @@ namespace RNC
             return;
         }
 
+        [Command("donatorstatus")]
+        public void cmd_donatorstatus(Player player)
+        {
+            EPlayer.GetAccount(player).DonatorStatus = !EPlayer.GetAccount(player).DonatorStatus;
+            EPlayer.Save(player);
+            EPlayer.SendMessage(player, $"You have toggled your donator status {(EPlayer.GetAccount(player).DonatorStatus == true ? "~g~ON" : "~r~OFF")}~w~!");
+        }
+
+        [Command("clanchat", "!{#AFAFAF}[USAGE] clanchat (text)", Alias = "c", GreedyArg = true)]
+        public void cmd_clanchat(Player player, string message)
+        {
+            if(!player.HasSharedData("ClanID") || player.GetSharedData<int>("ClanID") == -1)
+            {
+                EPlayer.SendMessage(player, "!{#FF6347}[!] !{#FFFFFF}You are not in any clan!");
+                return;
+            }
+            string nameDisp = (player.GetSharedData<string>("ClanTag") == "" ? player.GetSharedData<string>("ClanName") : player.GetSharedData<string>("ClanTag"));
+            foreach(Player playa in Settings.LoggedInPlayers.Where(p => p.HasSharedData("ClanID") && p.GetSharedData<int>("ClanID") == player.GetSharedData<int>("ClanID")))
+            {
+                EPlayer.SendMessage(playa, $"!{{#218a3d}}[{nameDisp}] {player.Name}: !{{#26a347}}{message}");
+            }
+            return;
+        }
+
         [Command("languagechat", "!{#AFAFAF}[USAGE] languagechat (/lc) (text)", Alias = "lc", GreedyArg = true)]
         public void cmd_languagechat(Player player, string message)
         {
@@ -9864,43 +9888,19 @@ namespace RNC
                 player.SetData("LastOOCTick", Environment.TickCount64);
             }
 
-            if (EPlayer.GetAccount(player).Admin < 1 || (EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true))
+            Settings.LoggedInPlayers.ForEach(pl =>
             {
-                if (EPlayer.GetAccount(player).DonatorLevel < 1)
-                {
-                    RAGE.Entities.Players.All.ForEach(pl =>
-                    {
-                        if (EPlayer.LoggedIn(pl))
-                        {
-                            if (pl.GetData<bool>("OOCState") == true) 
-                                pl.TriggerEvent("pushMsgToChat", $"(( [OOC] {player.Name}: {text} ))");
-                        }
-                    });
-                }
-                else
-                {
-                    Settings.LoggedInPlayers.ForEach(pl =>
-                    {
-                        if (pl.GetData<bool>("OOCState") == true) 
-                            pl.TriggerEvent("pushMsgToChat", $"(( [OOC] {EPlayer.GetDonatorLevelName(EPlayer.GetAccount(player).DonatorLevel, true)}!{{#FFFFFF}} {player.Name}: {text} ))");
-                    });
-                }
-            }
-            else
-            {
-                Settings.LoggedInPlayers.ForEach(pl =>
-                {
-                    if (pl.GetData<bool>("OOCState") == true)
-                        pl.TriggerEvent("pushMsgToChat", $"(( [OOC] {EPlayer.GetAdminLevelName(EPlayer.GetAccount(player).Admin, true)}!{{#FFFFFF}} {player.Name}: {text} ))");
-                });
-            }
+                if (pl.GetData<bool>("OOCState") == true)
+                    pl.TriggerEvent("pushMsgToChat", $"(( [OOC] {EPlayer.GetPrefix(player, true)}~w~ {player.Name}: {text} ))");
+            });
+     
 
             if(text.Contains("weather", StringComparison.OrdinalIgnoreCase) && player.GetSharedData<int>("PlayerWeather") == -1)
             {
                 player.TriggerEvent("pushMsgToChat", "~y~[TIP] ~w~Set a custom weather in the ~y~Menu~w~ if the current one is annoying you.");
             }
 
-            Discord.SendTextChannel("staff-bot", $"**(OOC) | {player.Name}**: {text}");
+            Discord.SendTextChannel("staff-bot", $"**(OOC) | {EPlayer.GetPrefix(player, false)} {player.Name}**: {text}");
         }
 
 
@@ -9945,6 +9945,8 @@ namespace RNC
 
             Discord.SendTextChannel("staff-bot", $"**(Lobby {player.GetSharedData<int>("InLobby")}) | {player.Name}**: {text}");
         }
+
+        
 
         [Command("ann", "!{#AFAFAF}[USAGE] ann (text)", Alias = "announce", GreedyArg = true)]
         public void cmd_ann(Player player, string text)
@@ -10189,6 +10191,7 @@ namespace RNC
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen all {(teamid == 0 ? "fugitives." : "cops.")}");
             }
         }
+
 
         [Command("tunfreeze", "!{#AFAFAF}[USAGE] tunfreeze (team 0 = fugitive, 1 = cop)")]
         public void cmd_tunfreeze(Player player, int teamid)

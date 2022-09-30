@@ -1766,7 +1766,7 @@ namespace RNC
                     string cName = clan.Name;
                     string cCreated = clan.CreatedOn;
                     bool partner = clan.CopchasePartnering;
-                    string tag = clan.Tag;
+                    string tag = (clan.ForceTag == true ? clan.Tag : "");
                     await context.SaveChangesAsync();
                     NAPI.Task.Run(() =>
                     {
@@ -1897,12 +1897,10 @@ namespace RNC
                     NAPI.Task.Run(() =>
                     {
                         player.SetSharedData("ClanID", cID);
-                        player.SetSharedData("ClanPartnering", partnering);
+                        player.SetSharedData("ClanPartnering", true);
                         player.SetSharedData("ClanTag", cTag);
                         player.SetSharedData("ClanTier", 0);
                         player.SetSharedData("ClanName", clanname);
-                        player.SetSharedData("ClanPartnering", true);
-                        player.SetSharedData("ClanTag", tag);
                         player.SetSharedData("ClanCreated", DateTime.Now.ToString("F"));
                         EPlayer.Notify(player, "Clan successfully created! Read chat for more information.", "green", "", false, 3000);
                         EPlayer.SendMessage(player, $"~g~[CLAN] ~w~Congratulations! You've successfully created a clan named ~y~{clanname}~w~ for 300 Points!");
@@ -3060,7 +3058,7 @@ namespace RNC
                         pClanName = pClan.Name;
                         pClanCreated = pClan.CreatedOn;
                         pClanPartnering = pClan.CopchasePartnering;
-                        pClanTag = pClan.Tag;
+                        pClanTag = (pClan.ForceTag == true ? pClan.Tag : "");
                     }
 
                     if (linkedSQLs.Intersect(context.Bans.AsQueryable().Select(bans => bans.AccountSQLID)).Any())
@@ -4311,7 +4309,7 @@ namespace RNC
                             player.SetSharedData("ClanName", playerClan.Name);
                             player.SetSharedData("ClanCreated", playerClan.CreatedOn);
                             player.SetSharedData("ClanPartnering", playerClan.CopchasePartnering);
-                            player.SetSharedData("ClanTag", playerClan.Tag);
+                            player.SetSharedData("ClanTag", (playerClan.ForceTag == true ? playerClan.Tag : ""));
 
 
                             player.TriggerEvent("Menu_ClearClanMembers");
@@ -4372,13 +4370,21 @@ namespace RNC
                         int totalDeaths = clan.WeekKills; // temp
                         int COTW_Wins = clan.WeekWins;
 
-                        NAPI.Task.Run(() =>
+                        using(MainDatabase context2 = ContextFactory.CreateContext())
                         {
-                            player.TriggerEvent("Menu_AddClan", clanID, clanName, tag, desc, banner, isOpen, players,
-                                                                maxPlayers, totalKills, totalDeaths, COTW_Wins);
+                            Account clanOwner = await context2.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.ClanID == clan.SQL_ID && a.ClanTier == 0);
+                            string ownerName = "UNKNOWN | BUGGED CLAN";
+                            if (clanOwner != null)
+                                ownerName = $"{clanOwner.Username} [DBID: {clanOwner.SQL_ID}]";
 
-                        });
-                        await NAPI.Task.WaitForMainThread();
+                            NAPI.Task.Run(() =>
+                            {
+                                player.TriggerEvent("Menu_AddClan", clanID, clanName, tag, desc, banner, isOpen, players,
+                                                                    maxPlayers, totalKills, totalDeaths, COTW_Wins, ownerName);
+
+                            });
+                            await NAPI.Task.WaitForMainThread();
+                        }
                     });
                 }
             });
@@ -5350,6 +5356,7 @@ namespace RNC
                                     Medkits = 0,
                                     Painkillers = 0,
                                     Language = -1,
+                                    DonatorStatus = true,
                                     XP = 1,
                                     Escapes = 0,
                                     Arrests = 0,
@@ -5826,13 +5833,33 @@ namespace RNC
             {
                 case "Medkit":
                     {
+                        int max = 4;
+                        if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 6;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 10;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
+                        if (EPlayer.GetAccount(player).Medkits >= max)
+                        {
+                            EPlayer.Error(player, $"You already have the maximum amount of medkits! ({max})");
+                            return;
+                        }
+
                         EPlayer.GetAccount(player).Medkits++;
                         EPlayer.Save(player, false);
                         player.TriggerEvent("UpdateMenuItem", type, EPlayer.GetAccount(player).Medkits);                   
                         break;
                     }
                 case "Painkiller":
-                    {      
+                    {
+                        int max = 4;
+                        if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 6;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 10;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
+                        if (EPlayer.GetAccount(player).Painkillers >= max)
+                        {
+                            EPlayer.Error(player, $"You already have the maximum amount of painkillers! ({max})");
+                            return;
+                        }
+
                         EPlayer.GetAccount(player).Painkillers++;
                         EPlayer.Save(player, false);
                         player.TriggerEvent("UpdateMenuItem", type, EPlayer.GetAccount(player).Painkillers);
@@ -5840,6 +5867,16 @@ namespace RNC
                     }
                 case "Lockpick":
                     {
+                        int max = 10;
+                        if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 20;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 25;
+                        if (EPlayer.GetAccount(player).Lockpicks >= max)
+                        {
+                            EPlayer.Error(player, $"You already have the maximum amount of lockpicks! ({max})");
+                            return;
+                        }
+
                         EPlayer.GetAccount(player).Lockpicks++;
                         EPlayer.Save(player, false);
                         player.TriggerEvent("UpdateMenuItem", type, EPlayer.GetAccount(player).Lockpicks);              

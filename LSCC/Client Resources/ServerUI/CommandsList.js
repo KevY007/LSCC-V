@@ -533,6 +533,20 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "clanchat",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": ["message"]
+  },
+  {
+    "CommandText": "donatorstatus",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "mycomps",
     "Usage": "",
     "Admin": 0,

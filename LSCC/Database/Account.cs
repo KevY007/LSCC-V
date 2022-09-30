@@ -44,6 +44,7 @@ namespace RNC
         public int Level { get; set; }
         public int XP { get; set; }
         public int DonatorLevel { get; set; }
+        public bool DonatorStatus { get; set; }
         public int Medkits { get; set; }
         public int Painkillers { get; set; }
         public int Language { get; set; }

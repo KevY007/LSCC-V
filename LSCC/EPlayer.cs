@@ -1277,6 +1277,30 @@ namespace RNC
                 }
             }
         }
+
+        public static string GetPrefix(Player player, bool color = true)
+        {
+            string toReturn = "";
+            Account acc = EPlayer.GetAccount(player);
+            if(acc.Admin >= 1 && player.GetData<bool>("Anonymous") == false)
+            {
+                toReturn = EPlayer.GetAdminLevelName(acc.Admin, color);
+                return toReturn;
+            }
+            if(acc.DonatorLevel >= 1 && acc.DonatorStatus == true)
+            {
+                toReturn = EPlayer.GetDonatorLevelName(acc.DonatorLevel, color);
+                return toReturn;
+            }
+            if(player.HasSharedData("ClanID") && player.GetSharedData<int>("ClanID") != -1 && player.HasSharedData("ClanTag") && player.GetSharedData<string>("ClanTag") != "")
+            {
+                if (color == true) toReturn += "!{#218a3d}";
+                toReturn += player.GetSharedData<string>("ClanTag");
+                return toReturn;
+            }
+            return "Player";
+        }
+
         public static void TryAdvanceChallenge(Player player, Challenge.ChallengeType challenge_type, string challenge_item)
         {
             TryAdvanceChallenge(player, (int)challenge_type, challenge_item);
@@ -2376,9 +2400,14 @@ namespace RNC
                 player.TriggerEvent("TogglePlayerChat", true);
                 player.ResetData("Dead");
 
+                player.TriggerEvent("hideMDC");
+
                 if (player.GetSharedData<int>("Team") == 0)
                 {
-                    NAPI.Util.ConsoleOutput("Calling SetPlayerWounded from EPlayer.Spawn (" + player.Name + ", 0, -1);");
+                    Events.OnPlayerWounded(player, 0, -1);
+                }
+                else if(player.GetSharedData<int>("Team") != 0 && player.GetSharedData<int>("Team") != 1)
+                {
                     Events.OnPlayerWounded(player, 0, -1);
                 }
 

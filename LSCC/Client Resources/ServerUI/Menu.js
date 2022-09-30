@@ -83,7 +83,7 @@ mp.events.add("LoadCrosshairProfiles", (profileData, activeProfile) => {
     ActiveCrosshairProfileUUID = activeProfile;
 });
 
-mp.events.add("Menu_AddClan", (clanID, cname, tag, desc, banner, isOpen, players, maxPlayers, kills, deaths, wins) => {
+mp.events.add("Menu_AddClan", (clanID, cname, tag, desc, banner, isOpen, players, maxPlayers, kills, deaths, wins, ownerName) => {
     ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.clansList.clans.push(
         {
             id: ${clanID},
@@ -95,6 +95,7 @@ mp.events.add("Menu_AddClan", (clanID, cname, tag, desc, banner, isOpen, players
             open: ${isOpen.toString()},
             players: ${players},
             maxplayers: ${maxPlayers},
+            owner: "${ownerName}",
             stats: {
               kills: ${kills},
               deaths: ${deaths},
