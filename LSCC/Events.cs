@@ -4859,7 +4859,10 @@ namespace RNC
             if(fuel <= 0.0)
             {
                 vehicle.EngineStatus = false;
+                vehicle.SetSharedData("Engine", false);
                 vehicle.Health = 0;
+
+                EPlayer.Error(player, $"Your vehicle <strong>ran out of fuel</strong>! Try to find a parked vehicle and steal it.");
             }
         }
 

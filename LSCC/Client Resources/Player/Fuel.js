@@ -54,9 +54,9 @@ function HandleFuel(){
 
     var distance = minimum;
     var distanceEffect = 1; // PLACEHOLDER!!!
-    if(distance < 100) distanceEffect = 0;
-    else if(distance >= 100 && distance <= 200) distanceEffect = 0.5;
-    else distanceEffect = 1;
+    if(distance < 100) distanceEffect = 0.2;
+    else if(distance >= 100 && distance <= 200) distanceEffect = 1;
+    else distanceEffect = 2;
 
 	var fuelToSubstract = (Math.pow(currentVehicleSpeed, 2)/100000)*distanceEffect;
     currentVehicleFuel -= fuelToSubstract;
@@ -66,8 +66,16 @@ function HandleFuel(){
     if(currentVehicleFuel <= 0.0){
         currentVehicleFuel = 0.0;
         wasInVehicle = false;
-        pushMessageToChat("~y~Your vehicle ran out of fuel! Tugy plaky");
+        
         mp.events.callRemote("UpdateVehicleFuel", 0, 65535); // 65535 = it takes the vehicle player is currently in
         return;
     }
 }
+
+mp.events.add("render", () => {
+    if(mp.players.local.isInAnyVehicle(false) && mp.players.local.vehicle != undefined){
+        if(mp.players.local.vehicle.getVariable("Engine") == false || currentVehicleFuel <= 0.0){
+            mp.players.local.vehicle.setEngineOn(false, true, true);
+        }
+    }
+});
