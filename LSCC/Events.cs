@@ -381,7 +381,6 @@ namespace RNC
                                                 }
                                             }
                                         });
-                                 
                                     }
 
                                     killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.3 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 10.0));
@@ -1766,13 +1765,20 @@ namespace RNC
             }
             string nameCheck = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 ";
             bool isNameGood = true;
+            bool isTagGood = true;
             for (int i = 0; i < clanname.Length; i++)
             {
                 if (!nameCheck.Contains(clanname[i])) { isNameGood = false; break; }
+                if (!nameCheck.Contains(tag[i])) { isTagGood = false; break; }
             }
             if (!isNameGood)
             {
                 EPlayer.Error(player, "Clan name must be alphanumeric (A-Z, 0-9)!", "sex");
+                return;
+            }
+            if (!isTagGood)
+            {
+                EPlayer.Error(player, "Clan tag must be alphanumeric (A-Z, 0-9)!", "sex");
                 return;
             }
 
@@ -1781,6 +1787,9 @@ namespace RNC
              * In real scenario there will be a UI with a confirmation window or something along those lines.
              * Also a warning that a weekly/monthly clan fee will be paid.
              */
+
+            string realDesc = $"[OWNER: {player.Name} ({acc.SQL_ID})] {desc}";
+
             EPlayer.SendMessage(player, "~y~Creating clan...");
             Task.Run(async () =>
             {
@@ -1810,7 +1819,7 @@ namespace RNC
                         WeekKills = 0,
                         TotalKills = 0,
                         WeekWins = 0,
-                        Description = desc,
+                        Description = realDesc,
                         Tag = tag,
                         CreatedOn = DateTime.Now.ToString("F"),
                         ClanAccess = 0,
@@ -4946,6 +4955,10 @@ namespace RNC
                                     EPlayer.SendMessageAll($"~y~[>] ~w~ A new week begins and all clans' weekly kills have been reset.");
                                 });
                             }
+                            await context.Clans.AsQueryable().ForEachAsync(c =>
+                            {
+                                c.WeekKills = 0;
+                            });
                             await context.SaveChangesAsync();
                         }
                     });
