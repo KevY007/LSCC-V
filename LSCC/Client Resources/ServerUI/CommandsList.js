@@ -547,6 +547,13 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "vehdbg",
+    "Usage": "",
+    "Admin": 5,
+    "Donator": 0,
+    "Parameters": ["vehicle name"]
+  },
+  {
     "CommandText": "givegun",
     "Usage": "[USAGE] givegun (target) (ammo) (weapon)",
     "Admin": 3,

@@ -416,10 +416,11 @@ function increaseChatOpacity(time = 4000){
     }, time);
 }
 
+var adminVehSpawner = false;
 mp.events.add("spawner_spawnVehicle", (modelname) => {
     VehicleSpawnerActive = false;
     ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.enabled = false;`);
-    mp.events.callRemote("Spawner_SpawnVehicle", modelname);
+    mp.events.callRemote("Spawner_SpawnVehicle", modelname, adminVehSpawner);
     mp.gui.cursor.show(false, false);
 });
 mp.events.add("spawner_close", () => {
@@ -427,8 +428,9 @@ mp.events.add("spawner_close", () => {
     ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.enabled = false;`);
     mp.gui.cursor.show(false, false);
 });
-mp.events.add("OpenVehicleSpawner", (carname) => {
+mp.events.add("OpenVehicleSpawner", (carname, admin) => {
     VehicleSpawnerActive = true;
+    adminVehSpawner = admin;
     ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.openSpawner('${carname}')`);
     mp.gui.cursor.show(true, true);
 });

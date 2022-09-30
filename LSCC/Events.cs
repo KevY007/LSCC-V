@@ -1852,7 +1852,7 @@ namespace RNC
         }
 
         [RemoteEvent("Spawner_SpawnVehicle")]
-        public void OnSpawnerRequestVehicle(Player player, string carname)
+        public void OnSpawnerRequestVehicle(Player player, string carname, bool isAdmin)
         {
             if(EPlayer.GetAccount(player).Admin < 1)
             {
@@ -1878,7 +1878,28 @@ namespace RNC
             aVehicle.Locked = false;
             aVehicle.SetSharedData("Team", -1);
 
-            Settings.AdminVehicles.Add(aVehicle);
+            if (isAdmin)
+            {
+                Settings.AdminVehicles.Add(aVehicle);
+                LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+                if(lobby != null)
+                {
+                    if (lobby.Fugitives.Contains(player) || lobby.Cops.Contains(player))
+                    {
+                        Logs.LogAdmin(player, "Spawned a vehicle while in copchase: " + carname.ToUpper());
+                    }
+                }             
+            }
+            else
+            {
+                if(player.HasData("FreeroamVehicles"))
+                    player.GetData<List<Vehicle>>("FreeroamVehicles").Add(aVehicle);
+                else
+                {
+                    List<Vehicle> vehs = new List<Vehicle>(); vehs.Add(aVehicle);
+                    player.SetData<List<Vehicle>>("FreeroamVehicles", vehs);
+                }
+            }
 
             NAPI.Task.Run(() =>
             {
@@ -1891,11 +1912,7 @@ namespace RNC
                 }
             }, 1000);
 
-            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
-            if (lobby.Fugitives.Contains(player) || lobby.Cops.Contains(player))
-            {
-                Logs.LogAdmin(player, "Spawned a vehicle while in copchase: " + carname.ToUpper());
-            }
+     
         }
 
         [ServerEvent(Event.PlayerEnterColshape)]
@@ -1935,9 +1952,9 @@ namespace RNC
         [ServerEvent(Event.PlayerEnterVehicle)]
         public void OnPlayerEnterVehicle(Player player, Vehicle vehicle, sbyte seatID)
         {
-            if(vehicle.GetSharedData<int>("Team") == 10)
+            if(vehicle.HasSharedData("Team") && vehicle.GetSharedData<int>("Team") == 10)
             {
-                if(vehicle.GetSharedData<bool>("Engine") == false)
+                if(vehicle.HasSharedData("Engine") && vehicle.GetSharedData<bool>("Engine") == false)
                 {
                     vehicle.EngineStatus = false;
                 }

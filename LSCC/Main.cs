@@ -1553,6 +1553,12 @@ namespace RNC
                 case "golfmk6":
                     seats = 4;
                     break;
+                case "centurionlspd":
+                    seats = 14;
+                    break;
+                case "bcso2slick":
+                    seats = 4;
+                    break;
             }
             return seats;
         }

@@ -780,6 +780,33 @@ namespace RNC
             player.TriggerEvent("pushMsgToChat", "~y~Your Discord code: ~w~" + _d.DiscordCode);
         }
 
+        [Command("vehdbg")]
+        public void cmd_vehdbg(Player player, string carname)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 5)
+            {
+                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+
+            Vehicle veh = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5f), player.Heading, 0, 0, "ADMIN", 255, false, true, player.Dimension);
+            veh.SetSharedData("Engine", true);
+            veh.SetSharedData("Locked", false);
+            veh.Locked = false;
+            veh.SetSharedData("Team", -1);
+            Settings.AdminVehicles.Add(veh);
+            NAPI.Task.Run(() =>
+            {
+                if(player != null && player.Exists && !player.Dead && veh != null && veh.Exists)
+                {
+                    player.SetIntoVehicle(veh, 0);
+                }
+            }, 1000);
+        }
+
         [Command("aveh", "!{#AFAFAF}[USAGE] aveh (optional: vehicle model) (optional: pri. col) (optional: sec. col)", Alias = "av")]
         public void cmd_aveh(Player player, string carname = "", int col1 = -1, int col2 = -1)
         {
@@ -792,7 +819,7 @@ namespace RNC
                 return;
             }
             // Vehicle spawner automatically grabs the car and spawns it if it's found.
-            player.TriggerEvent("OpenVehicleSpawner", carname);
+            player.TriggerEvent("OpenVehicleSpawner", carname, true);
             return;
 
         }
@@ -820,7 +847,7 @@ namespace RNC
                 player.SendNotification("~r~You had too many freeroam vehicles, removed the least recent.");
             }
             // Vehicle spawner automatically grabs the car and spawns it if it's found.
-            player.TriggerEvent("OpenVehicleSpawner", carname);
+            player.TriggerEvent("OpenVehicleSpawner", carname, false);
             return;
         }
 
