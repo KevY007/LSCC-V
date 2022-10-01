@@ -488,7 +488,7 @@ namespace RNC
                 return;
             }
 
-            if(player.Vehicle.HasSharedData("Fuel") && player.Vehicle.GetSharedData<double>("Fuel") <= 0.0)
+            if (player.Vehicle.HasSharedData("Fuel") && (double)player.Vehicle.GetSharedData<Single>("Fuel") <= 0.0)
             {
                 EPlayer.Error(player, $"Your car has no fuel, what are you trying to pull off here, buddy?");
                 return;
@@ -2805,8 +2805,17 @@ namespace RNC
                 EPlayer.Error(player, $"You must be in the lobby to use the weapon editor!");
                 return;
             }
+            LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
+            if(lobby != null)
+            {
+                if(lobby.gameStatus == 2)
+                {
+                    EPlayer.Error(player, $"You can't use this when copchase is about to start!", "nigger");
+                    return;
+                }
+            }
 
-            player.SetSharedData("InWeaponEditor", true);
+            //player.SetSharedData("InWeaponEditor", true);
             foreach(KeyValuePair<long, string> weapon in Main.WeaponReasons)
             {
                 player.GiveWeapon((WeaponHash)weapon.Key, 1);

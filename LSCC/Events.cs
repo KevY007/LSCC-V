@@ -998,7 +998,7 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            player.SetSharedData("InWeaponEditor", false);
+            //player.SetSharedData("InWeaponEditor", false);
             EPlayer.Spawn(player);
             player.SetSharedData("WeaponEditorActive", false);
         }
