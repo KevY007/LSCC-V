@@ -2806,6 +2806,7 @@ namespace RNC
                 return;
             }
 
+            player.SetSharedData("InWeaponEditor", true);
             foreach(KeyValuePair<long, string> weapon in Main.WeaponReasons)
             {
                 player.GiveWeapon((WeaponHash)weapon.Key, 1);

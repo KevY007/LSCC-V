@@ -726,6 +726,8 @@ namespace RNC
 
                 player.ResetData("Language");
 
+                player.SetSharedData("InWeaponEditor", false);
+
                 player.SetData("EditingClothing", -1);
                 player.SetData("Creator_Using", false);
                 player.SetData("Tuner_Using", false);
