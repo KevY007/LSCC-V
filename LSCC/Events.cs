@@ -2963,6 +2963,8 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
+            NAPI.Util.ConsoleOutput($"{player.Name} finished tutorial, voice setting: {useVoice.ToString()}, language {language}");
+
             int voiceMode = (useVoice ? 0 : 4);
             OnSetVoiceMode(player, voiceMode, false);
             player.TriggerEvent("setVoiceModeMenu", voiceMode);

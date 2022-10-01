@@ -112,8 +112,8 @@ mp.events.add("StartTutorial", () => {
 ]*/
 mp.events.add("OnFinishTutorial", (results) => {
 
+    mp.events.callRemote(results);
     let resobj = JSON.parse(results);
-
     IsInTutorial = false;
     let useVoice = resobj[1];
     let language = resobj[2];
