@@ -2229,114 +2229,114 @@ namespace RNC
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the loadouts...");
 
             new LoadoutData(1, "Default")
-                .Add(WeaponHash.Pistol, "package://Artwork/Weapons/Pistol.png", "Beretta M9", 40);
+                .Add(WeaponHash.Pistol, "package://Artwork/Weapons/Pistol.png", "Pistol", 40);
 
             // Discord-exclusive loadout
             new LoadoutData(1, "Negotiator")
-                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "M1911", 50)
-                .Add(WeaponHash.Heavyshotgun, "package://Artwork/Weapons/HeavyShotgun.png", "AA-12", 20)
+                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "Heavy Pistol", 50)
+                .Add(WeaponHash.Heavyshotgun, "package://Artwork/Weapons/HeavyShotgun.png", "Heavy Shotgun", 20)
                 .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1);
             // -------------------------
 
             new LoadoutData(1, "Patrol", 5)
-                .Add(WeaponHash.Combatpistol, "package://Artwork/Weapons/CombatPistol.png", "Glock 17", 30)
-                .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Remington 870", 15);
+                .Add(WeaponHash.Combatpistol, "package://Artwork/Weapons/CombatPistol.png", "Combat Pistol", 30)
+                .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Pump Shotgun", 15);
 
             new LoadoutData(1, "Metropolitan", 8)
-                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "M1911", 40)
-                .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Remington 870", 25)
+                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "Heavy Pistol", 40)
+                .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Pump Shotgun", 25)
                 .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1);
 
             new LoadoutData(1, "FBI", 12, 15)
-                .Add(WeaponHash.Pistol50, "package://Artwork/Weapons/Pistol50.png", "Desert Eagle", 40)
-                .Add(WeaponHash.Bullpupshotgun, "package://Artwork/Weapons/BullpupShotgun.png", "Kel Tec KSG", 28)
+                .Add(WeaponHash.Pistol50, "package://Artwork/Weapons/Pistol50.png", "Pistol .50", 40)
+                .Add(WeaponHash.Bullpupshotgun, "package://Artwork/Weapons/BullpupShotgun.png", "Bullpup Shotgun", 28)
                 .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 2);
             
             new LoadoutData(1, "CIA", 15, 30)
-                .Add(WeaponHash.Pistol_mk2, "package://Artwork/Weapons/PistolMk2.png", "H&K P30L", 50)
-                .Add(WeaponHash.Heavyshotgun, "package://Artwork/Weapons/HeavyShotgun.png", "AA-12", 20)
-                .Add(WeaponHash.Assaultsmg, "package://Artwork/Weapons/AssaultSMG.png", "FN P90", 80)
+                .Add(WeaponHash.Pistol_mk2, "package://Artwork/Weapons/PistolMk2.png", "Pistol Mk2", 50)
+                .Add(WeaponHash.Heavyshotgun, "package://Artwork/Weapons/HeavyShotgun.png", "Heavy Shotgun", 20)
+                .Add(WeaponHash.Assaultsmg, "package://Artwork/Weapons/AssaultSMG.png", "Assault SMG", 80)
                 .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1);
 
             new LoadoutData(1, "SWAT", 20, 50)
-                .Add(WeaponHash.Combatpistol, "package://Artwork/Weapons/CombatPistol.png", "Glock 17", 30)
-                .Add(WeaponHash.Smg, "package://Artwork/Weapons/SMG.png", "UMP-45", 60)
-                .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Remington 870", 15)
+                .Add(WeaponHash.Combatpistol, "package://Artwork/Weapons/CombatPistol.png", "Combat Pistol", 30)
+                .Add(WeaponHash.Smg, "package://Artwork/Weapons/SMG.png", "SMG", 60)
+                .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Pump Shotgun", 15)
                 .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 2);
 
             new LoadoutData(1, "Marine", 25, 70)
-                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "M1911", 30)
-                .Add(WeaponHash.Carbinerifle, "package://Artwork/Weapons/CarbineRifle.png", "AR-15", 60)
-                .Add(WeaponHash.Bullpupshotgun, "package://Artwork/Weapons/BullpupShotgun.png", "Kel Tec KSG", 28)
+                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "Heavy Pistol", 30)
+                .Add(WeaponHash.Carbinerifle, "package://Artwork/Weapons/CarbineRifle.png", "Carbine Rifle", 60)
+                .Add(WeaponHash.Bullpupshotgun, "package://Artwork/Weapons/BullpupShotgun.png", "Bullpup Shotgun", 28)
                 .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1);
 
             new LoadoutData(1, "Navy Seal", 35, 100)
-                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "M1911", 30)
-                .Add(WeaponHash.Heavyshotgun, "package://Artwork/Weapons/HeavyShotgun.png", "AA-12", 20)
-                .Add(WeaponHash.Specialcarbine, "package://Artwork/Weapons/SpecialCarbine.png", "SCAR-H", 70)
+                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "Heavy Pistol", 30)
+                .Add(WeaponHash.Heavyshotgun, "package://Artwork/Weapons/HeavyShotgun.png", "Heavy Shotgun", 20)
+                .Add(WeaponHash.Specialcarbine, "package://Artwork/Weapons/SpecialCarbine.png", "Special Carbine", 70)
                 .Add(WeaponHash.Bzgas, "package://Artwork/Weapons/BZGas.png", "BZ Gas", 1);
 
             new LoadoutData(1, "Juggernaut", 50, 150)
-                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "M1911", 40)
-                .Add(WeaponHash.Combatmg, "package://Artwork/Weapons/CombatMG.png", "M60", 160)
-                .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Remington 870", 15)
+                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "Heavy Pistol", 40)
+                .Add(WeaponHash.Combatmg, "package://Artwork/Weapons/CombatMG.png", "Combat MG", 160)
+                .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Pump Shotgun", 15)
                 .Add((WeaponHash)1, "package://Artwork/Weapons/Armour.png", "Full Armour", 100);
 
             //
 
             new LoadoutData(0, "Default")
-                .Add(WeaponHash.Pistol, "package://Artwork/Weapons/Pistol.png", "Beretta M9", 40);
+                .Add(WeaponHash.Pistol, "package://Artwork/Weapons/Pistol.png", "Pistol", 40);
 
             // Discord-exclusive loadout
             new LoadoutData(0, "Negotiator")
-                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "M1911", 50)
-                .Add(WeaponHash.Heavyshotgun, "package://Artwork/Weapons/HeavyShotgun.png", "Benelli M1014", 50)
+                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "Heavy Pistol", 50)
+                .Add(WeaponHash.Heavyshotgun, "package://Artwork/Weapons/HeavyShotgun.png", "Heavy Shotgun", 50)
                 .Add(WeaponHash.Molotov, "package://Artwork/Weapons/Molotov.png", "Molotov", 1);
             // -------------------------
 
             new LoadoutData(0, "Wannabe", 5)
-                .Add(WeaponHash.Snspistol, "package://Artwork/Weapons/SNSPistol.png", "Makarov", 60)
-                .Add(WeaponHash.Sawnoffshotgun, "package://Artwork/Weapons/SawnOffShotgun.png", "Winchester Model 1887", 40);
+                .Add(WeaponHash.Snspistol, "package://Artwork/Weapons/SNSPistol.png", "SNS Pistol", 60)
+                .Add(WeaponHash.Sawnoffshotgun, "package://Artwork/Weapons/SawnOffShotgun.png", "Sawn Off Shotgun", 40);
 
             new LoadoutData(0, "Hoodrat", 8, 10)
-                .Add(WeaponHash.Pistol_mk2, "package://Artwork/Weapons/PistolMk2.png", "H&K P30L", 50)
-                .Add(WeaponHash.Compactrifle, "package://Artwork/Weapons/CompactRifle.png", "Mini Draco AK-47", 80)
-                .Add(WeaponHash.Bullpupshotgun, "package://Artwork/Weapons/BullpupShotgun.png", "Kel Tec KSG", 50);
+                .Add(WeaponHash.Pistol_mk2, "package://Artwork/Weapons/PistolMk2.png", "Pistol Mk2", 50)
+                .Add(WeaponHash.Compactrifle, "package://Artwork/Weapons/CompactRifle.png", "Compact Rifle", 80)
+                .Add(WeaponHash.Bullpupshotgun, "package://Artwork/Weapons/BullpupShotgun.png", "Bullpup Shotgun", 50);
 
             new LoadoutData(0, "Thug", 13, 15)
-                .Add(WeaponHash.Pistol, "package://Artwork/Weapons/Pistol.png", "Beretta M9", 40)
-                .Add(WeaponHash.Microsmg, "package://Artwork/Weapons/MicroSMG.png", "MAC-10", 60)
-                .Add(WeaponHash.Bullpupshotgun, "package://Artwork/Weapons/BullpupShotgun.png", "Kel Tec KSG", 40);
+                .Add(WeaponHash.Pistol, "package://Artwork/Weapons/Pistol.png", "Pistol", 40)
+                .Add(WeaponHash.Microsmg, "package://Artwork/Weapons/MicroSMG.png", "Micro SMG", 60)
+                .Add(WeaponHash.Bullpupshotgun, "package://Artwork/Weapons/BullpupShotgun.png", "Bullpup Shotgun", 40);
 
             new LoadoutData(0, "Hustler", 15, 25)
-                .Add(WeaponHash.Combatpistol, "package://Artwork/Weapons/CombatPistol.png", "Glock 17", 60)
-                .Add(WeaponHash.Smg, "package://Artwork/Weapons/SMG.png", "UMP-45", 70);
+                .Add(WeaponHash.Combatpistol, "package://Artwork/Weapons/CombatPistol.png", "Combat Pistol", 60)
+                .Add(WeaponHash.Smg, "package://Artwork/Weapons/SMG.png", "SMG", 70);
 
             new LoadoutData(0, "Trigger", 22, 40)
-                .Add(WeaponHash.Pistol, "package://Artwork/Weapons/Pistol.png", "Beretta M9", 60)
-                .Add(WeaponHash.Assaultrifle, "package://Artwork/Weapons/AssaultRifle.png", "AK-47", 80);
+                .Add(WeaponHash.Pistol, "package://Artwork/Weapons/Pistol.png", "Pistol", 60)
+                .Add(WeaponHash.Assaultrifle, "package://Artwork/Weapons/AssaultRifle.png", "Assault Rifle", 80);
 
             new LoadoutData(0, "Enforcer", 27, 60)
-                .Add(WeaponHash.Pistol50, "package://Artwork/Weapons/Pistol50.png", "Desert Eagle", 28)
-                .Add(WeaponHash.Assaultrifle, "package://Artwork/Weapons/AssaultRifle.png", "AK-47", 80)
-                .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Remington 870", 40);
+                .Add(WeaponHash.Pistol50, "package://Artwork/Weapons/Pistol50.png", "Pistol .50", 28)
+                .Add(WeaponHash.Assaultrifle, "package://Artwork/Weapons/AssaultRifle.png", "Assault Rifle", 80)
+                .Add(WeaponHash.Pumpshotgun, "package://Artwork/Weapons/PumpShotgun.png", "Pump Shotgun", 40);
 
             new LoadoutData(0, "Shot-Caller", 27)
-                .Add(WeaponHash.Snspistol, "package://Artwork/Weapons/SNSPistol.png", "Makarov", 60)
-                .Add(WeaponHash.Microsmg, "package://Artwork/Weapons/MicroSMG.png", "MAC-10", 70)
-                .Add(WeaponHash.Heavyshotgun, "package://Artwork/Weapons/HeavyShotgun.png", "Benelli M1014", 50)
+                .Add(WeaponHash.Snspistol, "package://Artwork/Weapons/SNSPistol.png", "SNS Pistol", 60)
+                .Add(WeaponHash.Microsmg, "package://Artwork/Weapons/MicroSMG.png", "Micro SMG", 70)
+                .Add(WeaponHash.Heavyshotgun, "package://Artwork/Weapons/HeavyShotgun.png", "Heavy Shotgun", 50)
                 .Add(WeaponHash.Molotov, "package://Artwork/Weapons/Molotov.png", "Molotov", 1);
 
             new LoadoutData(0, "Kingpin", 35, 70)
-                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "M1911", 60)
-                .Add(WeaponHash.Heavyshotgun, "package://Artwork/Weapons/HeavyShotgun.png", "Benelli M1014", 50)
-                .Add(WeaponHash.Carbinerifle, "package://Artwork/Weapons/CarbineRifle.png", "AR-15", 80)
+                .Add(WeaponHash.Heavypistol, "package://Artwork/Weapons/HeavyPistol.png", "Heavy Pistol", 60)
+                .Add(WeaponHash.Heavyshotgun, "package://Artwork/Weapons/HeavyShotgun.png", "Heavy Shotgun", 50)
+                .Add(WeaponHash.Carbinerifle, "package://Artwork/Weapons/CarbineRifle.png", "Carbine Rifle", 80)
                 .Add(WeaponHash.Molotov, "package://Artwork/Weapons/Molotov.png", "Molotov", 1);
 
             new LoadoutData(0, "Godfather", 50, 70)
-                .Add(WeaponHash.Pistol50, "package://Artwork/Weapons/Pistol50.png", "Desert Eagle", 40)
-                .Add(WeaponHash.Bullpupshotgun, "package://Artwork/Weapons/BullpupShotgun.png", "Kel Tec KSG", 50)
-                .Add(WeaponHash.Specialcarbine, "package://Artwork/Weapons/SpecialCarbine.png", "SCAR-H", 80)
+                .Add(WeaponHash.Pistol50, "package://Artwork/Weapons/Pistol50.png", "Pistol .50", 40)
+                .Add(WeaponHash.Bullpupshotgun, "package://Artwork/Weapons/BullpupShotgun.png", "Bullpup Shotgun", 50)
+                .Add(WeaponHash.Specialcarbine, "package://Artwork/Weapons/SpecialCarbine.png", "Special Carbine", 80)
                 .Add(WeaponHash.Molotov, "package://Artwork/Weapons/Molotov.png", "Molotov", 3);
 
 
