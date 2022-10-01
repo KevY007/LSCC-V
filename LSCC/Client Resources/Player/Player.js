@@ -127,6 +127,8 @@ mp.keys.bind(0x46, true, function () {
 });
 
 mp.events.add('entityStreamIn', (entity) => {
+    if(entity == null || !entity.doesExist()) return;
+
     if (chaseRunning && mp.players.local.getVariable("Team") >= 0 && entity.type === 'vehicle' 
         && chaseStartVeh != -1 && entity.remoteId !== undefined && entity.remoteId == chaseStartVeh)
     {
@@ -2524,6 +2526,7 @@ mp.events.add("entcleartasks", (entity, immediately) => {
 
 function resolvePlayAnim(entity, animDictionary, animName, animFlag, speed = 8.0, speedMul = 0.0, duration = -1, playbackRate = 0.0, lockX = false, lockY = false, lockZ = false)
 {
+    if(entity == null || !entity.doesExist()) return;
 	entity.taskPlayAnim(animDictionary, animName, speed, speedMul, duration, animFlag, playbackRate, lockX, lockY, lockZ);
 }
 
