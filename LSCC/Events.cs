@@ -6335,7 +6335,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    var tuning = await context.PlayerTunings.AsQueryable().FirstOrDefaultAsync(a => a.AccountSQLID == acc.SQL_ID && a.Model == player.Vehicle.Model);
+                    var tuning = await context.PlayerTunings.AsQueryable().FirstOrDefaultAsync(a => a.AccountSQLID == acc.SQL_ID && a.Model == vmodel);
 
                     Dictionary<int, int> vMods = NAPI.Util.FromJson<Dictionary<int, int>>(modstring);
                     vMods.Remove(11); // Engine

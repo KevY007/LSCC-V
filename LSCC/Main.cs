@@ -4767,16 +4767,29 @@ namespace RNC
                                                             {
                                                                 NAPI.Task.Run(() =>
                                                                 {
-                                                                    p.GetData<Vehicle>("ChaseVehicle").PrimaryColor = inst.PrimaryColor;
-                                                                    p.GetData<Vehicle>("ChaseVehicle").SecondaryColor = inst.SecondaryColor;
-
-                                                                    foreach (var kvp in NAPI.Util.FromJson<Dictionary<int, int>>(inst.Mods))
+                                                                    try
                                                                     {
-                                                                        p.GetData<Vehicle>("ChaseVehicle").SetMod(kvp.Key, kvp.Value);
-                                                                        if (kvp.Key == 56) p.GetData<Vehicle>("ChaseVVehicle").WheelType = kvp.Value;
+                                                                        if (p.HasData("ChaseVehicle"))
+                                                                        {
+                                                                            p.GetData<Vehicle>("ChaseVehicle").PrimaryColor = inst.PrimaryColor;
+                                                                            p.GetData<Vehicle>("ChaseVehicle").SecondaryColor = inst.SecondaryColor;
+
+                                                                            foreach (var kvp in NAPI.Util.FromJson<Dictionary<int, int>>(inst.Mods))
+                                                                            {
+                                                                                if (kvp.Key != null && kvp.Value != null)
+                                                                                {
+                                                                                    p.GetData<Vehicle>("ChaseVehicle").SetMod(kvp.Key, kvp.Value);
+                                                                                    if (kvp.Key == 56) p.GetData<Vehicle>("ChaseVVehicle").WheelType = kvp.Value;
+                                                                                }
+                                                                            }
+                                                                            p.GetData<Vehicle>("ChaseVehicle").PearlescentColor = inst.PearlescentColor;
+                                                                            p.GetData<Vehicle>("ChaseVehicle").WheelColor = inst.WheelColor;
+                                                                        }
                                                                     }
-                                                                    p.GetData<Vehicle>("ChaseVehicle").PearlescentColor = inst.PearlescentColor;
-                                                                    p.GetData<Vehicle>("ChaseVehicle").WheelColor = inst.WheelColor;
+                                                                    catch (Exception ex)
+                                                                    {
+                                                                        NAPI.Util.ConsoleOutput($"Failed to set vehicle tunings for {p.Name}: {ex.ToString()}");
+                                                                    }
                                                                 });
 
                                                             }
