@@ -1198,7 +1198,7 @@ mp.events.add('render', () => {
         }
         else { mp.game.controls.enableControlAction(32, 257, true); }
 
-        if(mp.players.local.isClimbing()){
+        if(mp.players.local.isClimbing() && mp.players.local.getVariable("Team") >= 0){
             if(!wasClimbingLastFrame){ // if he was not climbing last frame aka just started climbing
                 wasClimbingLastFrame = true; // it initiates a timeout for 2,5s
                 if(climbProtectionState == -1){

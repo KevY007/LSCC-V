@@ -283,6 +283,91 @@ function menuSetting_getOptionNameFromValue(type, value){
     }
 }
 
+mp.events.add("UpdateMenuStatsTab", (email, admin, points, dpoints, dlevel, derbywins, escapes, arrests,
+                                     kills, deaths, kdr, playtime, warns, discordlinked) => {
+
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.$refs.statsTab.stats = [
+            {
+                icon: "fa-mailbox",
+                title: "E-Mail",
+                value: "${email}",
+            },
+            {
+                icon: "fa-shield-quartered",
+                title: "Admin",
+                value: "${admin}",
+            },
+            {
+                icon: "fa-coins",
+                title: "Points",
+                value: "${points}",
+            },
+            {
+                icon: "fa-treasure-chest",
+                title: "Donator Points",
+                value: "${dpoints}",
+            },
+            {
+                icon: "fa-gem",
+                title: "Donator Level",
+                value: "${dlevel}",
+            },
+            {
+                icon: "fa-truck-monster",
+                title: "Derby Wins",
+                value: "${derbywins}",
+            },
+            {
+                icon: "fa-person-to-portal",
+                title: "Escapes",
+                value: "${escapes}",
+            },
+            {
+                icon: "fa-handcuffs",
+                title: "Arrests",
+                value: "${arrests}",
+            },
+            {
+                icon: "fa-crosshairs",
+                title: "Kills",
+                value: "${kills}",
+            },
+            {
+                icon: "fa-skull",
+                title: "Deaths",
+                value: "${deaths}",
+            },
+            {
+                icon: "fa-scale-unbalanced",
+                title: "K/D Ratio",
+                value: "${kdr}",
+            },
+            {
+                icon: "fa-clock",
+                title: "Play Time",
+                value: "${playtime} hours",
+            },
+            {
+                icon: "fa-triangle-exclamation",
+                title: "Warns",
+                value: "${warns}",
+            },
+            {
+                icon: "clouds",
+                title: "Discord",
+                value: "${(discordlinked == true ? "Your account is verified." : "Your account isn't verified! (/verify)")}",
+            },
+        ]`);
+
+    // `gm.$refs.mainMenu.$refs.profileTab.$refs.statsTab.stats = {
+    //     {
+    //         icon: "fa-crosshairs",
+    //         title: "Kills",
+    //         value: 15,
+    //       },
+    // }`
+});
+
 function ToggleMenu()
 {
     if(MDCActive !== undefined && MDCActive == true){
@@ -314,7 +399,7 @@ function ToggleMenu()
         mp.events.callRemote("OnToggleMenu", menuToggled);
         mp.gui.cursor.show(menuToggled, menuToggled);
         activateChat(!menuToggled);
-
+        mp.events.callRemote("RequestStatsForStatsTab");
         UpdateStatsVars(mp.players.local);
 
         ServerUI.execute('gm.$refs.mainMenu.$refs.logsTab.isLoading = false;');
@@ -326,6 +411,8 @@ function ToggleMenu()
             ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.createdAt = "${mp.players.local.getVariable("ClanCreated")}"`);
             ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.name = '${mp.players.local.name}'`);
             ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.createdAt = '${mp.players.local.getVariable("RegisterDate")}'`);
+
+            
 
             // Testing for now, loads all clan data such as members, clan kills, etc.
             mp.events.callRemote("Menu_InitializeMyClanTab");

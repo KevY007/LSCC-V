@@ -621,21 +621,21 @@ namespace RNC
                     case "medkit":
                         max = 4;
                         if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 6;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 10;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 2) max = 10;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 3) max = 15;
                         owned = acc.Medkits;
                         break;
                     case "painkiller": owned = acc.Painkillers;
                         max = 4;
                         if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 6;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 10;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 2) max = 10;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 3) max = 15;
                         break;
                     case "lockpick": owned = acc.Lockpicks;
                         max = 10;
                         if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 20;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 25;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 2) max = 20;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 3) max = 25;
                         break;
                 }
 
@@ -653,20 +653,20 @@ namespace RNC
                     case "medkit":
                         max = 4;
                         if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 6;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 10;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 2) max = 10;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 3) max = 15;
                         break;
                     case "painkiller":
                         max = 4;
                         if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 6;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 10;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 2) max = 10;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 3) max = 15;
                         break;
                     case "lockpick":
                         max = 10;
                         if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 20;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 25;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 2) max = 20;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 3) max = 25;
                         break;
                 }
 

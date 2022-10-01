@@ -5987,6 +5987,26 @@ namespace RNC
             player.TriggerEvent("BeginReviving");
         }
 
+        [RemoteEvent("RequestStatsForStatsTab")]
+        public void OnRequestStatsForStatsTab(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+            Account acc = EPlayer.GetAccount(player);
+
+            double KDR = 0.0;
+            if (acc.Kills == 0) acc.Kills = 1;
+            if (acc.Deaths == 0) acc.Deaths = 1;
+            if (acc.MinutesPlayed == 0.0) acc.MinutesPlayed = 0.1;
+            KDR = (double)acc.Kills / (double)acc.Deaths;
+
+            DiscordData _d = NAPI.Util.FromJson<DiscordData>(acc.DiscordInfo);
+            bool discordLinked = !_d.DiscordID.Equals("n/a");
+
+            player.TriggerEvent("UpdateMenuStatsTab", acc.Email, EPlayer.GetAdminLevelName(acc.Admin, false), acc.Points, acc.DonatorPoints, EPlayer.GetDonatorLevelName(acc.DonatorLevel, false), acc.DerbyWins,
+                acc.Escapes, acc.Arrests, acc.Kills, acc.Deaths, KDR, (acc.MinutesPlayed / 60.0).ToString("N3"), acc.Warns, discordLinked);
+        }
+
         [RemoteEvent("Menu_RequestBuyItem")]
         public void OnRequestBuyItem(Player player, string name)
         {
@@ -6014,8 +6034,8 @@ namespace RNC
                     {
                         int max = 4;
                         if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 6;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 10;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 2) max = 10;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 3) max = 15;
                         if (EPlayer.GetAccount(player).Medkits >= max)
                         {
                             EPlayer.Error(player, $"You already have the maximum amount of medkits! ({max})");
@@ -6031,8 +6051,8 @@ namespace RNC
                     {
                         int max = 4;
                         if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 6;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 10;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 2) max = 10;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 3) max = 15;
                         if (EPlayer.GetAccount(player).Painkillers >= max)
                         {
                             EPlayer.Error(player, $"You already have the maximum amount of painkillers! ({max})");
@@ -6048,8 +6068,8 @@ namespace RNC
                     {
                         int max = 10;
                         if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 20;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 25;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 2) max = 20;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 3) max = 25;
                         if (EPlayer.GetAccount(player).Lockpicks >= max)
                         {
                             EPlayer.Error(player, $"You already have the maximum amount of lockpicks! ({max})");

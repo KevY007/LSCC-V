@@ -1229,7 +1229,7 @@ function ToggleScoreboard()
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.disableInput = true;`);
 		// ServerUI.execute(`gm.$refs.scoreboard.setPlayers([]);`);
 
-        let notifyscoreboardstr = `toast('Scoreboard Cursor', 'Press <strong>F2</strong> to show the cursor. Click on a player for actions.', 'nothing', 5000);`;
+        let notifyscoreboardstr = `toast('Scoreboard Cursor', 'Press <strong>F2</strong> to show the cursor. Click on a player for actions.', 'nothing', 5000, 2);`;
         ServerUI.execute(notifyscoreboardstr);
 
         updatePlayers();
@@ -1373,6 +1373,7 @@ mp.events.callLocal('ScoreboardToggleTyping', false);
 
 mp.events.add("HUDError", (msg, icon) => {
     if(!showHud && mp.players.local.getVariable("pLogged") == true) return;
+
     /*
 	let insertString = `iziToast.show({
 		message: "${msg}",
@@ -1382,13 +1383,16 @@ mp.events.add("HUDError", (msg, icon) => {
 		close: true		
 	});`;
     */
-    let insertString = `toast('', '${msg}', 'error', 5000);`;
+    let insertString = `toast(null, '${msg}', 'error', 5000);`;
     if(ServerUI != null) ServerUI.execute(insertString);
 });
 
 mp.events.add("HUDNotify", (msg, type, icon, close, timeout, orientation, displaymode) => {
     if(!showHud && mp.players.local.getVariable("pLogged") == true) return;
     
+    let displayModeNumber = 0;
+    if(displaymode == "replace") displayModeNumber = 2;
+
     /*
     let insertString = `iziToast.show({`;
     insertString += `message: \`${msg}\`, `;
@@ -1400,7 +1404,7 @@ mp.events.add("HUDNotify", (msg, type, icon, close, timeout, orientation, displa
     if(displaymode.length > 1) insertString += `displayMode: \`${displaymode}\`, `;
     insertString += "});";
     */
-    let insertString = `toast('', '${msg}', '${type}', ${timeout});`;
+    let insertString = `toast(null, '${msg}', '${type}', ${timeout}, ${displayModeNumber});`;
     if(ServerUI != null) ServerUI.execute(insertString);
 });
 // bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter, center
@@ -1415,7 +1419,7 @@ mp.events.add("HUDNotify2", (title, msg, orientation, displaymode) => {
     if(displaymode.length > 1) insertString += `displayMode: \`${displaymode}\`, `;
     insertString += "});";
     */
-    let insertString = `toast('${title}', '${msg}', 'nothing', 5000);`;
+    let insertString = `toast('${title}', '${msg}', 'nothing', 5000, 2);`;
     if(ServerUI != null) ServerUI.execute(insertString);
 });
 
