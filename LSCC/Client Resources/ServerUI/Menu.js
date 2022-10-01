@@ -857,16 +857,26 @@ mp.events.add("UpdateMenuMinigames", (arenas, currentMinigame) => {
     }
 });
 
-mp.events.add("AddMenuItem", (name, type, owned, price, description) => {
+mp.events.add("AddMenuItem", (name, type, owned, price, description, max) => {
     ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.items.push({
         name: "${name}",
         type: "${type}",
         owned: ${owned},
         price: ${price},
+        max: ${max},
         description: "${description}"
     });`);
 });
-
+mp.events.add("UpdateMaxMenuItem", (type, max) => {
+    ServerUI.execute(`
+        if(gm.$refs.mainMenu.$refs.inventoryTab.items.find(i => i.type == "${type}") != undefined){
+            gm.$refs.mainMenu.$refs.inventoryTab.items.find(i => i.type == "${type}").max = ${max};
+        }
+        else{
+            console.log("Failed to find item of type ${type} in the menu!");
+        }
+    `);
+});
 mp.events.add("UpdateMenuItem", (type, owned) => {
     ServerUI.execute(`
         if(gm.$refs.mainMenu.$refs.inventoryTab.items.find(i => i.type == "${type}") != undefined){
@@ -931,7 +941,6 @@ mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoa
         insertString +=  menuItems[i][4];
         insertString +=  menuItems[i][5];
         insertString += "});";
-
         ServerUI.execute(insertString);
     }
 });

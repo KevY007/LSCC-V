@@ -615,19 +615,65 @@ namespace RNC
             foreach(ItemData item in ItemData.Items)
             {
                 int owned = 0;
+                int max = 0;
                 switch (item.Type)
                 {
-                    case "medkit": owned = acc.Medkits;
+                    case "medkit":
+                        max = 4;
+                        if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 6;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 10;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
+                        owned = acc.Medkits;
                         break;
                     case "painkiller": owned = acc.Painkillers;
+                        max = 4;
+                        if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 6;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 10;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
                         break;
                     case "lockpick": owned = acc.Lockpicks;
+                        max = 10;
+                        if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 20;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 25;
                         break;
                 }
 
-                player.TriggerEvent("AddMenuItem", item.Name, item.Type, owned, item.Price, item.Description);
+                player.TriggerEvent("AddMenuItem", item.Name, item.Type, owned, item.Price, item.Description, max);
             }
         }
+
+        public static void UpdateMaxMenuItems(Player player)
+        {
+            foreach (ItemData item in ItemData.Items)
+            {
+                int max = 0;
+                switch (item.Type)
+                {
+                    case "medkit":
+                        max = 4;
+                        if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 6;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 10;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
+                        break;
+                    case "painkiller":
+                        max = 4;
+                        if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 6;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 10;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
+                        break;
+                    case "lockpick":
+                        max = 10;
+                        if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 20;
+                        else if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 25;
+                        break;
+                }
+
+                player.TriggerEvent("UpdateMaxMenuItem", item.Type, max);
+            }
+        }
+
         public static void Menu_UpdateItem(Player player, string type, int owned)
         {
             player.TriggerEvent("UpdateMenuItem", type, owned);

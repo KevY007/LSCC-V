@@ -9431,6 +9431,8 @@ namespace RNC
                                 {
                                     EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(1, true)}~w~!");
                                 });
+
+                                EPlayer.UpdateMaxMenuItems(player);
                                 break;
                             case 1:
                                 acc.DonatorPoints += 350;
@@ -9440,6 +9442,8 @@ namespace RNC
                                 {
                                     EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(2, true)}~w~!");
                                 });
+
+                                EPlayer.UpdateMaxMenuItems(player);
                                 break;
                             case 2:
                                 acc.DonatorPoints += 500;
@@ -9449,6 +9453,8 @@ namespace RNC
                                 {
                                     EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(3, true)}~w~!");
                                 });
+
+                                EPlayer.UpdateMaxMenuItems(player);
                                 break;
                             case 3:
                                 acc.DonatorPoints += 100;
@@ -9577,6 +9583,8 @@ namespace RNC
             player.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}You have set {target.Name}'s donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
             target.TriggerEvent("pushMsgToChat", $"!{{#00FF33}}{player.Name} has set your donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
             EPlayer.Save(target);
+
+            EPlayer.UpdateMaxMenuItems(target);
         }
 
         [Command("osetdonator", "!{#AFAFAF}[USAGE] osetdonator (target) (level)")]
