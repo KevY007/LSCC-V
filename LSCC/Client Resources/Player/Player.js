@@ -58,6 +58,8 @@ var climbProtectionTimeout = undefined;
 var shortClimbProtectionTimeout = undefined;
 var lastClimbProtectionTimestamp = 0;
 
+var climbProtectionEndTimestamp = 0; // when the climb protection should end in seconds
+
 var taseProtectionTimer = null;
 var wasInCar = false;
 
@@ -233,6 +235,21 @@ mp.events.add("OneSecondEvent", () => {
             mp.players.forEachInStreamRange((playa, id) => {
                 playa.setAlpha(255);
             });
+        }
+    }
+
+    if(climbProtectionEndTimestamp > 0){
+        let currentTimestamp = Date.now();
+        if(climbProtectionEndTimestamp <= currentTimestamp){
+            // end climb protection      
+            mp.events.callRemote("ClimbProtection", -1);
+            if(shortClimbProtectionTimeout){clearTimeout(shortClimbProtectionTimeout); shortClimbProtectionTimeout = undefined;}  
+            if(climbProtectionTimeout){clearTimeout(climbProtectionTimeout); climbProtectionTimeout = undefined;}  
+            if(checkClimbingDurationTimeout){clearTimeout(checkClimbingDurationTimeout); checkClimbingDurationTimeout = undefined;}
+       
+            wasClimbingLastFrame = false;
+            climbProtectionState = -1;       
+            climbProtectionEndTimestamp = 0;
         }
     }
 
@@ -987,6 +1004,8 @@ mp.events.add("ClearClimbTaseProtection", (reset_cooldown) => {
     climbProtectionState = -1;
     if(reset_cooldown)
         lastClimbProtectionTimestamp = 0;
+
+    climbProtectionEndTimestamp = 0;
 });
 // TASE PROTECTION
 var exitCarTime = 0;
@@ -1201,6 +1220,9 @@ mp.events.add('render', () => {
                                 if(climbProtectionTimeout){clearTimeout(climbProtectionTimeout); climbProtectionTimeout = undefined;}    
 
                                 let protecttime = (mp.players.local.getVariable("Team") == 0 ? 9000 : 18500);
+
+                                climbProtectionEndTimestamp = Date.now() + protecttime;
+
                                 climbProtectionTimeout = setTimeout(() => {
                                     if(!mp.players.local || !mp.players.exists(mp.players.local) || !wasClimbingLastFrame){
                                         clearTimeout(climbProtectionTimeout);
@@ -1211,6 +1233,7 @@ mp.events.add('render', () => {
                                     mp.events.callRemote("ClimbProtection", -1);
                                     // However, set this to 0 so it can still give them the short protection
                                     climbProtectionState = 0;    
+                                    climbProtectionEndTimestamp = 0;
 
                                     if(climbProtectionTimeout){clearTimeout(climbProtectionTimeout); climbProtectionTimeout = undefined;}                          
                                 }, protecttime);
@@ -1240,6 +1263,7 @@ mp.events.add('render', () => {
                     if(shortClimbProtectionTimeout){clearTimeout(shortClimbProtectionTimeout); shortClimbProtectionTimeout = undefined;}  
 
                     let protecttime = (mp.players.local.getVariable("Team") == 0 ? 2500 : 4000);
+                    climbProtectionEndTimestamp = Date.now() + protecttime;
                     shortClimbProtectionTimeout = setTimeout(() => {
                         if(!mp.players.local || !mp.players.exists(mp.players.local)){
                             clearTimeout(shortClimbProtectionTimeout);
@@ -1247,6 +1271,7 @@ mp.events.add('render', () => {
                         }
 
                         mp.events.callRemote("ClimbProtection", -1);
+                        climbProtectionEndTimestamp = 0;
                         climbProtectionState = -1;
 
                         if(shortClimbProtectionTimeout){clearTimeout(shortClimbProtectionTimeout); shortClimbProtectionTimeout = undefined;}  
