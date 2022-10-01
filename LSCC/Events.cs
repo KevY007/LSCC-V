@@ -1259,13 +1259,16 @@ namespace RNC
                 else if (component.Value.Name.Contains("Scope")) price = 125;
                 else if (component.Value.Name.Contains("Extended") || component.Value.Name.Contains("Box") ||
                     component.Value.Name.Contains("Drum")) price = 200;
-                else if (component.Value.Name.Contains("Finish") || component.Value.Name.Contains("Variant"))
+                else if (component.Value.Name.Contains("Finish") || component.Value.Name.Contains("Variant") ||
+                    component.Value.Name.Contains("Camo") || component.Value.Name.Contains("Patriot") || component.Value.Name.Contains("Skull")
+                    || component.Value.Name.Contains("Tint"))
                 {
                     if (EPlayer.GetAccount(player).DonatorLevel < 2) continue;
                     else price = 1000;
                 }
-                else if (component.Value.Name.EndsWith("Rounds") || component.Value.Name.EndsWith("Shells") || 
-                    component.Value.Name.Contains("Default Clip")) continue;
+                else if (component.Value.Name.EndsWith("Rounds") || component.Value.Name.EndsWith("Shells") ||
+                    component.Value.Name.Contains("Default Clip")) continue; // just adding for debug
+                else continue;
 
                 jData += $"{{\"name\":\"{component.Value.Name}\", \"hash\":\"{component.Key}\", \"price\":{price}, \"attached\":{alreadyHas.ToString().ToLower()}}},";
             }

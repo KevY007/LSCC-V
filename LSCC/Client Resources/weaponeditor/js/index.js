@@ -45,7 +45,7 @@ function showCategories(){
         if(document.getElementById(`category_${type}`) == undefined){
             let element = `
                 <div class="weapon-item" id="category_${type}" onclick="openCategory('${type}')">
-                    <img src="./js/${weaponData[i].ImageSrc}"/>
+                    <img style="height:48px; width:auto;" src="${weaponData[i].ImageSrc}"/>
                     <p class="hide-item-name">${type}</p>
                 </div>
             `;
@@ -71,6 +71,10 @@ function backButtonPress(){
     }
 }
 
+// class mp { DEBUG PURPOSES ONLY
+//     static trigger(text){ console.log(text); }
+//   }
+
 function openCategory(type, sound=true){
     if(sound == true)
         mp.trigger("WeaponEditor:playSound", "select");
@@ -90,7 +94,7 @@ function openCategory(type, sound=true){
     weaponData.filter(w => w.Type == type).forEach((weapon) => {   
         let element = `
             <div class="weapon-item" id="weapon_${weapon.Name}" onclick="openWeapon('${weapon.Name}')">
-                <img src="./js/${weapon.ImageSrc}"/>
+                <img style="height:48px; width:auto;" src="${weapon.ImageSrc}"/>
                 <p class="hide-item-name">${weapon.Name}</p>
             </div>
         `;

@@ -123,44 +123,42 @@ mp.events.add("WeaponEditor:requestAttachmentPreview", (atthash) => {
     mp.events.callRemote("WeaponEditor:onRequestAttachmentPreview", atthash);
 });
 mp.events.add("WeaponEditor:removePreviewAttachment", (wephash, comphash) => {
-    let realHash = (wephash > 0 ? wephash : (wephash+4294967296));
+    let realHash = wephash;
     mp.game.invoke('0x1E8BE90C74FB4C09', mp.players.local.handle, (realHash)>>0, (comphash)>>0);
 
     setTimeout(() => {
         mp.players.local.taskPlayAnim("weapons@pistol@stealth", "aim_med_loop", 10.0, 1.0, -1, 1, 1.0, false, false, false); 
-        mp.game.invoke('0xADF692B254977C0C', mp.players.local.handle, wephash, true);
+        mp.game.invoke('0xADF692B254977C0C', mp.players.local.handle, (realHash)>>0, true);
         mp.game.invoke('0x1E8BE90C74FB4C09', mp.players.local.handle, (realHash)>>0, (comphash)>>0);
     }, 100);
     setTimeout(() => {
         mp.players.local.taskPlayAnim("weapons@pistol@stealth", "aim_med_loop", 10.0, 1.0, -1, 1, 1.0, false, false, false); 
-        mp.game.invoke('0xADF692B254977C0C', mp.players.local.handle, wephash, true);
+        mp.game.invoke('0xADF692B254977C0C', mp.players.local.handle, (realHash)>>0, true);
     }, 500);
 });
 
 mp.events.add("WeaponEditor:sendAttachmentPreview", () => {
     // SET_CURRENT_PED_WEAPON(Ped ped, Hash weaponHash, BOOL equipNow)
     let hash = mp.players.local.weapon;
-    if(weaponData.find(w => w.Hash == hash) == undefined) hash -= 4294967296;
     setTimeout(() => {
       mp.players.local.taskPlayAnim("weapons@pistol@stealth", "aim_med_loop", 10.0, 1.0, -1, 1, 1.0, false, false, false); 
-      mp.game.invoke('0xADF692B254977C0C', mp.players.local.handle, hash, true);
+      mp.game.invoke('0xADF692B254977C0C', mp.players.local.handle, (hash)>>0, true);
     }, 100);
     // just in case setting the weapon again cuz sometimes the shit bugs idk
     setTimeout(() => {
       mp.players.local.taskPlayAnim("weapons@pistol@stealth", "aim_med_loop", 10.0, 1.0, -1, 1, 1.0, false, false, false); 
-      mp.game.invoke('0xADF692B254977C0C', mp.players.local.handle, hash, true);
+      mp.game.invoke('0xADF692B254977C0C', mp.players.local.handle, (hash)>>0, true);
     }, 500);
 });
 mp.events.add("WeaponEditor:sendComponentList", (data) => {
     let hash = mp.players.local.weapon;
-    if(weaponData.find(w => w.Hash == hash) == undefined) hash -= 4294967296;
     setTimeout(() => {
       mp.players.local.taskPlayAnim("weapons@pistol@stealth", "aim_med_loop", 10.0, 1.0, -1, 1, 1.0, false, false, false); 
-      mp.game.invoke('0xADF692B254977C0C', mp.players.local.handle, hash, true);
+      mp.game.invoke('0xADF692B254977C0C', mp.players.local.handle, (hash)>>0, true);
     }, 100);
     setTimeout(() => {
       mp.players.local.taskPlayAnim("weapons@pistol@stealth", "aim_med_loop", 10.0, 1.0, -1, 1, 1.0, false, false, false); 
-      mp.game.invoke('0xADF692B254977C0C', mp.players.local.handle, hash, true);
+      mp.game.invoke('0xADF692B254977C0C', mp.players.local.handle, (hash)>>0, true);
     }, 500);
     WeaponEditorDOM.execute(`setComponentList(${data})`);
 });
