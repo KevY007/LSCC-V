@@ -5761,11 +5761,48 @@ namespace RNC
             return;
         }
 
+        [Command("setplayerclan")]
+        public void cmd_setplayerclan(Player player, Player target, int clanID, int clanTier)
+        {
+            if (EPlayer.GetAccount(player).Admin < 5) return;
+
+            Task.Run(async () =>
+            {
+                using(MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Clan clan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == clanID);
+                    if (clan != null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.GetAccount(target).ClanID = clanID;
+                            EPlayer.GetAccount(target).ClanTier = clanTier;
+                            EPlayer.SendMessage(player, $"~y~You set {target.Name}'s clan to {clan.Name} tier {clanTier}!");
+                            EPlayer.SendMessage(target, $"~y~Your clan has been set to {clan.Name} as tier {clanTier} by {player.Name}!");
+                        });
+                     
+                    }
+                    else
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.SendMessage(player, "~r~Clan with that ID does not exist!");
+                        });
+                    }
+                }
+            });
+        }
+
         [Command("hotwire")]
         public static void cmd_hotwire(Player player)
         {
             if(!player.IsInVehicle || player.Vehicle == null || player.Vehicle.EngineStatus == true)
             {
+                return;
+            }
+            if(player.Vehicle.Class == 16 || player.Vehicle.Class == 15 || player.Vehicle.Class == 19)
+            {
+                EPlayer.SendMessage(player, "not today, buddy, not today");
                 return;
             }
 
@@ -8933,10 +8970,12 @@ namespace RNC
 
             EPlayer.Notify(player, $"Now tuning: {vehicleModel}<p>LMB to switch camera, menu keys to select, horn and lights can be used by default keys.</p> <p>DISCLAIMER: Removing components is not refundable.</p>", "green", "fas fa-exclamation", false, 10000, "topCenter");
             EPlayer.SendMessage(player, "~y~Loading car tunings...");
+            uint vehModel = veh.Model;
+            int playerSQLID = EPlayer.GetAccount(player).SQL_ID;
             Task.Run(async () => {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    var inst = await context.PlayerTunings.AsQueryable().FirstOrDefaultAsync(a => a.Model == veh.Model && a.AccountSQLID == EPlayer.GetAccount(player).SQL_ID);
+                    var inst = await context.PlayerTunings.AsQueryable().FirstOrDefaultAsync(a => a.Model == vehModel && a.AccountSQLID == playerSQLID);
                     NAPI.Task.Run(() =>
                     {
                         if (inst != null)

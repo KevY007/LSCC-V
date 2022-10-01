@@ -3441,7 +3441,7 @@ namespace RNC
 
                                     if (Settings.SpawnParkedVehicles)
                                     {
-                                        if (Settings.CarGenData.Count >= 1500)
+                                        if (Settings.CarGenData.Count >= 1000)
                                         {
                                             NAPI.Task.Run(() =>
                                             {

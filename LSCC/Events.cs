@@ -1632,7 +1632,7 @@ namespace RNC
             {
                 return;
             }
-
+            int myTier = acc.ClanTier;
             int clanToSee = acc.ClanID;
             Task.Run(async () =>
             {
@@ -1685,6 +1685,7 @@ namespace RNC
 
                         if(isClanDisbanded)
                         {
+                            NAPI.Util.ConsoleOutput($"CLAN HAS BEEN DISBANDED: {player.Name} LEFT HE WAS TIER {myTier}.");
                             foreach (Player clanMember in Settings.LoggedInPlayers.Where(pl => pl.HasSharedData("ClanID") && pl.GetSharedData<int>("ClanID") == clanToSee))
                             {
                                 clanMember.SetSharedData("ClanID", -1);
