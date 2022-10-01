@@ -433,6 +433,25 @@ function increaseChatOpacity(time = 4000){
 }
 
 var adminVehSpawner = false;
+
+function AddCustomVehiclesToSpawner(){
+    if(ServerUI != null){
+
+        let modelsList = ["lspdunm", "polbufac", "huntley2", "lspdvic", "prevolter", "m3e46", "pscout", "impala",
+        "shegrangerold", "shergauntlet", "polbisonf", "gresleyh", "tulip2", "golfmk6", "bcso2slick", "bcat", "police3slick",
+        "fibexecutioner"];
+
+        for(let i = 0 ; i < modelsList.length; i++){
+            ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.vehicles.push({
+                model: "${modelsList[i]}",
+                hash: "${modelsList[i]}",
+                type: 25,
+                image: "package://Artwork/Vehicles/${modelsList[i]}.png",
+            });`);
+        }
+    }
+}
+
 mp.events.add("spawner_spawnVehicle", (modelname) => {
     VehicleSpawnerActive = false;
     ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.enabled = false;`);
