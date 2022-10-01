@@ -8,7 +8,7 @@ mp.events.add("ClothingEditor:exit", (save) => {
 
     mp.events.callRemote("ClothingEditor:onExit", save, editorTeam);
 });
-mp.events.add("ClothingEditor:show", (team, gender, clothingData) => {
+mp.events.add("ClothingEditor:show", (team, gender, clothingData, forceSet) => {
     let cData = JSON.parse(clothingData);
     let toSend = {
         "Shirt":[cData.Clothes[11].Drawable, cData.Clothes[11].Texture],
@@ -29,7 +29,7 @@ mp.events.add("ClothingEditor:show", (team, gender, clothingData) => {
     mp.gui.cursor.show(true, true);
     mp.game.invoke("0xFC695459D4D0E219", 0.5, 0.5); // SET CURSOR POSITION TO CENTER [x,y = 0.5,0.5]
 
-    ClothingEditorDOM.execute(`ShowClothingEditor(${team}, '${gender}', ${toSendStr});`);
+    ClothingEditorDOM.execute(`ShowClothingEditor(${team}, '${gender}', ${toSendStr}, ${forceSet.toString()});`);
     ClothingEditorDOM.active = true;
     ClothingEditorActive = true;
 });

@@ -11,7 +11,7 @@ var LinkedTypesReal;
 var CurrentShirt = "JacketOpen";
 var AcceptedItems = [];
 
-function ShowClothingEditor(team, gender, cData){
+function ShowClothingEditor(team, gender, cData, forceSet){
     Team = team;
     Gender = gender;
     selectedShirtType = 0;
@@ -24,6 +24,10 @@ function ShowClothingEditor(team, gender, cData){
     UpdateContent();
     updateCurrentClothingData();
     setCurrentClothingData(cData);
+
+    if(forceSet){
+        updateOnPageSwitch();
+    }
 }
 function ExitClothingEditor(){
     mp.trigger("ClothingEditor:exit", false);

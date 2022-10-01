@@ -1659,11 +1659,15 @@ namespace RNC
                     acc.ClanID = -1;
                     acc.ClanTier = -1;
 
-                    await context.Accounts.AsQueryable().Where(a => a.ClanID == clanToSee).ForEachAsync(a =>
+                    if(isClanDisbanded)
                     {
-                        a.ClanID = -1;
-                        a.ClanTier = -1;
-                    });
+                        await context.Accounts.AsQueryable().Where(a => a.ClanID == clanToSee).ForEachAsync(a =>
+                        {
+                            a.ClanID = -1;
+                            a.ClanTier = -1;
+                        });
+                    }
+                
 
                     await context.SaveChangesAsync();
                     NAPI.Task.Run(() =>
@@ -1860,6 +1864,7 @@ namespace RNC
              */
 
             string realDesc = desc;
+            int accSQLID = EPlayer.GetAccount(player).SQL_ID;
 
             EPlayer.SendMessage(player, "~y~Creating clan...");
             Task.Run(async () =>
@@ -1901,6 +1906,11 @@ namespace RNC
                     await context.Clans.AddAsync(clan);
                     await context.SaveChangesAsync();
                     Clan thaClan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.Name == clanname);
+
+                    Account playerAccount = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == accSQLID);
+                    playerAccount.ClanID = thaClan.SQL_ID;
+                    playerAccount.ClanTier = 0;
+                    await context.SaveChangesAsync();
 
                     acc.ClanTier = 0;
                     acc.ClanID = thaClan.SQL_ID;
@@ -3388,10 +3398,13 @@ namespace RNC
                 pChar.Clothing[1].Clothes[11].Drawable = 55; pChar.Clothing[1].Clothes[11].Texture = 0;
                 pChar.Clothing[3].Clothes[11].Drawable = 48; pChar.Clothing[3].Clothes[11].Texture = 0;
 
+                pChar.Clothing[1].Clothes[8].Drawable = -1; pChar.Clothing[1].Clothes[11].Texture = 0;
+                pChar.Clothing[3].Clothes[8].Drawable = -1; pChar.Clothing[3].Clothes[11].Texture = 0;
+
                 int clothingDataID = (gender == 1 ? 3 : 1);
                 string clothingInfo = NAPI.Util.ToJson(pChar.Clothing[clothingDataID]);
                 player.TriggerEvent("creator_SetClothingPhase");
-                player.TriggerEvent("ClothingEditor:show", 1, genderChar, clothingInfo);
+                player.TriggerEvent("ClothingEditor:show", 1, genderChar, clothingInfo, true);
             }
             else
             {
@@ -3596,7 +3609,7 @@ namespace RNC
 
                         int clothingDataID = (gender == 1 ? 2 : 0);
                         string clothingInfo = NAPI.Util.ToJson(ConvChar.Clothing[clothingDataID]);
-                        player.TriggerEvent("ClothingEditor:show", 0, genderChar, clothingInfo);
+                        player.TriggerEvent("ClothingEditor:show", 0, genderChar, clothingInfo, true);
                     }
                     else
                     {
@@ -4516,7 +4529,6 @@ namespace RNC
                 {
                     await context.Clans.AsQueryable().ForEachAsync(async clan =>
                     {
-                        NAPI.Util.ConsoleOutput($"ADDING CLAN: {clan.Name} [{clan.SQL_ID}] to MENU");
                         int clanID = clan.SQL_ID;
                         string clanName = clan.Name;
                         string tag = clan.Tag;
@@ -4532,7 +4544,7 @@ namespace RNC
                         using(MainDatabase context2 = ContextFactory.CreateContext())
                         {
                             Account clanOwner = await context2.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.ClanID == clan.SQL_ID && a.ClanTier == 0);
-                            string ownerName = "UNKNOWN | BUGGED CLAN";
+                            string ownerName = $"BUGGED CLAN, REPORT TO DEV: {clan.SQL_ID}";
                             if (clanOwner != null)
                                 ownerName = $"{clanOwner.Username} [DBID: {clanOwner.SQL_ID}]";
 

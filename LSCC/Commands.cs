@@ -11160,7 +11160,7 @@ namespace RNC
 
                         int clothingDataID = (gender == 1 ? 3 : 1);
                         string clothingInfo = NAPI.Util.ToJson(ConvChar.Clothing[clothingDataID]);
-                        player.TriggerEvent("ClothingEditor:show", 1, genderChar, clothingInfo);
+                        player.TriggerEvent("ClothingEditor:show", 1, genderChar, clothingInfo, false);
                     }
                     else if (args[1].StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
                     {
@@ -11178,7 +11178,7 @@ namespace RNC
 
                         int clothingDataID = (gender == 1 ? 2 : 0);
                         string clothingInfo = NAPI.Util.ToJson(ConvChar.Clothing[clothingDataID]);
-                        player.TriggerEvent("ClothingEditor:show", 0, genderChar, clothingInfo);
+                        player.TriggerEvent("ClothingEditor:show", 0, genderChar, clothingInfo, false);
                     }
                     else if (args[1].StartsWith("donatorcop", StringComparison.OrdinalIgnoreCase))
                     {
