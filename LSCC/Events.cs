@@ -2999,9 +2999,6 @@ namespace RNC
                             EPlayer.ShowCharCreator(player, ConvChar, true);
                         }
                         catch { EPlayer.ShowCharCreator(player, null, true); }
-
-                        EPlayer.GetAccount(player).FinishedTutorial = true;
-                        EPlayer.Save(player);
                     });
                 }
             });
@@ -3153,13 +3150,14 @@ namespace RNC
 
                     try
                     {
-                        if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata-8 sending to creation."));
-
-                        ConvChar = NAPI.Util.FromJson<CharacterData>(acc.Character);
-
-                        EPlayer.ApplyCharacter(player, ConvChar, acc.LobbyClothing);
+                  
                         if (acc.FinishedTutorial)
                         {
+                            if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata-8 sending to creation."));
+
+                            ConvChar = NAPI.Util.FromJson<CharacterData>(acc.Character);
+
+                            EPlayer.ApplyCharacter(player, ConvChar, acc.LobbyClothing);
                             EPlayer.Spawn(player);
                             player.TriggerEvent("DestroyLoginScene");
                             player.TriggerEvent("login_StopMusic");
@@ -3380,7 +3378,16 @@ namespace RNC
                 int genderr = Convert.ToInt32(pChar.Gender);
                 string genderChar = "M";
                 if (genderr == 1) genderChar = "F";
-                NAPI.Util.ConsoleOutput($"Player {player.Name} editing char gender is {genderChar}");
+
+                pChar.Clothing[1].Clothes[3].Drawable = 0; pChar.Clothing[1].Clothes[3].Texture = 0;
+                pChar.Clothing[3].Clothes[3].Drawable = 0; pChar.Clothing[3].Clothes[3].Texture = 0;
+
+                pChar.Clothing[1].Clothes[4].Drawable = 35; pChar.Clothing[1].Clothes[4].Texture = 0;
+                pChar.Clothing[3].Clothes[4].Drawable = 37; pChar.Clothing[3].Clothes[4].Texture = 0;
+
+                pChar.Clothing[1].Clothes[11].Drawable = 55; pChar.Clothing[1].Clothes[11].Texture = 0;
+                pChar.Clothing[3].Clothes[11].Drawable = 48; pChar.Clothing[3].Clothes[11].Texture = 0;
+
                 int clothingDataID = (gender == 1 ? 3 : 1);
                 string clothingInfo = NAPI.Util.ToJson(pChar.Clothing[clothingDataID]);
                 player.TriggerEvent("creator_SetClothingPhase");
@@ -3612,6 +3619,7 @@ namespace RNC
                         player.SetData("Creator_Using", false);
                         player.TriggerEvent("toggleCreator", false);
                         player.SetSharedData("CharCreator_ShowClothingAfter", false);
+                        EPlayer.GetAccount(player).FinishedTutorial = true;
 
                         EPlayer.Save(player);
 

@@ -1557,6 +1557,9 @@ namespace RNC
                 case "bcso2slick":
                     seats = 4;
                     break;
+                case "police3slick":
+                    seats = 4;
+                    break;
             }
             return seats;
         }
@@ -2367,7 +2370,8 @@ namespace RNC
             new CarData(1, "FBI Buffalo A/C", "fbibufac", "package://Artwork/Vehicles/fbibufac.png", "Fast", 17, 20);
             new CarData(1, "Police Chopper", "polmav", "package://Artwork/Vehicles/polmav.png", "N/A", 20, 20);
             new CarData(1, "Unmarked Charger", "lspdunm", "package://Artwork/Vehicles/lspdunm.png", "Fast+", 25, 40);
-            new CarData(1, "Chevrolet Caprice PPV", "bcso2slick", "package://Artwork/Vehicles/bcso2slick.png", "Fast+", 30, 70);
+            new CarData(1, "Chevrolet Caprice PPV", "bcso2slick", "package://Artwork/Vehicles/bcso2slick.png", "Fast", 30, 65);
+            new CarData(1, "Vapid Torrence Slicktop", "police3slick", "package://Artwork/Vehicles/police3slick.png", "Fast+", 30, 70);
             new CarData(1, "Sheriff Gauntlet", "shergauntlet", "package://Artwork/Vehicles/shergauntlet.png", "Fast+", 38, 80);
             new CarData(1, "Lenco Bearcat: Centurion", "centurionlspd", "package://Artwork/Vehicles/centurionlspd.png", "Slow", 55, 100);
 

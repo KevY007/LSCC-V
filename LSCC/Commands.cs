@@ -11097,7 +11097,7 @@ namespace RNC
             if (action.StartsWith("reset", StringComparison.OrdinalIgnoreCase) && !action.StartsWith("resetclothing", StringComparison.OrdinalIgnoreCase))
             {
                 EPlayer.GetAccount(player).Character = "{}";
-                EPlayer.ShowCharCreator(player);
+                EPlayer.ShowCharCreator(player, null, true);
             }
             else if (action.StartsWith("edit", StringComparison.OrdinalIgnoreCase))
             {
