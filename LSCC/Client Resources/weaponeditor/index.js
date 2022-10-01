@@ -79,6 +79,7 @@ mp.events.add("WeaponEditor:playSound", (type) => {
 });
 
 mp.events.add("WeaponEditor:show", () => {
+    mp.events.callRemote("WeaponEditor:onOpen");
     WeaponEditorActive = true;
     ServerUI.execute(`gm.$refs.hud.enabled = false;`);
     mp.players.local.setAlpha(0);
