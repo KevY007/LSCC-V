@@ -1960,16 +1960,11 @@ namespace RNC
                 }
             }
 
-            VehicleHash? toSpawn = NAPI.Util.VehicleNameToModel(carname);
-            if(toSpawn == null)
-            {
-                player.TriggerEvent("Spawner_InvalidVehicle", carname);
-                return;
-            }
+            uint toSpawn = NAPI.Util.GetHashKey(carname);
 
             Random rand = new Random(DateTimeOffset.UtcNow.Millisecond);
 
-            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle((uint)toSpawn, player.Position.Around(5.0f), player.Heading, rand.Next(160), rand.Next(160), player.Name, 255, false, true, player.Dimension);
+            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(toSpawn, player.Position.Around(5.0f), player.Heading, rand.Next(160), rand.Next(160), player.Name, 255, false, true, player.Dimension);
             aVehicle.EngineStatus = true;
             aVehicle.SetSharedData("Engine", true);
             aVehicle.SetSharedData("Locked", false);

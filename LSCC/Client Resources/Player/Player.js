@@ -2929,6 +2929,7 @@ mp.events.add("OnPlayerLoginRegister", () => {
     }, 350);
     setTimeout(() => {
         InitializeHotwireDOM();
+        AddCustomVehiclesToSpawner()
     }, 400);
     setTimeout(() => {
         InitializeClothingEditorDOM();
