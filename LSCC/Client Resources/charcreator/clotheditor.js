@@ -767,4 +767,6 @@ menuClothing.MenuClose.on(() => {
     menuClothingExit = null;
     activateChat(true);
     mp.gui.cursor.visible = false;
+
+    mp.events.callRemote("CloseDonatorClothesMenu");
 });

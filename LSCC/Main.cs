@@ -3454,7 +3454,7 @@ namespace RNC
                                             NAPI.Task.Run(() =>
                                             {
                                                 crashcheck = 694;
-                                                List<jCarGenData> randomCars = Settings.CarGenData.OrderBy(x => new Random().Next()).Take(1500).ToList();
+                                                List<jCarGenData> randomCars = Settings.CarGenData.OrderBy(x => new Random().Next()).Take(Settings.ParkedVehiclesToSpawn).ToList();
                                                 crashcheck = 695;
                                                 int civiCarCnt = Settings.CivilianVehicles.Count();
                                                 foreach (jCarGenData car in randomCars)

@@ -606,7 +606,11 @@ namespace RNC
 
                         foreach (LobbyData p in Settings.Lobbies)
                         {
-                            builder.AddField(p.lobbyId.ToString(), RNC.Main.ConvertGameStatus(p.gameStatus, false) + " | " + Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == p.lobbyId).ToString() + " Players", true);
+                            NAPI.Task.Run(() =>
+                            {
+                                builder.AddField(p.lobbyId.ToString(), RNC.Main.ConvertGameStatus(p.gameStatus, false) + " | " + Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == p.lobbyId).ToString() + " Players", true);
+
+                            });
                         }
 
                         var embed = builder.Build();
@@ -619,16 +623,17 @@ namespace RNC
                 {
                     lock (Settings.LoggedInPlayers)
                     {
-                        if (Settings.LoggedInPlayers.Count(a => EPlayer.GetAccount(a).Admin > 0) < 1)
-                        {
-                            context.Channel.SendMessageAsync(":negative_squared_cross_mark: No admins are online!");
-                            return;
-                        }
-
-                        int players = 0;
-                        int tries = 0;
                         NAPI.Task.Run(() =>
                         {
+                            if (Settings.LoggedInPlayers.Count(a => EPlayer.GetAccount(a).Admin > 0) < 1)
+                            {
+                                context.Channel.SendMessageAsync(":negative_squared_cross_mark: No admins are online!");
+                                return;
+                            }
+
+                            int players = 0;
+                            int tries = 0;
+
                             while (players < Settings.LoggedInPlayers.Count(a => EPlayer.GetAccount(a).Admin > 0))
                             {
                                 tries++;

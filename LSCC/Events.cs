@@ -3573,6 +3573,15 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("CloseDonatorClothesMenu")]
+        public static void OnCloseDonatorClothesMenu(Player player)
+        {
+            player.SetData("EditingClothing", -1);
+            EPlayer.Save(player, false);
+            EPlayer.SendMessage(player, "~g~Clothing saved!");
+            return;
+        }
+
         [RemoteEvent("ClothingEditor:onExit")]
         public void OnExitClothingEditor(Player player, bool save, int team)
         {
