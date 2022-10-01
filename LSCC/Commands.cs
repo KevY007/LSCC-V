@@ -9400,8 +9400,9 @@ namespace RNC
                         await context.SaveChangesAsync();
                         return;
                     }
-
-                    /* ---Donation Types/Values---
+                    NAPI.Task.Run(() =>
+                    {
+                        /* ---Donation Types/Values---
                      * 0 => Bronze [VALUE: how many times it can be redeemed]
                      * 1 => Silver
                      * 2 => Gold
@@ -9409,62 +9410,61 @@ namespace RNC
                      * 4 => Namechange
                      * 5 => 5 namechanges [bundle]
                      */
-                    Account acc = EPlayer.GetAccount(player);
-                    switch (redeem.Value)
-                    {
-                        case 0:
-                            acc.DonatorPoints += 200;
-                            acc.DonatorLevel = 1;
-                            player.SetSharedData("Donator", acc.DonatorLevel);
-                            NAPI.Task.Run(() =>
-                            {
-                                EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(1, true)}~w~!");
-                            });
-                            break;
-                        case 1:
-                            acc.DonatorPoints += 350;
-                            acc.DonatorLevel = 2;
-                            player.SetSharedData("Donator", acc.DonatorLevel);
-                            NAPI.Task.Run(() =>
-                            {
-                                EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(2, true)}~w~!");
-                            });
-                            break;
-                        case 2:
-                            acc.DonatorPoints += 500;
-                            acc.DonatorLevel = 3;
-                            player.SetSharedData("Donator", acc.DonatorLevel);
-                            NAPI.Task.Run(() =>
-                            {
-                                EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(3, true)}~w~!");
-                            });
-                            break;
-                        case 3:
-                            acc.DonatorPoints += 100;
-                            NAPI.Task.Run(() =>
-                            {
-                                EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed !{{#a8ffb7}}100 Donator Points~w~!");
-                            });
-                            break;
-                        case 4:
-                            acc.Namechanges++;
-                            NAPI.Task.Run(() =>
-                            {
-                                EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed !{{#a8ffb7}}1 Namechange~w~!");
-                            });
-                            break;
-                        case 5:
-                            acc.Namechanges += 5;
-                            NAPI.Task.Run(() =>
-                            {
-                                EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed !{{#a8ffb7}}5 Namechanges Bundle~w~!");
-                            });
-                            break;
-                    }
-                    NAPI.Task.Run(() =>
-                    {
+                        Account acc = EPlayer.GetAccount(player);
+                        switch (redeem.Value)
+                        {
+                            case 0:
+                                acc.DonatorPoints += 200;
+                                acc.DonatorLevel = 1;
+                                player.SetSharedData("Donator", acc.DonatorLevel);
+                                NAPI.Task.Run(() =>
+                                {
+                                    EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(1, true)}~w~!");
+                                });
+                                break;
+                            case 1:
+                                acc.DonatorPoints += 350;
+                                acc.DonatorLevel = 2;
+                                player.SetSharedData("Donator", acc.DonatorLevel);
+                                NAPI.Task.Run(() =>
+                                {
+                                    EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(2, true)}~w~!");
+                                });
+                                break;
+                            case 2:
+                                acc.DonatorPoints += 500;
+                                acc.DonatorLevel = 3;
+                                player.SetSharedData("Donator", acc.DonatorLevel);
+                                NAPI.Task.Run(() =>
+                                {
+                                    EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(3, true)}~w~!");
+                                });
+                                break;
+                            case 3:
+                                acc.DonatorPoints += 100;
+                                NAPI.Task.Run(() =>
+                                {
+                                    EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed !{{#a8ffb7}}100 Donator Points~w~!");
+                                });
+                                break;
+                            case 4:
+                                acc.Namechanges++;
+                                NAPI.Task.Run(() =>
+                                {
+                                    EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed !{{#a8ffb7}}1 Namechange~w~!");
+                                });
+                                break;
+                            case 5:
+                                acc.Namechanges += 5;
+                                NAPI.Task.Run(() =>
+                                {
+                                    EPlayer.SendMessage(player, $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed !{{#a8ffb7}}5 Namechanges Bundle~w~!");
+                                });
+                                break;
+                        }
                         EPlayer.SendMessage(player, "~w~Thank you very much for donating! ~r~<3 ~w~-RnC Management");
                     });
+                    await NAPI.Task.WaitForMainThread();
 
                     context.RedeemableCodes.Remove(redeem);
                     await context.SaveChangesAsync();

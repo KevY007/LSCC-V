@@ -242,10 +242,12 @@ let saveItem = new UIMenuItem("Save", "Save all changes.");
 saveItem.ForeColor = new Color(118, 207, 39);
 creatorMainMenu.AddItem(saveItem);
 
-let cancelItem = new UIMenuItem("Cancel", "Discard all changes.");
-cancelItem.ForeColor = new Color(213, 0, 0);
-cancelItem.HighlightedForeColor = new Color(229, 57, 53);
-creatorMainMenu.AddItem(cancelItem);
+if(mp.players.local.getVariable("CharCreator_ShowClothingAfter") != true){
+    let cancelItem = new UIMenuItem("Cancel", "Discard all changes.");
+    cancelItem.ForeColor = new Color(213, 0, 0);
+    cancelItem.HighlightedForeColor = new Color(229, 57, 53);
+    creatorMainMenu.AddItem(cancelItem);
+}
 
 mp.events.add("char_Reset", () => {
     localPlayer.setDefaultComponentVariation();
@@ -711,6 +713,18 @@ creatorMenus.push(creatorHairMenu);
 // CREATOR HAIR & COLORS END
 
 // EVENTS
+mp.events.add("creator_SetClothingPhase", () => {
+    for (let i = 0; i < creatorMenus.length; i++) creatorMenus[i].Visible = false;
+
+    if(creatorCamera != undefined){
+        creatorCamera.destroy();
+        creatorCamera = undefined;
+    }
+    creatorCamera = mp.cameras.new("creatorCamera", creatorCoords.camera, new mp.Vector3(0, 0, 0), 85);
+    creatorCamera.pointAtCoord(creatorCoords.cameraLookAt.x, creatorCoords.cameraLookAt.y, creatorCoords.cameraLookAt.z);
+    creatorCamera.setActive(true);
+    mp.game.cam.renderScriptCams(true, false, 0, true, false);
+});
 mp.events.add("toggleCreator", (active, charData) => {
     if (active) {
         if (creatorCamera === undefined) {

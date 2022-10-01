@@ -3322,6 +3322,7 @@ namespace RNC
                     !a.HasData("Spectating") && 
                     a.GetSharedData<bool>("AutoJoin") == true && 
                     !a.Dead &&
+                    (a.HasData("EditingClothing") && a.GetData<int>("EditingClothing") == -1) &&
                     !a.GetSharedData<bool>("WeaponEditorActive")).OrderBy(c => Guid.NewGuid()).ToList();
                     pCount = lobbyPlayers.Count;
                     if (pCount < 2) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Total players less than two, failed to start"); return; }

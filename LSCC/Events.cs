@@ -2996,9 +2996,9 @@ namespace RNC
                             ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
 
                             player.SetData("cEditClothingData", ConvChar.Clothing);
-                            EPlayer.ShowCharCreator(player, ConvChar);
+                            EPlayer.ShowCharCreator(player, ConvChar, true);
                         }
-                        catch { EPlayer.ShowCharCreator(player); }
+                        catch { EPlayer.ShowCharCreator(player, null, true); }
 
                         EPlayer.GetAccount(player).FinishedTutorial = true;
                         EPlayer.Save(player);
@@ -3359,22 +3359,52 @@ namespace RNC
             }
             player.ResetData("cEditClothingData");
 
-            EPlayer.GetAccount(player).Character = NAPI.Util.ToJson(pChar);
-            EPlayer.ApplyCharacter(player, pChar);
-
-            player.SetData("Creator_Using", false);
-            player.TriggerEvent("toggleCreator", false);
-
-            EPlayer.Save(player);
-
-            EPlayer.Spawn(player);
-
-            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You can edit your character's clothing with /char clothing.");
-
-            if (EPlayer.GetAccount(player).Level == 1 && EPlayer.GetAccount(player).XP < 2)
+            if(player.HasSharedData("CharCreator_ShowClothingAfter") && player.GetSharedData<bool>("CharCreator_ShowClothingAfter") == true)
             {
-                player.TriggerEvent("pushMsgToChat", "!{#FF0000}[!] !{#FFFFFF}Please use /help and /keys to get started. Press M to open menu.");
-                EPlayer.Notify(player, "We highly recommend you to <strong>link your Discord account</strong> by using <strong>/verify</strong>. You will earn some rewards in return!", "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
+                EPlayer.GetAccount(player).Character = NAPI.Util.ToJson(pChar);
+                EPlayer.ApplyCharacter(player, pChar);
+                EPlayer.Save(player);
+
+                player.SetData("Creator_Using", false);
+
+                EPlayer.Notify(player, "Character Creation - Clothing", "You will now have to edit the clothing for each team.");
+
+                try
+                {
+                    EPlayer.ApplyCharacter(player, pChar, 1);
+                }
+                catch { return; }
+                player.SetData<CharacterData>("CharacterBeforeEdit", pChar);
+                player.SetData("EditingClothing", 1);
+                player.SetData("LastEditedClothingTeam", 1);
+                int genderr = Convert.ToInt32(pChar.Gender);
+                string genderChar = "M";
+                if (genderr == 1) genderChar = "F";
+                NAPI.Util.ConsoleOutput($"Player {player.Name} editing char gender is {genderChar}");
+                int clothingDataID = (gender == 1 ? 3 : 1);
+                string clothingInfo = NAPI.Util.ToJson(pChar.Clothing[clothingDataID]);
+                player.TriggerEvent("creator_SetClothingPhase");
+                player.TriggerEvent("ClothingEditor:show", 1, genderChar, clothingInfo);
+            }
+            else
+            {
+                EPlayer.GetAccount(player).Character = NAPI.Util.ToJson(pChar);
+                EPlayer.ApplyCharacter(player, pChar);
+
+                player.SetData("Creator_Using", false);
+                player.TriggerEvent("toggleCreator", false);
+
+                EPlayer.Save(player);
+
+                EPlayer.Spawn(player);
+
+                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You can edit your character's clothing with /char clothing.");
+
+                if (EPlayer.GetAccount(player).Level == 1 && EPlayer.GetAccount(player).XP < 2)
+                {
+                    player.TriggerEvent("pushMsgToChat", "!{#FF0000}[!] !{#FFFFFF}Please use /help and /keys to get started. Press M to open menu.");
+                    EPlayer.Notify(player, "We highly recommend you to <strong>link your Discord account</strong> by using <strong>/verify</strong>. You will earn some rewards in return!", "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
+                }
             }
         }
 
@@ -3382,6 +3412,12 @@ namespace RNC
         public void CreatorLeave(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return;
+
+            if(player.HasSharedData("CharCreator_ShowClothingAfter") && player.GetSharedData<bool>("CharCreator_ShowClothingAfter") == true)
+            {
+                EPlayer.Error(player, "You must edit your character and <strong>SAVE</strong> him/her before exiting!");
+                return;
+            }
 
             CharacterData ConvChar = new CharacterData();
             string PlayerChar = EPlayer.GetAccount(player).Character;
@@ -3523,9 +3559,84 @@ namespace RNC
             {
                 EPlayer.Save(player, false);
                 EPlayer.Notify(player, "You have successfully saved your uniform!", "green", "fas fa-check", false, 1500, "bottomRight", "replace");
+                player.SetData("EditingClothing", -1);
+                if (player.HasSharedData("CharCreator_ShowClothingAfter") && player.GetSharedData<bool>("CharCreator_ShowClothingAfter") == true)
+                {
+                    if(team == 1)
+                    {
+                        CharacterData ConvChar = new CharacterData();
+
+                        try
+                        {
+                            ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+                        }
+                        catch
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You do not have a character created! (/char reset)");
+                            return;
+                        }
+                        try
+                        {
+                            EPlayer.ApplyCharacter(player, ConvChar, 0);
+                        }
+                        catch { return; }
+                        player.SetData<CharacterData>("CharacterBeforeEdit", ConvChar);
+                        player.SetData("EditingClothing", 0);
+                        player.SetData("LastEditedClothingTeam", 0);
+                        int gender = Convert.ToInt32(ConvChar.Gender);
+                        string genderChar = "M";
+                        if (gender == 1) genderChar = "F";
+
+                        int clothingDataID = (gender == 1 ? 2 : 0);
+                        string clothingInfo = NAPI.Util.ToJson(ConvChar.Clothing[clothingDataID]);
+                        player.TriggerEvent("ClothingEditor:show", 0, genderChar, clothingInfo);
+                    }
+                    else
+                    {
+                        CharacterData ConvChar = new CharacterData();
+                        try
+                        {
+                            ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+                        }
+                        catch
+                        {
+                            player.Kick();
+                            return;
+                        }
+                        try
+                        {
+                            EPlayer.ApplyCharacter(player, ConvChar, 1);
+                        }
+                        catch { return; }
+
+                        player.SetData("Creator_Using", false);
+                        player.TriggerEvent("toggleCreator", false);
+                        player.SetSharedData("CharCreator_ShowClothingAfter", false);
+
+                        EPlayer.Save(player);
+
+                        EPlayer.Spawn(player);
+
+                        EPlayer.Notify(player, "Character Creation Finished!", "Thank you for going through the character creation process.");
+
+                        if (EPlayer.GetAccount(player).Level == 1 && EPlayer.GetAccount(player).XP < 2)
+                        {
+                            player.TriggerEvent("pushMsgToChat", "!{#FF0000}[!] !{#FFFFFF}Please use /help and /keys to get started. Press M to open menu.");
+                            EPlayer.Notify(player, "We highly recommend you to <strong>link your Discord account</strong> by using <strong>/verify</strong>. You will earn some rewards in return!", "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
+                        }
+                    }
+                }
+               
             }
             else
             {
+                if (player.HasSharedData("CharCreator_ShowClothingAfter") && player.GetSharedData<bool>("CharCreator_ShowClothingAfter") == true)
+                {
+                    OnExitClothingEditor(player, true, team);
+                    return;
+                }
+
+                player.SetData("EditingClothing", -1);
                 EPlayer.Error(player, "You exited the clothing editor without saving your changes.");
                 if (player.HasData("CharacterBeforeEdit"))
                 {

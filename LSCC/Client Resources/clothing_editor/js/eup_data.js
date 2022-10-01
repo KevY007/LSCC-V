@@ -142,7 +142,7 @@ const FugitiveFemaleClothing = [
     {
         clothing: "Shirt",
         type: "JacketOpen",
-        items: [1, 6, 7, 8, 10, 24, 25, 31, 34, 35, 51, 52, 53, 54, 58, 62, 63, 64, 69, 70, 77]
+        items: [7, 10, 25, 34, 51, 52, 53, 54, 58, 62, 63, 64, 69, 70, 77]
     },
     {
         clothing: "Shirt",

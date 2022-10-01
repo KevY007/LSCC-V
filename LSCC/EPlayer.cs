@@ -86,7 +86,7 @@ namespace RNC
             {
                 this.Clothes[i] = new AccClothData();
             }
-
+            /*
             if (teamID == 0)
             {
                 if (gender == 0)
@@ -161,6 +161,7 @@ namespace RNC
                 }
 
             }
+            */
             Hat = -1;
             HatTxt = -1;
             Glasses = -1;
@@ -2058,29 +2059,41 @@ namespace RNC
                                 if (save_linked_entries)
                                 {
                                     List<OwnedVehData> vehs = await context.OwnedVehicles.AsQueryable().Where(v => v.AccountSQLID == acc.SQL_ID).ToListAsync();
-                                    vehs.ForEach(v =>
+                                    if(vehs.Count > 0)
                                     {
-                                        context.Entry(v).State = EntityState.Modified;
-                                        savedEntries++;
-                                    });
+                                        vehs.ForEach(v =>
+                                        {
+                                            context.Entry(v).State = EntityState.Modified;
+                                            savedEntries++;
+                                        });
+                                    }
                                     List<OwnedLoadoutData> guns = await context.OwnedLoadouts.AsQueryable().Where(v => v.AccountSQLID == acc.SQL_ID).ToListAsync();
-                                    guns.ForEach(v =>
+                                    if(guns.Count > 0)
                                     {
-                                        context.Entry(v).State = EntityState.Modified;
-                                        savedEntries++;
-                                    });
+                                        guns.ForEach(v =>
+                                        {
+                                            context.Entry(v).State = EntityState.Modified;
+                                            savedEntries++;
+                                        });
+                                    }
                                     List<PlayerTunings> tunes = await context.PlayerTunings.AsQueryable().Where(t => t.AccountSQLID == acc.SQL_ID).ToListAsync();
-                                    tunes.ForEach(v =>
+                                    if(tunes.Count > 0)
                                     {
-                                        context.Entry(v).State = EntityState.Modified;
-                                        savedEntries++;
-                                    });
+                                        tunes.ForEach(v =>
+                                        {
+                                            context.Entry(v).State = EntityState.Modified;
+                                            savedEntries++;
+                                        });
+                                    }
                                     List<PlayerOutfit> fits = await context.PlayerOutfits.AsQueryable().Where(t => t.AccountID == acc.SQL_ID).ToListAsync();
-                                    fits.ForEach(v =>
+                                    if(fits.Count > 0)
                                     {
-                                        context.Entry(v).State = EntityState.Modified;
-                                        savedEntries++;
-                                    });
+                                        fits.ForEach(v =>
+                                        {
+                                            context.Entry(v).State = EntityState.Modified;
+                                            savedEntries++;
+                                        });
+                                    }
                                 }
 
                                 await context.SaveChangesAsync();
