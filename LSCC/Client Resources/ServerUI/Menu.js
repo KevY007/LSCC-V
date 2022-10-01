@@ -868,7 +868,6 @@ mp.events.add("AddMenuItem", (name, type, owned, price, description) => {
 });
 
 mp.events.add("UpdateMenuItem", (type, owned) => {
-    pushMessageToChat(`updating: ${type} ${owned}`);
     ServerUI.execute(`
         if(gm.$refs.mainMenu.$refs.inventoryTab.items.find(i => i.type == "${type}") != undefined){
             gm.$refs.mainMenu.$refs.inventoryTab.items.find(i => i.type == "${type}").owned = ${owned};

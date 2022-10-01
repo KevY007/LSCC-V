@@ -52,7 +52,30 @@ namespace RNC
                 Settings.SpawnParkedVehicles = !Settings.SpawnParkedVehicles;
                 EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has toggled random parked vehicles in copchase {(Settings.SpawnParkedVehicles ? "ON" : "OFF")}.");
             }
+            else if (action.StartsWith("parkedvehscount"))
+            {
+                string[] args = action.Split(' ');
+                if (args.Count() > 1)
+                {
+                    int speed = 0;
 
+                    if (!Int32.TryParse(args[1], out speed))
+                    {
+                        player.TriggerEvent("pushMsgToChat", $"!{{#999999}}You must enter a number between 500 and 1500!");
+                        return;
+                    }
+                    if(speed < 500 || speed > 1500)
+                    {
+                        player.TriggerEvent("pushMsgToChat", $"!{{#999999}}You must enter a number between 500 and 1500!");
+                        return;
+                    }
+
+                    Settings.ParkedVehiclesToSpawn = speed;
+
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set the number of randomly-parked vehicles in copchase to {speed}.");
+                }
+                else player.TriggerEvent("pushMsgToChat", "!{#999999}Proper usage: /serveroptions parkedvehscount <number of vehicles>");
+            }
             else if (action.StartsWith("derbyveh", StringComparison.OrdinalIgnoreCase))
             {
                 string[] args = action.Split(' ');
@@ -100,6 +123,8 @@ namespace RNC
                 player.TriggerEvent("pushMsgToChat", "speedafob => Max speed for anti fall off to trigger/work.");
                 player.TriggerEvent("pushMsgToChat", "camupdate => Please don't touch. Rate clients update cam direction to server.");
                 player.TriggerEvent("pushMsgToChat", "ooc => Toggles the OOC chat in server. (Does not save during restarts)");
+                player.TriggerEvent("pushMsgToChat", "parkedvehs => Toggles the random parked vehicle spawning in copchase (Does not save)");
+                player.TriggerEvent("pushMsgToChat", "parkedvehscount => Number of random parked vehicles to spawn (Does not save)");
             }
             else if (action.StartsWith("ooc", StringComparison.OrdinalIgnoreCase))
             {
@@ -197,7 +222,7 @@ namespace RNC
                 else player.TriggerEvent("pushMsgToChat", "!{#999999}Proper usage: /serveroptions usediscord <true/false>");
             }
 
-            else player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'maxinlobby, derbyveh, usediscord, onfootcollisions, afob, speedafob, camupdate'");
+            else player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'maxinlobby, derbyveh, usediscord, onfootcollisions, afob, speedafob, camupdate, parkedvehs, parkedvehscount'");
 
             return;
         }

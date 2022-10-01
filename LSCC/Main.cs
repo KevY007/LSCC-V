@@ -671,6 +671,7 @@ namespace RNC
 
         // Global Variables (changing accordingly)
         public static bool SpawnParkedVehicles { get; set; } = true; // for debug purposes whether to spawn random cars
+        public static int ParkedVehiclesToSpawn { get; set; } = 600;
         public static List<LobbyData> Lobbies { get; set; }
         public static List<Player> LoggedInPlayers { get; set; }
         public static List<Vehicle> AdminVehicles { get; set; }
@@ -3441,7 +3442,8 @@ namespace RNC
 
                                     if (Settings.SpawnParkedVehicles)
                                     {
-                                        if (Settings.CarGenData.Count >= 1000)
+                                        int carsAdded = 0;
+                                        if (Settings.CarGenData.Count >= Settings.ParkedVehiclesToSpawn)
                                         {
                                             NAPI.Task.Run(() =>
                                             {
@@ -3451,6 +3453,10 @@ namespace RNC
                                                 int civiCarCnt = Settings.CivilianVehicles.Count();
                                                 foreach (jCarGenData car in randomCars)
                                                 {
+                                                    if (carsAdded >= Settings.ParkedVehiclesToSpawn)
+                                                        break;
+                                                    carsAdded++;
+
                                                     Random rnd = new Random();
                                                     int modelsCount = car.Models.Count();
                                                     int randomModel = modelsCount > 0 ? (rnd.Next(modelsCount)) : (rnd.Next(civiCarCnt));
