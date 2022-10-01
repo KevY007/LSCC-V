@@ -19,8 +19,8 @@
             const base64 = canvas.toDataURL("image/jpg", 1);
             const blob = b64toBlob(base64);
             var myHeaders = new Headers();
-            //myHeaders.append("x-api-key", api_key);
-            myHeaders.append("x-api-key", "$5$ETb9rZjvrYcc1bnE$uL7fDXteGtMd07cCsBYrBpsF/Wkp3nrisYmTVldqJg4@$5$ETb9rZjvrYcc1bnE");
+            myHeaders.append("x-api-key", api_key);
+            //myHeaders.append("x-api-key", "$5$ETb9rZjvrYcc1bnE$uL7fDXteGtMd07cCsBYrBpsF/Wkp3nrisYmTVldqJg4@$5$ETb9rZjvrYcc1bnE");
 
             var formdata = new FormData();
             formdata.append("file", blob, name);
