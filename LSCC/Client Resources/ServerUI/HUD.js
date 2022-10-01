@@ -1210,7 +1210,10 @@ function ToggleScoreboard()
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.enabled = true;`);
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.disableInput = true;`);
 		// ServerUI.execute(`gm.$refs.scoreboard.setPlayers([]);`);
-		
+        
+        let notifyscoreboardstr = `toast('Scoreboard Cursor', 'Press <strong>F2</strong> to show the cursor. Click on a player for actions.', 'nothing', 5000);`;
+        ServerUI.execute(notifyscoreboardstr);
+
         updatePlayers();
 
         updater = setInterval(function()

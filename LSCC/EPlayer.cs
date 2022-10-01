@@ -437,10 +437,11 @@ namespace RNC
             player.TriggerEvent("char_Reset");
         }
 
-        public static void ShowCharCreator(Player player, CharacterData charData = null)
+        public static void ShowCharCreator(Player player, CharacterData charData = null, bool showClothingAfter = false)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
+            player.SetSharedData("CharCreator_ShowClothingAfter", showClothingAfter);
             player.TriggerEvent("DestroyPlayerCamera");
             player.SetData("Creator_Using", true);
 
@@ -648,6 +649,7 @@ namespace RNC
                 player.SetSharedData("AutoOOC", false);
 
                 player.SetSharedData("TaseProtection", false);
+                player.SetSharedData("CharCreator_ShowClothingAfter", false);
 
                 player.ResetData("LockpickTarget");
                 player.SetSharedData("PlacingStingers", false);
