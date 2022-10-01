@@ -2002,7 +2002,7 @@ namespace RNC
         [ServerEvent(Event.PlayerEnterColshape)]
         public void OnPlayerEnterColshape(ColShape shape, Player player)
         {
-            if (player.IsInVehicle)
+            if (player.IsInVehicle && player.HasSharedData("Team") && player.GetSharedData<int>("Team") == 0 && player.VehicleSeat == 0)
             {
                 if (shape.HasData("LinkedStingerObject") && shape.HasData("StingerID"))
                 {
