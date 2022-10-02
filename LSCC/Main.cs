@@ -2242,54 +2242,62 @@ namespace RNC
 
             // Discord-exclusive loadout
             new LoadoutData(1, "Negotiator")
-                .Add(WeaponHash.Heavypistol, "https://assets.gm.miami/gtav/weapons/Heavy-pistol-icon.png", "Heavy Pistol", 50)
                 .Add(WeaponHash.Heavyshotgun, "https://assets.gm.miami/gtav/weapons/Heavy-shotgun-icon.png", "Heavy Shotgun", 20)
-                .Add(WeaponHash.Bzgas, "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png", "BZ Gas", 1);
+                .Add(WeaponHash.Bzgas, "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png", "BZ Gas", 1)
+                .Add(WeaponHash.Heavypistol, "https://assets.gm.miami/gtav/weapons/Heavy-pistol-icon.png", "Heavy Pistol", 50);
             // -------------------------
 
             new LoadoutData(1, "Patrol", 5)
-                .Add(WeaponHash.Combatpistol, "https://assets.gm.miami/gtav/weapons/Combat-pistol-icon.png", "Combat Pistol", 30)
-                .Add(WeaponHash.Pumpshotgun, "https://assets.gm.miami/gtav/weapons/Pump-shotgun-icon.png", "Pump Shotgun", 15);
+                .Add(WeaponHash.Pumpshotgun, "https://assets.gm.miami/gtav/weapons/Pump-shotgun-icon.png", "Pump Shotgun", 15)
+                .Add(WeaponHash.Combatpistol, "https://assets.gm.miami/gtav/weapons/Combat-pistol-icon.png", "Combat Pistol", 30);
 
             new LoadoutData(1, "Metropolitan", 8)
-                .Add(WeaponHash.Heavypistol, "https://assets.gm.miami/gtav/weapons/Heavy-pistol-icon.png", "Heavy Pistol", 40)
                 .Add(WeaponHash.Pumpshotgun, "https://assets.gm.miami/gtav/weapons/Pump-shotgun-icon.png", "Pump Shotgun", 25)
-                .Add(WeaponHash.Bzgas, "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png", "BZ Gas", 1);
+                .Add(WeaponHash.Bzgas, "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png", "BZ Gas", 1)
+                .Add(WeaponHash.Heavypistol, "https://assets.gm.miami/gtav/weapons/Heavy-pistol-icon.png", "Heavy Pistol", 40);
 
             new LoadoutData(1, "FBI", 12, 15)
-                .Add(WeaponHash.Pistol50, "https://assets.gm.miami/gtav/weapons/Pistol.50-icon.png", "Pistol .50", 40)
                 .Add(WeaponHash.Bullpupshotgun, "https://assets.gm.miami/gtav/weapons/Bullpup-shotgun-icon.png", "Bullpup Shotgun", 28)
-                .Add(WeaponHash.Bzgas, "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png", "BZ Gas", 2);
+                .Add(WeaponHash.Bzgas, "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png", "BZ Gas", 2)
+                .Add(WeaponHash.Pistol50, "https://assets.gm.miami/gtav/weapons/Pistol.50-icon.png", "Pistol .50", 40);
             
             new LoadoutData(1, "CIA", 15, 30)
-                .Add(WeaponHash.Pistol_mk2, "https://assets.gm.miami/gtav/weapons/Pistol-mk2-icon.png", "Pistol Mk2", 50)
                 .Add(WeaponHash.Heavyshotgun, "https://assets.gm.miami/gtav/weapons/Heavy-shotgun-icon.png", "Heavy Shotgun", 20)
                 .Add(WeaponHash.Assaultsmg, "https://assets.gm.miami/gtav/weapons/Assault-smg-icon.png", "Assault SMG", 80)
-                .Add(WeaponHash.Bzgas, "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png", "BZ Gas", 1);
+                .Add(WeaponHash.Bzgas, "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png", "BZ Gas", 1)
+                .Add(WeaponHash.Pistol_mk2, "https://assets.gm.miami/gtav/weapons/Pistol-mk2-icon.png", "Pistol Mk2", 50);
 
             new LoadoutData(1, "SWAT", 20, 50)
-                .Add(WeaponHash.Combatpistol, "https://assets.gm.miami/gtav/weapons/Combat-pistol-icon.png", "Combat Pistol", 30)
-                .Add(WeaponHash.Smg, "https://assets.gm.miami/gtav/weapons/Smg-icon.png", "SMG", 60)
+                .Add(WeaponHash.Microsmg, "https://assets.gm.miami/gtav/weapons/Micro-smg-icon.png", "Micro SMG", 60)
                 .Add(WeaponHash.Pumpshotgun, "https://assets.gm.miami/gtav/weapons/Pump-shotgun-icon.png", "Pump Shotgun", 15)
-                .Add(WeaponHash.Bzgas, "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png", "BZ Gas", 2);
+                .Add(WeaponHash.Bzgas, "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png", "BZ Gas", 2)
+                .Add(WeaponHash.Combatpistol, "https://assets.gm.miami/gtav/weapons/Combat-pistol-icon.png", "Combat Pistol", 30);
 
             new LoadoutData(1, "Marine", 25, 70)
-                .Add(WeaponHash.Heavypistol, "https://assets.gm.miami/gtav/weapons/Heavy-pistol-icon.png", "Heavy Pistol", 30)
                 .Add(WeaponHash.Carbinerifle, "https://assets.gm.miami/gtav/weapons/Carbine-rifle-icon.png", "Carbine Rifle", 60)
                 .Add(WeaponHash.Bullpupshotgun, "https://assets.gm.miami/gtav/weapons/Bullpup-shotgun-icon.png", "Bullpup Shotgun", 28)
-                .Add(WeaponHash.Bzgas, "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png", "BZ Gas", 1);
+                .Add(WeaponHash.Bzgas, "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png", "BZ Gas", 1)
+                .Add(WeaponHash.Heavypistol, "https://assets.gm.miami/gtav/weapons/Heavy-pistol-icon.png", "Heavy Pistol", 30);
 
             new LoadoutData(1, "Navy Seal", 35, 100)
-                .Add(WeaponHash.Heavypistol, "https://assets.gm.miami/gtav/weapons/Heavy-pistol-icon.png", "Heavy Pistol", 30)
                 .Add(WeaponHash.Heavyshotgun, "https://assets.gm.miami/gtav/weapons/Heavy-shotgun-icon.png", "Heavy Shotgun", 20)
                 .Add(WeaponHash.Specialcarbine, "https://assets.gm.miami/gtav/weapons/Special-carbine-icon.png", "Special Carbine", 70)
-                .Add(WeaponHash.Bzgas, "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png", "BZ Gas", 1);
+                .Add(WeaponHash.Bzgas, "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png", "BZ Gas", 1)
+                .Add(WeaponHash.Heavypistol, "https://assets.gm.miami/gtav/weapons/Heavy-pistol-icon.png", "Heavy Pistol", 30);
+
+            // 3520460075 = Tactical Rifle hash
+            new LoadoutData(1, "Veteran", 45, 125)
+               .Add((WeaponHash)3520460075, "https://assets.gm.miami/gtav/weapons/Tactical-rifle-icon.png", "Service Carbine", 90)
+               .Add(WeaponHash.Bzgas, "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png", "BZ Gas", 1)
+               .Add(WeaponHash.NavyRevolver, "https://assets.gm.miami/gtav/weapons/Navy-revolver-icon.png", "Navy Revolver", 20);
 
             new LoadoutData(1, "Juggernaut", 50, 150)
-                .Add(WeaponHash.Heavypistol, "https://assets.gm.miami/gtav/weapons/Heavy-pistol-icon.png", "Heavy Pistol", 40)
-                .Add(WeaponHash.Combatmg, "https://assets.gm.miami/gtav/weapons/Combat-mg-icon.png", "Combat MG", 160)
+                .Add(WeaponHash.Mg, "https://assets.gm.miami/gtav/weapons/Mg-icon.png", "Combat MG", 160)
                 .Add(WeaponHash.Pumpshotgun, "https://assets.gm.miami/gtav/weapons/Pump-shotgun-icon.png", "Pump Shotgun", 15)
-                .Add((WeaponHash)1, "package://Artwork/Weapons/Armour.png", "Full Armour", 100);
+                .Add((WeaponHash)1, "package://Artwork/Weapons/Armour.png", "Full Armour", 100)
+                .Add(WeaponHash.Heavypistol, "https://assets.gm.miami/gtav/weapons/Heavy-pistol-icon.png", "Heavy Pistol", 40);
+
+       
 
             //
 
@@ -2298,55 +2306,60 @@ namespace RNC
 
             // Discord-exclusive loadout
             new LoadoutData(0, "Negotiator")
-                .Add(WeaponHash.Heavypistol, "https://assets.gm.miami/gtav/weapons/Heavy-pistol-icon.png", "Heavy Pistol", 50)
                 .Add(WeaponHash.Heavyshotgun, "https://assets.gm.miami/gtav/weapons/Heavy-shotgun-icon.png", "Heavy Shotgun", 50)
-                .Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 1);
+                .Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 1)
+                .Add(WeaponHash.Heavypistol, "https://assets.gm.miami/gtav/weapons/Heavy-pistol-icon.png", "Heavy Pistol", 50);
             // -------------------------
 
             new LoadoutData(0, "Wannabe", 5)
-                .Add(WeaponHash.Snspistol, "https://assets.gm.miami/gtav/weapons/Sns-pistol-icon.png", "SNS Pistol", 60)
-                .Add(WeaponHash.Sawnoffshotgun, "https://assets.gm.miami/gtav/weapons/Sawed-off-shotgun-icon.png", "Sawn Off Shotgun", 40);
+                .Add(WeaponHash.Sawnoffshotgun, "https://assets.gm.miami/gtav/weapons/Sawed-off-shotgun-icon.png", "Sawn Off Shotgun", 40)
+                .Add(WeaponHash.Snspistol, "https://assets.gm.miami/gtav/weapons/Sns-pistol-icon.png", "SNS Pistol", 60);
 
             new LoadoutData(0, "Hoodrat", 8, 10)
-                .Add(WeaponHash.Pistol_mk2, "https://assets.gm.miami/gtav/weapons/Pistol-mk2-icon.png", "Pistol Mk2", 50)
                 .Add(WeaponHash.Compactrifle, "https://assets.gm.miami/gtav/weapons/Compact-rifle-icon.png", "Compact Rifle", 80)
-                .Add(WeaponHash.Bullpupshotgun, "https://assets.gm.miami/gtav/weapons/Bullpup-shotgun-icon.png", "Bullpup Shotgun", 50);
+                .Add(WeaponHash.Bullpupshotgun, "https://assets.gm.miami/gtav/weapons/Bullpup-shotgun-icon.png", "Bullpup Shotgun", 50)
+                .Add(WeaponHash.Pistol_mk2, "https://assets.gm.miami/gtav/weapons/Pistol-mk2-icon.png", "Pistol Mk2", 50);
 
             new LoadoutData(0, "Thug", 13, 15)
-                .Add(WeaponHash.Pistol, "https://assets.gm.miami/gtav/weapons/Pistol-icon.png", "Pistol", 40)
                 .Add(WeaponHash.Microsmg, "https://assets.gm.miami/gtav/weapons/Micro-smg-icon.png", "Micro SMG", 60)
-                .Add(WeaponHash.Bullpupshotgun, "https://assets.gm.miami/gtav/weapons/Bullpup-shotgun-icon.png", "Bullpup Shotgun", 40);
+                .Add(WeaponHash.Bullpupshotgun, "https://assets.gm.miami/gtav/weapons/Bullpup-shotgun-icon.png", "Bullpup Shotgun", 40)
+                .Add(WeaponHash.Pistol, "https://assets.gm.miami/gtav/weapons/Pistol-icon.png", "Pistol", 40);
 
             new LoadoutData(0, "Hustler", 15, 25)
-                .Add(WeaponHash.Combatpistol, "https://assets.gm.miami/gtav/weapons/Combat-pistol-icon.png", "Combat Pistol", 60)
-                .Add(WeaponHash.Smg, "https://assets.gm.miami/gtav/weapons/Smg-icon.png", "SMG", 70);
+                .Add(WeaponHash.Smg, "https://assets.gm.miami/gtav/weapons/Smg-icon.png", "SMG", 70)
+                .Add(WeaponHash.Combatpistol, "https://assets.gm.miami/gtav/weapons/Combat-pistol-icon.png", "Combat Pistol", 60);
 
             new LoadoutData(0, "Trigger", 22, 40)
-                .Add(WeaponHash.Pistol, "https://assets.gm.miami/gtav/weapons/Pistol-icon.png", "Pistol", 60)
-                .Add(WeaponHash.Assaultrifle, "https://assets.gm.miami/gtav/weapons/Assault-rifle-icon.png", "Assault Rifle", 80);
+                .Add(WeaponHash.Assaultrifle, "https://assets.gm.miami/gtav/weapons/Assault-rifle-icon.png", "Assault Rifle", 80)
+                .Add(WeaponHash.Pistol, "https://assets.gm.miami/gtav/weapons/Pistol-icon.png", "Pistol", 60);
 
             new LoadoutData(0, "Enforcer", 27, 60)
-                .Add(WeaponHash.Pistol50, "https://assets.gm.miami/gtav/weapons/Pistol.50-icon.png", "Pistol .50", 28)
                 .Add(WeaponHash.Assaultrifle, "https://assets.gm.miami/gtav/weapons/Assault-rifle-icon.png", "Assault Rifle", 80)
-                .Add(WeaponHash.Pumpshotgun, "https://assets.gm.miami/gtav/weapons/Pump-shotgun-icon.png", "Pump Shotgun", 40);
+                .Add(WeaponHash.Pumpshotgun, "https://assets.gm.miami/gtav/weapons/Pump-shotgun-icon.png", "Pump Shotgun", 40)
+                .Add(WeaponHash.Pistol50, "https://assets.gm.miami/gtav/weapons/Pistol.50-icon.png", "Pistol .50", 28);
 
-            new LoadoutData(0, "Shot-Caller", 27)
-                .Add(WeaponHash.Snspistol, "https://assets.gm.miami/gtav/weapons/Sns-pistol-icon.png", "SNS Pistol", 60)
+            new LoadoutData(0, "Shot-Caller", 27, 40)
                 .Add(WeaponHash.Microsmg, "https://assets.gm.miami/gtav/weapons/Micro-smg-icon.png", "Micro SMG", 70)
                 .Add(WeaponHash.Heavyshotgun, "https://assets.gm.miami/gtav/weapons/Heavy-shotgun-icon.png", "Heavy Shotgun", 50)
-                .Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 1);
+                .Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 1)
+                .Add(WeaponHash.Snspistol, "https://assets.gm.miami/gtav/weapons/Sns-pistol-icon.png", "SNS Pistol", 60);
 
             new LoadoutData(0, "Kingpin", 35, 70)
-                .Add(WeaponHash.Heavypistol, "https://assets.gm.miami/gtav/weapons/Heavy-pistol-icon.png", "Heavy Pistol", 60)
                 .Add(WeaponHash.Heavyshotgun, "https://assets.gm.miami/gtav/weapons/Heavy-shotgun-icon.png", "Heavy Shotgun", 50)
                 .Add(WeaponHash.Carbinerifle, "https://assets.gm.miami/gtav/weapons/Carbine-rifle-icon.png", "Carbine Rifle", 80)
-                .Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 1);
+                .Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 1)
+                .Add(WeaponHash.Heavypistol, "https://assets.gm.miami/gtav/weapons/Heavy-pistol-icon.png", "Heavy Pistol", 60);
+            
+            new LoadoutData(0, "The Elder", 45, 70)
+               .Add(WeaponHash.Dbshotgun, "https://assets.gm.miami/gtav/weapons/Double-barrel-shotgun-icon.png", "Double-Barrel Shotgun", 12)
+               .Add(WeaponHash.Gusenberg, "https://assets.gm.miami/gtav/weapons/Gusenberg-sweeper-icon.png", "Gusenberg Sweeper", 120)
+               .Add(WeaponHash.NavyRevolver, "https://assets.gm.miami/gtav/weapons/Navy-revolver-icon.png", "Navy Revolver", 20);
 
             new LoadoutData(0, "Godfather", 50, 70)
-                .Add(WeaponHash.Pistol50, "https://assets.gm.miami/gtav/weapons/Pistol.50-icon.png", "Pistol .50", 40)
                 .Add(WeaponHash.Bullpupshotgun, "https://assets.gm.miami/gtav/weapons/Bullpup-shotgun-icon.png", "Bullpup Shotgun", 50)
                 .Add(WeaponHash.Specialcarbine, "https://assets.gm.miami/gtav/weapons/Special-carbine-icon.png", "Special Carbine", 80)
-                .Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 3);
+                .Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 3)
+                .Add(WeaponHash.Pistol50, "https://assets.gm.miami/gtav/weapons/Pistol.50-icon.png", "Pistol .50", 40);
 
 
             /* VEHICLES/SELECTION CREATION */

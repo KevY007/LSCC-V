@@ -1322,6 +1322,7 @@ namespace RNC
             if (lobby == null) { return; }
             if (lobby.gameMode == GameModes.BANKROBBERY)
             {
+                player.GiveWeapon(WeaponHash.Stungun, 1);
                 if (player.HasData("BankRobberyUnit"))
                 {
                     if(player.GetData<string>("BankRobberyUnit") == "fib")
@@ -1351,6 +1352,7 @@ namespace RNC
             }
             if (lobby.gameMode != GameModes.BUSTED)
             {
+                player.GiveWeapon(WeaponHash.Stungun, 1);
                 if (EPlayer.GetAccount(player).LoadoutCop.Length >= 2)
                 {
                     LoadoutData loadout = Settings.Loadouts.Find(a => a.Team == 1 && a.Name.Equals(EPlayer.GetAccount(player).LoadoutCop));
@@ -1443,8 +1445,7 @@ namespace RNC
                 }, 500 + player.Ping);
             }
 
-            player.GiveWeapon(WeaponHash.Stungun, 1);
-            player.GiveWeapon(WeaponHash.Nightstick, 1);
+            //player.GiveWeapon(WeaponHash.Nightstick, 1);
             player.TriggerEvent("pushMsgToChat", "!{#FF6347}[TASER] !{#FFFFFF}You have been equipped with a stungun, shoot at a fugitive that hasn't shot to tase them.");
             return;
         }
@@ -1586,9 +1587,9 @@ namespace RNC
                 }, 500 + player.Ping);
             }
 
-            WeaponHash[] randomWeps = { WeaponHash.Bottle, WeaponHash.Knife, WeaponHash.Bat, WeaponHash.Battleaxe, WeaponHash.Crowbar };
+            //WeaponHash[] randomWeps = { WeaponHash.Bottle, WeaponHash.Knife, WeaponHash.Bat, WeaponHash.Battleaxe, WeaponHash.Crowbar };
             
-            player.GiveWeapon(randomWeps.OrderBy(a => Guid.NewGuid()).First(), 1);
+            //player.GiveWeapon(randomWeps.OrderBy(a => Guid.NewGuid()).First(), 1);
             return;
         }
 
