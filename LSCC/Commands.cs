@@ -4527,6 +4527,7 @@ namespace RNC
             player.TriggerEvent("SetActorInvulnerable", false);
 
             EPlayer.Notify(player, $"Joined <strong>{Settings.DMNames[arenaid]}</strong>", "blue", "fas fa-users", false, 1000, "bottomCenter", "replace");
+            EPlayer.Notify(player, $"<strong>NOTE:</strong> Your autojoin is disabled while in deathmatch. You will be notified when a copchase round is about to start.", "yellow", "fas fa-users", false, 5000, "bottomCenter", "replace");
             return;
         }
 
@@ -11153,7 +11154,8 @@ namespace RNC
                     ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
 
                     player.SetData("cEditClothingData", ConvChar.Clothing);
-                    EPlayer.ShowCharCreator(player, ConvChar);
+                    EPlayer.ShowCharCreator(player, ConvChar, false, true);
+                    EPlayer.Notify(player, "Gender Change", "If you wish to change your gender, use <strong>/char reset</strong>!", "bottomRight", "replace");
                 }
                 catch { player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You do not have a character to edit!"); }
                

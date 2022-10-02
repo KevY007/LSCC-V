@@ -438,7 +438,7 @@ namespace RNC
             player.TriggerEvent("char_Reset");
         }
 
-        public static void ShowCharCreator(Player player, CharacterData charData = null, bool showClothingAfter = false)
+        public static void ShowCharCreator(Player player, CharacterData charData = null, bool showClothingAfter = false, bool blockGenderChange = false)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
@@ -474,7 +474,7 @@ namespace RNC
             player.Position = new Vector3(402.8664, -996.4108, -99.00027);
             player.Heading = -185.0f;
 
-            player.TriggerEvent("toggleCreator", true, NAPI.Util.ToJson(defaultChar));
+            player.TriggerEvent("toggleCreator", true, NAPI.Util.ToJson(defaultChar), blockGenderChange);
 
             return;
         }

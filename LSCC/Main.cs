@@ -2755,7 +2755,7 @@ namespace RNC
                                             {
                                                 lock (player)
                                                 {
-                                                    if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetSharedData<bool>("AutoJoin") == true && !EPlayer.IsAFK(player))
+                                                    if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetSharedData<int>("InDM") == -1 && player.GetSharedData<bool>("AutoJoin") == true && !EPlayer.IsAFK(player))
                                                     {
                                                         pCount++;
                                                     }
@@ -2780,24 +2780,34 @@ namespace RNC
                                                     {
                                                         if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetSharedData<bool>("AutoJoin") == true)
                                                         {
-                                                            if (player.HasData("Spectating"))
+                                                            if(player.GetSharedData<int>("InLobby") < 0 || player.GetSharedData<int>("InDM") != -1)
                                                             {
-                                                                Commands.cmd_specoff(player);
+                                                                player.TriggerEvent("PlaySoundFrontend", "10s", "MP_MISSION_COUNTDOWN_SOUNDSET");
+                                                                EPlayer.Notify(player, "A copchase round is about to start in your lobby! Go to the /lobby if you want to participate.", "orange", "fas fa-hourglass-start", false, 10000, "topCenter");
                                                             }
-                                                            if (player.GetSharedData<bool>("WeaponEditorActive"))
+                                                            else
                                                             {
-                                                                player.TriggerEvent("WeaponEditor:exit");
-                                                            }
-                                                            player.SetSharedData("InDM", -1);
+                                                                if (player.HasData("Spectating"))
+                                                                {
+                                                                    Commands.cmd_specoff(player);
+                                                                }
+                                                                if (player.GetSharedData<bool>("WeaponEditorActive"))
+                                                                {
+                                                                    player.TriggerEvent("WeaponEditor:exit");
+                                                                }
+                                                                player.SetSharedData("InDM", -1);
 
-                                                            EPlayer.Spawn(player);
-                                                            EPlayer.Notify(player, "The round is about to start!", "orange", "fas fa-hourglass-start", false, 10000, "topCenter");
+                                                                EPlayer.Spawn(player);
+                                                                player.TriggerEvent("PlaySoundFrontend", "10s", "MP_MISSION_COUNTDOWN_SOUNDSET");
+                                                                EPlayer.Notify(player, "The round is about to start!", "orange", "fas fa-hourglass-start", false, 10000, "topCenter");
 
-                                                            if (player.GetSharedData<bool>("IsTabbed") == true || EPlayer.IsAFK(player))
-                                                            {
-                                                                player.TriggerEvent("SendNotification", "AFK Check", "Chase is starting in 10 seconds",
-                                                                    "Race 'N' Chase", 10);
+                                                                if (player.GetSharedData<bool>("IsTabbed") == true || EPlayer.IsAFK(player))
+                                                                {
+                                                                    player.TriggerEvent("SendNotification", "AFK Check", "Chase is starting in 10 seconds",
+                                                                        "Race 'N' Chase", 10);
+                                                                }
                                                             }
+
                                                         }
                                                     }
                                                 }
@@ -3334,6 +3344,8 @@ namespace RNC
                     a.GetSharedData<bool>("AutoJoin") == true && 
                     !a.Dead &&
                     a.GetData<int>("EditingClothing") == -1 &&
+                    a.GetSharedData<int>("InDM") == -1 &&
+                    a.GetSharedData<int>("InLobby") >= 0 &&
                     !a.GetSharedData<bool>("WeaponEditorActive")).OrderBy(c => Guid.NewGuid()).ToList();
                     pCount = lobbyPlayers.Count;
                     if (pCount < 2) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Total players less than two, failed to start"); return; }

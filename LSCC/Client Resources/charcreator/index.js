@@ -11,6 +11,8 @@ const Point = NativeUI.Point;
 const ItemsCollection = NativeUI.ItemsCollection;
 const Color = NativeUI.Color;
 
+let isGenderChangeBlocked = false;
+
 const creatorCoords = {
     camera: new mp.Vector3(402.8664, -997.5515, -98.5),
     cameraLookAt: new mp.Vector3(402.8664, -996.4108, -98.5)
@@ -263,20 +265,25 @@ mp.events.add("char_Reset", () => {
 
 creatorMainMenu.ListChange.on((item, listIndex) => {
     if (item == genderItem) {
-        currentGender = listIndex;
-        mp.events.callRemote("creator_GenderChange", currentGender);
-
-        localPlayer.clearTasksImmediately();
-        applyCreatorOutfit();
-        angleItem.Index = 0;
-        resetParentsMenu(true);
-        resetFeaturesMenu(true);
-        resetAppearanceMenu(true);
-        localPlayer.setAlpha(255);
-
-        creatorHairMenu.Clear();
-        fillHairMenu();
-        creatorHairMenu.RefreshIndex();
+        if(isGenderChangeBlocked == true) {
+            mp.events.callLocal("HUDError", "You cannot change your gender here! Use <strong>/char reset</strong>!", "fa-crosshairs");
+        }
+        else{
+            currentGender = listIndex;
+            mp.events.callRemote("creator_GenderChange", currentGender);
+    
+            localPlayer.clearTasksImmediately();
+            applyCreatorOutfit();
+            angleItem.Index = 0;
+            resetParentsMenu(true);
+            resetFeaturesMenu(true);
+            resetAppearanceMenu(true);
+            localPlayer.setAlpha(255);
+    
+            creatorHairMenu.Clear();
+            fillHairMenu();
+            creatorHairMenu.RefreshIndex();
+        }
     }
 });
 
@@ -725,7 +732,9 @@ mp.events.add("creator_SetClothingPhase", () => {
     creatorCamera.setActive(true);
     mp.game.cam.renderScriptCams(true, false, 0, true, false);
 });
-mp.events.add("toggleCreator", (active, charData) => {
+mp.events.add("toggleCreator", (active, charData, blockGenderChange) => {
+    isGenderChangeBlocked = blockGenderChange;
+
     if (active) {
         if (creatorCamera === undefined) {
             creatorCamera = mp.cameras.new("creatorCamera", creatorCoords.camera, new mp.Vector3(0, 0, 0), 45);
@@ -810,7 +819,6 @@ mp.events.add("toggleCreator", (active, charData) => {
             creatorFeaturesMenu.RefreshIndex();
             creatorAppearanceMenu.RefreshIndex();
         }
-
         applyCreatorOutfit();
     } else {
         for (let i = 0; i < creatorMenus.length; i++) creatorMenus[i].Visible = false;

@@ -2575,6 +2575,7 @@ mp.events.add('native:call', (nativeName, args, hasCallback) => {
     }
 });
 
+
 mp.events.add("PopVehicleTires", () => {
     let vehicle = mp.players.local.vehicle;
     if(!vehicle) return;
@@ -2757,6 +2758,9 @@ mp.events.add(
 
     "PlayMissionComplete": (type) => {
         mp.game.audio.playMissionCompleteAudio(type);
+    },
+    "PlaySoundFrontend": (soundName, setName) => {
+        mp.game.audio.playSoundFrontend(-1, soundName, setName, true);
     },
 
     "StopSpectating": () => {
