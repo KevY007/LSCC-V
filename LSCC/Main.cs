@@ -1560,6 +1560,9 @@ namespace RNC
                 case "police3slick":
                     seats = 4;
                     break;
+                case "police3umk":
+                    seats = 4;
+                    break;
                 case "fibexecutioner":
                     seats = 7;
                     break;
@@ -2378,7 +2381,7 @@ namespace RNC
             new CarData(1, "Unmarked Charger", "lspdunm", "package://Artwork/Vehicles/lspdunm.png", "Fast+", 25, 40);
             new CarData(1, "FIB Executioner", "fibexecutioner", "package://Artwork/Vehicles/fibexecutioner.png", "Average", 25, 50);
             new CarData(1, "Chevrolet Caprice PPV", "bcso2slick", "package://Artwork/Vehicles/bcso2slick.png", "Fast", 30, 65);
-            new CarData(1, "Vapid Torrence Slicktop", "police3slick", "package://Artwork/Vehicles/police3slick.png", "Fast+", 30, 70);
+            new CarData(1, "Vapid Torrence Unmarked", "police3umk", "package://Artwork/Vehicles/police3umk.png", "Fast+", 30, 70);
             new CarData(1, "Sheriff Gauntlet", "shergauntlet", "package://Artwork/Vehicles/shergauntlet.png", "Fast+", 38, 80);
             new CarData(1, "Vapid TARV Bearcat", "bcat", "package://Artwork/Vehicles/bcat.png", "Slow", 55, 100);
 

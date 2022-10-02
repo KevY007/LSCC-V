@@ -439,7 +439,7 @@ function AddCustomVehiclesToSpawner(){
 
         let modelsList = ["lspdunm", "polbufac", "huntley2", "lspdvic", "prevolter", "m3e46", "pscout", "impala",
         "shegrangerold", "shergauntlet", "polbisonf", "gresleyh", "tulip2", "golfmk6", "bcso2slick", "bcat", "police3slick",
-        "fibexecutioner"];
+        "fibexecutioner", "police3umk"];
 
         for(let i = 0 ; i < modelsList.length; i++){
             ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.vehicles.push({
