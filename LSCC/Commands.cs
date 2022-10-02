@@ -2810,7 +2810,7 @@ namespace RNC
             {
                 if(lobby.gameStatus == 2)
                 {
-                    EPlayer.Error(player, $"You can't use this when copchase is about to start!", "nigger");
+                    EPlayer.Error(player, $"You can't use this when copchase is about to start!");
                     return;
                 }
             }

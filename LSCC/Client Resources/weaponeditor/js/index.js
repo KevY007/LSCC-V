@@ -71,9 +71,15 @@ function backButtonPress(){
     }
 }
 
-// class mp { DEBUG PURPOSES ONLY
-//     static trigger(text){ console.log(text); }
-//   }
+//class mp {
+//   static trigger(text){ console.log(text); }
+// }
+
+document.addEventListener("keyup", (e) => {
+    if(e.key == "Escape"){
+        backButtonPress();
+    }
+});
 
 function openCategory(type, sound=true){
     if(sound == true)
@@ -81,7 +87,7 @@ function openCategory(type, sound=true){
 
     CurrentPage = "category";
     CurrentCategory = type;
-    InfoTitle.innerHTML = "CLICK HERE TO GO BACK";
+    InfoTitle.innerHTML = "PRESS [ESC] TO GO BACK";
     InfoTitle.className = "back-button";
     InfoTitle.addEventListener("click", backButtonPress);
 
@@ -172,6 +178,9 @@ function selectAttachment(name, hash){
             document.getElementById("option-button").innerHTML = "REMOVE";
             InfoText.innerHTML = `Removing this attachment will <strong>sell</strong> it!`;
             ExtensionInfo.innerHTML = `<br></br><br></br>You'll be refunded the full price.`;
+
+            InfoTitle.className = "back-button";
+            InfoTitle.addEventListener("click", backButtonPress);
         }
         else{
             document.getElementById("option-button").style.display = "flex";

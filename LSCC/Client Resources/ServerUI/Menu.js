@@ -103,7 +103,7 @@ mp.events.add("Menu_AddClan", (clanID, cname, tag, desc, banner, isOpen, players
               deaths: ${deaths},
               wins: ${wins},
             },
-        }); console.log(JSON.stringify(gm.$refs.mainMenu.$refs.clansTab.$refs.clansList.clans));`);
+        });`);
 });
 mp.events.add("joinClan", (clanSQLID) => {
     mp.events.callRemote("Clan_OnRequestJoinClan", clanSQLID);

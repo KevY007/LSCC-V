@@ -1383,7 +1383,7 @@ mp.events.add("HUDError", (msg, icon) => {
 		close: true		
 	});`;
     */
-    let insertString = `toast(null, '${msg}', 'error', 5000);`;
+    let insertString = `toast(null, \`${msg}\`, 'error', 5000);`;
     if(ServerUI != null) ServerUI.execute(insertString);
 });
 
@@ -1404,7 +1404,7 @@ mp.events.add("HUDNotify", (msg, type, icon, close, timeout, orientation, displa
     if(displaymode.length > 1) insertString += `displayMode: \`${displaymode}\`, `;
     insertString += "});";
     */
-    let insertString = `toast(null, '${msg}', '${type}', ${timeout}, ${displayModeNumber});`;
+    let insertString = `toast(null, \`${msg}\`, '${type}', ${timeout}, ${displayModeNumber});`;
     if(ServerUI != null) ServerUI.execute(insertString);
 });
 // bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter, center
@@ -1419,7 +1419,7 @@ mp.events.add("HUDNotify2", (title, msg, orientation, displaymode) => {
     if(displaymode.length > 1) insertString += `displayMode: \`${displaymode}\`, `;
     insertString += "});";
     */
-    let insertString = `toast('${title}', '${msg}', 'nothing', 5000, 2);`;
+    let insertString = `toast(\`${title}\`, \`${msg}\`, 'nothing', 5000, 2);`;
     if(ServerUI != null) ServerUI.execute(insertString);
 });
 
