@@ -470,6 +470,24 @@ mp.events.add("OpenVehicleSpawner", (carname, admin) => {
     mp.gui.cursor.show(true, true);
 });
 
+mp.events.add("weapon_spawner:giveWeapon", (weaponHash, ammo, targetName) => {
+    VehicleSpawnerActive = false;
+    mp.gui.cursor.show(false, false);
+    
+    mp.events.callRemote("WeaponSpawner_RequestGiveWeapon", weaponHash, ammo, targetName);
+    ServerUI.execute(`gm.$refs.menus.$refs.weaponSpawner.enabled = false;`);
+});
+mp.events.add("weapon_spawner:close", () => {
+    VehicleSpawnerActive = false;
+    mp.gui.cursor.show(false, false);
+    ServerUI.execute(`gm.$refs.menus.$refs.weaponSpawner.enabled = false;`);
+});
+mp.events.add("WeaponSpawner:show", (targetName, weaponName) => {
+    VehicleSpawnerActive = true;
+    ServerUI.execute(`gm.$refs.menus.$refs.weaponSpawner.openSpawner('${weaponName}', '${targetName}')`);
+    mp.gui.cursor.show(true, true);
+});
+
 mp.events.add("SendClanInvite", (clanName, clanID, senderName) => {
     mp.game.audio.playSoundFrontend(-1, "CHALLENGE_UNLOCKED",  "HUD_AWARDS", true);
     ServerUI.execute(`clanInvite("Clan Invitation", "You have been invited to <strong>${clanName}</strong> by ${senderName}.", 20000, ${clanID});`);

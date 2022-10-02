@@ -3286,8 +3286,8 @@ namespace RNC
             EPlayer.SendMessage(player, $"Given you weapon ${hash}.");
         }
 
-        [Command("givegun", "!{#AFAFAF}[USAGE] givegun (target) (ammo) (weapon)", GreedyArg = true)]
-        public void cmd_givegun(Player player, Player target, int ammo, string wep)
+        [Command("givegun", "!{#AFAFAF}[USAGE] givegun (optional: target) (optional: weapon name)", GreedyArg = true)]
+        public void cmd_givegun(Player player, Player target = null, string weaponName = "")
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -3298,95 +3298,13 @@ namespace RNC
                 return;
             }
 
+            string targetName = (target == null ? player.Name : target.Name);
 
-            Int64 wephash = 0;
-            bool found = false;
-            string wepname = "";
-
-            if (!Int64.TryParse(wep, out wephash))
-            {
-                wephash = 0;
-            }
-
-            foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
-            {
-                if (wephash != 0)
-                {
-                    if (i.Key == wephash)
-                    {
-                        found = true;
-                        wepname = i.Value.Name;
-                    }
-                }
-                else
-                {
-                    if (!found)
-                    {
-                        if (i.Value.Name.Contains(wep, StringComparison.CurrentCultureIgnoreCase))
-                        {
-                            found = true;
-                            wephash = i.Key;
-                            wepname = i.Value.Name;
-                        }
-                    }
-                    if (i.Value.Name.Equals(wep, StringComparison.CurrentCultureIgnoreCase)) // If it's really equal then override old found
-                    {
-                        found = true;
-                        wephash = i.Key;
-                        wepname = i.Value.Name;
-                    }
-                }
-            }
-
-            foreach (KeyValuePair<long, string> i in Main.WeaponReasons)
-            {
-                if (wephash != 0)
-                {
-                    if (i.Key == wephash)
-                    {
-                        found = true;
-                        wepname = i.Value;
-                    }
-                }
-                else
-                {
-                    if (!found)
-                    {
-                        if (i.Value.Contains(wep, StringComparison.CurrentCultureIgnoreCase))
-                        {
-                            found = true;
-                            wephash = i.Key;
-                            wepname = i.Value;
-                        }
-                    }
-                    if (i.Value.Equals(wep, StringComparison.CurrentCultureIgnoreCase)) // If it's really equal then override old found
-                    {
-                        found = true;
-                        wephash = i.Key;
-                        wepname = i.Value;
-                    }
-                }
-            }
-
-
-            if (found == false)
-            {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Invalid weapon! Try using hashes or exact names.");
-                return;
-            }
-
-            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:givegun:{target.Name}:{wepname}:{ammo}"); } catch { }
-
-            Logs.LogAdmin(player, $"Gave {target.Name} a {wepname} with {ammo} ammo.");
-
-            target.GiveWeapon((WeaponHash)wephash, ammo);
-
-            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You have given a " + wepname + " with " + ammo + " ammo to the target.");
-            return;
+            player.TriggerEvent("WeaponSpawner:show", targetName, weaponName);
         }
 
-        [Command("gun", "!{#AFAFAF}[USAGE] gun (ammo) (weapon)", GreedyArg = true)]
-        public void cmd_gun(Player player, int ammo, string wep)
+        [Command("gun", "!{#AFAFAF}[USAGE] gun (optional: weapon name)", GreedyArg = true)]
+        public void cmd_gun(Player player, string weapon = "")
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -3397,88 +3315,7 @@ namespace RNC
                 return;
             }
 
-
-            Int64 wephash = 0;
-            bool found = false;
-            string wepname = "";
-
-            if (!Int64.TryParse(wep, out wephash))
-            {
-                wephash = 0;
-            }
-
-            foreach (KeyValuePair<long, jWeaponData> i in Settings.WeaponData)
-            {
-                if (wephash != 0)
-                {
-                    if (i.Key == wephash)
-                    {
-                        found = true;
-                        wepname = i.Value.Name;
-                    }
-                }
-                else
-                {
-                    if (!found)
-                    {
-                        if (i.Value.Name.Contains(wep, StringComparison.CurrentCultureIgnoreCase))
-                        {
-                            found = true;
-                            wephash = i.Key;
-                            wepname = i.Value.Name;
-                        }
-                    }
-                    if (i.Value.Name.Equals(wep, StringComparison.CurrentCultureIgnoreCase)) // If it's really equal then override old found
-                    {
-                        found = true;
-                        wephash = i.Key;
-                        wepname = i.Value.Name;
-                    }
-                }
-            }
-
-            foreach (KeyValuePair<long, string> i in Main.WeaponReasons)
-            {
-                if (wephash != 0)
-                {
-                    if (i.Key == wephash)
-                    {
-                        found = true;
-                        wepname = i.Value;
-                    }
-                }
-                else
-                {
-                    if (!found)
-                    {
-                        if (i.Value.Contains(wep, StringComparison.CurrentCultureIgnoreCase))
-                        {
-                            found = true;
-                            wephash = i.Key;
-                            wepname = i.Value;
-                        }
-                    }
-                    if (i.Value.Equals(wep, StringComparison.CurrentCultureIgnoreCase)) // If it's really equal then override old found
-                    {
-                        found = true;
-                        wephash = i.Key;
-                        wepname = i.Value;
-                    }
-                }
-            }
-
-
-            if (found == false)
-            {
-                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Invalid weapon! Try using hashes or exact names.");
-                return;
-            }
-
-            // try { Main.Log("freeroam.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:gun:{wepname}:{ammo}"); } catch { }
-
-            player.GiveWeapon((WeaponHash)wephash, ammo);
-
-            player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You have given yourself " + wepname + " with " + ammo + " ammo.");
+            player.TriggerEvent("WeaponSpawner:show", player.Name, weapon);
             return;
         }
 

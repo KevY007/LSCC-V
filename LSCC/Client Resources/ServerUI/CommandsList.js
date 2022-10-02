@@ -569,23 +569,21 @@ var CommandsDataJSON = [
   },
   {
     "CommandText": "givegun",
-    "Usage": "[USAGE] givegun (target) (ammo) (weapon)",
+    "Usage": "[USAGE] givegun (optional: target name) (optional: weapon name)",
     "Admin": 3,
     "Donator": 0,
     "Parameters": [
-      "target",
-      "ammo",
-      "weapon"
+      "optional: target name",
+      "optional: weapon name"
     ]
   },
   {
     "CommandText": "gun",
-    "Usage": "[USAGE] gun (ammo) (weapon)",
+    "Usage": "[USAGE] gun (optional: weapon name)",
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "ammo",
-      "weapon"
+      "optional: weapon name"
     ]
   },
   {

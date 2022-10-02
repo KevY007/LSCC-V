@@ -3069,6 +3069,58 @@ namespace RNC
             player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}Evading by swimming is not allowed, you are taking damage.");
         }
 
+        [RemoteEvent("WeaponSpawner_RequestGiveWeapon")]
+        public static void WeaponSpawner_OnRequestGiveWeapon(Player player, string wephash, int ammo, string targetName)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            uint weaponHash;
+            try
+            {
+                weaponHash = Convert.ToUInt32(wephash, 16);
+            }
+            catch 
+            {
+                EPlayer.Error(player, $"That weapon is invalid! Check with the developers: {wephash}");
+                return;
+            }
+
+            if(EPlayer.GetAccount(player).Admin >= 3)
+            {
+                Player target = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+                if(target == null)
+                {
+                    EPlayer.Error(player, "That player is not logged in!");
+                    return;
+                }
+
+                if(player.GetSharedData<int>("Team") >= 0 && target == player)
+                {
+                    Logs.LogAdmin(player, $"Gave themselves a weapon hashed {weaponHash} with {ammo} ammo IN COPCHASE.");
+                }
+                else if(target.GetSharedData<int>("Team") >= 0)
+                {
+                    Logs.LogAdmin(player, $"Gave a player IN COPCHASE, {target.Name} a weapon hashed {weaponHash} with {ammo} ammo.");
+                }
+                else Logs.LogAdmin(player, $"Gave a {target.Name} a weapon hashed {weaponHash} with {ammo} ammo.");
+
+                target.GiveWeapon((WeaponHash)weaponHash, ammo);
+
+                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You have given that weapon with " + ammo + " ammo to the target.");
+            }
+            else
+            {
+                if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension <= 256 || player.Dimension > 512)
+                {
+                    EPlayer.Error(player, "You are not in freeroam or are in default world! Use <strong>/world</strong> to change it.");
+                    return;
+                }
+
+                player.GiveWeapon((WeaponHash)weaponHash, ammo);
+                player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You received the weapon!");
+            }
+        }
+
         public static void OnPlayerLogin(Player player, Account acc)
         {
             if (EPlayer.LoggedIn(player)) return;
