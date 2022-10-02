@@ -176,402 +176,736 @@ mp.events.add("WeaponEditor:sendRemoveResponse", (comphash) => {
   WeaponEditorDOM.execute(`setAttachmentPurchased('${comphash}', false)`);
 });
 
+
+
 // i cba to fuck with these export/import shits right now just gonna put it here im tired its 3AM
 const weaponData = [
-    {
-      "Name": "Bottle",
-      "Type": "Melee",
-      "Hash": "-102323637",
-      "ImageSrc": "Weapons/weapon_-102323637.png"
-    },
-    {
-      "Name": "Hatchet",
-      "Type": "Melee",
-      "Hash": "-102973651",
-      "ImageSrc": "Weapons/weapon_-102973651.png"
-    },
-    {
-      "Name": "Revolver",
-      "Type": "Handguns",
-      "Hash": "-1045183535",
-      "ImageSrc": "Weapons/weapon_-1045183535.png"
-    },
-    {
-      "Name": "Special Carbine",
-      "Type": "Assault Rifles",
-      "Hash": "-1063057011",
-      "ImageSrc": "Weapons/weapon_-1063057011.png"
-    },
-    {
-      "Name": "Assault Rifle",
-      "Type": "Assault Rifles",
-      "Hash": "-1074790547",
-      "ImageSrc": "Weapons/weapon_-1074790547.png"
-    },
-    {
-      "Name": "SNS Pistol",
-      "Type": "Handguns",
-      "Hash": "-1076751822",
-      "ImageSrc": "Weapons/weapon_-1076751822.png"
-    },
-    {
-      "Name": "RPG",
-      "Type": "Heavy Weapons",
-      "Hash": "-1312131151",
-      "ImageSrc": "Weapons/weapon_-1312131151.png"
-    },
-    {
-      "Name": "Advanced Rifle",
-      "Type": "Assault Rifles",
-      "Hash": "-1357824103",
-      "ImageSrc": "Weapons/weapon_-1357824103.png"
-    },
-    {
-      "Name": "Proximity Mine",
-      "Type": "Thrown Weapons",
-      "Hash": "-1420407917",
-      "ImageSrc": "Weapons/weapon_-1420407917.png"
-    },
-    {
-      "Name": "Proximity Mine",
-      "Type": "Thrown Weapons",
-      "Hash": "-1466123874",
-      "ImageSrc": "Weapons/weapon_-1466123874.png"
-    },
-    {
-      "Name": "Grenade Launcher",
-      "Type": "Heavy Weapons",
-      "Hash": "-1568386805",
-      "ImageSrc": "Weapons/weapon_-1568386805.png"
-    },
-    {
-      "Name": "Fist",
-      "Type": "Melee",
-      "Hash": "-1569615261",
-      "ImageSrc": "Weapons/weapon_-1569615261.png"
-    },
-    {
-      "Name": "BZ Gas",
-      "Type": "Thrown Weapons",
-      "Hash": "-1600701090",
-      "ImageSrc": "Weapons/weapon_-1600701090.png"
-    },
-    {
-      "Name": "Bullpup Shotgun",
-      "Type": "Shotguns",
-      "Hash": "-1654528753",
-      "ImageSrc": "Weapons/weapon_-1654528753.png"
-    },
-    {
-      "Name": "MG",
-      "Type": "Machine Guns",
-      "Hash": "-1660422300",
-      "ImageSrc": "Weapons/weapon_-1660422300.png"
-    },
-    {
-      "Name": "Knife",
-      "Type": "Melee",
-      "Hash": "-1716189206",
-      "ImageSrc": "Weapons/weapon_-1716189206.png"
-    },
-    {
-      "Name": "Pistol .50",
-      "Type": "Handguns",
-      "Hash": "-1716589765",
-      "ImageSrc": "Weapons/weapon_-1716589765.png"
-    },
-    {
-      "Name": "Bat",
-      "Type": "Melee",
-      "Hash": "-1786099057",
-      "ImageSrc": "Weapons/weapon_-1786099057.png"
-    },
-    {
-      "Name": "Grenade",
-      "Type": "Thrown Weapons",
-      "Hash": "-1813897027",
-      "ImageSrc": "Weapons/weapon_-1813897027.png"
-    },
-    {
-      "Name": "Dagger",
-      "Type": "Melee",
-      "Hash": "-1834847097",
-      "ImageSrc": "Weapons/weapon_-1834847097.png"
-    },
-    {
-      "Name": "Flashlight",
-      "Type": "Melee",
-      "Hash": "-1951375401",
-      "ImageSrc": "Weapons/weapon_-1951375401.png"
-    },
-    {
-      "Name": "Carbine Rifle",
-      "Type": "Assault Rifles",
-      "Hash": "-2084633992",
-      "ImageSrc": "Weapons/weapon_-2084633992.png"
-    },
-    {
-      "Name": "Assault SMG",
-      "Type": "Machine Guns",
-      "Hash": "-270015777",
-      "ImageSrc": "Weapons/weapon_-270015777.png"
-    },
-    {
-      "Name": "Double-Barrel Shotgun",
-      "Type": "Shotguns",
-      "Hash": "-275439685",
-      "ImageSrc": "Weapons/weapon_-275439685.png"
-    },
-    {
-      "Name": "Smoke Grenade",
-      "Type": "Thrown Weapons",
-      "Hash": "-37975472",
-      "ImageSrc": "Weapons/weapon_-37975472.png"
-    },
-    {
-      "Name": "Assault Shotgun",
-      "Type": "Shotguns",
-      "Hash": "-494615257",
-      "ImageSrc": "Weapons/weapon_-494615257.png"
-    },
-    {
-      "Name": "Switchblade",
-      "Type": "Melee",
-      "Hash": "-538741184",
-      "ImageSrc": "Weapons/weapon_-538741184.png"
-    },
-    {
-      "Name": "Machete",
-      "Type": "Melee",
-      "Hash": "-581044007",
-      "ImageSrc": "Weapons/weapon_-581044007.png"
-    },
-    {
-      "Name": "Marksman Pistol",
-      "Type": "Handguns",
-      "Hash": "-598887786",
-      "ImageSrc": "Weapons/weapon_-598887786.png"
-    },
-    {
-      "Name": "Machine Pistol",
-      "Type": "Machine Guns",
-      "Hash": "-619010992",
-      "ImageSrc": "Weapons/weapon_-619010992.png"
-    },
-    {
-      "Name": "Knuckle Duster",
-      "Type": "Melee",
-      "Hash": "-656458692",
-      "ImageSrc": "Weapons/weapon_-656458692.png"
-    },
-    {
-      "Name": "Heavy Pistol",
-      "Type": "Handguns",
-      "Hash": "-771403250",
-      "ImageSrc": "Weapons/weapon_-771403250.png"
-    },
-    {
-      "Name": "Marksman Rifle",
-      "Type": "Sniper Rifles",
-      "Hash": "-952879014",
-      "ImageSrc": "Weapons/weapon_-952879014.png"
-    },
-    {
-      "Name": "Sniper Rifle",
-      "Type": "Sniper Rifles",
-      "Hash": "100416529",
-      "ImageSrc": "Weapons/weapon_100416529.png"
-    },
-    {
-      "Name": "Fire Extinguisher",
-      "Type": "Thrown Weapons",
-      "Hash": "101631238",
-      "ImageSrc": "Weapons/weapon_101631238.png"
-    },
-    {
-      "Name": "Minigun",
-      "Type": "Heavy Weapons",
-      "Hash": "1119849093",
-      "ImageSrc": "Weapons/weapon_1119849093.png"
-    },
-    {
-      "Name": "Golfclub",
-      "Type": "Melee",
-      "Hash": "1141786504",
-      "ImageSrc": "Weapons/weapon_1141786504.png"
-    },
-    {
-      "Name": "Flare Gun",
-      "Type": "Handguns",
-      "Hash": "1198879012",
-      "ImageSrc": "Weapons/weapon_1198879012.png"
-    },
-    {
-      "Name": "Flare",
-      "Type": "Thrown Weapons",
-      "Hash": "1233104067",
-      "ImageSrc": "Weapons/weapon_1233104067.png"
-    },
-    {
-      "Name": "Snowball",
-      "Type": "Thrown Weapons",
-      "Hash": "126349499",
-      "ImageSrc": "Weapons/weapon_126349499.png"
-    },
-    {
-      "Name": "Smoke Grenade Launcher",
-      "Type": "Heavy Weapons",
-      "Hash": "1305664598",
-      "ImageSrc": "Weapons/weapon_1305664598.png"
-    },
-    {
-      "Name": "Hammer",
-      "Type": "Melee",
-      "Hash": "1317494643",
-      "ImageSrc": "Weapons/weapon_1317494643.png"
-    },
-    {
-      "Name": "Vintage Pistol",
-      "Type": "Handguns",
-      "Hash": "137902532",
-      "ImageSrc": "Weapons/weapon_137902532.png"
-    },
-    {
-      "Name": "Combat Pistol",
-      "Type": "Handguns",
-      "Hash": "1593441988",
-      "ImageSrc": "Weapons/weapon_1593441988.png"
-    },
-    {
-      "Name": "Gusenberg Sweeper",
-      "Type": "Machine Guns",
-      "Hash": "1627465347",
-      "ImageSrc": "Weapons/weapon_1627465347.png"
-    },
-    {
-      "Name": "Compact Rifle",
-      "Type": "Assault Rifles",
-      "Hash": "1649403952",
-      "ImageSrc": "Weapons/weapon_1649403952.png"
-    },
-    {
-      "Name": "Homing Launcher",
-      "Type": "Heavy Weapons",
-      "Hash": "1672152130",
-      "ImageSrc": "Weapons/weapon_1672152130.png"
-    },
-    {
-      "Name": "Combat PDW",
-      "Type": "Machine Guns",
-      "Hash": "171789620",
-      "ImageSrc": "Weapons/weapon_171789620.png"
-    },
-    {
-      "Name": "Nightstick",
-      "Type": "Melee",
-      "Hash": "1737195953",
-      "ImageSrc": "Weapons/weapon_1737195953.png"
-    },
-    {
-      "Name": "Railgun",
-      "Type": "Heavy Weapons",
-      "Hash": "1834241177",
-      "ImageSrc": "Weapons/weapon_1834241177.png"
-    },
-    {
-      "Name": "Sawed-Off Shotgun",
-      "Type": "Shotguns",
-      "Hash": "2017895192",
-      "ImageSrc": "Weapons/weapon_2017895192.png"
-    },
-    {
-      "Name": "Heavy Sniper",
-      "Type": "Sniper Rifles",
-      "Hash": "205991906",
-      "ImageSrc": "Weapons/weapon_205991906.png"
-    },
-    {
-      "Name": "Bullpup Rifle",
-      "Type": "Assault Rifles",
-      "Hash": "2132975508",
-      "ImageSrc": "Weapons/weapon_2132975508.png"
-    },
-    {
-      "Name": "Firework Launcher",
-      "Type": "Heavy Weapons",
-      "Hash": "2138347493",
-      "ImageSrc": "Weapons/weapon_2138347493.png"
-    },
-    {
-      "Name": "Combat MG",
-      "Type": "Machine Guns",
-      "Hash": "2144741730",
-      "ImageSrc": "Weapons/weapon_2144741730.png"
-    },
-    {
-      "Name": "Micro SMG",
-      "Type": "Machine Guns",
-      "Hash": "324215364",
-      "ImageSrc": "Weapons/weapon_324215364.png"
-    },
-    {
-      "Name": "Pistol",
-      "Type": "Handguns",
-      "Hash": "453432689",
-      "ImageSrc": "Weapons/weapon_453432689.png"
-    },
-    {
-      "Name": "Pump Shotgun",
-      "Type": "Shotguns",
-      "Hash": "487013001",
-      "ImageSrc": "Weapons/weapon_487013001.png"
-    },
-    {
-      "Name": "AP Pistol",
-      "Type": "Handguns",
-      "Hash": "584646201",
-      "ImageSrc": "Weapons/weapon_584646201.png"
-    },
-    {
-      "Name": "Ball",
-      "Type": "Thrown Weapons",
-      "Hash": "600439132",
-      "ImageSrc": "Weapons/weapon_600439132.png"
-    },
-    {
-      "Name": "Molotov",
-      "Type": "Thrown Weapons",
-      "Hash": "615608432",
-      "ImageSrc": "Weapons/weapon_615608432.png"
-    },
-    {
-      "Name": "SMG",
-      "Type": "Machine Guns",
-      "Hash": "736523883",
-      "ImageSrc": "Weapons/weapon_736523883.png"
-    },
-    {
-      "Name": "Sticky Bomb",
-      "Type": "Thrown Weapons",
-      "Hash": "741814745",
-      "ImageSrc": "Weapons/weapon_741814745.png"
-    },
-    {
-      "Name": "Petrol Can",
-      "Type": "Thrown Weapons",
-      "Hash": "883325847",
-      "ImageSrc": "Weapons/weapon_883325847.png"
-    },
-    {
-      "Name": "Stun Gun",
-      "Type": "Handguns",
-      "Hash": "911657153",
-      "ImageSrc": "Weapons/weapon_911657153.png"
-    },
-    {
-      "Name": "Heavy Shotgun",
-      "Type": "Shotguns",
-      "Hash": "984333226",
-      "ImageSrc": "Weapons/weapon_984333226.png"
-    }
-  ]
+  {
+    "id": "weapon_dagger",
+    "name": "Antique Cavalry Dagger",
+    "type": 0,
+    "image": "https://assets.gm.miami/gtav/weapons/Antique-cavalry-dagger-icon.png",
+    "hash": "0x92A27487"
+  },
+  {
+    "id": "weapon_bat",
+    "name": "Baseball Bat",
+    "type": 0,
+    "image": "https://assets.gm.miami/gtav/weapons/Baseball-bat-icon.png",
+    "hash": "0x958A4A8F"
+  },
+  {
+    "id": "weapon_bottle",
+    "name": "Broken Bottle",
+    "type": 0,
+    "image": "https://assets.gm.miami/gtav/weapons/Broken-bottle-icon.png",
+    "hash": "0xF9E6AA4B"
+  },
+  {
+    "id": "weapon_crowbar",
+    "name": "Crowbar",
+    "type": 0,
+    "image": "https://assets.gm.miami/gtav/weapons/Crowbar-icon.png",
+    "hash": "0x84BD7BFD"
+  },
+  {
+    "id": "weapon_unarmed",
+    "name": "Fist",
+    "type": 0,
+    "image": "https://assets.gm.miami/gtav/weapons/Fist-icon.png",
+    "hash": "0xA2719263"
+  },
+  {
+    "id": "weapon_flashlight",
+    "name": "Flashlight",
+    "type": 0,
+    "image": "https://assets.gm.miami/gtav/weapons/Flashlight-icon.png",
+    "hash": "0x8BB05FD7"
+  },
+  {
+    "id": "weapon_golfclub",
+    "name": "Golf Club",
+    "type": 0,
+    "image": "https://assets.gm.miami/gtav/weapons/Golf-club-icon.png",
+    "hash": "0x440E4788"
+  },
+  {
+    "id": "weapon_hammer",
+    "name": "Hammer",
+    "type": 0,
+    "image": "https://assets.gm.miami/gtav/weapons/Hammer-icon.png",
+    "hash": "0x4E875F73"
+  },
+  {
+    "id": "weapon_hatchet",
+    "name": "Hatchet",
+    "type": 0,
+    "image": "https://assets.gm.miami/gtav/weapons/Hatchet-icon.png",
+    "hash": "0xF9DCBF2D"
+  },
+  {
+    "id": "weapon_knuckle",
+    "name": "Brass Knuckles",
+    "type": 0,
+    "image": "https://assets.gm.miami/gtav/weapons/Knuckles-icon.png",
+    "hash": "0xD8DF3C3C"
+  },
+  {
+    "id": "weapon_knife",
+    "name": "Knife",
+    "type": 0,
+    "image": "https://assets.gm.miami/gtav/weapons/Knife-icon.png",
+    "hash": "0x99B507EA"
+  },
+  {
+    "id": "weapon_machete",
+    "name": "Machete",
+    "type": 0,
+    "image": "https://assets.gm.miami/gtav/weapons/Machete-icon.png",
+    "hash": "0xDD5DF8D9"
+  },
+  {
+    "id": "weapon_switchblade",
+    "name": "Switchblade",
+    "type": 0,
+    "image": "https://assets.gm.miami/gtav/weapons/Switch-blade-icon.png",
+    "hash": "0xDFE37640"
+  },
+  {
+    "id": "weapon_nightstick",
+    "name": "Nightstick",
+    "type": 0,
+    "image": "https://assets.gm.miami/gtav/weapons/Nightstick-icon.png",
+    "hash": "0x678B81B1"
+  },
+  {
+    "id": "weapon_wrench",
+    "name": "Pipe Wrench",
+    "type": 0,
+    "image": "https://assets.gm.miami/gtav/weapons/Pipe-wrench-icon.png",
+    "hash": "0x19044EE0"
+  },
+  {
+    "id": "weapon_battleaxe",
+    "name": "Battle Axe",
+    "type": 0,
+    "image": "https://assets.gm.miami/gtav/weapons/Battle-axe-icon.png",
+    "hash": "0xCD274149"
+  },
+  {
+    "id": "weapon_poolcue",
+    "name": "Pool Cue",
+    "type": 0,
+    "image": "https://assets.gm.miami/gtav/weapons/Pool-cue-icon.png",
+    "hash": "0x94117305"
+  },
+  {
+    "id": "weapon_stone_hatchet",
+    "name": "Stone Hatchet",
+    "type": 0,
+    "image": "https://assets.gm.miami/gtav/weapons/Stone-hatchet-icon.png",
+    "hash": "0x3813FC08"
+  },
+  {
+    "id": "weapon_pistol",
+    "name": "Pistol",
+    "type": 1,
+    "image": "https://assets.gm.miami/gtav/weapons/Pistol-icon.png",
+    "hash": "0x1B06D571"
+  },
+  {
+    "id": "weapon_pistol_mk2",
+    "name": "Pistol Mk II",
+    "type": 1,
+    "image": "https://assets.gm.miami/gtav/weapons/Pistol-mk2-icon.png",
+    "hash": "0xBFE256D4"
+  },
+  {
+    "id": "weapon_combatpistol",
+    "name": "Combat Pistol",
+    "type": 1,
+    "image": "https://assets.gm.miami/gtav/weapons/Combat-pistol-icon.png",
+    "hash": "0x5EF9FEC4"
+  },
+  {
+    "id": "weapon_appistol",
+    "name": "AP Pistol",
+    "type": 1,
+    "image": "https://assets.gm.miami/gtav/weapons/Appistol-icon.png",
+    "hash": "0x22D8FE39"
+  },
+  {
+    "id": "weapon_stungun",
+    "name": "Stun Gun",
+    "type": 1,
+    "image": "https://assets.gm.miami/gtav/weapons/Stungun-icon.png",
+    "hash": "0x3656C8C1"
+  },
+  {
+    "id": "weapon_pistol50",
+    "name": "Pistol .50",
+    "type": 1,
+    "image": "https://assets.gm.miami/gtav/weapons/Pistol.50-icon.png",
+    "hash": "0x99AEEB3B"
+  },
+  {
+    "id": "weapon_snspistol",
+    "name": "SNS Pistol",
+    "type": 1,
+    "image": "https://assets.gm.miami/gtav/weapons/Sns-pistol-icon.png",
+    "hash": "0xBFD21232"
+  },
+  {
+    "id": "weapon_snspistol_mk2",
+    "name": "SNS Pistol Mk II",
+    "type": 1,
+    "image": "https://assets.gm.miami/gtav/weapons/Sns-pistol-mk2-icon.png",
+    "hash": "0x88374054"
+  },
+  {
+    "id": "weapon_heavypistol",
+    "name": "Heavy Pistol",
+    "type": 1,
+    "image": "https://assets.gm.miami/gtav/weapons/Heavy-pistol-icon.png",
+    "hash": "0xD205520E"
+  },
+  {
+    "id": "weapon_vintagepistol",
+    "name": "Vintage Pistol",
+    "type": 1,
+    "image": "https://assets.gm.miami/gtav/weapons/Vintage-pistol-icon.png",
+    "hash": "0x83839C4"
+  },
+  {
+    "id": "weapon_flaregun",
+    "name": "Flare Gun",
+    "type": 1,
+    "image": "https://assets.gm.miami/gtav/weapons/Flaregun-icon.png",
+    "hash": "0x47757124"
+  },
+  {
+    "id": "weapon_marksmanpistol",
+    "name": "Marksman Pistol",
+    "type": 1,
+    "image": "https://assets.gm.miami/gtav/weapons/Marksman-pistol-icon.png",
+    "hash": "0xDC4DB296"
+  },
+  {
+    "id": "weapon_revolver",
+    "name": "Heavy Revolver",
+    "type": 1,
+    "image": "https://assets.gm.miami/gtav/weapons/Heavy-revolver-icon.png",
+    "hash": "0xC1B3C3D1"
+  },
+  {
+    "id": "weapon_revolver_mk2",
+    "name": "Heavy Revolver Mk II",
+    "type": 1,
+    "image": "https://assets.gm.miami/gtav/weapons/Heavy-revolver-mk2-icon.png",
+    "hash": "0xCB96392F"
+  },
+  {
+    "id": "weapon_doubleaction",
+    "name": "Double Action Revolver",
+    "type": 1,
+    "image": "https://assets.gm.miami/gtav/weapons/Double-action-revolver-icon.png",
+    "hash": "0x97EA20B8"
+  },
+  {
+    "id": "weapon_raypistol",
+    "name": "Up-n-Atomizer",
+    "type": 1,
+    "image": "https://assets.gm.miami/gtav/weapons/Up-n-atomizer-icon.png",
+    "hash": "0xAF3696A1"
+  },
+  {
+    "id": "weapon_ceramicpistol",
+    "name": "Ceramic Pistol",
+    "type": 1,
+    "image": "https://assets.gm.miami/gtav/weapons/Ceramic-pistol-icon.png",
+    "hash": "0x2B5EF5EC"
+  },
+  {
+    "id": "weapon_navyrevolver",
+    "name": "Navy Revolver",
+    "type": 1,
+    "image": "https://assets.gm.miami/gtav/weapons/Navy-revolver-icon.png",
+    "hash": "0x917F6C8C"
+  },
+  {
+    "id": "weapon_gadgetpistol",
+    "name": "Perico Pistol",
+    "type": -1,
+    "image": "https://assets.gm.miami/gtav/weapons/Perico-pistol-icon.png",
+    "hash": "0x57A4368C"
+  },
+  {
+    "id": "weapon_stungun_mp",
+    "name": "Stun Gun",
+    "type": -1,
+    "image": "https://assets.gm.miami/gtav/weapons/Stungun-icon.png",
+    "hash": "0x45CD9CF3"
+  },
+  {
+    "id": "weapon_microsmg",
+    "name": "Micro SMG",
+    "type": 2,
+    "image": "https://assets.gm.miami/gtav/weapons/Micro-smg-icon.png",
+    "hash": "0x13532244"
+  },
+  {
+    "id": "weapon_smg",
+    "name": "SMG",
+    "type": 2,
+    "image": "https://assets.gm.miami/gtav/weapons/Smg-icon.png",
+    "hash": "0x2BE6766B"
+  },
+  {
+    "id": "weapon_smg_mk2",
+    "name": "SMG Mk II",
+    "type": 2,
+    "image": "https://assets.gm.miami/gtav/weapons/Smg-mk2-icon.png",
+    "hash": "0x78A97CD0"
+  },
+  {
+    "id": "weapon_assaultsmg",
+    "name": "Assault SMG",
+    "type": 2,
+    "image": "https://assets.gm.miami/gtav/weapons/Assault-smg-icon.png",
+    "hash": "0xEFE7E2DF"
+  },
+  {
+    "id": "weapon_combatpdw",
+    "name": "Combat PDW",
+    "type": -1,
+    "image": "https://assets.gm.miami/gtav/weapons/Combat-pdw-icon.png",
+    "hash": "0x0A3D4D34"
+  },
+  {
+    "id": "weapon_machinepistol",
+    "name": "Machine Pistol",
+    "type": 2,
+    "image": "https://assets.gm.miami/gtav/weapons/Machine-pistol-icon.png",
+    "hash": "0xDB1AA450"
+  },
+  {
+    "id": "weapon_minismg",
+    "name": "Mini SMG",
+    "type": 2,
+    "image": "https://assets.gm.miami/gtav/weapons/Mini-smg-icon.png",
+    "hash": "0xBD248B55"
+  },
+  {
+    "id": "weapon_raycarbine",
+    "name": "Unholy Hellbringer",
+    "type": 2,
+    "image": "https://assets.gm.miami/gtav/weapons/Unholy-hellbringer-icon.png",
+    "hash": "0x476BF155"
+  },
+  {
+    "id": "weapon_pumpshotgun",
+    "name": "Pump Shotgun",
+    "type": 3,
+    "image": "https://assets.gm.miami/gtav/weapons/Pump-shotgun-icon.png",
+    "hash": "0x1D073A89"
+  },
+  {
+    "id": "weapon_pumpshotgun_mk2",
+    "name": "Pump Shotgun Mk II",
+    "type": 3,
+    "image": "https://assets.gm.miami/gtav/weapons/Pump-shotgun-mk2-icon.png",
+    "hash": "0x555AF99A"
+  },
+  {
+    "id": "weapon_sawnoffshotgun",
+    "name": "Sawed-Off Shotgun",
+    "type": 3,
+    "image": "https://assets.gm.miami/gtav/weapons/Sawed-off-shotgun-icon.png",
+    "hash": "0x7846A318"
+  },
+  {
+    "id": "weapon_assaultshotgun",
+    "name": "Assault Shotgun",
+    "type": 3,
+    "image": "https://assets.gm.miami/gtav/weapons/Assault-shotgun-icon.png",
+    "hash": "0xE284C527"
+  },
+  {
+    "id": "weapon_bullpupshotgun",
+    "name": "Bullpup Shotgun",
+    "type": 3,
+    "image": "https://assets.gm.miami/gtav/weapons/Bullpup-shotgun-icon.png",
+    "hash": "0x9D61E50F"
+  },
+  {
+    "id": "weapon_musket",
+    "name": "Musket",
+    "type": 3,
+    "image": "https://assets.gm.miami/gtav/weapons/Musket-icon.png",
+    "hash": "0xA89CB99E"
+  },
+  {
+    "id": "weapon_heavyshotgun",
+    "name": "Heavy Shotgun",
+    "type": 3,
+    "image": "https://assets.gm.miami/gtav/weapons/Heavy-shotgun-icon.png",
+    "hash": "0x3AABBBAA"
+  },
+  {
+    "id": "weapon_dbshotgun",
+    "name": "Double Barrel Shotgun",
+    "type": 3,
+    "image": "https://assets.gm.miami/gtav/weapons/Double-barrel-shotgun-icon.png",
+    "hash": "0xEF951FBB"
+  },
+  {
+    "id": "weapon_autoshotgun",
+    "name": "Sweeper Shotgun",
+    "type": 3,
+    "image": "https://assets.gm.miami/gtav/weapons/Sweeper-shotgun-icon.png",
+    "hash": "0x12E82D3D"
+  },
+  {
+    "id": "weapon_combatshotgun",
+    "name": "Combat Shotgun",
+    "type": -1,
+    "image": "https://assets.gm.miami/gtav/weapons/Combat-shotgun-icon.png",
+    "hash": "0x5A96BA4"
+  },
+  {
+    "id": "weapon_assaultrifle",
+    "name": "Assault Rifle",
+    "type": 4,
+    "image": "https://assets.gm.miami/gtav/weapons/Assault-rifle-icon.png",
+    "hash": "0xBFEFFF6D"
+  },
+  {
+    "id": "weapon_assaultrifle_mk2",
+    "name": "Assault Rifle Mk II",
+    "type": 4,
+    "image": "https://assets.gm.miami/gtav/weapons/Assault-rifle-mk2-icon.png",
+    "hash": "0x394F415C"
+  },
+  {
+    "id": "weapon_carbinerifle",
+    "name": "Carbine Rifle",
+    "type": 4,
+    "image": "https://assets.gm.miami/gtav/weapons/Carbine-rifle-icon.png",
+    "hash": "0x83BF0278"
+  },
+  {
+    "id": "weapon_carbinerifle_mk2",
+    "name": "Carbine Rifle Mk II",
+    "type": 4,
+    "image": "https://assets.gm.miami/gtav/weapons/Carbine-rifle-mk2-icon.png",
+    "hash": "0xFAD1F1C9"
+  },
+  {
+    "id": "weapon_advancedrifle",
+    "name": "Advanced Rifle",
+    "type": 4,
+    "image": "https://assets.gm.miami/gtav/weapons/Advanced-rifle-icon.png",
+    "hash": "0xAF113F99"
+  },
+  {
+    "id": "weapon_specialcarbine",
+    "name": "Special Carbine",
+    "type": 4,
+    "image": "https://assets.gm.miami/gtav/weapons/Special-carbine-icon.png",
+    "hash": "0xC0A3098D"
+  },
+  {
+    "id": "weapon_specialcarbine_mk2",
+    "name": "Special Carbine Mk II",
+    "type": 4,
+    "image": "https://assets.gm.miami/gtav/weapons/Special-carbine-mk2-icon.png",
+    "hash": "0x969C3D67"
+  },
+  {
+    "id": "weapon_bullpuprifle",
+    "name": "Bullpup Rifle",
+    "type": 4,
+    "image": "https://assets.gm.miami/gtav/weapons/Bullpup-rifle-icon.png",
+    "hash": "0x7F229F94"
+  },
+  {
+    "id": "weapon_bullpuprifle_mk2",
+    "name": "Bullpup Rifle Mk II",
+    "type": 4,
+    "image": "https://assets.gm.miami/gtav/weapons/Bullpup-rifle-mk2-icon.png",
+    "hash": "0x84D6FAFD"
+  },
+  {
+    "id": "weapon_compactrifle",
+    "name": "Compact Rifle",
+    "type": 4,
+    "image": "https://assets.gm.miami/gtav/weapons/Compact-rifle-icon.png",
+    "hash": "0x624FE830"
+  },
+  {
+    "id": "weapon_militaryrifle",
+    "name": "Military Rifle",
+    "type": -1,
+    "image": "https://assets.gm.miami/gtav/weapons/Military-rifle-icon.png",
+    "hash": "0x9D1F17E6"
+  },
+  {
+    "id": "weapon_heavyrifle",
+    "name": "Heavy Rifle",
+    "type": -1,
+    "image": "https://assets.gm.miami/gtav/weapons/Heavy-rifle-icon.png",
+    "hash": "0xC78D71B4"
+  },
+  {
+    "id": "weapon_tacticalrifle",
+    "name": "Tactical Rifle",
+    "type": -1,
+    "image": "https://assets.gm.miami/gtav/weapons/Tactical-rifle-icon.png",
+    "hash": "0xD1D5F52B"
+  },
+  {
+    "id": "weapon_mg",
+    "name": "MG",
+    "type": 5,
+    "image": "https://assets.gm.miami/gtav/weapons/Mg-icon.png",
+    "hash": "0x9D07F764"
+  },
+  {
+    "id": "weapon_combatmg",
+    "name": "Combat MG",
+    "type": 5,
+    "image": "https://assets.gm.miami/gtav/weapons/Combat-mg-icon.png",
+    "hash": "0x7FD62962"
+  },
+  {
+    "id": "weapon_combatmg_mk2",
+    "name": "Combat MG Mk II",
+    "type": 5,
+    "image": "https://assets.gm.miami/gtav/weapons/Combat-mg-mk2-icon.png",
+    "hash": "0xDBBD7280"
+  },
+  {
+    "id": "weapon_gusenberg",
+    "name": "Gusenberg Sweeper",
+    "type": 5,
+    "image": "https://assets.gm.miami/gtav/weapons/Gusenberg-sweeper-icon.png",
+    "hash": "0x61012683"
+  },
+  {
+    "id": "weapon_sniperrifle",
+    "name": "Sniper Rifle",
+    "type": -1,
+    "image": "https://assets.gm.miami/gtav/weapons/Sniper-rifle-icon.png",
+    "hash": "0x05FC3C11"
+  },
+  {
+    "id": "weapon_heavysniper",
+    "name": "Heavy Sniper",
+    "type": -1,
+    "image": "https://assets.gm.miami/gtav/weapons/Heavy-sniper-icon.png",
+    "hash": "0x0C472FE2"
+  },
+  {
+    "id": "weapon_heavysniper_mk2",
+    "name": "Heavy Sniper Mk II",
+    "type": 6,
+    "image": "https://assets.gm.miami/gtav/weapons/Heavy-sniper-mk2-icon.png",
+    "hash": "0xA914799"
+  },
+  {
+    "id": "weapon_marksmanrifle",
+    "name": "Marksman Rifle",
+    "type": 6,
+    "image": "https://assets.gm.miami/gtav/weapons/Marksman-rifle-icon.png",
+    "hash": "0xC734385A"
+  },
+  {
+    "id": "weapon_marksmanrifle_mk2",
+    "name": "Marksman Rifle Mk II",
+    "type": 6,
+    "image": "https://assets.gm.miami/gtav/weapons/Marksman-rifle-mk2-icon.png",
+    "hash": "0x6A6C02E0"
+  },
+  {
+    "id": "weapon_precisionrifle",
+    "name": "Precision Rifle",
+    "type": -1,
+    "image": "https://assets.gm.miami/gtav/weapons/Precision-rifle-icon.png",
+    "hash": "0x6E7DDDEC"
+  },
+  {
+    "id": "weapon_rpg",
+    "name": "RPG",
+    "type": 7,
+    "image": "https://assets.gm.miami/gtav/weapons/Rocket-launcher-icon.png",
+    "hash": "0xB1CA77B1"
+  },
+  {
+    "id": "weapon_grenadelauncher",
+    "name": "Grenade Launcher",
+    "type": 7,
+    "image": "https://assets.gm.miami/gtav/weapons/Grenade-launcher-icon.png",
+    "hash": "0xA284510B"
+  },
+  {
+    "id": "weapon_grenadelauncher_smoke",
+    "name": "Grenade Launcher Smoke",
+    "type": 7,
+    "image": "https://assets.gm.miami/gtav/weapons/Grenade-launcher-icon.png",
+    "hash": "0x4DD2DC56"
+  },
+  {
+    "id": "weapon_minigun",
+    "name": "Minigun",
+    "type": 7,
+    "image": "https://assets.gm.miami/gtav/weapons/Minigun-icon.png",
+    "hash": "0x42BF8A85"
+  },
+  {
+    "id": "weapon_firework",
+    "name": "Firework Launcher",
+    "type": 7,
+    "image": "https://assets.gm.miami/gtav/weapons/Firework-launcher-icon.png",
+    "hash": "0x7F7497E5"
+  },
+  {
+    "id": "weapon_railgun",
+    "name": "Railgun",
+    "type": 7,
+    "image": "https://assets.gm.miami/gtav/weapons/Railgun-icon.png",
+    "hash": "0x6D544C99"
+  },
+  {
+    "id": "weapon_hominglauncher",
+    "name": "Homing Launcher",
+    "type": 7,
+    "image": "https://assets.gm.miami/gtav/weapons/Homing-launcher-icon.png",
+    "hash": "0x63AB0442"
+  },
+  {
+    "id": "weapon_compactlauncher",
+    "name": "Compact Grenade Launcher",
+    "type": -1,
+    "image": "https://assets.gm.miami/gtav/weapons/Grenade-compact-launcher-icon.png",
+    "hash": "0x0781FE4A"
+  },
+  {
+    "id": "weapon_rayminigun",
+    "name": "Widowmaker",
+    "type": 7,
+    "image": "https://assets.gm.miami/gtav/weapons/Widowmaker-icon.png",
+    "hash": "0xB62D1F67"
+  },
+  {
+    "id": "weapon_emplauncher",
+    "name": "Compact EMP Launcher",
+    "type": -1,
+    "image": "https://assets.gm.miami/gtav/weapons/EMP-launcher-icon.png",
+    "hash": "0xDB26713A"
+  },
+  {
+    "id": "weapon_grenade",
+    "name": "Grenade",
+    "type": 8,
+    "image": "https://assets.gm.miami/gtav/weapons/Grenade-icon.png",
+    "hash": "0x93E220BD"
+  },
+  {
+    "id": "weapon_bzgas",
+    "name": "BZ Gas",
+    "type": 8,
+    "image": "https://assets.gm.miami/gtav/weapons/Bz-gas-icon.png",
+    "hash": "0xA0973D5E"
+  },
+  {
+    "id": "weapon_molotov",
+    "name": "Molotov Cocktail",
+    "type": 8,
+    "image": "https://assets.gm.miami/gtav/weapons/Molotov-icon.png",
+    "hash": "0x24B17070"
+  },
+  {
+    "id": "weapon_stickybomb",
+    "name": "Sticky Bomb",
+    "type": 8,
+    "image": "https://assets.gm.miami/gtav/weapons/Sticky-bomb-icon.png",
+    "hash": "0x2C3731D9"
+  },
+  {
+    "id": "weapon_proxmine",
+    "name": "Proximity Mines",
+    "type": 8,
+    "image": "https://assets.gm.miami/gtav/weapons/Proximity-mines-icon.png",
+    "hash": "0xAB564B93"
+  },
+  {
+    "id": "weapon_snowball",
+    "name": "Snowballs",
+    "type": 8,
+    "image": "https://assets.gm.miami/gtav/weapons/Snowball-icon.png",
+    "hash": "0x787F0BB"
+  },
+  {
+    "id": "weapon_pipebomb",
+    "name": "Pipe Bombs",
+    "type": 8,
+    "image": "https://assets.gm.miami/gtav/weapons/Pipe-bomb-icon.png",
+    "hash": "0xBA45E8B8"
+  },
+  {
+    "id": "weapon_ball",
+    "name": "Baseball",
+    "type": 8,
+    "image": "https://assets.gm.miami/gtav/weapons/Ball-icon.png",
+    "hash": "0x23C9F95C"
+  },
+  {
+    "id": "weapon_smokegrenade",
+    "name": "Tear Gas",
+    "type": 8,
+    "image": "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png",
+    "hash": "0xFDBC8A50"
+  },
+  {
+    "id": "weapon_flare",
+    "name": "Flare",
+    "type": 8,
+    "image": "https://assets.gm.miami/gtav/weapons/Flare-icon.png",
+    "hash": "0x497FACC3"
+  },
+  {
+    "id": "weapon_petrolcan",
+    "name": "Jerry Can",
+    "type": 9,
+    "image": "https://assets.gm.miami/gtav/weapons/Petrolcan-icon.png",
+    "hash": "0x34A67B97"
+  },
+  {
+    "id": "gadget_parachute",
+    "name": "Parachute",
+    "type": 9,
+    "image": "https://assets.gm.miami/gtav/weapons/Parachute-icon.png",
+    "hash": "0xFBAB5776"
+  },
+  {
+    "id": "weapon_fireextinguisher",
+    "name": "Fire Extinguisher",
+    "type": -1,
+    "image": "https://assets.gm.miami/gtav/weapons/Fire2.png",
+    "hash": "0x060EC506"
+  },
+  {
+    "id": "weapon_hazardcan",
+    "name": "Hazardous Jerry Can",
+    "type": 9,
+    "image": "https://assets.gm.miami/gtav/weapons/Petrolcan-icon.png",
+    "hash": "0xBA536372"
+  },
+  {
+    "id": "weapon_fertilizercan",
+    "name": "Fertilizer Can",
+    "type": -1,
+    "image": "https://assets.gm.miami/gtav/weapons/Petrolcan-icon.png",
+    "hash": "0x184140A1"
+  }
+]

@@ -1954,7 +1954,18 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
     {
         if(sourceEntity !== null && sourceEntity !== undefined && sourceEntity.type === 'player')
         {
-
+            let gunData = weaponData.find(w => Number(w.Hash) == weapon);
+            if(gunData != undefined && (gunData.Type == "Assault Rifles" || gunData.Type == "Machine Guns")){
+                let nerfedDmg = (damage-10);
+                damage = nerfedDmg;
+                mp.game.weapon.setCurrentDamageEventAmount(nerfedDmg);
+            }
+            else{
+                let nerfedDmg = (damage-5);
+                if(nerfedDmg <= 0) nerfedDmg = 1;
+                damage = nerfedDmg;
+                mp.game.weapon.setCurrentDamageEventAmount(nerfedDmg);
+            }
        
             if(weapon == 3800352039){ // assault shotgun nerf
                 const vec1 = sourceEntity.position;
@@ -2049,6 +2060,13 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                     }
                 }
             }
+        }
+    }
+    else if(targetEntity !== null && targetEntity !== undefined && targetEntity.type === 'vehicle'){
+        if(sourceEntity !== null && sourceEntity !== undefined && sourceEntity.type === 'player'){
+            let nerfedDmg = Math.floor(damage/2);
+            damage = nerfedDmg;
+            mp.game.weapon.setCurrentDamageEventAmount(nerfedDmg);
         }
     }
 });
@@ -2333,11 +2351,24 @@ function isMeleeWeapon(weapon){
 }
 
 mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage) => {
-    if(sourceEntity !== undefined && sourceEntity !== null && sourceEntity.type === 'player' && sourceEntity == player && player.getVariable("Team") != -1)
+    if(sourceEntity !== undefined && sourceEntity !== null && sourceEntity.type === 'player' && sourceEntity == player)
     {
         if(targetEntity !== undefined && targetEntity !== null && targetEntity.type === 'player')
         {
             if(sourceEntity.getVariable("ClimbProtection") == true || targetEntity.getVariable("ClimbProtection") == true) return true;
+
+            let gunData = weaponData.find(w => Number(w.Hash) == weapon);
+            if(gunData != undefined && (gunData.Type == "Assault Rifles" || gunData.Type == "Machine Guns")){
+                let nerfedDmg = (damage-10);
+                damage = nerfedDmg;
+                mp.game.weapon.setCurrentDamageEventAmount(nerfedDmg);
+            }
+            else{
+                let nerfedDmg = (damage-5);
+                if(nerfedDmg <= 0) nerfedDmg = 1;
+                damage = nerfedDmg;
+                mp.game.weapon.setCurrentDamageEventAmount(nerfedDmg);
+            }
 
             if(weapon == 3800352039){ // assault shotgun nerf
                 const vec1 = sourceEntity.position;
@@ -2494,6 +2525,13 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
 
                 if(breakShot == true) return true;
             }
+        }
+    }
+    else if(targetEntity !== null && targetEntity !== undefined && targetEntity.type === 'vehicle'){
+        if(sourceEntity !== null && sourceEntity !== undefined && sourceEntity.type === 'player' && sourceEntity == player){
+            let nerfedDmg = Math.floor(damage/2);
+            damage = nerfedDmg;
+            mp.game.weapon.setCurrentDamageEventAmount(nerfedDmg);
         }
     }
 });
