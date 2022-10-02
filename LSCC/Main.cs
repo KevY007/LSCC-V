@@ -4495,6 +4495,7 @@ namespace RNC
                                                             if (p == null) continue;
 
                                                             p.Position = new Vector3(fugi.spawnX, fugi.spawnY, fugi.spawnZ).Around(30f);
+                                                            p.TriggerEvent("stopLoadingScreen");
                                                         }
                                                         catch { }
                                                     }
@@ -4509,6 +4510,7 @@ namespace RNC
                                                             if (p == null) continue;
 
                                                             p.Position = new Vector3(cop.spawnX, cop.spawnY, cop.spawnZ).Around(30f);
+                                                            p.TriggerEvent("stopLoadingScreen");
                                                         }
                                                         catch { }
                                                     }
@@ -4667,6 +4669,7 @@ namespace RNC
                                                 p.TriggerEvent("ToggleCollisionsForEnt", p.GetData<Vehicle>("ChaseVehicle"), false);
 
                                                 p.SetSharedData("Collisions", false);
+                                                p.TriggerEvent("stopLoadingScreen");
                                             }
                                             catch { }
                                         }
@@ -4687,6 +4690,7 @@ namespace RNC
 
                                                 p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
                                                 p.SetSharedData("Collisions", false);
+                                                p.TriggerEvent("stopLoadingScreen");
                                             }
                                             catch { }
                                         }
@@ -4754,6 +4758,7 @@ namespace RNC
                                                     });
 
                                                 }
+                                                p.TriggerEvent("stopLoadingScreen");
 
                                                 EPlayer.Freeze(p, false);
                                                 p.TriggerEvent("ToggleCanExitVehicle", false);
@@ -4769,6 +4774,7 @@ namespace RNC
                                             if (p == null || lobby.Fugitives.Contains(p)) continue;
                                             try
                                             {
+                                                p.TriggerEvent("stopLoadingScreen");
                                                 p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
                                                 p.TriggerEvent("ToggleNametags", true);
 
