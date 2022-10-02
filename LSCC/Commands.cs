@@ -5845,7 +5845,7 @@ namespace RNC
             {
                 return;
             }
-            if(player.Vehicle.Class == 16 || player.Vehicle.Class == 15 || player.Vehicle.Class == 19)
+            if(player.Vehicle.Class == 16 || player.Vehicle.Class == 15 || player.Vehicle.Class == 14)
             {
                 EPlayer.SendMessage(player, "not today, buddy, not today");
                 return;
