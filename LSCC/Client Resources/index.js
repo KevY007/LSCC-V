@@ -240,8 +240,6 @@ async function toggleLoginScene(toggle){
 mp.events.add("DestroyLoginScene", () => toggleLoginScene(false));
 
 mp.events.add('showLoginBrowser', (state) => {
-
-
     setTimeout(() => {
         if(ServerUI != null)
         {
