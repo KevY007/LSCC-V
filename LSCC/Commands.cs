@@ -9961,9 +9961,18 @@ namespace RNC
             int count = 0;
             foreach (Player adm in Settings.LoggedInPlayers.Where(b => EPlayer.LoggedIn(b) == true && EPlayer.GetAccount(b).Admin > 0))
             {
-                if (EPlayer.GetAccount(player).Admin < 3 && adm.GetData<bool>("Anonymous") == false)
+                if (EPlayer.GetAccount(player).Admin < 3)
                 {
-                    player.TriggerEvent("pushMsgToChat", $"{EPlayer.GetAdminLevelName(EPlayer.GetAccount(adm).Admin, true)}: !{{#FFFFFF}}{adm.Name}");
+                    if (adm.GetData<bool>("Anonymous") == false)
+                    {
+                        player.TriggerEvent("pushMsgToChat", $"{EPlayer.GetAdminLevelName(EPlayer.GetAccount(adm).Admin, true)}: !{{#FFFFFF}}{adm.Name}");
+                        count++;
+                    }
+                    else continue;
+                }
+                else
+                {
+                    player.TriggerEvent("pushMsgToChat", $"{EPlayer.GetAdminLevelName(EPlayer.GetAccount(adm).Admin, true)}: !{{#FFFFFF}}{adm.Name} !{{#C9C9C9}}[Vanish: {adm.GetData<bool>("Anonymous").ToString()}]");
                     count++;
                 }
             }
