@@ -471,7 +471,10 @@ mp.events.add("OpenVehicleSpawner", (carname, admin) => {
 });
 
 mp.events.add("SendClanInvite", (clanName, clanID, senderName) => {
+    mp.game.audio.playSoundFrontend(-1, "CHALLENGE_UNLOCKED",  "HUD_AWARDS", true);
     ServerUI.execute(`clanInvite("Clan Invitation", "You have been invited to <strong>${clanName}</strong> by ${senderName}.", 20000, ${clanID});`);
+    let notifyscoreboardstr = `toast('Show Cursor', 'To accept the invite, press <strong>[T]</strong> to open the chat & cursor, and click the Accept button.', 'nothing', 5000, 2);`;
+    ServerUI.execute(notifyscoreboardstr);
 });
 
 mp.events.add("startLoadingScreen", (time, message) => {

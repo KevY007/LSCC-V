@@ -353,7 +353,7 @@ mp.events.add("UpdateMenuStatsTab", (email, admin, points, dpoints, dlevel, derb
                 value: "${warns}",
             },
             {
-                icon: "clouds",
+                icon: "fa-clouds",
                 title: "Discord",
                 value: "${(discordlinked == true ? "Your account is verified." : "Your account isn't verified! (/verify)")}",
             },

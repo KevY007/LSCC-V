@@ -1552,13 +1552,19 @@ namespace RNC
                     seats = 4;
                     break;
                 case "centurionlspd":
-                    seats = 14;
+                    seats = 8;
                     break;
                 case "bcso2slick":
                     seats = 4;
                     break;
                 case "police3slick":
                     seats = 4;
+                    break;
+                case "fibexecutioner":
+                    seats = 7;
+                    break;
+                case "bcat":
+                    seats = 8;
                     break;
             }
             return seats;

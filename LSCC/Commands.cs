@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace RNC
@@ -5558,6 +5559,14 @@ namespace RNC
                 return;
             }
 
+            Regex exp = new Regex(@"^[a-zA-Z0-9]*$");
+            Match match = exp.Match(newname);
+            if (!match.Success)
+            {
+                EPlayer.Error(player, "Username contains illegal characters!", "fas fa-user");
+                return;
+            }
+
             EPlayer.SendMessage(player, "~y~Executing, please wait...");
             int pAdmin = EPlayer.GetAccount(player).Admin;
             Task.Run(async () =>
@@ -9509,6 +9518,13 @@ namespace RNC
                 player.TriggerEvent("pushMsgToChat", "!{#FF6347}[!] !{#FFFFFF}You don't have any namechanges!");
                 return;
             }
+            Regex exp = new Regex(@"^[a-zA-Z0-9]*$");
+            Match match = exp.Match(newname);
+            if (!match.Success)
+            {
+                EPlayer.Error(player, "Username contains illegal characters!", "fas fa-user");
+                return;
+            }
 
             int accID = EPlayer.GetAccount(player).SQL_ID;
             string name = player.Name;
@@ -9540,6 +9556,8 @@ namespace RNC
 
                     NAPI.Task.Run(() =>
                     {
+                        EPlayer.GetAccount(player).Username = newname;
+                        EPlayer.Save(player);
                         player.TriggerEvent("pushMsgToChat", "!{#FF6347} Reconnect with your new name: !{#FFFFFF}" + newname);
                         EPlayer.Notify(player, $"Please reconnect with your new name: {newname}", "green", "fas fa-check", false, 3000, "center", "replace");
                         player.Name = newname;

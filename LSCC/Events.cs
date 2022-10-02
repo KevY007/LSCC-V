@@ -1461,11 +1461,7 @@ namespace RNC
                 EPlayer.Error(player, "You do not have the authority to promote/demote clan members!");
                 return;
             }
-            if(tier == 0)
-            {
-                EPlayer.Error(player, "You cannot promote anyone to the <strong>Leader</strong> rank! Only you can have it.");
-                return;
-            }
+        
             int pClanTier = player.GetSharedData<int>("ClanTier");
             int pClanID = player.GetSharedData<int>("ClanID");
 
@@ -1523,6 +1519,15 @@ namespace RNC
                                 break;
                             case 2: rank = "Member (2)";
                                 break;
+                            case 0: rank = "Clan Leader (0)";
+                                break;
+                        }
+
+                        if(tier == 0)
+                        {
+                            EPlayer.GetAccount(player).ClanTier = 2;
+                            EPlayer.Save(player);
+                            EPlayer.Error(player, $"You transferred your clan ownership to {tAcc.Username}; your tier was set to Member (2).");
                         }
 
                         EPlayer.Notify(player, $"You successfully <strong>{text}</strong> {tAcc.Username} to <strong>{rank}</strong>!", "green", "", false, 3000);
@@ -1727,6 +1732,16 @@ namespace RNC
         [RemoteEvent("Clan_OnRequestInvitePlayer")]
         public void Clan_OnRequestInvitePlayer(Player player, string playerName)
         {
+            long currentTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+            if (player.HasData("LastClanInviteTimestamp"))
+            {
+                if(currentTimestamp - player.GetData<long>("LastClanInviteTimestamp") < 20)
+                {
+                    EPlayer.Error(player, $"Not so fast! You can invite a player to your clan every 20 seconds!");
+                    return;
+                }
+            }
+
             if (!EPlayer.LoggedIn(player))
                 return;
 
@@ -1748,6 +1763,7 @@ namespace RNC
                 EPlayer.Error(player, $"Player {playerName} is already in a clan! They'll have to leave before being able to join yours.", "sex");
                 return;
             }
+            player.SetData<long>("LastClanInviteTimestamp", currentTimestamp);
             EPlayer.Notify(player, $"You've invited that player to your clan. They have 20 seconds to accept.", "green", "", false, 3000);
             target.TriggerEvent("SendClanInvite", player.GetSharedData<string>("ClanName"), player.GetSharedData<int>("ClanID"), player.Name);
             
@@ -1820,22 +1836,35 @@ namespace RNC
         [RemoteEvent("OnRequestCreateClan")]
         public void OnRequestCreateClan(Player player, string clanname, string tag, string desc)
         {
-            if (!EPlayer.LoggedIn(player))
+            if(player.HasData("LoadingClanCreation") && player.GetData<bool>("LoadingClanCreation") == true)
+            {
+                EPlayer.Error(player, "slow down there, pal, stop spamming the god damn button!!!!!!!!!");
                 return;
+            }
+
+            player.SetData<bool>("LoadingClanCreation", true);
+            if (!EPlayer.LoggedIn(player))
+            {
+                player.SetData<bool>("LoadingClanCreation", false);
+                return;
+            }
 
             Account acc = EPlayer.GetAccount(player);
             if (player.GetSharedData<int>("ClanID") != -1 || player.GetSharedData<int>("ClanTier") != -1)
             {
+                player.SetData<bool>("LoadingClanCreation", false);
                 EPlayer.Error(player, "You are already in a clan! Please leave your current one first <strong>(Menu [M] > Clan > Leave)</strong>.", "sex");
                 return;
             }
             if (acc.Points < 300)
             {
+                player.SetData<bool>("LoadingClanCreation", false);
                 EPlayer.Error(player, "You need <strong>300 Points</strong> to create a clan!", "sex");
                 return;
             }
             if (clanname.Length > 32 || clanname.Length < 3)
             {
+                player.SetData<bool>("LoadingClanCreation", false);
                 EPlayer.Error(player, "Clan name must be between 3 and 32 characters!", "sex");
                 return;
             }
@@ -1852,11 +1881,13 @@ namespace RNC
             }
             if (!isNameGood)
             {
+                player.SetData<bool>("LoadingClanCreation", false);
                 EPlayer.Error(player, "Clan name must be alphanumeric (A-Z, 0-9)!", "sex");
                 return;
             }
             if (!isTagGood)
             {
+                player.SetData<bool>("LoadingClanCreation", false);
                 EPlayer.Error(player, "Clan tag must be alphanumeric (A-Z, 0-9)!", "sex");
                 return;
             }
@@ -1880,6 +1911,7 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
+                            player.SetData<bool>("LoadingClanCreation", false);
                             EPlayer.Error(player, "A clan with that name already exists!", "sex");
                         });
                         return;
@@ -1889,6 +1921,7 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
+                            player.SetData<bool>("LoadingClanCreation", false);
                             EPlayer.Error(player, "A clan with that tag already exists! Please choose a unique 3 or 4-character tag.", "sex");
                         });
                         return;
@@ -1944,6 +1977,7 @@ namespace RNC
                         player.TriggerEvent("UpdateMenuClanTab");
 
                         EPlayer.UpdateUIVars(player);
+                        player.SetData<bool>("LoadingClanCreation", false);
                     });
                 }
             });

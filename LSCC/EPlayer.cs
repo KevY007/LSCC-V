@@ -698,6 +698,8 @@ namespace RNC
                 player.SetSharedData("TaseProtection", false);
                 player.SetSharedData("CharCreator_ShowClothingAfter", false);
 
+                player.SetData<bool>("LoadingClanCreation", false);
+
                 player.ResetData("LockpickTarget");
                 player.SetSharedData("PlacingStingers", false);
 
@@ -2145,7 +2147,6 @@ namespace RNC
                                 }
 
                                 await context.SaveChangesAsync();
-                                Console.WriteLine($"[RnC Player Save] Saved {acc.Username} ({acc.SQL_ID})'s server statistics. Total entries modified: {savedEntries}.");
                             }
                         });
                     }
