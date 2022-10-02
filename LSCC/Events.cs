@@ -3006,8 +3006,6 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            NAPI.Util.ConsoleOutput($"{player.Name} finished tutorial, voice setting: {useVoice.ToString()}, language {language}");
-
             int voiceMode = (useVoice ? 0 : 4);
             OnSetVoiceMode(player, voiceMode, false);
             player.TriggerEvent("setVoiceModeMenu", voiceMode);
@@ -3037,6 +3035,12 @@ namespace RNC
                         try
                         {
                             ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+
+                            ConvChar.Clothing[0] = new ClothingData(0, 0); // Fugitive MALE
+                            ConvChar.Clothing[1] = new ClothingData(1, 0); // Cop MALE
+                            ConvChar.Clothing[2] = new ClothingData(0, 1); // Fugitive FEMALE
+                            ConvChar.Clothing[3] = new ClothingData(1, 1); // Cop FEMALE
+
 
                             player.SetData("cEditClothingData", ConvChar.Clothing);
                             EPlayer.ShowCharCreator(player, ConvChar, true);
@@ -3421,18 +3425,6 @@ namespace RNC
                 int genderr = Convert.ToInt32(pChar.Gender);
                 string genderChar = "M";
                 if (genderr == 1) genderChar = "F";
-
-                pChar.Clothing[1].Clothes[3].Drawable = 0; pChar.Clothing[1].Clothes[3].Texture = 0;
-                pChar.Clothing[3].Clothes[3].Drawable = 0; pChar.Clothing[3].Clothes[3].Texture = 0;
-
-                pChar.Clothing[1].Clothes[4].Drawable = 35; pChar.Clothing[1].Clothes[4].Texture = 0;
-                pChar.Clothing[3].Clothes[4].Drawable = 37; pChar.Clothing[3].Clothes[4].Texture = 0;
-
-                pChar.Clothing[1].Clothes[11].Drawable = 55; pChar.Clothing[1].Clothes[11].Texture = 0;
-                pChar.Clothing[3].Clothes[11].Drawable = 48; pChar.Clothing[3].Clothes[11].Texture = 0;
-
-                pChar.Clothing[1].Clothes[8].Drawable = -1; pChar.Clothing[1].Clothes[11].Texture = 0;
-                pChar.Clothing[3].Clothes[8].Drawable = -1; pChar.Clothing[3].Clothes[11].Texture = 0;
 
                 int clothingDataID = (gender == 1 ? 3 : 1);
                 string clothingInfo = NAPI.Util.ToJson(pChar.Clothing[clothingDataID]);

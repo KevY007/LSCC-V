@@ -26,7 +26,9 @@ function ShowClothingEditor(team, gender, cData, forceSet){
     setCurrentClothingData(cData);
 
     if(forceSet){
-        updateOnPageSwitch();
+        setTimeout(() => {
+            scrollShirtType(true);
+        }, 500);
     }
 }
 function ExitClothingEditor(){

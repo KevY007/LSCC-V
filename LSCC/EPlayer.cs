@@ -461,8 +461,14 @@ namespace RNC
 
             CharacterData defaultChar = new CharacterData();
             if (charData != null) defaultChar = charData;
+            else
+            {
+                defaultChar.Clothing[0] = new ClothingData(0, 0); // Fugitive MALE
+                defaultChar.Clothing[1] = new ClothingData(1, 0); // Cop MALE
+                defaultChar.Clothing[2] = new ClothingData(0, 1); // Fugitive FEMALE
+                defaultChar.Clothing[3] = new ClothingData(1, 1); // Cop FEMALE
+            }
 
-            defaultChar.Clothing = new CharacterData().Clothing;
             EPlayer.ApplyCharacter(player, defaultChar);
 
             player.Position = new Vector3(402.8664, -996.4108, -99.00027);
