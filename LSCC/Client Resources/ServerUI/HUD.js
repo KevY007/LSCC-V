@@ -592,7 +592,7 @@ function clearChat(){
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.messages = [];`);
 }
 
-//let api = {"chat:push": pushMessageToChat, "chat:clear": clearChat, "chat:activate": activateChat, "chat:show": focusChat}; 
+//let api = {"chat:push": mp.gui.chat.push, "chat:clear": clearChat, "chat:activate": activateChat, "chat:show": focusChat}; 
 
 mp.events.add("pushMsgToChat", (msg) => {
     mp.gui.chat.push(msg);

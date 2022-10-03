@@ -351,13 +351,13 @@ mp.events.addCommand("noclip_vsm", function (rate) {
     rate = Number(rate);
 
     if (rate < 0.01 || rate > 100.0) {
-        pushMessageToChat("Invalid rate, must be between 0.01 - 100.0 (0.10 optimal)");
+        mp.gui.chat.push("Invalid rate, must be between 0.01 - 100.0 (0.10 optimal)");
         return;
     }
 
     verySlowMult = rate;
 
-    pushMessageToChat(`Very slow multiplier (LSHIFT + CTRL together) set to ${verySlowMult}.`);
+    mp.gui.chat.push(`Very slow multiplier (LSHIFT + CTRL together) set to ${verySlowMult}.`);
 });
 
 mp.events.add("ToggleNoclip", () => {

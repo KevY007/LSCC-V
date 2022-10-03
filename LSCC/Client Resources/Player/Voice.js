@@ -47,8 +47,8 @@ mp.events.addCommand("voicebind", function (bind) {
     bind = Number(bind);
 
     if (!Number.isInteger(bind)) {
-        pushMessageToChat("USAGE: voicebind (keycode) --Input a virtual keycode e.g. 0x4E is 'N' (default)");
-        pushMessageToChat("https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes");
+        mp.gui.chat.push("USAGE: voicebind (keycode) --Input a virtual keycode e.g. 0x4E is 'N' (default)");
+        mp.gui.chat.push("https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes");
         return;
     }
 

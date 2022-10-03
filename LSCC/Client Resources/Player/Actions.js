@@ -233,15 +233,15 @@ function stopReviving(reason){
 
     switch(reason){
         case 1:{
-            pushMessageToChat("!{#FF6347}[!] !{#FFFFFF}Reviving failed - you are no longer in copchase.");
+            mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Reviving failed - you are no longer in copchase.");
             break;
         }        
         case 2:{
-            pushMessageToChat("!{#FF6347}[!] !{#FFFFFF}Reviving failed - target is no longer on the same team as you or is dead.");
+            mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Reviving failed - target is no longer on the same team as you or is dead.");
             break;
         }
         case 3:{
-            pushMessageToChat("!{#FF6347}[!] !{#FFFFFF}Reviving failed - You are severely injured.");
+            mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Reviving failed - You are severely injured.");
             break;           
         }
     }
@@ -330,13 +330,13 @@ function stopCuffing(reason){ // if unsuccessful / force stopped
 
     switch(reason){
         case 1:
-            pushMessageToChat("!{#FF6347}[!] !{#FFFFFF}Cuffing failed - the target is no longer a fugitive or deceased.");
+            mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Cuffing failed - the target is no longer a fugitive or deceased.");
             break;       
         case 2:
-            pushMessageToChat("!{#FF6347}[!] !{#FFFFFF}Cuffing failed as you moved too far from the fugitive.");
+            mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Cuffing failed as you moved too far from the fugitive.");
             break;
         case 12: // putting 12 cuz idk the ids anymore fuck this shit im braindead at this point
-            pushMessageToChat("!{#FF6347}[!] !{#FFFFFF}Cuffing failed - you are severely injured.");
+            mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Cuffing failed - you are severely injured.");
             break;
     }
 }

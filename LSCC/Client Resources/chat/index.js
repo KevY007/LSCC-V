@@ -27,16 +27,16 @@ mp.events.addCommand("pagesize", function (page) {
 
     if(chatbox == null) 
     {
-        pushMessageToChat("Chatbox isn't created yet.");
+        mp.gui.chat.push("Chatbox isn't created yet.");
         return;
     }
 
     if (!Number.isInteger(page)) {
-        pushMessageToChat("[USAGE] /pagesize (number: line count | default: 13)");
+        mp.gui.chat.push("[USAGE] /pagesize (number: line count | default: 13)");
         return;
     }   
     if(page < 5 || page > 30){
-        pushMessageToChat("Page size can be between 5 and 30! (default is 13)");
+        mp.gui.chat.push("Page size can be between 5 and 30! (default is 13)");
         return;       
     }
 
@@ -53,17 +53,17 @@ mp.events.addCommand("fontsize", function (rate) {
 
     if(chatbox == null) 
     {
-        pushMessageToChat("Chatbox isn't created yet.");
+        mp.gui.chat.push("Chatbox isn't created yet.");
         return;
     }
 
     if (!Number.isInteger(rate)) {
-        pushMessageToChat("[USAGE] /fontsize (number: font size | default: 20)");
+        mp.gui.chat.push("[USAGE] /fontsize (number: font size | default: 20)");
         return;
     }
 
     if(rate < 8 || rate > 28) {
-        pushMessageToChat("Fontsize can be between 8-28, default is 20.");
+        mp.gui.chat.push("Fontsize can be between 8-28, default is 20.");
         return;
     }
 
