@@ -1835,7 +1835,8 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                             }
                         }
                     });
-
+                    if(mp.players.local.vehicle != undefined && mp.players.local.vehicle.handle == targetEntity.handle) breakShot = false;
+                    
                     if(vehicleOccupants == 0) breakShot = false;
 
                     if(breakShot) mp.game.graphics.notify("~r~Do not teamkill!");
@@ -2494,6 +2495,8 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                             }
                         }
                     });
+
+                    if(mp.players.local.vehicle != undefined && mp.players.local.vehicle.handle == targetEntity.handle) breakShot = false;
 
                     if(vehicleOccupants == 0) breakShot = false;
 
