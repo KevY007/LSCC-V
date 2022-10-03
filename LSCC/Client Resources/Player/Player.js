@@ -452,6 +452,7 @@ if(mp.storage.data.radiotoggle !== undefined)
 {
     radioToggle = mp.storage.data.radiotoggle;
 }
+
 if(mp.storage.data.actionmenubind !== undefined){
     curActionMenuBind = mp.storage.data.actionmenubind;
     lastActionMenuBind = mp.storage.data.actionmenubind;
@@ -1078,6 +1079,7 @@ mp.events.add("clearTaseAnims", (time) => {
     }, time);
 });
 
+
 mp.events.add('render', () => {
 
     FPS_Frames++;
@@ -1086,6 +1088,12 @@ mp.events.add('render', () => {
         FPS = FPS_Frames;
         FPS_Frames = 0;
         FPS_Calc = Date.now();
+    }
+
+    if(radioToggle != undefined && radioToggle == false){
+        if(mp.players.local.vehicle !== undefined){
+            mp.game.invoke('0x1B9C0099CB942AC6', mp.players.local.vehicle.handle, 'OFF');
+        }
     }
 
     if(mp.players.local.getVariable("Team") == 0){
@@ -1391,11 +1399,6 @@ mp.events.add('render', () => {
 
             if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
             {
-                if(player.isInAnyVehicle(false))
-                {
-                    if(!radioToggle && player.seat == -1) mp.game.invoke('0x1B9C0099CB942AC6', player.vehicle.handle, 'OFF');
-                }
-                if(!radioToggle && player.seat == -1) mp.game.audio.setRadioToStationName('OFF');
 
                 mp.events.callLocal("OneSecondEvent");
 
@@ -1836,7 +1839,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                         }
                     });
                     if(mp.players.local.vehicle != undefined && mp.players.local.vehicle.handle == targetEntity.handle) breakShot = false;
-                    
+
                     if(vehicleOccupants == 0) breakShot = false;
 
                     if(breakShot) mp.game.graphics.notify("~r~Do not teamkill!");
