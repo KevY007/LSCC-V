@@ -553,31 +553,35 @@ function focusChat(toggle){
 }
 function pushMessageToChat(message){
     if(ServerUI == null){return;}
-
+/*
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.messages.push("${message}")`);
     increaseChatOpacity(4000);
+*/
+    mp.gui.chat.push(message);
 }
 function clearChat(){
     if(ServerUI == null) return;
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.messages = [];`);
 }
-let api = {"chat:push": pushMessageToChat, "chat:clear": clearChat, "chat:activate": activateChat, "chat:show": focusChat}; 
+
+//let api = {"chat:push": pushMessageToChat, "chat:clear": clearChat, "chat:activate": activateChat, "chat:show": focusChat}; 
 
 mp.events.add("pushMsgToChat", (msg) => {
-    pushMessageToChat(msg);
+    mp.gui.chat.push(msg);
 })
 
 mp.events.add("chat:push", (msg) => {
-    pushMessageToChat(msg);
+    mp.gui.chat.push(msg);
 });
+
 mp.events.add("chat:clear", (msg) => {
     clearChat();
 });
 mp.events.add("chat:activate", (toggle) => {
-    activateChat(toggle);
+    mp.gui.chat.activate(toggle);
 });
 mp.events.add("chat:show", (toggle) => {
-    focusChat(toggle);
+    mp.gui.chat.show(toggle);
 });
 
 mp.events.add("HideAllElementsExceptChat", (value) => {
@@ -674,14 +678,15 @@ mp.events.add('RestartHUD', () => {
 
     ServerUI = mp.browsers.new("package://ServerUI/index.html");
     setTimeout(() => {
-        ServerUI.markAsChat();
-        mp.gui.chat.activate(true);
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.commands = ${JSON.stringify(CommandsDataJSON)}`);
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = false;`)
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings = {
-            opacity: 1,
-            autoScroll: true,
-        }`);
+        //ServerUI.markAsChat();
+        //mp.gui.chat.activate(true);
+        //mp.gui.chat.show(true);
+        // ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.commands = ${JSON.stringify(CommandsDataJSON)}`);
+        // ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = false;`)
+        // ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings = {
+        //     opacity: 1,
+        //     autoScroll: true,
+        // }`);
     }, 1000);
     ServerUI.execute(`gm.$refs.hud.enabled = false;`);
 });

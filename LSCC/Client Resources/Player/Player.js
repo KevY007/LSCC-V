@@ -2935,7 +2935,10 @@ mp.events.add(
             AFKStage = 0;
             antiAFKActive = false;
             mp.gui.chat.show(false);
-            mp.gui.chat.activate(false);
+            //mp.gui.chat.activate(false);
+            setTimeout(() => {
+                ServerUI.markAsChat();
+            }, 250);
         }, 1000);
 
 
