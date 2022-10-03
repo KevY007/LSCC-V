@@ -495,12 +495,24 @@ mp.events.add("SendClanInvite", (clanName, clanID, senderName) => {
     ServerUI.execute(notifyscoreboardstr);
 });
 
+var IsInInfiniteLoading = true;
+var CanSkipLoading = false;
 mp.events.add("startLoadingScreen", (time, message) => {
     if(time == -1){
         ServerUI.execute('gm.$refs.loadingScreen.show(true);');
         if(message != "none")
             ServerUI.execute(`gm.$refs.loadingScreen.loadingText = "${message}"`);
         else ServerUI.execute(`gm.$refs.loadingScreen.loadingText = ""`);
+
+        IsInInfiniteLoading = true;
+
+        setTimeout(() => {
+            if(mp.players.local != null && mp.players.exists(mp.players.local) && IsInInfiniteLoading == true){
+                CanSkipLoading = true;
+                let notifyscoreboardstr = `toast('Skip Loading', 'Press <strong>SPACE BAR</strong> to skip the loading screen!', 'nothing', 10000, 2);`;
+                ServerUI.execute(notifyscoreboardstr);
+            }
+        }, 10000);
     }
     else{
         ServerUI.execute(`gm.$refs.loadingScreen.show(${time});`);
@@ -509,8 +521,18 @@ mp.events.add("startLoadingScreen", (time, message) => {
         else ServerUI.execute(`gm.$refs.loadingScreen.loadingText = ""`);
     }
 });
+mp.keys.bind(0x20, false, function() {
+    if(IsInInfiniteLoading == true && CanSkipLoading == true){
+        mp.events.callLocal("stopLoadingScreen");
+
+        let notifyscoreboardstr = `toast('Skip Loading', 'Press <strong>SPACE BAR</strong> to skip the loading screen!', 'nothing', 50, 2);`;
+        ServerUI.execute(notifyscoreboardstr);
+    }
+});
 mp.events.add("stopLoadingScreen", () => {
     ServerUI.execute('gm.$refs.loadingScreen.hide();');
+    IsInInfiniteLoading = false;
+    CanSkipLoading = false;
 });
 
 mp.events.addCommand("fontsize", (size) => {
