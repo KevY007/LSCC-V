@@ -121,24 +121,20 @@ var CommandsDataJSON = [
   },
   {
     "CommandText": "aveh",
-    "Usage": "[USAGE] aveh (optional: vehicle model) (optional: pri. col) (optional: sec. col)",
+    "Usage": "[USAGE] aveh (optional: vehicle model)",
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "optional: vehicle model",
-      "optional: pri. col",
-      "optional: sec. col"
+      "optional: vehicle model"
     ]
   },
   {
     "CommandText": "veh",
-    "Usage": "[USAGE] veh (vehicle model) (optional: pri. color) (optional: sec. color)",
+    "Usage": "[USAGE] veh (vehicle model)",
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "vehicle model",
-      "optional: pri. color",
-      "optional: sec. color"
+      "vehicle model"
     ]
   },
   {

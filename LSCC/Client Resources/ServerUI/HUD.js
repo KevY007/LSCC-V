@@ -452,10 +452,10 @@ function AddCustomVehiclesToSpawner(){
     }
 }
 
-mp.events.add("spawner_spawnVehicle", (modelname) => {
+mp.events.add("vehicleSpawner:spawnVehicle", (modelname, col1, col2) => {
     VehicleSpawnerActive = false;
     ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.enabled = false;`);
-    mp.events.callRemote("Spawner_SpawnVehicle", modelname, adminVehSpawner);
+    mp.events.callRemote("Spawner_SpawnVehicle", modelname, adminVehSpawner, col1, col2);
     mp.gui.cursor.show(false, false);
 });
 mp.events.add("spawner_close", () => {
@@ -470,14 +470,14 @@ mp.events.add("OpenVehicleSpawner", (carname, admin) => {
     mp.gui.cursor.show(true, true);
 });
 
-mp.events.add("weapon_spawner:giveWeapon", (weaponHash, ammo, targetName) => {
+mp.events.add("weaponSpawner:giveWeapon", (weaponHash, ammo, targetName) => {
     VehicleSpawnerActive = false;
     mp.gui.cursor.show(false, false);
     
     mp.events.callRemote("WeaponSpawner_RequestGiveWeapon", weaponHash, ammo, targetName);
     ServerUI.execute(`gm.$refs.menus.$refs.weaponSpawner.enabled = false;`);
 });
-mp.events.add("weapon_spawner:close", () => {
+mp.events.add("weaponSpawner:close", () => {
     VehicleSpawnerActive = false;
     mp.gui.cursor.show(false, false);
     ServerUI.execute(`gm.$refs.menus.$refs.weaponSpawner.enabled = false;`);
@@ -800,7 +800,7 @@ mp.events.add("TwoSecondsEvent", () => {
     if(mp.storage.data.menu.RealtimeSpeedo == false){
         if (specState == true && specTarget != null && mp.players.exists(specTarget)) 
         {
-            if(specTarget.isInAnyVehicle(false))
+            if(specTarget.isInAnyVehicle(false) && specTarget.vehicle != undefined)
             {
                 if(!speedo)
                 {
@@ -827,7 +827,7 @@ mp.events.add("TwoSecondsEvent", () => {
             }
         }
         else {
-            if(mp.players.local.isInAnyVehicle(false))
+            if(mp.players.local.isInAnyVehicle(false) && mp.players.local.vehicle != undefined)
             {
                 if(!speedo)
                 {

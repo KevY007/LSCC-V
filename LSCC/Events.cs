@@ -1984,9 +1984,9 @@ namespace RNC
         }
 
         [RemoteEvent("Spawner_SpawnVehicle")]
-        public void OnSpawnerRequestVehicle(Player player, string carname, bool isAdmin)
+        public void OnSpawnerRequestVehicle(Player player, string carname, bool isAdmin, string hexColor1, string hexColor2)
         {
-            if(EPlayer.GetAccount(player).Admin < 1)
+            if (EPlayer.GetAccount(player).Admin < 1)
             {
                 if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
                 {
@@ -2005,41 +2005,54 @@ namespace RNC
             aVehicle.Locked = false;
             aVehicle.SetSharedData("Team", -1);
 
-            if (isAdmin)
+            System.Drawing.Color color1 = System.Drawing.Color.FromArgb(255, 255, 255, 255);
+            System.Drawing.Color color2 = System.Drawing.Color.FromArgb(255, 255, 255, 255);
+
+            try
             {
-                Settings.AdminVehicles.Add(aVehicle);
-                LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
-                if(lobby != null)
-                {
-                    if (lobby.Fugitives.Contains(player) || lobby.Cops.Contains(player))
-                    {
-                        Logs.LogAdmin(player, "Spawned a vehicle while in copchase: " + carname.ToUpper());
-                    }
-                }             
+                color1 = System.Drawing.ColorTranslator.FromHtml(hexColor1);
+                color2 = System.Drawing.ColorTranslator.FromHtml(hexColor2);
             }
-            else
+            catch { }
+            finally
             {
-                if(player.HasData("FreeroamVehicles"))
-                    player.GetData<List<Vehicle>>("FreeroamVehicles").Add(aVehicle);
+                aVehicle.CustomPrimaryColor = new GTANetworkAPI.Color(color1.R, color1.G, color1.B);
+                aVehicle.CustomSecondaryColor = new GTANetworkAPI.Color(color2.R, color2.G, color2.B);
+
+                if (isAdmin)
+                {
+                    Settings.AdminVehicles.Add(aVehicle);
+                    LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+                    if (lobby != null)
+                    {
+                        if (lobby.Fugitives.Contains(player) || lobby.Cops.Contains(player))
+                        {
+                            Logs.LogAdmin(player, "Spawned a vehicle while in copchase: " + carname.ToUpper());
+                        }
+                    }
+                }
                 else
                 {
-                    List<Vehicle> vehs = new List<Vehicle>(); vehs.Add(aVehicle);
-                    player.SetData<List<Vehicle>>("FreeroamVehicles", vehs);
-                }
-            }
-
-            NAPI.Task.Run(() =>
-            {
-                lock (player)
-                {
-                    if (player != null && player.Exists)
+                    if (player.HasData("FreeroamVehicles"))
+                        player.GetData<List<Vehicle>>("FreeroamVehicles").Add(aVehicle);
+                    else
                     {
-                        if (!aVehicle.IsNull && aVehicle.Exists) player.SetIntoVehicle(aVehicle, 0);
+                        List<Vehicle> vehs = new List<Vehicle>(); vehs.Add(aVehicle);
+                        player.SetData<List<Vehicle>>("FreeroamVehicles", vehs);
                     }
                 }
-            }, 1000);
 
-     
+                NAPI.Task.Run(() =>
+                {
+                    lock (player)
+                    {
+                        if (player != null && player.Exists)
+                        {
+                            if (!aVehicle.IsNull && aVehicle.Exists) player.SetIntoVehicle(aVehicle, 0);
+                        }
+                    }
+                }, 1000);
+            }
         }
 
         [ServerEvent(Event.PlayerEnterColshape)]

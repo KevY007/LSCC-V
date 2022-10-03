@@ -839,8 +839,8 @@ namespace RNC
             }, 1000);
         }
 
-        [Command("aveh", "!{#AFAFAF}[USAGE] aveh (optional: vehicle model) (optional: pri. col) (optional: sec. col)", Alias = "av")]
-        public void cmd_aveh(Player player, string carname = "", int col1 = -1, int col2 = -1)
+        [Command("aveh", "!{#AFAFAF}[USAGE] aveh (optional: vehicle model)", Alias = "av")]
+        public void cmd_aveh(Player player, string carname = "")
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -856,8 +856,8 @@ namespace RNC
 
         }
 
-        [Command("veh", "!{#AFAFAF}[USAGE] veh (vehicle model) (optional: pri. color) (optional: sec. color)", Alias = "v")]
-        public static void cmd_veh(Player player, string carname = "", int col1 = -1, int col2 = -1)
+        [Command("veh", "!{#AFAFAF}[USAGE] veh (vehicle model)", Alias = "v")]
+        public static void cmd_veh(Player player, string carname = "")
         {
             if (!EPlayer.LoggedIn(player))
                 return;
