@@ -3083,7 +3083,7 @@ namespace RNC
         }
 
         [RemoteEvent("WeaponSpawner_RequestGiveWeapon")]
-        public static void WeaponSpawner_OnRequestGiveWeapon(Player player, string wephash, int ammo, string targetName)
+        public static void WeaponSpawner_OnRequestGiveWeapon(Player player, string wephash, int ammo, string targetName, bool attachments)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
@@ -3120,6 +3120,30 @@ namespace RNC
                 target.GiveWeapon((WeaponHash)weaponHash, ammo);
 
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have given that weapon with " + ammo + " ammo to the target.");
+
+                if (attachments)
+                {
+                    try
+                    {
+                        if (EPlayer.GetAccount(player).WeaponComponents != null && EPlayer.GetAccount(player).WeaponComponents.Length > 3)
+                        {
+                            Dictionary<long, wComponentData> weaponCompsData = new Dictionary<long, wComponentData>();
+                            weaponCompsData = NAPI.Util.FromJson<Dictionary<long, wComponentData>>(EPlayer.GetAccount(player).WeaponComponents);
+
+                            foreach (KeyValuePair<long, wComponentData> i in weaponCompsData)
+                            {
+                                if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
+                                {
+                                    i.Value.Components.ForEach((long comphash) =>
+                                    {
+                                        EPlayer.AttachComponent(player, i.Key, comphash);
+                                    });
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+                }
             }
             else
             {
@@ -3131,6 +3155,30 @@ namespace RNC
 
                 player.GiveWeapon((WeaponHash)weaponHash, ammo);
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You received the weapon!");
+
+                if (attachments)
+                {
+                    try
+                    {
+                        if (EPlayer.GetAccount(player).WeaponComponents != null && EPlayer.GetAccount(player).WeaponComponents.Length > 3)
+                        {
+                            Dictionary<long, wComponentData> weaponCompsData = new Dictionary<long, wComponentData>();
+                            weaponCompsData = NAPI.Util.FromJson<Dictionary<long, wComponentData>>(EPlayer.GetAccount(player).WeaponComponents);
+
+                            foreach (KeyValuePair<long, wComponentData> i in weaponCompsData)
+                            {
+                                if (player.GetWeaponAmmo((WeaponHash)i.Key) > 0)
+                                {
+                                    i.Value.Components.ForEach((long comphash) =>
+                                    {
+                                        EPlayer.AttachComponent(player, i.Key, comphash);
+                                    });
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+                }
             }
         }
 

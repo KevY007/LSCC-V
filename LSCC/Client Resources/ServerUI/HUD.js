@@ -470,11 +470,11 @@ mp.events.add("OpenVehicleSpawner", (carname, admin) => {
     mp.gui.cursor.show(true, true);
 });
 
-mp.events.add("weaponSpawner:giveWeapon", (weaponHash, ammo, targetName) => {
+mp.events.add("weaponSpawner:giveWeapon", (weaponHash, ammo, targetName, attachments) => {
     VehicleSpawnerActive = false;
     mp.gui.cursor.show(false, false);
     
-    mp.events.callRemote("WeaponSpawner_RequestGiveWeapon", weaponHash, ammo, targetName);
+    mp.events.callRemote("WeaponSpawner_RequestGiveWeapon", weaponHash, ammo, targetName, attachments);
     ServerUI.execute(`gm.$refs.menus.$refs.weaponSpawner.enabled = false;`);
 });
 mp.events.add("weaponSpawner:close", () => {
