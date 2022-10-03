@@ -913,6 +913,10 @@ function UpdateStatsVars(entity){
                     id: ${player.getVariable("ClanID")},
                     tier: ${player.getVariable("ClanTier")}
                 })`);
+                
+                if(player.getVariable("Donator") >= 2 || player.getVariable("Admin") >= 1)
+                    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.removeInputColors = false;`);
+                else ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.removeInputColors = true;`);
             
                 if(CommandsDataJSON){
                     let allowedCommands = CommandsDataJSON.filter(cmd => cmd.Admin <= mp.players.local.getVariable("Admin"));
@@ -1091,7 +1095,7 @@ mp.events.add('render', () => {
     }
 
     if(radioToggle != undefined && radioToggle == false){
-        if(mp.players.local.vehicle !== undefined){
+        if(mp.players.local.vehicle != null && mp.players.local.isInAnyVehicle(false)){
             mp.game.invoke('0x1B9C0099CB942AC6', mp.players.local.vehicle.handle, 'OFF');
         }
     }

@@ -1094,7 +1094,7 @@ namespace RNC
             }
 
             EPlayer.GetAccount(player).WeaponComponents = NAPI.Util.ToJson(newWepData);
-            EPlayer.GetAccount(player).Points += price;
+            EPlayer.GivePoints(player, price);
             EPlayer.Notify(player, $"You successfully removed/sold the attachment and have been refunded <strong>{price} Points</strong>.", "green", "", false, 3000);
             
             // try { Main.Log("currency.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:removecomp:{itemData.Name}:{comp.Name}"); } catch { }
@@ -1167,7 +1167,7 @@ namespace RNC
 
                 newWepData.Add(wephash, newDataTwo);
             }
-            EPlayer.GetAccount(player).Points -= price;
+            EPlayer.GivePoints(player, -price);
             EPlayer.GetAccount(player).WeaponComponents = NAPI.Util.ToJson(newWepData);
             EPlayer.Save(player);
             EPlayer.Notify(player, $"You successfully purchased the weapon attachment for {price} Points!", "green", "", false, 3000);
