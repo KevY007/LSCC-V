@@ -221,7 +221,7 @@ namespace RNC
                                     Player target = RAGE.Entities.Players.All.Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
                                     if (target != null)
                                     {
-                                        target.TriggerEvent("pushMsgToChat", "!{#FF6347} Your password has been changed to: !{#FFFFFF}" + newpass);
+                                        target.SendChatMessage("!{#FF6347} Your password has been changed to: !{#FFFFFF}" + newpass);
                                         EPlayer.Notify(target, $"Your password has been changed to <p><strong>{newpass}</strong></p>", "green", "fas fa-check", false, 3000, "center", "replace");
                                     }
 
@@ -420,10 +420,10 @@ namespace RNC
 
                                         _acc.DiscordInfo = NAPI.Util.ToJson(_d);
 
-                                        _p.TriggerEvent("pushMsgToChat", "!{#83ff75}Congratulations! You successfully linked your Discord account to your Race 'N' Chase account.");
-                                        _p.TriggerEvent("pushMsgToChat", "!{#ffff00}[>] !{#ffffff}You now have access to the !{#ffff00}Negotiator !{#ffffff}loadout for !{#0097ff}cops !{#ffffff}& !{#ffae00}fugitives!{#ffffff}.");
-                                        _p.TriggerEvent("pushMsgToChat", "!{#ffff00}[>] !{#ffffff}You unlocked a new !{#ffae00}fugitive !{#ffffff}vehicle: !{#ffff00}Super Diamond!{#ffffff}.");
-                                        _p.TriggerEvent("pushMsgToChat", "!{#ffff00}[>] !{#ffffff}You also received !{#ffff00}13 points & 10XP !{#ffffff}as a bonus.");
+                                        _p.SendChatMessage("!{#83ff75}Congratulations! You successfully linked your Discord account to your Race 'N' Chase account.");
+                                        _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You now have access to the !{#ffff00}Negotiator !{#ffffff}loadout for !{#0097ff}cops !{#ffffff}& !{#ffae00}fugitives!{#ffffff}.");
+                                        _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You unlocked a new !{#ffae00}fugitive !{#ffffff}vehicle: !{#ffff00}Super Diamond!{#ffffff}.");
+                                        _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You also received !{#ffff00}13 points & 10XP !{#ffffff}as a bonus.");
 
                                         EPlayer.GrantXP(_p, 10);
                                         EPlayer.GivePoints(_p, 13);
@@ -831,7 +831,7 @@ namespace RNC
                                     Logs.LogAdmin(aSQL, $"Set {target.Name}'s admin level to {EPlayer.GetAdminLevelName(level)}.");
                                     target.SetSharedData("Admin", level);
                                     targetAcc.Admin = level;
-                                    target.TriggerEvent("pushMsgToChat", $"~g~Your admin level has been set to ~y~{level}~g~ by [DC] {context.Author.Username}!");
+                                    target.SendChatMessage($"~g~Your admin level has been set to ~y~{level}~g~ by [DC] {context.Author.Username}!");
                                     context.Channel.SendMessageAsync($"[ADMSET] <@{context.Author.Id}> , you successfully set **{target.Name}'s** admin level to **{level}**!");
                                     return;
                                 }
@@ -911,11 +911,11 @@ namespace RNC
 
                                 RAGE.Entities.Players.All.ForEach((Player playa) =>
                                 {
-                                    playa.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}AdmCmd: {target.Name} has been kicked by [DC] {context.Author.Username} for {args[2]}.");
+                                    playa.SendChatMessage($"!{{#FF6347}}AdmCmd: {target.Name} has been kicked by [DC] {context.Author.Username} for {args[2]}.");
                                 });
 
                                 EPlayer.Notify(target, $"You have been kicked from the server by [DC] {context.Author.Username} for <p>{args[2]}</p>", "red", "fas fa-ban", true, 30000);
-                                target.TriggerEvent("pushMsgToChat", "!{#A9C4E4}Server closed the connection.");
+                                target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
                                 context.Channel.SendMessageAsync($"[ADMKICK] <@{context.Author.Id}> , you kicked {target.Name} for {args[2]}!");
 
@@ -1002,14 +1002,14 @@ namespace RNC
 
                                 RAGE.Entities.Players.All.ForEach((Player p) =>
                                 {
-                                    p.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}AdmCmd: [DC] {context.Author.Username} has banned {target.Name} for: {args[2]}");
+                                    p.SendChatMessage($"!{{#FF6347}}AdmCmd: [DC] {context.Author.Username} has banned {target.Name} for: {args[2]}");
                                 });
 
                                 EPlayer.Notify(target, $"You have been banned from the server.<p>Reason: {args[2]}</p><p>Admin: [DC] {context.Author.Username}</p>", "red", "fas fa-ban", true, 30000);
 
-                                target.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[BANNED] You have been banned from this server, Ban ID: {_new.SQL_ID}");
+                                target.SendChatMessage($"!{{#FF6347}}[BANNED] You have been banned from this server, Ban ID: {_new.SQL_ID}");
 
-                                target.TriggerEvent("pushMsgToChat", "!{#A9C4E4}Server closed the connection.");
+                                target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
                                 context.Channel.SendMessageAsync($"[ADMBAN] <@{context.Author.Id}> , you banned {target.Name} for {args[2]}!");
 
                                 Logs.LogAdmin(aSQL, $"Banned player {target.Name} for {args[2]}");
@@ -1092,7 +1092,7 @@ namespace RNC
                                         {
                                             RAGE.Entities.Players.All.ForEach((Player p) =>
                                             {
-                                                p.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}AdmCmd: [DC] {context.Author.Username} has offline-banned {target.Username} for: {args[2]}");
+                                                p.SendChatMessage($"!{{#FF6347}}AdmCmd: [DC] {context.Author.Username} has offline-banned {target.Username} for: {args[2]}");
                                             });
                                         });
                                     }
@@ -1222,12 +1222,12 @@ namespace RNC
 
                                     RAGE.Entities.Players.All.ForEach((Player playa) =>
                                     {
-                                        playa.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}AdmCmd: [DC] {context.Author.Username} has muted {target.Name} for {mins} minutes, reason: {reason}.");
+                                        playa.SendChatMessage($"!{{#FF6347}}AdmCmd: [DC] {context.Author.Username} has muted {target.Name} for {mins} minutes, reason: {reason}.");
                                     });
                                     Logs.LogAdmin(admID, $"Muted player {target.Name} for {mins} minutes, reason: {reason}.");
                                     Logs.AddToAdminRecord(tAcc.SQL_ID, admID, "Mute", reason, mins + " minutes.");
 
-                                    target.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}[!] !{{#FFFFFF}}You have been muted for {mins} minutes, reason: {reason}.");
+                                    target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been muted for {mins} minutes, reason: {reason}.");
                                     target.SetSharedData("MuteTime", tAcc.MuteTime);
                                     target.TriggerEvent("SetMuteCounter", tAcc.MuteTime);
 
@@ -1258,7 +1258,7 @@ namespace RNC
                                             {
                                                 RAGE.Entities.Players.All.ForEach((Player playa) =>
                                                 {
-                                                    playa.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}AdmCmd: [DC] {context.Author.Username} has offline muted {tpAcc.Username} for {mins} minutes, reason: {reason}.");
+                                                    playa.SendChatMessage($"!{{#FF6347}}AdmCmd: [DC] {context.Author.Username} has offline muted {tpAcc.Username} for {mins} minutes, reason: {reason}.");
                                                 });
                                             });
                                             await context.Channel.SendMessageAsync($":white_check_mark: **Successfully offline-muted {targetName} for {reason}!**");
@@ -1393,7 +1393,7 @@ namespace RNC
 
                                     RAGE.Entities.Players.All.ForEach((Player playa) =>
                                     {
-                                        playa.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}AdmCmd: [DC] {context.Author.Username} has jailed {target.Name} for {mins} minutes, reason: {reason}.");
+                                        playa.SendChatMessage($"!{{#FF6347}}AdmCmd: [DC] {context.Author.Username} has jailed {target.Name} for {mins} minutes, reason: {reason}.");
                                     });
                                     Logs.LogAdmin(admID, $"Jailed player {target.Name} for {mins} minutes, reason: {reason}.");
                                     EPlayer.Jail(target, mins, reason);
@@ -1426,7 +1426,7 @@ namespace RNC
                                             {
                                                 RAGE.Entities.Players.All.ForEach((Player playa) =>
                                                 {
-                                                    playa.TriggerEvent("pushMsgToChat", $"!{{#FF6347}}AdmCmd: [DC] {context.Author.Username} has offline jailed {tpAcc.Username} for {mins} minutes, reason: {reason}.");
+                                                    playa.SendChatMessage($"!{{#FF6347}}AdmCmd: [DC] {context.Author.Username} has offline jailed {tpAcc.Username} for {mins} minutes, reason: {reason}.");
                                                 });
                                             });
 
@@ -1493,7 +1493,7 @@ namespace RNC
                                 Player target = RAGE.Entities.Players.All.FirstOrDefault(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
                                 if (target != null)
                                 {
-                                    target.TriggerEvent("pushMsgToChat", "!{#FF6347} Reconnect with your new name: !{#FFFFFF}" + newname);
+                                    target.SendChatMessage("!{#FF6347} Reconnect with your new name: !{#FFFFFF}" + newname);
                                     EPlayer.Notify(target, $"Please reconnect with your new name: {newname}", "green", "fas fa-check", false, 3000, "center", "replace");
 
                                     EPlayer.Save(target);

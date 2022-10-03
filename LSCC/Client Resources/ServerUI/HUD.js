@@ -513,6 +513,34 @@ mp.events.add("stopLoadingScreen", () => {
     ServerUI.execute('gm.$refs.loadingScreen.hide();');
 });
 
+mp.events.addCommand("fontsize", (size) => {
+    
+    if(size < 0.5 || size > 1.5){
+        mp.gui.chat.push("!{#ff6347}[!] !{white}Font size must be between 0.5 and 1.5! (default: 0.9)");
+        return;
+    }
+    mp.storage.data.chat.fontsize = size;
+    mp.storage.flush();
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.fontSize = ${size}`);
+});
+mp.events.addCommand("pagesize", (size) => {
+    
+    if(size < 4 || size > 24){
+        mp.gui.chat.push("!{#ff6347}[!] !{white}Page size must be between 4 and 24! (default: 18)");
+        return;
+    }
+    mp.storage.data.chat.pagesize = size;
+    mp.storage.flush();
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.pageSize = ${size}`);
+});
+mp.events.addCommand("timestamp", () => {
+
+    mp.storage.data.chat.timestamp = !mp.storage.data.timestamp;
+    mp.storage.flush();
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.timeStamp = ${mp.storage.data.chat.timestamp.toString()}`);
+    mp.gui.chat.push(`!{white}Chat timestamps have been turned ${(mp.storage.data.chat.timestamp == true ? `!{green}ON` : `!{red}OFF`)}`);
+});
+
 function activateChat(toggle){
     if(ServerUI == null) return;
     if(menuToggled){
@@ -548,7 +576,7 @@ function focusChat(toggle){
         increaseChatOpacity(3000);
     }
 
-    mp.gui.cursor.show(toggle, toggle);
+    mp.gui.cursor.show(toggle, false);
     mp.events.callRemote("onFocusChat", toggle);
 }
 function pushMessageToChat(message){
@@ -636,6 +664,12 @@ mp.keys.bind(0x1B, true, function() { // ESC key
         mp.events.call("onOpenChatbox", false);       
     }
 });
+mp.keys.bind(0x0D, true, function() { // Enter Key
+    if(chatStatus){
+        focusChat(false);
+        mp.events.call("onOpenChatbox", false);       
+    }
+});
 
 mp.keys.bind(0x54, true, function() { // T key
     if(ServerUI == null) return;
@@ -654,11 +688,21 @@ mp.keys.bind(0x54, true, function() { // T key
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = false;`);
         return;
     }
-
     if(!chatStatus)
     {
         focusChat(true);
         mp.events.call("onOpenChatbox", true);
+
+        // The Anti-FUCK system: try to hide cursor instantly, but if it fails, hide it afterwards! :D very cool
+        setTimeout(() => {
+            mp.gui.cursor.show(true, false);
+        }, 5);
+        setTimeout(() => {
+            mp.gui.cursor.show(true, false);
+        }, 10);
+        setTimeout(() => {
+            mp.gui.cursor.show(true, false);
+        }, 50);
     }
 });
 mp.events.add("closeChat", () => {         

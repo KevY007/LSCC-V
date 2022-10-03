@@ -321,6 +321,7 @@ mp.events.add("onOpenChatbox", (toggle) =>
     mp.events.callRemote("UpdateChatState", toggle);
     traceLastFunc(`[Players] ChatBox Toggled ${toggle}`);
 
+    mp.gui.cursor.show(toggle, false);
     if(toggle == true){
         chatStatusLate = true;
     }

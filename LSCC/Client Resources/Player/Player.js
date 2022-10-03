@@ -3037,6 +3037,34 @@ function setStorageDataVars(){
     AFKStage = 0;
     antiAFKActive = true;
 
+    if(mp.storage.data.chat == undefined){
+        mp.storage.data.chat = {};
+        mp.storage.data.chat.timestamp = false;
+        mp.storage.data.chat.pagesize = 18;
+        mp.storage.data.chat.fontsize = 0.9;
+    }
+    if(mp.storage.data.chat.timestamp !== undefined){    
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.timeStamp = ${mp.storage.data.chat.timestamp.toString()}`);
+    }
+    else{
+        mp.storage.data.chat.timestamp = false;
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.timeStamp = false;`);
+    }
+    if(mp.storage.data.chat.pagesize !== undefined){    
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.pageSize = ${mp.storage.data.chat.pagesize}`);
+    }
+    else{
+        mp.storage.data.chat.pagesize = 18;
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.pageSize = 18;`);
+    }
+    if(mp.storage.data.chat.fontsize !== undefined){    
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.fontSize = ${mp.storage.data.chat.fontsize}`);
+    }
+    else{
+        mp.storage.data.chat.fontsize = 0.9;
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.fontSize = 0.9;`);
+    }
+
     if(mp.storage.data.menu.OOCauto !== undefined){
         autoOOC = mp.storage.data.menu.OOCauto;
         mp.events.callRemote("SetAutoOOC", autoOOC);
