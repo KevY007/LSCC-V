@@ -849,7 +849,7 @@ mp.events.add("TwoSecondsEvent", () => {
             }
         }
         else {
-            if(mp.players.local.isInAnyVehicle(false) && mp.players.local.vehicle != undefined)
+            if(mp.players.local.isInAnyVehicle(false) && mp.players.local.vehicle != undefined && mp.storage.data.menu.Speedo == true)
             {
                 if(!speedo)
                 {
@@ -1731,7 +1731,7 @@ mp.events.add("render", () => {
         else {
             if(mp.players.local.isInAnyVehicle(false))
             {
-                if(!speedo)
+                if(!speedo && mp.storage.data.menu.Speedo == true)
                 {
                     ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = true;`);
                     speedo = true;

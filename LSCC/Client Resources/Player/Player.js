@@ -74,7 +74,6 @@ const boneDistanceThreshold = 1;
 
 var lastGPSBind = 0x5A;
 var curGPSBind = 0x5A;
-var radioToggle = 0;
 
 var lastMapBind = 0x50;
 var curMapBind = 0x50;
@@ -3074,7 +3073,9 @@ function setStorageDataVars(){
         mp.storage.data.chat.fontsize = 0.9;
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.fontSize = 0.9;`);
     }
-
+    if(mp.storage.data.menu.Speedo == undefined){
+        mp.storage.data.menu.Speedo = true;
+    }
     if(mp.storage.data.menu.OOCauto !== undefined){
         autoOOC = mp.storage.data.menu.OOCauto;
         mp.events.callRemote("SetAutoOOC", autoOOC);

@@ -8,6 +8,8 @@ var chaseMode = 0; // 0= STANDARD | 1= BUSTED | and others as in SCRIPT
 var collisionTime = -1;
 var updateRate = 200;
 
+var radioToggle = 0;
+
 var chatStatus = false;
 var chatStatusLate = false;
 var menuToggledLate = false;

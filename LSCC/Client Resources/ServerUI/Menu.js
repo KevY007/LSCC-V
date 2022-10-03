@@ -27,6 +27,7 @@ if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD
     mp.storage.data.menu.ShowInactiveChat = true;
     mp.storage.data.menu.AutoLogin = true;
     mp.storage.data.menu.RealtimeSpeedo = false;
+    mp.storage.data.menu.Speedo = true;
 
     mp.storage.flush();
 }
@@ -485,6 +486,13 @@ function ToggleMenu()
                         description: "Toggles whether background music will play in events or not."
                     },
                     {
+                        id: 26,
+                        type: 1,
+                        name: "carradio",
+                        label: "GTA Car Radio",
+                        description: "Toggles whether you'll hear the in-game car radio music. NOTE: Due to GTAV sync, if the driver has disabled radio, you won't hear anything too!"
+                    },
+                    {
                         id: 21,
                         type: 1,
                         name: "autologintog",
@@ -591,6 +599,13 @@ function ToggleMenu()
                         name: "nametags",
                         label: "Nametags",
                         description: "Enable/disable nametags."
+                    },
+                    {
+                        id: 25,
+                        type: 1,
+                        name: "togspeedo",
+                        label: "Speedometer",
+                        description: "Enable/disable car speedometer."
                     },
                     {
                         id: 6,
@@ -729,6 +744,7 @@ function ToggleMenu()
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.hud[0].value = ${mp.storage.data.menu.HUD};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.bigmap[0].value = ${mp.storage.data.menu.alwaysExpandedMap};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.updr[0].value = ${mp.storage.data.menu.updateRate};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.togspeedo[0].value = ${mp.storage.data.menu.Speedo};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.monitor[0].value = ${mp.storage.data.menu.monitoring};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.vcbind[0].value = "${String.fromCharCode(curVoiceBind)}";`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.gpsbind[0].value = "${String.fromCharCode(curGPSBind)}";`);
@@ -740,6 +756,7 @@ function ToggleMenu()
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.eventmusic[0].value = ${mp.storage.data.menu.EventMusic};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autologintog[0].value = ${mp.storage.data.menu.AutoLogin};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.realtimespeedo[0].value = ${mp.storage.data.menu.RealtimeSpeedo};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.carradio[0].value = ${mp.storage.data.radiotoggle};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.oocauto[0].value = ${mp.storage.data.menu.OOCauto};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.voicemode[0].value = "${menuSetting_getOptionNameFromValue("voicemode", mp.storage.data.menu.VoiceMode)}";`);
         
@@ -888,6 +905,14 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     else if(id == 24)
     {
         changeMDCBind(value);
+    }
+    else if(id == 25){
+        mp.storage.data.menu.Speedo = value;
+        ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = ${value};`);
+    }
+    else if(id == 26){
+        mp.storage.data.radiotoggle = value;
+        radioToggle = value;
     }
 
     if(ServerUI != null)
