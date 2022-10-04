@@ -1869,6 +1869,7 @@ namespace RNC
                 return;
             }
             string nameCheck = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 ";
+            string tagNameCheck = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890 ";
             bool isNameGood = true;
             bool isTagGood = true;
             for (int i = 0; i < clanname.Length; i++)
@@ -1877,7 +1878,7 @@ namespace RNC
             }
             for(int i = 0; i < tag.Length; i++)
             {
-                if (!nameCheck.Contains(tag[i])) { isTagGood = false; break; }          
+                if (!tagNameCheck.Contains(tag[i])) { isTagGood = false; break; }          
             }
             if (!isNameGood)
             {
@@ -1888,7 +1889,7 @@ namespace RNC
             if (!isTagGood)
             {
                 player.SetData<bool>("LoadingClanCreation", false);
-                EPlayer.Error(player, "Clan tag must be alphanumeric (A-Z, 0-9)!", "sex");
+                EPlayer.Error(player, "Clan tag must be alphanumeric, all leters must be capitalized (A-Z, 0-9)!", "sex");
                 return;
             }
 
