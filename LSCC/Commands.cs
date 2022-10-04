@@ -53,7 +53,7 @@ namespace RNC
                 Settings.SpawnParkedVehicles = !Settings.SpawnParkedVehicles;
                 EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has toggled random parked vehicles in copchase {(Settings.SpawnParkedVehicles ? "ON" : "OFF")}.");
             }
-            else if (action.StartsWith("parkedvehscount"))
+            else if (action.StartsWith("numparkedvehs"))
             {
                 string[] args = action.Split(' ');
                 if (args.Count() > 1)
@@ -125,7 +125,7 @@ namespace RNC
                 player.SendChatMessage("camupdate => Please don't touch. Rate clients update cam direction to server.");
                 player.SendChatMessage("ooc => Toggles the OOC chat in server. (Does not save during restarts)");
                 player.SendChatMessage("parkedvehs => Toggles the random parked vehicle spawning in copchase (Does not save)");
-                player.SendChatMessage("parkedvehscount => Number of random parked vehicles to spawn (Does not save)");
+                player.SendChatMessage("numparkedvehs => Number of random parked vehicles to spawn (Does not save)");
             }
             else if (action.StartsWith("ooc", StringComparison.OrdinalIgnoreCase))
             {
@@ -223,7 +223,7 @@ namespace RNC
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions usediscord <true/false>");
             }
 
-            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'maxinlobby, derbyveh, usediscord, onfootcollisions, afob, speedafob, camupdate, parkedvehs, parkedvehscount'");
+            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'maxinlobby, derbyveh, usediscord, onfootcollisions, afob, speedafob, camupdate, parkedvehs, numparkedvehs'");
 
             return;
         }

@@ -1842,6 +1842,8 @@ namespace RNC
                 return;
             }
 
+            string theTag = tag.ToUpper();
+
             player.SetData<bool>("LoadingClanCreation", true);
             if (!EPlayer.LoggedIn(player))
             {
@@ -1876,9 +1878,9 @@ namespace RNC
             {
                 if (!nameCheck.Contains(clanname[i])) { isNameGood = false; break; }
             }
-            for(int i = 0; i < tag.Length; i++)
+            for(int i = 0; i < theTag.Length; i++)
             {
-                if (!tagNameCheck.Contains(tag[i])) { isTagGood = false; break; }          
+                if (!tagNameCheck.Contains(theTag[i])) { isTagGood = false; break; }          
             }
             if (!isNameGood)
             {
@@ -1917,7 +1919,7 @@ namespace RNC
                         });
                         return;
                     }
-                    Clan tagCheck = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.Tag == tag);
+                    Clan tagCheck = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.Tag == theTag);
                     if (tagCheck != null)
                     {
                         NAPI.Task.Run(() =>
@@ -1934,7 +1936,7 @@ namespace RNC
                         TotalKills = 0,
                         WeekWins = 0,
                         Description = realDesc,
-                        Tag = tag,
+                        Tag = theTag,
                         CreatedOn = DateTime.Now.ToString("F"),
                         ClanAccess = 0,
                         ForceTag = true,
