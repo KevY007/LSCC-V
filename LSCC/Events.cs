@@ -3081,6 +3081,13 @@ namespace RNC
         [RemoteEvent("RequestSwimPenalty")]
         public static void OnRequestSwimPenalty(Player player)
         {
+            if(player.HasSharedData("InDM") && player.GetSharedData<int>("InDM") != -1)
+            {
+                player.Health = 0;
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The waters are too dangerous for you, my friend - you can't swim in deathmatch!");
+                return;
+            }
+
             player.Health -= 5; // Slowly reduce health by 5 if in wotah.
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Evading by swimming is not allowed, you are taking damage.");
         }
@@ -7093,7 +7100,7 @@ namespace RNC
                                 {
                                     if (arenaID != 1 && arenaID != 5 && arenaID != 6 && arenaID != 7)
                                     {
-                                        switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 5))
+                                        switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 6))
                                         {
                                             case 0:
                                                 player.GiveWeapon(WeaponHash.Appistol, 1000);
@@ -7124,6 +7131,12 @@ namespace RNC
                                                 player.GiveWeapon(WeaponHash.Combatpdw, 1000);
                                                 player.GiveWeapon(WeaponHash.Pistol50, 1000);
                                                 player.GiveWeapon(WeaponHash.Assaultshotgun, 1000);
+                                                break;
+                                            case 5:
+                                                player.GiveWeapon((WeaponHash)3520460075, 1000); // m16
+                                                player.GiveWeapon((WeaponHash)94989220, 1000); // combat shotgun | spas-12 lookalike
+                                                player.GiveWeapon(WeaponHash.Vintagepistol, 1000);
+                                                player.GiveWeapon(WeaponHash.Machinepistol, 1000);
                                                 break;
                                         }
                                     }

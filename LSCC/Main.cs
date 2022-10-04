@@ -793,7 +793,8 @@ namespace RNC
             "Diamond Casino Rooftop",
             "Humane Labs (Pistol & Shotgun Only)",
             "Morgue (Stungun Only)",
-            "Server Room"
+            "Server Room",
+            "Yacht"
         };
 
         public static object[][,] DMSpawns = new object[][,]
@@ -907,6 +908,22 @@ namespace RNC
                 { new Vector3(2172.6338f, 2926.562f, -84.799805f), -96.70913f },
                 { new Vector3(2174.3457f, 2923.4778f, -81.07484f), 30.905758f },
                 { new Vector3(2155.554f, 2921.0679f, -81.07545f), -99.31608f },
+            },
+            new object[,] // Yacht
+            {
+                { new Vector3(-2020.4397f, -1044.3085f, 2.446505f), 38.107838f },
+                { new Vector3(-2035.8844f, -1034.2062f, 5.882396f), -108.74696f },
+                { new Vector3(-2057.9128f, -1019.32263f, 5.882021f), -22.493902f },
+                { new Vector3(-2076.1602f, -1017.83997f, 5.8841314f), -134.3238f },
+                { new Vector3(-2085.8054f, -1016.5439f, 5.884128f), 82.145386f },
+                { new Vector3(-2092.0054f, -1009.32764f, 5.884347f), 118.70009f },
+                { new Vector3(-2105.5747f, -1011.3669f, 5.8870034f), 110.23749f },
+                { new Vector3(-2125.5837f, -1004.77936f, 8.56874f), -108.86156f },
+                { new Vector3(-2088.8308f, -1016.88025f, 8.971198f), 71.05865f },
+                { new Vector3(-2052.3716f, -1028.8345f, 8.97149f), -108.099525f },
+                { new Vector3(-2062.7554f, -1025.5779f, 11.907997f), -109.13658f },
+                { new Vector3(-2082.9897f, -1018.7605f, 15.988901f), 72.777504f },
+                { new Vector3(-2047.9214f, -1023.5474f, 8.971496f), -114.67136f },
             }
         };
 
@@ -1659,7 +1676,8 @@ namespace RNC
 	        {1233104067, "Flare"},
 	        {615608432, "Molotov"},
             {3520460075, "Service Rifle"},
-	        {741814745, "Sticky Bomb"},
+            {94989220, "Combat Shotgun"},
+            {741814745, "Sticky Bomb"},
 	        {2874559379, "Proximity Mine"},
 	        {126349499, "Snowball"},
 	        {3125143736, "Pipe Bomb"},
