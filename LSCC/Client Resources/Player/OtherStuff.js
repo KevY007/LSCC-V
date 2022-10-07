@@ -672,12 +672,15 @@ mp.events.add('TakeScreenshot', (quality, compression, apiKey, identifier = "nul
             }, 1000);
             mp.events.remove(`Screenshotter${_fdate.getMilliseconds()}`);
         });
+
+        let resolution = mp.game.graphics.getScreenActiveResolution(0, 0);
+
         let toexec = `loadImage("${apiKey}",
         "${mp.players.local.name};${identifier}+${_fname}", 
         "http://screenshots/${_fname}", 
         "Screenshotter${_fdate.getMilliseconds()}", 
         "${identifier}", 
-        "http://194.163.144.228:8237/ss/upload");`;
+        "http://194.163.144.228:8237/ss/upload", ${resolution.x}, ${resolution.y});`;
         screenshotter_cef.execute(toexec);
     }, 2000);
 });

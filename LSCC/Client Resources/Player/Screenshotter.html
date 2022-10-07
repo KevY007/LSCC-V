@@ -8,11 +8,11 @@
     canvas.style.display = 'none';
 
     var context = canvas.getContext("2d");
-    function loadImage(api_key, name, url, event, identifier, uploadUrl) {
+    function loadImage(api_key, name, url, event, identifier, uploadUrl, resX, resY) {
         var image = new Image();
         image.onload = function () {
-            const width =  1920;
-            const height = 1080;
+            const width =  resX;
+            const height = resY;
             canvas.width = width;
             canvas.height = height;
             context.drawImage(image, 0, 0, width, height, 0, 0, width, height);
