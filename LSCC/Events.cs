@@ -90,6 +90,7 @@ namespace RNC
 
                     if (ban != null)
                     {
+                        NAPI.Util.ConsoleOutput($"Found a ban through IP: ${pAddress}, RID: ${pSCID}, HWID: {pSerial}");
                         Account evadeAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == ban.AccountSQLID);
                         string evadeAccountName = evadeAcc.Username;
                         NAPI.Task.Run(() =>
@@ -2097,6 +2098,17 @@ namespace RNC
         {
             if(vehicle.HasSharedData("Team") && vehicle.GetSharedData<int>("Team") == 10)
             {
+                LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
+                if (lobby != null)
+                {
+                    Blip vblip = lobby.ParkedVehicleBlips.FirstOrDefault(b => b.GetData<NetHandle>("LinkedVehicle") == vehicle.Handle);
+                    if (vblip != null)
+                    {
+                        vblip.Delete();
+                        lobby.ParkedVehicleBlips.Remove(vblip);
+                    }
+                }
+
                 if(vehicle.HasSharedData("Engine") && vehicle.GetSharedData<bool>("Engine") == false)
                 {
                     vehicle.EngineStatus = false;

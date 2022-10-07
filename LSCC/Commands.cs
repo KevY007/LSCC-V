@@ -65,9 +65,9 @@ namespace RNC
                         player.SendChatMessage($"!{{#999999}}You must enter a number between 500 and 1500!");
                         return;
                     }
-                    if(speed < 500 || speed > 1500)
+                    if(speed < 100 || speed > 500)
                     {
-                        player.SendChatMessage($"!{{#999999}}You must enter a number between 500 and 1500!");
+                        player.SendChatMessage($"!{{#999999}}You must enter a number between 100 and 500!");
                         return;
                     }
 
@@ -5514,7 +5514,67 @@ namespace RNC
             });
         }
 
-        [Command("changepass", "!{#AFAFAF}[USAGE] changepass (account name) (new password)")]
+
+        [Command("changeemail", "!{#AFAFAF}[USAGE] changeemail (account name) (new email)")]
+        public void cmd_changeemail(Player player, string name, string newpass)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                return;
+            }
+            int pAdmin = EPlayer.GetAccount(player).Admin;
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account tpAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                    if (tpAcc == null)
+                    {
+                        // reusing deleteaccount error message function since it's same
+                        deleteaccount_ReturnErrorTask(player, 0);
+                        return;
+                    }
+                    if (tpAcc.Admin > pAdmin)
+                    {
+                        // reusing deleteaccount error message function since it's same
+                        deleteaccount_ReturnErrorTask(player, 1);
+                        return;
+                    }
+                    Account mailcheck = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Email.Equals(newpass, StringComparison.OrdinalIgnoreCase));
+                    if (mailcheck != null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}An account with that e-mail exists and belongs to " + mailcheck.Username);
+
+                        });
+                         return;
+                    }
+
+                    tpAcc.Email = newpass;
+                    await context.SaveChangesAsync();
+
+                    NAPI.Task.Run(() =>
+                    {
+                        player.SendChatMessage($"~g~You've changed ${name}'s e-mail address to {newpass}!");
+
+                        Player target = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+                        if(target != null)
+                        {
+                            target.SendChatMessage($"~g~{player.Name} has changed your e-mail address to {newpass}!");
+                        }
+                        Logs.LogAdmin(player, $"Changed {name}'s e-mail address to {newpass}.");
+                    });
+                }
+            });
+
+        }
+
+            [Command("changepass", "!{#AFAFAF}[USAGE] changepass (account name) (new password)")]
         public void cmd_changepass(Player player, string name, string newpass)
         {
             if (!EPlayer.LoggedIn(player))
@@ -5879,8 +5939,8 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    Account tpAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true &&
-                        context.Bans.ToList().Where(a => a.AccountSQLID == p.SQL_ID).Count() == 0);
+                    Account tpAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) &&
+                        context.Bans.AsQueryable().Count(a => a.AccountSQLID == p.SQL_ID) == 0);
 
                     if (tpAcc == null)
                     {

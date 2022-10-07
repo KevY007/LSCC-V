@@ -193,12 +193,16 @@ namespace RNC
 
         public List<Lobby_StingerData> Stingers { get; set; }
 
+        public List<Blip> ParkedVehicleBlips { get; set; }
+
         public LobbyData()
         {
             Cops = new List<Player>();
             Fugitives = new List<Player>();
             Vehicles = new List<Vehicle>();
             Drops = new List<Pickup>();
+
+            ParkedVehicleBlips = new List<Blip>();
 
             BankRobbery = new BankRobberyData();
             NextEventCounter = 10; // how many rounds left until an event
@@ -671,7 +675,7 @@ namespace RNC
 
         // Global Variables (changing accordingly)
         public static bool SpawnParkedVehicles { get; set; } = true; // for debug purposes whether to spawn random cars
-        public static int ParkedVehiclesToSpawn { get; set; } = 600;
+        public static int ParkedVehiclesToSpawn { get; set; } = 200;
         public static List<LobbyData> Lobbies { get; set; }
         public static List<Player> LoggedInPlayers { get; set; }
         public static List<Vehicle> AdminVehicles { get; set; }
@@ -3041,6 +3045,12 @@ namespace RNC
             LobbyData lobby = Settings.Lobbies.Find(l => l.lobbyId == lobbyid);
             Stinger.ClearStingers(lobby);
 
+            foreach(Blip blip in lobby.ParkedVehicleBlips)
+            {
+                blip.Delete();
+            }
+            lobby.ParkedVehicleBlips.Clear();
+
             int winnerTeam = -1;
             if (lobby != null && lobby.gameStatus == 1)
             {
@@ -3534,6 +3544,10 @@ namespace RNC
                                                     bool locked = rnd.Next(100) > 50;
                                                     Vehicle veh = NAPI.Vehicle.CreateVehicle(carModel, new Vector3(car.X, car.Y, car.Z),
                                                         car.Heading, rnd.Next(100), rnd.Next(100), "", 255, locked, false, Convert.ToUInt32(lobbyid));
+
+                                                    Blip vBlip = NAPI.Blip.CreateBlip(1, new Vector3(car.X, car.Y, car.Z), 0.8f, 55, "Civilian Vehicle", 128, 200, true, 0, Convert.ToUInt32(lobbyid));
+                                                    vBlip.SetData<NetHandle>("LinkedVehicle", veh.Handle);
+                                                    lobby.ParkedVehicleBlips.Add(vBlip);
 
                                                     crashcheck = 681;
                                                     veh.EngineStatus = false;
@@ -4526,7 +4540,6 @@ namespace RNC
                                                             if (p == null) continue;
 
                                                             p.Position = new Vector3(fugi.spawnX, fugi.spawnY, fugi.spawnZ).Around(30f);
-                                                            p.TriggerEvent("stopLoadingScreen");
                                                         }
                                                         catch { }
                                                     }
@@ -4541,7 +4554,6 @@ namespace RNC
                                                             if (p == null) continue;
 
                                                             p.Position = new Vector3(cop.spawnX, cop.spawnY, cop.spawnZ).Around(30f);
-                                                            p.TriggerEvent("stopLoadingScreen");
                                                         }
                                                         catch { }
                                                     }
@@ -4700,7 +4712,7 @@ namespace RNC
                                                 p.TriggerEvent("ToggleCollisionsForEnt", p.GetData<Vehicle>("ChaseVehicle"), false);
 
                                                 p.SetSharedData("Collisions", false);
-                                                p.TriggerEvent("stopLoadingScreen");
+                                                //p.TriggerEvent("stopLoadingScreen");
                                             }
                                             catch { }
                                         }
@@ -4721,7 +4733,7 @@ namespace RNC
 
                                                 p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
                                                 p.SetSharedData("Collisions", false);
-                                                p.TriggerEvent("stopLoadingScreen");
+                                                //p.TriggerEvent("stopLoadingScreen");
                                             }
                                             catch { }
                                         }

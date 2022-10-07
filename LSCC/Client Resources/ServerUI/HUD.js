@@ -498,6 +498,10 @@ mp.events.add("SendClanInvite", (clanName, clanID, senderName) => {
 var IsInInfiniteLoading = true;
 var CanSkipLoading = false;
 mp.events.add("startLoadingScreen", (time, message) => {
+    if(mp.storage.data.menu.loadingscreens !== undefined && mp.storage.data.menu.loadingscreens == false){
+        return;
+    }
+
     if(time == -1){
         ServerUI.execute('gm.$refs.loadingScreen.show(true);');
         if(message != "none")
@@ -530,6 +534,10 @@ mp.keys.bind(0x20, false, function() {
     }
 });
 mp.events.add("stopLoadingScreen", () => {
+    if(mp.storage.data.menu.loadingscreens !== undefined && mp.storage.data.menu.loadingscreens == false){
+        return;
+    }
+
     ServerUI.execute('gm.$refs.loadingScreen.hide();');
     IsInInfiniteLoading = false;
     CanSkipLoading = false;
@@ -557,7 +565,7 @@ mp.events.addCommand("pagesize", (size) => {
 });
 mp.events.addCommand("timestamp", () => {
 
-    mp.storage.data.chat.timestamp = !mp.storage.data.timestamp;
+    mp.storage.data.chat.timestamp = !mp.storage.data.chat.timestamp;
     mp.storage.flush();
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.timeStamp = ${mp.storage.data.chat.timestamp.toString()}`);
     mp.gui.chat.push(`!{white}Chat timestamps have been turned ${(mp.storage.data.chat.timestamp == true ? `!{green}ON` : `!{red}OFF`)}`);

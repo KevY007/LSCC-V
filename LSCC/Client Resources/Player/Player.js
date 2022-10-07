@@ -3064,6 +3064,9 @@ function setStorageDataVars(){
         mp.storage.data.chat.timestamp = false;
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.timeStamp = false;`);
     }
+    if(mp.storage.data.menu.loadingscreens === undefined){
+        mp.storage.data.menu.loadingscreens = true;
+    }
     if(mp.storage.data.chat.pagesize !== undefined){    
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.pageSize = ${mp.storage.data.chat.pagesize}`);
     }

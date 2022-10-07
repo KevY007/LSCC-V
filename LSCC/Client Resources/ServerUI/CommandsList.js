@@ -1124,6 +1124,16 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "changeemail",
+    "Usage": "[USAGE] changeemail (account name) (new mail)",
+    "Admin": 4,
+    "Donator": 0,
+    "Parameters": [
+      "account name",
+      "new email"
+    ]
+  },
+  {
     "CommandText": "changemypass",
     "Usage": "[USAGE] changemypass (new password)",
     "Admin": 0,

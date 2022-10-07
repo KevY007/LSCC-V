@@ -921,9 +921,61 @@ namespace RNC
                                 }, 10);
                             }
                         }
-                        
+
                     }
                     else await context.Channel.SendMessageAsync("USAGE: !unban (name)");
+                }
+                else if (context.Content.StartsWith("!changeemail"))
+                {
+                    string[] args = context.Content.Split(" ", 3);
+                    if (args.Count() >= 3)
+                    {
+                        string username = args[1];
+                        string email = args[2];
+
+                        int aLevel = GetIngameAdminLevel(context.Author);
+                        int aSQL = await GetIngameSQLID(context.Author);
+                        if (aSQL == -1)
+                        {
+                            await context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
+                            await context.Channel.SendMessageAsync("**HINT:** /verify");
+                            return;
+                        }
+
+                        lock (RAGE.Entities.Players)
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                Task.Run(async () =>
+                                {
+                                    using (MainDatabase dbcontext = ContextFactory.CreateContext())
+                                    {
+                                        Account targetAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(t => t.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+                                        if (targetAcc == null)
+                                        {
+                                            await context.Channel.SendMessageAsync("**[!]** A player with that username could not be found!");
+                                            return;
+                                        }
+                                        if (targetAcc.Admin == 6 || targetAcc.Admin >= aLevel)
+                                        {
+                                            await context.Channel.SendMessageAsync("**[!]** That player is a higher/equal admin level than you!");
+                                            return;
+                                        }
+                                        Account mailcheck = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+                                        if (mailcheck != null)
+                                        {
+                                            await context.Channel.SendMessageAsync("**[!]** An account with that e-mail exists and belongs to " + mailcheck.Username);
+                                            return;
+                                        }
+                                        targetAcc.Email = email;
+                                        await dbcontext.SaveChangesAsync();
+                                        Logs.LogAdmin(aSQL, $"Set {targetAcc.Username}'s e-mail to {email}");
+                                        await context.Channel.SendMessageAsync($"[ADMSET] <@{context.Author.Id}> , you successfully set **{targetAcc.Username}'s** email to **{email}**!");
+                                    }
+                                });
+                            });
+                        }
+                    }
                 }
                 else if (context.Content.StartsWith("!setstaff"))
                 {
@@ -973,8 +1025,8 @@ namespace RNC
                                     return;
                                 }
 
-                                // if he is in-game
-                                if (RAGE.Entities.Players.All.Where(p => p.Name.Equals(args[1], StringComparison.OrdinalIgnoreCase)).Count() > 0)
+                                    // if he is in-game
+                                    if (RAGE.Entities.Players.All.Where(p => p.Name.Equals(args[1], StringComparison.OrdinalIgnoreCase)).Count() > 0)
                                 {
                                     Player target = RAGE.Entities.Players.All.FirstOrDefault(p => p.Name.Equals(args[1], StringComparison.OrdinalIgnoreCase));
                                     if (target == null) return; // doesnt hurt to have extra security :)
@@ -1156,7 +1208,7 @@ namespace RNC
                                         await dbcontext.SaveChangesAsync();
                                     }
                                 });
-                                
+
 
                                 EPlayer.SetDiscordStatus(target, "Gazing at the 'BANNED' screen.");
 
@@ -1174,9 +1226,9 @@ namespace RNC
 
                                 Logs.LogAdmin(aSQL, $"Banned player {target.Name} for {args[2]}");
                                 Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, aSQL, "Ban", args[2], "N/A");
-                                // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ban:{target.Name}:{reason}"); } catch { }
+                                    // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ban:{target.Name}:{reason}"); } catch { }
 
-                                target.SetData("Kicked", true);
+                                    target.SetData("Kicked", true);
                                 NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
                             }, 10);
                         }
@@ -1220,7 +1272,7 @@ namespace RNC
                                     {
                                         target = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(args[1], StringComparison.OrdinalIgnoreCase) == true &&
                                             dbcontext.Bans.Count(a => a.AccountSQLID == p.SQL_ID) == 0);
-                                        
+
                                         if (target == null)
                                         {
                                             await context.Channel.SendMessageAsync("**[!]** There's no account with that name or target is already banned (/bancheck).");
@@ -1256,9 +1308,9 @@ namespace RNC
                                             });
                                         });
                                     }
-                                    
+
                                 });
-       
+
                             });
                         }
                     }
@@ -1271,60 +1323,60 @@ namespace RNC
                     {
                         string name = args[1];
                         int admID = await GetIngameSQLID(context.Author);
-                            if (admID == -1)
-                            {
-                                await context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
-                                await context.Channel.SendMessageAsync("**HINT:** /verify");
-                                return;
-                            }
+                        if (admID == -1)
+                        {
+                            await context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
+                            await context.Channel.SendMessageAsync("**HINT:** /verify");
+                            return;
+                        }
 
-                            lock (RAGE.Entities.Players)
+                        lock (RAGE.Entities.Players)
+                        {
+                            NAPI.Task.Run(() =>
                             {
-                                NAPI.Task.Run(() =>
+                                Player target = RAGE.Entities.Players.All.FirstOrDefault(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+                                if (target != null)
                                 {
-                                    Player target = RAGE.Entities.Players.All.FirstOrDefault(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-                                    if (target != null)
-                                    {
-                                        Account acc = EPlayer.GetAccount(target);
-                                        if (acc.MuteTime == 0) { context.Channel.SendMessageAsync("**[!]** Target is not muted."); return; }
+                                    Account acc = EPlayer.GetAccount(target);
+                                    if (acc.MuteTime == 0) { context.Channel.SendMessageAsync("**[!]** Target is not muted."); return; }
 
                                         //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unmute:{target.Name}"); } catch { }
                                         Logs.LogAdmin(admID, $"Unmuted {target.Name}.");
-                                        acc.MuteTime = 0;
-                                        target.SetSharedData("MuteTime", 0);
+                                    acc.MuteTime = 0;
+                                    target.SetSharedData("MuteTime", 0);
 
-                                        EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] [DC] {context.Author.Username} has unmuted {target.Name}.");
+                                    EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] [DC] {context.Author.Username} has unmuted {target.Name}.");
 
-                                        context.Channel.SendMessageAsync($":white_check_mark: **Successfully unmuted {name}!**");
-                                    }
-                                    else
+                                    context.Channel.SendMessageAsync($":white_check_mark: **Successfully unmuted {name}!**");
+                                }
+                                else
+                                {
+                                    Task.Run(async () =>
                                     {
-                                        Task.Run(async () =>
+                                        using (MainDatabase dbcontext = ContextFactory.CreateContext())
                                         {
-                                            using (MainDatabase dbcontext = ContextFactory.CreateContext())
-                                            {
-                                                Account tpAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                                            Account tpAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
 
-                                                if (tpAcc == null)
-                                                {
-                                                    await context.Channel.SendMessageAsync("**[!]** There's no account with that name.");
-                                                    return;
-                                                }
+                                            if (tpAcc == null)
+                                            {
+                                                await context.Channel.SendMessageAsync("**[!]** There's no account with that name.");
+                                                return;
+                                            }
 
                                                 //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ounmute:{tpAcc.Username}"); } catch { }
                                                 Logs.LogAdmin(admID, $"Unmuted offline player {tpAcc.Username}.");
-                                                tpAcc.MuteTime = 0;
+                                            tpAcc.MuteTime = 0;
 
-                                                await dbcontext.SaveChangesAsync();
+                                            await dbcontext.SaveChangesAsync();
 
-                                                await context.Channel.SendMessageAsync($":white_check_mark: **Successfully offline-unmuted {name}!**");
-                                            }
-                                        });
-                                        
-                                    }
+                                            await context.Channel.SendMessageAsync($":white_check_mark: **Successfully offline-unmuted {name}!**");
+                                        }
+                                    });
 
-                                }, 10);
-                            }        
+                                }
+
+                            }, 10);
+                        }
                     }
                     else await context.Channel.SendMessageAsync("**[!]** !unmute [name]");
                 }
@@ -1424,7 +1476,7 @@ namespace RNC
                                             await context.Channel.SendMessageAsync($":white_check_mark: **Successfully offline-muted {targetName} for {reason}!**");
                                         }
                                     });
-                                    
+
                                 }
 
                             }, 10);
@@ -1461,8 +1513,8 @@ namespace RNC
                                     target.SetSharedData("JailTime", 0);
                                     EPlayer.Freeze(target, false);
 
-                                    //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unjail:{target.Name}"); } catch { }             
-                                    EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] [DC] {context.Author.Username} has unjailed {target.Name}.");
+                                        //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unjail:{target.Name}"); } catch { }             
+                                        EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] [DC] {context.Author.Username} has unjailed {target.Name}.");
                                     EPlayer.Spawn(target);
 
                                     context.Channel.SendMessageAsync($":white_check_mark: **Successfully unjailed {name}!**");
@@ -1481,8 +1533,8 @@ namespace RNC
                                                 return;
                                             }
 
-                                            //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ounjail:{tpAcc.Username}"); } catch { }
-                                            Logs.LogAdmin(admID, $"Unjailed offline player {tpAcc.Username} who had {tpAcc.JailTime} seconds remaining in jail.");
+                                                //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ounjail:{tpAcc.Username}"); } catch { }
+                                                Logs.LogAdmin(admID, $"Unjailed offline player {tpAcc.Username} who had {tpAcc.JailTime} seconds remaining in jail.");
                                             tpAcc.JailTime = 0;
 
                                             await dbcontext.SaveChangesAsync();
@@ -1491,11 +1543,11 @@ namespace RNC
                                             {
                                                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] [DC] {context.Author.Username} has offline unjailed {tpAcc.Username}.");
                                             });
-                                          
+
                                             await context.Channel.SendMessageAsync($":white_check_mark: **Successfully offline-unjailed {name}!**");
                                         }
                                     });
-                                    
+
                                 }
                             }, 10);
                         }
@@ -1593,7 +1645,7 @@ namespace RNC
                                             await context.Channel.SendMessageAsync($":white_check_mark: **Successfully offline-jailed {targetName} for {reason}!**");
                                         }
                                     });
-                                    
+
                                 }
 
                             }, 10);
