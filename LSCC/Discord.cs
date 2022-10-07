@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using GTANetworkAPI;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -37,10 +38,14 @@ namespace RNC
         public async static Task<int> GetIngameSQLID(SocketGuildUser user)
         {
             if (user == null) return -1;
+            if(user.Id == 922461597866295397 || user.Id == 1027945798069133443)
+            {
+                return 1; // if GM bot return KevY's ID, cba to make a new account for the bot now
+            }
 
             using (MainDatabase context = ContextFactory.CreateContext())
             {
-                Account _a = await context.Accounts.FirstOrDefaultAsync(a => a.DiscordInfo.Contains(user.Id.ToString()));
+                Account _a = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.DiscordInfo.Contains(user.Id.ToString()));
                 if (_a == null) return -1;
                 return _a.SQL_ID;
             }
@@ -49,6 +54,11 @@ namespace RNC
         public static int GetIngameAdminLevel(SocketGuildUser user)
         {
             if (user == null) return 0;
+            if(user.Id == 922461597866295397 || user.Id == 1027945798069133443) // if GM bot
+            {
+                return 6;
+            }
+
             int level = 0;
             var role = (user as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 714822199881760798); // mod
             if (user.Roles.Contains(role))
@@ -159,9 +169,14 @@ namespace RNC
                     return;
                 }
 
-                if (context.Channel.Name != "staff-bot") return;
+                if (context.Channel.Name != "staff-bot")
+                {
+                    // allow GM bot to write anywhere
+                    if (context.Author.Id != 1027945798069133443 && context.Author.Id != 922461597866295397 && context.Author.Id != 253938879554387969
+                        && context.Author.Id != 367360197900894209) return;
+                }
 
-                if(context.Content.StartsWith("!dbgtimecheck"))
+                if (context.Content.StartsWith("!dbgtimecheck"))
                 {
                     int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
                     if (aLevel < 6)
@@ -175,6 +190,122 @@ namespace RNC
                         context.Channel.SendMessageAsync("Done!");
                     }, 50);
                 }
+                else if (context.Content.StartsWith("!lookup"))
+                {
+                    string[] args = context.Content.Split(' ');
+                    if (args.Count() >= 3)
+                    {
+                        string type = args[1];
+                        string value = args[2];
+
+                        if(type != "email" && type != "rockstarname")
+                        {
+                            await context.Channel.SendMessageAsync("**[!]** Invalid type! You must use either `email` or `rockstarname` as the type.");
+                            return;
+                        }
+
+                        int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+
+                        int aSQLID = await GetIngameSQLID(context.Author as SocketGuildUser);
+
+                        if (aSQLID == -1)
+                        {
+                            await context.Channel.SendMessageAsync("**[!]** You must link your Discord & RnC account to use this!");
+                            return;
+                        }
+                        if (aLevel < 4)
+                        {
+                            await context.Channel.SendMessageAsync("**[!]** You must be a level 4+ admin to use this!");
+                            return;
+                        }
+
+                        if(type == "email")
+                        {
+                            using(MainDatabase dbcontext = ContextFactory.CreateContext())
+                            {
+                                List<Account> accounts = await dbcontext.Accounts.AsQueryable().Where(a => a.Email.Equals(value, StringComparison.OrdinalIgnoreCase)).ToListAsync();
+                                if (accounts.Count > 0)
+                                {
+                                    var builder = new EmbedBuilder()
+                                   .WithTitle("**SQL ID | Username | Last Login**")
+                                   .WithDescription("```\n```")
+                                   .WithColor(255, 0, 0)
+                                   .WithFooter(footer =>
+                                   {
+                                       footer
+                                           .WithText("Lookup results");
+                                   })
+                                   .WithAuthor(author =>
+                                   {
+                                       author
+                                           .WithName("Accounts list")
+                                           .WithIconUrl("https://i.imgur.com/pc6pzkq.png");
+                                   });
+
+                                    int proc = 0;
+                                    foreach (Account acc in accounts)
+                                    {
+                                        proc++;
+                                        builder.AddField($"{acc.SQL_ID} | {acc.Username} | {acc.LastLogin.ToString("F")}", true);
+
+                                        if (proc > 10) break;
+                                    }
+
+                                    var embed = builder.Build();
+
+                                    await context.Channel.SendMessageAsync(
+                                        "Reporting...",
+                                        embed: embed)
+                                        .ConfigureAwait(false);
+                                }
+                                else await context.Channel.SendMessageAsync(":negative_squared_cross_mark: No accounts found linked to that e-mail! *Try asking the user for their Rockstar Social Club username...*");
+                            }
+                        }
+                        else if (type == "rockstarname")
+                        {
+                            using (MainDatabase dbcontext = ContextFactory.CreateContext())
+                            {
+                                List<Account> accounts = await dbcontext.Accounts.AsQueryable().Where(a => a.RegisterSC.Equals(value, StringComparison.OrdinalIgnoreCase) || a.LastSC.Equals(value, StringComparison.OrdinalIgnoreCase)).ToListAsync();
+                                if (accounts.Count > 0)
+                                {
+                                    var builder = new EmbedBuilder()
+                                   .WithTitle("**SQL ID | Username | Last Login**")
+                                   .WithDescription("```\n```")
+                                   .WithColor(255, 0, 0)
+                                   .WithFooter(footer =>
+                                   {
+                                       footer
+                                           .WithText("Lookup results");
+                                   })
+                                   .WithAuthor(author =>
+                                   {
+                                       author
+                                           .WithName("Accounts list")
+                                           .WithIconUrl("https://i.imgur.com/pc6pzkq.png");
+                                   });
+
+                                    int proc = 0;
+                                    foreach (Account acc in accounts)
+                                    {
+                                        proc++;
+                                        builder.AddField($"{acc.SQL_ID} | {acc.Username} | {acc.LastLogin.ToString("F")}", true);
+
+                                        if (proc > 10) break;
+                                    }
+
+                                    var embed = builder.Build();
+
+                                    await context.Channel.SendMessageAsync(
+                                        "Reporting...",
+                                        embed: embed)
+                                        .ConfigureAwait(false);
+                                }
+                                else await context.Channel.SendMessageAsync(":negative_squared_cross_mark: No accounts found linked to that Rockstar username! *Try asking the user for their e-mail...*");
+                            }
+                        }
+                    }
+                    else await context.Channel.SendMessageAsync("USAGE: !lookup (type: email|rockstarname) (value)");
+                }
                 else if (context.Content.StartsWith("!changepass"))
                 {
                     string[] args = context.Content.Split(' ');
@@ -184,7 +315,7 @@ namespace RNC
                         string newpass = args[2];
 
                         int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
-                  
+
                         int aSQLID = await GetIngameSQLID(context.Author as SocketGuildUser);
 
                         if (aSQLID == -1)
@@ -199,25 +330,28 @@ namespace RNC
                         }
                         using (MainDatabase dbcontext = ContextFactory.CreateContext())
                         {
-                            Account tpAcc = await dbcontext.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                            Account tpAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                            if ((tpAcc != null) == false)
+                            {
+                                await context.Channel.SendMessageAsync("**[!]** There's no account with that name.");
+                                return;
+                            }
 
+                            if (tpAcc.Admin > aLevel)
+                            {
+                                await context.Channel.SendMessageAsync("**[!]** Target's admin level is higher than yours!");
+                                return;
+                            }
+                            string salt = AccountManager.GenSalt();
+                            string password = AccountManager.Crypt(newpass, salt);
+                            tpAcc.Salt = salt;
+                            tpAcc.Password = password;
+                            await dbcontext.SaveChangesAsync();
+                            await context.Channel.SendMessageAsync($":white_check_mark: **You've successfully changed {name}'s password!**");
                             lock (RAGE.Entities.Players)
                             {
-                                NAPI.Task.Run(() =>
+                                NAPI.Task.Run(async () =>
                                 {
-                                  
-                                    if ((tpAcc != null) == false)
-                                    {
-                                        context.Channel.SendMessageAsync("**[!]** There's no account with that name.");
-                                        return;
-                                    }
-
-                                    if (tpAcc.Admin > aLevel)
-                                    {
-                                        context.Channel.SendMessageAsync("**[!]** Target's admin level is higher than yours!");
-                                        return;
-                                    }
-
                                     Player target = RAGE.Entities.Players.All.Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
                                     if (target != null)
                                     {
@@ -230,14 +364,13 @@ namespace RNC
 
                                     EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}[DC] {context.Author.Username} has changed {tpAcc.Username}'s password.");
 
-                                    context.Channel.SendMessageAsync($":white_check_mark: **You've successfully changed {name}'s password!**");
-
-                                    string salt = AccountManager.GenSalt();
-                                    string password = AccountManager.Crypt(newpass, salt);
-                                    tpAcc.Salt = salt;
-                                    tpAcc.Password = password;
-                                    ContextFactory.SaveDB();
                                 }, 50);
+                            }
+
+                            if(aSQLID == 1)
+                            {
+                                await Task.Delay(100);
+                                await context.DeleteAsync();
                             }
                         }
                     }
@@ -265,44 +398,33 @@ namespace RNC
                         }
                         using (MainDatabase dbcontext = ContextFactory.CreateContext())
                         {
-                            Account tpAcc = await dbcontext.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                            Account tpAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                            if ((tpAcc != null) == false)
+                            {
+                                await context.Channel.SendMessageAsync("[!] There's no account with that name.");
+                                return;
+                            }
 
+                            if (tpAcc.Admin > aLevel)
+                            {
+                                await context.Channel.SendMessageAsync("[!] Target's admin level is higher than yours!");
+                                return;
+                            }
+                            await AccountManager.ClearForeignKeys(tpAcc);
+                            dbcontext.Accounts.Remove(tpAcc);
+                            await dbcontext.SaveChangesAsync();
                             lock (RAGE.Entities.Players)
                             {
-                                NAPI.Task.Run(() =>
+                                NAPI.Task.Run(async () =>
                                 {
-                                    if ((tpAcc != null) == false)
-                                    {
-                                        context.Channel.SendMessageAsync("[!] There's no account with that name.");
-                                        return;
-                                    }
-
-                                    if (tpAcc.Admin > aLevel)
-                                    {
-                                        context.Channel.SendMessageAsync("[!] Target's admin level is higher than yours!");
-                                        return;
-                                    }
-
-                                    Player target = RAGE.Entities.Players.All.Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
-                                    if (target != null)
-                                    {
-                                        context.Channel.SendMessageAsync("[!] Target must be online and logged in!");
-                                        return;
-                                    }
-
-                                    AccountManager.ClearForeignKeys(tpAcc);
-
                                     Logs.LogAdmin(aSQLID, $"Deleted account '{tpAcc.Username}'.");
-                                    context.Channel.SendMessageAsync($":white_check_mark: **You've successfully deleted {name}'s account!**");
+                                    await context.Channel.SendMessageAsync($":white_check_mark: **You've successfully deleted {name}'s account!**");
 
                                     EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}[DC] {context.Author.Username} has deleted account {tpAcc.Username}.");
-
-                                    dbcontext.Accounts.Remove(tpAcc);
-                                    ContextFactory.SaveDB();
                                 }, 50);
                             }
                         }
-                        
+
                     }
                     else await context.Channel.SendMessageAsync("USAGE: !deleteaccount (username)");
                 }
@@ -331,7 +453,7 @@ namespace RNC
                         {
                             NAPI.Task.Run(() =>
                             {
-                                Account toRecover = BackupContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(user, StringComparison.OrdinalIgnoreCase));
+                                Account toRecover = BackupContextFactory.Instance.Accounts.AsQueryable().FirstOrDefault(a => a.Username.Equals(user, StringComparison.OrdinalIgnoreCase));
                                 
                                 if (toRecover == null)
                                 {
@@ -339,7 +461,7 @@ namespace RNC
                                     return;
                                 }
 
-                                Account existCheck = ContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username.Equals(user, StringComparison.OrdinalIgnoreCase));
+                                Account existCheck = ContextFactory.Instance.Accounts.AsQueryable().FirstOrDefault(a => a.Username.Equals(user, StringComparison.OrdinalIgnoreCase));
                                 if (existCheck == null)
                                 {
                                     context.Channel.SendMessageAsync($":white_check_mark: **You've successfully recovered {user}'s in-game account! (DBID: {toRecover.SQL_ID})**");
@@ -376,9 +498,9 @@ namespace RNC
                             string vID = args[3];
                             //string msgID = args[4];
                             string chanID = args[4];
-                            await context.DeleteAsync(); 
-                            Account _acc = await dbcontext.Accounts.FirstOrDefaultAsync(a => a.Username.Equals(vName, StringComparison.OrdinalIgnoreCase));
-                            Account _check = await dbcontext.Accounts.FirstOrDefaultAsync<Account>(a => a.DiscordInfo.Contains($"\"DiscordID\":\"{vID}\""));
+                            await context.DeleteAsync();
+                            Account _acc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(vName, StringComparison.OrdinalIgnoreCase));
+                            Account _check = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync<Account>(a => a.DiscordInfo.Contains($"\"DiscordID\":\"{vID}\""));
 
                             lock (RAGE.Entities.Players)
                             {
@@ -408,7 +530,7 @@ namespace RNC
                                             context.Channel.SendMessageAsync($"!kuracback false {chanID} {vID} The code you have entered is invalid! Please use **(/verify)** in-game to check your code.");
                                             return;
                                         }
-                                         if (_check != null)
+                                        if (_check != null)
                                         {
                                             context.Channel.SendMessageAsync($"!kuracback false {chanID} {vID} This Discord account was already used to verify account **{_check.Username}**!");
                                             return;
@@ -427,22 +549,32 @@ namespace RNC
 
                                         EPlayer.GrantXP(_p, 10);
                                         EPlayer.GivePoints(_p, 13);
-                                        EPlayer.UnlockLoadout(_acc, _p, "Negotiator", 0);
-                                        EPlayer.UnlockLoadout(_acc, _p, "Negotiator", 1);
-                                        EPlayer.UnlockVehicle(_acc, _p, "superd", 0);
-                                        _p.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
+                                        Task.Run(async () =>
+                                        {
+                                            await EPlayer.UnlockLoadout(_acc, _p, "Negotiator", 0);
+                                            await EPlayer.UnlockLoadout(_acc, _p, "Negotiator", 1);
+                                            await EPlayer.UnlockVehicle(_acc, _p, "superd", 0);
 
-                                        EPlayer.UnlockAchievement(_p, "discord_verify");
+                                            NAPI.Task.Run(() =>
+                                            {
+                                                _p.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
 
-                                        ContextFactory.SaveDB();
-                                        context.Channel.SendMessageAsync($"!kuracback true {chanID} {vID} You successfully linked your Discord account to your Race 'N' Chase account!");
+                                                EPlayer.UnlockAchievement(_p, "discord_verify");
+
+                                                EPlayer.Save(_p, true);
+
+                                                context.Channel.SendMessageAsync($"!kuracback true {chanID} {vID} You successfully linked your Discord account to your Race 'N' Chase account!");
+                                            });
+                                        });
+
+
                                         return;
                                     }
                                     catch { }
                                 }, 50);
                             }
                         }
-                        
+
                     }
                     else return;
                 }
@@ -454,7 +586,7 @@ namespace RNC
                     {
                         using (MainDatabase dbcontext = ContextFactory.CreateContext())
                         {
-                            Account _acc = await dbcontext.Accounts.FirstOrDefaultAsync(a => a.Username.Equals(args[1], StringComparison.OrdinalIgnoreCase));
+                            Account _acc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(args[1], StringComparison.OrdinalIgnoreCase));
                             if (_acc == null)
                             {
                                 await context.Channel.SendMessageAsync(":exclamation: **Account with that username does not exist!**");
@@ -537,7 +669,7 @@ namespace RNC
                                     {
                                         author
                                             .WithName("Players")
-                                            .WithIconUrl("https://i.imgur.com/nJPbaL7.png");
+                                            .WithIconUrl("https://i.imgur.com/pc6pzkq.png");
                                     });
 
                                 int thisCount = 0;
@@ -549,27 +681,42 @@ namespace RNC
 
                                     players++;
                                     proc++;
-                                    string lobby = "Lobby " + pl.GetSharedData<int>("InLobby");
-                                    switch (pl.GetSharedData<int>("InLobby"))
+                                    string lobby = "Unknown";
+                                    int level = -1;
+                                    if (pl.HasSharedData("Level"))
                                     {
-                                        case -1:
-                                            lobby = "Login";
-                                            break;
-                                        case -2:
-                                            lobby = "Jail";
-                                            break;
-                                        case -3:
-                                            lobby = "Freeroam";
-                                            break;
-                                        case -4:
-                                            lobby = "Derby";
-                                            break;
-                                        case -5:
-                                            lobby = "Customizer";
-                                            break;
+                                        level = pl.GetSharedData<int>("Level");
                                     }
+                                    if (pl.HasSharedData("InLobby"))
+                                    {
+                                        lobby = "Lobby " + pl.GetSharedData<int>("InLobby");
+                                        switch (pl.GetSharedData<int>("InLobby"))
+                                        {
+                                            case -1:
+                                                lobby = "Login";
+                                                break;
+                                            case -2:
+                                                lobby = "Jail";
+                                                break;
+                                            case -3:
+                                                lobby = "Freeroam";
+                                                break;
+                                            case -4:
+                                                lobby = "Derby";
+                                                break;
+                                            case -5:
+                                                lobby = "Customizer";
+                                                break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        lobby = "Logging in...";
+                                        level = -1;
+                                    }
+                                    
 
-                                    builder.AddField(pl.Name, lobby + " | Level: " + pl.GetSharedData<int>("Level").ToString() + " | Ping: " + pl.Ping.ToString(), true);
+                                    builder.AddField(pl.Name, lobby + " | Level: " + level.ToString() + " | Ping: " + pl.Ping.ToString(), true);
 
                                     if (proc >= 20) break;
                                 }
@@ -601,7 +748,7 @@ namespace RNC
                                 {
                                     author
                                         .WithName("Lobbies")
-                                        .WithIconUrl("https://i.imgur.com/nJPbaL7.png");
+                                        .WithIconUrl("https://i.imgur.com/pc6pzkq.png");
                                 });
 
                         foreach (LobbyData p in Settings.Lobbies)
@@ -652,7 +799,7 @@ namespace RNC
                                     {
                                         author
                                             .WithName("Admins")
-                                            .WithIconUrl("https://i.imgur.com/nJPbaL7.png");
+                                            .WithIconUrl("https://i.imgur.com/pc6pzkq.png");
                                     });
 
                                 int thisCount = 0;
@@ -730,12 +877,12 @@ namespace RNC
                         }
                         using (MainDatabase dbcontext = ContextFactory.CreateContext())
                         {
-                            Account tpAcc = await dbcontext.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(args[1], StringComparison.OrdinalIgnoreCase) == true);
+                            Account tpAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(args[1], StringComparison.OrdinalIgnoreCase) == true);
                             BanData ban = null;
 
                             if (tpAcc != null)
                             {
-                                ban = await dbcontext.Bans.FirstOrDefaultAsync(a => a.AccountSQLID == tpAcc.SQL_ID);
+                                ban = await dbcontext.Bans.AsQueryable().FirstOrDefaultAsync(a => a.AccountSQLID == tpAcc.SQL_ID);
                             }
                             if (ban == null)
                             {
@@ -746,7 +893,7 @@ namespace RNC
                             string username = "Unregistered Ban";
                             if (ban.AccountSQLID != -1)
                             {
-                                Account pAcc = await dbcontext.Accounts.FirstOrDefaultAsync(acc => acc.SQL_ID == ban.AccountSQLID);
+                                Account pAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(acc => acc.SQL_ID == ban.AccountSQLID);
                                 if (pAcc != null)
                                 {
                                     username = pAcc.Username;
@@ -841,7 +988,7 @@ namespace RNC
                                     {
                                         using (MainDatabase dbcontext = ContextFactory.CreateContext())
                                         {
-                                            Account targetAcc = await dbcontext.Accounts.FirstOrDefaultAsync(t => t.Username.Equals(args[1], StringComparison.OrdinalIgnoreCase));
+                                            Account targetAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(t => t.Username.Equals(args[1], StringComparison.OrdinalIgnoreCase));
                                             if (targetAcc == null)
                                             {
                                                 await context.Channel.SendMessageAsync("**[!]** A player with that username could not be found!");
@@ -1058,7 +1205,7 @@ namespace RNC
                                 {
                                     using (MainDatabase dbcontext = ContextFactory.CreateContext())
                                     {
-                                        target = await dbcontext.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(args[1], StringComparison.OrdinalIgnoreCase) == true &&
+                                        target = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(args[1], StringComparison.OrdinalIgnoreCase) == true &&
                                             dbcontext.Bans.Count(a => a.AccountSQLID == p.SQL_ID) == 0);
                                         
                                         if (target == null)
@@ -1143,7 +1290,7 @@ namespace RNC
                                         {
                                             using (MainDatabase dbcontext = ContextFactory.CreateContext())
                                             {
-                                                Account tpAcc = await dbcontext.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                                                Account tpAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
 
                                                 if (tpAcc == null)
                                                 {
@@ -1239,7 +1386,7 @@ namespace RNC
                                     {
                                         using (MainDatabase dbcontext = ContextFactory.CreateContext())
                                         {
-                                            Account tpAcc = await dbcontext.Accounts.FirstOrDefaultAsync(a => a.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+                                            Account tpAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
                                             if (tpAcc == null)
                                             {
                                                 await context.Channel.SendMessageAsync("**[!]** That player does not exist in the database!");
@@ -1313,7 +1460,7 @@ namespace RNC
                                     {
                                         using (MainDatabase dbcontext = ContextFactory.CreateContext())
                                         {
-                                            Account tpAcc = await dbcontext.Accounts.FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                                            Account tpAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
 
                                             if ((tpAcc != null) == false)
                                             {
@@ -1407,7 +1554,7 @@ namespace RNC
                                     {
                                         using (MainDatabase dbcontext = ContextFactory.CreateContext())
                                         {
-                                            Account tpAcc = await dbcontext.Accounts.FirstOrDefaultAsync(a => a.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+                                            Account tpAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
                                             if (tpAcc == null)
                                             {
                                                 await context.Channel.SendMessageAsync("**[!]** That player does not exist in the database!");
@@ -1546,7 +1693,7 @@ namespace RNC
                         {
                             author
                                 .WithName("Help")
-                                .WithIconUrl("https://i.imgur.com/nJPbaL7.png");
+                                .WithIconUrl("https://i.imgur.com/pc6pzkq.png");
                         });
 
 
@@ -1574,6 +1721,7 @@ namespace RNC
                         embed: embed)
                         .ConfigureAwait(false);
                 }
+              
             }
             catch { }
 
