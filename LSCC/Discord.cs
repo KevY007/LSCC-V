@@ -989,6 +989,7 @@ namespace RNC
                                     Logs.LogAdmin(aSQL, $"Set {target.Name}'s admin level to {EPlayer.GetAdminLevelName(level)}.");
                                     target.SetSharedData("Admin", level);
                                     targetAcc.Admin = level;
+                                    EPlayer.Save(target, false);
                                     target.SendChatMessage($"~g~Your admin level has been set to ~y~{level}~g~ by [DC] {context.Author.Username}!");
                                     context.Channel.SendMessageAsync($"[ADMSET] <@{context.Author.Id}> , you successfully set **{target.Name}'s** admin level to **{level}**!");
                                     return;
@@ -1011,6 +1012,7 @@ namespace RNC
                                                 return;
                                             }
                                             targetAcc.Admin = level;
+                                            await dbcontext.SaveChangesAsync();
                                             Logs.LogAdmin(aSQL, $"Set {targetAcc.Username}'s admin level to {EPlayer.GetAdminLevelName(level)}.");
                                             await context.Channel.SendMessageAsync($"[ADMSET] <@{context.Author.Id}> , you successfully set **{targetAcc.Username}'s** admin level to **{level}**!");
                                         }

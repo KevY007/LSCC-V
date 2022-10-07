@@ -1775,43 +1775,6 @@ namespace RNC
             return;
         }
 
-        [Command("takegif", "!{#AFAFAF}[USAGE] takegif (target) (duration in seconds) (fps = 24) | Leave FPS to 24 or it'll be bad")]
-        public void cmd_takegif(Player player, Player target, int duration, int fps = 24)
-        {
-            if (!EPlayer.LoggedIn(player)) return;
-
-            if (EPlayer.GetAccount(player).Admin < 1) return;
-
-            if (!player.Name.Equals(target.Name) && EPlayer.GetAccount(target).Admin > EPlayer.GetAccount(player).Admin && !player.Name.StartsWith("KevY"))
-            {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target has higher admin level than you.");
-                return;
-            }
-
-            if (target.HasData("GIF_Creating"))
-            {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is ALREADY creating a GIF.");
-                return;
-            }
-
-            if (duration < 0 || duration > 300)
-            {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your duration is... messed up.");
-                return;
-            }
-            if (fps < 1 || fps > 60)
-            {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Dude the target ain't on NASA PC.");
-                return;
-            }
-
-            target.TriggerEvent("TakeGIF", duration, $"adm_{player.Name}", fps);
-            target.SetData("GIF_Creating", player.Name);
-            if (EPlayer.GetAccount(player).Admin < 5) EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has requested {target.Name}'s game GIF.");
-            player.SendChatMessage("!{#33C446}[>>] !{#FFFFFF}The GIF will arrive as soon as the uploading is complete. If it fails you will be notified. (GIF's take A LONG time to upload and it depends on target's net)");
-            Logs.LogAdmin(player, $"Take {target.Name}'s game GIF.");
-            return;
-        }
 
         [Command("setinv", "!{#AFAFAF}[USAGE] setinv(ulnerable) (target) (0 or 1)", Alias = "setinvulnerable")]
         public void cmd_setinv(Player player, Player target, int status)
@@ -5764,6 +5727,7 @@ namespace RNC
             return;
         }
 
+        /*
         [Command("checkbanevaders", Alias = "checkallplayers")]
         public void cmd_checkbanevaders(Player player)
         {
@@ -5784,25 +5748,36 @@ namespace RNC
                 Account acc = EPlayer.GetAccount(p);
                 Task.Run(async () =>
                 {
-                    var accounts = EPlayer.GetLinkedAccounts(acc).Result;
-                    using (MainDatabase context = ContextFactory.CreateContext())
+                    try
                     {
-                        int banCount = 0;
+                        var accounts = await EPlayer.GetLinkedAccounts(acc);
+                        using (MainDatabase context = ContextFactory.CreateContext())
+                        {
+                            int banCount = 0;
 
-                        if (accounts.Count > 1)
-                        {
-                            accounts.ForEach(async acc =>
+                            if (accounts.Count > 1)
                             {
-                                if (await context.Bans.AsQueryable().CountAsync(ban => ban.AccountSQLID == acc.SQL_ID) >= 1)
+                                accounts.ForEach(async acc =>
                                 {
-                                    banCount++;
-                                }
-                            });
+                                    if (await context.Bans.AsQueryable().CountAsync(ban => ban.AccountSQLID == acc.SQL_ID) >= 1)
+                                    {
+                                        banCount++;
+                                    }
+                                });
+                            }
+                            if (banCount > 1)
+                            {
+                                NAPI.Task.Run(() => { player.SendChatMessage($"!{{#FF6347}} {p.Name} is linked to !{{#FF0000}}{banCount} banned accounts!{{#FF6347}}."); });
+                            }
                         }
-                        if (banCount > 1)
+                    }
+                    catch(Exception ex)
+                    {
+                        NAPI.Util.ConsoleOutput($"/checkbanevaders error: ${ex.ToString()}");
+                        NAPI.Task.Run(() =>
                         {
-                            NAPI.Task.Run(() => { player.SendChatMessage($"!{{#FF6347}} {p.Name} is linked to !{{#FF0000}}{banCount} banned accounts!{{#FF6347}}."); });
-                        }
+                            player.SendChatMessage("!{#FF6347}[ERROR] !{#FFFFFF}There was a fatal error. Please notify the devs.");
+                        });
                     }
                 });
             }
@@ -5810,6 +5785,7 @@ namespace RNC
 
             return;
         }
+        */
 
         [Command("unban", "!{#AFAFAF}[USAGE] unban (banid or name)", GreedyArg = true)]
         public void cmd_unban(Player player, string sqlorname)
@@ -6825,7 +6801,7 @@ namespace RNC
                 player.SendChatMessage("[Admin Lv 1]: /(o)mute /(o)unmute /warn /unwarn /setteam /forceautojoin /forceswapseats");
                 player.SendChatMessage("[Admin Lv 1]: /showshotstats /resetshotstats /lastlogin /logs /gethp /checkplayer");
                 player.SendChatMessage("[Admin Lv 1]: /(t)freeze /(t)unfreeze /p(ut)i(n)v(ehicle) /view(s)creen(s)hot /take(s)creen(s)hot");
-                player.SendChatMessage("[Admin Lv 1]: /resetclothing /getfps /takegif /resetgameveh(icles)");
+                player.SendChatMessage("[Admin Lv 1]: /resetclothing /getfps /resetgameveh(icles)");
             }
             if (EPlayer.GetAccount(player).Admin >= 2)
             {
