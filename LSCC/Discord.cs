@@ -35,9 +35,13 @@ namespace RNC
             return Task.CompletedTask;
         }
 
-        public async static Task<int> GetIngameSQLID(SocketGuildUser user)
+        public async static Task<int> GetIngameSQLID(SocketUser user)
         {
-            if (user == null) return -1;
+            if (user == null)
+            {
+                NAPI.Task.Run(() => { NAPI.Util.ConsoleOutput($"[DISCORD] Attempted to get SQLID - User was null!"); });
+                return -1;
+            }
             if(user.Id == 922461597866295397 || user.Id == 1027945798069133443)
             {
                 return 1; // if GM bot return KevY's ID, cba to make a new account for the bot now
@@ -51,47 +55,53 @@ namespace RNC
             }
         }
 
-        public static int GetIngameAdminLevel(SocketGuildUser user)
+        public static int GetIngameAdminLevel(SocketUser user)
         {
-            if (user == null) return 0;
+            if (user == null)
+            {
+                NAPI.Task.Run(() => { NAPI.Util.ConsoleOutput($"[DISCORD] Attempted to get SQLID - User was null!"); });
+                return 0;
+            }
             if(user.Id == 922461597866295397 || user.Id == 1027945798069133443) // if GM bot
             {
                 return 6;
             }
 
+            SocketGuildUser realUser = user as SocketGuildUser;
+
             int level = 0;
-            var role = (user as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 714822199881760798); // mod
-            if (user.Roles.Contains(role))
+            var role = (realUser as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 714822199881760798); // mod
+            if (realUser.Roles.Contains(role))
             {
                 level = 1;
             }
-            role = (user as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 714821592701599814); // trial
-            if (user.Roles.Contains(role))
+            role = (realUser as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 714821592701599814); // trial
+            if (realUser.Roles.Contains(role))
             {
                 level = 2;
             }
-            role = (user as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 800001726043127848); // general
-            if (user.Roles.Contains(role))
+            role = (realUser as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 800001726043127848); // general
+            if (realUser.Roles.Contains(role))
             {
                 level = 3;
             }
-            role = (user as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 713734312335376465); // senior
-            if (user.Roles.Contains(role))
+            role = (realUser as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 713734312335376465); // senior
+            if (realUser.Roles.Contains(role))
             {
                 level = 4;
             }
-            role = (user as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 886616979912421387); // lead
-            if (user.Roles.Contains(role))
+            role = (realUser as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 886616979912421387); // lead
+            if (realUser.Roles.Contains(role))
             {
                 level = 5;
             }
-            role = (user as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 777641183512887316); // owner/management
-            if (user.Roles.Contains(role))
+            role = (realUser as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 777641183512887316); // owner/management
+            if (realUser.Roles.Contains(role))
             {
                 level = 6;
             }
-            role = (user as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 713798856680276079); // owner/management
-            if (user.Roles.Contains(role))
+            role = (realUser as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 713798856680276079); // owner/management
+            if (realUser.Roles.Contains(role))
             {
                 level = 6;
             }
@@ -178,7 +188,7 @@ namespace RNC
 
                 if (context.Content.StartsWith("!dbgtimecheck"))
                 {
-                    int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                    int aLevel = GetIngameAdminLevel(context.Author);
                     if (aLevel < 6)
                     {
                         await context.Channel.SendMessageAsync("https://cms.qz.com/wp-content/uploads/2018/06/new-pride-flag-01.jpg");
@@ -204,9 +214,9 @@ namespace RNC
                             return;
                         }
 
-                        int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                        int aLevel = GetIngameAdminLevel(context.Author);
 
-                        int aSQLID = await GetIngameSQLID(context.Author as SocketGuildUser);
+                        int aSQLID = await GetIngameSQLID(context.Author);
 
                         if (aSQLID == -1)
                         {
@@ -314,9 +324,10 @@ namespace RNC
                         string name = args[1];
                         string newpass = args[2];
 
-                        int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                        int aLevel = GetIngameAdminLevel(context.Author);
 
-                        int aSQLID = await GetIngameSQLID(context.Author as SocketGuildUser);
+                        int aSQLID = await GetIngameSQLID(context.Author);
+                        if (context.Author.Id == 1027945798069133443 || context.Author.Id == 922461597866295397) aSQLID = 1;
 
                         if (aSQLID == -1)
                         {
@@ -383,8 +394,8 @@ namespace RNC
                     {
                         string name = args[1];
 
-                        int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
-                        int aSQLID = await GetIngameSQLID(context.Author as SocketGuildUser);
+                        int aLevel = GetIngameAdminLevel(context.Author);
+                        int aSQLID = await GetIngameSQLID(context.Author);
 
                         if (aSQLID == -1)
                         {
@@ -436,8 +447,8 @@ namespace RNC
                     {
                         string user = args[1];
 
-                        int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
-                        int aSQLID = await GetIngameSQLID(context.Author as SocketGuildUser);
+                        int aLevel = GetIngameAdminLevel(context.Author);
+                        int aSQLID = await GetIngameSQLID(context.Author);
 
                         if (aSQLID == -1)
                         {
@@ -848,7 +859,7 @@ namespace RNC
                 }
                 else if (context.Content.StartsWith("!dbgmylevel"))
                 {
-                    int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                    int aLevel = GetIngameAdminLevel(context.Author);
                     await context.Channel.SendMessageAsync("**Your admin level [according to your role] is:** " + aLevel);
                     return;
                 }
@@ -869,7 +880,7 @@ namespace RNC
                     string[] args = context.Content.Split(" ", 2);
                     if (args.Count() >= 2)
                     {
-                        int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                        int aLevel = GetIngameAdminLevel(context.Author);
                         if (aLevel < 2)
                         {
                             await context.Channel.SendMessageAsync("You are not authorized to use this!");
@@ -927,7 +938,7 @@ namespace RNC
                             return;
                         }
 
-                        int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                        int aLevel = GetIngameAdminLevel(context.Author);
                         if (aLevel < 4)
                         {
                             await context.Channel.SendMessageAsync("**You are not authorized to use this command!**");
@@ -954,7 +965,7 @@ namespace RNC
                         {
                             NAPI.Task.Run(() =>
                             {
-                                int aSQL = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                                int aSQL = GetIngameAdminLevel(context.Author);
                                 if (aSQL == -1)
                                 {
                                     context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
@@ -1016,7 +1027,7 @@ namespace RNC
                     if (args.Count() >= 3)
                     {
                         Player target = null;
-                        int aSQL = await GetIngameSQLID(context.Author as SocketGuildUser);
+                        int aSQL = await GetIngameSQLID(context.Author);
                         lock (RAGE.Entities.Players)
                         {
                             NAPI.Task.Run(() =>
@@ -1034,7 +1045,7 @@ namespace RNC
                                     return;
                                 }
 
-                                int alevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                                int alevel = GetIngameAdminLevel(context.Author);
                                 if (aSQL == -1)
                                 {
                                     context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
@@ -1079,7 +1090,7 @@ namespace RNC
                     if (args.Count() >= 3)
                     {
                         Player target = null;
-                        int aSQL = await GetIngameSQLID(context.Author as SocketGuildUser);
+                        int aSQL = await GetIngameSQLID(context.Author);
                         lock (RAGE.Entities.Players)
                         {
                             NAPI.Task.Run(() =>
@@ -1097,7 +1108,7 @@ namespace RNC
                                     return;
                                 }
 
-                                int alevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                                int alevel = GetIngameAdminLevel(context.Author);
                                 if (aSQL == -1)
                                 {
                                     context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
@@ -1176,7 +1187,7 @@ namespace RNC
                     if (args.Count() >= 3)
                     {
                         Account target = null;
-                        int aSQL = await GetIngameSQLID(context.Author as SocketGuildUser);
+                        int aSQL = await GetIngameSQLID(context.Author);
                         lock (RAGE.Entities.Players)
                         {
                             NAPI.Task.Run(() =>
@@ -1187,7 +1198,7 @@ namespace RNC
                                     return;
                                 }
 
-                                int alevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                                int alevel = GetIngameAdminLevel(context.Author);
                                 if (aSQL == -1)
                                 {
                                     context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
@@ -1257,7 +1268,7 @@ namespace RNC
                     if (args.Count() >= 2)
                     {
                         string name = args[1];
-                        int admID = await GetIngameSQLID(context.Author as SocketGuildUser);
+                        int admID = await GetIngameSQLID(context.Author);
                             if (admID == -1)
                             {
                                 await context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
@@ -1341,7 +1352,7 @@ namespace RNC
                             return;
                         }
 
-                        int admID = await GetIngameSQLID(context.Author as SocketGuildUser);
+                        int admID = await GetIngameSQLID(context.Author);
                         lock (RAGE.Entities.Players)
                         {
                             NAPI.Task.Run(() =>
@@ -1352,7 +1363,7 @@ namespace RNC
                                     context.Channel.SendMessageAsync("**HINT:** /verify");
                                     return;
                                 }
-                                int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                                int aLevel = GetIngameAdminLevel(context.Author);
 
                                 Player target = RAGE.Entities.Players.All.FirstOrDefault(p => p.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
                                 if (target != null)
@@ -1425,7 +1436,7 @@ namespace RNC
                     if (args.Count() >= 2)
                     {
                         string name = args[1];
-                        int admID = await GetIngameSQLID(context.Author as SocketGuildUser);
+                        int admID = await GetIngameSQLID(context.Author);
                         lock (RAGE.Entities.Players)
                         {
                             NAPI.Task.Run(() =>
@@ -1515,7 +1526,7 @@ namespace RNC
                             return;
                         }
 
-                        int admID = await GetIngameSQLID(context.Author as SocketGuildUser);
+                        int admID = await GetIngameSQLID(context.Author);
                         lock (RAGE.Entities.Players)
                         {
                             NAPI.Task.Run(() =>
@@ -1526,7 +1537,7 @@ namespace RNC
                                     context.Channel.SendMessageAsync("**HINT:** /verify");
                                     return;
                                 }
-                                int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                                int aLevel = GetIngameAdminLevel(context.Author);
 
                                 Player target = RAGE.Entities.Players.All.FirstOrDefault(p => p.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
                                 if (target != null)
@@ -1596,7 +1607,7 @@ namespace RNC
                     {
                         string name = args[1];
                         string newname = args[2];
-                        int aLevel = GetIngameAdminLevel(context.Author as SocketGuildUser);
+                        int aLevel = GetIngameAdminLevel(context.Author);
                         lock (RAGE.Entities.Players)
                         {
                             NAPI.Task.Run(() =>
