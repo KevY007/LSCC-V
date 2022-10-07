@@ -336,8 +336,13 @@ mp.events.add("ResolveJS", (code) => {
 });
 
 mp.events.add("TwoSecondsEvent", () => {
-    if((chaseRunning && mp.players.local.getVariable("Team") !== undefined && mp.players.local.getVariable("Team") == 0) || mp.players.local.getVariable("InDM") != -1)
+    if(chaseRunning && mp.players.local.getVariable("Team") !== undefined && mp.players.local.getVariable("Team") == 0)
     {
+        if(mp.players.local.isSwimming() && !mp.players.local.isDead() && !mp.players.local.isInAnyVehicle(false)) {
+            mp.events.callRemote("RequestSwimPenalty");
+        }
+    }
+    if(mp.players.local.getVariable("InDM") > -1){
         if(mp.players.local.isSwimming() && !mp.players.local.isDead() && !mp.players.local.isInAnyVehicle(false)) {
             mp.events.callRemote("RequestSwimPenalty");
         }
