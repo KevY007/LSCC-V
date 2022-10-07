@@ -438,7 +438,7 @@ namespace RNC
 
         public DynSet()
         {
-            this.WeaponDataURL = "https://gist.githubusercontent.com/root-cause/3f29d38179b12245a003fb4fff615335/raw/7a8804b275fb1b9314cb39418a7415ea8bfd148d/v2189%2520Weapon%2520Data.json";
+            this.WeaponDataURL = "https://gist.githubusercontent.com/root-cause/3f29d38179b12245a003fb4fff615335/raw/5bca267fb5ad72acae1525772e883337df4518c6/v2699%2520Weapon%2520Data.json";
             this.DerbyVehicle = "brioso";
             this.OnfootCollision = true;
             this.AntiFallOffBike = true;
