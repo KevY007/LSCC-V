@@ -706,6 +706,9 @@ namespace RNC
 
                 player.SetData<bool>("LoadingClanCreation", false);
 
+                player.SetSharedData("LastVehicleExit", 0);
+
+
                 player.ResetData("LockpickTarget");
                 player.SetSharedData("PlacingStingers", false);
 

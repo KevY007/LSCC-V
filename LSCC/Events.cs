@@ -2173,6 +2173,9 @@ namespace RNC
             {
                 if (vehicle == null) return;
 
+                long currentTimestamp = new DateTimeOffset().ToUnixTimeSeconds();
+                player.SetSharedData("LastVehicleExit", currentTimestamp);
+
                 if (player.GetData<sbyte>("LastVehEnterSeat") == 0 && player.GetSharedData<int>("InLobby") >= 0 && player.GetSharedData<int>("Team") != -1)
                 {
                     if(vehicle.Locked || (vehicle.HasSharedData("Locked") && vehicle.GetSharedData<bool>("Locked") == true))

@@ -1831,6 +1831,10 @@ namespace RNC
             if (player.IsInVehicle)
             { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this inside of a vehicle!"); return; }
 
+            long currentTimestamp = new DateTimeOffset().ToUnixTimeSeconds();
+            if(currentTimestamp - player.GetSharedData<long>("LastVehicleExit") < 20)
+            { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this for a short period of time after exiting a vehicle! (20s)"); return; }
+
             if (!player.GetSharedData<string>("ActionType").Equals("none"))
             { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this while performing an action!"); return; }
 

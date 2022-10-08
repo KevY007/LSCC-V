@@ -509,9 +509,39 @@ namespace RNC
                             string vID = args[3];
                             //string msgID = args[4];
                             string chanID = args[4];
-                            await context.DeleteAsync();
                             Account _acc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(vName, StringComparison.OrdinalIgnoreCase));
                             Account _check = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync<Account>(a => a.DiscordInfo.Contains($"\"DiscordID\":\"{vID}\""));
+
+                            if (_acc == null)
+                            {
+                                await context.Channel.SendMessageAsync($"!kuracback false {chanID} {vID} An account with that name could not be found!");
+                                return;
+                            }
+                            DiscordData _d = NAPI.Util.FromJson<DiscordData>(_acc.DiscordInfo);
+
+                            bool giveDiscordPerks = false;
+                            if (_d.UsedDiscordPerks == false) giveDiscordPerks = true;
+
+                            if (!_d.DiscordID.Equals("n/a")) // if already verified just in case to return
+                            {
+                                await context.Channel.SendMessageAsync($"!kuracback false {chanID} {vID} An account with that name is already linked to <@{_d.DiscordID}>!");
+                                return;
+                            }
+                            if (!_d.DiscordCode.Equals(vCode))
+                            {
+                                await context.Channel.SendMessageAsync($"!kuracback false {chanID} {vID} The code you have entered is invalid! Please use **(/verify)** in-game to check your code.");
+                                return;
+                            }
+                            if (_check != null)
+                            {
+                                await context.Channel.SendMessageAsync($"!kuracback false {chanID} {vID} This Discord account was already used to verify account **{_check.Username}**!");
+                                return;
+                            }
+
+                            _d.DiscordID = vID;
+                            _d.LeftDiscord = false;
+                            _d.UsedDiscordPerks = true;
+                            string verificationData = NAPI.Util.ToJson(_d);
 
                             lock (RAGE.Entities.Players)
                             {
@@ -519,64 +549,57 @@ namespace RNC
                                 {
                                     try
                                     {
-                                        if (_acc == null)
-                                        {
-                                            context.Channel.SendMessageAsync($"!kuracback false {chanID} {vID} An account with that name could not be found!");
-                                            return;
-                                        }
-                                        DiscordData _d = NAPI.Util.FromJson<DiscordData>(_acc.DiscordInfo);
-                                        if (!_d.DiscordID.Equals("n/a")) // if already verified just in case to return
-                                        {
-                                            context.Channel.SendMessageAsync($"!kuracback false {chanID} {vID} An account with that name is already linked to <@{_d.DiscordID}>!");
-                                            return;
-                                        }
+
                                         Player _p = Settings.LoggedInPlayers.FirstOrDefault<Player>(p => p.Name.Equals(vName, StringComparison.OrdinalIgnoreCase));
                                         if (_p == null) // if the player is not online or logged in
                                         {
-                                            context.Channel.SendMessageAsync($"!kuracback false {chanID} {vID} You must be in-game and logged in to link your account!");
-                                            return;
-                                        }
-                                        if (!_d.DiscordCode.Equals(vCode))
-                                        {
-                                            context.Channel.SendMessageAsync($"!kuracback false {chanID} {vID} The code you have entered is invalid! Please use **(/verify)** in-game to check your code.");
-                                            return;
-                                        }
-                                        if (_check != null)
-                                        {
-                                            context.Channel.SendMessageAsync($"!kuracback false {chanID} {vID} This Discord account was already used to verify account **{_check.Username}**!");
-                                            return;
-                                        }
-
-                                        _d.DiscordID = vID;
-                                        _d.LeftDiscord = false;
-                                        _d.UsedDiscordPerks = true;
-
-                                        _acc.DiscordInfo = NAPI.Util.ToJson(_d);
-
-                                        _p.SendChatMessage("!{#83ff75}Congratulations! You successfully linked your Discord account to your Race 'N' Chase account.");
-                                        _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You now have access to the !{#ffff00}Negotiator !{#ffffff}loadout for !{#0097ff}cops !{#ffffff}& !{#ffae00}fugitives!{#ffffff}.");
-                                        _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You unlocked a new !{#ffae00}fugitive !{#ffffff}vehicle: !{#ffff00}Super Diamond!{#ffffff}.");
-                                        _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You also received !{#ffff00}13 points & 10XP !{#ffffff}as a bonus.");
-
-                                        EPlayer.GrantXP(_p, 10);
-                                        EPlayer.GivePoints(_p, 13);
-                                        Task.Run(async () =>
-                                        {
-                                            await EPlayer.UnlockLoadout(_acc, _p, "Negotiator", 0);
-                                            await EPlayer.UnlockLoadout(_acc, _p, "Negotiator", 1);
-                                            await EPlayer.UnlockVehicle(_acc, _p, "superd", 0);
-
-                                            NAPI.Task.Run(() =>
+                                            Task.Run(async () =>
                                             {
-                                                _p.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
-
-                                                EPlayer.UnlockAchievement(_p, "discord_verify");
-
-                                                EPlayer.Save(_p, true);
-
-                                                context.Channel.SendMessageAsync($"!kuracback true {chanID} {vID} You successfully linked your Discord account to your Race 'N' Chase account!");
+                                                await context.Channel.SendMessageAsync($"!kuracback false {chanID} {vID} You must be in-game and logged in to link your account!");
+                                                return;
                                             });
-                                        });
+                                            return;
+                                        }
+
+                                        if(giveDiscordPerks == true)
+                                        {
+                                            _p.SendChatMessage("!{#83ff75}Congratulations! You successfully linked your Discord account to your Race 'N' Chase account.");
+                                            _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You now have access to the !{#ffff00}Negotiator !{#ffffff}loadout for !{#0097ff}cops !{#ffffff}& !{#ffae00}fugitives!{#ffffff}.");
+                                            _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You unlocked a new !{#ffae00}fugitive !{#ffffff}vehicle: !{#ffff00}Super Diamond!{#ffffff}.");
+                                            _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You also received !{#ffff00}13 points & 10XP !{#ffffff}as a bonus.");
+
+                                            EPlayer.GrantXP(_p, 10);
+                                            EPlayer.GivePoints(_p, 13);
+                                            Task.Run(async () =>
+                                            {
+                                                await EPlayer.UnlockLoadout(_acc, _p, "Negotiator", 0);
+                                                await EPlayer.UnlockLoadout(_acc, _p, "Negotiator", 1);
+                                                await EPlayer.UnlockVehicle(_acc, _p, "superd", 0);
+
+                                                NAPI.Task.Run(() =>
+                                                {
+                                                    _p.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
+
+                                                    EPlayer.UnlockAchievement(_p, "discord_verify");
+
+                                                    EPlayer.GetAccount(_p).DiscordInfo = verificationData;
+                                                    EPlayer.Save(_p, true);
+
+                                                    context.Channel.SendMessageAsync($"!kuracback true {chanID} {vID} You successfully linked your Discord account to your Race 'N' Chase account ({_p.Name})!");
+                                                });
+                                                await context.DeleteAsync();
+                                            });
+                                        }
+                                        else
+                                        {
+                                            _p.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
+                                            EPlayer.GetAccount(_p).DiscordInfo = verificationData;
+                                            EPlayer.Save(_p, true);
+                                            _p.SendChatMessage("!{#83ff75}Congratulations! You successfully linked your Discord account to your Race 'N' Chase account, again.");
+                                            _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}Unfortunately, you already received your verification rewards before, so you won't be given any now.");
+
+                                            Task.Run(async () => await context.DeleteAsync());
+                                        }
 
 
                                         return;
@@ -588,6 +611,75 @@ namespace RNC
 
                     }
                     else return;
+                }
+                if (context.Content.StartsWith("!unverify"))
+                {
+                    string[] args = context.Content.Split(" ", 2);
+                    if (args.Count() >= 2)
+                    {
+                        string username = args[1];
+
+                        int aLevel = GetIngameAdminLevel(context.Author);
+                        int aSQL = await GetIngameSQLID(context.Author);
+                        if (aSQL == -1)
+                        {
+                            await context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
+                            await context.Channel.SendMessageAsync("**HINT:** /verify");
+                            return;
+                        }
+
+                        using (MainDatabase dbcontext = ContextFactory.CreateContext())
+                        {
+                            Account _acc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(args[1], StringComparison.OrdinalIgnoreCase));
+                            if (_acc == null)
+                            {
+                                await context.Channel.SendMessageAsync(":exclamation: **Account with that username does not exist!**");
+                                return;
+                            }
+
+                            DiscordData _d = NAPI.Util.FromJson<DiscordData>(_acc.DiscordInfo);
+                            if (_d != null)
+                            {
+                                if (_d.DiscordID.Equals("n/a"))
+                                {
+                                    await context.Channel.SendMessageAsync(":exclamation: **That account is not linked to any Discord account!**");
+                                    return;
+                                }
+
+                                _d.DiscordID = "n/a";
+                                string verifyData = NAPI.Util.ToJson(_d);
+
+                                lock (Settings.LoggedInPlayers)
+                                {
+                                    NAPI.Task.Run(() =>
+                                    {
+                                        Player player = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name == _acc.Username);
+                                        if (player != null)
+                                        {
+                                            Logs.LogAdmin(aSQL, $"Unverified ${_acc.Username}'s Discord account.");
+                                            EPlayer.GetAccount(player).DiscordInfo = verifyData;
+                                            EPlayer.Save(player, false);
+                                            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your Discord account has been unlinked by an admin! If you believe this is abuse, staff report them on Discord.");
+
+                                            Task.Run(async () =>
+                                            {
+                                                await context.Channel.SendMessageAsync($":white_check_mark: **You successfully un-verified {_acc.Username}'s Discord account from their in-game account.**");
+                                            });
+                                        }
+                                        else
+                                        {
+                                            Task.Run(async () =>
+                                            {
+                                                await context.Channel.SendMessageAsync(":exclamation: **That player is not online! They must be online in order to unverify their Discord.**");
+                                                return;
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }
+                    else await context.Channel.SendMessageAsync("USAGE: !unverify (username)");
                 }
 
                 if (context.Content.StartsWith("!getinfo"))
