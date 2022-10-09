@@ -1815,6 +1815,38 @@ mp.events.add('render', () => {
     }
 });
 
+// ADDING SHORT COOLDOWN TO SHOOTING AFTER THEY DO THE ROLL THING
+var rollShootCooldownActive = false;
+var currentRollCooldownTimestamp = 0;
+mp.events.add("render", () => {
+    if(mp.game.controls.isControlJustPressed(0, 22)){
+        if(mp.game.invoke('0x68EDDA28A5976D07') == 1 || mp.game.player.isFreeAiming()){
+            if(mp.players.local.isOnFoot())
+            {
+                currentRollCooldownTimestamp = (Date.now() + 1500);
+                rollShootCooldownActive = true;
+                ServerUI.execute(`toast('Shooting Cooldown...', '', 'warning', 1500, 2);`);
+            }
+        }
+    }
+
+    if(rollShootCooldownActive == true){
+        mp.game.controls.disableControlAction(32, 24, true);
+        mp.game.controls.disableControlAction(32, 140, true);
+        mp.game.controls.disableControlAction(32, 141, true);
+        mp.game.controls.disableControlAction(32, 142, true);
+        mp.game.controls.disableControlAction(32, 257, true);
+        mp.game.controls.disableControlAction(32, 263, true);
+        mp.game.controls.disableControlAction(32, 264, true);
+    }
+    if(Date.now() > currentRollCooldownTimestamp){
+        rollShootCooldownActive = false;
+        currentRollCooldownTimestamp = 0;
+    }
+
+
+});
+
 let recoil_LastShotTime = 0;
 
 mp._events.add("playerWeaponShot", (targetPosition, targetEntity) => 
