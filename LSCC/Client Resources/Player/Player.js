@@ -1815,6 +1815,8 @@ mp.events.add('render', () => {
     }
 });
 
+let recoil_LastShotTime = 0;
+
 mp._events.add("playerWeaponShot", (targetPosition, targetEntity) => 
 {
     ShotStats.TotalFired++;
@@ -1859,10 +1861,20 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
             if(gunName.includes("Revolver") || gunName === "Marksman Pistol" || gunName === "Pistol .50"){
                 shakeValue = (getRandomInt(8, 12)/10);
             }
+            if(gunName === "Stun Gun"){
+                shakeValue = 0;
+            }
         }
 
         if(mp.players.local.getStealthMovement() == true){
-            shakeValue = shakeValue/1.35; // slightly more accurate when crouching
+            shakeValue = shakeValue/1.45; // slightly more accurate when crouching
+        }
+        if(mp.game.player.isFreeAiming() == true){ // if player is holding right click to aim
+            shakeValue = shakeValue/3; // more accurate when holding right click
+        }
+
+        if((Date.now() - recoil_LastShotTime < 350) && gunType === "Handguns"){
+            shakeValue = shakeValue * 1.45;
         }
 
         const val = shakeValue;
@@ -1870,6 +1882,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
 
         mp.game.cam.setGameplayCamRelativePitch(campos.x + val, 1);
         mp.game.cam.setGameplayCamRelativeHeading(camhead + headval);
+        recoil_LastShotTime = Date.now();
     }
     else{
         mp.game.cam.shakeGameplayCam('SMALL_EXPLOSION_SHAKE', 0.03);
