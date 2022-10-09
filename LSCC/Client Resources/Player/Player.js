@@ -1856,7 +1856,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                     break;
             }
             // and now doing some specific weapons
-            if(gunName.includes("Revolver") || gunName === "Marksman Pistol"){
+            if(gunName.includes("Revolver") || gunName === "Marksman Pistol" || gunName === "Pistol .50"){
                 shakeValue = (getRandomInt(8, 12)/10);
             }
         }
