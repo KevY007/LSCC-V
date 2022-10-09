@@ -4659,7 +4659,9 @@ namespace RNC
                             player.TriggerEvent("Menu_ClearClanMembers");
                             foreach (Account accnt in clanAccounts)
                             {
-                                bool isOnline = (Settings.LoggedInPlayers.FirstOrDefault(p => EPlayer.GetAccount(player).SQL_ID == accnt.SQL_ID) != null);
+                                bool isOnline = false;
+                                Player _check = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.Equals(accnt.Username, StringComparison.OrdinalIgnoreCase));
+                                if (_check != null) isOnline = true;
 
                                 player.TriggerEvent("Menu_AddClanMember", accnt.SQL_ID, accnt.Username, accnt.ClanTier, accnt.Level, isOnline);
                             }

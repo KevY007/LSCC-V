@@ -491,7 +491,7 @@ mp.events.add("WeaponSpawner:show", (targetName, weaponName) => {
 mp.events.add("SendClanInvite", (clanName, clanID, senderName) => {
     mp.game.audio.playSoundFrontend(-1, "CHALLENGE_UNLOCKED",  "HUD_AWARDS", true);
     ServerUI.execute(`clanInvite("Clan Invitation", "You have been invited to <strong>${clanName}</strong> by ${senderName}.", 20000, ${clanID});`);
-    let notifyscoreboardstr = `toast('Show Cursor', 'To accept the invite, press <strong>[T]</strong> to open the chat & cursor, and click the Accept button.', 'nothing', 5000, 2);`;
+    let notifyscoreboardstr = `toast('Show Cursor', 'To accept the invite, press <strong>F2</strong> to show the cursor, and click the <strong>Accept</strong> button.', 'nothing', 6500, 2);`;
     ServerUI.execute(notifyscoreboardstr);
 });
 
@@ -1421,6 +1421,7 @@ mp.keys.bind(
     }
 );
 
+let cursorF2toggled = false;
 mp.keys.bind(0x71, false, function () {
     if(scoreboardToggled)
     {
@@ -1440,6 +1441,24 @@ mp.keys.bind(0x71, false, function () {
 
             //if(scoreboardBinded) mp.events.callLocal('ScoreboardToggleTyping', true);
         }
+    }
+    else{
+        if(!cursorF2toggled){
+            mp.gui.cursor.show(true, true);
+            cursorF2toggled = true;
+            mp.game.invoke("0xFC695459D4D0E219", 0.5, 0.5); // SET CURSOR POSITION TO CENTER [x,y = 0.5,0.5]
+        }
+        else{
+            mp.gui.cursor.show(false, false);
+            cursorF2toggled = false;
+        }
+    }
+});
+
+mp.events.add("OneSecondEvent", () => {
+    if(menuToggled == true || VehicleSpawnerActive == true || WeaponEditorActive == true || ClothingEditorActive == true 
+    || ActionMenuActive == true){
+        mp.gui.cursor.show(true, true);
     }
 });
 
