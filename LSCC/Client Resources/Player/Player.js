@@ -1819,6 +1819,61 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
 {
     ShotStats.TotalFired++;
 
+    if(mp.players.local.vehicle == undefined && !mp.players.local.isInAnyVehicle(false))
+    {
+        const campos = mp.game.cam.getGameplayCamRot(0);
+        const camhead = mp.game.cam.getGameplayCamRelativeHeading();
+
+        var shakeValue = 0;
+        let gunData = weaponData.find(w => Number(w.Hash) == mp.players.local.weapon);
+        if(gunData == undefined){
+            shakeValue = (getRandomInt(0, 7)/10);
+        }
+        else{
+            var gunType = gunData.Type;
+            var gunName = gunData.Name;
+            switch(gunType){ // first doing the types in general
+                case "Handguns":
+                    shakeValue = (getRandomInt(3, 7)/10);
+                    break;
+                case "Submachine Guns":
+                    shakeValue = (getRandomInt(4, 7)/10);
+                    break;
+                case "Shotguns":
+                    shakeValue = (getRandomInt(18, 25)/10);
+                    break;
+                case "Assault Rifles":
+                    shakeValue = (getRandomInt(4, 7)/10);
+                    break;
+                case "Machine Guns":
+                    shakeValue = (getRandomInt(6, 9)/10);
+                    break;
+                case "Sniper Rifles":
+                    shakeValue = (getRandomInt(5, 7)/10);
+                    break;
+                default:
+                    shakeValue = (getRandomInt(5, 10)/10);
+                    break;
+            }
+            // and now doing some specific weapons
+            if(gunName.includes("Revolver") || gunName === "Marksman Pistol"){
+                shakeValue = (getRandomInt(8, 12)/10);
+            }
+        }
+
+        if(mp.players.local.getStealthMovement() == true){
+            shakeValue = shakeValue/1.35; // slightly more accurate when crouching
+        }
+
+        const val = shakeValue;
+        const headval = (getRandomInt(0, 10) > 5 ? val : -val);
+
+        mp.game.cam.setGameplayCamRelativePitch(campos.x + val, 1);
+        mp.game.cam.setGameplayCamRelativeHeading(camhead + headval);
+    }
+    else{
+        mp.game.cam.shakeGameplayCam('SMALL_EXPLOSION_SHAKE', 0.03);
+    }
 
     if(targetEntity !== null && targetEntity !== undefined)
     {
