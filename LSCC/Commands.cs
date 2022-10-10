@@ -9908,7 +9908,7 @@ namespace RNC
             Settings.LoggedInPlayers.ForEach(pl =>
             {
                 if (pl.GetData<bool>("OOCState") == true)
-                    pl.SendChatMessage($"(( [OOC] {EPlayer.GetPrefix(player, true)}~w~ {player.Name}: {text} ))");
+                    pl.SendChatMessage($"(( [OOC] {EPlayer.GetPrefix(player, true)}~w~ {player.Name}: {text} ~w~))");
             });
      
 
@@ -9935,30 +9935,12 @@ namespace RNC
                 return;
             }
 
-            if (EPlayer.GetAccount(player).Admin < 1 || (EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true))
+
+            foreach (Player pl in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")))
             {
-                if (EPlayer.GetAccount(player).DonatorLevel < 1)
-                {
-                    foreach (Player pl in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")))
-                    {
-                        pl.SendChatMessage($"(( [LOBBY] {player.Name}: {text} ))");
-                    }
-                }
-                else
-                {
-                    foreach (Player pl in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")))
-                    {
-                        pl.SendChatMessage($"(( [LOBBY] {EPlayer.GetDonatorLevelName(EPlayer.GetAccount(player).DonatorLevel, true)}!{{#FFFFFF}} {player.Name}: {text} ))");
-                    }
-                }
+                pl.SendChatMessage($"(( [LOBBY] {EPlayer.GetPrefix(player)} {player.Name}: {text} ~w~))");
             }
-            else
-            {
-                foreach (Player pl in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")))
-                {
-                    pl.SendChatMessage($"(( [LOBBY] {EPlayer.GetAdminLevelName(EPlayer.GetAccount(player).Admin, true)}!{{#FFFFFF}} {player.Name}: {text} ))");
-                }
-            }
+
 
             Discord.SendTextChannel("staff-bot", $"**(Lobby {player.GetSharedData<int>("InLobby")}) | {player.Name}**: {text}");
         }
