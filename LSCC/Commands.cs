@@ -3486,18 +3486,18 @@ namespace RNC
             if (EPlayer.GetAccount(player).JailTime > 0)
             {
                 player.SetSharedData("AutoJoin", false);
-                player.SendChatMessage("You are in jail!");
+                player.SendChatMessage(Translate(player, "ERROR_JAIL"));
                 return;
             }
 
             if (player.GetSharedData<bool>("AutoJoin") == true)
             {
-                EPlayer.Notify(player, $"AutoJoin has been turned <strong>OFF</strong>.", "red", "fas fa-check", false, 1500, "bottomCenter", "replace");
+                EPlayer.Notify(player, Translate(player, "AUTOJOIN_OFF"), "red", "fas fa-check", false, 1500, "bottomCenter", "replace");
                 player.SetSharedData("AutoJoin", false);
             }
             else
             {
-                EPlayer.Notify(player, $"AutoJoin has been turned <strong>ON</strong>.", "green", "fas fa-check", false, 1500, "bottomCenter", "replace");
+                EPlayer.Notify(player, Translate(player, "AUTOJOIN_ON"), "green", "fas fa-check", false, 1500, "bottomCenter", "replace");
                 player.SetSharedData("AutoJoin", true);
             }
         }
@@ -3518,18 +3518,17 @@ namespace RNC
                     }
                 }
                 player.SetSharedData("WantsDriveby", false);
-                player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have disabled drive-by in your vehicle. (Only takes effect as a fugitive driver)");
+                player.SendChatMessage(Translate(player, "DRIVEBY_DISABLED"));
             }
             else
             {
                 if (player.GetSharedData<int>("Team") == 0 && player.IsInVehicle && player.VehicleSeat == 0)
                 {
-                    foreach (Player p in Settings.LoggedInPlayers.Where(a => a.Vehicle == player.Vehicle && a != player))
+                    foreach (Player p in Settings.LoggedInPlayers.Where(a => a.Vehicle == player.Vehicle))
                     {
-                        p.SendChatMessage("!{#33C446}[!!] !{#FFFFFF}" + player.Name + " has enabled drive-by in this vehicle. You may shoot again.");
+                        p.SendChatMessage(Translate(p, "DRIVEBY_ENABLED", player.Name));
                     }
                 }
-                player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have enabled drive-by in your vehicle again. (Only takes effect as a fugitive driver)");
                 player.SetSharedData("WantsDriveby", true);
             }
         }
@@ -3621,12 +3620,12 @@ namespace RNC
             if (player.GetSharedData<bool>($"VoiceMute{target.Name}") == true)
             {
                 player.SetSharedData($"VoiceMute{target.Name}", false);
-                EPlayer.Notify(player, $"You have unmuted player {target.Name}!", "green", "", false, 3000);
+                EPlayer.Notify(player, Translate(player, "VOICEBLOCK_OFF", target.Name), "green", "", false, 3000);
             }
             else if (player.GetSharedData<bool>($"VoiceMute{target.Name}") == false)
             {
                 player.SetSharedData($"VoiceMute{target.Name}", true);
-                EPlayer.Error(player, $"You have muted player {target.Name}!");
+                EPlayer.Error(player, Translate(player, "VOICEBLOCK_ON", target.Name));
             }
             return;
         }
@@ -3646,8 +3645,8 @@ namespace RNC
 
             if (player.Health == 0 || player.Dead)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are respawning!");
-                EPlayer.Notify(player, "Please wait to respawn.", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
+                //player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are respawning!");
+                EPlayer.Notify(player, Translate(player, "ERROR_RESPAWNING_NOCOLOR"), "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
                 return;
             }
             WeaponHash[] pistols = new WeaponHash[] { WeaponHash.Pistol, WeaponHash.Combatpistol, WeaponHash.Appistol, WeaponHash.Pistol50,

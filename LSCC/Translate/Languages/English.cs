@@ -123,6 +123,15 @@ namespace RNC.Translate.Languages
             {"CONVERT_DPOINTS_WARNING_1", "!{#33C446}[#] !{#FFFFFF}You will gain !{#33C446}{gain} points !{#FFFFFF}in place of !{#FF6347}{amount} donator points!{#FFFFFF}."},
             {"FREEROAM_CHANGE_WORLD", "~y~>>~w~ You have changed your freeroam world to {WORLD ID}."},
             {"FREEROAM_CHANGE_WORLD_GUN_HINT", "~g~>>~w~ You can use /gun in this freeroam world."},
+            {"VEHICLE_REPAIRED", "!{#00FF00}[>] ~w~Vehicle repaired!"},
+            {"ERROR_JAIL", "!{#FF6347}[!] !{#FFFFFF}You are in jail!"},
+            {"AUTOJOIN_OFF", "AutoJoin has been turned <strong>OFF</strong>."},
+            {"AUTOJOIN_ON", "AutoJoin has been turned <strong>ON</strong>."},
+            {"DRIVEBY_DISABLED", "!{#33C446}[#] !{#FFFFFF}You have disabled drive-by in your vehicle. (Only takes effect as a fugitive driver)"},
+            {"DRIVEBY_ENABLED", "!{#33C446}[!!] !{#FFFFFF}{PLAYER NAME} has enabled drive-by in this vehicle. You may shoot again."},
+            {"VOICEBLOCK_ON", "You have blocked voice comms from player <strong>{PLAYER NAME}</strong>"},
+            {"VOICEBLOCK_OFF", "You have un-blocked voice comms from player <strong>{PLAYER NAME}</strong>"},
+            {"ERROR_RESPAWNING_NOCOLOR", "Please wait, you are respawning..."},
         };
     }
 }
