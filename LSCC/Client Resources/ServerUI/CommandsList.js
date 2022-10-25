@@ -406,18 +406,14 @@ var CommandsDataJSON = [
     "Usage": "[USAGE] pk (option: buy/use/inv)",
     "Admin": 0,
     "Donator": 0,
-    "Parameters": [
-      "option: buy/use/inv"
-    ]
+    "Parameters": []
   },
   {
     "CommandText": "medkit",
     "Usage": "[USAGE] mk (option: buy/use/inv)",
     "Admin": 0,
     "Donator": 0,
-    "Parameters": [
-      "option: buy/use/inv"
-    ]
+    "Parameters": []
   },
   {
     "CommandText": "handsup",

@@ -13,17 +13,24 @@ namespace RNC
 {
     class Commands : Script
     {
+        static string Translate(Player player, string message_code, params object[] args)
+        {
+            return Translator.Translate(player, message_code, args);
+        }
+
         [Command("serveroptions", "!{#AFAFAF}[USAGE] serveroptions (option) | use 'help' to get all options", GreedyArg = true)]
         public void cmd_serveroptions(Player player, string action)
         {
+
             if (!EPlayer.LoggedIn(player))
                 return;
 
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
+
 
             //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:serveroptions:{action.Replace(":", "|")}"); } catch { }
 
@@ -35,7 +42,7 @@ namespace RNC
                     int value = 0;
                     if (!Int32.TryParse(args[1], out value) || value < 1 || value > 999)
                     {
-                        player.SendChatMessage($"!{{#999999}}Max players in a lobby should be between 1-999!");
+                        player.SendChatMessage(Translate(player, "ERROR_MAX_IN_LOBBY_NUM"));
                         return;
                     }
 
@@ -46,7 +53,7 @@ namespace RNC
                     Logs.LogAdmin(player, $"Set max players per lobby to {value}.");
                     EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has changed max players in a lobby to {value}.");
                 }
-                else player.SendChatMessage("!{#999999}Proper usage: /serveroptions maxinlobby <amount>");
+                else player.SendChatMessage(Translate(player, "ERROR_MAX_IN_LOBBY_USAGE"));
             }
             else if(action.StartsWith("parkedvehs"))
             {
@@ -62,12 +69,12 @@ namespace RNC
 
                     if (!Int32.TryParse(args[1], out speed))
                     {
-                        player.SendChatMessage($"!{{#999999}}You must enter a number between 500 and 1500!");
+                        player.SendChatMessage(Translate(player, "ERROR_NUMPARKEDVEHS_NUMBER"));
                         return;
                     }
                     if(speed < 100 || speed > 500)
                     {
-                        player.SendChatMessage($"!{{#999999}}You must enter a number between 100 and 500!");
+                        player.SendChatMessage(Translate(player, "ERROR_NUMPARKEDVEHS_NUMBER"));
                         return;
                     }
 
@@ -75,7 +82,7 @@ namespace RNC
 
                     EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set the number of randomly-parked vehicles in copchase to {speed}.");
                 }
-                else player.SendChatMessage("!{#999999}Proper usage: /serveroptions parkedvehscount <number of vehicles>");
+                else player.SendChatMessage(Translate(player, "USAGE_NUMPARKEDVEHS"));
             }
             else if (action.StartsWith("derbyveh", StringComparison.OrdinalIgnoreCase))
             {
@@ -89,7 +96,7 @@ namespace RNC
                     Logs.LogAdmin(player, $"Changed derby vehicle to {Settings.Dynamics.DerbyVehicle}");
                     EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set derby vehicle model to {Settings.Dynamics.DerbyVehicle}.");
                 }
-                else player.SendChatMessage("!{#999999}Proper usage: /serveroptions derbyveh <model name>");
+                else player.SendChatMessage(Translate(player, "USAGE_DERBY_MODELNAME"));
             }
 
             else if (action.StartsWith("onfootcollisions", StringComparison.OrdinalIgnoreCase))
@@ -286,7 +293,7 @@ namespace RNC
         [Command("trunk", Alias = "boot")]
         public void cmd_trunk(Player player)
         {
-            if (!player.IsInVehicle || player.Vehicle == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in any vehicle!"); return; }
+            if (!player.IsInVehicle || player.Vehicle == null) { player.SendChatMessage(Translate(player, "ERROR_NOT_IN_VEHICLE")); return; }
 
             if (player.Vehicle.HasSharedData("Status_Trunk"))
             {
@@ -316,7 +323,7 @@ namespace RNC
             Vehicle targetVeh = null;
             if(player.Vehicle != null || player.IsInVehicle)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are already in a vehicle!");
+                player.SendChatMessage(Translate(player, "ERROR_ALREADY_IN_VEHICLE"));
                 return;
             }
 
@@ -333,17 +340,17 @@ namespace RNC
             }
             if(targetVeh == null)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not within 3.5 meters of any locked vehicle!");
+                player.SendChatMessage(Translate(player, "ERROR_LOCKPICK_NOT_NEAR_VEHICLE"));
                 return;
             }
             if(EPlayer.GetAccount(player).Lockpicks <= 0)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have a Lockpick! Buy one in the menu.");
+                player.SendChatMessage(Translate(player, "ERROR_NO_LOCKPICK"));
                 return;
             }
 
             Events.RequestPlayAnimation(player, "mp_arresting", "a_uncuff", 31); // 31 = upper body only
-            player.SendChatMessage("~y~[LOCKPICKING]~w~ Hit ~y~SPACE~w~ when the ~b~blue~w~ dot is in the ~g~green zone~w~.");
+            player.SendChatMessage(Translate(player, "LOCKPICK_HELP"));
             player.TriggerEvent("startLockpicking", EPlayer.GetAccount(player).DonatorLevel);
             player.SetData<Vehicle>("LockpickTarget", targetVeh);
             EPlayer.GetAccount(player).Lockpicks--;
@@ -370,7 +377,7 @@ namespace RNC
 
             if (targetVeh == null)
             {
-                if (!player.HasData("SilentLock")) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not close enough to a vehicle!"); }
+                if (!player.HasData("SilentLock")) { player.SendChatMessage(Translate(player, "ERROR_NOT_NEAR_VEHICLE")); }
                 player.ResetData("SilentLock");
                 return;
             }
@@ -378,7 +385,7 @@ namespace RNC
             if (targetVeh.HasSharedData("Team") && targetVeh.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") &&
                 targetVeh.Locked == true)
             {
-                if (!player.HasData("SilentLock")) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot unlock this vehicle - use a lockpick ~y~(/lockpick)~w~!"); }
+                if (!player.HasData("SilentLock")) { player.SendChatMessage(Translate(player, "ERROR_CANT_UNLOCK_USE_LOCKPICK")); }
                 player.ResetData("SilentLock");
                 return;
             }
@@ -388,7 +395,7 @@ namespace RNC
             {
                 if (ld.gameMode == GameModes.BANKROBBERY && player.GetSharedData<int>("Team") == 0 && ld.BankRobbery.State < 1)
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Nice try, you cannot unlock this vehicle yet! Wait for the leader to take the money first.");
+                    player.SendChatMessage(Translate(player, "ERROR_CANT_UNLOCK_BANKROB"));
                     return;
                 }
             }
@@ -398,20 +405,20 @@ namespace RNC
 
             if (targetVeh.HasSharedData("Team") && targetVeh.GetSharedData<int>("Team") != player.GetSharedData<int>("Team"))
             {
-                EPlayer.Action(player, "locks the door from inside.");
+                EPlayer.Action(player, Translate(player, "ACTION_LOCKS_DOOR_INSIDE"));
             }
             else
             {
                 if (targetVeh.Locked)
                 {
-                    EPlayer.Action(player, "locks the door of the vehicle.");
+                    EPlayer.Action(player, Translate(player, "ACTION_LOCKS_VEHDOOR"));
                 }
-                else EPlayer.Action(player, "unlocks the door of the vehicle.");
+                else EPlayer.Action(player, Translate(player, "ACTION_UNLOCKS_VEHDOOR"));
             }
 
             return;
         }
-
+        /*
         [Command("applycomps")]
         public static void cmd_applycomps(Player player)
         {
@@ -478,8 +485,7 @@ namespace RNC
                 }
             });
         }
-
-        
+        */        
 
         [Command("engine")]
         public static void cmd_engine(Player player)
@@ -491,25 +497,25 @@ namespace RNC
 
             if (player.Vehicle.HasSharedData("Fuel") && (double)player.Vehicle.GetSharedData<Single>("Fuel") <= 0.0)
             {
-                EPlayer.Error(player, $"Your car has no fuel, what are you trying to pull off here, buddy?");
+                EPlayer.Error(player, Translate(player, "ERROR_NO_FUEL"));
                 return;
             }
 
             if (player.Vehicle.HasSharedData("Team") && (player.Vehicle.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") || player.Vehicle.GetSharedData<int>("Team") == 10) &&
                 player.Vehicle.EngineStatus == false)
             {
-                player.SendNotification("~r~You cannot start this vehicle - ~w~you will have to hotwire it! ~y~(/hotwire)");
+                player.SendNotification(Translate(player, "ERROR_CANT_START_USE_HOTWIRE"));
                 return;
             }
             if(player.Vehicle.GetSharedData<int>("Team") == 10 && player.Vehicle.EngineStatus == false)
             {
-                player.SendNotification("~r~You cannot start this vehicle - ~w~you will have to hotwire it! ~y~(/hotwire)");
+                player.SendNotification(Translate(player, "ERROR_CANT_START_USE_HOTWIRE"));
                 return;
             }
 
             if (player.VehicleSeat != 0)
             {
-                player.SendNotification("~r~You are not the driver!");
+                player.SendNotification(Translate(player, "ERROR_NOT_DRIVER"));
                 return;
             }
 
@@ -518,9 +524,9 @@ namespace RNC
 
             if (player.Vehicle.EngineStatus)
             {
-                EPlayer.Action(player, "turns the vehicle's engine on.");
+                EPlayer.Action(player, Translate(player, "ACTION_ENGINE_ON"));
             }
-            else EPlayer.Action(player, "turns the vehicle's engine off.");
+            else EPlayer.Action(player, Translate(player, "ACTION_ENGINE_OFF"));
 
             return;
         }
@@ -530,19 +536,19 @@ namespace RNC
         {
             if (!player.IsInVehicle || player.Vehicle == null)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not inside any vehicle!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_VEHICLE"));
                 return;
             }
 
             if (player.HasData("Seatbelt"))
             {
-                EPlayer.Action(player, "releases the seatbelt.");
+                EPlayer.Action(player, Translate(player, "ACTION_RELEASE_SEATBELT"));
                 player.ResetData("Seatbelt");
                 player.TriggerEvent("ToggleSeatbelt", false);
             }
             else
             {
-                EPlayer.Action(player, "fastens the seatbelt.");
+                EPlayer.Action(player, Translate(player, "ACTION_BUCKLE_SEATBELT"));
                 player.SetData("Seatbelt", true);
                 player.TriggerEvent("ToggleSeatbelt", true);
 
@@ -559,19 +565,19 @@ namespace RNC
 
             if (player.GetSharedData<int>("InLobby") < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You must be in a lobby to use this command!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
                 return;
             }
 
             LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
             if ((lobby != null) == false)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You must be in a lobby to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
                 return;
             }
 
-            player.SendChatMessage($"!{{#A8FFAB}}Time In Lobby: (H:M:S) !{{#FFFFFF}}{lobby.Time[0]}:{lobby.Time[1]}:{lobby.Time[2]}");
-            player.SendChatMessage("!{#A8FFAB}Weather Forecast: !{#FFFFFF}" + Main.WeatherToForecast(lobby.Weather) + " (" + lobby.Weather + ")");
+            player.SendChatMessage(Translate(player, "TIME_IN_LOBBY", lobby.Time[0], lobby.Time[1], lobby.Time[2]));
+            player.SendChatMessage(Translate(player, "WEATHER_FORECAST", Main.WeatherToForecast(lobby.Weather), lobby.Weather));
 
             return;
 
@@ -748,31 +754,31 @@ namespace RNC
 
             if (action.StartsWith("hud", StringComparison.OrdinalIgnoreCase))
             {
-                player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}Please press F7 to toggle HUD.");
+                player.SendChatMessage(Translate(player, "TOGGLE_HUD_HELP"));
             }
             else if (action.StartsWith("pm", StringComparison.OrdinalIgnoreCase))
             {
                 player.SetData("PMState", !player.GetData<bool>("PMState"));
                 if (player.GetData<bool>("PMState") == true)
                 {
-                    player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have enabled your PMs.");
+                    player.SendChatMessage(Translate(player, "TOGGLE_PRIVATE_MESSAGE_ON"));
                 }
-                else player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have disabled your PMs.");
+                else player.SendChatMessage(Translate(player, "TOGGLE_PRIVATE_MESSAGE_OFF"));
             }
             else if (action.StartsWith("ooc", StringComparison.OrdinalIgnoreCase))
             {
                 player.SetData("OOCState", !player.GetData<bool>("OOCState"));
                 if (player.GetData<bool>("OOCState") == true)
                 {
-                    player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have enabled OOC chat.");
+                    player.SendChatMessage(Translate(player, "TOGGLE_OOC_ON"));
                 }
-                else player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have disabled OOC chat.");
+                else player.SendChatMessage(Translate(player, "TOGGLE_OOC_OFF"));
             }
             else if (action.StartsWith("radio", StringComparison.OrdinalIgnoreCase))
             {
                 player.TriggerEvent("ToggleClientRadio");
             }
-            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'hud', 'pm', 'radio', 'ooc'");
+            else player.SendChatMessage(Translate(player, "ERROR_INVALID_TOGGLE_OPTION"));
 
             return;
         }
@@ -798,18 +804,18 @@ namespace RNC
             DiscordData _d = NAPI.Util.FromJson<DiscordData>(EPlayer.GetAccount(player).DiscordInfo);
             if (_d.DiscordID != "n/a")
             {
-                player.SendChatMessage("~y~Your Discord account is already linked.");
+                player.SendChatMessage(Translate(player, "ERROR_DISCORD_VERIFIED"));
                 return;
             }
 
-            player.SendChatMessage("~w~====================> !{#0097ff}HOW TO VERIFY ~w~<====================");
-            player.SendChatMessage("~y~[1]~w~ Join our !{#0097ff}Discord ~y~(discord.gg/y3g2WuR)~w~.");
-            player.SendChatMessage("~y~[2]~w~ Head into the !{#0097ff}#bot-commands ~w~channel.");
-            player.SendChatMessage("~y~[3]~w~ Use command ~y~/verify !{#a6ffa7}(name)!{#ffa6a6}(code) ~w~to verify.");
-            player.SendChatMessage("~w~And that's it! The process is very straight-forward. You, for example, have to enter:");
-            player.SendChatMessage($"~y~/verify !{{#a6ffa7}}{player.Name} !{{#ffa6a6}}{_d.DiscordCode}");
+            player.SendChatMessage(Translate(player, "DISCORD_VERIFY_HELP_1"));
+            player.SendChatMessage(Translate(player, "DISCORD_VERIFY_HELP_2"));
+            player.SendChatMessage(Translate(player, "DISCORD_VERIFY_HELP_3"));
+            player.SendChatMessage(Translate(player, "DISCORD_VERIFY_HELP_4"));
+            player.SendChatMessage(Translate(player, "DISCORD_VERIFY_HELP_5"));
+            player.SendChatMessage(Translate(player, "DISCORD_VERIFY_HELP_6", player.Name, _d.DiscordCode));
             player.SendChatMessage(" ");
-            player.SendChatMessage("~y~Your Discord code: ~w~" + _d.DiscordCode);
+            player.SendChatMessage(Translate(player, "DISCORD_VERIFY_CODE", _d.DiscordCode));
         }
 
         [Command("vehdbg")]
@@ -864,7 +870,7 @@ namespace RNC
 
             if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 return;
             }
 
@@ -876,7 +882,7 @@ namespace RNC
                 Vehicle veh = freeroamVehs.First();
                 freeroamVehs.Remove(veh);
                 veh.Delete();
-                player.SendNotification("~r~You had too many freeroam vehicles, removed the least recent.");
+                player.SendNotification(Translate(player, "FREEROAM_REMOVED_OLDEST_VEH"));
             }
             // Vehicle spawner automatically grabs the car and spawns it if it's found.
             player.TriggerEvent("OpenVehicleSpawner", carname, false);
@@ -891,18 +897,18 @@ namespace RNC
 
             if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 return;
             }
 
             if (hour < 0 || hour > 23)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Hours are between 0-23.");
+                player.SendChatMessage(Translate(player, "ERROR_INVALID_TIME_SET"));
                 return;
             }
 
             player.SetData("FreeroamTime", hour);
-            player.SendChatMessage("!{#FF6347}>> !{#FFFFFF}You have set your time/hour to " + hour + ".");
+            player.SendChatMessage(Translate(player, "FREEROAM_SET_TIME", hour));
 
             player.TriggerEvent("SetTimeWeather", player.GetData<int>("FreeroamTime"), 0, 0, player.GetData<int>("FreeroamWeather"));
 
@@ -917,22 +923,19 @@ namespace RNC
 
             if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
-                player.SendChatMessage("~g~HINT:~w~ You can change your weather in the ~y~Menu > Settings~w~.");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
+                player.SendChatMessage(Translate(player, "MYWEATHER_HINT"));
                 return;
             }
 
             if (weatherid < 0 || weatherid > 9)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Weather ID's are between 0-9.");
+                player.SendChatMessage(Translate(player, "ERROR_INVALID_WEATHER_SET"));
                 return;
             }
 
             player.SetData("FreeroamWeather", weatherid);
             player.TriggerEvent("SetTimeWeather", player.GetData<int>("FreeroamTime"), 0, 0, player.GetData<int>("FreeroamWeather"));
-
-
-
 
             return;
         }
@@ -945,14 +948,14 @@ namespace RNC
 
             if ((player.GetSharedData<int>("InLobby") == -3 && player.Dimension >= 256 && player.Dimension <= 512) == false && EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 return;
             }
 
             player.SetData("FreeroamBlip", !player.GetData<bool>("FreeroamBlip"));
             player.SetSharedData("VisibleBlip", player.GetData<bool>("FreeroamBlip"));
 
-            player.SendChatMessage("!{#FF6347}>> !{#FFFFFF}You have " + (player.GetData<bool>("FreeroamBlip") == true ? "enabled" : "disabled") + " your freeroam minimap blip.");
+            player.SendChatMessage(Translate(player, "FREEROAM_TOGGLE_BLIP"), (player.GetData<bool>("FreeroamBlip") == true ? Translate(player, "ENABLED") : Translate(player, "DISABLED")));
             return;
         }
 
@@ -964,14 +967,14 @@ namespace RNC
 
             if ((player.GetSharedData<int>("InLobby") == -3 && player.Dimension >= 256 && player.Dimension <= 512) == false && EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 return;
             }
 
             player.SetData("FreeroamGodmode", !player.GetData<bool>("FreeroamGodmode"));
             player.TriggerEvent("SetActorInvulnerable", player.GetData<bool>("FreeroamGodmode"));
 
-            player.SendChatMessage("!{#FF6347}>> !{#FFFFFF}You have " + (player.GetData<bool>("FreeroamGodmode") == true ? "enabled" : "disabled") + " freeroam godmode.");
+            player.SendChatMessage(Translate(player, "FREEROAM_TOGGLE_GODMODE"), (player.GetData<bool>("FreeroamBlip") == true ? Translate(player, "ENABLED") : Translate(player, "DISABLED")));
             return;
         }
 
@@ -983,7 +986,7 @@ namespace RNC
 
             if ((player.GetSharedData<int>("InLobby") == -3 && player.Dimension >= 256 && player.Dimension <= 512) == false && EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 return;
             }
 
@@ -997,8 +1000,7 @@ namespace RNC
                 player.SetData("FreeroamAFOB", true);
                 player.TriggerEvent("ToggleAFOB", true, 999);
             }
-
-            player.SendChatMessage("!{#FF6347}>> !{#FFFFFF}You have " + (player.HasData("FreeroamAFOB") ? "enabled" : "disabled") + " anti fall off bike.");
+            player.SendChatMessage(Translate(player, "FREEROAM_TOGGLE_AFOB"), (player.GetData<bool>("FreeroamBlip") == true ? Translate(player, "ENABLED") : Translate(player, "DISABLED")));
             return;
         }
 
@@ -1010,7 +1012,7 @@ namespace RNC
 
             if ((player.GetSharedData<int>("InLobby") == -3 && player.Dimension > 256 && player.Dimension <= 512) == false && EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam or you are in the default world!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM_OR_WORLD"));
                 return;
             }
 
@@ -1020,7 +1022,7 @@ namespace RNC
 
             foreach (Player p in Settings.LoggedInPlayers.Where(a => a.GetData<uint>("FreeroamWorld") == player.GetData<uint>("FreeroamWorld")))
             {
-                p.SendChatMessage("!{#FF6347}>> !{#FFFFFF}" + player.Name + " has changed the spawn of this freeroam world.");
+                p.SendChatMessage(Translate(p, "FREEROAM_CHANGE_SPAWN", player.Name));
             }
 
             //// try { Main.Log("freeroam.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setspawn:{player.Dimension-(uint)256}"); } catch { }
@@ -1046,16 +1048,14 @@ namespace RNC
 
             if (!isACop)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a cop.");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_COP"));
                 return;
             }
 
             player.SetData("GPS", !player.GetData<bool>("GPS"));
             player.SetSharedData("VisibleBlip", player.GetData<bool>("GPS"));
 
-            player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have " + (player.GetData<bool>("GPS") == true ? "enabled" : "disabled") +
-                " your emergency GPS beacon.");
-
+            player.SendChatMessage(Translate(player, "TOGGLE_GPS", (player.GetData<bool>("GPS") == true ? Translate(player, "ENABLED") : Translate(player, "DISABLED"))));
             return;
         }
 
@@ -1067,12 +1067,12 @@ namespace RNC
 
             if (player.GetSharedData<bool>("VehicleDL") == true)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}DL (vehicle info displayer) has been disabled.");
+                player.SendChatMessage(Translate(player, "VEHINFO_DISABLED"));
                 player.SetSharedData("VehicleDL", false);
             }
             else
             {
-                player.SendChatMessage("!{#33C446}[>] !{#FFFFFF}DL (vehicle info displayer) has been enabled.");
+                player.SendChatMessage(Translate(player, "VEHINFO_ENABLED"));
                 player.SetSharedData("VehicleDL", true);
             }
             return;
@@ -1237,18 +1237,18 @@ namespace RNC
             {
                 if (player.GetSharedData<int>("InLobby") != -3)
                 {
-                    player.SendChatMessage("!{#FF6347}[!] ~w~You must be an admin or in freeroam to use this command!");
+                    player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                     return;
                 }
                 if (target.GetSharedData<int>("InLobby") != -3)
                 {
-                    player.SendChatMessage("!{#FF6347}[!] ~w~Target is not in freeroam!");
+                    player.SendChatMessage(Translate(player, "ERROR_TARGET_NOT_IN_FREEROAM"));
                     return;
                 }
                 if (player.Dimension != target.Dimension)
                 {
-                    player.SendChatMessage("!{#FF6347}[!] ~w~You are not in the same world as the target! (/world)");
-                    player.SendChatMessage("!{#FF6347}>> ~w~Please don't bother/troll/grief players if they want to be alone in their world!");
+                    player.SendChatMessage(Translate(player, "ERROR_TARGET_DIFFERENT_WORLD"));
+                    player.SendChatMessage(Translate(player, "HINT_DONT_TROLL_FREEROAM"));
                     return;
                 }
                 if (player.IsInVehicle)
@@ -1260,8 +1260,8 @@ namespace RNC
                 {
                     player.Position = target.Position.Around(3.0f);
                 }
-                player.SendChatMessage($"!{{#C9C9C9}}You've teleported to {target.Name}'s position.");
-                target.SendChatMessage($"!{{#C9C9C9}}{player.Name} has teleported to your position.");
+                player.SendChatMessage(Translate(player, "TELEPORTED_TO_PLAYER", target.Name));
+                target.SendChatMessage(Translate(target, "PLAYER_TELEPORTED_TO_YOU", player.Name));
             }
             return;
         }
@@ -1329,6 +1329,7 @@ namespace RNC
             return;
         }
 
+        /*
         [Command("recoverall")]
         public void cmd_recoverall(Player player)
         {
@@ -1356,7 +1357,7 @@ namespace RNC
                     }
                 }
             });
-        }
+        }*/
 
         /*
         [Command("placespikes")]
@@ -1660,8 +1661,9 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            player.SendChatMessage("!{#f0c311}Chance of becoming a fugitive next round: !{#FFFFFF}" + player.GetSharedData<float>("FugitiveChance").ToString("N2") + "%");
-            player.SendChatMessage("!{#fa65b0}Highest chance in lobby: !{#FFFFFF}" + Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")).OrderByDescending(a => a.GetSharedData<float>("FugitiveChance")).First().GetSharedData<float>("FugitiveChance").ToString("N2") + "%");
+            player.SendChatMessage(Translate(player, "FUGITIVE_CHANCE", player.GetSharedData<float>("FugitiveChance").ToString("N2")));
+            player.SendChatMessage(Translate(player, "FUGITIVE_CHANCE_HIGHEST", Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")).OrderByDescending(a => a.GetSharedData<float>("FugitiveChance")).First().GetSharedData<float>("FugitiveChance").ToString("N2")));
+
         }
 
         [Command("togcols", "!{#AFAFAF}[USAGE] togcols (target)")]
@@ -1820,23 +1822,23 @@ namespace RNC
         public void cmd_sa(Player player)
         {
             if (player.GetSharedData<int>("Wounded") > 0)
-            { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Nice try - you cannot use this while wounded!"); return; }
+            { player.SendChatMessage(Translate(player, "ERROR_WOUNDED")); return; }
 
             if (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedData<long>("TasedTill"))
-            { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this right now as you're tased."); return; }
+            { player.SendChatMessage(Translate(player, "ERROR_TASED")); return; }
 
             if (player.HasData("Cuffed"))
-            { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this while cuffed."); return; }
+            { player.SendChatMessage(Translate(player, "ERROR_CUFFED")); return; }
 
             if (player.IsInVehicle)
-            { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this inside of a vehicle!"); return; }
+            { player.SendChatMessage(Translate(player, "ERROR_CANT_USE_INSIDE_VEHICLE")); return; }
 
             long currentTimestamp = new DateTimeOffset().ToUnixTimeSeconds();
             if(currentTimestamp - player.GetSharedData<long>("LastVehicleExit") < 20)
-            { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this for a short period of time after exiting a vehicle! (20s)"); return; }
+            { player.SendChatMessage(Translate(player, "ERROR_STOPANIM_VEHEXIT_COOLDOWN")); return; }
 
             if (!player.GetSharedData<string>("ActionType").Equals("none"))
-            { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this while performing an action!"); return; }
+            { player.SendChatMessage(Translate(player, "ERROR_IN_ACTION")); return; }
 
 
             if (player.HasData("Handsup"))
@@ -1861,156 +1863,96 @@ namespace RNC
             }
             player.SetSharedData("VisibleBlip", !player.GetSharedData<bool>("VisibleBlip"));
         }
-        [Command("painkillers", "!{#AFAFAF}[USAGE] pk (option: buy/use/inv)", Alias = "pk")]
+        [Command("painkillers", Alias = "pk")]
         public static void cmd_painkillers(Player player, string option)
         {
-            if (option == "buy")
+            if (player.GetSharedData<int>("Team") == -1)
             {
-                Account acc = EPlayer.GetAccount(player);
-                if (acc.Points < 6)
-                {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You need 6 points to purchase a painkiller!");
-                    return;
-                }
-                if (acc.Painkillers >= 15)
-                {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot have more than 15 painkillers on you at once!");
-                    return;
-                }
-
-                acc.Painkillers++;
-                EPlayer.GivePoints(player, -6);
-                player.SendChatMessage($"~g~You successfully purchased a painkiller for 6 points and how have !{{#FFFFFF}}{acc.Painkillers} panikillers~g~!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_COPCHASE"));
                 return;
             }
-            else if (option == "use")
+
+            if (EPlayer.GetAccount(player).Painkillers <= 0)
             {
-                if (player.GetSharedData<int>("Team") == -1)
-                {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can only use this in copchase!");
-                    return;
-                }
-
-                if (EPlayer.GetAccount(player).Painkillers <= 0)
-                {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have any painkillers! Please buy some using /pk buy.");
-                    return;
-                }
-
-                if (player.GetSharedData<string>("ActionType") != "none" || player.GetSharedData<int>("ActionTime") > 0)
-                { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are already performing an action!"); return; }
-
-                if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedData<long>("TasedTill")))
-                { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this right now."); return; }
-
-                /*if (player.IsInVehicle)
-                { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this inside of a vehicle!"); return; }  
-                */
-                if (player.Health > 90)
-                {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use painkillers when your HP is above 90, aka we do not support overdosing on painkillers.");
-                    return;
-                }
-
-                player.SetSharedData("ActionType", "painkiller");
-                player.SetSharedData("ActionTime", 40);
-                player.TriggerEvent("StartPlayerAction", "painkiller", 40);
-
-                EPlayer.Action(player, $"takes out a small bottle containing painkillers and swallows one.");
-                player.SendChatMessage("~y~You swallowed a painkiller and will be getting +1HP for the next 40 seconds.");
+                player.SendChatMessage(Translate(player, "ERROR_NO_PAINKILLERS"));
                 return;
             }
-            else if (option == "inv")
+
+            if (player.GetSharedData<string>("ActionType") != "none" || player.GetSharedData<int>("ActionTime") > 0)
+            { player.SendChatMessage(Translate(player, "ERROR_IN_ACTION")); return; }
+
+            if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedData<long>("TasedTill")))
+            { player.SendChatMessage(Translate(player, "ERROR_CANT_DO_RIGHT_NOW")); return; }
+
+            /*if (player.IsInVehicle)
+            { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this inside of a vehicle!"); return; }  
+            */
+            if (player.Health > 90)
             {
-                player.SendChatMessage($"~w~You have ~y~{EPlayer.GetAccount(player).Painkillers} painkillers ~w~in your inventory.");
-            }
-            else
-            {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option! Valid options are: buy, use, inv.");
+                player.SendChatMessage(Translate(player, "ERROR_PAINKILLERS_HIGH_HEALTH"));
                 return;
             }
+
+            player.SetSharedData("ActionType", "painkiller");
+            player.SetSharedData("ActionTime", 40);
+            player.TriggerEvent("StartPlayerAction", "painkiller", 40);
+
+            EPlayer.Action(player, Translate(player, "ACTION_PAINKILLERS"));
+            player.SendChatMessage(Translate(player, "PAINKILLERS_HELP"));
+            return;
         }
 
         [Command("medkit", "!{#AFAFAF}[USAGE] mk (option: buy/use/inv)", Alias = "mk")]
         public static void cmd_medkit(Player player, string option)
         {
-            if (option == "buy")
-            {
-                Account acc = EPlayer.GetAccount(player);
-                if (acc.Points < 10)
-                {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You need 10 points to purchase a medkit!");
-                    return;
-                }
-                if (acc.Medkits >= 5)
-                {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot have more than 5 medkits on you at once!");
-                    return;
-                }
 
-                acc.Medkits++;
-                EPlayer.GivePoints(player, -10);
-                player.SendChatMessage($"~g~You successfully purchased a medkit for 10 points and how have !{{#FFFFFF}}{acc.Medkits} medkits~g~!");
+            if (player.GetSharedData<int>("Team") == -1)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_COPCHASE"));
                 return;
             }
-            else if (option == "use")
+
+            if (EPlayer.GetAccount(player).Medkits <= 0)
             {
-                if (player.GetSharedData<int>("Team") == -1)
-                {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can only use this in copchase!");
-                    return;
-                }
-
-                if (EPlayer.GetAccount(player).Medkits <= 0)
-                {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have any medkits! Please buy some using /mk buy.");
-                    return;
-                }
-
-                if (player.GetSharedData<string>("ActionType") != "none" || player.GetSharedData<int>("ActionTime") > 0)
-                { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are already performing an action!"); return; }
-
-                if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedData<long>("TasedTill")))
-                { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this right now."); return; }
-
-                if (player.IsInVehicle)
-                { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this inside of a vehicle!"); return; }
-
-                if (player.Health > 80)
-                {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use medkits when your health is above 80!");
-                    return;
-                }
-
-                player.SetSharedData("ActionType", "medkit");
-                player.SetSharedData("ActionTime", 10);
-                player.TriggerEvent("StartPlayerAction", "medkit", 10);
-
-                EPlayer.Action(player, $"takes out a first aid kit and starts treating their wounds.");
-                player.SendChatMessage("~y~You are now using a medkit, this will take 10 seconds.");
+                player.SendChatMessage(Translate(player, "ERROR_NO_MEDKITS"));
                 return;
             }
-            else if (option == "inv")
+
+            if (player.GetSharedData<string>("ActionType") != "none" || player.GetSharedData<int>("ActionTime") > 0)
+            { player.SendChatMessage(Translate(player, "ERROR_IN_ACTION")); return; }
+
+            if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedData<long>("TasedTill")))
+            { player.SendChatMessage(Translate(player, "ERROR_CANT_DO_RIGHT_NOW")); return; }
+
+            if (player.IsInVehicle)
+            { player.SendChatMessage(Translate(player, "ERROR_CANT_USE_INSIDE_VEHICLE")); return; }
+
+            if (player.Health > 80)
             {
-                player.SendChatMessage($"~w~You have ~y~{EPlayer.GetAccount(player).Medkits} medkits ~w~in your inventory.");
-            }
-            else
-            {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option! Valid options are: buy, use, inv.");
+                player.SendChatMessage(Translate(player, "ERROR_MEDKITS_HIGH_HEALTH"));
                 return;
             }
+
+            player.SetSharedData("ActionType", "medkit");
+            player.SetSharedData("ActionTime", 10);
+            player.TriggerEvent("StartPlayerAction", "medkit", 10);
+
+            EPlayer.Action(player, Translate(player, "ACTION_MEDKIT"));
+            player.SendChatMessage(Translate(player, "MEDKIT_HELP"));
+            return;
+
         }
         [Command("handsup")]
         public void cmd_handsup(Player player)
         {
             if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedData<long>("TasedTill")))
-            { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this right now."); return; }
+            { player.SendChatMessage(Translate(player, "ERROR_CANT_DO_RIGHT_NOW")); return; }
 
             if (player.IsInVehicle)
-            { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this inside of a vehicle!"); return; }
+            { player.SendChatMessage(Translate(player, "ERROR_CANT_USE_INSIDE_VEHICLE")); return; }
 
             if (!player.GetSharedData<string>("ActionType").Equals("none"))
-            { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot do this while performing an action!"); return; }
+            { player.SendChatMessage(Translate(player, "ERROR_IN_ACTION")); return; }
 
             if (player.HasData("Handsup"))
             {
@@ -2172,7 +2114,7 @@ namespace RNC
             LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
             if (lobby == null)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in a copchase lobby!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_COPCHASE"));
                 return;
             }
 
@@ -2199,32 +2141,30 @@ namespace RNC
 
             if (!isACop)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a cop or the target cannot be dragged out right now!");
-                player.SendChatMessage("!{#AFAFAF}[HINT] You can use /dragout (target) to drag out a specific player.");
-                player.SendChatMessage("!{#AFAFAF}[HINT] Entering /dragout without any parameters will attempt to drag out the nearest fugitive.");
+                player.SendChatMessage(Translate(player, "ERROR_DRAGOUT_NOCOP_CANTDRAG"));
                 return;
             }
 
             if (lobby.GameProgress < 60)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot dragout at the start of the game!");
+                player.SendChatMessage(Translate(player, "ERROR_DRAG_GAME_START"));
                 return;
             }
 
-            if (player.Position.DistanceTo(target.Position) >= 3.5) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near that player!"); return; }
+            if (player.Position.DistanceTo(target.Position) >= 3.5) { player.SendChatMessage(Translate(player, "ERROR_PLAYER_NOT_CLOSE")); return; }
 
             if (Settings.LoggedInPlayers.Count(a => a.HasData("DraggingOut") && a.GetData<string>("DraggingOut").Equals(target.Name) && lobby.Cops.Contains(a)) > 0)
-            { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The target is already being dragged out!"); return; }
+            { player.SendChatMessage(Translate(player, "ERROR_TARGET_BEING_DRAGGED")); return; }
 
             target.TriggerEvent("ToggleSeatbelt", false);
             target.ResetData("Seatbelt");
-            EPlayer.Action(player, $"leans towards {target.Name}'s vehicle and tries to open the door to drag them out.");
+            EPlayer.Action(player, Translate(player, "ACTION_DRAGOUT", target.Name));
 
             target.SetData("DragoutVehicle", target.Vehicle);
             target.SetData("ExitedDragoutVehicle", false);
 
             player.SetData("DraggingOut", target.Name);
-            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are now dragging out the target, stay with them for 5 seconds to complete the operation.");
+            player.SendChatMessage(Translate(player, "DRAGOUT_HELP"));
 
             NAPI.Task.Run(() =>
             {
@@ -2236,7 +2176,7 @@ namespace RNC
                         {
                             if (target == null || !target.IsInstanceAlive || player == null || !player.IsInstanceAlive || player.Dead || player.GetSharedData<int>("Wounded") > 0)
                             {
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, target or you are no longer alive.");
+                                player.SendChatMessage(Translate(player, "ERROR_PLAYER_OR_TARGET_DEAD"));
                                 player.ResetData("DraggingOut");
                                 return;
                             }
@@ -2253,14 +2193,14 @@ namespace RNC
 
                             if (!isACop)
                             {
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, you cannot drag out that target anymore.");
+                                player.SendChatMessage(Translate(player, "ERROR_CANT_DRAGOUT_ANYMORE"));
                                 player.ResetData("DraggingOut");
                                 return;
                             }
 
                             if (target.Vehicle != target.GetData<Vehicle>("DragoutVehicle"))
                             {
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, the player entered another vehicle.");
+                                player.SendChatMessage(Translate(player, "ERROR_TARGET_ANOTHER_VEH"));
                                 player.ResetData("DraggingOut");
 
                                 target.ResetData("DragoutVehicle");
@@ -2269,7 +2209,7 @@ namespace RNC
                             }
                             if (target.GetData<bool>("ExitedDragoutVehicle") == true)
                             {
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Operation failed, the player exited their vehicle in the middle of the process. Try again!");
+                                player.SendChatMessage(Translate(player, "ERROR_TARGET_EXITED_VEH"));
                                 player.ResetData("DraggingOut");
 
                                 target.ResetData("DragoutVehicle");
@@ -2279,7 +2219,7 @@ namespace RNC
 
                             if (player.Position.DistanceTo(target.Position) >= 3.5)
                             {
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not near the target!");
+                                player.SendChatMessage(Translate(player, "ERROR_PLAYER_NOT_CLOSE"));
                                 player.ResetData("DraggingOut");
                                 return;
                             }
@@ -2288,7 +2228,7 @@ namespace RNC
                             target.TriggerEvent("ToggleSeatbelt", false);
                             target.ResetData("Seatbelt");
                             player.SetSharedData("FugitiveChance", player.GetSharedData<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(player).DonatorLevel + 1.0)));
-                            cmd_do(player, $"{target.Name} has been dragged out of the vehicle.");
+                            
                             player.ResetData("DraggingOut");
                             target.ResetData("DragoutVehicle");
                             target.ResetData("ExitedDragoutVehicle");
@@ -6277,6 +6217,12 @@ namespace RNC
             Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s fugitive percentage to {newLobby.FugitivePercent}.**");
 
             return;
+        }
+
+        [Command("testlang")]
+        public void cmd_testlang(Player player)
+        {
+            player.SendChatMessage(Translator.Translate(player, "TEST_MESSAGE", player.Name));
         }
 
         [Command("togglelobby", "!{#AFAFAF}[USAGE] toglobby (lobbyid)", Alias = "toglobby")]
