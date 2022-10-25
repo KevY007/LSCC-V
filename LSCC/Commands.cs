@@ -591,7 +591,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -826,7 +826,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 5)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -853,7 +853,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             // Vehicle spawner automatically grabs the car and spawns it if it's found.
@@ -1086,7 +1086,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -1163,7 +1163,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -1274,7 +1274,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -1312,7 +1312,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -1408,7 +1408,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             if(inactive_days < 3 || inactive_days > 365)
@@ -1502,7 +1502,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -1526,7 +1526,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -1550,7 +1550,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -1575,7 +1575,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -1613,7 +1613,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             if (alpha < 0 || alpha > 255)
@@ -1636,7 +1636,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             if (alpha < 0 || alpha > 255)
@@ -1674,7 +1674,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -1711,7 +1711,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -1786,7 +1786,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -1806,7 +1806,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -2248,7 +2248,7 @@ namespace RNC
         {
             if ((!player.IsInVehicle || !target.IsInVehicle) || player.Vehicle != target.Vehicle && player != target)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in the same vehicle as the target or not in one!");
+                player.SendChatMessage(Translate(player, "ERROR_TARGET_NOT_IN_SAME_VEH"));
                 return;
             }
 
@@ -2302,11 +2302,10 @@ namespace RNC
                                                 player.ResetData("_currentlySwappingSeats");
                                                 target.ResetData("_currentlySwappingSeats");
 
-                                                var msg = "!{#FFFFFF}(( !{#FF6347}" + player.Name + " and  " + target.Name + " have swapped seats." + " !{#FFFFFF}))";
 
                                                 foreach (Player playa in NAPI.Player.GetPlayersInRadiusOfPlayer(60, player))
                                                 {
-                                                    if (playa.Dimension == player.Dimension) playa.SendChatMessage(msg);
+                                                    if (playa.Dimension == player.Dimension) playa.SendChatMessage(Translate(playa, "SWAPPED_SEATS", player.Name, target.Name));
                                                 }
                                             }
                                         }
@@ -2329,8 +2328,8 @@ namespace RNC
                 catch { }
             }
 
-            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have sent a swapseats request to " + target.Name + ", they have 7s to accept.");
-            target.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have received a swapseats request from " + player.Name + ", you have 7s to accept. (/ss " + player.Name + ")");
+            player.SendChatMessage(Translate(player, "SWAP_SEAT_SENT", target.Name));
+            target.SendChatMessage(Translate(target, "SWAP_SEAT_SENT", player.Name, player.Name));
 
             player.ResetData("SwapSeating");
             player.ResetData("SwapSeatingTime");
@@ -2349,7 +2348,7 @@ namespace RNC
 
             if (acc.Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -2385,7 +2384,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 3 admin.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -2535,12 +2534,14 @@ namespace RNC
             return;
         }
 
+        /*
         [Command("rules")]
         public void cmd_rules(Player player)
         {
             player.SendChatMessage("!{#FF6347}>> As the rules have been changed multiple times in the past, please see the rule list in our discord server.");
             player.SendChatMessage("!{#FF6347}[!!] The list and discord server invite is available at /info.");
         }
+        */
 
         [Command("givecomp", "!{#AFAFAF}[USAGE] givecomp (target) (weapon/hash) (component/hash)", GreedyArg = true)]
         public void cmd_givecomp(Player player, Player target, string wep, string component)
@@ -2550,7 +2551,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 3 admin.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -2710,7 +2711,7 @@ namespace RNC
         {
             if(player.GetSharedData<int>("Team") > -1 || player.GetSharedData<int>("InDM") > -1 || player.GetSharedData<int>("InLobby") < 0)
             {
-                EPlayer.Error(player, $"You must be in the lobby to use the weapon editor!");
+                EPlayer.Error(player, Translate(player, "ERROR_NOT_IN_LOBBY_NOCOLOR"));
                 return;
             }
             LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
@@ -2718,7 +2719,7 @@ namespace RNC
             {
                 if(lobby.gameStatus == 2)
                 {
-                    EPlayer.Error(player, $"You can't use this when copchase is about to start!");
+                    EPlayer.Error(player, Translate(player, "ERROR_COPCHASE_ABOUT_TO_START"));
                     return;
                 }
             }
@@ -2742,7 +2743,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 3 admin.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -2979,7 +2980,7 @@ namespace RNC
 
             if (!type.Equals("standard to donator", StringComparison.OrdinalIgnoreCase) && !type.Equals("donator to standard", StringComparison.OrdinalIgnoreCase))
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Valid types of points are 'standard to donator' or 'donator to standard'");
+                player.SendChatMessage(Translate(player, "CONVERT_POINTS_OPTIONS"));
                 return;
             }
 
@@ -3001,7 +3002,7 @@ namespace RNC
 
                 if (acc.Points < amount)
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You don't possess !{#FF6347}" + $"{amount} !{{#FFFFFF}}points.");
+                    player.SendChatMessage(Translate(player, "ERROR_CONVERT_POINTS_NOTENOUGH", amount));
 
                     player.ResetData("ConvertingType");
                     player.ResetData("ConvertingAmount");
@@ -3025,7 +3026,7 @@ namespace RNC
 
                 if (amount < singlePrice)
                 {
-                    player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}Minimum points you can convert is {singlePrice}. (Rate: -{singlePrice} points for each donator point)");
+                    player.SendChatMessage(Translate(player, "ERROR_CONVERT_POINTS_MINIMUM", singlePrice, singlePrice));
 
                     player.ResetData("ConvertingType");
                     player.ResetData("ConvertingAmount");
@@ -3041,17 +3042,17 @@ namespace RNC
                     EPlayer.GivePoints(player, -remove);
                     acc.DonatorPoints += gain;
 
-                    player.SendChatMessage($"!{{#33C446}}[#] !{{#FFFFFF}}You have converted !{{#FF6347}}{remove} points !{{#FFFFFF}} into !{{#33C446}}{gain} donator points!{{#FFFFFF}}.");
-                    player.SendChatMessage($"!{{#d9f288}}Remaining Points: [{acc.Points}] !{{#FFFFFF}}| !{{#faf146}}Total Donator Points: [{acc.DonatorPoints}]");
+                    player.SendChatMessage(Translate(player, "CONVERT_POINTS_INFO", remove, gain));
+                    player.SendChatMessage(Translate(player, "CONVERT_POINTS_BALANCE", acc.Points, acc.DonatorPoints));
 
                     player.ResetData("ConvertingType");
                     player.ResetData("ConvertingAmount");
                 }
                 else
                 {
-                    player.SendChatMessage($"!{{#33C446}}[#] !{{#FFFFFF}}You will gain !{{#33C446}}{gain} donator points !{{#FFFFFF}}in place of !{{#FF6347}}{remove} points!{{#FFFFFF}}, with !{{#33C446}}{remainder}!{{#FFFFFF}} being the remains of !{{#33C446}}{amount}!{{#FFFFFF}}.");
-                    player.SendChatMessage($"!{{#33C446}}>> !{{#FFFFFF}}If you wish to proceed with the conversion, type the command as it is again. (RATE: -{singlePrice} points per donator point)");
-                    player.SendChatMessage($"!{{#FF6347}}NOTE: !{{#FFFFFF}}If you are just trying this for fun, please note there is irreversible LOSS in converting to points back.");
+                    player.SendChatMessage(Translate(player, "CONVERT_POINTS_WARNING_1", gain, remove, remainder, amount));
+                    player.SendChatMessage(Translate(player, "CONVERT_POINTS_WARNING_2", singlePrice));
+                    //player.SendChatMessage($"!{{#FF6347}}NOTE: !{{#FFFFFF}}If you are just trying this for fun, please note there is irreversible LOSS in converting to points back.");
 
                     player.SetData("ConvertingType", 0);
                     player.SetData("ConvertingAmount", amount);
@@ -3067,7 +3068,7 @@ namespace RNC
 
                 if (acc.DonatorPoints < amount)
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You don't possess !{#FF6347}" + $"{amount} !{{#FFFFFF}}donator points.");
+                    player.SendChatMessage(Translate(player, "ERROR_CONVERT_POINTS_NOTENOUGH", amount));
 
                     player.ResetData("ConvertingType");
                     player.ResetData("ConvertingAmount");
@@ -3094,7 +3095,7 @@ namespace RNC
 
                 if (amount == 0)
                 {
-                    player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}Minimum donator points you can convert is 1. (Rate: +{singleWorth} points for each donator point)");
+                    player.SendChatMessage(Translate(player, "ERROR_CONVERT_DPOINTS_MINIMUM", singleWorth));
 
                     player.ResetData("ConvertingType");
                     player.ResetData("ConvertingAmount");
@@ -3108,17 +3109,17 @@ namespace RNC
                     EPlayer.GivePoints(player, gain);
                     acc.DonatorPoints -= amount;
 
-                    player.SendChatMessage($"!{{#33C446}}[#] !{{#FFFFFF}}You have converted !{{#FF6347}}{amount} donator points !{{#FFFFFF}} into !{{#33C446}}{gain} points!{{#FFFFFF}}.");
-                    player.SendChatMessage($"!{{#faf146}}Remaining Donator Points: [{acc.DonatorPoints}] !{{#FFFFFF}}| !{{#d9f288}}Total Points: [{acc.Points}]");
+                    player.SendChatMessage(Translate(player, "CONVERT_DPOINTS_INFO", amount, gain));
+                    player.SendChatMessage(Translate(player, "CONVERT_POINTS_BALANCE", acc.Points, acc.DonatorPoints));
 
                     player.ResetData("ConvertingType");
                     player.ResetData("ConvertingAmount");
                 }
                 else
                 {
-                    player.SendChatMessage($"!{{#33C446}}[#] !{{#FFFFFF}}You will gain !{{#33C446}}{gain} points !{{#FFFFFF}}in place of !{{#FF6347}}{amount} donator points!{{#FFFFFF}}.");
-                    player.SendChatMessage($"!{{#33C446}}>> !{{#FFFFFF}}If you wish to proceed with the conversion, type the command as it is again. (RATE: +{singleWorth} points per donator point)");
-                    player.SendChatMessage($"!{{#FF6347}}NOTE: !{{#FFFFFF}}If you are just trying this for fun, please note there is irreversible LOSS in converting to donator points back.");
+                    player.SendChatMessage(Translate(player, "CONVERT_DPOINTS_WARNING_1", gain, amount));
+                    player.SendChatMessage(Translate(player, "CONVERT_POINTS_WARNING_2", singleWorth));
+                    //player.SendChatMessage($"!{{#FF6347}}NOTE: !{{#FFFFFF}}If you are just trying this for fun, please note there is irreversible LOSS in converting to donator points back.");
 
                     player.SetData("ConvertingType", 1);
                     player.SetData("ConvertingAmount", amount);
@@ -3127,7 +3128,7 @@ namespace RNC
             return;
         }
 
-
+        /*
         [Command("mycomps", GreedyArg = true)]
         public void cmd_mycomps(Player player)
         {
@@ -3177,6 +3178,7 @@ namespace RNC
             if (count == 0) player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have not bought any weapon components yet, /buycomp.");
             return;
         }
+        */
 
         [Command("givegundbg")]
         public void cmd_givegundbg(Player player, Int64 hash, int ammo = 500)
@@ -3201,7 +3203,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 3 admin.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -3218,7 +3220,7 @@ namespace RNC
 
             if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension <= 256 || player.Dimension > 512)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam or in default world! (/world)");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM_OR_WORLD"));
                 return;
             }
 
@@ -3234,13 +3236,13 @@ namespace RNC
 
             if (player.GetSharedData<int>("InLobby") != -3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 return;
             }
 
             if (worldid < 0 || worldid > 256)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The world ID can only be between 0-256! (0 is default)");
+                player.SendChatMessage(Translate(player, "ERROR_INVALID_WORLD_ID"));
                 return;
             }
 
@@ -3249,11 +3251,11 @@ namespace RNC
             player.Dimension = (uint)256 + (uint)worldid;
             player.SetData("FreeroamWorld", (uint)worldid);
 
-            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have changed your freeroam world to " + worldid.ToString() + ".");
+            player.SendChatMessage(Translate(player, "FREEROAM_CHANGE_WORLD", worldid.ToString()));
 
             if (worldid > 0)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can use /gun in this freeroam world.");
+                player.SendChatMessage(Translate(player, "FREEROAM_CHANGE_WORLD_GUN_HINT"));
             }
             else if (worldid <= 0)
             {
@@ -3270,7 +3272,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 3 admin.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -3378,18 +3380,18 @@ namespace RNC
 
             if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 return;
             }
 
             if (!player.IsInVehicle)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in any vehicle!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_VEHICLE"));
                 return;
             }
 
             player.Vehicle.Repair();
-            player.SendChatMessage("!{#00FF00}[>] ~w~Vehicle repaired!");
+            player.SendChatMessage(Translate(player, "VEHICLE_REPAIRED"));
         }
 
         [Command("afix", "!{#AFAFAF}[USAGE] afix (target)")]
@@ -3400,7 +3402,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 1 admin.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -3431,7 +3433,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 1 admin.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -3455,7 +3457,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -4885,7 +4887,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player)) return;
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] ~w~You are not authorized to use this command!");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             if (!EPlayer.LoggedIn(target)) return;
@@ -4904,7 +4906,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player)) return;
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] ~w~You are not authorized to use this command!");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             if (!EPlayer.LoggedIn(target)) return;
@@ -5107,7 +5109,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -5199,7 +5201,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -5254,7 +5256,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -5300,7 +5302,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -5396,7 +5398,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -5467,7 +5469,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             int pAdmin = EPlayer.GetAccount(player).Admin;
@@ -5526,7 +5528,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -5675,7 +5677,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -5740,7 +5742,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -5799,7 +5801,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -5866,7 +5868,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -5933,7 +5935,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -6007,7 +6009,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -6234,7 +6236,7 @@ namespace RNC
 
             if (acc.Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -6278,7 +6280,7 @@ namespace RNC
 
             if (acc.Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -6342,7 +6344,7 @@ namespace RNC
 
             if (acc.Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -6390,7 +6392,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player)) return;
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             if (!EPlayer.LoggedIn(target))
@@ -6409,7 +6411,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player)) return;
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             player.SendChatMessage("You have initiated ~y~saving of all server data~w~!");
@@ -6514,7 +6516,7 @@ namespace RNC
         {
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             int langID = -1;
@@ -6561,7 +6563,7 @@ namespace RNC
         {
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             Task.Run(async () =>
@@ -6758,7 +6760,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -6851,7 +6853,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             if (!EPlayer.LoggedIn(target)) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not logged in."); return; }
@@ -6871,7 +6873,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -6893,7 +6895,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -7157,7 +7159,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 5)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -7306,7 +7308,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             player.SendChatMessage("~y~Executing, please wait...");
@@ -8710,7 +8712,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 6)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -8725,7 +8727,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 6)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -8741,7 +8743,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 6)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -8762,7 +8764,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 6)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -8902,7 +8904,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -8930,7 +8932,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 6)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -8951,7 +8953,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 6)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -9022,7 +9024,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -9072,7 +9074,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -9148,7 +9150,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 5)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -9194,7 +9196,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 5)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -9403,7 +9405,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 5)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -9437,7 +9439,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 5)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -9494,7 +9496,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).DonatorLevel < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not authorized to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -9579,7 +9581,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -10027,7 +10029,7 @@ namespace RNC
                 return;
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else
@@ -10048,7 +10050,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else
@@ -10071,7 +10073,7 @@ namespace RNC
                 return;
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else
@@ -10098,7 +10100,7 @@ namespace RNC
                 return;
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else
@@ -10121,7 +10123,7 @@ namespace RNC
                 return;
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else
@@ -10145,7 +10147,7 @@ namespace RNC
                 return;
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else
@@ -10168,7 +10170,7 @@ namespace RNC
                 return;
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else
@@ -10192,7 +10194,7 @@ namespace RNC
                 return;
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else
@@ -10212,7 +10214,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else
@@ -10256,7 +10258,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -10315,7 +10317,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else
@@ -10355,7 +10357,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else
@@ -10383,7 +10385,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -10435,7 +10437,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else
@@ -10464,7 +10466,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else
@@ -10490,7 +10492,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else
@@ -10523,7 +10525,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -10579,7 +10581,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -10633,7 +10635,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else
@@ -10696,7 +10698,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else
@@ -10739,7 +10741,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else
@@ -10765,7 +10767,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else
@@ -10782,7 +10784,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else
@@ -10809,7 +10811,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             else

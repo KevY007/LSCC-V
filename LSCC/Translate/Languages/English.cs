@@ -11,7 +11,7 @@ namespace RNC.Translate.Languages
             // FORMAT: {MESSAGE CODE, MESSAGE}
             // "ACTION" messages are for the automatic /me messages. E.g. "unlocks the vehicle" will display "Player unlocks the vehicle"
             {"TEST_MESSAGE", "!{#FF6347}Welcome, ~w~{PLAYER NAME}."},
-            {"ERROR_COMMAND_NOT_AUTHORIZED", "!{#FF6347}[!] !{#FFFFFF}You cannot use this command."},
+            {"ERROR_COMMAND_NOT_AUTHORIZED", "!{#FF6347}[!] !{#FFFFFF}You are not authorized use this command."},
             {"ERROR_MAX_IN_LOBBY_NUM", "!{#999999}Max players in a lobby should be between 1-999!"},
             {"USAGE_MAX_IN_LOBBY", "!{#999999}Proper usage: /serveroptions maxinlobby <amount>"},
             {"ERROR_NUMPARKEDVEHS_NUMBER", "!{#999999}You must enter a number between 500 and 500!"},
@@ -37,6 +37,7 @@ namespace RNC.Translate.Languages
             {"ACTION_RELEASE_SEATBELT", "releases the seatbelt."},
             {"ACTION_BUCKLE_SEATBELT", "buckles the seatbelt."},
             {"ERROR_NOT_IN_LOBBY", "!{#FF6347}[!] !{#FFFFFF}You must be in a lobby to use this command!"},
+            {"ERROR_NOT_IN_LOBBY_NOCOLOR", "!{#FF6347}[!] !{#FFFFFF}You must be in a lobby to use this command!"},
             {"TIME_IN_LOBBY", "!{#A8FFAB}Time In Lobby: (H:M:S) !{#FFFFFF}{HOURS}:{MINUTES}:{SECONDS}"},
             {"WEATHER_FORECAST", "!{#A8FFAB}Weather Forecast: !{#FFFFFF}{WEATHER NAME} ({WEATHER NUMBER/ID})"},
             {"TOGGLE_HUD_HELP", "!{#33C446}[#] !{#FFFFFF}Please press F7 to toggle HUD."},
@@ -72,6 +73,7 @@ namespace RNC.Translate.Languages
             {"VEHINFO_DISABLED", "!{#FF6347}[!] !{#FFFFFF}DL (vehicle info displayer) has been disabled."},
             {"ERROR_TARGET_NOT_IN_FREEROAM", "!{#FF6347}[!] ~w~Target is not in freeroam!"},
             {"ERROR_TARGET_DIFFERENT_WORLD", "!{#FF6347}[!] ~w~You are not in the same world as the target! (/world)"},
+            {"ERROR_INVALID_WORLD_ID", "!{#FF6347}[!] !{#FFFFFF}The world ID can only be between 0-256! (0 is default)"},
             {"HINT_DONT_TROLL_FREEROAM", "!{#FF6347}>> ~w~Please don't bother/troll/grief players if they want to be alone in their world!"},
             {"TELEPORTED_TO_PLAYER", "!{#C9C9C9}You've teleported to {TARGET NAME}'s position."},
             {"PLAYER_TELEPORTED_TO_YOU", "!{#C9C9C9}{PLAYER NAME} has teleported to your position."},
@@ -103,6 +105,24 @@ namespace RNC.Translate.Languages
             {"ERROR_CANT_DRAGOUT_ANYMORE", "!{#FF6347}[!] !{#FFFFFF}Operation failed, you cannot drag out that target anymore."},
             {"ERROR_TARGET_ANOTHER_VEH", "!{#FF6347}[!] !{#FFFFFF}Operation failed, the player entered another vehicle."},
             {"ERROR_TARGET_EXITED_VEH", "!{#FF6347}[!] !{#FFFFFF}Operation failed, the player exited their vehicle in the middle of the process. Try again!"},
+            {"ERROR_TARGET_NOT_IN_SAME_VEH", "!{#FF6347}[!] !{#FFFFFF}You are not in the same vehicle as the target or not in one!"},
+            {"SWAPPED_SEATS", "!{#FF6347}(( ~w~{PLAYER NAME} and {PLAYER NAME} have swapped seats. !{#FF6347}))"},
+            {"SWAP_SEAT_SENT", "!{#FF6347}[!] !{#FFFFFF}You have sent a swapseats request to {PLAYER NAME}, they have 7s to accept."},
+            {"SWAP_SEAT_RECEIVED", "!{#FF6347}[!] !{#FFFFFF}You have received a swapseats request from {PLAYER NAME}, you have 7s to accept. (/ss {PLAYER NAME})"},
+            {"ERROR_COPCHASE_ABOUT_TO_START", "You can't use this when a copchase round is about to start! Please wait a few seconds..."},
+            // the 'standard to donator' and 'donator to standard' messages must stay the same since those are server parameters
+            {"CONVERT_POINTS_OPTIONS", "!{#FF6347}[!] !{#FFFFFF}Valid types of points are 'standard to donator' or 'donator to standard'"},
+            {"ERROR_CONVERT_POINTS_NOTENOUGH", "!{#FF6347}[!] !{#FFFFFF}You don't have ~y~{POINTS} ~w~points."},
+            {"ERROR_CONVERT_POINTS_MINIMUM", "!{#FF6347}[!] !{#FFFFFF}Minimum points you can convert is {POINTS}. (Rate: -{POINTS} points for each donator point)"},
+            {"CONVERT_POINTS_INFO", "!{#33C446}[#] !{#FFFFFF}You have converted !{#FF6347}{POINTS} points !{#FFFFFF} into !{#33C446}{POINTS} donator points!{#FFFFFF}."},
+            {"CONVERT_POINTS_BALANCE", "!{#d9f288}Remaining Points: [{POINTS}] !{#FFFFFF}| !{#faf146}Total Donator Points: [{DONATOR POINTS}]"},
+            {"CONVERT_POINTS_WARNING_1", "!{#33C446}[#] !{#FFFFFF}You will gain !{#33C446}{gain} donator points !{#FFFFFF}in place of !{#FF6347}{remove} points!{#FFFFFF}, with !{#33C446}{remainder}!{#FFFFFF} being the remains of !{#33C446}{amount}!{#FFFFFF}."},
+            {"CONVERT_POINTS_WARNING_2", "!{#33C446}>> !{#FFFFFF}If you wish to proceed with the conversion, type the command as it is again. (RATE: -{NUMBER} points per donator point)"},
+            {"ERROR_CONVERT_DPOINTS_MINIMUM", "!{#FF6347}[!] !{#FFFFFF}Minimum donator points you can convert is 1. (Rate: +{POINTS} points for each donator point)"},
+            {"CONVERT_DPOINTS_INFO", "!{#33C446}[#] !{#FFFFFF}You have converted !{#FF6347}{POINTS} donator points !{#FFFFFF} into !{#33C446}{POINTS} points!{#FFFFFF}."},
+            {"CONVERT_DPOINTS_WARNING_1", "!{#33C446}[#] !{#FFFFFF}You will gain !{#33C446}{gain} points !{#FFFFFF}in place of !{#FF6347}{amount} donator points!{#FFFFFF}."},
+            {"FREEROAM_CHANGE_WORLD", "~y~>>~w~ You have changed your freeroam world to {WORLD ID}."},
+            {"FREEROAM_CHANGE_WORLD_GUN_HINT", "~g~>>~w~ You can use /gun in this freeroam world."},
         };
     }
 }
