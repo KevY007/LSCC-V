@@ -242,7 +242,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -3697,8 +3697,8 @@ namespace RNC
                 {
                     if (Environment.TickCount64 - player.GetData<long>("LastLobbySwitch") < 1000)
                     {
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot enter lobbies that fast.");
-                        EPlayer.Notify(player, "Please don't repeatedly join lobby.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                        player.SendChatMessage(Translate(player, "ERROR_LOBBIES_TOOFAST"));
+                        EPlayer.Notify(player, Translate(player, "ERROR_LOBBIES_TOOFAST_NOCOLOR"), "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                         return;
                     }
                 }
@@ -3718,8 +3718,8 @@ namespace RNC
             }
 
             if (player.Health == 0 || player.Dead) {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are respawning!");
-                EPlayer.Notify(player, "Please wait to respawn.", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
+                player.SendChatMessage(Translate(player, "ERROR_RESPAWNING"));
+                EPlayer.Notify(player, Translate(player, "ERROR_RESPAWNING_NOCOLOR"), "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
@@ -3757,7 +3757,7 @@ namespace RNC
                 {
                     if (elobby.Fugitives.Contains(player) && !player.GetSharedData<string>("CuffedBy").Equals("n/a"))
                     {
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently being cuffed, mate.");
+                        player.SendChatMessage(Translate(player, "ERROR_CUFFED"));
                         return;
                     }
                     player.Health = 0;
@@ -3784,11 +3784,12 @@ namespace RNC
             if (elobby == null) player.SetSharedData("InLobby", -1);
 
             EPlayer.Spawn(player);
-            EPlayer.Notify(player, $"Joined <strong>Lobby</strong>", "blue", "fas fa-users", false, 1000, "bottomCenter", "replace");
+            EPlayer.Notify(player, Translate(player, "JOINED_LOBBY"), "blue", "fas fa-users", false, 1000, "bottomCenter", "replace");
             player.SetData<long>("LastLobbySwitch", Environment.TickCount64);
             return;
         }
 
+        /*
         [Command("mylobby")]
         public void cmd_mylobby(Player player)
         {
@@ -3806,6 +3807,7 @@ namespace RNC
 
             return;
         }
+        */
 
         [Command("clientcmd", Alias = "timestamp,pagesize,updaterate,lcmenu,fontsize,rappel,rapple,voicebind,noclip_vsm,autoooc,gpsbind,bigmap,bigmapbind", GreedyArg = true)] // It's a client-side command we're adding here just so it doesn't show "invalid command" when triggered.
         public void cmd_clientcmd(Player player)
@@ -3820,12 +3822,14 @@ namespace RNC
             return;
         }
 
+        /*
         [Command("restartmenu")]
         public void cmd_restartmenu(Player player)
         {
             player.TriggerEvent("RestartMenu");
             return;
         }
+        */
 
         [Command("anotes", "!{#AFAFAF}[USAGE] anote (target) [add|view|delete]", Alias = "anote", GreedyArg = true)]
         public void cmd_anote(Player player, Player target, string arg)
@@ -3985,7 +3989,7 @@ namespace RNC
             });
         }
 
-
+        /*
         [Command("lobbies")]
         public void cmd_lobbies(Player player)
         {
@@ -4016,6 +4020,7 @@ namespace RNC
 
             return;
         }
+        */
 
         [Command("switchlobby", "!{#AFAFAF}[USAGE] switchlobby (lobbyid) (optional: password)", Alias = "swl", GreedyArg = true)]
         public static void cmd_switchlobby(Player player, string args)
@@ -4027,8 +4032,8 @@ namespace RNC
 
             if (player.GetData<int>("JailTime") > 0)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are in jail!");
-                EPlayer.Notify(player, "You are currently jailed.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                player.SendChatMessage(Translate(player, "ERROR_JAIL"));
+                EPlayer.Notify(player, Translate(player, "ERROR_JAIL_NOCOLOR"), "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
@@ -4042,8 +4047,8 @@ namespace RNC
                 {
                     if (Environment.TickCount64 - player.GetData<long>("LastLobbySwitch") < 1000)
                     {
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot switch lobbies that fast.");
-                        EPlayer.Notify(player, "Please don't spam join lobby.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                        player.SendChatMessage(Translate(player, "ERROR_LOBBIES_TOOFAST"));
+                        EPlayer.Notify(player, Translate(player, "ERROR_LOBBIES_TOOFAST_NOCOLOR"), "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                         return;
                     }
                 }
@@ -4057,7 +4062,7 @@ namespace RNC
             {
                 if (!Int32.TryParse(split[0], out lobbyid) || lobbyid < 1)
                 {
-                    player.SendChatMessage($"!{{#999999}}Lobby ID cannot be less than 1!");
+                    player.SendChatMessage(Translate(player, "ERROR_INVALID_LOBBY"));
                     return;
                 }
             }
@@ -4071,15 +4076,15 @@ namespace RNC
             LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == lobbyid);
             if ((lobby != null) == false)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid lobby id!");
-                EPlayer.Notify(player, "Invalid lobby.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                player.SendChatMessage(Translate(player, "ERROR_INVALID_LOBBY"));
+                EPlayer.Notify(player, Translate(player, "ERROR_INVALID_LOBBY_NOCOLOR"), "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
             if (!lobby.Enabled)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Lobby is disabled!");
-                EPlayer.Notify(player, "Lobby is disabled.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                //player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Lobby is disabled!");
+                EPlayer.Notify(player, Translate(player, "ERROR_LOBBY_DISABLED"), "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
@@ -4087,23 +4092,23 @@ namespace RNC
             {
                 if (password.Length < 1)
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This lobby has a password, join with /swl (lobby id) (password).");
-                    EPlayer.Notify(player, "Lobby requires a password.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                    player.SendChatMessage(Translate(player, "ERROR_LOBBY_PASSWORD"));
+                    EPlayer.Notify(player, Translate(player, "ERROR_LOBBY_PASSWORD_NOCOLOR"), "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                     return;
                 }
 
                 if (!password.Equals(lobby.Password))
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid password for the lobby!");
-                    EPlayer.Notify(player, "Invalid password.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                    player.SendChatMessage(Translate(player, "ERROR_LOBBY_INVALID_PASSWORD"));
+                    EPlayer.Notify(player, Translate(player, "ERROR_LOBBY_INVALID_PASSWORD_NOCOLOR"), "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                     return;
                 }
             }
 
             if (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobbyid) >= Settings.Dynamics.MaxInLobby && EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That lobby is full!");
-                EPlayer.Notify(player, "Lobby is full.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                //player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That lobby is full!");
+                EPlayer.Notify(player, Translate(player, "ERROR_LOBBY_FULL"), "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
@@ -4112,8 +4117,8 @@ namespace RNC
             {
                 if (elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot switch lobbies in an ongoing game! (/lobby)");
-                    EPlayer.Notify(player, "You are currently in an ongoing game.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                    //player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot switch lobbies in an ongoing game! (/lobby)");
+                    EPlayer.Notify(player, Translate(player, "ERROR_LOBBY_INGAME"), "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                     return;
                 }
             }
@@ -4122,16 +4127,17 @@ namespace RNC
             foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && a.Id != player.Id))
             {
                 //targ.SendChatMessage($"[Lobby {lobbyid}] {player.Name} has joined this lobby.");
-                EPlayer.Notify(targ, $"<strong>{player.Name}</strong> joined the lobby", "blue", "fas fa-user-plus", false, 1000);
+                EPlayer.Notify(targ, Translate(targ, "PLAYER_JOINED_LOBBY", player.Name), "blue", "fas fa-user-plus", false, 1000);
             }
 
             player.SetSharedData("InLobby", lobbyid);
 
             NAPI.Player.SpawnPlayer(player, Settings.LobbySpawns.OrderBy(c => Guid.NewGuid()).First());
-            EPlayer.Notify(player, $"Joined <strong>Lobby {lobbyid}</strong>", "blue", "fas fa-users", false, 1000, "bottomCenter", "replace");
+            EPlayer.Notify(player, Translate(player, "JOINED_LOBBY"), "blue", "fas fa-users", false, 1000, "bottomCenter", "replace");
             return;
         }
 
+        /*
         [Command("dmarenas")]
         public void cmd_dmarenas(Player player)
         {
@@ -4154,6 +4160,7 @@ namespace RNC
 
             return;
         }
+        */
 
         [Command("realmendm", "!{#AFAFAF}[USAGE] realmendm (arenaid) (teamid)")]
         public static void cmd_realmendm(Player player, int arenaid, int teamid)
@@ -4284,8 +4291,8 @@ namespace RNC
 
             if (player.GetSharedData<int>("Team") != -1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in a copchase!");
-                EPlayer.Notify(player, "You are currently in a copchase!", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
+                player.SendChatMessage(Translate(player, "ERROR_IN_COPCHASE"));
+                EPlayer.Notify(player, Translate(player, "ERROR_IN_COPCHASE_NOCOLOR"), "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
@@ -4297,16 +4304,16 @@ namespace RNC
                     
                     if (elobby.gameStatus == 2)
                     {
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into freeroam while the match is starting!");
-                        EPlayer.Notify(player, "You cannot go into freeroam while copchase is starting!", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
+                        //player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into freeroam while the match is starting!");
+                        EPlayer.Notify(player, Translate(player, "ERROR_COPCHASE_ABOUT_TO_START"), "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
                         return;
                     }
                     
 
                     if (elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
                     {
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into freeroam while in the copchase! (/lobby)");
-                        EPlayer.Notify(player, "You are currently in a copchase!", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
+                        player.SendChatMessage(Translate(player, "ERROR_IN_COPCHASE"));
+                        EPlayer.Notify(player, Translate(player, "ERROR_IN_COPCHASE_NOCOLOR"), "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
                         return;
                     }
                 }
@@ -4315,30 +4322,30 @@ namespace RNC
             player.SetSharedData("InDM", -1);
             player.SetSharedData("InLobby", -3);
             EPlayer.Spawn(player, false, new Vector3(1061.547f, -720.113f, 56.786f));
-            EPlayer.Notify(player, $"Joined <strong>Freeroam</strong>", "blue", "fas fa-check", false, 1000, "bottomCenter", "replace");
+            EPlayer.Notify(player, Translate(player, "JOINED_FREEROAM"), "blue", "fas fa-check", false, 1000, "bottomCenter", "replace");
 
             cmd_fcmds(player);
             player.SendChatMessage(" ");
-            player.SendChatMessage("~g~TIP: You can use ~y~/fcmds~w~ at any time to see a list of freeroam commands.");
+            player.SendChatMessage(Translate(player, "JOINED_FREEROAM_TIP"));
             return;
         }
         [Command("fcmds")]
         public static void cmd_fcmds(Player player)
         {
             player.SendChatMessage("~y~====================> ~w~FREEROAM ~y~<====================");
-            player.SendChatMessage("In freeroam, you can do anything you want to! Here are some commands:");
-            player.SendChatMessage("~y~> /world [ID 0-256] ~w~-> changes your \"virtual world\", a.k.a you only see entities from the world you set.");
-            player.SendChatMessage("~y~> /mytime [hr 0-23] ~w~-> changes your time of day.");
-            player.SendChatMessage("~y~> /myweather [ID] ~w~-> changes your weather.");
-            player.SendChatMessage("~y~> /godmode ~w~-> toggles freeroam invincibility.");
-            player.SendChatMessage("~y~> /fix ~w~-> repairs the vehicle you are inside of.");
-            player.SendChatMessage("~y~> /gun [ammo][name] ~w~-> gives you a weapon of your choice.");
-            player.SendChatMessage("~y~> /veh [name]<opt:color1><opt:color2> ~w~-> spawns a vehicle of your choice; you can also specify a color if you want to.");
-            player.SendChatMessage("~y~> /teleport ~w~-> teleport to a specific location.");
-            player.SendChatMessage("~y~> /goto [player] ~w~-> teleport to a specific player.");
+            player.SendChatMessage(Translate(player, "FREEROAM_HELP_1"));
+            player.SendChatMessage(Translate(player, "FREEROAM_HELP_2"));
+            player.SendChatMessage(Translate(player, "FREEROAM_HELP_3"));
+            player.SendChatMessage(Translate(player, "FREEROAM_HELP_4"));
+            player.SendChatMessage(Translate(player, "FREEROAM_HELP_5"));
+            player.SendChatMessage(Translate(player, "FREEROAM_HELP_6"));
+            player.SendChatMessage(Translate(player, "FREEROAM_HELP_7"));
+            player.SendChatMessage(Translate(player, "FREEROAM_HELP_8"));
+            player.SendChatMessage(Translate(player, "FREEROAM_HELP_9"));
+            player.SendChatMessage(Translate(player, "FREEROAM_HELP_10"));
             player.SendChatMessage(" ");
-            player.SendChatMessage("~y~> /panim [library][name][flags] ~w~-> play ANY available GTA V animation. ");
-            player.SendChatMessage("~g~TIP: ~b~Flags list: ~w~tiny.cc/anim_flags | ~b~Animations: ~w~alexguirre.github.io/animations-list/");
+            player.SendChatMessage(Translate(player, "FREEROAM_HELP_11"));
+            player.SendChatMessage(Translate(player, "FREEROAM_HELP_12"));
         }
 
         [Command("derby")]
@@ -4349,8 +4356,8 @@ namespace RNC
 
             if (player.GetSharedData<int>("Team") != -1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase!");
-                EPlayer.Notify(player, "You are currently in a copchase!", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
+                player.SendChatMessage(Translate(player, "ERROR_IN_COPCHASE"));
+                EPlayer.Notify(player, Translate(player, "ERROR_IN_COPCHASE_NOCOLOR"), "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
@@ -4361,8 +4368,7 @@ namespace RNC
                 
                 if (elobby.gameStatus == 2)
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into derby while the match is starting!");
-                    EPlayer.Notify(player, "You cannot join derby while the copchase is starting!", "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
+                    EPlayer.Notify(player, Translate(player, "ERROR_COPCHASE_ABOUT_TO_START"), "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
                     return;
                 }
                 
@@ -4381,7 +4387,7 @@ namespace RNC
             player.SetSharedData("InLobby", -4);
 
             EPlayer.Spawn(player, false, ((Vector3)Settings.DerbySpawns[0, 0]).Around(2.0f));
-            EPlayer.Notify(player, $"Joined <strong>Derby</strong>", "blue", "fas fa-check", false, 1000, "bottomCenter", "replace");
+            EPlayer.Notify(player, Translate(player, "JOINED_DERBY"), "blue", "fas fa-check", false, 1000, "bottomCenter", "replace");
             return;
         }
 
@@ -4392,7 +4398,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1 && EPlayer.GetAccount(player).DonatorLevel < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -4427,7 +4433,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1 && EPlayer.GetAccount(player).DonatorLevel < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -4461,7 +4467,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -4479,7 +4485,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -4507,7 +4513,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -4535,7 +4541,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -4562,7 +4568,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             Logs.LogAdmin(player, $"Set {target.Name}'s dimension to {vw}.");
@@ -4577,7 +4583,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -4632,7 +4638,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -4695,7 +4701,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have the permission to use this command.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -4728,7 +4734,7 @@ namespace RNC
 
             if (player.IsInVehicle)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are in a vehicle.");
+                player.SendChatMessage(Translate(player, "ERROR_CANT_USE_INSIDE_VEHICLE"));
                 return;
             }
 
@@ -4746,13 +4752,13 @@ namespace RNC
 
             if (targetVeh == null)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not close enough to a vehicle with a trunk open!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_NEAR_TRUNK"));
                 return;
             }
 
             if (!targetVeh.HasData("BackupAmmo"))
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no ammo inside the trunk. (Cop vehicles spawn with ammo)");
+                player.SendChatMessage(Translate(player, "ERROR_NO_TRUNK_AMMO"));
                 return;
             }
 
@@ -4770,7 +4776,7 @@ namespace RNC
                         if (ammoBox.TryGetValue(i.Value.AmmoType, out weaponAmmo))
                         {
                             player.SetWeaponAmmo((WeaponHash)i.Key, player.GetWeaponAmmo((WeaponHash)i.Key) + weaponAmmo);
-                            notificationString = notificationString + $"<p>+{weaponAmmo} ammo to <strong>{i.Value.Name}</strong></p>";
+                            notificationString = notificationString + Translate(player, "RESTOCKED_AMMO", weaponAmmo, i.Value.Name);
                             ammoBox.Remove(i.Value.AmmoType);
                         }
                     }
@@ -4782,12 +4788,12 @@ namespace RNC
             {
                 targetVeh.SetData("BackupAmmo", ammoBox);
 
-                EPlayer.Action(player, "restocks from an ammunition box.");
+                EPlayer.Action(player, "ACTION_RESTOCK_AMMO");
                 EPlayer.Notify(player, notificationString, "green", "fas fa-boxes", false, 2000, "bottomRight");
             }
             else
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's no ammunition for your weapons. If the weapon is empty, hold it in hand and retry.");
+                player.SendChatMessage(Translate(player, "ERROR_NO_AMMO_FOR_GUN"));
             }
 
             if (ammoBox.Count == 0)

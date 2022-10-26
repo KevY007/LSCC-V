@@ -1704,7 +1704,7 @@ namespace RNC
            
             foreach (Player playa in NAPI.Player.GetPlayersInRadiusOfPlayer(40, player))
             {
-                if(player.Dimension == playa.Dimension) playa.SendChatMessage(msg);
+                if(player.Dimension == playa.Dimension) playa.SendChatMessage(Translator.Translate(playa, text));
             }
         }
 
