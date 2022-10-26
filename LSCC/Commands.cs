@@ -405,15 +405,15 @@ namespace RNC
 
             if (targetVeh.HasSharedData("Team") && targetVeh.GetSharedData<int>("Team") != player.GetSharedData<int>("Team"))
             {
-                EPlayer.Action(player, Translate(player, "ACTION_LOCKS_DOOR_INSIDE"));
+                EPlayer.Action(player, "ACTION_LOCKS_DOOR_INSIDE");
             }
             else
             {
                 if (targetVeh.Locked)
                 {
-                    EPlayer.Action(player, Translate(player, "ACTION_LOCKS_VEHDOOR"));
+                    EPlayer.Action(player, "ACTION_LOCKS_VEHDOOR");
                 }
-                else EPlayer.Action(player, Translate(player, "ACTION_UNLOCKS_VEHDOOR"));
+                else EPlayer.Action(player, "ACTION_UNLOCKS_VEHDOOR");
             }
 
             return;
@@ -524,9 +524,9 @@ namespace RNC
 
             if (player.Vehicle.EngineStatus)
             {
-                EPlayer.Action(player, Translate(player, "ACTION_ENGINE_ON"));
+                EPlayer.Action(player, "ACTION_ENGINE_ON");
             }
-            else EPlayer.Action(player, Translate(player, "ACTION_ENGINE_OFF"));
+            else EPlayer.Action(player, "ACTION_ENGINE_OFF");
 
             return;
         }
@@ -542,13 +542,13 @@ namespace RNC
 
             if (player.HasData("Seatbelt"))
             {
-                EPlayer.Action(player, Translate(player, "ACTION_RELEASE_SEATBELT"));
+                EPlayer.Action(player, "ACTION_RELEASE_SEATBELT");
                 player.ResetData("Seatbelt");
                 player.TriggerEvent("ToggleSeatbelt", false);
             }
             else
             {
-                EPlayer.Action(player, Translate(player, "ACTION_BUCKLE_SEATBELT"));
+                EPlayer.Action(player, "ACTION_BUCKLE_SEATBELT");
                 player.SetData("Seatbelt", true);
                 player.TriggerEvent("ToggleSeatbelt", true);
 
@@ -1897,7 +1897,7 @@ namespace RNC
             player.SetSharedData("ActionTime", 40);
             player.TriggerEvent("StartPlayerAction", "painkiller", 40);
 
-            EPlayer.Action(player, Translate(player, "ACTION_PAINKILLERS"));
+            EPlayer.Action(player, "ACTION_PAINKILLERS");
             player.SendChatMessage(Translate(player, "PAINKILLERS_HELP"));
             return;
         }
@@ -1937,7 +1937,7 @@ namespace RNC
             player.SetSharedData("ActionTime", 10);
             player.TriggerEvent("StartPlayerAction", "medkit", 10);
 
-            EPlayer.Action(player, Translate(player, "ACTION_MEDKIT"));
+            EPlayer.Action(player, "ACTION_MEDKIT");
             player.SendChatMessage(Translate(player, "MEDKIT_HELP"));
             return;
 
@@ -2158,7 +2158,7 @@ namespace RNC
 
             target.TriggerEvent("ToggleSeatbelt", false);
             target.ResetData("Seatbelt");
-            EPlayer.Action(player, Translate(player, "ACTION_DRAGOUT", target.Name));
+            EPlayer.Action(player, "ACTION_DRAGOUT", target.Name);
 
             target.SetData("DragoutVehicle", target.Vehicle);
             target.SetData("ExitedDragoutVehicle", false);

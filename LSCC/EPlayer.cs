@@ -1698,13 +1698,13 @@ namespace RNC
             }
         }
 
-        public static void Action(Player player, string text)
-        {
-            var msg = "!{#C3A3DB}* " + player.Name + " " + text;
-           
+        public static void Action(Player player, string message_code, params object[] args)
+        {           
             foreach (Player playa in NAPI.Player.GetPlayersInRadiusOfPlayer(40, player))
             {
-                if(player.Dimension == playa.Dimension) playa.SendChatMessage(Translator.Translate(playa, text));
+                var msg = "!{#C3A3DB}* " + player.Name + " " + Translator.Translate(playa, message_code, args);
+
+                if (player.Dimension == playa.Dimension) playa.SendChatMessage(msg);
             }
         }
 
