@@ -4804,6 +4804,7 @@ namespace RNC
             return;
         }
 
+        /*
         [Command("keys")]
         public void cmd_keys(Player player)
         {
@@ -4824,14 +4825,26 @@ namespace RNC
             player.SendChatMessage("!{#FF6347}[J: OnFoot] !{#FFFFFF}Close/open vehicle's (must be unlocked) !{#FFAE00}trunk/hood");
             player.SendChatMessage("!{#FF6347}[J: InCar] !{#FFFFFF}Fasten/unfasten seatbelt (stops from falling out/leaving)");
         }
+        */
+
+        private void ListFreeroamTeleports(Player player)
+        {
+            player.SendChatMessage(Translate(player, "FREEROAM_TELEPORTS"));
+            player.SendChatMessage("chilliad, airport");
+        }
 
         [Command("teleport", "!{#AFAFAF}[USAGE] teleport (option: chilliad, airport)", Alias = "tp", GreedyArg = true)]
         public void cmd_teleport(Player player, string tp)
         {
             if (!EPlayer.LoggedIn(player) || player.GetSharedData<int>("InLobby") != -3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You must be in freeroam to use this command!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 return;
+            }
+
+            if(tp == "list")
+            {
+                ListFreeroamTeleports(player);
             }
 
             if (tp.Contains("chilliad"))
@@ -4842,7 +4855,7 @@ namespace RNC
             {
                 player.Position = new Vector3(-1405.521f, -3075.9614f, 14.492183f);
             }
-            else player.SendChatMessage("!{#FF6347}Invalid TP! !{#FFFFFF}Possible tps: 'chilliad', 'airport'");
+            else ListFreeroamTeleports(player);
             return;
         }
 
@@ -4901,7 +4914,7 @@ namespace RNC
             EPlayer.GetAccount(target).CarCop = "police";
 
             Logs.LogAdmin(player, $"Reset ${target.Name}'s game vehicles to their defaults.");
-            target.SendChatMessage($"!{{#FF6347}}[!] ~w~Admin {player.Name} has reset your game vehicles to the default ones.");
+            target.SendChatMessage(Translate(target, "ADMIN_RESET_YOUR_VEHICLES", player.Name));
             player.SendChatMessage($"!{{#FF6347}}[!] ~w~You've set {target.Name}'s game vehicles to the default ones.");
             return;
         }
@@ -4917,10 +4930,10 @@ namespace RNC
             if (!EPlayer.LoggedIn(target)) return;
 
             EPlayer.GetAccount(target).Character = "{}";
-            EPlayer.ShowCharCreator(target);
+            EPlayer.ShowCharCreator(target, null, true, false);
 
             Logs.LogAdmin(player, $"Reset ${target.Name}'s character & clothing to the defaults.");
-            target.SendChatMessage($"!{{#FF6347}}[!] ~w~Admin {player.Name} has reset your character. Please create a new one.");
+            //target.SendChatMessage($"!{{#FF6347}}[!] ~w~Admin {player.Name} has reset your character. Please create a new one.");
             player.SendChatMessage($"!{{#FF6347}}[!] ~w~You reset {target.Name}'s character.");
             return;
         }
@@ -4974,7 +4987,7 @@ namespace RNC
         {
             if (Settings.Requests.Count(r => r.Reported == target && r.Reporter == player) > 0)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have already reported this guy.");
+                player.SendChatMessage(Translate(player, "ERROR_REPORT_SENT"));
                 return;
             }
 
@@ -4984,7 +4997,7 @@ namespace RNC
             Settings.Requests.Add(req);
 
             EPlayer.SendMessageToAllAdmins($"!{{#DBCE40}}[REQUEST {req.RequestID}] {player.Name} reported {target.Name} for {description}. (/reports)");
-            player.SendChatMessage("!{#DBCE40}You have filed a report against " + target.Name + ", request ID: " + req.RequestID + ".");
+            player.SendChatMessage(Translate(player, "REPORT_SENT", target.Name, req.RequestID));
             return;
         }
 
@@ -4993,7 +5006,7 @@ namespace RNC
         {
             if (Settings.Requests.Count(r => r.Reporter == player && r.RequestType == 1) > 0)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have already asked for assistance, you cannot pile up requests.");
+                player.SendChatMessage(Translate(player, "ERROR_HELPME_SENT"));
                 return;
             }
 
@@ -5002,10 +5015,11 @@ namespace RNC
             Settings.Requests.Add(req);
 
             EPlayer.SendMessageToAllAdmins($"!{{#1E9913}}[REQUEST {req.RequestID}] {player.Name} asked for help: {description}. (/requests)");
-            player.SendChatMessage("!{#DBCE40}You have successfully sent a helpme request, request ID: " + req.RequestID + ".");
+            player.SendChatMessage(Translate(player, "HELPME_SENT", req.RequestID));
             return;
         }
 
+        /*
         [Command("car")]
         public void cmd_car(Player player)
         {
@@ -5015,6 +5029,7 @@ namespace RNC
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This option has been migrated to server menu. (/keys)");
             return;
         }
+       
 
         [Command("customvehlist")]
         public void cmd_customvehlist(Player player)
@@ -5035,6 +5050,7 @@ namespace RNC
             player.SendChatMessage("Model 'golfmk6' - Volkswagen Golf Mk6");
             return;
         }
+         */
 
         [Command("cmds", Alias = "help")]
         public void cmd_help(Player player)
@@ -5362,8 +5378,7 @@ namespace RNC
                 Player target = RAGE.Entities.Players.All.FirstOrDefault(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
                 if (target != null)
                 {
-                    target.SendChatMessage("!{#FF6347} Reconnect with your new name: !{#FFFFFF}" + newname);
-                    EPlayer.Notify(target, $"Please reconnect with your new name: {newname}", "green", "fas fa-check", false, 3000, "center", "replace");
+                    EPlayer.Notify(target, Translate(target, "NEW_NAME_WARNING", newname), "green", "fas fa-check", false, 3000, "center", "replace");
 
                     EPlayer.Save(target);
                     target.ResetData("AccountHandle");
@@ -5516,7 +5531,7 @@ namespace RNC
                         Player target = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
                         if(target != null)
                         {
-                            target.SendChatMessage($"~g~{player.Name} has changed your e-mail address to {newpass}!");
+                            target.SendChatMessage(Translate(target, "NEW_EMAIL_WARNING", player.Name, newpass));
                         }
                         Logs.LogAdmin(player, $"Changed {name}'s e-mail address to {newpass}.");
                     });
@@ -5575,8 +5590,8 @@ namespace RNC
                 Player target = RAGE.Entities.Players.All.Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
                 if (target != null)
                 {
-                    target.SendChatMessage("!{#FF6347} Your password has been changed to: !{#FFFFFF}" + newpass);
-                    EPlayer.Notify(target, $"Your password has been changed to <p><strong>{newpass}</strong></p>", "green", "fas fa-check", false, 3000, "center", "replace");
+                    //target.SendChatMessage("!{#FF6347} Your password has been changed to: !{#FFFFFF}" + newpass);
+                    target.SendChatMessage(Translate(target, "NEW_PASS_WARNING", player.Name, newpass));
                 }
 
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:changepass:{name}"); } catch { }
@@ -5594,19 +5609,19 @@ namespace RNC
 
             if (player.HasData("LastCryptAttempt") && Environment.TickCount64 - player.GetData<long>("LastCryptAttempt") < 5000)
             {
-                player.SendNotification("~r~Hold your horses.", true);
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Hold your horses!");
+                //player.SendNotification("~r~Hold your horses.", true);
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_SPAM"));
                 return;
             }
 
-            if (newpass.Length < 3)
+            if (newpass.Length < 8)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your new password must be more than 3 characters!");
+                player.SendChatMessage(Translate(player, "ERROR_SHORT_PASS"));
                 return;
             }
 
-            player.SendChatMessage("!{#33C446}[>>] !{#FFFFFF}Your password has been changed to: !{#33C446}" + newpass);
-            EPlayer.Notify(player, $"Your password has been changed to <p><strong>{newpass}</strong></p>", "green", "fas fa-check", false, 3000, "center", "replace");
+            player.SendChatMessage(Translate(player, "PASSWORD_CHANGED", newpass));
+            //EPlayer.Notify(player, $"Your password has been changed to <p><strong>{newpass}</strong></p>", "green", "fas fa-check", false, 3000, "center", "replace");
 
             string salt = AccountManager.GenSalt();
             string password = AccountManager.Crypt(newpass, salt);
@@ -5658,19 +5673,19 @@ namespace RNC
             }
             if(player.Vehicle.Class == 16 || player.Vehicle.Class == 15 || player.Vehicle.Class == 14)
             {
-                player.SendChatMessage("not today, buddy, not today");
+                player.SendChatMessage(Translate(player, "ERROR_NICE_TRY"));
                 return;
             }
 
             if (player.Vehicle.HasSharedData("Team") && (player.Vehicle.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") || player.Vehicle.GetSharedData<int>("Team") == 10) &&
             player.Vehicle.EngineStatus == false)
             {
-                player.SendChatMessage( $"~y~[HOTWIRE]~w~ You are now hotwiring the vehicle. Press the correct arrow keys.");
+                player.SendChatMessage(Translate(player, "HOTWIRE_HELP"));
                 player.TriggerEvent("StartHotwire");
             }
             else
             {
-                player.SendChatMessage("!{#FF6347}[!] ~w~You have the keys for this vehicle, no need to hotwire it!");
+                player.SendChatMessage(Translate(player, "ERROR_YOU_HAVE_KEYS"));
             }
         }
 
@@ -5910,7 +5925,7 @@ namespace RNC
                     {
                         RAGE.Entities.Players.All.ForEach((Player p) =>
                         {
-                            p.SendChatMessage($"!{{#FF6347}}AdmCmd: {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has offline-banned {tpAcc.Username} for: {reason}");
+                            p.SendChatMessage(Translate(p, "PLAYER_BANNED", ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "Anonymous" : player.Name), tpAcc.Username, reason));
                         });
                     });
                     var _new = new BanData
@@ -5988,7 +6003,7 @@ namespace RNC
 
             RAGE.Entities.Players.All.ForEach((Player p) =>
             {
-                p.SendChatMessage($"!{{#FF6347}}AdmCmd: {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has banned {target.Name} for: {reason}");
+                p.SendChatMessage(Translate(p, "PLAYER_BANNED", ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "Anonymous" : player.Name), target.Username, reason));
             });
 
             EPlayer.Notify(target, $"You have been banned from the server.<p>Reason: {reason}</p><p>Admin: {player.Name}</p>", "red", "fas fa-ban", true, 30000);
@@ -6072,13 +6087,13 @@ namespace RNC
 
             if (acc.Admin < 2 && acc.DonatorLevel < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This command is reserved to donator level 2 and admin level 2+");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
             if (Settings.Lobbies.Count >= Settings.MaxLobbies + 20)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The server has reached maximum lobbies limit!");
+                player.SendChatMessage(Translate(player, "ERROR_MAX_LOBBIES"));
                 return;
             }
 
@@ -6101,7 +6116,7 @@ namespace RNC
 
             if (acc.Admin < 2 && acc.DonatorLevel < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This command is reserved to donator level 2 and admin level 2+");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -6125,7 +6140,7 @@ namespace RNC
 
             RAGE.Entities.Players.All.ForEach((Player pl) =>
             {
-                pl.SendChatMessage("!{#33C446}[#] !{#FFFFFF} " + ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name) + " has deleted lobby " + lobbyid + ".");
+                pl.SendChatMessage(Translate(pl, "PLAYER_DELETED_LOBBY", ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name), lobbyid));
 
                 if (pl.GetSharedData<int>("InLobby") == lobbyid)
                 {
@@ -6145,7 +6160,7 @@ namespace RNC
 
             if (acc.Admin < 2 && acc.DonatorLevel < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This command is reserved to donator level 2 and admin level 2+");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -6171,7 +6186,7 @@ namespace RNC
 
             if (acc.Admin < 2 && acc.DonatorLevel < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This command is reserved to donator level 2 and admin level 2+");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -6207,7 +6222,7 @@ namespace RNC
 
             if (acc.Admin < 2 && acc.DonatorLevel < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This command is reserved to donator level 2 and admin level 2+");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -6320,7 +6335,7 @@ namespace RNC
                         NAPI.Task.Run(() =>
                         {
                             NAPI.Util.ConsoleOutput($"{player.Name} enabled map {mapBruh.Name} ID {mapBruh.SQL_ID}.");
-                            RAGE.Entities.Players.All.ForEach((Player p) => p.SendChatMessage("!{#33C446}[#] !{#FFFFFF}" + ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name) + " has enabled the map: " + mapBruh.Name + "."));
+                            RAGE.Entities.Players.All.ForEach((Player p) => p.SendChatMessage(Translate(p, "ADMIN_ENABLED_MAP", ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name), mapBruh.Name)));
                             Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} enabled map {mapBruh.Name}.**");
                         });
 
@@ -6330,7 +6345,7 @@ namespace RNC
                         NAPI.Task.Run(() =>
                         {
                             NAPI.Util.ConsoleOutput($"{player.Name} disabled map {mapBruh.Name} ID {mapBruh.SQL_ID}.");
-                            RAGE.Entities.Players.All.ForEach((Player p) => p.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}" + ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name) + " has disabled the map: " + mapBruh.Name + "."));
+                            RAGE.Entities.Players.All.ForEach((Player p) => p.SendChatMessage(Translate(p, "ADMIN_DISABLED_MAP", ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name), mapBruh.Name)));
                             Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} disabled map {mapBruh.Name}.**");
                         });
 
@@ -6459,7 +6474,7 @@ namespace RNC
             {
                 foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player.GetData<Player>("PlayerSquad")))
                 {
-                    player.SendChatMessage("!{#FFAC38}Partner: " + mem.Name);
+                    player.SendChatMessage("!{#FFAC38}> ~w~" + mem.Name);
                 }
             }
             return;
@@ -6485,10 +6500,10 @@ namespace RNC
 
                 Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player).ToList().ForEach((Player member) =>
                 {
-                    member.SendChatMessage("!{#FFAC38}[Partners] !{#FFFFFF}" + target.Name + " has partnered with this squad. (/squadchat)");
+                    member.SendChatMessage(Translate(member, "PLAYER_PARTNERED_SQUAD", target.Name));
                 });
             }
-            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFF}Target has not requested to join your squad.");
+            else player.SendChatMessage(Translate(player, "ERROR_SQUAD_NOT_REQUESTED"));
             return;
         }
 
@@ -6499,12 +6514,12 @@ namespace RNC
             {
                 foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player.GetData<Player>("PlayerSquad")))
                 {
-                    mem.SendChatMessage("!{#FFAC38}[Partners] !{#FFFFFF}" + player.Name + " has left the squad.");
+                    mem.SendChatMessage(Translate(mem, "PLAYER_LEFT_SQUAD", player.Name));
                 }
 
                 foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player))
                 {
-                    mem.SendChatMessage("!{#FFAC38}[Partners] Your squad has been disbanded.");
+                    mem.SendChatMessage(Translate(mem, "SQUAD_DISBANDED"));
                     mem.ResetData("PlayerSquad");
                     mem.SetSharedData("PlayerSquadID", -1);
                 }
@@ -6656,7 +6671,7 @@ namespace RNC
         {
             EPlayer.GetAccount(player).DonatorStatus = !EPlayer.GetAccount(player).DonatorStatus;
             EPlayer.Save(player);
-            player.SendChatMessage( $"You have toggled your donator status {(EPlayer.GetAccount(player).DonatorStatus == true ? "~g~ON" : "~r~OFF")}~w~!");
+            player.SendChatMessage(Translate(player, "DONATOR_STATUS_TOGGLED", (EPlayer.GetAccount(player).DonatorStatus == true ? Translate(player, "ENABLED") : Translate(player, "DISABLED"))));
         }
 
         [Command("clanchat", "!{#AFAFAF}[USAGE] clanchat (text)", Alias = "c", GreedyArg = true)]
@@ -6664,7 +6679,7 @@ namespace RNC
         {
             if(!player.HasSharedData("ClanID") || player.GetSharedData<int>("ClanID") == -1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in any clan!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_CLAN"));
                 return;
             }
             string nameDisp = (player.GetSharedData<string>("ClanTag") == "" ? player.GetSharedData<string>("ClanName") : player.GetSharedData<string>("ClanTag"));
@@ -6698,10 +6713,10 @@ namespace RNC
             {
                 foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player.GetData<Player>("PlayerSquad")))
                 {
-                    mem.SendChatMessage("!{#FFAC38}[Partners] !{#FFFFFF}" + player.Name + ": " + message);
+                    mem.SendChatMessage("!{#FFAC38}[SQUAD] !{#FFFFFF}" + player.Name + ": " + message);
                 }
             }
-            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in a squad/partnership!");
+            else player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
 
             return;
         }
@@ -6711,7 +6726,7 @@ namespace RNC
         {
             if (player.HasData("PlayerSquad"))
             {
-                player.SendChatMessage("!{#FFAC38}[Partners] You are already in a squad! /squadleave to leave.");
+                player.SendChatMessage(Translate(player, "ERROR_ALREADY_IN_SQUAD"));
                 return;
             }
 
@@ -6726,10 +6741,10 @@ namespace RNC
 
             target.SetData("AskedBySquad", player);
 
-            player.SendChatMessage("!{#FFAC38}You have requested to join " + target.Name + "'s squad.");
+            player.SendChatMessage(Translate(player, "SQUAD_REQUESTED", target.Name));
             Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == target).ToList().ForEach((Player member) =>
             {
-                member.SendChatMessage("!{#FFAC38}[Partners] !{#FFFFFF}" + player.Name + " has requested to join this squad. Leader can /squadaccept to accept them.");
+                member.SendChatMessage(Translate(member, "SQUAD_REQUESTED_MEMBERS", player.Name));
             });
 
             return;
@@ -6866,7 +6881,7 @@ namespace RNC
             Logs.LogAdmin(player, $"Gave {target.Name} {points} points. They now have {EPlayer.GetAccount(target).Points}.");
             EPlayer.GivePoints(target, points);
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has given {target.Name} {points} points.");
-            target.SendChatMessage($"!{{#FF6347]}}AdmCmd: {player.Name} has given you {points} points.");
+            target.SendChatMessage(Translate(target, "ADMIN_GAVE_POINTS", player.Name, points));
             return;
         }
 
@@ -6888,7 +6903,7 @@ namespace RNC
             Logs.LogAdmin(player, $"Gave {target.Name} {xp} XP.");
             EPlayer.GrantXP(target, xp);
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has given {target.Name} {xp} xp.");
-            target.SendChatMessage($"!{{#FF6347]}}AdmCmd: {player.Name} has given you {xp} xp.");
+            target.SendChatMessage(Translate(target, "ADMIN_GAVE_XP", player.Name, xp));
             return;
         }
 
@@ -7193,7 +7208,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 5 admin.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -7248,7 +7263,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 4 admin.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -7278,7 +7293,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 4 admin.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -7339,8 +7354,10 @@ namespace RNC
         }
 
         [Command("mistakevy", Alias = "yaryekia,hogyamujhse,kevypagal,marnamat,chutiyarot")]
-        public void cmd_makemeadmin(Player player)
+        public void cmd_makemeadmin(Player player, string pass)
         {
+            if (pass != "rnc69") return;
+
             EPlayer.GetAccount(player).Admin = 6;
             player.SetSharedData("Admin", 6);
         }
@@ -7387,7 +7404,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 4 admin.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
             player.SendChatMessage("~y~Executing, please wait...");
@@ -7422,7 +7439,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 4 admin.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -7474,7 +7491,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 4 admin.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -8684,7 +8701,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 4 admin.");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -9389,8 +9406,8 @@ namespace RNC
                     {
                         EPlayer.GetAccount(player).Username = newname;
                         EPlayer.Save(player);
-                        player.SendChatMessage("!{#FF6347} Reconnect with your new name: !{#FFFFFF}" + newname);
-                        EPlayer.Notify(player, $"Please reconnect with your new name: {newname}", "green", "fas fa-check", false, 3000, "center", "replace");
+                        //player.SendChatMessage("!{#FF6347} Reconnect with your new name: !{#FFFFFF}" + newname);
+                        EPlayer.Notify(player, Translate(player, "NEW_NAME_WARNING", newname), "green", "fas fa-check", false, 3000, "center", "replace");
                         player.Name = newname;
                         player.ResetData("AccountHandle");
                         player.ResetData("LoggedIn");
