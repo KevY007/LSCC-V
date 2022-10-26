@@ -955,9 +955,7 @@ namespace RNC
             player.SetData("FreeroamBlip", !player.GetData<bool>("FreeroamBlip"));
             player.SetSharedData("VisibleBlip", player.GetData<bool>("FreeroamBlip"));
 
-            string togmsg = (player.GetData<bool>("FreeroamBlip") == true ? Translate(player, "ENABLED") : Translate(player, "DISABLED"));
-
-            player.SendChatMessage(Translate(player, "FREEROAM_TOGGLE_BLIP"), togmsg);
+            player.SendChatMessage(Translate(player, "FREEROAM_TOGGLE_BLIP", (player.GetData<bool>("FreeroamBlip") == true ? Translate(player, "ENABLED") : Translate(player, "DISABLED"))));
             return;
         }
 
@@ -976,9 +974,7 @@ namespace RNC
             player.SetData("FreeroamGodmode", !player.GetData<bool>("FreeroamGodmode"));
             player.TriggerEvent("SetActorInvulnerable", player.GetData<bool>("FreeroamGodmode"));
 
-            string togmsg = (player.GetData<bool>("FreeroamGodmode") == true ? Translate(player, "ENABLED") : Translate(player, "DISABLED"));
-
-            player.SendChatMessage(Translate(player, "FREEROAM_TOGGLE_GODMODE"), togmsg);
+            player.SendChatMessage(Translate(player, "FREEROAM_TOGGLE_GODMODE", (player.GetData<bool>("FreeroamGodmode") == true ? Translate(player, "ENABLED") : Translate(player, "DISABLED"))));
             return;
         }
 
@@ -1005,9 +1001,7 @@ namespace RNC
                 player.TriggerEvent("ToggleAFOB", true, 999);
             }
 
-            string togmsg = (player.GetData<bool>("FreeroamAFOB") == true ? Translate(player, "ENABLED") : Translate(player, "DISABLED"));
-
-            player.SendChatMessage(Translate(player, "FREEROAM_TOGGLE_AFOB"), togmsg);
+            player.SendChatMessage(Translate(player, "FREEROAM_TOGGLE_AFOB", (player.GetData<bool>("FreeroamAFOB") == true ? Translate(player, "ENABLED") : Translate(player, "DISABLED"))));
             return;
         }
 
@@ -1062,9 +1056,7 @@ namespace RNC
             player.SetData("GPS", !player.GetData<bool>("GPS"));
             player.SetSharedData("VisibleBlip", player.GetData<bool>("GPS"));
 
-            string togmsg = (player.GetData<bool>("GPS") == true ? Translate(player, "ENABLED") : Translate(player, "DISABLED"));
-
-            player.SendChatMessage(Translate(player, "TOGGLE_GPS", togmsg));
+            player.SendChatMessage(Translate(player, "TOGGLE_GPS", (player.GetData<bool>("GPS") == true ? Translate(player, "ENABLED") : Translate(player, "DISABLED"))));
             return;
         }
 
@@ -6681,8 +6673,7 @@ namespace RNC
             EPlayer.GetAccount(player).DonatorStatus = !EPlayer.GetAccount(player).DonatorStatus;
             EPlayer.Save(player);
 
-            string togmsg = (EPlayer.GetAccount(player).DonatorStatus == true ? Translate(player, "ENABLED") : Translate(player, "DISABLED"));
-            player.SendChatMessage(Translate(player, "DONATOR_STATUS_TOGGLED", togmsg));
+            player.SendChatMessage(Translate(player, "DONATOR_STATUS_TOGGLED", (EPlayer.GetAccount(player).DonatorStatus == true ? Translate(player, "ENABLED") : Translate(player, "DISABLED"))));
         }
 
         [Command("clanchat", "!{#AFAFAF}[USAGE] clanchat (text)", Alias = "c", GreedyArg = true)]

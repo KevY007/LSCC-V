@@ -63,7 +63,7 @@ namespace RNC.Translate.Languages
             {"ENABLED", "enabled"},
             {"DISABLED", "disabled"},
             {"FREEROAM_TOGGLE_BLIP", "~y~>>~w~ You have {ENABLED/DISABLED} your freeroam minimap blip!"},
-            {"FREEROAM_TOGGLE_GODMODE", "~y~>>~w~ You have {ENABLED/DISABLED} freeroam god mode and are now invulnerable!"},
+            {"FREEROAM_TOGGLE_GODMODE", "~y~>>~w~ You have {ENABLED/DISABLED} freeroam god mode / invulnerability!"},
             {"FREEROAM_TOGGLE_AFOB", "~y~>>~w~ You have {ENABLED/DISABLED} anti fall of bike in freeroam."},
             {"ERROR_NOT_IN_FREEROAM_OR_WORLD", "!{#FF6347}[!] !{#FFFFFF}You are not in freeroam or you are in the default world! Use ~y~(/world)~w~ to change it."},
             {"FREEROAM_CHANGE_SPAWN", "~y~>>~w~ {PLAYER NAME} has changed the spawn location of this freeroam world."},
