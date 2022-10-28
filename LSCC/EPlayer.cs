@@ -1637,16 +1637,36 @@ namespace RNC
             player.TriggerEvent("GetGroundZ", player.Position.X, player.Position.Y, player.Position.Z, player.Dimension, "ReturnAmmoPosZ");
         }
 
+        public static void SendMessageToAllEx(string text)
+        {
+            foreach (Player pl in NAPI.Pools.GetAllPlayers())
+            {
+                pl.SendChatMessage(text);
+            }
+        }
+
         public static void SendMessage(Player player, string message)
         {
             player.SendChatMessage(message);
         }
-        public static void SendMessageToAll(string message) { SendMessageAll(message); }
-        public static void SendMessageAll(string message)
+        public static void SendMessageToAll(string message_code, params object[] args) { SendMessageAll(message_code, args); }
+        public static void SendMessageAll(string message_code, params object[] args)
         {
             foreach(Player pl in NAPI.Pools.GetAllPlayers())
             {
-                pl.SendChatMessage(message);
+                pl.SendChatMessage(Translator.Translate(pl, message_code, args));
+            }
+        }
+
+        // This is for very specific cases. Make sure the message args go first, and the ENABLED/DISABLED part is LAST!!!
+        // e.g. "Player has set copchase to ENABLED/DISABLED."
+        public static void SendToggledMessage(string message_code, bool toggle, params object[] args)
+        {
+            foreach (Player pl in NAPI.Pools.GetAllPlayers())
+            {
+                string togmsg = (toggle ? Translator.Translate(pl, "ENABLED") : Translator.Translate(pl, "DISABLED"));
+
+                pl.SendChatMessage(Translator.Translate(pl, message_code, args, togmsg));
             }
         }
 

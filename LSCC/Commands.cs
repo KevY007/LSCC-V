@@ -51,14 +51,14 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Set max players per lobby to {value}.");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has changed max players in a lobby to {value}.");
+                    EPlayer.SendMessageToAll("MSGALL_MAXINLOBBY", EPlayer.GetAdminName(player), value);
                 }
                 else player.SendChatMessage(Translate(player, "ERROR_MAX_IN_LOBBY_USAGE"));
             }
             else if(action.StartsWith("parkedvehs"))
             {
                 Settings.SpawnParkedVehicles = !Settings.SpawnParkedVehicles;
-                EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has toggled random parked vehicles in copchase {(Settings.SpawnParkedVehicles ? "ON" : "OFF")}.");
+                EPlayer.SendToggledMessage("MSGALL_TOGRANDOMVEHS", Settings.SpawnParkedVehicles, EPlayer.GetAdminName(player));
             }
             else if (action.StartsWith("numparkedvehs"))
             {
@@ -80,7 +80,7 @@ namespace RNC
 
                     Settings.ParkedVehiclesToSpawn = speed;
 
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set the number of randomly-parked vehicles in copchase to {speed}.");
+                    EPlayer.SendMessageToAll("MSGALL_PARKEDVEHSNUM", EPlayer.GetAdminName(player), speed);
                 }
                 else player.SendChatMessage(Translate(player, "USAGE_NUMPARKEDVEHS"));
             }
@@ -94,7 +94,7 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Changed derby vehicle to {Settings.Dynamics.DerbyVehicle}");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set derby vehicle model to {Settings.Dynamics.DerbyVehicle}.");
+                    EPlayer.SendMessageToAll("MSGALL_DERBYVEHICLE", EPlayer.GetAdminName(player), Settings.Dynamics.DerbyVehicle);
                 }
                 else player.SendChatMessage(Translate(player, "USAGE_DERBY_MODELNAME"));
             }
@@ -117,7 +117,7 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Set on-foot collisions to {value.ToString()}.");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set copchase onfoot collisions to {value.ToString()}.");
+                    EPlayer.SendToggledMessage("MSGALL_ONFOOTCOLS", value, EPlayer.GetAdminName(player));
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions onfootcollisions <true/false>");
             }
@@ -137,8 +137,8 @@ namespace RNC
             else if (action.StartsWith("ooc", StringComparison.OrdinalIgnoreCase))
             {
                 Settings.OOC = !Settings.OOC;
-                Settings.LoggedInPlayers.ForEach(a =>
-                a.SendChatMessage($"!{{#FF6347}}AdmCmd: OOC chat has been {(Settings.OOC == true ? "!{#33C446}enabled" : "!{#FF0000}disabled")} !{{#FF6347}}by an administrator."));
+
+                EPlayer.SendToggledMessage("MSGALL_TOGOOC", Settings.OOC, EPlayer.GetAdminName(player));
             }
             else if (action.StartsWith("speedafob", StringComparison.OrdinalIgnoreCase))
             {
@@ -158,7 +158,7 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Set AFOB Speed Lim to {speed.ToString()}.");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set chase Anti Fall Off Bike max speed limit to {speed.ToString()}.");
+                    EPlayer.SendMessageToAll("MSGALL_AFOBSPEED", EPlayer.GetAdminName(player), speed);
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions speedafob <max speed>");
             }
@@ -180,7 +180,8 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Set camera update rate to {speed.ToString()}.");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set camera updater rate to {speed.ToString()}.");
+                    player.SendChatMessage("Done - flashlight camera update rate set.");
+                    //EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set camera updater rate to {speed.ToString()}.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions camupdate <flashlight cam update rate>");
             }
@@ -202,7 +203,7 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Set AFOB to {value.ToString()}.");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set Anti Fall Off Bike to {value.ToString()} for chases.");
+                    EPlayer.SendToggledMessage("MSG_TOGAFOB", value, EPlayer.GetAdminName(player));
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions afob <true/false>");
             }
@@ -224,8 +225,9 @@ namespace RNC
 
                     Main.SaveDynamicSettings();
 
+                    player.SendChatMessage($"Done, set Discord integration to {value.ToString()}.");
                     Logs.LogAdmin(player, $"Set server Discord integration to {value.ToString()}.");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set server discord integration to {value.ToString()}.");
+                    //EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set server discord integration to {value.ToString()}.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions usediscord <true/false>");
             }
@@ -616,7 +618,7 @@ namespace RNC
                     else
                     {
                         Logs.LogAdmin(player, $"Stopped copchase in lobby {value}.");
-                        EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has forcefully stopped the copchase in lobby {value}.");
+                        EPlayer.SendMessageToAll("MSGALL_ASTOPCOPCHASE", EPlayer.GetAdminName(player), value);
                     }
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /game stop <lobby id>");
@@ -636,8 +638,8 @@ namespace RNC
                     Main.StartGame(value);
                     player.SendChatMessage("~y~Attempting to start copchase. ~w~If it doesn't start, it could be due to ~y~lack of (autojoin-active) players~w~ or a ~y~round is already active~w~!");
                     Logs.LogAdmin(player, $"Attempted to force-start copchase in lobby {value}.");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has attempted to force-start copchase in lobby {value}.");
-                    
+                    EPlayer.SendMessageToAll("MSGALL_ASTARTCOPCHASE", EPlayer.GetAdminName(player), value);
+
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /game start <lobby id>");
             }
@@ -660,11 +662,11 @@ namespace RNC
 
                         if (lobby.GameAutoStart)
                         {
-                            Settings.LoggedInPlayers.ForEach(target => EPlayer.Notify(target, $"<strong>{EPlayer.GetAdminName(player)}</strong> has enabled copchases in <strong>lobby {lobby.lobbyId}</strong>.", "green", "fas fa-check", false, 1500, "bottomCenter", "replace"));
+                            Settings.LoggedInPlayers.ForEach(target => EPlayer.Notify(target, Translate(target, "MSGALL_COPCHASE_AUTOSTART_ON", EPlayer.GetAdminName(player), lobby.lobbyId), "green", "fas fa-check", false, 1500, "bottomCenter", "replace"));
                         }
                         else
                         {
-                            Settings.LoggedInPlayers.ForEach(target => EPlayer.Notify(target, $"<strong>{EPlayer.GetAdminName(player)}</strong> has disabled copchases in <strong>lobby {lobby.lobbyId}</strong>.", "red", "fas fa-ban", false, 1500, "bottomCenter", "replace"));
+                            Settings.LoggedInPlayers.ForEach(target => EPlayer.Notify(target, Translate(target, "MSGALL_COPCHASE_AUTOSTART_OFF", EPlayer.GetAdminName(player), lobby.lobbyId), "red", "fas fa-check", false, 1500, "bottomCenter", "replace"));
                         }
                     }
                     else player.SendChatMessage($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}The lobby id is invalid or doesn't exist.");
@@ -699,7 +701,7 @@ namespace RNC
                     lobby.FugitivePercent = value;
 
                     Logs.LogAdmin(player, $"Set teambalance in lobby {lobby.lobbyId} to {value}% fugitives.");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set lobby {lobby.lobbyId}'s fugitives percentage to {lobby.FugitivePercent}%.");
+                    EPlayer.SendMessageToAll("MSGALL_COPCHASE_BALANCE", EPlayer.GetAdminName(player), lobby.lobbyId, lobby.FugitivePercent);
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /game teambalance <lobby id> <percentage of fugitives>");
             }
@@ -737,7 +739,7 @@ namespace RNC
                     else { player.SendChatMessage("!{#999999}Proper usage: /game mode <lobby id> <mode: 'standard', 'busted', 'bankrob'>"); return; }
 
                     Logs.LogAdmin(player, $"Changed lobby {lobby.lobbyId}'s gamemode to {args[2]}");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set lobby {lobby.lobbyId}'s mode to {Main.ConvertGameMode(lobby.gameMode)}.");
+                    EPlayer.SendMessageToAll("MSGALL_LOBBY_MODE", EPlayer.GetAdminName(player), lobby.lobbyId, Main.ConvertGameMode(lobby.gameMode));
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /game mode <lobby id> <mode: 'standard', 'busted', 'bankrob'>");
             }
@@ -4221,15 +4223,15 @@ namespace RNC
 
             if (player.HasData("Spectating"))
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are in spectate mode!");
-                EPlayer.Notify(player, "You are currently spectating.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
+                EPlayer.Notify(player, Translate(player, "ERROR_NOT_IN_LOBBY_NOCOLOR"), "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
             if (player.GetSharedData<int>("Team") != -1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase!");
-                EPlayer.Notify(player, "You are in a copchase.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
+                EPlayer.Notify(player, Translate(player, "ERROR_NOT_IN_LOBBY_NOCOLOR"), "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
@@ -4242,15 +4244,15 @@ namespace RNC
 
             if (player.GetSharedData<int>("InLobby") <= -1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in any lobby!");
-                EPlayer.Notify(player, "You must be in a lobby.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
+                EPlayer.Notify(player, Translate(player, "ERROR_NOT_IN_LOBBY_NOCOLOR"), "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
             if (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == arenaid) >= 7 + (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")) / 3))
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That arena has maxed out on players.");
-                EPlayer.Notify(player, "Arena is full.", "red", "fas fa-users-slash", false, 1000, "bottomCenter", "replace");
+                //player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That arena has maxed out on players.");
+                EPlayer.Notify(player, Translate(player, "ERROR_ARENA_FULL"), "red", "fas fa-users-slash", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
@@ -4259,15 +4261,15 @@ namespace RNC
 
             if (elobby.gameStatus == 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into DM while the match is starting!");
-                EPlayer.Notify(player, "Unable to join.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                //player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into DM while the match is starting!");
+                EPlayer.Notify(player, Translate(player, "ERROR_COPCHASE_ABOUT_TO_START"), "red", "fas fa-lock", false, 5000, "bottomCenter", "replace");
                 return;
             }
 
             if (elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot go into DM while in the copchase! (/lobby)");
-                EPlayer.Notify(player, "You are in a copchase.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
+                EPlayer.Notify(player, Translate(player, "ERROR_NOT_IN_LOBBY_NOCOLOR"), "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
@@ -4279,8 +4281,8 @@ namespace RNC
             EPlayer.Spawn(player, false, dmSpawn);
             player.TriggerEvent("SetActorInvulnerable", false);
 
-            EPlayer.Notify(player, $"Joined <strong>{Settings.DMNames[arenaid]}</strong>", "blue", "fas fa-users", false, 1000, "bottomCenter", "replace");
-            EPlayer.Notify(player, $"<strong>NOTE:</strong> Your autojoin is disabled while in deathmatch. You will be notified when a copchase round is about to start.", "yellow", "fas fa-users", false, 5000, "bottomCenter", "replace");
+            EPlayer.Notify(player, Translate(player, "JOINED_DEATHMATCH", Settings.DMNames[arenaid]), "blue", "fas fa-users", false, 1000, "bottomCenter", "replace");
+            EPlayer.Notify(player, Translate(player, "DEATHMATCH_AUTOJOIN_WARNING"), "yellow", "fas fa-users", false, 5000, "bottomCenter", "replace");
             return;
         }
 
@@ -8997,7 +8999,7 @@ namespace RNC
         {
             if (EPlayer.GetAccount(player).Admin < 6) return;
 
-            EPlayer.SendMessageToAll("!{#c387ff}[DAILY CHALLENGES] ~w~New daily challenges are now available! Check ~y~Menu > Profile~w~ for more info.");
+            EPlayer.SendMessageToAllEx("!{#c387ff}[DAILY CHALLENGES] ~w~New daily challenges are now available! Check ~y~Menu > Profile~w~ for more info.");
             Task.Run(async () => {
                 Challenge.SetNewDailyChallenges();
             });
@@ -9929,9 +9931,9 @@ namespace RNC
             }
 
 
-            EPlayer.SendMessageToAll("!{#FF6347}=======================================");
-            EPlayer.SendMessageToAll($"(( {EPlayer.GetAdminLevelName(EPlayer.GetAccount(player).Admin, true)}!{{#FFFFFF}} {player.Name}: ))");
-            EPlayer.SendMessageToAll("(( " + text + "!{#FFFFFF} ))");
+            EPlayer.SendMessageToAllEx("!{#FF6347}=======================================");
+            EPlayer.SendMessageToAllEx($"(( {EPlayer.GetAdminLevelName(EPlayer.GetAccount(player).Admin, true)}!{{#FFFFFF}} {player.Name}: ))");
+            EPlayer.SendMessageToAllEx("(( " + text + "!{#FFFFFF} ))");
 
             Discord.SendTextChannel("staff-bot", $"**(ANNOUNCEMENT) | {player.Name}**: {text}");
         }

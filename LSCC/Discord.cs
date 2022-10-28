@@ -1829,7 +1829,7 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
-                            EPlayer.SendMessageToAll($"(( [DOOC] !{{#FF6347}}{context.Author.Username}!{{#FFFFFF}}: {args[1]} ))");
+                            EPlayer.SendMessageToAllEx($"(( [DOOC] !{{#FF6347}}{context.Author.Username}!{{#FFFFFF}}: {args[1]} ))");
                             context.Channel.SendMessageAsync($"**(DOOC) | {context.Author.Username}**: {args[1]}");
                         }, 100);
                     }
