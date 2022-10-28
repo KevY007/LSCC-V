@@ -10689,7 +10689,7 @@ namespace RNC
             }
             else
             {
-                EPlayer.Action(player, text);
+                EPlayer.ActionEx(player, text);
             }
         }
         [Command("do", "!{#AFAFAF}[USAGE] do (action)", GreedyArg = true)]

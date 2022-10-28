@@ -1732,6 +1732,14 @@ namespace RNC
                 if (player.Dimension == playa.Dimension) playa.SendChatMessage(msg);
             }
         }
+        public static void ActionEx(Player player, string message)
+        {
+            var msg = "!{#C3A3DB}* " + player.Name + " " + message;
+            foreach (Player playa in NAPI.Player.GetPlayersInRadiusOfPlayer(40, player))
+            {
+                if (player.Dimension == playa.Dimension) playa.SendChatMessage(msg);
+            }
+        }
 
         public static void Handcuff(Player player, bool toggle)
         {
