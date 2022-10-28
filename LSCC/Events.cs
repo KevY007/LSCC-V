@@ -39,8 +39,12 @@ namespace RNC
             {
                 try
                 {
-                    if(reason == "AFK")
-                        EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: Player {player.Name} has been kicked by SERVER for staying AFK too long.");
+                    if (reason == "AFK")
+                    {
+                        EPlayer.SendMessageToAll("MSGALL_AFK_KICKED", player.Name);
+                        player.KickSilent(reason);
+                        return;
+                    }
                     if (silent)
                     {
                         player.KickSilent(reason);

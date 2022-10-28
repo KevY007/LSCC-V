@@ -224,6 +224,7 @@
   "ACTION_PASS_GUN": "extends their arm towards {PLAYER NAME}, handing them a {WEAPON NAME}.",
   "PASSED_GUN": "!{#33C446}[#] !{#FFFFFF}You have passed your {WEAPON NAME} and all of its ammo to {PLAYER NAME}.",
   "PASSED_GUN_RECEIVED": "!{#33C446}[#] !{#FFFFFF}{PLAYER NAME} has passed you their {WEAPON NAME} with {AMMO} ammo.",
+  "KICKED_PUBLIC_MSG": "!{#FF6347}AdmCmd: {PLAYER NAME} has been kicked by {ADMIN NAME} for {REASON}.",
   "KICKED_MSG": "You have been kicked from the server by {PLAYER NAME} for <p>{REASON}</p>",
   "JAILED_MSG": "!{#FF6347}AdmCmd: {PLAYER NAME} has admin-jailed {PLAYER NAME} for {MINUTES} minutes, reason: {REASON}.",
   "WARNED_MSG": "!{#FF6347}AdmCmd: {PLAYER NAME} has warned {PLAYER NAME} for: {REASON}.",
@@ -267,5 +268,13 @@
   "MSGALL_COPCHASE_AUTOSTART_OFF": "<strong>{ADMIN NAME}</strong> has disabled copchases in <strong>lobby {LOBBY ID}</strong>.",
   "MSGALL_COPCHASE_AUTOSTART_ON": "<strong>{ADMIN NAME}</strong> has enabled copchases in <strong>lobby {LOBBY ID}</strong>.",
   "MSGALL_COPCHASE_BALANCE": "!{#FF6347}AdmCmd: !{#FFFFFF}{ADMIN NAME} has set lobby {LOBBY ID}'s fugitives percentage to {FUGITIVE PERCENT}%.",
-  "MSGALL_LOBBY_MODE": "!{#FF6347}AdmCmd: !{#FFFFFF}{ADMIN NAME} has set lobby {LOBBY ID}'s mode to {MODE NAME}."
+  "MSGALL_LOBBY_MODE": "!{#FF6347}AdmCmd: !{#FFFFFF}{ADMIN NAME} has set lobby {LOBBY ID}'s mode to {MODE NAME}.",
+  "MSGALL_AFK_KICKED": "!{#FF6347}AdmCmd: Player {PLAYER NAME} has been kicked by the server for staying AFK too long.",
+  "VERIFIED_MSG_1": "!{#83ff75}Congratulations! You successfully linked your Discord account to your Race 'N' Chase account.",
+  "VERIFIED_MSG_2": "!{#ffff00}[>] !{#ffffff}You now have access to the !{#ffff00}Negotiator !{#ffffff}loadout for !{#0097ff}cops !{#ffffff}& !{#ffae00}fugitives!{#ffffff}.",
+  "VERIFIED_MSG_3": "!{#ffff00}[>] !{#ffffff}You unlocked a new !{#ffae00}fugitive !{#ffffff}vehicle: !{#ffff00}Super Diamond!{#ffffff}.",
+  "VERIFIED_MSG_4": "!{#ffff00}[>] !{#ffffff}You also received !{#ffff00}13 points & 10XP !{#ffffff}as a bonus.",
+  "VERIFIED_OLD_MSG_1": "!{#83ff75}Congratulations! You successfully linked your Discord account to your Race 'N' Chase account, again.",
+  "VERIFIED_OLD_MSG_2": "!{#ffff00}[>] !{#ffffff}Unfortunately, you already received your verification rewards before, so you won't be given any now.",
+  "UNVERIFIED_BY_ADMIN": "!{#FF6347}[!] !{#FFFFFF}Your Discord account has been unlinked by an admin! If you believe this is abuse, staff report them on Discord."
 }
