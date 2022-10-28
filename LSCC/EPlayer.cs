@@ -1698,6 +1698,11 @@ namespace RNC
             }
         }
 
+        public static string GetAdminName(Player player)
+        {
+            return ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "ANONYMOUS" : player.Name);
+        }
+
         public static void Action(Player player, string message_code, params object[] args)
         {           
             foreach (Player playa in NAPI.Player.GetPlayersInRadiusOfPlayer(40, player))

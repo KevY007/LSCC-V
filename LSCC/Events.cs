@@ -888,7 +888,7 @@ namespace RNC
                 {
                     if (EPlayer.GetAccount(player).MuteTime > 0)
                     {
-                        player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                        player.SendChatMessage(Translator.Translate(player, "ERROR_MUTED", EPlayer.GetAccount(player).MuteReason, EPlayer.GetAccount(player).MuteTime));
                         return;
                     }
 
@@ -2905,7 +2905,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).MuteTime > 0)
             {
-                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                player.SendChatMessage(Translator.Translate(player, "ERROR_MUTED", EPlayer.GetAccount(player).MuteReason, EPlayer.GetAccount(player).MuteTime));
                 return;
             }
 

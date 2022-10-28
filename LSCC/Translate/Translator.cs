@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using System.Text;
 using GTANetworkAPI;
 
-using RNC.Translate.Languages;
-
 namespace RNC
 {
     public class Translator : Script
     {
         public static string Translate(Player player, string message_code, params object[] args)
         {
-            object[,] LANG = English.MESSAGES;
+            object[,] LANG = null;
             // Switch-case for other languages.
 
             for(int i = 0; i < LANG.GetLength(0); i++)

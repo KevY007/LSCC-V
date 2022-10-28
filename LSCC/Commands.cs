@@ -51,14 +51,14 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Set max players per lobby to {value}.");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has changed max players in a lobby to {value}.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has changed max players in a lobby to {value}.");
                 }
                 else player.SendChatMessage(Translate(player, "ERROR_MAX_IN_LOBBY_USAGE"));
             }
             else if(action.StartsWith("parkedvehs"))
             {
                 Settings.SpawnParkedVehicles = !Settings.SpawnParkedVehicles;
-                EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has toggled random parked vehicles in copchase {(Settings.SpawnParkedVehicles ? "ON" : "OFF")}.");
+                EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has toggled random parked vehicles in copchase {(Settings.SpawnParkedVehicles ? "ON" : "OFF")}.");
             }
             else if (action.StartsWith("numparkedvehs"))
             {
@@ -80,7 +80,7 @@ namespace RNC
 
                     Settings.ParkedVehiclesToSpawn = speed;
 
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set the number of randomly-parked vehicles in copchase to {speed}.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set the number of randomly-parked vehicles in copchase to {speed}.");
                 }
                 else player.SendChatMessage(Translate(player, "USAGE_NUMPARKEDVEHS"));
             }
@@ -94,7 +94,7 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Changed derby vehicle to {Settings.Dynamics.DerbyVehicle}");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set derby vehicle model to {Settings.Dynamics.DerbyVehicle}.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set derby vehicle model to {Settings.Dynamics.DerbyVehicle}.");
                 }
                 else player.SendChatMessage(Translate(player, "USAGE_DERBY_MODELNAME"));
             }
@@ -117,7 +117,7 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Set on-foot collisions to {value.ToString()}.");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set copchase onfoot collisions to {value.ToString()}.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set copchase onfoot collisions to {value.ToString()}.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions onfootcollisions <true/false>");
             }
@@ -158,7 +158,7 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Set AFOB Speed Lim to {speed.ToString()}.");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set chase Anti Fall Off Bike max speed limit to {speed.ToString()}.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set chase Anti Fall Off Bike max speed limit to {speed.ToString()}.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions speedafob <max speed>");
             }
@@ -180,7 +180,7 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Set camera update rate to {speed.ToString()}.");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set camera updater rate to {speed.ToString()}.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set camera updater rate to {speed.ToString()}.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions camupdate <flashlight cam update rate>");
             }
@@ -202,7 +202,7 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Set AFOB to {value.ToString()}.");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set Anti Fall Off Bike to {value.ToString()} for chases.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set Anti Fall Off Bike to {value.ToString()} for chases.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions afob <true/false>");
             }
@@ -225,7 +225,7 @@ namespace RNC
                     Main.SaveDynamicSettings();
 
                     Logs.LogAdmin(player, $"Set server Discord integration to {value.ToString()}.");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set server discord integration to {value.ToString()}.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set server discord integration to {value.ToString()}.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /serveroptions usediscord <true/false>");
             }
@@ -616,7 +616,7 @@ namespace RNC
                     else
                     {
                         Logs.LogAdmin(player, $"Stopped copchase in lobby {value}.");
-                        EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has forcefully stopped the copchase in lobby {value}.");
+                        EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has forcefully stopped the copchase in lobby {value}.");
                     }
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /game stop <lobby id>");
@@ -636,7 +636,7 @@ namespace RNC
                     Main.StartGame(value);
                     player.SendChatMessage("~y~Attempting to start copchase. ~w~If it doesn't start, it could be due to ~y~lack of (autojoin-active) players~w~ or a ~y~round is already active~w~!");
                     Logs.LogAdmin(player, $"Attempted to force-start copchase in lobby {value}.");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has attempted to force-start copchase in lobby {value}.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has attempted to force-start copchase in lobby {value}.");
                     
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /game start <lobby id>");
@@ -660,11 +660,11 @@ namespace RNC
 
                         if (lobby.GameAutoStart)
                         {
-                            Settings.LoggedInPlayers.ForEach(target => EPlayer.Notify(target, $"<strong>{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)}</strong> has enabled copchases in <strong>lobby {lobby.lobbyId}</strong>.", "green", "fas fa-check", false, 1500, "bottomCenter", "replace"));
+                            Settings.LoggedInPlayers.ForEach(target => EPlayer.Notify(target, $"<strong>{EPlayer.GetAdminName(player)}</strong> has enabled copchases in <strong>lobby {lobby.lobbyId}</strong>.", "green", "fas fa-check", false, 1500, "bottomCenter", "replace"));
                         }
                         else
                         {
-                            Settings.LoggedInPlayers.ForEach(target => EPlayer.Notify(target, $"<strong>{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)}</strong> has disabled copchases in <strong>lobby {lobby.lobbyId}</strong>.", "red", "fas fa-ban", false, 1500, "bottomCenter", "replace"));
+                            Settings.LoggedInPlayers.ForEach(target => EPlayer.Notify(target, $"<strong>{EPlayer.GetAdminName(player)}</strong> has disabled copchases in <strong>lobby {lobby.lobbyId}</strong>.", "red", "fas fa-ban", false, 1500, "bottomCenter", "replace"));
                         }
                     }
                     else player.SendChatMessage($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}The lobby id is invalid or doesn't exist.");
@@ -699,7 +699,7 @@ namespace RNC
                     lobby.FugitivePercent = value;
 
                     Logs.LogAdmin(player, $"Set teambalance in lobby {lobby.lobbyId} to {value}% fugitives.");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set lobby {lobby.lobbyId}'s fugitives percentage to {lobby.FugitivePercent}%.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set lobby {lobby.lobbyId}'s fugitives percentage to {lobby.FugitivePercent}%.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /game teambalance <lobby id> <percentage of fugitives>");
             }
@@ -737,7 +737,7 @@ namespace RNC
                     else { player.SendChatMessage("!{#999999}Proper usage: /game mode <lobby id> <mode: 'standard', 'busted', 'bankrob'>"); return; }
 
                     Logs.LogAdmin(player, $"Changed lobby {lobby.lobbyId}'s gamemode to {args[2]}");
-                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has set lobby {lobby.lobbyId}'s mode to {Main.ConvertGameMode(lobby.gameMode)}.");
+                    EPlayer.SendMessageToAll($"!{{#FF6347}}AdmCmd: !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has set lobby {lobby.lobbyId}'s mode to {Main.ConvertGameMode(lobby.gameMode)}.");
                 }
                 else player.SendChatMessage("!{#999999}Proper usage: /game mode <lobby id> <mode: 'standard', 'busted', 'bankrob'>");
             }
@@ -2529,7 +2529,7 @@ namespace RNC
 
             Logs.LogAdmin(player, $"Removed {comp.Name} on {itemData.Name} from {target.Name}.");
             player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have removed '{comp.Name}' on '{itemData.Name}' from {target.Name}.");
-            target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has removed '{comp.Name}' on '{itemData.Name}' from you.");
+            target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}{EPlayer.GetAdminName(player)} has removed '{comp.Name}' on '{itemData.Name}' from you.");
 
             EPlayer.Save(target);
             return;
@@ -2701,7 +2701,7 @@ namespace RNC
             Logs.LogAdmin(player, $"Gave {target.Name} component {comp.Name} for {itemData.Name}.");
 
             player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You gave '{comp.Name}' on '{itemData.Name}' to {target.Name}.");
-            target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been given '{comp.Name}' on '{itemData.Name}' by {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "an administrator" : player.Name)}.");
+            target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been given '{comp.Name}' on '{itemData.Name}' by {EPlayer.GetAdminName(player)}.");
 
             EPlayer.Save(target);
             return;
@@ -2828,7 +2828,7 @@ namespace RNC
 
             Logs.LogAdmin(player, $"Temporarily attached {comp.Name} on {itemData.Name} for {target.Name}.");
             player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}Temporarily attached '{comp.Name}' on '{itemData.Name}' for {target.Name}.");
-            target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}Temporarily attached '{comp.Name}' on '{itemData.Name}' by {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "an administrator" : player.Name)}.");
+            target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}Temporarily attached '{comp.Name}' on '{itemData.Name}' by {EPlayer.GetAdminName(player)}.");
             return;
         }
         /*
@@ -6060,7 +6060,7 @@ namespace RNC
 
             RAGE.Entities.Players.All.ForEach((Player p) =>
             {
-                p.SendChatMessage($"!{{#FF6347}}AdmCmd: {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has suspended {target.Name}'s account.");
+                p.SendChatMessage($"!{{#FF6347}}AdmCmd: {EPlayer.GetAdminName(player)} has suspended {target.Name}'s account.");
             });
 
             target.SendChatMessage($"!{{#FF6347}}[SUSPEND] Your account has been suspended and cannot be used anymore.");
@@ -6141,7 +6141,7 @@ namespace RNC
 
             RAGE.Entities.Players.All.ForEach((Player pl) =>
             {
-                pl.SendChatMessage(Translate(pl, "PLAYER_DELETED_LOBBY", ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name), lobbyid));
+                pl.SendChatMessage(Translate(pl, "PLAYER_DELETED_LOBBY", EPlayer.GetAdminName(player), lobbyid));
 
                 if (pl.GetSharedData<int>("InLobby") == lobbyid)
                 {
@@ -6336,7 +6336,7 @@ namespace RNC
                         NAPI.Task.Run(() =>
                         {
                             NAPI.Util.ConsoleOutput($"{player.Name} enabled map {mapBruh.Name} ID {mapBruh.SQL_ID}.");
-                            RAGE.Entities.Players.All.ForEach((Player p) => p.SendChatMessage(Translate(p, "ADMIN_ENABLED_MAP", ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name), mapBruh.Name)));
+                            RAGE.Entities.Players.All.ForEach((Player p) => p.SendChatMessage(Translate(p, "ADMIN_ENABLED_MAP", EPlayer.GetAdminName(player), mapBruh.Name)));
                             Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} enabled map {mapBruh.Name}.**");
                         });
 
@@ -6346,7 +6346,7 @@ namespace RNC
                         NAPI.Task.Run(() =>
                         {
                             NAPI.Util.ConsoleOutput($"{player.Name} disabled map {mapBruh.Name} ID {mapBruh.SQL_ID}.");
-                            RAGE.Entities.Players.All.ForEach((Player p) => p.SendChatMessage(Translate(p, "ADMIN_DISABLED_MAP", ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name), mapBruh.Name)));
+                            RAGE.Entities.Players.All.ForEach((Player p) => p.SendChatMessage(Translate(p, "ADMIN_DISABLED_MAP", EPlayer.GetAdminName(player), mapBruh.Name)));
                             Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} disabled map {mapBruh.Name}.**");
                         });
 
@@ -6399,7 +6399,7 @@ namespace RNC
 
                         NAPI.Util.ConsoleOutput($"{player.Name} set lobby {lobby.lobbyId} next map to {mapBruh.Name} ({mapBruh.SQL_ID}).");
 
-                        EPlayer.SendMessageInLobby(lobby.lobbyId, $"[Lobby {lobby.lobbyId}] Next game map has been set to !{{#8D8DFF}}{mapBruh.Name} !{{#FFFFFF}}by !{{#E84040}}{((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "an administrator" : player.Name)}!{{#FFFFFF}}.");
+                        EPlayer.SendMessageInLobby(lobby.lobbyId, $"[Lobby {lobby.lobbyId}] Next game map has been set to !{{#8D8DFF}}{mapBruh.Name} !{{#FFFFFF}}by !{{#E84040}}{EPlayer.GetAdminName(player)}!{{#FFFFFF}}.");
 
                     });
                 }
@@ -8807,15 +8807,15 @@ namespace RNC
 
             if(team.Equals("help", StringComparison.OrdinalIgnoreCase))
             {
-                player.SendChatMessage("!{#33C446}=> Vehicle Tuner Help/Frequently Asked Questions <=");
-                player.SendChatMessage("!{#33C446}Q: How to use the vehicle tuner?");
-                player.SendChatMessage("!{#999999}A: Simply equip the vehicle you want to tune and do /vtuner (team of the vehicle set).");
-                player.SendChatMessage("!{#33C446}Q: What happens if I change vehicles?");
-                player.SendChatMessage("!{#999999}A: Every vehicle's tuning data is saved differently for players, so you can switch vehicles normally.");
-                player.SendChatMessage("!{#33C446}Q: What is the price?");
-                player.SendChatMessage("!{#999999}A: As you're tuning the vehicle, the price will be updated in the bottom of the menu list. The price starts at 50 points per component but once you cross the 3 component limit (except colors), the price shifts in terms of donator points which can be converted with /convertpoints");
-                player.SendChatMessage("!{#33C446}Q: How to get rid of modifications/color?");
-                player.SendChatMessage("!{#999999}A: To remove all modifications and colors, you have to reset all parts to None or -1 and if there's not a single part, it'll remove all modifications. Similarly if you want to just keep the color on vehicle, you need to buy/save at least one modification (non color) on the vehicle.");
+                player.SendChatMessage(Translate(player, "VTUNER_HELP_1"));
+                player.SendChatMessage(Translate(player, "VTUNER_HELP_2"));
+                player.SendChatMessage(Translate(player, "VTUNER_HELP_3"));
+                player.SendChatMessage(Translate(player, "VTUNER_HELP_4"));
+                player.SendChatMessage(Translate(player, "VTUNER_HELP_5"));
+                player.SendChatMessage(Translate(player, "VTUNER_HELP_6"));
+                player.SendChatMessage(Translate(player, "VTUNER_HELP_7"));
+                player.SendChatMessage(Translate(player, "VTUNER_HELP_8"));
+                player.SendChatMessage(Translate(player, "VTUNER_HELP_9"));
 
                 player.SendChatMessage("!{#AFAFAF}[USAGE] vtuner !{#33C446}(cop / fugitive / help)");
                 return;
@@ -8836,13 +8836,13 @@ namespace RNC
             
             if(vehicleModel.Equals("?") || vehicleModel.StartsWith("default", StringComparison.OrdinalIgnoreCase))
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot tune the default 'randomized' vehicle!");
+                player.SendChatMessage(Translate(player, "ERROR_VTUNER_DEFAULT"));
                 return;
             }
 
             if (player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("InLobby") != -4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase or derby!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
                 return;
             }
 
@@ -8862,8 +8862,8 @@ namespace RNC
             player.TriggerEvent("CreatePlayerCamera", -373, -121, 39, -10, 0, -10, 60, true);
             player.TriggerEvent("SetTimeWeather", 12, 0, 0, 0);
 
-            EPlayer.Notify(player, $"Now tuning: {vehicleModel}<p>LMB to switch camera, menu keys to select, horn and lights can be used by default keys.</p> <p>DISCLAIMER: Removing components is not refundable.</p>", "green", "fas fa-exclamation", false, 10000, "topCenter");
-            player.SendChatMessage("~y~Loading car tunings...");
+            EPlayer.Notify(player, Translate(player, "VTUNER_MSG", vehicleModel), "green", "fas fa-exclamation", false, 10000, "topCenter");
+            //player.SendChatMessage("~y~Loading car tunings...");
             uint vehModel = veh.Model;
             int playerSQLID = EPlayer.GetAccount(player).SQL_ID;
             Task.Run(async () => {
@@ -8907,13 +8907,13 @@ namespace RNC
 
             if (player.GetSharedData<int>("InLobby") != -3)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in freeroam!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 return;
             }
 
             if (!player.IsInVehicle)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in any vehicle!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_VEHICLE"));
                 return;
             }
 
@@ -9233,7 +9233,7 @@ namespace RNC
             Logs.LogAdmin(player, $"Gave {points} donator points to {target.Name}");
             t_acc.DonatorPoints += points;
             player.SendChatMessage($"!{{#00FF33}}You gave {points} donator points to {target.Name}.");
-            target.SendChatMessage($"!{{#00FF33}}You received {points} donator points from {player.Name}.");
+            target.SendChatMessage(Translate(target, "ADMIN_GAVE_DP", player.Name, points));
             EPlayer.Save(target);
         }
 
@@ -9254,8 +9254,8 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
-                            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This code is invalid! Please ensure you are entering it correctly.");
-                            player.SendChatMessage("!{#C9C9C9}[HINT] A common mistake made is mixing up the letter 'O' and the number zero (0).");
+                            player.SendChatMessage(Translate(player, "ERROR_INVALID_CODE"));
+                            //player.SendChatMessage("!{#C9C9C9}[HINT] A common mistake made is mixing up the letter 'O' and the number zero (0).");
                         });
                         return;
                     }
@@ -9263,7 +9263,7 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
-                            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This code has been used already! Please ask the management for a new one if you donated and received this one.");
+                            player.SendChatMessage(Translate(player, "ERROR_CODE_USED"));
                         });
                         context.RedeemableCodes.Remove(redeem);
                         await context.SaveChangesAsync();
@@ -9288,7 +9288,7 @@ namespace RNC
                                 player.SetSharedData("Donator", acc.DonatorLevel);
                                 NAPI.Task.Run(() =>
                                 {
-                                    player.SendChatMessage( $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(1, true)}~w~!");
+                                    player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(1, true)));
                                 });
 
                                 EPlayer.UpdateMaxMenuItems(player);
@@ -9299,7 +9299,7 @@ namespace RNC
                                 player.SetSharedData("Donator", acc.DonatorLevel);
                                 NAPI.Task.Run(() =>
                                 {
-                                    player.SendChatMessage( $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(2, true)}~w~!");
+                                    player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(2, true)));
                                 });
 
                                 EPlayer.UpdateMaxMenuItems(player);
@@ -9310,7 +9310,7 @@ namespace RNC
                                 player.SetSharedData("Donator", acc.DonatorLevel);
                                 NAPI.Task.Run(() =>
                                 {
-                                    player.SendChatMessage( $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed {EPlayer.GetDonatorLevelName(3, true)}~w~!");
+                                    player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(3, true)));
                                 });
 
                                 EPlayer.UpdateMaxMenuItems(player);
@@ -9319,25 +9319,25 @@ namespace RNC
                                 acc.DonatorPoints += 100;
                                 NAPI.Task.Run(() =>
                                 {
-                                    player.SendChatMessage( $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed !{{#a8ffb7}}100 Donator Points~w~!");
+                                    player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", "!{#a8ffb7}100 Donator Points"));
                                 });
                                 break;
                             case 4:
                                 acc.Namechanges++;
                                 NAPI.Task.Run(() =>
                                 {
-                                    player.SendChatMessage( $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed !{{#a8ffb7}}1 Namechange~w~!");
+                                    player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", "!{#a8ffb7}1 Namechange"));
                                 });
                                 break;
                             case 5:
                                 acc.Namechanges += 5;
                                 NAPI.Task.Run(() =>
                                 {
-                                    player.SendChatMessage( $"!{{#ffe291}}[REDEEM] ~w~Congratulations! You've successfully redeemed !{{#a8ffb7}}5 Namechanges Bundle~w~!");
+                                    player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", "!{#a8ffb7}5 Namechanges Bundle"));
                                 });
                                 break;
                         }
-                        player.SendChatMessage("~w~Thank you very much for donating! ~r~<3 ~w~-RnC Management");
+                        player.SendChatMessage(Translate(player, "DONATION_THANKS"));
                     });
                     await NAPI.Task.WaitForMainThread();
 
@@ -9365,14 +9365,14 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Namechanges <= 0)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You don't have any namechanges!");
+                player.SendChatMessage(Translate(player, "ERROR_NO_NAMECHANGES"));
                 return;
             }
             Regex exp = new Regex(@"^[a-zA-Z0-9]*$");
             Match match = exp.Match(newname);
             if (!match.Success)
             {
-                EPlayer.Error(player, "Username contains illegal characters!", "fas fa-user");
+                EPlayer.Error(player, Translate(player, "ERROR_ILLEGAL_USERNAME"), "fas fa-user");
                 return;
             }
 
@@ -9386,7 +9386,7 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
-                            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}There's already an account with that name!");
+                            player.SendChatMessage(Translate(player, "ERROR_NAME_EXISTS"));
                         });
                         return;
                     }
@@ -9449,7 +9449,7 @@ namespace RNC
             t_acc.DonatorLevel = level;
             target.SetSharedData("Donator", level);
             player.SendChatMessage($"!{{#00FF33}}You have set {target.Name}'s donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
-            target.SendChatMessage($"!{{#00FF33}}{player.Name} has set your donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
+            target.SendChatMessage(Translate(target, "ADMIN_GAVE_DONATOR", EPlayer.GetDonatorLevelName(level, true), level));
             EPlayer.Save(target);
 
             EPlayer.UpdateMaxMenuItems(target);
@@ -9588,12 +9588,14 @@ namespace RNC
             return;
         }
 
+        /*
         [Command("afk", GreedyArg = true)]
         public void cmd_afk(Player pl)
         {
             cmd_autojoin(pl);
             pl.SendChatMessage("!{#FF6347}>> If you wish to go AFK, use /autojoin to toggle it to OFF. To avoid being put in a copchase!");
         }
+        */
 
         [Command("adminchat", "!{#AFAFAF}[USAGE] adminchat (text)", Alias = "a", GreedyArg = true)]
         public void cmd_adminchat(Player player, string text)
@@ -9622,7 +9624,8 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).MuteTime > 0)
             {
-                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                player.SendChatMessage(Translate(player, "ERROR_MUTED", EPlayer.GetAccount(player).MuteReason, EPlayer.GetAccount(player).MuteTime));
+                player.SendChatMessage(Translate(player, "ERROR_MUTED", EPlayer.GetAccount(player).MuteReason, EPlayer.GetAccount(player).MuteTime));
                 return;
             }
 
@@ -9646,7 +9649,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).MuteTime > 0)
             {
-                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                player.SendChatMessage(Translate(player, "ERROR_MUTED", EPlayer.GetAccount(player).MuteReason, EPlayer.GetAccount(player).MuteTime));
                 return;
             }
 
@@ -9668,20 +9671,19 @@ namespace RNC
 
             if (!player.IsInVehicle)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in any vehicle.");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_VEHICLE"));
                 return;
             }
 
             if (EPlayer.GetAccount(player).MuteTime > 0)
             {
-                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                player.SendChatMessage(Translate(player, "ERROR_MUTED", EPlayer.GetAccount(player).MuteReason, EPlayer.GetAccount(player).MuteTime));
                 return;
             }
 
-            string chatStr = $"[CAR] {player.Name.Replace("_", " ")} says: {text}";
             foreach (Player i in Settings.LoggedInPlayers.Where(a => a.IsInVehicle && a.Vehicle == player.Vehicle))
             {
-                i.SendChatMessage($"!{{#FFFF00}}{chatStr}");
+                i.SendChatMessage(Translate(i, "CAR_WHISPER", player.Name, text));
             }
             return;
         }
@@ -9694,18 +9696,17 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).MuteTime > 0)
             {
-                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                player.SendChatMessage(Translate(player, "ERROR_MUTED", EPlayer.GetAccount(player).MuteReason, EPlayer.GetAccount(player).MuteTime));
                 return;
             }
 
-            string chatStr = $"{player.Name.Replace("_", " ")} shouts: {text}";
             foreach (Player i in RAGE.Entities.Players.All)
             {
                 if (i.Dimension == player.Dimension)
                 {
-                    if (i.Position.DistanceTo(player.Position) <= 20.0) i.SendChatMessage($"!{{#D4D4D4}}{chatStr}");
-                    if (i.Position.DistanceTo(player.Position) > 20.0 && i.Position.DistanceTo(player.Position) <= 30.0) i.SendChatMessage($"!{{#B5B5B5}}{chatStr}");
-                    if (i.Position.DistanceTo(player.Position) > 30.0 && i.Position.DistanceTo(player.Position) <= 50.0) i.SendChatMessage($"!{{#999999}}{chatStr}");
+                    if (i.Position.DistanceTo(player.Position) <= 20.0) i.SendChatMessage($"!{{#D4D4D4}}{Translate(i, "SHOUTING", player.Name, text)}");
+                    if (i.Position.DistanceTo(player.Position) > 20.0 && i.Position.DistanceTo(player.Position) <= 30.0) i.SendChatMessage($"!{{#B5B5B5}}{Translate(i, "SHOUTING", player.Name, text)}");
+                    if (i.Position.DistanceTo(player.Position) > 30.0 && i.Position.DistanceTo(player.Position) <= 50.0) i.SendChatMessage($"!{{#999999}}{Translate(i, "SHOUTING", player.Name, text)}");
                 }
             }
             return;
@@ -9719,7 +9720,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).MuteTime > 0)
             {
-                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                player.SendChatMessage(Translate(player, "ERROR_MUTED", EPlayer.GetAccount(player).MuteReason, EPlayer.GetAccount(player).MuteTime));
                 return;
             }
 
@@ -9733,11 +9734,11 @@ namespace RNC
                 }
             }
 
-            if (!isInCopchase) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in the copchase as a cop."); return; }
+            if (!isInCopchase) { player.SendChatMessage(Translate(player, "ERROR_NOT_COP")); return; }
 
             if(!player.IsInVehicle || (!player.Vehicle.HasSharedData("Team") || player.Vehicle.GetSharedData<int>("Team") != 1))
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in a cop vehicle.");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_COP_CAR"));
                 return;
             }
 
@@ -9759,7 +9760,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).MuteTime > 0)
             {
-                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                player.SendChatMessage(Translate(player, "ERROR_MUTED", EPlayer.GetAccount(player).MuteReason, EPlayer.GetAccount(player).MuteTime));
                 return;
             }
 
@@ -9773,7 +9774,7 @@ namespace RNC
                 }
             }
 
-            if(!isInCopchase) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in the copchase."); return; }
+            if(!isInCopchase) { player.SendChatMessage(Translate(player, "ERROR_NOT_IN_COPCHASE")); return; }
 
             if (lobby.Cops.Contains(player))
             {
@@ -9828,7 +9829,7 @@ namespace RNC
             }
                 
             if(count == 0) {
-                player.SendChatMessage("!{#FF0000}No admins are online currently but don't do dumb moves, admins are always watching from discord.");
+                player.SendChatMessage(Translate(player, "NO_ADMINS_ONLINE"));
             }
             return;
         }
@@ -9845,7 +9846,7 @@ namespace RNC
             {
                 if (EPlayer.GetAccount(player).Admin < 1)
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}OOC is turned off.");
+                    player.SendChatMessage(Translate(player, "ERROR_OOC_OFF"));
                     return;
                 }
                 else player.SendNotification("~r~OOC chat is disabled (friendly reminder)");
@@ -9853,13 +9854,13 @@ namespace RNC
 
             if(player.GetData<bool>("OOCState") == false)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have currently disabled OOC chat! Re-enable it with /tog ooc to send and receive messages.");
+                player.SendChatMessage(Translate(player, "ERROR_PLAYER_OOC_OFF"));
                 return;
             }
 
             if (EPlayer.GetAccount(player).MuteTime > 0)
             {
-                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                player.SendChatMessage(Translate(player, "ERROR_MUTED", EPlayer.GetAccount(player).MuteReason, EPlayer.GetAccount(player).MuteTime));
                 return;
             }
 
@@ -9869,7 +9870,7 @@ namespace RNC
                 {
                     if (Environment.TickCount64 - player.GetData<long>("LastOOCTick") < 5000 && EPlayer.GetAccount(player).Admin < 1)
                     {
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}OOC slowmode is on! Wait a bit or use /lg or /lo");
+                        player.SendChatMessage(Translate(player, "ERROR_OOC_SPAM"));
                         return;
                     }
                 }
@@ -9882,12 +9883,6 @@ namespace RNC
                 if (pl.GetData<bool>("OOCState") == true)
                     pl.SendChatMessage($"(( [OOC] {EPlayer.GetPrefix(player, true)}~w~ {player.Name}: {text} ~w~))");
             });
-     
-
-            if(text.Contains("weather", StringComparison.OrdinalIgnoreCase) && player.GetSharedData<int>("PlayerWeather") == -1)
-            {
-                player.SendChatMessage("~y~[TIP] ~w~Set a custom weather in the ~y~Menu~w~ if the current one is annoying you.");
-            }
 
             Discord.SendTextChannel("staff-bot", $"**(OOC) | {EPlayer.GetPrefix(player, false)} {player.Name}**: {text}");
         }
@@ -9903,7 +9898,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).MuteTime > 0)
             {
-                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                player.SendChatMessage(Translate(player, "ERROR_MUTED", EPlayer.GetAccount(player).MuteReason, EPlayer.GetAccount(player).MuteTime));
                 return;
             }
 
@@ -9929,7 +9924,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not allowed to use this command!");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -9949,7 +9944,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not allowed to use this command!");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
             }
 
@@ -9971,21 +9966,21 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).MuteTime > 0)
             {
-                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                player.SendChatMessage(Translate(player, "ERROR_MUTED", EPlayer.GetAccount(player).MuteReason, EPlayer.GetAccount(player).MuteTime));
                 return;
             }
 
-            if (!EPlayer.LoggedIn(target)) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target not logged in."); return; }
+            if (!EPlayer.LoggedIn(target)) { player.SendChatMessage(Translate(player, "ERROR_TARGET_NOT_LOGIN")); return; }
 
             if (target.GetData<bool>("PMState") == false || player.GetData<bool>("PMState") == false) 
             { 
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your or the target's PM's are toggled OFF."); 
+                player.SendChatMessage(Translate(player, "ERROR_PRIVATEMESSAGE_OFF")); 
                 return; 
             }
 
 
-            target.SendChatMessage($"!{{#FFFF00}}(( PM received from {player.Name}: {text} ))");
-            player.SendChatMessage($"!{{#FFFF00}}(( PM sent to {target.Name}: {text} ))");
+            target.SendChatMessage(Translate(target, "PRIVATE_MESSAGE_RECEIVED", player.Name, text));
+            player.SendChatMessage(Translate(player, "PRIVATE_MESSAGE_SENT", target.Name, text));
             return;
         }
 
@@ -9995,11 +9990,11 @@ namespace RNC
             if (!(player.IsInVehicle && target.IsInVehicle && player.Vehicle == target.Vehicle) && 
                 player.Position.DistanceTo(target.Position) >= 3.5)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not close enough to the target or in the same vehicle!");
+                player.SendChatMessage(Translate(player, "ERROR_PLAYER_NOT_CLOSE"));
                 return;
             }
 
-            if(player == target || player.Dead) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot pass weapons to that target."); return; }
+            if(player == target || player.Dead) { player.SendChatMessage(Translate(player, "ERROR_CANT_PASS_WEAPON")); return; }
 
             WeaponHash wep = player.CurrentWeapon;
             string wepName = null;
@@ -10026,7 +10021,7 @@ namespace RNC
 
             if (wep == WeaponHash.Unarmed || wepName == null)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please equip a proper weapon on your hands.");
+                player.SendChatMessage(Translate(player, "ERROR_WEAPON_NOT_INHAND"));
                 return;
             }
 
@@ -10038,9 +10033,9 @@ namespace RNC
 
             target.GiveWeapon(wep, ammo);
 
-            EPlayer.Action(player, $"extends their arm towards {target.Name}, handing them a {wepName}.");
-            player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have passed your " + wepName + " and all of its ammo to " + target.Name + ".");
-            target.SendChatMessage("!{#33C446}[#] !{#FFFFFF}" + player.Name + " has passed you their " + wepName + " with " + ammo + " ammo.");
+            EPlayer.Action(player, "ACTION_PASS_GUN", target.Name, wepName);
+            player.SendChatMessage(Translate(player, "PASSED_GUN", wepName, target.Name));
+            target.SendChatMessage(Translate(target, "PASSED_GUN_RECEIVED", player.Name, wepName, ammo));
 
             return;
         }
@@ -10112,7 +10107,7 @@ namespace RNC
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:freeze:{target.Name}"); } catch { }
                 Logs.LogAdmin(player, $"Froze player {target.Name}.");
                 //target.SendChatMessage($"!{{#FF6347}}[AdmCmd] YOU HAVE BEEN FROZEN BY !{{#FF0000}}{player.Name}");
-                EPlayer.Notify(target, $"You have been frozen by {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "an administrator" : player.Name)}", "red", "fas fa-iciles", false, 2000);
+                //EPlayer.Notify(target, $"You have been frozen by {EPlayer.GetAdminName(player)}", "red", "fas fa-iciles", false, 2000);
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has frozen {target.Name}.");
             }
         }
@@ -10132,7 +10127,7 @@ namespace RNC
                 foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Position.DistanceTo(player.Position) <= range && a != player))
                 {
                     EPlayer.Freeze(p, true);
-                    EPlayer.Notify(p, $"You have been frozen by {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "an administrator" : player.Name)}", "red", "fas fa-iciles", false, 2000);
+                    //EPlayer.Notify(p, $"You have been frozen by {EPlayer.GetAdminName(player)}", "red", "fas fa-iciles", false, 2000);
                 }
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:rfreeze:{range}"); } catch { }
                 Logs.LogAdmin(player, $"Froze all players within {range}m.");
@@ -10155,7 +10150,7 @@ namespace RNC
                 foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a != player && a.GetSharedData<int>("Team") == teamid && a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")))
                 {
                     EPlayer.Freeze(p, true);
-                    EPlayer.Notify(p, $"You have been frozen by {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "an administrator" : player.Name)}", "red", "fas fa-iciles", false, 2000);
+                    //EPlayer.Notify(p, $"You have been frozen by {EPlayer.GetAdminName(player)}", "red", "fas fa-iciles", false, 2000);
                 }
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:tfreeze:{teamid}"); } catch { }
                 Logs.LogAdmin(player, "Froze all " + (teamid == 0 ? "fugitives." : "cops."));
@@ -10179,7 +10174,7 @@ namespace RNC
                 foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a != player && a.GetSharedData<int>("Team") == teamid && a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")))
                 {
                     EPlayer.Freeze(p, false);
-                    EPlayer.Notify(p, $"You have been thawed by {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "an administrator" : player.Name)}", "green", "fas fa-walking", false, 2000);
+                    //EPlayer.Notify(p, $"You have been thawed by {EPlayer.GetAdminName(player)}", "green", "fas fa-walking", false, 2000);
                 }
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:tunfreeze:{teamid}"); } catch { }
                 Logs.LogAdmin(player, "Unfroze all " + (teamid == 0 ? "fugitives." : "cops."));
@@ -10202,7 +10197,7 @@ namespace RNC
                 foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Position.DistanceTo(player.Position) <= range))
                 {
                     EPlayer.Freeze(p, false);
-                    EPlayer.Notify(p, $"You have been thawed by {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "an administrator" : player.Name)}", "green", "fas fa-walking", false, 2000);
+                    //EPlayer.Notify(p, $"You have been thawed by {EPlayer.GetAdminName(player)}", "green", "fas fa-walking", false, 2000);
                 }
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:runfreeze:{range}"); } catch { }
                 Logs.LogAdmin(player, $"Unfroze all players within {range}m");
@@ -10225,9 +10220,9 @@ namespace RNC
             {
                 EPlayer.Freeze(target, false);
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unfreeze:{target.Name}"); } catch { }
-                Logs.LogAdmin(player, $"Unfroze player {target.Name}.");
+                //Logs.LogAdmin(player, $"Unfroze player {target.Name}.");
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has unfrozen {target.Name}.");
-                EPlayer.Notify(target, $"You have been thawed by {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "an administrator" : player.Name)}", "green", "fas fa-walking", false, 2000);
+                EPlayer.Notify(target, $"You have been thawed by {EPlayer.GetAdminName(player)}", "green", "fas fa-walking", false, 2000);
             }
         }
         [Command("kick", "!{#AFAFAF}[USAGE] kick (target) (reason)", GreedyArg = true)]
@@ -10258,10 +10253,10 @@ namespace RNC
 
                 RAGE.Entities.Players.All.ForEach((Player playa) =>
                 {
-                    playa.SendChatMessage($"!{{#FF6347}}AdmCmd: {target.Name} has been kicked by {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "an administrator" : player.Name)} for {reason}.");
+                    playa.SendChatMessage($"!{{#FF6347}}AdmCmd: {target.Name} has been kicked by {EPlayer.GetAdminName(player)} for {reason}.");
                 });
 
-                EPlayer.Notify(target, $"You have been kicked from the server by {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "an administrator" : player.Name)} for <p>{reason}</p>", "red", "fas fa-ban", true, 30000);
+                EPlayer.Notify(target, Translate(player, "KICKED_MSG", EPlayer.GetAdminName(player), reason), "red", "fas fa-ban", true, 30000);
 
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:kick:{target.Name}:{reason.Replace(":", "|")}"); } catch { }
                 
@@ -10320,7 +10315,7 @@ namespace RNC
                     {
                         RAGE.Entities.Players.All.ForEach((Player playa) =>
                         {
-                            playa.SendChatMessage($"!{{#FF6347}}AdmCmd: {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has offline jailed {tpAcc.Username} for {minutes} minutes, reason: {reason}.");
+                            playa.SendChatMessage(Translate(playa, "JAILED_MSG", EPlayer.GetAdminName(player), tpAcc.Username, minutes, reason));
                         });
                     });
                 }
@@ -10360,7 +10355,7 @@ namespace RNC
 
                 RAGE.Entities.Players.All.ForEach((Player playa) =>
                 {
-                    playa.SendChatMessage($"!{{#FF6347}}AdmCmd: {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has jailed {target.Name} for {mins} minutes, reason: {reason}.");
+                    playa.SendChatMessage(Translate(playa, "JAILED_MSG", EPlayer.GetAdminName(player), target.Name, mins, reason));
                 });
 
                 //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:jail:{target.Name}:{mins}:{reason.Replace(":", "|")}"); } catch { }
@@ -10468,7 +10463,7 @@ namespace RNC
             {
                 RAGE.Entities.Players.All.ForEach((Player playa) =>
                 {
-                    playa.SendChatMessage($"!{{#FF6347}}AdmCmd: {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has warned {target.Name} for {reason}.");
+                    playa.SendChatMessage(Translate(playa, "WARNED_MSG", EPlayer.GetAdminName(player), target.Name, reason));
                 });
 
                 //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:warn:{target.Name}:{reason.Replace(":", "|")}"); } catch { }
@@ -10523,13 +10518,13 @@ namespace RNC
             {
                 RAGE.Entities.Players.All.ForEach((Player playa) =>
                 {
-                    playa.SendChatMessage($"!{{#FF6347}}AdmCmd: {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has muted {target.Name} for {mins} minutes, reason: {reason}.");
+                    playa.SendChatMessage(Translate(playa, "MUTED_MSG", EPlayer.GetAdminName(player), target.Name, mins, reason));
                 });
 
                 Account Acc = EPlayer.GetAccount(target);
                 Acc.MuteReason = reason;
                 Acc.MuteTime = Acc.MuteTime + (mins * 60);
-                target.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been muted for {mins} minutes, reason: {reason}.");
+                target.SendChatMessage(Translate(target, "MUTED_PLAYER_MSG", mins, reason));
 
                 Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Mute", reason, mins + " minutes.");
 
@@ -10586,7 +10581,7 @@ namespace RNC
                     {
                         RAGE.Entities.Players.All.ForEach((Player playa) =>
                         {
-                            playa.SendChatMessage($"!{{#FF6347}}AdmCmd: {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has offline muted {tpAcc.Username} for {minutes} minutes, reason: {reason}.");
+                            playa.SendChatMessage(Translate(playa, "MUTED_MSG", EPlayer.GetAdminName(player), tpAcc.Username, minutes, reason));
                         });
                     });
                 }
@@ -10635,11 +10630,14 @@ namespace RNC
 
                     await context.SaveChangesAsync();
                     NAPI.Task.Run(() =>
-                    {
+                    {/*
                         RAGE.Entities.Players.All.ForEach((Player playa) =>
                         {
-                            playa.SendChatMessage($"!{{#FF6347}}AdmCmd: {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has offline unmuted {tpAcc.Username}.");
+                            playa.SendChatMessage($"!{{#FF6347}}AdmCmd: {EPlayer.GetAdminName(player)} has offline unmuted {tpAcc.Username}.");
                         });
+                        */
+
+                        EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}AdmCmd: {EPlayer.GetAdminName(player)} has offline unmuted {tpAcc.Username}.");
                     });
                 }
             });
@@ -10685,7 +10683,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).MuteTime > 0)
             {
-                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                player.SendChatMessage(Translate(player, "ERROR_MUTED", EPlayer.GetAccount(player).MuteReason, EPlayer.GetAccount(player).MuteTime));
             }
             else
             {
@@ -10700,7 +10698,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).MuteTime > 0)
             {
-                player.SendChatMessage("!{#FF6347}You are currently muted for " + EPlayer.GetAccount(player).MuteReason + ", seconds left: " + EPlayer.GetAccount(player).MuteTime + ".");
+                player.SendChatMessage(Translate(player, "ERROR_MUTED", EPlayer.GetAccount(player).MuteReason, EPlayer.GetAccount(player).MuteTime));
             }
             else
             {
@@ -10744,13 +10742,13 @@ namespace RNC
 
                 if (target.GetSharedData<bool>("AutoJoin") == true)
                 {
-                    EPlayer.Notify(target, $"AutoJoin has been turned <strong>OFF</strong> by {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "an administrator" : player.Name)}.", "red", "fas fa-check", false, 1500, "bottomCenter", "replace");
+                    EPlayer.Notify(target, Translate(target, "AUTOJOIN_OFF"), "red", "fas fa-check", false, 1500, "bottomCenter", "replace");
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target's auto join has been turned off!");
                     target.SetSharedData("AutoJoin", false);
                 }
                 else
                 {
-                    EPlayer.Notify(target, $"AutoJoin has been turned <strong>ON</strong> by {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "an administrator" : player.Name)}.", "green", "fas fa-check", false, 1500, "bottomCenter", "replace");
+                    EPlayer.Notify(target, Translate(target, "AUTOJOIN_ON"), "green", "fas fa-check", false, 1500, "bottomCenter", "replace");
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target's auto join has been turned on!");
                     target.SetSharedData("AutoJoin", true);
                 }
@@ -10861,7 +10859,7 @@ namespace RNC
 
             if (player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("InLobby") != -4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase or derby!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
                 return;
             }
 
@@ -10887,7 +10885,7 @@ namespace RNC
 
             if(team.Contains("reset"))
             {
-                player.SendChatMessage("!{#FF6347}Please use /char help or /char resetclothing because you're at the wrong place.");
+                cmd_char(player, $"resetclothing {team}");
                 return;
             }
 
@@ -10967,7 +10965,7 @@ namespace RNC
 
             if (player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("InLobby") != -4)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase or derby!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
                 return;
             }
 
@@ -10988,16 +10986,16 @@ namespace RNC
                     EPlayer.ShowCharCreator(player, ConvChar, false, true);
                     EPlayer.Notify(player, "Gender Change", "If you wish to change your gender, use <strong>/char reset</strong>!", "bottomRight", "replace");
                 }
-                catch { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have a character to edit!"); }
+                catch { cmd_char(player, "reset"); }
                
             }
             else if (action.StartsWith("help", StringComparison.OrdinalIgnoreCase))
             {
-                player.SendChatMessage("!{#FF6347}[Option] !{#999999}reset !{#FFFFFF}- Resets your character and sends you back to creation.");
-                player.SendChatMessage("!{#FF6347}[Option] !{#999999}edit !{#FFFFFF}- Allows you to edit your current character.");
-                player.SendChatMessage("!{#FF6347}[Option] !{#999999}clothing !{#FFFFFF}- Sets clothing for a team, fugitive or cop.");
-                player.SendChatMessage("!{#FF6347}[Option] !{#999999}resetclothing !{#FFFFFF}- Resets the clothing for a team.");
-                player.SendChatMessage("!{#FF6347}[Option] !{#999999}lobbyteam !{#FFFFFF}- Sets the clothing of which team that appears on lobby, derby dm etc.");
+                player.SendChatMessage(Translate(player, "CHAR_OPTION_1"));
+                player.SendChatMessage(Translate(player, "CHAR_OPTION_2"));
+                player.SendChatMessage(Translate(player, "CHAR_OPTION_3"));
+                player.SendChatMessage(Translate(player, "CHAR_OPTION_4"));
+                player.SendChatMessage(Translate(player, "CHAR_OPTION_5"));
             }
             else if (action.StartsWith("clothing", StringComparison.OrdinalIgnoreCase))
             {
@@ -11009,13 +11007,13 @@ namespace RNC
                 }
                 catch
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have a character created! (/char reset)");
+                    cmd_char(player, "reset");
                     return;
                 }
 
                 if (EPlayer.GetAccount(player).Character.Length < 10 || EPlayer.GetAccount(player).Character == null)
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have a character created! (/char reset)");
+                    cmd_char(player, "reset");
                     return;
                 }
 
@@ -11062,7 +11060,7 @@ namespace RNC
                     {
                         if(EPlayer.GetAccount(player).DonatorLevel < 3)
                         {
-                            player.SendChatMessage("!{#FF6347}[!] ~w~You are not a Gold Donator!");
+                            player.SendChatMessage(Translate(player, "ERROR_NOT_GOLD_DONATOR"));
                             return;
                         }
 
@@ -11080,7 +11078,7 @@ namespace RNC
                     {
                         if (EPlayer.GetAccount(player).DonatorLevel < 3)
                         {
-                            player.SendChatMessage("!{#FF6347}[!] ~w~You are not a Gold Donator!");
+                            player.SendChatMessage(Translate(player, "ERROR_NOT_GOLD_DONATOR"));
                             return;
                         }
 
@@ -11094,9 +11092,9 @@ namespace RNC
                         player.SetData("LastEditedClothingTeam", 0);
                         player.TriggerEvent("ShowClothesMenu");
                     }
-                    else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid team, clothings can only be set for 'fugitive' or 'cop' team. Use 'donatorcop' or 'donatorfugitive' for unrestricted menu.");
+                    else player.SendChatMessage(Translate(player, "ERROR_INVALID_CLOTHING_TEAM"));
                 }
-                else player.SendChatMessage("!{#999999}Proper usage: /char clothing (team), teams: cop OR fugitive");
+                else player.SendChatMessage(Translate(player, "USAGE_CLOTHING"));
             }
             else if (action.StartsWith("resetclothing", StringComparison.OrdinalIgnoreCase))
             {
@@ -11108,13 +11106,13 @@ namespace RNC
                 }
                 catch
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have a character created! (/char reset)");
+                    cmd_char(player, "reset");
                     return;
                 }
 
                 if (EPlayer.GetAccount(player).Character.Length < 10 || EPlayer.GetAccount(player).Character == null)
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have a character created! (/char reset)");
+                    cmd_char(player, "reset");
                     return;
                 }
 
@@ -11129,7 +11127,7 @@ namespace RNC
 
                         EPlayer.Spawn(player, false);
 
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Reset your clothing for cop team.");
+                        player.SendChatMessage(Translate(player, "CLOTHING_RESET_COP"));
                     }
                     else if (args[1].StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
                     {
@@ -11139,11 +11137,11 @@ namespace RNC
 
                         EPlayer.Spawn(player, false);
 
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Reset your clothing for fugitive team.");
+                        player.SendChatMessage(Translate(player, "CLOTHING_RESET_FUGITIVE"));
                     }
-                    else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid team, clothings can only be set for 'fugitive' or 'cop' team.");
+                    else player.SendChatMessage(Translate(player, "USAGE_RESET_CLOTHING"));
                 }
-                else player.SendChatMessage("!{#999999}Proper usage: /char resetclothing (team), teams: cop OR fugitive");
+                else player.SendChatMessage(Translate(player, "USAGE_RESET_CLOTHING"));
             }
             else if (action.StartsWith("lobbyteam", StringComparison.OrdinalIgnoreCase))
             {
@@ -11155,13 +11153,13 @@ namespace RNC
                 }
                 catch
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have a character created! (/char reset)");
+                    cmd_char(player, "reset");
                     return;
                 }
 
                 if (EPlayer.GetAccount(player).Character.Length < 10 || EPlayer.GetAccount(player).Character == null)
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have a character created! (/char reset)");
+                    cmd_char(player, "reset");
                     return;
                 }
 
@@ -11172,15 +11170,15 @@ namespace RNC
                     {
                         EPlayer.GetAccount(player).LobbyClothing = 1;
 
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You will now spawn with cop clothing in lobby.");
+                        player.SendChatMessage(Translate(player, "LOBBY_CLOTHING_COP"));
                     }
                     else if (args[1].StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
                     {
                         EPlayer.GetAccount(player).LobbyClothing = 0;
 
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You will now spawn with fugitive clothing in lobby.");
+                        player.SendChatMessage(Translate(player, "LOBBY_CLOTHING_FUGITIVE"));
                     }
-                    else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid team, clothings can only be set for 'fugitive' or 'cop' team.");
+                    else player.SendChatMessage(Translate(player, "ERROR_INVALID_CLOTHING_TEAM_2"));
 
                     try
                     {
@@ -11190,10 +11188,10 @@ namespace RNC
                     }
                     catch { return; }
                 }
-                else player.SendChatMessage("!{#999999}Proper usage: /char lobbyteam (team), teams: cop OR fugitive");
+                else player.SendChatMessage(Translate(player, "ERROR_INVALID_CLOTHING_TEAM_2"));
             }
 
-            else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid option, possible options: 'help', 'edit', 'reset', 'clothing', 'resetclothing', 'lobbyteam'");
+            else player.SendChatMessage(Translate(player, "ERROR_CHAR_OPTIONS"));
 
             return;
         }
@@ -11239,12 +11237,12 @@ namespace RNC
 
             if (req.RequestType == 0)
             {
-                req.Reporter.SendChatMessage($"!{{#DBCE40}}[REQUEST {requestid}] {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has accepted your report on {req.Reported.Name}.");
+                req.Reporter.SendChatMessage(Translate(req.Reporter, "ADMIN_ACCEPTED_TICKET", requestid, EPlayer.GetAdminName(player), req.Reported.Name));
             }
             else if (req.RequestType == 1)
             {
-                req.Reporter.SendChatMessage($"!{{#1E9913}}[HELPME] {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has come to your assistance on the helpme: ");
-                req.Reporter.SendChatMessage($"!{{#A8A8A5}}Q: {req.Description}");
+
+                req.Reporter.SendChatMessage(Translate(req.Reporter, "ADMIN_ACCEPTED_TICKET", requestid, EPlayer.GetAdminName(player), req.Description));
             }
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#1E9913}}{player.Name} accepted {req.Reporter.Name}'s request ID {requestid}.");
 
@@ -11265,7 +11263,7 @@ namespace RNC
 
             RequestData req = Settings.Requests.ToList().Find(a => a.RequestID == requestid);
 
-            req.Reporter.SendChatMessage($"!{{#FF6347}}[REQUEST {requestid}] {((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "An administrator" : player.Name)} has denied your request, for {reason}.");
+            req.Reporter.SendChatMessage(Translate(req.Reporter, "ADMIN_DENIED_TICKET", requestid, player.Name, reason));
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} denied {req.Reporter.Name}'s request ID {requestid} for {reason}.");
 
             Settings.Requests.RemoveAll(r => r.RequestID == requestid);
@@ -11307,13 +11305,13 @@ namespace RNC
 
             if(player.HasData("Spectating"))
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Already spectating! Switching targets...");
+                player.SendChatMessage(Translate(player, "ERROR_ALREADY_SPECTATING"));
                 cmd_specoff(player);
             }
 
             if (player.GetSharedData<int>("InDM") != -1)
             {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are in /dm!");
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
                 return;
             }
 
@@ -11321,7 +11319,7 @@ namespace RNC
             {
                 if (player.GetSharedData<int>("Team") != -1)
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are in copchase!");
+                    player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
                     return;
                 }
 
@@ -11331,18 +11329,18 @@ namespace RNC
                     if (
                         !(lobby.gameStatus == 1 && (lobby.Cops.Contains(target) || lobby.Fugitives.Contains(target)) && target.IsInstanceAlive && !target.Dead))
                     {
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF]You can only spectate people that are in your lobby and copchase!");
+                        player.SendChatMessage(Translate(player, "ERROR_SPEC_SAME_LOBBY"));
                         return;
                     }
                 }
                 else
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF]You are not in a copchase lobby!");
+                    player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
                     return;
                 }
             }
 
-            if(target.HasData("Spectating")) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The target is spectating someone else!"); return; }
+            if(target.HasData("Spectating")) { player.SendChatMessage(Translate(player, "ERROR_TARGET_SPECTATING")); return; }
 
             player.SetData("Spectating", true);
             player.SetData("SpectatingPlayer", target);
@@ -11375,7 +11373,7 @@ namespace RNC
             }, 1000);
                 
 
-            player.SendChatMessage($"!{{#33C446}}[>] !{{#FFFFFF}}You are now spectating: !{{#FF6347}}{target.Name}");
+            player.SendChatMessage(Translate(player, "NOW_SPECTATING", target.Name));
 
             if (EPlayer.GetAccount(player).Admin > 0)
             {
@@ -11386,12 +11384,14 @@ namespace RNC
             return;
         }
 
+        /*
         [Command("loadout", Alias = "loadouts")]
         public void cmd_loadout(Player player)
         {
             player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This option has been migrated to server menu. (/keys)");
             return;
         }
+        */
 
         [Command("specoff", GreedyArg = true)]
         public static void cmd_specoff(Player player)
@@ -11399,7 +11399,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (!player.HasData("Spectating")) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not spectating anyone!"); return; }
+            if (!player.HasData("Spectating")) { player.SendChatMessage(Translate(player, "ERROR_NOT_SPECTATING")); return; }
 
             player.TriggerEvent("StopSpectating");
             player.TriggerEvent("SetPlayerFrozen", false);
