@@ -294,6 +294,11 @@ namespace RNC
 
     static class EPlayer
     {
+        static string Translate(Player player, string message_code, params object[] args)
+        {
+            return Translator.Translate(player, message_code, args);
+        }
+
         public static byte ColForOverlay(CharacterData character, int index)
         {
             byte color = 0;
@@ -872,7 +877,7 @@ namespace RNC
                 Account Acc = EPlayer.GetAccount(player);
                 Acc.JailReason = reason;
                 Acc.JailTime = Acc.JailTime + (minutes * 60);
-                player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You have been jailed for {minutes} minutes, reason: {reason}.");
+                player.SendChatMessage(Translator.Translate(player, "JAILED_PLAYER_MSG", minutes, reason));
 
                 lock (Settings.Lobbies)
                 {
@@ -1053,13 +1058,13 @@ namespace RNC
 
                 if (Acc.Warns < 10)
                 {
-                    player.SendChatMessage("!{#FF6347}You have been warned, be careful next time. After 10 warns you will receive jailtime on every warn until 20 warns.");
+                    player.SendChatMessage(Translate(player, "WARNED_PLAYER_MSG"));
                 }
                 else
                 {
                     if (Acc.Warns >= 20)
                     {
-                        player.SendChatMessage($"!{{#FF6347}}Mate, you've got like 20 warns, are you on a death route or what? I'm letting you go this time. - KevY");
+                        player.SendChatMessage(Translate(player, "WARNED_PLAYER_MSG_DANGER"));
                         Acc.Warns = 0;
                     }
                     else
@@ -1072,7 +1077,7 @@ namespace RNC
 
                         RAGE.Entities.Players.All.ForEach((Player p) =>
                         {
-                            p.SendChatMessage($"!{{#FF6347}}[AdmCmd] SERVER has jailed {player.Name} for {jailTime} mins, reason: Exceeding {Acc.Warns} warns.");
+                            p.SendChatMessage(Translate(p, "JAILED_MSG", "SERVER", player.Name, jailTime, $"{Acc.Warns} Warns"));
                         });
                     }
                 }
@@ -1449,7 +1454,7 @@ namespace RNC
             }
 
             //player.GiveWeapon(WeaponHash.Nightstick, 1);
-            player.SendChatMessage("!{#FF6347}[TASER] !{#FFFFFF}You have been equipped with a stungun, shoot at a fugitive that hasn't shot to tase them.");
+            player.SendChatMessage(Translate(player, "STUNGUN_MSG"));
             return;
         }
         public static void GiveFugitiveWeapons(Player player)
@@ -2079,10 +2084,10 @@ namespace RNC
                 {
                     RAGE.Entities.Players.All.ForEach((Player pl) =>
                     {
-                        if (lvlDiff > 1) pl.SendChatMessage($"!{{#00BA03}}[LEVEL UP] {player.Name} has levelled up +{lvlDiff} times to {acc.Level}!");
-                        else pl.SendChatMessage($"!{{#00BA03}}[LEVEL UP] {player.Name} has levelled up to {acc.Level}!");
+                        if (lvlDiff > 1) pl.SendChatMessage(Translate(pl, "LEVEL_UP_MULTIPLE", player.Name, lvlDiff, acc.Level));
+                        else pl.SendChatMessage(Translate(pl, "LEVEL_UP_ONE", player.Name, acc.Level));
                     });
-                    EPlayer.Notify(player, $"You have <strong>levelled up</strong> to <strong>{acc.Level}</strong>.", "green", "fas fa-check", false, 1500, "bottomRight", "replace");
+                    EPlayer.Notify(player, Translate(player, "LEVEL_UP_MSG", acc.Level), "green", "fas fa-check", false, 1500, "bottomRight", "replace");
 
                     player.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
                     try { NAPI.Task.Run(() => player.TriggerEvent("ShakeCam", "VIBRATE_SHAKE", 7.0f, 2000), 1000); } catch { }
@@ -2091,10 +2096,10 @@ namespace RNC
                 {
                     RAGE.Entities.Players.All.ForEach((Player pl) =>
                     {
-                        if (lvlDiff < -1) pl.SendChatMessage($"!{{#FF6347}}[LEVEL DOWN] {player.Name} has levelled down {lvlDiff} times to {acc.Level}!");
-                        else pl.SendChatMessage($"!{{#FF6347}}[LEVEL DOWN] {player.Name} has levelled down to {acc.Level}!");
+                        if (lvlDiff > 1) pl.SendChatMessage(Translate(pl, "LEVEL_DOWN_MULTIPLE", player.Name, lvlDiff, acc.Level));
+                        else pl.SendChatMessage(Translate(pl, "LEVEL_DOWN_ONE", player.Name, acc.Level));
                     });
-                    EPlayer.Notify(player, $"You have <strong>levelled down</strong> to <strong>{acc.Level}</strong>.", "red", "fas fa-cross", false, 1500, "bottomRight", "replace");
+                    EPlayer.Notify(player, Translate(player, "LEVEL_DOWN_MSG", acc.Level), "red", "fas fa-check", false, 1500, "bottomRight", "replace");
 
                     player.TriggerEvent("PlayMissionComplete", "GENERIC_FAILED");
                     try { NAPI.Task.Run(() => player.TriggerEvent("ShakeCam", "VIBRATE_SHAKE", 3.0f, 1500), 1000); } catch { }
@@ -2298,7 +2303,7 @@ namespace RNC
 
                     foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == LobbyToBeIn))
                     {
-                        targ.SendChatMessage($"!{{#FF6347}}[Lobby {LobbyToBeIn}] !{{#BFBFBF}}{player.Name} !{{#FFFFFF}}has joined this lobby.");
+                        targ.SendChatMessage(Translate(targ, "JOINED_LOBBY_MSG", LobbyToBeIn, player.Name));
                     }
                 }
 

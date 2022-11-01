@@ -16,6 +16,11 @@ namespace RNC
 {
     class Events : Script
     {
+        static string Translate(Player player, string message_code, params object[] args)
+        {
+            return Translator.Translate(player, message_code, args);
+        }
+
         [ServerEvent(Event.PlayerConnected)]
         public void OnPlayerConnected_Old(Player player)
         {
@@ -222,7 +227,7 @@ namespace RNC
             if(time == 0)
             {
                 player.Health = 0;
-                player.SendChatMessage("!{#FF6347}You succumbed to your injuries and have bled out.");
+                player.SendChatMessage(Translator.Translate(player, "SUCCUMB_TO_INJURIES"));
             }
         }
 
@@ -254,7 +259,6 @@ namespace RNC
                 }
 
                 player.SetSharedData("Wounded", state);
-                NAPI.Util.ConsoleOutput("[ONPLAYERWOUNDED " + player.Name + " STATE (" + state + ") KILLER ID  (" + killerID + ")");
 
                 Player killer = null;
                 if (killerID != -1)
@@ -280,12 +284,12 @@ namespace RNC
                         {
                             if (player.HasSharedData("ReviveTarget") && player.GetSharedData<string>("ReviveTarget") != "n/a")
                             {
-                                player.SendChatMessage("!{#FF6347}[!] ~w~Your revive attempt failed due to your death.");
+                                player.SendChatMessage(Translate(player, "REVIVE_FAIL_DEATH"));
                                 OnStopReviving(player);
                             }
                             player.SetSharedData("ReviveTarget", "n/a");
                             player.SetSharedData("BeingRevived", false);
-                            player.SendChatMessage("!{#C3A3DB}* You suddenly start losing strength and collapse - you lost too much blood.");
+                            player.SendChatMessage(Translate(player, "INJURED_ACTION_MSG"));
                             player.Health = 100;
 
                             if (player.IsInVehicle && player.Vehicle != null)
@@ -296,10 +300,10 @@ namespace RNC
                                 }
 
                                 player.Health = 25;
-                                player.SendChatMessage("!{#FF6347}You have been severely injured, but you are not dead yet!");
-                                player.SendChatMessage("!{#FF6347}You are currently in a vehicle & do not have enough strength to exit it.");
-                                player.SendChatMessage("!{#FF6347}A teammate will have to enter the vehicle in order to treat your wounds. [unlock your vehicle]");
-                                player.SendChatMessage("!{#FF6347}You will die in 60 seconds if you are not revived by a teammate. Use (/lobby) to respawn instantly.");
+                                player.SendChatMessage(Translate(player, "INJURED_MSG_CAR_1"));
+                                player.SendChatMessage(Translate(player, "INJURED_MSG_CAR_2"));
+                                player.SendChatMessage(Translate(player, "INJURED_MSG_CAR_3"));
+                                player.SendChatMessage(Translate(player, "INJURED_MSG_CAR_4"));
                             }
 
                             if (player.GetSharedData<string>("ActionType") != "none")
@@ -411,7 +415,7 @@ namespace RNC
                                         EPlayer.GrantXP(killer, 5);
                                         EPlayer.SendMessageInLobby(lobby.lobbyId, $"!{{#FF0000}}[KILLSTREAK] !{{#FF6347}}{killer.Name} !{{#FFFFFF}}is on a {killStreak} kills rampage! Someone stop them!");
 
-                                        killer.SendChatMessage("!{#00FF33}[!] !{#FFFFFF}You have earnt 5 XP and 5 points for maintaining a killstreak!");
+                                        killer.SendChatMessage(Translate(killer, "KILLSTREAK_5XP"));
                                         EPlayer.GivePoints(killer, 5);
                                         killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(killer).DonatorLevel + 1.0)));
                                     }
@@ -431,9 +435,9 @@ namespace RNC
                             player.Health = 25;
                             if (player.Vehicle == null && !player.IsInVehicle)
                             {
-                                player.SendChatMessage("!{#FF6347}You have been severely injured, but you are not dead yet!");
-                                player.SendChatMessage("!{#FF6347}You have enough strength to crawl - use it to crawl to safety.");
-                                player.SendChatMessage("!{#FF6347}You will die in 60 seconds if you are not revived by a teammate. Use (/lobby) to respawn instantly.");
+                                player.SendChatMessage(Translate(player, "INJURED_MSG_1"));
+                                player.SendChatMessage(Translate(player, "INJURED_MSG_2"));
+                                player.SendChatMessage(Translate(player, "INJURED_MSG_3"));
                             }
                             
                             if (player.HasSharedData("Team"))
@@ -590,13 +594,13 @@ namespace RNC
             switch (reason)
             {
                 case 0: // Not in CC
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your action was stopped: you are no longer in copchase.");
+                    player.SendChatMessage(Translate(player, "ACTION_STOPPED_NOT_IN_COPCHASE"));
                     break;
                 case 1: // Death
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your action has failed: you are severely wounded or dead.");
+                    player.SendChatMessage(Translate(player, "ACTION_STOPPED_DEAD"));
                     break;
                 case 2: // Max HP reached (painkillers)
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your painkillers effect stopped earlier: your HP is full.");
+                    player.SendChatMessage(Translate(player, "ACTION_STOPPED_PAINKILLER_MAXHP"));
                     break;
                 default: break;
             }
@@ -616,11 +620,11 @@ namespace RNC
                     if (pHP + 60 > 100) { player.Health = 100; }
                     else player.Health = pHP + 60;
 
-                    player.SendChatMessage($"~g~You used a medkit and gained +60HP. Your HP is now {(pHP + 60 > 100 ? 100 : pHP+60)}.");
+                    player.SendChatMessage(Translate(player, "USED_MEDKIT_SUCCESS", (pHP + 60 > 100 ? 100 : pHP + 60)));
                     break;
                 case "painkiller":
                     EPlayer.GetAccount(player).Painkillers--;
-                    player.SendChatMessage($"~g~Painkillers effect expired. You gained +40HP from them and your HP is now {player.Health}.");
+                    player.SendChatMessage(Translate(player, "USED_PAINKILLERS_SUCCESS", player.Health));
                     break;
                 default: return;
             }
@@ -737,19 +741,19 @@ namespace RNC
             {
                 case 0:
                     if(send_msg)
-                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Nearby (30m) (All players)");
+                        player.SendChatMessage(Translate(player, "VOICE_MODE_NEARBY"));
                     break;
                 case 1:
                     if (send_msg)
-                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Team Only (+15m proximity)");
+                        player.SendChatMessage(Translate(player, "VOICE_MODE_TEAMONLY"));
                     break;
                 case 2:
                     if (send_msg)
-                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Squad Only (Everyone else gets muted)");
+                        player.SendChatMessage(Translate(player, "VOICE_MODE_SQUADONLY"));
                     break;
                 case 3:
                     if (send_msg)
-                        player.SendChatMessage("!{#FFFF00}Voice mode set to: !{#FFFFFF}Disabled");
+                        player.SendChatMessage(Translate(player, "VOICE_MODE_DISABLED"));
                     foreach (Player p in Settings.LoggedInPlayers)
                     {
                         p.DisableVoiceTo(player);
@@ -766,21 +770,21 @@ namespace RNC
         {
             if(!player.IsInVehicle || player.Vehicle == null || player.VehicleSeat != 0)
             {
-                EPlayer.Error(player, $"Hotwire failed - your vehicle no longer exists or you are not the driver!");
+                EPlayer.Error(player, Translate(player, "HOTWIRE_FAIL_NOCAR"));
                 player.TriggerEvent("StopHotwire");
                 return;
             }
 
             if (!success)
             {
-                EPlayer.Error(player, $"You failed the hotwire minigame! Please try again...");
+                EPlayer.Error(player, Translate(player, "HOTWIRE_FAIL"));
                 player.TriggerEvent("StopHotwire");
             }
             else
             {
                 player.Vehicle.EngineStatus = true;
                 player.Vehicle.SetSharedData("Engine", true);
-                EPlayer.Action(player, "turns the vehicle's engine on.");         
+                EPlayer.Action(player, "ACTION_ENGINE_ON");
             }
         }
 
@@ -932,7 +936,7 @@ namespace RNC
                         {
                             listeners.AddRange(Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player.GetData<Player>("PlayerSquad")));
                         }
-                        else player.SendChatMessage("!{#FF6347}NOTE: You are trying to speak in squad chat while not being in a squad!");
+                        else player.SendChatMessage(Translate(player, "ERROR_NO_SQUAD"));
                     }
                     else if (player.GetSharedData<int>("VoiceMode") == 3)
                     {
@@ -985,7 +989,7 @@ namespace RNC
                     {
                         player.WarpOutOfVehicle();
                         player.Position = player.Position.Around(1.0f);
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot get inside a cop plane/chopper as a fugitive due to balance!");
+                        player.SendChatMessage(Translate(player, "FUGI_FORBID_CHOPPER"));
                     }
                 }
             }
