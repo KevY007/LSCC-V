@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
+using System.IO;
 using GTANetworkAPI;
+
+using Newtonsoft.Json;
 
 namespace RNC
 {
@@ -12,15 +16,26 @@ namespace RNC
             object[,] LANG = null;
             // Switch-case for other languages.
 
-            for(int i = 0; i < LANG.GetLength(0); i++)
+            using(FileStream stream = new FileStream("client_packages/Languages/Server/English.json", FileMode.Open, FileAccess.Read))
             {
-                if(LANG[i,0].ToString() == message_code)
+                using(StreamReader sr = new StreamReader(stream))
                 {
-                    string message = ApplyStringArguments(LANG[i,1].ToString(), args);
-                    return message;
+                    using(JsonTextReader jsonReader = new JsonTextReader(sr))
+                    {
+                        var langs = new JsonSerializer().Deserialize<Dictionary<string, string>>(jsonReader);
+
+                        KeyValuePair<string, string>? kvp = langs.FirstOrDefault(k => k.Key == message_code);
+                        if(kvp != null)
+                        {
+                            string unformatted = kvp?.Value;
+
+                            string message = ApplyStringArguments(unformatted, args);
+                            return message;
+                        }
+                        return $"[ERROR] This message is not defined: {message_code} | Language: English";
+                    }
                 }
             }
-            return $"[ERROR] This message is not defined: {message_code} | Language: English";
         }
 
         private static string ApplyStringArguments(string text, params object[] args)

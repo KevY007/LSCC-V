@@ -39,11 +39,6 @@
 
   <ItemGroup>
     <None Remove="meta.xml" />
-    <None Remove="Translate\Languages\English.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="Translate\Languages\English.json" />
   </ItemGroup>
 
   <ItemGroup>
