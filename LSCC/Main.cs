@@ -3239,6 +3239,9 @@ namespace RNC
                     i.TriggerEvent("hideMDC");
                     i.TriggerEvent("ClearClimbTaseProtection", true);
 
+                    i.TriggerEvent("Bleeding_ClearAll");
+                    i.SetSharedData("Bleeding_WasShot", false);
+
                     i.ResetData("DragoutVehicle");
                     i.ResetData("ExitedDragoutVehicle");
 
@@ -3418,6 +3421,8 @@ namespace RNC
                         player.TriggerEvent("startLoadingScreen", -1, "Loading copchase match...");
 
                         player.SetData("IsClanPartnered", false);
+
+                        player.SetSharedData("Bleeding_WasShot", false);
                     }
 
                     int crashcheck = 0;

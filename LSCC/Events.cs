@@ -621,6 +621,7 @@ namespace RNC
                     else player.Health = pHP + 60;
 
                     player.SendChatMessage(Translate(player, "USED_MEDKIT_SUCCESS", (pHP + 60 > 100 ? 100 : pHP + 60)));
+                    player.SetSharedData("Bleeding_WasShot", false);
                     break;
                 case "painkiller":
                     EPlayer.GetAccount(player).Painkillers--;
@@ -5971,14 +5972,34 @@ namespace RNC
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot tase a player that has shot.");
                 }
             }
+
+
             if(target.GetSharedData<int>("Team") >= 0 && target.GetSharedData<int>("Wounded") == 1)
             {
                 target.Health = 100;
             }
-            if (target.GetSharedData<int>("Team") >= 0 && target.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && target.GetSharedData<int>("Wounded") == 2)
+            if (target.GetSharedData<int>("Team") >= 0 && target.GetSharedData<int>("Team") != player.GetSharedData<int>("Team"))
             {
-                target.Health = 0;
+                target.SetSharedData("Bleeding_WasShot", true);
+                target.TriggerEvent("Bleeding_RequestShot");
+
+                if(target.GetSharedData<int>("Wounded") == 2)
+                {
+                    target.Health = 0;
+                }
             }
+        }
+        [RemoteEvent("Bleeding_AddShotBlood")]
+        public void Bleeding_AddShotBlood(Player player, Player target)
+        {
+            target.TriggerEvent("Bleeding_OnShot", player);
+        }
+
+        [RemoteEvent("SetWasShot")]
+        public void SetWasShot(Player player, int option)
+        {
+            if (option == 1) player.SetSharedData("Bleeding_WasShot", true);
+            else player.SetSharedData("Bleeding_WasShot", false);
         }
 
         [RemoteEvent("SetHealth")]
@@ -6822,7 +6843,8 @@ namespace RNC
                 return; // WHITE COLOR BUG FYX..
             }
 
-
+            player.TriggerEvent("Bleeding_ClearAll");
+            player.SetSharedData("Bleeding_WasShot", false);
             player.SetSharedData("Ping", player.Ping);
             player.SetData("SpawnTick", Environment.TickCount64);
             player.ResetData("Dead");

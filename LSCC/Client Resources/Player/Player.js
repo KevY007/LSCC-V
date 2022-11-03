@@ -47,6 +47,9 @@ let moveRotZ = 0.0;
 
 let playerBlips = [];
 
+let Bleeding_Objects = [];
+let LowHealthCameraActive = false;
+
 var targetChecker = Date.now();
 var updateChecker = Date.now();
 var clickDisable = false;
@@ -218,6 +221,28 @@ mp.events.add("render", () => {
 });
 mp.events.add("OneSecondEvent", () => {
     ShotStats.UpdateInterval++;
+
+    if(player.getVariable("Team") >= 0){
+        if(player.getHealth() <= 30){
+            if(!LowHealthCameraActive)
+            {
+                mp.game.cam.shakeGameplayCam('DRUNK_SHAKE', 0.22);
+                LowHealthCameraActive = true;
+            }
+        }
+        else{
+            if(LowHealthCameraActive){
+                mp.game.cam.shakeGameplayCam('DRUNK_SHAKE', 0);
+                LowHealthCameraActive = false;
+            }
+        }
+    }
+    else{
+        if(LowHealthCameraActive){
+            mp.game.cam.shakeGameplayCam('DRUNK_SHAKE', 0);
+            LowHealthCameraActive = false;
+        }
+    }
 
     // taser range: 7.5m
     if(player.getVariable("Team") == 1){  
@@ -3141,6 +3166,60 @@ mp.events.add("Suicide_ApplyAnimation", (animName, animTime) => {
         });
         
     }
+});
+
+mp.events.add("Bleeding_RequestShot", () => {
+    mp.players.forEachInRange(mp.players.local.position, 100, (entity) => {
+        if(entity.dimension == mp.players.local.dimension){
+            mp.events.callRemote("Bleeding_AddShotBlood", entity);
+        }
+    });
+});
+
+mp.events.add("Bleeding_OnShot", (entity) => {
+
+    const bloodPos = [entity.position.x + (getRandomInt(-100,100)/100), entity.position.y + (getRandomInt(-100,100)/100), entity.position.z];
+    const groundZ = mp.game.gameplay.getGroundZFor3dCoord(bloodPos[0], bloodPos[1], bloodPos[2], 0, false);
+    const zRot = getRandomInt(0, 180);
+
+    const bloodObj = mp.objects.new(mp.game.joaat('p_bloodsplat_s'), [bloodPos[0], bloodPos[1], groundZ+0.01], 
+    {
+        rotation:[270.0, 0, zRot], 
+        dimension:entity.dimension,
+    });
+
+    if(Bleeding_Objects.length > 50){
+        Bleeding_Objects[0].destroy();
+        Bleeding_Objects.splice(0, 1);
+    }
+    Bleeding_Objects.push(bloodObj);
+});
+mp.events.add("TwoSecondsEvent", () => {
+    mp.players.forEachInStreamRange((entity) => {
+        if(entity.getVariable("Bleeding_WasShot") == true && entity.dimension == mp.players.local.dimension){
+            const groundZ = mp.game.gameplay.getGroundZFor3dCoord(entity.position.x, entity.position.y, entity.position.z, 0, false);
+            const zRot = getRandomInt(0, 180);
+        
+            const bloodObj = mp.objects.new(mp.game.joaat('p_bloodsplat_s'), [entity.position.x, entity.position.y, groundZ+0.01], 
+            {
+                rotation:[270.0, 0, zRot], 
+                dimension:entity.dimension,
+            });
+        
+            if(Bleeding_Objects.length > 40){
+                Bleeding_Objects[0].destroy();
+                Bleeding_Objects.splice(0, 1);
+            }
+            Bleeding_Objects.push(bloodObj);
+        }
+    });
+});
+
+mp.events.add("Bleeding_ClearAll", () => {
+    for(let i = 0 ; i < Bleeding_Objects.length; i++){
+        Bleeding_Objects[i].destroy();
+    }
+    Bleeding_Objects = [];
 });
 
 function trySetBlood(){

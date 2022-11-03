@@ -704,6 +704,7 @@ namespace RNC
                 player.SetSharedData("NametagHack", false);
                 player.SetSharedData("VehicleDL", false); // for /DL like in SAMP
 
+                player.SetSharedData("Bleeding_WasShot", false);
                 player.SetSharedData("AutoOOC", false);
 
                 player.SetSharedData("TaseProtection", false);
