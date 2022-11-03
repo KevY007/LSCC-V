@@ -1821,6 +1821,37 @@ namespace RNC
             return;
         }
 
+        [Command("sticky")]
+        public void cmd_sticky(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+            if (target.HasData("Stickied"))
+                return;
+            if (player == target)
+                return;
+
+            if (player.HasData("Stickied"))
+            {
+                Settings.LoggedInPlayers.ForEach(p =>
+                {
+                    p.TriggerEvent("DetachPlayer", player);
+                });
+                player.ResetData("Stickied");
+            }
+            else
+            {
+                player.SetData("Stickied", true);
+                Events.RequestPlayAnimation(player, "nm", "firemans_carry", 1);
+                Settings.LoggedInPlayers.ForEach(p =>
+                {
+                    p.TriggerEvent("AttachPlayerToPlayer", player, target);
+                });
+            }
+
+        
+        }
+
         [Command("stopanim", Alias = "sa")]
         public void cmd_sa(Player player)
         {
@@ -1837,7 +1868,7 @@ namespace RNC
             { player.SendChatMessage(Translate(player, "ERROR_CANT_USE_INSIDE_VEHICLE")); return; }
 
             long currentTimestamp = new DateTimeOffset().ToUnixTimeSeconds();
-            if(currentTimestamp - player.GetSharedData<long>("LastVehicleExit") < 20)
+            if(currentTimestamp - player.GetSharedData<System.Int32>("LastVehicleExit") < 20)
             { player.SendChatMessage(Translate(player, "ERROR_STOPANIM_VEHEXIT_COOLDOWN")); return; }
 
             if (!player.GetSharedData<string>("ActionType").Equals("none"))

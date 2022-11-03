@@ -219,14 +219,24 @@ mp.events.add("render", () => {
     }
 
 });
+
+mp.events.add("DetachPlayer", (player) => {
+    player.detach(true, true);
+});
+
+// 35 0.5 0.1 0.2 0 90 0 => Best for the fireman carry animation.
+mp.events.add("AttachPlayerToPlayer", (playerToAttach, target) => {
+    playerToAttach.attachTo(target.handle, 35, 0.5, 0.1, 0.2, 0, 90, 0, true, false, false, true, 0, true);
+});
+
 mp.events.add("OneSecondEvent", () => {
     ShotStats.UpdateInterval++;
 
     if(player.getVariable("Team") >= 0){
-        if(player.getHealth() <= 30){
+        if(player.getHealth() <= 50){
             if(!LowHealthCameraActive)
             {
-                mp.game.cam.shakeGameplayCam('DRUNK_SHAKE', 0.22);
+                mp.game.cam.shakeGameplayCam('DRUNK_SHAKE', 0.21);
                 LowHealthCameraActive = true;
             }
         }
