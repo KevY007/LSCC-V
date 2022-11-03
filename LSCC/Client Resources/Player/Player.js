@@ -3143,6 +3143,18 @@ mp.events.add("Suicide_ApplyAnimation", (animName, animTime) => {
     }
 });
 
+function trySetBlood(){
+    setInterval(() => {
+        const groundZ = mp.game.gameplay.getGroundZFor3dCoord(player.position.x, player.position.y, player.position.z, 0, false);
+        const zRot = getRandomInt(0, 180);
+        mp.objects.new(mp.game.joaat('p_bloodsplat_s'), [player.position.x, player.position.y, groundZ+0.01], 
+        {
+            rotation:[270.0, 0, zRot], 
+            dimension:mp.players.local.dimension,
+        });
+    }, 1000); 
+}
+
 function setStorageDataVars(){
 
     if(mp.storage.data.menu == undefined) mp.storage.data.menu = {};
