@@ -10991,7 +10991,7 @@ namespace RNC
         }
 
         [Command("char", "!{#AFAFAF}[USAGE] character (option: reset, edit, help, [reset]clothing, lobbyteam)", GreedyArg = true, Alias = "character")]
-        public void cmd_char(Player player, string action)
+        public static void cmd_char(Player player, string action)
         {
             if (!EPlayer.LoggedIn(player))
                 return;

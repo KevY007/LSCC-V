@@ -1915,7 +1915,7 @@ namespace RNC
             string realDesc = desc;
             int accSQLID = EPlayer.GetAccount(player).SQL_ID;
 
-            player.SendChatMessage("~y~Creating clan...");
+            //player.SendChatMessage("~y~Creating clan...");
             Task.Run(async () =>
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
@@ -1979,11 +1979,11 @@ namespace RNC
                         player.SetSharedData("ClanName", clanname);
                         player.SetSharedData("ClanCreated", DateTime.Now.ToString("F"));
                         EPlayer.Notify(player, "Clan successfully created! Read chat for more information.", "green", "", false, 3000);
-                        player.SendChatMessage( $"~g~[CLAN] ~w~Congratulations! You've successfully created a clan named ~y~{clanname}~w~ for 300 Points!");
-                        player.SendChatMessage( $"~g~[CLAN] ~w~You can manage your clan through the clan panel (Menu [M] > Clans > My Clan)");
-                        player.SendChatMessage( $"~g~[CLAN] ~w~If you have any questions, ask the staff team or management.");
-                        player.SendChatMessage( $"~g~[CLAN] ~r~NOTICE: ~w~If you leave your clan, it will automatically be disbanded and deleted.");
-                        player.SendChatMessage( $"~g~[CLAN] ~w~Best of luck!");
+                        player.SendChatMessage(Translate(player, "CREATED_CLAN_1", clanname));
+                        player.SendChatMessage(Translate(player, "CREATED_CLAN_2"));
+                        player.SendChatMessage(Translate(player, "CREATED_CLAN_3"));
+                        player.SendChatMessage(Translate(player, "CREATED_CLAN_4"));
+                        player.SendChatMessage(Translate(player, "CREATED_CLAN_5"));
 
                         player.TriggerEvent("Menu_ClearClanMembers");
                         player.TriggerEvent("Menu_AddClanMember", acc.SQL_ID, acc.Username, 0, acc.Level, true);
@@ -2085,7 +2085,7 @@ namespace RNC
                     if (stinger.StingerColshapes.Contains(shape))
                     {
                         player.TriggerEvent("PopVehicleTires");
-                        player.SendChatMessage( $"~r~You drove over a stinger and your tires have been popped!");
+                        player.SendChatMessage(Translate(player, "DROVE_OVER_STINGER"));
 
                         if (stinger == null) return;
                         GTANetworkAPI.Object stingerObj = stinger.StingerObjects.FirstOrDefault(s => s.GetData<string>("StingerObjectKey") == stingerKey);
@@ -2156,7 +2156,7 @@ namespace RNC
                         {
                             foreach (Player f in l.Fugitives)
                             {
-                                f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {player.Name}: Fuck it! We'll take a police vehicle, who gives a shit if they track us?");
+                                f.SendChatMessage(Translate(f, "BANKROB_RADIO_TAKE_COP_CAR", player.Name));
                             }
                             Events.BankRobbery_SetState(player, 2);
                         }
@@ -2315,11 +2315,11 @@ namespace RNC
 
                                     foreach (Player f in lobby.Fugitives)
                                     {
-                                        f.SendChatMessage("!{#FF6347}[!] ~w~Your heist leader has disconnected! You have one more chance - " + _brob.HeistLeader.Name + " is your new leader.");
+                                        f.SendChatMessage(Translate(f, "HEIST_LEADER_DISCONNECT", _brob.HeistLeader.Name));
 
-                                        f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {_brob.HeistLeader.Name}: Sadly, we lost {player.Name}, but we must keep on going! Let's go!");
+                                        f.SendChatMessage(Translate(f, "NEW_HEIST_LEADER_RADIO", _brob.HeistLeader.Name, player.Name));
                                     }
-                                    _brob.HeistLeader.SendChatMessage("!{#FF6347}[!] ~w~You are now the heist leader. If you die, the round is over for your team.");
+                                    _brob.HeistLeader.SendChatMessage(Translate(_brob.HeistLeader, "NEW_HEIST_LEADER_MSG"));
                                 }
                             }
                             else
@@ -2354,7 +2354,7 @@ namespace RNC
                     {
                         foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player))
                         {
-                            mem.SendChatMessage("!{#FFAC38}[Partners] This squad has been disbanded as the leader left.");
+                            mem.SendChatMessage(Translate(mem, "SQUAD_DISBAND_LEADER_LEFT"));
                             mem.ResetData("PlayerSquad");
                             mem.SetSharedData("PlayerSquadID", -1);
                         }
@@ -2539,18 +2539,18 @@ namespace RNC
                                         EPlayer.GrantXP(killer, xpReduce);
                                         RAGE.Entities.Players.All.ForEach((Player ey) =>
                                         {
-                                            ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by {xpReduce} for killing a fugitive that hasn't shot.");
+                                            ey.SendChatMessage(Translate(ey, "REDUCE_XP_KILL_FUGI", killer.Name, xpReduce));
                                         });
 
                                         killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") - 1.0);
 
                                         //killer.Health = 0;
-                                        killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] Your fugitive chance has been decreased for killing an innocent fugitive.");
+                                        killer.SendChatMessage(Translate(killer, "REDUCE_FUGCHANCE_KILL_FUGI"));
                                         warnings = 0;
                                     }
 
                                     killer.SetData<int>("InnocentShotWarning", warnings);
-                                    killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Repeated attacking of fugitive's that haven't shot will result in a jail.");
+                                    killer.SendChatMessage(Translate(killer, "INNOCENT_FUG_KILL_WARN"));
                                 }
 
 
@@ -2562,7 +2562,7 @@ namespace RNC
 
                                 player.Armor = 0;
                                 player.Health = 100;
-                                player.SendChatMessage($"!{{FF6347}}[!] !{{#FFFFFF}}You have been put back in the game as you were killed unfairly.");
+                                player.SendChatMessage(Translate(player, "UNFAIR_KILL_BACK_INGAME"));
 
                                 if (pVeh != null)
                                 {
@@ -2588,12 +2588,12 @@ namespace RNC
                                 if (killer.IsInVehicle == true && killer.Vehicle.Model == NAPI.Util.GetHashKey("polmav"))
                                 {
                                     killer.Vehicle.Position = new Vector3(killer.Vehicle.Position.X, killer.Vehicle.Position.Y, killer.Vehicle.Position.Z + 20.0f);
-                                    killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Please do not heliblade.");
+                                    killer.SendChatMessage(Translate(killer, "HELIBLADE_WARNING"));
                                 }
                                 else if (warnings >= 7)
                                 {
                                     //killer.Health = 0;
-                                    killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] Your fugitive chance has been decreased for team killing.");
+                                    killer.SendChatMessage(Translate(killer, "REDUCE_FUGCHANCE_KILL_TEAM"));
                                     killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") - 1.0);
 
                                     int xpReduce = EPlayer.GetAccount(killer).XP >= 8 ? -(EPlayer.GetAccount(killer).XP / 4) : -3;
@@ -2601,7 +2601,7 @@ namespace RNC
                                     EPlayer.GrantXP(killer, xpReduce);
                                     RAGE.Entities.Players.All.ForEach((Player ey) =>
                                     {
-                                        ey.SendChatMessage($"!{{FF6347}}[RULEBREAK] {killer.Name}'s XP has been reduced by {xpReduce} for team killing.");
+                                        ey.SendChatMessage(Translate(ey, "REDUCE_XP_KILL_TEAM", killer.Name, xpReduce));
                                     });
 
                                     warnings = 0;
@@ -2609,7 +2609,7 @@ namespace RNC
 
                                 killer.SetData<int>("TeamShotWarning", warnings);
 
-                                killer.SendChatMessage($"!{{FF6347}}[RULEBREAK] !{{#FFFFFF}}Repeated team killing will result in a jail.");
+                                killer.SendChatMessage(Translate(killer, "TEAM_KILL_WARN"));
                             }
 
                             player.SetData("UnfairKillSpawn", true);
@@ -2628,7 +2628,7 @@ namespace RNC
 
                                 player.Armor = 0;
                                 player.Health = 100;
-                                player.SendChatMessage($"!{{FF6347}}[!] !{{#FFFFFF}}You have been put back in the game as you were killed unfairly.");
+                                player.SendChatMessage(Translate(player, "UNFAIR_KILL_BACK_INGAME"));
 
                                 if (pVeh != null)
                                 {
@@ -2671,7 +2671,7 @@ namespace RNC
                                         EPlayer.GrantXP(killer, 3);
                                         EPlayer.SendMessageInLobby(lobby.lobbyId, $"!{{#FF0000}}[KILLSTREAK] !{{#FF6347}}{killer.Name} !{{#FFFFFF}}is on a {killStreak} kills rampage! Someone stop them!");
 
-                                        killer.SendChatMessage("!{#00FF33}[!] !{#FFFFFF}You have earnt 3 XP and 3 points for maintaining a killstreak!");
+                                        killer.SendChatMessage(Translate(killer, "KILLSTREAK_3XP"));
                                         EPlayer.GivePoints(killer, 3);
                                         killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(killer).DonatorLevel + 1.0)));
                                     }
@@ -2752,10 +2752,10 @@ namespace RNC
                                         {
                                             if (killer != null)
                                             {
-                                                killer.SendChatMessage("~g~[>]~w~ You killed the first heist leader! You receive +2XP as bonus.");
+                                                killer.SendChatMessage(Translate(killer, "KILLED_HEIST_LEADER_BONUS"));
                                                 foreach (Player c in lobby.Cops)
                                                 {
-                                                    c.SendChatMessage($"!{{#FF6347}}[>] {killer.Name} has killed the first heist leader!");
+                                                    c.SendChatMessage(Translate(c, "KILLED_HEIST_LEADER", killer.Name));
                                                 }
                                                 EPlayer.GrantXP(killer, 2);
                                             }
@@ -2793,11 +2793,11 @@ namespace RNC
 
                                     foreach (Player f in lobby.Fugitives)
                                     {
-                                        f.SendChatMessage("!{#FF6347}[!] ~w~Your heist leader has been killed! You have one more chance - " + _brob.HeistLeader.Name + " is your new leader.");
+                                        f.SendChatMessage(Translate(f, "HEIST_LEADER_DEATH", _brob.HeistLeader.Name));
 
-                                        f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {_brob.HeistLeader.Name}: Sadly, we lost {player.Name}, but we must keep on going! Let's go!");
+                                        f.SendChatMessage(Translate(f, "NEW_HEIST_LEADER_RADIO", _brob.HeistLeader.Name, player.Name));
                                     }
-                                    _brob.HeistLeader.SendChatMessage("!{#FF6347}[!] ~w~You are now the heist leader. If you die, the round is over for your team.");
+                                    _brob.HeistLeader.SendChatMessage(Translate(_brob.HeistLeader, "NEW_HEIST_LEADER_MSG"));
                                 }
                             }
 
@@ -3108,12 +3108,12 @@ namespace RNC
             if(player.HasSharedData("InDM") && player.GetSharedData<int>("InDM") != -1)
             {
                 player.Health = 0;
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The waters are too dangerous for you, my friend - you can't swim in deathmatch!");
+                player.SendChatMessage(Translate(player, "DEATHMATCH_SWIM_PENALTY"));
                 return;
             }
 
             player.Health -= 5; // Slowly reduce health by 5 if in wotah.
-            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Evading by swimming is not allowed, you are taking damage.");
+            player.SendChatMessage(Translate(player, "SWIM_PENALTY"));
         }
 
         [RemoteEvent("WeaponSpawner_RequestGiveWeapon")]
@@ -3188,7 +3188,7 @@ namespace RNC
                 }
 
                 player.GiveWeapon((WeaponHash)weaponHash, ammo);
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You received the weapon!");
+                player.SendChatMessage(Translate(player, "RECEIVED_WEAPON"));
 
                 if (attachments)
                 {
@@ -3404,13 +3404,13 @@ namespace RNC
                         Main.DisplayMOTD(player, motdToShow);
                     }
 
-                    player.SendChatMessage("!{#a6a6a6}Your last login was on !{#c2c1b6}" + EPlayer.GetAccount(player).LastLogin.ToString());
+                    player.SendChatMessage(Translate(player, "LAST_LOGIN", EPlayer.GetAccount(player).LastLogin.ToString()));
                     EPlayer.GetAccount(player).LastLogin = DateTime.Now;
 
                     if (EPlayer.GetAccount(player).LastSessionMins >= 60.0)
-                        player.SendChatMessage($"!{{#a6a6a6}}Last session lasted !{{#c2c1b6}}{(EPlayer.GetAccount(player).LastSessionMins / 60.0).ToString("N1")} hours.");
+                        player.SendChatMessage(Translate(player, "LAST_SESSION_HOURS", (EPlayer.GetAccount(player).LastSessionMins / 60.0).ToString("N1")));
                     else
-                        player.SendChatMessage($"!{{#a6a6a6}}Last session lasted !{{#c2c1b6}}{(EPlayer.GetAccount(player).LastSessionMins).ToString("N1")} minutes.");
+                        player.SendChatMessage(Translate(player, "LAST_SESSION_MINUTES", (EPlayer.GetAccount(player).LastSessionMins).ToString("N1")));
                 });
 
 
@@ -3449,7 +3449,7 @@ namespace RNC
                     if (d.DiscordID == "n/a")
                     {
                         EPlayer.Notify(player, "We highly recommend you to <strong>link your Discord account</strong> by using <strong>/verify</strong>. You will earn some rewards in return!", "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
-                        player.SendChatMessage("!{#5eb9ff}[DISCORD] !{#9ebaff}We recommend you to link your Discord account and win some cool perks! ~y~(/verify)");
+                        player.SendChatMessage(Translate(player, "RECOMMEND_VERIFY_CHAT"));
                     }
 
                     foreach (Player adm in Settings.LoggedInPlayers.Where(p => EPlayer.GetAccount(p).Admin > 0))
@@ -3590,11 +3590,11 @@ namespace RNC
 
                 EPlayer.Spawn(player);
 
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can edit your character's clothing with /char clothing.");
+                //player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can edit your character's clothing with /char clothing.");
 
                 if (EPlayer.GetAccount(player).Level == 1 && EPlayer.GetAccount(player).XP < 2)
                 {
-                    player.SendChatMessage("!{#FF0000}[!] !{#FFFFFF}Please use /help and /keys to get started. Press M to open menu.");
+                    player.SendChatMessage(Translate(player, "REGISTER_GET_STARTED"));
                     EPlayer.Notify(player, "We highly recommend you to <strong>link your Discord account</strong> by using <strong>/verify</strong>. You will earn some rewards in return!", "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
                 }
             }
@@ -3666,7 +3666,7 @@ namespace RNC
 
                         NAPI.Task.Run(() =>
                         {
-                            player.SendChatMessage("!{#00FF00}You successfully saved your current outfit to slot " + (slot + 1) + ".");
+                            player.SendChatMessage(Translate(player, "OUTFIT_SLOT_SAVE", slot+1));
                         });
                     }
                     catch
@@ -3716,7 +3716,7 @@ namespace RNC
                                     {
                                         acc.Character = NAPI.Util.ToJson(outfits[slot]);
                                         EPlayer.Save(player);
-                                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You selected your outfit on slot " + (slot + 1) + ".");
+                                        player.SendChatMessage(Translate(player, "OUTFIT_SLOT_SELECT", slot+1));
                                     }
                                 });
                             }
@@ -3749,7 +3749,7 @@ namespace RNC
         {
             player.SetData("EditingClothing", -1);
             EPlayer.Save(player, false);
-            player.SendChatMessage("~g~Clothing saved!");
+            player.SendChatMessage(Translate(player, "CLOTHING_SAVED"));
             return;
         }
 
@@ -3773,7 +3773,7 @@ namespace RNC
                         }
                         catch
                         {
-                            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have a character created! (/char reset)");
+                            Commands.cmd_char(player, "reset");
                             return;
                         }
                         try
@@ -3823,7 +3823,7 @@ namespace RNC
 
                         if (EPlayer.GetAccount(player).Level == 1 && EPlayer.GetAccount(player).XP < 2)
                         {
-                            player.SendChatMessage("!{#FF0000}[!] !{#FFFFFF}Please use /help and /keys to get started. Press M to open menu.");
+                            player.SendChatMessage(Translate(player, "REGISTER_GET_STARTED"));
                             EPlayer.Notify(player, "We highly recommend you to <strong>link your Discord account</strong> by using <strong>/verify</strong>. You will earn some rewards in return!", "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
                         }
                     }
