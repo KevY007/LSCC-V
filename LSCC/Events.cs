@@ -3967,9 +3967,9 @@ namespace RNC
                         {
                             foreach (Player f in lobby.Fugitives)
                             {
-                                f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {lobby.BankRobbery.HeistLeader.Name}: I took all the cash I can, it's time to move!");
-                                f.SendChatMessage("!{#FF6347}[#] ~w~Escort your heist leader to one of the getaway vehicles. Once they enter one, the heist will proceed. Bank doors have been unlocked.");
-                                f.SendChatMessage("!{#FF6347}[#] ~w~Your hideout is located in ~y~" + BankRobberyData.HideoutNames[lobby.BankRobbery.Hideout] + "~w~ !{#c9c9c9}(a marker will be set when the heist proceeds)!");
+                                f.SendChatMessage(Translate(f, "BANK_ROB_CASH_TAKEN", lobby.BankRobbery.HeistLeader.Name));
+                                f.SendChatMessage(Translate(f, "BANK_ROB_ESCORT_1"));
+                                f.SendChatMessage(Translate(f, "BANK_ROB_ESCORD_2", BankRobberyData.HideoutNames[lobby.BankRobbery.Hideout]));
 
                                 f.TriggerEvent("BankRob_SetMusic", 1);
                                 f.TriggerEvent("BankDoorLocked", false);
@@ -4003,14 +4003,14 @@ namespace RNC
                             }
 
                             EPlayer.ApplyCharacter(leader, cd, 0);
-                            EPlayer.Action(leader, "grabs the duffel bag filled with cash and slings it over their shoulder.");
+                            EPlayer.Action(leader, "ACTION_BANKROB_GRAB_BAG");
 
                             //
                             foreach (Player c in lobby.Cops)
                             {
-                                c.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: All units, their leader stopped taking the money, they might try to get away soon!");
-                                c.SendChatMessage("!{#FF6347}[#] ~w~You must find the heist leader and neutralize them! The bank doors have been unlocked..");
-                                c.SendChatMessage("!{#FF6347}[#] ~w~Alternatively, you can keep the fugitives trapped inside the bank until the round ends to win.");
+                                c.SendChatMessage(Translate(c, "BANK_ROB_COP_CASH_TAKEN"));
+                                c.SendChatMessage(Translate(c, "BANK_ROB_COP_CASH_1"));
+                                c.SendChatMessage(Translate(c, "BANK_ROB_COP_CASH_2"));
                                 c.TriggerEvent("BankRob_SetMusic", 1);
                                 c.TriggerEvent("BankDoorLocked", false);
                                 EPlayer.GiveCopWeapons(c);
@@ -4029,28 +4029,21 @@ namespace RNC
                             foreach (Player f in lobby.Fugitives)
                             {
                                 f.TriggerEvent("playerCreateWaypoint", hp);
-                                f.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] {lobby.BankRobbery.HeistLeader.Name}: Alright, I'm in the car, let's move, quick!");
-                                if (f.IsInVehicle)
+                                f.SendChatMessage(Translate(f, "BANK_ROB_CAR_RADIO", lobby.BankRobbery.HeistLeader.Name));
+                                if (f.IsInVehicle && f.Vehicle.Occupants.Contains(lobby.BankRobbery.HeistLeader))
                                 {
-                                    if (f.Vehicle.Occupants.Contains(lobby.BankRobbery.HeistLeader))
-                                    {
-                                        f.SendChatMessage("!{#FF6347}[#] ~w~Drive the heist leader to the ~y~hideout~w~ marked on your minimap.");
-                                    }
-                                    else
-                                    {
-                                        f.SendChatMessage("!{#FF6347}[#] ~w~Escort your heist leader to the hideout.");
-                                    }
+                                    f.SendChatMessage(Translate(f, "BANK_ROB_CAR_1"));                               
                                 }
-                                else f.SendChatMessage("!{#FF6347}[#] ~w~Get in a vehicle and escort the heist leader to the hideout.");
+                                else f.SendChatMessage(Translate(f, "BANK_ROB_CAR_2"));
 
                                 f.TriggerEvent("BankRob_CreateFinishMarker", hp.X, hp.Y, hp.Z);
 
                             }
                             foreach (Player c in lobby.Cops)
                             {
-                                c.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: The robbers have made their way with the money into the vehicle.");
-                                c.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: Stop them before they get away!");
-                                c.SendChatMessage("!{#FF6347}[#] ~w~This is your last chance - take down the heist leader, or all the fugitives, before they get to their hideout!");
+                                c.SendChatMessage(Translate(c, "BANK_ROB_COP_CAR_RADIO"));
+                                c.SendChatMessage(Translate(c, "BANK_ROB_COP_CAR_RADIO_2"));
+                                c.SendChatMessage(Translate(c, "BANK_ROB_COP_CAR_MSG"));
                             }
                         }
                         break;
@@ -4080,8 +4073,8 @@ namespace RNC
                         foreach(Player f in lobby.Fugitives)
                         {
                             f.SendChatMessage("");
-                            f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: Now that I think about it, those Burritos you left as getaway might be too slow.");
-                            f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: I will take a look around and see if there is anything better you can \"borrow\".");
+                            f.SendChatMessage(Translate(f, "BANK_ROB_SCOUT_1"));
+                            f.SendChatMessage(Translate(f, "BANK_ROB_SCOUT_2"));
                             f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[0].Position.X, BankRobberyData.FugitiveVehicleData[0].Position.Y, BankRobberyData.FugitiveVehicleData[0].Position.Z);
                         }
                         break;
@@ -4089,8 +4082,8 @@ namespace RNC
                         foreach (Player f in lobby.Fugitives)
                         {
                             f.SendChatMessage("");
-                            f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: Some famous person pulled up in front of a building down the road with their bodyguards.");
-                            f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: There's a limousine and a bunch of fancy cars... not super fast, but at least you could go out in style!");
+                            f.SendChatMessage(Translate(f, "BANK_ROB_SCOUT_3"));
+                            f.SendChatMessage(Translate(f, "BANK_ROB_SCOUT_4"));
                             f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[4].Position.X, BankRobberyData.FugitiveVehicleData[4].Position.Y, BankRobberyData.FugitiveVehicleData[4].Position.Z);
                         }
                         break;
@@ -4098,8 +4091,8 @@ namespace RNC
                         foreach (Player f in lobby.Fugitives)
                         {
                             f.SendChatMessage("");
-                            f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: There's a small parking lot here with a bunch of different rides, they look good enough to me.");
-                            f.SendChatMessage("!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: It's located in an alley across the street, anyways, I hear sirens so I'm outta here, see you at the hideout!"); 
+                            f.SendChatMessage(Translate(f, "BANK_ROB_SCOUT_5"));
+                            f.SendChatMessage(Translate(f, "BANK_ROB_SCOUT_6"));
                             f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[11].Position.X, BankRobberyData.FugitiveVehicleData[11].Position.Y, BankRobberyData.FugitiveVehicleData[11].Position.Z);
                         }
                         break;
@@ -4113,8 +4106,8 @@ namespace RNC
                         {
                             foreach(Player c in lobby.Cops)
                             {
-                                c.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: All units, CCTV footage suggests that there are {lobby.Fugitives.Count} robbers.");
-                                c.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: They are all armed and dangerous, proceed with caution.");
+                                c.SendChatMessage(Translate(c, "BANK_ROB_DISPATCH_CCTV_1", lobby.Fugitives.Count));
+                                c.SendChatMessage(Translate(c, "BANK_ROB_DISPATCH_CCTV_2", lobby.Fugitives.Count));
                             }
                         }
                         break;
@@ -4499,8 +4492,8 @@ namespace RNC
                 {
                     if (Environment.TickCount64 - player.GetData<long>("LastLobbySwitch") < 1000)
                     {
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot switch minigames that fast.");
-                        EPlayer.Notify(player, "Please don't repeatedly join minigames.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
+                        player.SendChatMessage(Translate(player, "ERROR_MINIGAMES_TOOFAST"));
+                        EPlayer.Notify(player, Translate(player, "ERROR_MINIGAMES_TOOFAST_NOCOLOR"), "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                         return;
                     }
                 }
@@ -5138,7 +5131,7 @@ namespace RNC
                     if (player.IsInstanceAlive && !player.Dead && player.Health > 10 && !player.IsInVehicle)
                     {
                         player.Health = 0;
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please do not get out of your vehicle in derby!");
+                        player.SendChatMessage(Translate(player, "DERBY_LEFT_CAR"));
                     }
                 }
             }
@@ -5200,13 +5193,13 @@ namespace RNC
 
 
                     warnings++;
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Do not shoot at teammates, repeatedly doing this will result in punishment!");
+                    player.SendChatMessage(Translate(player, "TEAM_KILL_WARN"));
 
                     if (warnings >= 7)
                     {
                         player.Health = 0;
                         EPlayer.GrantXP(player, -1);
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have been killed and lost 1XP due to team attacking.");
+                        player.SendChatMessage(Translate(player, "SHOT_TEAMMATE_PUNISHMENT"));
                         warnings = 0;
                     }
 
@@ -5256,13 +5249,13 @@ namespace RNC
                     }
 
                     warnings++;
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Do not shoot at fugitives that haven't shot, repeatedly doing this will result in punishment!");
+                    player.SendChatMessage(Translate(player, "SHOT_FUGITIVE_WARNING"));
 
                     if (warnings >= 7)
                     {
                         player.Health = 0;
                         EPlayer.GrantXP(player, -1);
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have lost 1XP due to shooting at a fugitive without shot tag.");
+                        player.SendChatMessage(Translate(player, "SHOT_FUGITIVE_PUNISHMENT"));
                         warnings = 0;
                     }
 
@@ -5495,7 +5488,7 @@ namespace RNC
                         if (EPlayer.LoggedIn(pl) == true)
                         {
                             pl.TriggerEvent("addChallengesToMenu", 0, (Settings.Dynamics.NextWeekUnix - new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds()));
-                            pl.SendChatMessage("~y~[WEEKLY CHALLENGE] ~w~Seven days have passed and the weekly challenge streak was reset. Good luck!");
+                            pl.SendChatMessage(Translate(pl, "SEVEN_DAY_CHALLENGE_RESET"));
                         }
                     }
                     Main.SaveDynamicSettings();
@@ -5575,8 +5568,8 @@ namespace RNC
                 Commands.cmd_switchseats(player, newDriver);
                 NAPI.Task.Run(() => Commands.cmd_switchseats(newDriver, player), 500 + newDriver.Ping);
 
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Server detected you as an AFK driver and swapped your seat.");
-                newDriver.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}{player.Name} is AFK, you are now the new driver.");
+                player.SendChatMessage(Translate(player, "PLAYER_DRIVER_AFK"));
+                newDriver.SendChatMessage(Translate(newDriver, "DRIVER_AFK_NEW", player.Name));
             }
             catch { }
         }
@@ -5795,7 +5788,7 @@ namespace RNC
                     if (ldname.StartsWith("default", StringComparison.OrdinalIgnoreCase))
                     {
                         EPlayer.GetAccount(player).LoadoutFugitive = "?";
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your loadout for team fugitive has been set to 'default'.");
+                        player.SendChatMessage(Translate(player, "FUGI_LOADOUT_DEFAULT"));
                         return;
                     }
                     LoadoutData loadout = Settings.Loadouts.Find(b => b.Team == 0 && b.Name.Equals(ldname, StringComparison.OrdinalIgnoreCase));
@@ -5813,14 +5806,14 @@ namespace RNC
                     }
 
                     EPlayer.GetAccount(player).LoadoutFugitive = loadout.Name;
-                    player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set your fugitive loadout to " + loadout.Name + ".");
+                    player.SendChatMessage(Translate(player, "FUGI_LOADOUT", loadout.Name));
                 }
                 else if(team == 1)
                 {
                     if (ldname.StartsWith("default", StringComparison.OrdinalIgnoreCase))
                     {
                         EPlayer.GetAccount(player).LoadoutCop = "?";
-                        player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your loadout for team cop has been set to 'default'.");
+                        player.SendChatMessage(Translate(player, "COP_LOADOUT_DEFAULT"));
                         return;
                     }
                     LoadoutData loadout = Settings.Loadouts.Find(b => b.Team == 1 && b.Name.Equals(ldname, StringComparison.OrdinalIgnoreCase));
@@ -5838,7 +5831,7 @@ namespace RNC
                     }
 
                     EPlayer.GetAccount(player).LoadoutCop = loadout.Name;
-                    player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set your cop loadout to " + loadout.Name + ".");
+                    player.SendChatMessage(Translate(player, "COP_LOADOUT", loadout.Name));
                 }
             }
             player.ResetData("ViewingLoadoutSelector");
@@ -5864,7 +5857,7 @@ namespace RNC
                     EPlayer.Freeze(player, false);
                     EPlayer.Spawn(player);
                     ContextFactory.SaveDB();
-                    player.SendChatMessage("!{#00FF33}You have been unjailed as you have served your time.");
+                    player.SendChatMessage(Translate(player, "UNJAILED_SERVER"));
                 }
             }
             else if (type == 1)
@@ -5879,7 +5872,7 @@ namespace RNC
                 if (currentTime <= 0)
                 {
                     ContextFactory.SaveDB();
-                    player.SendChatMessage("!{#00FF33}You have been unmuted as you have served your time.");
+                    player.SendChatMessage(Translate(player, "UNMUTED_SERVER"));
                 }
             }
             return;
@@ -5907,7 +5900,7 @@ namespace RNC
                             if (RAGE.Entities.Players.All.Count(ey => lobby.Fugitives.Contains(ey) &&
                                 ey.Position.DistanceTo(player.Position) < 10.0) == 0)
                             {
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Do not tase your own teammates! You have been given a teamattack warning.");
+                                player.SendChatMessage(Translate(player, "TEAM_KILL_WARN"));
                                 EPlayer.Freeze(player, true);
 
                                 NAPI.Task.Run(() =>
@@ -5933,7 +5926,7 @@ namespace RNC
                                 if (warnings >= 4)
                                 {
                                     player.Health = 0;
-                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have been killed for team tasing!");
+                                    player.SendChatMessage(Translate(player, "SHOT_TEAMMATE_PUNISHMENT"));
                                     warnings = 0;
                                 }
 
@@ -5947,7 +5940,7 @@ namespace RNC
                     {
                         if (lobby.GameProgress < 60)
                         {
-                            player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot tase at the start of the round!");
+                            player.SendChatMessage(Translate(player, "TASE_START_ROUND"));
                             return;
                         }
 
@@ -5969,7 +5962,7 @@ namespace RNC
                 }
                 else
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You cannot tase a player that has shot.");
+                    player.SendChatMessage(Translate(player, "TASE_PLAYER_SHOT"));
                 }
             }
 
@@ -6044,7 +6037,7 @@ namespace RNC
                 if (!player.Dead && player.Health > 10 && !player.IsInVehicle)
                 {
                     player.Health = 0;
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Please do not get out of your vehicle in derby!");
+                    player.SendChatMessage(Translate(player, "DERBY_LEFT_CAR"));
                 }
             }
 
@@ -6119,7 +6112,7 @@ namespace RNC
             if (player.GetSharedData<int>("Team") != target.GetSharedData<int>("Team")) return;
 
             target.Health = 50;
-            target.SendChatMessage("!{#FFFF00}Your wounds have been treated and you gained your strength back.");
+            target.SendChatMessage(Translate(target, "REVIVED_MSG"));
             
             //target.StopAnimation();
             RequestPlayAnimation(target, "amb@world_human_push_ups@male@exit", "exit", 0, 9);
@@ -6140,8 +6133,8 @@ namespace RNC
             target.SetSharedData("Wounded", 0);
             target.TriggerEvent("ResetWounded");
 
-            player.SendChatMessage($"!{{#2fc900}}[REVIVE] You successfully revived {target.Name} and gained +2XP & 1 point for teamwork!");
-            target.SendChatMessage($"!{{#2fc900}}[REVIVE] You have been revived by {player.Name}.");
+            player.SendChatMessage(Translate(player, "REVIVED_PLAYER_REWARD", target.Name));
+            target.SendChatMessage(Translate(target, "REVIVED_BY_PLAYER", player.Name));
 
             EPlayer.GrantXP(player, 2);
             EPlayer.GivePoints(player, 1);
@@ -6175,8 +6168,8 @@ namespace RNC
             player.SetSharedData("ReviveTarget", target.Name);
             target.SetSharedData("BeingRevived", false);
 
-            player.SendChatMessage($"!{{#2fc900}}[REVIVE] You have begun reviving {target.Name} - keep holding H for 7 seconds.");
-            target.SendChatMessage($"!{{#2fc900}}[REVIVE] You are now being revived by {player.Name} - it will take 7 seconds.");
+            player.SendChatMessage(Translate(player, "BEGIN_REVIVING", target.Name));
+            target.SendChatMessage(Translate(target, "BEGIN_GETTING_REVIVED", player.Name));
 
             RequestPlayAnimation(player, "missheistfbi3b_ig8_2", "cpr_loop_paramedic", 1);
             player.TriggerEvent("BeginReviving");
@@ -6288,12 +6281,12 @@ namespace RNC
             Vehicle veh = player.GetData<Vehicle>("LockpickTarget");
             if (veh == null || veh.IsNull || !veh.IsInstanceAlive)
             {
-                player.SendChatMessage("~r~Lockpicking failed ~w~- the target vehicle no longer exists!");
+                player.SendChatMessage(Translate(player, "LOCKPICK_FAIL_NO_CAR"));
                 return;
             }
             if(veh.Locked == false || veh.GetSharedData<bool>("Locked") == false)
             {
-                player.SendChatMessage("~r~Lockpicking failed ~w~- the target vehicle is no longer locked!");
+                player.SendChatMessage(Translate(player, "LOCKPICK_FAIL_NOT_LOCKED"));
                 return;
             }
 
@@ -6307,11 +6300,11 @@ namespace RNC
             {
                 veh.Locked = false;
                 veh.SetSharedData("Locked", false);
-                player.SendChatMessage("~g~Lockpicking successful ~w~- you can now enter the vehicle!");
+                player.SendChatMessage(Translate(player, "LOCKPICK_SUCCESS"));
             }
             else
             {
-                player.SendChatMessage("~r~Lockpicking failed ~w~- you failed the minigame!");
+                player.SendChatMessage(Translate(player, "LOCKPICK_FAIL_MINIGAME"));
             }
         }
 
@@ -6339,8 +6332,8 @@ namespace RNC
             if (target == null) return;
 
             player.TriggerEvent("BeginCuffing", target);
-            player.SendChatMessage($"!{{#FF6347}}[!] !{{#FFFFFF}}You began cuffing {target.Name}, keep holding !{{#FFFF00}}H !{{#FFFFFF}}to handcuff them.");
-            EPlayer.Action(player, $"takes out a pair of handcuffs and starts locking them onto {target.Name}'s wrists.");
+            player.SendChatMessage(Translate(player, "HANDCUFF_BEGIN", target.Name));
+            EPlayer.Action(player, "ACTION_HANDCUFF", target.Name);
 
             Events.RequestPlayAnimation(player, "mp_arresting", "a_uncuff", 50); // 50 = allow movement while anim
             target.SetSharedData("CuffedBy", player.Name);
@@ -6942,7 +6935,7 @@ namespace RNC
                     player.Heading = (float)Settings.VectorJail[1];
                     player.Dimension = 200 + Convert.ToUInt32(player.Id);
                     EPlayer.Freeze(player, true);
-                    player.SendChatMessage($"!{{#FF6347}}[JAILED] !{{#FFFFFF}}You are in jail for {acc.JailTime} seconds, reason: {acc.JailReason}.");
+                    player.SendChatMessage(Translate(player, "JAIL_REMINDER", acc.JailTime, acc.JailReason));
 
                     return;
                 }
@@ -7252,7 +7245,7 @@ namespace RNC
                         {
                             NAPI.Task.Run(() =>
                             {
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The arena you are playing in does not exist.");
+                                //player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The arena you are playing in does not exist.");
                                 player.SetSharedData("InDM", -1);
                                 player.SetSharedData("Team", -1);
 
@@ -7267,7 +7260,7 @@ namespace RNC
                         {
                             NAPI.Task.Run(() =>
                             {
-                                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The arena you are playing in does not have the team you are set as, resetting...");
+                                //player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The arena you are playing in does not have the team you are set as, resetting...");
                                 player.SetSharedData("InDM", -1);
                                 player.SetSharedData("Team", -1);
 
@@ -7309,7 +7302,7 @@ namespace RNC
                                             {
                                                 if (team.Key.WeaponSets == null || team.Key.WeaponSets.Length < 5)
                                                 {
-                                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This DM arena does not have weapons set for your team " + team.Key.Team);
+                                                    //player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This DM arena does not have weapons set for your team " + team.Key.Team);
                                                     return;
                                                 }
 
@@ -7318,7 +7311,7 @@ namespace RNC
 
                                                 if (set == null)
                                                 {
-                                                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This DM arena does not have a proper weapons set for your team " + team.Key.Team);
+                                                    //player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}This DM arena does not have a proper weapons set for your team " + team.Key.Team);
                                                     return;
                                                 }
 
@@ -7342,7 +7335,7 @@ namespace RNC
                 }
                 else
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The arena you are playing in does not have a spawn for your team id!");
+                    //player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The arena you are playing in does not have a spawn for your team id!");
                 }
             }
         }
