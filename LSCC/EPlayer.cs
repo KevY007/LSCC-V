@@ -2278,7 +2278,7 @@ namespace RNC
 
                 if (forceAutojoin && player.GetSharedData<bool>("AutoJoin") == false)
                 {
-                    EPlayer.Notify(player, $"AutoJoin has been turned <strong>ON</strong>.", "green", "fas fa-check", false, 1500, "bottomRight", "replace");
+                    EPlayer.Notify(player, Translate(player, "AUTOJOIN_ON"), "green", "fas fa-check", false, 1500, "bottomRight", "replace");
                     player.SetSharedData("AutoJoin", true);
                 }
 

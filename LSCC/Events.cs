@@ -1106,7 +1106,7 @@ namespace RNC
 
             EPlayer.GetAccount(player).WeaponComponents = NAPI.Util.ToJson(newWepData);
             EPlayer.GivePoints(player, price);
-            EPlayer.Notify(player, $"You successfully removed/sold the attachment and have been refunded <strong>{price} Points</strong>.", "green", "", false, 3000);
+            EPlayer.Notify(player, Translate(player, "SELL_WEAPON_ATTACHMENT", price), "green", "", false, 3000);
             
             // try { Main.Log("currency.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:removecomp:{itemData.Name}:{comp.Name}"); } catch { }
             EPlayer.Save(player);
@@ -1181,7 +1181,7 @@ namespace RNC
             EPlayer.GivePoints(player, -price);
             EPlayer.GetAccount(player).WeaponComponents = NAPI.Util.ToJson(newWepData);
             EPlayer.Save(player);
-            EPlayer.Notify(player, $"You successfully purchased the weapon attachment for {price} Points!", "green", "", false, 3000);
+            EPlayer.Notify(player, Translate(player, "BUY_WEAPON_ATTACHMENT", price), "green", "", false, 3000);
             player.TriggerEvent("WeaponEditor:sendPurchaseResponse", comphash);
         }
 
@@ -1408,7 +1408,7 @@ namespace RNC
                                     if (value == 1) accString = "Public";
 
                                     player.TriggerEvent("Menu_UpdateClanSetting", "access", accString);
-                                    EPlayer.Notify(player, $"You've set your clan access to <strong>{(value == 0 ? "Invite-Only" : "Public")}</strong>!", "success", "fa-success", false, 3000);
+                                    EPlayer.Notify(player, Translate(player, "CLAN_ACCESS_SET", (value == 0 ? Translate(player, "INVITE_ONLY") : Translate(player, "PUBLIC"))), "success", "fa-success", false, 3000);
                                     player.TriggerEvent("UpdateMenuClanTab");
                                 });
                                 break;
@@ -1421,7 +1421,8 @@ namespace RNC
                                 NAPI.Task.Run(() =>
                                 {
                                     player.TriggerEvent("Menu_UpdateClanSetting", "forcetag", (value == 1));
-                                    EPlayer.Notify(player, $"You will {(value == 1 ? "now" : "no longer")} force your clan members to have the clan tag before their name!", "success", "fa-success", false, 3000);
+
+                                    EPlayer.Notify(player, Translate(player, "CLAN_TAG_TOGGLE", (value == 1 ? Translate(player, "ENABLED") : Translate(player, "DISABLED"))), "success", "fa-success", false, 3000);
                                     player.TriggerEvent("UpdateMenuClanTab");
 
                                     foreach(Player pl in Settings.LoggedInPlayers.Where(p => p.HasSharedData("ClanID") && p.GetSharedData<int>("ClanID") == pClanID))
@@ -1439,7 +1440,7 @@ namespace RNC
                                 NAPI.Task.Run(() =>
                                 {
                                     player.TriggerEvent("Menu_UpdateClanSetting", "partnering", (value == 1));
-                                    EPlayer.Notify(player, $"Your clan members will {(value == 1 ? "now" : "no longer")} spawn together in police vehicles as cops!", "success", "fa-success", false, 3000);
+                                    EPlayer.Notify(player, Translate(player, "CLAN_PAIR_TOGGLE", (value == 1 ? Translate(player, "ENABLED") : Translate(player, "DISABLED"))), "success", "fa-success", false, 3000);
                                     player.TriggerEvent("UpdateMenuClanTab");
 
                                     foreach (Player pl in Settings.LoggedInPlayers.Where(p => p.HasSharedData("ClanID") && p.GetSharedData<int>("ClanID") == pClanID))
@@ -1514,7 +1515,7 @@ namespace RNC
                         return;
                     }
 
-                    string text = (tAcc.ClanTier < tier) ? "demoted" : "promoted";
+                    int theClanTier = tAcc.ClanID;
                     tAcc.ClanTier = tier;
                     await context.SaveChangesAsync();
 
@@ -1523,6 +1524,8 @@ namespace RNC
 
                     NAPI.Task.Run(() =>
                     {
+                        string text = (theClanTier < tier) ? Translate(player, "DEMOTED") : Translate(player, "PROMOTED");
+                        string color = ((theClanTier < tier) ? "orange" : "green");
                         string rank = "";
                         switch (tier)
                         {
@@ -1538,10 +1541,10 @@ namespace RNC
                         {
                             EPlayer.GetAccount(player).ClanTier = 2;
                             EPlayer.Save(player);
-                            EPlayer.Error(player, $"You transferred your clan ownership to {tAcc.Username}; your tier was set to Member (2).");
+                            EPlayer.Error(player, Translate(player, "CLAN_OWNER_TRANSFER", tAcc.Username));
                         }
 
-                        EPlayer.Notify(player, $"You successfully <strong>{text}</strong> {tAcc.Username} to <strong>{rank}</strong>!", "green", "", false, 3000);
+                        EPlayer.Notify(player, Translate(player, "CLAN_RANK_CHANGE", text, tAcc.Username, rank), "green", "", false, 3000);
 
                         foreach (Player clanMember in Settings.LoggedInPlayers.Where(m => EPlayer.GetAccount(m).ClanID == pClanID))
                         {
@@ -1552,7 +1555,7 @@ namespace RNC
                         if (target != null)
                         {
                             target.SetSharedData("ClanTier", tier);
-                            EPlayer.Notify(target, $"You have been <strong>{text}</strong> in your clan to <strong>{rank}</strong>!", (text == "demoted" ? "orange" : "green"), "", false, 5000);
+                            EPlayer.Notify(target, Translate(target, "CLAN_RANK_CHANGE_PLAYER", text, rank), color, "", false, 5000);
                         }
                     });
                 }
@@ -1614,7 +1617,7 @@ namespace RNC
                     string user = tAcc.Username;
                     NAPI.Task.Run(() =>
                     {
-                        EPlayer.Notify(player, $"You successfully kicked {user} from the clan!", "green", "", false, 3000);
+                        EPlayer.Notify(player, Translate(player, "CLAN_KICK", user), "green", "", false, 3000);
 
                         foreach (Player clanMember in Settings.LoggedInPlayers.Where(m => EPlayer.GetAccount(m).ClanID == pClanID))
                         {
@@ -1633,7 +1636,7 @@ namespace RNC
                             target.SetSharedData("ClanTag", "");
                             target.TriggerEvent("UpdateMenuClanTab");
 
-                            EPlayer.Notify(target, $"You have been <strong>kicked</strong> from the clan!", "orange", "", false, 5000);
+                            EPlayer.Notify(target, Translate(target, "CLAN_KICK_PLAYER"), "orange", "", false, 5000);
                         }
                     });
                 }
@@ -1701,7 +1704,7 @@ namespace RNC
                         EPlayer.GetAccount(player).ClanID = -1;
                         EPlayer.GetAccount(player).ClanTier = -1;
                         EPlayer.Save(player, false);
-                        EPlayer.Notify(player, "You successfully left the clan!", "green", "", false, 3000);
+                        EPlayer.Notify(player, Translate(player, "CLAN_LEFT"), "green", "", false, 3000);
 
                         player.TriggerEvent("UpdateMenuClanTab");
 
@@ -1721,7 +1724,7 @@ namespace RNC
                                 EPlayer.GetAccount(clanMember).ClanID = -1;
                                 EPlayer.GetAccount(clanMember).ClanTier = -1;
                                 EPlayer.Save(clanMember, false);
-                                EPlayer.Notify(clanMember, $"Your clan leader, {player.Name}, has disbanded the clan!", "yellow", "", false, 3000);
+                                EPlayer.Notify(clanMember, Translate(clanMember, "CLAN_DISBANDED", player.Name), "yellow", "", false, 3000);
 
                                 clanMember.TriggerEvent("UpdateMenuClanTab");
 
@@ -1732,7 +1735,7 @@ namespace RNC
                         {
                             foreach (Player clanMember in Settings.LoggedInPlayers.Where(pl => pl.HasSharedData("ClanID") && pl.GetSharedData<int>("ClanID") == clanToSee))
                             {
-                                EPlayer.Notify(clanMember, $"Player {player.Name} has left the clan.", "yellow", "", false, 3000);
+                                EPlayer.Notify(clanMember, Translate(clanMember, "CLAN_LEFT_PLAYER", player.Name), "yellow", "", false, 3000);
                             }
                         }
                
@@ -1775,7 +1778,7 @@ namespace RNC
                 return;
             }
             player.SetData<long>("LastClanInviteTimestamp", currentTimestamp);
-            EPlayer.Notify(player, $"You've invited that player to your clan. They have 20 seconds to accept.", "green", "", false, 3000);
+            EPlayer.Notify(player, Translate(player, "CLAN_INVITED_PLAYER"), "green", "", false, 3000);
             target.TriggerEvent("SendClanInvite", player.GetSharedData<string>("ClanName"), player.GetSharedData<int>("ClanID"), player.Name);
             
         }
@@ -1830,14 +1833,14 @@ namespace RNC
                         EPlayer.GetAccount(player).ClanID = clanID;
                         EPlayer.GetAccount(player).ClanTier = 2;
                         EPlayer.Save(player, false);
-                        EPlayer.Notify(player, $"You successfully joined the clan: <strong>{cName}</strong>", "green", "", false, 3000);
+                        EPlayer.Notify(player, Translate(player, "CLAN_JOIN", cName), "green", "", false, 3000);
 
                         player.TriggerEvent("UpdateMenuClanTab");
                         EPlayer.UpdateUIVars(player);
 
                         foreach (Player pl in Settings.LoggedInPlayers.Where(p => EPlayer.GetAccount(p).ClanID == clanID))
                         {
-                            EPlayer.Notify(pl, $"<strong>{player.Name}</strong> has joined your clan!", "green", "", false, 3000);
+                            EPlayer.Notify(pl, Translate(pl, "CLAN_JOIN_PLAYER", player.Name), "green", "", false, 3000);
                         }
                     });
                 }
@@ -1978,7 +1981,7 @@ namespace RNC
                         player.SetSharedData("ClanTier", 0);
                         player.SetSharedData("ClanName", clanname);
                         player.SetSharedData("ClanCreated", DateTime.Now.ToString("F"));
-                        EPlayer.Notify(player, "Clan successfully created! Read chat for more information.", "green", "", false, 3000);
+                        EPlayer.Notify(player, Translate(player, "CLAN_CREATED_NOTIFY"), "green", "", false, 3000);
                         player.SendChatMessage(Translate(player, "CREATED_CLAN_1", clanname));
                         player.SendChatMessage(Translate(player, "CREATED_CLAN_2"));
                         player.SendChatMessage(Translate(player, "CREATED_CLAN_3"));

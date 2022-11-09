@@ -438,6 +438,27 @@
   "LAW_ON_WAY": "!{#FF6347}[#] ~w~Law enforcement is on their way, protect the heist leader!",
   "LAW_ON_WAY_RADIO": "!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: Alright ladies and gentlemen, I hear that the cops are on their way. Good luck!",
   "CAN_BE_SHOT_LONG_GAME": "!{#FF6347}You can be shot down by cops as the game has progressed to 70%!",
-  "CAN_BE_SHOT_LONG_GAME_GLOBAL": "!{#FF6347}[GAME] !{#FFFFFF}70% of the game has elapsed, all fugitives can be shot down now."
+  "CAN_BE_SHOT_LONG_GAME_GLOBAL": "!{#FF6347}[GAME] !{#FFFFFF}70% of the game has elapsed, all fugitives can be shot down now.",
+  "SELL_WEAPON_ATTACHMENT": "You successfully removed/sold the attachment and have been refunded <strong>{PRICE} Points</strong>.",
+  "BUY_WEAPON_ATTACHMENT": "You successfully purchased the weapon attachment for {PRICE} Points!",
+  "CLAN_ACCESS_SET": "You've set your clan access to <strong>{VALUE}</strong>!",
+  "INVITE_ONLY": "Invite-Only",
+  "PUBLIC": "Public",
+  "CLAN_TAG_TOGGLE": "You have {ENABLED/DISABLED} the clan tag to appear before your members' names!",
+  "CLAN_PAIR_TOGGLE": "You have {ENABLED/DISABLED} copchase pairing for your clan members!",
+  "PROMOTED": "promoted",
+  "DEMOTED": "promoted",
+  "CLAN_OWNER_TRANSFER": "You transferred your clan ownership to {PLAYER NAME}; your tier was set to Member (2).",
+  "CLAN_RANK_CHANGE": "You successfully <strong>{PROMOTED/DEMOTED}</strong> {PLAYER NAME} to <strong>{RANK NAME}</strong>!",
+  "CLAN_RANK_CHANGE_PLAYER": "You have been <strong>{PROMOTED/DEMOTED}</strong> in your clan to <strong>{RANK NAME}</strong>!",
+  "CLAN_KICK": "You successfully kicked {PLAYER NAME} from the clan!",
+  "CLAN_KICK_PLAYER": "You have been <strong>kicked</strong> from the clan!",
+  "CLAN_LEFT": "You successfully left the clan!",
+  "CLAN_DISBANDED": "Your clan leader, {PLAYER NAME}, has disbanded the clan!",
+  "CLAN_LEFT_PLAYER": "Player {PLAYER NAME} has left the clan.",
+  "CLAN_INVITED_PLAYER": "You've invited that player to your clan. They have 20 seconds to accept.",
+  "CLAN_JOIN": "You successfully joined the clan: <strong>{NAME}</strong>",
+  "CLAN_JOIN_PLAYER": "<strong>{PLAYER NAME}</strong> has joined your clan!",
+  "CLAN_CREATED_NOTIFY": "Clan successfully created! Read chat for more information."
 
 }
