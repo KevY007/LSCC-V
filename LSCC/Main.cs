@@ -1452,6 +1452,10 @@ namespace RNC
 
     public class Main : Script
     {
+        static string Translate(Player player, string message_code, params object[] args)
+        {
+            return Translator.Translate(player, message_code, args);
+        }
 
         public static void DisplayMOTD(Player target, MOTDData motd)
         {
@@ -2755,7 +2759,7 @@ namespace RNC
                                                     if (player.GetSharedData<int>("PlayerWeather") == -1)
                                                     {
                                                         player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
-                                                        player.SendChatMessage("!{#A8FFAB}[WEATHER FORECAST] " + weatherString);
+                                                        player.SendChatMessage(Translator.Translate(player, "WEATHER_FORECAST_2", weatherString));
                                                     }
                                                     else
                                                     {
@@ -2875,7 +2879,7 @@ namespace RNC
                                                 if (player.GetSharedData<int>("InLobby") == lobby.lobbyId)
                                                 {
                                                     player.SetSharedData("InLobby", -1);
-                                                    player.SendChatMessage("!{#FF0000}This lobby is disabled, resetting you to any other lobby.");
+                                                    player.SendChatMessage(Translate(player, "LOBBY_DISABLED_SENDING_ANOTHER"));
                                                     EPlayer.Spawn(player);
                                                 }
                                             }
@@ -3015,11 +3019,11 @@ namespace RNC
                     player.Health = 0;
                     if (winner == null)
                     {
-                        player.SendChatMessage("!{#E6DD3C}[DERBY] !{#FFFFFF}There was no winner in the derby match! Starting a new round.");
+                        player.SendChatMessage(Translate(player, "DERBY_WINNER_NONE"));
                     }
                     else
                     {
-                        player.SendChatMessage("!{#E6DD3C}[DERBY] " + winner.Name + " won the derby and has gained " + winXP + "XP and +5% fugitive chance.");
+                        player.SendChatMessage(Translate(player, "DERBY_WINNER", winner.Name, winXP));
                     }
                 }
 
@@ -3936,7 +3940,7 @@ namespace RNC
 
                                                         PutInsideCar.Add(mem);
                                                         hasClanPartnering = true;
-                                                        mem.SendChatMessage("!{#FFAC38}[Clan Partners] You are being paired with " + player.Name + " this chase.");
+                                                        mem.SendChatMessage(Translate(mem, "CLAN_PAIRING", player.Name));
 
                                                         seat++;
                                                     }
@@ -3969,7 +3973,7 @@ namespace RNC
                                                             }
 
                                                             PutInsideCar.Add(mem);
-                                                            mem.SendChatMessage("!{#FFAC38}[Partners] You are being paired with " + player.Name + " this chase.");
+                                                            mem.SendChatMessage(Translate(mem, "SQUAD_PAIRING", player.Name));
 
                                                             seat++;
                                                         }
@@ -4180,12 +4184,7 @@ namespace RNC
                                         else
                                         {
                                             carName = EPlayer.GetAccount(_tempPlayer).CarFugitive;
-                                            if (carName == "sanchez")
-                                            {
-                                                _tempPlayer.SendChatMessage("!{#FF0000}> The Sanchez is no longer a fugitive vehicle.");
-                                                _tempPlayer.SendChatMessage("!{#FF0000}> It has been replaced with the !{#FFFFFF}Felon GT!{#FF0000}, which has been added to your inventory.");
-                                                carName = "felon2";
-                                            }
+                            
                                             Account pAcc = EPlayer.GetAccount(_tempPlayer);
                                             // incrementing times this police vehicle was used
                                             Task.Run(async () =>
@@ -4589,11 +4588,11 @@ namespace RNC
                                                     p.Dimension = Convert.ToUInt32(lobby.lobbyId);
                                                     p.Position = new Vector3(427.2379f, -979.13336f, 30.709988f).Around(7f);
 
-                                                    p.SendChatMessage($"!{{#1E9913}}[!] ATTENTION: You are currently in the Bank Robbery event! This is not a standard chase.");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must prevent the fugitives from delivering the money to their hideout.");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You are allowed to shoot fugitives on sight without them firing first.");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}The fugitives are currently robbing the ~y~Pacific Standard~w~ bank.");
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Neutralize all the fugitives, or keep slowing them down until the round ends to win!");
+                                                    p.SendChatMessage(Translate(p, "START_BANKROB_1"));
+                                                    p.SendChatMessage(Translate(p, "START_BANKROB_2"));
+                                                    p.SendChatMessage(Translate(p, "START_BANKROB_3"));
+                                                    p.SendChatMessage(Translate(p, "START_BANKROB_4"));
+                                                    p.SendChatMessage(Translate(p, "START_BANKROB_5"));
 
                                                 }
                                                 catch { }
@@ -4612,41 +4611,42 @@ namespace RNC
                                                     p.TriggerEvent("ResetKillFeed");
                                                     p.TriggerEvent("ToggleNametags", true);
 
-                                                    p.SendChatMessage($"!{{#1E9913}}[!] ATTENTION: You are currently in the Bank Robbery event! This is not a standard chase.");
+                                                    p.SendChatMessage(Translate(p, "START_BANKROB_1"));
                                                     if (p == _brob.HeistLeader)
                                                     {
-                                                        if (lobby.Cops.Contains(p)) EPlayer.Notify(p, "You've been selected as the <strong>heist leader</strong>!", "orange", "fas fa-hourglass-start", false, 10000);
-                                                        p.SendChatMessage($"~y~!! YOU'VE BEEN SELECTED AS THE HEIST LEADER !!");
-                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must rob the bank and deliver the money to the hideout.");
-                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You are currently in the vault. Stay here for ~y~one minute ~w~to steal all the money.");
-                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}After that, do anything you can in order to get to the ~y~hideout~w~ with your team.");
-                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Watch out! Your death will significantly decrease your chances of winning the round.");
+                                                        EPlayer.Notify(p, Translate(p, "SELECTED_AS_LEADER"), "orange", "fas fa-hourglass-start", false, 10000);
+                                                        p.SendChatMessage(Translate(p, "SELECTED_AS_LEADER_2"));
+                                                        p.SendChatMessage(Translate(p, "START_BROB_LEADER_1"));
+                                                        p.SendChatMessage(Translate(p, "START_BROB_LEADER_2"));
+                                                        p.SendChatMessage(Translate(p, "START_BROB_LEADER_3"));
+                                                        p.SendChatMessage(Translate(p, "START_BROB_LEADER_4"));
 
                                                         p.Position = BankRobberyData.LeaderPos;
                                                         p.Heading = BankRobberyData.LeaderHeading;
                                                     }
                                                     else if (p == _brob.Sniper)
                                                     {
-                                                        p.SendChatMessage($"~y~!! YOU'VE BEEN SELECTED AS THE SNIPER !!");
-                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must rob help your heist leader, ~y~{_brob.HeistLeader.Name}~w~, deliver the money to the hideout..");
-                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Due to your excellent marksmanship skills, you were picked to be the \"sniper\".");
-                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You received a special set of weapons, including a sniper with low ammo. Use it wisely to fend off against the police.");
-                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You can use the ladders to climb up to a higher spot, or back down onto the street - it's entirely your choice.");
+                                                        p.SendChatMessage(Translate(p, "SELECTED_AS_SNIPER"));
+                                                        p.SendChatMessage(Translate(p, "START_BROB_SNIPER_1", _brob.HeistLeader.Name));
+                                                        p.SendChatMessage(Translate(p, "START_BROB_SNIPER_2"));
+                                                        p.SendChatMessage(Translate(p, "START_BROB_SNIPER_3"));
+                                                        p.SendChatMessage(Translate(p, "START_BROB_SNIPER_4"));
+                                               
 
                                                         p.Position = BankRobberyData.SniperPos;
                                                         p.Heading = BankRobberyData.SniperHeading;
                                                     }
                                                     else
                                                     {
-                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you must help your heist leader, ~y~{_brob.HeistLeader.Name}~w~, deliver the money to the hideout.");
-                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}You are currently in the bank. The heist leader is in the vault, taking the money.");
-                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}After ~y~one minute~w~, you may head with the heist leader to the ~y~hideout~w~.");
-                                                        p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Make sure you defend the heist leader! Leader's death significantly decreases your chances of winning.");
+                                                        p.SendChatMessage(Translate(p, "START_BROB_NORMAL_1", _brob.HeistLeader.Name));
+                                                        p.SendChatMessage(Translate(p, "START_BROB_NORMAL_2"));
+                                                        p.SendChatMessage(Translate(p, "START_BROB_NORMAL_3"));
+                                                        p.SendChatMessage(Translate(p, "START_BROB_NORMAL_4"));
 
                                                         p.Position = (Vector3)BankRobberyData.FugitiveSpawns[0, 0];
                                                         p.Heading = (float)BankRobberyData.FugitiveSpawns[0, 1];
                                                     }
-                                                    p.SendChatMessage($"!{{#1E9913}}[#] ~y~Work as a TEAM! ~w~You have one minute to plan out your getaway.");
+                                                    p.SendChatMessage(Translate(p, "START_BROB_WORKASTEAM"));
 
                                                 }
                                                 catch { }
@@ -4930,12 +4930,12 @@ namespace RNC
                                         if (currentCar >= 6) // Special/SWAT/FIB unit 
                                         {
                                             player.SetData<string>("BankRobberyUnit", "fib");
-                                            player.SendChatMessage("~b~[>] ~w~You've been assigned to the ~y~FIB~w~ unit.");
+                                            player.SendChatMessage(Translate(player, "BROB_ASSIGN_FIB"));
                                         }
                                         else // patrol unit
                                         {
                                             player.SetData<string>("BankRobberyUnit", "patrol");
-                                            player.SendChatMessage("~b~[>] ~w~You've been assigned to the ~y~PATROL~w~ unit.");
+                                            player.SendChatMessage(Translate(player, "BROB_ASSIGN_PATROL"));
                                         }
 
                                         EPlayer.Freeze(player, true);
@@ -5104,18 +5104,18 @@ namespace RNC
 
                                             p.TriggerEvent("ResetKillFeed");
 
-                                            if (lobby.Cops.Contains(p)) EPlayer.Notify(p, "You will be unfreezed in 10 seconds.", "orange", "fas fa-hourglass-start", false, 10000);
+                                            if (lobby.Cops.Contains(p)) EPlayer.Notify(p, Translate(p, "UNFREEZE_10S_NOTIFY"), "orange", "fas fa-hourglass-start", false, 10000);
                                             if (lobby.gameMode == GameModes.STANDARD)
                                             {
-                                                p.SendChatMessage("!{#FF6347}[!] !{#8D8DFF}Cops will be unfrozen in 10 seconds. !{#E84040}Fugitive's may take this time to prepare/start the chase.");
+                                                p.SendChatMessage(Translate(p, "COPS_10S_UNFREEZE"));
                                             }
                                             else if (lobby.gameMode == GameModes.BUSTED)
                                             {
-                                                p.SendChatMessage($"!{{#1E9913}}[!] ATTENTION: The lobby you're playing is in BUSTED! mode. This is not a standard chase.");
-                                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}In this mode, you do not receive weapons nor fight, rather you EVADE and win by skills!");
-                                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Cops have to box/stick close to fugitive's to start the busting process.");
-                                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}More cops would makes the process a lot faster and the closer you get.");
-                                                p.SendChatMessage($"!{{#1E9913}}[#] !{{#FFFFFF}}Fugitive's have to get away to regress the busting progress.");
+                                                p.SendChatMessage(Translate(p, "START_BUSTED_MSG_1"));
+                                                p.SendChatMessage(Translate(p, "START_BUSTED_MSG_2"));
+                                                p.SendChatMessage(Translate(p, "START_BUSTED_MSG_3"));
+                                                p.SendChatMessage(Translate(p, "START_BUSTED_MSG_4"));
+                                                p.SendChatMessage(Translate(p, "START_BUSTED_MSG_5"));
                                             }
                                         }
                                         catch { }
@@ -5303,7 +5303,7 @@ namespace RNC
                                                         p.TriggerEvent("ToggleCanExitVehicle", true);
                                                         p.TriggerEvent("playerCreateWaypoint", BankRobberyData.BankCheckpointPos);
 
-                                                        p.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: All available units, code 3, there's a 211 in progress in the Pacific Standard Bank!");
+                                                        p.SendChatMessage(Translate(p, "START_BROB_RADIO_COP"));
                                                     }
                                                     catch (Exception ex)
                                                     {
@@ -5325,20 +5325,20 @@ namespace RNC
                                                     if (p == lobby.BankRobbery.HeistLeader)
                                                     {
                                                         p.TriggerEvent("StartBankRobberyTimer");
-                                                        p.SendChatMessage("!{#FF6347}[#] ~w~You are taking the cash - this will take 60 seconds!");
+                                                        p.SendChatMessage(Translate(p, "TAKING_CASH_MSG"));
 
                                                         Events.RequestPlayAnimation(p, "mp_missheist_ornatebank", "stand_cash_in_bag_loop", 1);
                                                         EPlayer.Freeze(p, true);
 
-                                                        EPlayer.Notify(p, "Stealing the money....", "green", "fas fa-hourglass-start", false, 40000, "bottomCenter");
+                                                        EPlayer.Notify(p, Translate(p, "STEALING_MONEY"), "green", "fas fa-hourglass-start", false, 40000, "bottomCenter");
                                                     }
                                                     else
                                                     {
-                                                        p.SendChatMessage("!{#FF6347}[#] ~w~Law enforcement is on their way, protect the heist leader!");
+                                                        p.SendChatMessage(Translate(p, "LAW_ON_WAY"));
                                                     }
                                                     p.TriggerEvent("stopLoadingScreen");
 
-                                                    p.SendChatMessage($"!{{#FFEC8B}}** [RADIO | FREQ: 69420] SCOUT: Alright ladies and gentlemen, I hear that the cops are on their way. Good luck!");
+                                                    p.SendChatMessage(Translate(p, "LAW_ON_WAY_RADIO"));
                                                 }
                                             }
                                         }
@@ -5364,7 +5364,7 @@ namespace RNC
                                             fugitive.SetSharedData("VisibleBlip", true);
                                             lobby.FugitiveShowCounter = 29; // Set them to VISIBLE
 
-                                            fugitive.SendChatMessage("!{#FF6347}You can be shot down by cops as the game has progressed to 70%!");
+                                            fugitive.SendChatMessage(Translate(fugitive, "CAN_BE_SHOT_LONG_GAME"));
                                         }
                                     }
                                     catch { }
@@ -5378,7 +5378,7 @@ namespace RNC
                                         {
                                             if (pl == null) continue;
 
-                                            pl.SendChatMessage("!{#FF6347}[GAME] !{#FFFFFF}70% of the game has elapsed, all fugitives can be shot down now.");
+                                            pl.SendChatMessage(Translate(pl, "CAN_BE_SHOT_LONG_GAME_GLOBAL"));
                                             pl.TriggerEvent("StartChaseTimer", lobby.GameProgress, Settings.GameRunTime, -1, (short)lobby.gameMode);
                                         }
                                         catch { }
