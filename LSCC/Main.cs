@@ -2915,8 +2915,20 @@ namespace RNC
                                             List<Player> driverFugis = lobby.Fugitives.Where(f => f.IsInVehicle && f.VehicleSeat == 0).ToList();
                                             if (driverFugis.Count <= 0) { driverFugis.Add(lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)]); }
 
+                                            List<KeyValuePair<double, double>> fugiPoses = new List<KeyValuePair<double, double>>();
+                                            foreach(Player fugitive in lobby.Fugitives)
+                                            {
+                                                fugiPoses.Add(new KeyValuePair<double, double>(fugitive.Position.X, fugitive.Position.Y));
+                                            }
+
                                             foreach (Player cop in lobby.Cops)
                                             {
+                                                cop.TriggerEvent("PoliceHeliCam_ClearFugitives");
+                                                foreach(KeyValuePair<double, double> pos in fugiPoses)
+                                                {
+                                                    cop.TriggerEvent("PoliceHeliCam_AddFugitivePosition", pos.Key, pos.Value);
+                                                }
+
                                                 cop.TriggerEvent("MDC:RemoveBlipsOfType", "fugitivezone");
                                                 foreach (Player driver in driverFugis)
                                                 {
@@ -3419,6 +3431,7 @@ namespace RNC
 
                     foreach (Player player in lobbyPlayers)
                     {
+                        player.TriggerEvent("PoliceHeliCam_ClearFugitives");
                         player.TriggerEvent("hideMDC");
                         player.TriggerEvent("MDC:RemoveAllBlips");
                         player.TriggerEvent("ClearClimbTaseProtection", true);

@@ -69,7 +69,7 @@ mp.events.add('OneSecondEvent', () => {
     }
 });
 
-mp.keys.bind(0x58, false, function() {
+mp.keys.bind(0x55, false, function() {
     if(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false) return;
     if(Date.now() - lastChatToggle <= 500) return;
     if(menuToggled !== undefined && menuToggled) return;

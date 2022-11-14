@@ -229,6 +229,187 @@ mp.events.add("AttachPlayerToPlayer", (playerToAttach, target) => {
     playerToAttach.attachTo(target.handle, 35, 0.5, 0.1, 0.2, 0, 90, 0, true, false, false, true, 0, true);
 });
 
+var PoliceHeliCamActive = false;
+var LastPoliceHeliCamToggle = 0;
+var PoliceHeliCamFrameCount = 0;
+var PoliceHeliCam_Fugitives = []; // for client-side, updates every 2 seconds
+var PoliceHeliCam_Fugitives_Server = []; // for the server-side updates, every 15 seconds
+
+mp.keys.bind(0x58, true, () => {
+    if(Date.now() - LastPoliceHeliCamToggle < 550) return;
+    if((mp.players.local.getVariable("Team") != 1 || mp.players.local.vehicle == undefined 
+    || !mp.players.local.isInAnyVehicle(false) || mp.players.local.vehicle.getClass() != 15)){
+        return;
+    }
+
+    ToggleHeliCam(!PoliceHeliCamActive);
+});
+mp.events.add("PoliceHeliCam_ClearFugitives", () => {
+    PoliceHeliCam_Fugitives_Server = [];
+})
+mp.events.add("PoliceHeliCam_AddFugitivePosition", (x, y) => {
+    PoliceHeliCam_Fugitives_Server.push({x:x, y:y});
+});
+function ToggleHeliCam(toggle){
+
+    PoliceHeliCamActive = toggle;
+    LastPoliceHeliCamToggle = Date.now();
+
+    if(PoliceHeliCamActive){
+        mp.game.graphics.stopScreenEffect('FocusOut');
+        mp.game.graphics.startScreenEffect('FocusIn', 500, false);
+        mp.game.graphics.startScreenEffect('DeathFailNeutralIn', 500, true);
+        mp.game.audio.playSoundFrontend(-1, 'Hit_In', 'PLAYER_SWITCH_CUSTOM_SOUNDSET', true);
+
+        PoliceHeliCam_Fugitives = [];
+        mp.players.forEachInStreamRange((fugi) => {
+            if(fugi.dimension === mp.players.local.dimension && fugi.getVariable("Team") == 0){
+                PoliceHeliCam_Fugitives.push({x:fugi.position.x, y:fugi.position.y});
+            }
+        })
+
+    }
+    else{
+        mp.game.graphics.stopScreenEffect('FocusIn');
+        mp.game.graphics.stopScreenEffect('DeathFailNeutralIn');
+        mp.game.graphics.startScreenEffect('FocusOut', 500, false);
+        mp.game.audio.playSoundFrontend(-1, 'Hit_Out', 'PLAYER_SWITCH_CUSTOM_SOUNDSET', true);
+    }
+}
+
+mp.events.add("TwoSecondsEvent", () => {
+    if(!PoliceHeliCamActive) return;
+
+    PoliceHeliCam_Fugitives = [];
+    mp.players.forEachInStreamRange((fugi) => {
+        if(fugi.dimension === mp.players.local.dimension && fugi.getVariable("Team") == 0){
+            PoliceHeliCam_Fugitives.push({x:fugi.position.x, y:fugi.position.y});
+        }
+    })
+})
+
+function Render3DMapMatrix(){
+    if(!PoliceHeliCamActive) return;
+    if(PoliceHeliCamActive && (mp.players.local.getVariable("Team") != 1 || mp.players.local.vehicle == undefined 
+        || !mp.players.local.isInAnyVehicle(false) || mp.players.local.vehicle.getClass() != 15)){
+        ToggleHeliCam(false);
+        return;
+    }
+
+    PoliceHeliCamFrameCount++;
+    if(PoliceHeliCamFrameCount > 60) PoliceHeliCamFrameCount = 0;
+
+    const Z_value = (player.position.z < 325 ? 175 : (player.position.z-150));
+
+    for(let i = -4000 ; i <= 8000; i+=250){
+        mp.game.graphics.drawLine(i, -4000,Z_value, i, 6000, Z_value, 255, 255, 255, 32);
+    }
+    for(let i = -4000 ; i <= 6000; i+=250){
+        mp.game.graphics.drawLine(-4000, i,Z_value, 8000, i, Z_value, 255, 255, 255, 32);
+    }
+
+    const playerTooLow = (player.position.z < 200);
+    let currentX = -4000, currentY = -4000;
+    if(playerTooLow){
+        mp.game.graphics.drawBox(currentX, currentY, Z_value, (currentX+250), (currentY+250), (Z_value+0.001), 255, 0, 0, 16);
+        if(PoliceHeliCamFrameCount > 30){
+            mp.game.graphics.drawText("Altitude too low, gain some height!", [0.5, 0.005], { 
+                font: 4, 
+                color: [255, 50, 50, 185], 
+                scale: [0.7, 0.7], 
+                outline: true,
+                centre:true
+            });
+        }
+        for(let i = 0; i < 40 ; i++){
+            currentY = -4000;
+            for(let j = 0 ; j < 48 ; j++){
+                mp.game.graphics.drawBox(currentX, currentY, Z_value, (currentX+250), (currentY+250), (Z_value+0.001), 255, 0, 0, 16);
+                currentY += 250;
+            }
+            currentX += 250;
+        }
+        return;
+    }
+
+    mp.game.graphics.drawText(`ALT: ${Math.round(player.position.z)}m / 200m`, [0.5, 0.005], { 
+        font: 4, 
+        color: [255, 255, 255, 185], 
+        scale: [0.7, 0.7], 
+        outline: true,
+        centre:true
+    });
+    for(let i = 0; i < 40 ; i++){
+        currentY = -4000;
+        for(let j = 0 ; j < 48 ; j++){
+
+            let highlight = false;
+            for(let fug = 0 ; fug < PoliceHeliCam_Fugitives.length; fug++){
+                if(PoliceHeliCam_Fugitives[fug].x < (currentX+250) && PoliceHeliCam_Fugitives[fug].x > currentX){
+                    if(PoliceHeliCam_Fugitives[fug].y < (currentY+250) && PoliceHeliCam_Fugitives[fug].y > currentY){
+                        highlight = true;
+                        break;
+                    }
+                }
+            }
+            for(let fug = 0 ; fug < PoliceHeliCam_Fugitives_Server.length; fug++){
+                if(PoliceHeliCam_Fugitives_Server[fug].x < (currentX+250) && PoliceHeliCam_Fugitives_Server[fug].x > currentX){
+                    if(PoliceHeliCam_Fugitives_Server[fug].y < (currentY+250) && PoliceHeliCam_Fugitives_Server[fug].y > currentY){
+                        highlight = true;
+                        break;
+                    }
+                }
+            }
+            
+
+
+            if(highlight){
+                mp.game.graphics.drawBox(currentX, currentY, Z_value, (currentX+250), (currentY+250), (Z_value+0.001), 255, 255, 0, 16);
+
+                // distance calc and if player is close display street
+                const vec1 = mp.players.local.position;
+                const vec2 = new mp.Vector3((currentX+125), (currentY+125), Z_value);
+
+                const distance = vec1.subtract(vec2).length();
+                if(distance < 1000){
+                    let getStreet = mp.game.pathfind.getStreetNameAtCoord((currentX+125), (currentY+125), Z_value, 0, 0);
+                    let zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone((currentX+125), (currentY+125), Z_value));
+                    let realStreet = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
+        
+                    mp.game.graphics.drawText(`${zoneName}\n${realStreet}`, [(currentX+125), (currentY+125), (Z_value+0.5)], {
+                        font:4,
+                        color: [255, 255, 255, 128],
+                        scale: [0.45, 0.45],
+                        outline:true,
+                        centre:true
+                    });
+                }
+            }
+            else{
+                mp.game.graphics.drawBox(currentX, currentY, Z_value, (currentX+250), (currentY+250), (Z_value+0.001), 255, 255, 255, 0);
+            }
+
+            currentY += 250;
+        }
+        currentX += 250;
+    }
+
+    /*
+        let getStreet = mp.game.pathfind.getStreetNameAtCoord(posx, posy, posz, 0, 0);
+
+    zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(posx, posy, posz));
+    streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
+
+    mp.gui.chat.push(`!{#FFEC8B}** [RADIO | FREQ: 911] DISPATCH: Felon ${name} last spotted at ${streetName}, ${zoneName}.`);
+    */
+    
+
+    
+}
+mp.events.add("render", () => {
+    Render3DMapMatrix();
+});
+
 mp.events.add("OneSecondEvent", () => {
     ShotStats.UpdateInterval++;
 
