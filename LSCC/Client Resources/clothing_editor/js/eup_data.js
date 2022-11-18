@@ -270,10 +270,6 @@ const FugitiveLinkedTypes = [
     },
 ];
 
-// female shirt 405-439 crashes game
-// female shoes 90-111 crash the game
-// female bags 89-110 crash the game
-// bags 137 female = kevlar
 const FemaleClothing = [
     {
         clothing: "Shirt",

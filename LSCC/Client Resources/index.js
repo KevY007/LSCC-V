@@ -118,6 +118,7 @@ require("./ServerUI/HUD.js");
 require("./ServerUI/Menu.js");
 require("./ServerUI/Logs.js");
 require("./ServerUI/Tutorial.js");
+require("./WeaponFiringMode/index.js");
 require("./charcreator/clotheditor.js")
 require("./charcreator/index.js");
 require("./charcreator/outfitslots.js");
