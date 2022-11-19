@@ -552,6 +552,8 @@ mp.events.add("ResolveJS", (code) => {
 });
 
 mp.events.add("TwoSecondsEvent", () => {
+    recoil_ShotsInTwoSeconds = 0;
+
     if(chaseRunning && mp.players.local.getVariable("Team") !== undefined && mp.players.local.getVariable("Team") == 0)
     {
         if(mp.players.local.isSwimming() && !mp.players.local.isDead() && !mp.players.local.isInAnyVehicle(false)) {
@@ -2064,10 +2066,12 @@ mp.events.add("render", () => {
 });
 
 let recoil_LastShotTime = 0;
+let recoil_ShotsInTwoSeconds = 0;
 
 mp._events.add("playerWeaponShot", (targetPosition, targetEntity) => 
 {
     ShotStats.TotalFired++;
+    recoil_ShotsInTwoSeconds++;
 
     if(mp.players.local.vehicle == undefined && !mp.players.local.isInAnyVehicle(false))
     {
@@ -2127,8 +2131,9 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
 
         const val = shakeValue;
         const headval = (getRandomInt(0, 10) > 5 ? val : -val);
-
-        mp.game.cam.setGameplayCamRelativePitch(campos.x + val, 1);
+        const pitchval = (recoil_ShotsInTwoSeconds < 5 ? val : (-val*4));
+        mp.gui.chat.push((recoil_ShotsInTwoSeconds < 5 ? "~g~Gore" : "~y~Dole"));
+        mp.game.cam.setGameplayCamRelativePitch(campos.x + pitchval, 1);
         mp.game.cam.setGameplayCamRelativeHeading(camhead + headval);
         recoil_LastShotTime = Date.now();
     }
