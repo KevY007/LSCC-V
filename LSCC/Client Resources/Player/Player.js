@@ -197,8 +197,19 @@ mp.events.add('setPing', (pingtoset) => {
     ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.ping = ${ping}`);
 })
 
+
+let recoil_LastShotTime = 0;
+let recoil_ShotsInBurst = 0;
+let recoil_goingUp = true;
+
 var tasePreview = false;
 mp.events.add("render", () => {
+
+    if(recoil_ShotsInBurst > 0 && (Date.now() - recoil_LastShotTime > 300)){
+        recoil_ShotsInBurst = 0;
+        recoil_goingUp = true;
+    }
+
     if(player.getVariable("Team") == 1){  
         if(player.weapon == 911657153){
             tasePreview = true;
@@ -552,8 +563,6 @@ mp.events.add("ResolveJS", (code) => {
 });
 
 mp.events.add("TwoSecondsEvent", () => {
-    recoil_ShotsInTwoSeconds = 0;
-
     if(chaseRunning && mp.players.local.getVariable("Team") !== undefined && mp.players.local.getVariable("Team") == 0)
     {
         if(mp.players.local.isSwimming() && !mp.players.local.isDead() && !mp.players.local.isInAnyVehicle(false)) {
@@ -2065,13 +2074,10 @@ mp.events.add("render", () => {
 
 });
 
-let recoil_LastShotTime = 0;
-let recoil_ShotsInTwoSeconds = 0;
 
 mp._events.add("playerWeaponShot", (targetPosition, targetEntity) => 
 {
     ShotStats.TotalFired++;
-    recoil_ShotsInTwoSeconds++;
 
     if(mp.players.local.vehicle == undefined && !mp.players.local.isInAnyVehicle(false))
     {
@@ -2088,25 +2094,25 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
             var gunName = gunData.Name;
             switch(gunType){ // first doing the types in general
                 case "Handguns":
-                    shakeValue = (getRandomInt(3, 7)/10);
+                    shakeValue = (getRandomInt(2, 6)/10);
                     break;
                 case "Submachine Guns":
-                    shakeValue = (getRandomInt(4, 7)/10);
+                    shakeValue = (getRandomInt(3, 6)/10);
                     break;
                 case "Shotguns":
                     shakeValue = (getRandomInt(18, 25)/10);
                     break;
                 case "Assault Rifles":
-                    shakeValue = (getRandomInt(4, 7)/10);
+                    shakeValue = (getRandomInt(3, 6)/10);
                     break;
                 case "Machine Guns":
-                    shakeValue = (getRandomInt(6, 9)/10);
+                    shakeValue = (getRandomInt(5, 8)/10);
                     break;
                 case "Sniper Rifles":
-                    shakeValue = (getRandomInt(5, 7)/10);
+                    shakeValue = (getRandomInt(4, 6)/10);
                     break;
                 default:
-                    shakeValue = (getRandomInt(5, 10)/10);
+                    shakeValue = (getRandomInt(4, 9)/10);
                     break;
             }
             // and now doing some specific weapons
@@ -2119,23 +2125,30 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         }
 
         if(mp.players.local.getStealthMovement() == true){
-            shakeValue = shakeValue/1.45; // slightly more accurate when crouching
+            shakeValue = shakeValue/1.65; // slightly more accurate when crouching
         }
         if(mp.game.player.isFreeAiming() == true){ // if player is holding right click to aim
-            shakeValue = shakeValue/3; // more accurate when holding right click
+            shakeValue = shakeValue/3.5; // more accurate when holding right click
         }
 
         if((Date.now() - recoil_LastShotTime < 350) && gunType === "Handguns"){
             shakeValue = shakeValue * 1.45;
         }
 
+        recoil_ShotsInBurst++;
+        if(gunType !== "Handguns" && gunType !== "Shotguns"){
+            if(recoil_ShotsInBurst % 10 === 0){
+                recoil_goingUp = !recoil_goingUp;
+            }
+        }
+
         const val = shakeValue;
         const headval = (getRandomInt(0, 10) > 5 ? val : -val);
-        const pitchval = (recoil_ShotsInTwoSeconds < 5 ? val : (-val*4));
-        mp.gui.chat.push((recoil_ShotsInTwoSeconds < 5 ? "~g~Gore" : "~y~Dole"));
-        mp.game.cam.setGameplayCamRelativePitch(campos.x + pitchval, 1);
+        const pitchval = (recoil_goingUp === true ? (campos.x+val) : (campos.x-val));
+        mp.game.cam.setGameplayCamRelativePitch(pitchval, 1);
         mp.game.cam.setGameplayCamRelativeHeading(camhead + headval);
         recoil_LastShotTime = Date.now();
+        mp.gui.chat.push(`Y-Recoil Path: ${recoil_goingUp ? "!{#00FF00}UP" : "!{#FFFF00}DOWN"} !{#FFFFFF}| Pitch: !{#FFFF00}${pitchval.toFixed(2)} !{#FFFFFF}Diff: !{#FFFF00}${(campos.x-pitchval)}`);
     }
     else{
         mp.game.cam.shakeGameplayCam('SMALL_EXPLOSION_SHAKE', 0.03);
