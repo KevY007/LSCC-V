@@ -1100,7 +1100,7 @@ namespace RNC
 
             if (!alreadyHas)
             {
-                EPlayer.Error(player, $"You do not have that attachment! Re-enter the menu if it's bugged.");
+                EPlayer.Error(player, Translate(player, "ERROR_NO_ATTACHMENT_BUG"));
                 return;
             }
 
@@ -1118,7 +1118,7 @@ namespace RNC
         {
             if (EPlayer.GetAccount(player).Points < price)
             {
-                EPlayer.Error(player, $"You do not have enough Points to purchase this! You need <strong>{price - EPlayer.GetAccount(player).Points}</strong> more points.");
+                EPlayer.Error(player, Translate(player, "ERROR_NOT_ENOUGH_POINTS", (price - EPlayer.GetAccount(player).Points)));
                 return;
             }
 
@@ -1165,7 +1165,7 @@ namespace RNC
 
             if (alreadyHas)
             {
-                EPlayer.Error(player, $"You already purchased this attachment!");
+                EPlayer.Error(player, Translate(player, "ERROR_ATTACHMENT_PURCHASED"));
                 return;
             }
 
@@ -1219,7 +1219,7 @@ namespace RNC
 
             if (found == false)
             {
-                EPlayer.Error(player, $"That weapon does not have any compatible attachments!");
+                EPlayer.Error(player, Translate(player, "ERROR_WEAPON_NO_ATTACHMENTS"));
                 return;
             }
 
@@ -1309,7 +1309,7 @@ namespace RNC
             if(lobby.Stingers.Where(s => s.Stage < 3).Count() >= 2) // if 2+ stingers are are in deployment phase, dont allow for balancing
             {
                 player.TriggerEvent("MDC:StingerFail", "No backup units are available to deploy right now!");
-                EPlayer.Error(player, "A maximum of <strong>two</strong> stingers can be in deployment at once.");
+                EPlayer.Error(player, Translate(player, "ERROR_STINGERS_MAX_TWO"));
                 return;
             }
 
@@ -1371,12 +1371,12 @@ namespace RNC
             Account pAcc = EPlayer.GetAccount(player);
             if (player.GetSharedData<int>("ClanID") == -1)
             {
-                EPlayer.Error(player, "You are not in any clan!");
+                EPlayer.Error(player, Translate(player, "ERROR_NOT_IN_CLAN_NOCOLOR"));
                 return;
             }
             if (player.GetSharedData<int>("ClanTier") > 0)
             {
-                EPlayer.Error(player, "You do not have the authority to change clan settings!");
+                EPlayer.Error(player, Translate(player, "ERROR_CLAN_NO_AUTHORITY"));
                 return;
             }
             int pClanID = player.GetSharedData<int>("ClanID");
@@ -1391,7 +1391,7 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
-                            EPlayer.Error(player, "Your clan no longer exists!");
+                            EPlayer.Error(player, Translate(player, "ERROR_CLAN_NOT_EXISTS"));
                             return;
                         });
                     }
@@ -1465,12 +1465,12 @@ namespace RNC
             Account pAcc = EPlayer.GetAccount(player);
             if (player.GetSharedData<int>("ClanID") == -1)
             {
-                EPlayer.Error(player, "You are not in any clan!");
+                EPlayer.Error(player, Translate(player, "ERROR_NOT_IN_CLAN_NOCOLOR"));
                 return;
             }
             if (player.GetSharedData<int>("ClanTier") > 0)
             {
-                EPlayer.Error(player, "You do not have the authority to promote/demote clan members!");
+                EPlayer.Error(player, Translate(player, "ERROR_CLAN_NO_AUTHORITY_RANKS"));
                 return;
             }
         
@@ -1502,7 +1502,7 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
-                            EPlayer.Error(player, $"That player is already tier {tier} in your clan!");
+                            EPlayer.Error(player, Translate(player, "ERROR_CLAN_ALREADY_TIER", tier));
                         });
                         return;
                     }
@@ -1510,7 +1510,7 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
-                            EPlayer.Error(player, "That player is a tier higher than/equal to yours! You cannot promote/demote them.");
+                            EPlayer.Error(player, Translate(player, "ERROR_CLAN_SAME_TIER"));
                         });
                         return;
                     }
@@ -1571,12 +1571,12 @@ namespace RNC
             Account pAcc = EPlayer.GetAccount(player);
             if(player.GetSharedData<int>("ClanID") == -1)
             {
-                EPlayer.Error(player, "You are not in any clan!");
+                EPlayer.Error(player, Translate(player, "ERROR_NOT_IN_CLAN_NOCOLOR"));
                 return;
             }
             if(player.GetSharedData<int>("ClanTier") > 1)
             {
-                EPlayer.Error(player, "You do not have the authority to kick clan members!");
+                EPlayer.Error(player, Translate(player, "ERROR_CLAN_NO_AUTHORITY_KICK"));
                 return;
             }
             int pClanTier = player.GetSharedData<int>("ClanTier");
@@ -1606,7 +1606,7 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
-                            EPlayer.Error(player, "That player is a tier higher than/equal to yours! You cannot kick them.");
+                            EPlayer.Error(player, Translate(player, "ERROR_CLAN_SAME_TIER"));
                         });
                         return;
                     }
@@ -1751,7 +1751,7 @@ namespace RNC
             {
                 if(currentTimestamp - player.GetData<long>("LastClanInviteTimestamp") < 20)
                 {
-                    EPlayer.Error(player, $"Not so fast! You can invite a player to your clan every 20 seconds!");
+                    EPlayer.Error(player, Translate(player, "ERROR_CLAN_INVITE_COOLDOWN"));
                     return;
                 }
             }
@@ -1762,19 +1762,19 @@ namespace RNC
             Account acc = EPlayer.GetAccount(player);
             if (player.GetSharedData<int>("ClanID") == -1 || player.GetSharedData<int>("ClanTier") > 0)
             {
-                EPlayer.Error(player, "You are not in a clan or don't have permissions to invite players!", "sex");
+                EPlayer.Error(player, Translate(player, "ERROR_CLAN_NO_PERMISSIONS_INVITE"), "sex");
                 return;
             }
 
             Player target = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase));
             if(target == null)
             {
-                EPlayer.Error(player, $"Player <strong>{playerName}</strong> is not online! Please enter the <strong>full player name!</strong>", "sex");
+                EPlayer.Error(player, Translate(player, "ERROR_CLAN_INVITE_NOT_ONLINE", playerName), "sex");
                 return;
             }
             if(target.GetSharedData<int>("ClanID") != -1)
             {
-                EPlayer.Error(player, $"Player {playerName} is already in a clan! They'll have to leave before being able to join yours.", "sex");
+                EPlayer.Error(player, Translate(player, "ERROR_CLAN_INVITE_ALREADY_CLAN", playerName), "sex");
                 return;
             }
             player.SetData<long>("LastClanInviteTimestamp", currentTimestamp);
@@ -1791,7 +1791,7 @@ namespace RNC
             Account acc = EPlayer.GetAccount(player);
             if (player.GetSharedData<int>("ClanID") != -1 || player.GetSharedData<int>("ClanTier") != -1)
             {
-                EPlayer.Error(player, "You are already in a clan! Please leave your current one first <strong>(Menu [M] > Clan > Leave)</strong>.", "sex");
+                EPlayer.Error(player, Translate(player, "ERROR_ALREADY_IN_CLAN") , "sex");
                 return;
             }
 
@@ -1804,7 +1804,7 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
-                            EPlayer.Error(player, "That clan does not exist anymore!");
+                            EPlayer.Error(player, Translate(player, "ERROR_CLAN_NOT_EXISTS"));
                             return;
                         });
                     }
@@ -1869,19 +1869,19 @@ namespace RNC
             if (player.GetSharedData<int>("ClanID") != -1 || player.GetSharedData<int>("ClanTier") != -1)
             {
                 player.SetData<bool>("LoadingClanCreation", false);
-                EPlayer.Error(player, "You are already in a clan! Please leave your current one first <strong>(Menu [M] > Clan > Leave)</strong>.", "sex");
+                EPlayer.Error(player, Translate(player, "ERROR_ALREADY_IN_CLAN"), "sex");
                 return;
             }
             if (acc.Points < 300)
             {
                 player.SetData<bool>("LoadingClanCreation", false);
-                EPlayer.Error(player, "You need <strong>300 Points</strong> to create a clan!", "sex");
+                EPlayer.Error(player, Translate(player, "ERROR_CLAN_INSUFFICIENT_POINTS"), "sex");
                 return;
             }
             if (clanname.Length > 32 || clanname.Length < 3)
             {
                 player.SetData<bool>("LoadingClanCreation", false);
-                EPlayer.Error(player, "Clan name must be between 3 and 32 characters!", "sex");
+                EPlayer.Error(player, Translate(player, "ERROR_CLAN_NAME_CHARCOUNT"), "sex");
                 return;
             }
             string nameCheck = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 ";
@@ -1899,13 +1899,13 @@ namespace RNC
             if (!isNameGood)
             {
                 player.SetData<bool>("LoadingClanCreation", false);
-                EPlayer.Error(player, "Clan name must be alphanumeric (A-Z, 0-9)!", "sex");
+                EPlayer.Error(player, Translate(player, "ERROR_CLAN_NAME_ALPHANUMERIC"), "sex");
                 return;
             }
             if (!isTagGood)
             {
                 player.SetData<bool>("LoadingClanCreation", false);
-                EPlayer.Error(player, "Clan tag must be alphanumeric, all leters must be capitalized (A-Z, 0-9)!", "sex");
+                EPlayer.Error(player, Translate(player, "ERROR_CLAN_TAG_ALPHANUMERIC"), "sex");
                 return;
             }
 
@@ -1929,7 +1929,7 @@ namespace RNC
                         NAPI.Task.Run(() =>
                         {
                             player.SetData<bool>("LoadingClanCreation", false);
-                            EPlayer.Error(player, "A clan with that name already exists!", "sex");
+                            EPlayer.Error(player, Translate(player, "ERROR_CLAN_NAME_EXISTS"), "sex");
                         });
                         return;
                     }
@@ -1939,7 +1939,7 @@ namespace RNC
                         NAPI.Task.Run(() =>
                         {
                             player.SetData<bool>("LoadingClanCreation", false);
-                            EPlayer.Error(player, "A clan with that tag already exists! Please choose a unique 3 or 4-character tag.", "sex");
+                            EPlayer.Error(player, Translate(player, "ERROR_CLAN_TAG_EXISTS"), "sex");
                         });
                         return;
                     }
@@ -3031,7 +3031,7 @@ namespace RNC
             Player target = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
             if(target == null)
             {
-                EPlayer.Error(player, $"That player is no longer connected!");
+                EPlayer.Error(player, Translate(player, "ERROR_NO_LONGER_CONNECTED"));
                 return;
             }
             switch (action)
@@ -3140,7 +3140,7 @@ namespace RNC
                 Player target = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
                 if(target == null)
                 {
-                    EPlayer.Error(player, "That player is not logged in!");
+                    EPlayer.Error(player, Translate(player, "ERROR_NO_LONGER_CONNECTED_LOGGED"));
                     return;
                 }
 
@@ -3186,7 +3186,7 @@ namespace RNC
             {
                 if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension <= 256 || player.Dimension > 512)
                 {
-                    EPlayer.Error(player, "You are not in freeroam or are in default world! Use <strong>/world</strong> to change it.");
+                    EPlayer.Error(player, Translate(player, "ERROR_NOT_IN_FREEROAM_OR_WORLD_NOCOLOR"));
                     return;
                 }
 
@@ -3363,7 +3363,7 @@ namespace RNC
                         {
                             player.TriggerEvent("TogglePlayerChat", false);
                             player.TriggerEvent("StartTutorial");
-                            EPlayer.Error(player, $"It appears you haven't gone through the setup & tutorial yet! Showing it now...");
+                            EPlayer.Error(player, Translate(player, "SHOWING_TUTORIAL_LATE"));
                         }
                     }
                     catch
@@ -3385,7 +3385,7 @@ namespace RNC
                         else
                         {
                             player.TriggerEvent("StartTutorial");
-                            EPlayer.Error(player, $"It appears you haven't gone through the setup & tutorial yet! Showing it now...");
+                            EPlayer.Error(player, Translate(player, "SHOWING_TUTORIAL_LATE"));
                         }
                     }
                        
@@ -3610,7 +3610,7 @@ namespace RNC
 
             if(player.HasSharedData("CharCreator_ShowClothingAfter") && player.GetSharedData<bool>("CharCreator_ShowClothingAfter") == true)
             {
-                EPlayer.Error(player, "You must edit your character and <strong>SAVE</strong> him/her before exiting!");
+                EPlayer.Error(player, Translate(player, "ERROR_MUST_SAVE_CHAR"));
                 return;
             }
 
@@ -3842,7 +3842,7 @@ namespace RNC
                 }
 
                 player.SetData("EditingClothing", -1);
-                EPlayer.Error(player, "You exited the clothing editor without saving your changes.");
+                EPlayer.Error(player, Translate(player, "ERROR_EXITED_CLOTHINGEDITOR_NOSAVE"));
                 if (player.HasData("CharacterBeforeEdit"))
                 {
                     EPlayer.ApplyCharacter(player, player.GetData<CharacterData>("CharacterBeforeEdit"), team);
@@ -4307,19 +4307,19 @@ namespace RNC
 
                 if ((username == null || username.Length < 2))
                 {
-                    EPlayer.Error(player, "Username field is required!", "fas fa-user");
+                    EPlayer.Error(player, Translate(player, "ERROR_USERNAME_REQUIRED"), "fas fa-user");
                     return;
                 }
                 if ((password == null || password.Length < 2))
                 {
-                    EPlayer.Error(player, "Password field is required!", "fas fa-lock");
+                    EPlayer.Error(player, Translate(player, "ERROR_PASSWORD_REQUIRED"), "fas fa-user");
                     return;
                 }
 
                 NAPI.Util.ConsoleOutput($"[Login Attempt] Username {username} from {player.Name}");
                 if (Environment.TickCount64 - player.GetData<long>("LastCryptAttempt") < 1000 || EPlayer.LoggedIn(player))
                 {
-                    EPlayer.Error(player, "Please wait between each attempt.", "fas fa-lock");
+                    EPlayer.Error(player, Translate(player, "PLEASE_WAIT_ATTEMPT"), "fas fa-lock");
                     return;
                 }
                 player.SetData("LastCryptAttempt", Environment.TickCount64);
@@ -4681,7 +4681,7 @@ namespace RNC
                         {
                             if(EPlayer.GetAccount(player).ClanID != -1 || player.GetSharedData<int>("ClanID") != -1)
                             {
-                                EPlayer.Error(player, $"Server was unable to find your clan <strong>({player.GetSharedData<string>("ClanName")})</strong>, it might've been deleted!");
+                                EPlayer.Error(player, Translate(player, "SERVER_CANT_FIND_CLAN", player.GetSharedData<string>("ClanName")));
                                 player.SetSharedData("ClanID", -1);
                                 player.SetSharedData("ClanTier", -1);
                                 player.SetSharedData("ClanName", "NULL");
@@ -5292,7 +5292,7 @@ namespace RNC
                 vehicle.SetSharedData("Engine", false);
                 vehicle.Health = 0;
 
-                EPlayer.Error(player, $"Your vehicle <strong>ran out of fuel</strong>! Try to find a parked vehicle and steal it.");
+                EPlayer.Error(player, Translate(player, "OUT_OF_FUEL_NOTIFICATION"));
             }
         }
 
@@ -5586,37 +5586,37 @@ namespace RNC
 
             if ((username == null || username.Length < 2))
             {
-                EPlayer.Error(player, "Username field is required!", "fas fa-user");
+                EPlayer.Error(player, Translate(player, "ERROR_USERNAME_REQUIRED"), "fas fa-user");
                 return;
             }
             if ((password == null || password.Length < 2))
             {
-                EPlayer.Error(player, "Password field is required!", "fas fa-lock");
+                EPlayer.Error(player, Translate(player, "ERROR_PASSWORD_REQUIRED"), "fas fa-user");
                 return;
             }
 
             NAPI.Util.ConsoleOutput($"[Register Attempt] Username {username} from {player.Name}");
             if (Environment.TickCount64 - player.GetData<long>("LastCryptAttempt") < 1000 || EPlayer.LoggedIn(player))
             {
-                EPlayer.Error(player, "Please wait between each attempt.", "fas fa-lock");
+                EPlayer.Error(player, Translate(player, "PLEASE_WAIT_ATTEMPT"), "fas fa-user");
                 return;
             }
 
-            if (password.Length < 5)
+            if (password.Length < 8)
             {
-                EPlayer.Error(player, "Password does not match requirements!", "fas fa-lock");
+                EPlayer.Error(player, Translate(player, "ERROR_PASSWORD_NO_REQUIREMENTS"), "fas fa-lock");
                 return;
             }
-            if (username.Contains("@") || username.Length < 4 || username.Length >= 24)
+            if (username.Contains("@") || username.Length < 2 || username.Length >= 24)
             {
-                EPlayer.Error(player, "Username does not match requirements!", "fas fa-user");
+                EPlayer.Error(player, Translate(player, "ERROR_USERNAME_NO_REQUIREMENTS"), "fas fa-user");
                 return;
             }
             Regex exp = new Regex(@"^[a-zA-Z0-9]*$");
             Match match = exp.Match(username);
             if (!match.Success)
             {
-                EPlayer.Error(player, "Username contains illegal characters!", "fas fa-user");
+                EPlayer.Error(player, Translate(player, "ERROR_USERNAME_CHARACTERS"), "fas fa-user");
                 return;
             }
             if (email == null || !email.Contains("@") || email.Length < 5)
@@ -6215,7 +6215,7 @@ namespace RNC
             string type = item.Type;
             if (EPlayer.GetAccount(player).Points < price)
             {
-                EPlayer.Error(player, $"You do not have enough points to purchase a {name}! The price is <strong>{price} Points</strong>!");
+                EPlayer.Error(player, Translate(player, "ERROR_ITEM_NOT_ENOUGH_POINTS", price));
                 return;
             }
             EPlayer.GivePoints(player, -price);
@@ -6229,7 +6229,7 @@ namespace RNC
                         else if (EPlayer.GetAccount(player).DonatorLevel == 3) max = 15;
                         if (EPlayer.GetAccount(player).Medkits >= max)
                         {
-                            EPlayer.Error(player, $"You already have the maximum amount of medkits! ({max})");
+                            EPlayer.Error(player, Translate(player, "ERROR_ITEM_MAX", max));
                             return;
                         }
 
@@ -6246,7 +6246,7 @@ namespace RNC
                         else if (EPlayer.GetAccount(player).DonatorLevel == 3) max = 15;
                         if (EPlayer.GetAccount(player).Painkillers >= max)
                         {
-                            EPlayer.Error(player, $"You already have the maximum amount of painkillers! ({max})");
+                            EPlayer.Error(player, Translate(player, "ERROR_ITEM_MAX", max));
                             return;
                         }
 
@@ -6263,7 +6263,7 @@ namespace RNC
                         else if (EPlayer.GetAccount(player).DonatorLevel == 3) max = 25;
                         if (EPlayer.GetAccount(player).Lockpicks >= max)
                         {
-                            EPlayer.Error(player, $"You already have the maximum amount of lockpicks! ({max})");
+                            EPlayer.Error(player, Translate(player, "ERROR_ITEM_MAX", max));
                             return;
                         }
 
