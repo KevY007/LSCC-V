@@ -2193,7 +2193,7 @@ namespace RNC
                 {
                     if(vehicle.Locked || (vehicle.HasSharedData("Locked") && vehicle.GetSharedData<bool>("Locked") == true))
                     {
-                        EPlayer.Notify(player, "Your vehicle has been left unlocked as you exited it.", "orange", "fas fa-exclamation", false, 1500, "topCenter", "replace");
+                        EPlayer.Notify(player, Translate(player, "VEHICLE_LEFT_UNLOCKED"), "orange", "fas fa-exclamation", false, 1500, "topCenter", "replace");
                         vehicle.Locked = false;
                         vehicle.SetSharedData("Locked", false);
                     }
@@ -2985,7 +2985,7 @@ namespace RNC
                         //player.SetData("ClimbProtectionEnd", Environment.TickCount64 + time);
                         //player.SetData("LastClimbProtection", Environment.TickCount64);
                         //player.SetData("ClimbProtectionProcs", player.GetData<int>("ClimbProtectionProcs")+1);
-                        EPlayer.Notify(player, "Climb protection...", "green", "fas fa-hourglass", false, time, "topCenter", "replace");
+                        EPlayer.Notify(player, Translate(player, "CLIMB_PROTECTION"), "green", "fas fa-hourglass", false, time, "topCenter", "replace");
                     }
                     break;
 
@@ -2999,7 +2999,7 @@ namespace RNC
 
                         //player.SetData("ClimbProtectionEnd", Environment.TickCount64 + time);
                         //player.SetData("LastClimbProtection", Environment.TickCount64);
-                        EPlayer.Notify(player, "Climb protection...", "green", "fas fa-hourglass", false, time, "topCenter", "replace");
+                        EPlayer.Notify(player, Translate(player, "CLIMB_PROTECTION"), "green", "fas fa-hourglass", false, time, "topCenter", "replace");
                     }
                     break;
                 default:
@@ -3380,7 +3380,7 @@ namespace RNC
                             EPlayer.Spawn(player);
                             player.TriggerEvent("DestroyLoginScene");
 
-                            EPlayer.Notify(player, "Sorry, your character was reset (possibly due to an update), please create a new one. (<strong>/char</strong>)", "yellow", "fas fa-tshirt", false, 7000);
+                            EPlayer.Notify(player, Translate(player, "CHAR_RESET_UPDATE"), "yellow", "fas fa-tshirt", false, 7000);
                         }
                         else
                         {
@@ -3447,11 +3447,11 @@ namespace RNC
 
                     EPlayer.GetAccount(player).LastSessionMins = 0.0;
 
-                    EPlayer.Notify(player, "Login successful!", "green", "fas fa-check", false, 2000);
+                    EPlayer.Notify(player, Translate(player, "LOGIN_SUCCESS"), "green", "fas fa-check", false, 2000);
                     DiscordData d = NAPI.Util.FromJson<DiscordData>(EPlayer.GetAccount(player).DiscordInfo);
                     if (d.DiscordID == "n/a")
                     {
-                        EPlayer.Notify(player, "We highly recommend you to <strong>link your Discord account</strong> by using <strong>/verify</strong>. You will earn some rewards in return!", "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
+                        EPlayer.Notify(player, Translate(player, "DISCORD_VERIFY_NOTIF"), "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
                         player.SendChatMessage(Translate(player, "RECOMMEND_VERIFY_CHAT"));
                     }
 
@@ -3598,7 +3598,7 @@ namespace RNC
                 if (EPlayer.GetAccount(player).Level == 1 && EPlayer.GetAccount(player).XP < 2)
                 {
                     player.SendChatMessage(Translate(player, "REGISTER_GET_STARTED"));
-                    EPlayer.Notify(player, "We highly recommend you to <strong>link your Discord account</strong> by using <strong>/verify</strong>. You will earn some rewards in return!", "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
+                    EPlayer.Notify(player, Translate(player, "DISCORD_VERIFY_NOTIF"), "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
                 }
             }
         }
@@ -3762,7 +3762,7 @@ namespace RNC
             if (save)
             {
                 EPlayer.Save(player, false);
-                EPlayer.Notify(player, "You have successfully saved your uniform!", "green", "fas fa-check", false, 1500, "bottomRight", "replace");
+                EPlayer.Notify(player, Translate(player, "UNIFORM_SAVED"), "green", "fas fa-check", false, 1500, "bottomRight", "replace");
                 player.SetData("EditingClothing", -1);
                 if (player.HasSharedData("CharCreator_ShowClothingAfter") && player.GetSharedData<bool>("CharCreator_ShowClothingAfter") == true)
                 {
@@ -3827,7 +3827,7 @@ namespace RNC
                         if (EPlayer.GetAccount(player).Level == 1 && EPlayer.GetAccount(player).XP < 2)
                         {
                             player.SendChatMessage(Translate(player, "REGISTER_GET_STARTED"));
-                            EPlayer.Notify(player, "We highly recommend you to <strong>link your Discord account</strong> by using <strong>/verify</strong>. You will earn some rewards in return!", "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
+                            EPlayer.Notify(player, Translate(player, "DISCORD_VERIFY_NOTIF"), "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
                         }
                     }
                 }
@@ -4241,7 +4241,7 @@ namespace RNC
             player.TriggerEvent("Menu_UpdateLevelXP");
 
             //EPlayer.Spawn(player);
-            EPlayer.Notify(player, "Registration successful!", "green", "fas fa-check", false, 2000);
+            EPlayer.Notify(player, Translate(player, "REGISTER_SUCCESS"), "green", "fas fa-check", false, 2000);
 
             player.TriggerEvent("showLoginBrowser", false);
             player.TriggerEvent("StartTutorial");
@@ -4471,11 +4471,11 @@ namespace RNC
             {
                 if (toggle)
                 {
-                    EPlayer.Notify(player, $"AutoJoin has been turned <strong>ON</strong>.", "green", "fas fa-check", false, 1500, "bottomCenter", "replace");
+                    EPlayer.Notify(player, Translate(player, "AUTOJOIN_ON"), "green", "fas fa-check", false, 1500, "bottomCenter", "replace");
                 }
                 else
                 {
-                    EPlayer.Notify(player, $"AutoJoin has been turned <strong>OFF</strong>.", "red", "fas fa-check", false, 1500, "bottomCenter", "replace");
+                    EPlayer.Notify(player, Translate(player, "AUTOJOIN_OFF"), "red", "fas fa-check", false, 1500, "bottomCenter", "replace");
                 }
             }
         }
@@ -4757,7 +4757,7 @@ namespace RNC
                 DiscordData d = NAPI.Util.FromJson<DiscordData>(acc.DiscordInfo);
                 if (d.DiscordID == "n/a")
                 {
-                    EPlayer.Notify(player, $"You must <strong>link your Discord account</strong> to unlock this. <strong>(/verify)</strong>", "red", "fas fa-lock", false, 4000, "bottomCenter", "replace");
+                    EPlayer.Notify(player, Translate(player, "ERROR_LOCKED_DISCORD_VERIFY"), "red", "fas fa-lock", false, 4000, "bottomCenter", "replace");
                     return;
                 }
             }
@@ -4769,7 +4769,7 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
-                            EPlayer.Notify(player, $"Fugitive vehicle set to <strong>{car.Name}</strong>.", "blue", "fas fa-car", false, 3000, "bottomCenter", "replace");
+                            EPlayer.Notify(player, Translate(player, "FUGITIVE_VEHICLE_SET", car.Name), "blue", "fas fa-car", false, 3000, "bottomCenter", "replace");
                         });
                         acc.CarFugitive = car.Model;
                     }
@@ -4777,7 +4777,7 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
-                            EPlayer.Notify(player, $"Police vehicle set to <strong>{car.Name}</strong>.", "blue", "fas fa-car", false, 3000, "bottomCenter", "replace");
+                            EPlayer.Notify(player, Translate(player, "COP_VEHICLE_SET", car.Name), "blue", "fas fa-car", false, 3000, "bottomCenter", "replace");
                         });
                         acc.CarCop = car.Model;
                     }
@@ -4793,29 +4793,29 @@ namespace RNC
                     {
                         if (car.LevelRequired != 0 && car.LevelRequired > acc.Level)
                         {
-                            EPlayer.Notify(player, $"You need to be at least <strong>Level {car.LevelRequired}</strong> for this vehicle.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                            EPlayer.Notify(player, Translate(player, "CAR_LEVEL_REQUIRED", car.LevelRequired), "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
                             return;
                         }
                         if (car.DonatorPointsRequired != 0 && car.DonatorPointsRequired > acc.DonatorPoints)
                         {
-                            EPlayer.Notify(player, $"You need <strong>{car.DonatorPointsRequired} Donator Points</strong> for this vehicle.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                            EPlayer.Notify(player, Translate(player, "CAR_DONORPOINTS_REQUIRED", car.DonatorPointsRequired), "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
                             return;
                         }
                         if (car.PointsRequired != 0 && car.PointsRequired > acc.Points)
                         {
-                            EPlayer.Notify(player, $"You need <strong>{car.PointsRequired} Points</strong> for this vehicle.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                            EPlayer.Notify(player, Translate(player, "CAR_POINTS_REQUIRED", car.PointsRequired), "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
                             return;
                         }
                         if (car.DonatorLevelRequired != 0 && car.DonatorLevelRequired > acc.DonatorLevel)
                         {
-                            EPlayer.Notify(player, $"This vehicle is restricted to <strong>{EPlayer.GetDonatorLevelName(car.DonatorLevelRequired)}</strong>.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                            EPlayer.Notify(player, Translate(player, "CAR_DONATOR_REQUIRED", EPlayer.GetDonatorLevelName(car.DonatorLevelRequired)), "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
                             return;
                         }
 
                         EPlayer.GivePoints(player, -car.PointsRequired);
                         acc.DonatorPoints -= car.DonatorPointsRequired;
                         EPlayer.UnlockVehicle(acc, player, car.Model, car.Team);
-                        EPlayer.Notify(player, $"You have unlocked <strong>{car.Name}</strong>. You may select it now.", "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
+                        EPlayer.Notify(player, Translate(player, "CAR_PURCHASED", car.Name), "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
 
                         Task.Run(async () =>
                         {
@@ -4882,7 +4882,7 @@ namespace RNC
                 DiscordData d = NAPI.Util.FromJson<DiscordData>(acc.DiscordInfo);
                 if (d.DiscordID == "n/a")
                 {
-                    EPlayer.Notify(player, $"You must <strong>link your Discord account</strong> to unlock this. <strong>(/verify)</strong>", "red", "fas fa-lock", false, 4000, "bottomCenter", "replace");
+                    EPlayer.Notify(player, Translate(player, "ERROR_LOCKED_DISCORD_VERIFY"), "red", "fas fa-lock", false, 4000, "bottomCenter", "replace");
                     return;
                 }
             }
@@ -4895,7 +4895,7 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
-                            EPlayer.Notify(player, $"Fugitive loadout set to <strong>{loadout.Name}</strong>.", "blue", "fas fa-check", false, 3000, "bottomCenter", "replace");
+                            EPlayer.Notify(player, Translate(player, "FUGITIVE_LOADOUT_SET", loadout.Name), "blue", "fas fa-check", false, 3000, "bottomCenter", "replace");
                         });
                         acc.LoadoutFugitive = (loadout.Name.Equals("default", StringComparison.OrdinalIgnoreCase) ? "?" : loadout.Name);
                     }
@@ -4903,7 +4903,7 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
-                            EPlayer.Notify(player, $"Police loadout set to <strong>{loadout.Name}</strong>.", "blue", "fas fa-check", false, 3000, "bottomCenter", "replace");
+                            EPlayer.Notify(player, Translate(player, "COP_LOADOUT_SET", loadout.Name), "blue", "fas fa-check", false, 3000, "bottomCenter", "replace");
                         });
                         acc.LoadoutCop = (loadout.Name.Equals("default", StringComparison.OrdinalIgnoreCase) ? "?" : loadout.Name);
                     }
@@ -4919,29 +4919,29 @@ namespace RNC
                     {
                         if (loadout.LevelRequired != 0 && loadout.LevelRequired > acc.Level)
                         {
-                            EPlayer.Notify(player, $"You need to be at least <strong>Level {loadout.LevelRequired}</strong> for this loadout.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                            EPlayer.Notify(player, Translate(player, "LOADOUT_LEVEL_REQUIRED", loadout.LevelRequired), "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
                             return;
                         }
                         if (loadout.DonatorPointsRequired != 0 && loadout.DonatorPointsRequired > acc.DonatorPoints)
                         {
-                            EPlayer.Notify(player, $"You need <strong>{loadout.DonatorPointsRequired} Donator Points</strong> for this loadout.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                            EPlayer.Notify(player, Translate(player, "LOADOUT_DONORPOINTS_REQUIRED", loadout.DonatorPointsRequired), "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
                             return;
                         }
                         if (loadout.PointsRequired != 0 && loadout.PointsRequired > acc.Points)
                         {
-                            EPlayer.Notify(player, $"You need <strong>{loadout.PointsRequired} Points</strong> for this loadout.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                            EPlayer.Notify(player, Translate(player, "LOADOUT_POINTS_REQUIRED", loadout.PointsRequired), "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
                             return;
                         }
                         if (loadout.DonatorLevelRequired != 0 && loadout.DonatorLevelRequired > acc.DonatorLevel)
                         {
-                            EPlayer.Notify(player, $"This loadout is restricted to <strong>{EPlayer.GetDonatorLevelName(loadout.DonatorLevelRequired)}</strong>.", "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                            EPlayer.Notify(player, Translate(player, "LOADOUT_DONATOR_REQUIRED", EPlayer.GetDonatorLevelName(loadout.DonatorLevelRequired)), "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
                             return;
                         }
 
                         EPlayer.GivePoints(player, -loadout.PointsRequired);
                         acc.DonatorPoints -= loadout.DonatorPointsRequired;
                         EPlayer.UnlockLoadout(acc, player, loadout.Name, loadout.Team);
-                        EPlayer.Notify(player, $"You have unlocked <strong>{loadout.Name}</strong>. You may select it now.", "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
+                        EPlayer.Notify(player, Translate(player, "LOADOUT_PURCHASED", loadout.Name), "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
 
                         Task.Run(async () =>
                         {
@@ -5058,7 +5058,7 @@ namespace RNC
                                     if (ammoBox.TryGetValue(i.Value.AmmoType, out weaponAmmo))
                                     {
                                         guy.SetWeaponAmmo((WeaponHash)i.Key, guy.GetWeaponAmmo((WeaponHash)i.Key) + weaponAmmo);
-                                        notificationString = notificationString + $"<p>+{weaponAmmo} ammo to <strong>{i.Value.Name}</strong></p>";
+                                        notificationString = notificationString + Translate(player, "RESTOCKED_AMMO", weaponAmmo, i.Value.Name);
                                         ammoBox.Remove(i.Value.AmmoType);
                                     }
                                 }
@@ -5068,7 +5068,7 @@ namespace RNC
                         newPickup.SetData("AmmoBox", ammoBox);
                         if (notificationString.Length >= 3)
                         {
-                            EPlayer.Action(guy, "restocks from an ammunition box.");
+                            EPlayer.Action(guy, "ACTION_RESTOCKS_AMMO_BOX");
                             EPlayer.Notify(guy, notificationString, "green", "fas fa-boxes", false, 2000, "bottomRight");
                         }
 
@@ -5091,7 +5091,7 @@ namespace RNC
                 if (player.GetSharedData<int>("Team") != 0) return;
 
                 player.SetSharedData("TaseProtection", true); 
-                EPlayer.Notify(player, "Tase protection...", "yellow", "fas fa-hourglass", false, 5000, "topCenter", "replace");
+                EPlayer.Notify(player, Translate(player, "TASE_PROTECTION"), "yellow", "fas fa-hourglass", false, 5000, "topCenter", "replace");
             }
             else
             {
@@ -5155,7 +5155,7 @@ namespace RNC
             {
                 if (player.GetSharedData<bool>("HasShot") == false)
                 {
-                    EPlayer.Notify(player, $"You have now shot, <strong>cops can now kill you on sight.</strong>", "red", "fas fa-walking", false, 1500, "bottomCenter", "replace");
+                    EPlayer.Notify(player, Translate(player, "SHOT_TAG_WARNING_NOTIFICATION"), "red", "fas fa-walking", false, 1500, "bottomCenter", "replace");
                 }
 
                 player.SetSharedData("HasShot", true);
@@ -5527,11 +5527,12 @@ namespace RNC
         {
             Account acc = EPlayer.GetAccount(player);
             acc.AutoLogin = toggle;
+            EPlayer.Save(player, false);
 
             if (toggle)
-                EPlayer.Notify(player, "You turned Auto Login on! You will no longer need to enter your login info on this account.", "green", "fa-solid fa-user-check", true, 4000);
+                EPlayer.Notify(player, Translate(player, "AUTO_LOGIN_ON"), "green", "fa-solid fa-user-check", true, 4000);
             else
-                EPlayer.Notify(player, "You turned Auto Login off! You will now have to enter your login info when you connect.", "red", "fa-solid fa-user-xmark", true, 4000);
+                EPlayer.Notify(player, Translate(player, "AUTO_LOGIN_OFF"), "red", "fa-solid fa-user-xmark", true, 4000);
 
                 /*
                 Task.Run(async () =>
@@ -6218,7 +6219,6 @@ namespace RNC
                 return;
             }
             EPlayer.GivePoints(player, -price);
-            EPlayer.Notify(player, $"You successfully purchased a <strong>{name}</strong> for <strong>{price} Points</strong>!", "green", "fas fa-check", false, 3000, "bottomCenter", "replace");
             switch (name)
             {
                 case "Medkit":
@@ -6272,8 +6272,8 @@ namespace RNC
                         player.TriggerEvent("UpdateMenuItem", type, EPlayer.GetAccount(player).Lockpicks);              
                         break;
                     }
-       
             }
+            EPlayer.Notify(player, Translate(player, "ITEM_PURCHASE", name, price), "green", "fas fa-check", false, 3000, "bottomCenter", "replace");
             return;
         }
 
@@ -6705,7 +6705,7 @@ namespace RNC
                                 if (!player.HasData("TunerNoRefundWarn"))
                                 {
                                     player.SetData("TunerNoRefundWarn", true);
-                                    EPlayer.Notify(player, "Removing all components! <p>THIS ACTION IS IRREVERSIBLE AND NON REFUNDABLE, USE AGAIN TO PROCEED.</p>", "red", "fas fa-exclamation", false, 2500, "topCenter", "replace");
+                                    EPlayer.Notify(player, Translate(player, "REMOVE_COMPONENTS_WARNING"), "red", "fas fa-exclamation", false, 2500, "topCenter", "replace");
                                     return;
                                 }
                             });                
@@ -6722,7 +6722,7 @@ namespace RNC
                                 {
                                     NAPI.Task.Run(() =>
                                     {
-                                        EPlayer.Notify(player, $"You need {(vMods.Keys.Count * 10) - acc.DonatorPoints} more donator points for this upgrade! <p>You can only purchase max 2 components with standard points.</p>", "red", "fas fa-lock", false, 2500, "topCenter", "replace");
+                                        EPlayer.Notify(player, Translate(player, "TUNING_DONORPOINTS_REQUIRED", ((vMods.Keys.Count * 10) - acc.DonatorPoints)), "red", "fas fa-lock", false, 2500, "topCenter", "replace");
                                     });
                                     return;
                                 }
@@ -6734,7 +6734,7 @@ namespace RNC
                                 {
                                     NAPI.Task.Run(() =>
                                     {
-                                        EPlayer.Notify(player, $"You need {(vMods.Keys.Count * 50) - acc.Points} more points for this upgrade!", "red", "fas fa-lock", false, 2500, "topCenter", "replace");
+                                        EPlayer.Notify(player, Translate(player, "TUNING_POINTS_REQUIRED", ((vMods.Keys.Count * 50) - acc.Points)), "red", "fas fa-lock", false, 2500, "topCenter", "replace");
                                     });
                                     return;
                                 }
@@ -6745,7 +6745,7 @@ namespace RNC
                             }
                             NAPI.Task.Run(() =>
                             {
-                                EPlayer.Notify(player, $"Modifications saved!", "green", "fas fa-check", false, 2500, "topCenter");
+                                EPlayer.Notify(player, Translate(player, "TUNING_SAVED"), "green", "fas fa-check", false, 2500, "topCenter");
                             });
 
                             tuning = new PlayerTunings
@@ -6781,7 +6781,7 @@ namespace RNC
                                 {
                                     NAPI.Task.Run(() =>
                                     {
-                                        EPlayer.Notify(player, $"You need {(changes * 10) - acc.DonatorPoints} more donator points for this upgrade! <p>You can only purchase max 2 components with standard points.</p>", "red", "fas fa-lock", false, 2500, "topCenter", "replace");
+                                        EPlayer.Notify(player, Translate(player, "TUNING_DONORPOINTS_REQUIRED", ((vMods.Keys.Count * 10) - acc.DonatorPoints)), "red", "fas fa-lock", false, 2500, "topCenter", "replace");
                                     });
                                     return;
                                 }
@@ -6793,8 +6793,7 @@ namespace RNC
                                 {
                                     if (acc.Points < (changes * 50))
                                     {
-
-                                        EPlayer.Notify(player, $"You need {(changes * 50) - acc.Points} more points for this upgrade!", "red", "fas fa-lock", false, 2500, "topCenter", "replace");
+                                        EPlayer.Notify(player, Translate(player, "TUNING_POINTS_REQUIRED", ((vMods.Keys.Count * 50) - acc.Points)), "red", "fas fa-lock", false, 2500, "topCenter", "replace");
                                         return;
                                     }
                                     EPlayer.GivePoints(player, -(changes * 50));
@@ -6805,7 +6804,7 @@ namespace RNC
                             {
                                 NAPI.Task.Run(() =>
                                 {
-                                    EPlayer.Notify(player, $"Modifications saved!", "green", "fas fa-check", false, 2500, "topCenter");
+                                    EPlayer.Notify(player, Translate(player, "TUNING_SAVED"), "green", "fas fa-check", false, 2500, "topCenter");
                                 });                           
                                 tuning.PrimaryColor = priCol;
                                 tuning.SecondaryColor = secCol;
