@@ -2825,7 +2825,7 @@ namespace RNC
                                                             if(player.GetSharedData<int>("InLobby") < 0 || player.GetSharedData<int>("InDM") != -1)
                                                             {
                                                                 player.TriggerEvent("PlaySoundFrontend", "10s", "MP_MISSION_COUNTDOWN_SOUNDSET");
-                                                                EPlayer.Notify(player, "A copchase round is about to start in your lobby! Go to the /lobby if you want to participate.", "orange", "fas fa-hourglass-start", false, 10000, "topCenter");
+                                                                EPlayer.Notify(player, Translate(player, "ROUND_STARTING_GO_LOBBY"), "orange", "fas fa-hourglass-start", false, 10000, "topCenter");
                                                             }
                                                             else
                                                             {
@@ -2841,7 +2841,7 @@ namespace RNC
 
                                                                 EPlayer.Spawn(player);
                                                                 player.TriggerEvent("PlaySoundFrontend", "10s", "MP_MISSION_COUNTDOWN_SOUNDSET");
-                                                                EPlayer.Notify(player, "The round is about to start!", "orange", "fas fa-hourglass-start", false, 10000, "topCenter");
+                                                                EPlayer.Notify(player, Translate(player, "ROUND_STARTING"), "orange", "fas fa-hourglass-start", false, 10000, "topCenter");
 
                                                                 if (player.GetSharedData<bool>("IsTabbed") == true || EPlayer.IsAFK(player))
                                                                 {
@@ -4060,7 +4060,7 @@ namespace RNC
                                             player.SetSharedData("CuffedBy", "n/a");
                                             player.SetSharedData("Team", 1);
 
-                                            EPlayer.Notify(player, "<strong>Please wait</strong>, Bank Robbery is loading...", "yellow", "fas fa-spinner fa-spin", false, 19000, "bottomCenter");
+                                            EPlayer.Notify(player, Translate(player, "BANK_ROB_LOADING"), "yellow", "fas fa-spinner fa-spin", false, 19000, "bottomCenter");
                                         }
                                     }
                                 }
@@ -4427,7 +4427,7 @@ namespace RNC
                                                 EPlayer.SetColor(player, new Color(255, 174, 0), 0);
 
                                                 EPlayer.SetDiscordStatus(player, $"[Lobby {lobbyid}] Fugitive as {player.Name}");
-                                                EPlayer.Notify(player, "<strong>Please wait</strong>, Bank Robbery is loading...", "yellow", "fas fa-spinner fa-spin", false, 19000, "bottomCenter");
+                                                EPlayer.Notify(player, Translate(player, "BANK_ROB_LOADING"), "yellow", "fas fa-spinner fa-spin", false, 19000, "bottomCenter");
 
                                                 player.TriggerEvent("SetActorInvulnerable", false);
                                                 player.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
@@ -5504,7 +5504,7 @@ namespace RNC
                                     {
                                         fugi.SetSharedData("VisibleBlip", true);
 
-                                        if (lobby.FugitiveShowCounter == 60) EPlayer.Notify(fugi, "You are now visible on the radar.", "red", "fas fa-running", false, 3000);
+                                        if (lobby.FugitiveShowCounter == 60) EPlayer.Notify(fugi, Translate(fugi, "RADAR_VISIBLE"), "red", "fas fa-running", false, 3000);
                                     }
                                 }
                                 if (lobby.FugitiveShowCounter == 60 && lobby.GameProgress >= 60 && lobby.CollisionCounter <= -1)
@@ -5527,7 +5527,7 @@ namespace RNC
                                 {
                                     fugi.SetSharedData("VisibleBlip", false);
 
-                                    EPlayer.Notify(fugi, "You are no longer visible on the radar", "green", "fas fa-walking", false, 3000);
+                                    EPlayer.Notify(fugi, Translate(fugi, "RADAR_INVISIBLE"), "green", "fas fa-walking", false, 3000);
                                 }
                             }
                         }
@@ -5580,7 +5580,7 @@ namespace RNC
 
                                                 if (!lobby.Cops.Contains(player) && !lobby.Fugitives.Contains(player)) continue;
 
-                                                EPlayer.Notify(player, "Collisions have been enabled and weapons issued", "green", "fas fa-car-crash", false, 3000);
+                                                EPlayer.Notify(player, Translate(player, "COLLISIONS_ENABLED"), "green", "fas fa-car-crash", false, 3000);
 
                                                 player.Health = 100;
                                                 player.Armor = 0;

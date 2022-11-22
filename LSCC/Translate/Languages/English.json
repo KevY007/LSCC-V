@@ -491,6 +491,12 @@
   "REMOVE_COMPONENTS_WARNING": "Removing all components! <p>THIS ACTION IS IRREVERSIBLE AND NON REFUNDABLE, USE AGAIN TO PROCEED.</p>",
   "TUNING_DONORPOINTS_REQUIRED": "You need {POINTS} more donator points for this upgrade! <p>You can only purchase max 2 components with standard points.</p>",
   "TUNING_POINTS_REQUIRED": "You need {POINTS} more Points for this upgrade!",
-  "TUNING_SAVED": "Modifications saved!"
+  "TUNING_SAVED": "Modifications saved!",
+  "ROUND_STARTING_GO_LOBBY": "A copchase round is about to start in your lobby! Go to the /lobby if you want to participate.",
+  "ROUND_STARTING": "The round is about to start!",
+  "BANK_ROB_LOADING": "<strong>Please wait</strong>, Bank Robbery is loading...",
+  "RADAR_VISIBLE": "You are now visible on the radar.",
+  "RADAR_INVISIBLE": "You are no longer visible on the radar.",
+  "COLLISIONS_ENABLED": "Collisions have been enabled and weapons issued"
 
 }
