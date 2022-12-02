@@ -2172,16 +2172,16 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                     shakeValue = (getRandomInt(2, 6)/10);
                     break;
                 case "Submachine Guns":
-                    shakeValue = (getRandomInt(3, 6)/10);
+                    shakeValue = (getRandomInt(2, 4)/10);
                     break;
                 case "Shotguns":
                     shakeValue = (getRandomInt(18, 25)/10);
                     break;
                 case "Assault Rifles":
-                    shakeValue = (getRandomInt(3, 6)/10);
+                    shakeValue = (getRandomInt(1, 2)/10);
                     break;
                 case "Machine Guns":
-                    shakeValue = (getRandomInt(5, 8)/10);
+                    shakeValue = (getRandomInt(3, 6)/10);
                     break;
                 case "Sniper Rifles":
                     shakeValue = (getRandomInt(4, 6)/10);
@@ -2192,7 +2192,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
             }
             // and now doing some specific weapons
             if(gunName.includes("Revolver") || gunName === "Marksman Pistol" || gunName === "Pistol .50"){
-                shakeValue = (getRandomInt(8, 12)/10);
+                shakeValue = (getRandomInt(9, 14)/10);
             }
             if(gunName === "Stun Gun"){
                 shakeValue = 0;
@@ -2217,9 +2217,9 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
             }
         }
         
-        const val = (recoil_goingUp === true ? shakeValue : -shakeValue);
+        const val = shakeValue;
         const headval = (getRandomInt(0, 10) > 5 ? val : -val);
-        const pitchval = campos.x + val;
+        const pitchval = campos.x + (recoil_goingUp === true ? shakeValue : (-1-shakeValue));
         mp.game.cam.setGameplayCamRelativePitch(pitchval, 1);
         mp.game.cam.setGameplayCamRelativeHeading(camhead + headval);
         recoil_LastShotTime = Date.now();
