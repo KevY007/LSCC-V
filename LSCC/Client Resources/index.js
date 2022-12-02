@@ -64,6 +64,8 @@ var ActionMenuActive = false;
 var VehicleSpawnerActive = false;
 var WeaponEditorActive = false;
 
+var FireModeDisplayText = "";
+
 var cuffTarget = null;
 var cuffInterval = null;
 

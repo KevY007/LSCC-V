@@ -413,7 +413,7 @@ namespace RNC
                                     if (killStreak % 4 == 0 && killStreak >= 4 && (lobby.Cops.Contains(killer) || lobby.Fugitives.Contains(killer)))
                                     {
                                         EPlayer.GrantXP(killer, 5);
-                                        EPlayer.SendMessageInLobby(lobby.lobbyId, $"!{{#FF0000}}[KILLSTREAK] !{{#FF6347}}{killer.Name} !{{#FFFFFF}}is on a {killStreak} kills rampage! Someone stop them!");
+                                        EPlayer.SendMessageInLobby(lobby.lobbyId, "KILLSTREAK_LOBBY_MSG", killer.Name, killStreak);
 
                                         killer.SendChatMessage(Translate(killer, "KILLSTREAK_5XP"));
                                         EPlayer.GivePoints(killer, 5);
@@ -2672,7 +2672,7 @@ namespace RNC
                                     if (killStreak % 4 == 0 && killStreak >= 4 && (lobby.Cops.Contains(killer) || lobby.Fugitives.Contains(killer)))
                                     {
                                         EPlayer.GrantXP(killer, 3);
-                                        EPlayer.SendMessageInLobby(lobby.lobbyId, $"!{{#FF0000}}[KILLSTREAK] !{{#FF6347}}{killer.Name} !{{#FFFFFF}}is on a {killStreak} kills rampage! Someone stop them!");
+                                        EPlayer.SendMessageInLobby(lobby.lobbyId, "KILLSTREAK_LOBBY_MSG", killer.Name, killStreak);
 
                                         killer.SendChatMessage(Translate(killer, "KILLSTREAK_3XP"));
                                         EPlayer.GivePoints(killer, 3);
@@ -6102,7 +6102,7 @@ namespace RNC
                 EPlayer.GetAccount(cop).Arrests++;
                 cop.SendNotification("~g~+7 XP for busting " + fugitive.Name);
 
-                EPlayer.SendMessageInLobby(lobby.lobbyId, $"!{{#ADD8E6}}Fugitive {fugitive.Name} has been busted!");
+                EPlayer.SendMessageInLobby(lobby.lobbyId, "LOBBY_FUGITIVE_BUSTED", fugitive.Name);
 
                 Events.OnPlayerDeath(fugitive, cop, 696989); // Reason 696989 = handcuffs/busted (fast respawn).
             }
@@ -6451,7 +6451,7 @@ namespace RNC
             player.SetSharedData("FugitiveChance", player.GetSharedData<float>("FugitiveChance") + (0.2 * (double)((double)EPlayer.GetAccount(player).DonatorLevel + 1.0)));
             EPlayer.Action(player, $"has grabbed ahold of {target.Name} and slapped the handcuffs on their wrists.");
 
-            EPlayer.SendMessageInLobby(lobbye.lobbyId, $"!{{#ADD8E6}}Cop {player.Name} has apprehended Fugitive {target.Name}.");
+            EPlayer.SendMessageInLobby(lobbye.lobbyId, "LOBBY_FUGITIVE_ARRESTED", player.Name, target.Name);
 
             EPlayer.UnlockAchievement(player, "first_arrest");
             EPlayer.TryAdvanceChallenge(player, Challenge.ChallengeType.Arrest, "N/A");

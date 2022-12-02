@@ -2141,14 +2141,13 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                 recoil_goingUp = !recoil_goingUp;
             }
         }
-
-        const val = shakeValue;
+        
+        const val = (recoil_goingUp === true ? shakeValue : -shakeValue);
         const headval = (getRandomInt(0, 10) > 5 ? val : -val);
-        const pitchval = (recoil_goingUp === true ? (campos.x+val) : (campos.x-val));
+        const pitchval = campos.x + val;
         mp.game.cam.setGameplayCamRelativePitch(pitchval, 1);
         mp.game.cam.setGameplayCamRelativeHeading(camhead + headval);
         recoil_LastShotTime = Date.now();
-        mp.gui.chat.push(`Y-Recoil Path: ${recoil_goingUp ? "!{#00FF00}UP" : "!{#FFFF00}DOWN"} !{#FFFFFF}| Pitch: !{#FFFF00}${pitchval.toFixed(2)} !{#FFFFFF}Diff: !{#FFFF00}${(campos.x-pitchval)}`);
     }
     else{
         mp.game.cam.shakeGameplayCam('SMALL_EXPLOSION_SHAKE', 0.03);

@@ -1603,6 +1603,7 @@ mp.events.add("render", () => {
             ammo: ${ammoClip},
             maxAmmo: ${ammoWeapon + (clipSize-ammoClip)},
             image: "${wepData.ImageSrc}",
+            mode: "${FireModeDisplayText}"
           }`);
         }
     }

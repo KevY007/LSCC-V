@@ -2267,7 +2267,7 @@ namespace RNC
                             target.ResetData("DragoutVehicle");
                             target.ResetData("ExitedDragoutVehicle");
 
-                            EPlayer.SendMessageInLobby(lobbye.lobbyId, $"!{{#ADD8E6}}Cop {player.Name} has dragged {target.Name} out of the vehicle!");
+                            EPlayer.SendMessageInLobby(lobbye.lobbyId, "DRAGGED_OUT_OF_VEHICLE", player.Name, target.Name);
                             target.TriggerEvent("ThrowFromVehicle");
                         }
                     }
@@ -6432,7 +6432,7 @@ namespace RNC
 
                         NAPI.Util.ConsoleOutput($"{player.Name} set lobby {lobby.lobbyId} next map to {mapBruh.Name} ({mapBruh.SQL_ID}).");
 
-                        EPlayer.SendMessageInLobby(lobby.lobbyId, $"[Lobby {lobby.lobbyId}] Next game map has been set to !{{#8D8DFF}}{mapBruh.Name} !{{#FFFFFF}}by !{{#E84040}}{EPlayer.GetAdminName(player)}!{{#FFFFFF}}.");
+                        EPlayer.SendMessageInLobby(lobby.lobbyId, "NEXT_MAP_ADMIN", lobby.lobbyId, mapBruh.Name, EPlayer.GetAdminLevelName(EPlayer.GetAccount(player).Admin), player.Name);
 
                     });
                 }

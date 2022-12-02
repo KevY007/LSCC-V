@@ -2863,7 +2863,7 @@ namespace RNC
                                             {
                                                 if (Environment.TickCount64 - lobby.LastAutoStartMsg >= 90000)
                                                 {
-                                                    EPlayer.SendMessageInLobby(lobby.lobbyId, "!{#FFFF00}[GAME] !{#FFFFFF}Game will not start unless there are 2+ players to start a match.", true);
+                                                    EPlayer.SendMessageInLobby(lobby.lobbyId, "LOBBY_MIN_PLAYERS_MSG");
 
                                                     lobby.LastAutoStartMsg = Environment.TickCount64;
                                                 }

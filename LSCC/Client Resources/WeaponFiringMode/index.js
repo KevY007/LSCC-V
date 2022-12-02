@@ -53,17 +53,39 @@ mp.events.add("render", () => {
         let safeZone = mp.game.graphics.getSafeZoneSize();
         let finalDrawX = 0.8 - (1.0 - safeZone) * 0.5;
         let finalDrawY = 0.05 + (1.0 - safeZone) * 0.5;
+        
+        /*
         if (Constants.isBoltAction(currentWeapon))
             Constants.drawTextAligned("BOLT", finalDrawX, finalDrawY, 4, Constants.firingModeColor[curFiringMode], .5);
         else if(Constants.isPumpAction(currentWeapon))
             Constants.drawTextAligned("PUMP", finalDrawX, finalDrawY, 4, Constants.firingModeColor[curFiringMode], .5);
         else
             Constants.drawTextAligned(Constants.firingModeNames[curFiringMode], finalDrawX, finalDrawY, 4, Constants.firingModeColor[curFiringMode], .5);
+        */
+      
+        if (Constants.isBoltAction(currentWeapon))
+            FireModeDisplayText = "BOLT";
+        else if(Constants.isPumpAction(currentWeapon))
+            FireModeDisplayText = "PUMP";
+        else
+            FireModeDisplayText = Constants.firingModeNames[curFiringMode];
+        
     }
 });
 
 mp.keys.bind(0x48, false, () => {
-
+    if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
+        (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
+        (ActionMenuActive !== undefined && ActionMenuActive == true) ||
+        (ClothingEditorActive !== undefined && ClothingEditorActive == true) ||
+        (isHotwiring !== undefined && isHotwiring == true) ||
+        (menuToggled !== undefined && menuToggled == true)){
+        return;
+    }
+    if(Date.now() - lastChatToggle < 500 || chatStatus == true){
+        return;
+    }
+    
     if (ignoreCurrentWeapon) return;
 
     let newFiringMode = curFiringMode - 1;

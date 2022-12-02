@@ -2351,17 +2351,15 @@ namespace RNC
             
         }
 
-        public static void SendMessageInLobby(int lobbyid, string message, bool spam = false)
+        public static void SendMessageInLobby(int lobbyid, string message_code, params object[] args)
         {
             foreach (Player player in Settings.LoggedInPlayers)
             {
                 if (player.GetSharedData<int>("InLobby") == lobbyid)
                 {
-                    player.SendChatMessage(message);
+                    player.SendChatMessage(Translate(player, message_code, args));
                 }
             }
-
-            if (!spam) Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) |** {message}");
         }
         
         public static void SendMessageToAllAdmins(string message)
