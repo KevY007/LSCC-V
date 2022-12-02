@@ -203,7 +203,40 @@ let recoil_ShotsInBurst = 0;
 let recoil_goingUp = true;
 
 var tasePreview = false;
+
+let lastWeapon = 2725352035;
+let unholsterAnimTimeout = undefined;
+let holster_aimDisabled = false;
+
 mp.events.add("render", () => {
+
+    if(holster_aimDisabled === true){
+        mp.game.controls.disableControlAction(0, 25, true); // disable aim
+    }
+
+    if(mp.players.local.weapon != lastWeapon){
+        holster_aimDisabled = true;
+        clearTimeout(unholsterAnimTimeout);
+        lastWeapon = mp.players.local.weapon;
+        if(lastWeapon !== 2725352035){
+            mp.players.local.taskPlayAnim('reaction@intimidation@1h', 'intro', 24.0, 24.0, -1, 48, 0.3, false, false, false)
+
+            unholsterAnimTimeout = setTimeout(() => {
+                mp.players.local.stopAnim('reaction@intimidation@1h', 'intro', 3.0);
+                holster_aimDisabled = false;
+                clearTimeout(unholsterAnimTimeout);
+            }, 550);
+        }
+        else{
+            mp.players.local.taskPlayAnim('reaction@intimidation@1h', 'outro', 24.0, 24.0, -1, 48, 0.3, false, false, false)
+
+            unholsterAnimTimeout = setTimeout(() => {
+                mp.players.local.stopAnim('reaction@intimidation@1h', 'outro', 8.0);
+                holster_aimDisabled = false;
+                clearTimeout(unholsterAnimTimeout);
+            }, 500);
+        }
+    }
 
     if(recoil_ShotsInBurst > 0 && (Date.now() - recoil_LastShotTime > 300)){
         recoil_ShotsInBurst = 0;

@@ -1867,9 +1867,11 @@ namespace RNC
             if (player.IsInVehicle)
             { player.SendChatMessage(Translate(player, "ERROR_CANT_USE_INSIDE_VEHICLE")); return; }
 
+            /*
             long currentTimestamp = new DateTimeOffset().ToUnixTimeSeconds();
-            if(currentTimestamp - player.GetSharedData<System.Int32>("LastVehicleExit") < 20)
+            if(player.HasSharedData("LastVehicleExit") && player.GetSharedData<System.Int64>("LastVehicleExit") > 0 && currentTimestamp - player.GetSharedData<System.Int64>("LastVehicleExit") < 20)
             { player.SendChatMessage(Translate(player, "ERROR_STOPANIM_VEHEXIT_COOLDOWN")); return; }
+            */
 
             if (!player.GetSharedData<string>("ActionType").Equals("none"))
             { player.SendChatMessage(Translate(player, "ERROR_IN_ACTION")); return; }
