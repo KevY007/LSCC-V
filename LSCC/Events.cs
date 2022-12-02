@@ -3852,6 +3852,34 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("HolsterAnimation_PistolCheck")]
+        public void HolsterAnimation_PistolCheck(Player player, bool unholster)
+        {
+            try
+            {
+                CharacterData cdata = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+                if (cdata == null) return;
+
+
+                if(cdata.Gender == 0) // male
+                {
+                    if (cdata.Clothing[1].Clothes[7].Drawable != 171 && cdata.Clothing[1].Clothes[7].Drawable != 170) return;
+
+                    player.SetClothes(7, (unholster ? 171 : 170), 0);
+                }
+                else
+                {
+                    if (cdata.Clothing[3].Clothes[7].Drawable != 126 && cdata.Clothing[3].Clothes[7].Drawable != 127) return;
+
+                    player.SetClothes(7, (unholster ? 126 : 127), 0);
+                }
+            }
+            catch
+            {
+                // no big deal tbh
+            }
+        }
+
         [RemoteEvent("RequestSetClothes")]
         public void OnRequestSetClothes(Player player, int slot, int drawable, int texture)
         {

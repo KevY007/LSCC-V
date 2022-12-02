@@ -452,7 +452,7 @@ const MaleClothing = [
     {
         clothing: "Handwear",
         type: "Elbows",
-        items: [0, 19, 41]
+        items: [0, 11, 19, 41]
     },
     {
         clothing: "Hats",

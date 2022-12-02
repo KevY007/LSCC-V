@@ -197,6 +197,80 @@ mp.events.add('setPing', (pingtoset) => {
     ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.ping = ${ping}`);
 })
 
+let lastWeapon = 2725352035;
+let holsterAnimTimeout = undefined;
+let holster_aimDisabled = false;
+
+let holsterTimeoutTime = 0;
+let holsterAnimData = {};
+
+mp.events.add('render', () => {
+
+    if(!mp.players.local || !mp.players.local.weapon) return;
+
+    if(holster_aimDisabled === true){
+        mp.game.controls.disableControlAction(0, 25, true); // disable aim
+    }
+
+    if(mp.players.local.weapon != lastWeapon){
+        lastWeapon = mp.players.local.weapon;
+        holster_aimDisabled = true;
+        clearTimeout(holsterAnimTimeout);
+
+        let gunData = weaponData.find(w => Number(w.Hash) == mp.players.local.weapon);
+        const gunType = gunData.Type || "Handguns";
+        if(gunType === "Handguns" || gunType === "Submachine Guns"){
+            if(mp.players.local.getVariable("Team") == 0){
+                if(lastWeapon !== 2725352035){
+                    holsterAnimData = {dict:'reaction@intimidation@1h', name:'intro', offset:0.3};
+                    holsterTimeoutTime = 550;
+                }
+                else{
+                    holsterAnimData = {dict:'reaction@intimidation@1h', name:'outro', offset:0.3};
+                    holsterTimeoutTime = 500;
+                }
+            }
+            else{
+                if(lastWeapon !== 2725352035){
+                    holsterAnimData = {dict:'rcmjosh4', name:'josh_leadout_cop2', offset:0};
+                    holsterTimeoutTime = 550;
+
+                    if(mp.players.local.getVariable("Team") == 1)
+                        mp.events.callRemote("HolsterAnimation_PistolCheck", true);
+                }
+                else{
+                    holsterAnimData = {dict:'rcmjosh4', name:'josh_leadout_cop2', offset:0};
+                    holsterTimeoutTime = 200;
+
+                    if(mp.players.local.getVariable("Team") == 1)
+                        mp.events.callRemote("HolsterAnimation_PistolCheck", false);
+                }
+            }
+        }
+        else{
+            if(mp.players.local.getVariable("Team") == 0){
+                holsterAnimData = {dict:'reaction@intimidation@1h', name:'outro', offset:0.3};
+                holsterTimeoutTime = 500;
+            }
+            else{
+                holsterAnimData = {dict:'rcmjosh4', name:'josh_leadout_cop2', offset:0};
+                holsterTimeoutTime = 200;
+
+                if(mp.players.local.getVariable("Team") == 1)
+                    mp.events.callRemote("HolsterAnimation_PistolCheck", false);
+            }
+        }
+        mp.players.local.taskPlayAnim(holsterAnimData.dict, holsterAnimData.name, 24.0, 24.0, -1, 48, holsterAnimData.offset, false, false, false)
+
+        holsterAnimTimeout = setTimeout(() => {
+            mp.players.local.stopAnim(holsterAnimData.dict, holsterAnimData.name, 3.0);
+            holster_aimDisabled = false;
+            clearTimeout(holsterAnimTimeout);
+        }, holsterTimeoutTime);
+        
+    }
+});
+
 
 let recoil_LastShotTime = 0;
 let recoil_ShotsInBurst = 0;
@@ -204,39 +278,7 @@ let recoil_goingUp = true;
 
 var tasePreview = false;
 
-let lastWeapon = 2725352035;
-let unholsterAnimTimeout = undefined;
-let holster_aimDisabled = false;
-
 mp.events.add("render", () => {
-
-    if(holster_aimDisabled === true){
-        mp.game.controls.disableControlAction(0, 25, true); // disable aim
-    }
-
-    if(mp.players.local.weapon != lastWeapon){
-        holster_aimDisabled = true;
-        clearTimeout(unholsterAnimTimeout);
-        lastWeapon = mp.players.local.weapon;
-        if(lastWeapon !== 2725352035){
-            mp.players.local.taskPlayAnim('reaction@intimidation@1h', 'intro', 24.0, 24.0, -1, 48, 0.3, false, false, false)
-
-            unholsterAnimTimeout = setTimeout(() => {
-                mp.players.local.stopAnim('reaction@intimidation@1h', 'intro', 3.0);
-                holster_aimDisabled = false;
-                clearTimeout(unholsterAnimTimeout);
-            }, 550);
-        }
-        else{
-            mp.players.local.taskPlayAnim('reaction@intimidation@1h', 'outro', 24.0, 24.0, -1, 48, 0.3, false, false, false)
-
-            unholsterAnimTimeout = setTimeout(() => {
-                mp.players.local.stopAnim('reaction@intimidation@1h', 'outro', 8.0);
-                holster_aimDisabled = false;
-                clearTimeout(unholsterAnimTimeout);
-            }, 500);
-        }
-    }
 
     if(recoil_ShotsInBurst > 0 && (Date.now() - recoil_LastShotTime > 300)){
         recoil_ShotsInBurst = 0;
@@ -3338,31 +3380,32 @@ mp.events.add(
 mp.events.add("OnPlayerLoginRegister", () => {
 
     setTimeout(() => {
-        setStorageDataVars();
-    }, 550);
-
-    if(mp.storage.data.menu !== undefined && mp.storage.data.menu.myweather !== undefined)
-    {
-        mp.events.callRemote("SetPlayerPrivateWeather", mp.storage.data.menu.myweather);
-    }
-
-    setTimeout(() => {
-        InitializeMDC();
+        focusChat(false);
     }, 300);
     setTimeout(() => {
+        setStorageDataVars();
+    }, 400);
+    setTimeout(() => {
+        InitializeMDC();
+        mp.game.streaming.requestAnimDict("rcmjosh4");
+    }, 500);
+    setTimeout(() => {
         InitializeWeaponEditor();
-    }, 350);
+        mp.game.streaming.requestAnimDict("reaction@intimidation@1h");
+    }, 600);
     setTimeout(() => {
         InitializeHotwireDOM();
         AddCustomVehiclesToSpawner()
-    }, 400);
+    }, 700);
     setTimeout(() => {
         InitializeClothingEditorDOM();
-    }, 450);
 
-    setTimeout(() => {
-        focusChat(false);
-    }, 250);
+        if(mp.storage.data.menu !== undefined && mp.storage.data.menu.myweather !== undefined)
+        {
+            mp.events.callRemote("SetPlayerPrivateWeather", mp.storage.data.menu.myweather);
+        }
+    }, 800);
+
 });
 
 
