@@ -204,6 +204,13 @@ let holster_aimDisabled = false;
 let holsterTimeoutTime = 0;
 let holsterAnimData = {};
 
+mp.events.add("holsterAnimSync_clearAnim", (entity, dict, name, speed) => {
+    entity.stopAnim(dict, name, speed);
+});
+mp.events.add("holsterAnimSync_playAnim", (entity, animDictionary, animName, animFlag, speed = 8.0, speedMul = 0.0, duration = -1, offset = 0.0, lockX = false, lockY = false, lockZ = false) => {
+    entity.taskPlayAnim(animDictionary, animName, speed, speedMul, duration, animFlag, offset, lockX, lockY, lockZ);
+});
+
 mp.events.add('render', () => {
 
     if(!mp.players.local || !mp.players.local.weapon) return;
@@ -261,9 +268,11 @@ mp.events.add('render', () => {
             }
         }
         mp.players.local.taskPlayAnim(holsterAnimData.dict, holsterAnimData.name, 24.0, 24.0, -1, 48, holsterAnimData.offset, false, false, false)
+        mp.events.callRemote("HolsterAnimation_PlaySynced", holsterAnimData.dict, holsterAnimData.name, 24.0, 24.0, -1, 48, holsterAnimData.offset, false, false, false)
 
         holsterAnimTimeout = setTimeout(() => {
             mp.players.local.stopAnim(holsterAnimData.dict, holsterAnimData.name, 3.0);
+            mp.events.callRemote("HolsterAnimation_StopSynced", holsterAnimData.dict, holsterAnimData.name, 3.0);
             holster_aimDisabled = false;
             clearTimeout(holsterAnimTimeout);
         }, holsterTimeoutTime);

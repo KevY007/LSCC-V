@@ -3852,6 +3852,26 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("HolsterAnimation_StopSynced")]
+        public void HolsterAnimation_StopSynced(Player player, string dict, string name, double speed)
+        {
+            RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a.Position.DistanceTo(player.Position) < 500.0).ToList().ForEach((Player act) =>
+            {
+                if (act.Id != player.Id)
+                    act.TriggerEvent("holsterAnimSync_clearAnim", player, dict, name, speed);
+            });
+        }
+
+        [RemoteEvent("HolsterAnimation_PlaySynced")]
+        public void HolsterAnimation_PlaySynced(Player player, string dict, string name, double speed, double speedMultiplier, double duration, int flag, double offset, bool lockX, bool lockY, bool lockZ)
+        {
+            RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a.Position.DistanceTo(player.Position) < 500.0).ToList().ForEach((Player act) =>
+            {
+                if (act.Id != player.Id)
+                    act.TriggerEvent("holsterAnimSync_playAnim", player, dict, name, flag, speed, speedMultiplier, duration, offset, lockX, lockY, lockZ);
+            });
+        }
+
         [RemoteEvent("HolsterAnimation_PistolCheck")]
         public void HolsterAnimation_PistolCheck(Player player, bool unholster)
         {
