@@ -1345,6 +1345,9 @@ mp.events.add("playerEnterVehicle", (vehicle, seat) => {
             vehicle.setEngineOn(false, true, true);
         }
     }
+    if(vehicle.getVariable("Fuel") && vehicle.getVariable("Fuel") <= 0.0){
+        vehicle.setEngineOn(false, true, true);
+    }
 });
 mp.events.add("playerLeaveVehicle", (vehicle, seat) => {
     exitCarTime = Math.floor(Date.now() / 1000);

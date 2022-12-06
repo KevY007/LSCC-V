@@ -2128,6 +2128,13 @@ namespace RNC
                 }
             }
 
+            if(vehicle.HasSharedData("Fuel") && vehicle.GetSharedData<float>("Fuel") <= 0.0 )
+            {
+                EPlayer.Notify(player, Translate(player, "NO_FUEL_NOTIFICATION"), "orange", "fa-fuel", false, 3000, "bottomRight", "replace");
+                vehicle.EngineStatus = false;
+                vehicle.SetSharedData("Engine", false);
+            }
+
             player.SetSharedData("Ping", player.Ping);
             vehicle.SetSharedData("Engine", vehicle.EngineStatus);
 
