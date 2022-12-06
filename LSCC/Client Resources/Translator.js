@@ -1,6 +1,8 @@
 const {Language:English} = require('./Languages/Client/Game/English');
 
 function TranslateMessage(message_code, args){
+    if(!args) args = [];
+
     var LANG = null;
     // switch case
     LANG = English;

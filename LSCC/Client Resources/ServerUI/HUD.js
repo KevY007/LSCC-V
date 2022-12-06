@@ -247,7 +247,7 @@ mp.events.add('actionMenu:clickItem', (actionID) => {
         }
         case 12: // Handcuff/revive message tip sends them to hold 'H'
         {
-            ServerUI.execute(`toast('Hotkey Help', 'You must <strong>hold down "H"</strong> to perform that action!', 'warning', 3000);`);
+            ServerUI.execute(`toast('${Translate("HOTKEY_HELP")}', '${Translate("MUST_HOLD_H")}', 'warning', 3000);`);
             break;
         }
         case 13: // Engine command
@@ -491,7 +491,7 @@ mp.events.add("WeaponSpawner:show", (targetName, weaponName) => {
 mp.events.add("SendClanInvite", (clanName, clanID, senderName) => {
     mp.game.audio.playSoundFrontend(-1, "CHALLENGE_UNLOCKED",  "HUD_AWARDS", true);
     ServerUI.execute(`clanInvite("Clan Invitation", "You have been invited to <strong>${clanName}</strong> by ${senderName}.", 20000, ${clanID});`);
-    let notifyscoreboardstr = `toast('Show Cursor', 'To accept the invite, press <strong>F2</strong> to show the cursor, and click the <strong>Accept</strong> button.', 'nothing', 6500, 2);`;
+    let notifyscoreboardstr = `toast('${Translate("SHOW_CURSOR")}', '${Translate("CLAN_INVITE_TIP")}', 'nothing', 6500, 2);`;
     ServerUI.execute(notifyscoreboardstr);
 });
 
@@ -513,7 +513,7 @@ mp.events.add("startLoadingScreen", (time, message) => {
         setTimeout(() => {
             if(mp.players.local != null && mp.players.exists(mp.players.local) && IsInInfiniteLoading == true){
                 CanSkipLoading = true;
-                let notifyscoreboardstr = `toast('Skip Loading', 'Press <strong>SPACE BAR</strong> to skip the loading screen!', 'nothing', 10000, 2);`;
+                let notifyscoreboardstr = `toast('${Translate("SKIP_LOADING")}', '${Translate("SKIP_LOADING_TIP")}', 'nothing', 10000, 2);`;
                 ServerUI.execute(notifyscoreboardstr);
             }
         }, 10000);
@@ -529,7 +529,7 @@ mp.keys.bind(0x20, false, function() {
     if(IsInInfiniteLoading == true && CanSkipLoading == true){
         mp.events.callLocal("stopLoadingScreen");
 
-        let notifyscoreboardstr = `toast('Skip Loading', 'Press <strong>SPACE BAR</strong> to skip the loading screen!', 'nothing', 50, 2);`;
+        let notifyscoreboardstr = `toast('${Translate("SKIP_LOADING")}', '${Translate("SKIP_LOADING_TIP")}', 'nothing', 1, 2);`;
         ServerUI.execute(notifyscoreboardstr);
     }
 });
@@ -1329,7 +1329,7 @@ function ToggleScoreboard()
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.disableInput = true;`);
 		// ServerUI.execute(`gm.$refs.scoreboard.setPlayers([]);`);
 
-        let notifyscoreboardstr = `toast('Scoreboard Cursor', 'Press <strong>F2</strong> to show the cursor. Click on a player for actions.', 'nothing', 5000, 2);`;
+        let notifyscoreboardstr = `toast('${Translate("SHOW_CURSOR")}', '${Translate("SCOREBOARD_TIP")}', 'nothing', 6500, 2);`;
         ServerUI.execute(notifyscoreboardstr);
 
         updatePlayers();

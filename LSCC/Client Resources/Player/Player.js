@@ -2139,7 +2139,7 @@ mp.events.add("render", () => {
             {
                 currentRollCooldownTimestamp = (Date.now() + 1500);
                 rollShootCooldownActive = true;
-                ServerUI.execute(`toast('Shooting Cooldown...', '', 'warning', 1500, 2);`);
+                ServerUI.execute(`toast('${Translate("SHOOTING_COOLDOWN")}', '', 'warning', 1500, 2);`);
             }
         }
     }
