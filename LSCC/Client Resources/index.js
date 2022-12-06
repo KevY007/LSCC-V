@@ -1,4 +1,5 @@
-﻿var currentJailTime = 0;
+﻿const {TranslateMessage: Translate} = require('./Translator');
+var currentJailTime = 0;
 var lastJailUpdate = 10;
 
 var chaseRunning = false;

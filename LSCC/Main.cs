@@ -2685,22 +2685,23 @@ namespace RNC
 
                 if (Environment.TickCount64 - Settings.LastMessageTick > 90000)
                 {
+                    /*
                     string[] msgList = {
-                    "If you would like to experience some exclusive and limited features then donate to keep the server running!",
-                    "The server's discord, information and credits can be found at /discord or /info!",
-                    "Use /rules to see the server rules.",
-                    "Use /cmds to see the server commands & /helpme if you need assistance.",
-                    "Have you seen someone cheating? Screenshot or record them and you'll never see them again.",
-                    "Bored of waiting in the lobby? Check out our side activities like Deathmatch, Freeroam, Derby!",
-                    "Want to earn some quick score? Head over to a DM arena!",
-                    "You can save your current cop & fugitive appearance profile and select a different one by using /outfit.",
-                    "Points can be used to purchase items such as medkits (/mk), painkillers (/pk), and even tune vehicles (/vtuner).",
-                    "You can press M to open the menu, check more at /keys!",
-                    "Use /clothing and /char to change your clothing or character's face.",
-                };
+                        "If you would like to experience some exclusive and limited features then donate to keep the server running!",
+                        "The server's discord, information and credits can be found at /discord or /info!",
+                        "Use /rules to see the server rules.",
+                        "Use /cmds to see the server commands & /helpme if you need assistance.",
+                        "Have you seen someone cheating? Screenshot or record them and you'll never see them again.",
+                        "Bored of waiting in the lobby? Check out our side activities like Deathmatch, Freeroam, Derby!",
+                        "Want to earn some quick score? Head over to a DM arena!",
+                        "You can save your current cop & fugitive appearance profile and select a different one by using /outfit.",
+                        "Points can be used to purchase items such as medkits (/mk), painkillers (/pk), and even tune vehicles (/vtuner).",
+                        "You can press M to open the menu, check more at /keys!",
+                        "Use /clothing and /char to change your clothing or character's face.",
+                    };
 
                     RAGE.Entities.Players.All.ForEach((Player e) => e.SendChatMessage("[?] !{#F0FC72}" + msgList.OrderBy(c => Guid.NewGuid()).First()));
-
+                    */
                     Settings.LastMessageTick = Environment.TickCount64;
                 }
 
