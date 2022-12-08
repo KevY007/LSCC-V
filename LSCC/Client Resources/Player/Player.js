@@ -225,7 +225,7 @@ mp.events.add('render', () => {
         clearTimeout(holsterAnimTimeout);
 
         let gunData = weaponData.find(w => Number(w.Hash) == mp.players.local.weapon);
-        const gunType = gunData.Type || "Handguns";
+        const gunType = (gunData ? (gunData.Type || "Handguns") : "Handguns");
         if(gunType === "Handguns" || gunType === "Submachine Guns"){
             if(mp.players.local.getVariable("Team") == 0){
                 if(lastWeapon !== 2725352035){
