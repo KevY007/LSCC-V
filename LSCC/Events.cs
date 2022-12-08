@@ -472,10 +472,10 @@ namespace RNC
                                         }
                                         */
 
-                                        string chatStr = $"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: Officer {player.Name} is down and needs medical assistance!";
+                                        //string chatStr = $"!{{#FFEC8B}}** [RADIO | FREQ: 911] DISPATCH: Officer {player.Name} is down and needs medical assistance!";
                                         foreach (Player cop in lobby.Cops.Where(c => c.Position.DistanceTo(player.Position) < 75))
                                         {
-                                            cop.SendChatMessage(chatStr);
+                                            //cop.SendChatMessage(chatStr);
                                             if (cop != player)
                                             {
                                                 cop.TriggerEvent("RemoveTooltip", "H");
@@ -510,6 +510,7 @@ namespace RNC
                                         }
                                         */
 
+                                        /*
                                         int msgrand = new Random().Next(0, 5);
                                         string msg = "";
                                         switch (msgrand)
@@ -532,9 +533,10 @@ namespace RNC
                                         }
 
                                         string chatStr = $"!{{#FFEC8B}}** [WT | FREQ: {lobby.lobbyId + 8346}] {player.Name.Replace("_", " ")}: {msg}";
+                                        */
                                         foreach (Player fug in lobby.Fugitives.Where(c => c.Position.DistanceTo(player.Position) < 75))
                                         {
-                                            fug.SendChatMessage(chatStr);
+                                            //fug.SendChatMessage(chatStr);
                                             if (fug != player)
                                             {
                                                 fug.TriggerEvent("RemoveTooltip", "H");
@@ -1318,11 +1320,13 @@ namespace RNC
             player.TriggerEvent("MDC:StingerSuccess", spikeID, "Success - a backup unit was dispatched to deploy the stingers.");
             player.TriggerEvent("MDC:UpdateBlip", spikeID, "spike", sg.StingerObjects[0].Position.X, sg.StingerObjects[0].Position.Y);
 
+            /*
             string chatStr = $"!{{#FFEC8B}}** [RADIO | FREQ: 911] {player.Name.Replace("_", " ")}: Dispatch, requesting a stinger deployment at {sg.Street}, {sg.Area}, over!";
             foreach (Player i in lobby.Cops)
             {
                 i.SendChatMessage(chatStr);
             }
+            */
 
             // Stinger is added to the lobby stingers array.
             // GameUpdate() will then handle the deployment timer and create new objects if necessary.
