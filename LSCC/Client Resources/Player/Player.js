@@ -1651,7 +1651,7 @@ mp.events.add('render', () => {
                 mp.game.invoke('0x16E42E800B472221', player.handle); // Force Open Parachute (( 1.1 Bug where you can't open ))
             }
             */
-           
+
             if(player.isInAnyVehicle(false) && chaseRunning)
             {
                 if (player.seat !== undefined)
