@@ -146,6 +146,7 @@ namespace RNC
                 return;
             }
             int pAdmin = EPlayer.GetAccount(player).Admin;
+            int pSQL = EPlayer.GetAccount(player).SQL_ID;
             Task.Run(async () =>
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
@@ -161,7 +162,7 @@ namespace RNC
                         });
                         return;
                     }
-                    if (target.Admin >= pAdmin)
+                    if (target.Admin >= pAdmin && target.SQL_ID != pSQL)
                     {
                         NAPI.Task.Run(() =>
                         {

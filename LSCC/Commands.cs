@@ -4253,6 +4253,21 @@ namespace RNC
             if (arenaid == 666) return;
             if (!EPlayer.LoggedIn(player)) return;
             if (EPlayer.GetAccount(player).JailTime > 0) return;
+            if (EPlayer.GetAccount(player).DeathmatchBanTime > 0)
+            {
+                long secs = EPlayer.GetAccount(player).DeathmatchBanTime - DateTimeOffset.Now.ToUnixTimeSeconds();
+                if(secs > 0)
+                {
+                    player.SendChatMessage(Translate(player, "BANNED_FROM_MINIGAME"));
+                    EPlayer.Error(player, Translate(player, "BANNED_FROM_MINIGAME_NOTIFICATION"));
+                    return;
+                }
+                else
+                {
+                    EPlayer.GetAccount(player).DeathmatchBanTime = 0;
+                    EPlayer.Save(player, false);
+                }
+            }
 
             if (player.HasData("Spectating"))
             {
@@ -4319,11 +4334,132 @@ namespace RNC
             return;
         }
 
+        [Command("mgbans")]
+        public static void cmd_mgbans(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            Account acc = EPlayer.GetAccount(player);
+            player.SendChatMessage(Translate(player, "OUTSTANDING_BANS_MESSAGE"));
+            bool anyFound = false;
+
+
+            if(acc.CopchaseBanTime > 0)
+            {
+                long secs = acc.CopchaseBanTime - DateTimeOffset.Now.ToUnixTimeSeconds();
+                string leftTime = (secs < 60 ? "<1" : Math.Floor((decimal)secs / 60).ToString());
+                anyFound = true;
+                player.SendChatMessage(Translate(player, "MINIGAME_BAN_LIST", "Copchase", leftTime, acc.CopchaseBanReason));
+            }
+            if (acc.DeathmatchBanTime > 0)
+            {
+                long secs = acc.DeathmatchBanTime - DateTimeOffset.Now.ToUnixTimeSeconds();
+                string leftTime = (secs < 60 ? "<1" : Math.Floor((decimal)secs / 60).ToString());
+                anyFound = true;
+                player.SendChatMessage(Translate(player, "MINIGAME_BAN_LIST", "Deathmatch", leftTime, acc.DeathmatchBanReason));
+            }
+            if (acc.FreeroamBanTime > 0)
+            {
+                long secs = acc.FreeroamBanTime - DateTimeOffset.Now.ToUnixTimeSeconds();
+                string leftTime = (secs < 60 ? "<1" : Math.Floor((decimal)secs / 60).ToString());
+                anyFound = true;
+                player.SendChatMessage(Translate(player, "MINIGAME_BAN_LIST", "Freeroam", leftTime, acc.FreeroamBanReason));
+            }
+
+            if (anyFound)
+            {
+                player.SendChatMessage(Translate(player, "NO_MINIGAME_BANS"));
+            }
+        }
+
+        [Command("minigameban", "!{#AFAFAF}[USAGE] minigameban (player) (option: 'freeroam', 'deathmatch', 'copchase') (time in minutes) (reason)", Alias = "mgban", GreedyArg = true)]
+        public static void cmd_minigameban(Player player, Player target, string option, long minutes, string reason)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 2)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
+                return;
+            }
+            if (!EPlayer.LoggedIn(target))
+            {
+                player.SendChatMessage(Translate(player, "ERROR_TARGET_NOT_LOGIN"));
+                return;
+            }
+            if (EPlayer.GetAccount(player).Admin < EPlayer.GetAccount(target).Admin)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That player is a higher admin level than you!");
+                return;
+            }
+            if(minutes < 1 || minutes > 43200)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The ban time must be between 1 minute and 43200 minutes !{#c9c9c9}(30 days)~w~!");
+                return;
+            }
+
+            Account tAcc = EPlayer.GetAccount(target);
+            long banTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds() + (minutes * 60);
+            switch (option)
+            {
+                case "freeroam":
+                    tAcc.FreeroamBanReason = reason;
+                    tAcc.FreeroamBanTime = banTimestamp;
+                    if (target.GetSharedData<int>("InLobby") == -3)
+                    {
+                        cmd_lobby(target);
+                    }
+                    break;
+                case "deathmatch":
+                    tAcc.DeathmatchBanReason = reason;
+                    tAcc.DeathmatchBanTime = banTimestamp;
+                    if (target.GetSharedData<int>("InDM") >= 0)
+                    {
+                        cmd_lobby(target);
+                    }
+                    break;
+                case "copchase":
+                    tAcc.CopchaseBanReason = reason;
+                    tAcc.CopchaseBanTime = banTimestamp;
+                    if(target.GetSharedData<int>("Team") >= 0)
+                    {
+                        cmd_lobby(target);
+                    }
+                    break;
+                default:
+                    player.SendChatMessage("!{#AFAFAF}[USAGE] minigameban (player) (option: 'freeroam', 'deathmatch', 'copchase') (time in minutes) (reason)");
+                    return;
+            }
+
+            EPlayer.Save(target, false);
+            if(player.GetData<bool>("Anonymous") == true)
+            {
+                EPlayer.SendMessageToAllAdmins($"{player.Name} has banned {target.Name} from playing the {option} minigame for {minutes} minutes, reason: {reason}!");
+            }
+            else
+            {
+                EPlayer.SendMessageAll("PLAYER_BANNED_FROM_MINIGAME", target.Name, option.ToUpper(), minutes, reason);
+            }
+        }
+
         [Command("freeroam")]
         public static void cmd_freeroam(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return;
             if (EPlayer.GetAccount(player).JailTime > 0) return;
+            if(EPlayer.GetAccount(player).FreeroamBanTime > 0)
+            {
+                long secs = EPlayer.GetAccount(player).FreeroamBanTime - DateTimeOffset.Now.ToUnixTimeSeconds();
+                if (secs > 0)
+                {
+                    player.SendChatMessage(Translate(player, "BANNED_FROM_MINIGAME"));
+                    EPlayer.Error(player, Translate(player, "BANNED_FROM_MINIGAME_NOTIFICATION"));
+                    return;
+                }
+                else
+                {
+                    EPlayer.GetAccount(player).FreeroamBanTime = 0;
+                    EPlayer.Save(player, false);
+                }
+            }
 
             if (player.GetSharedData<int>("Team") != -1)
             {

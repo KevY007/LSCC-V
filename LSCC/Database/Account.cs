@@ -52,6 +52,12 @@ namespace RNC
         public string JailReason { get; set; }
         public int MuteTime { get; set; }
         public string MuteReason { get; set; }
+        public long CopchaseBanTime { get; set; }
+        public string CopchaseBanReason { get; set; }
+        public long DeathmatchBanTime { get; set; }
+        public string DeathmatchBanReason { get; set; }
+        public long FreeroamBanTime { get; set; }
+        public string FreeroamBanReason { get; set; }
         public int Warns { get; set; }
         public int Kills { get; set; }
         public int Deaths { get; set; }

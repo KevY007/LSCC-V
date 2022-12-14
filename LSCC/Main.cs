@@ -3414,9 +3414,6 @@ namespace RNC
                     pCount = lobbyPlayers.Count;
                     if (pCount < 2) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Total players less than two, failed to start"); return; }
 
-             
-
-
                     decimal perc = (decimal)0;
                     if(lobby.gameMode != GameModes.BANKROBBERY) perc = (decimal)pCount * ((decimal)lobby.FugitivePercent / (decimal)100);
                     else
@@ -3430,8 +3427,24 @@ namespace RNC
 
                     if (fugitives == pCount) fugitives--; // There will ALWAYS be AT LEAST one COP.
 
+                    List<Player> bannedCCplayers = new List<Player>();
                     foreach (Player player in lobbyPlayers)
                     {
+                        if(EPlayer.GetAccount(player).CopchaseBanTime > 0)
+                        {
+                            long secs = EPlayer.GetAccount(player).CopchaseBanTime - DateTimeOffset.Now.ToUnixTimeSeconds();
+                            if (secs > 0)
+                            {
+                                player.SendChatMessage(Translate(player, "BANNED_FROM_COPCHASE"));
+                                bannedCCplayers.Add(player);
+                            }
+                            else
+                            {
+                                EPlayer.GetAccount(player).CopchaseBanTime = 0;
+                                EPlayer.Save(player, false);
+                            }
+                        }
+
                         player.TriggerEvent("PoliceHeliCam_ClearFugitives");
                         player.TriggerEvent("hideMDC");
                         player.TriggerEvent("MDC:RemoveAllBlips");
@@ -3442,6 +3455,7 @@ namespace RNC
 
                         player.SetSharedData("Bleeding_WasShot", false);
                     }
+                    lobbyPlayers.RemoveAll(player => bannedCCplayers.Contains(player));
 
                     int crashcheck = 0;
                     try

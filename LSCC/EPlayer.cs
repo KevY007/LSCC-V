@@ -2371,7 +2371,7 @@ namespace RNC
                 if (EPlayer.LoggedIn(i))
                 {
                     acc = i.GetData<Account>("AccountHandle");
-                    if (acc.Admin > 0) i.SendChatMessage(message);
+                    if (acc.Admin > 0) i.SendChatMessage($"[A] {message}");
                 }
             }
 
