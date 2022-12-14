@@ -4346,23 +4346,47 @@ namespace RNC
             if(acc.CopchaseBanTime > 0)
             {
                 long secs = acc.CopchaseBanTime - DateTimeOffset.Now.ToUnixTimeSeconds();
-                string leftTime = (secs < 60 ? "<1" : Math.Floor((decimal)secs / 60).ToString());
-                anyFound = true;
-                player.SendChatMessage(Translate(player, "MINIGAME_BAN_LIST", "Copchase", leftTime, acc.CopchaseBanReason));
+                if(secs > 0)
+                {
+                    string leftTime = (secs < 60 ? "<1" : Math.Floor((decimal)secs / 60).ToString());
+                    anyFound = true;
+                    player.SendChatMessage(Translate(player, "MINIGAME_BAN_LIST", "Copchase", leftTime, acc.CopchaseBanReason));
+                }
+                else
+                {
+                    acc.CopchaseBanTime = 0;
+                    EPlayer.Save(player, false);
+                }
             }
             if (acc.DeathmatchBanTime > 0)
             {
                 long secs = acc.DeathmatchBanTime - DateTimeOffset.Now.ToUnixTimeSeconds();
-                string leftTime = (secs < 60 ? "<1" : Math.Floor((decimal)secs / 60).ToString());
-                anyFound = true;
-                player.SendChatMessage(Translate(player, "MINIGAME_BAN_LIST", "Deathmatch", leftTime, acc.DeathmatchBanReason));
+                if(secs > 0)
+                {
+                    string leftTime = (secs < 60 ? "<1" : Math.Floor((decimal)secs / 60).ToString());
+                    anyFound = true;
+                    player.SendChatMessage(Translate(player, "MINIGAME_BAN_LIST", "Deathmatch", leftTime, acc.DeathmatchBanReason));
+                }
+                else
+                {
+                    acc.DeathmatchBanTime = 0;
+                    EPlayer.Save(player, false);
+                }
             }
             if (acc.FreeroamBanTime > 0)
             {
                 long secs = acc.FreeroamBanTime - DateTimeOffset.Now.ToUnixTimeSeconds();
-                string leftTime = (secs < 60 ? "<1" : Math.Floor((decimal)secs / 60).ToString());
-                anyFound = true;
-                player.SendChatMessage(Translate(player, "MINIGAME_BAN_LIST", "Freeroam", leftTime, acc.FreeroamBanReason));
+                if (secs > 0)
+                {
+                    string leftTime = (secs < 60 ? "<1" : Math.Floor((decimal)secs / 60).ToString());
+                    anyFound = true;
+                    player.SendChatMessage(Translate(player, "MINIGAME_BAN_LIST", "Freeroam", leftTime, acc.FreeroamBanReason));
+                }
+                else
+                {
+                    acc.FreeroamBanTime = 0;
+                    EPlayer.Save(player, false);
+                }
             }
 
             if (anyFound)
