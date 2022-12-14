@@ -576,30 +576,30 @@ mp.events.add("OneSecondEvent", () => {
             if(SecondsSinceLastKeyPress == 600){ // MAKING SURE IDFK
                 if(AFKStage == 0){ AFKStage = 1;}
 
-                mp.gui.chat.push("~r~[ANTI-AFK] ~w~It appears you didn't press any keys for 10 minutes.");
-                mp.gui.chat.push("~r~[ANTI-AFK] ~w~If you continue being AFK, you will be kicked in 15 minutes!");
-                mp.gui.chat.push("~r~[ANTI-AFK] ~w~Your autojoin has also been turned off, it will be re-enabled if you come back.");
+                mp.gui.chat.push(Translate("AFK_MESSAGE_1_1"));
+                mp.gui.chat.push(Translate("AFK_MESSAGE_1_2"));
+                mp.gui.chat.push(Translate("AFK_MESSAGE_1_3"));
 
                 mp.events.callRemote("SetAutoJoin", false, true);
             }
             else if(SecondsSinceLastKeyPress == 900){
                 if(AFKStage == 0){ AFKStage = 1;}
-                mp.gui.chat.push("~r~[ANTI-AFK] ~w~You will be kicked from the server in 10 minutes for being AFK too long!");
+                mp.gui.chat.push(Translate("AFK_MESSAGE_10_MIN"));
             }
             else if(SecondsSinceLastKeyPress == 1200){
                 if(AFKStage == 0){ AFKStage = 1;}
-                mp.gui.chat.push("~r~[ANTI-AFK] ~w~You will be kicked from the server in 5 minutes for being AFK too long!");
+                mp.gui.chat.push(Translate("AFK_MESSAGE_5_MIN"));
             }
             else if(SecondsSinceLastKeyPress == 1440){
                 if(AFKStage == 0){ AFKStage = 1;}
-                mp.gui.chat.push("~r~[ANTI-AFK] ~w~You will be kicked from the server in 1 minute for being AFK too long!");
+                mp.gui.chat.push(Translate("AFK_MESSAGE_1_MIN"));
             }
         }
         else{
             if(AFKStage != 2)
             {
                 AFKStage = 2;
-                mp.gui.chat.push("~r~[ANTI-AFK] ~w~You've been kicked from the server for being AFK too long!");
+                mp.gui.chat.push(Translate("AFK_MESSAGE_KICKED"));
                 mp.events.callRemote("KickPlayer", "AFK", false);
             }
         }

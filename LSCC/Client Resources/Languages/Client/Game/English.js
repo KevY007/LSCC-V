@@ -8,6 +8,13 @@ const Language = {
     "SKIP_LOADING_TIP":"Press <strong>SPACE BAR</strong> to skip the loading screen!",
     "CLAN_INVITE_TIP":"To accept the invite, press <strong>F2</strong> to show the cursor, and click the <strong>Accept</strong> button.",
     "MUST_HOLD_H":"You must hold down <strong>H</strong> to perform this action!",
-    "LAST_SEEN_REPORT":"!{#FFEC8B}** [RADIO | FREQ: 911] DISPATCH: Felon {PLAYER NAME} last spotted at {STREET NAME}, {ZONE NAME}."
+    "LAST_SEEN_REPORT":"!{#FFEC8B}** [RADIO | FREQ: 911] DISPATCH: Felon {PLAYER NAME} last spotted at {STREET NAME}, {ZONE NAME}.",
+    "AFK_MESSAGE_1_1":"!{#ff0000}[ANTI-AFK] !{#ffffff}It appears you didn't press any keys for 10 minutes.",
+    "AFK_MESSAGE_1_2":"!{#ff0000}[ANTI-AFK] !{#ffffff}If you continue being AFK, you will be kicked in 15 minutes!",
+    "AFK_MESSAGE_1_3":"!{#ff0000}[ANTI-AFK] !{#ffffff}Your autojoin has also been turned off, it will be re-enabled if you come back.",
+    "AFK_MESSAGE_10_MIN":"!{#ff0000}[ANTI-AFK] !{#ffffff}You will be kicked from the server in 10 minutes for being AFK too long!",
+    "AFK_MESSAGE_5_MIN":"!{#ff0000}[ANTI-AFK] !{#ffffff}You will be kicked from the server in 5 minutes for being AFK too long!",
+    "AFK_MESSAGE_1_MIN":"!{#ff0000}[ANTI-AFK] !{#ffffff}You will be kicked from the server in 1 minute for being AFK too long!",
+    "AFK_MESSAGE_KICKED":"!{#ff0000}[ANTI-AFK] !{#ffffff}You've been kicked from the server for being AFK too long!",
 }
 exports.Language = Language;
