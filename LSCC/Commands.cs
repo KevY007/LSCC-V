@@ -4389,7 +4389,7 @@ namespace RNC
                 }
             }
 
-            if (anyFound)
+            if (!anyFound)
             {
                 player.SendChatMessage(Translate(player, "NO_MINIGAME_BANS"));
             }
