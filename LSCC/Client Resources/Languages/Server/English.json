@@ -1,6 +1,7 @@
 ﻿{
   "TEST_MESSAGE": "!{#FF6347}Welcome, ~w~{PLAYER NAME}.",
   "ERROR_COMMAND_NOT_AUTHORIZED": "!{#FF6347}[!] !{#FFFFFF}You are not authorized use this command.",
+  "PLAYER_BANNED_FROM_MINIGAME": "!{#FF6347}AdmCmd: Player {PLAYER NAME} has been banned from playing {GAMEMODE NAME} for {MINUTES} minutes, reason: {REASON}",
   "ERROR_MAX_IN_LOBBY_NUM": "!{#999999}Max players in a lobby should be between 1-999!",
   "USAGE_MAX_IN_LOBBY": "!{#999999}Proper usage: /serveroptions maxinlobby <amount>",
   "ERROR_NUMPARKEDVEHS_NUMBER": "!{#999999}You must enter a number between 500 and 500!",
@@ -218,7 +219,7 @@
   "ERROR_OOC_OFF": "!{#FF6347}[!] !{#FFFFFF}OOC is currently turned off.",
   "ERROR_PLAYER_OOC_OFF": "!{#FF6347}[!] !{#FFFFFF}You have currently disabled OOC chat! Re-enable it with /tog ooc to send and receive messages.",
   "ERROR_OOC_SPAM": "!{#FF6347}[!] !{#FFFFFF}OOC slowmode is on! Wait a bit or use /lg or /lo",
-  "ERROR_TARGET_NOT_LOGIN": "!{#FF6347}[!] !{#FFFFFF}Target not logged in.",
+  "ERROR_TARGET_NOT_LOGIN": "!{#FF6347}[!] !{#FFFFFF}Target is not logged in.",
   "ERROR_PRIVATEMESSAGE_OFF": "!{#FF6347}[!] !{#FFFFFF}Your or the target's private messages are toggled OFF.",
   "PRIVATE_MESSAGE_SENT": "!{#FFFF00}(( PM sent to {PLAYER NAME}: {MESSAGE} ))",
   "PRIVATE_MESSAGE_RECEIVED": "!{#FFFF00}(( PM received from {PLAYER NAME}: {MESSAGE} ))",
@@ -542,5 +543,11 @@
   "KILLSTREAK_LOBBY_MSG": "!{#FF0000}[KILLSTREAK] !{#FF6347}{NAME} !{#FFFFFF}is on a {NUMBER OF KILLS} kills rampage! Someone stop them!",
   "LOBBY_FUGITIVE_BUSTED": "!{#ADD8E6}Fugitive {NAME} has been busted!",
   "LOBBY_FUGITIVE_ARRESTED": "!{#ADD8E6}Cop {PLAYER NAME} has apprehended Fugitive {FUGITIVE NAME}.",
-  "LOBBY_MIN_PLAYERS_MSG": "!{#FFFF00}[GAME] !{#FFFFFF}Game will not start unless there are 2+ players to start a match."
+  "LOBBY_MIN_PLAYERS_MSG": "!{#FFFF00}[GAME] !{#FFFFFF}Game will not start unless there are 2+ players to start a match.",
+  "BANNED_FROM_COPCHASE": "!{#FF6347}[!] !{#FFFFFF}You are currently banned from playing copchase and will not participate in this round. To view a list of outstanding minigame bans, use !{#FFFF00}/mgbans!{#FFFFFF}.",
+  "BANNED_FROM_MINIGAME": "!{#FF6347}[!] !{#FFFFFF}You are currently banned from this minigame. To view a list of outstanding minigame bans, use !{#FFFF00}/mgbans!{#FFFFFF}.",
+  "BANNED_FROM_MINIGAME_NOTIFICATION": "You are currently <strong>banned</strong> from this minigame. To view a list of outstanding minigame bans, use <strong>/mgbans</strong>.",
+  "OUTSTANDING_BANS_MESSAGE": "!{#FFFF00}======[OUTSTANDING MINIGAME BANS]======",
+  "MINIGAME_BAN_LIST": "!{#FF6347}> ~w~{MINIGAME NAME}: ~y~{MINUTES} ~w~minutes left. | ~y~Reason: ~w~{REASON}",
+  "NO_MINIGAME_BANS": "~g~No outstanding bans from any minigame found!"
 }
