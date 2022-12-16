@@ -47,6 +47,8 @@ mp.events.add('RestartMenu', () => {
         { label: "Sessions", value: 2 },
         { label: "Admin", value: 1 },
         { label: "Admin Records", value: 3 },
+        { label: "Incoming Damages", value: 4 },
+        { label: "Outgoing Damages", value: 5 },
       ];`);
     ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.filterType = {label: "Admin Records", value: 3};`);
 

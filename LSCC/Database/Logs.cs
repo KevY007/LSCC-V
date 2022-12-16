@@ -26,6 +26,18 @@ namespace RNC
         public string Description { get; set; }
         public DateTime Timestamp { get; set; }
     }
+    public class Logs_Damage
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public DateTime Timestamp { get; set; }
+        public int AccountID { get; set; }
+        public int DealerID { get; set; } // who dealt the dammage
+        public string Weapon { get; set; }
+        public int Health { get; set; } // HP after getting damaged
+        public string Bodypart { get; set; }
+        public string Notes { get; set; }
+    }
     public class Logs_AdminRecord
     {
         [Key]
@@ -54,7 +66,9 @@ namespace RNC
         {
             Admin = 1,
             Session = 2,
-            AdminRecord = 3
+            AdminRecord = 3,
+            IncomingDamage = 4,
+            OutgoingDamage = 5,
         };
 
         [RemoteEvent("Logs_GetAutoCompleteNames")]
@@ -222,6 +236,43 @@ namespace RNC
                                 for (int i = 0; i < _logs.Count; i++)
                                 {
                                     (string, string, string, string, string) _toAdd = (_logs[i].TimestampJoin.ToString(), _logs[i].TimestampLeave.ToString(), _logs[i].Duration, _logs[i].IP, _logs[i].HWID);
+                                    _toSend[i] = _toAdd;
+                                }
+                                NAPI.Task.Run(() =>
+                                {
+                                    string jsonShit = NAPI.Util.ToJson(_toSend);
+                                    player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
+                                });
+                                break;
+                            }
+
+                        case (int)LogType.IncomingDamage:
+                            {
+                                List<Logs_Damage> _logs = await context.Logs_Damages.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToListAsync();
+                                object[] _toSend = new object[_logs.Count];
+                                for (int i = 0; i < _logs.Count; i++)
+                                {
+                                    Account dealer = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == _logs[i].DealerID);
+                                    string dealerName = (dealer == null ? "[UNKNOWN]" : dealer.Username);
+                                    (string, string, string, string, string, string) _toAdd = (_logs[i].Timestamp.ToString(), dealerName, _logs[i].Weapon, _logs[i].Health.ToString(), _logs[i].Bodypart, _logs[i].Notes);
+                                    _toSend[i] = _toAdd;
+                                }
+                                NAPI.Task.Run(() =>
+                                {
+                                    string jsonShit = NAPI.Util.ToJson(_toSend);
+                                    player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
+                                });
+                                break;
+                            }
+                        case (int)LogType.OutgoingDamage:
+                            {
+                                List<Logs_Damage> _logs = await context.Logs_Damages.AsQueryable().Where(l => l.DealerID == target.SQL_ID).ToListAsync();
+                                object[] _toSend = new object[_logs.Count];
+                                for (int i = 0; i < _logs.Count; i++)
+                                {
+                                    Account victim = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == _logs[i].AccountID);
+                                    string victimName = (victim == null ? "[UNKNOWN]" : victim.Username);
+                                    (string, string, string, string, string, string) _toAdd = (_logs[i].Timestamp.ToString(), victimName, _logs[i].Weapon, _logs[i].Health.ToString(), _logs[i].Bodypart, _logs[i].Notes);
                                     _toSend[i] = _toAdd;
                                 }
                                 NAPI.Task.Run(() =>

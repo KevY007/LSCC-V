@@ -54,6 +54,16 @@ mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
             ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.cols = ${jsonLogs}`);
             break;
         }
+        case 4:{ // incoming damage
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Timestamp", "Dealt By", "Weapon", "Health (after DMG)", "Bodypart", "Notes"];`);
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.cols = ${jsonLogs}`);
+            break;
+        }
+        case 5:{ // outgoing damage
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Timestamp", "Victim", "Weapon", "Health (after DMG)", "Bodypart", "Notes"];`);
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.cols = ${jsonLogs}`);
+            break;
+        }
     }
     ServerUI.execute('gm.$refs.mainMenu.$refs.logsTab.isLoading = false;');
 

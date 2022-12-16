@@ -1,4 +1,4 @@
-const Language = {
+{
     "CS_TEST": "Hello, {PLAYER NAME}!",
     "HOTKEY_HELP":"Hotkey Help",
     "SHOOTING_COOLDOWN":"Shooting Cooldown...",
@@ -17,4 +17,3 @@ const Language = {
     "AFK_MESSAGE_1_MIN":"!{#ff0000}[ANTI-AFK] !{#ffffff}You will be kicked from the server in 1 minute for being AFK too long!",
     "AFK_MESSAGE_KICKED":"!{#ff0000}[ANTI-AFK] !{#ffffff}You've been kicked from the server for being AFK too long!",
 }
-exports.Language = Language;
