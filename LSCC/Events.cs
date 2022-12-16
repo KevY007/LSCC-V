@@ -636,6 +636,33 @@ namespace RNC
             player.SetSharedData("ActionTime", 0);
         }
 
+        [RemoteEvent("ShotListen_SendInfo")]
+        public void ShotListen_SendInfo(Player player, string weaponName, string target, int playerHitsInRow)
+        {
+            if (!player.HasData("AdminsShotListening")) return;
+
+            List<(Player, string, int)> admins = player.GetData<List<(Player, string, int)>>("AdminsShotListening");
+
+            foreach((Player, string, int) _item in admins)
+            {
+                Player admin = _item.Item1;
+                string listenType = _item.Item2;
+                int trigger = _item.Item3;
+
+                if(listenType == "all")
+                {
+                    admin.SendChatMessage($"!{{#FF6347}}[SHOT LISTEN] !{{#ffce52}}{player.Name} shot with a {weaponName.ToUpper()} at {target.ToUpper()}! !{{#AFAFAF}}(Player hits in a row: {playerHitsInRow})");
+                }
+                else if(listenType == "sus")
+                {
+                    if(playerHitsInRow % trigger == 0) // if trigger is 5, it'll send every 5-10-15 shots, etc etc. big brain?
+                    {
+                        admin.SendChatMessage($"!{{#FF6347}}[SHOT LISTEN] !{{#ffce52}}{player.Name} has fired {playerHitsInRow}+ times, all of which hit a player without missing! !{{#AFAFAF}}(Weapon used: {weaponName.ToUpper()})");
+                    }
+                }
+            }
+        }
+
         [RemoteEvent("SyncShotStats")]
         public static void OnSynchronizeShotStatistics(Player player, int TotalShotsFired, int PlayerHits, int VehicleHits, int Missed)
         {
@@ -2276,6 +2303,21 @@ namespace RNC
                         if (pl.HasData("AskedBySquad") && pl.GetData<Player>("AskedBySquad") == player)
                         {
                             pl.ResetData("AskedBySquad");
+                        }
+
+                        if (pl.HasData("AdminsShotListening"))
+                        {
+                            List<(Player, string, int)> admins = pl.GetData<List<(Player, string, int)>>("AdminsShotListening");
+                            (Player, string, int) toRemove = admins.FirstOrDefault(a => a.Item1 == player);
+                            try
+                            {
+                                admins.Remove(toRemove);
+                                if (admins.Count > 0)
+                                    pl.SetData<List<(Player, string, int)>>("AdminsShotListening", admins);
+                                else pl.ResetData("AdminsShotListening");
+                            }
+                            catch { }
+
                         }
                     });
                 }

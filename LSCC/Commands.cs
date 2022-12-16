@@ -3578,6 +3578,74 @@ namespace RNC
             return;
         }
 
+        [Command("shotlisten", "!{#AFAFAF}[USAGE] shotlisten (target) (options: 'all', 'sus', 'help', 'stop') (trigger [default:10])")]
+        public void cmd_shotlisten(Player player, Player target, string option, int trigger = 10)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 2)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
+                return;
+            }
+            if(trigger < 5 || trigger > 100)
+            {
+                player.SendChatMessage("!{#FF6347}[!] ~w~The trigger number must be between 5 and 100! !{#AFAFAF}Use /shotlisten help for more info about the trigger.");
+                return;
+            }
+            switch (option)
+            {
+                case "help":
+                    player.SendChatMessage("!{#AFAFAF}[EXPLANATION] ~w~/shotlisten allows you to get real-time information about a player's shots.");
+                    player.SendChatMessage("!{#AFAFAF}[OPTION 'stop'] ~w~This will stop listening to a specific player's shots. You can use ~y~/clearshotlisten~w~ to clear all players instantly.");
+                    player.SendChatMessage(" ");
+                    player.SendChatMessage("!{#AFAFAF}[OPTION 'all'] ~w~This will send info about EVERY shot, no matter if they shot at a player, car, building... anything!");
+                    player.SendChatMessage("!{#AFAFAF}[OPTION 'all'] ~w~This option will probably cause a lot of chat spam, so it's recommended you only use it when actively watching a player.");
+                    player.SendChatMessage(" ");
+                    player.SendChatMessage("!{#AFAFAF}[OPTION 'sus'] ~w~This option will only send you a warning message if the player lands a certain number of shots in a row.");
+                    player.SendChatMessage("!{#AFAFAF}[OPTION 'sus'] ~w~You can set the \"trigger\" to the number of shots that you want before it sends you a warning.");
+                    player.SendChatMessage("!{#AFAFAF}[OPTION 'sus'] ~w~For example, if you set it to 10, you will get a warning message whenever the player hits someone 10 times in a row without missing.");
+                    return;
+                case "all":
+                    if (target.HasData("AdminsShotListening"))
+                    {
+                        List<(Player, string, int)> admins = target.GetData<List<(Player, string, int)>>("AdminsShotListening");
+                        (Player, string, int) shotListenData = (player, "all", trigger);
+                        admins.Add(shotListenData);
+                        target.SetData<List<(Player, string, int)>>("AdminsShotListening", admins);
+                        player.SendChatMessage($"~b~[SHOT LISTEN]~w~ You will now get information about ~y~all~w~ of {target.Name}'s shots!");
+                    }
+                    else
+                    {
+                        (Player, string, int) shotListenData = (player, "all", trigger);
+                        List<(Player, string, int)> data = new List<(Player, string, int)>();
+                        data.Add(shotListenData);
+                        target.SetData<List<(Player, string, int)>>("AdminsShotListening", data);
+                        player.SendChatMessage($"~b~[SHOT LISTEN]~w~ You will now get information about ~y~all~w~ of {target.Name}'s shots!");
+                    }
+                    return;
+                case "sus":
+                    if (target.HasData("AdminsShotListening"))
+                    {
+                        List<(Player, string, int)> admins = target.GetData<List<(Player, string, int)>>("AdminsShotListening");
+                        (Player, string, int) shotListenData = (player, "sus", trigger);
+                        admins.Add(shotListenData);
+                        target.SetData<List<(Player, string, int)>>("AdminsShotListening", admins);
+                        player.SendChatMessage($"~b~[SHOT LISTEN]~w~ You will now get warned whenever {target.Name} hits {trigger} shots without missing.");
+                    }
+                    else
+                    {
+                        (Player, string, int) shotListenData = (player, "sus", trigger);
+                        List<(Player, string, int)> data = new List<(Player, string, int)>();
+                        data.Add(shotListenData);
+                        target.SetData<List<(Player, string, int)>>("AdminsShotListening", data);
+                        player.SendChatMessage($"~b~[SHOT LISTEN]~w~ You will now get warned whenever {target.Name} hits {trigger} shots without missing.");
+                    }
+                    return;
+            }
+        }
+
         [Command("checkstats")]
         public void cmd_checkstats(Player player, Player target)
         {

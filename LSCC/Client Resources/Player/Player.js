@@ -2163,18 +2163,21 @@ mp.events.add("render", () => {
 
 });
 
+let shotListenData = {
+    playerHitsInRow:0,
+}
 
 mp._events.add("playerWeaponShot", (targetPosition, targetEntity) => 
 {
     ShotStats.TotalFired++;
 
+    let gunData = weaponData.find(w => Number(w.Hash) == mp.players.local.weapon);
     if(mp.players.local.vehicle == undefined && !mp.players.local.isInAnyVehicle(false))
     {
         const campos = mp.game.cam.getGameplayCamRot(0);
         const camhead = mp.game.cam.getGameplayCamRelativeHeading();
 
         var shakeValue = 0;
-        let gunData = weaponData.find(w => Number(w.Hash) == mp.players.local.weapon);
         if(gunData == undefined){
             shakeValue = (getRandomInt(0, 7)/10);
         }
@@ -2244,6 +2247,17 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
 
     if(targetEntity !== null && targetEntity !== undefined)
     {
+        if(targetEntity.type === 'player'){
+            shotListenData.playerHitsInRow++;
+
+        }
+        else{
+            shotListenData.playerHitsInRow = 0;
+        }
+
+        let gunName = (gunData ? gunData.Name : "Unknown");
+        mp.events.callRemote("ShotListen_SendInfo", gunName, targetEntity.type, shotListenData.playerHitsInRow);
+
         if(targetEntity.type === 'vehicle') ShotStats.HitVehicle++;
         else if(targetEntity.type === 'player') ShotStats.HitPlayer++;
         else ShotStats.Missed++;
@@ -2372,6 +2386,11 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                 }
             }
         }
+    }
+    else{
+        shotListenData.playerHitsInRow = 0;
+        let gunName = (gunData ? gunData.Name : "Unknown");
+        mp.events.callRemote("ShotListen_SendInfo", gunName, "nothing", shotListenData.playerHitsInRow);
     }
 
     if(mp.players.local.getVariable("HasShot") == false && player.getVariable("Team") == 0 && chaseRunning)
