@@ -3309,6 +3309,7 @@ namespace RNC
                     player.Name = acc.Username;
                     player.SetData("LoggedIn", true);
                     player.SetData("AccountHandle", acc);
+                    player.SetSharedData("SQL_ID", acc.SQL_ID);
                     player.SetSharedData("pLogged", true);
                     player.SetSharedData("RegisterDate", acc.RegisterDate.ToString("F"));
                     
@@ -4294,6 +4295,8 @@ namespace RNC
                 }
             });
 
+            player.SetSharedData("SQL_ID", acc.SQL_ID);
+
             player.SetSharedData("Level", acc.Level);
             player.SetSharedData("CurrentXP", acc.XP);
             player.SetSharedData("NextLevelXP", EPlayer.GetMaxLevelXP(acc.Level));
@@ -4519,6 +4522,13 @@ namespace RNC
 
             player.TriggerEvent("UpdateMenuLobbies", NAPI.Util.ToJson(Menu_LobbiesData(player)), player.GetSharedData<int>("InLobby"));
             player.TriggerEvent("UpdateMenuMinigames", NAPI.Util.ToJson(Menu_MinigamesData(player)), (player.GetSharedData<int>("InLobby") < 0) ? player.GetSharedData<int>("InLobby") : player.GetSharedData<int>("InDM"));
+        }
+
+        [RemoteEvent("Server_RequestLogDamage")]
+        public void OnRequestLogDamage(Player player, int dealerSQLID, string weaponName, int damage, int health, string bodypart, string notes)
+        {
+            int accSQL = EPlayer.GetAccount(player).SQL_ID;
+            Logs.LogDamage(accSQL, dealerSQLID, weaponName, damage, health, bodypart, notes);
         }
 
         [RemoteEvent("SetAutoJoin")]
