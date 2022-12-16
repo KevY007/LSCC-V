@@ -428,7 +428,7 @@ function LogPlayerDamage(sourceEntity, weaponHash, damage, bodypartIndex, extraN
 
   let notes = extraNotes;
 
-  if(mp.players.local.getInvincible() === true){
+  if(mp.game.player.getInvincible() === true){
     notes += `${(notes.length > 0 && "; ")}Player had invincibility.`
 
     if(mp.players.local.getVariable("Team") != 0 && mp.players.local.getVariable("Team") != 1){
