@@ -43,14 +43,14 @@ mp.events.add('RestartMenu', () => {
     ServerUI = mp.browsers.new("package://ServerUI/index.html");
     ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
 
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.logTypes = [
-        { label: "Sessions", value: 2 },
-        { label: "Admin", value: 1 },
-        { label: "Admin Records", value: 3 },
-        { label: "Incoming Damages", value: 4 },
-        { label: "Outgoing Damages", value: 5 },
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.options = [
+        { name: "Sessions", value: 2 },
+        { name: "Admin", value: 1 },
+        { name: "Admin Records", value: 3 },
+        { name: "Incoming Damages", value: 4 },
+        { name: "Outgoing Damages", value: 5 },
       ];`);
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.filterType = {label: "Admin Records", value: 3};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.filterType = {name: "Admin Records", value: 3};`);
 
     mp.events.callLocal("MenuToggleTyping", false);
 });

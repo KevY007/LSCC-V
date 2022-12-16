@@ -3333,6 +3333,7 @@ namespace RNC
                     player.SetSharedData("CurrentXP", acc.XP);
                     player.SetSharedData("NextLevelXP", EPlayer.GetMaxLevelXP(acc.Level));
                     player.TriggerEvent("Menu_UpdateLevelXP", true);
+                    player.TriggerEvent("InitiateLogsTab");
                 });
                 await NAPI.Task.WaitForMainThread();
 
@@ -4301,6 +4302,8 @@ namespace RNC
             player.SetSharedData("CurrentXP", acc.XP);
             player.SetSharedData("NextLevelXP", EPlayer.GetMaxLevelXP(acc.Level));
             player.TriggerEvent("Menu_UpdateLevelXP");
+
+            player.TriggerEvent("InitiateLogsTab");
 
             //EPlayer.Spawn(player);
             EPlayer.Notify(player, Translate(player, "REGISTER_SUCCESS"), "green", "fas fa-check", false, 2000);

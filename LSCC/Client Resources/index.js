@@ -424,14 +424,15 @@ function LogPlayerDamage(sourceEntity, weaponHash, damage, bodypartIndex, extraN
   const damagedHP = (mp.players.local.getHealth() - damage);
 
   let bodypartData = boneData.find(b => b.boneIndex === bodypartIndex);
-  if(!bodypartData) bodypartData = {bodypartName:"Torso"}
+  if(!bodypartData) bodypartData = {bodypartName:`Unknown`}
 
   let notes = extraNotes;
 
   if(mp.game.player.getInvincible() === true){
-    notes += `${(notes.length > 0 && "; ")}Player had invincibility.`
+    if(notes.length > 0) notes += "; ";
+    notes += "Player had invincibility."
 
-    if(mp.players.local.getVariable("Team") != 0 && mp.players.local.getVariable("Team") != 1){
+    if(mp.players.local.getVariable("Team") == -1){
       if(mp.players.local.getVariable("InLobby") === -3){
         notes += " They were in FREEROAM!";
       }
@@ -442,17 +443,17 @@ function LogPlayerDamage(sourceEntity, weaponHash, damage, bodypartIndex, extraN
         notes += " They were most likely in the LOBBY!";
       }
     }
-  }
-  else{
-    if(mp.players.local.getVariable("Wounded") > 0){
-      notes += " Probably because they were WOUNDED in COPCHASE!";
-    }
     else{
-      notes += " They were in COPCHASE!";
+      if(mp.players.local.getVariable("Wounded") > 0){
+        notes += " Probably because they were WOUNDED in COPCHASE!";
+      }
+      else{
+        notes += " They were in COPCHASE!";
+      }
     }
   }
 
-  mp.events.callRemote("Server_RequestLogDamage", dealerSQLID, gunData.Name, damage, damagedHP, bodypartData.bodypartName, notes);
+  mp.events.callRemote("Server_RequestLogDamage", dealerSQLID, gunData.Name, damage, damagedHP, `${bodypartData.bodypartName} (${bodypartIndex})`, notes);
 }
 
 // haha hex no export
