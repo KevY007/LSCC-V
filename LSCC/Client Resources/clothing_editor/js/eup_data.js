@@ -370,69 +370,69 @@ const FemaleClothing = [
 
 const MaleClothing = [
     {
-        clothing: "Shirt",
-        type: "JacketOpen",
-        items: [468, 462, 455, 453, 444, 439, 438, 437, 434, 433, 431, 430, 428, 427, 426, 425, 424, 422]
+        clothing: 'Shirt',        
+        type: 'JacketOpen',       
+        items: [497, 491, 484, 482, 473,468, 467, 466, 463, 462,460, 459, 457, 456, 455,454, 453, 451]
+      },
+      {
+        clothing: 'Shirt',        
+        type: 'ShortSleeves',
+        items: [499, 498, 486,477, 472, 449,447, 446]
+      },
+      {
+        clothing: 'Shirt',
+        type: 'LongSleeves',
+        items: [ 488, 487, 476, 471, 448 ]
+      },
+      {
+        clothing: 'Shirt',
+        type: 'Armored',
+        items: [ 493, 492, 489, 480, 479 ]
+      },
+      {
+        clothing: 'Undershirt',
+        type: 'InsideShirt',
+        items: [244, 243, 234, 233,231, 230, 225, 224,210, 209]
+      },
+      {
+        clothing: 'Undershirt',
+        type: 'DutyBelt',
+        items: [ 229, 228, 227, 226, 221, 220, 219, 218, 214, 213,212, 208, 207, 204, 203,201, 200, 199]
+      },
+    { 
+        clothing: 'Undershirt', 
+        type: 'KevlarUS', 
+        items: [ -1, 216, 222 ] 
+    },
+    { 
+        clothing: 'Pants', 
+        type: 'Normal', 
+        items: [ 167, 164 ] 
     },
     {
-        clothing: "Shirt",
-        type: "ShortSleeves",
-        items: [470, 469, 457, 448, 443, 420, 418, 417]
-    },
-    {
-        clothing: "Shirt",
-        type: "LongSleeves",
-        items: [459, 458, 447, 442, 419]
-    },
-    {
-        clothing: "Shirt",
-        type: "Armored",
-        items: [464, 463, 460, 451, 450]
-    },
-    {
-        clothing: "Undershirt",
-        type: "InsideShirt",
-        items: [242, 241, 232, 231, 229, 228, 223, 222, 208, 207]
-    },
-    {
-        clothing: "Undershirt",
-        type: "DutyBelt",
-        items: [227, 226, 225, 224, 219, 218, 217, 216, 212, 211, 210, 206, 205, 202, 201, 199, 198, 197]
-    },
-    {
-        clothing: "Undershirt",
-        type: "KevlarUS",
-        items: [-1, 214, 220]
-    },
-    {
-        clothing: "Pants",
-        type: "Normal",
-        items: [155, 152]
-    },
-    {
-        clothing: "Pants",
-        type: "AnkleHigh",
-        items: [163, 154, 153, 151]
+      clothing: 'Pants',
+      type: 'AnkleHigh',
+      items: [ 175, 166, 165, 163 ]
     },
     {
         clothing: "Shoes",
         type: "Low",
-        items: [110]
+        items: [127]
     },
     {
         clothing: "Shoes",
         type: "High",
-        items: [109]
+        items: [126]
+    },
+    { 
+        clothing: 'Accessory 1', 
+        type: 'Tie', 
+        items: [ -1, 128, 127 ] 
     },
     {
-        clothing: "Accessory 1",
-        type: "Tie",
-        items: [-1, 115, 114]
-    },
-    {
-        clothing: "Accessory 2",
-        type: "HipHolster",
-        items: [-1, 170, 171]
+      clothing: 'Accessory 2',
+      type: 'HipHolster',
+      items: [ -1, 183, 184 ]
     },
     {
         clothing: "Armor",

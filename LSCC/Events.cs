@@ -3938,9 +3938,9 @@ namespace RNC
 
                 if(cdata.Gender == 0) // male
                 {
-                    if (cdata.Clothing[1].Clothes[7].Drawable != 171 && cdata.Clothing[1].Clothes[7].Drawable != 170) return;
+                    if (cdata.Clothing[1].Clothes[7].Drawable != 183 && cdata.Clothing[1].Clothes[7].Drawable != 184) return;
 
-                    player.SetClothes(7, (unholster ? 171 : 170), 0);
+                    player.SetClothes(7, (unholster ? 184 : 183), 0);
                 }
                 else
                 {
