@@ -272,49 +272,48 @@ const FugitiveLinkedTypes = [
 
 const FemaleClothing = [
     {
-        clothing: "Shirt",
-        type: "JacketOpen",
-        items: [467, 466, 464, 463, 462, 461, 458, 456, 454, 453, 447]
-    },
-    {
-        clothing: "Shirt",
-        type: "ShortSleeves",
-        items: [465, 455, 444, 442, 441]
-    },
-    {
-        clothing: "Shirt",
-        type: "LongSleeves",
-        items: [470, 460, 443]
-    },
-    {
-        clothing: "Shirt",
-        type: "Armored",
-        items: [450]
+        clothing: 'Shirt',
+        type: 'JacketOpen',
+        items: [500, 499, 497, 496,495, 494, 491, 489,487, 486, 480]
+      },
+      {
+        clothing: 'Shirt',
+        type: 'ShortSleeves',
+        items: [ 498, 488, 477, 475, 474 ]
+      },
+      { 
+        clothing: 'Shirt', 
+        type: 'LongSleeves', 
+        items: [ 503, 493, 476 ] },
+      { 
+        clothing: 'Shirt', 
+        type: 'Armored', 
+        items: [ 483 ] 
     },
     {
         clothing: "Undershirt",
         type: "InsideShirt",
-        items: [242]
+        items: [244, 258, ]
     },
     {
         clothing: "Undershirt",
         type: "DutyBelt",
-        items: [243, 241, 238, 237, 236]
+        items: [245, 243, 240, 239, 238]
     },
     {
         clothing: "Undershirt",
         type: "KevlarUS",
         items: []
     },
-    {
-        clothing: "Pants",
-        type: "Normal",
-        items: [163, 161]
+    { 
+        clothing: 'Pants', 
+        type: 'Normal', 
+        items: [ 176, 174 ] 
     },
     {
-        clothing: "Pants",
-        type: "AnkleHigh",
-        items: [162, 160, 159, 158]
+      clothing: 'Pants',
+      type: 'AnkleHigh',
+      items: [ 175, 173, 172, 171 ]
     },
     {
         clothing: "Shoes",
@@ -329,12 +328,12 @@ const FemaleClothing = [
     {
         clothing: "Accessory 1",
         type: "Tie",
-        items: [115, 114]
+        items: [-1, 115, 114]
     },
     {
         clothing: "Accessory 2",
         type: "HipHolster",
-        items: [127, 126]
+        items: [-1, 146, 147]
     },
     {
         clothing: "Armor",

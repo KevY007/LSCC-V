@@ -3946,7 +3946,7 @@ namespace RNC
                 {
                     if (cdata.Clothing[3].Clothes[7].Drawable != 126 && cdata.Clothing[3].Clothes[7].Drawable != 127) return;
 
-                    player.SetClothes(7, (unholster ? 126 : 127), 0);
+                    player.SetClothes(7, (unholster ? 147 : 146), 0);
                 }
             }
             catch
