@@ -39,9 +39,10 @@ for (i = 0; i < player.getNumberOfDrawableVariations(1) + 1; i++) MasksDrawable.
 
 
 let numMasksInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
-MasksDrawable.splice(MasksDrawable.length-141+numMasksInstalled);
+//MasksDrawable.splice(MasksDrawable.length-141+numMasksInstalled);
+MasksDrawable.splice(MasksDrawable.length+numMasksInstalled);
 
-let MasksTextureArray = [];
+let MasksTextureArray = [0];
 let MasksTextureLimite = player.getNumberOfTextureVariations(1, player.getDrawableVariation(1));
 for (i = 0; i < MasksTextureLimite + 1; i++) MasksTextureArray.push(i.toString());
 
@@ -104,7 +105,8 @@ for (i = 0; i < player.getNumberOfPropDrawableVariations(0) + 1; i++)
 }
 
 let numHatsInstalled = 0; // EXTRA HATS INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
-HatsDrawable.splice(HatsDrawable.length-21+numHatsInstalled);
+//HatsDrawable.splice(HatsDrawable.length-21+numHatsInstalled);
+HatsDrawable.splice(HatsDrawable.length+numHatsInstalled);
 
 // Texture
 let HatsTexture = [];
@@ -160,10 +162,11 @@ for (i = 0; i < player.getNumberOfDrawableVariations(11) + 1; i++) JacketsDrawab
 
 
 let numJacketsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
-JacketsDrawable.splice(JacketsDrawable.length-141+numJacketsInstalled);
+//JacketsDrawable.splice(JacketsDrawable.length-141+numJacketsInstalled);
+JacketsDrawable.splice(JacketsDrawable.length+numJacketsInstalled);
 
 // Texture
-let JacketsTextureArray = [];
+let JacketsTextureArray = [0];
 let JacketsTextureLimite = player.getNumberOfTextureVariations(11, player.getDrawableVariation(11));
 for (i = 0; i < JacketsTextureLimite + 1; i++) JacketsTextureArray.push(i.toString());
 
@@ -216,9 +219,10 @@ for (i = 0; i < player.getNumberOfDrawableVariations(8) + 1; i++) ShirtsDrawable
 
 
 let numShirtsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
-ShirtsDrawable.splice(ShirtsDrawable.length-160+numShirtsInstalled);
+//ShirtsDrawable.splice(ShirtsDrawable.length-160+numShirtsInstalled);
+ShirtsDrawable.splice(ShirtsDrawable.length+numShirtsInstalled);
 
-let ShirtsTextureArray = [];
+let ShirtsTextureArray = [0];
 let ShirtsTextureLimite = player.getNumberOfTextureVariations(8, player.getDrawableVariation(8));
 for (i = 0; i < ShirtsTextureLimite + 1; i++) ShirtsTextureArray.push(i.toString());
 
@@ -271,9 +275,10 @@ for (i = 0; i < player.getNumberOfDrawableVariations(4) + 1; i++) PantsDrawable.
 
 
 let numPantsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
-PantsDrawable.splice(PantsDrawable.length-161+numPantsInstalled);
+//PantsDrawable.splice(PantsDrawable.length-161+numPantsInstalled);
+PantsDrawable.splice(PantsDrawable.length+numPantsInstalled);
 
-let PantsTextureArray = [];
+let PantsTextureArray = [0];
 let PantsTextureLimite = player.getNumberOfTextureVariations(4, player.getDrawableVariation(4));
 for (i = 0; i < PantsTextureLimite + 1; i++) PantsTextureArray.push(i.toString());
 
@@ -325,9 +330,10 @@ let ShoesDrawable = [];
 for (i = 0; i < player.getNumberOfDrawableVariations(6) + 1; i++) ShoesDrawable.push(i.toString());
 
 let numShoesInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
-ShoesDrawable.splice(ShoesDrawable.length-151+numShoesInstalled);
+//ShoesDrawable.splice(ShoesDrawable.length-151+numShoesInstalled);
+ShoesDrawable.splice(ShoesDrawable.length+numShoesInstalled);
 
-let ShoesTextureArray = [];
+let ShoesTextureArray = [0];
 let ShoesTextureLimite = player.getNumberOfTextureVariations(6, player.getDrawableVariation(6));
 for (i = 0; i < ShoesTextureLimite + 1; i++) ShoesTextureArray.push(i.toString());
 
@@ -380,9 +386,10 @@ for (i = 0; i < player.getNumberOfDrawableVariations(3) + 1; i++) TorsoDrawable.
 
 
 let numTorsoInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
-TorsoDrawable.splice(TorsoDrawable.length-141+numTorsoInstalled);
+//TorsoDrawable.splice(TorsoDrawable.length-141+numTorsoInstalled);
+TorsoDrawable.splice(TorsoDrawable.length+numTorsoInstalled);
 
-let TorsoTextureArray = [];
+let TorsoTextureArray = [0];
 let TorsoTextureLimite = player.getNumberOfTextureVariations(3, player.getDrawableVariation(3));
 for (i = 0; i < TorsoTextureLimite + 1; i++) TorsoTextureArray.push(i.toString());
 
@@ -435,7 +442,8 @@ let GlassesDrawable = [];
 for (i = 0; i < player.getNumberOfPropDrawableVariations(1) + 1; i++) GlassesDrawable.push(i.toString())
 
 let numGlassesInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
-GlassesDrawable.splice(GlassesDrawable.length-17+numGlassesInstalled);
+//GlassesDrawable.splice(GlassesDrawable.length-17+numGlassesInstalled);
+GlassesDrawable.splice(GlassesDrawable.length+numGlassesInstalled);
 
 // Texture
 let GlassesTexture = [];
@@ -491,9 +499,10 @@ for (i = 0; i < player.getNumberOfDrawableVariations(7) + 1; i++) AccessoriesDra
 
 
 let numAccessoriesInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
-AccessoriesDrawable.splice(AccessoriesDrawable.length-161+numAccessoriesInstalled);
+//AccessoriesDrawable.splice(AccessoriesDrawable.length-161+numAccessoriesInstalled);
+AccessoriesDrawable.splice(AccessoriesDrawable.length+numAccessoriesInstalled);
 
-let AccessoriesTextureArray = [];
+let AccessoriesTextureArray = [0];
 let AccessoriesTextureLimite = player.getNumberOfTextureVariations(7, player.getDrawableVariation(7));
 for (i = 0; i < AccessoriesTextureLimite + 1; i++) AccessoriesTextureArray.push(i.toString());
 
@@ -546,9 +555,10 @@ for (i = 0; i < player.getNumberOfDrawableVariations(5) + 1; i++) BagsDrawable.p
 
 
 let numBagsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
-BagsDrawable.splice(BagsDrawable.length-151+numBagsInstalled);
+//BagsDrawable.splice(BagsDrawable.length-151+numBagsInstalled);
+BagsDrawable.splice(BagsDrawable.length+numBagsInstalled);
 
-let BagsTextureArray = [];
+let BagsTextureArray = [0];
 let BagsTextureLimite = player.getNumberOfTextureVariations(5, player.getDrawableVariation(5));;
 for (i = 0; i < BagsTextureLimite + 1; i++) BagsTextureArray.push(i.toString());
 
