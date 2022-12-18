@@ -251,7 +251,7 @@ namespace RNC
                             {
                                 List<Logs_Damage> _logs = await context.Logs_Damages.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToListAsync();
                                 object[] _toSend = new object[_logs.Count];
-                                for (int i = 0; i < _logs.Count; i++)
+                                for (int i = 0; i < (_logs.Count > 250 ? 250 : _logs.Count); i++)
                                 {
                                     Account dealer = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == _logs[i].DealerID);
                                     string dealerName = (dealer == null ? "[UNKNOWN]" : dealer.Username);
@@ -269,7 +269,7 @@ namespace RNC
                             {
                                 List<Logs_Damage> _logs = await context.Logs_Damages.AsQueryable().Where(l => l.DealerID == target.SQL_ID).ToListAsync();
                                 object[] _toSend = new object[_logs.Count];
-                                for (int i = 0; i < _logs.Count; i++)
+                                for (int i = 0; i < (_logs.Count > 250 ? 250 : _logs.Count); i++)
                                 {
                                     Account victim = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == _logs[i].AccountID);
                                     string victimName = (victim == null ? "[UNKNOWN]" : victim.Username);

@@ -3578,6 +3578,32 @@ namespace RNC
             return;
         }
 
+        [Command("clearshotlisten")]
+        public void cmd_clearshotlisten(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 2)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
+                return;
+            }
+
+            int clearCount = 0;
+            foreach(Player pl in Settings.LoggedInPlayers)
+            {
+                if (pl.HasData("AdminsShotListening"))
+                {
+                    List<(Player, string, int)> admins = pl.GetData<List<(Player, string, int)>>("AdminsShotListening");
+                    List<(Player, string, int)> playa = (List<(Player, string, int)>)admins.Where(a => a.Item1 == player);
+                    if (playa.Count > 0) clearCount++;
+                    admins.RemoveAll(a => playa.Contains(a));
+                }
+            }
+            player.SendChatMessage($"!{{#FF6347}}[!] ~w~You've cleared {clearCount} shot listens!");
+        }
+
         [Command("shotlisten", "!{#AFAFAF}[USAGE] shotlisten (target) (options: 'all', 'sus', 'help', 'stop') (trigger [default:10])")]
         public void cmd_shotlisten(Player player, Player target, string option, int trigger = 10)
         {
@@ -3612,6 +3638,11 @@ namespace RNC
                     {
                         List<(Player, string, int)> admins = target.GetData<List<(Player, string, int)>>("AdminsShotListening");
                         (Player, string, int) shotListenData = (player, "all", trigger);
+                        if (admins.Contains(shotListenData))
+                        {
+                            player.SendChatMessage($"!{{#FF6347}}[!] ~w~You are already listening to ALL shots from {target.Name}!");
+                            return;
+                        }
                         admins.Add(shotListenData);
                         target.SetData<List<(Player, string, int)>>("AdminsShotListening", admins);
                         player.SendChatMessage($"~b~[SHOT LISTEN]~w~ You will now get information about ~y~all~w~ of {target.Name}'s shots!");
@@ -3630,6 +3661,11 @@ namespace RNC
                     {
                         List<(Player, string, int)> admins = target.GetData<List<(Player, string, int)>>("AdminsShotListening");
                         (Player, string, int) shotListenData = (player, "sus", trigger);
+                        if (admins.Contains(shotListenData)) {
+
+                            player.SendChatMessage($"!{{#FF6347}}[!] ~w~You are already listening to SUS shots from {target.Name}!");
+                            return;
+                        }
                         admins.Add(shotListenData);
                         target.SetData<List<(Player, string, int)>>("AdminsShotListening", admins);
                         player.SendChatMessage($"~b~[SHOT LISTEN]~w~ You will now get warned whenever {target.Name} hits {trigger} shots without missing.");
@@ -3641,6 +3677,23 @@ namespace RNC
                         data.Add(shotListenData);
                         target.SetData<List<(Player, string, int)>>("AdminsShotListening", data);
                         player.SendChatMessage($"~b~[SHOT LISTEN]~w~ You will now get warned whenever {target.Name} hits {trigger} shots without missing.");
+                    }
+                    return;
+                case "stop":
+                    if (target.HasData("AdminsShotListening"))
+                    {
+                        List<(Player, string, int)> admins = target.GetData<List<(Player, string, int)>>("AdminsShotListening");
+                        List<(Player, string, int)> shotListenData = (List<(Player, string, int)>)admins.Where(a => a.Item1 == player);
+                        if(shotListenData.Count > 0)
+                        {
+                            admins.RemoveAll(a => shotListenData.Contains(a));
+                            target.SetData<List<(Player, string, int)>>("AdminsShotListening", admins);
+                            player.SendChatMessage($"!{{#FF6347}}[!] ~w~You are no longer listening to any shots from {target.Name}!");
+                        }
+                        else
+                        {
+                            player.SendChatMessage($"!{{#FF6347}}[!] ~w~You are not listening to any shots from {target.Name}!");
+                        }
                     }
                     return;
             }

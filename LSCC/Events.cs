@@ -655,7 +655,7 @@ namespace RNC
                 }
                 else if(listenType == "sus")
                 {
-                    if(playerHitsInRow % trigger == 0) // if trigger is 5, it'll send every 5-10-15 shots, etc etc. big brain?
+                    if(playerHitsInRow > 0 && playerHitsInRow % trigger == 0) // if trigger is 5, it'll send every 5-10-15 shots, etc etc. big brain?
                     {
                         admin.SendChatMessage($"!{{#FF6347}}[SHOT LISTEN] !{{#ffce52}}{player.Name} has fired {playerHitsInRow}+ times, all of which hit a player without missing! !{{#AFAFAF}}(Weapon used: {weaponName.ToUpper()})");
                     }
@@ -4572,8 +4572,10 @@ namespace RNC
         [RemoteEvent("Server_RequestLogDamage")]
         public void OnRequestLogDamage(Player player, int dealerSQLID, string weaponName, int damage, int health, string bodypart, string notes)
         {
+            string realNotes = (notes.Length > 0 ? notes : "None");
+
             int accSQL = EPlayer.GetAccount(player).SQL_ID;
-            Logs.LogDamage(accSQL, dealerSQLID, weaponName, damage, health, bodypart, notes);
+            Logs.LogDamage(accSQL, dealerSQLID, weaponName, damage, health, bodypart, realNotes);
         }
 
         [RemoteEvent("SetAutoJoin")]

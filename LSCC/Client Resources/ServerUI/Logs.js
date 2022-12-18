@@ -15,7 +15,7 @@ mp.events.add("InitiateLogsTab", () => {
         { name: "Incoming Damages", value: 4 },
         { name: "Outgoing Damages", value: 5 },
       ];`);
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.selectedOption = {name: "Admin Records", value: 3};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.selectedOption = 3;`);
 });
 mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
 

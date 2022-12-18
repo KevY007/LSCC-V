@@ -430,26 +430,25 @@ function LogPlayerDamage(sourceEntity, weaponHash, damage, bodypartIndex, extraN
 
   if(mp.game.player.getInvincible() === true){
     if(notes.length > 0) notes += "; ";
-    notes += "Player had invincibility."
-
-    if(mp.players.local.getVariable("Team") == -1){
-      if(mp.players.local.getVariable("InLobby") === -3){
-        notes += " They were in FREEROAM!";
-      }
-      else if(mp.players.local.getVariable("InDM") != -1){
-        notes += " They were in DEATHMATCH!";
-      }
-      else{
-        notes += " They were most likely in the LOBBY!";
-      }
+    notes += "Player had invincibility. "
+  }
+  if(mp.players.local.getVariable("Team") == -1){
+    if(mp.players.local.getVariable("InLobby") === -3){
+      notes += "They were in FREEROAM!";
+    }
+    else if(mp.players.local.getVariable("InDM") != -1){
+      notes += "They were in DEATHMATCH!";
     }
     else{
-      if(mp.players.local.getVariable("Wounded") > 0){
-        notes += " Probably because they were WOUNDED in COPCHASE!";
-      }
-      else{
-        notes += " They were in COPCHASE!";
-      }
+      notes += "They were most likely in the LOBBY! [Server Invincibility]";
+    }
+  }
+  else{
+    if(mp.players.local.getVariable("Wounded") > 0){
+      notes += "They were WOUNDED in COPCHASE! [Server Invincibility]";
+    }
+    else{
+      notes += "They were in COPCHASE!";
     }
   }
 
