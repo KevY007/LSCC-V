@@ -111,8 +111,8 @@ mp.keys.bind(0x48, false, () => {
         mp.game.audio.playSoundFrontend(-1, "Faster_Click", "RESPAWN_ONLINE_SOUNDSET", true);
         weaponConfig[currentWeapon] = curFiringMode;
         
-        mp.gui.chat.push("You have switched your weapon-mode to " + Constants.firingModeNames[curFiringMode] + "!")
-
+        let notifyscoreboardstr = `toast('${Translate("FIRE_MODE")}', '${Translate("WEAPON_FIRE_MODE_SWITCH", [Constants.firingModeNames[curFiringMode]])}', 'nothing', 500, 2);`;
+        ServerUI.execute(notifyscoreboardstr);
     }
 });
 

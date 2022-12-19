@@ -270,33 +270,33 @@ mp.events.add('actionMenu:clickItem', (actionID) => {
 function actionMenu_lobbyCheck(){
     let dmID = mp.players.local.getVariable("InDM");
     if(dmID != -1){
-        mp.events.callLocal("actionMenu:addItem", 8, "Go to lobby", "#f87171", "fa-door-open");  
+        mp.events.callLocal("actionMenu:addItem", 8, Translate("GO_TO_LOBBY"), "#f87171", "fa-door-open");  
         return;
     }
     let lobbyID = mp.players.local.getVariable("InLobby");
     if(lobbyID > -1 && mp.players.local.getVariable("Team") < 0){ // copchase lobby
-        mp.events.callLocal("actionMenu:addItem", 6, "Edit Weapons", "#38bdf8", "fa-gun");   
+        mp.events.callLocal("actionMenu:addItem", 6, Translate("EDIT_WEAPONS"), "#38bdf8", "fa-gun");   
         let color = "#a3e635";
         if(mp.players.local.getVariable("AutoJoin") == false) color = "#f87171";
-        mp.events.callLocal("actionMenu:addItem", 15, "Autojoin", color, "fa-joystick");   
+        mp.events.callLocal("actionMenu:addItem", 15, Translate("AUTOJOIN"), color, "fa-joystick");   
     }
     else if(lobbyID == -4){ // derby
-        mp.events.callLocal("actionMenu:addItem", 8, "Go to lobby", "#f87171", "fa-door-open");  
+        mp.events.callLocal("actionMenu:addItem", 8, Translate("GO_TO_LOBBY"), "#f87171", "fa-door-open");  
     }
     else if(lobbyID == -3){ // freeroam
-        mp.events.callLocal("actionMenu:addItem", 9, "Spawn Vehicle", "#4ade80", "fa-car");   
+        mp.events.callLocal("actionMenu:addItem", 9, Translate("SPAWN_VEHICLE"), "#4ade80", "fa-car");   
         if(mp.players.local.isInAnyVehicle(true)){
-            mp.events.callLocal("actionMenu:addItem", 7, "Vehicle Tuning", "#a78bfa", "fa-car-wrench");  
-            mp.events.callLocal("actionMenu:addItem", 10, "Repair Vehicle", "#c084fc", "fa-car-bolt");  
+            mp.events.callLocal("actionMenu:addItem", 7, Translate("VEHICLE_TUNING"), "#a78bfa", "fa-car-wrench");  
+            mp.events.callLocal("actionMenu:addItem", 10, Translate("REPAIR_VEHICLE"), "#c084fc", "fa-car-bolt");  
         } 
-        mp.events.callLocal("actionMenu:addItem", 8, "Go to lobby", "#f87171", "fa-door-open");  
+        mp.events.callLocal("actionMenu:addItem", 8, Translate("GO_TO_LOBBY"), "#f87171", "fa-door-open");  
     }
 }
 // This function checks what team the player is in, and adds options for each team.
 function actionMenu_teamCheck(){
     let team = mp.players.local.getVariable("Team");
     if(team >= 0){
-        mp.events.callLocal("actionMenu:addItem", 3, "Painkiller", "#22c55e", "fa-pills");    
+        mp.events.callLocal("actionMenu:addItem", 3, Translate("PAINKILLER"), "#22c55e", "fa-pills");    
         
         let foundReviveTarget = false;
         mp.players.forEachInRange(mp.players.local.position, 5, (playa) => {
@@ -304,20 +304,20 @@ function actionMenu_teamCheck(){
                 if(playa.remoteId != mp.players.local.remoteId && playa.getVariable("Wounded") == 2 && 
                 playa.getVariable("BeingRevived") == false && playa.getVariable("Team") == team){
                     foundReviveTarget = true;
-                    mp.events.callLocal("actionMenu:addItem", 12, "Revive", "#fb923c", "fa-hand-holding-medical");  
+                    mp.events.callLocal("actionMenu:addItem", 12, Translate("REVIVE"), "#fb923c", "fa-hand-holding-medical");  
                 }
             }
         });
 
         if(team == 0){
             if(!mp.players.local.isInAnyVehicle(true)){
-                mp.events.callLocal("actionMenu:addItem", 2, "Medkit", "#fb7185", "fa-kit-medical");      
+                mp.events.callLocal("actionMenu:addItem", 2, Translate("MEDKIT"), "#fb7185", "fa-kit-medical");      
                 let isFound = false;
                 mp.vehicles.forEachInRange(mp.players.local.position, 3.5, (vehicle) => {
                     if(!isFound)
                     {
                         if(vehicle.getVariable("Locked") == true && vehicle.getVariable("Team") != team){   
-                            mp.events.callLocal("actionMenu:addItem", 4, "Lockpick", "#facc15", "fa-signature-lock");    
+                            mp.events.callLocal("actionMenu:addItem", 4, Translate("LOCKPICK"), "#facc15", "fa-signature-lock");    
                             isFound = true;
                         }
                     }
@@ -325,9 +325,9 @@ function actionMenu_teamCheck(){
             }
         }
         else{
-            mp.events.callLocal("actionMenu:addItem", 5, "GPS Beacon", "#60a5fa", "fa-location-dot");   
+            mp.events.callLocal("actionMenu:addItem", 5, Translate("GPS_BEACON"), "#60a5fa", "fa-location-dot");   
             if(!mp.players.local.isInAnyVehicle(true)){
-                mp.events.callLocal("actionMenu:addItem", 2, "Medkit", "#fb7185", "fa-kit-medical");  
+                mp.events.callLocal("actionMenu:addItem", 2, Translate("MEDKIT"), "#fb7185", "fa-kit-medical");  
                 
                 let foundDragoutTarget = false;
                 let foundCuffTarget = false;
@@ -335,13 +335,13 @@ function actionMenu_teamCheck(){
                     if(!foundDragoutTarget)
                     {
                         if(playa.getVariable("Team") == 0 && playa.isInAnyVehicle(true)){
-                            mp.events.callLocal("actionMenu:addItem", 11, "Drag out", "#22d3ee", "fa-person-through-window");  
+                            mp.events.callLocal("actionMenu:addItem", 11, Translate("DRAG_OUT"), "#22d3ee", "fa-person-through-window");  
                             foundDragoutTarget = true;
                         }
                     }
                     if(!foundCuffTarget && !foundReviveTarget){
                         if(playa.getVariable("Team") == 0 && !playa.isInAnyVehicle(true)){
-                            mp.events.callLocal("actionMenu:addItem", 12, "Arrest", "#fb923c", "fa-handcuffs");  
+                            mp.events.callLocal("actionMenu:addItem", 12, Translate("ARREST"), "#fb923c", "fa-handcuffs");  
                             foundCuffTarget = true;
                         }
                     }
@@ -355,20 +355,20 @@ function actionMenu_vehicleCheck(){
     if(mp.players.local.isInAnyVehicle(false)){
         let vehicle = mp.players.local.vehicle;
         if(vehicle.getVariable("Locked") == true)
-            mp.events.callLocal("actionMenu:addItem", 0, "Unlock", "#a3e635", "fa-lock-keyhole-open");
-        else mp.events.callLocal("actionMenu:addItem", 0, "Lock", "#f87171", "fa-lock-keyhole");
+            mp.events.callLocal("actionMenu:addItem", 0, Translate("UNLOCK"), "#a3e635", "fa-lock-keyhole-open");
+        else mp.events.callLocal("actionMenu:addItem", 0, Translate("LOCK"), "#f87171", "fa-lock-keyhole");
 
-        mp.events.callLocal("actionMenu:addItem", 1, "Seatbelt", "#fb923c", "fa-shield-slash");
+        mp.events.callLocal("actionMenu:addItem", 1, Translate("SEATBELT"), "#fb923c", "fa-shield-slash");
     
         if(vehicle.getVariable("Fuel") == undefined || vehicle.getVariable("Fuel") > 0.0){
             if(vehicle.engine == true){
-                mp.events.callLocal("actionMenu:addItem", 13, "Engine", "#60a5fa", "fa-engine");
+                mp.events.callLocal("actionMenu:addItem", 13, Translate("ENGINE"), "#60a5fa", "fa-engine");
             }
             else{
                 if(vehicle.getVariable("Team") != mp.players.local.getVariable("Team")){
-                    mp.events.callLocal("actionMenu:addItem", 14, "Hotwire", "#60a5fa", "fa-bolt");
+                    mp.events.callLocal("actionMenu:addItem", 14, Translate("Hotwire"), "#60a5fa", "fa-bolt");
                 }
-                else mp.events.callLocal("actionMenu:addItem", 13, "Engine", "#60a5fa", "fa-engine");
+                else mp.events.callLocal("actionMenu:addItem", 13, Translate("ENGINE"), "#60a5fa", "fa-engine");
             }
         }
     }
@@ -377,8 +377,8 @@ function actionMenu_vehicleCheck(){
             if(vehicle.getVariable("Team") == mp.players.local.getVariable("Team"))
             {
                 if(vehicle.getVariable("Locked") == true)
-                    mp.events.callLocal("actionMenu:addItem", 0, "Unlock", "#a3e635", "fa-lock-keyhole-open");
-                else mp.events.callLocal("actionMenu:addItem", 0, "Lock", "#f87171", "fa-lock-keyhole");
+                    mp.events.callLocal("actionMenu:addItem", 0, Translate("UNLOCK"), "#a3e635", "fa-lock-keyhole-open");
+                else mp.events.callLocal("actionMenu:addItem", 0, Translate("LOCK"), "#f87171", "fa-lock-keyhole");
                 return;
             }
         });
@@ -893,9 +893,12 @@ mp.events.add("TwoSecondsEvent", () => {
 
         if(mp.players.local.vehicle){
             if(mp.players.local.getVariable("Team") == 1 && chaseRunning)
-                if(createdTooltips.indexOf("B") == -1) mp.events.callLocal("AddTooltip", "B", "Silent Siren", 1);
+                if(createdTooltips.indexOf("B") == -1) mp.events.callLocal("AddTooltip", "B", Translate("SILENT_SIREN"), 1);
                 
-            if(createdTooltips.indexOf("L") == -1) mp.events.callLocal("AddTooltip", "L", "Lock", -1);
+            if(mp.players.local.vehicle.getVariable("Locked") === true)
+                if(createdTooltips.indexOf("L") == -1) mp.events.callLocal("AddTooltip", "L", Translate("UNLOCK"), -1);
+            else 
+                if(createdTooltips.indexOf("L") == -1) mp.events.callLocal("AddTooltip", "L", Translate("LOCK"), -1);
         }
         else{
             if(createdTooltips.indexOf("L") != -1) mp.events.callLocal("RemoveTooltip", "L");
@@ -956,8 +959,8 @@ mp.events.add("TwoSecondsEvent", () => {
                     {
                         if(createdTooltips.indexOf("J") == -1) 
                         {
-                            if(closestHandle == "boot") mp.events.callLocal("AddTooltip", "J", "Trunk", -1);
-                            else if(closestHandle == "bonnet") mp.events.callLocal("AddTooltip", "J", "Bonnet", -1);
+                            if(closestHandle == "boot") mp.events.callLocal("AddTooltip", "J", Translate("TRUNK"), -1);
+                            else if(closestHandle == "bonnet") mp.events.callLocal("AddTooltip", "J", Translate("BONNET"), -1);
                         }
                     }
                     else if(createdTooltips.indexOf("J") != -1) mp.events.callLocal("RemoveTooltip", "J");

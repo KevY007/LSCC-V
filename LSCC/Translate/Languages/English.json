@@ -549,5 +549,6 @@
   "BANNED_FROM_MINIGAME_NOTIFICATION": "You are currently <strong>banned</strong> from this minigame. To view a list of outstanding minigame bans, use <strong>/mgbans</strong>.",
   "OUTSTANDING_BANS_MESSAGE": "!{#FFFF00}======[OUTSTANDING MINIGAME BANS]======",
   "MINIGAME_BAN_LIST": "!{#FF6347}> ~w~{MINIGAME NAME}: ~y~{MINUTES} ~w~minutes left. | ~y~Reason: ~w~{REASON}",
-  "NO_MINIGAME_BANS": "~g~No outstanding bans from any minigame found!"
+  "NO_MINIGAME_BANS": "~g~No outstanding bans from any minigame found!",
+  "REVIVE": "Revive"
 }

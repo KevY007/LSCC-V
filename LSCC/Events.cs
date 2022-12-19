@@ -479,7 +479,7 @@ namespace RNC
                                             if (cop != player)
                                             {
                                                 cop.TriggerEvent("RemoveTooltip", "H");
-                                                cop.TriggerEvent("AddTooltip", "H", "Revive", 1);
+                                                cop.TriggerEvent("AddTooltip", "H", Translate(cop, "REVIVE"), 1);
                                             }
                                         }
                                     }
@@ -540,7 +540,7 @@ namespace RNC
                                             if (fug != player)
                                             {
                                                 fug.TriggerEvent("RemoveTooltip", "H");
-                                                fug.TriggerEvent("AddTooltip", "H", "Revive", 0);
+                                                fug.TriggerEvent("AddTooltip", "H", Translate(fug, "REVIVE"), 0);
                                             }
                                         }
                                     }

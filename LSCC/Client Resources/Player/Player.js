@@ -187,7 +187,7 @@ mp.events.add("ShowHandcuffTooltip", () => {
     HandcuffTooltipTime = Date.now() + 19000;
 
     if(!HandcuffTooltipShown)
-        mp.events.callLocal("AddTooltip", "H", "Handcuff", 1);
+        mp.events.callLocal("AddTooltip", "H", Translate("ARREST"), 1);
 
     HandcuffTooltipShown = true;
 });
@@ -713,8 +713,8 @@ function registerLastKeyPress()
 
     if(AFKStage > 0){      
         mp.events.callRemote("SetAutoJoin", true, true);
-        mp.gui.chat.push("~g~[ANTI-AFK] ~w~Welcome back. Please note if you stay idle for more than 25 minutes, you will be kicked!");
-        mp.gui.chat.push("~g~[ANTI-AFK] ~w~Your autojoin has been re-enabled.");
+        mp.gui.chat.push(Translate("AFK_RETURN_1"));
+        mp.gui.chat.push(Translate("AFK_RETURN_2"));
     }
 
   SecondsSinceLastKeyPress = 0;
