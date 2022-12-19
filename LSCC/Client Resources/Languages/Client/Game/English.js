@@ -46,5 +46,8 @@ const Language = {
     "TASE_PROTECTION": "TASE PROTECTION",
     "LADDER_PROTECTION": "LADDER PROTECTION",
     "PLAYER_INJURED": "(( Player is wounded; hold [H] to help them up, or press [E] to carry them. ))",
+    "MENU":"Menu",
+    "ACTION_MENU": "Action Menu",
+    "VOICE_CHAT": "Voice Chat"
 }
 exports.Language = Language;
