@@ -1231,6 +1231,101 @@ namespace RNC
                     }
                     else await context.Channel.SendMessageAsync("USAGE: !kick (name) (reason)");
                 }
+                else if (context.Content.StartsWith("!givepoints"))
+                {
+                    string[] args = context.Content.Split(" ", 3);
+                    if (args.Count() >= 4)
+                    {
+                        string targetName = args[1];
+                        string pointsStr = args[2];
+                        string silent = args[3];
+
+                        int pointsToGive = -1; 
+                        bool isPointsGood = int.TryParse(pointsStr, out pointsToGive);
+                        if (!isPointsGood)
+                        {
+                            await context.Channel.SendMessageAsync("**[!]** The 'Points' must be a number!");
+                            return;
+                        }
+
+                        Player target = null;
+                        int aSQL = await GetIngameSQLID(context.Author);
+                        int alevel = GetIngameAdminLevel(context.Author);
+
+                        if(aSQL == -1)
+                        {
+                            await context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
+                            await context.Channel.SendMessageAsync("**HINT:** /verify");
+                            return;
+                        }
+                        if(alevel < 6)
+                        {
+                            await context.Channel.SendMessageAsync("**[!]** Sorry, only **Management** can use this, bozo!");
+                            return;
+                        }
+
+                        lock (RAGE.Entities.Players)
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                foreach (Player pl in RAGE.Entities.Players.All)
+                                {
+                                    if (pl.Name.Equals(args[1], StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        target = pl; break;
+                                    }
+                                }
+                                if (target == null)
+                                {
+                                    Task.Run(async () =>
+                                    {
+                                        using (MainDatabase dbcontext = ContextFactory.CreateContext())
+                                        {
+                                            Account tAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+
+                                            if(tAcc == null)
+                                            {
+                                                await context.Channel.SendMessageAsync("**[!]** An account with that name could not be found!");
+                                                return;
+                                            }
+
+                                            tAcc.Points += pointsToGive;
+                                            await dbcontext.SaveChangesAsync();
+
+                                            if (silent != "yes")
+                                            {
+                                                Logs.LogAdmin(aSQL, $"Gave {tAcc.Username} {pointsToGive} points. They now have {tAcc.Points}.");
+                                            }                                            
+                                            await context.Channel.SendMessageAsync($"**[#]** You've given {tAcc.Username} {pointsToGive} Points! They now have {tAcc.Points}.");
+                                            return;
+                                        }
+                                    });
+                                }
+                                else // if player is online
+                                {
+                                    if (!EPlayer.LoggedIn(target))
+                                    {
+                                        context.Channel.SendMessageAsync("**[!]** Target is not logged in!");
+                                        return;
+                                    }
+
+                                    EPlayer.GetAccount(target).Points += pointsToGive;
+                                    EPlayer.Save(target, false);
+
+                                    context.Channel.SendMessageAsync($"**[#]** You've given {target.Name} {pointsToGive} Points! They now have {EPlayer.GetAccount(target).Points}.");
+
+                                    if (silent != "yes")
+                                    {
+                                        Logs.LogAdmin(aSQL, $"Gave {target.Name} {pointsToGive} points. They now have {EPlayer.GetAccount(target).Points}.");
+                                        target.SendChatMessage(Translator.Translate(target, "ADMIN_GAVE_POINTS", "[DC]" + context.Author.Username, pointsToGive));
+                                    }
+                                    return;
+                                }
+                            }, 10);
+                        }
+                    }
+                    else await context.Channel.SendMessageAsync("USAGE: !givepoints (name) (reason) (silent: yes/no)");
+                }
                 else if (context.Content.StartsWith("!ban"))
                 {
                     string[] args = context.Content.Split(" ", 3);
