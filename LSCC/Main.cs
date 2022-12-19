@@ -3059,6 +3059,7 @@ namespace RNC
         }
         public static bool StopGame(int lobbyid, int reason)
         {
+            return false;
             LobbyData lobby = Settings.Lobbies.Find(l => l.lobbyId == lobbyid);
             Stinger.ClearStingers(lobby);
 

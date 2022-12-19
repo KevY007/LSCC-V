@@ -745,8 +745,8 @@ namespace RNC
                 player.SetSharedData("BeingRevived", false);
                 player.SetSharedData("ReviveTarget", "n/a");
 
-                player.SetSharedData("CarryingPlayer", player); // my brain is fried so i am doing it this way :)
-                player.SetSharedData("CarriedBy", player); // if carriedby == player, it means not carrying, wow, so target != player
+                player.SetSharedData("CarryingPlayer", -1);
+                player.SetSharedData("CarriedBy", -1);
 
                 player.ResetData("TunerNoRefundWarn");
                 player.ResetData("ConvertingType");
@@ -2229,14 +2229,20 @@ namespace RNC
             return nothing;
         }
 
+        public static Player GetByID(int ID)
+        {
+            return NAPI.Pools.GetAllPlayers().FirstOrDefault(p => p.Id == ID);
+        }
+
         public static void CarryPlayer(Player player, Player target)
         {
-            player.SetSharedData("CarryingPlayer", target);
-            target.SetSharedData("CarriedBy", player);
+            player.SetSharedData("CarryingPlayer", target.Id);
+            target.SetSharedData("CarriedBy", player.Id);
 
             target.TriggerEvent("onGetCarried");
 
-            Events.RequestPlayAnimation(player, "nm", "firemans_carry", 1);
+            Events.RequestClearAnimation(target);
+            Events.RequestPlayAnimation(target, "nm", "firemans_carry", 1);
             Settings.LoggedInPlayers.ForEach(p =>
             {
                 p.TriggerEvent("AttachPlayerToPlayer", target, player);
@@ -2244,8 +2250,10 @@ namespace RNC
         }
         public static void StopCarry(Player player)
         {
-            Player target = player.GetSharedData<Player>("CarryingPlayer");
-            if (target == player) return;
+            int targetID = player.GetSharedData<int>("CarryingPlayer");
+            if (targetID == -1) return;
+            Player target = GetByID(targetID);
+            if (target == null) return;
 
             target.TriggerEvent("onStopGettingCarried");
             Settings.LoggedInPlayers.ForEach(p =>
@@ -2253,8 +2261,8 @@ namespace RNC
                 p.TriggerEvent("DetachPlayer", target);
             });
 
-            player.SetSharedData("CarryingPlayer", player);
-            target.SetSharedData("CarriedBy", target);
+            player.SetSharedData("CarryingPlayer", -1);
+            target.SetSharedData("CarriedBy", -1);
         }
 
         public static void Spawn(Player player, bool forceAutojoin = true, Vector3 spawn = default(Vector3))
@@ -2291,8 +2299,8 @@ namespace RNC
                 player.TriggerEvent("TogglePlayerChat", true);
                 player.ResetData("Dead");
 
-                player.SetSharedData("CarryingPlayer", player);
-                player.SetSharedData("CarriedBy", player);
+                player.SetSharedData("CarryingPlayer", -1);
+                player.SetSharedData("CarriedBy", -1);
 
                 player.TriggerEvent("hideMDC");
 

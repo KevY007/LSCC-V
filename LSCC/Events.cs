@@ -2475,6 +2475,11 @@ namespace RNC
                     EPlayer.Save(player);
                 }
 
+                if(player.GetSharedData<int>("CarriedBy") != -1)
+                {
+                    Player carrier = EPlayer.GetByID(player.GetSharedData<int>("CarriedBy"));
+                    if (carrier != null) EPlayer.StopCarry(carrier);
+                }
                 EPlayer.StopCarry(player);
 
                 Settings.LoggedInPlayers.Remove(player);
@@ -2496,8 +2501,10 @@ namespace RNC
         }
 
         [RemoteEvent("RequestCarryPlayer")]
-        public static void OnRequestCarryPlayer(Player player, Player target)
+        public static void OnRequestCarryPlayer(Player player, int targetID)
         {
+            Player target = EPlayer.GetByID(targetID);
+            if (target == null) return;
             EPlayer.CarryPlayer(player, target);
 
             player.SendChatMessage(Translate(player, "CARRYING_PLAYER", target.Name));
@@ -2510,8 +2517,10 @@ namespace RNC
         [RemoteEvent("RequestStopCarryPlayer")]
         public static void OnRequestStopCarryPlayer(Player player)
         {
-            Player target = player.GetSharedData<Player>("CarryingPlayer");
-            if (target == player) return;
+            int targetID = player.GetSharedData<int>("CarryingPlayer");
+            if (targetID == -1) return;
+            Player target = EPlayer.GetByID(targetID);
+            if (target == null) return;
 
             EPlayer.StopCarry(player);
 
@@ -2537,6 +2546,12 @@ namespace RNC
                 player.TriggerEvent("togglePlayerCrawl", false);
 
                 EPlayer.StopCarry(player);
+
+                if (player.GetSharedData<int>("CarriedBy") != -1)
+                {
+                    Player carrier = EPlayer.GetByID(player.GetSharedData<int>("CarriedBy"));
+                    if (carrier != null) EPlayer.StopCarry(carrier);
+                }
 
                 string reasonStr;
                 bool wasInGame = false;

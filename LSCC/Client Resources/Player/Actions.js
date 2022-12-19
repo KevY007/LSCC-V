@@ -129,15 +129,22 @@ function MedkitAction(){
 }
 
 // ------ E KEY ------ //
-let carryTarget = mp.players.local;
 
-mp.keys.bind(0x45, false, () => carryCheck);
+mp.keys.bind(0x45, true, () => {carryCheck();});
 function carryCheck(){
-    if(!canRevive()){
+    if(mp.players.local.getVariable("Team") == -1 || mp.players.local.getVariable("Wounded") > 0) return;
+    if(mp.players.local.isInAnyVehicle(false)) return;
+    if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
+        (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
+        (ActionMenuActive !== undefined && ActionMenuActive == true) ||
+        (ClothingEditorActive !== undefined && ClothingEditorActive == true) ||
+        (menuToggled !== undefined && menuToggled == true) ||
+        (chatStatus !== undefined && chatStatus == true) ||
+        (isHotwiring !== undefined && isHotwiring == true)){
         return;
     }
     carryTarget = mp.players.local.getVariable("CarryingPlayer");
-    if(carryTarget.remoteId === mp.players.local.remoteId){
+    if(carryTarget === -1){
         tryCarryPlayer();
     }
     else{
@@ -153,13 +160,13 @@ function tryCarryPlayer(){
             {
                 if(pl.remoteId != mp.players.local.remoteId)
                 {
-                    if(pl.getVariable("BeingRevived") == false && (pl.getVariable("CarriedBy").remoteId === pl.remoteId))
+                    if(pl.getVariable("BeingRevived") == false && pl.getVariable("CarriedBy") == -1)
                     {
                         let distance = calcDist(mp.players.local.position, pl.position);
                         if(distance < 5)
                         {
                             carryTarget = pl;
-                            mp.events.callRemote("RequestCarryPlayer", pl);
+                            mp.events.callRemote("RequestCarryPlayer", pl.remoteId);
                             return;
                         }
                     }
@@ -234,12 +241,13 @@ function onHoldHkey()
 let isReviving = false;
 
 function canRevive(){
-    if(mp.players.local.getVariable("Team") == -1 || mp.players.local.getVariable("Wounded") > 0 || chatStatus || menuToggled || scoreboardToggled || Date.now() - lastChatToggle <= 500) return false; 
+    if(mp.players.local.getVariable("Team") == -1 || carryTarget !== -1 || mp.players.local.getVariable("Wounded") > 0 || chatStatus || menuToggled || scoreboardToggled || Date.now() - lastChatToggle <= 500) return false; 
     return true;
 }
 mp.events.add("BeginReviving", () => {
     if(mp.players.local == null || !mp.players.exists(mp.players.local)) return;
     if(reviveTarget == null || !mp.players.exists(reviveTarget)) return;
+    if(carryTarget !== -1) return;
     if(mp.players.local.getVariable("Wounded") > 0){
         return;
     }

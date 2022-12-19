@@ -10,6 +10,7 @@ var collisionTime = -1;
 var updateRate = 200;
 
 var radioToggle = 0;
+var carryTarget = -1;
 
 var chatStatus = false;
 var chatStatusLate = false;
