@@ -309,6 +309,8 @@ namespace RNC
                             player.SendChatMessage(Translate(player, "INJURED_ACTION_MSG"));
                             player.Health = 100;
 
+                            EPlayer.StopCarry(player);
+
                             if (player.IsInVehicle && player.Vehicle != null)
                             {
                                 if (player.Vehicle.Class == 15 || player.Vehicle.Class == 16)
@@ -2473,6 +2475,8 @@ namespace RNC
                     EPlayer.Save(player);
                 }
 
+                EPlayer.StopCarry(player);
+
                 Settings.LoggedInPlayers.Remove(player);
                 EPlayer.ResetPlayerData(player);
 
@@ -2491,6 +2495,31 @@ namespace RNC
             player.Health = 0;
         }
 
+        [RemoteEvent("RequestCarryPlayer")]
+        public static void OnRequestCarryPlayer(Player player, Player target)
+        {
+            EPlayer.CarryPlayer(player, target);
+
+            player.SendChatMessage(Translate(player, "CARRYING_PLAYER", target.Name));
+            player.SendChatMessage(Translate(player, "CARRYING_PLAYER_WARNING"));
+
+            target.SendChatMessage(Translate(target, "BEING_CARRIED", player.Name));
+
+            EPlayer.Action(player, "ACTION_CARRY", target.Name);
+        }
+        [RemoteEvent("RequestStopCarryPlayer")]
+        public static void OnRequestStopCarryPlayer(Player player)
+        {
+            Player target = player.GetSharedData<Player>("CarryingPlayer");
+            if (target == player) return;
+
+            EPlayer.StopCarry(player);
+
+            EPlayer.Action(player, "ACTION_STOP_CARRY", target.Name);
+            player.SendChatMessage(Translate(player, "STOP_CARRY"));
+            target.SendChatMessage(Translate(target, "STOP_BEING_CARRIED"));
+        }
+
         [ServerEvent(Event.PlayerDeath)]
         public static void OnPlayerDeath(Player player, Player killer, uint reason)
         {
@@ -2506,6 +2535,8 @@ namespace RNC
                 player.TriggerEvent("ToggleSeatbelt", false);
                 player.ResetData("DraggingOut");
                 player.TriggerEvent("togglePlayerCrawl", false);
+
+                EPlayer.StopCarry(player);
 
                 string reasonStr;
                 bool wasInGame = false;

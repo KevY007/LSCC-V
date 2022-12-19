@@ -550,5 +550,12 @@
   "OUTSTANDING_BANS_MESSAGE": "!{#FFFF00}======[OUTSTANDING MINIGAME BANS]======",
   "MINIGAME_BAN_LIST": "!{#FF6347}> ~w~{MINIGAME NAME}: ~y~{MINUTES} ~w~minutes left. | ~y~Reason: ~w~{REASON}",
   "NO_MINIGAME_BANS": "~g~No outstanding bans from any minigame found!",
-  "REVIVE": "Revive"
+  "REVIVE": "Revive",
+  "CARRYING_PLAYER": "!{#5555FF}[CARRY] ~w~You are now carrying {TARGET NAME}! Press ~y~E ~w~again to stop carrying them.",
+  "CARRYING_PLAYER_WARNING": "!{#FF6347}[!] ~w~Some actions, such as carrying large weapons, are not possible while carrying a player.",
+  "ACTION_CARRY": "kneels next to {TARGET NAME} and picks them up to carry them.",
+  "ACTION_STOP_CARRY": "slowly drops {TAGET NAME} on the ground.",
+  "BEING_CARRIED": "!{#5555FF}[CARRY] ~w~You are now being carried by {PLAYER NAME}!",
+  "STOP_BEING_CARRIED": "!{#5555FF}[CARRY] ~w~You are no longer being carried and can crawl around again.",
+  "STOP_CARRY": "!{#5555FF}[CARRY] ~w~You are no longer carrying a player and can normally perform all actions again."
 }

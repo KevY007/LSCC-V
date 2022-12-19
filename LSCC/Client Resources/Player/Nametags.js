@@ -18,7 +18,8 @@ var NAMETAG_MESSAGES = {
     "PLAYER_INJURED": "(( Player is wounded; hold [H] to help them up, or press [E] to carry them. ))"
 }
 mp.events.add("Translator:UpdateNametagMessages", (object) => {
-    NAMETAG_MESSAGES = object;
+    mp.gui.chat.push(`Received: ${object}`);
+    NAMETAG_MESSAGES = JSON.parse(object);
 });
 
 function isPlayerInLOS(target) {

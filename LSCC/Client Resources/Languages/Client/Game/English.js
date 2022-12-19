@@ -45,6 +45,6 @@ const Language = {
     "PLAYER_SHOT": "(( THIS PLAYER HAS SHOT ))",
     "TASE_PROTECTION": "TASE PROTECTION",
     "LADDER_PROTECTION": "LADDER PROTECTION",
-    "PLAYER_INJURED": "(( Player is wounded; hold [H] to help them up, or press [E] to carry them. ))"
+    "PLAYER_INJURED": "(( Player is wounded; hold [H] to help them up, or press [E] to carry them. ))",
 }
 exports.Language = Language;

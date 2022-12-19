@@ -3245,6 +3245,8 @@ namespace RNC
                 {
                     if (i.GetSharedData<int>("InLobby") != lobby.lobbyId) continue;
 
+                    EPlayer.StopCarry(i);
+
                     i.TriggerEvent("MDC:RemoveAllBlips");
                     i.TriggerEvent("ResetKillFeed");
                     i.SetSharedData("HeistLeader", false);

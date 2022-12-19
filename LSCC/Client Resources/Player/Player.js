@@ -3413,9 +3413,11 @@ mp.events.add(
             setTimeout(() => {
                 if(mp.storage.data.language){
                     mp.events.callLocal("Translator:ChangeLanguage", mp.storage.data.language, true);
+                    mp.events.callLocal("Translator:UpdateNametagMessagesManual");
                 }
                 else{
                     mp.events.callLocal("Translator:ChangeLanguage", 0, true);
+                    mp.events.callLocal("Translator:UpdateNametagMessagesManual");
                 }
             }, 100);
         }, 1000);

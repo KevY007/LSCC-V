@@ -56,15 +56,18 @@ function updateUILanguage(){
         case 4: ServerUI.execute(`gm.$refs.helpers.setLocale("vi")`); break;
     }
 }
+mp.events.add("Translator:UpdateNametagMessagesManual", () => {
+    updateNametagsMessages();
+})
 function updateNametagsMessages(){
     const LANG = getLanguageObject();
     var NAMETAG_MESSAGES = {
-        PLAYER_SHOT: LANG.PLAYER_SHOT,
-        TASE_PROTECTION: LANG.TASE_PROTECTION,
-        LADDER_PROTECTION: LANG.LADDER_PROTECTION,
-        PLAYER_INJURED: LANG.PLAYER_INJURED
+        "PLAYER_SHOT": LANG.PLAYER_SHOT,
+        "TASE_PROTECTION": LANG.TASE_PROTECTION,
+        "LADDER_PROTECTION": LANG.LADDER_PROTECTION,
+        "PLAYER_INJURED": LANG.PLAYER_INJURED
     }
-    mp.events.callLocal("Translator:UpdateNametagMessages", NAMETAG_MESSAGES);
+    mp.events.callLocal("Translator:UpdateNametagMessages", JSON.stringify(NAMETAG_MESSAGES));
 }
 
 function TranslateMessage(message_code, args){

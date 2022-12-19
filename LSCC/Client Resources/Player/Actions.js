@@ -128,6 +128,67 @@ function MedkitAction(){
     }, 1000);
 }
 
+// ------ E KEY ------ //
+let carryTarget = mp.players.local;
+
+mp.keys.bind(0x45, false, () => carryCheck);
+function carryCheck(){
+    if(!canRevive()){
+        return;
+    }
+    carryTarget = mp.players.local.getVariable("CarryingPlayer");
+    if(carryTarget.remoteId === mp.players.local.remoteId){
+        tryCarryPlayer();
+    }
+    else{
+        stopCarryPlayer();
+    }
+}
+
+function tryCarryPlayer(){
+    mp.players.forEach(pl => {
+        if(pl.getVariable("Team") == mp.players.local.getVariable("Team"))
+        {
+            if(pl.getVariable("Wounded") == 2)
+            {
+                if(pl.remoteId != mp.players.local.remoteId)
+                {
+                    if(pl.getVariable("BeingRevived") == false && (pl.getVariable("CarriedBy").remoteId === pl.remoteId))
+                    {
+                        let distance = calcDist(mp.players.local.position, pl.position);
+                        if(distance < 5)
+                        {
+                            carryTarget = pl;
+                            mp.events.callRemote("RequestCarryPlayer", pl);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+function stopCarryPlayer(){
+    if(carryTarget.remoteId === mp.players.local.remoteId) return;
+
+    mp.events.callRemote("RequestStopCarryPlayer");
+}
+
+mp.events.add("onGetCarried", () => {
+    if(mp.players.local === undefined || !mp.players.exists(mp.players.local)) return;
+
+    if(mp.players.local.getVariable("Wounded") > 0){
+        mp.events.callLocal("togglePlayerCrawl", false);
+    }
+});
+mp.events.add("onStopGettingCarried", () => {
+    if(mp.players.local === undefined || !mp.players.exists(mp.players.local)) return;
+
+    if(mp.players.local.getVariable("Wounded") > 0){
+        mp.events.callLocal("togglePlayerCrawl", true);
+    }
+});
+
 // ------ H KEY ------ //
 let reviveTarget = null;
 let reviveTime = 7;

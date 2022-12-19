@@ -745,6 +745,9 @@ namespace RNC
                 player.SetSharedData("BeingRevived", false);
                 player.SetSharedData("ReviveTarget", "n/a");
 
+                player.SetSharedData("CarryingPlayer", player); // my brain is fried so i am doing it this way :)
+                player.SetSharedData("CarriedBy", player); // if carriedby == player, it means not carrying, wow, so target != player
+
                 player.ResetData("TunerNoRefundWarn");
                 player.ResetData("ConvertingType");
                 player.ResetData("ConvertingAmount");
@@ -2225,6 +2228,35 @@ namespace RNC
             };
             return nothing;
         }
+
+        public static void CarryPlayer(Player player, Player target)
+        {
+            player.SetSharedData("CarryingPlayer", target);
+            target.SetSharedData("CarriedBy", player);
+
+            target.TriggerEvent("onGetCarried");
+
+            Events.RequestPlayAnimation(player, "nm", "firemans_carry", 1);
+            Settings.LoggedInPlayers.ForEach(p =>
+            {
+                p.TriggerEvent("AttachPlayerToPlayer", target, player);
+            });
+        }
+        public static void StopCarry(Player player)
+        {
+            Player target = player.GetSharedData<Player>("CarryingPlayer");
+            if (target == player) return;
+
+            target.TriggerEvent("onStopGettingCarried");
+            Settings.LoggedInPlayers.ForEach(p =>
+            {
+                p.TriggerEvent("DetachPlayer", target);
+            });
+
+            player.SetSharedData("CarryingPlayer", player);
+            target.SetSharedData("CarriedBy", target);
+        }
+
         public static void Spawn(Player player, bool forceAutojoin = true, Vector3 spawn = default(Vector3))
         {
             try
@@ -2258,6 +2290,9 @@ namespace RNC
                 player.TriggerEvent("DestroyPlayerCamera");
                 player.TriggerEvent("TogglePlayerChat", true);
                 player.ResetData("Dead");
+
+                player.SetSharedData("CarryingPlayer", player);
+                player.SetSharedData("CarriedBy", player);
 
                 player.TriggerEvent("hideMDC");
 
