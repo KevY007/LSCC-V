@@ -1,0 +1,150 @@
+{
+  "auth": {
+    "welcome": "Chào mừng bạn đến với {server}!",
+    "quickLoginAs": "Đăng nhập nhanh với tài khoản",
+    "username": "Tên tài khoản",
+    "password": "Mật khẩu",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "incorrectUserOrPass": "Tên tài khoản hoặc mật khẩu không chính xác",
+    "dontHaveAnAccount": "Bạn không có tài khoản?",
+    "haveAnAccount": "Bạn đã có tài khoản?",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "email": "Email"
+  },
+  "hud": {},
+  "mainmenu": {
+    "lobbies": {
+      "title": "Lobbies"
+    },
+    "minigames": {
+      "title": "Minigames"
+    },
+    "loadouts": {
+      "title": "Trang bị",
+      "weapons": "Vũ khí",
+      "requirements": "Yêu cầu",
+      "name": "Tên vũ khí",
+      "ammo": "Đạn",
+      "preview": "Hình ảnh vũ khí"
+    },
+    "vehicles": {
+      "title": "Phương tiện",
+      "specifications": "Tốc độ",
+      "requirements": "Yêu cầu"
+    },
+    "profile": {
+      "title": "Thông tin cá nhân",
+      "level": "Level {level}",
+      "createdOn": "Được tạo vào {date}",
+      "tabs": {
+        "stats": "Thống kê",
+        "challenges": "Thử thách",
+        "achievements": "Thành tựu"
+      }
+    },
+    "clans": {
+      "title": "Clans",
+      "clear": "Xóa bộ lọc",
+      "myClan": {
+        "owner": "Chủ sở hữu: {owner}",
+        "createdOn": "Được tạo vào {date}",
+        "members": {
+          "you": "{member} (You)",
+          "status": "Trạng thái",
+          "name": "Tên",
+          "level": "Level",
+          "rank": "Rank",
+          "actions": "Các thao tác",
+          "noActions": "Không có thao tác nào khả dụng",
+          "for": "Dành cho {member}",
+          "kick": "Loại {member}?",
+          "changeClanRank": "Thay đổi Clan Rank",
+          "leaderChangeWarning": "Nếu chuyển cho người chơi này tier <strong>Leader</strong>, bạn sẽ tự động chuyển quyền <strong>sở hữu</strong> clan của bạn cho người này. Tier của bạn cũng sẽ được chỉnh về <strong>Officer</strong>."
+        },
+        "settings": {
+          "invitePlayers": "Mời người chơi",
+          "invitePlayersPlaceholder": "Người chơi",
+          "clanAccessTitle": "Truy cập Clan",
+          "clanAccessDescription": "Nếu bạn chỉnh thành công khai, nút 'tham gia' sẽ xuất hiện lên clan của bạn trong bảng danh sách clan, và ai cũng sẽ có thể tham gia clan của bạn.",
+          "forceClanTagTitle": "Bật/Tắt Clan Tag",
+          "forceClanTagDescription": "Mọi thành viên của bạn sẽ xuất hiện clan tag phía trước tên của họ khi sử dụng kênh chat. Ngoại trừ donators & staff sẽ không bị ảnh hưởng.",
+          "copchasePartneringTitle": "Ghép đội trong Copchase",
+          "copchasePartneringDescription": "Mọi thành viên clan của bạn sẽ ở chung xe với nhau trong copchase nếu bạn BẬT tính năng này. Tính năng này không có tác dụng với những người được chọn là fugitive.",
+          "clanAccessOptions": {
+            "inviteOnly": "Invite-Only",
+            "public": "Chung"
+          }
+        }
+      },
+      "tabs": {
+        "clans": "Clans",
+        "myClan": "Clan của tôi",
+        "stats": "Thông kê",
+        "members": "Thành viên",
+        "settings": "Cài đặt"
+      },
+      "creator": {
+        "title": "Người tạo clan",
+        "description": "Clans là các nhóm phải cạnh tranh để đứng đầu. Mỗi lần mạng giết được của một thành viên trong clan đều được tính vào tổng số lần tiêu diệt của clan. Mỗi tuần, clan có nhiều mạng hạ gục nhất sẽ giành được \"Clan of the Week\" để thưởng cho các thành viên clan những phần thưởng thú vị. Ngoài các phần thưởng, clans còn mang lại các lợi thế khác, như tự động ghép với nhau với các thành viên trong clan của bạn trong copchase.",
+        "shortDescription": "Mô tả ngắn gọn",
+        "tag": "Tag",
+        "name": "Tên",
+        "or": "hoặc"
+      }
+    },
+    "inventory": {
+      "title": "Túi đồ",
+      "owned": "Sở hữu: {owned}/{max}",
+      "price": "Giá: {price}",
+      "max": "Bạn đã có đủ số lượng của vật phẩm này rồi.",
+      "noPoints": "Bạn không có đủ điểm để mua vật phẩm này.",
+      "buy": "Nhấn để mua vật phẩm này."
+    },
+    "settings": {
+      "title": "Cài đặt",
+      "crosshair": {
+        "title": "Tâm ngắm",
+        "createProfileFirst": "Tạo tâm đầu tiên",
+        "newProfile": "Tâm mới",
+        "newLayer": "Tạo lớp mới",
+        "crosshairEnabled": "Bật tâm ngắm",
+        "alwaysOn": "Luôn bật",
+        "enabledOnSnipers": "Chỉ hiện thị với các khẩu súng ngắm",
+        "cloneProfile": "Sao chép tâm",
+        "deleteProfile": "Xóa tâm",
+        "clickToEdit": "Nhấn để chỉnh sửa",
+        "dragToReorder": "Kéo để đổi vị trí",
+        "extendView": "Chỉnh sửa chi tiết",
+        "reduceView": "Ẩn",
+        "hideLayer": "Ẩn lớp",
+        "showLayer": "Hiện lớp",
+        "cloneLayer": "Sao chép lớp",
+        "deleteLayer": "Xóa lớp"
+      }
+    }
+  },
+  "components": {
+    "tabs": {
+      "police": "Police",
+      "fugitive": "Fugitive"
+    },
+    "button": {
+      "join": "Tham gia",
+      "select": "Chọn",
+      "selected": "Đã chọn",
+      "buy": "Mua",
+      "max": "Tối đa",
+      "create": "Tạo",
+      "cancel": "Hủy bỏ",
+      "leave": "Rời",
+      "disband": "Hủy bỏ",
+      "kick": "Đuổi",
+      "change": "Thay đổi",
+      "invite": "Mời"
+    },
+    "rooms": {
+      "join": "Tham gia"
+    }
+  }
+}

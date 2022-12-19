@@ -34,6 +34,23 @@ namespace RNC
             NAPI.Util.ConsoleOutput(output);
         }
 
+        [RemoteEvent("Translator:SetLanguageServer")]
+        public static void Translator_SetLanguageServer(Player player, int langID, bool update_db)
+        {
+            player.SetSharedData("Language", langID);
+            if (update_db)
+            {
+                if (!EPlayer.LoggedIn(player))
+                {
+                    NAPI.Util.ConsoleOutput($"[TRANSLATOR FAIL] Tried to update {player.Name}'s language in database while they weren't logged in.");
+                    return;
+                }
+
+                EPlayer.GetAccount(player).Language = langID;
+                EPlayer.Save(player, false);
+            }
+        }
+
         [RemoteEvent("KickPlayer")]
         public void KickPlayer(Player player, string reason, bool silent)
         {

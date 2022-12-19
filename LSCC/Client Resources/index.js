@@ -413,7 +413,6 @@ mp.events.add("login_StopMusic", () => {
     ServerUI.execute(`gm.$refs.auth.$refs.panel.stop();`);
 });
 
-
 function LogPlayerDamage(sourceEntity, weaponHash, damage, bodypartIndex, extraNotes = ""){
   const dealerSQLID = sourceEntity.getVariable("SQL_ID");
   if(!dealerSQLID) return;

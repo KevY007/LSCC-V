@@ -3410,6 +3410,14 @@ mp.events.add(
             setTimeout(() => {
                 ServerUI.markAsChat();
             }, 250);
+            setTimeout(() => {
+                if(mp.storage.data.language){
+                    mp.events.callLocal("Translator:ChangeLanguage", mp.storage.data.language, true);
+                }
+                else{
+                    mp.events.callLocal("Translator:ChangeLanguage", 0, true);
+                }
+            }, 100);
         }, 1000);
 
 

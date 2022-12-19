@@ -1,0 +1,150 @@
+{
+  "auth": {
+    "welcome": "Bienvenue sur {server}!",
+    "quickLoginAs": "Connexion rapide en tant que",
+    "username": "Utilisateur",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "incorrectUserOrPass": "Nom d'utilisateur ou mot de passe incorrect",
+    "dontHaveAnAccount": "Vous n'avez pas de compte ?",
+    "haveAnAccount": "Déjà inscrit ?",
+    "login": "Se connecter",
+    "register": "S'inscrire",
+    "email": "S'inscrire"
+  },
+  "hud": {},
+  "mainmenu": {
+    "lobbies": {
+      "title": "Salons"
+    },
+    "minigames": {
+      "title": "Mini-jeux"
+    },
+    "loadouts": {
+      "title": "Équipements",
+      "weapons": "Armes",
+      "requirements": "Pré-requis",
+      "name": "Nom",
+      "ammo": "Munitions",
+      "preview": "Prévisualisation"
+    },
+    "vehicles": {
+      "title": "Véhicules",
+      "specifications": "Caractéristiques",
+      "requirements": "Pré-requis"
+    },
+    "profile": {
+      "title": "Profil",
+      "level": "Niveau {level}",
+      "createdOn": "Créé le {date}",
+      "tabs": {
+        "stats": "Statistiques",
+        "challenges": "Défis",
+        "achievements": "Succès"
+      }
+    },
+    "clans": {
+      "title": "Clans",
+      "clear": "Effacer",
+      "myClan": {
+        "owner": "Propriétaire : {owner}",
+        "createdOn": "Créé le {date}",
+        "members": {
+          "you": "{member} (vous)",
+          "status": "Statut",
+          "name": "Nom",
+          "level": "Niveau",
+          "rank": "Rang",
+          "actions": "Actions",
+          "noActions": "Aucune action disponible",
+          "for": "Pour {member}",
+          "kick": "Expulser {member}?",
+          "changeClanRank": "Changer le rang du clan",
+          "leaderChangeWarning": "En définissant à ce joueur le niveau de <strong>Chef</strong>, vous leur transmettrez automatiquement la <strong>propriété</strong> de votre clan. Votre rang sera fixé à <strong>Officier</strong>."
+        },
+        "settings": {
+          "invitePlayers": "Inviter des joueurs",
+          "invitePlayersPlaceholder": "Joueur",
+          "clanAccessTitle": "Accès au clan",
+          "clanAccessDescription": "Si activé, un bouton 'Rejoindre' sera affiché pour votre clan dans la liste des clans, tout le monde pourra le rejoindre.",
+          "forceClanTagTitle": "Étiquette de clan forcé",
+          "forceClanTagDescription": "Si activé, les joueurs qui font partie de votre clan afficheront le tag du clan avant leur nom dans le chat. Cela exclut les donateurs et les membres du staff.",
+          "copchasePartneringTitle": "Partenariat copchase (duo)",
+          "copchasePartneringDescription": "Si activé, les membres du clan apparaîtront dans le même véhicule de police lors de la copchase. Cette option n'affecte pas l'apparition en tant que fugitif.",
+          "clanAccessOptions": {
+            "inviteOnly": "Sur invitation",
+            "public": "Publique"
+          }
+        }
+      },
+      "tabs": {
+        "clans": "Clans",
+        "myClan": "Mon clan",
+        "stats": "Statistiques",
+        "members": "Membres",
+        "settings": "Paramètres"
+      },
+      "creator": {
+        "title": "Créateur du clan",
+        "description": "Les clans sont des groupes qui doivent se battre les uns contre les autres pour arriver en tête. Chaque meurtre effectué par un membre du clan compte dans le total des meurtres du clan. Chaque semaine, le clan ayant tué le plus grand nombre de personnes remportera le titre de \"Clan de la semaine\", qui récompensera les membres du clan par de belles récompenses. Outre les récompenses potentielles, les clans offrent d'autres avantages, tels que le partenariat automatique avec les autres membres du clan dans le cadre de copchase.",
+        "shortDescription": "Description courte",
+        "tag": "Étiquettes",
+        "name": "Nom",
+        "or": "ou"
+      }
+    },
+    "inventory": {
+      "title": "Inventaire",
+      "owned": "Possédé : {owned}/{max}",
+      "price": "Prix : {price}",
+      "max": "Vous avez la quantité maximale de cet objet.",
+      "noPoints": "Vous n’avez pas assez d’argent pour améliorer cet objet.",
+      "buy": "Cliquez pour acheter cet objet."
+    },
+    "settings": {
+      "title": "Paramètres",
+      "crosshair": {
+        "title": "Réticule",
+        "createProfileFirst": "Créez d'abord un profil",
+        "newProfile": "Nouveau Profil",
+        "newLayer": "Nouveau calque",
+        "crosshairEnabled": "Réticule activé",
+        "alwaysOn": "Toujours activé",
+        "enabledOnSnipers": "Activé sur les snipers",
+        "cloneProfile": "Cloner le profil",
+        "deleteProfile": "Activé sur les snipers",
+        "clickToEdit": "Cliquez pour modifier",
+        "dragToReorder": "Faites glisser pour réorganiser",
+        "extendView": "Étendre la vue",
+        "reduceView": "Réduire la vue",
+        "hideLayer": "Cacher le calque",
+        "showLayer": "Afficher le calque",
+        "cloneLayer": "Cloner le calque",
+        "deleteLayer": "Supprimer le calque"
+      }
+    }
+  },
+  "components": {
+    "tabs": {
+      "police": "Police",
+      "fugitive": "Fugitif"
+    },
+    "button": {
+      "join": "Rejoindre",
+      "select": "Sélectionner",
+      "selected": "Sélectionné",
+      "buy": "Acheter",
+      "max": "Maximum",
+      "create": "Créer",
+      "cancel": "Annuler",
+      "leave": "Quitter",
+      "disband": "Dissoudre",
+      "kick": "Expulser",
+      "change": "Modifier",
+      "invite": "Inviter"
+    },
+    "rooms": {
+      "join": "Rejoindre"
+    }
+  }
+}

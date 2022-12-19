@@ -285,6 +285,15 @@ function menuSetting_getOptionNameFromValue(type, value){
             return `${Number(value)*100}`;      
             break;   
         }
+        case "language":{
+            switch(Number(value)){
+                case 0: return "English";
+                case 1: return "Spanish/Español";
+                case 2: return "French/Français";
+                case 3: return "Croatian/Hrvatski";
+                case 4: return "Vietnamese/Tiếng Việt";
+            }        
+        }
     }
 }
 
@@ -438,6 +447,35 @@ function ToggleMenu()
             {
                 name: "Game",
                 settings:[
+                    {
+                        id: 29,
+                        type: 4,
+                        name: "serverlanguage",
+                        label: "Language",
+                        description: "Changes the language in which *most* server messages are displayed. Want to help with translations? Join our Discord for more info.",
+                        options: [
+                          {
+                            label: "English",
+                            value: "0",
+                          },
+                          {
+                            label: "Spanish/Español",
+                            value: "1",
+                          },
+                          {
+                            label: "French/Français",
+                            value: "2",
+                          },
+                          {
+                            label: "Croatian/Hrvatski",
+                            value: "3",
+                          },
+                          {
+                            label: "Vietnamese/Tiếng Việt",
+                            value: "4",
+                          }
+                        ]
+                    },
                     {
                         id: 12,
                         type: 4,
@@ -769,6 +807,7 @@ function ToggleMenu()
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.bigmapbind[0].value = "${String.fromCharCode(curMapBind)}";`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.actionmenubind[0].value = "${String.fromCharCode(curActionMenuBind)}";`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.mdcbind[0].value = "${String.fromCharCode(curMDCBind)}";`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.serverlanguage[0].value = ${menuSetting_getOptionNameFromValue("language", mp.storage.data.language)};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.myweather[0].value = "${menuSetting_getOptionNameFromValue("weather", mp.storage.data.menu.myweather)}";`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autojoinopt[0].value = ${mp.storage.data.menu.AutoJoin};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.eventmusic[0].value = ${mp.storage.data.menu.EventMusic};`);
@@ -940,6 +979,9 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     else if(id == 28){
         mp.storage.data.menu.SnowEnabled = value;
         mp.game1.gameplay.enableSnow = value;
+    }
+    else if(id == 29){
+        mp.events.callLocal("Translator:ChangeLanguage", value, false);
     }
 
     if(ServerUI != null)

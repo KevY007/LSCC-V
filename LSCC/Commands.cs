@@ -9763,7 +9763,7 @@ namespace RNC
             t_acc.DonatorLevel = level;
             target.SetSharedData("Donator", level);
             player.SendChatMessage($"!{{#00FF33}}You have set {target.Name}'s donator level to {EPlayer.GetDonatorLevelName(level, true)} ({level})");
-            target.SendChatMessage(Translate(target, "ADMIN_GAVE_DONATOR", EPlayer.GetDonatorLevelName(level, true), level));
+            target.SendChatMessage(Translate(target, "ADMIN_GAVE_DONATOR", player.Name, EPlayer.GetDonatorLevelName(level, true), level));
             EPlayer.Save(target);
 
             EPlayer.UpdateMaxMenuItems(target);

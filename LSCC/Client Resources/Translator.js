@@ -1,15 +1,78 @@
 const {Language:English} = require('./Languages/Client/Game/English');
+const {Language:Spanish} = require('./Languages/Client/Game/Spanish');
+const {Language:French} = require('./Languages/Client/Game/French');
+const {Language:Vietnamese} = require('./Languages/Client/Game/Vietnamese');
+const {Language:Croatian} = require('./Languages/Client/Game/Croatian');
+
+var CURRENT_LANGUAGE = 0;
+const VALID_LANGUAGES = [0,1,2,3,4];
+mp.events.add("Translator:ChangeLanguage", (languageID, onJoin) => {
+  if(!VALID_LANGUAGES.includes(languageID)){
+    CURRENT_LANGUAGE = 0;
+    mp.storage.data.language = 0;
+    mp.gui.chat.push(`Your language (${languageID}) was invalid! Setting you back to English.`);
+  }
+  mp.storage.data.language = languageID;
+  mp.storage.flush();
+  CURRENT_LANGUAGE = languageID;
+  
+  if(onJoin === false){
+    let notifyscoreboardstr = `toast('${Translate("CS_TEST", [mp.players.local.name])}', '', 'nothing', 6500, 2);`;
+    ServerUI.execute(notifyscoreboardstr);
+  }
+  mp.events.callRemote("Translator:SetLanguageServer", languageID, !onJoin);
+
+  updateNametagsMessages();
+  setTimeout(() => {
+    updateUILanguage();
+  }, 100);
+
+});
+
+function getLanguageObject(){
+    var LANG = null;
+
+    switch(CURRENT_LANGUAGE){
+        case 0: LANG = English; break;
+        case 1: LANG = Spanish; break;
+        case 2: LANG = French; break;
+        case 3: LANG = Croatian; break;
+        case 4: LANG = Vietnamese; break;
+        default: LANG = English; break;
+    }
+    return LANG;
+}
+function updateUILanguage(){
+    if(ServerUI === undefined) return;
+
+    switch(CURRENT_LANGUAGE){
+        default: ServerUI.execute(`gm.$refs.helpers.setLocale("en")`); break;
+        case 0: ServerUI.execute(`gm.$refs.helpers.setLocale("en")`); break;
+        case 1: ServerUI.execute(`gm.$refs.helpers.setLocale("es")`); break;
+        case 2: ServerUI.execute(`gm.$refs.helpers.setLocale("fr")`); break;
+        case 3: ServerUI.execute(`gm.$refs.helpers.setLocale("hr")`); break;
+        case 4: ServerUI.execute(`gm.$refs.helpers.setLocale("vi")`); break;
+    }
+}
+function updateNametagsMessages(){
+    const LANG = getLanguageObject();
+    var NAMETAG_MESSAGES = {
+        PLAYER_SHOT: LANG.PLAYER_SHOT,
+        TASE_PROTECTION: LANG.TASE_PROTECTION,
+        LADDER_PROTECTION: LANG.LADDER_PROTECTION,
+        PLAYER_INJURED: LANG.PLAYER_INJURED
+    }
+    mp.events.callLocal("Translator:UpdateNametagMessages", NAMETAG_MESSAGES);
+}
 
 function TranslateMessage(message_code, args){
     if(!args) args = [];
 
-    var LANG = null;
-    // switch case
-    LANG = English;
+    const LANG = getLanguageObject();
 
     const keys = Object.keys(LANG);
     if(!keys.includes(message_code)){
-        return `[ERROR] This message is not defined: ${message_code} | Language: English`;
+        return `[ERROR] This message is not defined: ${message_code} | Language: ${CURRENT_LANGUAGE}`;
     }
     const unformattedMsg = LANG[message_code];
     const toReturn = ApplyStringArguments(unformattedMsg, args);

@@ -13,10 +13,20 @@ namespace RNC
     {
         public static string Translate(Player player, string message_code, params object[] args)
         {
-            object[,] LANG = null;
+            int languageID = player.GetSharedData<int>("Language");
+            string LANG = "English";
+            switch (languageID)
+            {
+                case 0: LANG = "English"; break;
+                case 1: LANG = "Spanish"; break;
+                case 2: LANG = "French"; break;
+                case 3: LANG = "Croatian"; break;
+                case 4: LANG = "Vietnamese"; break;
+                default: LANG = "English"; break;
+            }
             // Switch-case for other languages.
 
-            using(FileStream stream = new FileStream("client_packages/Languages/Server/English.json", FileMode.Open, FileAccess.Read))
+            using (FileStream stream = new FileStream($"client_packages/Languages/Server/{LANG}.json", FileMode.Open, FileAccess.Read))
             {
                 using(StreamReader sr = new StreamReader(stream))
                 {
@@ -32,7 +42,7 @@ namespace RNC
                             string message = ApplyStringArguments(unformatted, args);
                             return message;
                         }
-                        return $"[ERROR] This message is not defined: {message_code} | Language: English";
+                        return $"[ERROR] This message is not defined: {message_code} | Language: {LANG}";
                     }
                 }
             }
