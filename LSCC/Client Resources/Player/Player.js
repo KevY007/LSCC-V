@@ -3626,6 +3626,15 @@ function setStorageDataVars(){
         mp.events.callRemote("SetAutoJoin", mp.storage.data.menu.AutoJoin, false);
     }
 
+    if(mp.storage.data.menu.SnowEnabled !== undefined){
+        mp.game1.gameplay.enableSnow = mp.storage.data.menu.SnowEnabled;
+    }
+    else{
+        mp.game1.gameplay.enableSnow = false;
+        mp.storage.data.menu.SnowEnabled = false;
+    }
+    
+
     if(mp.storage.data.menu.InactiveChatOpacity == undefined){
         mp.storage.data.menu.InactiveChatOpacity = 0.5;
     }

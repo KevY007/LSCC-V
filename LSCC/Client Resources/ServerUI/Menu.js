@@ -28,7 +28,8 @@ if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD
     mp.storage.data.menu.AutoLogin = true;
     mp.storage.data.menu.RealtimeSpeedo = false;
     mp.storage.data.menu.Speedo = true;
-    mp.storage.data.menu.loadingscreens = true;
+    mp.storage.data.menu.loadingscreens = true;    
+    mp.storage.data.menu.SnowEnabled = false;
 
     mp.storage.flush();
 }
@@ -475,6 +476,13 @@ function ToggleMenu()
                         ]
                     },
                     {
+                        id: 28,
+                        type: 1,
+                        name: "enablesnow",
+                        label: "Snowy Map",
+                        description: "Toggles snow in the map of San Andreas (on the roads, etc.)."
+                    },
+                    {
                         id: 14,
                         type: 1,
                         name: "autojoinopt",
@@ -768,6 +776,7 @@ function ToggleMenu()
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.realtimespeedo[0].value = ${mp.storage.data.menu.RealtimeSpeedo};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.carradio[0].value = ${mp.storage.data.radiotoggle};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.loadingscreens[0].value = ${mp.storage.data.menu.loadingscreens};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.enablesnow[0].value = ${mp.storage.data.menu.SnowEnabled};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.oocauto[0].value = ${mp.storage.data.menu.OOCauto};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.voicemode[0].value = "${menuSetting_getOptionNameFromValue("voicemode", mp.storage.data.menu.VoiceMode)}";`);
         
@@ -927,6 +936,10 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     }
     else if(id == 27){
         mp.storage.data.menu.loadingscreens = value;
+    }
+    else if(id == 28){
+        mp.storage.data.menu.SnowEnabled = value;
+        mp.game1.gameplay.enableSnow = value;
     }
 
     if(ServerUI != null)
