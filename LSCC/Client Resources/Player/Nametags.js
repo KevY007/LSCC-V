@@ -11,6 +11,16 @@ let showHPStatus = 0;
 
 mp.nametags.enabled = false;
 
+var NAMETAG_MESSAGES = {
+    "PLAYER_SHOT": "(( THIS PLAYER HAS SHOT ))",
+    "TASE_PROTECTION": "TASE PROTECTION",
+    "LADDER_PROTECTION": "LADDER PROTECTION",
+    "PLAYER_INJURED": "(( Player is wounded; hold [H] to help them up, or press [E] to carry them. ))"
+}
+mp.events.add("Translator:UpdateNametagMessages", (object) => {
+    NAMETAG_MESSAGES = object;
+});
+
 function isPlayerInLOS(target) {
     if(target === undefined) return false;
 
@@ -132,7 +142,7 @@ mp.events.add('render', (nametags) => {
                 if(renderNametags == true) {
                     if(player.getVariable("Team") !== undefined && player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && !BankRobberyOn)
                     {
-                        mp.game.graphics.drawText("(( THIS PLAYER HAS SHOT ))", [x, y - 0.045],
+                        mp.game.graphics.drawText(NAMETAG_MESSAGES.PLAYER_SHOT, [x, y - 0.045],
                         {
                             font: 0,
                             color: [237, 212, 52, 255],
@@ -157,9 +167,9 @@ mp.events.add('render', (nametags) => {
                     }
                     else if(player.getVariable("Team") == 0 && player.getVariable("TaseProtection") == true)
                     {
-                        var typingStr = "(( TASE PROTECTION ))";
-                        if(timerCount == 0) typingStr = "(( TASE PROTECTION ))";
-                        else if(timerCount == 1) typingStr = "( TASE PROTECTION )";
+                        var typingStr = `(( ${NAMETAG_MESSAGES.TASE_PROTECTION} ))`;
+                        if(timerCount == 0) typingStr = `(( ${NAMETAG_MESSAGES.TASE_PROTECTION} ))`;
+                        else if(timerCount == 1) typingStr = `( ${NAMETAG_MESSAGES.TASE_PROTECTION} )`;
                         else if(timerCount == 2) timerCount = 0;
                 
                         mp.game.graphics.drawText(typingStr, [x, y - 0.0250],
@@ -172,9 +182,9 @@ mp.events.add('render', (nametags) => {
                     }
                     else if(player.getVariable("ClimbProtection") == true)
                     {
-                        var typingStr = "(( LADDER PROTECTION ))";
-                        if(timerCount == 0) typingStr = "(( LADDER PROTECTION ))";
-                        else if(timerCount == 1) typingStr = "( LADDER PROTECTION )";
+                        var typingStr = `(( ${NAMETAG_MESSAGES.LADDER_PROTECTION} ))`;
+                        if(timerCount == 0) typingStr = `(( ${NAMETAG_MESSAGES.LADDER_PROTECTION} ))`;
+                        else if(timerCount == 1) typingStr = `( ${NAMETAG_MESSAGES.LADDER_PROTECTION} )`;
                         else if(timerCount == 2) timerCount = 0;
                 
                         mp.game.graphics.drawText(typingStr, [x, y - 0.0250],
@@ -187,7 +197,7 @@ mp.events.add('render', (nametags) => {
                     }                   
                     else if(player.getVariable("Wounded") == 1 || player.getVariable("Wounded") == 2)
                     {
-                        var typingStr = `(( This player is wounded; hold [H] near them begin reviving them. ))`;
+                        var typingStr = NAMETAG_MESSAGES.PLAYER_INJURED;
                         mp.game.graphics.drawText(typingStr, [x, y - 0.0250],
                             {
                                 font: 0,
@@ -293,7 +303,7 @@ mp.events.add('render', (nametags) => {
                 if(player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && renderNametags == true && chaseRunning && !BankRobberyOn)
                 {
                     // They out of distance but still try?
-                    mp.game.graphics.drawText("(( THIS PLAYER HAS SHOT ))", [x, y],
+                    mp.game.graphics.drawText(NAMETAG_MESSAGES.PLAYER_SHOT, [x, y],
                     {
                         font: 0,
                         color: [237, 212, 52, 255],

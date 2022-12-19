@@ -1848,8 +1848,6 @@ namespace RNC
                     p.TriggerEvent("AttachPlayerToPlayer", player, target);
                 });
             }
-
-        
         }
 
         [Command("stopanim", Alias = "sa")]

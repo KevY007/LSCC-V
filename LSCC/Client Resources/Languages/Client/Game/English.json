@@ -41,5 +41,9 @@
     "WEAPON_FIRE_MODE_SWITCH":"Weapon firing mode switched to: <strong>{FIRE MODE}</strong>",
     "SILENT_SIREN":"Silent Siren",
     "TRUNK":"Trunk",
-    "BONNET":"Bonnet"
+    "BONNET":"Bonnet",
+    "PLAYER_SHOT": "(( THIS PLAYER HAS SHOT ))",
+    "TASE_PROTECTION": "TASE PROTECTION",
+    "LADDER_PROTECTION": "LADDER PROTECTION",
+    "PLAYER_INJURED": "(( Player is wounded; hold [H] to help them up, or press [E] to carry them. ))"
 }
