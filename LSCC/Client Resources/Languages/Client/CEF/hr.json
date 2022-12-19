@@ -1,0 +1,150 @@
+{
+  "auth": {
+    "welcome": "Dobro došli na {server}!",
+    "quickLoginAs": "Prijavi se kao",
+    "username": "Korisničko ime",
+    "password": "Lozinka",
+    "confirmPassword": "Potvrdi lozinku",
+    "incorrectUserOrPass": "Pogrešno korisničko ime ili zaporka",
+    "dontHaveAnAccount": "Nemate račun?",
+    "haveAnAccount": "Imate korisnički račun?",
+    "login": "test",
+    "register": "Registracija",
+    "email": "Email"
+  },
+  "hud": {},
+  "mainmenu": {
+    "lobbies": {
+      "title": "Lobiji"
+    },
+    "minigames": {
+      "title": "Mini igre"
+    },
+    "loadouts": {
+      "title": "Oružje",
+      "weapons": "Oružja",
+      "requirements": "Zahtjevi",
+      "name": "Naziv",
+      "ammo": "Municija",
+      "preview": "Pregled"
+    },
+    "vehicles": {
+      "title": "Vozila",
+      "specifications": "Specifikacije",
+      "requirements": "Zahtjevi"
+    },
+    "profile": {
+      "title": "Profil",
+      "level": "Level {level}",
+      "createdOn": "Stvoren {date}",
+      "tabs": {
+        "stats": "Stats",
+        "challenges": "Izazovi",
+        "achievements": "Postignuća"
+      }
+    },
+    "clans": {
+      "title": "Klanovi",
+      "clear": "Očisti",
+      "myClan": {
+        "owner": "Vlasnik: {owner}",
+        "createdOn": "Stvoren {date}",
+        "members": {
+          "you": "{member} (Ti)",
+          "status": "Status",
+          "name": "Ime",
+          "level": "Level",
+          "rank": "Rank",
+          "actions": "Radnje",
+          "noActions": "Nema dostupnih radnji",
+          "for": "Za {member}",
+          "kick": "Izbaci {member}?",
+          "changeClanRank": "Promjeni Clan Rank",
+          "leaderChangeWarning": "Postavljanjem ovog igrača na razinu <strong>Vođe</strong>, automatski ćete mu prenijeti svoje <strong>vlasništvo</strong> nad klanom. Vaša će razina biti postavljena na <strong>Službenik</strong>."
+        },
+        "settings": {
+          "invitePlayers": "Pozovite igrače",
+          "invitePlayersPlaceholder": "Igrač",
+          "clanAccessTitle": "Pristup klanu",
+          "clanAccessDescription": "Ako je postavljeno na javno, gumb 'Pridruži' bit će prikazan za vaš klan na popisu klanova, svatko će mu se moći pridružiti.",
+          "forceClanTagTitle": "Prisili Clan Tag",
+          "forceClanTagDescription": "Ako je postavljeno na ON, igrači koji su u vašem klanu imat će klansku oznaku prikazanu ispred svog imena u chatu. Ovo isključuje donatore i članove osoblja.",
+          "copchasePartneringTitle": "Copchase Partnerstvo",
+          "copchasePartneringDescription": "Ako je uključeno, članovi klana pojavit će se u istom policijskom vozilu u potjeri za policajcima. Ova opcija ne utječe na mrijest povezan s bjeguncima.",
+          "clanAccessOptions": {
+            "inviteOnly": "Samo uz pozivnicu",
+            "public": "Javno"
+          }
+        }
+      },
+      "tabs": {
+        "clans": "Klanovi",
+        "myClan": "Moj Klan",
+        "stats": "Statistike",
+        "members": "Članovi",
+        "settings": "Postavke"
+      },
+      "creator": {
+        "title": "Klan Creator",
+        "description": "Klanovi su grupe koje se moraju natjecati jedna protiv druge kako bi bile na vrhu. Svako ubojstvo koje član klana učini računa se u ukupni broj ubojstava klana. Svaki tjedan, klan s najviše ubojstava osvojit će \"Klan tjedna\" koji članove klana nagrađuje velikim nagradama. Osim potencijalnih nagrada, klanovi nude i druge prednosti, kao što je automatsko partnerstvo s vašim kolegama članovima klana u copchaseu.",
+        "shortDescription": "Kratki opis",
+        "tag": "Tag",
+        "name": "Ime",
+        "or": "ili"
+      }
+    },
+    "inventory": {
+      "title": "Zaliha",
+      "owned": "Posjeduje: {owned}/{max}",
+      "price": "Cijena: {price}",
+      "max": "Imate maksimalnu količinu ove stavke.",
+      "noPoints": "Nemate dovoljno bodova za kupnju ovoe stavke.",
+      "buy": "Kliknite za kupnju ovog artikla."
+    },
+    "settings": {
+      "title": "Postavke",
+      "crosshair": {
+        "title": "Ciljnik",
+        "createProfileFirst": "Izradi profil",
+        "newProfile": "Novi profil",
+        "newLayer": "Novi sloj",
+        "crosshairEnabled": "Crosshair Omogućen",
+        "alwaysOn": "Uvijek uključeno",
+        "enabledOnSnipers": "Omogućeno na snajperima",
+        "cloneProfile": "Kloniraj Profil",
+        "deleteProfile": "Izbriši profil",
+        "clickToEdit": "Klikni za uređivanje",
+        "dragToReorder": "Povuci za premještanje",
+        "extendView": "Prošireni Prikaz",
+        "reduceView": "Smanjen Prikaz",
+        "hideLayer": "Sakrij Sloj",
+        "showLayer": "Prikaži Sloj",
+        "cloneLayer": "Kloniraj Sloj",
+        "deleteLayer": "Obriši sloj"
+      }
+    }
+  },
+  "components": {
+    "tabs": {
+      "police": "Policija",
+      "fugitive": "Kriminalci"
+    },
+    "button": {
+      "join": "Uđi",
+      "select": "Odaberi",
+      "selected": "Odabrano",
+      "buy": "Kupi",
+      "max": "Maks",
+      "create": "Kreiraj",
+      "cancel": "Otkaži",
+      "leave": "Napusti",
+      "disband": "Raspustiti",
+      "kick": "Izbaci",
+      "change": "Promijeni",
+      "invite": "Pozovi"
+    },
+    "rooms": {
+      "join": "Uđi"
+    }
+  }
+}

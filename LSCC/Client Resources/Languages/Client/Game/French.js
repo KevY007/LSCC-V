@@ -1,4 +1,4 @@
-{
+const Language = {
     "CS_TEST": "Bonjour, {PLAYER NAME}!",
     "HOTKEY_HELP": "Aide aux touches",
     "SHOOTING_COOLDOWN": "Cooldown des tirs...",
@@ -43,3 +43,4 @@
     "TRUNK": "Coffre",
     "BONNET": "Capuchon"
 }
+exports.Language = Language;

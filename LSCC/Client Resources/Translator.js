@@ -7,20 +7,22 @@ const {Language:Croatian} = require('./Languages/Client/Game/Croatian');
 var CURRENT_LANGUAGE = 0;
 const VALID_LANGUAGES = [0,1,2,3,4];
 mp.events.add("Translator:ChangeLanguage", (languageID, onJoin) => {
-  if(!VALID_LANGUAGES.includes(languageID)){
+  const realLanguageID = Number(languageID);
+  if(!VALID_LANGUAGES.includes(realLanguageID)){
     CURRENT_LANGUAGE = 0;
     mp.storage.data.language = 0;
-    mp.gui.chat.push(`Your language (${languageID}) was invalid! Setting you back to English.`);
+    mp.gui.chat.push(`Your language (${realLanguageID}) was invalid! Setting you back to English.`);
+    return;
   }
-  mp.storage.data.language = languageID;
+  mp.storage.data.language = realLanguageID;
   mp.storage.flush();
-  CURRENT_LANGUAGE = languageID;
+  CURRENT_LANGUAGE = realLanguageID;
   
   if(onJoin === false){
     let notifyscoreboardstr = `toast('${Translate("CS_TEST", [mp.players.local.name])}', '', 'nothing', 6500, 2);`;
     ServerUI.execute(notifyscoreboardstr);
   }
-  mp.events.callRemote("Translator:SetLanguageServer", languageID, !onJoin);
+  mp.events.callRemote("Translator:SetLanguageServer", realLanguageID, !onJoin);
 
   updateNametagsMessages();
   setTimeout(() => {

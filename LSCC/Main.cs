@@ -2760,7 +2760,7 @@ namespace RNC
                                                     if (player.GetSharedData<int>("PlayerWeather") == -1)
                                                     {
                                                         player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
-                                                        player.SendChatMessage(Translator.Translate(player, "WEATHER_FORECAST_2", weatherString));
+                                                        //player.SendChatMessage(Translator.Translate(player, "WEATHER_FORECAST_2", weatherString));
                                                     }
                                                     else
                                                     {

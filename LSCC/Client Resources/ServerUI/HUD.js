@@ -809,9 +809,9 @@ mp.events.add('ToggleTooltips', (status) =>
 
     if(status)
     {
-        mp.events.callLocal("AddTooltip", "M", "Menu", -1);
-        mp.events.callLocal("AddTooltip", String.fromCharCode(curActionMenuBind), "Action Menu", -1);
-        mp.events.callLocal("AddTooltip", String.fromCharCode(curVoiceBind), "Voice Chat", -1);
+        mp.events.callLocal("AddTooltip", "M", Translate("MENU"), -1);
+        mp.events.callLocal("AddTooltip", String.fromCharCode(curActionMenuBind), Translate("ACTION_MENU"), -1);
+        mp.events.callLocal("AddTooltip", String.fromCharCode(curVoiceBind), Translate("VOICE_CHAT"), -1);
     }
     else {
 
