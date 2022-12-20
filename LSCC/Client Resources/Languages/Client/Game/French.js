@@ -41,6 +41,13 @@ const Language = {
     "WEAPON_FIRE_MODE_SWITCH": "Le mode de tir de l'arme est passé à : <strong>{FIRE MODE}</strong>",
     "SILENT_SIREN": "Alarme silencieuse",
     "TRUNK": "Coffre",
-    "BONNET": "Capuchon"
+    "BONNET": "Capuchon",
+    "PLAYER_SHOT": "(( CE JOUEUR A TIRÉ ))",
+    "TASE_PROTECTION": "PROTECTION DE TASE",
+    "LADDER_PROTECTION": "PROTECTION D'ÉCHELLE",
+    "PLAYER_INJURED": "(( Le joueur est blessé ; maintenez [H] pour l'aider ou appuyez sur [E] pour le transporter))",
+    "MENU": "Menu",
+    "ACTION_MENU": "Menu des actions",
+    "VOICE_CHAT": "Chat vocal"
 }
 exports.Language = Language;

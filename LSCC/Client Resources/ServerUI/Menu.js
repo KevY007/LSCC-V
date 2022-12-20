@@ -447,6 +447,12 @@ function ToggleMenu()
             setTimeout(() => {menuToggledLate = false;}, 500);
         }
         
+        /*
+          {
+            label: "Croatian/Hrvatski",
+            value: "3",
+          },
+        */
 
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.categories = [
             {
@@ -470,10 +476,6 @@ function ToggleMenu()
                           {
                             label: "French/Français",
                             value: "2",
-                          },
-                          {
-                            label: "Croatian/Hrvatski",
-                            value: "3",
                           },
                           {
                             label: "Vietnamese/Tiếng Việt",

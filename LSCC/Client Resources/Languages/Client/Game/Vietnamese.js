@@ -41,6 +41,13 @@ const Language = {
     "WEAPON_FIRE_MODE_SWITCH": "Vũ khí của bạn đã được chuyển về chế độ: <strong>{FIRE MODE}</strong>",
     "SILENT_SIREN": "Tắt/bật tiếng còi",
     "TRUNK": "Cốp xe",
-    "BONNET": "Mui xe"
+    "BONNET": "Mui xe",
+    "PLAYER_SHOT": "(( NGƯỜI CHƠI NÀY ĐÃ NỔ SÚNG ))",
+    "TASE_PROTECTION": "BẢO VỆ KHỎI BỊ GIẬT ĐIỆN",
+    "LADDER_PROTECTION": "BẠN SẼ KHÔNG NHẬN SÁT THƯƠNG KHI SỬ DỤNG THANG",
+    "PLAYER_INJURED": "(( Người chơi bị thương; giữ [H] để giúp họ dậy, hoặc nhấn [E] để vác họ. ))",
+    "MENU": "Menu",
+    "ACTION_MENU": "Action Menu",
+    "VOICE_CHAT": "Voice Chat"
 }
 exports.Language = Language;
