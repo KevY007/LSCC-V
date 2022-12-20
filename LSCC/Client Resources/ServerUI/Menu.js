@@ -260,10 +260,15 @@ function menuSetting_getOptionNameFromValue(type, value){
                 case -1: return "Dynamic";
                 case 0: return "Sunny";
                 case 2: return "Cloudy";
+                case 3: return "Smog";
                 case 4: return "Foggy";
+                case 5: return "Overcast";
                 case 6: return "Rain";
                 case 7: return "Thunderstorm";
-                case 9: return "Snowfall";
+                case 9: return "Neutral";
+                case 10: return "Snowfall";
+                case 11: return "Blizzard";
+                case 12: return "Snowlight";
                 default: return "Unknown";
             }
             break;
@@ -494,10 +499,17 @@ function ToggleMenu()
                           {
                             label: "Cloudy",
                             value: "2",
+                          },    {
+                            label: "Smog",
+                              value: "3",
                           },
                           {
                             label: "Foggy",
                             value: "4",
+                          },
+                          {
+                            label: "Overcast",
+                              value: "5",
                           },
                           {
                             label: "Rain",
@@ -505,11 +517,23 @@ function ToggleMenu()
                           },
                           {
                             label: "Thunderstorm",
-                              value: "7",
+                            value: "7",
+                          },   
+                          {
+                            label: "Neutral",
+                              value: "9",
                           },
                           {
                             label: "Snowfall",
-                              value: "9",
+                              value: "10",
+                          }, 
+                          {
+                            label: "Blizzard",
+                              value: "11",
+                          }, 
+                          {
+                            label: "Snowlight",
+                              value: "12",
                           },
                         ]
                     },

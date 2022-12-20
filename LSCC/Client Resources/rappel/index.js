@@ -47,10 +47,12 @@ function rappelPlayer(warningLevel)
     localPlayer.clearTasks();
     localPlayer.taskRappelFromHeli(10.0);
 }
-
+/*
 mp.events.add('OneSecondEvent', () => {
+    
     if(mp.storage.data.menu.tooltips == true && ServerUI != null)
     {
+        
         if(mp.players.local.vehicle)
         {
             const taskStatus = mp.players.local.getScriptTaskStatus(-275944640);
@@ -66,8 +68,10 @@ mp.events.add('OneSecondEvent', () => {
             else mp.events.callLocal("RemoveTooltip", "X");
         }
         else mp.events.callLocal("RemoveTooltip", "X");
+        
     }
 });
+*/
 
 mp.keys.bind(0x55, false, function() {
     if(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false) return;

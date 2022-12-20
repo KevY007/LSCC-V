@@ -3369,6 +3369,10 @@ mp.events.add(
 
         if(mp.game.vehicle.isThisModelAHeli(vehicle.model) || mp.game.vehicle.isThisModelAPlane(vehicle.model)) {
             mp.events.callRemote("RequestParachute", vehicle);
+
+            if(mp.players.local.getVariable("Team") === 1){
+                mp.events.callLocal("AddTooltip", "X", "Police Camera™", 1);
+            }
         }
 
         if (seat == -1) {
@@ -3389,6 +3393,8 @@ mp.events.add(
                 mp.players.local.clearTasks();
                 mp.players.local.setIntoVehicle(vehicle.handle, seat);
             }
+
+            mp.events.callLocal("RemoveTooltip", "X");
 
             if(vehicle.getVariable("Engine") !== undefined)
                 vehicle.setEngineOn(vehicle.getVariable("Engine"), true, true);
