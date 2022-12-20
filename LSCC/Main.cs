@@ -2417,8 +2417,10 @@ namespace RNC
             new CarData(1, "Police Transporter", "policet", "package://Artwork/Vehicles/policet.png", "Snail", 15);
             new CarData(1, "FBI Buffalo A/C", "fbibufac", "package://Artwork/Vehicles/fbibufac.png", "Fast", 17, 20);
             new CarData(1, "Police Chopper", "polmav", "package://Artwork/Vehicles/polmav.png", "N/A", 20, 20);
+            new CarData(1, "AS-350", "as350", "package://Artwork/Vehicles/as350.png", "N/A", 20, 25);
             new CarData(1, "Unmarked Charger", "lspdunm", "package://Artwork/Vehicles/lspdunm.png", "Fast+", 25, 40);
             new CarData(1, "FIB Executioner", "fibexecutioner", "package://Artwork/Vehicles/fibexecutioner.png", "Average", 25, 50);
+            new CarData(1, "Police Buffalo SX", "buffalosxpol", "package://Artwork/Vehicles/buffalosxpol.png", "Fast+", 30, 50);
             new CarData(1, "Chevrolet Caprice PPV", "bcso2slick", "package://Artwork/Vehicles/bcso2slick.png", "Fast", 30, 65);
             new CarData(1, "Vapid Torrence Unmarked", "police3umk", "package://Artwork/Vehicles/police3umk.png", "Fast+", 30, 70);
             new CarData(1, "Sheriff Gauntlet", "shergauntlet", "package://Artwork/Vehicles/shergauntlet.png", "Fast+", 38, 80);
@@ -2452,11 +2454,13 @@ namespace RNC
             new CarData(0, "Sultan", "sultan", "package://Artwork/Vehicles/sultan.png", "Average", 25, 40);
             new CarData(0, "Tulip SS", "tulip2", "package://Artwork/Vehicles/tulip2.png", "Fast", 30, 50);
             //new CarData(0, "Kuruma", "kuruma", "package://Artwork/Vehicles/kuruma.png", "Fast", 30, 60); KURUMA TEMPORARILY REMOVED UNTIL BULLET PROOF GTA ONLIEN BUG FIX
+            new CarData(0, "Buffalo SX", "buffalosx", "package://Artwork/Vehicles/buffalosx.png", "Fast+", 30, 70);
             new CarData(0, "Dominator GTT", "dominator8", "package://Artwork/Vehicles/dominator8.png", "Fast+", 32, 50);
             new CarData(0, "BMW M3 E46", "m3e46", "package://Artwork/Vehicles/m3e46.png", "Fast", 35, 0, 10);
             new CarData(0, "Sultan Classic", "sultan2", "package://Artwork/Vehicles/sultan2.png", "Fast", 37, 80);
             new CarData(0, "ZR350", "zr350", "package://Artwork/Vehicles/zr350.png", "Fast", 40, 70);
             new CarData(0, "Golf Mk6", "golfmk6", "package://Artwork/Vehicles/golfmk6.png", "Fast+", 50, 85);
+            new CarData(0, "2019 Porsche Macan", "pm19", "package://Artwork/Vehicles/pm19.png", "Fast+", 60, 80);
 
             if (Settings.Dynamics.Discord)
             {
@@ -3059,7 +3063,6 @@ namespace RNC
         }
         public static bool StopGame(int lobbyid, int reason)
         {
-            return false;
             LobbyData lobby = Settings.Lobbies.Find(l => l.lobbyId == lobbyid);
             Stinger.ClearStingers(lobby);
 
@@ -3598,7 +3601,9 @@ namespace RNC
                                                     veh.SetSharedData("SpeedInfo", "Average");
                                                     lobby.Vehicles.Add(veh);
                                                     veh.SetSharedData("Collisions", true);
-                                                    veh.SetSharedData("Fuel", new Random().NextDouble() * 100);
+                                                    double randNum = new Random().NextDouble() * 100;
+                                                    veh.SetSharedData("DirtLevel", randNum);
+                                                    veh.SetSharedData("Fuel", randNum);
 
                                                 }
                                             });
@@ -3886,6 +3891,7 @@ namespace RNC
                                             pVehicle.SetSharedData("Fuel", 100.0);
                                             pVehicle.SetSharedData("Locked", true);
                                             pVehicle.Locked = true;
+                                            pVehicle.SetSharedData("DirtLevel", 0.0);
                                             pVehicle.SetSharedData("Team", 1);
                                             pVehicle.SetSharedData("SpeedInfo", vehSpeedClass);
 
@@ -4254,6 +4260,7 @@ namespace RNC
                                         pVehicle.SetSharedData("Fuel", 100.0);
                                         pVehicle.SetSharedData("Locked", false);
                                         pVehicle.Locked = false;
+                                        pVehicle.SetSharedData("DirtLevel", 0.0);
                                         pVehicle.SetSharedData("Team", 0);
                                         pVehicle.SetSharedData("SpeedInfo", vehSpeedClass);
                                         lobby.Vehicles.Add(pVehicle);

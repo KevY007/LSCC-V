@@ -2280,6 +2280,17 @@ namespace RNC
                 {
                     Commands.cmd_specoff(player);
                 }
+                if (player.HasData("IsNoclipping"))
+                {
+                    player.SetSharedData("VisibleBlip", player.GetData<bool>("IsNoclipping"));
+                    player.ResetData("IsNoclipping");
+                    player.TriggerEvent("ForceNoclip", false);
+                    player.SetSharedData("EntAlpha", 255);
+                    if (EPlayer.GetAccount(player).Admin > 2)
+                        Logs.LogAdmin(player, "Forced out of noclip mode.");
+
+                    //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:noclip:stop"); } catch { }
+                }
 
                 if (!Settings.LoggedInPlayers.Contains(player)) Settings.LoggedInPlayers.Add(player);
 

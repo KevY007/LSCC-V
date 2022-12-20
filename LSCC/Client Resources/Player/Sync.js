@@ -127,10 +127,12 @@ mp.events.add('entityStreamIn', (entity) => {
     }
     if (entity.type === 'vehicle') 
     {
+        entity.setDirtLevel(entity.getVariable("DirtLevel") || 0.0);
+
         if(entity.getVariable("SirenState") !== undefined && entity.getClass() === 18)
         {
             entity.setSiren(entity.getVariable("SirenState"));
-        }
+        } 
         if(entity.getVariable("Status_Trunk") !== undefined)
         {
             if (entity.getVariable("Status_Trunk") == true)

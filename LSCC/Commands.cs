@@ -820,6 +820,59 @@ namespace RNC
             player.SendChatMessage(Translate(player, "DISCORD_VERIFY_CODE", _d.DiscordCode));
         }
 
+        [Command("veh2", "!{#AFAFAF}[USAGE] veh2 (car model name) (optional: color 1) (optional: color 2)")]
+        public void cmd_veh2(Player player, string carname, int col1 = -1, int col2 = -1)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
+                return;
+            }
+
+            List<Vehicle> freeroamVehs = new List<Vehicle>();
+            freeroamVehs = player.GetData<List<Vehicle>>("FreeroamVehicles");
+
+            if (freeroamVehs.Count >= 5)
+            {
+                Vehicle veh = freeroamVehs.First();
+                freeroamVehs.Remove(veh);
+                veh.Delete();
+                player.SendNotification(Translate(player, "FREEROAM_REMOVED_OLDEST_VEH"));
+            }
+
+            uint toSpawn = NAPI.Util.GetHashKey(carname);
+
+            Random rand = new Random(DateTimeOffset.UtcNow.Millisecond);
+
+            Vehicle aVehicle = NAPI.Vehicle.CreateVehicle(toSpawn, player.Position.Around(5.0f), player.Heading, col1, col2, player.Name, 255, false, true, player.Dimension);
+            aVehicle.EngineStatus = true;
+            aVehicle.SetSharedData("Engine", true);
+            aVehicle.SetSharedData("Locked", false);
+            aVehicle.Locked = false;
+            aVehicle.SetSharedData("Team", -1);
+            aVehicle.SetSharedData("DirtLevel", 0.0);
+            if (player.HasData("FreeroamVehicles"))
+                player.GetData<List<Vehicle>>("FreeroamVehicles").Add(aVehicle);
+            else
+            {
+                List<Vehicle> vehs = new List<Vehicle>(); vehs.Add(aVehicle);
+                player.SetData<List<Vehicle>>("FreeroamVehicles", vehs);
+            }
+            NAPI.Task.Run(() =>
+            {
+                lock (player)
+                {
+                    if (player != null && player.Exists)
+                    {
+                        if (!aVehicle.IsNull && aVehicle.Exists) player.SetIntoVehicle(aVehicle, 0);
+                    }
+                }
+            }, 1000);
+        }
+
         [Command("vehdbg")]
         public void cmd_vehdbg(Player player, string carname)
         {
@@ -836,6 +889,7 @@ namespace RNC
             veh.SetSharedData("Engine", true);
             veh.SetSharedData("Locked", false);
             veh.Locked = false;
+            veh.SetSharedData("DirtLevel", 0.0);
             veh.SetSharedData("Team", -1);
             Settings.AdminVehicles.Add(veh);
             NAPI.Task.Run(() =>
@@ -1578,8 +1632,11 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
-                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
-                return;
+                if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
+                {
+                    player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
+                    return;
+                }
             }
 
             if (player.HasData("IsNoclipping"))
@@ -1587,8 +1644,9 @@ namespace RNC
                 player.SetSharedData("VisibleBlip", player.GetData<bool>("IsNoclipping"));
                 player.ResetData("IsNoclipping");
                 player.TriggerEvent("ForceNoclip", false);
-                Logs.LogAdmin(player, "Left noclip mode.");
                 player.SetSharedData("EntAlpha", 255);
+                if (EPlayer.GetAccount(player).Admin > 2)
+                    Logs.LogAdmin(player, "Left noclip mode.");
 
                 //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:noclip:stop"); } catch { }
             }
@@ -1601,9 +1659,10 @@ namespace RNC
                 player.SetData("IsNoclipping", player.GetSharedData<bool>("VisibleBlip"));
                 player.SetSharedData("VisibleBlip", false);
                 player.TriggerEvent("ForceNoclip", true);
-                Logs.LogAdmin(player, "Entered noclip mode.");
                 player.SetSharedData("EntAlpha", 0);
                 //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:noclip:start"); } catch { }
+                if (EPlayer.GetAccount(player).Admin > 2)
+                    Logs.LogAdmin(player, "Entered noclip mode.");
             }
             return;
         }

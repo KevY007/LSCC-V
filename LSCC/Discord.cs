@@ -1233,7 +1233,7 @@ namespace RNC
                 }
                 else if (context.Content.StartsWith("!givepoints"))
                 {
-                    string[] args = context.Content.Split(" ", 3);
+                    string[] args = context.Content.Split(" ", 4);
                     if (args.Count() >= 4)
                     {
                         string targetName = args[1];
@@ -1309,10 +1309,9 @@ namespace RNC
                                         return;
                                     }
 
-                                    EPlayer.GetAccount(target).Points += pointsToGive;
-                                    EPlayer.Save(target, false);
+                                    EPlayer.GivePoints(target, pointsToGive);
 
-                                    context.Channel.SendMessageAsync($"**[#]** You've given {target.Name} {pointsToGive} Points! They now have {EPlayer.GetAccount(target).Points}.");
+                                    context.Channel.SendMessageAsync($"**[#]** You've given {target.Name} {pointsToGive} Points! They now have {EPlayer.GetAccount(target).Points+pointsToGive}.");
 
                                     if (silent != "yes")
                                     {
@@ -1324,7 +1323,7 @@ namespace RNC
                             }, 10);
                         }
                     }
-                    else await context.Channel.SendMessageAsync("USAGE: !givepoints (name) (reason) (silent: yes/no)");
+                    else await context.Channel.SendMessageAsync("**USAGE:** !givepoints (name) (points) (silent: yes/no)");
                 }
                 else if (context.Content.StartsWith("!ban"))
                 {

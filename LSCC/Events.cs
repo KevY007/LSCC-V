@@ -2071,6 +2071,7 @@ namespace RNC
             aVehicle.SetSharedData("Locked", false);
             aVehicle.Locked = false;
             aVehicle.SetSharedData("Team", -1);
+            aVehicle.SetSharedData("DirtLevel", 0.0);
 
             System.Drawing.Color color1 = System.Drawing.Color.FromArgb(255, 255, 255, 255);
             System.Drawing.Color color2 = System.Drawing.Color.FromArgb(255, 255, 255, 255);
