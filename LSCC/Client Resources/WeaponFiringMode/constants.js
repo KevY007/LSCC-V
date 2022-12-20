@@ -21,7 +21,7 @@ exports = {
         mp.game.joaat("GROUP_THROWN"), mp.game.joaat("GROUP_PETROLCAN"), mp.game.joaat("GROUP_DIGISCANNER"), mp.game.joaat("GROUP_HEAVY")
     ],
 
-    burstFireAllowedWeapons : [mp.game.joaat("WEAPON_CARBINERIFLE") ],
+    burstFireAllowedWeapons : [mp.game.joaat("WEAPON_CARBINERIFLE"), mp.game.joaat("WEAPON_TACTICALRIFLE"), mp.game.joaat("WEAPON_ASSAULTRIFLE") ],
     burstFireAllowedGroups : [ ],
 
 

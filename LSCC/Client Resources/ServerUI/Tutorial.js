@@ -22,8 +22,7 @@ mp.events.add("StartTutorial", () => {
             title: "Language",
             description: "The main language on Race 'N' Chase is ENGLISH, however we have a special chat for various languages where players \
             can communicate in their own language. Select your language here:",
-            options: ["English/None", "Spanish/Español", "French/Français", "Russian/Pусский", "Turkish/Türkçe", "Ex-Yugo/Balkanski", 
-                      "Arabic/earabiun"],
+            options: ["English/None", "Spanish/Español", "French/Français", "Vietnamese/Tiếng Việt"],
             value: "English/None"
         },
         {
@@ -116,10 +115,19 @@ mp.events.add("OnFinishTutorial", (results) => {
     let resobj = JSON.parse(results);
     IsInTutorial = false;
     let useVoice = resobj[1];
-    let language = resobj[2];
 
+    let langID = 0;
+    switch(resobj[2]){
+        case "Spanish/Español": langID = 1; break;
+        case "French/Français": langID = 2; break;
+        case "Croatian/Hrvatski": langID = 3; break;
+        case "Vietnamese/Tiếng Việt": langID = 4; break;
+        default: langID = 0; break;
+    }
+
+    mp.events.callLocal("Translator:ChangeLanguage", langID, true);
     mp.events.callLocal("login_StopMusic");
-    mp.events.callRemote("Server_FinishTutorial", useVoice, language);
+    mp.events.callRemote("Server_FinishTutorial", useVoice, langID);
     mp.gui.cursor.show(false, false);
    // ServerUI.execute(`gm.$refs.hud.enabled = true;`);
 });

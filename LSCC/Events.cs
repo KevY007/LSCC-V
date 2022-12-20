@@ -3193,7 +3193,7 @@ namespace RNC
         }
 
         [RemoteEvent("Server_FinishTutorial")]
-        public static void OnFinishTutorial(Player player, bool useVoice, string language)
+        public static void OnFinishTutorial(Player player, bool useVoice, int languageID)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
@@ -3201,45 +3201,26 @@ namespace RNC
             OnSetVoiceMode(player, voiceMode, false);
             player.TriggerEvent("setVoiceModeMenu", voiceMode);
 
-            string realLanguage = language.Substring(0, language.IndexOf('/'));
-            Task.Run(async () =>
+            player.TriggerEvent("DestroyPlayerCamera");
+            EPlayer.GetAccount(player).Language = languageID;
+            player.TriggerEvent("DestroyLoginScene");
+
+            CharacterData ConvChar = new CharacterData();
+            try
             {
-                using (MainDatabase context = ContextFactory.CreateContext())
-                {
-                    Language lang = await context.Languages.AsQueryable().FirstOrDefaultAsync(l => l.LanguageName.Equals(realLanguage));
-                    int lID = -1;
-                    if(lang == null)
-                    {
-                        lID = -1;
-                    }
-                    else
-                    {
-                        lID = lang.SQL_ID;
-                    }
-                    NAPI.Task.Run(() =>
-                    {
-                        player.TriggerEvent("DestroyPlayerCamera");
-                        EPlayer.GetAccount(player).Language = lID;
-                        player.TriggerEvent("DestroyLoginScene");
+                ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
 
-                        CharacterData ConvChar = new CharacterData();
-                        try
-                        {
-                            ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-
-                            ConvChar.Clothing[0] = new ClothingData(0, 0); // Fugitive MALE
-                            ConvChar.Clothing[1] = new ClothingData(1, 0); // Cop MALE
-                            ConvChar.Clothing[2] = new ClothingData(0, 1); // Fugitive FEMALE
-                            ConvChar.Clothing[3] = new ClothingData(1, 1); // Cop FEMALE
+                ConvChar.Clothing[0] = new ClothingData(0, 0); // Fugitive MALE
+                ConvChar.Clothing[1] = new ClothingData(1, 0); // Cop MALE
+                ConvChar.Clothing[2] = new ClothingData(0, 1); // Fugitive FEMALE
+                ConvChar.Clothing[3] = new ClothingData(1, 1); // Cop FEMALE
 
 
-                            player.SetData("cEditClothingData", ConvChar.Clothing);
-                            EPlayer.ShowCharCreator(player, ConvChar, true);
-                        }
-                        catch { EPlayer.ShowCharCreator(player, null, true); }
-                    });
-                }
-            });
+                player.SetData("cEditClothingData", ConvChar.Clothing);
+                EPlayer.ShowCharCreator(player, ConvChar, true);
+            }
+            catch { EPlayer.ShowCharCreator(player, null, true); }
+
         }
 
         [RemoteEvent("SpectateChangeHPAR")]
