@@ -438,28 +438,26 @@ function Render3DMapMatrix(){
         currentY = -4000;
         for(let j = 0 ; j < 48 ; j++){
 
-            let highlight = false;
-            for(let fug = 0 ; fug < PoliceHeliCam_Fugitives.length; fug++){
-                if(PoliceHeliCam_Fugitives[fug].x < (currentX+250) && PoliceHeliCam_Fugitives[fug].x > currentX){
-                    if(PoliceHeliCam_Fugitives[fug].y < (currentY+250) && PoliceHeliCam_Fugitives[fug].y > currentY){
-                        highlight = true;
-                        break;
-                    }
-                }
-            }
+            let highlight = 0;
             for(let fug = 0 ; fug < PoliceHeliCam_Fugitives_Server.length; fug++){
                 if(PoliceHeliCam_Fugitives_Server[fug].x < (currentX+250) && PoliceHeliCam_Fugitives_Server[fug].x > currentX){
                     if(PoliceHeliCam_Fugitives_Server[fug].y < (currentY+250) && PoliceHeliCam_Fugitives_Server[fug].y > currentY){
-                        highlight = true;
+                        highlight = 2;
                         break;
                     }
                 }
             }
-            
+            for(let fug = 0 ; fug < PoliceHeliCam_Fugitives.length; fug++){
+                if(PoliceHeliCam_Fugitives[fug].x < (currentX+250) && PoliceHeliCam_Fugitives[fug].x > currentX){
+                    if(PoliceHeliCam_Fugitives[fug].y < (currentY+250) && PoliceHeliCam_Fugitives[fug].y > currentY){
+                        highlight = 1;
+                        break;
+                    }
+                }
+            }
 
-
-            if(highlight){
-                mp.game.graphics.drawBox(currentX, currentY, Z_value, (currentX+250), (currentY+250), (Z_value+0.001), 255, 255, 0, 16);
+            if(highlight > 0){
+                mp.game.graphics.drawBox(currentX, currentY, Z_value, (currentX+250), (currentY+250), (Z_value+0.001), (highlight == 2 ? 255 : 0), 255, 0, 16);
 
                 // distance calc and if player is close display street
                 const vec1 = mp.players.local.position;

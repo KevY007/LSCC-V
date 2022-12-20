@@ -2637,6 +2637,24 @@ namespace RNC
                                 }
                                 EPlayer.GetAccount(killer).Kills++;
                                 EPlayer.GetAccount(player).Deaths++;
+
+                                if (EPlayer.GetAccount(killer).ClanID != -1)
+                                {
+                                    int killerClanID = EPlayer.GetAccount(killer).ClanID;
+                                    Task.Run(async () =>
+                                    {
+                                        using (MainDatabase context = ContextFactory.CreateContext())
+                                        {
+                                            Clan clan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == killerClanID);
+                                            if (clan != null)
+                                            {
+                                                clan.TotalKills++;
+                                                clan.WeekKills++;
+                                                await context.SaveChangesAsync();
+                                            }
+                                        }
+                                    });
+                                }
                             }
 
                             EPlayer.GrantXP(killer, 1);
@@ -5586,97 +5604,18 @@ namespace RNC
                                 c.WeekKills = 0;
                             });
                             await context.SaveChangesAsync();
+
+                            List<Logs_Damage> dmglog = await context.Logs_Damages.AsQueryable().ToListAsync();
+                            context.Logs_Damages.RemoveRange(dmglog);
+
+                            await context.SaveChangesAsync();
+                            NAPI.Task.Run(() =>
+                            {
+                                NAPI.Util.ConsoleOutput("[1 WEEK] Damage logs have been cleared!");
+                            });
                         }
                     });
-                    
-                    // ARCHIVING INACTIVE ACCOUNTS.....
-                    /*
-                    Account cunt = ContextFactory.Instance.Accounts.ToList().FirstOrDefault(a => (new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() - new DateTimeOffset(a.LastLogin).ToUnixTimeSeconds()) > 2629746);
-                    if (cunt != null)
-                    {
-                        EPlayer.SendMessageToAll("~p~[WEEK PASS] ~w~One week has passed. Inactive accounts will now be archived.");
-                        EPlayer.SendMessageToAll("~b~[ACCOUNT ARCHIVE] ~w~This might cause some server lag for a few seconds, please wait...");
-                        EPlayer.SendMessageToAll("~b~[ACCOUNT ARCHIVE] ~w~You will be frozen until the archiving process is over.");
-                        NAPI.Util.ConsoleOutput("[1 WEEK] All accounts inactive for 1+ months will be archived.");
-                        int archivedAccs = 0;
-
-                        NAPI.Task.Run(() =>
-                        {
-                            foreach (Player pl in NAPI.Pools.GetAllPlayers().Where(p => p.GetSharedData<int>("Team") > 0))
-                            {
-                                EPlayer.Notify(pl, "<strong>Account archiving in process...</strong> This will take a few seconds.", "orange", "fa-regular fa-server", false, 999999999, "center", "replace");
-                                EPlayer.Freeze(pl, true);
-                            }
-                            foreach (Account acc in ContextFactory.Instance.Accounts)
-                            {
-                                acc.ChallengeStreak = 0;
-                                acc.CompletedDailyChallenge = false;
-
-                                if ((new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() - new DateTimeOffset(acc.LastLogin).ToUnixTimeSeconds()) > 2629746) // 2,629,746 = 1 month in seconds
-                                {
-                                    acc.MOTD = NAPI.Util.ToJson(new MOTDData()
-                                    {
-                                        AdminName = "SERVER",
-                                        Message = "~b~[ACCOUNT ARCHIVE]~w~ You've been inactive for over a month, so your account was archived. It has now been recovered automatically.",
-                                        PostedOn = DateTime.Now.ToShortDateString()
-                                    });
-
-                                    if (BackupContextFactory.Instance.Accounts.FirstOrDefault(a => a.Username == acc.Username) == null)
-                                    {
-                                        BackupContextFactory.Instance.Accounts.Add(acc);
-
-                                        List<OwnedVehData> ownedVehs = ContextFactory.Instance.OwnedVehicles.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
-                                        List<OwnedLoadoutData> ownedLoadouts = ContextFactory.Instance.OwnedLoadouts.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
-                                        List<PlayerOutfit> savedOutfits = ContextFactory.Instance.PlayerOutfits.ToList().Where(v => v.AccountID == acc.SQL_ID).ToList();
-                                        List<PlayerTunings> savedTunings = ContextFactory.Instance.PlayerTunings.ToList().Where(v => v.AccountSQLID == acc.SQL_ID).ToList();
-                                        List<UnlockedAchievement> unlockedAchievements = ContextFactory.Instance.UnlockedAchievements.ToList().Where(v => v.AccountID == acc.SQL_ID).ToList();
-
-                                        BackupContextFactory.Instance.OwnedLoadouts.AddRange(ownedLoadouts);
-                                        BackupContextFactory.Instance.OwnedVehicles.AddRange(ownedVehs);
-                                        BackupContextFactory.Instance.PlayerOutfits.AddRange(savedOutfits);
-                                        BackupContextFactory.Instance.PlayerTunings.AddRange(savedTunings);
-                                        BackupContextFactory.Instance.UnlockedAchievements.AddRange(unlockedAchievements);
-
-                                        ContextFactory.Instance.PlayerOutfits.RemoveRange(savedOutfits);
-                                        ContextFactory.Instance.OwnedLoadouts.RemoveRange(ownedLoadouts);
-                                        ContextFactory.Instance.OwnedVehicles.RemoveRange(ownedVehs);
-                                        ContextFactory.Instance.PlayerTunings.RemoveRange(savedTunings);
-                                        ContextFactory.Instance.UnlockedAchievements.RemoveRange(unlockedAchievements);
-
-                                        ContextFactory.Instance.Accounts.Remove(acc);
-                                        archivedAccs++;
-
-                                        List<Logs_Session> records = ContextFactory.Instance.Logs_Session.ToList().Where(a => a.AccountID == acc.SQL_ID).ToList();
-                                        ContextFactory.Instance.Logs_Session.RemoveRange(records);
-                                    }
-                                }
-                                else
-                                {
-                                    acc.MOTD = NAPI.Util.ToJson(new MOTDData()
-                                    {
-                                        AdminName = "SERVER",
-                                        Message = "~y~[WEEKLY CHALLENGE] ~w~Seven days have passed and the weekly challenge streak was reset.",
-                                        PostedOn = DateTime.Now.ToShortDateString()
-                                    });
-                                }
-                            }
-
-                            BackupContextFactory.Instance.SaveChanges();
-                            ContextFactory.Instance.SaveChanges();
-                            NAPI.Util.ConsoleOutput($"[ACCOUNT ARCHIVE] {archivedAccs} have been archived. Total accounts in archive: {BackupContextFactory.Instance.Accounts.Count()}");
-
-                            foreach (Player pl in NAPI.Pools.GetAllPlayers())
-                            {
-                                if (EPlayer.LoggedIn(pl) == true)
-                                {
-                                    EPlayer.Notify(pl, "<strong>Account archiving in process...</strong> This will take a few seconds.", "orange", "fa-regular fa-server", false, 1, "center", "replace");
-                                    EPlayer.Freeze(pl, false);
-                                }
-                            }
-                            EPlayer.SendMessageToAll("~b~[ACCOUNT ARCHIVE] ~w~Account archive process ~g~finished~w~! You've been unfrozen.");
-                        }, 100);
-                    } 
-                    */
+          
                     Settings.Dynamics.NextWeekUnix = new DateTimeOffset(DateTime.Now).AddDays(7).ToUnixTimeSeconds();
 
                     foreach (Player pl in NAPI.Pools.GetAllPlayers())
