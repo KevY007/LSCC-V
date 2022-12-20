@@ -5624,6 +5624,8 @@ namespace RNC
                                                 }
                                                 else if (lobby.Fugitives.Contains(player))
                                                 {
+                                                    player.Armor = 25;
+
                                                     EPlayer.GiveFugitiveWeapons(player);
                                                     player.TriggerEvent("SetActorInvulnerable", false);
                                                 }
