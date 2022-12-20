@@ -1348,6 +1348,7 @@ namespace RNC
                         player.Health = 100;
                         player.Armor = 100;
 
+                        player.SetSharedData("Handgun_Hash", (uint)WeaponHash.Heavypistol);
                         player.GiveWeapon(WeaponHash.Heavypistol, 100);
                         player.GiveWeapon(WeaponHash.Assaultsmg, 200);
                         player.GiveWeapon(WeaponHash.Specialcarbine, 500);
@@ -1359,6 +1360,7 @@ namespace RNC
                         player.Health = 100;
                         player.Armor = 75;
 
+                        player.SetSharedData("Handgun_Hash", (uint)WeaponHash.Combatpistol);
                         player.GiveWeapon(WeaponHash.Combatpistol, 100);
                         player.GiveWeapon(WeaponHash.Smg, 300);
                         player.GiveWeapon(WeaponHash.Carbinerifle, 500);
@@ -1410,6 +1412,11 @@ namespace RNC
                                         jWeaponData wepdat;
                                         if (Settings.WeaponData.TryGetValue(Convert.ToInt64((WeaponHash)wepar[0]), out wepdat))
                                         {
+                                            if (wepdat.Group.Equals("GROUP_PISTOL"))
+                                            {
+                                                player.SetSharedData("Handgun_Hash", wepar[0]);
+                                            }
+
                                             if (EPlayer.GetAccount(player).PurchasedAmmo.Length >= 4)
                                             {
                                                 var data = NAPI.Util.FromJson<Dictionary<string, int>>(EPlayer.GetAccount(player).PurchasedAmmo);
@@ -1482,6 +1489,7 @@ namespace RNC
                     player.Health = 100;
                     player.Armor = 100;
 
+                    player.SetSharedData("Handgun_Hash", (uint)WeaponHash.Pistol50);
                     player.GiveWeapon(WeaponHash.Pistol50, 100);
                     player.GiveWeapon(WeaponHash.Heavyshotgun, 50);
                     player.GiveWeapon(WeaponHash.Smg, 250);
@@ -1493,6 +1501,7 @@ namespace RNC
                     player.Health = 100;
                     player.Armor = 50;
 
+                    player.SetSharedData("Handgun_Hash", (uint)WeaponHash.Snspistol);
                     player.GiveWeapon(WeaponHash.Snspistol, 100);
                     player.GiveWeapon(WeaponHash.Sawnoffshotgun, 50);
                     player.GiveWeapon(WeaponHash.Assaultrifle, 90);
@@ -1504,6 +1513,7 @@ namespace RNC
                     player.Health = 100;
                     player.Armor = 50;
 
+                    player.SetSharedData("Handgun_Hash", (uint)WeaponHash.Pistol);
                     player.GiveWeapon(WeaponHash.Pistol, 100);
                     player.GiveWeapon(WeaponHash.Pumpshotgun, 50);
                     player.GiveWeapon(WeaponHash.Microsmg, 200);
@@ -1552,6 +1562,11 @@ namespace RNC
                                         jWeaponData wepdat;
                                         if (Settings.WeaponData.TryGetValue(Convert.ToInt64((WeaponHash)wepar[0]), out wepdat))
                                         {
+                                            if (wepdat.Group.Equals("GROUP_PISTOL"))
+                                            {
+                                                player.SetSharedData("Handgun_Hash", wepar[0]);
+                                            }
+
                                             if (EPlayer.GetAccount(player).PurchasedAmmo.Length >= 4)
                                             {
                                                 var data = NAPI.Util.FromJson<Dictionary<string, int>>(EPlayer.GetAccount(player).PurchasedAmmo);
@@ -2312,6 +2327,7 @@ namespace RNC
                 player.TriggerEvent("TogglePlayerChat", true);
                 player.ResetData("Dead");
 
+                player.ResetSharedData("Handgun_Hash");
                 player.SetSharedData("CarryingPlayer", -1);
                 player.SetSharedData("CarriedBy", -1);
 

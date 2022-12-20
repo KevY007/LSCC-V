@@ -3258,6 +3258,7 @@ namespace RNC
                     i.TriggerEvent("BankRob_ClearFinishMarker");
                     i.TriggerEvent("BankRob_SetMusic", -1);
                     i.TriggerEvent("StopHotwire");
+                    i.ResetSharedData("Handgun_Hash");
                     i.TriggerEvent("stopLockpicking");
                     i.TriggerEvent("hideMDC");
                     i.TriggerEvent("ClearClimbTaseProtection", true);

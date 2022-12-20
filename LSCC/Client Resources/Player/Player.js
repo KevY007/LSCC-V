@@ -3127,7 +3127,6 @@ mp.events.add(
         Seatbelt_LastVeh = null;
         Seatbelt_LastSeat = -1;
     },
-
     "SyncServerSettings": (onfootcollisions, cameraUpdateTime) => {
         ServerSettings.OnfootCollisions = onfootcollisions;
         ServerSettings.CameraUpdateTime = cameraUpdateTime;

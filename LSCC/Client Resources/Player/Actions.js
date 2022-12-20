@@ -131,6 +131,91 @@ function MedkitAction(){
 // ------ E KEY ------ //
 
 mp.keys.bind(0x45, true, () => {carryCheck();});
+
+let isCurrentWeaponAllowedForCarry = false;
+let carry_lastWeaponCarried = undefined;
+
+function equipHandgun(){
+    if(mp.players.local.getVariable("Handgun_Hash") !== undefined){
+        const gunData = weaponData.find(w => Number(w.Hash) == mp.players.local.getVariable("Handgun_Hash"));
+        if(gunData !== undefined && gunData.Type === "Handguns"){
+            mp.game.invoke('0xADF692B254977C0C', mp.players.local.handle, mp.players.local.getVariable("Handgun_Hash")>>0, true);
+            isCurrentWeaponAllowedForCarry = true;
+        }
+        else{
+            mp.game.invoke('0xADF692B254977C0C', mp.players.local.handle, 2725352035>>0, true);
+            isCurrentWeaponAllowedForCarry = true;
+        }
+    }
+    else{
+        mp.game.invoke('0xADF692B254977C0C', mp.players.local.handle, 2725352035>>0, true);
+        isCurrentWeaponAllowedForCarry = true;
+    }
+}
+
+mp.events.add("render", () => {
+    if(carryTarget === undefined) return;
+
+    if(carryTarget != -1){
+        if(mp.players.local.weapon !== carry_lastWeaponCarried){
+            isCurrentWeaponAllowedForCarry = false;
+            carry_lastWeaponCarried = mp.players.local.weapon;
+        }
+
+        if(!isCurrentWeaponAllowedForCarry){
+            let weaponHash = mp.players.local.weapon;
+            if(weaponHash !== undefined){
+                const gunData = weaponData.find(w => Number(w.Hash) == weaponHash);
+                if(gunData !== undefined){
+                    if(gunData.Type === "Handguns" || gunData.Type === "Melee"){
+                        isCurrentWeaponAllowedForCarry = true;
+                    }
+                    else{
+                        equipHandgun();
+                    }
+                    
+                }
+                else{
+                    equipHandgun();
+                }
+            }
+            else{
+                equipHandgun();
+            }
+        }
+
+        disableControlsOnCarry();        
+    }
+});
+
+function disableControlsOnCarry(){
+    mp.game.controls.disableControlAction(27, 75, true); // disable exit vehicle
+        mp.game.controls.disableControlAction(0, 23, true); // disable enter vehicle
+        mp.game.controls.disableControlAction(27, 23, true); // disable enter vehicle
+
+        mp.game.controls.disableControlAction(0, 22, true); //jump
+        mp.game.controls.disableControlAction(0, 44, true); //cover
+
+        /*
+        mp.game.controls.disableControlAction(0, 37, true); //weapon wheel / switch
+        mp.game.controls.disableControlAction(0, 99, true); //next weapon
+        mp.game.controls.disableControlAction(0, 100, true); //prev weapon
+
+        //mp.game.controls.disableControlAction(0, 157, true); //weapon switch
+        mp.game.controls.disableControlAction(0, 158, true); //weapon switch
+        //mp.game.controls.disableControlAction(0, 159, true); //weapon switch
+        mp.game.controls.disableControlAction(0, 160, true); //weapon switch
+        mp.game.controls.disableControlAction(0, 161, true); //weapon switch
+        mp.game.controls.disableControlAction(0, 162, true); //weapon switch
+        mp.game.controls.disableControlAction(0, 163, true); //weapon switch
+        mp.game.controls.disableControlAction(0, 164, true); //weapon switch
+        mp.game.controls.disableControlAction(0, 165, true); //weapon switch
+
+        mp.game.controls.disableControlAction(0, 261, true); //weapon switch scroll
+        mp.game.controls.disableControlAction(0, 262, true); //weapon switch scroll
+        */
+}
+
 function carryCheck(){
     if(mp.players.local.getVariable("Team") == -1 || mp.players.local.getVariable("Wounded") > 0) return;
     if(mp.players.local.isInAnyVehicle(false)) return;
@@ -178,6 +263,9 @@ function tryCarryPlayer(){
 function stopCarryPlayer(){
     if(carryTarget.remoteId === mp.players.local.remoteId) return;
 
+    carryTarget = -1;
+    isCurrentWeaponAllowedForCarry = false;
+    carry_lastWeaponCarried = undefined;
     mp.events.callRemote("RequestStopCarryPlayer");
 }
 
