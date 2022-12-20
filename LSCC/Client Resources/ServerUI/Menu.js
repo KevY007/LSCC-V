@@ -807,7 +807,7 @@ function ToggleMenu()
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.bigmapbind[0].value = "${String.fromCharCode(curMapBind)}";`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.actionmenubind[0].value = "${String.fromCharCode(curActionMenuBind)}";`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.mdcbind[0].value = "${String.fromCharCode(curMDCBind)}";`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.serverlanguage[0].value = ${menuSetting_getOptionNameFromValue("language", mp.storage.data.language)};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.serverlanguage[0].value = "${menuSetting_getOptionNameFromValue("language", mp.storage.data.language)}";`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.myweather[0].value = "${menuSetting_getOptionNameFromValue("weather", mp.storage.data.menu.myweather)}";`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autojoinopt[0].value = ${mp.storage.data.menu.AutoJoin};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.eventmusic[0].value = ${mp.storage.data.menu.EventMusic};`);
@@ -982,6 +982,7 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     }
     else if(id == 29){
         mp.events.callLocal("Translator:ChangeLanguage", value, false);
+        mp.events.callLocal("Translator:UpdateNametagMessagesManual");
     }
 
     if(ServerUI != null)

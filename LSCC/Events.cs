@@ -662,6 +662,8 @@ namespace RNC
 
             List<(Player, string, int)> admins = player.GetData<List<(Player, string, int)>>("AdminsShotListening");
 
+            bool screenTaken = false;
+            string admName = "";
             foreach((Player, string, int) _item in admins)
             {
                 Player admin = _item.Item1;
@@ -676,7 +678,14 @@ namespace RNC
                 {
                     if(playerHitsInRow > 0 && playerHitsInRow % trigger == 0) // if trigger is 5, it'll send every 5-10-15 shots, etc etc. big brain?
                     {
-                        admin.SendChatMessage($"!{{#FF6347}}[SHOT LISTEN] !{{#ffce52}}{player.Name} has fired {playerHitsInRow}+ times, all of which hit a player without missing! !{{#AFAFAF}}(Weapon used: {weaponName.ToUpper()})");
+                        admin.SendChatMessage($"!{{#FF6347}}[SHOT LISTEN] !{{#ffce52}}{player.Name} has fired {playerHitsInRow}+ times, all of which hit a player without missing! !{{#AFAFAF}}(Weapon used: {weaponName.ToUpper()})");                
+                        if (!screenTaken)
+                        {
+                            player.TriggerEvent("TakeScreenshot", 50, 50, player.GetSharedData<string>("ScreenshotServerAPI"), $"adm_{admin.Name}");
+                            screenTaken = true;
+                            admName = admin.Name;
+                        }
+                        admin.SendChatMessage($"!{{#FF6347}}[>>] !{{#AFAFAF}}A screenshot of their game was automatically taken and uploaded under admin ~w~{admName}");
                     }
                 }
             }
@@ -2471,9 +2480,13 @@ namespace RNC
                             break;
                     }
 
-                    Logs.LogSession(player);
+                    if (EPlayer.LoggedIn(player))
+                    {
+                        Logs.LogSession(player);
 
-                    EPlayer.Save(player);
+                        EPlayer.Save(player);
+                    }
+                  
                 }
 
                 if(player.GetSharedData<int>("CarriedBy") != -1)

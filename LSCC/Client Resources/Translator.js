@@ -21,9 +21,13 @@ mp.events.add("Translator:ChangeLanguage", (languageID, onJoin) => {
   if(onJoin === false){
     let notifyscoreboardstr = `toast('${Translate("CS_TEST", [mp.players.local.name])}', '', 'nothing', 6500, 2);`;
     ServerUI.execute(notifyscoreboardstr);
+
+    mp.events.callLocal("ToggleTooltips", !mp.storage.data.menu.tooltips);
+    setTimeout(() => {
+        mp.events.callLocal("ToggleTooltips", !mp.storage.data.menu.tooltips);
+    }, 100);
   }
   mp.events.callRemote("Translator:SetLanguageServer", realLanguageID, !onJoin);
-
   updateNametagsMessages();
   setTimeout(() => {
     updateUILanguage();

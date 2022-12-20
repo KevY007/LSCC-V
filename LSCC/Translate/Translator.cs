@@ -11,19 +11,40 @@ namespace RNC
 {
     public class Translator : Script
     {
+        public static string GetLanguageNameByID(int ID, bool localized = false)
+        {
+            string LANG = "";
+            if (!localized)
+            {
+                switch (ID)
+                {
+                    case 0: LANG = "English"; break;
+                    case 1: LANG = "Spanish"; break;
+                    case 2: LANG = "French"; break;
+                    case 3: LANG = "Croatian"; break;
+                    case 4: LANG = "Vietnamese"; break;
+                    default: LANG = "English"; break;
+                }
+            }
+            else
+            {
+                switch (ID)
+                {
+                    case 0: LANG = "English"; break;
+                    case 1: LANG = "Español"; break;
+                    case 2: LANG = "Français"; break;
+                    case 3: LANG = "Hrvatski"; break;
+                    case 4: LANG = "Tiếng Việt"; break;
+                    default: LANG = "English"; break;
+                }
+            }
+            return LANG;
+        }
+
         public static string Translate(Player player, string message_code, params object[] args)
         {
             int languageID = player.GetSharedData<int>("Language");
-            string LANG = "English";
-            switch (languageID)
-            {
-                case 0: LANG = "English"; break;
-                case 1: LANG = "Spanish"; break;
-                case 2: LANG = "French"; break;
-                case 3: LANG = "Croatian"; break;
-                case 4: LANG = "Vietnamese"; break;
-                default: LANG = "English"; break;
-            }
+            string LANG = GetLanguageNameByID(languageID);
             // Switch-case for other languages.
 
             using (FileStream stream = new FileStream($"client_packages/Languages/Server/{LANG}.json", FileMode.Open, FileAccess.Read))

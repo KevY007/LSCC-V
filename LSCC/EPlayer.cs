@@ -1112,7 +1112,9 @@ namespace RNC
                 toReturn += player.GetSharedData<string>("ClanTag");
                 return toReturn;
             }
-            return "Player";
+            if (color == true) toReturn += "~w~";
+            toReturn += "Player";
+            return toReturn;
         }
 
         public static void TryAdvanceChallenge(Player player, Challenge.ChallengeType challenge_type, string challenge_item)

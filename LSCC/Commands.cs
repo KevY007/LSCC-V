@@ -4717,9 +4717,10 @@ namespace RNC
             player.SendChatMessage(Translate(player, "FREEROAM_HELP_8"));
             player.SendChatMessage(Translate(player, "FREEROAM_HELP_9"));
             player.SendChatMessage(Translate(player, "FREEROAM_HELP_10"));
-            player.SendChatMessage(" ");
             player.SendChatMessage(Translate(player, "FREEROAM_HELP_11"));
+            player.SendChatMessage(" ");
             player.SendChatMessage(Translate(player, "FREEROAM_HELP_12"));
+            player.SendChatMessage(Translate(player, "FREEROAM_HELP_13"));
         }
 
         [Command("derby")]
@@ -6905,6 +6906,7 @@ namespace RNC
             return;
         }
 
+        /*
         [Command("removelanguage", "!{#AFAFAF}[USAGE] removelanguage (language) | /languages for a list")]
         public void cmd_removelanguage(Player player, string language)
         {
@@ -7039,6 +7041,7 @@ namespace RNC
 
             return;
         }
+        */
 
         [Command("donatorstatus")]
         public void cmd_donatorstatus(Player player)
@@ -10207,6 +10210,59 @@ namespace RNC
             return;
         }
 
+        [Command("gooc", "!{#AFAFAF}[USAGE] gooc (text)", Alias = "go", GreedyArg = true)]
+        public static void cmd_gooc(Player player, string text)
+        {
+            player.SetData("TUA_LT", 0);
+
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (Settings.OOC != true)
+            {
+                if (EPlayer.GetAccount(player).Admin < 1)
+                {
+                    player.SendChatMessage(Translate(player, "ERROR_OOC_OFF"));
+                    return;
+                }
+                else player.SendNotification("~r~OOC chat is disabled (friendly reminder)");
+            }
+
+            if (player.GetData<bool>("OOCState") == false)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_PLAYER_OOC_OFF"));
+                return;
+            }
+
+            if (EPlayer.GetAccount(player).MuteTime > 0)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_MUTED", EPlayer.GetAccount(player).MuteReason, EPlayer.GetAccount(player).MuteTime));
+                return;
+            }
+
+            if (RAGE.Entities.Players.All.Count > 20)
+            {
+                if (player.HasData("LastOOCTick"))
+                {
+                    if (Environment.TickCount64 - player.GetData<long>("LastOOCTick") < 5000 && EPlayer.GetAccount(player).Admin < 1)
+                    {
+                        player.SendChatMessage(Translate(player, "ERROR_OOC_SPAM"));
+                        return;
+                    }
+                }
+
+                player.SetData("LastOOCTick", Environment.TickCount64);
+            }
+
+            Settings.LoggedInPlayers.ForEach(pl =>
+            {
+                if (pl.GetData<bool>("OOCState") == true)
+                    pl.SendChatMessage($"!{{#AFAFAF}}(( [GOOC] {EPlayer.GetPrefix(player, true)}~w~ {player.Name}: {text} !{{#AFAFAF}}))");
+            });
+
+            Discord.SendTextChannel("staff-bot", $"**(GOOC) | {EPlayer.GetPrefix(player, false)} {player.Name}**: {text}");
+        }
+
         [Command("ooc", "!{#AFAFAF}[USAGE] ooc (text)", Alias = "o", GreedyArg = true)]
         public static void cmd_ooc(Player player, string text)
         {
@@ -10251,13 +10307,23 @@ namespace RNC
                 player.SetData("LastOOCTick", Environment.TickCount64);
             }
 
-            Settings.LoggedInPlayers.ForEach(pl =>
+            int languageID = EPlayer.GetAccount(player).Language;
+            if(languageID == 0)
             {
-                if (pl.GetData<bool>("OOCState") == true)
-                    pl.SendChatMessage($"(( [OOC] {EPlayer.GetPrefix(player, true)}~w~ {player.Name}: {text} ~w~))");
-            });
+                cmd_gooc(player, text);
+                return;
+            }
+            else
+            {
+                string languageName = Translator.GetLanguageNameByID(languageID, true);
+                Settings.LoggedInPlayers.ForEach(pl =>
+                {
+                    if (pl.GetData<bool>("OOCState") == true && EPlayer.GetAccount(pl).Language == languageID)
+                        pl.SendChatMessage($"(( [~g~{languageName}~w~] {EPlayer.GetPrefix(player, true)}~w~ {player.Name}: {text} ~w~))");
+                });
+            }
 
-            Discord.SendTextChannel("staff-bot", $"**(OOC) | {EPlayer.GetPrefix(player, false)} {player.Name}**: {text}");
+            //Discord.SendTextChannel("staff-bot", $"**() | {EPlayer.GetPrefix(player, false)} {player.Name}**: {text}");
         }
 
 
