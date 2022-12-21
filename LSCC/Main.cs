@@ -1551,6 +1551,16 @@ namespace RNC
                     seats = 4;
                     break;
 
+                case "buffalosx":
+                    seats = 4;
+                    break;
+                case "buffalosxpol":
+                    seats = 4;
+                    break;
+                case "pm19":
+                    seats = 2;
+                    break;
+
                 case "tailgater2":
                     seats = 4;
                     break;
