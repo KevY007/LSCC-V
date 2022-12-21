@@ -2310,6 +2310,11 @@ namespace RNC
         [ServerEvent(Event.PlayerDisconnected)]
         public void OnPlayerDisconnected(Player player, DisconnectionType type, string reason)
         {
+            try
+            {
+
+            
+            Logs.LogSession(player);
             if (player.HasData("Tuner_Vehicle")) player.GetData<Vehicle>("Tuner_Vehicle").Delete();
 
             foreach(Player p in Settings.LoggedInPlayers.Where(a => a.HasData("Spectating") && a.GetData<Player>("SpectatingPlayer") == player))
@@ -2480,13 +2485,6 @@ namespace RNC
                             break;
                     }
 
-                    if (EPlayer.LoggedIn(player))
-                    {
-                        Logs.LogSession(player);
-
-                        EPlayer.Save(player);
-                    }
-                  
                 }
 
                 if(player.GetSharedData<int>("CarriedBy") != -1)
@@ -2500,6 +2498,11 @@ namespace RNC
                 EPlayer.ResetPlayerData(player);
 
                 Discord.SendTextChannel("staff-bot", $"**{player.Name} has left the server.** *(Total online: {RAGE.Entities.Players.Count - 1})*");
+            }
+            }
+            catch(Exception ex)
+            {
+                NAPI.Util.ConsoleOutput("[ON PLAYER DISCONNECT EXCEPTION] " + ex.ToString());
             }
         }
 

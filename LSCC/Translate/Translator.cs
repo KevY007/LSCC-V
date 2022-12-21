@@ -43,29 +43,39 @@ namespace RNC
 
         public static string Translate(Player player, string message_code, params object[] args)
         {
-            int languageID = player.GetSharedData<int>("Language");
-            string LANG = GetLanguageNameByID(languageID);
-            // Switch-case for other languages.
-
-            using (FileStream stream = new FileStream($"client_packages/Languages/Server/{LANG}.json", FileMode.Open, FileAccess.Read))
+            try
             {
-                using(StreamReader sr = new StreamReader(stream))
+
+
+                int languageID = (player.HasSharedData("Language") ? player.GetSharedData<int>("Language") : 0);
+                string LANG = GetLanguageNameByID(languageID);
+                // Switch-case for other languages.
+
+                using (FileStream stream = new FileStream($"client_packages/Languages/Server/{LANG}.json", FileMode.Open, FileAccess.Read))
                 {
-                    using(JsonTextReader jsonReader = new JsonTextReader(sr))
+                    using (StreamReader sr = new StreamReader(stream))
                     {
-                        var langs = new JsonSerializer().Deserialize<Dictionary<string, string>>(jsonReader);
-
-                        KeyValuePair<string, string>? kvp = langs.FirstOrDefault(k => k.Key == message_code);
-                        if(kvp != null)
+                        using (JsonTextReader jsonReader = new JsonTextReader(sr))
                         {
-                            string unformatted = kvp?.Value;
+                            var langs = new JsonSerializer().Deserialize<Dictionary<string, string>>(jsonReader);
 
-                            string message = ApplyStringArguments(unformatted, args);
-                            return message;
+                            KeyValuePair<string, string>? kvp = langs.FirstOrDefault(k => k.Key == message_code);
+                            if (kvp != null)
+                            {
+                                string unformatted = kvp?.Value;
+
+                                string message = ApplyStringArguments(unformatted, args);
+                                return message;
+                            }
+                            return $"[ERROR] This message is not defined: {message_code} | Language: {LANG}";
                         }
-                        return $"[ERROR] This message is not defined: {message_code} | Language: {LANG}";
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                NAPI.Util.ConsoleOutput(ex.ToString());
+                return $"[ERROR] Error sending message: {ex.Message} | SEND THIS TO THE DEVS.";
             }
         }
 
