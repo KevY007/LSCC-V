@@ -225,9 +225,9 @@ const weaponData = [
   },
   {
     "id": "weapon_doubleaction",
-    "Name": "Double Action Revolver",
+    "Name": "Snub Nose Revolver",
     "Type": "Handguns",
-    "ImageSrc": "https://assets.gm.miami/gtav/weapons/Double-action-revolver-icon.png",
+    "ImageSrc": "https://i.imgur.com/TY7Npph.png",
     "Hash": "0x97EA20B8"
   },
   {

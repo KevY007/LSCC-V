@@ -223,9 +223,9 @@ namespace RNC
                             await context.Channel.SendMessageAsync("**[!]** You must link your Discord & RnC account to use this!");
                             return;
                         }
-                        if (aLevel < 4)
+                        if (aLevel < 2)
                         {
-                            await context.Channel.SendMessageAsync("**[!]** You must be a level 4+ admin to use this!");
+                            await context.Channel.SendMessageAsync("**[!]** You must be a level 2+ admin to use this!");
                             return;
                         }
 
@@ -334,9 +334,9 @@ namespace RNC
                             await context.Channel.SendMessageAsync("**[!]** You must link your Discord & RnC account to use this!");
                             return;
                         }
-                        if (aLevel < 4)
+                        if (aLevel < 2)
                         {
-                            await context.Channel.SendMessageAsync("**[!]** You must be a level 4+ admin to use this!");
+                            await context.Channel.SendMessageAsync("**[!]** You must be a level 2+ admin to use this!");
                             return;
                         }
                         using (MainDatabase dbcontext = ContextFactory.CreateContext())
@@ -1960,6 +1960,8 @@ namespace RNC
                     builder.AddField("unmute", "Unmutes a player. | Works for both offline and online players.");
                     builder.AddField("jail", "Jails a player. | Works for both offline and online players.");
                     builder.AddField("unjail", "Unjails a player. | Works for both offline and online players.");
+                    builder.AddField("lookup", "Look up a player by their E-mail or Rockstar Username. (trial+)");
+                    builder.AddField("changepass", "Change a player's password. (trial+)");
                     builder.AddField("ban", "Bans a player. (trial+)");
                     builder.AddField("oban", "Bans an offline player. (trial+)");
                     builder.AddField("unban", "Bans a player. (trial+)");
