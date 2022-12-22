@@ -2153,7 +2153,7 @@ let shotListenData = {
     playerHitsInRow:0,
 }
 
-var recoil_smoothing = 0.6;
+var recoil_smoothing = 0.1;
 mp.events.add("changeRecoilSmooting", (value) => {
     recoil_smoothing = value;
 })
