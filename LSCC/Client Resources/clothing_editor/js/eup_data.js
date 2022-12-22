@@ -73,7 +73,7 @@ const FugitiveMaleClothing = [
     {
         clothing: "Undershirt",
         type: "InsideShirt",
-        items: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 21, 22, 29, 30, 31, 32, 34, 35]
+        items: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 21, 22, 29, 30, 31, 32, 34, 35, 15]
     },
     {
         clothing: "Pants",
@@ -158,7 +158,7 @@ const FugitiveFemaleClothing = [
         clothing: "Undershirt",
         type: "InsideShirt",
         items: [0, 1, 2, 5, 11, 13, 15, 16, 17, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30, 31, 37, 38, 39, 40, 41, 44, 45,
-                46, 52, 55, 56, 58, 59, 66, 67, ]
+                46, 52, 55, 56, 58, 59, 66, 67]
     },
     {
         clothing: "Pants",
@@ -293,17 +293,17 @@ const FemaleClothing = [
     {
         clothing: "Undershirt",
         type: "InsideShirt",
-        items: [244, 258, ]
+        items: [244, 258, 15]
     },
     {
         clothing: "Undershirt",
         type: "DutyBelt",
-        items: [245, 243, 240, 239, 238]
+        items: [245, 243, 240, 239, 238, 15]
     },
     {
         clothing: "Undershirt",
         type: "KevlarUS",
-        items: []
+        items: [15]
     },
     { 
         clothing: 'Pants', 
@@ -391,17 +391,17 @@ const MaleClothing = [
       {
         clothing: 'Undershirt',
         type: 'InsideShirt',
-        items: [244, 243, 234, 233,231, 230, 225, 224,210, 209]
+        items: [244, 243, 234, 233,231, 230, 225, 224,210, 209, 15]
       },
       {
         clothing: 'Undershirt',
         type: 'DutyBelt',
-        items: [ 229, 228, 227, 226, 221, 220, 219, 218, 214, 213,212, 208, 207, 204, 203,201, 200, 199]
+        items: [ 229, 228, 227, 226, 221, 220, 219, 218, 214, 213,212, 208, 207, 204, 203,201, 200, 199, 15]
       },
     { 
         clothing: 'Undershirt', 
         type: 'KevlarUS', 
-        items: [ -1, 216, 222 ] 
+        items: [ -1, 216, 222, 15] 
     },
     { 
         clothing: 'Pants', 

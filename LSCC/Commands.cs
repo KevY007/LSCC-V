@@ -2427,7 +2427,7 @@ namespace RNC
             }
 
             player.SendChatMessage(Translate(player, "SWAP_SEAT_SENT", target.Name));
-            target.SendChatMessage(Translate(target, "SWAP_SEAT_SENT", player.Name, player.Name));
+            target.SendChatMessage(Translate(target, "SWAP_SEAT_RECEIVED", player.Name, player.Name));
 
             player.ResetData("SwapSeating");
             player.ResetData("SwapSeatingTime");

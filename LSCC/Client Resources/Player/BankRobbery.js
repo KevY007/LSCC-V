@@ -54,7 +54,7 @@ mp.events.add("StartBankRobberyTimer", () => {
         }
 
         robTimeLeft--;
-        if(robTimeLeft <= 0){
+        if(robTimeLeft <= 2){
             mp.events.callRemote("BankRob_ContinueState", 1);
             clearInterval(robTimer);
         }

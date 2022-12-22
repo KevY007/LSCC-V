@@ -3782,7 +3782,8 @@ namespace RNC
                                             }
                                         }
 
-                                        if (EPlayer.GetAccount(player).CarCop.Equals("polmav", StringComparison.OrdinalIgnoreCase))
+                                        if (EPlayer.GetAccount(player).CarCop.Equals("polmav", StringComparison.OrdinalIgnoreCase) ||
+                                            EPlayer.GetAccount(player).CarCop.Equals("as350", StringComparison.OrdinalIgnoreCase))
                                         {
                                             spawnLoc = null;
                                             foreach (MapSpawn tSpawn in Spawns.Where(a => a.spawnTeam == 2))

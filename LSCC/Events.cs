@@ -4156,7 +4156,7 @@ namespace RNC
                             {
                                 f.SendChatMessage(Translate(f, "BANK_ROB_CASH_TAKEN", lobby.BankRobbery.HeistLeader.Name));
                                 f.SendChatMessage(Translate(f, "BANK_ROB_ESCORT_1"));
-                                f.SendChatMessage(Translate(f, "BANK_ROB_ESCORD_2", BankRobberyData.HideoutNames[lobby.BankRobbery.Hideout]));
+                                f.SendChatMessage(Translate(f, "BANK_ROB_ESCORT_2", BankRobberyData.HideoutNames[lobby.BankRobbery.Hideout]));
 
                                 f.TriggerEvent("BankRob_SetMusic", 1);
                                 f.TriggerEvent("BankDoorLocked", false);
