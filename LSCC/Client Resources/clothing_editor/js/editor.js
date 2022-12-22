@@ -111,7 +111,7 @@ function UpdateContent(){
     for(let i = 0 ; i < ClothingData.length ; i++){
         let acceptedCheck = [];
         switch(ClothingData[i].clothing){
-            case "Undershirt": acceptedCheck = realType.accepted.Undershirts;
+            case "Undershirt": acceptedCheck = [...realType.accepted.Undershirts, 15];
             break;
             case "Pants": acceptedCheck = realType.accepted.Pants;
             break;

@@ -2153,7 +2153,7 @@ let shotListenData = {
     playerHitsInRow:0,
 }
 
-var recoil_smoothing = 0.1;
+var recoil_smoothing = 0.65;
 mp.events.add("changeRecoilSmooting", (value) => {
     recoil_smoothing = value;
 })
@@ -2184,7 +2184,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                     break;
                 case "Shotguns":
                     if(gunName !== "Heavy Shotgun" && gunName !== "Combat Shotgun" && gunName !== "Assault Shotgun")
-                        shakeValue = (getRandomInt(54,66)/10);
+                        shakeValue = (getRandomInt(55, 65)/10);
                     else shakeValue = (getRandomInt(15,25)/10);
                     break;
                 case "Assault Rifles":
@@ -2235,7 +2235,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
             }
         }
 
-        shakeValue = shakeValue/recoil_smoothing;
+        //shakeValue = shakeValue/recoil_smoothing;
         
         const val = shakeValue;
         const headval = (getRandomInt(0, 10) > 5 ? val : -val);
