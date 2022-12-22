@@ -139,7 +139,7 @@ function equipHandgun(){
     if(mp.players.local.getVariable("Handgun_Hash") !== undefined){
         const gunData = weaponData.find(w => Number(w.Hash) == mp.players.local.getVariable("Handgun_Hash"));
         if(gunData !== undefined && gunData.Type === "Handguns"){
-            mp.game.invoke('0xADF692B254977C0C', mp.players.local.handle, mp.players.local.getVariable("Handgun_Hash")>>0, true);
+            mp.game.invoke('0xADF692B254977C0C', mp.players.local.handle, (Number(gunData.Hash))>>0, true);
             isCurrentWeaponAllowedForCarry = true;
         }
         else{
@@ -251,6 +251,7 @@ function tryCarryPlayer(){
                         if(distance < 5)
                         {
                             carryTarget = pl;
+                            mp.game.player.setSprint(false);
                             mp.events.callRemote("RequestCarryPlayer", pl.remoteId);
                             return;
                         }
@@ -260,10 +261,12 @@ function tryCarryPlayer(){
         }
     });
 }
+mp.events.add("onStopCarryPlayer", () => {stopCarryPlayer();});
 function stopCarryPlayer(){
     if(carryTarget.remoteId === mp.players.local.remoteId) return;
 
     carryTarget = -1;
+    mp.game.player.setSprint(true);
     isCurrentWeaponAllowedForCarry = false;
     carry_lastWeaponCarried = undefined;
     mp.events.callRemote("RequestStopCarryPlayer");

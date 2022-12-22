@@ -2271,6 +2271,7 @@ namespace RNC
             Player target = GetByID(targetID);
             if (target == null) return;
 
+            player.TriggerEvent("onStopCarryPlayer");
             target.TriggerEvent("onStopGettingCarried");
             Settings.LoggedInPlayers.ForEach(p =>
             {

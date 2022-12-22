@@ -48,32 +48,20 @@ mp.events.add("render", () => {
             if (mp.game.controls.isDisabledControlJustPressed(0, 24)) mp.game.audio.playSoundFrontend(-1, "Faster_Click", "RESPAWN_ONLINE_SOUNDSET", true);
         }
     }
-
-    if (mp.game.ui.isHudComponentActive(2) || Date.now() - lastWeaponConfigUpdate < 3000) {
-        let safeZone = mp.game.graphics.getSafeZoneSize();
-        let finalDrawX = 0.8 - (1.0 - safeZone) * 0.5;
-        let finalDrawY = 0.05 + (1.0 - safeZone) * 0.5;
-        
-        /*
-        if (Constants.isBoltAction(currentWeapon))
-            Constants.drawTextAligned("BOLT", finalDrawX, finalDrawY, 4, Constants.firingModeColor[curFiringMode], .5);
-        else if(Constants.isPumpAction(currentWeapon))
-            Constants.drawTextAligned("PUMP", finalDrawX, finalDrawY, 4, Constants.firingModeColor[curFiringMode], .5);
-        else
-            Constants.drawTextAligned(Constants.firingModeNames[curFiringMode], finalDrawX, finalDrawY, 4, Constants.firingModeColor[curFiringMode], .5);
-        */
-      
-        if (Constants.isBoltAction(currentWeapon))
-            FireModeDisplayText = "BOLT";
-        else if(Constants.isPumpAction(currentWeapon))
-            FireModeDisplayText = "PUMP";
-        else
-            FireModeDisplayText = Constants.firingModeNames[curFiringMode];
-        
-    }
 });
 
-mp.keys.bind(0x48, false, () => {
+mp.events.add("OneSecondEvent", () => {
+    if (ignoreCurrentWeapon) return;
+
+    if (Constants.isBoltAction(currentWeapon))
+        FireModeDisplayText = "BOLT";
+    else if(Constants.isPumpAction(currentWeapon))
+        FireModeDisplayText = "PUMP";
+    else
+        FireModeDisplayText = Constants.firingModeNames[curFiringMode];
+});
+
+mp.keys.bind(0x42, false, () => {
     if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
         (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
         (ActionMenuActive !== undefined && ActionMenuActive == true) ||

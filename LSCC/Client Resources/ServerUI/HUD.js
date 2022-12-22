@@ -265,6 +265,13 @@ mp.events.add('actionMenu:clickItem', (actionID) => {
             mp.events.callRemote("actionMenu_SelectedItem", actionID);
             break;
         }
+        case 16: // Silent Siren
+        {
+            if (mp.players.local.vehicle && mp.players.local.vehicle.getPedInSeat(-1) === mp.players.local.handle && mp.players.local.vehicle.getClass() === 18) {           
+                mp.events.callRemote('SilentSirenSync', mp.players.local.vehicle);
+            }
+            break;
+        }
     }
 });
 function actionMenu_lobbyCheck(){
@@ -352,6 +359,7 @@ function actionMenu_teamCheck(){
 }
 // This function checks for nearby vehicle OR if player is in vehicle. If yes, it will add a LOCK option.
 function actionMenu_vehicleCheck(){
+
     if(mp.players.local.isInAnyVehicle(false)){
         let vehicle = mp.players.local.vehicle;
         if(vehicle.getVariable("Locked") == true)
@@ -360,6 +368,10 @@ function actionMenu_vehicleCheck(){
 
         mp.events.callLocal("actionMenu:addItem", 1, Translate("SEATBELT"), "#fb923c", "fa-shield-slash");
     
+        if (mp.players.local.vehicle && mp.players.local.vehicle.getPedInSeat(-1) === mp.players.local.handle && mp.players.local.vehicle.getClass() === 18) {        
+            mp.events.callLocal("actionMenu:addItem", 16, Translate("SILENT_SIREN"), "#818cf8", "fa-siren");
+        }
+
         if(vehicle.getVariable("Fuel") == undefined || vehicle.getVariable("Fuel") > 0.0){
             if(vehicle.engine == true){
                 mp.events.callLocal("actionMenu:addItem", 13, Translate("ENGINE"), "#60a5fa", "fa-engine");
@@ -892,8 +904,6 @@ mp.events.add("TwoSecondsEvent", () => {
         }
 
         if(mp.players.local.vehicle){
-            if(mp.players.local.getVariable("Team") == 1 && chaseRunning)
-                if(createdTooltips.indexOf("B") == -1) mp.events.callLocal("AddTooltip", "B", Translate("SILENT_SIREN"), 1);
                 
             if(mp.players.local.vehicle.getVariable("Locked") === true)
                 if(createdTooltips.indexOf("L") == -1) mp.events.callLocal("AddTooltip", "L", Translate("UNLOCK"), -1);
@@ -916,8 +926,7 @@ mp.events.add("TwoSecondsEvent", () => {
         }
         else{
             if(createdTooltips.indexOf(String.fromCharCode(curGPSBind)) != -1) mp.events.callLocal("RemoveTooltip", String.fromCharCode(curGPSBind));
-            if(createdTooltips.indexOf(String.fromCharCode(curMDCBind)) != -1) mp.events.callLocal("RemoveTooltip", String.fromCharCode(curMDCBind));
-            if(createdTooltips.indexOf("B") != -1) mp.events.callLocal("RemoveTooltip", "B");     
+            if(createdTooltips.indexOf(String.fromCharCode(curMDCBind)) != -1) mp.events.callLocal("RemoveTooltip", String.fromCharCode(curMDCBind));  
         }
 
         if(!mp.players.local.isInAnyVehicle(false)) 
@@ -1141,11 +1150,16 @@ mp.events.add("UpdateRateEvent", () => {
     if (mp.game.invoke(Natives.IS_RADAR_ENABLED) && !mp.game.invoke(Natives.IS_RADAR_HIDDEN)) {
         minimap = getMinimapAnchor();
 
+        /*
         const position = mp.players.local.position;
         let getStreet = mp.game.pathfind.getStreetNameAtCoord(position.x, position.y, position.z, 0, 0);
 
         zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(position.x, position.y, position.z));
         streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
+        */
+        zoneName = mp.game.hud.getCurrentAreaNameString();
+        streetName = mp.game.hud.getCurrentStreetNameString();
+        if(streetName.length <= 0) streetName = zoneName;
     }
     
     if(ServerUI != null && (!(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false || mp.players.local.getVariable("InLobby") === undefined)))

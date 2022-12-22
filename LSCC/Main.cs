@@ -695,6 +695,8 @@ namespace RNC
         public static List<jCarGenData> CarGenData { get; set; }
         public static List<SpawnSet> FreeroamSpawns { get; set; }
 
+        public static bool OOCSlowMode { get; set; } = false;
+
         // Dyn Settings Global
         public static DynSet Dynamics { get; set; }
 
@@ -2511,6 +2513,7 @@ namespace RNC
             }
             else NAPI.Util.ConsoleOutput("(RnC | OPT) Discord Bot is disabled, live commands and statuses not updated!");
 
+            NAPI.TextLabel.CreateTextLabel("not today, friend", new Vector3(104.954094f, -744.55927f, 45.754745f), 2.0f, 1.0f, 0, new Color(255, 255, 255), false);
             NAPI.TextLabel.CreateTextLabel("Bored of waiting? Play some DM", new Vector3(107.493866f, -744.79114f, 242.15219f), 13.0f, 2.2f, 0, new Color(255, 0, 0, 156), false);
             NAPI.TextLabel.CreateTextLabel("Press M to open menu and more", new Vector3(109.71294f, -753.1537f, 242.15219f), 13.0f, 2.2f, 0, new Color(56, 236, 242, 156), false);
             NAPI.TextLabel.CreateTextLabel("Check out other modes in the menu", new Vector3(121.34787f, -738.852f, 242.1522f), 13.0f, 2.2f, 0, new Color(40, 153, 45, 156), false);
@@ -2700,7 +2703,7 @@ namespace RNC
                                 Challenge.SetNewDailyChallenges();
                                 NAPI.Task.Run(() =>
                                 {
-                                    EPlayer.SendMessageToAll("!{#c387ff}[DAILY CHALLENGES] ~w~New daily challenges are now available! Check ~y~Menu > Profile~w~ for more info.");
+                                    EPlayer.SendMessageToAll("NEW_CHALLENGES");
                                 });
                                 
                                 await context.Accounts.AsQueryable().ForEachAsync(acc =>
@@ -2850,11 +2853,11 @@ namespace RNC
                                                 lobby.gameStatus = 2;
 
                                                 if (lobby.gameMode == GameModes.STANDARD)
-                                                    EPlayer.SendMessageToAll($"!{{#33C446}}[Lobby {lobby.lobbyId}] !{{#FFFFFF}}Copchase will start in 10 seconds... ({pCount} players)");
+                                                    EPlayer.SendMessageToAll("COPCHASE_START", lobby.lobbyId, pCount);
                                                 else if (lobby.gameMode == GameModes.BUSTED)
-                                                    EPlayer.SendMessageToAll($"!{{#33C446}}[Lobby {lobby.lobbyId}] !{{#FFFFFF}}BUSTED! mode will start in 10 seconds... ({pCount} players)");
+                                                    EPlayer.SendMessageToAll("BUSTED_START", lobby.lobbyId, pCount);
                                                 else if (lobby.gameMode == GameModes.BANKROBBERY)
-                                                    EPlayer.SendMessageToAll($"!{{#33C446}}[Lobby {lobby.lobbyId}] !{{#FFFFFF}}Bank Robbery event will start in 10 seconds... ({pCount} players)");
+                                                    EPlayer.SendMessageToAll("BANKROB_START", lobby.lobbyId, pCount);
 
                                                 NAPI.Util.ConsoleOutput($"[TimeUpdate] Game starting in 10 seconds in lobby {lobby.lobbyId}...");
                                                 foreach (Player player in Settings.LoggedInPlayers)
@@ -3114,13 +3117,13 @@ namespace RNC
                 switch (reason)
                 {
                     case 0:
-                        EPlayer.SendMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FF0000}}The game has been stopped by an administrator.");
+                        EPlayer.SendMessageToAll("GAME_STOP_ADMIN", lobbyid);
                         Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Stopped by an admin.**");
                         break;
                     case 1: // time run out | fugi escape shit
                         if (lobby.gameMode != GameModes.BANKROBBERY)
                         {
-                            EPlayer.SendMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}The fugitives managed to escape from the cops.");
+                            EPlayer.SendMessageToAll("GAME_STOP_FUGITIVE_ESCAPE", lobbyid);
                             Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives have escaped.**");
                             winnerTeam = 0;
                             foreach (Player i in lobby.Fugitives)
@@ -3140,7 +3143,7 @@ namespace RNC
                             if (lobby.gameMode == GameModes.BANKROBBERY)
                             {
                                 winnerTeam = 1;
-                                EPlayer.SendMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}The fugitives didn't manage to rob the bank in time. Cops win!");
+                                EPlayer.SendMessageToAll("GAME_STOP_FUGITIVE_BANKROB_FAIL", lobbyid);
                                 Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives didn't manage to rob the bank in time.**");
 
                                 foreach (Player i in lobby.Cops)
@@ -3156,7 +3159,7 @@ namespace RNC
                         }
                         break;
                     case 2:
-                        EPlayer.SendMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] ~w~All law enforcement units have been taken out by the fugitives.");
+                        EPlayer.SendMessageToAll("GAME_STOP_COPS_DEAD", lobbyid);
                         Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | All cops have been eliminated.**");
 
                         if (lobby.gameMode != GameModes.BANKROBBERY)
@@ -3193,7 +3196,7 @@ namespace RNC
                         }
                         break;
                     case 3:
-                        EPlayer.SendMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}The situation has been successfully handled by the police.");
+                        EPlayer.SendMessageToAll("GAME_STOP_FUGITIVES_DEAD", lobbyid);
                         Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Police has neutralized all fugitives.**");
 
                         if (lobby.gameMode != GameModes.BANKROBBERY)
@@ -3225,11 +3228,11 @@ namespace RNC
                         }
                         break;
                     case 4:
-                        EPlayer.SendMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}Game has ended due to lack of players.");
+                        EPlayer.SendMessageToAll("GAME_STOP_NO_PLAYERS", lobbyid);
                         Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Game was ended due to lack of players.**");
                         break;
                     case 5: // event cop win
-                        EPlayer.SendMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}Bank Robbery has ended - there was no one left to replace the heist leader. Cops win!");
+                        EPlayer.SendMessageToAll("GAME_STOP_BANKROB_NO_LEADER", lobbyid);
                         Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | No one was left to replace the heist leader.**");
                         winnerTeam = 1;
                         foreach (Player i in lobby.Cops)
@@ -3245,7 +3248,7 @@ namespace RNC
                         if (lobby.gameMode == GameModes.BANKROBBERY)
                         {
                             winnerTeam = 0;
-                            EPlayer.SendMessageToAll($"!{{#33C446}}[Lobby {lobbyid}] !{{#FFFFFF}}Bank Robbery has ended - fugitives successfully delivered the money to their hideout!");
+                            EPlayer.SendMessageToAll("GAME_STOP_BANKROB_FUGI_WIN", lobbyid);
                             Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives successfully delivered the money to their hideout.**");
                             foreach (Player i in lobby.Fugitives)
                             {
@@ -4521,7 +4524,7 @@ namespace RNC
                                     Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Standard Copchase has been started! Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
 
                                     if (lobby.NextEventCounter == 0)
-                                        EPlayer.SendMessageToAll("!{#DB6135}[LOBBY -> BANK ROBBERY] ~w~Bank Robbery event will start next round in ~y~lobby #" + lobby.lobbyId + "~w~!");
+                                        EPlayer.SendMessageToAll("BANK_ROB_NOTIFY_LOBBY", lobby.lobbyId);
                                 }
                                 else if (lobby.gameMode == GameModes.BUSTED)
                                 {
@@ -5153,15 +5156,15 @@ namespace RNC
                                         {
                                             if (lobby.gameMode == GameModes.STANDARD)
                                             {
-                                                EPlayer.SendMessageToAll($"[Lobby {lobby.lobbyId}] Copchase started with !{{#8D8DFF}}{lobby.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{lobby.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{mapName}!{{#FFFFFF}}.");
+                                                EPlayer.SendMessageToAll("COPCHASE_STARTED", lobby.lobbyId, lobby.Cops.Count, lobby.Fugitives.Count, mapName);
                                             }
                                             else if (lobby.gameMode == GameModes.BUSTED)
                                             {
-                                                EPlayer.SendMessageToAll($"[Lobby {lobby.lobbyId}] Mode BUSTED! started with !{{#8D8DFF}}{lobby.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{lobby.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}{mapName}!{{#FFFFFF}}.");
+                                                EPlayer.SendMessageToAll("BUSTED_STARTED", lobby.lobbyId, lobby.Cops.Count, lobby.Fugitives.Count, mapName);
                                             }
                                             else if (lobby.gameMode == GameModes.BANKROBBERY)
                                             {
-                                                EPlayer.SendMessageToAll($"[Lobby {lobby.lobbyId}] Mode Bank Robbery started with !{{#8D8DFF}}{lobby.Cops.Count} cops !{{#FFFFFF}}& !{{#E84040}}{lobby.Fugitives.Count} fugitives !{{#FFFFFF}}on map !{{#DAA520}}Pacific Standard Bank!{{#FFFFFF}}.");
+                                                EPlayer.SendMessageToAll("BANKROB_STARTED", lobby.lobbyId, lobby.Cops.Count, lobby.Fugitives.Count, mapName);
                                             }
                                         });
                                     }

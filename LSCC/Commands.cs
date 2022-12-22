@@ -60,6 +60,11 @@ namespace RNC
                 Settings.SpawnParkedVehicles = !Settings.SpawnParkedVehicles;
                 EPlayer.SendToggledMessage("MSGALL_TOGRANDOMVEHS", Settings.SpawnParkedVehicles, EPlayer.GetAdminName(player));
             }
+            else if (action.StartsWith("slowmode"))
+            {
+                Settings.OOCSlowMode = !Settings.OOCSlowMode;
+                player.SendChatMessage($"!{{#FF6347}}[!] ~w~You have toggled OOC slow mode: {Settings.OOCSlowMode.ToString()}");
+            }
             else if (action.StartsWith("numparkedvehs"))
             {
                 string[] args = action.Split(' ');
@@ -10240,7 +10245,7 @@ namespace RNC
                 return;
             }
 
-            if (RAGE.Entities.Players.All.Count > 20)
+            if (RAGE.Entities.Players.All.Count > 20 && Settings.OOCSlowMode == true)
             {
                 if (player.HasData("LastOOCTick"))
                 {
@@ -10293,7 +10298,7 @@ namespace RNC
                 return;
             }
 
-            if(RAGE.Entities.Players.All.Count > 20)
+            if(RAGE.Entities.Players.All.Count > 20 && Settings.OOCSlowMode == true)
             {
                 if(player.HasData("LastOOCTick"))
                 {
@@ -10344,14 +10349,12 @@ namespace RNC
 
             foreach (Player pl in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")))
             {
-                pl.SendChatMessage($"(( [LOBBY] {EPlayer.GetPrefix(player)} {player.Name}: {text} ~w~))");
+                pl.SendChatMessage($"(( [LOBBY] {EPlayer.GetPrefix(player)} ~w~{player.Name}: {text} ~w~))");
             }
 
 
             Discord.SendTextChannel("staff-bot", $"**(Lobby {player.GetSharedData<int>("InLobby")}) | {player.Name}**: {text}");
         }
-
-        
 
         [Command("ann", "!{#AFAFAF}[USAGE] ann (text)", Alias = "announce", GreedyArg = true)]
         public void cmd_ann(Player player, string text)

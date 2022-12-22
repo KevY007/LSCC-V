@@ -897,18 +897,6 @@ mp.keys.bind(0x4C, false, function() {
 //     }
 // });
 
-mp.keys.bind(0x42, true, _ => {
-    if(menuToggled !== undefined && menuToggled) return;
-    if(Date.now() - lastChatToggle >= 500 && chatStatus == false)
-    {
-        traceLastFunc(`[Players] Attempt B key/silent siren`);
-
-        if (localPlayer.vehicle && localPlayer.vehicle.getPedInSeat(-1) === localPlayer.handle && localPlayer.vehicle.getClass() === 18) {
-            mp.events.callRemote('SilentSirenSync', localPlayer.vehicle)
-        }
-    }
-});
-
 function createCam(x, y, z, rx, ry, rz, viewangle, moveable = false) {
     traceLastFunc(`[Players] Create Cam`);
 
@@ -2137,9 +2125,9 @@ mp.events.add("render", () => {
         if(mp.game.invoke('0x68EDDA28A5976D07') == 1 || mp.game.player.isFreeAiming()){
             if(mp.players.local.isOnFoot())
             {
-                currentRollCooldownTimestamp = (Date.now() + 1500);
+                currentRollCooldownTimestamp = (Date.now() + 1000);
                 rollShootCooldownActive = true;
-                ServerUI.execute(`toast('${Translate("SHOOTING_COOLDOWN")}', '', 'warning', 1500, 2);`);
+                ServerUI.execute(`toast('${Translate("SHOOTING_COOLDOWN")}', '', 'warning', 1000, 2);`);
             }
         }
     }
@@ -2164,6 +2152,11 @@ mp.events.add("render", () => {
 let shotListenData = {
     playerHitsInRow:0,
 }
+
+var recoil_smoothing = 0.6;
+mp.events.add("changeRecoilSmooting", (value) => {
+    recoil_smoothing = value;
+})
 
 mp._events.add("playerWeaponShot", (targetPosition, targetEntity) => 
 {
@@ -2190,7 +2183,9 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                     shakeValue = (getRandomInt(2, 4)/10);
                     break;
                 case "Shotguns":
-                    shakeValue = (getRandomInt(18, 25)/10);
+                    if(gunName !== "Heavy Shotgun" && gunName !== "Combat Shotgun" && gunName !== "Assault Shotgun")
+                        shakeValue = (getRandomInt(54,66)/10);
+                    else shakeValue = (getRandomInt(15,25)/10);
                     break;
                 case "Assault Rifles":
                     shakeValue = (getRandomInt(1, 2)/10);
@@ -2214,12 +2209,20 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
             }
         }
 
-        if(mp.players.local.getStealthMovement() == true){
-            shakeValue = shakeValue/1.65; // slightly more accurate when crouching
+        if(gunType !== "Shotguns"){
+            if(mp.players.local.getStealthMovement() == true){
+                shakeValue = shakeValue/1.65; // slightly more accurate when crouching
+            }
+            if(mp.game.player.isFreeAiming() == true){ // if player is holding right click to aim
+                shakeValue = shakeValue/3.5; // more accurate when holding right click
+            }
         }
-        if(mp.game.player.isFreeAiming() == true){ // if player is holding right click to aim
-            shakeValue = shakeValue/3.5; // more accurate when holding right click
+        else{
+            if(mp.game.player.isFreeAiming() == true){ // if player is holding right click to aim
+                shakeValue = shakeValue/1.25; // more accurate when holding right click
+            }
         }
+    
 
         if((Date.now() - recoil_LastShotTime < 350) && gunType === "Handguns"){
             shakeValue = shakeValue * 1.45;
@@ -2231,16 +2234,18 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                 recoil_goingUp = !recoil_goingUp;
             }
         }
+
+        shakeValue = shakeValue/recoil_smoothing;
         
         const val = shakeValue;
         const headval = (getRandomInt(0, 10) > 5 ? val : -val);
         const pitchval = campos.x + (recoil_goingUp === true ? shakeValue : (-1-shakeValue));
-        mp.game.cam.setGameplayCamRelativePitch(pitchval, 1);
+        mp.game.cam.setGameplayCamRelativePitch(pitchval, recoil_smoothing);
         mp.game.cam.setGameplayCamRelativeHeading(camhead + headval);
         recoil_LastShotTime = Date.now();
     }
     else{
-        mp.game.cam.shakeGameplayCam('SMALL_EXPLOSION_SHAKE', 0.03);
+        mp.game.cam.shakeGameplayCam('SMALL_EXPLOSION_SHAKE', 0.007);
     }
 
     if(targetEntity !== null && targetEntity !== undefined)

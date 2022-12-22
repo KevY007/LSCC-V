@@ -2313,194 +2313,196 @@ namespace RNC
             try
             {
 
-            
-            Logs.LogSession(player);
-            if (player.HasData("Tuner_Vehicle")) player.GetData<Vehicle>("Tuner_Vehicle").Delete();
 
-            foreach(Player p in Settings.LoggedInPlayers.Where(a => a.HasData("Spectating") && a.GetData<Player>("SpectatingPlayer") == player))
-            {
-                Commands.cmd_specoff(p);
-            }
-            NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has left the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
+                Logs.LogSession(player);
+                if (player.HasData("Tuner_Vehicle")) player.GetData<Vehicle>("Tuner_Vehicle").Delete();
 
-            lock (Settings.Requests)
-            {
-                Settings.Requests.RemoveAll(a => a.Reporter == player || a.Reported == player);
-            }
-
-            try
-            {
-                lock (Settings.LoggedInPlayers)
+                foreach (Player p in Settings.LoggedInPlayers.Where(a => a.HasData("Spectating") && a.GetData<Player>("SpectatingPlayer") == player))
                 {
-                    Settings.LoggedInPlayers.ForEach((Player pl) =>
-                    {
-                        if (pl.HasData("AskedBySquad") && pl.GetData<Player>("AskedBySquad") == player)
-                        {
-                            pl.ResetData("AskedBySquad");
-                        }
-
-                        if (pl.HasData("AdminsShotListening"))
-                        {
-                            List<(Player, string, int)> admins = pl.GetData<List<(Player, string, int)>>("AdminsShotListening");
-                            (Player, string, int) toRemove = admins.FirstOrDefault(a => a.Item1 == player);
-                            try
-                            {
-                                admins.Remove(toRemove);
-                                if (admins.Count > 0)
-                                    pl.SetData<List<(Player, string, int)>>("AdminsShotListening", admins);
-                                else pl.ResetData("AdminsShotListening");
-                            }
-                            catch { }
-
-                        }
-                    });
+                    Commands.cmd_specoff(p);
                 }
-            }
-            catch { }
+                NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has left the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
-            foreach(var lobby in Settings.Lobbies)
-            {
-                lock (lobby)
+                lock (Settings.Requests)
                 {
-                    lock (lobby.Cops) { lobby.Cops.Remove(player); }
-                    lock (lobby.Fugitives) { lobby.Fugitives.Remove(player); }
+                    Settings.Requests.RemoveAll(a => a.Reporter == player || a.Reported == player);
                 }
-            }
 
-            if (player.HasSharedData("HeistLeader"))
-            {
-                if (player.GetSharedData<bool>("HeistLeader") == true)
+                try
                 {
-                    LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
-                    if (lobby != null)
-                    {
-                        if (lobby.gameMode == GameModes.BANKROBBERY)
-                        {
-                            if (lobby.BankRobbery.State > 0)
-                            {
-                                lobby.BankRobbery.LeaderLives--;
-                                if (lobby.BankRobbery.LeaderLives <= 0 || (lobby.Fugitives.Count - 1) <= 0)
-                                {
-                                    Main.StopGame(lobby.lobbyId, 5);
-                                }
-                                else
-                                {
-
-                                    BankRobberyData _brob = lobby.BankRobbery;
-                                    _brob.HeistLeader = null;
-                                    int unfuck = 0;
-                                    while (_brob.HeistLeader == null)
-                                    {
-                                        _brob.HeistLeader = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
-
-                                        unfuck++;
-                                        if (unfuck > 50)
-                                        {
-                                            Main.StopGame(lobby.lobbyId, 5);
-                                            break;
-                                        }
-                                    }
-                                    _brob.HeistLeader.SetSharedData("HeistLeader", true);
-                                    lobby.BankRobbery.HeistLeader = _brob.HeistLeader;
-
-                                    foreach (Player f in lobby.Fugitives)
-                                    {
-                                        f.SendChatMessage(Translate(f, "HEIST_LEADER_DISCONNECT", _brob.HeistLeader.Name));
-
-                                        f.SendChatMessage(Translate(f, "NEW_HEIST_LEADER_RADIO", _brob.HeistLeader.Name, player.Name));
-                                    }
-                                    _brob.HeistLeader.SendChatMessage(Translate(_brob.HeistLeader, "NEW_HEIST_LEADER_MSG"));
-                                }
-                            }
-                            else
-                            {   // if leader exits within first minute, fuck his tight little pussy up and stop the game
-                                Main.StopGame(lobby.lobbyId, 5);                               
-                            }
-                        }
-
-                        
-                    }
-                }
-            }
-            lock (player)
-            {
-                if (EPlayer.LoggedIn(player))
-                {
-                    if (player.HasData("DerbyVehicle"))
-                    {
-                        try { player.GetData<Vehicle>("DerbyVehicle").Delete(); }
-                        catch { }
-
-                        player.ResetData("DerbyVehicle");
-                    }
-
-                    if (player.HasData("PlayerSquad"))
-                    {
-                        player.ResetData("PlayerSquad");
-                        player.SetSharedData("PlayerSquadID", -1);
-                    }
-
                     lock (Settings.LoggedInPlayers)
                     {
-                        foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player))
+                        Settings.LoggedInPlayers.ForEach((Player pl) =>
                         {
-                            mem.SendChatMessage(Translate(mem, "SQUAD_DISBAND_LEADER_LEFT"));
-                            mem.ResetData("PlayerSquad");
-                            mem.SetSharedData("PlayerSquadID", -1);
-                        }
+                            if (pl.HasData("AskedBySquad") && pl.GetData<Player>("AskedBySquad") == player)
+                            {
+                                pl.ResetData("AskedBySquad");
+                            }
+
+                            if (pl.HasData("AdminsShotListening"))
+                            {
+                                List<(Player, string, int)> admins = pl.GetData<List<(Player, string, int)>>("AdminsShotListening");
+                                (Player, string, int) toRemove = admins.FirstOrDefault(a => a.Item1 == player);
+                                try
+                                {
+                                    admins.Remove(toRemove);
+                                    if (admins.Count > 0)
+                                        pl.SetData<List<(Player, string, int)>>("AdminsShotListening", admins);
+                                    else pl.ResetData("AdminsShotListening");
+                                }
+                                catch { }
+
+                            }
+                        });
                     }
-
-                    player.SetSharedData("VisibleBlip", false);
-
-                    List<Vehicle> freeroamVehs = new List<Vehicle>();
-                    freeroamVehs = player.GetData<List<Vehicle>>("FreeroamVehicles");
-
-                    for (int i = freeroamVehs.Count - 1; i >= 0; i--)
-                    {
-                        if (!freeroamVehs[i].IsNull && freeroamVehs[i] != null)
-                        {
-                            freeroamVehs[i].Delete();
-                            freeroamVehs.RemoveAt(i);
-                        }
-                    }
-
-                    if(freeroamVehs.Count > 0)
-                    {
-                        for(int i = 0; i < freeroamVehs.Count; i++)
-                        {
-                            freeroamVehs.RemoveAt(i);
-                        }
-                    }
-
-                    freeroamVehs.Clear();
-
-                    switch (type)
-                    {
-                        case DisconnectionType.Left:
-                            EPlayer.SendMessageToAll("!{#4343FA}[PART] !{#FFFFFF}" + player.Name + " has left the server. !{#4343FA}(Leaving)");
-                            break;
-
-                        case DisconnectionType.Timeout:
-                            EPlayer.SendMessageToAll("!{#4343FA}[PART] !{#FFFFFF}" + player.Name + " has left the server. !{#4343FA}(Kicked/TimedOut)");
-                            break;
-                    }
-
                 }
+                catch { }
 
-                if(player.GetSharedData<int>("CarriedBy") != -1)
+                foreach (var lobby in Settings.Lobbies)
                 {
-                    Player carrier = EPlayer.GetByID(player.GetSharedData<int>("CarriedBy"));
-                    if (carrier != null) EPlayer.StopCarry(carrier);
+                    lock (lobby)
+                    {
+                        lock (lobby.Cops) { lobby.Cops.Remove(player); }
+                        lock (lobby.Fugitives) { lobby.Fugitives.Remove(player); }
+                    }
                 }
-                EPlayer.StopCarry(player);
 
-                Settings.LoggedInPlayers.Remove(player);
-                EPlayer.ResetPlayerData(player);
+                if (player.HasSharedData("HeistLeader"))
+                {
+                    if (player.GetSharedData<bool>("HeistLeader") == true)
+                    {
+                        LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
+                        if (lobby != null)
+                        {
+                            if (lobby.gameMode == GameModes.BANKROBBERY)
+                            {
+                                if (lobby.BankRobbery.State > 0)
+                                {
+                                    lobby.BankRobbery.LeaderLives--;
+                                    if (lobby.BankRobbery.LeaderLives <= 0 || (lobby.Fugitives.Count - 1) <= 0)
+                                    {
+                                        Main.StopGame(lobby.lobbyId, 5);
+                                    }
+                                    else
+                                    {
 
-                Discord.SendTextChannel("staff-bot", $"**{player.Name} has left the server.** *(Total online: {RAGE.Entities.Players.Count - 1})*");
+                                        BankRobberyData _brob = lobby.BankRobbery;
+                                        _brob.HeistLeader = null;
+                                        int unfuck = 0;
+                                        while (_brob.HeistLeader == null)
+                                        {
+                                            _brob.HeistLeader = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
+
+                                            unfuck++;
+                                            if (unfuck > 50)
+                                            {
+                                                Main.StopGame(lobby.lobbyId, 5);
+                                                break;
+                                            }
+                                        }
+                                        _brob.HeistLeader.SetSharedData("HeistLeader", true);
+                                        lobby.BankRobbery.HeistLeader = _brob.HeistLeader;
+
+                                        foreach (Player f in lobby.Fugitives)
+                                        {
+                                            f.SendChatMessage(Translate(f, "HEIST_LEADER_DISCONNECT", _brob.HeistLeader.Name));
+
+                                            f.SendChatMessage(Translate(f, "NEW_HEIST_LEADER_RADIO", _brob.HeistLeader.Name, player.Name));
+                                        }
+                                        _brob.HeistLeader.SendChatMessage(Translate(_brob.HeistLeader, "NEW_HEIST_LEADER_MSG"));
+                                    }
+                                }
+                                else
+                                {   // if leader exits within first minute, fuck his tight little pussy up and stop the game
+                                    Main.StopGame(lobby.lobbyId, 5);
+                                }
+                            }
+
+
+                        }
+                    }
+                }
+                lock (player)
+                {
+                    if (EPlayer.LoggedIn(player))
+                    {
+                        if (player.HasData("DerbyVehicle"))
+                        {
+                            try { player.GetData<Vehicle>("DerbyVehicle").Delete(); }
+                            catch { }
+
+                            player.ResetData("DerbyVehicle");
+                        }
+
+                        if (player.HasData("PlayerSquad"))
+                        {
+                            player.ResetData("PlayerSquad");
+                            player.SetSharedData("PlayerSquadID", -1);
+                        }
+
+                        lock (Settings.LoggedInPlayers)
+                        {
+                            foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player))
+                            {
+                                mem.SendChatMessage(Translate(mem, "SQUAD_DISBAND_LEADER_LEFT"));
+                                mem.ResetData("PlayerSquad");
+                                mem.SetSharedData("PlayerSquadID", -1);
+                            }
+                        }
+
+                        player.SetSharedData("VisibleBlip", false);
+
+                        List<Vehicle> freeroamVehs = new List<Vehicle>();
+                        if (player.HasData("FreeroamVehicles"))
+                        {
+                            freeroamVehs = player.GetData<List<Vehicle>>("FreeroamVehicles");
+
+                            for (int i = freeroamVehs.Count - 1; i >= 0; i--)
+                            {
+                                if (!freeroamVehs[i].IsNull && freeroamVehs[i] != null)
+                                {
+                                    freeroamVehs[i].Delete();
+                                    freeroamVehs.RemoveAt(i);
+                                }
+                            }
+
+                            if (freeroamVehs.Count > 0)
+                            {
+                                for (int i = 0; i < freeroamVehs.Count; i++)
+                                {
+                                    freeroamVehs.RemoveAt(i);
+                                }
+                            }
+
+                            freeroamVehs.Clear();
+                        }
+                        switch (type)
+                        {
+                            case DisconnectionType.Left:
+                                EPlayer.SendMessageToAll("PLAYER_LEAVE", player.Name);
+                                break;
+
+                            case DisconnectionType.Timeout:
+                                EPlayer.SendMessageToAll("PLAYER_CRASH", player.Name);
+                                break;
+                        }
+
+                    }
+
+                    if (player.GetSharedData<int>("CarriedBy") != -1)
+                    {
+                        Player carrier = EPlayer.GetByID(player.GetSharedData<int>("CarriedBy"));
+                        if (carrier != null) EPlayer.StopCarry(carrier);
+                    }
+                    EPlayer.StopCarry(player);
+
+                    Settings.LoggedInPlayers.Remove(player);
+                    EPlayer.ResetPlayerData(player);
+
+                    Discord.SendTextChannel("staff-bot", $"**{player.Name} has left the server.** *(Total online: {RAGE.Entities.Players.Count - 1})*");
+                }
             }
-            }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 NAPI.Util.ConsoleOutput("[ON PLAYER DISCONNECT EXCEPTION] " + ex.ToString());
             }
