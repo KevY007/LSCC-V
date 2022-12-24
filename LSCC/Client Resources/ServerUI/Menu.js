@@ -30,6 +30,7 @@ if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD
     mp.storage.data.menu.Speedo = true;
     mp.storage.data.menu.loadingscreens = true;    
     mp.storage.data.menu.SnowEnabled = false;
+    mp.storage.data.menu.XMRAutoPlay = true;
 
     mp.storage.flush();
 }
@@ -554,6 +555,13 @@ function ToggleMenu()
                         description: "Toggles whether you will be put in copchase rounds or not."
                     },
                     {
+                        id: 30,
+                        type: 1,
+                        name: "autoplayradio",
+                        label: "XMR Auto-Play",
+                        description: "If toggled on, your most recent radio station will automatically be set upon entering a car without a radio station set."
+                    },
+                    {
                         id: 15,
                         type: 1,
                         name: "eventmusic",
@@ -842,6 +850,7 @@ function ToggleMenu()
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.carradio[0].value = ${mp.storage.data.radiotoggle};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.loadingscreens[0].value = ${mp.storage.data.menu.loadingscreens};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.enablesnow[0].value = ${mp.storage.data.menu.SnowEnabled};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autoplayradio[0].value = ${mp.storage.data.menu.XMRAutoPlay};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.oocauto[0].value = ${mp.storage.data.menu.OOCauto};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.voicemode[0].value = "${menuSetting_getOptionNameFromValue("voicemode", mp.storage.data.menu.VoiceMode)}";`);
         
@@ -1009,6 +1018,9 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     else if(id == 29){
         mp.events.callLocal("Translator:ChangeLanguage", value, false);
         mp.events.callLocal("Translator:UpdateNametagMessagesManual");
+    }
+    else if(id == 30){
+        mp.storage.data.menu.XMRAutoPlay = value;
     }
 
     if(ServerUI != null)

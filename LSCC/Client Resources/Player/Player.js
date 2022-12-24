@@ -3470,6 +3470,16 @@ mp.events.add(
                     mp.events.callLocal("Translator:UpdateNametagMessagesManual");
                 }
             }, 100);
+            setTimeout(() => {
+                if(mp.storage.data.radio === undefined){
+                    mp.storage.data.radio = {recents:[]};
+                }
+                if(mp.storage.data.radio.recents === undefined){
+                    mp.storage.data.radio.recents = [];
+                }
+                mp.storage.flush();
+                mp.events.callRemote("XMR_RequestStationList", JSON.stringify(mp.storage.data.radio.recents), true);
+            }, 1000);
         }, 1000);
 
 
@@ -3675,6 +3685,10 @@ function setStorageDataVars(){
     else{
         mp.storage.data.menu.OOCauto = autoOOC;
         mp.events.callRemote("SetAutoOOC", autoOOC);
+    }
+
+    if(mp.storage.data.menu.XMRAutoPlay == undefined){
+        mp.storage.data.menu.XMRAutoPlay = true;
     }
 
     if(mp.storage.data.menu.AutoJoin !== undefined){

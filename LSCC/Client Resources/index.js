@@ -52,6 +52,8 @@ var menuToggled = false;
 var scoreboardToggled = false;
 var scoreboardCursor = false;
 
+var StationPickerToggled = false;
+
 var MDC_DOM = null;
 var MDCActive = false;
 var isLockpicking = false;
@@ -122,6 +124,7 @@ require("./ServerUI/HUD.js");
 require("./ServerUI/Menu.js");
 require("./ServerUI/Logs.js");
 require("./ServerUI/Tutorial.js");
+require("./ServerUI/XMR.js");
 require("./WeaponFiringMode/index.js");
 require("./charcreator/index.js");
 require("./charcreator/outfitslots.js");

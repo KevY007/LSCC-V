@@ -11,6 +11,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace RNC
 {
@@ -1841,6 +1843,118 @@ namespace RNC
             target.TriggerEvent("SendClanInvite", player.GetSharedData<string>("ClanName"), player.GetSharedData<int>("ClanID"), player.Name);
             
         }
+
+        [RemoteEvent("XMR_RequestPlayStationUnsynced")]
+        public void XMR_RequestPlayStationUnsynced(Player player, int stationID)
+        {
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    RadioStation station = await context.RadioStations.AsQueryable().FirstOrDefaultAsync(r => r.SQL_ID == stationID);
+                    if (station == null) return;
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("XMR_PlayStationForPlayer", station.SQL_ID, station.Name, station.StreamURL, station.IconURL);
+                    });
+                }
+            });
+        }
+
+        [RemoteEvent("XMR_RequestPlayStation")]
+        public static void XMR_RequestPlayStation(Player player, int stationID)
+        {
+            if ((!player.IsInVehicle || (player.VehicleSeat != 0))) return;
+
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    RadioStation station = await context.RadioStations.AsQueryable().FirstOrDefaultAsync(r => r.SQL_ID == stationID);
+                    if (station == null) return;
+                    NAPI.Task.Run(() =>
+                    {
+                        if (player.IsInVehicle)
+                        {
+                            Vehicle veh = player.Vehicle;
+
+                            foreach (Entity ent in veh.Occupants)
+                            {
+                                if (ent.Type == EntityType.Player)
+                                {
+                                    Player pl = (Player)ent;
+                                    pl.TriggerEvent("XMR_PlayStationForPlayer", station.SQL_ID, station.Name, station.StreamURL, station.IconURL);
+                                }
+                            }
+                            veh.SetSharedData("RadioStation", station.SQL_ID);
+                        }
+                    });
+                }
+            });
+        }
+
+        [RemoteEvent("XMR_RequestRecentStations")]
+        public static void XMR_RequestRecentStations(Player player, string recentStationData)
+        {
+            try
+            {
+                JArray recentStations = JArray.Parse(recentStationData);
+                if (recentStations.Count > 0)
+                {
+                    Task.Run(async () =>
+                    {
+                        using (MainDatabase context = ContextFactory.CreateContext())
+                        {
+                            List<RadioStation> stations = new List<RadioStation>();
+                            foreach (int station in recentStations)
+                            {
+                                RadioStation _s = await context.RadioStations.AsQueryable().FirstOrDefaultAsync(s => s.SQL_ID == station);
+                                if (_s != null)
+                                {
+                                    stations.Add(_s);
+                                }
+                            }
+
+                            string stationData = NAPI.Util.ToJson(stations);
+                            NAPI.Task.Run(() =>
+                            {
+                                player.TriggerEvent("XMR_LoadRecentStations", stationData);
+                            });
+                        }
+                    });
+                }
+                else
+                {
+                    player.TriggerEvent("XMR_LoadRecentStations", "[]");
+                }
+            }
+            catch(Exception ex)
+            {
+                NAPI.Util.ConsoleOutput("RECENT STATIONS: " + ex.ToString());
+                player.TriggerEvent("XMR_LoadRecentStations", "[]");
+            }
+        }
+
+        [RemoteEvent("XMR_RequestStationList")]
+        public static void XMR_RequestStationList(Player player, string recentStationData, bool useRecentStationData)
+        {
+            if(useRecentStationData)
+                XMR_RequestRecentStations(player, recentStationData);
+
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    string categories = NAPI.Util.ToJson(context.RadioCategories);
+                    string stations = NAPI.Util.ToJson(context.RadioStations);
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("XMR_SetStationList", stations, categories);
+                    });
+                }
+            });
+        }
+
         [RemoteEvent("Clan_OnRequestJoinClan")]
         public void Clan_OnRequestJoinClan(Player player, int clanSQLID)
         {

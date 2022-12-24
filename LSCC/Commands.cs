@@ -7248,6 +7248,272 @@ namespace RNC
             return;
         }
 
+        [Command("removestation", "!{#AFAFAF}[USAGE] removestation (station ID)")]
+        public void cmd_removestation(Player player, int stationID)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
+                return;
+            }
+
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    RadioStation rs = await context.RadioStations.AsQueryable().FirstOrDefaultAsync(r => r.SQL_ID == stationID);
+                    if (rs == null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.SendChatMessage($"~r~That radio station does not exist. Use ~y~/rstations ~r~to view all stations.");
+                        });
+                        return;
+                    }
+                    context.RadioStations.Remove(rs);
+                    await context.SaveChangesAsync();
+
+                    NAPI.Task.Run(() =>
+                    {
+                        player.SendChatMessage($"~g~Successfully removed station ~r~{rs.Name} ~g~from the server.");
+                        Logs.LogAdmin(player, $"Removed radio station \"{rs.Name}\" from the server.");
+                    });
+                }
+            });
+        }
+        [Command("addcategory", "!{#AFAFAF}[USAGE] addcategory (name)", GreedyArg = true)]
+        public void cmd_addcategory(Player player, string name)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
+                return;
+            }
+
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    RadioCategory cat = new RadioCategory()
+                    {
+                        Name = name
+                    };
+                    await context.RadioCategories.AddAsync(cat);
+                    await context.SaveChangesAsync();
+
+                    NAPI.Task.Run(() =>
+                    {
+                        player.SendChatMessage($"~g~Successfully added new radio category with the name ~y~{name} ~g~to the server! Use ~y~/rcats~g~ to see its ID.");
+                        Logs.LogAdmin(player, $"Added radio category \"{name}\" to the server.");
+
+                        foreach (Player pl in NAPI.Pools.GetAllPlayers())
+                        {
+                            Events.XMR_RequestStationList(player, "[]", false);
+                        }
+                    });
+                }
+            });
+        }
+
+        [Command("addstation", "!{#AFAFAF}[USAGE] addstation (category ID) (icon URL) (stream URL) (name)", GreedyArg = true)]
+        public void cmd_addstation(Player player, int categoryID, string icon, string stream, string name)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
+                return;
+            }
+
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    RadioCategory cat = await context.RadioCategories.AsQueryable().FirstOrDefaultAsync(r => r.SQL_ID == categoryID);
+                    if (cat == null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.SendChatMessage($"~r~That radio category does not exist. Use ~y~/rcats ~r~to view categories.");
+                        });
+                        return;
+                    }
+
+                    RadioStation _s = new RadioStation()
+                    {
+                        Name = name,
+                        StreamURL = stream,
+                        IconURL = icon,
+                        CategoryID = categoryID,
+                    };
+                    await context.RadioStations.AddAsync(_s);
+                    await context.SaveChangesAsync();
+
+                    NAPI.Task.Run(() =>
+                    {
+                        player.SendChatMessage($"~g~Successfully added new radio station with the name ~y~{name} ~g~to the server! Use ~y~/rstations~g~ to view its ID.");
+                        Logs.LogAdmin(player, $"Added radio station \"{name}\" to the server.");
+
+                        foreach(Player pl in NAPI.Pools.GetAllPlayers())
+                        {
+                            Events.XMR_RequestStationList(player, "[]", false);
+                        }
+                    });
+                }
+            });
+        }
+
+        [Command("rstations")]
+        public void cmd_rstations(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
+                return;
+            }
+
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    await context.RadioStations.AsQueryable().ForEachAsync(async station =>
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.SendChatMessage($"~y~ID: ~w~{station.SQL_ID} ~b~| ~y~Name: ~w~{station.Name}");
+                        });
+                        await NAPI.Task.WaitForMainThread();
+                    });
+                }
+            });
+        }
+        [Command("rcats")]
+        public void cmd_rcats(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
+                return;
+            }
+
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    await context.RadioCategories.AsQueryable().ForEachAsync(async station =>
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.SendChatMessage($"~y~ID: ~w~{station.SQL_ID} ~b~| ~y~Name: ~w~{station.Name}");
+                        });
+                        await NAPI.Task.WaitForMainThread();
+                    });
+                }
+            });
+        }
+
+        [Command("radioshow")]
+        public void cmd_radioshow(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+            if (!player.IsInVehicle)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_VEHICLE"));
+                return;
+            }
+            
+            if(player.VehicleSeat == 0)
+            {
+                cmd_setstation(player);
+            }
+            else
+            {
+                player.TriggerEvent("XMR_Toggle", true);
+            }
+        }
+        [Command("setstation", "!{#AFAFAF}[USAGE] setstation (optional: ID)")]
+        public void cmd_setstation(Player player, int ID = -1)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (!player.IsInVehicle)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_VEHICLE"));
+                return;
+            }
+            if(player.VehicleSeat != 0)
+            {
+                EPlayer.Error(player, Translate(player, "ERROR_NOT_DRIVER"));
+                return;
+            }
+
+            if(ID == -1)
+            {
+                player.TriggerEvent("StationPicker_Toggle", true);
+            }
+            else
+            {
+                Task.Run(async () =>
+                {
+                    using (MainDatabase context = ContextFactory.CreateContext())
+                    {
+                        RadioStation station = await context.RadioStations.AsQueryable().FirstOrDefaultAsync(r => r.SQL_ID == ID);
+                        if(station == null)
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                player.TriggerEvent("StationPicker_Toggle", true);
+                            });
+                        }
+                        else
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                Events.XMR_RequestPlayStation(player, ID);
+                            });
+                        }                      
+                    }
+                });
+
+            }
+        }
+        [Command("fixr")]
+        public void cmd_fixr(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            player.TriggerEvent("StationPicker_Toggle", false);
+            player.TriggerEvent("XMR_Toggle", false);
+
+            player.TriggerEvent("XMR_StopStationForPlayer");
+        }
+        [Command("radiohide")]
+        public void cmd_radiohide(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            player.TriggerEvent("StationPicker_Toggle", false);
+            player.TriggerEvent("XMR_Toggle", false);
+        }
+
         [Command("givepoints", "!{#AFAFAF}[USAGE] givepoints (target) (points)", Alias = "pay,sendpoints")]
         public void cmd_givepoints(Player player, Player target, int points)
         {

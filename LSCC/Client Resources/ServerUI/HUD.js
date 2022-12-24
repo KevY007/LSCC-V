@@ -155,7 +155,7 @@ mp.events.add('actionMenu:close', () => {
 });
 mp.events.add('actionMenu:open', () => {
     if(chatStatus == true || menuToggled == true || MDCActive == true || scoreboardToggled == true
-        || VehicleSpawnerActive == true || WeaponEditorActive == true || isHotwiring == true || ClothingEditorActive == true) return;
+        || VehicleSpawnerActive == true || WeaponEditorActive == true || StationPickerToggled == true || isHotwiring == true || ClothingEditorActive == true) return;
 
     mp.game.invoke("0xFC695459D4D0E219", 0.5, 0.5); // SET CURSOR POSITION TO CENTER [x,y = 0.5,0.5]
     ActionMenuActive = true;
@@ -272,6 +272,13 @@ mp.events.add('actionMenu:clickItem', (actionID) => {
             }
             break;
         }
+        case 17: // Radio toggle
+        {
+            if(mp.players.local.isInAnyVehicle(false)){
+                mp.events.callLocal("XMR_ToggleOpposite");
+            }
+            break;
+        }
     }
 });
 function actionMenu_lobbyCheck(){
@@ -361,6 +368,9 @@ function actionMenu_teamCheck(){
 function actionMenu_vehicleCheck(){
 
     if(mp.players.local.isInAnyVehicle(false)){
+
+        mp.events.callLocal("actionMenu:addItem", 17, "XMR", "#f472b6", "fa-radio");
+
         let vehicle = mp.players.local.vehicle;
         if(vehicle.getVariable("Locked") == true)
             mp.events.callLocal("actionMenu:addItem", 0, Translate("UNLOCK"), "#a3e635", "fa-lock-keyhole-open");
@@ -602,6 +612,7 @@ function focusChat(toggle){
     (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
     (ActionMenuActive !== undefined && ActionMenuActive == true) || 
     (ClothingEditorActive !== undefined && ClothingEditorActive == true) ||
+    (StationPickerToggled !== undefined && StationPickerToggled == true) ||
     (isHotwiring !== undefined && isHotwiring == true)){
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = false;`);
         return;
@@ -726,6 +737,7 @@ mp.keys.bind(0x54, true, function() { // T key
     (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
     (ClothingEditorActive !== undefined && ClothingEditorActive == true) ||
     (ActionMenuActive !== undefined && ActionMenuActive == true) || 
+    (StationPickerToggled !== undefined && StationPickerToggled == true) ||
     (isHotwiring !== undefined && isHotwiring == true)){
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = false;`);
         return;
@@ -1474,7 +1486,7 @@ mp.keys.bind(0x71, false, function () {
 
 mp.events.add("OneSecondEvent", () => {
     if(menuToggled == true || VehicleSpawnerActive == true || WeaponEditorActive == true || ClothingEditorActive == true 
-    || ActionMenuActive == true){
+    || ActionMenuActive == true || StationPickerToggled == true){
         mp.gui.cursor.show(true, true);
     }
 });
