@@ -7248,6 +7248,34 @@ namespace RNC
             return;
         }
 
+        [Command("givepoints", "!{#AFAFAF}[USAGE] givepoints (target) (points)", Alias = "pay,sendpoints")]
+        public void cmd_givepoints(Player player, Player target, int points)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (!EPlayer.LoggedIn(target)) { player.SendChatMessage(Translate(player, "ERROR_TARGET_NOT_LOGIN")); return; }
+
+            if(points < 1 || points > 10000)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_PAY_INVALID_POINTS"));
+                return;
+            }
+
+            Account pAcc = EPlayer.GetAccount(player);
+            if(pAcc.Points < points)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_CONVERT_POINTS_NOTENOUGH", points));
+                return;
+            }
+
+            EPlayer.GivePoints(player, -points);
+            EPlayer.GivePoints(target, points);
+
+            player.SendChatMessage(Translate(player, "SENT_POINTS", points, target.Name, DateTime.Now.ToString("G")));
+            target.SendChatMessage(Translate(target, "RECEIVED_POINTS", points, player.Name, DateTime.Now.ToString("G")));
+        }
+
         [Command("agivepoints", "!{#AFAFAF}[USAGE] agivepoints (target) (points)")]
         public void cmd_agivepoints(Player player, Player target, int points)
         {

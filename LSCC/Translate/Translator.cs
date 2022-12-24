@@ -46,6 +46,7 @@ namespace RNC
             try
             {
                 int languageID = (player.HasSharedData("Language") ? player.GetSharedData<int>("Language") : 0);
+
                 string LANG = GetLanguageNameByID(languageID);
                 // Switch-case for other languages.
 

@@ -1867,6 +1867,16 @@ namespace RNC
                             return;
                         });
                     }
+
+                    int clanMembers = await context.Accounts.AsQueryable().CountAsync(a => a.ClanID == clan.SQL_ID);
+                    if(clanMembers >= 20)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Error(player, Translate(player, "ERROR_CLAN_FULL", 20));
+                            return;
+                        });
+                    }
                  
                     Account accnt = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == acc.SQL_ID);
                     accnt.ClanID = clan.SQL_ID;
