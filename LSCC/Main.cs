@@ -1559,7 +1559,10 @@ namespace RNC
                 case "buffalosxpol":
                     seats = 4;
                     break;
-                case "pm19":
+                case "cayenneturbo":
+                    seats = 4;
+                    break;
+                case "pursport":
                     seats = 2;
                     break;
 
@@ -2498,7 +2501,7 @@ namespace RNC
             new CarData(0, "Sultan Classic", "sultan2", "package://Artwork/Vehicles/sultan2.png", "Fast", 37, 80);
             new CarData(0, "ZR350", "zr350", "package://Artwork/Vehicles/zr350.png", "Fast", 40, 70);
             new CarData(0, "Golf Mk6", "golfmk6", "package://Artwork/Vehicles/golfmk6.png", "Fast+", 50, 85);
-            new CarData(0, "2019 Porsche Macan", "pm19", "package://Artwork/Vehicles/pm19.png", "Fast+", 60, 80);
+            new CarData(0, "2022 Porsche Cayenne", "cayenneturbo", "package://Artwork/Vehicles/cayenneturbo.png", "Fast+", 60, 80);
 
             if (Settings.Dynamics.Discord)
             {
@@ -4284,7 +4287,9 @@ namespace RNC
                                                         }
                                                         else
                                                         {
-                                                            vehSpeedClass = "Average";
+                                                            if (carName != "pursport")
+                                                                vehSpeedClass = "Average";
+                                                            else vehSpeedClass = "Fast+";
                                                         }
                                                     }
                                                 }
