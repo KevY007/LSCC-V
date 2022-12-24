@@ -576,5 +576,9 @@
   "BANK_ROB_NOTIFY_LOBBY": "!{#DB6135}[LOBBY -> BANK ROBBERY] ~w~Bank Robbery event will start next round in ~y~lobby #{LOBBY ID}~w~!",
   "COPCHASE_STARTED": "[Lobby {LOBBY ID}] Copchase started with !{#8D8DFF}{POLICE COUNT} cops !{#FFFFFF}& !{#E84040}{FUGITIVE COUNT} fugitives !{#FFFFFF}on map !{#DAA520}{mapName}!{#FFFFFF}.",
   "BANKROB_STARTED": "[Lobby {LOBBY ID}] Bank Robbery started with !{#8D8DFF}{POLICE COUNT} cops !{#FFFFFF}& !{#E84040}{FUGITIVE COUNT} fugitives !{#FFFFFF}on map !{#DAA520}{mapName}!{#FFFFFF}.",
-  "BUSTED_STARTED": "[Lobby {LOBBY ID}] BUSTED started with !{#8D8DFF}{POLICE COUNT} cops !{#FFFFFF}& !{#E84040}{FUGITIVE COUNT} fugitives !{#FFFFFF}on map !{#DAA520}{mapName}!{#FFFFFF}."
+  "BUSTED_STARTED": "[Lobby {LOBBY ID}] BUSTED started with !{#8D8DFF}{POLICE COUNT} cops !{#FFFFFF}& !{#E84040}{FUGITIVE COUNT} fugitives !{#FFFFFF}on map !{#DAA520}{mapName}!{#FFFFFF}.",
+  "ERROR_CLAN_FULL": "That clan has reached its members limit ({MAX MEMBERS NUMBER})! You can't join it at the moment.",
+  "ERROR_PAY_INVALID_POINTS": "!{#FF6347}[!] ~w~You can only send between 1 and 10 000 points at once!",
+  "SENT_POINTS": "!{#55FF55}[PAY] ~w~You have sent {POINTS} Points to {PLAYER NAME}. !{#AFAFAF}({DATE AND TIME})",
+  "RECEIVED_POINTS": "!{#55FF55}[PAY] ~w~You have received {POINTS} Points from {PLAYER NAME}. !{#AFAFAF}({DATE AND TIME})"
 }

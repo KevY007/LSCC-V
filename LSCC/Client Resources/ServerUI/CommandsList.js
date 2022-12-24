@@ -1,4 +1,3 @@
-// update this when adding new commands
 var CommandsDataJSON = [
   {
     "CommandText": "serveroptions",
@@ -33,6 +32,13 @@ var CommandsDataJSON = [
   },
   {
     "CommandText": "trunk",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "boot",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
@@ -88,6 +94,13 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "weather",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "game",
     "Usage": "[USAGE] game (option: stop, start, autostart, teambalance, mode)",
     "Admin": 2,
@@ -106,7 +119,23 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "toggle",
+    "Usage": "[USAGE] tog (option: hud, pm, radio, ooc)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "option: hud, pm, radio, ooc"
+    ]
+  },
+  {
     "CommandText": "info",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "discord",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
@@ -120,7 +149,34 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "veh2",
+    "Usage": "[USAGE] veh2 (car model name) (optional: color 1) (optional: color 2)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "car model name",
+      "optional: color 1",
+      "optional: color 2"
+    ]
+  },
+  {
+    "CommandText": "vehdbg",
+    "Usage": "",
+    "Admin": 5,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "aveh",
+    "Usage": "[USAGE] aveh (optional: vehicle model)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "optional: vehicle model"
+    ]
+  },
+  {
+    "CommandText": "av",
     "Usage": "[USAGE] aveh (optional: vehicle model)",
     "Admin": 1,
     "Donator": 0,
@@ -138,6 +194,15 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "v",
+    "Usage": "[USAGE] veh (vehicle model)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "vehicle model"
+    ]
+  },
+  {
     "CommandText": "mytime",
     "Usage": "[USAGE] mytime (hour)",
     "Admin": 0,
@@ -147,7 +212,25 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "myt",
+    "Usage": "[USAGE] mytime (hour)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "hour"
+    ]
+  },
+  {
     "CommandText": "myweather",
+    "Usage": "[USAGE] myweather (weatherid)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "weatherid"
+    ]
+  },
+  {
+    "CommandText": "myw",
     "Usage": "[USAGE] myweather (weatherid)",
     "Admin": 0,
     "Donator": 0,
@@ -191,7 +274,35 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "bk",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "dl",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "vinfo",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "vehdebug",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "vehinfo",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
@@ -235,9 +346,32 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "gethere",
+    "Usage": "[USAGE] bring (target)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "target"
+    ]
+  },
+  {
     "CommandText": "bringall",
     "Usage": "",
     "Admin": 3,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "gethereall",
+    "Usage": "",
+    "Admin": 3,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "recoverall",
+    "Usage": "",
+    "Admin": 0,
     "Donator": 0,
     "Parameters": []
   },
@@ -314,6 +448,34 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "fugichance",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "fugitivechance",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "fugitivechances",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "chance",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "togcols",
     "Usage": "[USAGE] togcols (target)",
     "Admin": 2,
@@ -343,6 +505,16 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "viewss",
+    "Usage": "[USAGE] viewss (identifier) | Use 'last' for last taken screenshot",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "identifier",
+      " Use 'last' for last taken screenshot"
+    ]
+  },
+  {
     "CommandText": "takescreenshot",
     "Usage": "[USAGE] takescreenshot (target) (quality = 20) | Quality 20 is default",
     "Admin": 5,
@@ -354,19 +526,29 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "CommandText": "takegif",
-    "Usage": "[USAGE] takegif (target) (duration in seconds) (fps = 24) | Leave FPS to 24 or it'll be bad",
+    "CommandText": "takess",
+    "Usage": "[USAGE] takescreenshot (target) (quality = 20) | Quality 20 is default",
     "Admin": 5,
     "Donator": 0,
     "Parameters": [
       "target",
-      "duration in seconds",
-      "fps = 24",
-      " Leave FPS to 24 or it'll be bad"
+      "quality = 20",
+      " Quality 20 is default"
     ]
   },
   {
     "CommandText": "setinv",
+    "Usage": "[USAGE] setinv(ulnerable) (target) (0 or 1)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "ulnerable",
+      "target",
+      "0 or 1"
+    ]
+  },
+  {
+    "CommandText": "setinvulnerable",
     "Usage": "[USAGE] setinv(ulnerable) (target) (0 or 1)",
     "Admin": 1,
     "Donator": 0,
@@ -388,7 +570,43 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "setarmor",
+    "Usage": "[USAGE] setar(mor) (target) (armor)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "mor",
+      "target",
+      "armor"
+    ]
+  },
+  {
+    "CommandText": "setarmour",
+    "Usage": "[USAGE] setar(mor) (target) (armor)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "mor",
+      "target",
+      "armor"
+    ]
+  },
+  {
+    "CommandText": "sticky",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "stopanim",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "sa",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
@@ -403,7 +621,14 @@ var CommandsDataJSON = [
   },
   {
     "CommandText": "painkillers",
-    "Usage": "[USAGE] pk (option: buy/use/inv)",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "pk",
+    "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
@@ -413,7 +638,18 @@ var CommandsDataJSON = [
     "Usage": "[USAGE] mk (option: buy/use/inv)",
     "Admin": 0,
     "Donator": 0,
-    "Parameters": []
+    "Parameters": [
+      "option: buy/use/inv"
+    ]
+  },
+  {
+    "CommandText": "mk",
+    "Usage": "[USAGE] mk (option: buy/use/inv)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "option: buy/use/inv"
+    ]
   },
   {
     "CommandText": "handsup",
@@ -450,7 +686,83 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "swapseats",
+    "Usage": "[USAGE] switchseats (target)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "target"
+    ]
+  },
+  {
+    "CommandText": "swapseat",
+    "Usage": "[USAGE] switchseats (target)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "target"
+    ]
+  },
+  {
+    "CommandText": "switchseat",
+    "Usage": "[USAGE] switchseats (target)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "target"
+    ]
+  },
+  {
+    "CommandText": "ss",
+    "Usage": "[USAGE] switchseats (target)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "target"
+    ]
+  },
+  {
     "CommandText": "forceswitchseats",
+    "Usage": "[USAGE] forceswitchseats (player) (target)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "player",
+      "target"
+    ]
+  },
+  {
+    "CommandText": "forceswapseats",
+    "Usage": "[USAGE] forceswitchseats (player) (target)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "player",
+      "target"
+    ]
+  },
+  {
+    "CommandText": "forceswapseat",
+    "Usage": "[USAGE] forceswitchseats (player) (target)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "player",
+      "target"
+    ]
+  },
+  {
+    "CommandText": "forceswitchseat",
+    "Usage": "[USAGE] forceswitchseats (player) (target)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "player",
+      "target"
+    ]
+  },
+  {
+    "CommandText": "fss",
     "Usage": "[USAGE] forceswitchseats (player) (target)",
     "Admin": 1,
     "Donator": 0,
@@ -525,20 +837,6 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "CommandText": "clanchat",
-    "Usage": "",
-    "Admin": 0,
-    "Donator": 0,
-    "Parameters": ["message"]
-  },
-  {
-    "CommandText": "donatorstatus",
-    "Usage": "",
-    "Admin": 0,
-    "Donator": 0,
-    "Parameters": []
-  },
-  {
     "CommandText": "mycomps",
     "Usage": "",
     "Admin": 0,
@@ -553,19 +851,12 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
-    "CommandText": "vehdbg",
-    "Usage": "",
-    "Admin": 5,
-    "Donator": 0,
-    "Parameters": ["vehicle name"]
-  },
-  {
     "CommandText": "givegun",
-    "Usage": "[USAGE] givegun (optional: target name) (optional: weapon name)",
+    "Usage": "[USAGE] givegun (optional: target) (optional: weapon name)",
     "Admin": 3,
     "Donator": 0,
     "Parameters": [
-      "optional: target name",
+      "optional: target",
       "optional: weapon name"
     ]
   },
@@ -599,6 +890,13 @@ var CommandsDataJSON = [
   },
   {
     "CommandText": "fix",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "repair",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
@@ -651,11 +949,36 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "db",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "stats",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
     "Parameters": []
+  },
+  {
+    "CommandText": "clearshotlisten",
+    "Usage": "",
+    "Admin": 2,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "shotlisten",
+    "Usage": "[USAGE] shotlisten (target) (options: 'all', 'sus', 'help', 'stop') (trigger [default:10])",
+    "Admin": 2,
+    "Donator": 0,
+    "Parameters": [
+      "target",
+      "options: 'all', 'sus', 'help', 'stop'",
+      "trigger [default:10]"
+    ]
   },
   {
     "CommandText": "checkstats",
@@ -666,6 +989,41 @@ var CommandsDataJSON = [
   },
   {
     "CommandText": "gethp",
+    "Usage": "",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "checkhp",
+    "Usage": "",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "getar",
+    "Usage": "",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "checkar",
+    "Usage": "",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "getarmour",
+    "Usage": "",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "getarmor",
     "Usage": "",
     "Admin": 1,
     "Donator": 0,
@@ -730,7 +1088,112 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "timestamp",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "pagesize",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "updaterate",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "lcmenu",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "fontsize",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "rappel",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "rapple",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "voicebind",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "noclip_vsm",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "autoooc",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "gpsbind",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "bigmap",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "bigmapbind",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "packetloss",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "pl",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "ploss",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
@@ -761,6 +1224,23 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "anote",
+    "Usage": "[USAGE] anote (target) [add|view|delete]",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "target",
+      "view|delete]",
+      "delete]",
+      "text",
+      "text",
+      "Note ID | use 'view' to check",
+      "target",
+      "view|delete]",
+      "delete]"
+    ]
+  },
+  {
     "CommandText": "lobbies",
     "Usage": "",
     "Admin": 0,
@@ -769,6 +1249,16 @@ var CommandsDataJSON = [
   },
   {
     "CommandText": "switchlobby",
+    "Usage": "[USAGE] switchlobby (lobbyid) (optional: password)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "lobbyid",
+      "optional: password"
+    ]
+  },
+  {
+    "CommandText": "swl",
     "Usage": "[USAGE] switchlobby (lobbyid) (optional: password)",
     "Admin": 1,
     "Donator": 0,
@@ -804,6 +1294,45 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "mgbans",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "minigameban",
+    "Usage": "[USAGE] minigameban (player) (option: 'freeroam', 'deathmatch', 'copchase') (time in minutes) (reason)",
+    "Admin": 2,
+    "Donator": 0,
+    "Parameters": [
+      "player",
+      "option: 'freeroam', 'deathmatch', 'copchase'",
+      "time in minutes",
+      "reason",
+      "player",
+      "option: 'freeroam', 'deathmatch', 'copchase'",
+      "time in minutes",
+      "reason"
+    ]
+  },
+  {
+    "CommandText": "mgban",
+    "Usage": "[USAGE] minigameban (player) (option: 'freeroam', 'deathmatch', 'copchase') (time in minutes) (reason)",
+    "Admin": 2,
+    "Donator": 0,
+    "Parameters": [
+      "player",
+      "option: 'freeroam', 'deathmatch', 'copchase'",
+      "time in minutes",
+      "reason",
+      "player",
+      "option: 'freeroam', 'deathmatch', 'copchase'",
+      "time in minutes",
+      "reason"
+    ]
+  },
+  {
     "CommandText": "freeroam",
     "Usage": "",
     "Admin": 0,
@@ -834,6 +1363,15 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "sweather",
+    "Usage": "[USAGE] setweather (weatherid)",
+    "Admin": 1,
+    "Donator": 1,
+    "Parameters": [
+      "weatherid"
+    ]
+  },
+  {
     "CommandText": "settime",
     "Usage": "[USAGE] settime (hour)",
     "Admin": 1,
@@ -843,7 +1381,28 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "stime",
+    "Usage": "[USAGE] settime (hour)",
+    "Admin": 1,
+    "Donator": 1,
+    "Parameters": [
+      "hour"
+    ]
+  },
+  {
     "CommandText": "gotopos",
+    "Usage": "[USAGE] gotopos (x) (y) (z) (optional: heading)",
+    "Admin": 3,
+    "Donator": 0,
+    "Parameters": [
+      "x",
+      "y",
+      "z",
+      "optional: heading"
+    ]
+  },
+  {
+    "CommandText": "gpos",
     "Usage": "[USAGE] gotopos (x) (y) (z) (optional: heading)",
     "Admin": 3,
     "Donator": 0,
@@ -892,7 +1451,26 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "setvw",
+    "Usage": "[USAGE] setdimension (target) (vw)",
+    "Admin": 2,
+    "Donator": 0,
+    "Parameters": [
+      "target",
+      "vw"
+    ]
+  },
+  {
     "CommandText": "sendtolobby",
+    "Usage": "[USAGE] sendtolobby (target)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "target"
+    ]
+  },
+  {
+    "CommandText": "stl",
     "Usage": "[USAGE] sendtolobby (target)",
     "Admin": 1,
     "Donator": 0,
@@ -912,6 +1490,30 @@ var CommandsDataJSON = [
   },
   {
     "CommandText": "putinveh",
+    "Usage": "[USAGE] putinveh (target) (player) (optional: seatid) | \\",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "target",
+      "player",
+      "optional: seatid",
+      " \\"
+    ]
+  },
+  {
+    "CommandText": "piv",
+    "Usage": "[USAGE] putinveh (target) (player) (optional: seatid) | \\",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "target",
+      "player",
+      "optional: seatid",
+      " \\"
+    ]
+  },
+  {
+    "CommandText": " putinvehicle",
     "Usage": "[USAGE] putinveh (target) (player) (optional: seatid) | \\",
     "Admin": 1,
     "Donator": 0,
@@ -946,6 +1548,15 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "tp",
+    "Usage": "[USAGE] teleport (option: chilliad, airport)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "option: chilliad, airport"
+    ]
+  },
+  {
     "CommandText": "dbgplayanim",
     "Usage": "",
     "Admin": 0,
@@ -953,7 +1564,21 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "panim",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "dbglinkmane",
+    "Usage": "",
+    "Admin": 6,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "dbgcef",
     "Usage": "",
     "Admin": 6,
     "Donator": 0,
@@ -974,7 +1599,28 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "dbgsetcar",
+    "Usage": "",
+    "Admin": 5,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "dbgcargame",
+    "Usage": "",
+    "Admin": 5,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "resetgamevehicles",
+    "Usage": "",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "resetgameveh",
     "Usage": "",
     "Admin": 1,
     "Donator": 0,
@@ -988,7 +1634,21 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "resetchar",
+    "Usage": "",
+    "Admin": 2,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "dbgexitlinkmane",
+    "Usage": "",
+    "Admin": 6,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "dbgexitcef",
     "Usage": "",
     "Admin": 6,
     "Donator": 0,
@@ -1009,7 +1669,21 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "setmaxspeed",
+    "Usage": "",
+    "Admin": 4,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "dbgdriveforce",
+    "Usage": "",
+    "Admin": 4,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "setdriveforce",
     "Usage": "",
     "Admin": 4,
     "Donator": 0,
@@ -1035,6 +1709,15 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "ask",
+    "Usage": "[USAGE] helpme (desc)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "desc"
+    ]
+  },
+  {
     "CommandText": "car",
     "Usage": "",
     "Admin": 0,
@@ -1050,6 +1733,13 @@ var CommandsDataJSON = [
   },
   {
     "CommandText": "cmds",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "help",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
@@ -1110,6 +1800,16 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "changeemail",
+    "Usage": "[USAGE] changeemail (account name) (new email)",
+    "Admin": 4,
+    "Donator": 0,
+    "Parameters": [
+      "account name",
+      "new email"
+    ]
+  },
+  {
     "CommandText": "changepass",
     "Usage": "[USAGE] changepass (account name) (new password)",
     "Admin": 4,
@@ -1120,16 +1820,6 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "CommandText": "changeemail",
-    "Usage": "[USAGE] changeemail (account name) (new mail)",
-    "Admin": 4,
-    "Donator": 0,
-    "Parameters": [
-      "account name",
-      "new email"
-    ]
-  },
-  {
     "CommandText": "changemypass",
     "Usage": "[USAGE] changemypass (new password)",
     "Admin": 0,
@@ -1137,6 +1827,13 @@ var CommandsDataJSON = [
     "Parameters": [
       "new password"
     ]
+  },
+  {
+    "CommandText": "setplayerclan",
+    "Usage": "",
+    "Admin": 5,
+    "Donator": 0,
+    "Parameters": []
   },
   {
     "CommandText": "hotwire",
@@ -1157,6 +1854,13 @@ var CommandsDataJSON = [
   },
   {
     "CommandText": "checkbanevaders",
+    "Usage": "",
+    "Admin": 2,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "checkallplayers",
     "Usage": "",
     "Admin": 2,
     "Donator": 0,
@@ -1208,6 +1912,13 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "clobby",
+    "Usage": "",
+    "Admin": 2,
+    "Donator": 2,
+    "Parameters": []
+  },
+  {
     "CommandText": "deletelobby",
     "Usage": "[USAGE] deletelobby (lobbyid)",
     "Admin": 2,
@@ -1217,7 +1928,26 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "dlobby",
+    "Usage": "[USAGE] deletelobby (lobbyid)",
+    "Admin": 2,
+    "Donator": 2,
+    "Parameters": [
+      "lobbyid"
+    ]
+  },
+  {
     "CommandText": "setlobbypassword",
+    "Usage": "[USAGE] setlobbypassword (lobbyid) (password)",
+    "Admin": 2,
+    "Donator": 2,
+    "Parameters": [
+      "lobbyid",
+      "password"
+    ]
+  },
+  {
+    "CommandText": "setlobbypass",
     "Usage": "[USAGE] setlobbypassword (lobbyid) (password)",
     "Admin": 2,
     "Donator": 2,
@@ -1238,6 +1968,17 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "setlobbymode",
+    "Usage": "[USAGE] setlobbymode (lobbyid) (mode) | Mode = 'standard' or 'busted'",
+    "Admin": 2,
+    "Donator": 2,
+    "Parameters": [
+      "lobbyid",
+      "mode",
+      " Mode = 'standard' or 'busted'"
+    ]
+  },
+  {
     "CommandText": "setlobbyfugitivepercent",
     "Usage": "[USAGE] setlobbyfugitivepercent (lobbyid) (percent)",
     "Admin": 2,
@@ -1248,7 +1989,33 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "setlobbyfugiperc",
+    "Usage": "[USAGE] setlobbyfugitivepercent (lobbyid) (percent)",
+    "Admin": 2,
+    "Donator": 2,
+    "Parameters": [
+      "lobbyid",
+      "percent"
+    ]
+  },
+  {
+    "CommandText": "testlang",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "togglelobby",
+    "Usage": "[USAGE] toglobby (lobbyid)",
+    "Admin": 2,
+    "Donator": 0,
+    "Parameters": [
+      "lobbyid"
+    ]
+  },
+  {
+    "CommandText": "toglobby",
     "Usage": "[USAGE] toglobby (lobbyid)",
     "Admin": 2,
     "Donator": 0,
@@ -1266,7 +2033,25 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "togmap",
+    "Usage": "[USAGE] togmap (map id/name)",
+    "Admin": 2,
+    "Donator": 0,
+    "Parameters": [
+      "map id/name"
+    ]
+  },
+  {
     "CommandText": "nextmap",
+    "Usage": "[USAGE] nextmap (map ID or name)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "map ID or name"
+    ]
+  },
+  {
+    "CommandText": "selectnextmap",
     "Usage": "[USAGE] nextmap (map ID or name)",
     "Admin": 1,
     "Donator": 0,
@@ -1303,6 +2088,13 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "partners",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "squadaccept",
     "Usage": "",
     "Admin": 0,
@@ -1310,7 +2102,21 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "partneraccept",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "squadleave",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "partnerleave",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,
@@ -1353,7 +2159,42 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "donatorstatus",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "clanchat",
+    "Usage": "[USAGE] clanchat (text)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "text"
+    ]
+  },
+  {
+    "CommandText": "c",
+    "Usage": "[USAGE] clanchat (text)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "text"
+    ]
+  },
+  {
     "CommandText": "languagechat",
+    "Usage": "[USAGE] languagechat (/lc) (text)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "/lc",
+      "text"
+    ]
+  },
+  {
+    "CommandText": "lc",
     "Usage": "[USAGE] languagechat (/lc) (text)",
     "Admin": 0,
     "Donator": 0,
@@ -1373,7 +2214,26 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "sc",
+    "Usage": "[USAGE] squadchat (sc) (text)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "sc",
+      "text"
+    ]
+  },
+  {
     "CommandText": "squad",
+    "Usage": "[USAGE] squad (target)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "target"
+    ]
+  },
+  {
+    "CommandText": "partner",
     "Usage": "[USAGE] squad (target)",
     "Admin": 0,
     "Donator": 0,
@@ -1389,7 +2249,32 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "fugilist",
+    "Usage": "",
+    "Admin": 2,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "lastlogin",
+    "Usage": "[USAGE] lastlogin (full username)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "full username"
+    ]
+  },
+  {
+    "CommandText": "seen",
+    "Usage": "[USAGE] lastlogin (full username)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "full username"
+    ]
+  },
+  {
+    "CommandText": "lastseen",
     "Usage": "[USAGE] lastlogin (full username)",
     "Admin": 1,
     "Donator": 0,
@@ -1419,6 +2304,117 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "ahelp",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "removestation",
+    "Usage": "[USAGE] removestation (station ID)",
+    "Admin": 4,
+    "Donator": 0,
+    "Parameters": [
+      "station ID"
+    ]
+  },
+  {
+    "CommandText": "addcategory",
+    "Usage": "[USAGE] addcategory (name)",
+    "Admin": 4,
+    "Donator": 0,
+    "Parameters": [
+      "CommandText"
+    ]
+  },
+  {
+    "CommandText": "addstation",
+    "Usage": "[USAGE] addstation (category ID) (icon URL) (stream URL) (name)",
+    "Admin": 4,
+    "Donator": 0,
+    "Parameters": [
+      "category ID",
+      "icon URL",
+      "stream URL",
+      "CommandText"
+    ]
+  },
+  {
+    "CommandText": "rstations",
+    "Usage": "",
+    "Admin": 4,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "rcats",
+    "Usage": "",
+    "Admin": 4,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "radioshow",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "setstation",
+    "Usage": "[USAGE] setstation (optional: ID)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "optional: ID"
+    ]
+  },
+  {
+    "CommandText": "fixr",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "radiohide",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "givepoints",
+    "Usage": "[USAGE] givepoints (target) (points)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "target",
+      "points"
+    ]
+  },
+  {
+    "CommandText": "pay",
+    "Usage": "[USAGE] givepoints (target) (points)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "target",
+      "points"
+    ]
+  },
+  {
+    "CommandText": "sendpoints",
+    "Usage": "[USAGE] givepoints (target) (points)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "target",
+      "points"
+    ]
+  },
+  {
     "CommandText": "agivepoints",
     "Usage": "[USAGE] agivepoints (target) (points)",
     "Admin": 4,
@@ -1440,6 +2436,16 @@ var CommandsDataJSON = [
   },
   {
     "CommandText": "setteam",
+    "Usage": "[USAGE] setteam (target) (team)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "target",
+      "team"
+    ]
+  },
+  {
+    "CommandText": "steam",
     "Usage": "[USAGE] setteam (target) (team)",
     "Admin": 1,
     "Donator": 0,
@@ -1521,6 +2527,18 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "fuckupdb",
+    "Usage": "[USAGE] editdmarena (help/list/add/remove/set) | Choose any one category.",
+    "Admin": 6,
+    "Donator": 0,
+    "Parameters": [
+      "list/add/remove/set",
+      " Choose any one category.",
+      "help/list/add/remove/set",
+      " Choose any one category."
+    ]
+  },
+  {
     "CommandText": "editdmarena",
     "Usage": "[USAGE] editdmarena (help)",
     "Admin": 4,
@@ -1551,7 +2569,21 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "triggerjsa",
+    "Usage": "",
+    "Admin": 6,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "triggerjsplayer",
+    "Usage": "",
+    "Admin": 6,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "triggerjsp",
     "Usage": "",
     "Admin": 6,
     "Donator": 0,
@@ -1635,6 +2667,26 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "makeadmin",
+    "Usage": "[USAGE] setadmin (target) (level)",
+    "Admin": 4,
+    "Donator": 0,
+    "Parameters": [
+      "target",
+      "level"
+    ]
+  },
+  {
+    "CommandText": "setstaff",
+    "Usage": "[USAGE] setadmin (target) (level)",
+    "Admin": 4,
+    "Donator": 0,
+    "Parameters": [
+      "target",
+      "level"
+    ]
+  },
+  {
     "CommandText": "osetadmin",
     "Usage": "[USAGE] osetadmin (target) (level)",
     "Admin": 4,
@@ -1700,6 +2752,16 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "makedonator",
+    "Usage": "[USAGE] setdonator (target) (level)",
+    "Admin": 5,
+    "Donator": 0,
+    "Parameters": [
+      "target",
+      "level"
+    ]
+  },
+  {
     "CommandText": "osetdonator",
     "Usage": "[USAGE] osetdonator (target) (level)",
     "Admin": 5,
@@ -1711,6 +2773,15 @@ var CommandsDataJSON = [
   },
   {
     "CommandText": "dc",
+    "Usage": "[USAGE] donatorchat (text)",
+    "Admin": 0,
+    "Donator": 1,
+    "Parameters": [
+      "text"
+    ]
+  },
+  {
+    "CommandText": "donatorchat",
     "Usage": "[USAGE] donatorchat (text)",
     "Admin": 0,
     "Donator": 1,
@@ -1744,7 +2815,25 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "a",
+    "Usage": "[USAGE] adminchat (text)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "text"
+    ]
+  },
+  {
     "CommandText": "looc",
+    "Usage": "[USAGE] looc (text)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "text"
+    ]
+  },
+  {
+    "CommandText": "b",
     "Usage": "[USAGE] looc (text)",
     "Admin": 0,
     "Donator": 0,
@@ -1762,7 +2851,25 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "l",
+    "Usage": "[USAGE] low (text)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "text"
+    ]
+  },
+  {
     "CommandText": "cw",
+    "Usage": "[USAGE] carwhisper (text)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "text"
+    ]
+  },
+  {
+    "CommandText": "carwhisper",
     "Usage": "[USAGE] carwhisper (text)",
     "Admin": 0,
     "Donator": 0,
@@ -1780,7 +2887,25 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "shout",
+    "Usage": "[USAGE] shout (text)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "text"
+    ]
+  },
+  {
     "CommandText": "m",
+    "Usage": "[USAGE] megaphone (text)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "text"
+    ]
+  },
+  {
+    "CommandText": "megaphone",
     "Usage": "[USAGE] megaphone (text)",
     "Admin": 0,
     "Donator": 0,
@@ -1798,6 +2923,33 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "wt",
+    "Usage": "[USAGE] radio (text)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "text"
+    ]
+  },
+  {
+    "CommandText": "walkietalkie",
+    "Usage": "[USAGE] radio (text)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "text"
+    ]
+  },
+  {
+    "CommandText": "radio",
+    "Usage": "[USAGE] radio (text)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "text"
+    ]
+  },
+  {
     "CommandText": "admins",
     "Usage": "",
     "Admin": 3,
@@ -1805,10 +2957,44 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "staff",
+    "Usage": "",
+    "Admin": 3,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "gooc",
+    "Usage": "[USAGE] gooc (text)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "text"
+    ]
+  },
+  {
+    "CommandText": "go",
+    "Usage": "[USAGE] gooc (text)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "text"
+    ]
+  },
+  {
     "CommandText": "ooc",
     "Usage": "[USAGE] ooc (text)",
     "Admin": 1,
-    "Donator": 1,
+    "Donator": 0,
+    "Parameters": [
+      "text"
+    ]
+  },
+  {
+    "CommandText": "o",
+    "Usage": "[USAGE] ooc (text)",
+    "Admin": 1,
+    "Donator": 0,
     "Parameters": [
       "text"
     ]
@@ -1816,8 +3002,26 @@ var CommandsDataJSON = [
   {
     "CommandText": "lobbychat",
     "Usage": "[USAGE] lobbychat (text)",
-    "Admin": 1,
-    "Donator": 1,
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "text"
+    ]
+  },
+  {
+    "CommandText": "lg",
+    "Usage": "[USAGE] lobbychat (text)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "text"
+    ]
+  },
+  {
+    "CommandText": "lo",
+    "Usage": "[USAGE] lobbychat (text)",
+    "Admin": 0,
+    "Donator": 0,
     "Parameters": [
       "text"
     ]
@@ -1832,7 +3036,23 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "announce",
+    "Usage": "[USAGE] ann (text)",
+    "Admin": 2,
+    "Donator": 0,
+    "Parameters": [
+      "text"
+    ]
+  },
+  {
     "CommandText": "anonymous",
+    "Usage": "",
+    "Admin": 2,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "vanish",
     "Usage": "",
     "Admin": 2,
     "Donator": 0,
@@ -1858,6 +3078,15 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "pgun",
+    "Usage": "[USAGE] passgun (target)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "target"
+    ]
+  },
+  {
     "CommandText": "removeguns",
     "Usage": "[USAGE] removeguns (target)",
     "Admin": 2,
@@ -1867,7 +3096,23 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "rguns",
+    "Usage": "[USAGE] removeguns (target)",
+    "Admin": 2,
+    "Donator": 0,
+    "Parameters": [
+      "target"
+    ]
+  },
+  {
     "CommandText": "removegunsfromall",
+    "Usage": "",
+    "Admin": 3,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "rgfa",
     "Usage": "",
     "Admin": 3,
     "Donator": 0,
@@ -2121,7 +3366,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "option: reset, cop, fugitive, donatorcop, donatorfugitive"
+      "option: reset, cop, fugitive"
     ]
   },
   {
@@ -2135,13 +3380,29 @@ var CommandsDataJSON = [
     "CommandText": "char",
     "Usage": "[USAGE] character (option: reset, edit, help, [reset]clothing, lobbyteam)",
     "Admin": 0,
-    "Donator": 0,
+    "Donator": 3,
+    "Parameters": [
+      "option: reset, edit, help, [reset]clothing, lobbyteam"
+    ]
+  },
+  {
+    "CommandText": "character",
+    "Usage": "[USAGE] character (option: reset, edit, help, [reset]clothing, lobbyteam)",
+    "Admin": 0,
+    "Donator": 3,
     "Parameters": [
       "option: reset, edit, help, [reset]clothing, lobbyteam"
     ]
   },
   {
     "CommandText": "requests",
+    "Usage": "",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "reports",
     "Usage": "",
     "Admin": 1,
     "Donator": 0,
@@ -2157,7 +3418,45 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "ar",
+    "Usage": "[USAGE] acceptreport (requestid)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "requestid"
+    ]
+  },
+  {
+    "CommandText": "acceptrequest",
+    "Usage": "[USAGE] acceptreport (requestid)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "requestid"
+    ]
+  },
+  {
     "CommandText": "denyreport",
+    "Usage": "[USAGE] denyreport (requestid) (reason)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "requestid",
+      "reason"
+    ]
+  },
+  {
+    "CommandText": "dr",
+    "Usage": "[USAGE] denyreport (requestid) (reason)",
+    "Admin": 1,
+    "Donator": 0,
+    "Parameters": [
+      "requestid",
+      "reason"
+    ]
+  },
+  {
+    "CommandText": "denyrequest",
     "Usage": "[USAGE] denyreport (requestid) (reason)",
     "Admin": 1,
     "Donator": 0,
@@ -2184,6 +3483,13 @@ var CommandsDataJSON = [
   },
   {
     "CommandText": "loadout",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
+    "CommandText": "loadouts",
     "Usage": "",
     "Admin": 0,
     "Donator": 0,

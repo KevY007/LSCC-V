@@ -576,5 +576,9 @@
   "BANK_ROB_NOTIFY_LOBBY": "!{#DB6135}[LOBBY -> BRAQUAGE DE BANQUE] ~w~l'événement de braquage de banque commencera à la prochaine manche dans le~y~lobby #{LOBBY ID}~w~!",
   "COPCHASE_STARTED": "[Lobby {LOBBY ID}] Copchase commencée avec !{#8D8DFF}{POLICE COUNT} flics !{#FFFFFF}& !{#E84040}{FUGITIVE COUNT} fugitifs !{#FFFFFF}sur la carte !{#DAA520}{mapName}!{#FFFFFF}.",
   "BANKROB_STARTED": "[Lobby {LOBBY ID}] Le braquage de banque a commencé avec !{#8D8DFF}{POLICE COUNT} flics !{#FFFFFF}& !{#E84040}{FUGITIVE COUNT} fugitifs !{#FFFFFF}sur la carte !{#DAA520}{mapName}!{#FFFFFF}.",
-  "BUSTED_STARTED": "[Lobby {LOBBY ID}] BUSTEDE commencé avec !{#8D8DFF}{POLICE COUNT} flics !{#FFFFFF}& !{#E84040}{FUGITIVE COUNT} fugitifs !{#FFFFFF}sur la carte !{#DAA520}{mapName}!{#FFFFFF}."
+  "BUSTED_STARTED": "[Lobby {LOBBY ID}] BUSTEDE commencé avec !{#8D8DFF}{POLICE COUNT} flics !{#FFFFFF}& !{#E84040}{FUGITIVE COUNT} fugitifs !{#FFFFFF}sur la carte !{#DAA520}{mapName}!{#FFFFFF}.",
+  "ERROR_CLAN_FULL": "Ce clan a atteint sa limite de membres ({MAX MEMBERS NUMBER}) ! Vous ne pouvez pas le rejoindre pour le moment.",
+  "ERROR_PAY_INVALID_POINTS": "!{#FF6347}[!] ~w~Vous ne pouvez envoyer qu'entre 1 et 10 000 points à la fois !",
+  "SENT_POINTS": "!{#55FF55}[PAY] ~w~Vous avez envoyé {POINTS} points à {PLAYER NAME}!{#AFAFAF}({DATE AND TIME})",
+  "RECEIVED_POINTS": "!{#55FF55}[PAY] ~w~Vous avez reçu {POINTS} points de {PLAYER NAME}!{#AFAFAF}({DATE AND TIME})"
 }
