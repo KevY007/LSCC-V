@@ -2345,7 +2345,7 @@ namespace RNC
             new LoadoutData(1, "Veteran", 45, 125)
                .Add((WeaponHash)3520460075, "https://assets.gm.miami/gtav/weapons/Tactical-rifle-icon.png", "Service Carbine", 90)
                .Add(WeaponHash.Bzgas, "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png", "BZ Gas", 1)
-               .Add(WeaponHash.NavyRevolver, "https://assets.gm.miami/gtav/weapons/Navy-revolver-icon.png", "Navy Revolver", 20);
+               .Add(WeaponHash.NavyRevolver, "https://assets.gm.miami/gtav/weapons/Navy-revolver-icon.png", "Navy Revolver", 26);
 
             new LoadoutData(1, "Juggernaut", 50, 150)
                 .Add(WeaponHash.Mg, "https://assets.gm.miami/gtav/weapons/Mg-icon.png", "Combat MG", 160)

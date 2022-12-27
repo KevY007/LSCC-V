@@ -32,9 +32,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Client Resources\cs_packages\**" />
-    <EmbeddedResource Remove="Client Resources\cs_packages\**" />
-    <None Remove="Client Resources\cs_packages\**" />
+    <Compile Remove="Client Resources\**" />
+    <Compile Remove="node_modules\**" />
+    <EmbeddedResource Remove="Client Resources\**" />
+    <EmbeddedResource Remove="node_modules\**" />
+    <None Remove="Client Resources\**" />
+    <None Remove="node_modules\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,12 +67,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Client Resources\index.js">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
