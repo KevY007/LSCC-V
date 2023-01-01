@@ -388,7 +388,7 @@ function actionMenu_vehicleCheck(){
             }
             else{
                 if(vehicle.getVariable("Team") != mp.players.local.getVariable("Team")){
-                    mp.events.callLocal("actionMenu:addItem", 14, Translate("Hotwire"), "#60a5fa", "fa-bolt");
+                    mp.events.callLocal("actionMenu:addItem", 14, Translate("HOTWIRE"), "#60a5fa", "fa-bolt");
                 }
                 else mp.events.callLocal("actionMenu:addItem", 13, Translate("ENGINE"), "#60a5fa", "fa-engine");
             }
