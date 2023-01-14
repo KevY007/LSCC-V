@@ -333,7 +333,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -342,7 +342,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -351,7 +351,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -426,7 +426,7 @@ var CommandsDataJSON = [
     "Admin": 3,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "0-255"
     ]
   },
@@ -436,7 +436,7 @@ var CommandsDataJSON = [
     "Admin": 3,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "0-255"
     ]
   },
@@ -481,7 +481,7 @@ var CommandsDataJSON = [
     "Admin": 2,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -490,7 +490,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "health"
     ]
   },
@@ -520,7 +520,7 @@ var CommandsDataJSON = [
     "Admin": 5,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "quality = 20",
       " Quality 20 is default"
     ]
@@ -531,7 +531,7 @@ var CommandsDataJSON = [
     "Admin": 5,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "quality = 20",
       " Quality 20 is default"
     ]
@@ -542,7 +542,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "ulnerable",
+      "_player:ulnerable",
       "target",
       "0 or 1"
     ]
@@ -553,7 +553,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "ulnerable",
+      "_player:ulnerable",
       "target",
       "0 or 1"
     ]
@@ -564,7 +564,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "mor",
+      "_player:mor",
       "target",
       "armor"
     ]
@@ -575,7 +575,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "mor",
+      "_player:mor",
       "target",
       "armor"
     ]
@@ -586,7 +586,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "mor",
+      "_player:mor",
       "target",
       "armor"
     ]
@@ -664,7 +664,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "optional:target"
+      "_player:optional:target"
     ]
   },
   {
@@ -673,7 +673,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "optional:target"
+      "_player:optional:target"
     ]
   },
   {
@@ -682,7 +682,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -691,7 +691,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -700,7 +700,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -709,7 +709,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -718,7 +718,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -727,8 +727,8 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "player",
-      "target"
+      "_player:player",
+      "_player:target"
     ]
   },
   {
@@ -737,8 +737,8 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "player",
-      "target"
+      "_player:player",
+      "_player:target"
     ]
   },
   {
@@ -747,8 +747,8 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "player",
-      "target"
+      "_player:player",
+      "_player:target"
     ]
   },
   {
@@ -757,8 +757,8 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "player",
-      "target"
+      "_player:player",
+      "_player:target"
     ]
   },
   {
@@ -767,8 +767,8 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "player",
-      "target"
+      "_player:player",
+      "_player:target"
     ]
   },
   {
@@ -777,7 +777,7 @@ var CommandsDataJSON = [
     "Admin": 3,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "weapon/hash",
       "component/hash"
     ]
@@ -795,7 +795,7 @@ var CommandsDataJSON = [
     "Admin": 3,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "weapon/hash",
       "component/hash"
     ]
@@ -813,7 +813,7 @@ var CommandsDataJSON = [
     "Admin": 3,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "component/hash"
     ]
   },
@@ -856,7 +856,7 @@ var CommandsDataJSON = [
     "Admin": 3,
     "Donator": 0,
     "Parameters": [
-      "optional: target",
+      "_player:optional: target",
       "optional: weapon name"
     ]
   },
@@ -908,7 +908,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -924,7 +924,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -975,7 +975,7 @@ var CommandsDataJSON = [
     "Admin": 2,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "options: 'all', 'sus', 'help', 'stop'",
       "trigger [default:10]"
     ]
@@ -1056,7 +1056,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -1212,7 +1212,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "view|delete]",
       "delete]",
       "text",
@@ -1229,7 +1229,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "view|delete]",
       "delete]",
       "text",
@@ -1306,7 +1306,7 @@ var CommandsDataJSON = [
     "Admin": 2,
     "Donator": 0,
     "Parameters": [
-      "player",
+      "_player:player",
       "option: 'freeroam', 'deathmatch', 'copchase'",
       "time in minutes",
       "reason",
@@ -1322,7 +1322,7 @@ var CommandsDataJSON = [
     "Admin": 2,
     "Donator": 0,
     "Parameters": [
-      "player",
+      "_player:player",
       "option: 'freeroam', 'deathmatch', 'copchase'",
       "time in minutes",
       "reason",
@@ -1419,7 +1419,7 @@ var CommandsDataJSON = [
     "Admin": 3,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -1428,7 +1428,7 @@ var CommandsDataJSON = [
     "Admin": 3,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -1437,7 +1437,7 @@ var CommandsDataJSON = [
     "Admin": 3,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -1446,7 +1446,7 @@ var CommandsDataJSON = [
     "Admin": 2,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "vw"
     ]
   },
@@ -1456,7 +1456,7 @@ var CommandsDataJSON = [
     "Admin": 2,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "vw"
     ]
   },
@@ -1466,7 +1466,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -1475,7 +1475,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -1484,7 +1484,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "cop/fugitive"
     ]
   },
@@ -1494,8 +1494,8 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target",
-      "player",
+      "_player:target",
+      "_player:player",
       "optional: seatid",
       " \\"
     ]
@@ -1506,8 +1506,8 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target",
-      "player",
+      "_player:target",
+      "_player:player",
       "optional: seatid",
       " \\"
     ]
@@ -1518,8 +1518,8 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target",
-      "player",
+      "_player:target",
+      "_player:player",
       "optional: seatid",
       " \\"
     ]
@@ -1695,7 +1695,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "desc"
     ]
   },
@@ -1891,7 +1891,7 @@ var CommandsDataJSON = [
     "Admin": 2,
     "Donator": 0,
     "Parameters": [
-      "CommandText",
+      "_player:name",
       "reason"
     ]
   },
@@ -1901,7 +1901,7 @@ var CommandsDataJSON = [
     "Admin": 2,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -2229,7 +2229,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -2238,7 +2238,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -2325,7 +2325,7 @@ var CommandsDataJSON = [
     "Admin": 4,
     "Donator": 0,
     "Parameters": [
-      "CommandText"
+      "name"
     ]
   },
   {
@@ -2337,7 +2337,7 @@ var CommandsDataJSON = [
       "category ID",
       "icon URL",
       "stream URL",
-      "CommandText"
+      "name"
     ]
   },
   {
@@ -2390,7 +2390,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "points"
     ]
   },
@@ -2400,7 +2400,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "points"
     ]
   },
@@ -2410,7 +2410,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "points"
     ]
   },
@@ -2420,7 +2420,7 @@ var CommandsDataJSON = [
     "Admin": 4,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "points"
     ]
   },
@@ -2430,7 +2430,7 @@ var CommandsDataJSON = [
     "Admin": 4,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "xp"
     ]
   },
@@ -2440,7 +2440,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "team"
     ]
   },
@@ -2450,7 +2450,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "team"
     ]
   },
@@ -2505,7 +2505,7 @@ var CommandsDataJSON = [
     "Admin": 4,
     "Donator": 0,
     "Parameters": [
-      "CommandText"
+      "name"
     ]
   },
   {
@@ -2514,7 +2514,7 @@ var CommandsDataJSON = [
     "Admin": 4,
     "Donator": 0,
     "Parameters": [
-      "CommandText"
+      "name"
     ]
   },
   {
@@ -2523,7 +2523,7 @@ var CommandsDataJSON = [
     "Admin": 4,
     "Donator": 0,
     "Parameters": [
-      "CommandText"
+      "name"
     ]
   },
   {
@@ -2662,7 +2662,7 @@ var CommandsDataJSON = [
     "Admin": 4,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "level"
     ]
   },
@@ -2672,7 +2672,7 @@ var CommandsDataJSON = [
     "Admin": 4,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "level"
     ]
   },
@@ -2682,7 +2682,7 @@ var CommandsDataJSON = [
     "Admin": 4,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "level"
     ]
   },
@@ -2712,7 +2712,7 @@ var CommandsDataJSON = [
     "Admin": 5,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "points"
     ]
   },
@@ -2747,7 +2747,7 @@ var CommandsDataJSON = [
     "Admin": 5,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "level"
     ]
   },
@@ -2757,7 +2757,7 @@ var CommandsDataJSON = [
     "Admin": 5,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "level"
     ]
   },
@@ -3064,7 +3064,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "text"
     ]
   },
@@ -3074,7 +3074,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -3083,7 +3083,7 @@ var CommandsDataJSON = [
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -3092,7 +3092,7 @@ var CommandsDataJSON = [
     "Admin": 2,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -3101,7 +3101,7 @@ var CommandsDataJSON = [
     "Admin": 2,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -3124,7 +3124,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -3169,7 +3169,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -3178,7 +3178,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "reason"
     ]
   },
@@ -3199,7 +3199,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "minutes",
       "reason"
     ]
@@ -3210,7 +3210,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -3228,7 +3228,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "reason"
     ]
   },
@@ -3238,7 +3238,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -3247,7 +3247,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target",
+      "_player:target",
       "mins",
       "reason"
     ]
@@ -3278,7 +3278,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -3305,7 +3305,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -3314,7 +3314,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -3323,7 +3323,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -3332,7 +3332,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -3348,7 +3348,7 @@ var CommandsDataJSON = [
     "Admin": 3,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -3478,7 +3478,7 @@ var CommandsDataJSON = [
     "Admin": 1,
     "Donator": 0,
     "Parameters": [
-      "target"
+      "_player:target"
     ]
   },
   {
@@ -3495,4 +3495,4 @@ var CommandsDataJSON = [
     "Donator": 0,
     "Parameters": []
   }
-];
+]
