@@ -879,7 +879,7 @@ namespace RNC
         }
 
         [Command("vehdbg")]
-        public void cmd_vehdbg(Player player, string carname)
+        public void cmd_vehdbg(Player player, string carname, int col1 = -1, int col2 = -1)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -890,7 +890,7 @@ namespace RNC
                 return;
             }
 
-            Vehicle veh = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5f), player.Heading, 0, 0, "ADMIN", 255, false, true, player.Dimension);
+            Vehicle veh = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carname), player.Position.Around(5f), player.Heading, col1, col2, "ADMIN", 255, false, true, player.Dimension);
             veh.SetSharedData("Engine", true);
             veh.SetSharedData("Locked", false);
             veh.Locked = false;

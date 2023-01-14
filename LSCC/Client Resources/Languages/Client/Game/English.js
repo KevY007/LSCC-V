@@ -48,6 +48,7 @@ const Language = {
     "PLAYER_INJURED": "(( Player is wounded; hold [H] to help them up, or press [E] to carry them. ))",
     "MENU":"Menu",
     "ACTION_MENU": "Action Menu",
-    "VOICE_CHAT": "Voice Chat"
+    "VOICE_CHAT": "Voice Chat",
+    "CLIMB_PROTECTION": "CLIMB PROTECTION"
 }
 exports.Language = Language;

@@ -14,7 +14,7 @@ mp.nametags.enabled = false;
 var NAMETAG_MESSAGES = {
     "PLAYER_SHOT": "(( THIS PLAYER HAS SHOT ))",
     "TASE_PROTECTION": "TASE PROTECTION",
-    "LADDER_PROTECTION": "LADDER PROTECTION",
+    "CLIMB_PROTECTION": "CLIMB PROTECTION",
     "PLAYER_INJURED": "(( Player is wounded; hold [H] to help them up, or press [E] to carry them. ))"
 }
 mp.events.add("Translator:UpdateNametagMessages", (object) => {

@@ -1566,6 +1566,31 @@ namespace RNC
                     seats = 2;
                     break;
 
+                case "polalamor":
+                    seats = 4;
+                    break;
+                case "polbisonr":
+                    seats = 4;
+                    break;
+                case "polbuffalor":
+                    seats = 4;
+                    break;
+                case "polbuffalor2":
+                    seats = 4;
+                    break;
+                case "polfugitiver":
+                    seats = 4;
+                    break;
+                case "poltorencer":
+                    seats = 4;
+                    break;
+                case "polgauntler":
+                    seats = 2;
+                    break;
+                case "polvigeror":
+                    seats = 2;
+                    break;
+
                 case "tailgater2":
                     seats = 4;
                     break;
@@ -2449,6 +2474,8 @@ namespace RNC
             new CarData(1, "Granger Retro", "shegrangerold", "package://Artwork/Vehicles/shegrangerold.png", "Slow", 3);
             new CarData(1, "Police Bike", "policeb", "package://Artwork/Vehicles/policeb.png", "Average", 3);
             new CarData(1, "Police Buffalo", "police2", "package://Artwork/Vehicles/police2.png", "Average", 5, 5);
+            new CarData(1, "Sheriff Alamo", "polalamor", "package://Artwork/Vehicles/polalamor.png", "Slow", 6, 5);
+            new CarData(1, "Sheriff Bison", "polbisonr", "package://Artwork/Vehicles/polbisonf.png", "Slow", 6, 8);
             new CarData(1, "Police Bison", "polbisonf", "package://Artwork/Vehicles/polbisonf.png", "Average", 6, 10);
             new CarData(1, "Police Scout", "pscout", "package://Artwork/Vehicles/pscout.png", "Average+", 6, 10);
             new CarData(1, "Unmarked Scout", "umkscout", "package://Artwork/Vehicles/umkscout.png", "Average+", 8, 10);
@@ -2459,12 +2486,18 @@ namespace RNC
             new CarData(1, "FBI Buffalo A/C", "fbibufac", "package://Artwork/Vehicles/fbibufac.png", "Fast", 17, 20);
             new CarData(1, "Police Chopper", "polmav", "package://Artwork/Vehicles/polmav.png", "N/A", 20, 20);
             new CarData(1, "AS-350", "as350", "package://Artwork/Vehicles/as350.png", "N/A", 20, 25);
+            new CarData(1, "Sheriff Fugitive", "polfugitiver", "package://Artwork/Vehicles/polfugitiver.png", "Fast", 25, 40);
             new CarData(1, "Unmarked Charger", "lspdunm", "package://Artwork/Vehicles/lspdunm.png", "Fast+", 25, 40);
+            new CarData(1, "Sheriff Gauntlet 2", "polgauntletr", "package://Artwork/Vehicles/polgauntletr.png", "Fast", 25, 45);
             new CarData(1, "FIB Executioner", "fibexecutioner", "package://Artwork/Vehicles/fibexecutioner.png", "Average", 25, 50);
+            new CarData(1, "Sheriff Torrence", "poltorencer", "package://Artwork/Vehicles/poltorencer.png", "Fast", 28, 40);
             new CarData(1, "Police Buffalo SX", "buffalosxpol", "package://Artwork/Vehicles/buffalosxpol.png", "Fast+", 30, 50);
             new CarData(1, "Chevrolet Caprice PPV", "bcso2slick", "package://Artwork/Vehicles/bcso2slick.png", "Fast", 30, 65);
             new CarData(1, "Vapid Torrence Unmarked", "police3umk", "package://Artwork/Vehicles/police3umk.png", "Fast+", 30, 70);
             new CarData(1, "Sheriff Gauntlet", "shergauntlet", "package://Artwork/Vehicles/shergauntlet.png", "Fast+", 38, 80);
+            new CarData(1, "Sheriff Vigero", "polvigeror", "package://Artwork/Vehicles/polvigeror.png", "Fast+", 45, 70);
+            new CarData(1, "Sheriff Buffalo SX", "polbuffalor", "package://Artwork/Vehicles/polbuffalor.png", "Fast+", 50, 70);
+            new CarData(1, "Sheriff Buffalo", "polbuffalor2", "package://Artwork/Vehicles/polbuffalor2.png", "Fast+", 50, 75);
             new CarData(1, "Vapid TARV Bearcat", "bcat", "package://Artwork/Vehicles/bcat.png", "Slow", 55, 100);
 
             // 0-100's Fugitive
@@ -2479,6 +2512,7 @@ namespace RNC
             new CarData(0, "Super Diamond", "superd", "package://Artwork/Vehicles/superd.png", "Fast");
             new CarData(0, "Primo", "primo", "package://Artwork/Vehicles/primo.png", "Slow");
             new CarData(0, "Futo GTX", "futo2", "package://Artwork/Vehicles/futo2.png", "Slow", 0, 5);
+            new CarData(0, "Stratum", "stratum", "package://Artwork/Vehicles/stratum.png", "Slow", 0, 5);
             new CarData(0, "Seminole Frontier", "seminole2", "package://Artwork/Vehicles/seminole2.png", "Slow", 1);
             new CarData(0, "Huntley", "huntley", "package://Artwork/Vehicles/huntley.png", "Average", 3);
             new CarData(0, "Tailgater", "tailgater", "package://Artwork/Vehicles/tailgater.png", "Slow", 5);
@@ -2487,18 +2521,22 @@ namespace RNC
             new CarData(0, "Huntley IV", "huntley2", "package://Artwork/Vehicles/huntley2.png", "Average", 6);
             new CarData(0, "Gresley Hellhound", "gresleyh", "package://Artwork/Vehicles/gresleyh.png", "Average+", 8, 3);
             new CarData(0, "Blista Classic", "blista2", "package://Artwork/Vehicles/blista2.png", "Average", 10);
+            new CarData(0, "Gang Burrito", "gburrito2", "package://Artwork/Vehicles/gburrito2.png", "Slow", 10, 5);
             new CarData(0, "Cheburek", "cheburek", "package://Artwork/Vehicles/cheburek.png", "Average", 15, 10);
             new CarData(0, "Exemplar", "exemplar", "package://Artwork/Vehicles/exemplar.png", "Average+", 17, 15);
             new CarData(0, "Chevrolet Impala SS '96", "impala", "package://Artwork/Vehicles/impala.png", "Average", 18, 30);
+            new CarData(0, "Issi 8", "issi8", "package://Artwork/Vehicles/issi8.png", "Average+", 22, 25);
             new CarData(0, "Buffalo", "buffalo", "package://Artwork/Vehicles/buffalo.png", "Average", 22, 30);
             new CarData(0, "Tailgater S", "tailgater2", "package://Artwork/Vehicles/tailgater2.png", "Average+", 23, 30);
             new CarData(0, "Sultan", "sultan", "package://Artwork/Vehicles/sultan.png", "Average", 25, 40);
+            new CarData(0, "Omnis", "omnis", "package://Artwork/Vehicles/omnis.png", "Fast", 25, 50);
             new CarData(0, "Tulip SS", "tulip2", "package://Artwork/Vehicles/tulip2.png", "Fast", 30, 50);
             //new CarData(0, "Kuruma", "kuruma", "package://Artwork/Vehicles/kuruma.png", "Fast", 30, 60); KURUMA TEMPORARILY REMOVED UNTIL BULLET PROOF GTA ONLIEN BUG FIX
             new CarData(0, "Buffalo SX", "buffalosx", "package://Artwork/Vehicles/buffalosx.png", "Fast+", 30, 70);
             new CarData(0, "Dominator GTT", "dominator8", "package://Artwork/Vehicles/dominator8.png", "Fast+", 32, 50);
             new CarData(0, "BMW M3 E46", "m3e46", "package://Artwork/Vehicles/m3e46.png", "Fast", 35, 0, 10);
             new CarData(0, "Sultan Classic", "sultan2", "package://Artwork/Vehicles/sultan2.png", "Fast", 37, 80);
+            new CarData(0, "Windsor 2", "windsor2", "package://Artwork/Vehicles/windsor2.png", "Fast", 40, 60);
             new CarData(0, "ZR350", "zr350", "package://Artwork/Vehicles/zr350.png", "Fast", 40, 70);
             new CarData(0, "Golf Mk6", "golfmk6", "package://Artwork/Vehicles/golfmk6.png", "Fast+", 50, 85);
             new CarData(0, "2022 Porsche Cayenne", "cayenneturbo", "package://Artwork/Vehicles/cayenneturbo.png", "Fast+", 60, 80);
