@@ -417,17 +417,17 @@ mp.events.add("login_StopMusic", () => {
     ServerUI.execute(`gm.$refs.auth.$refs.panel.stop();`);
 });
 
-function LogPlayerDamage(sourceEntity, weaponHash, damage, bodypartIndex, extraNotes = ""){
-  const dealerSQLID = sourceEntity.getVariable("SQL_ID");
-  if(!dealerSQLID) return;
+function LogPlayerDamage(targetEntity, weaponHash, damage, bodypartIndex, extraNotes = ""){
+  const targetSQLID = targetEntity.getVariable("SQL_ID");
+  if(!targetSQLID) return;
 
   let gunData = weaponData.find(w => Number(w.Hash) == weaponHash);
   if(!gunData) gunData = {Name:"Unknown"}
 
   const damagedHP = (mp.players.local.getHealth() - damage);
 
-  let bodypartData = boneData.find(b => b.boneIndex === bodypartIndex);
-  if(!bodypartData) bodypartData = {bodypartName:`Unknown`}
+  let bodypartData = boneData.find(b => b.index === bodypartIndex);
+  if(!bodypartData) bodypartData = {name:`Unknown`}
 
   let notes = extraNotes;
 
@@ -454,66 +454,32 @@ function LogPlayerDamage(sourceEntity, weaponHash, damage, bodypartIndex, extraN
       notes += "They were in COPCHASE!";
     }
   }
-
-  mp.events.callRemote("Server_RequestLogDamage", dealerSQLID, gunData.Name, damage, damagedHP, `${bodypartData.bodypartName} (${bodypartIndex})`, notes);
+  mp.events.callRemote("Server_RequestLogDamage", targetSQLID, gunData.Name, damage, damagedHP, `${bodypartData.name} (${bodypartIndex})`, notes);
 }
 
 // haha hex no export
 const boneData = [
-  {bodypartName:"Lower Abdomen", boneName: 'SKEL_ROOT', boneID: 0, boneIndex: 0 },
-  {bodypartName:"Left Foot", boneName: 'SKEL_L_Toe0', boneID: 2108, boneIndex: 5 },     
-  {bodypartName:"Left Hand", boneName: 'SKEL_L_Finger01', boneID: 4089, boneIndex: 44 },
-  {bodypartName:"Left Hand", boneName: 'SKEL_L_Finger02', boneID: 4090, boneIndex: 45 },
-  {bodypartName:"Left Hand", boneName: 'SKEL_L_Finger31', boneID: 4137, boneIndex: 56 },
-  {bodypartName:"Left Hand", boneName: 'SKEL_L_Finger32', boneID: 4138, boneIndex: 57 },
-  {bodypartName:"Left Hand", boneName: 'SKEL_L_Finger41', boneID: 4153, boneIndex: 59 },
-  {bodypartName:"Left Hand", boneName: 'SKEL_L_Finger42', boneID: 4154, boneIndex: 60 },
-  {bodypartName:"Left Hand", boneName: 'SKEL_L_Finger11', boneID: 4169, boneIndex: 49 },
-  {bodypartName:"Left Hand", boneName: 'SKEL_L_Finger12', boneID: 4170, boneIndex: 50 },
-  {bodypartName:"Left Hand", boneName: 'SKEL_L_Finger21', boneID: 4185, boneIndex: 53 },
-  {bodypartName:"Left Hand", boneName: 'SKEL_L_Finger22', boneID: 4186, boneIndex: 54 },
-  {bodypartName:"Right Shoulder", boneName: 'SKEL_R_Clavicle', boneID: 10706, boneIndex: 68 },
-  {bodypartName:"Pelvis", boneName: 'SKEL_Pelvis', boneID: 11816, boneIndex: 1 },
-  {bodypartName:"Left Foot", boneName: 'SKEL_L_Foot', boneID: 14201, boneIndex: 4 },
-  {bodypartName:"Left Hand", boneName: 'SKEL_L_Hand', boneID: 18905, boneIndex: 42 },
-  {bodypartName:"Right Foot", boneName: 'SKEL_R_Toe0', boneID: 20781, boneIndex: 17 },
-  {bodypartName:"Lower Abdomen", boneName: 'SKEL_Spine0', boneID: 23553, boneIndex: 35 },
-  {bodypartName:"Upper Abdomen", boneName: 'SKEL_Spine1', boneID: 24816, boneIndex: 36 },
-  {bodypartName:"Lower Chest", boneName: 'SKEL_Spine2', boneID: 24817, boneIndex: 37 },
-  {bodypartName:"Upper Chest", boneName: 'SKEL_Spine3', boneID: 24818, boneIndex: 38 },
-  {bodypartName:"Left Hand", boneName: 'SKEL_L_Finger00', boneID: 26610, boneIndex: 43 },
-  {bodypartName:"Left Hand", boneName: 'SKEL_L_Finger10', boneID: 26611, boneIndex: 48 },
-  {bodypartName:"Left Hand", boneName: 'SKEL_L_Finger20', boneID: 26612, boneIndex: 52 },
-  {bodypartName:"Left Hand", boneName: 'SKEL_L_Finger30', boneID: 26613, boneIndex: 55 },
-  {bodypartName:"Left Hand", boneName: 'SKEL_L_Finger40', boneID: 26614, boneIndex: 58 },
-  {bodypartName:"Right Forearm", boneName: 'SKEL_R_Forearm', boneID: 28252, boneIndex: 70 },
-  {bodypartName:"Head", boneName: 'SKEL_Head', boneID: 31086, boneIndex: 98 },
-  {bodypartName:"Right Calf", boneName: 'SKEL_R_Calf', boneID: 36864, boneIndex: 15 },
-  {bodypartName:"Neck", boneName: 'SKEL_Neck_1', boneID: 39317, boneIndex: 97 },
-  {bodypartName:"Right Upper Arm", boneName: 'SKEL_R_UpperArm', boneID: 40269, boneIndex: 69 },
-  {bodypartName:"Left Upper Arm", boneName: 'SKEL_L_UpperArm', boneID: 45509, boneIndex: 40 },
-  {bodypartName:"Right Thigh", boneName: 'SKEL_R_Thigh', boneID: 51826, boneIndex: 14 },
-  {bodypartName:"Right Foot", boneName: 'SKEL_R_Foot', boneID: 52301, boneIndex: 16 },
-  {bodypartName:"Right Hand", boneName: 'SKEL_R_Hand', boneID: 57005, boneIndex: 71 },
-  {bodypartName:"Lower Back", boneName: 'SKEL_Spine_Root', boneID: 57597, boneIndex: 34 },
-  {bodypartName:"Left Thigh", boneName: 'SKEL_L_Thigh', boneID: 58271, boneIndex: 2 },
-  {bodypartName:"Right Hand", boneName: 'SKEL_R_Finger00', boneID: 58866, boneIndex: 72 },
-  {bodypartName:"Right Hand", boneName: 'SKEL_R_Finger20', boneID: 58868, boneIndex: 81 },
-  {bodypartName:"Right Hand", boneName: 'SKEL_R_Finger30', boneID: 58869, boneIndex: 84 },
-  {bodypartName:"Right Hand", boneName: 'SKEL_R_Finger40', boneID: 58870, boneIndex: 87 },
-  {bodypartName:"Left Forearm", boneName: 'SKEL_L_Forearm', boneID: 61163, boneIndex: 41 },
-  {bodypartName:"Left Calf", boneName: 'SKEL_L_Calf', boneID: 63931, boneIndex: 3 },
-  {bodypartName:"Right Hand", boneName: 'SKEL_R_Finger01', boneID: 64016, boneIndex: 73 },
-  {bodypartName:"Right Hand", boneName: 'SKEL_R_Finger02', boneID: 64017, boneIndex: 74 },
-  {bodypartName:"Right Hand", boneName: 'SKEL_R_Finger31', boneID: 64064, boneIndex: 85 },
-  {bodypartName:"Right Hand", boneName: 'SKEL_R_Finger32', boneID: 64065, boneIndex: 86 },
-  {bodypartName:"Right Hand", boneName: 'SKEL_R_Finger41', boneID: 64080, boneIndex: 88 },
-  {bodypartName:"Right Hand", boneName: 'SKEL_R_Finger42', boneID: 64081, boneIndex: 89 },
-  {bodypartName:"Right Hand", boneName: 'SKEL_R_Finger11', boneID: 64096, boneIndex: 78 },
-  {bodypartName:"Right Hand", boneName: 'SKEL_R_Finger12', boneID: 64097, boneIndex: 79 },
-  {bodypartName:"Right Hand", boneName: 'SKEL_R_Finger21', boneID: 64112, boneIndex: 82 },
-  {bodypartName:"Right Hand", boneName: 'SKEL_R_Finger22', boneID: 64113, boneIndex: 83 },
-  {bodypartName:"Left Shoulder", boneName: 'SKEL_L_Clavicle', boneID: 64729, boneIndex: 39 }
+  {index:0, name:"Pelvis"},
+  {index:1, name:"Left Thigh"},
+  {index:2, name:"Left Calf"},
+  {index:3, name:"Left Foot"},
+  {index:4, name:"Right Thigh"},
+  {index:5, name:"Right Calf"},
+  {index:6, name:"Right Foot"},
+  {index:7, name:"Lower Abdomen"},
+  {index:8, name:"Upper Abdomen"},
+  {index:9, name:"Chest"},
+  {index:10, name:"Chest"},
+  {index:11, name:"Left Clavicle"},
+  {index:12, name:"Left Upper Arm"},
+  {index:13, name:"Left Forearm"},
+  {index:14, name:"Left Hand"},
+  {index:15, name:"Right Clavicle"},
+  {index:16, name:"Right Upper Arm"},
+  {index:17, name:"Right Forearm"},
+  {index:18, name:"Right Hand"},
+  {index:19, name:"Neck"},
+  {index:20, name:"Head"}
 ];
 
 const weaponData = [

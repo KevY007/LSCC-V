@@ -4775,12 +4775,12 @@ namespace RNC
         }
 
         [RemoteEvent("Server_RequestLogDamage")]
-        public void OnRequestLogDamage(Player player, int dealerSQLID, string weaponName, int damage, int health, string bodypart, string notes)
+        public void OnRequestLogDamage(Player player, int targetSQLID, string weaponName, int damage, int health, string bodypart, string notes)
         {
             string realNotes = (notes.Length > 0 ? notes : "None");
 
             int accSQL = EPlayer.GetAccount(player).SQL_ID;
-            Logs.LogDamage(accSQL, dealerSQLID, weaponName, damage, health, bodypart, realNotes);
+            Logs.LogDamage(targetSQLID, accSQL, weaponName, damage, health, bodypart, realNotes);
         }
 
         [RemoteEvent("SetAutoJoin")]

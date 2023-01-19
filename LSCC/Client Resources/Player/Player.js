@@ -2416,7 +2416,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 damage = nerfedDmg;
                 mp.game.weapon.setCurrentDamageEventAmount(nerfedDmg);
 
-                LogPlayerDamage(sourceEntity, weapon, nerfedDmg, boneIndex);
+                //LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
             }
             else{
                 let nerfedDmg = (damage-5);
@@ -2424,7 +2424,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 damage = nerfedDmg;
                 mp.game.weapon.setCurrentDamageEventAmount(nerfedDmg);
 
-                LogPlayerDamage(sourceEntity, weapon, nerfedDmg, boneIndex);
+                //LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
             }
             if(weapon == 2441047180){ // navy revolver nerf
                 const vec1 = sourceEntity.position;
@@ -2436,19 +2436,19 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                     damage = 75;
                     mp.game.weapon.setCurrentDamageEventAmount(75);
 
-                    LogPlayerDamage(sourceEntity, weapon, 75, boneIndex);
+                    //LogPlayerDamage(targetEntity, weapon, 75, boneIndex);
                 }
                 else if(distance >= 9.0 && distance < 18.0){
                     damage = 50;
                     mp.game.weapon.setCurrentDamageEventAmount(50);
 
-                    LogPlayerDamage(sourceEntity, weapon, 50, boneIndex);
+                    //LogPlayerDamage(targetEntity, weapon, 50, boneIndex);
                 }
                 else{
                     damage = 25;
                     mp.game.weapon.setCurrentDamageEventAmount(25);
 
-                    LogPlayerDamage(sourceEntity, weapon, 25, boneIndex);
+                    //LogPlayerDamage(targetEntity, weapon, 25, boneIndex);
                 }
             }
             if(weapon == 3800352039){ // assault shotgun nerf
@@ -2460,19 +2460,19 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                     damage = 10;
                     mp.game.weapon.setCurrentDamageEventAmount(10);
                 
-                    LogPlayerDamage(sourceEntity, weapon, 10, boneIndex);
+                    //LogPlayerDamage(targetEntity, weapon, 10, boneIndex);
                 }
                 else if(distance > 9.2681523185659 && distance < 19.267101852897){
                     damage = 7;
                     mp.game.weapon.setCurrentDamageEventAmount(7);
                 
-                    LogPlayerDamage(sourceEntity, weapon, 7, boneIndex);
+                    //LogPlayerDamage(targetEntity, weapon, 7, boneIndex);
                 }
                 else{
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                 
-                    LogPlayerDamage(sourceEntity, weapon, 0, boneIndex, "Target too far - no damage dealt.");
+                    //LogPlayerDamage(targetEntity, weapon, 0, boneIndex, "Target too far - no damage dealt.");
                 }
             }
             else if(weapon == 984333226){  // heavy shotgun nerf - shoots 1 pellet so it gets more dmg
@@ -2484,19 +2484,19 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                     damage = 37;
                     mp.game.weapon.setCurrentDamageEventAmount(37);
                 
-                    LogPlayerDamage(sourceEntity, weapon, 37, boneIndex);
+                    //LogPlayerDamage(targetEntity, weapon, 37, boneIndex);
                 }
                 else if(distance > 9.2681523185659 && distance < 19.267101852897){
                     damage = 28;
                     mp.game.weapon.setCurrentDamageEventAmount(28);
                 
-                    LogPlayerDamage(sourceEntity, weapon, 28, boneIndex);
+                    //LogPlayerDamage(targetEntity, weapon, 28, boneIndex);
                 }
                 else{
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                 
-                    LogPlayerDamage(sourceEntity, weapon, 0, boneIndex, "Target too far - no damage dealt.");
+                    //LogPlayerDamage(targetEntity, weapon, 0, boneIndex, "Target too far - no damage dealt.");
                 }
             }
 
@@ -2858,12 +2858,14 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 let nerfedDmg = (damage-10);
                 damage = nerfedDmg;
                 mp.game.weapon.setCurrentDamageEventAmount(nerfedDmg);
+                LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
             }
             else{
                 let nerfedDmg = (damage-5);
                 if(nerfedDmg <= 0) nerfedDmg = 1;
                 damage = nerfedDmg;
                 mp.game.weapon.setCurrentDamageEventAmount(nerfedDmg);
+                LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
             }
             if(weapon == 2441047180){ // navy revolver nerf
                 const vec1 = sourceEntity.position;
@@ -2874,14 +2876,17 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 if(distance < 9.0){
                     damage = 75;
                     mp.game.weapon.setCurrentDamageEventAmount(75);
+                    LogPlayerDamage(targetEntity, weapon, 75, boneIndex);
                 }
                 else if(distance >= 9.0 && distance < 18.0){
                     damage = 50;
                     mp.game.weapon.setCurrentDamageEventAmount(50);
+                    LogPlayerDamage(targetEntity, weapon, 50, boneIndex);
                 }
                 else{
                     damage = 25;
                     mp.game.weapon.setCurrentDamageEventAmount(25);
+                    LogPlayerDamage(targetEntity, weapon, 25, boneIndex);
                 }
             }
             if(weapon == 3800352039){ // assault shotgun nerf
@@ -2892,14 +2897,17 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 if(distance < 9.2681523185659){
                     damage = 10;
                     mp.game.weapon.setCurrentDamageEventAmount(10);
+                    LogPlayerDamage(targetEntity, weapon, 10, boneIndex);
                 }
                 else if(distance > 9.2681523185659 && distance < 19.267101852897){
                     damage = 7;
                     mp.game.weapon.setCurrentDamageEventAmount(7);
+                    LogPlayerDamage(targetEntity, weapon, 7, boneIndex);
                 }
                 else{
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
+                    LogPlayerDamage(targetEntity, weapon, 0, boneIndex);
                 }
             }
             else if(weapon == 984333226){  // heavy shotgun nerf - shoots 1 pellet so it gets more dmg
@@ -2910,14 +2918,17 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 if(distance < 9.2681523185659){
                     damage = 37;
                     mp.game.weapon.setCurrentDamageEventAmount(37);
+                    LogPlayerDamage(targetEntity, weapon, 37, boneIndex);
                 }
                 else if(distance > 9.2681523185659 && distance < 19.267101852897){
                     damage = 28;
                     mp.game.weapon.setCurrentDamageEventAmount(28);
+                    LogPlayerDamage(targetEntity, weapon, 28, boneIndex);
                 }
                 else{
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
+                    LogPlayerDamage(targetEntity, weapon, 0, boneIndex);
                 }
             }
 
