@@ -114,6 +114,7 @@ require('mp-commands');
 require('./ServerUI/CommandsList.js');
 require("./nativeui/index.js");
 
+require('./HeliCam/index.js');
 require('./Player/Player.js');
 require('./Player/SpikesRoadblocks.js');
 require('./Player/Achievements.js');

@@ -4753,6 +4753,24 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("HeliCam_OnStart")]
+        public void OnStartHeliCam(Player player)
+        {
+            player.SetSharedData("HeliCam", true);
+            player.SetSharedData("HeliCamLight", true);
+        }
+        [RemoteEvent("HeliCam_OnStop")]
+        public void OnStopHeliCam(Player player)
+        {
+            player.SetSharedData("HeliCam", false);
+            player.SetSharedData("HeliCamLight", false);
+        }
+        [RemoteEvent("HeliCam_UpdatePosition")]
+        public void OnHeliCamUpdate(Player player, double px, double py, double pz, double fx, double fy, double fz)
+        {
+            player.SetSharedData("HeliCamPosition", $"{{\"x\":{px}, \"y\":{py}, \"z\":{pz}, \"fx\":{fx}, \"fy\":{fy}, \"fz\":{fz}}}");
+        }
+
         [RemoteEvent("Server_RequestLobbySwitch")]
         public void OnRequestLobbySwitch(Player player, int lobbyID, string password)
         {
