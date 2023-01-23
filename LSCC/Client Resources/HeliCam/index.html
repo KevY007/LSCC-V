@@ -2,25 +2,78 @@
 <html>
     <head>
         <link href="./style/style.css" rel="stylesheet"/>
+        <script src="./js/index.js" defer></script>
     </head>
     <body>
         <div class="wrapper">
+
+            <div class="crosshair-holder">
+                <img id="crosshair" class="crosshair" src="./img/crosshair.png"/>
+                <img id="lmb_tip" class="invisible" src="./img/lmb.png"/>
+            </div>
+
+            <div class="invisible" id="focusPanel">
+                <div class="focus-header">
+                    <div class="focus-header-row">
+                        <img class="row-icon" src="./img/vehicle.png">
+                        <p id="vehicleName">BUFFALO</p>
+                    </div>
+                    <div class="focus-header-row">
+                        <img class="row-icon" src="./img/fuel.png">
+                        <p id="vehicleFuel">69%</p>
+                    </div>
+                    <div class="focus-header-row">
+                        <img class="row-icon" src="./img/speed.png">
+                        <p id="vehicleSpeed">140KM/H</p>
+                    </div>
+                    <div class="focus-header-row">
+                        <img class="row-icon" src="./img/compass.png">
+                        <p id="vehicleLocation">La Puerta, Little Seoul</p>
+                    </div>
+                </div>
+                <!--
+                <div class="separator"></div>
+                <div class="passengers-list">
+                    <div class="passenger-item">
+                        (D) codenameisafuckingbitch
+                    </div>
+                    <div class="passenger-item">
+                        RotX
+                    </div>
+                    <div class="passenger-item">
+                        vozac123
+                    </div>
+                </div>
+                -->
+            </div>
+
             <div class="status-panel">
                 <div class="panel-row">
                     <p class="panel-item-title">VIEW:</p>
-                    <p class="panel-item-selected">NORMAL</p>
-                    <p class="panel-item-unselected">NV</p>
-                    <p class="panel-item-unselected">THERMAL</p>
+                    <p id="view_1" class="panel-item-selected">NORMAL</p>
+                    <p id="view_2" class="panel-item-unselected">NV</p>
+                    <p id="view_3" class="panel-item-unselected">THERMAL</p>
+
+                    <img src="./img/key_k.png" class="panel-control">
                 </div>
                 <div class="panel-row">
                     <p class="panel-item-title">ZOOM:</p>
                     <div class="slider-container">
                         <div class="slider-line">
-                            <div class="dot">
-
+                            <div id="knob" class="dot">
+                                <p id="zoomValue" class="dot-text">0%</p>
                             </div>
                         </div>
                     </div>
+
+                    <img src="./img/scroll.png" class="panel-control">
+                </div>
+                <div class="panel-row">
+                    <p class="panel-item-title">LIGHT:</p>
+                    <p id="light_enabled" class="panel-item-selected">ENABLED</p>
+                    <p id="light_disabled" class="panel-item-unselected">DISABLED</p>
+
+                    <img src="./img/key_l.png" class="panel-control">
                 </div>
             </div>
         </div>

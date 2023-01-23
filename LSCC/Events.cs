@@ -4765,6 +4765,11 @@ namespace RNC
             player.SetSharedData("HeliCam", false);
             player.SetSharedData("HeliCamLight", false);
         }
+        [RemoteEvent("HeliCam_ToggleLight")]
+        public void OnHeliCamToggleLight(Player player, bool value)
+        {
+            player.SetSharedData("HeliCamLight", value);
+        }
         [RemoteEvent("HeliCam_UpdatePosition")]
         public void OnHeliCamUpdate(Player player, double px, double py, double pz, double fx, double fy, double fz)
         {

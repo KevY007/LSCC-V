@@ -1234,7 +1234,8 @@ namespace RNC
                         };
                         await context.UnlockedAchievements.AddAsync(ach);
 
-                        NAPI.Task.Run(() => { 
+                        NAPI.Task.Run(() => {
+                            if (player == null) return;
                             if(achdata == null) { achdata = Settings.Achievements.FirstOrDefault(a => a.Code == achievement); }                            
                             if(achdata != null)
                                 player.TriggerEvent("unlockAchievement", achdata.Name);
