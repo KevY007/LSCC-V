@@ -20,6 +20,21 @@ mp.events.add("addFloatTip", (id, key, action, posX, posY, posZ, maxDist, useDis
     });
 });
 
+mp.events.add("removeTipByID", (id) => {
+    var tip = FloatTips.find(t => t.id === id);
+    if(!tip) return;
+
+    var idx = FloatTips.indexOf(tip);
+    FloatTips.splice(idx, 1);
+});
+mp.events.add("removeTipsByKey", (key) => {
+    var tips = FloatTips.filter(t => t.key === key);
+    if(!tips || tips.length === 0) return;
+    
+    const newTips = FloatTips.filter( x => !tips.filter( y => y.id === x.id).length);
+    FloatTips = newTips;
+});
+
 mp.events.add("triggerTipsByKey", (key) => {
     var tips = FloatTips.filter(t => t.key === key);
     if(!tips || tips.length === 0) return;

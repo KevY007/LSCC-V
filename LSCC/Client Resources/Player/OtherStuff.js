@@ -873,6 +873,7 @@ mp.keys.bind(0x4A, false, () => {
             }
             else */if (closestHandle == "bonnet")
             {
+                mp.events.callLocal("triggerTipsByKey", 'J');
                 if(veh.vehicle.getDoorAngleRatio(4) >= 0.25)
                 {
                     mp.players.local.setHeading(veh.vehicle.getHeading() - 180.0);
@@ -909,6 +910,7 @@ mp.keys.bind(0x4A, false, () => {
             }
             else if (closestHandle == "boot")
             {
+                mp.events.callLocal("triggerTipsByKey", 'J');
                 if(veh.vehicle.getDoorAngleRatio(5) >= 0.25)
                 {
                     mp.players.local.setHeading(veh.vehicle.getHeading());

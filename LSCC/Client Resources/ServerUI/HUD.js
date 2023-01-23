@@ -849,6 +849,8 @@ mp.events.add('ToggleTooltips', (status) =>
     }
 });
 
+var lastClosestVehBoneHandle = "";
+
 mp.events.add("TwoSecondsEvent", () => {
 
     if(mp.storage.data.menu.RealtimeSpeedo == false){
@@ -960,11 +962,13 @@ mp.events.add("TwoSecondsEvent", () => {
           
                 let closestHandle = "";
                 let closestDist = 100.0;
+                let bonePos = undefined;
                 sidebones.forEach((side) => {
                     let bone = veh.vehicle.getBoneIndexByName(side);
                     if(bone != -1)
                     {
-                        let dist = calcDist(mp.players.local.position, veh.vehicle.getWorldPositionOfBone(bone));
+                        bonePos = veh.vehicle.getWorldPositionOfBone(bone);
+                        let dist = calcDist(mp.players.local.position, bonePos);
                         if(dist < closestDist)
                         {
                             closestDist = dist;
@@ -978,23 +982,43 @@ mp.events.add("TwoSecondsEvent", () => {
                     if((veh.vehicle.getVariable("Locked") === undefined || veh.vehicle.getVariable("Locked") == false) || 
                     (veh.vehicle.getVariable("Locked") == true && (mp.players.local.weapon == 0x84BD7BFD || mp.players.local.weapon == 2227010557)))
                     {
-                        if(createdTooltips.indexOf("J") == -1) 
-                        {
-                            if(closestHandle == "boot") mp.events.callLocal("AddTooltip", "J", Translate("TRUNK"), -1);
-                            else if(closestHandle == "bonnet") mp.events.callLocal("AddTooltip", "J", Translate("BONNET"), -1);
+                        if(closestHandle != lastClosestVehBoneHandle){
+                            mp.events.callLocal("RemoveTooltip", "J");
+                            mp.events.callLocal("removeTipByID", veh.handle);
+                            if(closestHandle == "boot"){
+                                mp.events.callLocal("addFloatTip", veh.handle, 'J', Translate("TRUNK"), bonePos.x, bonePos.y, bonePos.z, 7, 3.5);
+                                mp.events.callLocal("AddTooltip", "J", Translate("TRUNK"), -1);
+                            }
+                            else if(closestHandle == "bonnet"){
+                                mp.events.callLocal("addFloatTip", veh.handle, 'J', Translate("BONNET"), bonePos.x, bonePos.y, bonePos.z, 7, 3.5);
+                                mp.events.callLocal("AddTooltip", "J", Translate("BONNET"), -1);
+                            }
+                            
+                            lastClosestVehBoneHandle = closestHandle;
                         }
+               
+                      
                     }
-                    else if(createdTooltips.indexOf("J") != -1) mp.events.callLocal("RemoveTooltip", "J");
+                    else if(createdTooltips.indexOf("J") != -1){
+                        mp.events.callLocal("removeTipsByKey", 'J');
+                        mp.events.callLocal("RemoveTooltip", "J");
+                    }
                 }
-                else if(createdTooltips.indexOf("J") != -1) mp.events.callLocal("RemoveTooltip", "J");
+                else if(createdTooltips.indexOf("J") != -1){
+                    mp.events.callLocal("removeTipsByKey", 'J');
+                    mp.events.callLocal("RemoveTooltip", "J");
+                }
             }
-            else if(createdTooltips.indexOf("J") != -1) mp.events.callLocal("RemoveTooltip", "J");
+            else if(createdTooltips.indexOf("J") != -1){
+                mp.events.callLocal("removeTipsByKey", 'J');
+                mp.events.callLocal("RemoveTooltip", "J");
+            }
         }
         else
         {
             if((createdTooltips.indexOf("J") != -1 && keyTrunk) || createdTooltips.indexOf("J") == -1)
             {
-                mp.events.callLocal("RemoveTooltip", "J");
+                mp.events.callLocal("removeTipsByKey", 'J');
                 
                 /*
                 if(mp.players.local.vehicle.getClass() != 8 && mp.players.local.vehicle.model != mp.game.joaat('policeb'))
