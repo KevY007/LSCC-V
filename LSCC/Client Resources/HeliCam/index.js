@@ -7,6 +7,10 @@ const zoomSpeed = 1.5;
 const minZoom = 5.0;
 const maxZoom = 60.0;
 
+/* Misc */
+let targetVehicleHandle = null;
+let focusedVehicle = null;
+
 /* Sync & Updates */
 let lastHeliCamUpdate = 0;
 
@@ -20,6 +24,9 @@ mp.events.add("startHeliCam", () => {
 
     mp.game.cam.renderScriptCams(true, false, 0, true, false);
     mp.events.callRemote("HeliCam_OnStart");
+
+    targetVehicleHandle = null;
+    focusedVehicle = null;
 });
 mp.events.add("stopHeliCam", () => {
     if(heliCam == null) return;
@@ -29,6 +36,9 @@ mp.events.add("stopHeliCam", () => {
     heliCam.setActive(false);
     heliCam.destroy();
     heliCam = null;    
+
+    targetVehicleHandle = null;
+    focusedVehicle = null;
 });
 
 // Check if camera is pointing at vehicle
@@ -52,15 +62,64 @@ mp.events.addCommand("hdbg", () => {
 })
 mp.events.addCommand("shdbg", () => {
     mp.events.callLocal("stopHeliCam");
-})
+});
+
+mp.events.add('click', (x, y, upOrDown, leftOrRight, relativeX, relativeY, worldPosition, hitEntity) => {
+	if (heliCam === null || !heliCam.isActive() || !heliCam.isRendering()) return;
+
+    if(upOrDown == "down" && leftOrRight == "left"){
+        if(targetVehicleHandle == null) return;
+        const veh = Object.values(mp.vehicles).find(v => v.handle === targetVehicleHandle);
+        if(veh == undefined) return;
+
+        heliCam.pointAt(veh.handle, 0, 0, 0, true);
+        focusedVehicle = veh;
+    }
+    if(upOrDown == "down" && leftOrRight == "right"){
+        if(focusedVehicle == null) return;
+
+        heliCam.stopPointing();
+        focusedVehicle = null;
+    }
+});
 
 mp.events.add('render', () => {
 	if (heliCam === null || !heliCam.isActive() || !heliCam.isRendering()) return;
-    if(pointingAt(1000) === undefined) return;
+
+    if(focusedVehicle !== null){
+        mp.game.graphics.drawMarker(
+            0,
+            focusedVehicle.position.x, focusedVehicle.position.y, focusedVehicle.position.z + 2,
+            0, 0, 0,
+            0, 0, 0,
+            1.0, 1.0, 1.0,
+            0, 200, 0, 128,
+            false, false, 2,
+            false, null, null, false,
+          );
+        mp.game.graphics.drawText(`${mp.game.vehicle.getDisplayNameFromVehicleModel(focusedVehicle.model).toUpperCase()}`, [focusedVehicle.position.x, focusedVehicle.position.y, focusedVehicle.position.z],{
+            font:2,
+            color:[255, 255, 0, 200],
+            outline:true,
+            scale:[0.5, 0.5],
+            centre:true
+        });
+        return;
+    }
+
+    if(pointingAt(1000) === undefined){
+        targetVehicleHandle = null;
+        return;
+    }
 
     const rayData = pointingAt(1000);
     const {position:carPosition, entity:carEntity} = rayData;
-    if(carEntity.type !== 'vehicle') return;
+    if(carEntity.type !== 'vehicle'){
+        targetVehicleHandle = null;
+        return;
+    }
+
+    if(carEntity.handle != targetVehicleHandle) targetVehicleHandle = carEntity.handle;
 
     const veh = Object.values(mp.vehicles).find(v => v.handle === carEntity.handle);
     //const dimensions = mp.game.gameplay.getModelDimensions(veh.model);
