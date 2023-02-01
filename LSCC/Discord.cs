@@ -1741,6 +1741,35 @@ namespace RNC
                     }
                     else await context.Channel.SendMessageAsync("**[!]** !unjail [name]");
                 }
+                else if(context.Content.StartsWith("!reloaddb"))
+                {
+                    int admID = await GetIngameSQLID(context.Author);
+                    if (admID == -1)
+                    {
+                        await context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
+                        await context.Channel.SendMessageAsync("**HINT:** /verify");
+                        return;
+                    }
+                    int aLevel = GetIngameAdminLevel(context.Author);
+                    if(aLevel < 6)
+                    {
+                        await context.Channel.SendMessageAsync("**[!]** You are not authorized to use this!");
+                        return;
+                    }
+                    await Task.Run(async () =>
+                    {
+                        using(MainDatabase dbcontext = ContextFactory.CreateContext())
+                        {
+                            long startTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                            await dbcontext.Accounts.ForEachAwaitAsync(async (account) =>
+                            {
+                                await dbcontext.Entry(account).ReloadAsync();
+                            });
+                            long endTime = DateTimeOffset.Now.ToUnixTimeMilliseconds()-startTime;
+                            await context.Channel.SendMessageAsync($"**[>]** Reload finished! ({endTime}ms)");
+                        }
+                    });
+                }
                 else if (context.Content.StartsWith("!jail"))
                 {
                     string[] args = context.Content.Split(" ", 4);
