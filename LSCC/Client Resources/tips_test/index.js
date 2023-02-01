@@ -5,6 +5,7 @@ let lastFrameUpdate = 0;
 function InitializeFloatTips(){
     FloatTipsDOM = mp.browsers.new("package://tips_test/index.html");
 }
+/*
 mp.events.add("addFloatTip", (id, key, action, posX, posY, posZ, maxDist, useDist) => {
     FloatTips.push({
         id: id,
@@ -109,25 +110,16 @@ mp.events.add('render', () => {
         mp.game.graphics.drawText(tip.key, [pos2d.x, pos2d.y+scaleData.keyTextOffsetY], {font:4, color:[255, 255, 255, 200], scale:[scaleData.keyTextScale, scaleData.keyTextScale]});
         mp.game.graphics.drawText(tip.action, [pos2d.x+(scaleData.keyBoxWidthHalf+actwidth/2), pos2d.y+scaleData.actionTextOffsetY], {font:4, centre:true, outline:false, scale:[scaleData.actionTextScale, scaleData.actionTextScale], color:[200, 200, 200, 200]});
 
-        /*
-            Tested Pos: 117.7586, -748.2128, 242.15207
-            Tip Pos: 119.00362, -748.689, 242.15201
-            d = 1.332982
-        */
     }
 });
-
-
+*/
 
 
 
 /*======================== OLD SYSTEM WITH CEF THAT WAS LAGGY =======================================*/
-/*
-function InitializeFloatTips(){
-    FloatTipsDOM = mp.browsers.new("package://tips_test/index.html");
-}
 
-mp.events.add("addFloatTip", (id, key, action, posX, posY, posZ) => {
+
+mp.events.add("addFloatTip", (id, key, action, posX, posY, posZ, maxDist = 0, useDist = 0) => {
     FloatTips.push({
         id: id,
         key:key, action:action, 
@@ -164,4 +156,3 @@ mp.events.add('render', () => {
         lastFrameUpdate = 0;
     }
 });
-*/

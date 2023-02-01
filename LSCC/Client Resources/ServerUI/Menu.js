@@ -1043,7 +1043,17 @@ mp.events.add("PutPlayerInLobby", (lobbyID, password) => {
 });
 
 mp.events.add("RequestJoinMinigame", (ID) => {
-    mp.events.callRemote("Server_RequestMinigameJoin", ID);
+
+    if(ID === 6969){
+        mp.events.callRemote("Server_RequestMinigameJoin", -3);
+    }
+    else if(ID === 6970){
+        mp.events.callRemote("Server_RequestMinigameJoin", -4);
+    }
+    else{
+        mp.events.callRemote("Server_RequestMinigameJoin", ID - 69420);
+    }
+
     ToggleMenu();
 });
 
@@ -1055,25 +1065,74 @@ mp.events.add("MenuSelectLoadout", (name, team) => {
     mp.events.callRemote("MenuSelectedLoadout", name, team);
 });
 
+function minigameNameToID(name){
+    switch(name){
+        case "Freeroam":
+            return 4;
+        case "Derby":
+            return 3;
+        case "DM":
+            return 2;
+        default:
+            return -1;
+    }
+}
+
 mp.events.add("UpdateMenuMinigames", (arenas, currentMinigame) => {
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.minigamesTab.games = [];`);
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.minigamesTab.currentMinigame = ${currentMinigame};`);
+    //ServerUI.execute(`gm.$refs.mainMenu.$refs.minigamesTab.games = [];`);
     
     let menuItems = JSON.parse(arenas);
     for(let i = 0; i < menuItems.length; i++)
     {
-        let insertString = `gm.$refs.mainMenu.$refs.minigamesTab.games.push({`;
-        insertString += `"id": ${menuItems[i][0]}, `;
+
+        let insertString = `gm.$refs.mainMenu.$refs.playTab.rooms.push({`;
+        insertString += `"id": ${(menuItems[i][0]+69420)}, `;
         insertString += `"name": "${menuItems[i][1]}", `;
-        insertString += `"background": "${menuItems[i][2]}", `;
+        insertString += `"image": "${menuItems[i][2]}", `;
         insertString += `"players": ${menuItems[i][3]}, `;
         insertString += `"maxplayers": ${menuItems[i][4]}, `;
-        if(menuItems[i][5].length > 1) insertString += `"gamemode": "${menuItems[i][5]}", `;
+        if(menuItems[i][5].length > 1) insertString += `"type": ${minigameNameToID(menuItems[i][5])}, `;
+        insertString += `"joinFunction":"RequestJoinMinigame"`;
         if(menuItems[i][6].length > 1) insertString += `"description": "${menuItems[i][6]}", `;
         
         insertString += "});";
 
         ServerUI.execute(insertString);
+    }
+
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.rooms.push({
+        id: 6969,
+        type: 4,
+        name: "Freeroam",
+        image:
+        "package://Artwork/Freeroam.png",
+        players: ${menuItems[0][3]},
+        maxplayers: 1000,
+        joinFunction: "RequestJoinMinigame",
+    });`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.rooms.push({
+        id: 6970,
+        type: 3,
+        name: "Derby",
+        image:
+        "package://Artwork/Derby.jpg",
+        players: ${menuItems[1][3]},
+        maxplayers: 20,
+        joinFunction: "RequestJoinMinigame",
+    });`);
+
+    if(currentMinigame !== -1){
+        if(currentMinigame !== -3 && currentMinigame !== -4){
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.currentRoom = ${currentMinigame + 69420};`);
+        }
+        else{
+            if(currentMinigame === -3)
+                ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.currentRoom = 6969;`);
+
+            if(currentMinigame === -4)
+                ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.currentRoom = 6970;`);
+
+        }
     }
 });
 
@@ -1166,6 +1225,33 @@ mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoa
 });
 
 mp.events.add("UpdateMenuLobbies", (lobbies, currentLobby) => {
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.rooms = [];`);
+
+    // Lobby Data
+    // ID, Name, Background, Gamemode, Password, Players, MaxPlayers, Description
+    let menuItems = JSON.parse(lobbies);
+    for(let i = 0; i < menuItems.length; i++)
+    {
+        let insertString = `gm.$refs.mainMenu.$refs.playTab.rooms.push({`;
+        insertString += `"id": ${menuItems[i][0]}, `;
+        insertString += `"name": "${menuItems[i][1]}", `;
+        insertString += `"image": "${menuItems[i][2]}", `;
+        insertString += `"type": ${(menuItems[i][3] === "Standard" ? 0 : 1)}, `;
+        if(menuItems[i][4].length > 1) insertString += `"password": "${menuItems[i][4]}", `;
+        insertString += `"players": ${menuItems[i][5]}, `;
+        insertString += `"maxplayers": ${menuItems[i][6]},`;
+        insertString += `"joinFunction":"PutPlayerInLobby"`
+        //if(menuItems[i][7].length > 1) insertString += `, "description": "${menuItems[i][7]}"`;
+        insertString += "});";
+
+        ServerUI.execute(insertString);
+    }
+    
+    if(currentLobby >= 1)
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.currentRoom = ${currentLobby};`);
+});
+/*
+mp.events.add("UpdateMenuLobbies", (lobbies, currentLobby) => {
     ServerUI.execute(`gm.$refs.mainMenu.$refs.lobbiesTab.lobbies = [];`);
     ServerUI.execute(`gm.$refs.mainMenu.$refs.lobbiesTab.currentLobby = ${currentLobby};`);
 
@@ -1188,6 +1274,7 @@ mp.events.add("UpdateMenuLobbies", (lobbies, currentLobby) => {
         ServerUI.execute(insertString);
     }
 });
+*/
 
 // mp.events.add("SaveCrosshair", (crData) => {
 //     mp.storage.data.menu.CrosshairData = crData;

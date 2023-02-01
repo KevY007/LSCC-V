@@ -135,7 +135,7 @@ mp.events.add('render', (nametags) => {
 
                 var health = player.getHealth() / 100;
             
-                var armour = player.getArmour() / 100;
+                var armour = (player.getArmour() > 100 ? 100 : player.getArmour()) / 100;
                 
                 y -= scale * (0.005 * (screenRes.y / 1080));
 

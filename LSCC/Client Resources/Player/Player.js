@@ -17,6 +17,23 @@ mp.events.add("ToggleCanExitVehicle", (toggle) => {
     player.canExitVehicle = toggle;
 })
 
+const BASSFXType = {
+    BASS_FX_DX8_CHORUS: 0,
+    BASS_FX_DX8_COMPRESSOR: 1,
+    BASS_FX_DX8_DISTORTION: 2,
+    BASS_FX_DX8_ECHO: 3,
+    BASS_FX_DX8_FLANGER: 4,
+    BASS_FX_DX8_GARGLE: 5,
+    BASS_FX_DX8_I3DL2REVERB: 6,
+    BASS_FX_DX8_PARAMEQ: 7,
+    BASS_FX_DX8_REVERB: 8,
+    BASS_FX_VOLUME: 9,
+
+    // bass_fx.dll
+    BASS_FX_BFX_PEAKEQ: 65540,
+    BASS_FX_BFX_BQF: 65555
+};
+
 let ping = 69;
 
 let chaseStartVeh = -1;
@@ -843,6 +860,69 @@ mp.keys.bind(lastActionMenuBind, true, actionMenuOpen);
 mp.keys.bind(lastActionMenuBind, false, actionMenuClose);
 mp.keys.bind(lastMDCBind, true, ToggleMDC);
 mp.keys.bind(lastGPSBind, true, TogGPSMode);
+
+
+
+const bassBfxBqfLowpass = 0;
+const bassBfxBqfHighpass = 1;
+const bassBfxChannelAll = -1;
+
+const playerTalkEffects = [];
+
+mp.events.add("playerStopTalking", (player) => {
+    const talker = playerTalkEffects.find(p => p.handle === player.remoteId);
+    if(!talker){
+        mp.gui.chat.push(`no talk data for ${player.name}`);
+        return;
+    }
+    player.removeVoiceFx(talker.bfq);
+    player.removeVoiceFx(talker.peak);
+
+    playerTalkEffects.splice(playerTalkEffects.indexOf(talker), 1);
+});
+mp.events.add("playerStartTalking", (player) => {
+    const bfqHandle = player.setVoiceFx(BASSFXType.BASS_FX_BFX_BQF, 0);
+    const peakEqHandle = player.setVoiceFx(BASSFXType.BASS_FX_BFX_PEAKEQ, 0);
+    player.setVoiceFxBQF(bfqHandle, {
+        lFilter: bassBfxBqfHighpass,
+        fCenter: 900.0,
+        fGain: 0.0, 
+        fBandwidth: 0.86, 
+        fQ: 0.0, 
+        fS: 0.0, 
+        lChannel: bassBfxChannelAll
+    });
+
+    player.setVoiceFxBQF(bfqHandle, {
+        lFilter: bassBfxBqfLowpass,
+        fCenter: 1400.0,
+        fGain: 0.0,
+        fBandwidth: 0.83,
+        fQ: 0.0,
+        fS: 0.0,
+        lChannel: bassBfxChannelAll
+    });
+
+    player.setVoiceFxPeakEq(peakEqHandle, {
+        lBand: 0,
+        fBandwidth: 13.0, 
+        fQ: 1070.0, 
+        fCenter: 0.0, 
+        fGain: 0.3, 
+        lChannel: bassBfxChannelAll
+    });
+
+    player.setVoiceFxPeakEq(peakEqHandle, {
+        lBand: 1,
+        fBandwidth: 13.0,
+        fQ: 1300.0,
+        fCenter: 0.0,
+        fGain: 0.4,
+        lChannel: bassBfxChannelAll
+    });
+
+    playerTalkEffects.push({handle:player.remoteId, bfq:bfqHandle, peak:peakEqHandle});
+});
 
 mp.events.addCommand("gpsbind", function (bind) {
     
