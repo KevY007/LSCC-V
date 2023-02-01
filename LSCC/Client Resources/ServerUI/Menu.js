@@ -1200,10 +1200,10 @@ mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) =>
 });
 
 mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoadout) => {
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.loadoutsTab.$refs.police.loadouts = [];`);
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.loadoutsTab.$refs.fugitive.loadouts = [];`);
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.loadoutsTab.$refs.police.selectedLoadout = "${(currentCopLoadout == "?" ? "Default" : currentCopLoadout)}";`);
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.loadoutsTab.$refs.fugitive.selectedLoadout = "${(currentFugiLoadout == "?" ? "Default" : currentFugiLoadout)}";`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.loadouts = [];`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.loadouts = [];`);
+    //ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.$refs.police.selectedLoadout = "${(currentCopLoadout == "?" ? "Default" : currentCopLoadout)}";`);
+    //ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.$refs.fugitive.selectedLoadout = "${(currentFugiLoadout == "?" ? "Default" : currentFugiLoadout)}";`);
 
     // Loadout Data
     // Name, Locked, Background, Requirements, Weapons
@@ -1211,16 +1211,30 @@ mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoa
     for(let i = 0; i < menuItems.length; i++)
     {
         let insertString = "";
-        if(menuItems[i][0] == 0) insertString = `gm.$refs.mainMenu.$refs.loadoutsTab.$refs.fugitive.loadouts.push({`;
-        else if(menuItems[i][0] == 1) insertString = `gm.$refs.mainMenu.$refs.loadoutsTab.$refs.police.loadouts.push({`;
+
+        insertString = `gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.loadouts.push({`;
         
+        insertString += `"teamId": ${menuItems[i][0]}, `;
         insertString += `"name": "${menuItems[i][1]}", `;
         insertString += `"background": "${menuItems[i][2]}", `;
-        insertString += `"locked": ${menuItems[i][3]}, `;
+        //insertString += `"locked": ${menuItems[i][3]}, `;
         insertString +=  menuItems[i][4];
         insertString +=  menuItems[i][5];
         insertString += "});";
         ServerUI.execute(insertString);
+
+        if(menuItems[i][3] === false){ // if locked == false aka if owns loadout
+            insertString = `gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.loadouts.push({`;
+            
+            insertString += `"teamId": ${menuItems[i][0]}, `;
+            insertString += `"name": "${menuItems[i][1]}", `;
+            insertString += `"background": "${menuItems[i][2]}", `;
+            //insertString += `"locked": ${menuItems[i][3]}, `;
+            insertString +=  menuItems[i][4];
+            insertString +=  menuItems[i][5];
+            insertString += "});";
+            ServerUI.execute(insertString);
+        }
     }
 });
 
