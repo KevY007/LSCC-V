@@ -1173,29 +1173,45 @@ mp.events.add("MenuBuyItem", (name) => {
 // --------------------
 
 mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) => {
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.vehiclesTab.$refs.police.vehicles = [];`);
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.vehiclesTab.$refs.fugitive.vehicles = [];`);
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.vehiclesTab.$refs.police.selectedModel = "${currentCopCar}";`);
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.vehiclesTab.$refs.fugitive.selectedModel = "${currentFugiCar}";`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.vehiclesTab.vehicles = [];`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.vehicles = [];`);
+    //ServerUI.execute(`gm.$refs.mainMenu.$refs.vehiclesTab.$refs.police.selectedModel = "${currentCopCar}";`);
+    //ServerUI.execute(`gm.$refs.mainMenu.$refs.vehiclesTab.$refs.fugitive.selectedModel = "${currentFugiCar}";`);
 
     // Vehicle Data
     // Model, Name, Background, Energy, Price, Locked
     let menuItems = JSON.parse(vehicles);
     for(let i = 0; i < menuItems.length; i++)
     {
-        let insertString = "";
-        if(menuItems[i][0] == 0) insertString = `gm.$refs.mainMenu.$refs.vehiclesTab.$refs.fugitive.vehicles.push({`;
-        else if(menuItems[i][0] == 1) insertString = `gm.$refs.mainMenu.$refs.vehiclesTab.$refs.police.vehicles.push({`;
-        
+        // menuItems[i][0] = team ID | 0 fugitive | 1 cop
+        // menuItems[i][4] = locked true/false | false = owner
+        let insertString = `gm.$refs.mainMenu.$refs.storeTab.$refs.vehiclesTab.vehicles.push({`;
+        insertString += `"id": ${i}, `;
+        insertString += `"teamId": ${menuItems[i][0]}, `;
         insertString += `"model": "${menuItems[i][1]}", `;
         insertString += `"name": "${menuItems[i][2]}", `;
-        insertString += `"background": "${menuItems[i][3]}", `;
-        insertString += `"locked": ${menuItems[i][4]}, `;
-        if(menuItems[i][5].length > 1) insertString += `"speed": "${menuItems[i][5]}", `;
+        insertString += `"image": "${menuItems[i][3]}", `;
+        //insertString += `"locked": ${menuItems[i][4]}, `;
+        insertString += `"speed": "${(menuItems[i][2] !== "Random" ? menuItems[i][5] : "Random")}", `;
         if(menuItems[i][6].length > 1) insertString += `"requirements": ${menuItems[i][6]},`;
         insertString += "});";
 
         ServerUI.execute(insertString);
+        if(menuItems[i][4] === false){ // if locked === false aka if owns vehicle
+            let insertString = `gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.vehicles.push({`;
+            insertString += `"id": ${i}, `;
+            insertString += `"teamId": ${menuItems[i][0]}, `;
+            insertString += `"model": "${menuItems[i][1]}", `;
+            insertString += `"name": "${menuItems[i][2]}", `;
+            insertString += `"image": "${menuItems[i][3]}", `;
+            //insertString += `"locked": ${menuItems[i][4]}, `;
+            insertString += `"speed": "${(menuItems[i][2] !== "Random" ? menuItems[i][5] : "Random")}", `;
+            if(menuItems[i][6].length > 1) insertString += `"requirements": ${menuItems[i][6]},`;
+            insertString += "});";
+
+            ServerUI.execute(insertString);
+        }
+
     }
 });
 
