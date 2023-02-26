@@ -6,6 +6,7 @@ using System.IO;
 using GTANetworkAPI;
 
 using Newtonsoft.Json;
+using GTANetworkMethods;
 
 namespace RNC
 {
@@ -41,12 +42,10 @@ namespace RNC
             return LANG;
         }
 
-        public static string Translate(Player player, string message_code, params object[] args)
+        public static string Translate(int languageID, string message_code, params object[] args)
         {
             try
             {
-                int languageID = (player.HasSharedData("Language") ? player.GetSharedData<int>("Language") : 0);
-
                 string LANG = GetLanguageNameByID(languageID);
                 // Switch-case for other languages.
 
@@ -70,6 +69,20 @@ namespace RNC
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                NAPI.Util.ConsoleOutput(ex.ToString());
+                return $"[ERROR] Error sending message: {ex.Message} | SEND THIS TO THE DEVS.";
+            }
+        }
+
+        public static string Translate(GTANetworkAPI.Player player, string message_code, params object[] args)
+        {
+            try
+            {
+                int languageID = (player.HasSharedData("Language") ? player.GetSharedData<int>("Language") : 0);
+                return Translate(languageID, message_code, args);
             }
             catch (Exception ex)
             {

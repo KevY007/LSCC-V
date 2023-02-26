@@ -5693,7 +5693,7 @@ namespace RNC
                                         {
                                             AdminName = "SERVER",
                                             PostedOn = DateTime.Now.ToShortDateString(),
-                                            Message = "~y~[CLAN OF THE WEEK]~w~ Congratulations! Your clan had the most kills this week and you won a reward! All clans' weekly kills have been reset."
+                                            Message = Translator.Translate(account.Language, "COTW_MOTD", prize)
                                         };
                                         account.MOTD = NAPI.Util.ToJson(motd);
 
@@ -5706,7 +5706,7 @@ namespace RNC
                                             {
                                                 isPlayerOnline = true;
                                                 EPlayer.GivePoints(check, prize);
-                                                EPlayer.SendMessage(check, $"~y~You've received ~w~{prize} Points ~y~as reward for being clan of the week.");
+                                                check.SendChatMessage(Translate(check, "COTW_ONLINE_MESSAGE", prize));
                                             }
                                         });
                                         await NAPI.Task.WaitForMainThread();
@@ -5721,15 +5721,15 @@ namespace RNC
                                         {
                                             AdminName = "SERVER",
                                             PostedOn = DateTime.Now.ToShortDateString(),
-                                            Message = $"~r~[CLAN OF THE WEEK]~w~ Clan {mostKills.Name} won clan of the week. All clans' weekly kills have been reset!"
+                                            Message = Translator.Translate(account.Language, "COTW_OTHER_MOTD", mostKills.Name)
                                         };
                                         account.MOTD = NAPI.Util.ToJson(motd);
                                     }
                                 }
                                 NAPI.Task.Run(() =>
                                 {
-                                    EPlayer.SendMessageAll($"~y~[CLAN OF THE WEEK] ~w~Clan ~g~{mostKills.Name} ~w~had the most kills this week! Congratulations!");
-                                    EPlayer.SendMessageAll($"~y~[>] ~w~ A new week begins and all clans' weekly kills have been reset.");
+                                    EPlayer.SendMessageAll("COTW_OTHER_MESSAGE_1", mostKills.Name);
+                                    EPlayer.SendMessageAll("COTW_OTHER_MESSAGE_2");
                                 });
                             }
                             await context.Clans.AsQueryable().ForEachAsync(c =>
