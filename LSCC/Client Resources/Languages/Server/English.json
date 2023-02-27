@@ -580,5 +580,10 @@
   "ERROR_CLAN_FULL": "That clan has reached its members limit ({MAX MEMBERS NUMBER})! You can't join it at the moment.",
   "ERROR_PAY_INVALID_POINTS": "!{#FF6347}[!] ~w~You can only send between 1 and 10 000 points at once!",
   "SENT_POINTS": "!{#55FF55}[PAY] ~w~You have sent {POINTS} Points to {PLAYER NAME}. !{#AFAFAF}({DATE AND TIME})",
-  "RECEIVED_POINTS": "!{#55FF55}[PAY] ~w~You have received {POINTS} Points from {PLAYER NAME}. !{#AFAFAF}({DATE AND TIME})"
+  "RECEIVED_POINTS": "!{#55FF55}[PAY] ~w~You have received {POINTS} Points from {PLAYER NAME}. !{#AFAFAF}({DATE AND TIME})",
+  "COTW_MOTD":"~y~[CLAN OF THE WEEK]~w~ Congratulations! Your clan had the most kills this week and you won {POINTS} points! All clans' weekly kills have been reset.",
+  "COTW_ONLINE_MESSAGE":"~y~You've received ~w~{POINTS} Points ~y~as reward for being part of the clan of the week.",
+  "COTW_OTHER_MOTD":"~r~[CLAN OF THE WEEK]~w~ Clan {CLAN NAME} won clan of the week. All clans' weekly kills have been reset!",
+  "COTW_OTHER_MESSAGE_1":"~y~[CLAN OF THE WEEK] ~w~Clan ~g~{CLAN NAME} ~w~had the most kills this week! Congratulations!",
+  "COTW_OTHER_MESSAGE_2":"~y~[>] ~w~ A new week begins and all clans' weekly kills have been reset."
 }

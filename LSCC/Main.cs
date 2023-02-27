@@ -2477,12 +2477,15 @@ namespace RNC
             new CarData(1, "Sheriff Alamo", "polalamor", "package://Artwork/Vehicles/polalamor.png", "Slow", 6, 5);
             new CarData(1, "Sheriff Bison", "polbisonr", "package://Artwork/Vehicles/polbisonf.png", "Slow", 6, 8);
             new CarData(1, "Police Bison", "polbisonf", "package://Artwork/Vehicles/polbisonf.png", "Average", 6, 10);
-            new CarData(1, "Police Scout", "pscout", "package://Artwork/Vehicles/pscout.png", "Average+", 6, 10);
-            new CarData(1, "Unmarked Scout", "umkscout", "package://Artwork/Vehicles/umkscout.png", "Average+", 8, 10);
+            new CarData(1, "Police Scout", "polscout", "package://Artwork/Vehicles/polscout.png", "Average+", 6, 10);
+            new CarData(1, "Police Bike 2", "policeb1", "package://Artwork/Vehicles/policeb1.png", "Fast", 6, 15);
+            new CarData(1, "Unmarked Scout", "unmarkedscout", "package://Artwork/Vehicles/unmarkedscout.png", "Average+", 8, 10);
             new CarData(1, "LSPD Crown Vic", "lspdvic", "package://Artwork/Vehicles/lspdvic.png", "Average+", 10, 10);
             new CarData(1, "FBI Granger", "fbi2", "package://Artwork/Vehicles/fbi2.png", "Slow", 10, 15);
             new CarData(1, "Police Buffalo A/C", "polbufac", "package://Artwork/Vehicles/polbufac.png", "Fast", 13, 20);
             new CarData(1, "Police Transporter", "policet", "package://Artwork/Vehicles/policet.png", "Snail", 15);
+            new CarData(1, "Police Alamo", "polalamo", "package://Artwork/Vehicles/polalamo.png", "Fast", 15, 15);
+            new CarData(1, "Unmarked Alamo", "umkalamo", "package://Artwork/Vehicles/umkalamo.png", "Fast", 15, 20);
             new CarData(1, "FBI Buffalo A/C", "fbibufac", "package://Artwork/Vehicles/fbibufac.png", "Fast", 17, 20);
             new CarData(1, "Police Chopper", "polmav", "package://Artwork/Vehicles/polmav.png", "N/A", 20, 20);
             new CarData(1, "AS-350", "as350", "package://Artwork/Vehicles/as350.png", "N/A", 20, 25);
@@ -2493,12 +2496,13 @@ namespace RNC
             new CarData(1, "Sheriff Torrence", "poltorencer", "package://Artwork/Vehicles/poltorencer.png", "Fast", 28, 40);
             new CarData(1, "Police Buffalo SX", "buffalosxpol", "package://Artwork/Vehicles/buffalosxpol.png", "Fast+", 30, 50);
             new CarData(1, "Chevrolet Caprice PPV", "bcso2slick", "package://Artwork/Vehicles/bcso2slick.png", "Fast", 30, 65);
-            new CarData(1, "Vapid Torrence Unmarked", "police3umk", "package://Artwork/Vehicles/police3umk.png", "Fast+", 30, 70);
+            new CarData(1, "Torrence Interceptor", "intcept", "package://Artwork/Vehicles/intcept.png", "Fast+", 30, 65);
+            new CarData(1, "Torrence Unmarked", "intcept2", "package://Artwork/Vehicles/intcept2.png", "Fast+", 30, 70);
             new CarData(1, "Sheriff Gauntlet", "shergauntlet", "package://Artwork/Vehicles/shergauntlet.png", "Fast+", 38, 80);
             new CarData(1, "Sheriff Vigero", "polvigeror", "package://Artwork/Vehicles/polvigeror.png", "Fast+", 45, 70);
             new CarData(1, "Sheriff Buffalo SX", "polbuffalor", "package://Artwork/Vehicles/polbuffalor.png", "Fast+", 50, 70);
             new CarData(1, "Sheriff Buffalo", "polbuffalor2", "package://Artwork/Vehicles/polbuffalor2.png", "Fast+", 50, 75);
-            new CarData(1, "Vapid TARV Bearcat", "bcat", "package://Artwork/Vehicles/bcat.png", "Slow", 55, 100);
+            new CarData(1, "LENCO Bearcat", "bcat", "package://Artwork/Vehicles/bcat.png", "Slow", 55, 100);
 
             // 0-100's Fugitive
             // >9 second mark = Slow
@@ -2530,6 +2534,7 @@ namespace RNC
             new CarData(0, "Tailgater S", "tailgater2", "package://Artwork/Vehicles/tailgater2.png", "Average+", 23, 30);
             new CarData(0, "Sultan", "sultan", "package://Artwork/Vehicles/sultan.png", "Average", 25, 40);
             new CarData(0, "Omnis", "omnis", "package://Artwork/Vehicles/omnis.png", "Fast", 25, 50);
+            new CarData(0, "Scout", "scout", "package://Artwork/Vehicles/scout.png", "Fast", 30, 40);
             new CarData(0, "Tulip SS", "tulip2", "package://Artwork/Vehicles/tulip2.png", "Fast", 30, 50);
             //new CarData(0, "Kuruma", "kuruma", "package://Artwork/Vehicles/kuruma.png", "Fast", 30, 60); KURUMA TEMPORARILY REMOVED UNTIL BULLET PROOF GTA ONLIEN BUG FIX
             new CarData(0, "Buffalo SX", "buffalosx", "package://Artwork/Vehicles/buffalosx.png", "Fast+", 30, 70);
