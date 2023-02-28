@@ -10,6 +10,38 @@ const ItemsCollection = NativeUI.ItemsCollection;
 const Color = NativeUI.Color;
 const ListItem = NativeUI.ListItem;
 
+var ClothesMenuMode = -1;
+/*
+ MODES:
+ 1 = EUP COP
+ 2 = RESTRICTED FUGITIVE
+ -1 = ALL
+*/
+var ClothesMenuGender = 'U';
+
+var menuClothingJackets;
+var menuClothingShirts;
+var menuClothingPants;
+var menuClothingShoes;
+var menuClothingAccessories;
+var menuClothingBags;
+var menuClothingArmor;
+var menuClothingExit;
+var JacketsItem;
+var JacketsTextureItem;
+var ShirtsItem;
+var ShirtsTextureItem;
+var PantsItem;
+var PantsTextureItem;
+var ShoesItem;
+var ShoesTextureItem;
+var AccessoriesItem;
+var AccessoriesTextureItem;
+var BagsItem;
+var BagsTextureItem;
+var ArmorItem;
+var ArmorTextureItem;
+
 let player = mp.players.local;
 
 let todosMenus = [];
@@ -26,6 +58,7 @@ menuClothing.AddItem(menuClothingItem8 = new UIMenuItem("Glasses", "Select your 
 menuClothing.AddItem(menuClothingItem10 = new UIMenuItem("Bags", "Select your bag."));
 menuClothing.AddItem(menuClothingItem1 = new UIMenuItem("Masks", "Select your mask."));
 menuClothing.AddItem(menuClothingItem9 = new UIMenuItem("Accessories", "Select your accessories."));
+menuClothing.AddItem(menuClothingItem9 = new UIMenuItem("Armor", "Select your armor."));
 
 menuClothing.Visible = false;
 todosMenus.push(menuClothing);
@@ -156,226 +189,24 @@ menuClothingHats.ItemSelect.on((item, index) => {
 // MENU Jackets COMPONENT 11
 ///////////////////////////////////////////////////////
 
-// Drawable
-let JacketsDrawable = [];
-for (i = 0; i < player.getNumberOfDrawableVariations(11) + 1; i++) JacketsDrawable.push(i.toString());
 
-
-let numJacketsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
-//JacketsDrawable.splice(JacketsDrawable.length-141+numJacketsInstalled);
-JacketsDrawable.splice(JacketsDrawable.length+numJacketsInstalled);
-
-// Texture
-let JacketsTextureArray = [0];
-let JacketsTextureLimite = player.getNumberOfTextureVariations(11, player.getDrawableVariation(11));
-for (i = 0; i < JacketsTextureLimite + 1; i++) JacketsTextureArray.push(i.toString());
-
-const menuClothingJackets = new Menu("Shirts", "", new Point(50, 50));
-menuClothingJacketsExit = null;
-let JacketsItem = new UIMenuListItem("Shirts", "Select your shirt.", new ItemsCollection(JacketsDrawable), player.getDrawableVariation(11));
-let JacketsTextureItem = new UIMenuListItem("Color", "Select your shirt's color.", new ItemsCollection(JacketsTextureArray), player.getTextureVariation(11));
-menuClothingJackets.AddItem(JacketsItem);
-menuClothingJackets.AddItem(JacketsTextureItem);
-menuClothingJackets.ParentMenu = menuClothing;
-menuClothingJackets.Visible = false;
-todosMenus.push(menuClothingJackets);
-
-menuClothingJackets.ListChange.on((item, listIndex) => {
-	let drawable = parseInt(JacketsItem.SelectedItem.DisplayText);
-	let texture = parseInt(JacketsTextureItem.SelectedItem.DisplayText);
-    switch (item) {
-    	case JacketsItem:
-    		mp.events.callRemote('RequestSetClothes', 11, drawable, 0);
-    		JacketsTextureNewArray = [];
-			for (i = 0; i < player.getNumberOfTextureVariations(11, player.getDrawableVariation(11)) + 1; i++) JacketsTextureNewArray.push(i.toString());
-    		JacketsTextureItem.Collection = new NativeUI.ItemsCollection(JacketsTextureNewArray).getListItems();
-    		JacketsTextureItem.Index = 0;
-    	break
-
-    	case JacketsTextureItem:
-    		mp.events.callRemote('RequestSetClothes', 11, drawable, texture);
-    }
-});
-
-menuClothingJackets.ItemSelect.on((item, index) => {
-    switch (item.Text) {
-
-        case "Exit":
-            menuClothingJackets.RemoveItem(menuClothingJacketsExit);
-            menuClothingJacketsExit = null;
-
-            menuClothingJackets.Visible = false;
-            menuClothing.Visible = true;
-        break;
-    }
-});
 ///////////////////////////////////////////////////////
 // MENU Shirts COMPONENT 8
 ///////////////////////////////////////////////////////
 
 
-let ShirtsDrawable = [];
-for (i = 0; i < player.getNumberOfDrawableVariations(8) + 1; i++) ShirtsDrawable.push(i.toString());
-
-
-let numShirtsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
-//ShirtsDrawable.splice(ShirtsDrawable.length-160+numShirtsInstalled);
-ShirtsDrawable.splice(ShirtsDrawable.length+numShirtsInstalled);
-
-let ShirtsTextureArray = [0];
-let ShirtsTextureLimite = player.getNumberOfTextureVariations(8, player.getDrawableVariation(8));
-for (i = 0; i < ShirtsTextureLimite + 1; i++) ShirtsTextureArray.push(i.toString());
-
-const menuClothingShirts = new Menu("Undershirts", "", new Point(50, 50));
-menuClothingShirtsExit = null;
-let ShirtsItem = new UIMenuListItem("Undershirts", "Select your undershirt.", new ItemsCollection(ShirtsDrawable), player.getDrawableVariation(8));
-let ShirtsTextureItem = new UIMenuListItem("Color", "Select your undershirt's color.", new ItemsCollection(ShirtsTextureArray), player.getTextureVariation(8));
-menuClothingShirts.AddItem(ShirtsItem);
-menuClothingShirts.AddItem(ShirtsTextureItem);
-menuClothingShirts.ParentMenu = menuClothing;
-menuClothingShirts.Visible = false;
-todosMenus.push(menuClothingShirts);
-
-menuClothingShirts.ListChange.on((item, listIndex) => {
-	let drawable = parseInt(ShirtsItem.SelectedItem.DisplayText);
-	let texture = parseInt(ShirtsTextureItem.SelectedItem.DisplayText);
-    switch (item) {
-    	case ShirtsItem:
-    		mp.events.callRemote('RequestSetClothes', 8, drawable, 0);
-    		ShirtsTextureNewArray = [];
-			for (i = 0; i < player.getNumberOfTextureVariations(8, player.getDrawableVariation(8)) + 1; i++) ShirtsTextureNewArray.push(i.toString());
-    		ShirtsTextureItem.Collection = new NativeUI.ItemsCollection(ShirtsTextureNewArray).getListItems();
-    		ShirtsTextureItem.Index = 0;
-    	break
-
-    	case ShirtsTextureItem:
-    		mp.events.callRemote('RequestSetClothes', 8, drawable, texture);
-    }
-});
-
-menuClothingShirts.ItemSelect.on((item, index) => {
-    switch (item.Text) {
-
-        case "Exit":
-            menuClothingShirts.RemoveItem(menuClothingShirtsExit);
-            menuClothingShirtsExit = null;
-
-            menuClothingShirts.Visible = false;
-            menuClothing.Visible = true;
-        break;
-    }
-});
 
 ///////////////////////////////////////////////////////
 // MENU CALÇAS COMPONENT 4
 ///////////////////////////////////////////////////////
 
-let PantsDrawable = [];
-for (i = 0; i < player.getNumberOfDrawableVariations(4) + 1; i++) PantsDrawable.push(i.toString());
 
-
-let numPantsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
-//PantsDrawable.splice(PantsDrawable.length-161+numPantsInstalled);
-PantsDrawable.splice(PantsDrawable.length+numPantsInstalled);
-
-let PantsTextureArray = [0];
-let PantsTextureLimite = player.getNumberOfTextureVariations(4, player.getDrawableVariation(4));
-for (i = 0; i < PantsTextureLimite + 1; i++) PantsTextureArray.push(i.toString());
-
-const menuClothingPants = new Menu("Pants", "", new Point(50, 50));
-menuClothingPantsExit = null;
-let PantsItem = new UIMenuListItem("Pants", "Select your pants.", new ItemsCollection(PantsDrawable), player.getDrawableVariation(4));
-let PantsTextureItem = new UIMenuListItem("Color", "Select your pants color.", new ItemsCollection(PantsTextureArray), player.getTextureVariation(4));
-menuClothingPants.AddItem(PantsItem);
-menuClothingPants.AddItem(PantsTextureItem);
-menuClothingPants.ParentMenu = menuClothing;
-menuClothingPants.Visible = false;
-todosMenus.push(menuClothingPants);
-
-menuClothingPants.ListChange.on((item, listIndex) => {
-    let drawable = parseInt(PantsItem.SelectedItem.DisplayText);
-    let texture = parseInt(PantsTextureItem.SelectedItem.DisplayText);
-    switch (item) {
-        case PantsItem:
-            mp.events.callRemote('RequestSetClothes', 4, drawable, 0);
-            PantsTextureNewArray = [];
-            for (i = 0; i < player.getNumberOfTextureVariations(4, player.getDrawableVariation(4)) + 1; i++) PantsTextureNewArray.push(i.toString());
-            PantsTextureItem.Collection = new NativeUI.ItemsCollection(PantsTextureNewArray).getListItems();
-            PantsTextureItem.Index = 0;
-        break
-
-        case PantsTextureItem:
-            mp.events.callRemote('RequestSetClothes', 4, drawable, texture);
-    }
-});
-
-menuClothingPants.ItemSelect.on((item, index) => {
-    switch (item.Text) {
-
-        case "Exit":
-            menuClothingPants.RemoveItem(menuClothingPantsExit);
-            menuClothingPantsExit = null;
-
-            menuClothingPants.Visible = false;
-            menuClothing.Visible = true;
-        break;
-    }
-});
 
 ///////////////////////////////////////////////////////
 // MENU Shoes COMPONENT 6
 ///////////////////////////////////////////////////////
 
-let ShoesDrawable = [];
-for (i = 0; i < player.getNumberOfDrawableVariations(6) + 1; i++) ShoesDrawable.push(i.toString());
 
-let numShoesInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
-//ShoesDrawable.splice(ShoesDrawable.length-151+numShoesInstalled);
-ShoesDrawable.splice(ShoesDrawable.length+numShoesInstalled);
-
-let ShoesTextureArray = [0];
-let ShoesTextureLimite = player.getNumberOfTextureVariations(6, player.getDrawableVariation(6));
-for (i = 0; i < ShoesTextureLimite + 1; i++) ShoesTextureArray.push(i.toString());
-
-const menuClothingShoes = new Menu("Shoes", "", new Point(50, 50));
-menuClothingShoesExit = null;
-let ShoesItem = new UIMenuListItem("Shoes", "Select your shoes.", new ItemsCollection(ShoesDrawable), player.getDrawableVariation(6));
-let ShoesTextureItem = new UIMenuListItem("Color", "Select your shoes color.", new ItemsCollection(ShoesTextureArray), player.getTextureVariation(6));
-menuClothingShoes.AddItem(ShoesItem);
-menuClothingShoes.AddItem(ShoesTextureItem);
-menuClothingShoes.ParentMenu = menuClothing;
-menuClothingShoes.Visible = false;
-todosMenus.push(menuClothingShoes);
-
-menuClothingShoes.ListChange.on((item, listIndex) => {
-    let drawable = parseInt(ShoesItem.SelectedItem.DisplayText);
-    let texture = parseInt(ShoesTextureItem.SelectedItem.DisplayText);
-    switch (item) {
-        case ShoesItem:
-            mp.events.callRemote('RequestSetClothes', 6, drawable, 0);
-            ShoesTextureNewArray = [];
-            for (i = 0; i < player.getNumberOfTextureVariations(6, player.getDrawableVariation(6)) + 1; i++) ShoesTextureNewArray.push(i.toString());
-            ShoesTextureItem.Collection = new NativeUI.ItemsCollection(ShoesTextureNewArray).getListItems();
-            ShoesTextureItem.Index = 0;
-        break
-
-        case ShoesTextureItem:
-            mp.events.callRemote('RequestSetClothes', 6, drawable, texture);
-    }
-});
-
-menuClothingShoes.ItemSelect.on((item, index) => {
-    switch (item.Text) {
-
-        case "Exit":
-            menuClothingShoes.RemoveItem(menuClothingShoesExit);
-            menuClothingShoesExit = null;
-
-            menuClothingShoes.Visible = false;
-            menuClothing.Visible = true;
-        break;
-    }
-});
 
 ///////////////////////////////////////////////////////
 // MENU MÃOS COMPONENT 3
@@ -490,117 +321,13 @@ menuClothingGlasses.ItemSelect.on((item, index) => {
     }
 });
 
-///////////////////////////////////////////////////////
-// MENU ACESSÓRIOS COMPONENT 7
-///////////////////////////////////////////////////////
-
-let AccessoriesDrawable = [];
-for (i = 0; i < player.getNumberOfDrawableVariations(7) + 1; i++) AccessoriesDrawable.push(i.toString());
+//
 
 
-let numAccessoriesInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
-//AccessoriesDrawable.splice(AccessoriesDrawable.length-161+numAccessoriesInstalled);
-AccessoriesDrawable.splice(AccessoriesDrawable.length+numAccessoriesInstalled);
 
-let AccessoriesTextureArray = [0];
-let AccessoriesTextureLimite = player.getNumberOfTextureVariations(7, player.getDrawableVariation(7));
-for (i = 0; i < AccessoriesTextureLimite + 1; i++) AccessoriesTextureArray.push(i.toString());
-
-const menuClothingAccessories = new Menu("Accessories", "", new Point(50, 50));
-menuClothingAccessoriesExit = null;
-let AccessoriesItem = new UIMenuListItem("Accessories", "Select your accessories.", new ItemsCollection(AccessoriesDrawable), player.getDrawableVariation(7));
-let AccessoriesTextureItem = new UIMenuListItem("Color", "Select your accessories color.", new ItemsCollection(AccessoriesTextureArray), player.getTextureVariation(7));
-menuClothingAccessories.AddItem(AccessoriesItem);
-menuClothingAccessories.AddItem(AccessoriesTextureItem);
-menuClothingAccessories.ParentMenu = menuClothing;
-menuClothingAccessories.Visible = false;
-todosMenus.push(menuClothingAccessories);
-
-menuClothingAccessories.ListChange.on((item, listIndex) => {
-    let drawable = parseInt(AccessoriesItem.SelectedItem.DisplayText);
-    let texture = parseInt(AccessoriesTextureItem.SelectedItem.DisplayText);
-    switch (item) {
-        case AccessoriesItem:
-            mp.events.callRemote('RequestSetClothes', 7, drawable, 0);
-            AccessoriesTextureNewArray = [];
-            for (i = 0; i < player.getNumberOfTextureVariations(7, player.getDrawableVariation(7)) + 1; i++) AccessoriesTextureNewArray.push(i.toString());
-            AccessoriesTextureItem.Collection = new NativeUI.ItemsCollection(AccessoriesTextureNewArray).getListItems();
-            AccessoriesTextureItem.Index = 0;
-        break
-
-        case AccessoriesTextureItem:
-            mp.events.callRemote('RequestSetClothes', 7, drawable, texture);
-    }
-});
-
-menuClothingAccessories.ItemSelect.on((item, index) => {
-    switch (item.Text) {
-
-        case "Exit":
-            menuClothingAccessories.RemoveItem(menuClothingAccessoriesExit);
-            menuClothingAccessoriesExit = null;
-
-            menuClothingAccessories.Visible = false;
-            menuClothing.Visible = true;
-        break;
-    }
-});
-
-///////////////////////////////////////////////////////
-// MENU Bags COMPONENT 5
-///////////////////////////////////////////////////////
-
-let BagsDrawable = [];
-for (i = 0; i < player.getNumberOfDrawableVariations(5) + 1; i++) BagsDrawable.push(i.toString());
+//
 
 
-let numBagsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
-//BagsDrawable.splice(BagsDrawable.length-151+numBagsInstalled);
-BagsDrawable.splice(BagsDrawable.length+numBagsInstalled);
-
-let BagsTextureArray = [0];
-let BagsTextureLimite = player.getNumberOfTextureVariations(5, player.getDrawableVariation(5));;
-for (i = 0; i < BagsTextureLimite + 1; i++) BagsTextureArray.push(i.toString());
-
-const menuClothingBags = new Menu("Bags", "", new Point(50, 50));
-menuClothingBagsExit = null;
-let BagsItem = new UIMenuListItem("Bags", "Select your bag.", new ItemsCollection(BagsDrawable), player.getDrawableVariation(5));
-let BagsTextureItem = new UIMenuListItem("Color", "Select your bag's color.", new ItemsCollection(BagsTextureArray), player.getTextureVariation(5));
-menuClothingBags.AddItem(BagsItem);
-menuClothingBags.AddItem(BagsTextureItem);
-menuClothingBags.ParentMenu = menuClothing;
-menuClothingBags.Visible = false;
-todosMenus.push(menuClothingBags);
-
-menuClothingBags.ListChange.on((item, listIndex) => {
-    let drawable = parseInt(BagsItem.SelectedItem.DisplayText);
-    let texture = parseInt(BagsTextureItem.SelectedItem.DisplayText);
-    switch (item) {
-        case BagsItem:
-            mp.events.callRemote('RequestSetClothes', 5, drawable, 0);
-            BagsTextureNewArray = [];
-            for (i = 0; i < player.getNumberOfTextureVariations(5, player.getDrawableVariation(5)) + 1; i++) BagsTextureNewArray.push(i.toString());
-            BagsTextureItem.Collection = new NativeUI.ItemsCollection(BagsTextureNewArray).getListItems();
-            BagsTextureItem.Index = 0;
-        break
-
-        case BagsTextureItem:
-            mp.events.callRemote('RequestSetClothes', 5, drawable, texture);
-    }
-});
-
-menuClothingBags.ItemSelect.on((item, index) => {
-    switch (item.Text) {
-
-        case "Exit":
-            menuClothingBags.RemoveItem(menuClothingBagsExit);
-            menuClothingBagsExit = null;
-
-            menuClothingBags.Visible = false;
-            menuClothing.Visible = true;
-        break;
-    }
-});
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /*
@@ -739,13 +466,618 @@ menuClothing.ItemSelect.on((item, index) => {
         break;
 
         case 10:
+            menuClothing.Visible = false;
+            menuClothingArmor.Visible = true;
+
+            if(menuClothingArmorExit == null)
+            {
+                menuClothingArmorExit = new UIMenuItem("Exit", "Go back to last menu.");
+                menuClothingArmorExit.ForeColor = new Color(127, 237, 28);
+                menuClothingArmor.AddItem(menuClothingArmorExit);
+            }
+        break;
+
+        case 11:
             menuClothing.Close();
         break;
     }
 });
 
-mp.events.add("ShowClothesMenu", () =>
+function getDrawablesListForMenus(mode, gender){
+
+    let JacketsDrawable, ShirtsDrawable, PantsDrawable, ShoesDrawable, AccessoriesDrawable, BagsDrawable, ArmorDrawable;
+    let JacketsTextureArray, ShirtsTextureArray, PantsTextureArray, ShoesTextureArray, AccessoriesTextureArray, BagsTextureArray, ArmorTextureArray;
+    
+
+    if(mode === -1){
+        JacketsDrawable = [];
+        for (i = 0; i < player.getNumberOfDrawableVariations(11) + 1; i++) JacketsDrawable.push(i.toString());
+
+        let numJacketsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+        //JacketsDrawable.splice(JacketsDrawable.length-141+numJacketsInstalled);
+        JacketsDrawable.splice(JacketsDrawable.length+numJacketsInstalled);
+
+        // Texture
+        JacketsTextureArray = [0];
+        let JacketsTextureLimite = player.getNumberOfTextureVariations(11, player.getDrawableVariation(11));
+        for (i = 0; i < JacketsTextureLimite + 1; i++) JacketsTextureArray.push(i.toString());
+
+
+        ShirtsDrawable = [];
+        for (i = 0; i < player.getNumberOfDrawableVariations(8) + 1; i++) ShirtsDrawable.push(i.toString());
+
+        let numShirtsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+        //ShirtsDrawable.splice(ShirtsDrawable.length-160+numShirtsInstalled);
+        ShirtsDrawable.splice(ShirtsDrawable.length+numShirtsInstalled);
+
+        ShirtsTextureArray = [0];
+        let ShirtsTextureLimite = player.getNumberOfTextureVariations(8, player.getDrawableVariation(8));
+        for (i = 0; i < ShirtsTextureLimite + 1; i++) ShirtsTextureArray.push(i.toString());
+
+        PantsDrawable = [];
+        for (i = 0; i < player.getNumberOfDrawableVariations(4) + 1; i++) PantsDrawable.push(i.toString());
+
+
+        let numPantsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+        //PantsDrawable.splice(PantsDrawable.length-161+numPantsInstalled);
+        PantsDrawable.splice(PantsDrawable.length+numPantsInstalled);
+
+        PantsTextureArray = [0];
+        let PantsTextureLimite = player.getNumberOfTextureVariations(4, player.getDrawableVariation(4));
+        for (i = 0; i < PantsTextureLimite + 1; i++) PantsTextureArray.push(i.toString());
+
+
+        ShoesDrawable = [];
+        for (i = 0; i < player.getNumberOfDrawableVariations(6) + 1; i++) ShoesDrawable.push(i.toString());
+
+        let numShoesInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+        //ShoesDrawable.splice(ShoesDrawable.length-151+numShoesInstalled);
+        ShoesDrawable.splice(ShoesDrawable.length+numShoesInstalled);
+
+        ShoesTextureArray = [0];
+        let ShoesTextureLimite = player.getNumberOfTextureVariations(6, player.getDrawableVariation(6));
+        for (i = 0; i < ShoesTextureLimite + 1; i++) ShoesTextureArray.push(i.toString());
+
+        AccessoriesDrawable = [];
+        for (i = 0; i < player.getNumberOfDrawableVariations(7) + 1; i++) AccessoriesDrawable.push(i.toString());
+
+
+        let numAccessoriesInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+        //AccessoriesDrawable.splice(AccessoriesDrawable.length-161+numAccessoriesInstalled);
+        AccessoriesDrawable.splice(AccessoriesDrawable.length+numAccessoriesInstalled);
+
+        AccessoriesTextureArray = [0];
+        let AccessoriesTextureLimite = player.getNumberOfTextureVariations(7, player.getDrawableVariation(7));
+        for (i = 0; i < AccessoriesTextureLimite + 1; i++) AccessoriesTextureArray.push(i.toString());
+
+
+        BagsDrawable = [];
+        for (i = 0; i < player.getNumberOfDrawableVariations(5) + 1; i++) BagsDrawable.push(i.toString());
+
+        let numBagsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+        //BagsDrawable.splice(BagsDrawable.length-151+numBagsInstalled);
+        BagsDrawable.splice(BagsDrawable.length+numBagsInstalled);
+
+        BagsTextureArray = [0];
+        let BagsTextureLimite = player.getNumberOfTextureVariations(5, player.getDrawableVariation(5));;
+        for (i = 0; i < BagsTextureLimite + 1; i++) BagsTextureArray.push(i.toString());
+
+        ArmorDrawable = [-1];
+    
+        ArmorTextureArray = [0];
+    }
+    else{
+        if(mode === 1){
+            if(gender === 'M'){
+                JacketsDrawable = [];
+                for(let i = 446 ; i <= 499 ; i++) JacketsDrawable.push(i.toString());
+
+                ShirtsDrawable = ['15'];
+                for(let i = 199 ; i <= 244 ; i++) ShirtsDrawable.push(i.toString());
+
+                PantsDrawable = [];
+                for(let i = 163 ; i <= 175 ; i++) PantsDrawable.push(i.toString());
+
+                ShoesDrawable = ['126', '127', '24', '25'];
+
+                AccessoriesDrawable = ['0'];  
+                for(let i = 167 ; i <= 184 ; i++) AccessoriesDrawable.push(i.toString());
+    
+                BagsDrawable = ['0'];
+                for(let i = 111 ; i <= 145 ; i++) BagsDrawable.push(i.toString());
+
+                ArmorDrawable = ['0'];
+                for(let i = 62 ; i <= 82 ; i++) ArmorDrawable.push(i.toString());
+            }
+            else if(gender === 'F'){
+                JacketsDrawable = [];
+                for(let i = 474 ; i <= 522 ; i++) JacketsDrawable.push(i.toString());
+
+                ShirtsDrawable = ['15'];
+                for(let i = 238 ; i <= 279 ; i++) ShirtsDrawable.push(i.toString());
+
+                PantsDrawable = [];
+                for(let i = 171 ; i <= 176 ; i++) PantsDrawable.push(i.toString());
+
+                ShoesDrawable = ['25', '27'];
+
+                AccessoriesDrawable = ['0'];  
+                for(let i = 136 ; i <= 147 ; i++) AccessoriesDrawable.push(i.toString());
+    
+                BagsDrawable = ['0'];
+                for(let i = 111 ; i <= 141 ; i++) BagsDrawable.push(i.toString());
+
+                ArmorDrawable = ['0'];
+                for(let i = 57 ; i <= 81 ; i++) ArmorDrawable.push(i.toString());
+            }
+    
+            let numJacketsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+            //JacketsDrawable.splice(JacketsDrawable.length-141+numJacketsInstalled);
+            JacketsDrawable.splice(JacketsDrawable.length+numJacketsInstalled);
+    
+            // Texture
+            JacketsTextureArray = [0];
+            let JacketsTextureLimite = player.getNumberOfTextureVariations(11, player.getDrawableVariation(11));
+            for (i = 0; i < JacketsTextureLimite + 1; i++) JacketsTextureArray.push(i.toString());
+    
+    
+            let numShirtsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+            //ShirtsDrawable.splice(ShirtsDrawable.length-160+numShirtsInstalled);
+            ShirtsDrawable.splice(ShirtsDrawable.length+numShirtsInstalled);
+    
+            ShirtsTextureArray = [0];
+            let ShirtsTextureLimite = player.getNumberOfTextureVariations(8, player.getDrawableVariation(8));
+            for (i = 0; i < ShirtsTextureLimite + 1; i++) ShirtsTextureArray.push(i.toString());
+    
+    
+    
+            let numPantsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+            //PantsDrawable.splice(PantsDrawable.length-161+numPantsInstalled);
+            PantsDrawable.splice(PantsDrawable.length+numPantsInstalled);
+    
+            PantsTextureArray = [0];
+            let PantsTextureLimite = player.getNumberOfTextureVariations(4, player.getDrawableVariation(4));
+            for (i = 0; i < PantsTextureLimite + 1; i++) PantsTextureArray.push(i.toString());
+    
+    
+            let numShoesInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+            //ShoesDrawable.splice(ShoesDrawable.length-151+numShoesInstalled);
+            ShoesDrawable.splice(ShoesDrawable.length+numShoesInstalled);
+    
+            ShoesTextureArray = [0];
+            let ShoesTextureLimite = player.getNumberOfTextureVariations(6, player.getDrawableVariation(6));
+            for (i = 0; i < ShoesTextureLimite + 1; i++) ShoesTextureArray.push(i.toString());
+     
+    
+            let numAccessoriesInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+            //AccessoriesDrawable.splice(AccessoriesDrawable.length-161+numAccessoriesInstalled);
+            AccessoriesDrawable.splice(AccessoriesDrawable.length+numAccessoriesInstalled);
+    
+            AccessoriesTextureArray = [0];
+            let AccessoriesTextureLimite = player.getNumberOfTextureVariations(7, player.getDrawableVariation(7));
+            for (i = 0; i < AccessoriesTextureLimite + 1; i++) AccessoriesTextureArray.push(i.toString());
+    
+    
+            let numBagsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+            //BagsDrawable.splice(BagsDrawable.length-151+numBagsInstalled);
+            BagsDrawable.splice(BagsDrawable.length+numBagsInstalled);
+    
+            BagsTextureArray = [0];
+            let BagsTextureLimite = player.getNumberOfTextureVariations(5, player.getDrawableVariation(5));;
+            for (i = 0; i < BagsTextureLimite + 1; i++) BagsTextureArray.push(i.toString());
+
+    
+            let numArmorInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+            //BagsDrawable.splice(BagsDrawable.length-151+numBagsInstalled);
+            BagsDrawable.splice(ArmorDrawable.length+numArmorInstalled);
+    
+            ArmorTextureArray = [0];
+            let ArmorDrawableLimite = player.getNumberOfTextureVariations(5, player.getDrawableVariation(5));;
+            for (i = 0; i < ArmorDrawableLimite + 1; i++) ArmorTextureArray.push(i.toString());
+        }
+        else if(mode === 2){
+            if(gender === 'M'){
+                JacketsDrawable = [];
+                for(let i = 0 ; i <= 445 ; i++) JacketsDrawable.push(i.toString());
+
+                ShirtsDrawable = [];
+                for(let i = 0 ; i <= 198 ; i++) ShirtsDrawable.push(i.toString());
+
+                PantsDrawable = [];
+                for(let i = 0 ; i <= 162 ; i++) PantsDrawable.push(i.toString());
+
+                ShoesDrawable = [];
+                for(let i = 0 ; i <= 125 ; i++) ShoesDrawable.push(i.toString());
+
+                AccessoriesDrawable = [];  
+                for(let i = 0 ; i <= 166 ; i++) AccessoriesDrawable.push(i.toString());
+    
+                BagsDrawable = [];
+                for(let i = 0 ; i <= 110 ; i++) BagsDrawable.push(i.toString());
+
+                ArmorDrawable = ['0'];
+            }
+            else if(gender === 'F'){
+                JacketsDrawable = [];
+                for(let i = 0 ; i <= 473 ; i++) JacketsDrawable.push(i.toString());
+
+                ShirtsDrawable = [];
+                for(let i = 0 ; i <= 237 ; i++) ShirtsDrawable.push(i.toString());
+
+                PantsDrawable = [];
+                for(let i = 0 ; i <= 170 ; i++) PantsDrawable.push(i.toString());
+
+                ShoesDrawable = [];
+                for(let i = 0 ; i <= 125 ; i++) ShoesDrawable.push(i.toString());
+
+                AccessoriesDrawable = [];  
+                for(let i = 0 ; i <= 135 ; i++) AccessoriesDrawable.push(i.toString());
+    
+                BagsDrawable = [];
+                for(let i = 0 ; i <= 110 ; i++) BagsDrawable.push(i.toString());
+
+                ArmorDrawable = ['0'];
+            }
+    
+            let numJacketsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+            //JacketsDrawable.splice(JacketsDrawable.length-141+numJacketsInstalled);
+            JacketsDrawable.splice(JacketsDrawable.length+numJacketsInstalled);
+    
+            // Texture
+            JacketsTextureArray = [0];
+            let JacketsTextureLimite = player.getNumberOfTextureVariations(11, player.getDrawableVariation(11));
+            for (i = 0; i < JacketsTextureLimite + 1; i++) JacketsTextureArray.push(i.toString());
+    
+    
+            let numShirtsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+            //ShirtsDrawable.splice(ShirtsDrawable.length-160+numShirtsInstalled);
+            ShirtsDrawable.splice(ShirtsDrawable.length+numShirtsInstalled);
+    
+            ShirtsTextureArray = [0];
+            let ShirtsTextureLimite = player.getNumberOfTextureVariations(8, player.getDrawableVariation(8));
+            for (i = 0; i < ShirtsTextureLimite + 1; i++) ShirtsTextureArray.push(i.toString());
+    
+    
+    
+            let numPantsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+            //PantsDrawable.splice(PantsDrawable.length-161+numPantsInstalled);
+            PantsDrawable.splice(PantsDrawable.length+numPantsInstalled);
+    
+            PantsTextureArray = [0];
+            let PantsTextureLimite = player.getNumberOfTextureVariations(4, player.getDrawableVariation(4));
+            for (i = 0; i < PantsTextureLimite + 1; i++) PantsTextureArray.push(i.toString());
+    
+    
+            let numShoesInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+            //ShoesDrawable.splice(ShoesDrawable.length-151+numShoesInstalled);
+            ShoesDrawable.splice(ShoesDrawable.length+numShoesInstalled);
+    
+            ShoesTextureArray = [0];
+            let ShoesTextureLimite = player.getNumberOfTextureVariations(6, player.getDrawableVariation(6));
+            for (i = 0; i < ShoesTextureLimite + 1; i++) ShoesTextureArray.push(i.toString());
+     
+    
+            let numAccessoriesInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+            //AccessoriesDrawable.splice(AccessoriesDrawable.length-161+numAccessoriesInstalled);
+            AccessoriesDrawable.splice(AccessoriesDrawable.length+numAccessoriesInstalled);
+    
+            AccessoriesTextureArray = [0];
+            let AccessoriesTextureLimite = player.getNumberOfTextureVariations(7, player.getDrawableVariation(7));
+            for (i = 0; i < AccessoriesTextureLimite + 1; i++) AccessoriesTextureArray.push(i.toString());
+    
+    
+            let numBagsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+            //BagsDrawable.splice(BagsDrawable.length-151+numBagsInstalled);
+            BagsDrawable.splice(BagsDrawable.length+numBagsInstalled);
+    
+            BagsTextureArray = [0];
+            let BagsTextureLimite = player.getNumberOfTextureVariations(5, player.getDrawableVariation(5));;
+            for (i = 0; i < BagsTextureLimite + 1; i++) BagsTextureArray.push(i.toString());
+
+    
+            let numArmorInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
+            //BagsDrawable.splice(BagsDrawable.length-151+numBagsInstalled);
+            BagsDrawable.splice(ArmorDrawable.length+numArmorInstalled);
+    
+            ArmorTextureArray = [0];
+            let ArmorDrawableLimite = player.getNumberOfTextureVariations(5, player.getDrawableVariation(5));;
+            for (i = 0; i < ArmorDrawableLimite + 1; i++) ArmorTextureArray.push(i.toString());
+        }
+    }
+
+    menuClothingJackets = new Menu("Shirts", "", new Point(50, 50));
+    menuClothingJacketsExit = null;
+    JacketsItem = new UIMenuListItem("Shirts", "Select your shirt.", new ItemsCollection(JacketsDrawable), player.getDrawableVariation(11));
+    JacketsTextureItem = new UIMenuListItem("Color", "Select your shirt's color.", new ItemsCollection(JacketsTextureArray), player.getTextureVariation(11));
+    menuClothingJackets.AddItem(JacketsItem);
+    menuClothingJackets.AddItem(JacketsTextureItem);
+    menuClothingJackets.ParentMenu = menuClothing;
+    menuClothingJackets.Visible = false;
+    todosMenus.push(menuClothingJackets);
+
+    menuClothingShirts = new Menu("Undershirts", "", new Point(50, 50));
+    menuClothingShirtsExit = null;
+    ShirtsItem = new UIMenuListItem("Undershirts", "Select your undershirt.", new ItemsCollection(ShirtsDrawable), player.getDrawableVariation(8));
+    ShirtsTextureItem = new UIMenuListItem("Color", "Select your undershirt's color.", new ItemsCollection(ShirtsTextureArray), player.getTextureVariation(8));
+    menuClothingShirts.AddItem(ShirtsItem);
+    menuClothingShirts.AddItem(ShirtsTextureItem);
+    menuClothingShirts.ParentMenu = menuClothing;
+    menuClothingShirts.Visible = false;
+    todosMenus.push(menuClothingShirts);
+
+    menuClothingPants = new Menu("Pants", "", new Point(50, 50));
+    menuClothingPantsExit = null;
+    PantsItem = new UIMenuListItem("Pants", "Select your pants.", new ItemsCollection(PantsDrawable), player.getDrawableVariation(4));
+    PantsTextureItem = new UIMenuListItem("Color", "Select your pants color.", new ItemsCollection(PantsTextureArray), player.getTextureVariation(4));
+    menuClothingPants.AddItem(PantsItem);
+    menuClothingPants.AddItem(PantsTextureItem);
+    menuClothingPants.ParentMenu = menuClothing;
+    menuClothingPants.Visible = false;
+    todosMenus.push(menuClothingPants);
+
+    menuClothingShoes = new Menu("Shoes", "", new Point(50, 50));
+    menuClothingShoesExit = null;
+    ShoesItem = new UIMenuListItem("Shoes", "Select your shoes.", new ItemsCollection(ShoesDrawable), player.getDrawableVariation(6));
+    ShoesTextureItem = new UIMenuListItem("Color", "Select your shoes color.", new ItemsCollection(ShoesTextureArray), player.getTextureVariation(6));
+    menuClothingShoes.AddItem(ShoesItem);
+    menuClothingShoes.AddItem(ShoesTextureItem);
+    menuClothingShoes.ParentMenu = menuClothing;
+    menuClothingShoes.Visible = false;
+    todosMenus.push(menuClothingShoes);
+
+    menuClothingAccessories = new Menu("Accessories", "", new Point(50, 50));
+    menuClothingAccessoriesExit = null;
+    AccessoriesItem = new UIMenuListItem("Accessories", "Select your accessories.", new ItemsCollection(AccessoriesDrawable), player.getDrawableVariation(7));
+    AccessoriesTextureItem = new UIMenuListItem("Color", "Select your accessories color.", new ItemsCollection(AccessoriesTextureArray), player.getTextureVariation(7));
+    menuClothingAccessories.AddItem(AccessoriesItem);
+    menuClothingAccessories.AddItem(AccessoriesTextureItem);
+    menuClothingAccessories.ParentMenu = menuClothing;
+    menuClothingAccessories.Visible = false;
+    todosMenus.push(menuClothingAccessories);
+    
+    menuClothingBags = new Menu("Bags", "", new Point(50, 50));
+    menuClothingBagsExit = null;
+    BagsItem = new UIMenuListItem("Bags", "Select your bag.", new ItemsCollection(BagsDrawable), player.getDrawableVariation(5));
+    BagsTextureItem = new UIMenuListItem("Color", "Select your bag's color.", new ItemsCollection(BagsTextureArray), player.getTextureVariation(5));
+    menuClothingBags.AddItem(BagsItem);
+    menuClothingBags.AddItem(BagsTextureItem);
+    menuClothingBags.ParentMenu = menuClothing;
+    menuClothingBags.Visible = false;
+    todosMenus.push(menuClothingBags);    
+
+    menuClothingArmor = new Menu("Armor", "", new Point(50, 50));
+    menuClothingArmorExit = null;
+    ArmorItem = new UIMenuListItem("Armor", "Select your armor.", new ItemsCollection(ArmorDrawable), player.getDrawableVariation(5));
+    ArmorTextureItem = new UIMenuListItem("Color", "Select your armor's color.", new ItemsCollection(ArmorTextureArray), player.getTextureVariation(5));
+    menuClothingArmor.AddItem(ArmorItem);
+    menuClothingArmor.AddItem(ArmorTextureItem);
+    menuClothingArmor.ParentMenu = menuClothing;
+    menuClothingArmor.Visible = false;
+    todosMenus.push(menuClothingArmor);    
+
+    menuClothingJackets.ListChange.on((item, listIndex) => {
+        let drawable = parseInt(JacketsItem.SelectedItem.DisplayText);
+        let texture = parseInt(JacketsTextureItem.SelectedItem.DisplayText);
+        switch (item) {
+            case JacketsItem:
+                mp.events.callRemote('RequestSetClothes', 11, drawable, 0);
+                JacketsTextureNewArray = [];
+                for (i = 0; i < player.getNumberOfTextureVariations(11, player.getDrawableVariation(11)) + 1; i++) JacketsTextureNewArray.push(i.toString());
+                JacketsTextureItem.Collection = new NativeUI.ItemsCollection(JacketsTextureNewArray).getListItems();
+                JacketsTextureItem.Index = 0;
+            break
+    
+            case JacketsTextureItem:
+                mp.events.callRemote('RequestSetClothes', 11, drawable, texture);
+        }
+    });
+    
+    menuClothingJackets.ItemSelect.on((item, index) => {
+        switch (item.Text) {
+    
+            case "Exit":
+                menuClothingJackets.RemoveItem(menuClothingJacketsExit);
+                menuClothingJacketsExit = null;
+    
+                menuClothingJackets.Visible = false;
+                menuClothing.Visible = true;
+            break;
+        }
+    });
+    
+    menuClothingShirts.ListChange.on((item, listIndex) => {
+        let drawable = parseInt(ShirtsItem.SelectedItem.DisplayText);
+        let texture = parseInt(ShirtsTextureItem.SelectedItem.DisplayText);
+        switch (item) {
+            case ShirtsItem:
+                mp.events.callRemote('RequestSetClothes', 8, drawable, 0);
+                ShirtsTextureNewArray = [];
+                for (i = 0; i < player.getNumberOfTextureVariations(8, player.getDrawableVariation(8)) + 1; i++) ShirtsTextureNewArray.push(i.toString());
+                ShirtsTextureItem.Collection = new NativeUI.ItemsCollection(ShirtsTextureNewArray).getListItems();
+                ShirtsTextureItem.Index = 0;
+            break
+    
+            case ShirtsTextureItem:
+                mp.events.callRemote('RequestSetClothes', 8, drawable, texture);
+        }
+    });
+    
+    menuClothingShirts.ItemSelect.on((item, index) => {
+        switch (item.Text) {
+    
+            case "Exit":
+                menuClothingShirts.RemoveItem(menuClothingShirtsExit);
+                menuClothingShirtsExit = null;
+    
+                menuClothingShirts.Visible = false;
+                menuClothing.Visible = true;
+            break;
+        }
+    });
+    
+    menuClothingPants.ListChange.on((item, listIndex) => {
+        let drawable = parseInt(PantsItem.SelectedItem.DisplayText);
+        let texture = parseInt(PantsTextureItem.SelectedItem.DisplayText);
+        switch (item) {
+            case PantsItem:
+                mp.events.callRemote('RequestSetClothes', 4, drawable, 0);
+                PantsTextureNewArray = [];
+                for (i = 0; i < player.getNumberOfTextureVariations(4, player.getDrawableVariation(4)) + 1; i++) PantsTextureNewArray.push(i.toString());
+                PantsTextureItem.Collection = new NativeUI.ItemsCollection(PantsTextureNewArray).getListItems();
+                PantsTextureItem.Index = 0;
+            break
+    
+            case PantsTextureItem:
+                mp.events.callRemote('RequestSetClothes', 4, drawable, texture);
+        }
+    });
+    
+    menuClothingPants.ItemSelect.on((item, index) => {
+        switch (item.Text) {
+    
+            case "Exit":
+                menuClothingPants.RemoveItem(menuClothingPantsExit);
+                menuClothingPantsExit = null;
+    
+                menuClothingPants.Visible = false;
+                menuClothing.Visible = true;
+            break;
+        }
+    });
+    
+    menuClothingShoes.ListChange.on((item, listIndex) => {
+        let drawable = parseInt(ShoesItem.SelectedItem.DisplayText);
+        let texture = parseInt(ShoesTextureItem.SelectedItem.DisplayText);
+        switch (item) {
+            case ShoesItem:
+                mp.events.callRemote('RequestSetClothes', 6, drawable, 0);
+                ShoesTextureNewArray = [];
+                for (i = 0; i < player.getNumberOfTextureVariations(6, player.getDrawableVariation(6)) + 1; i++) ShoesTextureNewArray.push(i.toString());
+                ShoesTextureItem.Collection = new NativeUI.ItemsCollection(ShoesTextureNewArray).getListItems();
+                ShoesTextureItem.Index = 0;
+            break
+    
+            case ShoesTextureItem:
+                mp.events.callRemote('RequestSetClothes', 6, drawable, texture);
+        }
+    });
+    
+    menuClothingShoes.ItemSelect.on((item, index) => {
+        switch (item.Text) {
+    
+            case "Exit":
+                menuClothingShoes.RemoveItem(menuClothingShoesExit);
+                menuClothingShoesExit = null;
+    
+                menuClothingShoes.Visible = false;
+                menuClothing.Visible = true;
+            break;
+        }
+    });
+    
+    menuClothingAccessories.ListChange.on((item, listIndex) => {
+        let drawable = parseInt(AccessoriesItem.SelectedItem.DisplayText);
+        let texture = parseInt(AccessoriesTextureItem.SelectedItem.DisplayText);
+        switch (item) {
+            case AccessoriesItem:
+                mp.events.callRemote('RequestSetClothes', 7, drawable, 0);
+                AccessoriesTextureNewArray = [];
+                for (i = 0; i < player.getNumberOfTextureVariations(7, player.getDrawableVariation(7)) + 1; i++) AccessoriesTextureNewArray.push(i.toString());
+                AccessoriesTextureItem.Collection = new NativeUI.ItemsCollection(AccessoriesTextureNewArray).getListItems();
+                AccessoriesTextureItem.Index = 0;
+            break
+    
+            case AccessoriesTextureItem:
+                mp.events.callRemote('RequestSetClothes', 7, drawable, texture);
+        }
+    });
+    
+    menuClothingAccessories.ItemSelect.on((item, index) => {
+        switch (item.Text) {
+    
+            case "Exit":
+                menuClothingAccessories.RemoveItem(menuClothingAccessoriesExit);
+                menuClothingAccessoriesExit = null;
+    
+                menuClothingAccessories.Visible = false;
+                menuClothing.Visible = true;
+            break;
+        }
+    });
+    
+    menuClothingBags.ListChange.on((item, listIndex) => {
+        let drawable = parseInt(BagsItem.SelectedItem.DisplayText);
+        let texture = parseInt(BagsTextureItem.SelectedItem.DisplayText);
+        switch (item) {
+            case BagsItem:
+                mp.events.callRemote('RequestSetClothes', 5, drawable, 0);
+                BagsTextureNewArray = [];
+                for (i = 0; i < player.getNumberOfTextureVariations(5, player.getDrawableVariation(5)) + 1; i++) BagsTextureNewArray.push(i.toString());
+                BagsTextureItem.Collection = new NativeUI.ItemsCollection(BagsTextureNewArray).getListItems();
+                BagsTextureItem.Index = 0;
+            break
+    
+            case BagsTextureItem:
+                mp.events.callRemote('RequestSetClothes', 5, drawable, texture);
+        }
+    });
+    
+    menuClothingBags.ItemSelect.on((item, index) => {
+        switch (item.Text) {
+    
+            case "Exit":
+                menuClothingBags.RemoveItem(menuClothingBagsExit);
+                menuClothingBagsExit = null;
+    
+                menuClothingBags.Visible = false;
+                menuClothing.Visible = true;
+            break;
+        }
+    });
+
+    menuClothingArmor.ListChange.on((item, listIndex) => {
+        let drawable = parseInt(ArmorItem.SelectedItem.DisplayText);
+        let texture = parseInt(ArmorTextureItem.SelectedItem.DisplayText);
+        switch (item) {
+            case ArmorItem:
+                mp.events.callRemote('RequestSetClothes', 9, drawable, 0);
+                ArmorTextureNewArray = [];
+                for (i = 0; i < player.getNumberOfTextureVariations(5, player.getDrawableVariation(5)) + 1; i++) ArmorTextureNewArray.push(i.toString());
+                ArmorTextureItem.Collection = new NativeUI.ItemsCollection(ArmorTextureNewArray).getListItems();
+                ArmorTextureItem.Index = 0;
+            break
+    
+            case ArmorTextureItem:
+                mp.events.callRemote('RequestSetClothes', 9, drawable, texture);
+        }
+    });
+    
+    menuClothingArmor.ItemSelect.on((item, index) => {
+        switch (item.Text) {
+    
+            case "Exit":
+                menuClothingArmor.RemoveItem(menuClothingArmorExit);
+                menuClothingArmorExit = null;
+    
+                menuClothingArmor.Visible = false;
+                menuClothing.Visible = true;
+            break;
+        }
+    });
+}
+
+mp.events.add("ShowClothesMenu", (mode, genderChar) =>
 {
+    if(mode)
+        ClothesMenuMode = mode;
+    else ClothesMenuMode = -1;
+
+    if(genderChar)
+        ClothesMenuGender = genderChar;
+    else ClothesMenuGender = 'U';
+
+    getDrawablesListForMenus(ClothesMenuMode, ClothesMenuGender);
+
     if (menuClothing.Visible | menuClothingMasks.Visible | 
         menuClothingHats.Visible | 
         menuClothingJackets.Visible | 
@@ -758,7 +1090,7 @@ mp.events.add("ShowClothesMenu", () =>
         menuClothingBags.Visible) {
         todosMenus.forEach(function(element, index, array){element.Close()});
     } else {
-        
+
         menuClothing.Open();
         if(menuClothingExit == null)
         {

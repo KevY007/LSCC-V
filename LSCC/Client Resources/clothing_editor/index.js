@@ -9,6 +9,17 @@ mp.events.add("ClothingEditor:exit", (save) => {
     mp.events.callRemote("ClothingEditor:onExit", save, editorTeam);
 });
 mp.events.add("ClothingEditor:show", (team, gender, clothingData, forceSet) => {
+
+    if(!forceSet){
+        if(team === 1){
+            mp.events.callLocal("ShowClothesMenu", 1, gender);
+        }
+        else if(team === 0){
+            mp.events.callLocal("ShowClothesMenu", 2, gender);
+        }
+        return;
+    }
+ 
     let cData = JSON.parse(clothingData);
     let toSend = {
         "Shirt":[cData.Clothes[11].Drawable, cData.Clothes[11].Texture],
@@ -32,6 +43,7 @@ mp.events.add("ClothingEditor:show", (team, gender, clothingData, forceSet) => {
     ClothingEditorDOM.execute(`ShowClothingEditor(${team}, '${gender}', ${toSendStr}, ${forceSet.toString()});`);
     ClothingEditorDOM.active = true;
     ClothingEditorActive = true;
+    
 });
 mp.events.add("ClothingEditor:updateClothingManual", (componentIndex, drawable, texture) => {
     let isProp = (componentIndex < 3);
