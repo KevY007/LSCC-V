@@ -69,7 +69,8 @@ function updateNametagsMessages(){
         "PLAYER_SHOT": LANG.PLAYER_SHOT,
         "TASE_PROTECTION": LANG.TASE_PROTECTION,
         "LADDER_PROTECTION": LANG.LADDER_PROTECTION,
-        "PLAYER_INJURED": LANG.PLAYER_INJURED
+        "PLAYER_INJURED": LANG.PLAYER_INJURED,
+        "ENEMY_INJURED": LANG.ENEMY_INJURED
     }
     mp.events.callLocal("Translator:UpdateNametagMessages", JSON.stringify(NAMETAG_MESSAGES));
 }

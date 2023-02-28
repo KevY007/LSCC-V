@@ -46,6 +46,7 @@ const Language = {
     "TASE_PROTECTION": "PROTECCIÓN DE TASER",
     "LADDER_PROTECTION": "PROTECCIÓN DE ESCALADA",
     "PLAYER_INJURED": "(( El jugador está herido; mantén pulsado [H] para ayudarles, o pulsa [E] para cargarlos. ))",
+    "ENEMY_INJURED":"(( El jugador está herido ))",
     "MENU": "Menú",
     "ACTION_MENU": "Menú de acciones",
     "VOICE_CHAT": "Chat de voz"

@@ -46,6 +46,7 @@ const Language = {
     "TASE_PROTECTION": "TASE PROTECTION",
     "LADDER_PROTECTION": "LADDER PROTECTION",
     "PLAYER_INJURED": "(( Player is wounded; hold [H] to help them up, or press [E] to carry them. ))",
+    "ENEMY_INJURED":"(( Player is wounded ))",
     "MENU":"Menu",
     "ACTION_MENU": "Action Menu",
     "VOICE_CHAT": "Voice Chat",

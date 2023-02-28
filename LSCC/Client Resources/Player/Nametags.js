@@ -15,7 +15,8 @@ var NAMETAG_MESSAGES = {
     "PLAYER_SHOT": "(( THIS PLAYER HAS SHOT ))",
     "TASE_PROTECTION": "TASE PROTECTION",
     "CLIMB_PROTECTION": "CLIMB PROTECTION",
-    "PLAYER_INJURED": "(( Player is wounded; hold [H] to help them up, or press [E] to carry them. ))"
+    "PLAYER_INJURED": "(( Player is wounded; hold [H] to help them up, or press [E] to carry them. ))",
+    "ENEMY_INJURED": "(( Player is wounded ))"
 }
 mp.events.add("Translator:UpdateNametagMessages", (object) => {
     NAMETAG_MESSAGES = JSON.parse(object);
@@ -195,16 +196,31 @@ mp.events.add('render', (nametags) => {
                             outline: true
                         });
                     }                   
-                    else if(player.getVariable("Wounded") == 1 || player.getVariable("Wounded") == 2)
+                    else if((player.getVariable("Wounded") == 1 || player.getVariable("Wounded") == 2))
                     {
-                        var typingStr = NAMETAG_MESSAGES.PLAYER_INJURED;
-                        mp.game.graphics.drawText(typingStr, [x, y - 0.0250],
-                            {
-                                font: 0,
-                                color: [255, 99, 71, 228],
-                                scale: [0.285, 0.285],
-                                outline: true
-                            });
+                        var typingStr = "";
+                        if(player.getVariable("Team") === mp.players.local.getVariable("Team")){
+                            typingStr = NAMETAG_MESSAGES.PLAYER_INJURED;
+
+                            mp.game.graphics.drawText(typingStr, [x, y - 0.0250],
+                                {
+                                    font: 0,
+                                    color: [255, 99, 71, 228],
+                                    scale: [0.245, 0.245],
+                                    outline: true
+                                });  
+                        }
+                        else{
+                            typingStr = NAMETAG_MESSAGES.ENEMY_INJURED;
+                            mp.game.graphics.drawText(typingStr, [x, y - 0.0250],
+                                {
+                                    font: 0,
+                                    color: [255, 25, 25, 200],
+                                    scale: [0.2, 0.2],
+                                    outline: true
+                                });  
+                        }
+                                            
                     }
                     else if(player.getVariable("IsTabbed") !== undefined && player.getVariable("IsTabbed") == true)
                     {

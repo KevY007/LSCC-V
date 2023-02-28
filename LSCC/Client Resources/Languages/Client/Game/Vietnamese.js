@@ -46,6 +46,7 @@ const Language = {
     "TASE_PROTECTION": "BAO VE KHOI SUNG DIEN",
     "LADDER_PROTECTION": "BAN SE KHONG NHAN SAT THUONG KHI DANG SU DUNG THANG",
     "PLAYER_INJURED": "(( Nguoi choi bi thuong; giu phim [H] de giup ho day, hoac nhan [E] de vac ho. ))",
+    "ENEMY_INJURED":"(( Nguoi choi bi thuong ))",
     "MENU": "Menu",
     "ACTION_MENU": "Action Menu",
     "VOICE_CHAT": "Voice Chat"
