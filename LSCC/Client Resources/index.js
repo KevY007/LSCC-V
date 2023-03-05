@@ -129,7 +129,9 @@ require("./ServerUI/XMR.js");
 require("./WeaponFiringMode/index.js");
 require("./charcreator/index.js");
 require("./charcreator/outfitslots.js");
-require("./charcreator/clotheditor.js")
+require("./charcreator/clotheditor.js");
+require("./charcreator/tattoo/data.js");
+require("./charcreator/tattoo/menu.js");
 require('./mdc_screen/index.js');
 require('./hotwire_game/index.js');
 require('./weaponeditor/index.js');
