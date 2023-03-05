@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Runtime.ConstrainedExecution;
 
 namespace RNC
 {
@@ -5182,14 +5183,24 @@ namespace RNC
             List<object[]> vehItems = new List<object[]>();
             foreach (var car in Settings.Cars)
             {
-                string price = "[";
-                if (car.LevelRequired > 0) price += "\"Level " + car.LevelRequired.ToString() + "\",";
-                if (car.PointsRequired > 0) price += "\"" + car.PointsRequired.ToString() + " Points\",";
-                if (car.DonatorPointsRequired > 0) price += "\"" + car.DonatorPointsRequired.ToString() + " Donator Points\",";
-                if (car.DonatorLevelRequired > 0) price += "\"" + EPlayer.GetDonatorLevelName(car.DonatorLevelRequired) + "\"";
-                if (price.Length < 2) price = "[\"Free\"";
 
-                price += "]";
+                string requirements = "[";
+                if (car.LevelRequired > 0)
+                    requirements += $"{{text:\"Level {car.LevelRequired}\", meets:{(car.LevelRequired < _a.Level).ToString().ToLower()}}}";
+
+                if (car.PointsRequired > 0)
+                    requirements += $"{{text:\"{car.PointsRequired} Points\", meets:{(car.PointsRequired < _a.Points).ToString().ToLower()}}}";
+
+                if (car.DonatorPointsRequired > 0)
+                    requirements += $"{{text:\"{car.DonatorPointsRequired} Donator Points\", meets:{(car.DonatorPointsRequired < _a.DonatorPoints).ToString().ToLower()}}}";
+
+                if (car.DonatorLevelRequired > 0)
+                    requirements += $"{{text:\"{EPlayer.GetDonatorLevelName(car.DonatorLevelRequired)}\", meets:{(car.DonatorLevelRequired < _a.DonatorLevel).ToString().ToLower()}}}";
+
+                if (requirements.Length < 2)
+                    requirements = "[{text:\"Free\", meets:true}";
+
+                requirements += "]";
 
 
                 bool isOwnedVeh = await EPlayer.HasOwnedVehicle(_a, car.Model, car.Team);
@@ -5202,7 +5213,7 @@ namespace RNC
                             car.Image,
                             !isOwnedVeh,
                             car.Info,
-                            price
+                            requirements
                 });
             }
 
@@ -5317,14 +5328,19 @@ namespace RNC
 
                 weaponString += "],";
 
-                string requireString = "\"requirements\": [";
+                string requirements = "\"requirements\":[";
+                if (loadout.LevelRequired > 0)
+                    requirements += $"{{text:\"Level {loadout.LevelRequired}\", meets:{(loadout.LevelRequired < acc.Level).ToString().ToLower()}}}";
+                if (loadout.PointsRequired > 0)
+                    requirements += $"{{text:\"{loadout.PointsRequired} Points\", meets:{(loadout.PointsRequired < acc.Points).ToString().ToLower()}}}";
+                if (loadout.DonatorPointsRequired > 0)
+                    requirements += $"{{text:\"{loadout.DonatorPointsRequired} Donator Points\", meets:{(loadout.DonatorPointsRequired < acc.DonatorPoints).ToString().ToLower()}}}";
+                if (loadout.DonatorLevelRequired > 0)
+                    requirements += $"{{text:\"{EPlayer.GetDonatorLevelName(loadout.DonatorLevelRequired)}\", meets:{(loadout.DonatorLevelRequired < acc.DonatorLevel).ToString().ToLower()}}}";
+                if (requirements == "\"requirements\":[")
+                    requirements = "\"requirements\":[{text:\"Free\", meets:true}";
 
-                if (loadout.LevelRequired > 0) requireString += $"\"Level {loadout.LevelRequired}\",";
-                if (loadout.PointsRequired > 0) requireString += $"\"{loadout.PointsRequired} Points\",";
-                if (loadout.DonatorPointsRequired > 0) requireString += $"\"{loadout.DonatorPointsRequired} Donator Points\",";
-                if (loadout.DonatorLevelRequired > 0) requireString += $"\"{EPlayer.GetDonatorLevelName(loadout.DonatorLevelRequired)}\",";
-
-                requireString += "],";
+                requirements += "]";
 
                 bool hasOwnedLoadout = await EPlayer.HasOwnedLoadout(acc, loadout.Name, loadout.Team);
                 loadoutItems.Add(new object[]
@@ -5333,7 +5349,7 @@ namespace RNC
                             loadout.Name,
                             loadout.Background,
                             !hasOwnedLoadout,
-                            requireString,
+                            requirements,
                             weaponString
                 });
             }

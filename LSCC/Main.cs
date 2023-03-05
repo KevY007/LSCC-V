@@ -674,7 +674,7 @@ namespace RNC
         public const string DCBotToken = "NjAyNTQ1Mzc0MDY1OTgzNTgw.XtaCEQ.clpqVL5c0X_38xkT-mYTr4_N9a4";
 
         // Global Variables (changing accordingly)
-        public static bool SpawnParkedVehicles { get; set; } = true; // for debug purposes whether to spawn random cars
+        public static bool SpawnParkedVehicles { get; set; } = false; // for debug purposes whether to spawn random cars
         public static int ParkedVehiclesToSpawn { get; set; } = 200;
         public static List<LobbyData> Lobbies { get; set; }
         public static List<Player> LoggedInPlayers { get; set; }
