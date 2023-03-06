@@ -86,6 +86,8 @@ namespace RNC
         public int ClanID { get; set; }
         public int ClanTier { get; set; }
 
+        public string TattooList { get; set; }
+
         public string ActiveCrosshairProfile { get; set; }
         public string CrosshairProfiles { get; set; }
     }

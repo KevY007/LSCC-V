@@ -7057,6 +7057,29 @@ namespace RNC
             player.SendChatMessage(Translate(player, "DONATOR_STATUS_TOGGLED", (EPlayer.GetAccount(player).DonatorStatus == true ? Translate(player, "ENABLED") : Translate(player, "DISABLED"))));
         }
 
+        [Command("tattoo")]
+        public void cmd_tattoo(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            CharacterData ConvChar = new CharacterData();
+            try
+            {
+                ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+            }
+            catch
+            {
+                cmd_char(player, "reset");
+                return;
+            }
+
+            int gender = Convert.ToInt32(ConvChar.Gender);
+            string genderChar = "M";
+            if (gender == 1) genderChar = "F";
+
+            player.TriggerEvent("ShowTattooMenu", genderChar);
+        }
+
         [Command("clanchat", "!{#AFAFAF}[USAGE] clanchat (text)", Alias = "c", GreedyArg = true)]
         public void cmd_clanchat(Player player, string message)
         {

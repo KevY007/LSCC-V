@@ -3560,7 +3560,10 @@ namespace RNC
                     player.SetSharedData("SQL_ID", acc.SQL_ID);
                     player.SetSharedData("pLogged", true);
                     player.SetSharedData("RegisterDate", acc.RegisterDate.ToString("F"));
-                    
+
+                    player.SetSharedData("TattooList", acc.TattooList);
+                    player.TriggerEvent("ApplyTattoos", acc.TattooList);
+
                     player.SetSharedData("Donator", acc.DonatorLevel);
                     player.SetSharedData("ScreenshotServerAPI", $"{acc.Password}@{acc.Salt}");
 
@@ -4466,6 +4469,38 @@ namespace RNC
             return;
         }
 
+        [RemoteEvent("UpdateTattooList")]
+        public static void UpdateTattooList(Player player, string tattooList)
+        {
+            player.SetSharedData("TattooList", tattooList);
+            uint oldDim = player.Dimension;
+            player.Dimension = 6969;
+            NAPI.Task.Run(() =>
+            {
+                if (player != null)
+                    player.Dimension = oldDim;
+            }, 500);
+        }
+
+        [RemoteEvent("SaveTattoos")]
+        public static void OnSaveTattoos(Player player, string tattooList)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            EPlayer.GetAccount(player).TattooList = tattooList;
+            EPlayer.Save(player, false);
+
+            player.SetSharedData("TattooList", tattooList);
+
+            uint oldDim = player.Dimension;
+            player.Dimension = 6969;
+            NAPI.Task.Run(() =>
+            {
+                if(player != null)
+                    player.Dimension = oldDim;
+            }, 1000);
+        }
+
         [RemoteEvent("DisableWaypoint")]
         public static void OnPlayerDisableWaypoint(Player player)
         {
@@ -4514,6 +4549,8 @@ namespace RNC
 
             player.TriggerEvent("BankDoorLocked", false);
             player.TriggerEvent("BankRob_SetMusic", -1);
+
+            player.SetSharedData("TattooList", "[]");
 
             player.TriggerEvent("OnPlayerLoginRegister");
             player.TriggerEvent("LoadCrosshairProfiles", acc.CrosshairProfiles, acc.ActiveCrosshairProfile);
@@ -6026,6 +6063,7 @@ namespace RNC
                                     ClanID = -1,
                                     CrosshairProfiles = "[]",
                                     ActiveCrosshairProfile = "{}",
+                                    TattooList = "[]"
                                 };
                                 AccountManager.Add(_new);
                                 OnPlayerRegister(player, _new);
@@ -7125,6 +7163,11 @@ namespace RNC
                 return; // WHITE COLOR BUG FYX..
             }
 
+            if (player.HasSharedData("TattooList"))
+            {
+                player.TriggerEvent("ApplyTattoos", player.GetSharedData<string>("TattooList"));
+            }
+
             player.TriggerEvent("Bleeding_ClearAll");
             player.SetSharedData("Bleeding_WasShot", false);
             player.SetSharedData("Ping", player.Ping);
@@ -7139,6 +7182,7 @@ namespace RNC
             player.SetData("LastClimbProtection", Environment.TickCount64-30000);
             player.SetData("ClimbProtectionProcs", 0);
             player.ResetData("DraggingOut");
+
 
             player.ResetData("_currentlySwappingSeats");
             foreach (Player p in Settings.LoggedInPlayers.Where(a => a.HasData("Spectating") && a.GetData<Player>("SpectatingPlayer") == player))
