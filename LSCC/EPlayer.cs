@@ -714,6 +714,8 @@ namespace RNC
 
                 player.SetData<bool>("LoadingClanCreation", false);
 
+                player.SetSharedData("LaserEquipped", false);
+
                 player.SetSharedData("LastVehicleExit", 0);
 
 

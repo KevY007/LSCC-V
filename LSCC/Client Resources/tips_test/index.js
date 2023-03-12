@@ -120,6 +120,9 @@ mp.events.add('render', () => {
 
 
 mp.events.add("addFloatTip", (id, key, action, posX, posY, posZ, maxDist = 0, useDist = 0) => {
+
+    if(!FloatTipsDOM) return;
+
     FloatTips.push({
         id: id,
         key:key, action:action, 
@@ -138,6 +141,8 @@ mp.events.add("addFloatTip", (id, key, action, posX, posY, posZ, maxDist = 0, us
 });
 
 mp.events.add('render', () => {
+    if(!FloatTipsDOM) return;
+    
     let resolution = mp.game.graphics.getScreenActiveResolution(0,0);
     lastFrameUpdate++;
     if(lastFrameUpdate >= 1){

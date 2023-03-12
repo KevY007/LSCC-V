@@ -9907,6 +9907,16 @@ namespace RNC
             EPlayer.Save(target);
         }
 
+        [Command("laser")]
+        public void cmd_laser(Player player)
+        {
+            if(player.GetSharedData<bool>("LaserEquipped") == false || !player.HasSharedData("LaserEquipped"))
+                player.SetSharedData("LaserEquipped", true);
+            else
+                player.SetSharedData("LaserEquipped", false);
+
+            player.SendChatMessage($"Laser {(player.GetSharedData<bool>("LaserEquipped") ? "~g~ENABLED" : "~r~DISABLED")}");
+        }
 
         [Command("redeem", "!{#AFAFAF}[USAGE] redeem (code)")]
         public void cmd_redeem(Player player, string code)
