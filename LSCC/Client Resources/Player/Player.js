@@ -2320,7 +2320,8 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         
         const val = shakeValue;
         const headval = (getRandomInt(0, 10) > 5 ? val : -val);
-        const pitchval = campos.x + (recoil_goingUp === true ? shakeValue : (-1-shakeValue));
+        const pitchval = campos.x + shakeValue;
+        //const pitchval = campos.x + (recoil_goingUp === true ? shakeValue : (-1-shakeValue));
         mp.game.cam.setGameplayCamRelativePitch(pitchval, recoil_smoothing);
         mp.game.cam.setGameplayCamRelativeHeading(camhead + headval);
         recoil_LastShotTime = Date.now();
