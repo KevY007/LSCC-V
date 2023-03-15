@@ -1195,6 +1195,7 @@ mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) =>
         insertString += `"speed": "${(menuItems[i][2] !== "Random" ? menuItems[i][5] : "Random")}", `;
         if(menuItems[i][6].length > 1) insertString += `"requirements": ${menuItems[i][6]},`;
         insertString += "});";
+    
 
         ServerUI.execute(insertString);
         if(menuItems[i][4] === false){ // if locked === false aka if owns vehicle
@@ -1238,6 +1239,7 @@ mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoa
         insertString +=  menuItems[i][5];
         insertString += "});";
         ServerUI.execute(insertString);
+
 
         if(menuItems[i][3] === false){ // if locked == false aka if owns loadout
             insertString = `gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.loadouts.push({`;
