@@ -494,7 +494,7 @@ namespace RNC
                     else await context.Channel.SendMessageAsync("USAGE: !recoveraccount (username)");
                 }
                 */
-                else if (context.Content.StartsWith("!verify"))
+                else if (context.Content.StartsWith("!linkaccount"))
                 {
                     // first ID is the bot, rest are codename rotx kevy
                     if (context.Author.Id != 922461597866295397 && context.Author.Id != 367360197900894209 && context.Author.Id != 253938879554387969

@@ -805,7 +805,7 @@ namespace RNC
             player.SendChatMessage("!{#c9c9c9}If you are looking for your Discord verification code, use (/verify). ;-)");
             return;
         }
-        [Command("verify")]
+        [Command("verify", Alias = "link")]
         public void cmd_verify(Player player)
         {
             DiscordData _d = NAPI.Util.FromJson<DiscordData>(EPlayer.GetAccount(player).DiscordInfo);

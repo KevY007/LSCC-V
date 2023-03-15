@@ -684,7 +684,7 @@ namespace RNC
                         admin.SendChatMessage($"!{{#FF6347}}[SHOT LISTEN] !{{#ffce52}}{player.Name} has fired {playerHitsInRow}+ times, all of which hit a player without missing! !{{#AFAFAF}}(Weapon used: {weaponName.ToUpper()})");                
                         if (!screenTaken)
                         {
-                            player.TriggerEvent("TakeScreenshot", 50, 50, player.GetSharedData<string>("ScreenshotServerAPI"), $"adm_{admin.Name}");
+                            player.TriggerEvent("TakeScreenshot", 50, 50, admin.GetSharedData<string>("ScreenshotServerAPI"), admin.GetSharedData<int>("SQL_ID"));
                             screenTaken = true;
                             admName = admin.Name;
                         }
