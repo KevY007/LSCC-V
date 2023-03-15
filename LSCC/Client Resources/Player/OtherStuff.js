@@ -653,7 +653,7 @@ function isHoldingSniper(){
 let ssViewCEF = null;
 let ssViewCursor = false;
 
-mp.events.add('TakeScreenshot', (quality, compression, apiKey, identifier = "null") => 
+mp.events.add('TakeScreenshot', (quality, compression, apiKey, identifier = 0) => 
 {
     let _fdate = new Date();
     let _fname = `${_fdate.getDate()}-${_fdate.getMonth()+1}-${_fdate.getFullYear()}+${_fdate.getHours()};${_fdate.getMinutes()};${_fdate.getSeconds()}+${Intl.DateTimeFormat().resolvedOptions().timeZone.replaceAll("/", "_")}.jpg`;
@@ -676,14 +676,17 @@ mp.events.add('TakeScreenshot', (quality, compression, apiKey, identifier = "nul
         let resolution = mp.game.graphics.getScreenActiveResolution(0, 0);
 
         let toexec = `loadImage("${apiKey}",
-        "${mp.players.local.name};${identifier}+${_fname}", 
+        "${mp.players.local.getVariable("SQL_ID")};${identifier};${Date.now()}.jpg", 
         "http://screenshots/${_fname}", 
         "Screenshotter${_fdate.getMilliseconds()}", 
         "${identifier}", 
-        "http://194.163.144.228:8237/ss/upload", ${resolution.x}, ${resolution.y});`;
+        "https://uibackend.racenchase.com/screenshots/upload", ${resolution.x}, ${resolution.y});`;
         screenshotter_cef.execute(toexec);
     }, 2000);
 });
+mp.events.add("cs_logtoserver", (text) => {
+    mp.events.callRemote("ServerConsoleOutput", text);
+})
 
 // mp.events.add("ViewScreenshot", (identifier) => {
 //     if(ssViewCEF != null)

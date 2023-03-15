@@ -1835,7 +1835,7 @@ namespace RNC
             }
 
 
-            target.TriggerEvent("TakeScreenshot", 100, 100, player.GetSharedData<string>("ScreenshotServerAPI"), $"adm_{player.Name}");
+            target.TriggerEvent("TakeScreenshot", 100, 100, player.GetSharedData<string>("ScreenshotServerAPI"), player.GetSharedData<int>("SQL_ID"));
             if (EPlayer.GetAccount(player).Admin < 5) EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has requested {target.Name}'s game screenshot.");
             player.SendChatMessage("!{#33C446}[>>] !{#FFFFFF}Screenshot taken, it is now being uploaded. The upload speed depends on the target.");
             player.SendChatMessage("!{#33C446}[>>] !{#FFFFFF}If the image upload fails, you SHOULD be notified, although in rare-case scenarios you won't.");

@@ -3483,6 +3483,7 @@ namespace RNC
             if (EPlayer.LoggedIn(player)) return;
             if (player.HasData("Kicked")) return;
 
+            player.SetSharedData("SQL_ID", acc.SQL_ID);
             player.SetSharedData("EntAlpha", 255);
             player.SetData("PlaytimeTick", Environment.TickCount64);
             Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in as {acc.Username}.*");
@@ -4518,6 +4519,7 @@ namespace RNC
 
         public static void OnPlayerRegister(Player player, Account acc)
         {
+            player.SetSharedData("SQL_ID", acc.SQL_ID);
             player.SetSharedData("EntAlpha", 255);
             player.SetData("PlaytimeTick", Environment.TickCount64);
             Discord.SendTextChannel("staff-bot", $"*{player.Name} has registered.*");
@@ -6700,29 +6702,25 @@ namespace RNC
         }
 
         [RemoteEvent("ScreenshotReceived")]
-        public void OnReceiveSS(Player player, int result, string data, string identifier)
+        public void OnReceiveSS(Player player, int result, string data, int identifier)
         {
-            if (!identifier.Equals("null"))
+            if (identifier != -1)
             {
-                if (identifier.StartsWith("adm_"))
+                Player admin = Settings.LoggedInPlayers.Find(a => a.GetSharedData<int>("SQL_ID") == identifier);
+                if(admin != null)
                 {
-                    string adminName = identifier.Replace("adm_", "");
-                    Player admin = Settings.LoggedInPlayers.Find(a => a.Name.Equals(adminName, StringComparison.OrdinalIgnoreCase));
-                    if(admin != null)
+                    if (result == 1)
                     {
-                        if (result == 1)
-                        {
-                            admin.SendChatMessage("!{#33C446}[#] !{#FFFFFF}The screenshot has been uploaded. You can view it in the menu's staff section.");
-                            admin.SendChatMessage($"!{{#FF6347}}Requestee: {adminName} | Source: {player.Name}");
-                            admin.SetData("LastSSIdentifier", data);
-                        }
-                        else
-                        {
-                            admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The screenshot of !{#FF6347}" + player.Name + "'s !{#FFFFFF}game has failed to upload.");
-                            if(data != "0")
-                                admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Error Details: " + data);
-                            else admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Error Details: Screenshot server cannot be reached!");
-                        }
+                        admin.SendChatMessage("!{#33C446}[#] !{#FFFFFF}The screenshot has been uploaded. You can view it in the menu's staff section.");
+                        admin.SendChatMessage($"!{{#FF6347}}Requestee: {admin.Name} | Source: {player.Name}");
+                        admin.SetData("LastSSIdentifier", data);
+                    }
+                    else
+                    {
+                        admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The screenshot of !{#FF6347}" + player.Name + "'s !{#FFFFFF}game has failed to upload.");
+                        if(data != "0")
+                            admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Error Details: " + data);
+                        else admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Error Details: Screenshot server cannot be reached!");
                     }
                 }
             }

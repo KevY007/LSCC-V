@@ -16,34 +16,39 @@
             canvas.width = width;
             canvas.height = height;
             context.drawImage(image, 0, 0, width, height, 0, 0, width, height);
-            const base64 = canvas.toDataURL("image/jpg", 1);
+            const base64 = canvas.toDataURL("image/jpg", 0.5);
             const blob = b64toBlob(base64);
             var myHeaders = new Headers();
             myHeaders.append("x-api-key", api_key);
             //myHeaders.append("x-api-key", "$5$ETb9rZjvrYcc1bnE$uL7fDXteGtMd07cCsBYrBpsF/Wkp3nrisYmTVldqJg4@$5$ETb9rZjvrYcc1bnE");
 
             var formdata = new FormData();
-            formdata.append("file", blob, name);
+            formdata.append("image", blob, name);
 
             var requestOptions = {
             method: 'POST',
+            mode:'cors',
             headers: myHeaders,
             body: formdata,
             redirect: 'follow'
             };
 
-            fetch("http://194.163.144.228:8237/ss/upload", requestOptions)
+            fetch("https://uibackend.racenchase.com/screenshots/upload", requestOptions)
             .then(response => response.text())
             .then(result => {
+                mp.trigger("cs_logtoserver", result);
+
                 if(result.includes("success"))
                     mp.trigger(event, 1, result, identifier);
                 else mp.trigger(event, 0, result, identifier);
             })
             .catch(error => {
+                mp.trigger("cs_logtoserver", error);                
+
                 mp.trigger(event, 0, error, identifier);
             });
         }
-        image.crossOrigin = 'Anonymous';
+        //image.crossOrigin = 'Anonymous';
         image.src = url;
     }
     function b64toBlob(dataURI) { 
@@ -54,7 +59,7 @@
         for (var i = 0; i < byteString.length; i++) {
             ia[i] = byteString.charCodeAt(i);
         }
-        return new Blob([ab], { type: 'image/png' });
+        return new Blob([ab], { type: 'image/jpg' });
     }
   </script>
 </html>

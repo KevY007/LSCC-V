@@ -1307,6 +1307,7 @@ function UpdateStatsVars(entity){
         }
     }
 }
+
 mp.events.addDataHandler('PlayerSquadID', function(entity, value, oldValue){
     entity.SquadID = value;
 

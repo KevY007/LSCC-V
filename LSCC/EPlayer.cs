@@ -695,6 +695,7 @@ namespace RNC
         {
             lock (player)
             {
+                player.SetSharedData("SQL_ID", -1);
                 player.ResetData("Kicked");
                 player.ResetData("Dead");
                 player.SetData("SpawnTick", Environment.TickCount64);
