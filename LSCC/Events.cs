@@ -5124,6 +5124,123 @@ namespace RNC
             });
         }
 
+        [RemoteEvent("Menu_OnCodeRedeem")]
+        public void OnMenuCodeRedeem(Player player, string code)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    RedeemableCode redeem = await context.RedeemableCodes.AsQueryable().FirstOrDefaultAsync(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+
+                    if (redeem == null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("menu_store_redeem_result", false, "This code is invalid!");
+                            //player.SendChatMessage(Translate(player, "ERROR_INVALID_CODE"));
+                            //player.SendChatMessage("!{#C9C9C9}[HINT] A common mistake made is mixing up the letter 'O' and the number zero (0).");
+                        });
+                        return;
+                    }
+                    if (redeem.Uses <= 0)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("menu_store_redeem_result", false, "This code was already used!");
+                            //player.SendChatMessage(Translate(player, "ERROR_CODE_USED"));
+                        });
+                        context.RedeemableCodes.Remove(redeem);
+                        await context.SaveChangesAsync();
+                        return;
+                    }
+                    NAPI.Task.Run(() =>
+                    {
+                        /* ---Donation Types/Values---
+                     * 0 => Bronze [VALUE: how many times it can be redeemed]
+                     * 1 => Silver
+                     * 2 => Gold
+                     * 3 => 100 Donator Points
+                     * 4 => Namechange
+                     * 5 => 5 namechanges [bundle]
+                     */
+                        Account acc = EPlayer.GetAccount(player);
+                        switch (redeem.Value)
+                        {
+                            case 0:
+                                acc.DonatorPoints += 200;
+                                acc.DonatorLevel = 1;
+                                player.SetSharedData("Donator", acc.DonatorLevel);
+                                NAPI.Task.Run(() =>
+                                {
+                                    player.TriggerEvent("menu_store_redeem_result", true, "You successfully redeemed Bronze!");
+                                    //player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(1, true)));
+                                });
+
+                                EPlayer.UpdateMaxMenuItems(player);
+                                break;
+                            case 1:
+                                acc.DonatorPoints += 350;
+                                acc.DonatorLevel = 2;
+                                player.SetSharedData("Donator", acc.DonatorLevel);
+                                NAPI.Task.Run(() =>
+                                {
+                                    player.TriggerEvent("menu_store_redeem_result", true, "You successfully redeemed Silver!");
+                                    //player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(2, true)));
+                                });
+
+                                EPlayer.UpdateMaxMenuItems(player);
+                                break;
+                            case 2:
+                                acc.DonatorPoints += 500;
+                                acc.DonatorLevel = 3;
+                                player.SetSharedData("Donator", acc.DonatorLevel);
+                                NAPI.Task.Run(() =>
+                                {
+                                    player.TriggerEvent("menu_store_redeem_result", true, "You successfully redeemed Gold!");
+                                    //player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(3, true)));
+                                });
+
+                                EPlayer.UpdateMaxMenuItems(player);
+                                break;
+                            case 3:
+                                acc.DonatorPoints += 100;
+                                NAPI.Task.Run(() =>
+                                {
+                                    player.TriggerEvent("menu_store_redeem_result", true, "You successfully redeemed 100DP!");
+                                    //player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", "!{#a8ffb7}100 Donator Points"));
+                                });
+                                break;
+                            case 4:
+                                acc.Namechanges++;
+                                NAPI.Task.Run(() =>
+                                {
+                                    player.TriggerEvent("menu_store_redeem_result", true, "You successfully redeemed 1 Namechange!");
+                                    //player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", "!{#a8ffb7}1 Namechange"));
+                                });
+                                break;
+                            case 5:
+                                acc.Namechanges += 5;
+                                NAPI.Task.Run(() =>
+                                {
+                                    player.TriggerEvent("menu_store_redeem_result", true, "You successfully redeemed 5 Namechanges Budle!");
+                                    //player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", "!{#a8ffb7}5 Namechanges Bundle"));
+                                });
+                                break;
+                        }
+                        player.SendChatMessage(Translate(player, "DONATION_THANKS"));
+                    });
+                    await NAPI.Task.WaitForMainThread();
+
+                    context.RedeemableCodes.Remove(redeem);
+                    await context.SaveChangesAsync();
+                }
+            });
+        }
+
         [RemoteEvent("MenuSelectedVehicle")]
         public void OnMenuVehicleSelect(Player player, string model, int team)
         {
@@ -5225,16 +5342,16 @@ namespace RNC
 
                 string requirements = "[";
                 if (car.LevelRequired > 0)
-                    requirements += $"{{text:\"Level {car.LevelRequired}\", meets:{(car.LevelRequired < _a.Level).ToString().ToLower()}}},";
+                    requirements += $"{{text:\"Level {car.LevelRequired}\", meets:{(_a.Level >= car.LevelRequired).ToString().ToLower()}}},";
 
                 if (car.PointsRequired > 0)
-                    requirements += $"{{text:\"{car.PointsRequired} Points\", meets:{(car.PointsRequired < _a.Points).ToString().ToLower()}}},";
+                    requirements += $"{{text:\"{car.PointsRequired} Points\", meets:{(_a.Points >= car.PointsRequired).ToString().ToLower()}}},";
 
                 if (car.DonatorPointsRequired > 0)
-                    requirements += $"{{text:\"{car.DonatorPointsRequired} Donator Points\", meets:{(car.DonatorPointsRequired < _a.DonatorPoints).ToString().ToLower()}}},";
+                    requirements += $"{{text:\"{car.DonatorPointsRequired} Donator Points\", meets:{(_a.DonatorPoints >= car.DonatorPointsRequired).ToString().ToLower()}}},";
 
                 if (car.DonatorLevelRequired > 0)
-                    requirements += $"{{text:\"{EPlayer.GetDonatorLevelName(car.DonatorLevelRequired)}\", meets:{(car.DonatorLevelRequired < _a.DonatorLevel).ToString().ToLower()}}},";
+                    requirements += $"{{text:\"{EPlayer.GetDonatorLevelName(car.DonatorLevelRequired)}\", meets:{(_a.DonatorLevel >= car.DonatorLevelRequired).ToString().ToLower()}}},";
 
                 if (requirements.Length < 2)
                     requirements = "[{text:\"Free\", meets:true}";
@@ -5369,13 +5486,13 @@ namespace RNC
 
                 string requirements = "\"requirements\":[";
                 if (loadout.LevelRequired > 0)
-                    requirements += $"{{text:\"Level {loadout.LevelRequired}\", meets:{(loadout.LevelRequired < acc.Level).ToString().ToLower()}}},";
+                    requirements += $"{{text:\"Level {loadout.LevelRequired}\", meets:{(acc.Level >= loadout.LevelRequired).ToString().ToLower()}}},";
                 if (loadout.PointsRequired > 0)
-                    requirements += $"{{text:\"{loadout.PointsRequired} Points\", meets:{(loadout.PointsRequired < acc.Points).ToString().ToLower()}}},";
+                    requirements += $"{{text:\"{loadout.PointsRequired} Points\", meets:{(acc.Points >= loadout.PointsRequired).ToString().ToLower()}}},";
                 if (loadout.DonatorPointsRequired > 0)
-                    requirements += $"{{text:\"{loadout.DonatorPointsRequired} Donator Points\", meets:{(loadout.DonatorPointsRequired < acc.DonatorPoints).ToString().ToLower()}}},";
+                    requirements += $"{{text:\"{loadout.DonatorPointsRequired} Donator Points\", meets:{(acc.DonatorPoints >= loadout.DonatorPointsRequired).ToString().ToLower()}}},";
                 if (loadout.DonatorLevelRequired > 0)
-                    requirements += $"{{text:\"{EPlayer.GetDonatorLevelName(loadout.DonatorLevelRequired)}\", meets:{(loadout.DonatorLevelRequired < acc.DonatorLevel).ToString().ToLower()}}},";
+                    requirements += $"{{text:\"{EPlayer.GetDonatorLevelName(loadout.DonatorLevelRequired)}\", meets:{(acc.DonatorLevel >= loadout.DonatorLevelRequired).ToString().ToLower()}}},";
                 if (requirements == "\"requirements\":[")
                     requirements = "\"requirements\":[{text:\"Free\", meets:true}";
 

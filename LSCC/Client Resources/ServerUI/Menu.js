@@ -1170,6 +1170,19 @@ mp.events.add("UpdateMenuItem", (type, owned) => {
 mp.events.add("MenuBuyItem", (name) => {
     mp.events.callRemote("Menu_RequestBuyItem", name);
 });
+
+mp.events.add("menu_store_redeem", (code) => {
+    mp.events.callRemote("Menu_OnCodeRedeem", code);
+});
+mp.events.add("menu_store_redeem_result", (success, message) => {
+    if(!ServerUI) return;
+
+    ServerUI.execute(`gm.$refs.storeTab.dpTab = {
+        success:${success.toString()},
+        message:"${message}"
+    }`);
+});
+
 // --------------------
 
 mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) => {
