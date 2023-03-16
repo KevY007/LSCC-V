@@ -2499,6 +2499,9 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
 
                 showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
                 //LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
+                damage = 0;
+                mp.game.weapon.setCurrentDamageEventAmount(0);
+                mp.game.weapon.cancelCurrentDamageEvent();
             }
             else{
                 let nerfedDmg = (damage-5);
@@ -2509,6 +2512,9 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
 
                 //LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
+                damage = 0;
+                mp.game.weapon.setCurrentDamageEventAmount(0);
+                mp.game.weapon.cancelCurrentDamageEvent();
             }
             if(weapon == 2441047180){ // navy revolver nerf
                 const vec1 = sourceEntity.position;
@@ -2523,6 +2529,9 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                     showDamageIndicatorOnPosition(75, targetEntity, boneIndex);
 
                     //LogPlayerDamage(targetEntity, weapon, 75, boneIndex);
+                damage = 0;
+                mp.game.weapon.setCurrentDamageEventAmount(0);
+                mp.game.weapon.cancelCurrentDamageEvent();
                 }
                 else if(distance >= 9.0 && distance < 18.0){
                     damage = 50;
@@ -2531,6 +2540,9 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                     showDamageIndicatorOnPosition(50, targetEntity, boneIndex);
 
                     //LogPlayerDamage(targetEntity, weapon, 50, boneIndex);
+                damage = 0;
+                mp.game.weapon.setCurrentDamageEventAmount(0);
+                mp.game.weapon.cancelCurrentDamageEvent();
                 }
                 else{
                     damage = 25;
@@ -2539,6 +2551,9 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                     showDamageIndicatorOnPosition(25, targetEntity, boneIndex);
 
                     //LogPlayerDamage(targetEntity, weapon, 25, boneIndex);
+                damage = 0;
+                mp.game.weapon.setCurrentDamageEventAmount(0);
+                mp.game.weapon.cancelCurrentDamageEvent();
                 }
             }
             if(weapon == 3800352039){ // assault shotgun nerf
@@ -2553,6 +2568,9 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                     showDamageIndicatorOnPosition(10, targetEntity, boneIndex);
                 
                     //LogPlayerDamage(targetEntity, weapon, 10, boneIndex);
+                damage = 0;
+                mp.game.weapon.setCurrentDamageEventAmount(0);
+                mp.game.weapon.cancelCurrentDamageEvent();
                 }
                 else if(distance > 9.2681523185659 && distance < 19.267101852897){
                     damage = 7;
@@ -2561,12 +2579,18 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                     showDamageIndicatorOnPosition(7, targetEntity, boneIndex);
                 
                     //LogPlayerDamage(targetEntity, weapon, 7, boneIndex);
+                damage = 0;
+                mp.game.weapon.setCurrentDamageEventAmount(0);
+                mp.game.weapon.cancelCurrentDamageEvent();
                 }
                 else{
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                 
                     //LogPlayerDamage(targetEntity, weapon, 0, boneIndex, "Target too far - no damage dealt.");
+                damage = 0;
+                mp.game.weapon.setCurrentDamageEventAmount(0);
+                mp.game.weapon.cancelCurrentDamageEvent();
                 }
             }
             else if(weapon == 984333226){  // heavy shotgun nerf - shoots 1 pellet so it gets more dmg
@@ -2581,6 +2605,9 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                     showDamageIndicatorOnPosition(37, targetEntity, boneIndex);
                 
                     //LogPlayerDamage(targetEntity, weapon, 37, boneIndex);
+                damage = 0;
+                mp.game.weapon.setCurrentDamageEventAmount(0);
+                mp.game.weapon.cancelCurrentDamageEvent();
                 }
                 else if(distance > 9.2681523185659 && distance < 19.267101852897){
                     damage = 28;
@@ -2589,12 +2616,18 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                     showDamageIndicatorOnPosition(28, targetEntity, boneIndex);
                 
                     //LogPlayerDamage(targetEntity, weapon, 28, boneIndex);
+                damage = 0;
+                mp.game.weapon.setCurrentDamageEventAmount(0);
+                mp.game.weapon.cancelCurrentDamageEvent();
                 }
                 else{
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                 
                     //LogPlayerDamage(targetEntity, weapon, 0, boneIndex, "Target too far - no damage dealt.");
+                damage = 0;
+                mp.game.weapon.setCurrentDamageEventAmount(0);
+                mp.game.weapon.cancelCurrentDamageEvent();
                 }
             }
 
@@ -2959,6 +2992,11 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
                 
                 showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
+
+                mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), nerfedDmg, targetPlayer.getArmour());
+                damage = 0;
+                mp.game.weapon.setCurrentDamageEventAmount(0);
+                mp.game.weapon.cancelCurrentDamageEvent();
             }
             else{
                 let nerfedDmg = (damage-5);
@@ -2968,6 +3006,11 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
                 
                 showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
+
+                mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), nerfedDmg, targetPlayer.getArmour());
+                damage = 0;
+                mp.game.weapon.setCurrentDamageEventAmount(0);
+                mp.game.weapon.cancelCurrentDamageEvent();
             }
             if(weapon == 2441047180){ // navy revolver nerf
                 const vec1 = sourceEntity.position;
@@ -2981,6 +3024,11 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     LogPlayerDamage(targetEntity, weapon, 75, boneIndex);
                 
                     showDamageIndicatorOnPosition(75, targetEntity, boneIndex);
+
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 75, targetPlayer.getArmour());
+                    damage = 0;
+                    mp.game.weapon.setCurrentDamageEventAmount(0);
+                    mp.game.weapon.cancelCurrentDamageEvent();
                 }
                 else if(distance >= 9.0 && distance < 18.0){
                     damage = 50;
@@ -2988,6 +3036,11 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     LogPlayerDamage(targetEntity, weapon, 50, boneIndex);
                 
                     showDamageIndicatorOnPosition(50, targetEntity, boneIndex);
+
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 50, targetPlayer.getArmour());
+                    damage = 0;
+                    mp.game.weapon.setCurrentDamageEventAmount(0);
+                    mp.game.weapon.cancelCurrentDamageEvent();
                 }
                 else{
                     damage = 25;
@@ -2995,6 +3048,11 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     LogPlayerDamage(targetEntity, weapon, 25, boneIndex);
                 
                     showDamageIndicatorOnPosition(25, targetEntity, boneIndex);
+
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 25, targetPlayer.getArmour());
+                    damage = 0;
+                    mp.game.weapon.setCurrentDamageEventAmount(0);
+                    mp.game.weapon.cancelCurrentDamageEvent();
                 }
             }
             if(weapon == 3800352039){ // assault shotgun nerf
@@ -3008,6 +3066,10 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     LogPlayerDamage(targetEntity, weapon, 10, boneIndex);
                 
                     showDamageIndicatorOnPosition(10, targetEntity, boneIndex);
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 10, targetPlayer.getArmour());
+                    damage = 0;
+                    mp.game.weapon.setCurrentDamageEventAmount(0);
+                    mp.game.weapon.cancelCurrentDamageEvent();
                 }
                 else if(distance > 9.2681523185659 && distance < 19.267101852897){
                     damage = 7;
@@ -3015,11 +3077,18 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     LogPlayerDamage(targetEntity, weapon, 7, boneIndex);
                 
                     showDamageIndicatorOnPosition(7, targetEntity, boneIndex);
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 7, targetPlayer.getArmour());
+                    damage = 0;
+                    mp.game.weapon.setCurrentDamageEventAmount(0);
+                    mp.game.weapon.cancelCurrentDamageEvent();
                 }
                 else{
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     LogPlayerDamage(targetEntity, weapon, 0, boneIndex);
+                    damage = 0;
+                    mp.game.weapon.setCurrentDamageEventAmount(0);
+                    mp.game.weapon.cancelCurrentDamageEvent();
                 }
             }
             else if(weapon == 984333226){  // heavy shotgun nerf - shoots 1 pellet so it gets more dmg
@@ -3033,6 +3102,10 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     LogPlayerDamage(targetEntity, weapon, 37, boneIndex);
                 
                     showDamageIndicatorOnPosition(37, targetEntity, boneIndex);
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 37, targetPlayer.getArmour());
+                    damage = 0;
+                    mp.game.weapon.setCurrentDamageEventAmount(0);
+                    mp.game.weapon.cancelCurrentDamageEvent();
                 }
                 else if(distance > 9.2681523185659 && distance < 19.267101852897){
                     damage = 28;
@@ -3040,11 +3113,18 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     LogPlayerDamage(targetEntity, weapon, 28, boneIndex);
                 
                     showDamageIndicatorOnPosition(28, targetEntity, boneIndex);
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 28, targetPlayer.getArmour());
+                    damage = 0;
+                    mp.game.weapon.setCurrentDamageEventAmount(0);
+                    mp.game.weapon.cancelCurrentDamageEvent();
                 }
                 else{
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     LogPlayerDamage(targetEntity, weapon, 0, boneIndex);
+                    damage = 0;
+                    mp.game.weapon.setCurrentDamageEventAmount(0);
+                    mp.game.weapon.cancelCurrentDamageEvent();
                 }
             }
 

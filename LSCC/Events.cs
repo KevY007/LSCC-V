@@ -6325,6 +6325,34 @@ namespace RNC
             }
             return;
         }
+        
+        [RemoteEvent("PlayerShot_SyncHealth")]
+        public void SyncHealthOnShot(Player player, Player target, int targetHealth, int damageToDeal, int targetArmour)
+        {
+            int ARtoset = 0;
+            int HPtoset = 0;
+
+            if(targetArmour > damageToDeal)
+            {
+                HPtoset = targetHealth;
+                ARtoset = targetArmour - damageToDeal;
+            }
+            else
+            {
+                int diff = (damageToDeal - targetArmour);
+                ARtoset = 0;
+                HPtoset = targetHealth - diff;
+            }
+
+            if (ARtoset < 0) ARtoset = 0;
+            if (HPtoset < 0) HPtoset = 0;
+
+            target.Armor = ARtoset;
+            target.Health = HPtoset;
+
+            target.SendChatMessage($"~r~[DAMAGE] ~w~You've been hit by ~y~{player.Name} ~w~for ~r~{damageToDeal} ~w~damage. ~b~[AR:{ARtoset}|HP:{HPtoset}]");
+            player.SendChatMessage($"~g~[DAMAGE] ~w~You hit ~y~{target.Name} ~w~for ~r~{damageToDeal}~w~ damage, they now have ~r~{HPtoset}~w~ health ~b~(AR: {ARtoset})~w~!");
+        }
 
         [RemoteEvent("opsp")] // wont trigger incar btw 
         public void OnPlayerShootPlayer(Player player, Player target, uint bone, Int64 weapon)
