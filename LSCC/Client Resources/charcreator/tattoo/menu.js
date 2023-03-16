@@ -123,6 +123,7 @@ function applyTattoo(tattooName){
     player.setDecoration(mp.game.joaat(TATTOO_DATA[CurrentOverlayIdx].overlay), mp.game.joaat(Gender === 'M' ? tattooData.HashNameMale : tattooData.HashNameFemale));
 }
 function applyTattoosOnEntity(entity, tattooList){
+    return;
 
     const list = JSON.parse(tattooList);
     for(let j = 0 ; j < list.length ; j++){

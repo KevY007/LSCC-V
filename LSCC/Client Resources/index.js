@@ -124,6 +124,7 @@ require("./Player/Nametags.js");
 require("./Player/SyncScripts/Aim");
 require("./Player/SyncScripts/Flashlight");
 require("./Player/SyncScripts/Laser");
+require('./Player/DamageIndicator/damage_indicator');
 require("./ServerUI/HUD.js");
 require("./ServerUI/Menu.js");
 require("./ServerUI/Logs.js");
@@ -264,7 +265,7 @@ mp.events.add('showLoginBrowser', (state) => {
             ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
             ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
             if(state){
-                ServerUI.execute(`gm.$refs.auth.startLoading(5);`); // initiate the fake loading screen to allow CEF sounds and shit duhh
+                ServerUI.execute(`gm.$refs.auth.startLoading(1);`); // initiate the fake loading screen to allow CEF sounds and shit duhh
                 toggleLoginScene(true);
                 mp.events.callRemote("requestQuickLoginForgotUsernameData"); // yes
                 ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.items = [];`);
