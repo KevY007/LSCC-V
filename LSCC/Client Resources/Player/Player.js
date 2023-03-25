@@ -1300,7 +1300,10 @@ function UpdateStatsVars(entity){
             
                 if(CommandsDataJSON){
                     let allowedCommands = CommandsDataJSON.filter(cmd => cmd.Admin <= mp.players.local.getVariable("Admin"));
-                    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.commands = ${JSON.stringify(allowedCommands)}`);
+                    allowedCommands.sort(function(a, b){
+                        return a.CommandText.length - b.CommandText.length;
+                    });
+                    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.commands = ${JSON.stringify(allowedCommands)}`);
                 }
             }
         }
@@ -2487,6 +2490,20 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
 
 mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weapon, boneIndex, damage) => {
 
+    if(targetEntity !== null && targetEntity !== undefined && targetEntity.type === 'vehicle'){
+        if(sourceEntity !== null && sourceEntity !== undefined && sourceEntity.type === 'player'){
+            let nerfedDmg = Math.floor(damage/2);
+            damage = nerfedDmg;
+            mp.game.weapon.setCurrentDamageEventAmount(nerfedDmg);
+            return;
+        }
+    }
+
+    damage = 0;
+    mp.game.weapon.setCurrentDamageEventAmount(0);
+    mp.game.weapon.cancelCurrentDamageEvent();
+    return;
+
     if(targetEntity !== null && targetEntity !== undefined && targetEntity.type === 'player' && targetEntity == player)
     {
         if(sourceEntity !== null && sourceEntity !== undefined && sourceEntity.type === 'player')
@@ -2993,7 +3010,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 
                 showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
 
-                mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), nerfedDmg, targetPlayer.getArmour());
+                mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), nerfedDmg, targetPlayer.getArmour(), weapon>>0);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -3007,7 +3024,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 
                 showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
 
-                mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), nerfedDmg, targetPlayer.getArmour());
+                mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), nerfedDmg, targetPlayer.getArmour(), weapon>>0);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -3025,7 +3042,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 
                     showDamageIndicatorOnPosition(75, targetEntity, boneIndex);
 
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 75, targetPlayer.getArmour());
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 75, targetPlayer.getArmour(), weapon>>0);
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3037,7 +3054,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 
                     showDamageIndicatorOnPosition(50, targetEntity, boneIndex);
 
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 50, targetPlayer.getArmour());
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 50, targetPlayer.getArmour(), weapon>>0);
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3049,7 +3066,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 
                     showDamageIndicatorOnPosition(25, targetEntity, boneIndex);
 
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 25, targetPlayer.getArmour());
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 25, targetPlayer.getArmour(), weapon>>0);
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3066,7 +3083,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     LogPlayerDamage(targetEntity, weapon, 10, boneIndex);
                 
                     showDamageIndicatorOnPosition(10, targetEntity, boneIndex);
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 10, targetPlayer.getArmour());
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 10, targetPlayer.getArmour(), weapon>>0);
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3077,7 +3094,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     LogPlayerDamage(targetEntity, weapon, 7, boneIndex);
                 
                     showDamageIndicatorOnPosition(7, targetEntity, boneIndex);
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 7, targetPlayer.getArmour());
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 7, targetPlayer.getArmour(), weapon>>0);
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3102,7 +3119,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     LogPlayerDamage(targetEntity, weapon, 37, boneIndex);
                 
                     showDamageIndicatorOnPosition(37, targetEntity, boneIndex);
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 37, targetPlayer.getArmour());
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 37, targetPlayer.getArmour(), weapon>>0);
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3113,7 +3130,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     LogPlayerDamage(targetEntity, weapon, 28, boneIndex);
                 
                     showDamageIndicatorOnPosition(28, targetEntity, boneIndex);
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 28, targetPlayer.getArmour());
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 28, targetPlayer.getArmour(), weapon>>0);
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3132,6 +3149,9 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
             {
                 if(sourceEntity.getVariable("Team") == targetEntity.getVariable("Team"))
                 {
+                    damage = 0;
+                    mp.game.weapon.setCurrentDamageEventAmount(0);
+                    mp.game.weapon.cancelCurrentDamageEvent();
                     return true;
                 }
 
@@ -3139,29 +3159,51 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 {
                     if(targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
                     {
-                        if(weapon != 911657153) return true; // cant damage dem at alll if thy havent shot unless taser
+                        if(weapon != 911657153){
+                           
+                            damage = 0;
+                            mp.game.weapon.setCurrentDamageEventAmount(0);
+                            mp.game.weapon.cancelCurrentDamageEvent();
+                            return true; // cant damage dem at alll if thy havent shot unless taser
+                        }
 
-                        if(chaseTimeCur < 60) return true; // nah not at da start
+                        if(chaseTimeCur < 60){                           
+                            damage = 0;
+                            mp.game.weapon.setCurrentDamageEventAmount(0);
+                            mp.game.weapon.cancelCurrentDamageEvent();
+                            return true;
+                        }
 
                         if(targetEntity.getVariable("TaseProtection") == true && targetEntity.getVariable("Team") == 0)
-                        {
+                        {                   
+                            damage = 0;
+                            mp.game.weapon.setCurrentDamageEventAmount(0);
+                            mp.game.weapon.cancelCurrentDamageEvent();
                             mp.game.graphics.notify("~r~Cannot tase! Target exiting vehicle!");
                             return true;
                         }
 
                         if(targetEntity.getVariable("Team") == 0 && targetEntity.getVariable("HasShot") == true) {
+                            damage = 0;
+                            mp.game.weapon.setCurrentDamageEventAmount(0);
+                            mp.game.weapon.cancelCurrentDamageEvent();
                             return true;
                         }
 
                         if((targetEntity.isInAnyVehicle(false) == true || 
                             calcDist(targetEntity.position, player.position) > 7.5)) {
-
+                            damage = 0;
+                            mp.game.weapon.setCurrentDamageEventAmount(0);
+                            mp.game.weapon.cancelCurrentDamageEvent();
                             mp.game.graphics.notify("~r~Taser out of reach, get closer!");
                             return true; // Stun Gun no shot if more than 10 meters or target in car.
                         }
                     }
                     else{
                         if(weapon == 911657153){ // Attempt to tase a fugitive with shot tag.
+                            damage = 0;
+                            mp.game.weapon.setCurrentDamageEventAmount(0);
+                            mp.game.weapon.cancelCurrentDamageEvent();
                             mp.game.graphics.notify("~r~Target has shot, cannot tase them!");
                             return true;
                         }
@@ -3184,6 +3226,9 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     }
                     if(targetEntity.getVariable("Wounded") == 2)
                     {
+                        damage = 0;
+                        mp.game.weapon.setCurrentDamageEventAmount(0);
+                        mp.game.weapon.cancelCurrentDamageEvent();
                         mp.events.callRemote("opsp", targetPlayer, boneIndex, mp.players.local.weapon);
                         return true;
                     }
@@ -3246,7 +3291,12 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     mp.console.logInfo("Taser does not work for vehicles.");
                 }
 
-                if(breakShot == true) return true;
+                if(breakShot == true){
+                    damage = 0;
+                    mp.game.weapon.setCurrentDamageEventAmount(0);
+                    mp.game.weapon.cancelCurrentDamageEvent();
+                    return true;
+                }
             }
         }
     }

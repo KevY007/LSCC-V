@@ -6,6 +6,29 @@ const Natives = {
     SET_TEXT_OUTLINE: "0x2513DFB0FB8400FE"
 };
 
+var OnlinePlayersJSON = [];
+mp.events.add("addPlayerToOnlineList", (name) => {
+    if(OnlinePlayersJSON.includes(name)) return;
+
+    OnlinePlayersJSON.push(name);
+})
+mp.events.add("removePlayerFromOnlineList", (name) => {
+    if(!OnlinePlayersJSON.includes(name)) return;
+
+    var idx = OnlinePlayersJSON.indexOf(name);
+    OnlinePlayersJSON.splice(idx, 1);
+});
+
+mp.events.add("chat_requestAutoCompletePlayers", (query) => {
+    if(!ServerUI) return;
+
+    const players = OnlinePlayersJSON.filter(p => p.toLowerCase().startsWith(query.toLowerCase()));
+    var playersToSet = players;
+    if(playersToSet.length > 5) playersToSet = players.slice(0, 5);
+
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.autoCompletePlayers = ${JSON.stringify(playersToSet)}`);
+});
+
 var wasCustomCrosshairOn = false;
 
 let minimap = {};
@@ -596,16 +619,34 @@ mp.events.addCommand("timestamp", () => {
 function activateChat(toggle){
     if(ServerUI == null) return;
     if(menuToggled){
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.enabled = false;`);
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggle(false);`);
         return;
     }
 
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.enabled = ${toggle.toString()}`);
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggle(${toggle.toString()})`);
 };
 function focusChat(toggle){
     if(ServerUI == null) return;
+
+    var channels = `gm.$refs.hud.$refs.base.$refs.chat.api.channels = [`;
+    channels += `
+        {name:"Global", value:"go"},
+        {name:"Lobby", value:"lg"},
+    `
+    if(mp.players.local.getVariable("ClanID") !== -1)
+        channels += `{name:"Clan", value:"c"},`
+
+    if(mp.players.local.getVariable("Admin") > 0)
+        channels += `{name:"Staff", value:"a"},`
+
+    channels += `]`;
+
+    ServerUI.execute(channels);
+
+
     if(menuToggled){
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = false;`);
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
+        //ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`);
         return;
     }
     if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
@@ -614,10 +655,12 @@ function focusChat(toggle){
     (ClothingEditorActive !== undefined && ClothingEditorActive == true) ||
     (StationPickerToggled !== undefined && StationPickerToggled == true) ||
     (isHotwiring !== undefined && isHotwiring == true)){
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = false;`);
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
+        //ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`);
         return;
     }
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = ${toggle.toString()}`);
+    //ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = ${toggle.toString()}`);
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(${toggle.toString()});`);
 
     if(toggle){
         if(mp.storage.data.menu.ActiveChatOpacity !== undefined){
@@ -629,7 +672,7 @@ function focusChat(toggle){
         increaseChatOpacity(3000);
     }
 
-    mp.gui.cursor.show(toggle, false);
+    mp.gui.cursor.show(toggle, toggle);
     mp.events.callRemote("onFocusChat", toggle);
 }
 function pushMessageToChat(message){
@@ -671,7 +714,7 @@ mp.events.add("HideAllElementsExceptChat", (value) => {
         `
             gm.$refs.hud.$refs.topRight.$refs.info.enabled = false; 
             gm.$refs.hud.$refs.topRight.$refs.killFeed.enabled = false;
-            gm.$refs.hud.$refs.base.$refs.chat.enabled = ${showHud.toString()};
+            gm.$refs.hud.$refs.base.$refs.chat.api.toggle(${showHud.toString()});
         `);
     }
     else{
@@ -679,7 +722,7 @@ mp.events.add("HideAllElementsExceptChat", (value) => {
             `
             gm.$refs.hud.$refs.topRight.$refs.info.enabled = ${mp.storage.data.menu.topRightInfo}; 
             gm.$refs.hud.$refs.topRight.$refs.killFeed.enabled = ${mp.storage.data.menu.killFeed};
-            gm.$refs.hud.$refs.base.$refs.chat.enabled = ${showHud.toString()};
+            gm.$refs.hud.$refs.base.$refs.chat.api.toggle(${showHud.toString()});
             `);       
     }
 });
@@ -727,7 +770,7 @@ mp.keys.bind(0x0D, true, function() { // Enter Key
 mp.keys.bind(0x54, true, function() { // T key
     if(ServerUI == null) return;
     if(menuToggled){
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = false;`);
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
         return;
     }
     if(mp.storage.data.menu.HUD !== undefined && mp.storage.data.menu.HUD == false){
@@ -739,7 +782,7 @@ mp.keys.bind(0x54, true, function() { // T key
     (ActionMenuActive !== undefined && ActionMenuActive == true) || 
     (StationPickerToggled !== undefined && StationPickerToggled == true) ||
     (isHotwiring !== undefined && isHotwiring == true)){
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = false;`);
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
         return;
     }
     if(!chatStatus)
@@ -780,7 +823,7 @@ mp.events.add('RestartHUD', () => {
         //mp.gui.chat.activate(true);
         //mp.gui.chat.show(true);
         // ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.commands = ${JSON.stringify(CommandsDataJSON)}`);
-        // ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.active = false;`)
+        // ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`)
         // ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings = {
         //     opacity: 1,
         //     autoScroll: true,

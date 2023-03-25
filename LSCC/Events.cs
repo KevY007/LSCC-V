@@ -2459,6 +2459,8 @@ namespace RNC
                     {
                         Settings.LoggedInPlayers.ForEach((Player pl) =>
                         {
+                            pl.TriggerEvent("removePlayerFromOnlineList", player.Name);
+
                             if (pl.HasData("AskedBySquad") && pl.GetData<Player>("AskedBySquad") == player)
                             {
                                 pl.ResetData("AskedBySquad");
@@ -2481,7 +2483,9 @@ namespace RNC
                         });
                     }
                 }
-                catch { }
+                catch(Exception ex) {
+                    NAPI.Util.ConsoleOutput(ex.ToString());
+                }
 
                 foreach (var lobby in Settings.Lobbies)
                 {
@@ -3738,6 +3742,12 @@ namespace RNC
                     EPlayer.Menu_AddItems(player);
                     Achievement.LoadAchievementsForPlayer(player);
                     Challenge.AddChallengesForPlayer(player);
+
+                    foreach(Player pl in Settings.LoggedInPlayers)
+                    {
+                        pl.TriggerEvent("addPlayerToOnlineList", acc.Username);
+                        player.TriggerEvent("addPlayerToOnlineList", pl.Name);
+                    }
                 });                
             });
             
@@ -6327,8 +6337,22 @@ namespace RNC
         }
         
         [RemoteEvent("PlayerShot_SyncHealth")]
-        public void SyncHealthOnShot(Player player, Player target, int targetHealth, int damageToDeal, int targetArmour)
+        public void SyncHealthOnShot(Player player, Player target, int targetHealth, int damageToDeal, int targetArmour, long weapon)
         {
+            if (targetHealth <= 0) return;
+            if (player.CurrentWeapon == WeaponHash.Stungun) return;
+
+            int playerTeam = player.GetSharedData<int>("Team");
+            int targetTeam = target.GetSharedData<int>("Team");
+            if(targetTeam != -1)
+            {
+                if (playerTeam == targetTeam) return;
+                if (targetTeam == 0 && playerTeam == 1 && target.GetSharedData<bool>("HasShot") == false) return;
+                if (target.GetSharedData<int>("Wounded") == 1) return;
+            }
+
+            target.SendChatMessage($"You've been ~r~shot ~w~for ~r~{damageToDeal}~w~DMG by ~r~{player.Name}~w~!");
+
             int ARtoset = 0;
             int HPtoset = 0;
 
@@ -6345,13 +6369,32 @@ namespace RNC
             }
 
             if (ARtoset < 0) ARtoset = 0;
-            if (HPtoset < 0) HPtoset = 0;
+            if (HPtoset < 0)
+            {
+                HPtoset = 0;
+
+                if(targetTeam != -1 && target.GetSharedData<int>("Wounded") == 0)
+                {
+                    //OnPlayerWounded(target, 1, player.Id);
+                    target.TriggerEvent("setWounded", 1, player.Id);
+                    target.Armor = 0;
+                    target.Health = 100;
+                    return;
+                }
+                else
+                {
+                    target.Health = 0;
+                    target.Armor = 0;
+                    OnPlayerDeath(target, player, (uint)weapon);
+                    return;
+                }
+            }
 
             target.Armor = ARtoset;
             target.Health = HPtoset;
 
-            target.SendChatMessage($"~r~[DAMAGE] ~w~You've been hit by ~y~{player.Name} ~w~for ~r~{damageToDeal} ~w~damage. ~b~[AR:{ARtoset}|HP:{HPtoset}]");
-            player.SendChatMessage($"~g~[DAMAGE] ~w~You hit ~y~{target.Name} ~w~for ~r~{damageToDeal}~w~ damage, they now have ~r~{HPtoset}~w~ health ~b~(AR: {ARtoset})~w~!");
+            //target.SendChatMessage($"~r~[DAMAGE] ~w~You've been hit by ~y~{player.Name} ~w~for ~r~{damageToDeal} ~w~damage. ~b~[AR:{ARtoset}|HP:{HPtoset}]");
+            //player.SendChatMessage($"~g~[DAMAGE] ~w~You hit ~y~{target.Name} ~w~for ~r~{damageToDeal}~w~ damage, they now have ~r~{HPtoset}~w~ health ~b~(AR: {ARtoset})~w~!");
         }
 
         [RemoteEvent("opsp")] // wont trigger incar btw 

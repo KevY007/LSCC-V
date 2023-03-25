@@ -388,6 +388,30 @@ mp.events.add("UpdateMenuStatsTab", (email, admin, points, dpoints, dlevel, derb
     // }`
 });
 
+/*
+play
+store
+inventory
+profile
+clans
+wiki
+settings
+*/
+
+mp.events.add("menu_tabData", (tab) => {
+    mp.gui.chat.push(`Requested ${tab} tab data.`);
+    switch(tab){
+        case "clans":
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.clansList.clans = [];`);
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.name = "${mp.players.local.getVariable("ClanName")}"`);
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.createdAt = "${mp.players.local.getVariable("ClanCreated")}"`);
+
+            mp.events.callRemote("Menu_RequestClansList");
+            mp.events.callRemote("Menu_InitializeMyClanTab");
+            break;
+    }
+});
+
 function ToggleMenu()
 {
     if(MDCActive !== undefined && MDCActive == true){
@@ -405,7 +429,7 @@ function ToggleMenu()
         ToggleScoreboard();
     }
     if(ServerUI != null && Date.now() - lastChatToggle >= 500 && chatStatus == false && mp.players.local.getVariable("pLogged") !== undefined 
-        && mp.players.local.getVariable("pLogged") == true && Date.now() - lastMenuToggle >= 1000)
+        && mp.players.local.getVariable("pLogged") == true && Date.now() - lastMenuToggle >= 100)
     {
         lastMenuToggle = Date.now();
         traceLastFunc(`[Menu] Attempt open/M key`);
@@ -413,9 +437,10 @@ function ToggleMenu()
         menuToggled = !menuToggled;
 
         //if(ServerUI != null) ServerUI.execute(`gm.miniHud = ${!menuToggled};`);
-        //ServerUI.execute(`gm._pStores.globals.isMainMenuOpen = ${menuToggled};`);
-        ServerUI.execute(`gm.$refs.hud.enabled = ${menuToggled ? 'false' : mp.storage.data.menu.HUD.toString()};`);
+        ServerUI.execute(`gm._pStores.globals.isMainMenuOpen = ${menuToggled};`);
         ServerUI.execute(`gm.$refs.mainMenu.enabled = ${menuToggled}`);
+        
+        ServerUI.execute(`gm.$refs.hud.enabled = ${menuToggled ? 'false' : mp.storage.data.menu.HUD.toString()};`);
         mp.events.callRemote("OnToggleMenu", menuToggled);
         mp.gui.cursor.show(menuToggled, menuToggled);
         activateChat(!menuToggled);
@@ -425,17 +450,16 @@ function ToggleMenu()
         ServerUI.execute('gm.$refs.mainMenu.$refs.logsTab.isLoading = false;');
 
         if(menuToggled){
-            ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.clansList.clans = [];`);
-            mp.events.callRemote("Menu_RequestClansList");
-            ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.name = "${mp.players.local.getVariable("ClanName")}"`);
-            ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.createdAt = "${mp.players.local.getVariable("ClanCreated")}"`);
+            //ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.clansList.clans = [];`);
+            //mp.events.callRemote("Menu_RequestClansList");
+            //ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.name = "${mp.players.local.getVariable("ClanName")}"`);
+            //ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.createdAt = "${mp.players.local.getVariable("ClanCreated")}"`);
             ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.name = '${mp.players.local.name}'`);
             ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.createdAt = '${mp.players.local.getVariable("RegisterDate")}'`);
 
             
 
             // Testing for now, loads all clan data such as members, clan kills, etc.
-            mp.events.callRemote("Menu_InitializeMyClanTab");
 
             if(FirstTimeMenuOpen){
                 FirstTimeMenuOpen = false;
