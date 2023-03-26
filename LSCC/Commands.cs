@@ -1938,6 +1938,8 @@ namespace RNC
             if (!player.GetSharedData<string>("ActionType").Equals("none"))
             { player.SendChatMessage(Translate(player, "ERROR_IN_ACTION")); return; }
 
+            player.TriggerEvent("togglePrecisionPositioner", false);
+            player.SetSharedData("PlayedAnimation", "NULL");
 
             if (player.HasData("Handsup"))
             {
@@ -5239,7 +5241,7 @@ namespace RNC
             return;
         }
 
-        [Command("dbgplayanim", Alias = "panim")]
+        [Command("dbgplayanim")]
         public void cmd_playanim(Player player, string lib, string name, int flags)
         {
             if (!EPlayer.LoggedIn(player)) return;
@@ -5247,6 +5249,24 @@ namespace RNC
             {
                 Events.RequestPlayAnimation(player, lib, name, flags);
                 player.SendChatMessage("~y~[ANIMATION]~w~ Attempting to play animation ~y~" + name + "~w~.");
+            }
+            return;
+        }
+
+        [Command("anim", "!{#AFAFAF}[USAGE] anim (library) (name) (flags)", Alias = "panim")]
+        public void cmd_anim(Player player, string lib, string name, int flags)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin >= 4 || player.GetSharedData<int>("InLobby") == -3)
+            {
+                player.SetSharedData("PlayedAnimation", $"{{\"library\":\"{lib}\", \"name\":\"{name}\", \"flags\":{flags}}}");
+                player.TriggerEvent("togglePrecisionPositioner", true);
+
+                player.SendChatMessage("~y~[ANIMATION]~w~ Attempting to play animation ~y~" + name + "~w~.");
+                player.SendChatMessage("~y~W,A,S,D ~w~for movement. ~r~| ~y~E,Q ~w~for rotation. ~r~| ~y~CTRL,SHIFT ~w~for height.");
+                player.SendChatMessage("~y~/sa ~w~or ~y~press F ~w~to stop!");
+
+                Events.RequestPlayAnimation(player, lib, name, flags);
             }
             return;
         }

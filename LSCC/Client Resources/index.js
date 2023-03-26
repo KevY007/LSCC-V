@@ -81,6 +81,8 @@ var FPS = 0; // This is the actual fps.
 var FPS_Frames = 0;
 var FPS_Calc = Date.now();
 
+var precisionPositionerActive = false;
+
 mp.players.local.Team = -1;
 mp.game.vehicle.defaultEngineBehaviour = false;
 mp.game.gameplay.enableMpDlcMaps(true);
@@ -160,33 +162,7 @@ async function toggleLoginScene(toggle){
     if(toggle){
   
         /* CREATING THE VEHICLES */
-        loginSceneEntities[0] = mp.vehicles.new(mp.game.joaat("cavalcade"), new mp.Vector3(-694.26056, -1044.3917, 15.728991),
-            {
-                heading: -4.97181,
-                numberPlate: 'RNC123',
-                color: [[255, 0, 0], [255, 255, 255]],
-                alpha: 255,
-                engine: false,
-                dimension: mp.players.local.dimension
-            });
-        loginSceneEntities[1] = mp.vehicles.new(mp.game.joaat("police2"), new mp.Vector3(-688.26843, -1044.1389, 15.873694),
-        {
-            heading: 103.21785,
-            numberPlate: 'RNC123',
-            color: [[0,0,0], [255, 255, 255]],
-            alpha: 255,
-            engine: false,
-            dimension: mp.players.local.dimension
-        });
-        loginSceneEntities[2] = mp.vehicles.new(mp.game.joaat("police"), new mp.Vector3(-696.2687, -1050.3245, 15.12663),
-        {
-            heading: -29.521137,
-            numberPlate: 'RNC123',
-            color: [[0,0,0], [255, 255, 255]],
-            alpha: 255,
-            engine: false,
-            dimension: mp.players.local.dimension
-        });
+
         
         /* GENERAL STUFF - TIME OF DAY, ANIM DICTS... */
 
@@ -194,55 +170,9 @@ async function toggleLoginScene(toggle){
         mp.game.time.setClockTime(21, 0, 0);
         mp.game.gameplay.setWeatherTypeNow('CLEAR');
 
-        mp.game.streaming.requestAnimDict("arrest");
-        for(let i = 0; mp.game.streaming.hasAnimDictLoaded("arrest") === 0 && i < 15; i++){
-            await mp.game.waitAsync(100);
-        }
-        mp.game.streaming.requestAnimDict("amb@medic@standing@kneel@base");
-        for(let i = 0; mp.game.streaming.hasAnimDictLoaded("amb@medic@standing@kneel@base") === 0 && i < 15; i++){
-            await mp.game.waitAsync(100);
-        }
-        mp.game.streaming.requestAnimDict("random@arrests@busted");
-        for(let i = 0; mp.game.streaming.hasAnimDictLoaded("random@arrests@busted") === 0 && i < 15; i++){
-            await mp.game.waitAsync(100);
-        }
-        mp.game.streaming.requestAnimDict("combat@damage@writhe");
-        for(let i = 0; mp.game.streaming.hasAnimDictLoaded("combat@damage@writhe") === 0 && i < 15; i++){
-            await mp.game.waitAsync(100);
-        }
 
         /* CREATING THE PEDS */
         setTimeout(() => {
-            loginSceneEntities[3] = mp.peds.new( // gangster 1 - dead
-                mp.game.joaat('csb_grove_str_dlr'), 
-                new mp.Vector3(-697.9484, -1043.4353, 15.86826),
-                -47.113903,
-                mp.players.local.dimension
-            );
-            loginSceneEntities[4] = mp.peds.new( // gangster 2 - surrendering
-                mp.game.joaat('a_m_m_salton_02'), 
-                new mp.Vector3(-693.20276, -1047.7367, 15.804193),
-                34.280487,
-                mp.players.local.dimension
-            );
-            loginSceneEntities[5] = mp.peds.new( // cop speaking into radio, aiming at gangster 2
-                mp.game.joaat('s_m_y_cop_01'), 
-                new mp.Vector3(-692.4914, -1048.5272, 15.750268),
-                35.93633,
-                mp.players.local.dimension
-            );
-            loginSceneEntities[6] = mp.peds.new( // cop 2 - kneeling next to ded guy
-                mp.game.joaat('s_f_y_cop_01'), 
-                new mp.Vector3(-696.91583, -1044.7444, 15.767713),
-                67.523476,
-                mp.players.local.dimension
-            );
-            loginSceneEntities[7] = mp.peds.new( // cop 3 - idling next to them
-                mp.game.joaat('s_m_y_cop_01'), 
-                new mp.Vector3(-689.9278, -1046.8384, 15.976717),
-                104.24435,
-                mp.players.local.dimension
-            );
 
         }, 550);
     }

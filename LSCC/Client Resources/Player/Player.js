@@ -155,45 +155,6 @@ mp.events.add('entityStreamIn', (entity) => {
             mp.events.callRemote("RequestSetInVehicle", entity, chaseStartSeat);
         }
     }
-
-    /* Applying login entitires anims */
-    if(loginSceneEntities[0] && entity == loginSceneEntities[0]){
-        loginSceneEntities[0].setLights(2);
-        loginSceneEntities[0].setDamage(-1, 0, 0, 100, 25, true);
-        loginSceneEntities[0].setDoorOpen(0, false, true);
-        loginSceneEntities[0].setDoorOpen(3, false, true);
-    }
-    if(loginSceneEntities[1] && entity == loginSceneEntities[1]){
-        loginSceneEntities[1].setLights(3);
-        loginSceneEntities[1].setSiren(true);
-        loginSceneEntities[1].setDoorOpen(0, false, true);
-        loginSceneEntities[1].setDoorOpen(1, false, true);
-    }
-    if(loginSceneEntities[2] && entity == loginSceneEntities[2]){
-        loginSceneEntities[2].setLights(3);
-        loginSceneEntities[2].setSiren(true);
-        loginSceneEntities[2].setDoorOpen(0, false, true);
-    }
-    if(loginSceneEntities[3] && entity == loginSceneEntities[3]){
-        loginSceneEntities[3].applyDamagePack("Explosion_Large", 100, 1);
-        loginSceneEntities[3].taskPlayAnim("combat@damage@writhe", "writhe_loop", 8.0, 1.0, -1, 1, 1.0, false, false, false);    
-    }
-    if(loginSceneEntities[4] && entity == loginSceneEntities[4]){
-        loginSceneEntities[4].taskPlayAnim("random@arrests@busted", "idle_a", 8.0, 1.0, -1, 1, 1.0, false, false, false);    
-    }
-    if(loginSceneEntities[5] && entity == loginSceneEntities[5]){
-        mp.game.invoke('0xBF0FD6E56C964FCB', loginSceneEntities[5].handle, 1593441988, 0, false, false); // GIVE_WEAPON_TO_PED
-        mp.game.invoke('0xADF692B254977C0C', loginSceneEntities[5].handle, 1593441988, true); // SET_CURRENT_PED_WEAPON    
-        loginSceneEntities[5].taskPlayAnim("arrest", "radio_chatter", 8.0, 1.0, -1, 1, 1.0, false, false, false);       
-    }
-    if(loginSceneEntities[6] && entity == loginSceneEntities[6]){
-        loginSceneEntities[6].taskPlayAnim("amb@medic@standing@kneel@base", "base", 8.0, 1.0, -1, 1, 1.0, false, false, false);     
-    }
-    if(loginSceneEntities[7] && entity == loginSceneEntities[7]){
-        loginSceneEntities[7].setComponentVariation(0, 1, 0, 0);
-        loginSceneEntities[7].setComponentVariation(3, 0, 1, 0);
-        loginSceneEntities[7].taskStartScenarioInPlace('WORLD_HUMAN_COP_IDLES', 0, false);   
-    }
 });
 
 var HandcuffTooltipTime = 0;
@@ -994,9 +955,21 @@ function moveCam(x, y, z, rx, ry, rz, time, newviewangle){
         moveToCam = null;
     }
     moveToCam = mp.cameras.new("MoveToCam", {x, y, z}, { x: rx, y: ry, z: rz}, newviewangle);
+
+    const {x:oX, y:oY, z:oZ} = camera.getCoord();
+    const {x:oXR, y:oYR, z:oZR} = camera.getRot(2);
+
     setTimeout(() => {
         camera.setActiveWithInterp(moveToCam.handle, time, 1, 1);
     }, 100);
+
+    setTimeout(() => {
+        if(camera){
+            destroyCam();
+            createCam(x,y,z,rx,ry,rz, newviewangle, true);
+            moveCam(oX, oY, oZ, oXR, oYR, oZR, time, newviewangle);
+        }
+    }, time-1);
     
 }
 
@@ -3751,6 +3724,134 @@ mp.events.add(
             }
         }, 2000);
     },
+});
+
+
+
+var precisionEditorKeys = {"W":false, "A":false, "S":false, "D":false, "E":false, "Q":false, "SHIFT":false, "CTRL":false};
+function precisionPositioner_handleInput(key, isDown){
+    if(!precisionPositionerActive) return; 
+    if(chatStatus) return;
+
+    precisionEditorKeys = {...precisionEditorKeys, [key]:isDown};
+}
+
+mp.keys.bind(0x57, true, () => {precisionPositioner_handleInput("W", true)});
+mp.keys.bind(0x57, false, () => {precisionPositioner_handleInput("W", false)});
+mp.keys.bind(0x41, true, () => {precisionPositioner_handleInput("A", true)});
+mp.keys.bind(0x41, false, () => {precisionPositioner_handleInput("A", false)});
+mp.keys.bind(0x53, true, () => {precisionPositioner_handleInput("S", true)});
+mp.keys.bind(0x53, false, () => {precisionPositioner_handleInput("S", false)});
+mp.keys.bind(0x44, true, () => {precisionPositioner_handleInput("D", true)});
+mp.keys.bind(0x44, false, () => {precisionPositioner_handleInput("D", false)});
+mp.keys.bind(0x45, true, () => {precisionPositioner_handleInput("E", true)});
+mp.keys.bind(0x45, false, () => {precisionPositioner_handleInput("E", false)});
+mp.keys.bind(0x51, true, () => {precisionPositioner_handleInput("Q", true)});
+mp.keys.bind(0x51, false, () => {precisionPositioner_handleInput("Q", false)});
+mp.keys.bind(0x10, true, () => {precisionPositioner_handleInput("SHIFT", true)});
+mp.keys.bind(0x10, false, () => {precisionPositioner_handleInput("SHIFT", false)});
+mp.keys.bind(0x11, true, () => {precisionPositioner_handleInput("CTRL", true)});
+mp.keys.bind(0x11, false, () => {precisionPositioner_handleInput("CTRL", false)});
+
+mp.keys.bind(0x46, false, () => {
+    if(precisionPositionerActive && !chatStatus){
+        mp.events.callRemote("StopAnimPositioner");
+    }
+});
+
+var precisionPositioner_animData = {};
+mp.events.add("togglePrecisionPositioner", (toggle) => {
+    mp.players.local.freezePosition(toggle);
+    mp.players.local.setCollision(!toggle, !toggle);
+    precisionPositionerActive = toggle;
+
+    if(toggle && mp.players.local.getVariable("PlayedAnimation") !== "NULL"){
+        const ANIMOBJECT = JSON.parse(mp.players.local.getVariable("PlayedAnimation"));
+        precisionPositioner_animData = {flags:ANIMOBJECT.flags, name:ANIMOBJECT.name, library:ANIMOBJECT.library};
+        mp.gui.chat.push(`[X] Library: ${precisionPositioner_animData.library} | Name: ${precisionPositioner_animData.name}`);
+    }
+});
+
+var wasKeyPressedLastFrame = false;
+mp.events.add('render', () => {
+    if(!precisionPositionerActive) return;
+
+    mp.game.controls.disableControlAction(32, 21, true);
+    mp.game.controls.disableControlAction(32, 22, true);
+    mp.game.controls.disableControlAction(32, 23, true);
+    mp.game.controls.disableControlAction(32, 24, true);
+    mp.game.controls.disableControlAction(32, 25, true);
+    mp.game.controls.disableControlAction(32, 49, true);
+    mp.game.controls.disableControlAction(32, 75, true);
+    mp.game.controls.disableControlAction(32, 30, true);
+    mp.game.controls.disableControlAction(32, 31, true);
+    mp.game.controls.disableControlAction(32, 32, true);
+    mp.game.controls.disableControlAction(32, 33, true);
+    mp.game.controls.disableControlAction(32, 34, true);
+    mp.game.controls.disableControlAction(32, 35, true);
+    mp.game.controls.disableControlAction(32, 44, true);
+    mp.game.controls.disableControlAction(32, 36, true);
+
+    var position = mp.players.local.position;
+    var heading = mp.players.local.getHeading();
+
+    var positionToSet = position;
+    var headingToSet = heading;
+
+    var wasAnyKeyPressed = false;
+
+    if(precisionEditorKeys["W"] === true){
+        let radians = -mp.players.local.getHeading()*Math.PI/180;
+        positionToSet.x = position.x + (0.01 * Math.sin(radians));
+        positionToSet.y = position.y + (0.01 * Math.cos(radians));
+        wasAnyKeyPressed = true;
+    }
+    if(precisionEditorKeys["S"] === true){
+        let radians = -mp.players.local.getHeading()*Math.PI/180;
+        positionToSet.x = position.x + (-0.01 * Math.sin(radians));
+        positionToSet.y = position.y + (-0.01 * Math.cos(radians));
+        wasAnyKeyPressed = true;
+    }
+    if(precisionEditorKeys["A"] === true){
+        let radians = -(mp.players.local.getHeading()+90)*Math.PI/180;
+        positionToSet.x = position.x + (0.01 * Math.sin(radians));
+        positionToSet.y = position.y + (0.01 * Math.cos(radians));
+        wasAnyKeyPressed = true;
+    }
+    if(precisionEditorKeys["D"] === true){
+        let radians = -(mp.players.local.getHeading()-90)*Math.PI/180;
+        positionToSet.x = position.x + (0.01 * Math.sin(radians));
+        positionToSet.y = position.y + (0.01 * Math.cos(radians));
+        wasAnyKeyPressed = true;
+    }
+    if(precisionEditorKeys["E"] === true){
+        headingToSet = heading - 0.25;
+        wasAnyKeyPressed = true;
+    }
+    if(precisionEditorKeys["Q"] === true){
+        headingToSet = heading + 0.25;
+        wasAnyKeyPressed = true;
+    }
+    if(precisionEditorKeys["CTRL"] === true){
+        positionToSet.z = position.z - 0.01;
+        wasAnyKeyPressed = true;
+    }
+    if(precisionEditorKeys["SHIFT"] === true){
+        positionToSet.z = position.z + 0.01;
+        wasAnyKeyPressed = true;
+    }
+
+    if(wasAnyKeyPressed){
+        mp.players.local.position = positionToSet;
+        mp.players.local.setHeading(headingToSet);
+    }
+    else{
+        if(wasKeyPressedLastFrame === true){
+            mp.events.callLocal("entplayanim", mp.players.local, precisionPositioner_animData.library, precisionPositioner_animData.name, precisionPositioner_animData.flags)
+        }
+    }
+
+    wasKeyPressedLastFrame = wasAnyKeyPressed;
 });
 
 mp.events.add("OnPlayerLoginRegister", () => {

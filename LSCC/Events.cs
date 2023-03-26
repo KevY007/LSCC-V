@@ -4127,6 +4127,23 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("StopAnimPositioner")]
+        public static void OnStopAnimPositioner(Player player)
+        {
+            player.TriggerEvent("togglePrecisionPositioner", false);
+            player.SetSharedData("PlayedAnimation", "NULL");
+            if (player.HasData("Handsup"))
+            {
+                player.TriggerEvent("SetHandsup", false);
+                player.ResetData("Handsup");
+            }
+            else
+            {
+                Events.RequestClearAnimation(player);
+                player.TriggerEvent("ClearTaskNotFalling");
+            }
+        }
+
         [RemoteEvent("HolsterAnimation_StopSynced")]
         public void HolsterAnimation_StopSynced(Player player, string dict, string name, double speed)
         {
@@ -7352,6 +7369,11 @@ namespace RNC
             if (player.HasSharedData("TattooList"))
             {
                 player.TriggerEvent("ApplyTattoos", player.GetSharedData<string>("TattooList"));
+            }
+
+            if(player.GetSharedData<string>("PlayedAnimation") != "NULL")
+            {
+                OnStopAnimPositioner(player);
             }
 
             player.TriggerEvent("Bleeding_ClearAll");

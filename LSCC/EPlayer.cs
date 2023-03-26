@@ -1836,7 +1836,7 @@ namespace RNC
         {
             player.TriggerEvent("TogglePlayerChat", false);
             EPlayer.Freeze(player, true);
-            player.Position = new Vector3(Settings.LoginCameraX, Settings.LoginCameraY, Settings.LoginCameraZ);
+            player.Position = new Vector3(2049.2263f, 2971.5293f, -67.30182f);
             player.Dimension = 666 + Convert.ToUInt32(RAGE.Entities.Players.Count);
             player.SetSharedData("EntAlpha", 0);
  
@@ -1845,7 +1845,7 @@ namespace RNC
             NAPI.Task.Run(() =>
             {
                 if (player != null)
-                    player.TriggerEvent("MovePlayerCamera", Settings.LoginCameraXEnd, Settings.LoginCameraYEnd, Settings.LoginCameraZEnd, Settings.LoginCameraRxEnd, Settings.LoginCameraRyEnd, Settings.LoginCameraRzEnd, 120000, Settings.LoginCameraViewAngle); 
+                    player.TriggerEvent("MovePlayerCamera", Settings.LoginCameraXEnd, Settings.LoginCameraYEnd, Settings.LoginCameraZEnd, Settings.LoginCameraRxEnd, Settings.LoginCameraRyEnd, Settings.LoginCameraRzEnd, 15000, Settings.LoginCameraViewAngle); 
             }, 1000);
 
             EPlayer.LoginBrowserSetup(player);
