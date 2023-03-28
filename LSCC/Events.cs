@@ -7468,7 +7468,7 @@ namespace RNC
                     EPlayer.SetDiscordStatus(player, $"In jail as {player.Name}");
 
                     player.SetSharedData("AutoJoin", false);
-                    player.SetSharedData("InLobby", -2);
+                    //player.SetSharedData("InLobby", -2);
                     player.SetSharedData("JailTime", acc.JailTime);
                     player.TriggerEvent("SetJailCounter", acc.JailTime);
                     EPlayer.SetColor(player, new Color(168, 128, 8, 255));
