@@ -955,6 +955,7 @@ function moveCam(x, y, z, rx, ry, rz, time, newviewangle){
         moveToCam = null;
     }
     moveToCam = mp.cameras.new("MoveToCam", {x, y, z}, { x: rx, y: ry, z: rz}, newviewangle);
+    camera.shake('HAND_SHAKE', 0.4);
 
     const {x:oX, y:oY, z:oZ} = camera.getCoord();
     const {x:oXR, y:oYR, z:oZR} = camera.getRot(2);
@@ -3881,6 +3882,8 @@ mp.events.add("OnPlayerLoginRegister", () => {
         {
             mp.events.callRemote("SetPlayerPrivateWeather", mp.storage.data.menu.myweather);
         }
+
+        mp.game.object.doorControl(4147641866, 2055.52, 2969.68, -67.3, true, 0, 0, 0.2);
     }, 800);
 
 });

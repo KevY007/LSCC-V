@@ -160,21 +160,99 @@ traceLastFunc("Main::Init()");
 var loginSceneEntities = [];
 async function toggleLoginScene(toggle){
     if(toggle){
+
+        mp.game.streaming.requestAnimDict("amb@prop_human_seat_bar@male@elbows_on_bar@idle_a");
+        mp.game.streaming.requestAnimDict("amb@prop_human_seat_chair@female@arms_folded@idle_a");
+        mp.game.streaming.requestAnimDict("amb@prop_human_seat_chair@male@elbows_on_knees@idle_b");
+        mp.game.streaming.requestAnimDict("anim@amb@casino@brawl@fights@argue@");
+        mp.game.streaming.requestAnimDict("anim@heists@ornate_bank@chat_manager");
   
-        /* CREATING THE VEHICLES */
+        /* CREATING THE PEDS */
+        setTimeout(() => {
+          loginSceneEntities[0] = mp.peds.new(
+            mp.game.joaat('a_m_y_gay_01'),
+            new mp.Vector3(2055.6335, 2963.446, -67.70754),
+            -125.94715,
+            mp.players.local.dimension
+          );
 
-        
+          loginSceneEntities[1] = mp.peds.new(
+            mp.game.joaat('ig_kaylee'),
+            new mp.Vector3(2057.192, 2961.257, -67.811966),
+            52.981815,
+            mp.players.local.dimension
+          );
+
+          loginSceneEntities[2] = mp.peds.new(
+            mp.game.joaat('a_m_y_vindouche_01'),
+            new mp.Vector3(2058.2307, 2962.797, -67.82209),
+            67.54069,
+            mp.players.local.dimension
+          );
+
+          loginSceneEntities[3] = mp.peds.new(
+            mp.game.joaat('s_m_y_dealer_01'),
+            new mp.Vector3(2056.2158, 2966.3682, -67.30179),
+            144.91861,
+            mp.players.local.dimension
+          );
+
+          loginSceneEntities[4] = mp.peds.new(
+            mp.game.joaat('g_m_m_chicold_01'),
+            new mp.Vector3(2052.9705, 2961.859, -67.30187),
+            -36.38813,
+            mp.players.local.dimension
+          );
+
+          loginSceneEntities[5] = mp.peds.new(
+            mp.game.joaat('a_m_m_farmer_01'),
+            new mp.Vector3(2057.881, 2961.7786, -67.30188),
+            52.57501,
+            mp.players.local.dimension
+          );
+
+          // Room 2
+          loginSceneEntities[6] = mp.peds.new(
+            mp.game.joaat('csb_prolsec'),
+            new mp.Vector3(2063.319, 2966.2705, -67.30189),
+            48.209084,
+            mp.players.local.dimension
+          );
+
+          loginSceneEntities[7] = mp.peds.new(
+            mp.game.joaat('s_m_y_swat_01'),
+            new mp.Vector3(2059.623, 2971.459, -67.30181),
+            -160.187,
+            mp.players.local.dimension
+          );
+
+          loginSceneEntities[8] = mp.peds.new(
+            mp.game.joaat('s_m_y_swat_01'),
+            new mp.Vector3(2058.6614, 2970.3154, -67.30181),
+            -129.64273,
+            mp.players.local.dimension
+          );
+
+          loginSceneEntities[9] = mp.peds.new(
+            mp.game.joaat('s_m_y_swat_01'),
+            new mp.Vector3(2057.7458, 2969.198, -67.30181),
+            -116.9288,
+            mp.players.local.dimension
+          );
+
+          loginSceneEntities[10] = mp.peds.new(
+            mp.game.joaat('s_m_y_swat_01'),
+            new mp.Vector3(2057.7458, 2967.9717, -67.30181),
+            -93.87298,
+            mp.players.local.dimension
+          );
+
+        }, 100);
+
         /* GENERAL STUFF - TIME OF DAY, ANIM DICTS... */
-
         mp.game.audio.startAudioScene("CHARACTER_CHANGE_IN_SKY_SCENE");
         mp.game.time.setClockTime(21, 0, 0);
         mp.game.gameplay.setWeatherTypeNow('CLEAR');
-
-
-        /* CREATING THE PEDS */
-        setTimeout(() => {
-
-        }, 550);
     }
     else{
         mp.game.audio.stopAudioScene("CHARACTER_CHANGE_IN_SKY_SCENE");
@@ -184,6 +262,51 @@ async function toggleLoginScene(toggle){
         loginSceneEntities = [];
     }
 }
+mp.events.add('entityStreamIn', (entity) => {
+  if(!loginSceneEntities.includes(entity)) return;
+
+  entity.freezePosition(true);
+  entity.setCollision(false, false);
+
+  const idx = loginSceneEntities.indexOf(entity);
+  switch(idx){
+    case 0:
+      entity.taskPlayAnim('amb@prop_human_seat_bar@male@elbows_on_bar@idle_a', 'idle_a', 8.0, 1.0, -1, 1, 1.0, false, false, false);
+      break;
+    case 1:
+      entity.taskPlayAnim('amb@prop_human_seat_chair@female@arms_folded@idle_a', 'idle_c', 8.0, 1.0, -1, 1, 1.0, false, false, false);
+      break;
+    case 2:
+      entity.taskPlayAnim('amb@prop_human_seat_chair@male@elbows_on_knees@idle_b', 'idle_e', 8.0, 1.0, -1, 1, 1.0, false, false, false);
+      break;
+    case 3:
+      mp.game.invoke('0xBF0FD6E56C964FCB', entity.handle, 2144741730>>0, 100, false, true);
+      break;
+    case 4:
+      mp.game.invoke('0xBF0FD6E56C964FCB', entity.handle, 2144741730>>0, 100, false, true);
+      break;
+    case 5:
+      mp.game.invoke('0xBF0FD6E56C964FCB', entity.handle, 584646201>>0, 100, false, true);
+      entity.taskPlayAnim('anim@amb@casino@brawl@fights@argue@', 'arguement_loop_mp_m_brawler_01', 8.0, 1.0, -1, 1, 1.0, false, false, false);
+      break;
+    case 6:
+      entity.taskPlayAnim('anim@heists@ornate_bank@chat_manager', 'on_foot', 8.0, 1.0, -1, 1, 1.0, false, false, false);
+      break;
+    case 7:
+      mp.game.invoke('0xBF0FD6E56C964FCB', entity.handle, 736523883>>0, 100, false, true);
+      break;
+    case 8:
+      mp.game.invoke('0xBF0FD6E56C964FCB', entity.handle, 984333226>>0, 100, false, true);
+      break;
+    case 9:
+      mp.game.invoke('0xBF0FD6E56C964FCB', entity.handle, 736523883>>0, 100, false, true);
+      break;
+    case 10:
+      mp.game.invoke('0xBF0FD6E56C964FCB', entity.handle, 984333226>>0, 100, false, true);
+      break;
+  }
+});
+
 mp.events.add("DestroyLoginScene", () => toggleLoginScene(false));
 
 mp.events.add('showLoginBrowser', (state) => {

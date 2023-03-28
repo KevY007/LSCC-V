@@ -17,6 +17,7 @@ using Newtonsoft.Json.Converters;
 using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+//using GTANetworkMethods;
 
 namespace RNC
 {
@@ -714,20 +715,20 @@ namespace RNC
 
 
         // Locations
-        public const float LoginCameraX = 2054.6f;
-        public const float LoginCameraY = 2975.7f;
-        public const float LoginCameraZ = -66.5f;
-        public const float LoginCameraRx = -8f;
-        public const float LoginCameraRy = 0f;
-        public const float LoginCameraRz = -127f;
-        public const float LoginCameraViewAngle = 60;
-
-        public const float LoginCameraXEnd = 2048.6f;
-        public const float LoginCameraYEnd = 2967.8f;
-        public const float LoginCameraZEnd = -66.5f;
-        public const float LoginCameraRxEnd = -8f;
+        public const float LoginCameraXEnd = 2050.15429f;
+        public const float LoginCameraYEnd = 2967.41162f;
+        public const float LoginCameraZEnd = -66.618f;
+        public const float LoginCameraRxEnd = -5f;
         public const float LoginCameraRyEnd = 0f;
-        public const float LoginCameraRzEnd = -120f;
+        public const float LoginCameraRzEnd = -125.135f;
+        public const float LoginCameraViewAngle = 40;
+
+        public const float LoginCameraX = 2054.8395f;
+        public const float LoginCameraY = 2973.848f;
+        public const float LoginCameraZ = -66.618f;
+        public const float LoginCameraRx = -5f;
+        public const float LoginCameraRy = 0f;
+        public const float LoginCameraRz = -134.34f;
 
         public static string[] CivilianVehicles =
         {
@@ -779,16 +780,25 @@ namespace RNC
 
         public static Vector3[] LobbySpawns = new Vector3[]
         {
-            new Vector3(117.00068f, -743.66974f, 242.15219f),
-            new Vector3(123.96491f, -768.45325f, 242.15216f),
-            new Vector3(124.12404f, -747.3597f, 242.15218f),
-            new Vector3(121.5661f, -728.85785f, 242.15215f),
-            new Vector3(109.62965f, -753.2608f, 242.15224f),
-            new Vector3(109.04599f, -744.92554f, 242.15225f),
-            new Vector3(135.08902f, -766.33203f, 242.152f),
+            new Vector3(2069.2861f, 2995.4106f, -67.70157f),
+            new Vector3(2054.4092f, 2974.1233f, -67.30131f), 
+            new Vector3(2022.6499f, 3020.7466f, -72.69173f), 
+            new Vector3(2042.7986f, 3011.162f, -72.701996f), 
+            new Vector3(2058.3594f, 2992.1797f, -72.70203f),
+            new Vector3(2051.1077f, 2970.5386f, -61.90173f),
+            new Vector3(2069.274f, 2996.021f, -63.501797f),
+            new Vector3(2066.6445f, 2986.484f, -62.50187f), 
+            new Vector3(2060.0073f, 2993.4216f, -62.501953f), 
+            new Vector3(2046.1349f, 2936.4468f, -61.90174f), 
+            new Vector3(2089.6162f, 2928.3945f, -61.9019f), 
+            new Vector3(2116.1406f, 2924.1868f, -61.9019f),
+            new Vector3(2091.659f, 2944.1787f, -61.901913f),
+            new Vector3(2054.5134f, 2953.5405f, -61.89666f), 
+            new Vector3(2042.21f, 2962.7363f, -65.50202f),
+            new Vector3(2112.1326f, 2944.9526f, -65.50179f)
         };
 
-        public static object[] VectorJail = { new Vector3(459.55798f, -998.202f, 24.914848f), -75.06f };
+        public static object[] VectorJail = { new Vector3(2061.5889f, 2967.7412f, -67.30185f), 53f };
 
         public static string[] DMNames = new string[]
         {

@@ -7474,8 +7474,8 @@ namespace RNC
                     EPlayer.SetColor(player, new Color(168, 128, 8, 255));
                     player.Position = (Vector3)Settings.VectorJail[0];
                     player.Heading = (float)Settings.VectorJail[1];
-                    player.Dimension = 200 + Convert.ToUInt32(player.Id);
-                    EPlayer.Freeze(player, true);
+                    player.Dimension = 100 + Convert.ToUInt32(player.GetSharedData<int>("InLobby"));
+                    EPlayer.Freeze(player, false);
                     player.SendChatMessage(Translate(player, "JAIL_REMINDER", acc.JailTime, acc.JailReason));
 
                     return;
