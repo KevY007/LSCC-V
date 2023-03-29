@@ -4013,11 +4013,11 @@ function setStorageDataVars(){
         mp.storage.data.chat.fontsize = 0.9;
     }
     if(mp.storage.data.chat.timestamp !== undefined){    
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.timeStamp = ${mp.storage.data.chat.timestamp.toString()}`);
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.timestamps = ${mp.storage.data.chat.timestamp.toString()}`);
     }
     else{
         mp.storage.data.chat.timestamp = false;
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.timeStamp = false;`);
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.timestamps = false;`);
     }
     if(mp.storage.data.menu.loadingscreens === undefined){
         mp.storage.data.menu.loadingscreens = true;

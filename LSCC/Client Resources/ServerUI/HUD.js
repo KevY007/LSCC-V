@@ -612,7 +612,7 @@ mp.events.addCommand("timestamp", () => {
 
     mp.storage.data.chat.timestamp = !mp.storage.data.chat.timestamp;
     mp.storage.flush();
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.timeStamp = ${mp.storage.data.chat.timestamp.toString()}`);
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.timestamps = ${mp.storage.data.chat.timestamp.toString()}`);
     mp.gui.chat.push(`!{white}Chat timestamps have been turned ${(mp.storage.data.chat.timestamp == true ? `!{green}ON` : `!{red}OFF`)}`);
 });
 
