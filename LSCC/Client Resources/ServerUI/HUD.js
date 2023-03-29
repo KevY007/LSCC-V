@@ -767,6 +767,28 @@ mp.keys.bind(0x0D, true, function() { // Enter Key
     }
 });
 
+mp.keys.bind(0x26, true, function() { // UP arrow
+    if(chatStatus && ServerUI){
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.historyUp();`);
+    }
+});
+mp.keys.bind(0x28, true, function() { // DOWN arrow
+    if(chatStatus && ServerUI){
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.historyDown();`);
+    }
+});
+
+mp.keys.bind(0x21, true, function() { // PAGE UP arrow
+    if(chatStatus && ServerUI){
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.channelUp();`);
+    }
+});
+mp.keys.bind(0x222, true, function() { // PAGE DOWN arrow
+    if(chatStatus && ServerUI){
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.channelDown();`);
+    }
+});
+
 mp.keys.bind(0x54, true, function() { // T key
     if(ServerUI == null) return;
     if(menuToggled){
