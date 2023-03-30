@@ -10739,10 +10739,25 @@ namespace RNC
                 return; 
             }
 
+            target.SetData<Player>("LastPMFrom", player);
 
             target.SendChatMessage(Translate(target, "PRIVATE_MESSAGE_RECEIVED", player.Name, text));
             player.SendChatMessage(Translate(player, "PRIVATE_MESSAGE_SENT", target.Name, text));
             return;
+        }
+        [Command("re", "!{#AFAFAF}[USAGE] re (text)", Alias = "reply", GreedyArg = true)]
+        public void cmd_re(Player player, string text)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (!player.HasData("LastPMFrom")) return;
+
+            Player target = player.GetData<Player>("LastPMFrom");
+            if (target == null) return;
+
+            Player _check = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name == target.Name);
+            if (_check == null) return;
+
+            cmd_pm(player, target, text);
         }
 
         [Command("passgun", "!{#AFAFAF}[USAGE] passgun (target)", Alias = "pgun")]
