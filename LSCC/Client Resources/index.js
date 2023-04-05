@@ -325,11 +325,11 @@ mp.events.add('showLoginBrowser', (state) => {
                 mp.events.callLocal("actionMenu:removeAllItems");
             }
             else{
-                ServerUI.execute(`gm.$refs.auth.$refs.panel.authSuccess = true;`);
+                ServerUI.execute(`gm.$refs.auth.api.authSuccess = true;`);
                 setTimeout(() => {
                     if(!mp.players.local || !mp.players.exists(mp.players.local)) return;
 
-                    ServerUI.execute(`gm.$refs.auth.authPanel = false;`);
+                    ServerUI.execute(`gm.$refs.auth.api.enabled = false;`);
                     if(!IsInTutorial)
                         ServerUI.execute(`gm.$refs.hud.enabled = true;`);
                 }, 1000);
@@ -351,24 +351,34 @@ mp.events.add('showLoginBrowser', (state) => {
 
 mp.events.add("login_ShowInvalidInfo", (toggle) => {
     if(ServerUI && ServerUI.active){
-        ServerUI.execute(`gm.$refs.auth.$refs.panel.authLoading = false;`);
+        ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
         mp.events.callLocal("HUDError", "The login credentials are invalid!");
+        mp.gui.cursor.show(true, true);
         //ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.login.loginError = ${toggle.toString()}`);
     }
 });
 mp.events.add("login_ShowAccountExists", (toggle) => {
     if(ServerUI && ServerUI.active){
-        ServerUI.execute(`gm.$refs.auth.$refs.panel.authLoading = false;`);
+        ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
         mp.events.callLocal("HUDError", "That username is already taken!");
+        mp.gui.cursor.show(true, true);
         //ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.register.usernameAlreadyExists = ${toggle.toString()}`);
     }
 });
 mp.events.add("login_MaxAccountLimit", (toggle) => {
     if(ServerUI && ServerUI.active){
-        ServerUI.execute(`gm.$refs.auth.$refs.panel.authLoading = false;`);
+        ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
+        mp.events.callLocal("HUDError", "You've reached the maximum accounts limit! (2 accounts)");
+        mp.gui.cursor.show(true, true);
         //ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.register.usernameAlreadyExists = ${toggle.toString()}`);
         // TO-DO: Add a message that max account limit has been reached!
     }
+});
+mp.events.add("login_ForceStopLoading", () => {
+  if(ServerUI && ServerUI.active){
+    ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
+    mp.gui.cursor.show(true, true);
+  }
 });
 
 mp.events.add("browser_ServerConsole", (msg) => mp.events.callRemote("ServerConsoleOutput", msg));
@@ -410,12 +420,12 @@ mp.events.add('auth_login', (username, password) => {
     mp.events.callRemote('OnPlayerLoginAttempt', username, password);
 });
 
-mp.events.add('auth_register', (email, username, password, confirmPass) => {
+mp.events.add('auth_register', (username, email, password, confirmPass) => {
 
   if(password === confirmPass)
     mp.events.callRemote('OnPlayerRegisterAttempt', email, username, password);
   else{
-    ServerUI.execute(`gm.$refs.auth.$refs.panel.authLoading = false;`);
+    ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
     mp.events.callLocal("HUDError", "The passwords do not match!");
   }
 
@@ -428,18 +438,18 @@ mp.events.add('requestAutoLoginData', () => {
 mp.events.add('sendAutoLoginDataToBrowser', (data) => {
     setTimeout(() => {
         if(data.length > 2)
-            ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.login.quickLoginUsername = "${data}"`);
+            ServerUI.execute(`gm.$refs.auth.api.login.quickLogin.username = "${data}"`);
     }, 500);
 });
 mp.events.add('sendForgotUsernameToBrowser', (data) => {
     setTimeout(() => {
-        ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.login.foundUsernames = ${data}`);
+        ServerUI.execute(`gm.$refs.auth.api.login.possibleUsernames = ${data}`);
     }, 500);
 
 });
 
-mp.events.add('autologinToServer', (username) => {
-    ServerUI.execute(`gm.$refs.auth.$refs.panel.authLoading = true;`);
+mp.events.add('auth_quickLogin', (username) => {
+    ServerUI.execute(`gm.$refs.auth.api.isLoading = true;`);
     mp.events.callRemote("OnAutoLoginAttempt", username);
 });
 

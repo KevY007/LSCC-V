@@ -4687,11 +4687,13 @@ namespace RNC
                 if ((username == null || username.Length < 2))
                 {
                     EPlayer.Error(player, Translate(player, "ERROR_USERNAME_REQUIRED"), "fas fa-user");
+                    player.TriggerEvent("login_ForceStopLoading");
                     return;
                 }
                 if ((password == null || password.Length < 2))
                 {
                     EPlayer.Error(player, Translate(player, "ERROR_PASSWORD_REQUIRED"), "fas fa-user");
+                    player.TriggerEvent("login_ForceStopLoading");
                     return;
                 }
 
@@ -4699,6 +4701,7 @@ namespace RNC
                 if (Environment.TickCount64 - player.GetData<long>("LastCryptAttempt") < 1000 || EPlayer.LoggedIn(player))
                 {
                     EPlayer.Error(player, Translate(player, "PLEASE_WAIT_ATTEMPT"), "fas fa-lock");
+                    player.TriggerEvent("login_ForceStopLoading");
                     return;
                 }
                 player.SetData("LastCryptAttempt", Environment.TickCount64);
@@ -4817,6 +4820,7 @@ namespace RNC
             catch(Exception ex)
             {
                 NAPI.Util.ConsoleOutput("CRINGE LOGIN FAIL: " + ex.ToString());
+                player.TriggerEvent("login_ForceStopLoading");
             }
         }
 
@@ -6065,11 +6069,13 @@ namespace RNC
             if ((username == null || username.Length < 2))
             {
                 EPlayer.Error(player, Translate(player, "ERROR_USERNAME_REQUIRED"), "fas fa-user");
+                player.TriggerEvent("login_ForceStopLoading");
                 return;
             }
             if ((password == null || password.Length < 2))
             {
                 EPlayer.Error(player, Translate(player, "ERROR_PASSWORD_REQUIRED"), "fas fa-user");
+                player.TriggerEvent("login_ForceStopLoading");
                 return;
             }
 
@@ -6077,22 +6083,26 @@ namespace RNC
             if (Environment.TickCount64 - player.GetData<long>("LastCryptAttempt") < 1000 || EPlayer.LoggedIn(player))
             {
                 EPlayer.Error(player, Translate(player, "PLEASE_WAIT_ATTEMPT"), "fas fa-user");
+                player.TriggerEvent("login_ForceStopLoading");
                 return;
             }
 
             if (password.Length < 8)
             {
                 EPlayer.Error(player, Translate(player, "ERROR_PASSWORD_NO_REQUIREMENTS"), "fas fa-lock");
+                player.TriggerEvent("login_ForceStopLoading");
                 return;
             }
             if (username.Contains("@") || username.Length < 2 || username.Length >= 24)
             {
                 EPlayer.Error(player, Translate(player, "ERROR_USERNAME_NO_REQUIREMENTS"), "fas fa-user");
+                player.TriggerEvent("login_ForceStopLoading");
                 return;
             }
             if (!IsEmailValid(email))
             {
                 EPlayer.Error(player, "The e-mail address you entered is invalid!", "fas fa-user");
+                player.TriggerEvent("login_ForceStopLoading");
                 return;
             }
             Regex exp = new Regex(@"^[a-zA-Z0-9]*$");
@@ -6100,6 +6110,7 @@ namespace RNC
             if (!match.Success)
             {
                 EPlayer.Error(player, Translate(player, "ERROR_USERNAME_CHARACTERS"), "fas fa-user");
+                player.TriggerEvent("login_ForceStopLoading");
                 return;
             }
             if (email == null || !email.Contains("@") || email.Length < 5)
