@@ -6042,6 +6042,20 @@ namespace RNC
             catch { }
         }
 
+        public static bool IsEmailValid(string emailaddress)
+        {
+            try
+            {
+                MailAddress m = new MailAddress(emailaddress);
+
+                return true;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+        }
+
         [RemoteEvent("OnPlayerRegisterAttempt")]
         public static void OnPlayerRegisterAttempt(Player player, string email, string username, string password)
         {
@@ -6074,6 +6088,11 @@ namespace RNC
             if (username.Contains("@") || username.Length < 2 || username.Length >= 24)
             {
                 EPlayer.Error(player, Translate(player, "ERROR_USERNAME_NO_REQUIREMENTS"), "fas fa-user");
+                return;
+            }
+            if (!IsEmailValid(email))
+            {
+                EPlayer.Error(player, "The e-mail address you entered is invalid!", "fas fa-user");
                 return;
             }
             Regex exp = new Regex(@"^[a-zA-Z0-9]*$");

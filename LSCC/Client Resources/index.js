@@ -352,13 +352,15 @@ mp.events.add('showLoginBrowser', (state) => {
 mp.events.add("login_ShowInvalidInfo", (toggle) => {
     if(ServerUI && ServerUI.active){
         ServerUI.execute(`gm.$refs.auth.$refs.panel.authLoading = false;`);
-        ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.login.loginError = ${toggle.toString()}`);
+        mp.events.callLocal("HUDError", "The login credentials are invalid!");
+        //ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.login.loginError = ${toggle.toString()}`);
     }
 });
 mp.events.add("login_ShowAccountExists", (toggle) => {
     if(ServerUI && ServerUI.active){
         ServerUI.execute(`gm.$refs.auth.$refs.panel.authLoading = false;`);
-        ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.register.usernameAlreadyExists = ${toggle.toString()}`);
+        mp.events.callLocal("HUDError", "That username is already taken!");
+        //ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.register.usernameAlreadyExists = ${toggle.toString()}`);
     }
 });
 mp.events.add("login_MaxAccountLimit", (toggle) => {
@@ -403,14 +405,20 @@ mp.events.add("onOpenChatbox", (toggle) =>
 
 });
 
-mp.events.add('loginInformationToServer', (username, password) => {
+mp.events.add('auth_login', (username, password) => {
 
     mp.events.callRemote('OnPlayerLoginAttempt', username, password);
 });
 
-mp.events.add('registerInformationToServer', (email, username, password) => {
+mp.events.add('auth_register', (email, username, password, confirmPass) => {
 
+  if(password === confirmPass)
     mp.events.callRemote('OnPlayerRegisterAttempt', email, username, password);
+  else{
+    ServerUI.execute(`gm.$refs.auth.$refs.panel.authLoading = false;`);
+    mp.events.callLocal("HUDError", "The passwords do not match!");
+  }
+
 });
 
 mp.events.add('requestAutoLoginData', () => {
