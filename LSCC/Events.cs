@@ -4871,10 +4871,13 @@ namespace RNC
         [RemoteEvent("Server_RequestLogDamage")]
         public void OnRequestLogDamage(Player player, int targetSQLID, string weaponName, int damage, int health, string bodypart, string notes)
         {
+            return;
+            /*
             string realNotes = (notes.Length > 0 ? notes : "None");
 
             int accSQL = EPlayer.GetAccount(player).SQL_ID;
             Logs.LogDamage(targetSQLID, accSQL, weaponName, damage, health, bodypart, realNotes);
+            */
         }
 
         [RemoteEvent("SetAutoJoin")]
@@ -6384,7 +6387,7 @@ namespace RNC
         }
         
         [RemoteEvent("PlayerShot_SyncHealth")]
-        public void SyncHealthOnShot(Player player, Player target, int targetHealth, int damageToDeal, int targetArmour, long weapon)
+        public void SyncHealthOnShot(Player player, Player target, int targetHealth, int damageToDeal, int targetArmour, long weapon, int boneIndex)
         {
             if (targetHealth <= 0) return;
             if (player.CurrentWeapon == WeaponHash.Stungun) return;
@@ -6403,7 +6406,11 @@ namespace RNC
             int ARtoset = 0;
             int HPtoset = 0;
 
-            if(targetArmour > damageToDeal)
+            int targetSQLID = target.GetSharedData<int>("SQL_ID");
+            int dealerSQLID = player.GetSharedData<int>("SQL_ID");
+
+
+            if (targetArmour > damageToDeal)
             {
                 HPtoset = targetHealth;
                 ARtoset = targetArmour - damageToDeal;
@@ -6426,6 +6433,7 @@ namespace RNC
                     target.TriggerEvent("setWounded", 1, player.Id);
                     target.Armor = 0;
                     target.Health = 100;
+                    Logs.LogDamage(targetSQLID, dealerSQLID, weapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
                     return;
                 }
                 else
@@ -6433,12 +6441,14 @@ namespace RNC
                     target.Health = 0;
                     target.Armor = 0;
                     OnPlayerDeath(target, player, (uint)weapon);
+                    Logs.LogDamage(targetSQLID, dealerSQLID, weapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
                     return;
                 }
             }
 
             target.Armor = ARtoset;
             target.Health = HPtoset;
+            Logs.LogDamage(targetSQLID, dealerSQLID, weapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
 
             //target.SendChatMessage($"~r~[DAMAGE] ~w~You've been hit by ~y~{player.Name} ~w~for ~r~{damageToDeal} ~w~damage. ~b~[AR:{ARtoset}|HP:{HPtoset}]");
             //player.SendChatMessage($"~g~[DAMAGE] ~w~You hit ~y~{target.Name} ~w~for ~r~{damageToDeal}~w~ damage, they now have ~r~{HPtoset}~w~ health ~b~(AR: {ARtoset})~w~!");

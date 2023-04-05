@@ -47,12 +47,50 @@ mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
             break;
         }
         case 4:{ // incoming damage
-            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Timestamp", "Dealt By", "Weapon", "Damage", "Health (after DMG)", "Bodypart", "Notes"];`);
+
+            let damageLogs = JSON.parse(jsonLogs);
+            for(let i = 0 ; i < damageLogs.length ; i++){
+                var weaponID = damageLogs[i][2];
+                var bodypartID = damageLogs[i][5];
+
+                let gunData = weaponData.find(w => Number(w.Hash) == weaponID);
+                if(gunData)
+                    damageLogs[i][2] = gunData.Name;
+                else damageLogs[i][2] = `Unknown (${weaponID})`;
+
+                let bodypartData = boneData.find(b => b.index === bodypartID);
+
+                if(bodypartData)
+                    damageLogs[i][5] = bodypartData.name;
+                else damageLogs[i][5] = `Unknown (${bodypartID})`;
+            }
+            jsonLogs = JSON.stringify(damageLogs);
+
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Timestamp", "Dealt By", "Weapon", "Damage", "Health (after DMG)", "Bodypart", "Notes", "Armor (after DMG)"];`);
             ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.columns = ${jsonLogs}`);
             break;
         }
         case 5:{ // outgoing damage
-            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Timestamp", "Victim", "Weapon", "Damage", "Health (after DMG)", "Bodypart", "Notes"];`);
+
+            let damageLogs = JSON.parse(jsonLogs);
+            for(let i = 0 ; i < damageLogs.length ; i++){
+                var weaponID = damageLogs[i][2];
+                var bodypartID = damageLogs[i][5];
+
+                let gunData = weaponData.find(w => Number(w.Hash) == weaponID);
+                if(gunData)
+                    damageLogs[i][2] = gunData.Name;
+                else damageLogs[i][2] = `Unknown (${weaponID})`;
+
+                let bodypartData = boneData.find(b => b.index === bodypartID);
+
+                if(bodypartData)
+                    damageLogs[i][5] = bodypartData.name;
+                else damageLogs[i][5] = `Unknown (${bodypartID})`;
+            }
+            jsonLogs = JSON.stringify(damageLogs);
+
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Timestamp", "Victim", "Weapon", "Damage", "Health (after DMG)", "Bodypart", "Notes", "Armor (after DMG)"];`);
             ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.columns = ${jsonLogs}`);
             break;
         }

@@ -33,11 +33,12 @@ namespace RNC
         public DateTime Timestamp { get; set; }
         public int AccountID { get; set; }
         public int DealerID { get; set; } // who dealt the dammage
-        public string Weapon { get; set; }
+        public long Weapon { get; set; }
         public int Damage { get; set; }
         public int Health { get; set; } // HP after getting damaged
-        public string Bodypart { get; set; }
+        public int Bodypart { get; set; }
         public string Notes { get; set; }
+        public int Armor { get; set; } // Armor after getting damaged
     }
     public class Logs_AdminRecord
     {
@@ -95,7 +96,7 @@ namespace RNC
                     });
                 }
             });
-  
+
         }
         /*
         [RemoteEvent("ReqLogFromSrv")]
@@ -149,7 +150,7 @@ namespace RNC
         */ // Ignore this shit, old logs
 
 
-        
+
         [RemoteEvent("ReqLogFromSrv")]
         public static void RequestLogsFromServer(Player player, string targetName, int type)
         {
@@ -255,7 +256,7 @@ namespace RNC
                                 {
                                     Account dealer = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == _logs[i].DealerID);
                                     string dealerName = (dealer == null ? "[UNKNOWN]" : dealer.Username);
-                                    (string, string, string, string, string, string, string) _toAdd = (_logs[i].Timestamp.ToString(), dealerName, _logs[i].Weapon, _logs[i].Damage.ToString(), _logs[i].Health.ToString(), _logs[i].Bodypart, _logs[i].Notes);
+                                    (string, string, long, string, string, int, string, int) _toAdd = (_logs[i].Timestamp.ToString(), dealerName, _logs[i].Weapon, _logs[i].Damage.ToString(), _logs[i].Health.ToString(), _logs[i].Bodypart, _logs[i].Notes, _logs[i].Armor);
                                     _toSend[i] = _toAdd;
                                 }
                                 NAPI.Task.Run(() =>
@@ -273,7 +274,7 @@ namespace RNC
                                 {
                                     Account victim = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == _logs[i].AccountID);
                                     string victimName = (victim == null ? "[UNKNOWN]" : victim.Username);
-                                    (string, string, string, string, string, string, string) _toAdd = (_logs[i].Timestamp.ToString(), victimName, _logs[i].Weapon, _logs[i].Damage.ToString(), _logs[i].Health.ToString(), _logs[i].Bodypart, _logs[i].Notes);
+                                    (string, string, long, string, string, int, string, int) _toAdd = (_logs[i].Timestamp.ToString(), victimName, _logs[i].Weapon, _logs[i].Damage.ToString(), _logs[i].Health.ToString(), _logs[i].Bodypart, _logs[i].Notes, _logs[i].Armor);
                                     _toSend[i] = _toAdd;
                                 }
                                 NAPI.Task.Run(() =>
@@ -326,21 +327,23 @@ namespace RNC
         {
             LogAdmin(EPlayer.GetAccount(player).SQL_ID, description);
         }
-        public static void LogDamage(int accSQLID, int dealerSQLID, string weapon, int damage, int health, string bodypart, string notes)
+        public static void LogDamage(int accSQLID, int dealerSQLID, long weapon, int damage, int health, int bodypart, string notes, int armor)
         {
-            Logs_Damage _d = new Logs_Damage()
-            {
-                Timestamp = DateTime.Now,
-                AccountID = accSQLID,
-                DealerID = dealerSQLID,
-                Weapon = weapon,
-                Damage = damage,
-                Health = health,
-                Bodypart = bodypart,
-                Notes = notes
-            };
             Task.Run(async () =>
             {
+                Logs_Damage _d = new Logs_Damage()
+                {
+                    Timestamp = DateTime.Now,
+                    AccountID = accSQLID,
+                    DealerID = dealerSQLID,
+                    Weapon = weapon,
+                    Damage = damage,
+                    Health = health,
+                    Bodypart = bodypart,
+                    Notes = notes,
+                    Armor = armor
+                };
+
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
                     await context.Logs_Damages.AddAsync(_d);

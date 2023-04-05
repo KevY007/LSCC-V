@@ -2489,7 +2489,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 mp.game.weapon.setCurrentDamageEventAmount(nerfedDmg);
 
                 showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
-                //LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
+                ////LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2502,7 +2502,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 
                 showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
 
-                //LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
+                ////LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2519,7 +2519,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 
                     showDamageIndicatorOnPosition(75, targetEntity, boneIndex);
 
-                    //LogPlayerDamage(targetEntity, weapon, 75, boneIndex);
+                    ////LogPlayerDamage(targetEntity, weapon, 75, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2530,7 +2530,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 
                     showDamageIndicatorOnPosition(50, targetEntity, boneIndex);
 
-                    //LogPlayerDamage(targetEntity, weapon, 50, boneIndex);
+                    ////LogPlayerDamage(targetEntity, weapon, 50, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2541,7 +2541,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 
                     showDamageIndicatorOnPosition(25, targetEntity, boneIndex);
 
-                    //LogPlayerDamage(targetEntity, weapon, 25, boneIndex);
+                    ////LogPlayerDamage(targetEntity, weapon, 25, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2558,7 +2558,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 
                     showDamageIndicatorOnPosition(10, targetEntity, boneIndex);
                 
-                    //LogPlayerDamage(targetEntity, weapon, 10, boneIndex);
+                    ////LogPlayerDamage(targetEntity, weapon, 10, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2569,7 +2569,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 
                     showDamageIndicatorOnPosition(7, targetEntity, boneIndex);
                 
-                    //LogPlayerDamage(targetEntity, weapon, 7, boneIndex);
+                    ////LogPlayerDamage(targetEntity, weapon, 7, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2578,7 +2578,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                 
-                    //LogPlayerDamage(targetEntity, weapon, 0, boneIndex, "Target too far - no damage dealt.");
+                    ////LogPlayerDamage(targetEntity, weapon, 0, boneIndex, "Target too far - no damage dealt.");
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2595,7 +2595,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 
                     showDamageIndicatorOnPosition(37, targetEntity, boneIndex);
                 
-                    //LogPlayerDamage(targetEntity, weapon, 37, boneIndex);
+                    ////LogPlayerDamage(targetEntity, weapon, 37, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2606,7 +2606,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 
                     showDamageIndicatorOnPosition(28, targetEntity, boneIndex);
                 
-                    //LogPlayerDamage(targetEntity, weapon, 28, boneIndex);
+                    ////LogPlayerDamage(targetEntity, weapon, 28, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2615,7 +2615,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                 
-                    //LogPlayerDamage(targetEntity, weapon, 0, boneIndex, "Target too far - no damage dealt.");
+                    ////LogPlayerDamage(targetEntity, weapon, 0, boneIndex, "Target too far - no damage dealt.");
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2980,11 +2980,11 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 let nerfedDmg = (damage-10);
                 damage = nerfedDmg;
                 mp.game.weapon.setCurrentDamageEventAmount(nerfedDmg);
-                LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
+                //LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
                 
                 showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
 
-                mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), nerfedDmg, targetPlayer.getArmour(), weapon>>0);
+                mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), nerfedDmg, targetPlayer.getArmour(), weapon>>0, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2994,11 +2994,11 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 if(nerfedDmg <= 0) nerfedDmg = 1;
                 damage = nerfedDmg;
                 mp.game.weapon.setCurrentDamageEventAmount(nerfedDmg);
-                LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
+                //LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
                 
                 showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
 
-                mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), nerfedDmg, targetPlayer.getArmour(), weapon>>0);
+                mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), nerfedDmg, targetPlayer.getArmour(), weapon>>0, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -3012,11 +3012,11 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 if(distance < 9.0){
                     damage = 75;
                     mp.game.weapon.setCurrentDamageEventAmount(75);
-                    LogPlayerDamage(targetEntity, weapon, 75, boneIndex);
+                    //LogPlayerDamage(targetEntity, weapon, 75, boneIndex);
                 
                     showDamageIndicatorOnPosition(75, targetEntity, boneIndex);
 
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 75, targetPlayer.getArmour(), weapon>>0);
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 75, targetPlayer.getArmour(), weapon>>0, boneIndex);
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3024,11 +3024,11 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 else if(distance >= 9.0 && distance < 18.0){
                     damage = 50;
                     mp.game.weapon.setCurrentDamageEventAmount(50);
-                    LogPlayerDamage(targetEntity, weapon, 50, boneIndex);
+                    //LogPlayerDamage(targetEntity, weapon, 50, boneIndex);
                 
                     showDamageIndicatorOnPosition(50, targetEntity, boneIndex);
 
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 50, targetPlayer.getArmour(), weapon>>0);
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 50, targetPlayer.getArmour(), weapon>>0, boneIndex);
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3036,11 +3036,11 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 else{
                     damage = 25;
                     mp.game.weapon.setCurrentDamageEventAmount(25);
-                    LogPlayerDamage(targetEntity, weapon, 25, boneIndex);
+                    //LogPlayerDamage(targetEntity, weapon, 25, boneIndex);
                 
                     showDamageIndicatorOnPosition(25, targetEntity, boneIndex);
 
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 25, targetPlayer.getArmour(), weapon>>0);
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 25, targetPlayer.getArmour(), weapon>>0, boneIndex);
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3054,10 +3054,10 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 if(distance < 9.2681523185659){
                     damage = 10;
                     mp.game.weapon.setCurrentDamageEventAmount(10);
-                    LogPlayerDamage(targetEntity, weapon, 10, boneIndex);
+                    //LogPlayerDamage(targetEntity, weapon, 10, boneIndex);
                 
                     showDamageIndicatorOnPosition(10, targetEntity, boneIndex);
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 10, targetPlayer.getArmour(), weapon>>0);
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 10, targetPlayer.getArmour(), weapon>>0, boneIndex);
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3065,10 +3065,10 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 else if(distance > 9.2681523185659 && distance < 19.267101852897){
                     damage = 7;
                     mp.game.weapon.setCurrentDamageEventAmount(7);
-                    LogPlayerDamage(targetEntity, weapon, 7, boneIndex);
+                    //LogPlayerDamage(targetEntity, weapon, 7, boneIndex);
                 
                     showDamageIndicatorOnPosition(7, targetEntity, boneIndex);
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 7, targetPlayer.getArmour(), weapon>>0);
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 7, targetPlayer.getArmour(), weapon>>0, boneIndex);
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3076,7 +3076,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 else{
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
-                    LogPlayerDamage(targetEntity, weapon, 0, boneIndex);
+                    //LogPlayerDamage(targetEntity, weapon, 0, boneIndex);
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3090,10 +3090,10 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 if(distance < 9.2681523185659){
                     damage = 37;
                     mp.game.weapon.setCurrentDamageEventAmount(37);
-                    LogPlayerDamage(targetEntity, weapon, 37, boneIndex);
+                    //LogPlayerDamage(targetEntity, weapon, 37, boneIndex);
                 
                     showDamageIndicatorOnPosition(37, targetEntity, boneIndex);
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 37, targetPlayer.getArmour(), weapon>>0);
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 37, targetPlayer.getArmour(), weapon>>0, boneIndex);
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3101,10 +3101,10 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 else if(distance > 9.2681523185659 && distance < 19.267101852897){
                     damage = 28;
                     mp.game.weapon.setCurrentDamageEventAmount(28);
-                    LogPlayerDamage(targetEntity, weapon, 28, boneIndex);
+                    //LogPlayerDamage(targetEntity, weapon, 28, boneIndex);
                 
                     showDamageIndicatorOnPosition(28, targetEntity, boneIndex);
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 28, targetPlayer.getArmour(), weapon>>0);
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 28, targetPlayer.getArmour(), weapon>>0, boneIndex);
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3112,7 +3112,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 else{
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
-                    LogPlayerDamage(targetEntity, weapon, 0, boneIndex);
+                    //LogPlayerDamage(targetEntity, weapon, 0, boneIndex);
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
