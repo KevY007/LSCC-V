@@ -961,7 +961,11 @@ function moveCam(x, y, z, rx, ry, rz, time, newviewangle){
     const {x:oXR, y:oYR, z:oZR} = camera.getRot(2);
 
     setTimeout(() => {
-        camera.setActiveWithInterp(moveToCam.handle, time, 1, 1);
+        if(!camera)
+            createCam(x,y,z,rx,ry,rz, newviewangle, true);
+
+        if(camera)
+            camera.setActiveWithInterp(moveToCam.handle, time, 1, 1);
     }, 100);
 
     setTimeout(() => {
@@ -2968,12 +2972,40 @@ function isMeleeWeapon(weapon){
     }
 }
 
+let lastRegisteredShotTime = 0;
+let shotsToRegister = [];
+let triggerMultipleShotsStamp = 0;
+mp.events.add("render", () => {
+    if(triggerMultipleShotsStamp === 0) return;
+    if(Date.now() < triggerMultipleShotsStamp) return;
+    if(shotsToRegister.length <= 0) return;
+
+    var weapon = shotsToRegister[0].weapon;
+    var totalDmg = 0;
+    var target = shotsToRegister[0].target;
+    var bone = shotsToRegister[0].bone;
+    for(var i = 0 ; i < shotsToRegister.length ; i++){
+        totalDmg += shotsToRegister[i].damage;
+    }
+
+    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", target, target.getHealth(), totalDmg, target.getArmour(), weapon>>>0, bone);  
+    mp.events.callRemoteUnreliable("ServerConsoleOutput", `${mp.players.local.name} | Added up total damage: ${totalDmg} from the fast shots (${shotsToRegister.length} total)`);           
+
+    shotsToRegister = [];
+    triggerMultipleShotsStamp = 0;
+    lastRegisteredShotTime = Date.now();
+});
+
 mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage) => {
     if(sourceEntity !== undefined && sourceEntity !== null && sourceEntity.type === 'player' && sourceEntity == player)
     {
         if(targetEntity !== undefined && targetEntity !== null && targetEntity.type === 'player')
         {
             if(sourceEntity.getVariable("ClimbProtection") == true || targetEntity.getVariable("ClimbProtection") == true) return true;
+
+            if(targetPlayer.getHealth() <= 0) return;
+
+            let DAMAGE_TO_DEAL = 0;
 
             let gunData = weaponData.find(w => Number(w.Hash) == weapon);
             if(gunData != undefined && (gunData.Type == "Assault Rifles" || gunData.Type == "Machine Guns")){
@@ -2984,7 +3016,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 
                 showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
 
-                mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), nerfedDmg, targetPlayer.getArmour(), weapon>>0, boneIndex);
+                DAMAGE_TO_DEAL = nerfedDmg;
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2998,7 +3030,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 
                 showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
 
-                mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), nerfedDmg, targetPlayer.getArmour(), weapon>>0, boneIndex);
+                DAMAGE_TO_DEAL = nerfedDmg;
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -3016,7 +3048,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 
                     showDamageIndicatorOnPosition(75, targetEntity, boneIndex);
 
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 75, targetPlayer.getArmour(), weapon>>0, boneIndex);
+                    DAMAGE_TO_DEAL = 75;
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3028,7 +3060,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 
                     showDamageIndicatorOnPosition(50, targetEntity, boneIndex);
 
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 50, targetPlayer.getArmour(), weapon>>0, boneIndex);
+                    DAMAGE_TO_DEAL = 50;
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3040,7 +3072,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 
                     showDamageIndicatorOnPosition(25, targetEntity, boneIndex);
 
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 25, targetPlayer.getArmour(), weapon>>0, boneIndex);
+                    DAMAGE_TO_DEAL = 25;
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3057,7 +3089,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     //LogPlayerDamage(targetEntity, weapon, 10, boneIndex);
                 
                     showDamageIndicatorOnPosition(10, targetEntity, boneIndex);
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 10, targetPlayer.getArmour(), weapon>>0, boneIndex);
+                    DAMAGE_TO_DEAL = 10;
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3068,7 +3100,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     //LogPlayerDamage(targetEntity, weapon, 7, boneIndex);
                 
                     showDamageIndicatorOnPosition(7, targetEntity, boneIndex);
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 7, targetPlayer.getArmour(), weapon>>0, boneIndex);
+                    DAMAGE_TO_DEAL = 7;
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3093,7 +3125,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     //LogPlayerDamage(targetEntity, weapon, 37, boneIndex);
                 
                     showDamageIndicatorOnPosition(37, targetEntity, boneIndex);
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 37, targetPlayer.getArmour(), weapon>>0, boneIndex);
+                    DAMAGE_TO_DEAL = 37;
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3104,7 +3136,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     //LogPlayerDamage(targetEntity, weapon, 28, boneIndex);
                 
                     showDamageIndicatorOnPosition(28, targetEntity, boneIndex);
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), 28, targetPlayer.getArmour(), weapon>>0, boneIndex);
+                    DAMAGE_TO_DEAL = 28;
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3119,6 +3151,19 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 }
             }
 
+            if(DAMAGE_TO_DEAL > 0){
+                if(Date.now() - lastRegisteredShotTime > 20 && gunData.Type !== "Shotguns"){
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), DAMAGE_TO_DEAL, targetPlayer.getArmour(), weapon>>>0, boneIndex);            
+                    lastRegisteredShotTime = Date.now();
+                }
+                else{
+                    shotsToRegister.push({weapon:weapon, damage:DAMAGE_TO_DEAL, target:targetPlayer, bone:boneIndex});
+
+                    triggerMultipleShotsStamp = Date.now()+30;
+                    mp.events.callRemoteUnreliable("ServerConsoleOutput", `${mp.players.local.name} is dealing damage too fast! Adding to shotsToRegister (${shotsToRegister.length})`);
+                }
+            }
+            
             if(targetEntity.getVariable("Team") != -1 && player.getVariable("Team") != -1)
             {
                 if(sourceEntity.getVariable("Team") == targetEntity.getVariable("Team"))

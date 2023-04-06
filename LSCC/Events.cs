@@ -6389,6 +6389,7 @@ namespace RNC
         [RemoteEvent("PlayerShot_SyncHealth")]
         public void SyncHealthOnShot(Player player, Player target, int targetHealth, int damageToDeal, int targetArmour, long weapon, int boneIndex)
         {
+            if (target.Dead) return;
             if (targetHealth <= 0) return;
             if (player.CurrentWeapon == WeaponHash.Stungun) return;
 
@@ -6401,7 +6402,7 @@ namespace RNC
                 if (target.GetSharedData<int>("Wounded") == 1) return;
             }
 
-            target.SendChatMessage($"You've been ~r~shot ~w~for ~r~{damageToDeal}~w~DMG by ~r~{player.Name}~w~!");
+            //target.SendChatMessage($"You've been ~r~shot ~w~for ~r~{damageToDeal}~w~DMG by ~r~{player.Name}~w~!");
 
             int ARtoset = 0;
             int HPtoset = 0;

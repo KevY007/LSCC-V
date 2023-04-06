@@ -256,7 +256,7 @@ namespace RNC
                                 {
                                     Account dealer = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == _logs[i].DealerID);
                                     string dealerName = (dealer == null ? "[UNKNOWN]" : dealer.Username);
-                                    (string, string, long, string, string, int, string, int) _toAdd = (_logs[i].Timestamp.ToString(), dealerName, _logs[i].Weapon, _logs[i].Damage.ToString(), _logs[i].Health.ToString(), _logs[i].Bodypart, _logs[i].Notes, _logs[i].Armor);
+                                    (string, string, long, string, string, int, int) _toAdd = (_logs[i].Timestamp.ToString(), dealerName, _logs[i].Weapon, _logs[i].Damage.ToString(), _logs[i].Health.ToString(), _logs[i].Bodypart, _logs[i].Armor);
                                     _toSend[i] = _toAdd;
                                 }
                                 NAPI.Task.Run(() =>
@@ -274,7 +274,7 @@ namespace RNC
                                 {
                                     Account victim = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == _logs[i].AccountID);
                                     string victimName = (victim == null ? "[UNKNOWN]" : victim.Username);
-                                    (string, string, long, string, string, int, string, int) _toAdd = (_logs[i].Timestamp.ToString(), victimName, _logs[i].Weapon, _logs[i].Damage.ToString(), _logs[i].Health.ToString(), _logs[i].Bodypart, _logs[i].Notes, _logs[i].Armor);
+                                    (string, string, long, string, string, int, int) _toAdd = (_logs[i].Timestamp.ToString(), victimName, _logs[i].Weapon, _logs[i].Damage.ToString(), _logs[i].Health.ToString(), _logs[i].Bodypart, _logs[i].Armor);
                                     _toSend[i] = _toAdd;
                                 }
                                 NAPI.Task.Run(() =>

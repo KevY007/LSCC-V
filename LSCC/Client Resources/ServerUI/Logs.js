@@ -30,6 +30,8 @@ mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
         else break;
     }
 
+    mp.events.callRemote("ServerConsoleOutput", jsonLogs);
+
     switch(type){
         case 1:{ // admin
             ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Timestamp", "Description"];`);
@@ -47,13 +49,18 @@ mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
             break;
         }
         case 4:{ // incoming damage
+            mp.events.callRemote("ServerConsoleOutput", "i got to this part lol");
 
             let damageLogs = JSON.parse(jsonLogs);
+            mp.events.callRemote("ServerConsoleOutput", "after damage logs!! xd");
             for(let i = 0 ; i < damageLogs.length ; i++){
                 var weaponID = damageLogs[i][2];
                 var bodypartID = damageLogs[i][5];
 
-                let gunData = weaponData.find(w => Number(w.Hash) == weaponID);
+                let gunData = null;
+                if(weaponID > 0)
+                    gunData = weaponData.find(w => Number(w.Hash) == weaponID);
+                else gunData = weaponData.find(w => Number(w.Hash) == weaponID>>>0);
                 if(gunData)
                     damageLogs[i][2] = gunData.Name;
                 else damageLogs[i][2] = `Unknown (${weaponID})`;
@@ -66,7 +73,7 @@ mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
             }
             jsonLogs = JSON.stringify(damageLogs);
 
-            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Timestamp", "Dealt By", "Weapon", "Damage", "Health (after DMG)", "Bodypart", "Notes", "Armor (after DMG)"];`);
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Timestamp", "Dealt By", "Weapon", "Damage", "Health (after DMG)", "Bodypart", "Armor (after DMG)"];`);
             ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.columns = ${jsonLogs}`);
             break;
         }
@@ -76,8 +83,11 @@ mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
             for(let i = 0 ; i < damageLogs.length ; i++){
                 var weaponID = damageLogs[i][2];
                 var bodypartID = damageLogs[i][5];
-
-                let gunData = weaponData.find(w => Number(w.Hash) == weaponID);
+                
+                let gunData = null;
+                if(weaponID > 0)
+                    gunData = weaponData.find(w => Number(w.Hash) == weaponID);
+                else gunData = weaponData.find(w => Number(w.Hash) == weaponID>>>0);
                 if(gunData)
                     damageLogs[i][2] = gunData.Name;
                 else damageLogs[i][2] = `Unknown (${weaponID})`;
@@ -90,7 +100,7 @@ mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
             }
             jsonLogs = JSON.stringify(damageLogs);
 
-            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Timestamp", "Victim", "Weapon", "Damage", "Health (after DMG)", "Bodypart", "Notes", "Armor (after DMG)"];`);
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Timestamp", "Victim", "Weapon", "Damage", "Health (after DMG)", "Bodypart", "Armor (after DMG)"];`);
             ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.columns = ${jsonLogs}`);
             break;
         }
