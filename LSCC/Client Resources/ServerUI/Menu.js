@@ -447,6 +447,8 @@ function ToggleMenu()
         mp.events.callRemote("RequestStatsForStatsTab");
         UpdateStatsVars(mp.players.local);
 
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.privateRoom = undefined;`);
+
         ServerUI.execute('gm.$refs.mainMenu.$refs.logsTab.isLoading = false;');
 
         if(menuToggled){
@@ -1230,6 +1232,37 @@ mp.events.add("menu_store_redeem_result", (success, message) => {
     ServerUI.execute(`gm.$refs.storeTab.dpTab = {
         success:${success.toString()},
         message:"${message}"
+    }`);
+});
+
+mp.events.add("privateRoom_create", (name, pass, type, maxPlayers, maxPing) => {
+    mp.events.callRemote("Menu_OnLobbyCreate", name, pass, type, maxPlayers, maxPing);
+});
+mp.events.add("privateRoom_updateSettings", (roomJSON) => {
+    const roomData = JSON.parse(roomJSON);
+
+    mp.gui.chat.push(`name ${roomData.name} pass ${roomData.password} type ${roomData.type} maxPl ${roomData.maxPlayers} maxPi ${roomData.maxPing}`);
+    mp.events.callRemote("Menu_OnLobbyEdit", roomData.name, roomData.password, roomData.type, roomData.maxPlayers, roomData.maxPing);
+});
+mp.events.add("privateRoom_delete", (id) => {
+    mp.events.callRemote("Menu_OnLobbyDelete", id);
+});
+mp.events.add("privateRoom_kickPlayer", (id) => {
+    mp.events.callRemote("Menu_OnLobbyKickPlayer", id);
+});
+
+mp.events.add("addPrivateLobbyToMenu", (id, name, password, type, playerCount, maxPlayers, maxPing, ownerName, playerList) => {
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.privateRoom = {
+        id:${id},
+        name:"${name}",
+        password:"${password}",
+        type:${type},
+        players:${playerCount},
+        maxPlayers:${maxPlayers},
+        maxPing:${maxPing},
+        owner:"${ownerName}",
+        playerList:${playerList},
+        image:"https://i.pinimg.com/originals/54/28/fa/5428faf1395c1f9c90fbefc71d88b88b.jpg"
     }`);
 });
 

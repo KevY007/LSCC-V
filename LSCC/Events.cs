@@ -4850,6 +4850,8 @@ namespace RNC
         [RemoteEvent("Server_RequestLobbySwitch")]
         public void OnRequestLobbySwitch(Player player, int lobbyID, string password)
         {
+            player.SendChatMessage($"REQUESTING TO JOIN {lobbyID} WITH PASSWORD {password}");
+
             if (!EPlayer.LoggedIn(player)) return;
 
             if (player.GetSharedData<int>("InLobby") == lobbyID)
@@ -4962,18 +4964,35 @@ namespace RNC
             // ID, Name, Background, Gamemode, Password, Players, MaxPlayers, Description
             Settings.Lobbies.ForEach((LobbyData lobby) =>
             {
-                int players = Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId);
-                lobbyItems.Add(new object[]
+                List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId).ToList();
+                int players = lobbyPlayers.Count;
+
+                if (lobby.PlayerCreated == true && lobby.lobbyId == EPlayer.GetAccount(player).SQL_ID + 50000)
                 {
+                    string playerListJSON = "[";
+                    foreach(Player pl in lobbyPlayers)
+                    {
+                        playerListJSON += $"{{id:{pl.Id}, name:\"{pl.Name}\", ping:{pl.Ping}}},";
+                    }
+                    playerListJSON += "]";
+
+                    player.TriggerEvent("addPrivateLobbyToMenu", lobby.lobbyId, lobby.Name, lobby.Password, (int)lobby.gameMode, players, lobby.MaxPlayers, lobby.MaxPing, player.Name, playerListJSON);
+                }
+                else
+                {
+                    lobbyItems.Add(new object[]
+                    {
                         lobby.lobbyId,
-                        "Lobby " + lobby.lobbyId.ToString(),
+                        (lobby.Name == "" ? "Lobby " + lobby.lobbyId.ToString() : lobby.Name),
                         lobby.Background,
                         Main.ConvertGameMode(lobby.gameMode),
                         EPlayer.GetAccount(player).Admin > 0 ? "" : lobby.Password,
                         players,
                         Settings.Dynamics.MaxInLobby,
                         players > 0 ? Main.ConvertGameStatus(lobby.gameStatus) : ""
-                });
+                    });
+                }
+         
             });
             return lobbyItems;
         }
@@ -5154,6 +5173,141 @@ namespace RNC
                             await NAPI.Task.WaitForMainThread();
                         }
                     });
+                }
+            });
+        }
+
+        [RemoteEvent("Menu_OnLobbyCreate")]
+        public void OnMenuLobbyCreate(Player player, string name, string password, int type, int maxPlayers, int maxPing)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            Account acc = EPlayer.GetAccount(player);
+            if (acc == null) return;
+            if (acc.Admin < 2 && acc.DonatorLevel < 2)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
+                return;
+            }
+
+            LobbyData existCheck = Settings.Lobbies.FirstOrDefault(l => l.PlayerCreated && l.LobbyOwnerSQLID == acc.SQL_ID);
+            if (existCheck != null)
+            {
+                EPlayer.Error(player, "You already have a custom lobby! Please edit that one or delete it first.");
+                return;
+            }
+
+            LobbyData newLobby = new LobbyData();
+            newLobby.PlayerCreated = true;
+            newLobby.LobbyOwnerSQLID = acc.SQL_ID;
+            newLobby.Password = password;
+            newLobby.MaxPlayers = maxPlayers;
+            newLobby.Name = name;
+            newLobby.MaxPing = maxPing;
+            newLobby.lobbyId = acc.SQL_ID+50000;
+            newLobby.gameMode = (GameModes)type;
+            EPlayer.Notify(player, "Lobby successfully created!", "green", "fa-success", false, 3000);
+        }
+
+        [RemoteEvent("Menu_OnLobbyKickPlayer")]
+        public void OnMenuLobbyKickPlayer(Player player, int playerId)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Player target = Settings.LoggedInPlayers.FirstOrDefault(p => p.Id == playerId);
+            if(target == null)
+            {
+                EPlayer.Error(player, Translate(player, "ERROR_NO_LONGER_CONNECTED_LOGGED"));
+                return;
+            }
+            if(target.GetSharedData<int>("InLobby") != EPlayer.GetAccount(player).SQL_ID + 50000)
+            {
+                EPlayer.Error(player, "That player is not in your lobby!");
+                return;
+            }
+            EPlayer.Notify(player, $"Kicked player <strong>{target.Name}</strong> from the lobby.", "green", "fa-success", false, 3000);
+
+            target.SetSharedData("InLobby", 1);
+            EPlayer.Spawn(target, true);
+        }
+
+        [RemoteEvent("Menu_OnLobbyEdit")]
+        public void OnMenuLobbyEdit(Player player, string name, string password, int type, int maxPlayers, int maxPing)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            Account acc = EPlayer.GetAccount(player);
+            if (acc == null) return;
+            if (acc.Admin < 2 && acc.DonatorLevel < 2)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
+                return;
+            }
+
+            LobbyData target = Settings.Lobbies.FirstOrDefault(l => l.PlayerCreated && l.lobbyId == (acc.SQL_ID+50000) && l.LobbyOwnerSQLID == acc.SQL_ID);
+            if (target == null)
+            {
+                EPlayer.Error(player, "That lobby does not exist OR you don't have permission to delete it!");
+                return;
+            }
+            if (target.gameStatus == 1)
+            {
+                EPlayer.Error(player, "There's currently a game running in that lobby!");
+                return;
+            }
+            target.PlayerCreated = true;
+            target.LobbyOwnerSQLID = acc.SQL_ID;
+            target.Password = password;
+            target.MaxPlayers = maxPlayers;
+            target.Name = name;
+            target.MaxPing = maxPing;
+            target.lobbyId = acc.SQL_ID + 50000;
+            target.gameMode = (GameModes)type;
+            EPlayer.Notify(player, "Lobby successfully edited!", "green", "fa-success", false, 3000);
+        }
+
+        [RemoteEvent("Menu_OnLobbyDelete")]
+        public void OnMenuLobbyDelete(Player player, int lobbyId)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            Account acc = EPlayer.GetAccount(player);
+            if (acc == null) return;
+            if (acc.Admin < 2 && acc.DonatorLevel < 2)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
+                return;
+            }
+
+            LobbyData target = Settings.Lobbies.FirstOrDefault(l => l.PlayerCreated && l.lobbyId == lobbyId && l.LobbyOwnerSQLID == acc.SQL_ID);
+            if(target == null)
+            {
+                EPlayer.Error(player, "That lobby does not exist OR you don't have permission to delete it!");
+                return;
+            }
+            if(target.gameStatus == 1)
+            {
+                EPlayer.Error(player, "There's currently a game running in that lobby!");
+                return;
+            }
+            Settings.Lobbies.Remove(target);
+            Settings.Lobbies.RemoveAll(a => a.lobbyId == lobbyId);
+
+            target.Enabled = false;
+            target.gameStatus = 0;
+            target.lobbyId = -1;
+
+            EPlayer.Error(player, "Lobby deleted!");
+            RAGE.Entities.Players.All.ForEach((Player pl) =>
+            {
+                pl.SendChatMessage(Translate(pl, "PLAYER_DELETED_LOBBY", EPlayer.GetAdminName(player), lobbyId));
+
+                if (pl.GetSharedData<int>("InLobby") == lobbyId)
+                {
+                    EPlayer.Spawn(pl, true);
                 }
             });
         }

@@ -75,17 +75,10 @@ mp.events.addCommand("voicebind", function (bind) {
 
 mp.events.add("playerStopTalking", (player) => {
     if(!ServerUI) return;
-    ServerUI.execute(`
-        if(gm.$refs.hud.$refs.base.$refs.voiceActivity.activeVoices.findIndex(i => i.id === ${player.remoteId}) != -1){
-            gm.$refs.hud.$refs.base.$refs.voiceActivity.activeVoices.splice(gm.$refs.hud.$refs.base.$refs.voiceActivity.activeVoices.findIndex(i => i.id === ${player.remoteId}), 1);
-        }
-    `)
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.removeVoice(${player.remoteId})`);
 });
 mp.events.add("playerStartTalking", (player) => {
     if(!ServerUI) return;
-    ServerUI.execute(`
-        if(gm.$refs.hud.$refs.base.$refs.voiceActivity.activeVoices.findIndex(i => i.id === ${player.remoteId}) == -1){
-            gm.$refs.hud.$refs.base.$refs.voiceActivity.activeVoices.push({id: ${player.remoteId}, name: "${player.name}"});
-        }
-    `)
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.enabled = true;`);
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.addVoice(${player.remoteId}, "${player.name}")`);
 });

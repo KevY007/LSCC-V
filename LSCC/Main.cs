@@ -161,6 +161,9 @@ namespace RNC
 
     public class LobbyData
     {
+        public string Name { get; set; } = "";
+        public int LobbyOwnerSQLID { get; set; }
+
         public List<Player> Cops { get; set; }
         public List<Player> Fugitives { get; set; }
         public List<Vehicle> Vehicles { get; set; }
@@ -190,7 +193,9 @@ namespace RNC
         public int Weather { get; set; }
         public int NextMapID { get; set; }
         public string Background { get; set; }
+        public int MaxPlayers { get; set; } = 20;
         public KeyValuePair<Player, Player> FirstKill { get; set; }
+        public int MaxPing { get; set; } = 500;
 
         public List<Lobby_StingerData> Stingers { get; set; }
 
@@ -198,6 +203,7 @@ namespace RNC
 
         public LobbyData()
         {
+            Name = "";
             Cops = new List<Player>();
             Fugitives = new List<Player>();
             Vehicles = new List<Vehicle>();
@@ -219,6 +225,8 @@ namespace RNC
 
             Weather = new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 9);
 
+            MaxPing = 500;
+            MaxPlayers = 20;
             lobbyId = -1;
             lastMapId = -1;
             for (int i = 1; i < Settings.NextLobbyID; i++)
@@ -245,6 +253,7 @@ namespace RNC
             FugitivePercent = 28;
             Enabled = true;
             PlayerCreated = false;
+            LobbyOwnerSQLID = -1;
             Password = "";
 
             string[] lobbyBgs = {
