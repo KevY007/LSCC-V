@@ -155,6 +155,27 @@ require("./Player/Busted.js");
 require("./Player/Voice.js");
 require("./Player/VehicleTuner.js");
 
+
+var ReactDOM = null;
+mp.events.add("testNativeEventSend", (text) => {
+  mp.gui.chat.push(text);
+});
+mp.events.add("callReactEventNoArgs", () => {
+  mp.events.callLocal("testNativeEventReceive");
+});
+mp.events.add("callReactEvent", () => {
+  mp.events.callLocal("testNativeEventReceive", "yes");
+});
+
+mp.events.add("react_delete", () => {
+  if(ReactDOM) ReactDOM.destroy();
+
+  ReactDOM = null;
+})
+mp.events.add("react_new", () => {
+  ReactDOM = mp.browsers.new("package://react_test/index.html");
+});
+
 traceLastFunc("Main::Init()");
 
 var loginSceneEntities = [];

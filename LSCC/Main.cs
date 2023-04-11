@@ -259,17 +259,21 @@ namespace RNC
 
     public class ItemData
     {
+        public int ID { get; set; }
+        public string Image { get; set; }
         public string Name { get; set; }
         public string Type { get; set; }
         public int Price { get; set; }
         public string Description { get; set; }
 
-        public ItemData(string name, string type, int price, string description)
+        public ItemData(int ID, string name, string type, int price, string description, string image)
         {
+            this.ID = ID;
             Name = name;
             Type = type;
             Price = price;
             Description = description;
+            Image = image;
 
             Items.Add(this);
         }
@@ -2175,9 +2179,9 @@ namespace RNC
 
 
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the items...");
-            new ItemData("Medkit", "medkit", 10, "Replenishes 60 HP, takes 10 seconds to fully use.");
-            new ItemData("Painkiller", "painkiller", 6, "Replenishes 1 HP/second for 40 seconds; you are free to move around.");
-            new ItemData("Lockpick", "lockpick", 10, "Allows you to break into locked vehicles; only fugitives can use this item.");
+            new ItemData(0, "Medkit", "medkit", 10, "Replenishes 60 HP, takes 10 seconds to fully use.", "https://cdn-icons-png.flaticon.com/512/2467/2467977.png");
+            new ItemData(1, "Painkiller", "painkiller", 6, "Replenishes 1 HP/second for 40 seconds; you are free to move around.", "https://cdn-icons-png.flaticon.com/512/3437/3437974.png");
+            new ItemData(2, "Lockpick", "lockpick", 10, "Allows you to break into locked vehicles; only fugitives can use this item.", "https://cdn-icons-png.flaticon.com/512/4690/4690067.png");
 
             /* PRE-SET STINGERS CREATION */
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the pre-set stingers...");

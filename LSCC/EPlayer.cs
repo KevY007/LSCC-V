@@ -650,7 +650,7 @@ namespace RNC
                         break;
                 }
 
-                player.TriggerEvent("AddMenuItem", item.Name, item.Type, owned, item.Price, item.Description, max);
+                player.TriggerEvent("AddMenuItem", item.Name, item.Type, owned, item.Price, item.Description, max, item.ID, item.Image);
             }
         }
 
@@ -681,13 +681,13 @@ namespace RNC
                         break;
                 }
 
-                player.TriggerEvent("UpdateMaxMenuItem", item.Type, max);
+                player.TriggerEvent("UpdateMaxMenuItem", item.ID, max);
             }
         }
 
-        public static void Menu_UpdateItem(Player player, string type, int owned)
+        public static void Menu_UpdateItem(Player player, int ID, int owned)
         {
-            player.TriggerEvent("UpdateMenuItem", type, owned);
+            player.TriggerEvent("UpdateMenuItem", ID, owned);
         }
 
 

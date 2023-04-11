@@ -1160,39 +1160,65 @@ mp.events.add("UpdateMenuMinigames", (arenas, currentMinigame) => {
     }
 });
 
-mp.events.add("AddMenuItem", (name, type, owned, price, description, max) => {
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.items.push({
+mp.events.add("AddMenuItem", (name, type, owned, price, description, max, id, image) => {
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.itemsTab.items.push({
+        id: ${id},
         name: "${name}",
-        type: "${type}",
+        image: "${image}",
         owned: ${owned},
-        price: ${price},
+        cost: ${price},
+        max: ${max},
+        description: "${description}"
+    });`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.itemsTab.items.push({
+        id: ${id},
+        name: "${name}",
+        image: "${image}",
+        owned: ${owned},
+        cost: ${price},
         max: ${max},
         description: "${description}"
     });`);
 });
-mp.events.add("UpdateMaxMenuItem", (type, max) => {
+mp.events.add("UpdateMaxMenuItem", (id, max) => {
     ServerUI.execute(`
-        if(gm.$refs.mainMenu.$refs.inventoryTab.items.find(i => i.type == "${type}") != undefined){
-            gm.$refs.mainMenu.$refs.inventoryTab.items.find(i => i.type == "${type}").max = ${max};
+        if(gm.$refs.mainMenu.$refs.inventoryTab.$refs.itemsTab.items.find(i => i.id == ${id}) != undefined){
+            gm.$refs.mainMenu.$refs.inventoryTab.$refs.itemsTab.items.find(i => i.id == ${id}).max = ${max};
         }
         else{
-            console.log("Failed to find item of type ${type} in the menu!");
+            console.log("Failed to find item of type ${id} in the menu!");
         }
     `);
+    ServerUI.execute(`
+    if(gm.$refs.mainMenu.$refs.storeTab.$refs.itemsTab.items.find(i => i.id == ${id}) != undefined){
+        gm.$refs.mainMenu.$refs.storeTab.$refs.itemsTab.items.find(i => i.id == ${id}).max = ${max};
+    }
+    else{
+        console.log("Failed to find item of type ${id} in the menu!");
+    }
+`);
 });
-mp.events.add("UpdateMenuItem", (type, owned) => {
+mp.events.add("UpdateMenuItem", (id, owned) => {
     ServerUI.execute(`
-        if(gm.$refs.mainMenu.$refs.inventoryTab.items.find(i => i.type == "${type}") != undefined){
-            gm.$refs.mainMenu.$refs.inventoryTab.items.find(i => i.type == "${type}").owned = ${owned};
+        if(gm.$refs.mainMenu.$refs.inventoryTab.$refs.itemsTab.items.find(i => i.id == ${id}) != undefined){
+            gm.$refs.mainMenu.$refs.inventoryTab.$refs.itemsTab.items.find(i => i.id == ${id}).owned = ${owned};
         }
         else{
-            console.log("Failed to find item of type ${type} in the menu!");
+            console.log("Failed to find item of type ${id} in the menu!");
         }
     `);
+    ServerUI.execute(`
+    if(gm.$refs.mainMenu.$refs.storeTab.$refs.itemsTab.items.find(i => i.id == ${id}) != undefined){
+        gm.$refs.mainMenu.$refs.storeTab.$refs.itemsTab.items.find(i => i.id == ${id}).owned = ${owned};
+    }
+    else{
+        console.log("Failed to find item of type ${id} in the menu!");
+    }
+`);
 });
 // called by menu:
-mp.events.add("MenuBuyItem", (name) => {
-    mp.events.callRemote("Menu_RequestBuyItem", name);
+mp.events.add("menu_buyItem", (id) => {
+    mp.events.callRemote("Menu_RequestBuyItem", id);
 });
 
 mp.events.add("menu_store_redeem", (code) => {

@@ -72,3 +72,20 @@ mp.events.addCommand("voicebind", function (bind) {
     mp.events.callLocal("RemoveTooltip", String.fromCharCode(lastVoiceBind));
     mp.events.callLocal("AddTooltip", String.fromCharCode(curVoiceBind), "Voice Chat", -1);
 });
+
+mp.events.add("playerStopTalking", (player) => {
+    if(!ServerUI) return;
+    ServerUI.execute(`
+        if(gm.$refs.hud.$refs.base.$refs.voiceActivity.activeVoices.findIndex(i => i.id === ${player.remoteId}) != -1){
+            gm.$refs.hud.$refs.base.$refs.voiceActivity.activeVoices.splice(gm.$refs.hud.$refs.base.$refs.voiceActivity.activeVoices.findIndex(i => i.id === ${player.remoteId}), 1);
+        }
+    `)
+});
+mp.events.add("playerStartTalking", (player) => {
+    if(!ServerUI) return;
+    ServerUI.execute(`
+        if(gm.$refs.hud.$refs.base.$refs.voiceActivity.activeVoices.findIndex(i => i.id === ${player.remoteId}) == -1){
+            gm.$refs.hud.$refs.base.$refs.voiceActivity.activeVoices.push({id: ${player.remoteId}, name: "${player.name}"});
+        }
+    `)
+});

@@ -6773,14 +6773,14 @@ namespace RNC
         }
 
         [RemoteEvent("Menu_RequestBuyItem")]
-        public void OnRequestBuyItem(Player player, string name)
+        public void OnRequestBuyItem(Player player, int ID)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            ItemData item = ItemData.Items.FirstOrDefault(i => i.Name == name);
+            ItemData item = ItemData.Items.FirstOrDefault(i => i.ID == ID);
             if(item == null)
             {
-                EPlayer.Error(player, $"Invalid item: <strong>{name}</strong>! Report this to the devs.");
+                EPlayer.Error(player, $"Invalid item: <strong>{ID}</strong>! Report this to the devs.");
                 return;
             }
 
@@ -6792,7 +6792,7 @@ namespace RNC
                 return;
             }
             EPlayer.GivePoints(player, -price);
-            switch (name)
+            switch (item.Name)
             {
                 case "Medkit":
                     {
@@ -6808,7 +6808,7 @@ namespace RNC
 
                         EPlayer.GetAccount(player).Medkits++;
                         EPlayer.Save(player, false);
-                        player.TriggerEvent("UpdateMenuItem", type, EPlayer.GetAccount(player).Medkits);                   
+                        player.TriggerEvent("UpdateMenuItem", ID, EPlayer.GetAccount(player).Medkits);                   
                         break;
                     }
                 case "Painkiller":
@@ -6825,7 +6825,7 @@ namespace RNC
 
                         EPlayer.GetAccount(player).Painkillers++;
                         EPlayer.Save(player, false);
-                        player.TriggerEvent("UpdateMenuItem", type, EPlayer.GetAccount(player).Painkillers);
+                        player.TriggerEvent("UpdateMenuItem", ID, EPlayer.GetAccount(player).Painkillers);
                         break;
                     }
                 case "Lockpick":
@@ -6842,11 +6842,11 @@ namespace RNC
 
                         EPlayer.GetAccount(player).Lockpicks++;
                         EPlayer.Save(player, false);
-                        player.TriggerEvent("UpdateMenuItem", type, EPlayer.GetAccount(player).Lockpicks);              
+                        player.TriggerEvent("UpdateMenuItem", ID, EPlayer.GetAccount(player).Lockpicks);              
                         break;
                     }
             }
-            EPlayer.Notify(player, Translate(player, "ITEM_PURCHASE", name, price), "green", "fas fa-check", false, 3000, "bottomCenter", "replace");
+            EPlayer.Notify(player, Translate(player, "ITEM_PURCHASE", item.Name, price), "green", "fas fa-check", false, 3000, "bottomCenter", "replace");
             return;
         }
 

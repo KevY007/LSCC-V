@@ -823,66 +823,66 @@ mp.keys.bind(lastGPSBind, true, TogGPSMode);
 
 
 
-const bassBfxBqfLowpass = 0;
-const bassBfxBqfHighpass = 1;
-const bassBfxChannelAll = -1;
+// const bassBfxBqfLowpass = 0;
+// const bassBfxBqfHighpass = 1;
+// const bassBfxChannelAll = -1;
 
-const playerTalkEffects = [];
+// const playerTalkEffects = [];
 
-mp.events.add("playerStopTalking", (player) => {
-    const talker = playerTalkEffects.find(p => p.handle === player.remoteId);
-    if(!talker){
-        mp.gui.chat.push(`no talk data for ${player.name}`);
-        return;
-    }
-    player.removeVoiceFx(talker.bfq);
-    player.removeVoiceFx(talker.peak);
+// mp.events.add("playerStopTalking", (player) => {
+//     const talker = playerTalkEffects.find(p => p.handle === player.remoteId);
+//     if(!talker){
+//         mp.gui.chat.push(`no talk data for ${player.name}`);
+//         return;
+//     }
+//     player.removeVoiceFx(talker.bfq);
+//     player.removeVoiceFx(talker.peak);
 
-    playerTalkEffects.splice(playerTalkEffects.indexOf(talker), 1);
-});
-mp.events.add("playerStartTalking", (player) => {
-    const bfqHandle = player.setVoiceFx(BASSFXType.BASS_FX_BFX_BQF, 0);
-    const peakEqHandle = player.setVoiceFx(BASSFXType.BASS_FX_BFX_PEAKEQ, 0);
-    player.setVoiceFxBQF(bfqHandle, {
-        lFilter: bassBfxBqfHighpass,
-        fCenter: 900.0,
-        fGain: 0.0, 
-        fBandwidth: 0.86, 
-        fQ: 0.0, 
-        fS: 0.0, 
-        lChannel: bassBfxChannelAll
-    });
+//     playerTalkEffects.splice(playerTalkEffects.indexOf(talker), 1);
+// });
+// mp.events.add("playerStartTalking", (player) => {
+//     const bfqHandle = player.setVoiceFx(BASSFXType.BASS_FX_BFX_BQF, 0);
+//     const peakEqHandle = player.setVoiceFx(BASSFXType.BASS_FX_BFX_PEAKEQ, 0);
+//     player.setVoiceFxBQF(bfqHandle, {
+//         lFilter: bassBfxBqfHighpass,
+//         fCenter: 900.0,
+//         fGain: 0.0, 
+//         fBandwidth: 0.86, 
+//         fQ: 0.0, 
+//         fS: 0.0, 
+//         lChannel: bassBfxChannelAll
+//     });
 
-    player.setVoiceFxBQF(bfqHandle, {
-        lFilter: bassBfxBqfLowpass,
-        fCenter: 1400.0,
-        fGain: 0.0,
-        fBandwidth: 0.83,
-        fQ: 0.0,
-        fS: 0.0,
-        lChannel: bassBfxChannelAll
-    });
+//     player.setVoiceFxBQF(bfqHandle, {
+//         lFilter: bassBfxBqfLowpass,
+//         fCenter: 1400.0,
+//         fGain: 0.0,
+//         fBandwidth: 0.83,
+//         fQ: 0.0,
+//         fS: 0.0,
+//         lChannel: bassBfxChannelAll
+//     });
 
-    player.setVoiceFxPeakEq(peakEqHandle, {
-        lBand: 0,
-        fBandwidth: 13.0, 
-        fQ: 1070.0, 
-        fCenter: 0.0, 
-        fGain: 0.3, 
-        lChannel: bassBfxChannelAll
-    });
+//     player.setVoiceFxPeakEq(peakEqHandle, {
+//         lBand: 0,
+//         fBandwidth: 13.0, 
+//         fQ: 1070.0, 
+//         fCenter: 0.0, 
+//         fGain: 0.3, 
+//         lChannel: bassBfxChannelAll
+//     });
 
-    player.setVoiceFxPeakEq(peakEqHandle, {
-        lBand: 1,
-        fBandwidth: 13.0,
-        fQ: 1300.0,
-        fCenter: 0.0,
-        fGain: 0.4,
-        lChannel: bassBfxChannelAll
-    });
+//     player.setVoiceFxPeakEq(peakEqHandle, {
+//         lBand: 1,
+//         fBandwidth: 13.0,
+//         fQ: 1300.0,
+//         fCenter: 0.0,
+//         fGain: 0.4,
+//         lChannel: bassBfxChannelAll
+//     });
 
-    playerTalkEffects.push({handle:player.remoteId, bfq:bfqHandle, peak:peakEqHandle});
-});
+//     playerTalkEffects.push({handle:player.remoteId, bfq:bfqHandle, peak:peakEqHandle});
+// });
 
 mp.events.addCommand("gpsbind", function (bind) {
     
