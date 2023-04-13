@@ -14,6 +14,7 @@ mp.events.add("InitiateLogsTab", () => {
         { name: "Admin Records", value: 3 },
         { name: "Incoming Damages", value: 4 },
         { name: "Outgoing Damages", value: 5 },
+        { name: "Commands", value: 6 },
       ];`);
     ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.selectedOption = 3;`);
 });
@@ -29,8 +30,6 @@ mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
         }
         else break;
     }
-
-    mp.events.callRemote("ServerConsoleOutput", jsonLogs);
 
     switch(type){
         case 1:{ // admin
@@ -104,7 +103,16 @@ mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
             ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.columns = ${jsonLogs}`);
             break;
         }
+        case 6:{ // commands
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Timestamp", "Command"];`);
+            ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.columns = ${jsonLogs}`);
+            break;
+        }
     }
     ServerUI.execute('gm.$refs.mainMenu.$refs.logsTab.isLoading = false;');
 
+});
+
+mp.events.add('playerCommand', (command) => {
+    mp.events.callRemote("logPlayerCommand", command);
 });

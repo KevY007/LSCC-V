@@ -26,6 +26,14 @@ namespace RNC
         public string Description { get; set; }
         public DateTime Timestamp { get; set; }
     }
+    public class Logs_Command
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public int AccountID { get; set; }
+        public DateTime Timestamp { get; set; }
+        public string Command { get; set; }
+    }
     public class Logs_Damage
     {
         [Key]
@@ -71,6 +79,7 @@ namespace RNC
             AdminRecord = 3,
             IncomingDamage = 4,
             OutgoingDamage = 5,
+            Command = 6,
         };
 
         [RemoteEvent("Logs_GetAutoCompleteNames")]
@@ -230,6 +239,24 @@ namespace RNC
 
                                 break;
                             }
+                        case (int)LogType.Command:
+                            {
+
+                                List<Logs_Command> _logs = await context.Logs_Commands.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToListAsync();
+                                object[] _toSend = new object[_logs.Count];
+                                for (int i = 0; i < _logs.Count; i++)
+                                {
+                                    (string, string) _toAdd = (_logs[i].Timestamp.ToString(), _logs[i].Command);
+                                    _toSend[i] = _toAdd;
+                                }
+                                NAPI.Task.Run(() =>
+                                {
+                                    string jsonShit = NAPI.Util.ToJson(_toSend);
+                                    player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
+                                });
+
+                                break;
+                            }
                         case (int)LogType.Session:
                             {
 
@@ -330,6 +357,26 @@ namespace RNC
         public static void LogAdmin(Player player, string description)
         {
             LogAdmin(EPlayer.GetAccount(player).SQL_ID, description);
+        }
+        [RemoteEvent("logPlayerCommand")]
+        public static void LogCommand(Player player, string command)
+        {
+            int pSQL = EPlayer.GetAccount(player).SQL_ID;
+            Task.Run(async () =>
+            {
+                Logs_Command _l = new Logs_Command()
+                {
+                    Command = command,
+                    Timestamp = DateTime.Now,
+                    AccountID = pSQL
+                };
+
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    await context.Logs_Commands.AddAsync(_l);
+                    await context.SaveChangesAsync();
+                }
+            });
         }
         public static void LogDamage(int accSQLID, int dealerSQLID, long weapon, int damage, int health, int bodypart, string notes, int armor)
         {

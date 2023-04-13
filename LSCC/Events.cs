@@ -6606,6 +6606,7 @@ namespace RNC
             //player.SendChatMessage($"~g~[DAMAGE] ~w~You hit ~y~{target.Name} ~w~for ~r~{damageToDeal}~w~ damage, they now have ~r~{HPtoset}~w~ health ~b~(AR: {ARtoset})~w~!");
         }
 
+
         [RemoteEvent("opsp")] // wont trigger incar btw 
         public void OnPlayerShootPlayer(Player player, Player target, uint bone, Int64 weapon)
         {
