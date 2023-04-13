@@ -295,7 +295,11 @@ namespace RNC
 
         public static void LogSession(Player player)
         {
-            if (!player.HasData("JoinTimeUnix")) return;
+            if (!player.HasData("JoinTimeUnix"))
+            {
+                NAPI.Util.ConsoleOutput($"[SESSION LOG FAIL] {player.Name} has no Join Time timestamp data!");
+                return;
+            }
 
             long _currentUnix = DateTimeOffset.Now.ToUnixTimeSeconds();
             long _joinUnix = player.GetData<long>("JoinTimeUnix");

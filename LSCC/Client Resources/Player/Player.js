@@ -411,6 +411,7 @@ function Render3DMapMatrix(){
         outline: true,
         centre:true
     });
+
     for(let i = 0; i < 40 ; i++){
         currentY = -4000;
         for(let j = 0 ; j < 48 ; j++){
@@ -4114,6 +4115,10 @@ function setStorageDataVars(){
         mp.storage.data.menu.SnowEnabled = false;
     }
     
+    if(mp.storage.data.menu.ShowVoiceActivity == undefined){
+        mp.storage.data.menu.ShowVoiceActivity = true;
+    }
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.enabled = ${mp.storage.data.menu.ShowVoiceActivity.toString()};`);
 
     if(mp.storage.data.menu.InactiveChatOpacity == undefined){
         mp.storage.data.menu.InactiveChatOpacity = 0.5;

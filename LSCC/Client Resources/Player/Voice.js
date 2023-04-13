@@ -79,6 +79,5 @@ mp.events.add("playerStopTalking", (player) => {
 });
 mp.events.add("playerStartTalking", (player) => {
     if(!ServerUI) return;
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.enabled = true;`);
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.addVoice(${player.remoteId}, "${player.name}")`);
 });

@@ -2437,8 +2437,6 @@ namespace RNC
         {
             try
             {
-
-
                 Logs.LogSession(player);
                 if (player.HasData("Tuner_Vehicle")) player.GetData<Vehicle>("Tuner_Vehicle").Delete();
 
@@ -3487,6 +3485,7 @@ namespace RNC
             if (EPlayer.LoggedIn(player)) return;
             if (player.HasData("Kicked")) return;
 
+            player.SetData<long>("JoinTimeUnix", DateTimeOffset.Now.ToUnixTimeSeconds());
             player.SetSharedData("SQL_ID", acc.SQL_ID);
             player.SetSharedData("EntAlpha", 255);
             player.SetData("PlaytimeTick", Environment.TickCount64);
@@ -3610,8 +3609,6 @@ namespace RNC
 
                 NAPI.Task.Run(() =>
                 {
-                    player.SetData<long>("JoinTimeUnix", DateTimeOffset.Now.ToUnixTimeSeconds());
-
                     CharacterData ConvChar = new CharacterData();
 
                     try

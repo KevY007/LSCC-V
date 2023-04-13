@@ -31,6 +31,7 @@ if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD
     mp.storage.data.menu.loadingscreens = true;    
     mp.storage.data.menu.SnowEnabled = false;
     mp.storage.data.menu.XMRAutoPlay = true;
+    mp.storage.data.menu.ShowVoiceActivity = true;
 
     mp.storage.flush();
 }
@@ -764,6 +765,13 @@ function ToggleMenu()
                         description: "Automatically send all text messages to the global OOC chat, so you don't have to type /o every time."
                     },
                     {
+                        id: 31,
+                        type: 1,
+                        name: "showvoice",
+                        label: "Voice Activity Display",
+                        description: "Toggles whether to show a list of users that's currently talking or not."
+                    },
+                    {
                         id: 17,
                         type: 4,
                         name: "voicemode",
@@ -878,6 +886,7 @@ function ToggleMenu()
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.enablesnow[0].value = ${mp.storage.data.menu.SnowEnabled};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autoplayradio[0].value = ${mp.storage.data.menu.XMRAutoPlay};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.oocauto[0].value = ${mp.storage.data.menu.OOCauto};`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.showvoice[0].value = ${mp.storage.data.menu.ShowVoiceActivity};`);
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.voicemode[0].value = "${menuSetting_getOptionNameFromValue("voicemode", mp.storage.data.menu.VoiceMode)}";`);
         
         ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.activechatopacity[0].value = "${menuSetting_getOptionNameFromValue("activechatopacity", mp.storage.data.menu.ActiveChatOpacity)}";`);       
@@ -1047,6 +1056,10 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     }
     else if(id == 30){
         mp.storage.data.menu.XMRAutoPlay = value;
+    }
+    else if(id == 31){
+        mp.storage.data.menu.ShowVoiceActivity = value;
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.enabled = ${value.toString()};`);
     }
 
     if(ServerUI != null)
