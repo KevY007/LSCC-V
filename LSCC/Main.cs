@@ -1657,6 +1657,19 @@ namespace RNC
                 case "bcat":
                     seats = 8;
                     break;
+
+                case "primo3":
+                    seats = 4;
+                    break;
+                case "landroamer":
+                    seats = 4;
+                    break;
+                case "altior":
+                    seats = 4;
+                    break;
+                case "esperanto2d":
+                    seats = 2;
+                    break;
             }
             return seats;
         }
@@ -2538,16 +2551,20 @@ namespace RNC
             // Fugitives
             new CarData(0, "Super Diamond", "superd", "package://Artwork/Vehicles/superd.png", "Fast");
             new CarData(0, "Primo", "primo", "package://Artwork/Vehicles/primo.png", "Slow");
+            new CarData(0, "Esperanto", "esperanto2d", "package://Artwork/Vehicles/esperanto2d.png", "Slow", 0, 3);
+            new CarData(0, "Primo LX", "primo3", "package://Artwork/Vehicles/primo3.png", "Slow", 0, 5);
             new CarData(0, "Futo GTX", "futo2", "package://Artwork/Vehicles/futo2.png", "Slow", 0, 5);
             new CarData(0, "Stratum", "stratum", "package://Artwork/Vehicles/stratum.png", "Slow", 0, 5);
             new CarData(0, "Seminole Frontier", "seminole2", "package://Artwork/Vehicles/seminole2.png", "Slow", 1);
             new CarData(0, "Huntley", "huntley", "package://Artwork/Vehicles/huntley.png", "Average", 3);
+            new CarData(0, "Altior", "altior", "package://Artwork/Vehicles/altior.png", "Average", 4, 5);
             new CarData(0, "Tailgater", "tailgater", "package://Artwork/Vehicles/tailgater.png", "Slow", 5);
             //new CarData(0, "Sanchez", "sanchez2", "package://Artwork/Vehicles/sanchez2.png", "Fast", 5, 10);
             new CarData(0, "Felon GT", "felon2", "package://Artwork/Vehicles/felon2.png", "Average+", 5);
             new CarData(0, "Huntley IV", "huntley2", "package://Artwork/Vehicles/huntley2.png", "Average", 6);
             new CarData(0, "Gresley Hellhound", "gresleyh", "package://Artwork/Vehicles/gresleyh.png", "Average+", 8, 3);
             new CarData(0, "Blista Classic", "blista2", "package://Artwork/Vehicles/blista2.png", "Average", 10);
+            new CarData(0, "Landroamer", "landroamer", "package://Artwork/Vehicles/landroamer.png", "Average+", 10, 5);
             new CarData(0, "Gang Burrito", "gburrito2", "package://Artwork/Vehicles/gburrito2.png", "Slow", 10, 5);
             new CarData(0, "Cheburek", "cheburek", "package://Artwork/Vehicles/cheburek.png", "Average", 15, 10);
             new CarData(0, "Exemplar", "exemplar", "package://Artwork/Vehicles/exemplar.png", "Average+", 17, 15);
