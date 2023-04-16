@@ -9973,72 +9973,114 @@ namespace RNC
                     NAPI.Task.Run(() =>
                     {
                         /* ---Donation Types/Values---
-                     * 0 => Bronze [VALUE: how many times it can be redeemed]
-                     * 1 => Silver
-                     * 2 => Gold
-                     * 3 => 100 Donator Points
-                     * 4 => Namechange
-                     * 5 => 5 namechanges [bundle]
-                     */
+                            0 - Rank Budle ( To je ono kad mu s rankom da i namechangeve i sve kaj treba ko noramlan rank kad kupe_
+                            -- 0 - Bronze
+                            -- 1 - Silver
+                            -- 2 - Gold
+                            1 - Rank (Samo rank bez cjelog bundla)
+                            -- 0 - Bronze
+                            -- 1 - Silver
+                            -- 2 - Gold
+                            2 - DiamondPoints
+                            -- broj pointova kolko za dat
+                            3 - Namechanges
+                            -- broj namechangeva
+                        */
                         Account acc = EPlayer.GetAccount(player);
-                        switch (redeem.Value)
+
+                        switch (redeem.Type)
                         {
                             case 0:
-                                acc.DonatorPoints += 200;
-                                acc.DonatorLevel = 1;
-                                player.SetSharedData("Donator", acc.DonatorLevel);
-                                NAPI.Task.Run(() =>
+                                switch (redeem.Value)
                                 {
-                                    player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(1, true)));
-                                });
+                                    case 0:
+                                        //acc.DonatorPoints += 200;
+                                        acc.Namechanges += 1;
+                                        acc.DonatorLevel = 1;
+                                        player.SetSharedData("Donator", acc.DonatorLevel);
+                                        NAPI.Task.Run(() =>
+                                        {
+                                            player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(1, true)));
+                                        });
 
-                                EPlayer.UpdateMaxMenuItems(player);
+                                        EPlayer.UpdateMaxMenuItems(player);
+                                        break;
+                                    case 1:
+                                        //acc.DonatorPoints += 350;
+                                        acc.Namechanges += 3;
+                                        acc.DonatorLevel = 2;
+                                        player.SetSharedData("Donator", acc.DonatorLevel);
+                                        NAPI.Task.Run(() =>
+                                        {
+                                            player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(2, true)));
+                                        });
+
+                                        EPlayer.UpdateMaxMenuItems(player);
+                                        break;
+                                    case 2:
+                                        //acc.DonatorPoints += 500;
+                                        acc.Namechanges += 5;
+                                        acc.DonatorLevel = 3;
+                                        player.SetSharedData("Donator", acc.DonatorLevel);
+                                        NAPI.Task.Run(() =>
+                                        {
+                                            player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(3, true)));
+                                        });
+
+                                        EPlayer.UpdateMaxMenuItems(player);
+                                        break;
+                                }
                                 break;
                             case 1:
-                                acc.DonatorPoints += 350;
-                                acc.DonatorLevel = 2;
-                                player.SetSharedData("Donator", acc.DonatorLevel);
-                                NAPI.Task.Run(() =>
+                                switch (redeem.Value)
                                 {
-                                    player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(2, true)));
-                                });
+                                    case 0:
+                                        acc.DonatorLevel = 1;
+                                        player.SetSharedData("Donator", acc.DonatorLevel);
+                                        NAPI.Task.Run(() =>
+                                        {
+                                            player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(1, true)));
+                                        });
 
-                                EPlayer.UpdateMaxMenuItems(player);
+                                        EPlayer.UpdateMaxMenuItems(player);
+                                        break;
+                                    case 1:
+                                        acc.DonatorLevel = 2;
+                                        player.SetSharedData("Donator", acc.DonatorLevel);
+                                        NAPI.Task.Run(() =>
+                                        {
+                                            player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(2, true)));
+                                        });
+
+                                        EPlayer.UpdateMaxMenuItems(player);
+                                        break;
+                                    case 2:
+                                        acc.DonatorLevel = 3;
+                                        player.SetSharedData("Donator", acc.DonatorLevel);
+                                        NAPI.Task.Run(() =>
+                                        {
+                                            player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(3, true)));
+                                        });
+
+                                        EPlayer.UpdateMaxMenuItems(player);
+                                        break;
+                                }
                                 break;
                             case 2:
-                                acc.DonatorPoints += 500;
-                                acc.DonatorLevel = 3;
-                                player.SetSharedData("Donator", acc.DonatorLevel);
-                                NAPI.Task.Run(() =>
                                 {
-                                    player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(3, true)));
-                                });
-
-                                EPlayer.UpdateMaxMenuItems(player);
+                                    acc.DonatorPoints += redeem.Value;
+                                    player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", $"~y~{redeem.Value}DP"));
+                                }
                                 break;
                             case 3:
-                                acc.DonatorPoints += 100;
-                                NAPI.Task.Run(() =>
                                 {
-                                    player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", "!{#a8ffb7}100 Donator Points"));
-                                });
-                                break;
-                            case 4:
-                                acc.Namechanges++;
-                                NAPI.Task.Run(() =>
-                                {
-                                    player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", "!{#a8ffb7}1 Namechange"));
-                                });
-                                break;
-                            case 5:
-                                acc.Namechanges += 5;
-                                NAPI.Task.Run(() =>
-                                {
-                                    player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", "!{#a8ffb7}5 Namechanges Bundle"));
-                                });
+                                    acc.Namechanges += redeem.Value;
+                                    player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", $"~y~{redeem.Value} Namechange{(redeem.Value > 1 ? "s" : "")}"));
+                                }
                                 break;
                         }
                         player.SendChatMessage(Translate(player, "DONATION_THANKS"));
+                        EPlayer.Save(player, false);
                     });
                     await NAPI.Task.WaitForMainThread();
 

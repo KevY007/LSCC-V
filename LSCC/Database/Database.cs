@@ -148,6 +148,7 @@ namespace RNC
         [Key]
         public int SQL_ID { get; set; }
         public string Code { get; set; }
+        public int Type { get; set; }
         public int Value { get; set; }
         public int Uses { get; set; }
     }

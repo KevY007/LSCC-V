@@ -2734,38 +2734,22 @@ namespace RNC
 
         public async void GenerateRedeemableCodes()
         {
-            using (MainDatabase context = ContextFactory.CreateContext())
-            {
-                if (await context.RedeemableCodes.AsQueryable().CountAsync() > 0) return;
-
-                // GENERATING NEW DONATION CODES
-                string alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-
+            // UNUSED: Codes are generated on purchase.
+            return;
                 /* ---Donation Types/Values---
-                 * 0 => Bronze [VALUE: how many times it can be redeemed | unused?]
-                 * 1 => Silver
-                 * 2 => Gold
-                 * 3 => 100 Donator Points
-                 * 4 => Namechange
-                 * 5 => 5 namechanges [bundle]
+                    0 - Rank Budle ( To je ono kad mu s rankom da i namechangeve i sve kaj treba ko noramlan rank kad kupe_ 
+                    -- 0 - Bronze i0
+                    -- 1 - Silver i1
+                    -- 2 - Gold i2
+                    1 - Rank (Samo rank bez cjelog bundla)
+                    -- 0 - Bronze i3
+                    -- 1 - Silver i4
+                    -- 2 - Gold i5
+                    2 - DiamondPoints
+                    -- broj pointova kolko za dat i6
+                    3 - Namechanges
+                    -- broj namechangeva i7
                  */
-                Random rndcode = new Random();
-                int code_length = 7; // how many characters the code is
-                for (int i = 0; i < 6; i++)
-                {
-                    for (int j = 0; j < 250; j++)
-                    {
-                        string code = new string(Enumerable.Repeat(alphanumeric, code_length).Select(s => s[rndcode.Next(s.Length)]).ToArray());
-                        if (await context.RedeemableCodes.AsQueryable().FirstOrDefaultAsync(c => c.Code.Equals(code)) == null)
-                        {
-                            // Value is set to "i" because i represents the donation package type's ID [see list above]
-                            await context.RedeemableCodes.AddAsync(new RedeemableCode() { Code = code, Uses = 1, Value = i });
-                        }
-                    }
-                }
-                await context.SaveChangesAsync();
-            }
-
         }
 
         public void TimeUpdate()
