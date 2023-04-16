@@ -1968,6 +1968,28 @@ namespace RNC
                 return ownedCars;
             }
         }
+        public async static Task<List<CarData>> GetOwnedVehicles(Account acc)
+        {
+            List<CarData> ownedCars = new List<CarData>();
+
+            List<CarData> defaults = Settings.Cars.Where(l => l.Name == "Random").ToList();
+            ownedCars.AddRange(defaults);
+
+            using (MainDatabase context = ContextFactory.CreateContext())
+            {
+                List<OwnedVehData> ownedDBcars = await context.OwnedVehicles.AsQueryable().Where(a => a.AccountSQLID == acc.SQL_ID).ToListAsync();
+
+                foreach(OwnedVehData ownedDBcar in ownedDBcars)
+                {
+                    CarData car = Settings.Cars.FirstOrDefault(c => c.Model == ownedDBcar.Model && c.Team == ownedDBcar.Team);
+                    if(car != null)
+                    {
+                        ownedCars.Add(car);
+                    }
+                }
+                return ownedCars;
+            }
+        }
         public async static Task<bool> UnlockVehicle(Account acc, Player player, string model, int team)
         {
             if (!LoggedIn(player)) return false;
@@ -2016,6 +2038,58 @@ namespace RNC
             }
         }
 
+        public async static Task<List<LoadoutData>> GetOwnedLoadouts(Account acc)
+        {
+            List<LoadoutData> ownedLoadouts = new List<LoadoutData>();
+
+            List<LoadoutData> defaults = Settings.Loadouts.Where(l => l.Name == "Default").ToList();
+            ownedLoadouts.AddRange(defaults);
+
+            using (MainDatabase context = ContextFactory.CreateContext())
+            {
+                List<OwnedLoadoutData> ownedDBloadouts = await context.OwnedLoadouts.AsQueryable().Where(l => l.AccountSQLID == acc.SQL_ID).ToListAsync();
+                foreach(OwnedLoadoutData ownedDBloadout in ownedDBloadouts)
+                {
+                    LoadoutData ld = Settings.Loadouts.FirstOrDefault(l => l.Name.ToLower() == ownedDBloadout.Name.ToLower() && l.Team == ownedDBloadout.Team);
+                    if (ld != null) ownedLoadouts.Add(ld);
+                    else NAPI.Util.ConsoleOutput($"[OWNED LOADOUTS] Can't find loadout data for name {ownedDBloadout.Name}!");
+                }
+
+                return ownedLoadouts;
+            }
+        }
+
+        public static void UpdateMenuPrivateLobby(Player player, LobbyData lobby)
+        {
+            if(lobby == null)
+            {
+                player.TriggerEvent("removePrivateLobby");
+                return;
+            }
+
+            List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId).ToList();
+            int players = lobbyPlayers.Count;
+
+            if (lobby.PlayerCreated == true && lobby.lobbyId == EPlayer.GetAccount(player).SQL_ID + 50000)
+            {
+                string playerListJSON = "[";
+                foreach (Player pl in lobbyPlayers)
+                {
+                    playerListJSON += $"{{id:{pl.Id}, name:\"{pl.Name}\", ping:{pl.Ping}}},";
+                }
+                playerListJSON += "]";
+
+                string bplayerListJSON = "[";
+                foreach (Player pl in lobby.BannedPlayers)
+                {
+                    bplayerListJSON += $"{{id:{pl.Id}, name:\"{pl.Name}\", ping:{pl.Ping}}},";
+                }
+                bplayerListJSON += "]";
+
+                player.TriggerEvent("updateMenuPrivateLobby", lobby.lobbyId, lobby.Name, lobby.Password, (int)lobby.gameMode, players, lobby.MaxPlayers, lobby.MaxPing, player.Name, playerListJSON, bplayerListJSON);
+            }
+        }
+        
         public async static Task<List<string>> GetOwnedLoadouts(Account acc, int team)
         {
             List<string> ownedLoadouts = new List<string>();
@@ -2026,8 +2100,7 @@ namespace RNC
                 foreach (var item in loadouts) ownedLoadouts.Add(item.Name);
 
                 return ownedLoadouts;
-            }
-      
+            }     
         }
         public async static Task<bool> UnlockLoadout(Account acc, Player player, string name, int team)
         {

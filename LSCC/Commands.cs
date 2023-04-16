@@ -4361,6 +4361,16 @@ namespace RNC
 
             NAPI.Player.SpawnPlayer(player, Settings.LobbySpawns.OrderBy(c => Guid.NewGuid()).First());
             EPlayer.Notify(player, Translate(player, "JOINED_LOBBY"), "blue", "fas fa-users", false, 1000, "bottomCenter", "replace");
+
+            if (lobby.PlayerCreated)
+            {
+                Player creator = Settings.LoggedInPlayers.FirstOrDefault(p => EPlayer.GetAccount(p).SQL_ID == lobbyid - 50000);
+                if(creator != null)
+                {
+                    EPlayer.UpdateMenuPrivateLobby(creator, lobby);
+                }
+            }
+
             return;
         }
 

@@ -408,7 +408,7 @@ settings
 */
 
 mp.events.add("menu_tabData", (tab) => {
-    mp.gui.chat.push(`Requested ${tab} tab data.`);
+    // store inventory play wiki settings profile clans
     switch(tab){
         case "clans":
             ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.clansList.clans = [];`);
@@ -418,6 +418,21 @@ mp.events.add("menu_tabData", (tab) => {
             mp.events.callRemote("Menu_RequestClansList");
             mp.events.callRemote("Menu_InitializeMyClanTab");
             break;
+        case "play":
+            mp.events.callRemote("Menu_RequestTabData", tab);
+            break;
+        case "profile":
+            mp.events.callRemote("Menu_RequestTabData", tab);
+            break;
+        case "inventory":
+            mp.events.callRemote("Menu_RequestTabData", tab);
+            break;
+        case "store":
+            mp.events.callRemote("Menu_RequestTabData", tab);
+            break;
+        case "settings":
+            updateMenuSettingsTab();
+            break;         
     }
 });
 
@@ -489,417 +504,6 @@ function ToggleMenu()
             value: "3",
           },
         */
-
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.categories = [
-            {
-                name: "Game",
-                settings:[
-                    {
-                        id: 29,
-                        type: 4,
-                        name: "serverlanguage",
-                        label: "Language",
-                        description: "Changes the language in which *most* server messages are displayed. Want to help with translations? Join our Discord for more info.",
-                        options: [
-                          {
-                            label: "English",
-                            value: "0",
-                          },
-                          {
-                            label: "Spanish/Español",
-                            value: "1",
-                          },
-                          {
-                            label: "French/Français",
-                            value: "2",
-                          },
-                          {
-                            label: "Vietnamese/Tiếng Việt",
-                            value: "4",
-                          }
-                        ]
-                    },
-                    {
-                        id: 12,
-                        type: 4,
-                        name: "myweather",
-                        label: "Weather",
-                        description: "Changes the weather displayed only on your screen.",
-                        options: [
-                          {
-                              label: "Dynamic",
-                              value: "-1",
-                          },
-                          {
-                            label: "Sunny",
-                            value: "0",
-                          },
-                          {
-                            label: "Cloudy",
-                            value: "2",
-                          },    {
-                            label: "Smog",
-                              value: "3",
-                          },
-                          {
-                            label: "Foggy",
-                            value: "4",
-                          },
-                          {
-                            label: "Overcast",
-                              value: "5",
-                          },
-                          {
-                            label: "Rain",
-                              value: "6",
-                          },
-                          {
-                            label: "Thunderstorm",
-                            value: "7",
-                          },   
-                          {
-                            label: "Neutral",
-                              value: "9",
-                          },
-                          {
-                            label: "Snowfall",
-                              value: "10",
-                          }, 
-                          {
-                            label: "Blizzard",
-                              value: "11",
-                          }, 
-                          {
-                            label: "Snowlight",
-                              value: "12",
-                          },
-                        ]
-                    },
-                    {
-                        id: 28,
-                        type: 1,
-                        name: "enablesnow",
-                        label: "Snowy Map",
-                        description: "Toggles snow in the map of San Andreas (on the roads, etc.)."
-                    },
-                    {
-                        id: 14,
-                        type: 1,
-                        name: "autojoinopt",
-                        label: "Autojoin",
-                        description: "Toggles whether you will be put in copchase rounds or not."
-                    },
-                    {
-                        id: 30,
-                        type: 1,
-                        name: "autoplayradio",
-                        label: "XMR Auto-Play",
-                        description: "If toggled on, your most recent radio station will automatically be set upon entering a car without a radio station set."
-                    },
-                    {
-                        id: 15,
-                        type: 1,
-                        name: "eventmusic",
-                        label: "Event Music",
-                        description: "Toggles whether background music will play in events or not."
-                    },
-                    {
-                        id: 26,
-                        type: 1,
-                        name: "carradio",
-                        label: "GTA Car Radio",
-                        description: "Toggles whether you'll hear the in-game car radio music. NOTE: Due to GTAV sync, if the driver has disabled radio, you won't hear anything too!"
-                    },
-                    {
-                        id: 27,
-                        type: 1,
-                        name: "loadingscreens",
-                        label: "Enable Loading Screens",
-                        description: "Toggles the loading screens (e.g. the one at beginning of copchase) on or off. Disable this if you are experiencing issues with long loading screens."
-                    },
-                    {
-                        id: 21,
-                        type: 1,
-                        name: "autologintog",
-                        label: "Auto Login",
-                        description: "Automatically log in to this account - eliminates the need to enter your login info."
-                    },
-                    {
-                        id: 22,
-                        type: 1,
-                        name: "realtimespeedo",
-                        label: "Real-time Speedometer Updates",
-                        description: "If toggled on, the speedometer will update in real-time (every frame). This option might have a bad effect on your performance."
-                    }
-                ]
-            },
-            {
-                name: "Keybinds",
-                settings: [
-                    {
-                        id: 7,
-                        type: 3,
-                        name: "vcbind",
-                        label: "Push To Talk",
-                        description: "Click to change the push to talk key."
-                      },
-                      {
-                        id: 8,
-                        type: 3,
-                        name: "gpsbind",
-                        label: "GPS Key",
-                        description: "This is the key used to toggle GPS."
-                      },
-                      {
-                        id: 11,
-                        type: 3,
-                        name: "bigmapbind",
-                        label: "Expanded Minimap",
-                        description: "Toggles the larger minimap view."
-                      },
-                      {
-                        id: 23,
-                        type: 3,
-                        name: "actionmenubind",
-                        label: "Quick-Action Menu",
-                        description: "Opens the quick-action menu when held down, closes it when key is let go."
-                      },
-                      {
-                        id: 24,
-                        type: 3,
-                        name: "mdcbind",
-                        label: "Police MDC",
-                        description: "Toggles the police Mobile Data Computer."
-                      }
-                ]
-            },
-            {
-                name: "Display",
-                settings: [
-                    {
-                        id: 9,
-                        type: 1,
-                        name: "hud",
-                        label: "User Interface",
-                        description: "Completely disable/enable the HUD."
-                    },
-                    {
-                      id: 1,
-                      type: 1,
-                      name: "tri",
-                      label: "Top Right Info",
-                      description: "This includes RnC Logo, Player Count, Current Lobby ID, Clock."
-                    },
-                    {
-                      id: 2,
-                      type: 1,
-                      name: "kf",
-                      label: "Kill Feed",
-                      description: "This includes Kill Feed."
-                    },
-                    {
-                      id: 3,
-                      type: 1,
-                      name: "gp",
-                      label: "Game Progress",
-                      description: "This includes In-Game Progress Timer."
-                    },
-                    {
-                      id: 4,
-                      type: 1,
-                      name: "bigmap",
-                      label: "Expanded Minimap",
-                      description: "Toggle permanently expanded minimap."
-                    },
-                    {
-                        id: 5,
-                        type: 1,
-                        name: "tooltips",
-                        label: "Tooltips",
-                        description: "Enable/disable tooltips."
-                    },
-                    {
-                        id: 10,
-                        type: 1,
-                        name: "nametags",
-                        label: "Nametags",
-                        description: "Enable/disable nametags."
-                    },
-                    {
-                        id: 25,
-                        type: 1,
-                        name: "togspeedo",
-                        label: "Speedometer",
-                        description: "Enable/disable car speedometer."
-                    },
-                    {
-                        id: 6,
-                        type: 2,
-                        name: "updr",
-                        label: "Update Rate",
-                        description: "How fast should blips & UI segments update.",
-                        options: [
-                          {
-                            name: "Slow",
-                            value: "1000",
-                          },
-                          {
-                            name: "Normal",
-                            value: "200",
-                          },
-                          {
-                            name: "Fast",
-                            value: "10",
-                          },
-                        ]
-                    },
-                    {
-                        id: 16,
-                        type: 1,
-                        name: "monitor",
-                        label: "FPS/Ping Monitoring",
-                        description: "Toggles whether your FPS & ping will be displayed in the top right corner."
-                    }
-                ]
-            },
-            {
-                name: "Chat",
-                settings: [
-                    {
-                        id: 13,
-                        type: 1,
-                        name: "oocauto",
-                        label: "Auto OOC",
-                        description: "Automatically send all text messages to the global OOC chat, so you don't have to type /o every time."
-                    },
-                    {
-                        id: 31,
-                        type: 1,
-                        name: "showvoice",
-                        label: "Voice Activity Display",
-                        description: "Toggles whether to show a list of users that's currently talking or not."
-                    },
-                    {
-                        id: 17,
-                        type: 4,
-                        name: "voicemode",
-                        label: "Voice Mode",
-                        description: "Sets the voice channel in which you speak. (SHORTCUT: N+TAB)",
-                        default: "Nearby",
-                        options: [
-                          {
-                            label: "Nearby",
-                            value: "0",
-                          },
-                          {
-                            label: "Team",
-                            value: "1",
-                          },
-                          {
-                            label: "Squad",
-                            value: "2",
-                          },
-                          {
-                            label: "Disabled",
-                            value: "3",
-                          },
-                        ]
-                    },
-                    {
-                        id: 18,
-                        type: 4,
-                        name: "activechatopacity",
-                        label: "Active Chat Opacity",
-                        description: "Changes the opacity of the chat while it's in 'active' state, a.k.a. while typing or receiving messages.",
-                        default: "${(mp.storage.data.menu.ActiveChatOpacity == undefined ? "100" : (mp.storage.data.menu.ActiveChatOpacity*100).toString())}",
-                        options: [
-                          {
-                            label: "100",
-                            value: "1",
-                          },
-                          {
-                            label: "75",
-                            value: "0.75",
-                          },
-                          {
-                            label: "50",
-                            value: "0.5",
-                          },
-                          {
-                            label: "25",
-                            value: "0.25",
-                          },
-                        ]
-                    },
-                    {
-                        id: 19,
-                        type: 4,
-                        name: "inactivechatopacity",
-                        label: "Inactive Chat Opacity",
-                        description: "Changes the opacity of the chat while it's in 'inactive' state, a.k.a. when some time passes without any new messages.",
-                        default: "${(mp.storage.data.menu.InactiveChatOpacity == undefined ? "50" : (mp.storage.data.menu.InactiveChatOpacity*100).toString())}",
-                        options: [
-                          {
-                            label: "100",
-                            value: "1",
-                          },
-                          {
-                            label: "75",
-                            value: "0.75",
-                          },
-                          {
-                            label: "50",
-                            value: "0.5",
-                          },
-                          {
-                            label: "25",
-                            value: "0.25",
-                          },
-                        ]
-                    },
-                    {
-                        id: 20,
-                        type: 1,
-                        name: "showinactivechat",
-                        label: "Show Inactive Chat",
-                        description: "Toggles whether the chat will be visible or not while it's in the 'inactive' state."
-                    },
-                ]
-            }
-        ]`);
-
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.tri[0].value = ${mp.storage.data.menu.topRightInfo}`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.gp[0].value = ${mp.storage.data.menu.gameProgress};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.tooltips[0].value = ${mp.storage.data.menu.tooltips};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.kf[0].value = ${mp.storage.data.menu.killFeed};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.nametags[0].value = ${mp.storage.data.menu.nametags};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.hud[0].value = ${mp.storage.data.menu.HUD};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.bigmap[0].value = ${mp.storage.data.menu.alwaysExpandedMap};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.updr[0].value = ${mp.storage.data.menu.updateRate};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.togspeedo[0].value = ${mp.storage.data.menu.Speedo};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.monitor[0].value = ${mp.storage.data.menu.monitoring};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.vcbind[0].value = "${String.fromCharCode(curVoiceBind)}";`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.gpsbind[0].value = "${String.fromCharCode(curGPSBind)}";`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.bigmapbind[0].value = "${String.fromCharCode(curMapBind)}";`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.actionmenubind[0].value = "${String.fromCharCode(curActionMenuBind)}";`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.mdcbind[0].value = "${String.fromCharCode(curMDCBind)}";`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.serverlanguage[0].value = "${menuSetting_getOptionNameFromValue("language", mp.storage.data.language)}";`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.myweather[0].value = "${menuSetting_getOptionNameFromValue("weather", mp.storage.data.menu.myweather)}";`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autojoinopt[0].value = ${mp.storage.data.menu.AutoJoin};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.eventmusic[0].value = ${mp.storage.data.menu.EventMusic};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autologintog[0].value = ${mp.storage.data.menu.AutoLogin};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.realtimespeedo[0].value = ${mp.storage.data.menu.RealtimeSpeedo};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.carradio[0].value = ${mp.storage.data.radiotoggle};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.loadingscreens[0].value = ${mp.storage.data.menu.loadingscreens};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.enablesnow[0].value = ${mp.storage.data.menu.SnowEnabled};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autoplayradio[0].value = ${mp.storage.data.menu.XMRAutoPlay};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.oocauto[0].value = ${mp.storage.data.menu.OOCauto};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.showvoice[0].value = ${mp.storage.data.menu.ShowVoiceActivity};`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.voicemode[0].value = "${menuSetting_getOptionNameFromValue("voicemode", mp.storage.data.menu.VoiceMode)}";`);
-        
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.activechatopacity[0].value = "${menuSetting_getOptionNameFromValue("activechatopacity", mp.storage.data.menu.ActiveChatOpacity)}";`);       
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.inactivechatopacity[0].value = "${menuSetting_getOptionNameFromValue("inactivechatopacity", mp.storage.data.menu.InactiveChatOpacity)}";`);
-        ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.showinactivechat[0].value = ${mp.storage.data.menu.ShowInactiveChat.toString()};`);
     }
 }
 
@@ -923,7 +527,418 @@ mp.events.add("MenuToggleTyping", (state) => {
         mp.keys.bind(0x4D, false, ToggleMenu);
     }
 });
+function updateMenuSettingsTab(){
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.categories = [
+        {
+            name: "Game",
+            settings:[
+                {
+                    id: 29,
+                    type: 4,
+                    name: "serverlanguage",
+                    label: "Language",
+                    description: "Changes the language in which *most* server messages are displayed. Want to help with translations? Join our Discord for more info.",
+                    options: [
+                      {
+                        label: "English",
+                        value: "0",
+                      },
+                      {
+                        label: "Spanish/Español",
+                        value: "1",
+                      },
+                      {
+                        label: "French/Français",
+                        value: "2",
+                      },
+                      {
+                        label: "Vietnamese/Tiếng Việt",
+                        value: "4",
+                      }
+                    ]
+                },
+                {
+                    id: 12,
+                    type: 4,
+                    name: "myweather",
+                    label: "Weather",
+                    description: "Changes the weather displayed only on your screen.",
+                    options: [
+                      {
+                          label: "Dynamic",
+                          value: "-1",
+                      },
+                      {
+                        label: "Sunny",
+                        value: "0",
+                      },
+                      {
+                        label: "Cloudy",
+                        value: "2",
+                      },    {
+                        label: "Smog",
+                          value: "3",
+                      },
+                      {
+                        label: "Foggy",
+                        value: "4",
+                      },
+                      {
+                        label: "Overcast",
+                          value: "5",
+                      },
+                      {
+                        label: "Rain",
+                          value: "6",
+                      },
+                      {
+                        label: "Thunderstorm",
+                        value: "7",
+                      },   
+                      {
+                        label: "Neutral",
+                          value: "9",
+                      },
+                      {
+                        label: "Snowfall",
+                          value: "10",
+                      }, 
+                      {
+                        label: "Blizzard",
+                          value: "11",
+                      }, 
+                      {
+                        label: "Snowlight",
+                          value: "12",
+                      },
+                    ]
+                },
+                {
+                    id: 28,
+                    type: 1,
+                    name: "enablesnow",
+                    label: "Snowy Map",
+                    description: "Toggles snow in the map of San Andreas (on the roads, etc.)."
+                },
+                {
+                    id: 14,
+                    type: 1,
+                    name: "autojoinopt",
+                    label: "Autojoin",
+                    description: "Toggles whether you will be put in copchase rounds or not."
+                },
+                {
+                    id: 30,
+                    type: 1,
+                    name: "autoplayradio",
+                    label: "XMR Auto-Play",
+                    description: "If toggled on, your most recent radio station will automatically be set upon entering a car without a radio station set."
+                },
+                {
+                    id: 15,
+                    type: 1,
+                    name: "eventmusic",
+                    label: "Event Music",
+                    description: "Toggles whether background music will play in events or not."
+                },
+                {
+                    id: 26,
+                    type: 1,
+                    name: "carradio",
+                    label: "GTA Car Radio",
+                    description: "Toggles whether you'll hear the in-game car radio music. NOTE: Due to GTAV sync, if the driver has disabled radio, you won't hear anything too!"
+                },
+                {
+                    id: 27,
+                    type: 1,
+                    name: "loadingscreens",
+                    label: "Enable Loading Screens",
+                    description: "Toggles the loading screens (e.g. the one at beginning of copchase) on or off. Disable this if you are experiencing issues with long loading screens."
+                },
+                {
+                    id: 21,
+                    type: 1,
+                    name: "autologintog",
+                    label: "Auto Login",
+                    description: "Automatically log in to this account - eliminates the need to enter your login info."
+                },
+                {
+                    id: 22,
+                    type: 1,
+                    name: "realtimespeedo",
+                    label: "Real-time Speedometer Updates",
+                    description: "If toggled on, the speedometer will update in real-time (every frame). This option might have a bad effect on your performance."
+                }
+            ]
+        },
+        {
+            name: "Keybinds",
+            settings: [
+                {
+                    id: 7,
+                    type: 3,
+                    name: "vcbind",
+                    label: "Push To Talk",
+                    description: "Click to change the push to talk key."
+                  },
+                  {
+                    id: 8,
+                    type: 3,
+                    name: "gpsbind",
+                    label: "GPS Key",
+                    description: "This is the key used to toggle GPS."
+                  },
+                  {
+                    id: 11,
+                    type: 3,
+                    name: "bigmapbind",
+                    label: "Expanded Minimap",
+                    description: "Toggles the larger minimap view."
+                  },
+                  {
+                    id: 23,
+                    type: 3,
+                    name: "actionmenubind",
+                    label: "Quick-Action Menu",
+                    description: "Opens the quick-action menu when held down, closes it when key is let go."
+                  },
+                  {
+                    id: 24,
+                    type: 3,
+                    name: "mdcbind",
+                    label: "Police MDC",
+                    description: "Toggles the police Mobile Data Computer."
+                  }
+            ]
+        },
+        {
+            name: "Display",
+            settings: [
+                {
+                    id: 9,
+                    type: 1,
+                    name: "hud",
+                    label: "User Interface",
+                    description: "Completely disable/enable the HUD."
+                },
+                {
+                  id: 1,
+                  type: 1,
+                  name: "tri",
+                  label: "Top Right Info",
+                  description: "This includes RnC Logo, Player Count, Current Lobby ID, Clock."
+                },
+                {
+                  id: 2,
+                  type: 1,
+                  name: "kf",
+                  label: "Kill Feed",
+                  description: "This includes Kill Feed."
+                },
+                {
+                  id: 3,
+                  type: 1,
+                  name: "gp",
+                  label: "Game Progress",
+                  description: "This includes In-Game Progress Timer."
+                },
+                {
+                  id: 4,
+                  type: 1,
+                  name: "bigmap",
+                  label: "Expanded Minimap",
+                  description: "Toggle permanently expanded minimap."
+                },
+                {
+                    id: 5,
+                    type: 1,
+                    name: "tooltips",
+                    label: "Tooltips",
+                    description: "Enable/disable tooltips."
+                },
+                {
+                    id: 10,
+                    type: 1,
+                    name: "nametags",
+                    label: "Nametags",
+                    description: "Enable/disable nametags."
+                },
+                {
+                    id: 25,
+                    type: 1,
+                    name: "togspeedo",
+                    label: "Speedometer",
+                    description: "Enable/disable car speedometer."
+                },
+                {
+                    id: 6,
+                    type: 2,
+                    name: "updr",
+                    label: "Update Rate",
+                    description: "How fast should blips & UI segments update.",
+                    options: [
+                      {
+                        name: "Slow",
+                        value: "1000",
+                      },
+                      {
+                        name: "Normal",
+                        value: "200",
+                      },
+                      {
+                        name: "Fast",
+                        value: "10",
+                      },
+                    ]
+                },
+                {
+                    id: 16,
+                    type: 1,
+                    name: "monitor",
+                    label: "FPS/Ping Monitoring",
+                    description: "Toggles whether your FPS & ping will be displayed in the top right corner."
+                }
+            ]
+        },
+        {
+            name: "Chat",
+            settings: [
+                {
+                    id: 13,
+                    type: 1,
+                    name: "oocauto",
+                    label: "Auto OOC",
+                    description: "Automatically send all text messages to the global OOC chat, so you don't have to type /o every time."
+                },
+                {
+                    id: 31,
+                    type: 1,
+                    name: "showvoice",
+                    label: "Voice Activity Display",
+                    description: "Toggles whether to show a list of users that's currently talking or not."
+                },
+                {
+                    id: 17,
+                    type: 4,
+                    name: "voicemode",
+                    label: "Voice Mode",
+                    description: "Sets the voice channel in which you speak. (SHORTCUT: N+TAB)",
+                    default: "Nearby",
+                    options: [
+                      {
+                        label: "Nearby",
+                        value: "0",
+                      },
+                      {
+                        label: "Team",
+                        value: "1",
+                      },
+                      {
+                        label: "Squad",
+                        value: "2",
+                      },
+                      {
+                        label: "Disabled",
+                        value: "3",
+                      },
+                    ]
+                },
+                {
+                    id: 18,
+                    type: 4,
+                    name: "activechatopacity",
+                    label: "Active Chat Opacity",
+                    description: "Changes the opacity of the chat while it's in 'active' state, a.k.a. while typing or receiving messages.",
+                    default: "${(mp.storage.data.menu.ActiveChatOpacity == undefined ? "100" : (mp.storage.data.menu.ActiveChatOpacity*100).toString())}",
+                    options: [
+                      {
+                        label: "100",
+                        value: "1",
+                      },
+                      {
+                        label: "75",
+                        value: "0.75",
+                      },
+                      {
+                        label: "50",
+                        value: "0.5",
+                      },
+                      {
+                        label: "25",
+                        value: "0.25",
+                      },
+                    ]
+                },
+                {
+                    id: 19,
+                    type: 4,
+                    name: "inactivechatopacity",
+                    label: "Inactive Chat Opacity",
+                    description: "Changes the opacity of the chat while it's in 'inactive' state, a.k.a. when some time passes without any new messages.",
+                    default: "${(mp.storage.data.menu.InactiveChatOpacity == undefined ? "50" : (mp.storage.data.menu.InactiveChatOpacity*100).toString())}",
+                    options: [
+                      {
+                        label: "100",
+                        value: "1",
+                      },
+                      {
+                        label: "75",
+                        value: "0.75",
+                      },
+                      {
+                        label: "50",
+                        value: "0.5",
+                      },
+                      {
+                        label: "25",
+                        value: "0.25",
+                      },
+                    ]
+                },
+                {
+                    id: 20,
+                    type: 1,
+                    name: "showinactivechat",
+                    label: "Show Inactive Chat",
+                    description: "Toggles whether the chat will be visible or not while it's in the 'inactive' state."
+                },
+            ]
+        }
+    ]`);
 
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.tri[0].value = ${mp.storage.data.menu.topRightInfo}`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.gp[0].value = ${mp.storage.data.menu.gameProgress};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.tooltips[0].value = ${mp.storage.data.menu.tooltips};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.kf[0].value = ${mp.storage.data.menu.killFeed};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.nametags[0].value = ${mp.storage.data.menu.nametags};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.hud[0].value = ${mp.storage.data.menu.HUD};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.bigmap[0].value = ${mp.storage.data.menu.alwaysExpandedMap};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.updr[0].value = ${mp.storage.data.menu.updateRate};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.togspeedo[0].value = ${mp.storage.data.menu.Speedo};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.monitor[0].value = ${mp.storage.data.menu.monitoring};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.vcbind[0].value = "${String.fromCharCode(curVoiceBind)}";`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.gpsbind[0].value = "${String.fromCharCode(curGPSBind)}";`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.bigmapbind[0].value = "${String.fromCharCode(curMapBind)}";`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.actionmenubind[0].value = "${String.fromCharCode(curActionMenuBind)}";`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.mdcbind[0].value = "${String.fromCharCode(curMDCBind)}";`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.serverlanguage[0].value = "${menuSetting_getOptionNameFromValue("language", mp.storage.data.language)}";`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.myweather[0].value = "${menuSetting_getOptionNameFromValue("weather", mp.storage.data.menu.myweather)}";`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autojoinopt[0].value = ${mp.storage.data.menu.AutoJoin};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.eventmusic[0].value = ${mp.storage.data.menu.EventMusic};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autologintog[0].value = ${mp.storage.data.menu.AutoLogin};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.realtimespeedo[0].value = ${mp.storage.data.menu.RealtimeSpeedo};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.carradio[0].value = ${mp.storage.data.radiotoggle};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.loadingscreens[0].value = ${mp.storage.data.menu.loadingscreens};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.enablesnow[0].value = ${mp.storage.data.menu.SnowEnabled};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autoplayradio[0].value = ${mp.storage.data.menu.XMRAutoPlay};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.oocauto[0].value = ${mp.storage.data.menu.OOCauto};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.showvoice[0].value = ${mp.storage.data.menu.ShowVoiceActivity};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.voicemode[0].value = "${menuSetting_getOptionNameFromValue("voicemode", mp.storage.data.menu.VoiceMode)}";`);
+    
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.activechatopacity[0].value = "${menuSetting_getOptionNameFromValue("activechatopacity", mp.storage.data.menu.ActiveChatOpacity)}";`);       
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.inactivechatopacity[0].value = "${menuSetting_getOptionNameFromValue("inactivechatopacity", mp.storage.data.menu.InactiveChatOpacity)}";`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.showinactivechat[0].value = ${mp.storage.data.menu.ShowInactiveChat.toString()};`);
+}
 // ID 69420 ==> Custom Crosshair Toggle | ID 69421 ==> Always On Crosshair |  ID 69422 ==> Sniper Custom or Default crosshair
 mp.events.add("MenuChangeSettings", (id, value) => 
 {
@@ -1118,7 +1133,6 @@ mp.events.add("MenuSelectVehicle", (model, team) => {
 });
 
 mp.events.add("MenuSelectLoadout", (name, team) => {
-    mp.gui.chat.push(`You selected ${name} ${team}`);
     mp.events.callRemote("MenuSelectedLoadout", name, team);
 
     if(team == 1){
@@ -1307,8 +1321,10 @@ mp.events.add("privateRoom_banPlayer", (id) => {
 mp.events.add("privateRoom_unbanPlayer", (id) => {
     mp.events.callRemote("Menu_OnLobbyUnbanPlayer", id);
 });
-
-mp.events.add("addPrivateLobbyToMenu", (id, name, password, type, playerCount, maxPlayers, maxPing, ownerName, playerList, bannedPlayersList) => {
+mp.events.add("removePrivateLobby", () => {
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.privateRoom = undefined;`);
+})
+mp.events.add("updateMenuPrivateLobby", (id, name, password, type, playerCount, maxPlayers, maxPing, ownerName, playerList, bannedPlayersList) => {
     ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.privateRoom = {
         id:${id},
         name:"${name}",
@@ -1325,10 +1341,31 @@ mp.events.add("addPrivateLobbyToMenu", (id, name, password, type, playerCount, m
 });
 
 // --------------------
+mp.events.add("UpdateMenuOwnedVehicles", (vehicles, currentCopCar, currentFugiCar) => {
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.vehicles = [];`);
+    // Vehicle Data
+    // Model, Name, Background, Energy, Price, Locked
+    let menuItems = JSON.parse(vehicles);
+    for(let i = 0; i < menuItems.length; i++)
+    {
+        let insertString = `gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.vehicles.push({`;
+        insertString += `"id": ${i}, `;
+        insertString += `"teamId": ${menuItems[i][0]}, `;
+        insertString += `"model": "${menuItems[i][1]}", `;
+        insertString += `"name": "${menuItems[i][2]}", `;
+        insertString += `"image": "${menuItems[i][3]}", `;
+        //insertString += `"locked": ${menuItems[i][4]}, `;
+        insertString += `"speed": "${(menuItems[i][2] !== "Random" ? menuItems[i][5] : "Random")}", `;
+        if(menuItems[i][6].length > 1) insertString += `"requirements": ${menuItems[i][6]},`;
+        insertString += "});";
 
+        ServerUI.execute(insertString);
+    }    
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.selectedVehiclePolice = "${currentCopCar}"`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.selectedVehicleFugitive = "${currentFugiCar}"`);
+});
 mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) => {
     ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.vehiclesTab.vehicles = [];`);
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.vehicles = [];`);
     //ServerUI.execute(`gm.$refs.mainMenu.$refs.vehiclesTab.$refs.police.selectedModel = "${currentCopCar}";`);
     //ServerUI.execute(`gm.$refs.mainMenu.$refs.vehiclesTab.$refs.fugitive.selectedModel = "${currentFugiCar}";`);
 
@@ -1337,6 +1374,8 @@ mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) =>
     let menuItems = JSON.parse(vehicles);
     for(let i = 0; i < menuItems.length; i++)
     {
+        if(menuItems[i][2] == "Random") continue;
+
         // menuItems[i][0] = team ID | 0 fugitive | 1 cop
         // menuItems[i][4] = locked true/false | false = owner
         let insertString = `gm.$refs.mainMenu.$refs.storeTab.$refs.vehiclesTab.vehicles.push({`;
@@ -1349,33 +1388,13 @@ mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) =>
         insertString += `"speed": "${(menuItems[i][2] !== "Random" ? menuItems[i][5] : "Random")}", `;
         if(menuItems[i][6].length > 1) insertString += `"requirements": ${menuItems[i][6]},`;
         insertString += "});";
-    
-
+   
         ServerUI.execute(insertString);
-        if(menuItems[i][4] === false){ // if locked === false aka if owns vehicle
-            let insertString = `gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.vehicles.push({`;
-            insertString += `"id": ${i}, `;
-            insertString += `"teamId": ${menuItems[i][0]}, `;
-            insertString += `"model": "${menuItems[i][1]}", `;
-            insertString += `"name": "${menuItems[i][2]}", `;
-            insertString += `"image": "${menuItems[i][3]}", `;
-            //insertString += `"locked": ${menuItems[i][4]}, `;
-            insertString += `"speed": "${(menuItems[i][2] !== "Random" ? menuItems[i][5] : "Random")}", `;
-            if(menuItems[i][6].length > 1) insertString += `"requirements": ${menuItems[i][6]},`;
-            insertString += "});";
-
-            ServerUI.execute(insertString);
-        }
-
     }    
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.selectedVehiclePolice = "${currentCopCar}"`);
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.selectedVehicleFugitive = "${currentFugiCar}"`);
     ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.vehiclesTab.selectedVehiclePolice = "${currentCopCar}"`);
     ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.vehiclesTab.selectedVehicleFugitive = "${currentFugiCar}"`);
 });
-
-mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoadout) => {
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.loadouts = [];`);
+mp.events.add("UpdateMenuOwnedLoadouts", (loadouts, currentCopLoadout, currentFugiLoadout) => {
     ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.loadouts = [];`);
     //ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.$refs.police.selectedLoadout = "${(currentCopLoadout == "?" ? "Default" : currentCopLoadout)}";`);
     //ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.$refs.fugitive.selectedLoadout = "${(currentFugiLoadout == "?" ? "Default" : currentFugiLoadout)}";`);
@@ -1385,6 +1404,32 @@ mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoa
     let menuItems = JSON.parse(loadouts);
     for(let i = 0; i < menuItems.length; i++)
     {
+        let insertString = `gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.loadouts.push({`;
+            
+        insertString += `"teamId": ${menuItems[i][0]}, `;
+        insertString += `"name": "${menuItems[i][1]}", `;
+        insertString += `"background": "${menuItems[i][2]}", `;
+        //insertString += `"locked": ${menuItems[i][3]}, `;
+        insertString +=  menuItems[i][4];
+        insertString +=  menuItems[i][5];
+        insertString += "});";
+        ServerUI.execute(insertString);
+    }
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.selectedLoadoutPolice = "${currentCopLoadout}"`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.selectedLoadoutFugitive = "${currentFugiLoadout}"`);
+});
+mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoadout) => {
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.loadouts = [];`);
+    //ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.$refs.police.selectedLoadout = "${(currentCopLoadout == "?" ? "Default" : currentCopLoadout)}";`);
+    //ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.$refs.fugitive.selectedLoadout = "${(currentFugiLoadout == "?" ? "Default" : currentFugiLoadout)}";`);
+
+    // Loadout Data
+    // Name, Locked, Background, Requirements, Weapons
+    let menuItems = JSON.parse(loadouts);
+    for(let i = 0; i < menuItems.length; i++)
+    {
+        if(menuItems[i][1] == "Default") continue;
+
         let insertString = "";
 
         insertString = `gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.loadouts.push({`;
@@ -1398,22 +1443,7 @@ mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoa
         insertString += "});";
         ServerUI.execute(insertString);
 
-
-        if(menuItems[i][3] === false){ // if locked == false aka if owns loadout
-            insertString = `gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.loadouts.push({`;
-            
-            insertString += `"teamId": ${menuItems[i][0]}, `;
-            insertString += `"name": "${menuItems[i][1]}", `;
-            insertString += `"background": "${menuItems[i][2]}", `;
-            //insertString += `"locked": ${menuItems[i][3]}, `;
-            insertString +=  menuItems[i][4];
-            insertString +=  menuItems[i][5];
-            insertString += "});";
-            ServerUI.execute(insertString);
-        }
     }
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.selectedLoadoutPolice = "${currentCopLoadout}"`);
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.selectedLoadoutFugitive = "${currentFugiLoadout}"`);
     ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.selectedLoadoutPolice = "${currentCopLoadout}"`);
     ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.selectedLoadoutFugitive = "${currentFugiLoadout}"`);
 });
@@ -1426,6 +1456,9 @@ mp.events.add("UpdateMenuLobbies", (lobbies, currentLobby) => {
     let menuItems = JSON.parse(lobbies);
     for(let i = 0; i < menuItems.length; i++)
     {
+        let ownerName = "null";
+        if(menuItems[i][8].length > 0) ownerName = `"${menuItems[i][8]}"`
+
         let insertString = `gm.$refs.mainMenu.$refs.playTab.rooms.push({`;
         insertString += `"id": ${menuItems[i][0]}, `;
         insertString += `"name": "${menuItems[i][1]}", `;
@@ -1434,7 +1467,8 @@ mp.events.add("UpdateMenuLobbies", (lobbies, currentLobby) => {
         if(menuItems[i][4].length > 1) insertString += `"password": "${menuItems[i][4]}", `;
         insertString += `"players": ${menuItems[i][5]}, `;
         insertString += `"maxplayers": ${menuItems[i][6]},`;
-        insertString += `"joinFunction":"PutPlayerInLobby"`
+        insertString += `"joinFunction":"PutPlayerInLobby",`,
+        insertString += `"owner":${ownerName}`;
         //if(menuItems[i][7].length > 1) insertString += `, "description": "${menuItems[i][7]}"`;
         insertString += "});";
 
