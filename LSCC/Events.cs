@@ -2446,6 +2446,11 @@ namespace RNC
                 }
                 NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has left the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
+                foreach(LobbyData bannedFromLobbies in Settings.Lobbies.Where(l => l.BannedPlayers.Contains(player)))
+                {
+                    bannedFromLobbies.BannedPlayers.Remove(player);
+                }
+
                 lock (Settings.Requests)
                 {
                     Settings.Requests.RemoveAll(a => a.Reporter == player || a.Reported == player);
@@ -4973,7 +4978,14 @@ namespace RNC
                     }
                     playerListJSON += "]";
 
-                    player.TriggerEvent("addPrivateLobbyToMenu", lobby.lobbyId, lobby.Name, lobby.Password, (int)lobby.gameMode, players, lobby.MaxPlayers, lobby.MaxPing, player.Name, playerListJSON);
+                    string bplayerListJSON = "[";
+                    foreach (Player pl in lobby.BannedPlayers)
+                    {
+                        bplayerListJSON += $"{{id:{pl.Id}, name:\"{pl.Name}\", ping:{pl.Ping}}},";
+                    }
+                    bplayerListJSON += "]";
+
+                    player.TriggerEvent("addPrivateLobbyToMenu", lobby.lobbyId, lobby.Name, lobby.Password, (int)lobby.gameMode, players, lobby.MaxPlayers, lobby.MaxPing, player.Name, playerListJSON, bplayerListJSON);
                 }
                 else
                 {
@@ -5207,6 +5219,61 @@ namespace RNC
             EPlayer.Notify(player, "Lobby successfully created!", "green", "fa-success", false, 3000);
         }
 
+        [RemoteEvent("Menu_OnLobbyBanPlayer")]
+        public void OnMenuLobbyBanPlayer(Player player, int playerId)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Player target = Settings.LoggedInPlayers.FirstOrDefault(p => p.Id == playerId);
+            if (target == null)
+            {
+                EPlayer.Error(player, Translate(player, "ERROR_NO_LONGER_CONNECTED_LOGGED"));
+                return;
+            }
+            if (target.GetSharedData<int>("InLobby") != EPlayer.GetAccount(player).SQL_ID + 50000)
+            {
+                EPlayer.Error(player, "That player is not in your lobby!");
+                return;
+            }
+            int lobbyID = (EPlayer.GetAccount(player).SQL_ID + 50000);
+
+            LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == lobbyID);
+            if(lobby == null)
+            {
+                EPlayer.Error(player, "Your lobby doesn't exist anymore!");
+                return;
+            }
+            lobby.BannedPlayers.Add(target);
+            EPlayer.Notify(player, "Successfully banned player from lobby!", "green", "", true, 3000);
+
+            OnMenuLobbyKickPlayer(player, playerId);
+        }
+        [RemoteEvent("Menu_OnLobbyUnbanPlayer")]
+        public void OnMenuLobbyUnbanPlayer(Player player, int playerId)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Player target = Settings.LoggedInPlayers.FirstOrDefault(p => p.Id == playerId);
+            if (target == null)
+            {
+                EPlayer.Error(player, Translate(player, "ERROR_NO_LONGER_CONNECTED_LOGGED"));
+                return;
+            }
+            int lobbyID = (EPlayer.GetAccount(player).SQL_ID + 50000);
+
+            LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == lobbyID);
+            if (lobby == null)
+            {
+                EPlayer.Error(player, "Your lobby doesn't exist anymore!");
+                return;
+            }
+            if (lobby.BannedPlayers.Contains(target))
+            {
+                lobby.BannedPlayers.Remove(target);
+            }
+            EPlayer.Notify(player, "Successfully unbanned player from lobby!", "green", "", true, 3000);
+        }
+
         [RemoteEvent("Menu_OnLobbyKickPlayer")]
         public void OnMenuLobbyKickPlayer(Player player, int playerId)
         {
@@ -5309,6 +5376,85 @@ namespace RNC
             });
         }
 
+        [RemoteEvent("Menu_OnWeaponEditor")]
+        public void OnMenuWeaponEditor(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            player.TriggerEvent("ForceCloseMenu");
+            Commands.cmd_weaponeditor(player);
+        }
+        [RemoteEvent("Menu_OnEditVehicle")]
+        public void OnMenuEditVehicle(Player player, string model, int teamID)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            Account _a = EPlayer.GetAccount(player);
+            Task.Run(async () =>
+            {
+                if(await EPlayer.HasOwnedVehicle(_a, model, teamID))
+                {
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("ForceCloseMenu");
+                        if (teamID == 1)
+                            EPlayer.GetAccount(player).CarCop = model;
+                        else
+                            EPlayer.GetAccount(player).CarFugitive = model;
+
+                        EPlayer.Save(player, false);
+                        Commands.cmd_vtuner(player, (teamID == 1 ? "cop" : "fugitive"));
+                    });
+                }
+                else
+                {
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.Error(player, "<strong>Fatal error</strong> - You do not own that vehicle!");
+                    });
+                }
+            });
+        }
+
+        [RemoteEvent("Menu_OnBuyNamechange")]
+        public void OnMenuBuyNamechange(Player player, int packageID)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            int namechangeNumber = 0;
+            int packagePrice = 0;
+
+            switch (packageID)
+            {
+                case 0:
+                    packagePrice = 100;
+                    namechangeNumber = 1;
+                    break;
+                case 1:
+                    packagePrice = 450;
+                    namechangeNumber = 5;
+                    break;
+                case 2:
+                    packagePrice = 800;
+                    namechangeNumber = 10;
+                    break;
+            }
+
+            if(EPlayer.GetAccount(player).DonatorPoints < packagePrice)
+            {
+                EPlayer.Error(player, Translate(player, "ERROR_NOT_ENOUGH_POINTS", EPlayer.GetAccount(player).DonatorPoints - packagePrice));
+                return;
+            }
+
+            EPlayer.GetAccount(player).Namechanges += namechangeNumber;
+            EPlayer.GetAccount(player).DonatorPoints -= packagePrice;
+            EPlayer.Save(player, false);
+            EPlayer.Notify(player, Translate(player, "REDEEM_SUCCESS", $"~y~Namechange (x{namechangeNumber})"), "green", "", true, 3000);
+        }
+
         [RemoteEvent("Menu_OnCodeRedeem")]
         public void OnMenuCodeRedeem(Player player, string code)
         {
@@ -5325,8 +5471,8 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
-                            player.TriggerEvent("menu_store_redeem_result", false, "This code is invalid!");
-                            //player.SendChatMessage(Translate(player, "ERROR_INVALID_CODE"));
+                            player.SendChatMessage(Translate(player, "ERROR_INVALID_CODE"));
+                            player.TriggerEvent("menu_store_redeem_result", false, "Invalid code!");
                             //player.SendChatMessage("!{#C9C9C9}[HINT] A common mistake made is mixing up the letter 'O' and the number zero (0).");
                         });
                         return;
@@ -5335,8 +5481,8 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
-                            player.TriggerEvent("menu_store_redeem_result", false, "This code was already used!");
-                            //player.SendChatMessage(Translate(player, "ERROR_CODE_USED"));
+                            player.SendChatMessage(Translate(player, "ERROR_CODE_USED"));
+                            player.TriggerEvent("menu_store_redeem_result", false, "Code already used!");
                         });
                         context.RedeemableCodes.Remove(redeem);
                         await context.SaveChangesAsync();
@@ -5345,78 +5491,122 @@ namespace RNC
                     NAPI.Task.Run(() =>
                     {
                         /* ---Donation Types/Values---
-                     * 0 => Bronze [VALUE: how many times it can be redeemed]
-                     * 1 => Silver
-                     * 2 => Gold
-                     * 3 => 100 Donator Points
-                     * 4 => Namechange
-                     * 5 => 5 namechanges [bundle]
-                     */
+                            0 - Rank Budle ( To je ono kad mu s rankom da i namechangeve i sve kaj treba ko noramlan rank kad kupe_
+                            -- 0 - Bronze
+                            -- 1 - Silver
+                            -- 2 - Gold
+                            1 - Rank (Samo rank bez cjelog bundla)
+                            -- 0 - Bronze
+                            -- 1 - Silver
+                            -- 2 - Gold
+                            2 - DiamondPoints
+                            -- broj pointova kolko za dat
+                            3 - Namechanges
+                            -- broj namechangeva
+                        */
                         Account acc = EPlayer.GetAccount(player);
-                        switch (redeem.Value)
+
+                        switch (redeem.Type)
                         {
                             case 0:
-                                acc.DonatorPoints += 200;
-                                acc.DonatorLevel = 1;
-                                player.SetSharedData("Donator", acc.DonatorLevel);
-                                NAPI.Task.Run(() =>
+                                switch (redeem.Value)
                                 {
-                                    player.TriggerEvent("menu_store_redeem_result", true, "You successfully redeemed Bronze!");
-                                    //player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(1, true)));
-                                });
+                                    case 0:
+                                        //acc.DonatorPoints += 200;
+                                        acc.Namechanges += 1;
+                                        acc.DonatorLevel = 1;
+                                        player.SetSharedData("Donator", acc.DonatorLevel);
+                                        NAPI.Task.Run(() =>
+                                        {
+                                            player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(1, true)));
+                                            player.TriggerEvent("menu_store_redeem_result", true, "Successfully redeemed item!");
+                                        });
 
-                                EPlayer.UpdateMaxMenuItems(player);
+                                        EPlayer.UpdateMaxMenuItems(player);
+                                        break;
+                                    case 1:
+                                        //acc.DonatorPoints += 350;
+                                        acc.Namechanges += 3;
+                                        acc.DonatorLevel = 2;
+                                        player.SetSharedData("Donator", acc.DonatorLevel);
+                                        NAPI.Task.Run(() =>
+                                        {
+                                            player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(2, true)));
+                                            player.TriggerEvent("menu_store_redeem_result", true, "Successfully redeemed item!");
+                                        });
+
+                                        EPlayer.UpdateMaxMenuItems(player);
+                                        break;
+                                    case 2:
+                                        //acc.DonatorPoints += 500;
+                                        acc.Namechanges += 5;
+                                        acc.DonatorLevel = 3;
+                                        player.SetSharedData("Donator", acc.DonatorLevel);
+                                        NAPI.Task.Run(() =>
+                                        {
+                                            player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(3, true)));
+                                            player.TriggerEvent("menu_store_redeem_result", true, "Successfully redeemed item!");
+                                        });
+
+                                        EPlayer.UpdateMaxMenuItems(player);
+                                        break;
+                                }
                                 break;
                             case 1:
-                                acc.DonatorPoints += 350;
-                                acc.DonatorLevel = 2;
-                                player.SetSharedData("Donator", acc.DonatorLevel);
-                                NAPI.Task.Run(() =>
+                                switch (redeem.Value)
                                 {
-                                    player.TriggerEvent("menu_store_redeem_result", true, "You successfully redeemed Silver!");
-                                    //player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(2, true)));
-                                });
+                                    case 0:
+                                        acc.DonatorLevel = 1;
+                                        player.SetSharedData("Donator", acc.DonatorLevel);
+                                        NAPI.Task.Run(() =>
+                                        {
+                                            player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(1, true)));
+                                            player.TriggerEvent("menu_store_redeem_result", true, "Successfully redeemed item!");
+                                        });
 
-                                EPlayer.UpdateMaxMenuItems(player);
+                                        EPlayer.UpdateMaxMenuItems(player);
+                                        break;
+                                    case 1:
+                                        acc.DonatorLevel = 2;
+                                        player.SetSharedData("Donator", acc.DonatorLevel);
+                                        NAPI.Task.Run(() =>
+                                        {
+                                            player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(2, true)));
+                                            player.TriggerEvent("menu_store_redeem_result", true, "Successfully redeemed item!");
+                                        });
+
+                                        EPlayer.UpdateMaxMenuItems(player);
+                                        break;
+                                    case 2:
+                                        acc.DonatorLevel = 3;
+                                        player.SetSharedData("Donator", acc.DonatorLevel);
+                                        NAPI.Task.Run(() =>
+                                        {
+                                            player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(3, true)));
+                                            player.TriggerEvent("menu_store_redeem_result", true, "Successfully redeemed item!");
+                                        });
+
+                                        EPlayer.UpdateMaxMenuItems(player);
+                                        break;
+                                }
                                 break;
                             case 2:
-                                acc.DonatorPoints += 500;
-                                acc.DonatorLevel = 3;
-                                player.SetSharedData("Donator", acc.DonatorLevel);
-                                NAPI.Task.Run(() =>
                                 {
-                                    player.TriggerEvent("menu_store_redeem_result", true, "You successfully redeemed Gold!");
-                                    //player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(3, true)));
-                                });
-
-                                EPlayer.UpdateMaxMenuItems(player);
+                                    acc.DonatorPoints += redeem.Value;
+                                    player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", $"~y~{redeem.Value}DP"));
+                                    player.TriggerEvent("menu_store_redeem_result", true, "Successfully redeemed item!");
+                                }
                                 break;
                             case 3:
-                                acc.DonatorPoints += 100;
-                                NAPI.Task.Run(() =>
                                 {
-                                    player.TriggerEvent("menu_store_redeem_result", true, "You successfully redeemed 100DP!");
-                                    //player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", "!{#a8ffb7}100 Donator Points"));
-                                });
-                                break;
-                            case 4:
-                                acc.Namechanges++;
-                                NAPI.Task.Run(() =>
-                                {
-                                    player.TriggerEvent("menu_store_redeem_result", true, "You successfully redeemed 1 Namechange!");
-                                    //player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", "!{#a8ffb7}1 Namechange"));
-                                });
-                                break;
-                            case 5:
-                                acc.Namechanges += 5;
-                                NAPI.Task.Run(() =>
-                                {
-                                    player.TriggerEvent("menu_store_redeem_result", true, "You successfully redeemed 5 Namechanges Budle!");
-                                    //player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", "!{#a8ffb7}5 Namechanges Bundle"));
-                                });
+                                    acc.Namechanges += redeem.Value;
+                                    player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", $"~y~{redeem.Value} Namechange{(redeem.Value > 1 ? "s" : "")}"));
+                                    player.TriggerEvent("menu_store_redeem_result", true, "Successfully redeemed item!");
+                                }
                                 break;
                         }
                         player.SendChatMessage(Translate(player, "DONATION_THANKS"));
+                        EPlayer.Save(player, false);
                     });
                     await NAPI.Task.WaitForMainThread();
 
@@ -5424,6 +5614,8 @@ namespace RNC
                     await context.SaveChangesAsync();
                 }
             });
+
+            return;
         }
 
         [RemoteEvent("MenuSelectedVehicle")]

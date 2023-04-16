@@ -4301,6 +4301,12 @@ namespace RNC
                 EPlayer.Notify(player, Translate(player, "ERROR_INVALID_LOBBY_NOCOLOR"), "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
+            if (lobby.BannedPlayers.Contains(player))
+            {
+                player.SendChatMessage("!{#FF6347}[!] ~w~You are currently banned from that lobby! Attempting to circumvent this ban will result in a ~r~server-wide ban!~w~.");
+                EPlayer.Error(player, "You are <strong>banned</strong> from joining that lobby! Attempting to circumvent this ban will result in a <strong>server-wide ban!</strong>.");
+                return;
+            }
 
             if (!lobby.Enabled)
             {
@@ -9488,7 +9494,7 @@ namespace RNC
         }
 
         [Command("vtuner", "!{#AFAFAF}[USAGE] vtuner (cop / fugitive / help)")]
-        public void cmd_vtuner(Player player, string team = "help")
+        public static void cmd_vtuner(Player player, string team = "help")
         {
             if (!EPlayer.LoggedIn(player)) return;
 
@@ -9937,159 +9943,6 @@ namespace RNC
                 player.SetSharedData("LaserEquipped", false);
 
             player.SendChatMessage($"Laser {(player.GetSharedData<bool>("LaserEquipped") ? "~g~ENABLED" : "~r~DISABLED")}");
-        }
-
-        [Command("redeem", "!{#AFAFAF}[USAGE] redeem (code)")]
-        public void cmd_redeem(Player player, string code)
-        {
-            if (!EPlayer.LoggedIn(player))
-                return;
-
-            Task.Run(async () =>
-            {
-                using (MainDatabase context = ContextFactory.CreateContext())
-                {
-                    RedeemableCode redeem = await context.RedeemableCodes.AsQueryable().FirstOrDefaultAsync(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
-
-                    if (redeem == null)
-                    {
-                        NAPI.Task.Run(() =>
-                        {
-                            player.SendChatMessage(Translate(player, "ERROR_INVALID_CODE"));
-                            //player.SendChatMessage("!{#C9C9C9}[HINT] A common mistake made is mixing up the letter 'O' and the number zero (0).");
-                        });
-                        return;
-                    }
-                    if (redeem.Uses <= 0)
-                    {
-                        NAPI.Task.Run(() =>
-                        {
-                            player.SendChatMessage(Translate(player, "ERROR_CODE_USED"));
-                        });
-                        context.RedeemableCodes.Remove(redeem);
-                        await context.SaveChangesAsync();
-                        return;
-                    }
-                    NAPI.Task.Run(() =>
-                    {
-                        /* ---Donation Types/Values---
-                            0 - Rank Budle ( To je ono kad mu s rankom da i namechangeve i sve kaj treba ko noramlan rank kad kupe_
-                            -- 0 - Bronze
-                            -- 1 - Silver
-                            -- 2 - Gold
-                            1 - Rank (Samo rank bez cjelog bundla)
-                            -- 0 - Bronze
-                            -- 1 - Silver
-                            -- 2 - Gold
-                            2 - DiamondPoints
-                            -- broj pointova kolko za dat
-                            3 - Namechanges
-                            -- broj namechangeva
-                        */
-                        Account acc = EPlayer.GetAccount(player);
-
-                        switch (redeem.Type)
-                        {
-                            case 0:
-                                switch (redeem.Value)
-                                {
-                                    case 0:
-                                        //acc.DonatorPoints += 200;
-                                        acc.Namechanges += 1;
-                                        acc.DonatorLevel = 1;
-                                        player.SetSharedData("Donator", acc.DonatorLevel);
-                                        NAPI.Task.Run(() =>
-                                        {
-                                            player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(1, true)));
-                                        });
-
-                                        EPlayer.UpdateMaxMenuItems(player);
-                                        break;
-                                    case 1:
-                                        //acc.DonatorPoints += 350;
-                                        acc.Namechanges += 3;
-                                        acc.DonatorLevel = 2;
-                                        player.SetSharedData("Donator", acc.DonatorLevel);
-                                        NAPI.Task.Run(() =>
-                                        {
-                                            player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(2, true)));
-                                        });
-
-                                        EPlayer.UpdateMaxMenuItems(player);
-                                        break;
-                                    case 2:
-                                        //acc.DonatorPoints += 500;
-                                        acc.Namechanges += 5;
-                                        acc.DonatorLevel = 3;
-                                        player.SetSharedData("Donator", acc.DonatorLevel);
-                                        NAPI.Task.Run(() =>
-                                        {
-                                            player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(3, true)));
-                                        });
-
-                                        EPlayer.UpdateMaxMenuItems(player);
-                                        break;
-                                }
-                                break;
-                            case 1:
-                                switch (redeem.Value)
-                                {
-                                    case 0:
-                                        acc.DonatorLevel = 1;
-                                        player.SetSharedData("Donator", acc.DonatorLevel);
-                                        NAPI.Task.Run(() =>
-                                        {
-                                            player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(1, true)));
-                                        });
-
-                                        EPlayer.UpdateMaxMenuItems(player);
-                                        break;
-                                    case 1:
-                                        acc.DonatorLevel = 2;
-                                        player.SetSharedData("Donator", acc.DonatorLevel);
-                                        NAPI.Task.Run(() =>
-                                        {
-                                            player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(2, true)));
-                                        });
-
-                                        EPlayer.UpdateMaxMenuItems(player);
-                                        break;
-                                    case 2:
-                                        acc.DonatorLevel = 3;
-                                        player.SetSharedData("Donator", acc.DonatorLevel);
-                                        NAPI.Task.Run(() =>
-                                        {
-                                            player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(3, true)));
-                                        });
-
-                                        EPlayer.UpdateMaxMenuItems(player);
-                                        break;
-                                }
-                                break;
-                            case 2:
-                                {
-                                    acc.DonatorPoints += redeem.Value;
-                                    player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", $"~y~{redeem.Value}DP"));
-                                }
-                                break;
-                            case 3:
-                                {
-                                    acc.Namechanges += redeem.Value;
-                                    player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", $"~y~{redeem.Value} Namechange{(redeem.Value > 1 ? "s" : "")}"));
-                                }
-                                break;
-                        }
-                        player.SendChatMessage(Translate(player, "DONATION_THANKS"));
-                        EPlayer.Save(player, false);
-                    });
-                    await NAPI.Task.WaitForMainThread();
-
-                    context.RedeemableCodes.Remove(redeem);
-                    await context.SaveChangesAsync();
-                }
-            });
-            
-            return;
         }
         /*
         [Command("forcelogin")]

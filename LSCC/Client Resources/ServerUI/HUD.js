@@ -1266,6 +1266,7 @@ mp.events.add("UpdateRateEvent", () => {
     if(ServerUI != null && (!(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false || mp.players.local.getVariable("InLobby") === undefined)))
     {
         ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.points = ${mp.players.local.getVariable("Points")};`);
+        ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.donatorPoints = ${mp.players.local.getVariable("DonatorPoints")};`);
         
         let lobbyStr = "";
         

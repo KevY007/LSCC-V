@@ -527,15 +527,15 @@ namespace RNC
             {
                 case 1:
                     if (colored) name = "!{#CD7F32}";
-                    name = name + "Bronze Donator";
+                    name = name + "Bronze";
                     break;
                 case 2:
                     if (colored) name = "!{#C0C0C0}";
-                    name = name + "Silver Donator";
+                    name = name + "Silver";
                     break;
                 case 3:
                     if (colored) name = "!{#FFD700}";
-                    name = name + "Gold Donator";
+                    name = name + "Gold";
                     break;
                 default:
                     name = "Player";

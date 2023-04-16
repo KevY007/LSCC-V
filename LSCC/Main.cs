@@ -200,6 +200,8 @@ namespace RNC
         public List<Lobby_StingerData> Stingers { get; set; }
 
         public List<Blip> ParkedVehicleBlips { get; set; }
+        
+        public List<Player> BannedPlayers { get; set; }
 
         public LobbyData()
         {
@@ -210,6 +212,8 @@ namespace RNC
             Drops = new List<Pickup>();
 
             ParkedVehicleBlips = new List<Blip>();
+
+            BannedPlayers = new List<Player>();
 
             BankRobbery = new BankRobberyData();
             NextEventCounter = 10; // how many rounds left until an event

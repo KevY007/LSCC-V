@@ -255,6 +255,14 @@ mp.keys.bind(0x1B, true, function() { // ESC key
     }
 });
 
+mp.events.add("ForceCloseMenu", () => {
+    if(menuToggled == true){
+        ToggleMenu();     
+    }
+    ServerUI.execute(`gm._pStores.globals.isMainMenuOpen = false;`);
+    ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
+});
+
 function menuSetting_getOptionNameFromValue(type, value){
     switch(type){
         case "weather":{
@@ -1098,10 +1106,29 @@ mp.events.add("RequestJoinMinigame", (ID) => {
 
 mp.events.add("MenuSelectVehicle", (model, team) => {
     mp.events.callRemote("MenuSelectedVehicle", model, team);
+
+    if(team == 1){
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.selectedVehiclePolice = "${model}"`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.vehiclesTab.selectedVehiclePolice = "${model}"`);
+    }
+    else{
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.selectedVehicleFugitive = "${model}"`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.vehiclesTab.selectedVehicleFugitive = "${model}"`);
+    }
 });
 
 mp.events.add("MenuSelectLoadout", (name, team) => {
+    mp.gui.chat.push(`You selected ${name} ${team}`);
     mp.events.callRemote("MenuSelectedLoadout", name, team);
+
+    if(team == 1){
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.selectedLoadoutPolice = "${name}"`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.selectedLoadoutPolice = "${name}"`);
+    }
+    else{
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.selectedLoadoutFugitive = "${name}"`);
+        ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.selectedLoadoutFugitive = "${name}"`);
+    }
 });
 
 function minigameNameToID(name){
@@ -1232,20 +1259,30 @@ mp.events.add("UpdateMenuItem", (id, owned) => {
 `);
 });
 // called by menu:
+mp.events.add("menu_buyNamechange", (id) => {
+    mp.events.callRemote("Menu_OnBuyNamechange", id);
+});
 mp.events.add("menu_buyItem", (id) => {
     mp.events.callRemote("Menu_RequestBuyItem", id);
 });
-
+mp.events.add("MenuCustomizeLoadout", () => {
+    mp.events.callRemote("Menu_OnWeaponEditor");
+});
+mp.events.add("MenuCustomizeVehicle", (model, teamID) => {
+    mp.events.callRemote("Menu_OnEditVehicle", model, teamID);
+});
 mp.events.add("menu_store_redeem", (code) => {
     mp.events.callRemote("Menu_OnCodeRedeem", code);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.dpTab.isRedeeming = true;`);
 });
 mp.events.add("menu_store_redeem_result", (success, message) => {
     if(!ServerUI) return;
 
-    ServerUI.execute(`gm.$refs.storeTab.dpTab = {
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.dpTab.redeemResponse = {
         success:${success.toString()},
         message:"${message}"
     }`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.dpTab.isRedeeming = false;`);
 });
 
 mp.events.add("privateRoom_create", (name, pass, type, maxPlayers, maxPing) => {
@@ -1264,7 +1301,14 @@ mp.events.add("privateRoom_kickPlayer", (id) => {
     mp.events.callRemote("Menu_OnLobbyKickPlayer", id);
 });
 
-mp.events.add("addPrivateLobbyToMenu", (id, name, password, type, playerCount, maxPlayers, maxPing, ownerName, playerList) => {
+mp.events.add("privateRoom_banPlayer", (id) => {
+    mp.events.callRemote("Menu_OnLobbyBanPlayer", id);
+});
+mp.events.add("privateRoom_unbanPlayer", (id) => {
+    mp.events.callRemote("Menu_OnLobbyUnbanPlayer", id);
+});
+
+mp.events.add("addPrivateLobbyToMenu", (id, name, password, type, playerCount, maxPlayers, maxPing, ownerName, playerList, bannedPlayersList) => {
     ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.privateRoom = {
         id:${id},
         name:"${name}",
@@ -1275,6 +1319,7 @@ mp.events.add("addPrivateLobbyToMenu", (id, name, password, type, playerCount, m
         maxPing:${maxPing},
         owner:"${ownerName}",
         playerList:${playerList},
+        bannedPlayers:${bannedPlayersList},
         image:"https://i.pinimg.com/originals/54/28/fa/5428faf1395c1f9c90fbefc71d88b88b.jpg"
     }`);
 });
@@ -1322,7 +1367,11 @@ mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) =>
             ServerUI.execute(insertString);
         }
 
-    }
+    }    
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.selectedVehiclePolice = "${currentCopCar}"`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.selectedVehicleFugitive = "${currentFugiCar}"`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.vehiclesTab.selectedVehiclePolice = "${currentCopCar}"`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.vehiclesTab.selectedVehicleFugitive = "${currentFugiCar}"`);
 });
 
 mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoadout) => {
@@ -1363,6 +1412,10 @@ mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoa
             ServerUI.execute(insertString);
         }
     }
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.selectedLoadoutPolice = "${currentCopLoadout}"`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.selectedLoadoutFugitive = "${currentFugiLoadout}"`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.selectedLoadoutPolice = "${currentCopLoadout}"`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.selectedLoadoutFugitive = "${currentFugiLoadout}"`);
 });
 
 mp.events.add("UpdateMenuLobbies", (lobbies, currentLobby) => {

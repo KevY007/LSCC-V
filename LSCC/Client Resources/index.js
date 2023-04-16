@@ -347,6 +347,7 @@ mp.events.add('showLoginBrowser', (state) => {
             }
             else{
                 ServerUI.execute(`gm.$refs.auth.api.authSuccess = true;`);
+                ServerUI.execute(`gm.$refs.auth.stop();`);
                 setTimeout(() => {
                     if(!mp.players.local || !mp.players.exists(mp.players.local)) return;
 
