@@ -6536,6 +6536,15 @@ namespace RNC
             }
             return;
         }
+
+        [RemoteEvent("requestDonatorPointsVar")]
+        public void OnRequestDonatorPointsVariableUpdate(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player) == null) return;
+
+            player.SetSharedData("DonatorPoints", EPlayer.GetAccount(player).DonatorPoints);
+        }
         
         [RemoteEvent("PlayerShot_SyncHealth")]
         public void SyncHealthOnShot(Player player, Player target, int targetHealth, int damageToDeal, int targetArmour, long weapon, int boneIndex)

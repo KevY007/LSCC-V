@@ -1247,7 +1247,16 @@ mp.events.add("CS_UpdateStatsVars", () => {
     UpdateStatsVars(player);
 });
 
-function UpdateStatsVars(entity){
+mp.events.add("TwoSecondsEvent", () => {
+    if(ServerUI == null || ServerUI == undefined || ServerUI == undefined || ServerUI == null) return;
+
+    mp.events.callRemoteUnreliable("requestDonatorPointsVar");
+    setTimeout(() => {
+        UpdateStatsVars(mp.players.local, false);
+    }, 500);
+});
+
+function UpdateStatsVars(entity, all = true){
     // yes im double checking the same shit cuz for some reason this shit decided to break for no reason
     if(ServerUI == null || ServerUI == undefined || ServerUI == undefined || ServerUI == null) return;
     entity = mp.players.local;
@@ -1266,24 +1275,36 @@ function UpdateStatsVars(entity){
                     points: ${player.getVariable("Points")},
                     admin: ${player.getVariable("Admin")},
                     donator: ${player.getVariable("Donator")},
-                    api: "${player.getVariable("ScreenshotServerAPI")}"
+                    donatorPoints: ${player.getVariable("DonatorPoints")},
+                    api: "${player.getVariable("ScreenshotServerAPI")}",
+                    lobbyId: ${player.getVariable("InLobby")},
+                    teamId: ${player.getVariable("Team")},
+                    heading: ${player.heading},
+                    location:{
+                        x: ${player.position.x},
+                        y: ${player.position.y},
+                        z: ${player.position.z},
+                    }
                 })`);
                 ServerUI.execute(`gm.$refs.helpers.$refs.states.setUser(["clan"], {
                     id: ${player.getVariable("ClanID")},
                     tier: ${player.getVariable("ClanTier")}
                 })`);
                 
-                if(player.getVariable("Donator") >= 2 || player.getVariable("Admin") >= 1)
-                    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.removeInputColors = false;`);
-                else ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.removeInputColors = true;`);
+                if(all === true){
+                    if(player.getVariable("Donator") >= 2 || player.getVariable("Admin") >= 1)
+                        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.removeInputColors = false;`);
+                    else ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.removeInputColors = true;`);
             
-                if(CommandsDataJSON){
-                    let allowedCommands = CommandsDataJSON.filter(cmd => cmd.Admin <= mp.players.local.getVariable("Admin"));
-                    allowedCommands.sort(function(a, b){
-                        return a.CommandText.length - b.CommandText.length;
-                    });
-                    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.commands = ${JSON.stringify(allowedCommands)}`);
+                    if(CommandsDataJSON){
+                        let allowedCommands = CommandsDataJSON.filter(cmd => cmd.Admin <= mp.players.local.getVariable("Admin"));
+                        allowedCommands.sort(function(a, b){
+                            return a.CommandText.length - b.CommandText.length;
+                        });
+                        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.commands = ${JSON.stringify(allowedCommands)}`);
+                    }
                 }
+             
             }
         }
     }
