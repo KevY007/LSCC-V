@@ -3191,7 +3191,7 @@ namespace RNC
         }
 
         [ServerEvent(Event.ChatMessage)]
-        public void OnPlayerText(Player player, string message)
+        public static void OnPlayerText(Player player, string message)
         {
             player.SetData("TUA_LT", 0);
 
@@ -4852,8 +4852,6 @@ namespace RNC
         [RemoteEvent("Server_RequestLobbySwitch")]
         public void OnRequestLobbySwitch(Player player, int lobbyID, string password)
         {
-            player.SendChatMessage($"REQUESTING TO JOIN {lobbyID} WITH PASSWORD {password}");
-
             if (!EPlayer.LoggedIn(player)) return;
 
             if (player.GetSharedData<int>("InLobby") == lobbyID)
@@ -4954,7 +4952,7 @@ namespace RNC
             player.TriggerEvent("UpdateMenuMinigames", NAPI.Util.ToJson(Menu_MinigamesData(player)), (player.GetSharedData<int>("InLobby") < 0) ? player.GetSharedData<int>("InLobby") : player.GetSharedData<int>("InDM"));
             player.SetData<long>("LastLobbySwitch", Environment.TickCount64);
         }
-
+        
         public List<object[]> Menu_LobbiesData(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return new List<object[]>();

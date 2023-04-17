@@ -161,7 +161,9 @@ TattooMenu.MenuClose.on(() => {
 
 mp.events.add("ApplyTattoos", (tattooList) => {
     player.clearDecorations();
+    if(!tattooList) return;
     const list = JSON.parse(tattooList);
+    if(!list) return;
     for(let i = 0 ; i < list.length ; i++){
         applyTattooEx(list[i]);
     }

@@ -869,7 +869,7 @@ mp.events.add(
       let resolution = mp.game.graphics.getScreenActiveResolution(0, 0);
 
       let toexec = `loadImage("${apiKey}",
-        "${mp.players.local.getVariable("SQL_ID")};${Date.now()}.jpg", 
+        "${mp.players.local.getVariable("SQL_ID")};${Date.now()}.jpeg", 
         "http://screenshots/${_fname}", 
         "Screenshotter${_fdate.getMilliseconds()}", 
         "${identifier}", 

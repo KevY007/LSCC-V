@@ -698,6 +698,7 @@ namespace RNC
                 player.SetSharedData("SQL_ID", -1);
                 player.ResetData("Kicked");
                 player.ResetData("Dead");
+                player.SetSharedData("DonatorPoints", 0);
                 player.SetData("SpawnTick", Environment.TickCount64);
                 player.ResetData("AccountHandle");
                 player.ResetData("CompNoRefundWarn");

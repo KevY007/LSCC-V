@@ -16,7 +16,7 @@
             canvas.width = width;
             canvas.height = height;
             context.drawImage(image, 0, 0, width, height, 0, 0, width, height);
-            const base64 = canvas.toDataURL("image/jpg", 0.5);
+            const base64 = canvas.toDataURL("image/jpeg", 0.5);
             const blob = b64toBlob(base64);
             var myHeaders = new Headers();
             myHeaders.append("x-api-key", api_key);
@@ -59,7 +59,7 @@
         for (var i = 0; i < byteString.length; i++) {
             ia[i] = byteString.charCodeAt(i);
         }
-        return new Blob([ab], { type: 'image/jpg' });
+        return new Blob([ab], { type: 'image/jpeg' });
     }
   </script>
 </html>

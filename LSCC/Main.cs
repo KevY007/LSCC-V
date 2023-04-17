@@ -5020,8 +5020,11 @@ namespace RNC
                                                                             {
                                                                                 if (kvp.Key != null && kvp.Value != null)
                                                                                 {
-                                                                                    p.GetData<Vehicle>("ChaseVehicle").SetMod(kvp.Key, kvp.Value);
-                                                                                    if (kvp.Key == 56) p.GetData<Vehicle>("ChaseVVehicle").WheelType = kvp.Value;
+                                                                                    if (p.HasData("ChaseVehicle"))
+                                                                                    {
+                                                                                        p.GetData<Vehicle>("ChaseVehicle").SetMod(kvp.Key, kvp.Value);
+                                                                                        if (kvp.Key == 56) p.GetData<Vehicle>("ChaseVVehicle").WheelType = kvp.Value;
+                                                                                    }
                                                                                 }
                                                                             }
                                                                             p.GetData<Vehicle>("ChaseVehicle").PearlescentColor = inst.PearlescentColor;

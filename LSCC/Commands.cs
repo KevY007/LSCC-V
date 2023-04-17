@@ -1821,8 +1821,8 @@ namespace RNC
         }
         */
 
-        [Command("takescreenshot", "!{#AFAFAF}[USAGE] takescreenshot (target) (quality = 20) | Quality 20 is default", Alias = "takess")]
-        public void cmd_takescreenshot(Player player, Player target, int quality)
+        [Command("takescreenshot", "!{#AFAFAF}[USAGE] takescreenshot (target)", Alias = "takess")]
+        public void cmd_takescreenshot(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
@@ -3072,6 +3072,7 @@ namespace RNC
         }
         */
 
+        /*
         [Command("convertpoints", "!{#AFAFAF}[USAGE] convertpoints (amount) (standard to donator | donator to standard)", GreedyArg = true)]
         public void cmd_convertpoints(Player player, int amount, string type)
         {
@@ -3227,6 +3228,7 @@ namespace RNC
             }
             return;
         }
+        */
 
         /*
         [Command("mycomps", GreedyArg = true)]
@@ -10491,6 +10493,12 @@ namespace RNC
             });
 
             Discord.SendTextChannel("staff-bot", $"**(GOOC) | {EPlayer.GetPrefix(player, false)} {player.Name}**: {text}");
+        }
+
+        [Command("text", GreedyArg = true)]
+        public static void cmd_text(Player player, string text)
+        {
+            Events.OnPlayerText(player, text);
         }
 
         [Command("ooc", "!{#AFAFAF}[USAGE] ooc (text)", Alias = "o", GreedyArg = true)]

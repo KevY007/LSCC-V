@@ -630,6 +630,7 @@ function focusChat(toggle){
 
     var channels = `gm.$refs.hud.$refs.base.$refs.chat.api.channels = [`;
     channels += `
+        {name:"Local", value:"text"},
         {name:"Global", value:"go"},
         {name:"Lobby", value:"lg"},
     `

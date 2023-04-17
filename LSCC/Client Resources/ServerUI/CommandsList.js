@@ -149,6 +149,13 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "link",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "veh2",
     "Usage": "[USAGE] veh2 (car model name) (optional: color 1) (optional: color 2)",
     "Admin": 0,
@@ -516,24 +523,20 @@ var CommandsDataJSON = [
   },
   {
     "CommandText": "takescreenshot",
-    "Usage": "[USAGE] takescreenshot (target) (quality = 20) | Quality 20 is default",
+    "Usage": "[USAGE] takescreenshot (target)",
     "Admin": 5,
     "Donator": 0,
     "Parameters": [
-      "_player:target",
-      "quality = 20",
-      " Quality 20 is default"
+      "_player:target"
     ]
   },
   {
     "CommandText": "takess",
-    "Usage": "[USAGE] takescreenshot (target) (quality = 20) | Quality 20 is default",
+    "Usage": "[USAGE] takescreenshot (target)",
     "Admin": 5,
     "Donator": 0,
     "Parameters": [
-      "_player:target",
-      "quality = 20",
-      " Quality 20 is default"
+      "_player:target"
     ]
   },
   {
@@ -1564,11 +1567,26 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
-    "CommandText": "panim",
-    "Usage": "",
+    "CommandText": "anim",
+    "Usage": "[USAGE] anim (library) (name) (flags)",
     "Admin": 0,
     "Donator": 0,
-    "Parameters": []
+    "Parameters": [
+      "library",
+      "CommandText",
+      "flags"
+    ]
+  },
+  {
+    "CommandText": "panim",
+    "Usage": "[USAGE] anim (library) (name) (flags)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "library",
+      "CommandText",
+      "flags"
+    ]
   },
   {
     "CommandText": "dbglinkmane",
@@ -2166,6 +2184,13 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
+    "CommandText": "tattoo",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "clanchat",
     "Usage": "[USAGE] clanchat (text)",
     "Admin": 0,
@@ -2325,7 +2350,7 @@ var CommandsDataJSON = [
     "Admin": 4,
     "Donator": 0,
     "Parameters": [
-      "name"
+      "CommandText"
     ]
   },
   {
@@ -2337,7 +2362,7 @@ var CommandsDataJSON = [
       "category ID",
       "icon URL",
       "stream URL",
-      "name"
+      "CommandText"
     ]
   },
   {
@@ -2505,7 +2530,7 @@ var CommandsDataJSON = [
     "Admin": 4,
     "Donator": 0,
     "Parameters": [
-      "name"
+      "CommandText"
     ]
   },
   {
@@ -2514,7 +2539,7 @@ var CommandsDataJSON = [
     "Admin": 4,
     "Donator": 0,
     "Parameters": [
-      "name"
+      "CommandText"
     ]
   },
   {
@@ -2523,7 +2548,7 @@ var CommandsDataJSON = [
     "Admin": 4,
     "Donator": 0,
     "Parameters": [
-      "name"
+      "CommandText"
     ]
   },
   {
@@ -2717,13 +2742,11 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "CommandText": "redeem",
-    "Usage": "[USAGE] redeem (code)",
+    "CommandText": "laser",
+    "Usage": "",
     "Admin": 0,
     "Donator": 0,
-    "Parameters": [
-      "code"
-    ]
+    "Parameters": []
   },
   {
     "CommandText": "forcelogin",
@@ -2982,6 +3005,13 @@ var CommandsDataJSON = [
     ]
   },
   {
+    "CommandText": "text",
+    "Usage": "",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": []
+  },
+  {
     "CommandText": "ooc",
     "Usage": "[USAGE] ooc (text)",
     "Admin": 1,
@@ -3065,6 +3095,24 @@ var CommandsDataJSON = [
     "Donator": 0,
     "Parameters": [
       "_player:target",
+      "text"
+    ]
+  },
+  {
+    "CommandText": "re",
+    "Usage": "[USAGE] re (text)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
+      "text"
+    ]
+  },
+  {
+    "CommandText": "reply",
+    "Usage": "[USAGE] re (text)",
+    "Admin": 0,
+    "Donator": 0,
+    "Parameters": [
       "text"
     ]
   },
@@ -3495,4 +3543,4 @@ var CommandsDataJSON = [
     "Donator": 0,
     "Parameters": []
   }
-]
+];
