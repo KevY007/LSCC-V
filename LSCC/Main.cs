@@ -3069,47 +3069,7 @@ namespace RNC
                 {
                     System.Threading.Tasks.Task.Run(() =>
                     {
-                        if (Settings.LoggedInPlayers.Count <= 1 && Settings.DCMentionTime > Environment.TickCount64) // Mention time is high but don't have pb
-                            Settings.DCMentionTime = Environment.TickCount64 - 600000; // Allow it to mention again next time players after 5 mins.
-
-                        if (Environment.TickCount64 - Settings.DCMentionTime >= 900000) // 15 mins passed?
-                        {
-                            if (Settings.LoggedInPlayers.Count >= 2)
-                            {
-                                if (Settings.LoggedInPlayers.Count >= (Settings.DCMentionPlayers * 2) || Settings.DCMentionPlayers == 0) // Players doubled
-                                {
-                                    // trigger
-                                    foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.Dynamics.DCServerID))
-                                    {
-                                        var botchan = guild.TextChannels.ToList().Find(a => a.Id == Settings.Dynamics.DCMentionRoleChan);
-
-                                        if (botchan != null)
-                                        {
-                                            string playerDiff = "0";
-                                            if (Settings.LoggedInPlayers.Count - Settings.DCMentionPlayers >= 0)
-                                            {
-                                                playerDiff = $"+{Settings.LoggedInPlayers.Count - Settings.DCMentionPlayers}";
-                                            }
-                                            else playerDiff = $"{Settings.LoggedInPlayers.Count - Settings.DCMentionPlayers}";
-
-                                            botchan.SendMessageAsync($"<@&{Settings.Dynamics.DCMentionRoleID}> **There are {Settings.LoggedInPlayers.Count} players ingame.** \n" +
-                                             $"Last proper update: **{(Environment.TickCount64 - Settings.DCMentionTime) / 1000}s** ago. | " +
-                                             $"Last update players: **{Settings.DCMentionPlayers}** ({playerDiff} since before)");
-                                        }
-                                    }
-
-                                    Settings.DCMentionTime = Environment.TickCount64;
-
-                                    Settings.DCMentionPlayers = Settings.LoggedInPlayers.Count;
-                                }
-                                else
-                                {
-                                    Settings.DCMentionPlayers = (Settings.LoggedInPlayers.Count / 2); // Half the players, but next time mention in 30 mins.
-                                    Settings.DCMentionTime = Environment.TickCount64 + (1800000 - 900000); // Mention next in half an hour unless PB drops.
-                                }
-                            }
-                            else Settings.DCMentionPlayers = Settings.LoggedInPlayers.Count;
-                        }
+                        // Update discord bot status
                         if (Environment.TickCount64 - Settings.LastCountUpdate >= 60000)
                         {
                             Settings.LastCountUpdate = Environment.TickCount64;
