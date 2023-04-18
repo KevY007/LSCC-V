@@ -7452,6 +7452,7 @@ namespace RNC
                     }
                     else
                     {
+                        NAPI.Util.ConsoleOutput(data);
                         admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The screenshot of !{#FF6347}" + player.Name + "'s !{#FFFFFF}game has failed to upload.");
                         if(data != "0")
                             admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Error Details: " + data);
