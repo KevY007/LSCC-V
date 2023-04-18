@@ -114,12 +114,15 @@ namespace RNC
             if (_client == null) return Task.CompletedTask;
             if (_client.ConnectionState != ConnectionState.Connected) return Task.CompletedTask;
 
-            string channelId;
+            ulong channelId;
 
             switch (channel) {
                 case "staff-bot":
-                channelId = "717768143140814928";
-                break;
+                    channelId = 717768143140814928;
+                    break;
+                default:
+                    channelId = 717768143140814928;
+                    break;
             }
 
             if (text != null)
@@ -129,15 +132,10 @@ namespace RNC
                 text = Regex.Replace(text, @"\!\{(.*?)}|\!\{(.*?)}", "");
             }
 
-            foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.Dynamics.DCServerID))
-            {
-                var botchan = guild.TextChannels.First(a => a.Id == channelId);
 
-                if (botchan != null)
-                {
-                    botchan.SendMessageAsync(text, isTTS, embed, options);
-                }
-            }
+            var foundChannel = Discord._client.GetChannel(channelId) as ITextChannel;
+            if (foundChannel != null) foundChannel.SendMessageAsync(text, isTTS, embed, options);
+
             return Task.CompletedTask;
         }
 
