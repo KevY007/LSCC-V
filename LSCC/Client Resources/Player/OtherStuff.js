@@ -564,6 +564,7 @@ function startNoClip() {
   mp.game.cam.renderScriptCams(true, false, 0, true, false);
   localPlayer.freezePosition(true);
   localPlayer.setInvincible(true);
+  mp.events.callRemote("SetInvincible", true);
   localPlayer.setVisible(false, false);
   localPlayer.setCollision(false, false);
 }
@@ -578,6 +579,7 @@ function stopNoClip() {
   mp.game.cam.renderScriptCams(false, false, 0, true, false);
   localPlayer.freezePosition(false);
   localPlayer.setInvincible(false);
+  mp.events.callRemote("SetInvincible", true);
   localPlayer.setVisible(true, false);
   localPlayer.setCollision(true, false);
 }

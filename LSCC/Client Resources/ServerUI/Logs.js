@@ -59,7 +59,7 @@ mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
                 let gunData = null;
                 if(weaponID > 0)
                     gunData = weaponData.find(w => Number(w.Hash) == weaponID);
-                else gunData = weaponData.find(w => Number(w.Hash) == weaponID>>>0);
+                else gunData = weaponData.find(w => Number(w.Hash) == (weaponID+4294967296));
                 if(gunData)
                     damageLogs[i][2] = gunData.Name;
                 else damageLogs[i][2] = `Unknown (${weaponID})`;
@@ -86,7 +86,7 @@ mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
                 let gunData = null;
                 if(weaponID > 0)
                     gunData = weaponData.find(w => Number(w.Hash) == weaponID);
-                else gunData = weaponData.find(w => Number(w.Hash) == weaponID>>>0);
+                else gunData = weaponData.find(w => Number(w.Hash) == (weaponID+4294967296));
                 if(gunData)
                     damageLogs[i][2] = gunData.Name;
                 else damageLogs[i][2] = `Unknown (${weaponID})`;

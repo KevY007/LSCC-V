@@ -33,6 +33,7 @@ if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD
     mp.storage.data.menu.XMRAutoPlay = true;
     mp.storage.data.menu.ShowVoiceActivity = true;
     mp.storage.data.menu.ChatAccessibility = false;
+    mp.storage.data.menu.ShowDamageIndicator = true;
 
     mp.storage.flush();
 }
@@ -765,6 +766,13 @@ function updateMenuSettingsTab(){
                     description: "Enable/disable nametags."
                 },
                 {
+                    id: 33,
+                    type: 1,
+                    name: "damageindicator",
+                    label: "Damage Indicators",
+                    description: "Enable/disable damage indicators."
+                },
+                {
                     id: 25,
                     type: 1,
                     name: "togspeedo",
@@ -865,6 +873,7 @@ function updateMenuSettingsTab(){
     ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.updr[0].value = ${mp.storage.data.menu.updateRate};`);
     ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.togspeedo[0].value = ${mp.storage.data.menu.Speedo};`);
     ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.monitor[0].value = ${mp.storage.data.menu.monitoring};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.damageindicator[0].value = ${mp.storage.data.menu.ShowDamageIndicator};`);
     ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.vcbind[0].value = "${String.fromCharCode(curVoiceBind)}";`);
     ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.gpsbind[0].value = "${String.fromCharCode(curGPSBind)}";`);
     ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.bigmapbind[0].value = "${String.fromCharCode(curMapBind)}";`);
@@ -1034,6 +1043,9 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     else if(id == 32){
         mp.storage.data.menu.ChatAccessibility = value;
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.accessibilityMode = ${value.toString()}`);
+    }
+    else if(id == 33){
+        mp.storage.data.menu.ShowDamageIndicator = value;
     }
 
     if(ServerUI != null)

@@ -1,6 +1,7 @@
 var RadioToggled = false;
 
 mp.events.add("XMR_LoadRecentStations", (stationData) => {
+    return;
     const stations = JSON.parse(stationData);
     const data = stations.map(station => ({
         id:station.SQL_ID,
@@ -16,6 +17,7 @@ mp.events.add("XMR_LoadRecentStations", (stationData) => {
 });
 
 mp.events.add("XMR_SetStationList", (stationData, categoryData) => {
+    return;
     const stations = JSON.parse(stationData);
     const categories = JSON.parse(categoryData);
     const data = stations.map(station => ({
@@ -39,6 +41,7 @@ mp.events.add("XMR_SetStationList", (stationData, categoryData) => {
 });
 
 mp.events.add("StationPicker_Toggle", (toggle) => {
+    return;
     if(!ServerUI) return;
 
     StationPickerToggled = toggle;
@@ -48,6 +51,7 @@ mp.events.add("StationPicker_Toggle", (toggle) => {
 });
 
 mp.events.add("XMR_Toggle", (toggle) => {
+    return;
     if(!ServerUI) return;
 
     RadioToggled = toggle;
@@ -67,6 +71,7 @@ mp.events.add("XMR_Toggle", (toggle) => {
     }
 });
 mp.events.add("XMR_ToggleOpposite", () => {
+    return;
     RadioToggled = !RadioToggled;
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.enabled = ${RadioToggled.toString()}`);
 
@@ -76,11 +81,13 @@ mp.events.add("XMR_ToggleOpposite", () => {
 });
 
 mp.events.add("RequestPlayRadio", (id) => {
+    return;
     mp.events.callLocal("StationPicker_Toggle", false);
     mp.events.callRemote("XMR_RequestPlayStation", id);
 });
 
 mp.events.add("AddRecentStation", (id) => {
+    return;
     if(mp.storage.data.radio === undefined){
         mp.storage.data.radio = {recents:[]};
     }
@@ -100,10 +107,12 @@ mp.events.add("AddRecentStation", (id) => {
 });
 
 mp.events.add("radiopicker_close", () => {
+    return;
     mp.events.callLocal("StationPicker_Toggle", false);
 });
 
 mp.events.add("XMR_StopStationForPlayer", () => {
+    return;
     if(!ServerUI) return;
 
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.stop();`);
@@ -111,6 +120,7 @@ mp.events.add("XMR_StopStationForPlayer", () => {
     mp.events.callLocal("StationPicker_Toggle", false);
 });
 mp.events.add("XMR_PlayStationForPlayer", (id, name, stream, icon) => {
+    return;
     if(!ServerUI) return;
 
     mp.events.callLocal("AddRecentStation", id);
@@ -130,9 +140,11 @@ mp.events.add("XMR_PlayStationForPlayer", (id, name, stream, icon) => {
 });
 
 mp.events.add("playerLeaveVehicle", (vehicle, seat) => {
+    return;
     mp.events.callLocal("XMR_StopStationForPlayer");
 }) 
 mp.events.add("playerEnterVehicle", (vehicle, seat) => {
+    return;
     if(vehicle.getVariable("RadioStation") !== undefined){
         mp.events.callRemote("XMR_RequestPlayStationUnsynced", vehicle.getVariable("RadioStation"));
     }    
@@ -148,6 +160,7 @@ mp.events.add("playerEnterVehicle", (vehicle, seat) => {
 });
 
 mp.events.add("XMR_ChangeVolume", (volume) => {
+    return;
     mp.storage.data.radio.volume = volume;
     mp.storage.flush();
 });

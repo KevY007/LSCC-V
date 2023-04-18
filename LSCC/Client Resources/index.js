@@ -73,6 +73,13 @@ var FireModeDisplayText = "";
 var cuffTarget = null;
 var cuffInterval = null;
 
+/* Camera object */
+let heliCam = null;
+function isHeliCamActive(){
+	if (heliCam === null || !heliCam.isActive() || !heliCam.isRendering()) return false;
+  return true;
+}
+
 var IsInTutorial = false;
 
 var disableSprint = false;
@@ -493,7 +500,7 @@ function actionMenuClose(){
 }
 function ToggleMDC(){
     if(mp.players.local.getVariable("Team") != 1 || mp.players.local.getVariable("Wounded") > 0) return;
-    if(menuToggled == true || chatStatus == true || ActionMenuActive == true || isHotwiring == true || ClothingEditorActive == true) return;
+    if(menuToggled == true || chatStatus == true || isHeliCamActive() || ActionMenuActive == true || isHotwiring == true || ClothingEditorActive == true) return;
 
     if(scoreboardToggled)
     {

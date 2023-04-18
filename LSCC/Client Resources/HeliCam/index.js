@@ -1,6 +1,3 @@
-/* Camera object */
-let heliCam = null;
-
 /* Camera settings */
 const mouseSensitivity = 4;
 const zoomSpeed = 1.5;
@@ -126,12 +123,12 @@ function pointingAt(distance) {
     return result; // and return the result ( undefined, if no hit )
 }
 
-mp.events.addCommand("hdbg", () => {
-    mp.events.callLocal("startHeliCam");
-})
-mp.events.addCommand("shdbg", () => {
-    mp.events.callLocal("stopHeliCam");
-});
+// mp.events.addCommand("hdbg", () => {
+//     mp.events.callLocal("startHeliCam");
+// })
+// mp.events.addCommand("shdbg", () => {
+//     mp.events.callLocal("stopHeliCam");
+// });
 
 mp.events.add('click', (x, y, upOrDown, leftOrRight, relativeX, relativeY, worldPosition, hitEntity) => {
 	if (heliCam === null || !heliCam.isActive() || !heliCam.isRendering()) return;
@@ -183,14 +180,20 @@ function UpdateHeliCamCEF_Zoom(zoom){
     HeliCamCEF.execute(`SetZoomValue(${realZoom})`);
 }
 
+mp.events.add("playerLeaveVehicle", (vehicle, seat) => {
+	if (heliCam === null || !heliCam.isActive() || !heliCam.isRendering()) return;
+
+    mp.events.callLocal("stopHeliCam");    
+});
+
 function UpdateHeliCamCEF(vehicle){
     if(!HeliCamCEF) return;
      const fuel = vehicle.getVariable("Fuel");
      const speed = (vehicle.getSpeed() * 3.6).toFixed(0);
 //
-     //const getStreet = mp.game.pathfind.getStreetNameAtCoord(vehicle.position.x, vehicle.position.y, vehicle.position.z, 0, 0);
-     //const zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(vehicle.position.x, vehicle.position.y, vehicle.position.z));
-     //const streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
+     const getStreet = mp.game.pathfind.getStreetNameAtCoord(vehicle.position.x, vehicle.position.y, vehicle.position.z, 0, 0);
+     const zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(vehicle.position.x, vehicle.position.y, vehicle.position.z));
+     const streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
 //
 //
      //const fuelStr = fuel ? `${Math.floor(fuel)}%` : `∞`;

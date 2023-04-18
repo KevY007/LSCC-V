@@ -49,6 +49,10 @@ function getDamageText(damage){
 }
 
 function showDamageIndicator(damage, is_me = false){
+    if(!mp.storage.data.menu.ShowDamageIndicator) return;
+    if(damage === 0) return;
+    if(is_me && mp.game.player.getInvincible()) return;
+
     Indicators.push({
         color:getIndicatorColorFromDamage(damage, is_me),
         position:[0.5, 0.8],
@@ -60,6 +64,10 @@ function showDamageIndicator(damage, is_me = false){
 }
 
 function showDamageIndicatorOnPosition(damage, entity, boneIdx){
+    if(!mp.storage.data.menu.ShowDamageIndicator) return;
+    if(damage === 0) return;
+    if(entity.getVariable("Invincible") === true) return;
+
     const pos2d = mp.game.graphics.world3dToScreen2d(entity.position);
     if(!pos2d) return;
     

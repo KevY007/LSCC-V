@@ -1635,7 +1635,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (EPlayer.GetAccount(player).Admin < 2)
+            if (EPlayer.GetAccount(player).Admin < 5)
             {
                 if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
                 {

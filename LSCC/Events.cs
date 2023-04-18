@@ -2684,6 +2684,7 @@ namespace RNC
         public static void OnPlayerDeath(Player player, Player killer, uint reason)
         {
             if (!EPlayer.LoggedIn(player)) return;
+            NAPI.Util.ConsoleOutput($"{killer.Name} killed {player.Name} with weapon ID {reason}");
 
             try
             {
@@ -4843,6 +4844,11 @@ namespace RNC
         {
             player.SetSharedData("HeliCamLight", value);
         }
+        [RemoteEvent("SetInvincible")]
+        public void OnSetInvincible(Player player, bool value)
+        {
+            player.SetSharedData("Invincible", value);
+        }
         [RemoteEvent("HeliCam_UpdatePosition")]
         public void OnHeliCamUpdate(Player player, double px, double py, double pz, double fx, double fy, double fz)
         {
@@ -6866,6 +6872,9 @@ namespace RNC
             if (targetHealth <= 0) return;
             if (player.CurrentWeapon == WeaponHash.Stungun) return;
 
+            long realWeapon = weapon;
+            if (weapon < 0) realWeapon = (weapon + 4294967296);
+
             int playerTeam = player.GetSharedData<int>("Team");
             int targetTeam = target.GetSharedData<int>("Team");
             if(targetTeam != -1)
@@ -6907,22 +6916,22 @@ namespace RNC
                     target.TriggerEvent("setWounded", 1, player.Id);
                     target.Armor = 0;
                     target.Health = 100;
-                    Logs.LogDamage(targetSQLID, dealerSQLID, weapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
+                    Logs.LogDamage(targetSQLID, dealerSQLID, realWeapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
                     return;
                 }
                 else
                 {
                     target.Health = 0;
                     target.Armor = 0;
-                    OnPlayerDeath(target, player, (uint)weapon);
-                    Logs.LogDamage(targetSQLID, dealerSQLID, weapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
+                    OnPlayerDeath(target, player, (uint)realWeapon);
+                    Logs.LogDamage(targetSQLID, dealerSQLID, realWeapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
                     return;
                 }
             }
 
             target.Armor = ARtoset;
             target.Health = HPtoset;
-            Logs.LogDamage(targetSQLID, dealerSQLID, weapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
+            Logs.LogDamage(targetSQLID, dealerSQLID, realWeapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
 
             //target.SendChatMessage($"~r~[DAMAGE] ~w~You've been hit by ~y~{player.Name} ~w~for ~r~{damageToDeal} ~w~damage. ~b~[AR:{ARtoset}|HP:{HPtoset}]");
             //player.SendChatMessage($"~g~[DAMAGE] ~w~You hit ~y~{target.Name} ~w~for ~r~{damageToDeal}~w~ damage, they now have ~r~{HPtoset}~w~ health ~b~(AR: {ARtoset})~w~!");

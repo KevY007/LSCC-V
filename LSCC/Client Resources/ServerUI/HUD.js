@@ -177,7 +177,7 @@ mp.events.add('actionMenu:close', () => {
     mp.gui.cursor.show(false, false);
 });
 mp.events.add('actionMenu:open', () => {
-    if(chatStatus == true || menuToggled == true || MDCActive == true || scoreboardToggled == true
+    if(chatStatus == true || isHeliCamActive() || menuToggled == true || MDCActive == true || scoreboardToggled == true
         || VehicleSpawnerActive == true || WeaponEditorActive == true || StationPickerToggled == true || isHotwiring == true || ClothingEditorActive == true) return;
 
     mp.game.invoke("0xFC695459D4D0E219", 0.5, 0.5); // SET CURSOR POSITION TO CENTER [x,y = 0.5,0.5]
@@ -295,11 +295,9 @@ mp.events.add('actionMenu:clickItem', (actionID) => {
             }
             break;
         }
-        case 17: // Radio toggle
+        case 17:
         {
-            if(mp.players.local.isInAnyVehicle(false)){
-                mp.events.callLocal("XMR_ToggleOpposite");
-            }
+            mp.events.callLocal("startHeliCam");
             break;
         }
     }
@@ -392,8 +390,6 @@ function actionMenu_vehicleCheck(){
 
     if(mp.players.local.isInAnyVehicle(false)){
 
-        mp.events.callLocal("actionMenu:addItem", 17, "XMR", "#f472b6", "fa-radio");
-
         let vehicle = mp.players.local.vehicle;
         if(vehicle.getVariable("Locked") == true)
             mp.events.callLocal("actionMenu:addItem", 0, Translate("UNLOCK"), "#a3e635", "fa-lock-keyhole-open");
@@ -415,6 +411,10 @@ function actionMenu_vehicleCheck(){
                 }
                 else mp.events.callLocal("actionMenu:addItem", 13, Translate("ENGINE"), "#60a5fa", "fa-engine");
             }
+        }
+
+        if(vehicle.getClass() === 15 && mp.players.local.getVariable("Team") === 1){
+            mp.events.callLocal("actionMenu:addItem", 17, "Heli Cam", "#a78bfa", "fa-helicopter");
         }
     }
     else{
@@ -444,6 +444,7 @@ mp.events.add('ToggleNametags', (state) => {
 */
 
 function increaseChatOpacity(time = 4000){
+    return; 
     if(chatOpacityTimeout != null){
         clearInterval(chatOpacityTimeout);
     }
@@ -655,7 +656,7 @@ function focusChat(toggle){
     (ActionMenuActive !== undefined && ActionMenuActive == true) || 
     (ClothingEditorActive !== undefined && ClothingEditorActive == true) ||
     (StationPickerToggled !== undefined && StationPickerToggled == true) ||
-    (isHotwiring !== undefined && isHotwiring == true)){
+    (isHotwiring !== undefined && isHotwiring == true) || isHeliCamActive()){
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
         //ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`);
         return;
@@ -663,15 +664,15 @@ function focusChat(toggle){
     //ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = ${toggle.toString()}`);
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(${toggle.toString()});`);
 
-    if(toggle){
-        if(mp.storage.data.menu.ActiveChatOpacity !== undefined){
-            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = ${mp.storage.data.menu.ActiveChatOpacity.toString()}`);
-        }
-        else ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = 1.0`);
-    }
-    else{
-        increaseChatOpacity(3000);
-    }
+    // if(toggle){
+    //     if(mp.storage.data.menu.ActiveChatOpacity !== undefined){
+    //         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = ${mp.storage.data.menu.ActiveChatOpacity.toString()}`);
+    //     }
+    //     else ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = 1.0`);
+    // }
+    // else{
+    //     increaseChatOpacity(3000);
+    // }
 
     mp.gui.cursor.show(toggle, toggle);
     mp.events.callRemote("onFocusChat", toggle);
@@ -804,7 +805,7 @@ mp.keys.bind(0xBF, true, function(){  // /? key
     (ClothingEditorActive !== undefined && ClothingEditorActive == true) ||
     (ActionMenuActive !== undefined && ActionMenuActive == true) || 
     (StationPickerToggled !== undefined && StationPickerToggled == true) ||
-    (isHotwiring !== undefined && isHotwiring == true)){
+    (isHotwiring !== undefined && isHotwiring == true) || isHeliCamActive()){
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
         return;
     }
@@ -841,7 +842,7 @@ mp.keys.bind(0x54, true, function() { // T key
     (ClothingEditorActive !== undefined && ClothingEditorActive == true) ||
     (ActionMenuActive !== undefined && ActionMenuActive == true) || 
     (StationPickerToggled !== undefined && StationPickerToggled == true) ||
-    (isHotwiring !== undefined && isHotwiring == true)){
+    (isHotwiring !== undefined && isHotwiring == true) || isHeliCamActive()){
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
         return;
     }

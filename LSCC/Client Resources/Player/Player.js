@@ -1291,11 +1291,7 @@ function UpdateStatsVars(entity, all = true){
                     tier: ${player.getVariable("ClanTier")}
                 })`);
                 
-                if(all === true){
-                    if(player.getVariable("Donator") >= 2 || player.getVariable("Admin") >= 1)
-                        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.removeInputColors = false;`);
-                    else ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.removeInputColors = true;`);
-            
+                if(all === true){            
                     if(CommandsDataJSON){
                         let allowedCommands = CommandsDataJSON.filter(cmd => cmd.Admin <= mp.players.local.getVariable("Admin"));
                         allowedCommands.sort(function(a, b){
@@ -2679,6 +2675,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                         {
                             if(!mp.players.local.isDead()){
                                 mp.game.player.setInvincible(true);
+                                mp.events.callRemote("SetInvincible", true);
                                 mp.players.local.setInvincible(true);
                                 mp.events.callLocal("setWounded", 1, sourcePlayer.remoteId);
                                 damage = 0;
@@ -2773,6 +2770,7 @@ mp.events.add("ResetWounded", () => {
     if(chaseRunning && mp.players.local.getVariable("Team") >= 0) 
     {
         mp.players.local.setInvincible(false);
+        mp.events.callRemote("SetInvincible", false);
         mp.game.player.setInvincible(false);
     }
 
@@ -2843,6 +2841,7 @@ mp.events.add('setWounded', (state, idToPass) =>
             mp.events.callRemote("play_anim", 'anim@veh@lowrider@std@ds@arm@base', 'die', 2, 8.0, 0, -1, 0, false, false, false);
         }
         mp.game.player.setInvincible(true);
+        mp.events.callRemote("SetInvincible", true);
         mp.game.player.setInvincible(true);
         setTimeout(() => {
             if(chaseRunning && mp.players.local.getVariable("Team") >= 0 && mp.players.local.getVariable("Wounded") != 0 && !mp.players.local.isDead())
@@ -2858,6 +2857,7 @@ mp.events.add('setWounded', (state, idToPass) =>
         if(mp.players.local.getVariable("Wounded") != 1 || !chaseRunning || mp.players.local.getVariable("Team") < 0 || mp.players.local.isDead()) return;
         
         mp.players.local.setInvincible(false);
+        mp.events.callRemote("SetInvincible", false);
         mp.game.player.setInvincible(false);
         if(!mp.players.local.isInAnyVehicle(false))
         {
@@ -3010,7 +3010,7 @@ mp.events.add("render", () => {
         totalDmg += shotsToRegister[i].damage;
     }
 
-    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", target, target.getHealth(), totalDmg, target.getArmour(), weapon>>>0, bone);  
+    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", target, target.getHealth(), totalDmg, target.getArmour(), weapon, bone);  
     mp.events.callRemoteUnreliable("ServerConsoleOutput", `${mp.players.local.name} | Added up total damage: ${totalDmg} from the fast shots (${shotsToRegister.length} total)`);           
 
     shotsToRegister = [];
@@ -3024,7 +3024,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
         if(targetEntity !== undefined && targetEntity !== null && targetEntity.type === 'player')
         {
             if(sourceEntity.getVariable("ClimbProtection") == true || targetEntity.getVariable("ClimbProtection") == true) return true;
-
+            if(targetPlayer.getVariable("Invincible") === true) return;
             if(targetPlayer.getHealth() <= 0) return;
 
             let DAMAGE_TO_DEAL = 0;
@@ -3175,7 +3175,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
 
             if(DAMAGE_TO_DEAL > 0){
                 if(Date.now() - lastRegisteredShotTime > 20 && gunData.Type !== "Shotguns"){
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), DAMAGE_TO_DEAL, targetPlayer.getArmour(), weapon>>>0, boneIndex);            
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), DAMAGE_TO_DEAL, targetPlayer.getArmour(), weapon, boneIndex);            
                     lastRegisteredShotTime = Date.now();
                 }
                 else{
@@ -3637,10 +3637,12 @@ mp.events.add(
         if(toggle)
         {
             player.setInvincible(true);
+            mp.events.callRemote("SetInvincible", true);
         }
         else
         {
             player.setInvincible(false);
+            mp.events.callRemote("SetInvincible", false);
         }
     },
 
@@ -4113,6 +4115,10 @@ function setStorageDataVars(){
     else{
         mp.storage.data.menu.OOCauto = autoOOC;
         mp.events.callRemote("SetAutoOOC", autoOOC);
+    }
+
+    if(mp.storage.data.menu.ShowDamageIndicator === undefined){
+        mp.storage.data.menu.ShowDamageIndicator = true;
     }
 
     if(mp.storage.data.menu.ChatAccessibility == undefined){

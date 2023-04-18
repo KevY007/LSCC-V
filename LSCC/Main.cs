@@ -2134,7 +2134,7 @@ namespace RNC
                         }
                     }
                     catch { NAPI.Util.ConsoleOutput("(RnC | STARTUP) Failed to clear old weapondata.json, permission problem?"); }
-
+                    
                     try
                     {
                         File.Move("racenchase/weapondata.json.tmp", "racenchase/weapondata.json");
