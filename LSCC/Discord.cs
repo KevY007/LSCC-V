@@ -123,7 +123,7 @@ namespace RNC
 
             foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.Dynamics.DCServerID))
             {
-                var botchan = guild.TextChannels.First(a => a.Name == channel);
+                var botchan = guild.TextChannels.First(a => a.Id == channel);
 
                 if (botchan != null)
                 {
@@ -507,36 +507,20 @@ namespace RNC
                             string vName = args[1];
                             string vCode = args[2];
                             string vID = args[3];
-                            //string msgID = args[4];
-                            string chanID = args[4];
                             Account _acc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(vName, StringComparison.OrdinalIgnoreCase));
                             Account _check = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync<Account>(a => a.DiscordInfo.Contains($"\"DiscordID\":\"{vID}\""));
 
-                            if (_acc == null)
-                            {
-                                await context.Channel.SendMessageAsync($"!kuracback false {chanID} {vID} An account with that name could not be found!");
-                                return;
-                            }
+                            if (_acc == null) return;
                             DiscordData _d = NAPI.Util.FromJson<DiscordData>(_acc.DiscordInfo);
 
                             bool giveDiscordPerks = false;
                             if (_d.UsedDiscordPerks == false) giveDiscordPerks = true;
 
-                            if (!_d.DiscordID.Equals("n/a")) // if already verified just in case to return
-                            {
-                                await context.Channel.SendMessageAsync($"!kuracback false {chanID} {vID} An account with that name is already linked to <@{_d.DiscordID}>!");
-                                return;
-                            }
-                            if (!_d.DiscordCode.Equals(vCode))
-                            {
-                                await context.Channel.SendMessageAsync($"!kuracback false {chanID} {vID} The code you have entered is invalid! Please use **(/verify)** in-game to check your code.");
-                                return;
-                            }
-                            if (_check != null)
-                            {
-                                await context.Channel.SendMessageAsync($"!kuracback false {chanID} {vID} This Discord account was already used to verify account **{_check.Username}**!");
-                                return;
-                            }
+                            if (!_d.DiscordID.Equals("n/a")) return; // if already verified just in case to return
+
+                            if (!_d.DiscordCode.Equals(vCode)) return;
+
+                            if (_check != null) return;
 
                             _d.DiscordID = vID;
                             _d.LeftDiscord = false;
@@ -551,15 +535,7 @@ namespace RNC
                                     {
 
                                         Player _p = Settings.LoggedInPlayers.FirstOrDefault<Player>(p => p.Name.Equals(vName, StringComparison.OrdinalIgnoreCase));
-                                        if (_p == null) // if the player is not online or logged in
-                                        {
-                                            Task.Run(async () =>
-                                            {
-                                                await context.Channel.SendMessageAsync($"!kuracback false {chanID} {vID} You must be in-game and logged in to link your account!");
-                                                return;
-                                            });
-                                            return;
-                                        }
+                                        if (_p == null) return; // if the player is not online or logged in
 
                                         if(giveDiscordPerks == true)
                                         {
@@ -585,8 +561,6 @@ namespace RNC
 
                                                     EPlayer.GetAccount(_p).DiscordInfo = verificationData;
                                                     EPlayer.Save(_p, true);
-
-                                                    context.Channel.SendMessageAsync($"!kuracback true {chanID} {vID} You successfully linked your Discord account to your Race 'N' Chase account ({_p.Name})!");
                                                 });
                                                 await context.DeleteAsync();
                                             });
