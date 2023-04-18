@@ -3010,12 +3010,19 @@ mp.events.add("render", () => {
         totalDmg += shotsToRegister[i].damage;
     }
 
-    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", target, target.getHealth(), totalDmg, target.getArmour(), weapon, bone);  
+    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", target, target.getHealth(), totalDmg, target.getArmour(), weapon.toString(), bone);  
     mp.events.callRemoteUnreliable("ServerConsoleOutput", `${mp.players.local.name} | Added up total damage: ${totalDmg} from the fast shots (${shotsToRegister.length} total)`);           
 
     shotsToRegister = [];
     triggerMultipleShotsStamp = 0;
     lastRegisteredShotTime = Date.now();
+});
+
+mp.events.add("fakeDeathToRespawn", () => {
+    mp.game.player.setInvincible(true);
+    mp.players.local.setInvincible(true);
+    mp.events.callRemote("SetInvincible", true);
+    mp.players.local.setToRagdoll(10000, 10000, 0, false, false, false);
 });
 
 mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage) => {
@@ -3175,7 +3182,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
 
             if(DAMAGE_TO_DEAL > 0){
                 if(Date.now() - lastRegisteredShotTime > 20 && gunData.Type !== "Shotguns"){
-                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), DAMAGE_TO_DEAL, targetPlayer.getArmour(), weapon, boneIndex);            
+                    mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), DAMAGE_TO_DEAL, targetPlayer.getArmour(), weapon.toString(), boneIndex);            
                     lastRegisteredShotTime = Date.now();
                 }
                 else{

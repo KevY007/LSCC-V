@@ -3185,6 +3185,510 @@ namespace RNC
             }
         }
 
+        public static void OnPlayerDeathEx(Player player, Player killer, long reason)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            NAPI.Util.ConsoleOutput($"[DEATH-EX] {killer.Name} killed {player.Name} with weapon ID {reason}");
+
+            try
+            {
+                player.SetSharedData("Collisions", true); // Reset collision from chase.
+                player.SetSharedData("CuffedBy", "n/a");
+                player.ResetData("FreezeWeapons");
+                player.SetData("Dead", Environment.TickCount64);
+                player.ResetData("Seatbelt");
+                player.TriggerEvent("ToggleSeatbelt", false);
+                player.ResetData("DraggingOut");
+                player.TriggerEvent("togglePlayerCrawl", false);
+
+                EPlayer.StopCarry(player);
+
+                if (player.GetSharedData<int>("CarriedBy") != -1)
+                {
+                    Player carrier = EPlayer.GetByID(player.GetSharedData<int>("CarriedBy"));
+                    if (carrier != null) EPlayer.StopCarry(carrier);
+                }
+
+                string reasonStr;
+                bool wasInGame = false;
+                jWeaponData wepDat = new jWeaponData();
+
+                if (Settings.WeaponData.TryGetValue((long)reason, out wepDat))
+                {
+                    reasonStr = wepDat.Name;
+                }
+                else if (Main.WeaponReasons.TryGetValue(reason, out reasonStr))
+                {
+                    // oh its already set ^^
+                }
+                else
+                {
+                    reasonStr = null;
+                }
+
+                if (player.GetSharedData<string>("ActionType") != "none")
+                {
+                    EPlayer.StopPlayerAction(player, 1);
+                }
+
+                if (reason == 696988) reasonStr = "handcuffs";
+                if (reason == 696989) reasonStr = "arrest/busted";
+
+                if (reasonStr != null)
+                {
+                    reasonStr.Replace(".", "");
+                }
+
+                if (player.GetSharedData<int>("InLobby") == -4 && Settings.DerbyTimeLeft > 0 && Settings.DerbyTimeLeft != 180 &&
+                    player.HasSharedData("DerbyTime"))
+                {
+                    if (player.GetSharedData<int>("DerbyTime") >= 5)
+                    {
+                        foreach (Player inderby in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
+                        {
+                            inderby.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell down");
+                        }
+                    }
+                    player.SetSharedData("DerbyTime", 0);
+                }
+                try
+                {
+                    if (killer != null && !killer.IsNull && killer != player)
+                    {
+                        NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
+
+                        if (wepDat != null && wepDat.Group != null)
+                            EPlayer.TryAdvanceChallenge(killer, Challenge.ChallengeType.AnyKill, wepDat.Group);
+
+                        if ((killer.GetSharedData<int>("InLobby") == -6 || killer.GetSharedData<int>("InLobby") > -1) && killer.GetSharedData<int>("InDM") > -1)
+                        {
+                            int arenaID = killer.GetSharedData<int>("InDM");
+
+                            lock (Settings.LoggedInPlayers)
+                            {
+                                foreach (Player indm in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == killer.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == arenaID))
+                                {
+                                    if (reasonStr == null)
+                                    {
+                                        indm.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell");
+                                    }
+                                    else
+                                    {
+                                        indm.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                    }
+                                }
+                                EPlayer.GetAccount(killer).Kills++;
+                                EPlayer.GetAccount(player).Deaths++;
+
+                                if (EPlayer.GetAccount(killer).ClanID != -1)
+                                {
+                                    int killerClanID = EPlayer.GetAccount(killer).ClanID;
+                                    Task.Run(async () =>
+                                    {
+                                        using (MainDatabase context = ContextFactory.CreateContext())
+                                        {
+                                            Clan clan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == killerClanID);
+                                            if (clan != null)
+                                            {
+                                                clan.TotalKills++;
+                                                clan.WeekKills++;
+                                                await context.SaveChangesAsync();
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+
+                            EPlayer.GrantXP(killer, 1);
+                        }
+
+                        if (killer.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("InLobby") >= 0)
+                        {
+                            EPlayer.GrantXP(killer, 1);
+
+                            if (reason != 696988 && reason != 696989 && player.GetSharedData<int>("Team") == 0 && killer.GetSharedData<int>("Team") == 1 && player.GetSharedData<bool>("HasShot") == false)
+                            {
+                                Vehicle pVeh = null;
+                                int seat = 0;
+                                if (player.IsInVehicle)
+                                {
+                                    pVeh = player.Vehicle;
+                                    seat = player.VehicleSeat;
+                                }
+
+                                if (pVeh == null || RAGE.Entities.Players.All.Count(ey => ey.IsInVehicle && ey.Vehicle == player.Vehicle &&
+                                         ey.GetSharedData<int>("Team") == 0 && ey.GetSharedData<bool>("HasShot") == true) == 0)
+                                {
+
+
+                                    int warnings = 0;
+                                    if (killer.HasData("InnocentShotWarning")) warnings = killer.GetData<int>("InnocentShotWarning");
+
+                                    warnings += 3;
+                                    if (warnings >= 7)
+                                    {
+                                        int xpReduce = EPlayer.GetAccount(killer).XP >= 8 ? -(EPlayer.GetAccount(killer).XP / 4) : -3;
+
+                                        EPlayer.GrantXP(killer, xpReduce);
+                                        RAGE.Entities.Players.All.ForEach((Player ey) =>
+                                        {
+                                            ey.SendChatMessage(Translate(ey, "REDUCE_XP_KILL_FUGI", killer.Name, xpReduce));
+                                        });
+
+                                        killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") - 1.0);
+
+                                        //killer.Health = 0;
+                                        killer.SendChatMessage(Translate(killer, "REDUCE_FUGCHANCE_KILL_FUGI"));
+                                        warnings = 0;
+                                    }
+
+                                    killer.SetData<int>("InnocentShotWarning", warnings);
+                                    killer.SendChatMessage(Translate(killer, "INNOCENT_FUG_KILL_WARN"));
+                                }
+
+
+                                player.SetData("UnfairKillSpawn", true);
+
+
+
+                                NAPI.Player.SpawnPlayer(player, player.Position);
+
+                                player.Armor = 0;
+                                player.Health = 100;
+                                player.SendChatMessage(Translate(player, "UNFAIR_KILL_BACK_INGAME"));
+
+                                if (pVeh != null)
+                                {
+                                    player.SetIntoVehicle(pVeh, seat);
+                                }
+
+                                return;
+                            }
+                        }
+
+
+                        if (reason != 696988 && reason != 696989 && player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("Team") == killer.GetSharedData<int>("Team") &&
+                            player.GetSharedData<int>("InLobby") >= 0)
+                        {
+                            if (RAGE.Entities.Players.All.Count(ey => ey.GetSharedData<int>("Team") != -1 && ey.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") &&
+                                     ey.Position.DistanceTo(player.Position) < 10.0) == 0)
+                            {
+                                int warnings = 0;
+                                if (killer.HasData("TeamShotWarning")) warnings = killer.GetData<int>("TeamShotWarning");
+
+                                warnings += 3;
+
+                                if (killer.IsInVehicle == true && killer.Vehicle.Model == NAPI.Util.GetHashKey("polmav"))
+                                {
+                                    killer.Vehicle.Position = new Vector3(killer.Vehicle.Position.X, killer.Vehicle.Position.Y, killer.Vehicle.Position.Z + 20.0f);
+                                    killer.SendChatMessage(Translate(killer, "HELIBLADE_WARNING"));
+                                }
+                                else if (warnings >= 7)
+                                {
+                                    //killer.Health = 0;
+                                    killer.SendChatMessage(Translate(killer, "REDUCE_FUGCHANCE_KILL_TEAM"));
+                                    killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") - 1.0);
+
+                                    int xpReduce = EPlayer.GetAccount(killer).XP >= 8 ? -(EPlayer.GetAccount(killer).XP / 4) : -3;
+
+                                    EPlayer.GrantXP(killer, xpReduce);
+                                    RAGE.Entities.Players.All.ForEach((Player ey) =>
+                                    {
+                                        ey.SendChatMessage(Translate(ey, "REDUCE_XP_KILL_TEAM", killer.Name, xpReduce));
+                                    });
+
+                                    warnings = 0;
+                                }
+
+                                killer.SetData<int>("TeamShotWarning", warnings);
+
+                                killer.SendChatMessage(Translate(killer, "TEAM_KILL_WARN"));
+                            }
+
+                            player.SetData("UnfairKillSpawn", true);
+
+                            lock (player)
+                            {
+                                Vehicle pVeh = null;
+                                int seat = 0;
+                                if (player.IsInVehicle)
+                                {
+                                    pVeh = player.Vehicle;
+                                    seat = player.VehicleSeat;
+                                }
+
+                                NAPI.Player.SpawnPlayer(player, player.Position);
+
+                                player.Armor = 0;
+                                player.Health = 100;
+                                player.SendChatMessage(Translate(player, "UNFAIR_KILL_BACK_INGAME"));
+
+                                if (pVeh != null)
+                                {
+                                    player.SetIntoVehicle(pVeh, seat);
+                                }
+                            }
+
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        NAPI.Util.ConsoleOutput($"[Death] {player.Name} has died of {(reasonStr == null ? "N/A" : reasonStr)}.");
+                    }
+
+                    LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+                    if (lobby != null)
+                    {
+                        if (killer == null && player.GetSharedData<int>("Wounded") != 0)
+                        {
+                            killer = Settings.LoggedInPlayers.FirstOrDefault(a => a.Name.Equals(player.GetSharedData<string>("LastKiller")));
+                            reasonStr = "Executed";
+                        }
+
+                        if (lobby.gameStatus == 1)
+                        {
+                            if (lobby.Cops.Contains(player) || lobby.Fugitives.Contains(player)) EPlayer.CreateAmmoBox(player);
+
+                            if (killer != null)
+                            {
+                                Player lastkilla = Settings.LoggedInPlayers.FirstOrDefault(a => a.Name.Equals(player.GetSharedData<string>("LastKiller")));
+                                if (lastkilla != killer)
+                                {
+                                    int killStreak = killer.GetData<int>("Killstreak") + 1;
+                                    killer.SetData("Killstreak", killStreak);
+                                    if (killStreak >= 5) EPlayer.UnlockAchievement(killer, "serial_killer");
+
+                                    if (killStreak % 4 == 0 && killStreak >= 4 && (lobby.Cops.Contains(killer) || lobby.Fugitives.Contains(killer)))
+                                    {
+                                        EPlayer.GrantXP(killer, 3);
+                                        EPlayer.SendMessageInLobby(lobby.lobbyId, "KILLSTREAK_LOBBY_MSG", killer.Name, killStreak);
+
+                                        killer.SendChatMessage(Translate(killer, "KILLSTREAK_3XP"));
+                                        EPlayer.GivePoints(killer, 3);
+                                        killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(killer).DonatorLevel + 1.0)));
+                                    }
+                                }
+
+
+                                /////////////////////////////////////
+                                if (player.GetSharedData<int>("Wounded") == 0)
+                                {
+                                    EPlayer.GetAccount(killer).Kills++;
+                                    EPlayer.GetAccount(player).Deaths++;
+                                }
+                                else
+                                {
+                                    killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") + 0.05 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 20.0));
+                                }
+                            }
+
+                            if (lobby.Fugitives.Contains(player))
+                            {
+                                wasInGame = true;
+
+                                if (killer != null && killer.GetSharedData<int>("Team") == 1) EPlayer.GrantXP(killer, 2);
+
+                                lock (Settings.LoggedInPlayers)
+                                {
+                                    foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                    {
+                                        if (killer != null && !killer.IsNull && killer != player)
+                                        {
+                                            if (reasonStr == null)
+                                            {
+                                                ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Killed", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                            }
+                                            else
+                                            {
+                                                if (reason == 696988)
+                                                {
+                                                    ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Arrested", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                                }
+                                                else if (reason == 696989)
+                                                {
+                                                    ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Busted", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                                }
+                                                else ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (reasonStr == null)
+                                            {
+                                                ay.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell");
+                                            }
+                                            else
+                                            {
+                                                ay.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), reasonStr);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                bool select_new_leader = false;
+                                if (lobby.gameMode == GameModes.BANKROBBERY)
+                                {
+                                    if ((lobby.Fugitives.Count - 1) <= 0) // in case all fugis die 
+                                    {
+                                        Main.StopGame(lobby.lobbyId, 3);
+                                    }
+
+                                    if (lobby.BankRobbery.HeistLeader == player)
+                                    {
+                                        lobby.BankRobbery.LeaderLives--;
+                                        if (lobby.BankRobbery.LeaderLives <= 0)
+                                        {
+                                            Main.StopGame(lobby.lobbyId, 5);
+                                        }
+                                        else
+                                        {
+                                            if (killer != null)
+                                            {
+                                                killer.SendChatMessage(Translate(killer, "KILLED_HEIST_LEADER_BONUS"));
+                                                foreach (Player c in lobby.Cops)
+                                                {
+                                                    c.SendChatMessage(Translate(c, "KILLED_HEIST_LEADER", killer.Name));
+                                                }
+                                                EPlayer.GrantXP(killer, 2);
+                                            }
+                                            select_new_leader = true;
+                                        }
+                                    }
+                                }
+
+                                lobby.Fugitives.Remove(player);
+                                player.SetSharedData("HeistLeader", false);
+
+                                if (lobby.Fugitives.Count <= 0)
+                                {
+                                    Main.StopGame(lobby.lobbyId, 3);
+                                }
+
+                                if (select_new_leader)
+                                {
+                                    BankRobberyData _brob = lobby.BankRobbery;
+                                    _brob.HeistLeader = null;
+                                    int unfuck = 0;
+                                    while (_brob.HeistLeader == null)
+                                    {
+                                        _brob.HeistLeader = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
+
+                                        unfuck++;
+                                        if (unfuck > 50)
+                                        {
+                                            Main.StopGame(lobby.lobbyId, 5);
+                                            break;
+                                        }
+                                    }
+                                    _brob.HeistLeader.SetSharedData("HeistLeader", true);
+                                    lobby.BankRobbery.HeistLeader = _brob.HeistLeader;
+
+                                    foreach (Player f in lobby.Fugitives)
+                                    {
+                                        f.SendChatMessage(Translate(f, "HEIST_LEADER_DEATH", _brob.HeistLeader.Name));
+
+                                        f.SendChatMessage(Translate(f, "NEW_HEIST_LEADER_RADIO", _brob.HeistLeader.Name, player.Name));
+                                    }
+                                    _brob.HeistLeader.SendChatMessage(Translate(_brob.HeistLeader, "NEW_HEIST_LEADER_MSG"));
+                                }
+                            }
+
+                            if (lobby.Cops.Contains(player))
+                            {
+                                wasInGame = true;
+
+                                if (killer != null && killer.GetSharedData<int>("Team") == 0)
+                                {
+                                    Events.PlayerRequestShotTag(killer);
+                                }
+
+                                lock (Settings.LoggedInPlayers)
+                                {
+                                    foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                    {
+                                        if (killer != null && !killer.IsNull && player != killer)
+                                        {
+                                            if (reasonStr == null)
+                                            {
+                                                ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Killed", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                            }
+                                            else
+                                            {
+                                                ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (reasonStr == null)
+                                            {
+                                                ay.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell");
+                                            }
+                                            else
+                                            {
+                                                ay.TriggerEvent("pushToKillFee2d", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), reasonStr);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                lobby.Cops.Remove(player);
+
+                                if (lobby.Cops.Count <= 0)
+                                {
+                                    Main.StopGame(lobby.lobbyId, 2);
+                                }
+                            }
+
+                            player.TriggerEvent("ResetWounded");
+                            player.SetSharedData("Wounded", 0);
+                            //OnStopReviving(player);
+                        }
+                    }
+
+                    player.RemoveAllWeapons();
+
+                    NAPI.Task.Run(() =>
+                    {
+                        try
+                        {
+                            if (player != null && player.Exists)
+                            {
+                                Random rand = new Random(DateTimeOffset.UtcNow.Millisecond);
+                                Vector3 SpawnArea = Settings.LobbySpawns[rand.Next(Settings.LobbySpawns.Length)];
+                                if (player.GetSharedData<int>("InLobby") == -4) SpawnArea = ((Vector3)Settings.DerbySpawns[0, 0]).Around(2.0f);
+                                if (player.GetSharedData<int>("InLobby") > -1 && lobby != null)
+                                {
+                                    int arenaID = player.GetSharedData<int>("InDM");
+                                    if (arenaID > -1)
+                                    {
+                                        int spawnID = rand.Next(Settings.DMSpawns[arenaID].GetLength(0));
+                                        Vector3 dmSpawn = (Vector3)Settings.DMSpawns[arenaID][spawnID, 0];
+                                        SpawnArea = (Vector3)dmSpawn;
+                                    }
+                                }
+                                if (player.GetSharedData<int>("InLobby") == -6)
+                                {
+                                    SpawnArea = player.Position; // So that player spawns inside the arena, and is transported whenever he spawns to a new point.
+                                }
+
+                                NAPI.Player.SpawnPlayer(player, SpawnArea);
+                            }
+                        }
+                        catch { }
+                    }, (wasInGame == true && reason != 696989) ? 10000 : 1500);
+                }
+                catch { }
+
+                EPlayer.Save(player, false);
+                player.SetData("Killstreak", 0);
+            }
+            catch (Exception ex)
+            {
+                NAPI.Util.ConsoleOutput("[EXCEPTION IN OnPlayerDeath] " + ex.ToString());
+            }
+        }
+
         [RemoteEvent("SetAutoOOC")]
         public static void SetAutoOOC(Player player, bool toggle)
         {
@@ -6866,14 +7370,15 @@ namespace RNC
         }
         
         [RemoteEvent("PlayerShot_SyncHealth")]
-        public void SyncHealthOnShot(Player player, Player target, int targetHealth, int damageToDeal, int targetArmour, long weapon, int boneIndex)
+        public void SyncHealthOnShot(Player player, Player target, int targetHealth, int damageToDeal, int targetArmour, string weapon, int boneIndex)
         {
             if (target.Dead) return;
             if (targetHealth <= 0) return;
             if (player.CurrentWeapon == WeaponHash.Stungun) return;
 
-            long realWeapon = weapon;
-            if (weapon < 0) realWeapon = (weapon + 4294967296);
+            uint realWeapon = Convert.ToUInt32(weapon);
+
+            NAPI.Util.ConsoleOutput($"Weapon ID: {realWeapon} | Original ID: {weapon}");
 
             int playerTeam = player.GetSharedData<int>("Team");
             int targetTeam = target.GetSharedData<int>("Team");
@@ -6921,9 +7426,12 @@ namespace RNC
                 }
                 else
                 {
-                    target.Health = 0;
+                    target.Health = 1;
                     target.Armor = 0;
-                    OnPlayerDeath(target, player, (uint)realWeapon);
+
+                    target.TriggerEvent("fakeDeathToRespawn");
+                    OnPlayerDeath(target, player, realWeapon);
+
                     Logs.LogDamage(targetSQLID, dealerSQLID, realWeapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
                     return;
                 }
@@ -7160,7 +7668,7 @@ namespace RNC
 
                 EPlayer.SendMessageInLobby(lobby.lobbyId, "LOBBY_FUGITIVE_BUSTED", fugitive.Name);
 
-                Events.OnPlayerDeath(fugitive, cop, 696989); // Reason 696989 = handcuffs/busted (fast respawn).
+                Events.OnPlayerDeathEx(fugitive, cop, 696989); // Reason 696989 = handcuffs/busted (fast respawn).
             }
             return;
         }
@@ -7521,7 +8029,7 @@ namespace RNC
                 EPlayer.UnlockAchievement(player, "100_arrests");
             }
 
-            Events.OnPlayerDeath(target, player, 696988); // Reason 696988 = handcuffs.
+            Events.OnPlayerDeathEx(target, player, 696988); // Reason 696988 = handcuffs.
 
             target.SetSharedData("CuffedBy", "n/a");
         }
