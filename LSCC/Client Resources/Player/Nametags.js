@@ -138,7 +138,7 @@ mp.events.add('render', (nametags) => {
             
                 //var armour = (player.getArmour() > 100 ? 100 : player.getArmour()) / 100;
                 
-                y -= (scale * (0.01 * (screenRes.y / 1080)));
+                y -= (scale * (0.1   * (screenRes.y / 1080)));
 
                 if(renderNametags == true) {
                     if(player.getVariable("Team") !== undefined && player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && !BankRobberyOn)
