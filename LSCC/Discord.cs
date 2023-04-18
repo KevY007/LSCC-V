@@ -114,6 +114,14 @@ namespace RNC
             if (_client == null) return Task.CompletedTask;
             if (_client.ConnectionState != ConnectionState.Connected) return Task.CompletedTask;
 
+            string channelId;
+
+            switch (channel) {
+                case "staff-bot":
+                channelId = "717768143140814928";
+                break;
+            }
+
             if (text != null)
             {
                 text = "[" + DateTime.Now.ToString("HH:mm:ss") + "] " + text;
@@ -123,7 +131,7 @@ namespace RNC
 
             foreach (var guild in Discord._client.Guilds.Where(a => a.Id == Settings.Dynamics.DCServerID))
             {
-                var botchan = guild.TextChannels.First(a => a.Id == channel);
+                var botchan = guild.TextChannels.First(a => a.Id == channelId);
 
                 if (botchan != null)
                 {
@@ -599,7 +607,7 @@ namespace RNC
                         if (aSQL == -1)
                         {
                             await context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
-                            await context.Channel.SendMessageAsync("**HINT:** /verify");
+                            await context.Channel.SendMessageAsync("**HINT:** /link");
                             return;
                         }
 
@@ -1005,7 +1013,7 @@ namespace RNC
                         if (aSQL == -1)
                         {
                             await context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
-                            await context.Channel.SendMessageAsync("**HINT:** /verify");
+                            await context.Channel.SendMessageAsync("**HINT:** /link");
                             return;
                         }
 
@@ -1088,7 +1096,7 @@ namespace RNC
                                 if (aSQL == -1)
                                 {
                                     context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
-                                    context.Channel.SendMessageAsync("**HINT:** /verify");
+                                    context.Channel.SendMessageAsync("**HINT:** /link");
                                     return;
                                 }
 
@@ -1170,7 +1178,7 @@ namespace RNC
                                 if (aSQL == -1)
                                 {
                                     context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
-                                    context.Channel.SendMessageAsync("**HINT:** /verify");
+                                    context.Channel.SendMessageAsync("**HINT:** /link");
                                     return;
                                 }
 
@@ -1229,7 +1237,7 @@ namespace RNC
                         if(aSQL == -1)
                         {
                             await context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
-                            await context.Channel.SendMessageAsync("**HINT:** /verify");
+                            await context.Channel.SendMessageAsync("**HINT:** /link");
                             return;
                         }
                         if(alevel < 6)
@@ -1327,7 +1335,7 @@ namespace RNC
                                 if (aSQL == -1)
                                 {
                                     context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
-                                    context.Channel.SendMessageAsync("**HINT:** /verify");
+                                    context.Channel.SendMessageAsync("**HINT:** /link");
                                     return;
                                 }
 
@@ -1417,7 +1425,7 @@ namespace RNC
                                 if (aSQL == -1)
                                 {
                                     context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
-                                    context.Channel.SendMessageAsync("**HINT:** /verify");
+                                    context.Channel.SendMessageAsync("**HINT:** /link");
                                     return;
                                 }
 
@@ -1487,7 +1495,7 @@ namespace RNC
                         if (admID == -1)
                         {
                             await context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
-                            await context.Channel.SendMessageAsync("**HINT:** /verify");
+                            await context.Channel.SendMessageAsync("**HINT:** /link");
                             return;
                         }
 
@@ -1575,7 +1583,7 @@ namespace RNC
                                 if (admID == -1)
                                 {
                                     context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
-                                    context.Channel.SendMessageAsync("**HINT:** /verify");
+                                    context.Channel.SendMessageAsync("**HINT:** /link");
                                     return;
                                 }
                                 int aLevel = GetIngameAdminLevel(context.Author);
@@ -1659,7 +1667,7 @@ namespace RNC
                                 if (admID == -1)
                                 {
                                     context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
-                                    context.Channel.SendMessageAsync("**HINT:** /verify");
+                                    context.Channel.SendMessageAsync("**HINT:** /link");
                                     return;
                                 }
 
@@ -1721,7 +1729,7 @@ namespace RNC
                     if (admID == -1)
                     {
                         await context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
-                        await context.Channel.SendMessageAsync("**HINT:** /verify");
+                        await context.Channel.SendMessageAsync("**HINT:** /link");
                         return;
                     }
                     int aLevel = GetIngameAdminLevel(context.Author);
@@ -1778,7 +1786,7 @@ namespace RNC
                                 if (admID == -1)
                                 {
                                     context.Channel.SendMessageAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
-                                    context.Channel.SendMessageAsync("**HINT:** /verify");
+                                    context.Channel.SendMessageAsync("**HINT:** /link");
                                     return;
                                 }
                                 int aLevel = GetIngameAdminLevel(context.Author);

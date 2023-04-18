@@ -802,7 +802,7 @@ namespace RNC
             player.SendChatMessage("!{#FFFFFF}Developers: !{#FF6347}KevY (Lead), jambredrek (Game) and RotX (Web/UI)");
             player.SendChatMessage("!{#FFFFFF}Thanks to all those who participated in !{#FF6347}beta testing and early launch!{#FFFFFF}.");
             player.SendChatMessage("  ");
-            player.SendChatMessage("!{#c9c9c9}If you are looking for your Discord verification code, use (/verify). ;-)");
+            player.SendChatMessage("!{#c9c9c9}If you are looking for your Discord verification code, use (/link). ;-)");
             return;
         }
         [Command("verify", Alias = "link")]

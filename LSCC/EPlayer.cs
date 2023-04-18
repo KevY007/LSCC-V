@@ -992,7 +992,7 @@ namespace RNC
             {
                 if (EPlayer.GetAccount(target) == acc)
                 {
-                    target.SendChatMessage("!{#fa9194}You haven't linked a Discord account yet! !{#ffffff}Please do so in order to activate some cool perks. !{#ffff00}(/discord, /verify)");
+                    target.SendChatMessage("!{#fa9194}You haven't linked a Discord account yet! !{#ffffff}Please do so in order to activate some cool perks. !{#ffff00}(/discord, /link)");
                 }
                 else
                 {
