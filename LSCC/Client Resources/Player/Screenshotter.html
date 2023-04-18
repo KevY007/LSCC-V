@@ -46,10 +46,11 @@
           "https://uibackend.racenchase.com/screenshots/upload",
           requestOptions
         )
-          .then((response) => {
+          .then(async (response) => {
+            let data = await response.json();
             return {
               status: response.status,
-              data: response.json(),
+              data: data,
             };
           })
           .then((result) => {
