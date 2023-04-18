@@ -3043,7 +3043,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 mp.game.weapon.setCurrentDamageEventAmount(nerfedDmg);
                 //LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
                 
-                showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
+                //showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
 
                 DAMAGE_TO_DEAL = nerfedDmg;
                 damage = 0;
@@ -3057,7 +3057,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 mp.game.weapon.setCurrentDamageEventAmount(nerfedDmg);
                 //LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
                 
-                showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
+                //showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
 
                 DAMAGE_TO_DEAL = nerfedDmg;
                 damage = 0;
@@ -3075,7 +3075,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     mp.game.weapon.setCurrentDamageEventAmount(75);
                     //LogPlayerDamage(targetEntity, weapon, 75, boneIndex);
                 
-                    showDamageIndicatorOnPosition(75, targetEntity, boneIndex);
+                    //showDamageIndicatorOnPosition(75, targetEntity, boneIndex);
 
                     DAMAGE_TO_DEAL = 75;
                     damage = 0;
@@ -3087,7 +3087,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     mp.game.weapon.setCurrentDamageEventAmount(50);
                     //LogPlayerDamage(targetEntity, weapon, 50, boneIndex);
                 
-                    showDamageIndicatorOnPosition(50, targetEntity, boneIndex);
+                    //showDamageIndicatorOnPosition(50, targetEntity, boneIndex);
 
                     DAMAGE_TO_DEAL = 50;
                     damage = 0;
@@ -3099,7 +3099,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     mp.game.weapon.setCurrentDamageEventAmount(25);
                     //LogPlayerDamage(targetEntity, weapon, 25, boneIndex);
                 
-                    showDamageIndicatorOnPosition(25, targetEntity, boneIndex);
+                    //showDamageIndicatorOnPosition(25, targetEntity, boneIndex);
 
                     DAMAGE_TO_DEAL = 25;
                     damage = 0;
@@ -3117,7 +3117,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     mp.game.weapon.setCurrentDamageEventAmount(10);
                     //LogPlayerDamage(targetEntity, weapon, 10, boneIndex);
                 
-                    showDamageIndicatorOnPosition(10, targetEntity, boneIndex);
+                    //showDamageIndicatorOnPosition(10, targetEntity, boneIndex);
                     DAMAGE_TO_DEAL = 10;
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
@@ -3128,7 +3128,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     mp.game.weapon.setCurrentDamageEventAmount(7);
                     //LogPlayerDamage(targetEntity, weapon, 7, boneIndex);
                 
-                    showDamageIndicatorOnPosition(7, targetEntity, boneIndex);
+                    //showDamageIndicatorOnPosition(7, targetEntity, boneIndex);
                     DAMAGE_TO_DEAL = 7;
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
@@ -3153,7 +3153,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     mp.game.weapon.setCurrentDamageEventAmount(37);
                     //LogPlayerDamage(targetEntity, weapon, 37, boneIndex);
                 
-                    showDamageIndicatorOnPosition(37, targetEntity, boneIndex);
+                    //showDamageIndicatorOnPosition(37, targetEntity, boneIndex);
                     DAMAGE_TO_DEAL = 37;
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
@@ -3164,7 +3164,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     mp.game.weapon.setCurrentDamageEventAmount(28);
                     //LogPlayerDamage(targetEntity, weapon, 28, boneIndex);
                 
-                    showDamageIndicatorOnPosition(28, targetEntity, boneIndex);
+                    //showDamageIndicatorOnPosition(28, targetEntity, boneIndex);
                     DAMAGE_TO_DEAL = 28;
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
