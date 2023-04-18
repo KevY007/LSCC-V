@@ -5,61 +5,80 @@
     var image = document.getElementById("html5");
     var canvas = document.createElement("canvas");
     document.body.appendChild(canvas);
-    canvas.style.display = 'none';
+    canvas.style.display = "none";
 
     var context = canvas.getContext("2d");
-    function loadImage(api_key, name, url, event, identifier, uploadUrl, resX, resY) {
-        var image = new Image();
-        image.onload = function () {
-            const width =  resX;
-            const height = resY;
-            canvas.width = width;
-            canvas.height = height;
-            context.drawImage(image, 0, 0, width, height, 0, 0, width, height);
-            const base64 = canvas.toDataURL("image/jpeg", 0.5);
-            const blob = b64toBlob(base64);
-            var myHeaders = new Headers();
-            myHeaders.append("x-api-key", api_key);
-            //myHeaders.append("x-api-key", "$5$ETb9rZjvrYcc1bnE$uL7fDXteGtMd07cCsBYrBpsF/Wkp3nrisYmTVldqJg4@$5$ETb9rZjvrYcc1bnE");
+    function loadImage(
+      api_key,
+      name,
+      url,
+      event,
+      identifier,
+      uploadUrl,
+      resX,
+      resY
+    ) {
+      var image = new Image();
+      image.onload = function () {
+        const width = resX;
+        const height = resY;
+        canvas.width = width;
+        canvas.height = height;
+        context.drawImage(image, 0, 0, width, height, 0, 0, width, height);
+        const base64 = canvas.toDataURL("image/jpeg", 0.5);
+        const blob = b64toBlob(base64);
+        var myHeaders = new Headers();
+        myHeaders.append("x-api-key", api_key);
+        //myHeaders.append("x-api-key", "$5$ETb9rZjvrYcc1bnE$uL7fDXteGtMd07cCsBYrBpsF/Wkp3nrisYmTVldqJg4@$5$ETb9rZjvrYcc1bnE");
 
-            var formdata = new FormData();
-            formdata.append("image", blob, name);
+        var formdata = new FormData();
+        formdata.append("image", blob, name);
 
-            var requestOptions = {
-            method: 'POST',
-            mode:'cors',
-            headers: myHeaders,
-            body: formdata,
-            redirect: 'follow'
+        var requestOptions = {
+          method: "POST",
+          mode: "cors",
+          headers: myHeaders,
+          body: formdata,
+          redirect: "follow",
+        };
+
+        fetch(
+          "https://uibackend.racenchase.com/screenshots/upload",
+          requestOptions
+        )
+          .then((response) => {
+            return {
+              status: response.status,
+              data: response.json(),
             };
+          })
+          .then((result) => {
+            mp.trigger("cs_logtoserver", result);
 
-            fetch("https://uibackend.racenchase.com/screenshots/upload", requestOptions)
-            .then(response => response.text())
-            .then(result => {
-                mp.trigger("cs_logtoserver", result);
+            if (result.status === 200) {
+              mp.trigger(event, 1, result.data.message, identifier);
+            } else {
+              mp.trigger(event, 0, result.data.message, identifier);
+            }
+          })
+          .catch((error) => {
+            mp.trigger("cs_logtoserver", error);
 
-                if(result.includes("success"))
-                    mp.trigger(event, 1, result, identifier);
-                else mp.trigger(event, 0, result, identifier);
-            })
-            .catch(error => {
-                mp.trigger("cs_logtoserver", error);                
-
-                mp.trigger(event, 0, error, identifier);
-            });
-        }
-        //image.crossOrigin = 'Anonymous';
-        image.src = url;
+            mp.trigger(event, 0, error.message, identifier);
+          });
+      };
+      //image.crossOrigin = 'Anonymous';
+      image.src = url;
     }
-    function b64toBlob(dataURI) { 
-        var byteString = atob(dataURI.split(',')[1]);
-        var ab = new ArrayBuffer(byteString.length);
-        var ia = new Uint8Array(ab);
-        
-        for (var i = 0; i < byteString.length; i++) {
-            ia[i] = byteString.charCodeAt(i);
-        }
-        return new Blob([ab], { type: 'image/jpeg' });
+    function b64toBlob(dataURI) {
+      var byteString = atob(dataURI.split(",")[1]);
+      var ab = new ArrayBuffer(byteString.length);
+      var ia = new Uint8Array(ab);
+
+      for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      return new Blob([ab], { type: "image/jpeg" });
     }
   </script>
 </html>
