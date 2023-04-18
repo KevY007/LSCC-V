@@ -4077,7 +4077,7 @@ function setStorageDataVars(){
         mp.storage.data.chat = {};
         mp.storage.data.chat.timestamp = false;
         mp.storage.data.chat.pagesize = 18;
-        mp.storage.data.chat.fontsize = 0.9;
+        mp.storage.data.chat.fontsizenew = 1.0;
     }
     if(mp.storage.data.chat.timestamp !== undefined){    
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.timestamps = ${mp.storage.data.chat.timestamp.toString()}`);
@@ -4090,18 +4090,18 @@ function setStorageDataVars(){
         mp.storage.data.menu.loadingscreens = true;
     }
     if(mp.storage.data.chat.pagesize !== undefined){    
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.pageSize = ${mp.storage.data.chat.pagesize}`);
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.pageSize = ${mp.storage.data.chat.pagesize}`);
     }
     else{
         mp.storage.data.chat.pagesize = 18;
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.pageSize = 18;`);
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.pageSize = 18;`);
     }
-    if(mp.storage.data.chat.fontsize !== undefined){    
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.fontSize = ${mp.storage.data.chat.fontsize}`);
+    if(mp.storage.data.chat.fontsizenew !== undefined){    
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.fontSize = ${mp.storage.data.chat.fontsizenew}`);
     }
     else{
-        mp.storage.data.chat.fontsize = 0.9;
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.fontSize = 0.9;`);
+        mp.storage.data.chat.fontsizenew = 1.0;
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.fontSize = 1.0;`);
     }
     if(mp.storage.data.menu.Speedo == undefined){
         mp.storage.data.menu.Speedo = true;
@@ -4114,6 +4114,11 @@ function setStorageDataVars(){
         mp.storage.data.menu.OOCauto = autoOOC;
         mp.events.callRemote("SetAutoOOC", autoOOC);
     }
+
+    if(mp.storage.data.menu.ChatAccessibility == undefined){
+        mp.storage.data.menu.ChatAccessibility = false;
+    }
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.accessibilityMode = ${mp.storage.data.menu.ChatAccessibility.toString()}`);
 
     if(mp.storage.data.menu.XMRAutoPlay == undefined){
         mp.storage.data.menu.XMRAutoPlay = true;

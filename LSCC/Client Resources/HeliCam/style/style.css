@@ -8,10 +8,11 @@ body{
     background-image:url('../img//background.png');
     background-size: cover;
     */
-    backdrop-filter: saturate(50%);
+    /*backdrop-filter: saturate(50%);*/
     margin:0;
 
     user-select: none;
+    overflow:hidden;
 }
 .crosshair-holder{
     position:relative;
@@ -157,19 +158,28 @@ body{
     visibility:hidden;
     display:none;
 }
-
+.focused-panel-player{
+    position:absolute;
+    bottom:20px;
+    right:50px;
+    padding:10px;
+    width:auto;
+    height:50px;
+    background-color: rgba(0,0,0,0.5);
+    border:4px solid rgba(255,255,255, 0.8);
+}
 .focused-panel{
     position:absolute;
     bottom:20px;
     right:50px;
     padding:10px;
     width:auto;
-    height:auto;
+    height:200px;
     background-color: rgba(0,0,0,0.5);
     border:4px solid rgba(255,255,255, 0.8);
 }
 .focus-header{
-    height:200px;
+    height:100px;
     display:flex;
     align-items: center;
     flex-direction: column;
@@ -203,4 +213,26 @@ body{
     font-family: BrassMono;
     color:white;
     font-size:24px;
+}
+.heartbeat-display{
+    background-color: black;
+    height:50px;
+    border-radius: 10px;
+    position: relative;
+}
+.heartbeat-gif{
+    width:120px;
+    height:70px;
+}
+.heartbeat-none{
+    width:120px;
+    height:70px;
+    opacity:0.0;
+}
+.heartbeat-number{
+    position: absolute;
+    top:-18px;
+    right:5px;
+    font-size: 20px;
+    text-align: right;
 }

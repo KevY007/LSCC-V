@@ -33,9 +33,10 @@ function ToggleLight(value){
     }
 }
 
-function UpdateDataPanel(name, fuel, speed, location){
+function UpdateDataPanel(name, passengers, location, speed){
     document.getElementById("vehicleName").innerHTML = name;
-    document.getElementById("vehicleFuel").innerHTML = fuel;
+    document.getElementById("vehiclePassengers").innerHTML = passengers.toString();
+    //document.getElementById("vehicleFuel").innerHTML = fuel;
     document.getElementById("vehicleSpeed").innerHTML = speed;
     document.getElementById("vehicleLocation").innerHTML = location;
 }
@@ -47,6 +48,25 @@ function ToggleFocusPanel(value){
     else{
         document.getElementById("focusPanel").className = "invisible";
     }
+}
+
+function logToConsole(text){
+    console.log(text);
+}
+
+function TogglePlayerFocusPanel(value){
+    if(value){
+        document.getElementById("focusPanelPlayer").className = "focused-panel";
+    }
+    else{
+        document.getElementById("focusPanelPlayer").className = "invisible";
+    }
+}
+function UpdatePlayerDataPanel(health, name){
+    document.getElementById("playerHealth").innerHTML = `${health.toString()}BPM`;
+    document.getElementById("playerName").innerHTML = name;
+
+    document.getElementById("heartbeatGif").className = (health > 0 ? "heartbeat-gif" : "heartbeat-none");
 }
 
 function SetZoomValue(value){

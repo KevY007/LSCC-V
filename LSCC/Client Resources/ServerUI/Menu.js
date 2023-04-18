@@ -32,6 +32,7 @@ if(typeof mp.storage.data.menu == "undefined" || typeof mp.storage.data.menu.HUD
     mp.storage.data.menu.SnowEnabled = false;
     mp.storage.data.menu.XMRAutoPlay = true;
     mp.storage.data.menu.ShowVoiceActivity = true;
+    mp.storage.data.menu.ChatAccessibility = false;
 
     mp.storage.flush();
 }
@@ -844,63 +845,11 @@ function updateMenuSettingsTab(){
                     ]
                 },
                 {
-                    id: 18,
-                    type: 4,
-                    name: "activechatopacity",
-                    label: "Active Chat Opacity",
-                    description: "Changes the opacity of the chat while it's in 'active' state, a.k.a. while typing or receiving messages.",
-                    default: "${(mp.storage.data.menu.ActiveChatOpacity == undefined ? "100" : (mp.storage.data.menu.ActiveChatOpacity*100).toString())}",
-                    options: [
-                      {
-                        label: "100",
-                        value: "1",
-                      },
-                      {
-                        label: "75",
-                        value: "0.75",
-                      },
-                      {
-                        label: "50",
-                        value: "0.5",
-                      },
-                      {
-                        label: "25",
-                        value: "0.25",
-                      },
-                    ]
-                },
-                {
-                    id: 19,
-                    type: 4,
-                    name: "inactivechatopacity",
-                    label: "Inactive Chat Opacity",
-                    description: "Changes the opacity of the chat while it's in 'inactive' state, a.k.a. when some time passes without any new messages.",
-                    default: "${(mp.storage.data.menu.InactiveChatOpacity == undefined ? "50" : (mp.storage.data.menu.InactiveChatOpacity*100).toString())}",
-                    options: [
-                      {
-                        label: "100",
-                        value: "1",
-                      },
-                      {
-                        label: "75",
-                        value: "0.75",
-                      },
-                      {
-                        label: "50",
-                        value: "0.5",
-                      },
-                      {
-                        label: "25",
-                        value: "0.25",
-                      },
-                    ]
-                },
-                {
-                    id: 20,
+                    id: 32,
                     type: 1,
-                    name: "showinactivechat",
-                    label: "Show Inactive Chat",
-                    description: "Toggles whether the chat will be visible or not while it's in the 'inactive' state."
+                    name: "chataccessibility",
+                    label: "Accessibility Mode",
+                    description: "Toggles accessibility mode to make chat more visible (outline on text, etc.)"
                 },
             ]
         }
@@ -935,9 +884,7 @@ function updateMenuSettingsTab(){
     ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.showvoice[0].value = ${mp.storage.data.menu.ShowVoiceActivity};`);
     ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.voicemode[0].value = "${menuSetting_getOptionNameFromValue("voicemode", mp.storage.data.menu.VoiceMode)}";`);
     
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.activechatopacity[0].value = "${menuSetting_getOptionNameFromValue("activechatopacity", mp.storage.data.menu.ActiveChatOpacity)}";`);       
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.inactivechatopacity[0].value = "${menuSetting_getOptionNameFromValue("inactivechatopacity", mp.storage.data.menu.InactiveChatOpacity)}";`);
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.showinactivechat[0].value = ${mp.storage.data.menu.ShowInactiveChat.toString()};`);
+    ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.chataccessibility[0].value = ${mp.storage.data.menu.ChatAccessibility.toString()};`);
 }
 // ID 69420 ==> Custom Crosshair Toggle | ID 69421 ==> Always On Crosshair |  ID 69422 ==> Sniper Custom or Default crosshair
 mp.events.add("MenuChangeSettings", (id, value) => 
@@ -1083,6 +1030,10 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     else if(id == 31){
         mp.storage.data.menu.ShowVoiceActivity = value;
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.enabled = ${value.toString()};`);
+    }
+    else if(id == 32){
+        mp.storage.data.menu.ChatAccessibility = value;
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.accessibilityMode = ${value.toString()}`);
     }
 
     if(ServerUI != null)

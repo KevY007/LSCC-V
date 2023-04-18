@@ -590,13 +590,13 @@ mp.events.add("stopLoadingScreen", () => {
 
 mp.events.addCommand("fontsize", (size) => {
     
-    if(size < 0.5 || size > 1.5){
-        mp.gui.chat.push("!{#ff6347}[!] !{white}Font size must be between 0.5 and 1.5! (default: 0.9)");
+    if(size < 0.5 || size > 2.5){
+        mp.gui.chat.push("!{#ff6347}[!] !{white}Font size must be between 0.5 and 2.5! (default: 1.0)");
         return;
     }
-    mp.storage.data.chat.fontsize = size;
+    mp.storage.data.chat.fontsizenew = size;
     mp.storage.flush();
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.fontSize = ${size}`);
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.fontSize = ${size}`);
 });
 mp.events.addCommand("pagesize", (size) => {
     
@@ -606,10 +606,10 @@ mp.events.addCommand("pagesize", (size) => {
     }
     mp.storage.data.chat.pagesize = size;
     mp.storage.flush();
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.pageSize = ${size}`);
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.pageSize = ${size}`);
 });
 mp.events.addCommand("timestamp", () => {
-
+ 
     mp.storage.data.chat.timestamp = !mp.storage.data.chat.timestamp;
     mp.storage.flush();
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.timestamps = ${mp.storage.data.chat.timestamp.toString()}`);
@@ -787,6 +787,43 @@ mp.keys.bind(0x21, true, function() { // PAGE UP arrow
 mp.keys.bind(0x222, true, function() { // PAGE DOWN arrow
     if(chatStatus && ServerUI){
         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.channelDown();`);
+    }
+});
+
+mp.keys.bind(0xBF, true, function(){  // /? key
+    if(ServerUI == null) return;
+    if(menuToggled){
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
+        return;
+    }
+    if(mp.storage.data.menu.HUD !== undefined && mp.storage.data.menu.HUD == false){
+        return;
+    }
+    if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
+    (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
+    (ClothingEditorActive !== undefined && ClothingEditorActive == true) ||
+    (ActionMenuActive !== undefined && ActionMenuActive == true) || 
+    (StationPickerToggled !== undefined && StationPickerToggled == true) ||
+    (isHotwiring !== undefined && isHotwiring == true)){
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
+        return;
+    }
+    if(!chatStatus)
+    {
+        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.input = '/'`);
+        focusChat(true);
+        mp.events.call("onOpenChatbox", true);
+
+        // The Anti-FUCK system: try to hide cursor instantly, but if it fails, hide it afterwards! :D very cool
+        setTimeout(() => {
+            mp.gui.cursor.show(true, false);
+        }, 5);
+        setTimeout(() => {
+            mp.gui.cursor.show(true, false);
+        }, 10);
+        setTimeout(() => {
+            mp.gui.cursor.show(true, false);
+        }, 50);
     }
 });
 
