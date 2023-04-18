@@ -43,6 +43,7 @@ mp.events.add("startHeliCam", () => {
     focusedVehicle = null;
     playerTarget = null;
     focusedPlayer = null;
+    displayLostSignal = false;
 });
 mp.keys.bind(0x11, false, () => {
 	if (heliCam === null && heliCam.isActive() && heliCam.isRendering()) return;
@@ -103,12 +104,16 @@ mp.events.add("stopHeliCam", () => {
     focusedPlayer = null;
     targetVehicleHandle = null;
     focusedVehicle = null;
+    displayLostSignal = false;
+    mp.game.graphics.setSeethrough(false);
+    mp.game.graphics.setNightvision(false);
 });
 
 // Check if camera is pointing at vehicle
 mp.events.add("getPointingAt", (distance) => {pointingAt(distance)});
 function pointingAt(distance) {
 	if (heliCam === null && heliCam.isActive() && heliCam.isRendering()) return;
+    if(focusedPlayer !== null || focusedVehicle !== null) return;
 
     let ccposition = heliCam.getCoord(); // grab the position of the gameplay camera as Vector3
 
@@ -130,6 +135,7 @@ mp.events.addCommand("shdbg", () => {
 
 mp.events.add('click', (x, y, upOrDown, leftOrRight, relativeX, relativeY, worldPosition, hitEntity) => {
 	if (heliCam === null || !heliCam.isActive() || !heliCam.isRendering()) return;
+    displayLostSignal = false;
 
     if(upOrDown == "down" && leftOrRight == "left"){
         if(targetVehicleHandle == null && playerTarget == null) return;
@@ -150,15 +156,20 @@ mp.events.add('click', (x, y, upOrDown, leftOrRight, relativeX, relativeY, world
 
             heliCam.pointAt(focusedPlayer.handle, 0, 0, 0, true);
             HeliCamCEF.execute(`SetCrosshair('lock')`);
+            UpdateHeliCamPlayerCEF(focusedPlayer);
+            HeliCamCEF.execute(`TogglePlayerFocusPanel(true);`);
         }  
     }
     if(upOrDown == "down" && leftOrRight == "right"){
         if(focusedVehicle == null && focusedPlayer == null) return;
 
         HeliCamCEF.execute(`ToggleFocusPanel(false);`);
+        HeliCamCEF.execute(`TogglePlayerFocusPanel(false);`);
         heliCam.stopPointing();
         focusedVehicle = null;
         focusedPlayer = null;
+        targetVehicleHandle = null;
+        playerTarget = null;
         HeliCamCEF.execute(`SetCrosshair('crosshair')`);
     }
 });
@@ -174,54 +185,79 @@ function UpdateHeliCamCEF_Zoom(zoom){
 
 function UpdateHeliCamCEF(vehicle){
     if(!HeliCamCEF) return;
-
      const fuel = vehicle.getVariable("Fuel");
      const speed = (vehicle.getSpeed() * 3.6).toFixed(0);
+//
+     //const getStreet = mp.game.pathfind.getStreetNameAtCoord(vehicle.position.x, vehicle.position.y, vehicle.position.z, 0, 0);
+     //const zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(vehicle.position.x, vehicle.position.y, vehicle.position.z));
+     //const streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
+//
+//
+     //const fuelStr = fuel ? `${Math.floor(fuel)}%` : `∞`;
+     const speedStr = speed ? `${speed}KM/H` : `0KM/H`;
+     //const nameStr = name;
+     const locStr = `${streetName}, ${zoneName}`;
      const name = mp.game.vehicle.getDisplayNameFromVehicleModel(vehicle.model).toUpperCase();
 
-     const getStreet = mp.game.pathfind.getStreetNameAtCoord(vehicle.position.x, vehicle.position.y, vehicle.position.z, 0, 0);
-     const zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(vehicle.position.x, vehicle.position.y, vehicle.position.z));
-     const streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
+        let passengerCnt = 0;
+        mp.players.forEachInStreamRange(player => {
+            if(player.vehicle && player.vehicle.handle === vehicle.handle) passengerCnt++;
+        });
 
 
-     const fuelStr = fuel ? `${Math.floor(fuel)}%` : `∞`;
-     const speedStr = speed ? `${speed}KM/H` : `0KM/H`;
-     const nameStr = name;
-     const locStr = `${streetName}, ${zoneName}`;
-
-     HeliCamCEF.execute(`UpdateDataPanel('${nameStr}', '${fuelStr}', '${speedStr}', '${locStr}');`);
+     HeliCamCEF.execute(`UpdateDataPanel('${name}', ${passengerCnt}, '${locStr}', '${speedStr}');`);
 }
 
+function UpdateHeliCamPlayerCEF(target){
+    const health = target.getHealth();
+    HeliCamCEF.execute(`UpdatePlayerDataPanel(${health}, '${target.name}');`);
+}
+
+let displayLostSignal = false;
+mp.events.add('entityStreamOut', (entity) => {
+    if(focusedPlayer === entity || focusedVehicle === entity){
+        HeliCamCEF.execute(`ToggleFocusPanel(false);`);
+        HeliCamCEF.execute(`TogglePlayerFocusPanel(false);`);
+        heliCam.stopPointing();
+        focusedVehicle = null;
+        focusedPlayer = null;
+        HeliCamCEF.execute(`SetCrosshair('crosshair')`);
+
+        displayLostSignal = true;
+        setTimeout(() => {
+            displayLostSignal = false;
+        }, 1000);
+    }
+});
 
 mp.events.add('render', () => {
 	if (heliCam === null || !heliCam.isActive() || !heliCam.isRendering()) return;
 
-    if(focusedVehicle !== null){
-        HeliCamCEFFrames++;
-        if(HeliCamCEFFrames > 100){
-            UpdateHeliCamCEF(focusedVehicle);
-            HeliCamCEFFrames = 0;
-        }
-        /*
-        mp.game.graphics.drawMarker(
-            0,
-            focusedVehicle.position.x, focusedVehicle.position.y, focusedVehicle.position.z + 2,
-            0, 0, 0,
-            0, 0, 0,
-            1.0, 1.0, 1.0,
-            0, 200, 0, 128,
-            false, false, 2,
-            false, null, null, false,
-          );
-        mp.game.graphics.drawText(`${mp.game.vehicle.getDisplayNameFromVehicleModel(focusedVehicle.model).toUpperCase()}`, [focusedVehicle.position.x, focusedVehicle.position.y, focusedVehicle.position.z],{
+    if(displayLostSignal === true){
+        mp.game.graphics.drawText("SIGNAL LOST", [0.5, 0.6], {
             font:2,
-            color:[255, 255, 0, 200],
+            color:[255,0,0,255],
             outline:true,
             scale:[0.5, 0.5],
             centre:true
         });
-        */
+    }
+
+    if(focusedVehicle !== null){
+        HeliCamCEFFrames++;
+        if(HeliCamCEFFrames > 500){
+            UpdateHeliCamCEF(focusedVehicle);
+            HeliCamCEFFrames = 0;
+        }
         return;
+    }
+    if(focusedPlayer !== null){
+        HeliCamCEFFrames++;
+        if(HeliCamCEFFrames > 500){
+            UpdateHeliCamPlayerCEF(focusedPlayer);
+            HeliCamCEFFrames = 0;
+        }
+        return;  
     }
 
     if(pointingAt(1000) === undefined){    
@@ -301,16 +337,26 @@ mp.events.add('render', () => {
 
 // Sync
 mp.events.add('render', () => {
-    mp.players.streamed.forEach(target => {
-        if(target.getVariable("HeliCam") === true && target.getVariable("HeliCamLight") === true 
-            && target.getVariable("HeliCamPosition") !== undefined){
 
-                const {x,y,z,fx,fy,fz} = JSON.parse(target.getVariable("HeliCamPosition"));
-                //const dist = Math.round(mp.game.system.vdist2(x, y, z, mp.players.local.position.x, mp.players.local.position.y, mp.players.local.position.z) / 3);
-                mp.game.graphics.drawSpotLightWithShadow(x,y,z,fx,fy,fz, 255, 255, 255, 500, 10, 1, 12, 1, 0);
-                mp.game.graphics.drawLightWithRange(x,y,z, 255, 255, 255, 1, 10);
+    mp.players.streamed.forEach(target => {
+        if(target !== mp.players.local && target.getVariable("HeliCam") === true && target.getVariable("HeliCamLight") === true ){
+
+                const x = target.getVariable("HeliPosX");
+                const y = target.getVariable("HeliPosY");
+                const z = target.getVariable("HeliPosZ");
+                const fx = target.getVariable("HeliForX");
+                const fy = target.getVariable("HeliForY");
+                const fz = target.getVariable("HeliForZ");
+
+                if(x && y && z && fx && fy && fz){
+                    //const dist = Math.round(mp.game.system.vdist2(x, y, z, mp.players.local.position.x, mp.players.local.position.y, mp.players.local.position.z) / 3);
+                    mp.game.graphics.drawSpotLightWithShadow(x,y,z,fx,fy,fz, 255, 255, 255, 500, 3, 1, 12, 1, 0);
+                    mp.game.graphics.drawLightWithRange(x,y,z, 255, 255, 255, 1, 10);
+                }
+           
         }
     });
+    
 });
 
 function convertZoomToPercentage(value){
@@ -351,12 +397,16 @@ mp.events.add('render', () => {
 
             UpdateHeliCamCEF_Zoom(currentFov);
         }
-
-        if(Date.now() - lastHeliCamUpdate > 100){
-            const forward = heliCam.getDirection();
-            const position = heliCam.getCoord();
-
-            mp.events.callRemoteUnreliable("HeliCam_UpdatePosition", position.x, position.y, position.z, forward.x, forward.y, forward.z);
-        }
+        
+        const forward = heliCam.getDirection();
+        const position = heliCam.getCoord();
+        if(LightToggled){
+            mp.game.graphics.drawSpotLightWithShadow(position.x, position.y, position.z, forward.x, forward.y, forward.z, 255, 255, 255, 500, 3, 1, 12, 1, 0);
+            mp.game.graphics.drawLightWithRange(position.x, position.y, position.z, 255, 255, 255, 1, 10);   
+            if(Date.now() - lastHeliCamUpdate > 100){
+                lastHeliCamUpdate = Date.now();
+                mp.events.callRemoteUnreliable("HeliCam_UpdatePosition", position.x, position.y, position.z, forward.x, forward.y, forward.z);
+            }  
+        }      
     }
 });

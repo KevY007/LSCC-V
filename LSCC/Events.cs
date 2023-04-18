@@ -4846,7 +4846,14 @@ namespace RNC
         [RemoteEvent("HeliCam_UpdatePosition")]
         public void OnHeliCamUpdate(Player player, double px, double py, double pz, double fx, double fy, double fz)
         {
-            player.SetSharedData("HeliCamPosition", $"{{\"x\":{px}, \"y\":{py}, \"z\":{pz}, \"fx\":{fx}, \"fy\":{fy}, \"fz\":{fz}}}");
+            player.SetSharedData("HeliPosX", px);
+            player.SetSharedData("HeliPosY", py);
+            player.SetSharedData("HeliPosZ", pz);
+            player.SetSharedData("HeliForX", fx);
+            player.SetSharedData("HeliForY", fy);
+            player.SetSharedData("HeliForZ", fz);
+
+            //player.SetSharedData("HeliCamPosition", $"{{\"x\":{px}, \"y\":{py}, \"z\":{pz}, \"fx\":{fx}, \"fy\":{fy}, \"fz\":{fz}}}");
         }
 
         [RemoteEvent("Server_RequestLobbySwitch")]
