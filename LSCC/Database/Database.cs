@@ -368,8 +368,6 @@ namespace RNC
                 _connectionString = "Server=localhost;Database=racenchase_test;Uid=racenchase;Pwd=12345678";
             else
                 _connectionString = "Server=" + Settings.MySQL_Host + ";Database=" + Settings.MySQL_Database + ";Uid=" + Settings.MySQL_User + ";Pwd=" + Settings.MySQL_Password + ";Port=" + Settings.MySQL_Port;
-
-            GTANetworkAPI.NAPI.Util.ConsoleOutput("CONNECTION STRING: " + _connectionString);
         }
     }
 
@@ -503,8 +501,6 @@ namespace RNC
                 _connectionString = "Server=localhost;Database=racenchase_backup_test;Uid=racenchase;Pwd=12345678;";
             else
                 _connectionString = "Server=" + Settings.MySQL_Host + ";Database=" + (Settings.MySQL_Database + "_backup") + ";Uid=" + Settings.MySQL_User + ";Pwd=" + Settings.MySQL_Password + ";Port=" + Settings.MySQL_Port;
-
-            GTANetworkAPI.NAPI.Util.ConsoleOutput("CONNECTION STRING: " + _connectionString);
         }
     }
     #endregion
