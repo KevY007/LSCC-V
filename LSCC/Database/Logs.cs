@@ -41,7 +41,7 @@ namespace RNC
         public DateTime Timestamp { get; set; }
         public int AccountID { get; set; }
         public int DealerID { get; set; } // who dealt the dammage
-        public long Weapon { get; set; }
+        public string Weapon { get; set; }
         public int Damage { get; set; }
         public int Health { get; set; } // HP after getting damaged
         public int Bodypart { get; set; }
@@ -202,7 +202,7 @@ namespace RNC
                     {
                         case (int)LogType.AdminRecord:
                             {
-                                List<Logs_AdminRecord> _logs = await context.Logs_AdminRecords.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToListAsync();
+                                List<Logs_AdminRecord> _logs = await context.Logs_AdminRecords.AsQueryable().Where(l => l.AccountID == target.SQL_ID).OrderByDescending(x => x.SQL_ID).ToListAsync();
 
                                 object[] _toSend = new object[_logs.Count];
                                 for (int i = 0; i < _logs.Count; i++)
@@ -224,7 +224,7 @@ namespace RNC
                         case (int)LogType.Admin:
                             {
 
-                                List<Logs_Admin> _logs = await context.Logs_Admin.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToListAsync();
+                                List<Logs_Admin> _logs = await context.Logs_Admin.AsQueryable().Where(l => l.AccountID == target.SQL_ID).OrderByDescending(x => x.SQL_ID).ToListAsync();
                                 object[] _toSend = new object[_logs.Count];
                                 for (int i = 0; i < _logs.Count; i++)
                                 {
@@ -242,7 +242,7 @@ namespace RNC
                         case (int)LogType.Command:
                             {
 
-                                List<Logs_Command> _logs = await context.Logs_Commands.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToListAsync();
+                                List<Logs_Command> _logs = await context.Logs_Commands.AsQueryable().Where(l => l.AccountID == target.SQL_ID).OrderByDescending(x => x.SQL_ID).ToListAsync();
                                 object[] _toSend = new object[_logs.Count];
                                 for (int i = 0; i < _logs.Count; i++)
                                 {
@@ -260,7 +260,7 @@ namespace RNC
                         case (int)LogType.Session:
                             {
 
-                                List<Logs_Session> _logs = await context.Logs_Session.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToListAsync();
+                                List<Logs_Session> _logs = await context.Logs_Session.AsQueryable().Where(l => l.AccountID == target.SQL_ID).OrderByDescending(x => x.SQL_ID).ToListAsync();
                                 object[] _toSend = new object[_logs.Count];
                                 for (int i = 0; i < _logs.Count; i++)
                                 {
@@ -277,13 +277,13 @@ namespace RNC
 
                         case (int)LogType.IncomingDamage:
                             {
-                                List<Logs_Damage> _logs = await context.Logs_Damages.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToListAsync();
+                                List<Logs_Damage> _logs = await context.Logs_Damages.AsQueryable().Where(l => l.AccountID == target.SQL_ID).OrderByDescending(x => x.SQL_ID).ToListAsync();
                                 object[] _toSend = new object[_logs.Count];
                                 for (int i = 0; i < (_logs.Count > 250 ? 250 : _logs.Count); i++)
                                 {
                                     Account dealer = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == _logs[i].DealerID);
                                     string dealerName = (dealer == null ? "[UNKNOWN]" : dealer.Username);
-                                    (string, string, long, string, string, int, int) _toAdd = (_logs[i].Timestamp.ToString(), dealerName, _logs[i].Weapon, _logs[i].Damage.ToString(), _logs[i].Health.ToString(), _logs[i].Bodypart, _logs[i].Armor);
+                                    (string, string, string, string, string, int, int) _toAdd = (_logs[i].Timestamp.ToString(), dealerName, _logs[i].Weapon, _logs[i].Damage.ToString(), _logs[i].Health.ToString(), _logs[i].Bodypart, _logs[i].Armor);
                                     _toSend[i] = _toAdd;
                                 }
                                 NAPI.Task.Run(() =>
@@ -295,13 +295,13 @@ namespace RNC
                             }
                         case (int)LogType.OutgoingDamage:
                             {
-                                List<Logs_Damage> _logs = await context.Logs_Damages.AsQueryable().Where(l => l.DealerID == target.SQL_ID).ToListAsync();
+                                List<Logs_Damage> _logs = await context.Logs_Damages.AsQueryable().Where(l => l.DealerID == target.SQL_ID).OrderByDescending(x => x.SQL_ID).ToListAsync();
                                 object[] _toSend = new object[_logs.Count];
                                 for (int i = 0; i < (_logs.Count > 250 ? 250 : _logs.Count); i++)
                                 {
                                     Account victim = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == _logs[i].AccountID);
                                     string victimName = (victim == null ? "[UNKNOWN]" : victim.Username);
-                                    (string, string, long, string, string, int, int) _toAdd = (_logs[i].Timestamp.ToString(), victimName, _logs[i].Weapon, _logs[i].Damage.ToString(), _logs[i].Health.ToString(), _logs[i].Bodypart, _logs[i].Armor);
+                                    (string, string, string, string, string, int, int) _toAdd = (_logs[i].Timestamp.ToString(), victimName, _logs[i].Weapon, _logs[i].Damage.ToString(), _logs[i].Health.ToString(), _logs[i].Bodypart, _logs[i].Armor);
                                     _toSend[i] = _toAdd;
                                 }
                                 NAPI.Task.Run(() =>
@@ -378,7 +378,7 @@ namespace RNC
                 }
             });
         }
-        public static void LogDamage(int accSQLID, int dealerSQLID, long weapon, int damage, int health, int bodypart, string notes, int armor)
+        public static void LogDamage(int accSQLID, int dealerSQLID, string weapon, int damage, int health, int bodypart, string notes, int armor)
         {
             Task.Run(async () =>
             {

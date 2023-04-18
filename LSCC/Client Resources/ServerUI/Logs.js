@@ -48,10 +48,8 @@ mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
             break;
         }
         case 4:{ // incoming damage
-            mp.events.callRemote("ServerConsoleOutput", "i got to this part lol");
 
             let damageLogs = JSON.parse(jsonLogs);
-            mp.events.callRemote("ServerConsoleOutput", "after damage logs!! xd");
             for(let i = 0 ; i < damageLogs.length ; i++){
                 var weaponID = damageLogs[i][2];
                 var bodypartID = damageLogs[i][5];

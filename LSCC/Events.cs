@@ -7421,7 +7421,7 @@ namespace RNC
                     target.TriggerEvent("setWounded", 1, player.Id);
                     target.Armor = 0;
                     target.Health = 100;
-                    Logs.LogDamage(targetSQLID, dealerSQLID, realWeapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
+                    Logs.LogDamage(targetSQLID, dealerSQLID, weapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
                     return;
                 }
                 else
@@ -7432,14 +7432,14 @@ namespace RNC
                     target.TriggerEvent("fakeDeathToRespawn");
                     OnPlayerDeath(target, player, realWeapon);
 
-                    Logs.LogDamage(targetSQLID, dealerSQLID, realWeapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
+                    Logs.LogDamage(targetSQLID, dealerSQLID, weapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
                     return;
                 }
             }
 
             target.Armor = ARtoset;
             target.Health = HPtoset;
-            Logs.LogDamage(targetSQLID, dealerSQLID, realWeapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
+            Logs.LogDamage(targetSQLID, dealerSQLID, weapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
 
             //target.SendChatMessage($"~r~[DAMAGE] ~w~You've been hit by ~y~{player.Name} ~w~for ~r~{damageToDeal} ~w~damage. ~b~[AR:{ARtoset}|HP:{HPtoset}]");
             //player.SendChatMessage($"~g~[DAMAGE] ~w~You hit ~y~{target.Name} ~w~for ~r~{damageToDeal}~w~ damage, they now have ~r~{HPtoset}~w~ health ~b~(AR: {ARtoset})~w~!");
