@@ -54,8 +54,6 @@
             };
           })
           .then((result) => {
-            mp.trigger("cs_logtoserver", JSON.stringify(result));
-
             if (result.status === 200) {
               mp.trigger(event, 1, result.data.message, identifier);
             } else {
@@ -63,8 +61,6 @@
             }
           })
           .catch((error) => {
-            mp.trigger("cs_logtoserver", JSON.stringify(error));
-
             mp.trigger(event, 0, error.message, identifier);
           });
       };
