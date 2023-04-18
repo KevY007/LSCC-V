@@ -40,7 +40,7 @@ function isPlayerInLOS(target) {
 
     let targetPos = target.getBoneCoords(12844, 0.0, 0, 0.25);
 
-    let result = mp.raycasting.testPointToPoint(position, targetPos, [1, 16]); // now test point to point
+    let result = mp.raycasting.testPointToPoint(position, targetPos, [1, 16, 256, 128, 64, 32]); // now test point to point
     
     if(result === undefined)
     {
@@ -134,20 +134,20 @@ mp.events.add('render', (nametags) => {
                 let scale = (distWithAdjust / (maxDistWithAdjust));
                 if(scale < 0.6) scale = 0.6;
 
-                var health = player.getHealth() / 100;
+                //var health = player.getHealth() / 100;
             
-                var armour = (player.getArmour() > 100 ? 100 : player.getArmour()) / 100;
+                //var armour = (player.getArmour() > 100 ? 100 : player.getArmour()) / 100;
                 
-                y -= scale * (0.005 * (screenRes.y / 1080));
+                y -= (scale * (0.01 * (screenRes.y / 1080)));
 
                 if(renderNametags == true) {
                     if(player.getVariable("Team") !== undefined && player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && !BankRobberyOn)
                     {
-                        mp.game.graphics.drawText(NAMETAG_MESSAGES.PLAYER_SHOT, [x, y - 0.045],
+                        mp.game.graphics.drawText(NAMETAG_MESSAGES.PLAYER_SHOT, [x, y - 0.033],
                         {
                             font: 0,
                             color: [237, 212, 52, 255],
-                            scale: [0.3, 0.3],
+                            scale: [0.26, 0.26],
                             outline: true
                         });
                     }
@@ -158,11 +158,11 @@ mp.events.add('render', (nametags) => {
                         else if(timerCount == 1) typingStr = `( IDLE [${SecondsSinceLastKeyPress}s/1500s] )`;
                         else if(timerCount == 2) timerCount = 0;
                 
-                        mp.game.graphics.drawText(typingStr, [x, y - 0.0250],
+                        mp.game.graphics.drawText(typingStr, [x, y - 0.015],
                         {
                             font: 0,
                             color: [92, 255, 206, 228],
-                            scale: [0.285, 0.285],
+                            scale: [0.21, 0.21],
                             outline: true
                         });                        
                     }
@@ -173,11 +173,11 @@ mp.events.add('render', (nametags) => {
                         else if(timerCount == 1) typingStr = `( ${NAMETAG_MESSAGES.TASE_PROTECTION} )`;
                         else if(timerCount == 2) timerCount = 0;
                 
-                        mp.game.graphics.drawText(typingStr, [x, y - 0.0250],
+                        mp.game.graphics.drawText(typingStr, [x, y - 0.015],
                         {
                             font: 0,
                             color: [20, 103, 219, 228],
-                            scale: [0.285, 0.285],
+                            scale: [0.21, 0.21],
                             outline: true
                         });
                     }
@@ -188,11 +188,11 @@ mp.events.add('render', (nametags) => {
                         else if(timerCount == 1) typingStr = `( ${NAMETAG_MESSAGES.LADDER_PROTECTION} )`;
                         else if(timerCount == 2) timerCount = 0;
                 
-                        mp.game.graphics.drawText(typingStr, [x, y - 0.0250],
+                        mp.game.graphics.drawText(typingStr, [x, y - 0.015],
                         {
                             font: 0,
                             color: [20, 103, 219, 228],
-                            scale: [0.285, 0.285],
+                            scale: [0.23, 0.23],
                             outline: true
                         });
                     }                   
@@ -202,7 +202,7 @@ mp.events.add('render', (nametags) => {
                         if(player.getVariable("Team") === mp.players.local.getVariable("Team")){
                             typingStr = NAMETAG_MESSAGES.PLAYER_INJURED;
 
-                            mp.game.graphics.drawText(typingStr, [x, y - 0.0250],
+                            mp.game.graphics.drawText(typingStr, [x, y - 0.015],
                                 {
                                     font: 0,
                                     color: [255, 99, 71, 228],
@@ -212,7 +212,7 @@ mp.events.add('render', (nametags) => {
                         }
                         else{
                             typingStr = NAMETAG_MESSAGES.ENEMY_INJURED;
-                            mp.game.graphics.drawText(typingStr, [x, y - 0.0250],
+                            mp.game.graphics.drawText(typingStr, [x, y - 0.015],
                                 {
                                     font: 0,
                                     color: [255, 25, 25, 200],
@@ -229,11 +229,11 @@ mp.events.add('render', (nametags) => {
                         else if(timerCount == 1) typingStr = "( TABBED )";
                         else if(timerCount == 2) timerCount = 0;
                 
-                        mp.game.graphics.drawText(typingStr, [x, y - 0.0250],
+                        mp.game.graphics.drawText(typingStr, [x, y - 0.015],
                         {
                             font: 0,
                             color: [255, 99, 71, 228],
-                            scale: [0.285, 0.285],
+                            scale: [0.21, 0.21],
                             outline: true
                         });
                     }
@@ -244,36 +244,48 @@ mp.events.add('render', (nametags) => {
                         else if(timerCount == 1) typingStr = "( .. )";
                         else if(timerCount == 2) typingStr = "( ... )";
 
-                        mp.game.graphics.drawText(typingStr, [x, y - 0.055],
+                        mp.game.graphics.drawText(typingStr, [x, y - 0.03],
                         {
                             font: 0,
                             color: [228, 240, 48, 228],
-                            scale: [0.335, 0.335],
+                            scale: [0.26, 0.26],
                             outline: true
                         });
                     }
                         
-                    if(player.col)
-                    {
+                    if(player.getVariable("ShowDamaged") === false){
+                        if(player.col)
+                        {
+                            mp.game.graphics.drawText(player.name.replace('_', ' '), [x, y],
+                            {
+                            font: 4,
+                            color: [player.col_r, player.col_g, player.col_b, player.col_a],
+                            scale: [0.398, 0.398],
+                            outline: true
+                            });
+                        }
+                        else
+                        {
+                            mp.game.graphics.drawText(player.name.replace('_', ' '), [x, y],
+                            {
+                            font: 4,
+                            color: defaultcolor,
+                            scale: [0.398, 0.398],
+                            outline: true
+                            });
+                        }
+                    }  
+                    else{
                         mp.game.graphics.drawText(player.name.replace('_', ' '), [x, y],
                         {
                         font: 4,
-                        color: [player.col_r, player.col_g, player.col_b, player.col_a],
-                        scale: [0.4, 0.4],
+                        color: [248, 113, 113, 255],
+                        scale: [0.398, 0.398],
                         outline: true
                         });
-                    }
-                    else
-                    {
-                        mp.game.graphics.drawText(player.name.replace('_', ' '), [x, y],
-                        {
-                        font: 4,
-                        color: defaultcolor,
-                        scale: [0.4, 0.4],
-                        outline: true
-                        });
-                    }
+                    }                
 
+                    /*
                     if(showHPStatus == 1 || (mp.game.player.isFreeAimingAtEntity(player.handle) && showHPStatus == 2))
                     {
                         let y2 = y + 0.056;
@@ -303,6 +315,7 @@ mp.events.add('render', (nametags) => {
                             graphics.drawRect(x - (width + 0.02) / 2 * (1 - health), y2, (0.02 + width) * health, (0.003 + height), 92, 95, 242, 200);
                         }
                     }
+                    */
                 }
 
                 if(mp.game.player.isFreeAimingAtEntity(player.handle) && mp.players.local.weaponAmmo > 1 && 
@@ -323,7 +336,7 @@ mp.events.add('render', (nametags) => {
                     {
                         font: 0,
                         color: [237, 212, 52, 255],
-                        scale: [0.3, 0.3],
+                        scale: [0.2, 0.2],
                         outline: true
                     });
                 }

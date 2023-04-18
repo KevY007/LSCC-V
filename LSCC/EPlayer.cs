@@ -700,6 +700,7 @@ namespace RNC
                 player.ResetData("Dead");
                 player.SetSharedData("DonatorPoints", 0);
                 player.SetSharedData("Invincible", false);
+                player.SetSharedData("ShowDamaged", false);
                 player.SetData("SpawnTick", Environment.TickCount64);
                 player.ResetData("AccountHandle");
                 player.ResetData("CompNoRefundWarn");
@@ -708,6 +709,7 @@ namespace RNC
                 player.SetSharedData("VehicleDL", false); // for /DL like in SAMP
                 player.ResetData("LastPMFrom");
                 player.SetSharedData("LastVehicleExit", 0);
+                player.SetSharedData("Invincible", false);
 
                 player.SetSharedData("Bleeding_WasShot", false);
                 player.SetSharedData("AutoOOC", false);

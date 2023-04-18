@@ -6864,7 +6864,19 @@ namespace RNC
 
             player.SetSharedData("DonatorPoints", EPlayer.GetAccount(player).DonatorPoints);
         }
-        
+
+        [RemoteEvent("SetIsDamaged")]
+        public void SetIsPlayerDamaged(Player player)
+        {
+            player.SetSharedData("ShowDamaged", true);
+            player.TriggerEvent("setClearDamageNametag");
+        }
+        [RemoteEvent("RemoveIsDamaged")]
+        public void RemoveIsPlayerDamaged(Player player)
+        {
+            player.SetSharedData("ShowDamaged", false);
+        }
+
         [RemoteEvent("PlayerShot_SyncHealth")]
         public void SyncHealthOnShot(Player player, Player target, int targetHealth, int damageToDeal, int targetArmour, string weapon, int boneIndex)
         {
@@ -6905,7 +6917,7 @@ namespace RNC
                 ARtoset = 0;
                 HPtoset = targetHealth - diff;
             }
-
+            SetIsPlayerDamaged(target);
             player.TriggerEvent("showDamageIndicatorOnPosition", damageToDeal, target, boneIndex);
 
             if (ARtoset < 0) ARtoset = 0;
@@ -7439,6 +7451,7 @@ namespace RNC
         [RemoteEvent("ScreenshotReceived")]
         public void OnReceiveSS(Player player, int result, string data, int identifier)
         {
+            NAPI.Util.ConsoleOutput(data);
             if (identifier != -1)
             {
                 Player admin = Settings.LoggedInPlayers.Find(a => a.GetSharedData<int>("SQL_ID") == identifier);
@@ -7452,7 +7465,6 @@ namespace RNC
                     }
                     else
                     {
-                        NAPI.Util.ConsoleOutput(data);
                         admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The screenshot of !{#FF6347}" + player.Name + "'s !{#FFFFFF}game has failed to upload.");
                         if(data != "0")
                             admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Error Details: " + data);

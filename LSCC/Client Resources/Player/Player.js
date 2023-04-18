@@ -2484,7 +2484,26 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         mp.events.callRemote("SetShotsFired", true);
 });
 
+let damageNametagTimeout = null;
+let isShowingDamage = false;
+
+mp.events.add("setClearDamageNametag", () => {
+    if(damageNametagTimeout){
+        clearTimeout(damageNametagTimeout);
+        damageNametagTimeout = null;
+    }
+    isShowingDamage = true;
+    damageNametagTimeout = setTimeout(() => {
+        if(mp.players.local == null || mp.players.local == undefined || !mp.players.exists(mp.players.local)) return;
+        
+        mp.events.callRemote("RemoveIsDamaged");
+        isShowingDamage = false;
+    }, 500);
+});
+
 mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weapon, boneIndex, damage) => {
+
+    mp.events.callRemote("SetIsDamaged");
 
     if(targetEntity !== null && targetEntity !== undefined && targetEntity.type === 'vehicle'){
         if(sourceEntity !== null && sourceEntity !== undefined && sourceEntity.type === 'player'){
