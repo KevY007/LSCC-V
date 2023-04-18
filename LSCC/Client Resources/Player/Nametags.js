@@ -91,6 +91,20 @@ mp.events.add('showHPBars', (status) => {
     showHPStatus = status;
 });
 
+var NT_SCALE = 0.8;
+var NT_OFFSET = 0;
+var NT_MULTIPLIER = -0.07;
+mp.events.add("nt_adjust", (type, value) => {
+    switch(type){
+        case "scale": NT_SCALE = value;
+        break;
+        case "offset": NT_OFFSET = value;
+        break;
+        case "multiplier": NT_MULTIPLIER = value;
+        break;
+    }
+});
+
 mp.events.add('render', (nametags) => {
     const graphics = mp.game.graphics;
     const screenRes = graphics.getScreenResolution(0, 0);
@@ -132,22 +146,22 @@ mp.events.add('render', (nametags) => {
             if((distWithAdjust <= (maxDistWithAdjust)) || (specState || isNoClip) || mp.players.local.getVariable("NametagHack") == true)
             {
                 let scale = (distWithAdjust / (maxDistWithAdjust));
-                if(scale < 0.6) scale = 0.6;
+                if(scale < NT_SCALE) scale = NT_SCALE;
 
                 //var health = player.getHealth() / 100;
             
                 //var armour = (player.getArmour() > 100 ? 100 : player.getArmour()) / 100;
                 
-                y -= (scale * (0.1   * (screenRes.y / 1080)));
+                y -= ((scale * (NT_MULTIPLIER   * (screenRes.y / 1080))) + NT_OFFSET);
 
                 if(renderNametags == true) {
                     if(player.getVariable("Team") !== undefined && player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && !BankRobberyOn)
                     {
-                        mp.game.graphics.drawText(NAMETAG_MESSAGES.PLAYER_SHOT, [x, y - 0.033],
+                        mp.game.graphics.drawText(NAMETAG_MESSAGES.PLAYER_SHOT, [x, y - 0.02],
                         {
                             font: 0,
                             color: [237, 212, 52, 255],
-                            scale: [0.26, 0.26],
+                            scale: [0.23, 0.23],
                             outline: true
                         });
                     }
@@ -260,7 +274,7 @@ mp.events.add('render', (nametags) => {
                             {
                             font: 4,
                             color: [player.col_r, player.col_g, player.col_b, player.col_a],
-                            scale: [0.398, 0.398],
+                            scale: [0.395, 0.395],
                             outline: true
                             });
                         }
@@ -270,7 +284,7 @@ mp.events.add('render', (nametags) => {
                             {
                             font: 4,
                             color: defaultcolor,
-                            scale: [0.398, 0.398],
+                            scale: [0.395, 0.395],
                             outline: true
                             });
                         }
@@ -280,7 +294,7 @@ mp.events.add('render', (nametags) => {
                         {
                         font: 4,
                         color: [248, 113, 113, 255],
-                        scale: [0.398, 0.398],
+                        scale: [0.395, 0.395],
                         outline: true
                         });
                     }                

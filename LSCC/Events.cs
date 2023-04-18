@@ -109,7 +109,7 @@ namespace RNC
             string pSerial = player.Serial;
             string pAddress = player.Address;
             ulong pSCID = player.SocialClubId;
-            NAPI.Notification.SendNotificationToPlayer(player, "Welcome to ~y~Race ~w~'n ~b~Chase~w~. Please wait...");
+            //NAPI.Notification.SendNotificationToPlayer(player, "Welcome to ~y~Race ~w~'n ~b~Chase~w~. Please wait...");
             Task.Run(async () =>
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
@@ -6917,7 +6917,9 @@ namespace RNC
                 ARtoset = 0;
                 HPtoset = targetHealth - diff;
             }
-            SetIsPlayerDamaged(target);
+            if(damageToDeal > 0)
+                SetIsPlayerDamaged(target);
+
             player.TriggerEvent("showDamageIndicatorOnPosition", damageToDeal, target, boneIndex);
 
             if (ARtoset < 0) ARtoset = 0;

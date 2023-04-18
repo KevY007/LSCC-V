@@ -2503,7 +2503,9 @@ mp.events.add("setClearDamageNametag", () => {
 
 mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weapon, boneIndex, damage) => {
 
-    mp.events.callRemote("SetIsDamaged");
+    if(mp.players.local.getVariable("Invisible") === false && sourceEntity.type !== 'player'){
+        mp.events.callRemote("SetIsDamaged");
+    }
 
     if(targetEntity !== null && targetEntity !== undefined && targetEntity.type === 'vehicle'){
         if(sourceEntity !== null && sourceEntity !== undefined && sourceEntity.type === 'player'){
