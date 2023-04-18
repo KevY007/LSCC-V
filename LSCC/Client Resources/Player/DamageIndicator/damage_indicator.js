@@ -63,6 +63,8 @@ function showDamageIndicator(damage, is_me = false){
     });
 }
 
+mp.events.add("showDamageIndicatorOnPosition", (damage, entity, boneIdx) => showDamageIndicatorOnPosition(damage, entity, boneIdx));
+
 function showDamageIndicatorOnPosition(damage, entity, boneIdx){
     if(!mp.storage.data.menu.ShowDamageIndicator) return;
     if(damage === 0) return;

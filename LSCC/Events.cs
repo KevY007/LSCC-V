@@ -6906,6 +6906,8 @@ namespace RNC
                 HPtoset = targetHealth - diff;
             }
 
+            player.TriggerEvent("showDamageIndicatorOnPosition", damageToDeal, target, boneIndex);
+
             if (ARtoset < 0) ARtoset = 0;
             if (HPtoset < 0)
             {
