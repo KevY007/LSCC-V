@@ -4056,6 +4056,7 @@ mp.events.add("Bleeding_OnShot", (entity) => {
     Bleeding_Objects.push(bloodObj);
 });
 mp.events.add("TwoSecondsEvent", () => {
+    mp.events.callRemote("RemoveIsDamaged");
     mp.players.forEachInStreamRange((entity) => {
         if(entity.getVariable("Bleeding_WasShot") == true && entity.dimension == mp.players.local.dimension){
             const groundZ = mp.game.gameplay.getGroundZFor3dCoord(entity.position.x, entity.position.y, entity.position.z, 0, false);

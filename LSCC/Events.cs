@@ -6886,8 +6886,6 @@ namespace RNC
 
             uint realWeapon = Convert.ToUInt32(weapon);
 
-            NAPI.Util.ConsoleOutput($"Weapon ID: {realWeapon} | Original ID: {weapon}");
-
             int playerTeam = player.GetSharedData<int>("Team");
             int targetTeam = target.GetSharedData<int>("Team");
             if(targetTeam != -1)

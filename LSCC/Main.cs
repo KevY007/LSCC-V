@@ -1662,6 +1662,9 @@ namespace RNC
                     seats = 8;
                     break;
 
+                case "omnis":
+                    seats = 2;
+                    break;
                 case "primo3":
                     seats = 4;
                     break;
@@ -1706,7 +1709,9 @@ namespace RNC
 	        {3218215474, "SNS Pistol"},
 	        {2285322324, "SNS Pistol MK2"},
 	        {3523564046, "Heavy Pistol"},
-	        {137902532, "Vintage Pistol"},
+            {2636060646, "Military Rifle"},
+            {3347935668, "Heavy Rifle"},
+            {137902532, "Vintage Pistol"},
 	        {1198879012, "Flare Gun"},
 	        {3696079510, "Marksman Pistol"},
 	        {3249783761, "Heavy Revolver"},
@@ -2476,9 +2481,9 @@ namespace RNC
                 .Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 1)
                 .Add(WeaponHash.Heavypistol, "https://assets.gm.miami/gtav/weapons/Heavy-pistol-icon.png", "Heavy Pistol", 60);
 
-            // 2636060646 - Heavy Rifle hash
+            // 3347935668 - Heavy Rifle hash
             new LoadoutData(0, "Rebel", 40, 60)
-                .Add((WeaponHash)2636060646, "https://assets.gm.miami/gtav/weapons/Heavy-rifle-icon.png", "Heavy Rifle", 100)
+                .Add((WeaponHash)3347935668, "https://assets.gm.miami/gtav/weapons/Heavy-rifle-icon.png", "Heavy Rifle", 100)
                 .Add(WeaponHash.Dbshotgun, "https://assets.gm.miami/gtav/weapons/Double-barrel-shotgun-icon.png", "Double-Barrel Shotgun", 6)
                 .Add(WeaponHash.CeramicPistol, "https://assets.gm.miami/gtav/weapons/Ceramic-pistol-icon.png", "Ceramic Pistol", 30);
 
