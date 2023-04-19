@@ -2237,8 +2237,36 @@ mp.events.add("changeRecoilSmooting", (value) => {
     recoil_smoothing = value;
 })
 
+var bulletLinesOn = false;
+var bulletLineData = [];
+
+mp.events.add('render', () => {
+    for(let i = 0 ; i < bulletLineData.length ; i++){
+        const line = bulletLineData[i];
+        if(!line.end || !line.start) continue;
+
+        if(line.hit === true)
+            mp.game.graphics.drawLine(line.start.x, line.start.y, line.start.z, line.end.x, line.end.y, line.end.z, 0, 255, 0, 200);
+        else
+            mp.game.graphics.drawLine(line.start.x, line.start.y, line.start.z, line.end.x, line.end.y, line.end.z, 255, 0, 0, 200);
+    }
+});
+mp.events.add('toggleBulletLines', (value) => {
+    bulletLinesOn = value;
+});
+mp.events.add('clearBulletLines', () => {
+    bulletLineData = [];
+})
+
 mp._events.add("playerWeaponShot", (targetPosition, targetEntity) => 
 {
+    if(bulletLinesOn === true){
+        const playerPosition = mp.players.local.getWorldPositionOfBone(mp.players.local.getBoneIndexByName("BONETAG_R_HAND"));  
+        if(targetEntity && targetEntity.type === 'player')
+            bulletLineData.push({start:playerPosition, end:targetPosition, hit:true});
+        else bulletLineData.push({start:playerPosition, end:targetPosition, hit:false});
+    }
+
     ShotStats.TotalFired++;
 
     let gunData = weaponData.find(w => Number(w.Hash) == mp.players.local.weapon);
