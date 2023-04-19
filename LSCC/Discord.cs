@@ -185,7 +185,8 @@ namespace RNC
                     return;
                 }
 
-                if (context.Channel.Name != "staff-bot")
+                // staff-bot channel id
+                if (context.Channel.Id != 717768143140814928)
                 {
                     // allow GM bot to write anywhere
                     if (context.Author.Id != 1027945798069133443 && context.Author.Id != 922461597866295397 && context.Author.Id != 253938879554387969
