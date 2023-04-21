@@ -5435,6 +5435,89 @@ namespace RNC
             });
         }
 
+        [RemoteEvent("Menu_OnBuyRank")]
+        public void OnMenuBuyRank(Player player, int packageID)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            int packagePrice = 0;
+            int donoLevel = 0;
+
+            switch (packageID)
+            {
+                case 1:
+                    packagePrice = 200;
+                    donoLevel = 1;
+                    break;
+                case 2:
+                    packagePrice = 500;
+                    donoLevel = 2;
+                    break;
+                case 3:
+                    packagePrice = 1000;
+                    donoLevel = 3;
+                    break;
+            }
+            if(EPlayer.GetAccount(player).DonatorPoints < packagePrice)
+            {
+                EPlayer.Error(player, "You don't have enough Diamond Points for this!");
+                return;
+            }
+            if (EPlayer.GetAccount(player).DonatorLevel >= donoLevel)
+            {
+                EPlayer.Error(player, "Your rank is already equal or higher than the one you're trying to purchase!");
+                return;
+            }
+
+            Account acc = EPlayer.GetAccount(player);
+            acc.DonatorPoints -= packagePrice;
+            switch (packageID)
+            {
+                case 1:
+                    //acc.DonatorPoints += 200;
+                    acc.Namechanges += 1;
+                    acc.DonatorLevel = 1;
+                    player.SetSharedData("Donator", acc.DonatorLevel);
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.Notify(player, $"Successfully purchased <strong>{EPlayer.GetDonatorLevelName(1)}</strong>!", "green", "", true, 5000);
+                        player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(1, true)));
+                    });
+
+                    EPlayer.UpdateMaxMenuItems(player);
+                    break;
+                case 2:
+                    //acc.DonatorPoints += 350;
+                    acc.Namechanges += 3;
+                    acc.DonatorLevel = 2;
+                    player.SetSharedData("Donator", acc.DonatorLevel);
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.Notify(player, $"Successfully purchased <strong>{EPlayer.GetDonatorLevelName(2)}</strong>!", "green", "", true, 5000);
+                        player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(2, true)));
+                    });
+
+                    EPlayer.UpdateMaxMenuItems(player);
+                    break;
+                case 3:
+                    //acc.DonatorPoints += 500;
+                    acc.Namechanges += 5;
+                    acc.DonatorLevel = 3;
+                    player.SetSharedData("Donator", acc.DonatorLevel);
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.Notify(player, $"Successfully purchased <strong>{EPlayer.GetDonatorLevelName(3)}</strong>!", "green", "", true, 5000);
+                        player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", EPlayer.GetDonatorLevelName(3, true)));
+                    });
+
+                    EPlayer.UpdateMaxMenuItems(player);
+                    break;
+            }
+            EPlayer.Save(player, false);
+        }
+
+
         [RemoteEvent("Menu_OnBuyNamechange")]
         public void OnMenuBuyNamechange(Player player, int packageID)
         {

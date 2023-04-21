@@ -1239,6 +1239,9 @@ mp.events.add("UpdateMenuItem", (id, owned) => {
 mp.events.add("menu_buyNamechange", (id) => {
     mp.events.callRemote("Menu_OnBuyNamechange", id);
 });
+mp.events.add("menu_buyRank", (id) => {
+    mp.events.callRemote("Menu_OnBuyRank", id);
+});
 mp.events.add("menu_buyItem", (id) => {
     mp.events.callRemote("Menu_RequestBuyItem", id);
 });
