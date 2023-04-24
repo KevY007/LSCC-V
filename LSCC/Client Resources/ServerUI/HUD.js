@@ -1836,28 +1836,39 @@ mp.events.add("render", () => {
         }
     }
 
-    if(!showReticule)
-    {
-        mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
-        customCrosshairOn = false;
-    }
-    if(isLockpicking == true || ActionMenuActive == true){
-        mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
-        customCrosshairOn = false;
-    }
-    if(customCrosshairOn == true){
-        if(!wasCustomCrosshairOn){
-            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);
-            wasCustomCrosshairOn = true;
+    if(!HideAllCrosshairs.AntiPeek){
+        if(!showReticule)
+        {
+            mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
+            customCrosshairOn = false;
         }
-        mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
+        if(isLockpicking == true || ActionMenuActive == true){
+            mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
+            customCrosshairOn = false;
+        }
+        if(customCrosshairOn == true){
+            if(!wasCustomCrosshairOn){
+                ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);
+                wasCustomCrosshairOn = true;
+            }
+            mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
+        }
+        else{
+            if(wasCustomCrosshairOn == true){
+                ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);
+                wasCustomCrosshairOn = false;
+            }
+        }
     }
     else{
+        mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
         if(wasCustomCrosshairOn == true){
             ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);
             wasCustomCrosshairOn = false;
+            customCrosshairOn = false;
         }
     }
+ 
 
     if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
     {       

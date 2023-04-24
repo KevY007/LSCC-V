@@ -90,6 +90,8 @@ var FPS_Calc = Date.now();
 
 var precisionPositionerActive = false;
 
+var HideAllCrosshairs = {AntiPeek:false};
+
 mp.players.local.Team = -1;
 mp.game.vehicle.defaultEngineBehaviour = false;
 mp.game.gameplay.enableMpDlcMaps(true);
@@ -134,6 +136,7 @@ require("./Player/SyncScripts/Aim");
 require("./Player/SyncScripts/Flashlight");
 require("./Player/SyncScripts/Laser");
 require('./Player/DamageIndicator/damage_indicator');
+require('./Player/DamageIndicator/anti_peek');
 require("./ServerUI/HUD.js");
 require("./ServerUI/Menu.js");
 require("./ServerUI/Logs.js");
