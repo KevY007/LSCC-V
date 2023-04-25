@@ -10,7 +10,7 @@
     var context = canvas.getContext("2d");
     function loadImage(
       api_key,
-      name,
+      playerId,
       url,
       event,
       identifier,
@@ -32,7 +32,8 @@
         //myHeaders.append("x-api-key", "$5$ETb9rZjvrYcc1bnE$uL7fDXteGtMd07cCsBYrBpsF/Wkp3nrisYmTVldqJg4@$5$ETb9rZjvrYcc1bnE");
 
         var formdata = new FormData();
-        formdata.append("image", blob, name);
+        formdata.append("playerId", playerId);
+        formdata.append("image", blob, `${Date.now()}.jpeg`);
 
         var requestOptions = {
           method: "POST",
