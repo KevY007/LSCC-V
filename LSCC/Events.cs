@@ -3512,10 +3512,11 @@ namespace RNC
 
             if (acc.RegisterDate.Year == 2000) acc.RegisterDate = DateTime.Now; // Year 2000 = it's not set.
 
-            if (acc.DiscordInfo == null || acc.DiscordInfo.Length < 4)
+            if (acc.DiscordCode == null || acc.DiscordCode == "-----")
             {
                 DiscordData _discordData = new DiscordData();
-                acc.DiscordInfo = NAPI.Util.ToJson(_discordData);
+                acc.DiscordID = "n/a";
+                acc.DiscordCode = _discordData.DiscordCode;
                 NAPI.Util.ConsoleOutput($"[DISCORD INTEGRATION] {player.Name}'s discord data was invalid, generating them new. This is a one time thing, unless discord data is deleted.");
             }
 
@@ -3720,8 +3721,7 @@ namespace RNC
                     EPlayer.GetAccount(player).LastSessionMins = 0.0;
 
                     EPlayer.Notify(player, Translate(player, "LOGIN_SUCCESS"), "green", "fas fa-check", false, 2000);
-                    DiscordData d = NAPI.Util.FromJson<DiscordData>(EPlayer.GetAccount(player).DiscordInfo);
-                    if (d.DiscordID == "n/a")
+                    if (EPlayer.GetAccount(player).DiscordID == "n/a")
                     {
                         EPlayer.Notify(player, Translate(player, "DISCORD_VERIFY_NOTIF"), "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
                         player.SendChatMessage(Translate(player, "RECOMMEND_VERIFY_CHAT"));
@@ -5732,8 +5732,7 @@ namespace RNC
 
             if (car.Model.Equals("superd")) // discord-exclusive car
             {
-                DiscordData d = NAPI.Util.FromJson<DiscordData>(acc.DiscordInfo);
-                if (d.DiscordID == "n/a")
+                if (EPlayer.GetAccount(player).DiscordID == "n/a")
                 {
                     EPlayer.Notify(player, Translate(player, "ERROR_LOCKED_DISCORD_VERIFY"), "red", "fas fa-lock", false, 4000, "bottomCenter", "replace");
                     return;
@@ -5908,8 +5907,7 @@ namespace RNC
 
             if(loadout.Name == "Negotiator")
             {
-                DiscordData d = NAPI.Util.FromJson<DiscordData>(acc.DiscordInfo);
-                if (d.DiscordID == "n/a")
+                if (EPlayer.GetAccount(player).DiscordID == "n/a")
                 {
                     EPlayer.Notify(player, Translate(player, "ERROR_LOCKED_DISCORD_VERIFY"), "red", "fas fa-lock", false, 4000, "bottomCenter", "replace");
                     return;
@@ -6735,7 +6733,9 @@ namespace RNC
                                     Password = newPass,
                                     Salt = salt,
                                     Username = username,
-                                    DiscordInfo = jsonDiscordData,
+                                    DiscordCode = _discordData.DiscordCode,
+                                    DiscordID = "n/a",
+                                    UsedDiscordPerks = false,
                                     ChallengeInfo = jsonChallengeData,
                                     AutoLogin = true,
                                     Admin = 0,
@@ -7349,8 +7349,7 @@ namespace RNC
             if (acc.MinutesPlayed == 0.0) acc.MinutesPlayed = 0.1;
             KDR = (double)acc.Kills / (double)acc.Deaths;
 
-            DiscordData _d = NAPI.Util.FromJson<DiscordData>(acc.DiscordInfo);
-            bool discordLinked = !_d.DiscordID.Equals("n/a");
+            bool discordLinked = !EPlayer.GetAccount(player).DiscordID.Equals("n/a");
 
             player.TriggerEvent("UpdateMenuStatsTab", acc.Email, EPlayer.GetAdminLevelName(acc.Admin, false), acc.Points, acc.DonatorPoints, EPlayer.GetDonatorLevelName(acc.DonatorLevel, false), acc.DerbyWins,
                 acc.Escapes, acc.Arrests, acc.Kills, acc.Deaths, KDR, (acc.MinutesPlayed / 60.0).ToString("N3"), acc.Warns, discordLinked);
@@ -8100,7 +8099,14 @@ namespace RNC
                     EPlayer.SetColor(player, new Color(168, 128, 8, 255));
                     player.Position = (Vector3)Settings.VectorJail[0];
                     player.Heading = (float)Settings.VectorJail[1];
-                    player.Dimension = 100 + Convert.ToUInt32(player.GetSharedData<int>("InLobby"));
+                    try
+                    {
+                        player.Dimension = 100 + Convert.ToUInt32(player.GetSharedData<int>("InLobby"));
+                    }
+                    catch
+                    {
+                        player.Dimension = 69420;
+                    }
                     EPlayer.Freeze(player, false);
                     player.SendChatMessage(Translate(player, "JAIL_REMINDER", acc.JailTime, acc.JailReason));
 

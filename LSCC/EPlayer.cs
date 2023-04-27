@@ -990,8 +990,7 @@ namespace RNC
 
             target.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} ({acc.SQL_ID}) at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
 
-            DiscordData _d = NAPI.Util.FromJson<DiscordData>(acc.DiscordInfo);
-            if (_d.DiscordID.Equals("n/a"))
+            if (EPlayer.GetAccount(target).DiscordID.Equals("n/a"))
             {
                 if (EPlayer.GetAccount(target) == acc)
                 {
@@ -1010,7 +1009,7 @@ namespace RNC
                 }
                 else
                 {
-                    target.SendChatMessage($"!{{#83ff75}}Discord account is linked! (UID:!{{#ffffff}}{_d.DiscordID}!{{#83ff75}})");
+                    target.SendChatMessage($"!{{#83ff75}}Discord account is linked! (UID:!{{#ffffff}}{EPlayer.GetAccount(target).DiscordID}!{{#83ff75}})");
                 }
             }
 

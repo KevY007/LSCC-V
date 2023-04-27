@@ -49,7 +49,7 @@ namespace RNC
 
             using (MainDatabase context = ContextFactory.CreateContext())
             {
-                Account _a = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.DiscordInfo.Contains(user.Id.ToString()));
+                Account _a = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.DiscordID == user.Id.ToString());
                 if (_a == null) return -1;
                 return _a.SQL_ID;
             }
@@ -507,25 +507,24 @@ namespace RNC
                     if (context.Author.Id != 922461597866295397 && context.Author.Id != 367360197900894209 && context.Author.Id != 253938879554387969
                         && context.Author.Id != 319893828142366720) return;
                     string[] args = context.Content.Split(' ');
-                    if (args.Count() >= 5)
+                    if (args.Count() >= 3)
                     {
                         using (MainDatabase dbcontext = ContextFactory.CreateContext())
                         {
                             string vName = args[1];
-                            string vCode = args[2];
-                            string vID = args[3];
+                            string vID = args[2];
                             Account _acc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(vName, StringComparison.OrdinalIgnoreCase));
-                            Account _check = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync<Account>(a => a.DiscordInfo.Contains($"\"DiscordID\":\"{vID}\""));
+                            Account _check = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync<Account>(a => a.DiscordID == vID);
 
                             if (_acc == null) return;
-                            DiscordData _d = NAPI.Util.FromJson<DiscordData>(_acc.DiscordInfo);
+                            DiscordData _d = new DiscordData();
 
                             bool giveDiscordPerks = false;
                             if (_d.UsedDiscordPerks == false) giveDiscordPerks = true;
 
                             if (!_d.DiscordID.Equals("n/a")) return; // if already verified just in case to return
 
-                            if (!_d.DiscordCode.Equals(vCode)) return;
+                            //if (!_d.DiscordCode.Equals(vCode)) return;
 
                             if (_check != null) return;
 
@@ -566,7 +565,8 @@ namespace RNC
 
                                                     EPlayer.UnlockAchievement(_p, "discord_verify");
 
-                                                    EPlayer.GetAccount(_p).DiscordInfo = verificationData;
+                                                    EPlayer.GetAccount(_p).DiscordID = vID;
+                                                    EPlayer.GetAccount(_p).UsedDiscordPerks = true;
                                                     EPlayer.Save(_p, true);
                                                 });
                                                 await context.DeleteAsync();
@@ -575,7 +575,8 @@ namespace RNC
                                         else
                                         {
                                             _p.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
-                                            EPlayer.GetAccount(_p).DiscordInfo = verificationData;
+                                            EPlayer.GetAccount(_p).DiscordID = vID;
+                                            EPlayer.GetAccount(_p).UsedDiscordPerks = true;
                                             EPlayer.Save(_p, true);
                                             _p.SendChatMessage(Translator.Translate(_p, "VERIFIED_OLD_MSG_1"));
                                             _p.SendChatMessage(Translator.Translate(_p, "VERIFIED_OLD_MSG_2"));
@@ -619,17 +620,14 @@ namespace RNC
                                 return;
                             }
 
-                            DiscordData _d = NAPI.Util.FromJson<DiscordData>(_acc.DiscordInfo);
-                            if (_d != null)
+                            if (_acc != null)
                             {
-                                if (_d.DiscordID.Equals("n/a"))
+                                if (_acc.DiscordID.Equals("n/a"))
                                 {
                                     await context.Channel.SendMessageAsync(":exclamation: **That account is not linked to any Discord account!**");
                                     return;
                                 }
 
-                                _d.DiscordID = "n/a";
-                                string verifyData = NAPI.Util.ToJson(_d);
 
                                 lock (Settings.LoggedInPlayers)
                                 {
@@ -639,7 +637,7 @@ namespace RNC
                                         if (player != null)
                                         {
                                             Logs.LogAdmin(aSQL, $"Unverified ${_acc.Username}'s Discord account.");
-                                            EPlayer.GetAccount(player).DiscordInfo = verifyData;
+                                            EPlayer.GetAccount(player).DiscordID = "n/a";
                                             EPlayer.Save(player, false);
                                             player.SendChatMessage(Translator.Translate(player, "UNVERIFIED_BY_ADMIN"));
 

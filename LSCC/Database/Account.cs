@@ -27,7 +27,9 @@ namespace RNC
         public string Username { get; set; }
         public string Password { get; set; }
         public string Salt { get; set; }
-        public string DiscordInfo { get; set; }
+        public string DiscordID { get; set; }
+        public string DiscordCode { get; set; }
+        public bool UsedDiscordPerks { get; set; }
         public string ChallengeInfo { get; set; }
         public DateTime RegisterDate { get; set; }
         public string RegisterHWID { get; set; }

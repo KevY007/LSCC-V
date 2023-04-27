@@ -662,8 +662,7 @@ namespace RNC
                 {
                     player.TriggerEvent("addAchievementsToMenu");
 
-                    DiscordData discordData = NAPI.Util.FromJson<DiscordData>(acc.DiscordInfo);
-                    if (discordData.DiscordID != "n/a")
+                    if (EPlayer.GetAccount(player).DiscordID != "n/a")
                     {
                         EPlayer.UnlockAchievement(player, "discord_verify");
                     }
@@ -2179,7 +2178,7 @@ namespace RNC
             /* ACHIEVEMENTS CREATION */
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the achievements...");
 
-            new Achievement("discord_verify", "Social Butterfly", "Link your Discord account to your RnC account. (/verify)", 0, 0, true);
+            new Achievement("discord_verify", "Social Butterfly", "Link your Discord account to your RnC account. (/link)", 0, 0, true);
             new Achievement("first_derby", "Derby Master?", "Win a round in the Derby mode.", 4, 3, true);
             new Achievement("first_kill", "First Kill", "Get your first kill in copchase.", 4, 2, true);
             new Achievement("first_escape", "You'll never catch me!", "Escape as a fugitive in copchase.", 5, 2, true);

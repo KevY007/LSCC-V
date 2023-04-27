@@ -808,8 +808,7 @@ namespace RNC
         [Command("verify", Alias = "link")]
         public void cmd_verify(Player player)
         {
-            DiscordData _d = NAPI.Util.FromJson<DiscordData>(EPlayer.GetAccount(player).DiscordInfo);
-            if (_d.DiscordID != "n/a")
+            if (EPlayer.GetAccount(player).DiscordID != "n/a")
             {
                 player.SendChatMessage(Translate(player, "ERROR_DISCORD_VERIFIED"));
                 return;
@@ -820,9 +819,9 @@ namespace RNC
             player.SendChatMessage(Translate(player, "DISCORD_VERIFY_HELP_3"));
             player.SendChatMessage(Translate(player, "DISCORD_VERIFY_HELP_4"));
             player.SendChatMessage(Translate(player, "DISCORD_VERIFY_HELP_5"));
-            player.SendChatMessage(Translate(player, "DISCORD_VERIFY_HELP_6", player.Name, _d.DiscordCode));
+            player.SendChatMessage(Translate(player, "DISCORD_VERIFY_HELP_6", player.Name, EPlayer.GetAccount(player).DiscordCode));
             player.SendChatMessage(" ");
-            player.SendChatMessage(Translate(player, "DISCORD_VERIFY_CODE", _d.DiscordCode));
+            player.SendChatMessage(Translate(player, "DISCORD_VERIFY_CODE", EPlayer.GetAccount(player).DiscordCode));
         }
 
         [Command("veh2", "!{#AFAFAF}[USAGE] veh2 (car model name) (optional: color 1) (optional: color 2)")]
@@ -1824,7 +1823,7 @@ namespace RNC
         [Command("takescreenshot", "!{#AFAFAF}[USAGE] takescreenshot (target)", Alias = "takess")]
         public void cmd_takescreenshot(Player player, Player target)
         {
-            if (!EPlayer.LoggedIn(player)) return;
+            if (!EPlayer.LoggedIn(player) || !EPlayer.LoggedIn(target)) return;
 
             if (EPlayer.GetAccount(player).Admin < 1) return;
 
@@ -1835,6 +1834,7 @@ namespace RNC
             }
 
 
+            target.SetSharedData("SQL_ID", EPlayer.GetAccount(target).SQL_ID);
             target.TriggerEvent("TakeScreenshot", 100, 100, player.GetSharedData<string>("ScreenshotServerAPI"), player.GetSharedData<int>("SQL_ID"));
             if (EPlayer.GetAccount(player).Admin < 5) EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has requested {target.Name}'s game screenshot.");
             player.SendChatMessage("!{#33C446}[>>] !{#FFFFFF}Screenshot taken, it is now being uploaded. The upload speed depends on the target.");
@@ -8255,7 +8255,9 @@ namespace RNC
                             Password = "[]",
                             Salt = "[]",
                             Username = $"leo_is_gay_{i}",
-                            DiscordInfo = "[]",
+                            DiscordID = "n/a",
+                            DiscordCode = "-----",
+                            UsedDiscordPerks = false,
                             ChallengeInfo = "[]",
                             AutoLogin = true,
                             Admin = 0,
