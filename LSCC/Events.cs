@@ -3515,7 +3515,7 @@ namespace RNC
             if (acc.DiscordCode == null || acc.DiscordCode == "-----")
             {
                 DiscordData _discordData = new DiscordData();
-                acc.DiscordID = "n/a";
+                acc.DiscordID = null;
                 acc.DiscordCode = _discordData.DiscordCode;
                 NAPI.Util.ConsoleOutput($"[DISCORD INTEGRATION] {player.Name}'s discord data was invalid, generating them new. This is a one time thing, unless discord data is deleted.");
             }
@@ -6734,7 +6734,7 @@ namespace RNC
                                     Salt = salt,
                                     Username = username,
                                     DiscordCode = _discordData.DiscordCode,
-                                    DiscordID = "n/a",
+                                    DiscordID = null,
                                     UsedDiscordPerks = false,
                                     ChallengeInfo = jsonChallengeData,
                                     AutoLogin = true,
