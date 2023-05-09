@@ -41,10 +41,17 @@ mp.events.add('render', () => {
         HideAllCrosshairs.AntiPeek = false;
         return;
     }
+    let weapCoord = mp.players.local.getWorldPositionOfBone(mp.players.local.getBoneIndexByName("BONETAG_R_HAND"));   
 
-    const weaponRaycast = RayCastGamePlayWeapon(weaponEntityIndex, 10.0, 1);
+    const weaponRaycast = RayCastGamePlayWeapon(weaponEntityIndex, 8.0, 1);
 
     if(!weaponRaycast){
+        HideAllCrosshairs.AntiPeek = false;
+        return;
+    }
+    const entityRaycast1 = mp.raycasting.testPointToPoint(weapCoord, weaponRaycast.position, mp.players.local, 4);
+    const entityRaycast2 = mp.raycasting.testPointToPoint(weapCoord, weaponRaycast.position, mp.players.local, 8);
+    if((entityRaycast1 && entityRaycast1.entity.type === 'player') || (entityRaycast2 && entityRaycast2.entity.type === 'player')){
         HideAllCrosshairs.AntiPeek = false;
         return;
     }
