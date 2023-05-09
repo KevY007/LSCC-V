@@ -1,13 +1,37 @@
 var Indicators = [];
 var SmartIndicators = [];
 
-function getIndicatorColorFromEntity(entity, damage){
+// TYPE: 0 = None | 1 = Broken | 2 = Armored
+
+function getIndicatorColorFromEntity(entity, damage, type = 0){
     var color = [0,0,0];
     if(entity.remoteId !== mp.players.local.remoteId){
         if(damage < 40)
-            color = [100, 255, 100, 255];
+        switch(type){
+            case 0: 
+                color = [100, 255, 100, 255];
+                break;
+            case 1:
+                color = [167, 100, 255, 255];
+                break;
+            case 2:
+                color = [100, 255, 201, 255];
+                break;
+
+        }
         else
-            color = [255, 200, 0, 255];
+            switch(type){
+                case 0:
+                    color = [255, 200, 0, 255];
+                    break;
+                case 1:
+                    color = [170, 59, 255, 255];
+                    break;
+                case 2:
+                    color = [0, 128, 255, 255];
+                    break;
+
+            }
     }
     else{
         if(damage > -40)
@@ -63,9 +87,9 @@ function showDamageIndicator(damage, is_me = false){
     });
 }
 
-mp.events.add("showDamageIndicatorOnPosition", (damage, entity, boneIdx) => {showDamageIndicatorOnPosition(damage, entity, boneIdx); });
+mp.events.add("showDamageIndicatorOnPosition", (damage, entity, boneIdx, type) => {showDamageIndicatorOnPosition(damage, entity, boneIdx, type); });
 
-function showDamageIndicatorOnPosition(damage, entity, boneIdx){
+function showDamageIndicatorOnPosition(damage, entity, boneIdx, type){
     if(!mp.storage.data.menu.ShowDamageIndicator) return;
     if(damage === 0) return;
     if(entity.getVariable("Invincible") === true) return;
@@ -74,7 +98,7 @@ function showDamageIndicatorOnPosition(damage, entity, boneIdx){
     if(!pos2d) return;
     
     SmartIndicators.push({
-        color:getIndicatorColorFromEntity(entity, damage),
+        color:getIndicatorColorFromEntity(entity, damage, type),
         entity:entity,
         boneIndex:boneIdx,
         position:[pos2d.x, pos2d.y],

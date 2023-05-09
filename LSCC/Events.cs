@@ -6987,21 +6987,28 @@ namespace RNC
             int dealerSQLID = player.GetSharedData<int>("SQL_ID");
 
 
+            int armorStatus = 0; // 0 = None | 1 = Broken | 2 = Armored
+
             if (targetArmour > damageToDeal)
             {
                 HPtoset = targetHealth;
                 ARtoset = targetArmour - damageToDeal;
+                armorStatus = 2;
             }
             else
             {
                 int diff = (damageToDeal - targetArmour);
+
+                if (targetArmour > 0) armorStatus = 1;
+                else armorStatus = 0;
+
                 ARtoset = 0;
                 HPtoset = targetHealth - diff;
             }
             if(damageToDeal > 0)
                 SetIsPlayerDamaged(target);
 
-            player.TriggerEvent("showDamageIndicatorOnPosition", damageToDeal, target, boneIndex);
+            player.TriggerEvent("showDamageIndicatorOnPosition", damageToDeal, target, boneIndex, armorStatus);
 
             if (ARtoset < 0) ARtoset = 0;
             if (HPtoset < 0)
