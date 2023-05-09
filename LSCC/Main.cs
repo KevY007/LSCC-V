@@ -3328,6 +3328,7 @@ namespace RNC
 
                     EPlayer.StopCarry(i);
 
+                    i.TriggerEvent("forceStopCuffing");
                     i.TriggerEvent("MDC:RemoveAllBlips");
                     i.TriggerEvent("ResetKillFeed");
                     i.SetSharedData("HeistLeader", false);

@@ -475,6 +475,14 @@ mp.events.add("BeginCuffing", (target) => {
         }
     }, 1000);
 });
+
+mp.events.add("forceStopCuffing", () => {
+    stopCuffing(69);
+    mp.events.callRemote("clear_anim");
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
+    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+});
+
 function stopCuffing(reason){ // if unsuccessful / force stopped
 
     disableSprint = false;
