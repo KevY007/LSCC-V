@@ -42,7 +42,7 @@ mp.events.add('render', () => {
         return;
     }
 
-    const weaponRaycast = RayCastGamePlayWeapon(weaponEntityIndex, 5.0, 1);
+    const weaponRaycast = RayCastGamePlayWeapon(weaponEntityIndex, 10.0, 1);
 
     if(!weaponRaycast){
         HideAllCrosshairs.AntiPeek = false;

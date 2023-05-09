@@ -4830,8 +4830,8 @@ namespace RNC
 
                                                 p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
 
-                                                p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
-                                                EPlayer.Freeze(p, true);
+                                                //p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
+                                                //EPlayer.Freeze(p, true);
 
                                                 p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
                                                 p.TriggerEvent("ToggleCollisionsForEnt", p.GetData<Vehicle>("ChaseVehicle"), false);
@@ -4853,8 +4853,8 @@ namespace RNC
 
                                                 p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
 
-                                                p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
-                                                EPlayer.Freeze(p, true);
+                                               // p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
+                                                //EPlayer.Freeze(p, true);
 
                                                 p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
                                                 p.SetSharedData("Collisions", false);
@@ -4928,7 +4928,7 @@ namespace RNC
                                                 }
                                                 p.TriggerEvent("stopLoadingScreen");
 
-                                                EPlayer.Freeze(p, false);
+                                                //EPlayer.Freeze(p, false);
                                                 p.TriggerEvent("ToggleCanExitVehicle", false);
                                             }
                                             catch { }
@@ -5007,7 +5007,7 @@ namespace RNC
                                                     });
 
                                                 }
-                                                EPlayer.Freeze(p, false);
+                                                //EPlayer.Freeze(p, false);
                                                 p.TriggerEvent("ToggleCanExitVehicle", false);
                                             }
                                             catch { }
@@ -5263,7 +5263,7 @@ namespace RNC
                                     {
                                         if (p != null)
                                         {
-                                            EPlayer.Freeze(p, false);
+                                            //EPlayer.Freeze(p, false);
                                             p.TriggerEvent("ToggleCanExitVehicle", false);
                                         }
                                     }

@@ -15,7 +15,7 @@ function getIndicatorColorFromEntity(entity, damage, type = 0){
                 color = [167, 100, 255, 255];
                 break;
             case 2:
-                color = [100, 255, 201, 255];
+                color = [0, 162, 255, 255];
                 break;
 
         }
