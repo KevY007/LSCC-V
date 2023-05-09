@@ -4881,7 +4881,7 @@ namespace RNC
                                                 p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
                                                 p.TriggerEvent("ToggleNametags", true);
 
-                                                p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
+                                                //p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
 
                                                 p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", true);
                                                 p.SetSharedData("Collisions", true);
@@ -4946,7 +4946,7 @@ namespace RNC
                                                 p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
                                                 p.TriggerEvent("ToggleNametags", true);
 
-                                                p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
+                                                //p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
 
                                                 p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", true);
                                                 p.SetSharedData("Collisions", true);
