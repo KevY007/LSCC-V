@@ -481,6 +481,7 @@ mp.events.add("forceStopCuffing", () => {
     mp.events.callRemote("clear_anim");
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+    mp.events.callLocal("StopPlayerActions");
 });
 
 function stopCuffing(reason){ // if unsuccessful / force stopped
