@@ -7349,17 +7349,26 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
             Account acc = EPlayer.GetAccount(player);
+            if (acc == null) return;
 
             double KDR = 0.0;
             if (acc.Kills == 0) acc.Kills = 1;
             if (acc.Deaths == 0) acc.Deaths = 1;
             if (acc.MinutesPlayed == 0.0) acc.MinutesPlayed = 0.1;
             KDR = (double)acc.Kills / (double)acc.Deaths;
+            try
+            {
+                bool discordLinked = !EPlayer.GetAccount(player).DiscordID.Equals("n/a");
 
-            bool discordLinked = !EPlayer.GetAccount(player).DiscordID.Equals("n/a");
-
-            player.TriggerEvent("UpdateMenuStatsTab", acc.Email, EPlayer.GetAdminLevelName(acc.Admin, false), acc.Points, acc.DonatorPoints, EPlayer.GetDonatorLevelName(acc.DonatorLevel, false), acc.DerbyWins,
-                acc.Escapes, acc.Arrests, acc.Kills, acc.Deaths, KDR, (acc.MinutesPlayed / 60.0).ToString("N3"), acc.Warns, discordLinked);
+                player.TriggerEvent("UpdateMenuStatsTab", acc.Email, EPlayer.GetAdminLevelName(acc.Admin, false), acc.Points, acc.DonatorPoints, EPlayer.GetDonatorLevelName(acc.DonatorLevel, false), acc.DerbyWins,
+                    acc.Escapes, acc.Arrests, acc.Kills, acc.Deaths, KDR, (acc.MinutesPlayed / 60.0).ToString("N3"), acc.Warns, discordLinked);
+            }
+            catch(Exception ex)
+            {
+                player.TriggerEvent("UpdateMenuStatsTab", acc.Email, EPlayer.GetAdminLevelName(acc.Admin, false), acc.Points, acc.DonatorPoints, EPlayer.GetDonatorLevelName(acc.DonatorLevel, false), acc.DerbyWins,
+                    acc.Escapes, acc.Arrests, acc.Kills, acc.Deaths, KDR, (acc.MinutesPlayed / 60.0).ToString("N3"), acc.Warns, false);
+                NAPI.Util.ConsoleOutput($"[REQUESTING STATS FOR TAB] Player: {player.Name} | Error: {ex.ToString()}");
+            }
         }
 
         [RemoteEvent("Menu_RequestBuyItem")]
