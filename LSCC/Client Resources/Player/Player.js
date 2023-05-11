@@ -2319,7 +2319,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         if(gunType !== "Shotguns"){
             let isCrouching = false, isAiming = false;
             if(mp.players.local.getStealthMovement() == true){
-                shakeValue = shakeValue/1.65; // slightly more accurate when crouching
+                shakeValue = shakeValue/2.25; // slightly more accurate when crouching
                 isCrouching = true;
             }
             if(mp.game.player.isFreeAiming() == true){ // if player is holding right click to aim
