@@ -2519,7 +2519,7 @@ namespace RNC
             new CarData(1, "Police Bike", "policeb", "package://Artwork/Vehicles/policeb.png", "Average", 3);
             new CarData(1, "Police Buffalo", "police2", "package://Artwork/Vehicles/police2.png", "Average", 5, 5);
             new CarData(1, "Sheriff Alamo", "polalamor", "package://Artwork/Vehicles/polalamor.png", "Slow", 6, 5);
-            new CarData(1, "Sheriff Bison", "polbisonr", "package://Artwork/Vehicles/polbisonf.png", "Slow", 6, 8);
+            new CarData(1, "Sheriff Bison", "polbisonr", "package://Artwork/Vehicles/polbisonr.png", "Slow", 6, 8);
             new CarData(1, "Police Bison", "polbisonf", "package://Artwork/Vehicles/polbisonf.png", "Average", 6, 10);
             new CarData(1, "Police Scout", "polscout", "package://Artwork/Vehicles/polscout.png", "Average+", 6, 10);
             new CarData(1, "Police Bike 2", "policeb1", "package://Artwork/Vehicles/policeb1.png", "Fast", 6, 15);
@@ -2574,6 +2574,7 @@ namespace RNC
             new CarData(0, "Blista Classic", "blista2", "package://Artwork/Vehicles/blista2.png", "Average", 10);
             new CarData(0, "Landroamer", "landroamer", "package://Artwork/Vehicles/landroamer.png", "Average+", 10, 5);
             new CarData(0, "Gang Burrito", "gburrito2", "package://Artwork/Vehicles/gburrito2.png", "Slow", 10, 5);
+            new CarData(0, "Fugitive", "fugitive", "package://Artwork/Vehicles/fugitive.png", "Average", 10, 10);
             new CarData(0, "Cheburek", "cheburek", "package://Artwork/Vehicles/cheburek.png", "Average", 15, 10);
             new CarData(0, "Exemplar", "exemplar", "package://Artwork/Vehicles/exemplar.png", "Average+", 17, 15);
             new CarData(0, "Chevrolet Impala SS '96", "impala", "package://Artwork/Vehicles/impala.png", "Average", 18, 30);
