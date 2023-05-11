@@ -221,8 +221,8 @@ mp.events.add('entityStreamIn', (entity) => {
 
     if(entity.type === 'vehicle'){
         if(entity.getVariable("Team") && mp.players.local.getVariable("Team")){
-            if(mp.players.local.getVariable("Team") == 1 || mp.players.local.getVariable("Team") == 2){
-                if(entity.getVariable("Team") == 1 || entity.getVariable("Team") == 2){
+            if(mp.players.local.getVariable("Team") == 1 || mp.players.local.getVariable("Team") == 0){
+                if(entity.getVariable("Team") == 1 || entity.getVariable("Team") == 0){
                     if(entity.getVariable("Team") !== mp.players.local.getVariable("Team")){
                         entity.setDoorsLockedForPlayer(mp.players.local, true);
                         entity.setDoorsLocked(3);

@@ -27,6 +27,7 @@ function RayCastGamePlayWeapon(weapon, distance, flag){
 }
 
 mp.events.add('render', () => {
+    if(mp.players.local.getVariable("Team") != 0 && mp.players.local.getVariable("Team") != 1) return;
     if(mp.players.local.weapon === 2725352035){
         HideAllCrosshairs.AntiPeek = false;
         return;

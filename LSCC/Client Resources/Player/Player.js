@@ -2317,11 +2317,18 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         }
 
         if(gunType !== "Shotguns"){
+            let isCrouching = false, isAiming = false;
             if(mp.players.local.getStealthMovement() == true){
                 shakeValue = shakeValue/1.65; // slightly more accurate when crouching
+                isCrouching = true;
             }
             if(mp.game.player.isFreeAiming() == true){ // if player is holding right click to aim
                 shakeValue = shakeValue/3.5; // more accurate when holding right click
+                isAiming = true;
+            }
+
+            if(!isAiming && !isCrouching){
+                shakeValue = shakeValue * 4;
             }
         }
         else{
@@ -2332,7 +2339,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
     
 
         if((Date.now() - recoil_LastShotTime < 350) && gunType === "Handguns"){
-            shakeValue = shakeValue * 1.45;
+            shakeValue = shakeValue * 1.75;
         }
 
         recoil_ShotsInBurst++;

@@ -1954,7 +1954,7 @@ namespace RNC
             {
                 if (points > 0)
                     EPlayer.ScreenNotify(player, $"~g~+{points} Points");
-                else EPlayer.ScreenNotify(player, $"~r~-{points} Points");
+                else EPlayer.ScreenNotify(player, $"~r~{points} Points");
                 EPlayer.GetAccount(player).Points += points;
                 player.SetSharedData("Points", EPlayer.GetAccount(player).Points);
                 EPlayer.Save(player);
@@ -2167,7 +2167,7 @@ namespace RNC
 
                 if(xp > 0)
                     EPlayer.ScreenNotify(player, $"~g~+{xp} XP");
-                else EPlayer.ScreenNotify(player, $"~r~-{xp} XP");
+                else EPlayer.ScreenNotify(player, $"~r~{xp} XP");
 
                 Account acc = EPlayer.GetAccount(player);
                 acc.XP += xp;
