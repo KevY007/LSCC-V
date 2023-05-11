@@ -1125,6 +1125,8 @@ namespace RNC
 
         public static string GetPrefix(Player player, bool color = true)
         {
+            if (player.GetSharedData<bool>("FakeNameOn")) return "~w~Player";
+
             string toReturn = "";
             Account acc = EPlayer.GetAccount(player);
             if(acc.Admin >= 1 && player.GetData<bool>("Anonymous") == false)
@@ -1782,21 +1784,21 @@ namespace RNC
 
         public static string GetAdminName(Player player)
         {
-            return ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "ANONYMOUS" : player.Name);
+            return ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "ANONYMOUS" : EPlayer.Name(player));
         }
 
         public static void Action(Player player, string message_code, params object[] args)
         {           
             foreach (Player playa in NAPI.Player.GetPlayersInRadiusOfPlayer(40, player))
             {
-                var msg = "!{#C3A3DB}* " + player.Name + " " + Translator.Translate(playa, message_code, args);
+                var msg = "!{#C3A3DB}* " + EPlayer.Name(player) + " " + Translator.Translate(playa, message_code, args);
 
                 if (player.Dimension == playa.Dimension) playa.SendChatMessage(msg);
             }
         }
         public static void ActionEx(Player player, string message)
         {
-            var msg = "!{#C3A3DB}* " + player.Name + " " + message;
+            var msg = "!{#C3A3DB}* " + EPlayer.Name(player) + " " + message;
             foreach (Player playa in NAPI.Player.GetPlayersInRadiusOfPlayer(40, player))
             {
                 if (player.Dimension == playa.Dimension) playa.SendChatMessage(msg);
@@ -2220,8 +2222,8 @@ namespace RNC
                 {
                     RAGE.Entities.Players.All.ForEach((Player pl) =>
                     {
-                        if (lvlDiff > 1) pl.SendChatMessage(Translate(pl, "LEVEL_UP_MULTIPLE", player.Name, lvlDiff, acc.Level));
-                        else pl.SendChatMessage(Translate(pl, "LEVEL_UP_ONE", player.Name, acc.Level));
+                        if (lvlDiff > 1) pl.SendChatMessage(Translate(pl, "LEVEL_UP_MULTIPLE", EPlayer.Name(player), lvlDiff, acc.Level));
+                        else pl.SendChatMessage(Translate(pl, "LEVEL_UP_ONE", EPlayer.Name(player), acc.Level));
                     });
                     EPlayer.Notify(player, Translate(player, "LEVEL_UP_MSG", acc.Level), "green", "fas fa-check", false, 1500, "bottomRight", "replace");
 
@@ -2232,8 +2234,8 @@ namespace RNC
                 {
                     RAGE.Entities.Players.All.ForEach((Player pl) =>
                     {
-                        if (lvlDiff > 1) pl.SendChatMessage(Translate(pl, "LEVEL_DOWN_MULTIPLE", player.Name, lvlDiff, acc.Level));
-                        else pl.SendChatMessage(Translate(pl, "LEVEL_DOWN_ONE", player.Name, acc.Level));
+                        if (lvlDiff > 1) pl.SendChatMessage(Translate(pl, "LEVEL_DOWN_MULTIPLE", EPlayer.Name(player), lvlDiff, acc.Level));
+                        else pl.SendChatMessage(Translate(pl, "LEVEL_DOWN_ONE", EPlayer.Name(player), acc.Level));
                     });
                     EPlayer.Notify(player, Translate(player, "LEVEL_DOWN_MSG", acc.Level), "red", "fas fa-check", false, 1500, "bottomRight", "replace");
 
@@ -2492,7 +2494,7 @@ namespace RNC
 
                     foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == LobbyToBeIn))
                     {
-                        targ.SendChatMessage(Translate(targ, "JOINED_LOBBY_MSG", LobbyToBeIn, player.Name));
+                        targ.SendChatMessage(Translate(targ, "JOINED_LOBBY_MSG", LobbyToBeIn, EPlayer.Name(player)));
                     }
                 }
 

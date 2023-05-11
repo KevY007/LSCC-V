@@ -66,7 +66,7 @@ namespace RNC
                 {
                     if (reason == "AFK")
                     {
-                        EPlayer.SendMessageToAll("MSGALL_AFK_KICKED", player.Name);
+                        EPlayer.SendMessageToAll("MSGALL_AFK_KICKED", EPlayer.Name(player));
                         player.KickSilent(reason);
                         return;
                     }
@@ -425,7 +425,7 @@ namespace RNC
                                     }
                                     foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
                                     {
-                                        ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), $"Downed {reasonStr}", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                        ay.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), $"Downed {reasonStr}", EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)));
                                     }
 
                                     int killStreak = killer.GetData<int>("Killstreak") + 1;
@@ -435,7 +435,7 @@ namespace RNC
                                     if (killStreak % 4 == 0 && killStreak >= 4 && (lobby.Cops.Contains(killer) || lobby.Fugitives.Contains(killer)))
                                     {
                                         EPlayer.GrantXP(killer, 5);
-                                        EPlayer.SendMessageInLobby(lobby.lobbyId, "KILLSTREAK_LOBBY_MSG", killer.Name, killStreak);
+                                        EPlayer.SendMessageInLobby(lobby.lobbyId, "KILLSTREAK_LOBBY_MSG", EPlayer.Name(killer), killStreak);
 
                                         killer.SendChatMessage(Translate(killer, "KILLSTREAK_5XP"));
                                         EPlayer.GivePoints(killer, 5);
@@ -1786,7 +1786,7 @@ namespace RNC
                                 EPlayer.GetAccount(clanMember).ClanID = -1;
                                 EPlayer.GetAccount(clanMember).ClanTier = -1;
                                 EPlayer.Save(clanMember, false);
-                                EPlayer.Notify(clanMember, Translate(clanMember, "CLAN_DISBANDED", player.Name), "yellow", "", false, 3000);
+                                EPlayer.Notify(clanMember, Translate(clanMember, "CLAN_DISBANDED", EPlayer.Name(player)), "yellow", "", false, 3000);
 
                                 clanMember.TriggerEvent("UpdateMenuClanTab");
 
@@ -1797,7 +1797,7 @@ namespace RNC
                         {
                             foreach (Player clanMember in Settings.LoggedInPlayers.Where(pl => pl.HasSharedData("ClanID") && pl.GetSharedData<int>("ClanID") == clanToSee))
                             {
-                                EPlayer.Notify(clanMember, Translate(clanMember, "CLAN_LEFT_PLAYER", player.Name), "yellow", "", false, 3000);
+                                EPlayer.Notify(clanMember, Translate(clanMember, "CLAN_LEFT_PLAYER", EPlayer.Name(player)), "yellow", "", false, 3000);
                             }
                         }
                
@@ -2024,7 +2024,7 @@ namespace RNC
 
                         foreach (Player pl in Settings.LoggedInPlayers.Where(p => EPlayer.GetAccount(p).ClanID == clanID))
                         {
-                            EPlayer.Notify(pl, Translate(pl, "CLAN_JOIN_PLAYER", player.Name), "green", "", false, 3000);
+                            EPlayer.Notify(pl, Translate(pl, "CLAN_JOIN_PLAYER", EPlayer.Name(player)), "green", "", false, 3000);
                         }
                     });
                 }
@@ -2351,7 +2351,7 @@ namespace RNC
                         {
                             foreach (Player f in l.Fugitives)
                             {
-                                f.SendChatMessage(Translate(f, "BANKROB_RADIO_TAKE_COP_CAR", player.Name));
+                                f.SendChatMessage(Translate(f, "BANKROB_RADIO_TAKE_COP_CAR", EPlayer.Name(player)));
                             }
                             Events.BankRobbery_SetState(player, 2);
                         }
@@ -2537,9 +2537,9 @@ namespace RNC
 
                                         foreach (Player f in lobby.Fugitives)
                                         {
-                                            f.SendChatMessage(Translate(f, "HEIST_LEADER_DISCONNECT", _brob.HeistLeader.Name));
+                                            f.SendChatMessage(Translate(f, "HEIST_LEADER_DISCONNECT", EPlayer.Name(_brob.HeistLeader)));
 
-                                            f.SendChatMessage(Translate(f, "NEW_HEIST_LEADER_RADIO", _brob.HeistLeader.Name, player.Name));
+                                            f.SendChatMessage(Translate(f, "NEW_HEIST_LEADER_RADIO", EPlayer.Name(_brob.HeistLeader), EPlayer.Name(player)));
                                         }
                                         _brob.HeistLeader.SendChatMessage(Translate(_brob.HeistLeader, "NEW_HEIST_LEADER_MSG"));
                                     }
@@ -2611,11 +2611,11 @@ namespace RNC
                         switch (type)
                         {
                             case DisconnectionType.Left:
-                                EPlayer.SendMessageToAll("PLAYER_LEAVE", player.Name);
+                                EPlayer.SendMessageToAll("PLAYER_LEAVE", EPlayer.Name(player));
                                 break;
 
                             case DisconnectionType.Timeout:
-                                EPlayer.SendMessageToAll("PLAYER_CRASH", player.Name);
+                                EPlayer.SendMessageToAll("PLAYER_CRASH", EPlayer.Name(player));
                                 break;
                         }
 
@@ -2658,12 +2658,12 @@ namespace RNC
             if (target == null) return;
             EPlayer.CarryPlayer(player, target);
 
-            player.SendChatMessage(Translate(player, "CARRYING_PLAYER", target.Name));
+            player.SendChatMessage(Translate(player, "CARRYING_PLAYER", EPlayer.Name(target)));
             player.SendChatMessage(Translate(player, "CARRYING_PLAYER_WARNING"));
 
-            target.SendChatMessage(Translate(target, "BEING_CARRIED", player.Name));
+            target.SendChatMessage(Translate(target, "BEING_CARRIED", EPlayer.Name(player)));
 
-            EPlayer.Action(player, "ACTION_CARRY", target.Name);
+            EPlayer.Action(player, "ACTION_CARRY", EPlayer.Name(target));
         }
         [RemoteEvent("RequestStopCarryPlayer")]
         public static void OnRequestStopCarryPlayer(Player player)
@@ -2675,7 +2675,7 @@ namespace RNC
 
             EPlayer.StopCarry(player);
 
-            EPlayer.Action(player, "ACTION_STOP_CARRY", target.Name);
+            EPlayer.Action(player, "ACTION_STOP_CARRY", EPlayer.Name(target));
             player.SendChatMessage(Translate(player, "STOP_CARRY"));
             target.SendChatMessage(Translate(target, "STOP_BEING_CARRIED"));
         }
@@ -2741,7 +2741,7 @@ namespace RNC
                     {
                         foreach (Player inderby in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
                         {
-                            inderby.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell down");
+                            inderby.TriggerEvent("pushToKillFeed2", EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell down");
                         }
                     }
                     player.SetSharedData("DerbyTime", 0);
@@ -2765,11 +2765,11 @@ namespace RNC
                                 {
                                     if (reasonStr == null)
                                     {
-                                        indm.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell");
+                                        indm.TriggerEvent("pushToKillFeed2", EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell");
                                     }
                                     else
                                     {
-                                        indm.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                        indm.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)));
                                     }
                                 }
                                 EPlayer.GetAccount(killer).Kills++;
@@ -2827,7 +2827,7 @@ namespace RNC
                                         EPlayer.GrantXP(killer, xpReduce);
                                         RAGE.Entities.Players.All.ForEach((Player ey) =>
                                         {
-                                            ey.SendChatMessage(Translate(ey, "REDUCE_XP_KILL_FUGI", killer.Name, xpReduce));
+                                            ey.SendChatMessage(Translate(ey, "REDUCE_XP_KILL_FUGI", EPlayer.Name(killer), xpReduce));
                                         });
 
                                         killer.SetSharedData("FugitiveChance", killer.GetSharedData<float>("FugitiveChance") - 1.0);
@@ -2889,7 +2889,7 @@ namespace RNC
                                     EPlayer.GrantXP(killer, xpReduce);
                                     RAGE.Entities.Players.All.ForEach((Player ey) =>
                                     {
-                                        ey.SendChatMessage(Translate(ey, "REDUCE_XP_KILL_TEAM", killer.Name, xpReduce));
+                                        ey.SendChatMessage(Translate(ey, "REDUCE_XP_KILL_TEAM", EPlayer.Name(killer), xpReduce));
                                     });
 
                                     warnings = 0;
@@ -2957,7 +2957,7 @@ namespace RNC
                                     if (killStreak % 4 == 0 && killStreak >= 4 && (lobby.Cops.Contains(killer) || lobby.Fugitives.Contains(killer)))
                                     {
                                         EPlayer.GrantXP(killer, 3);
-                                        EPlayer.SendMessageInLobby(lobby.lobbyId, "KILLSTREAK_LOBBY_MSG", killer.Name, killStreak);
+                                        EPlayer.SendMessageInLobby(lobby.lobbyId, "KILLSTREAK_LOBBY_MSG", EPlayer.Name(killer), killStreak);
 
                                         killer.SendChatMessage(Translate(killer, "KILLSTREAK_3XP"));
                                         EPlayer.GivePoints(killer, 3);
@@ -2992,30 +2992,30 @@ namespace RNC
                                         {
                                             if (reasonStr == null)
                                             {
-                                                ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Killed", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                                ay.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), "Killed", EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)));
                                             }
                                             else
                                             {
                                                 if (reason == 696988)
                                                 {
-                                                    ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Arrested", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                                    ay.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), "Arrested", EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)));
                                                 }
                                                 else if (reason == 696989)
                                                 {
-                                                    ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Busted", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                                    ay.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), "Busted", EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)));
                                                 }
-                                                else ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                                else ay.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)));
                                             }
                                         }
                                         else
                                         {
                                             if (reasonStr == null)
                                             {
-                                                ay.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell");
+                                                ay.TriggerEvent("pushToKillFeed2", EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell");
                                             }
                                             else
                                             {
-                                                ay.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), reasonStr);
+                                                ay.TriggerEvent("pushToKillFeed2", EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), reasonStr);
                                             }
                                         }
                                     }
@@ -3043,7 +3043,7 @@ namespace RNC
                                                 killer.SendChatMessage(Translate(killer, "KILLED_HEIST_LEADER_BONUS"));
                                                 foreach (Player c in lobby.Cops)
                                                 {
-                                                    c.SendChatMessage(Translate(c, "KILLED_HEIST_LEADER", killer.Name));
+                                                    c.SendChatMessage(Translate(c, "KILLED_HEIST_LEADER", EPlayer.Name(killer)));
                                                 }
                                                 EPlayer.GrantXP(killer, 2);
                                             }
@@ -3081,9 +3081,9 @@ namespace RNC
 
                                     foreach (Player f in lobby.Fugitives)
                                     {
-                                        f.SendChatMessage(Translate(f, "HEIST_LEADER_DEATH", _brob.HeistLeader.Name));
+                                        f.SendChatMessage(Translate(f, "HEIST_LEADER_DEATH", EPlayer.Name(_brob.HeistLeader)));
 
-                                        f.SendChatMessage(Translate(f, "NEW_HEIST_LEADER_RADIO", _brob.HeistLeader.Name, player.Name));
+                                        f.SendChatMessage(Translate(f, "NEW_HEIST_LEADER_RADIO", EPlayer.Name(_brob.HeistLeader), EPlayer.Name(player)));
                                     }
                                     _brob.HeistLeader.SendChatMessage(Translate(_brob.HeistLeader, "NEW_HEIST_LEADER_MSG"));
                                 }
@@ -3106,22 +3106,22 @@ namespace RNC
                                         {
                                             if (reasonStr == null)
                                             {
-                                                ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), "Killed", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                                ay.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), "Killed", EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)));
                                             }
                                             else
                                             {
-                                                ay.TriggerEvent("pushToKillFeed", killer.Name, EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)));
+                                                ay.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)));
                                             }
                                         }
                                         else
                                         {
                                             if (reasonStr == null)
                                             {
-                                                ay.TriggerEvent("pushToKillFeed2", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell");
+                                                ay.TriggerEvent("pushToKillFeed2", EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), "Fell");
                                             }
                                             else
                                             {
-                                                ay.TriggerEvent("pushToKillFee2d", player.Name, EPlayer.HexConverter(EPlayer.GetColor(player)), reasonStr);
+                                                ay.TriggerEvent("pushToKillFee2d", EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), reasonStr);
                                             }
                                         }
                                     }
@@ -3210,7 +3210,7 @@ namespace RNC
 
             if (player.GetSharedData<bool>("AutoOOC") == false)
             {
-                string chatStr = $"{player.Name.Replace("_", " ")} says: {message}";
+                string chatStr = $"{EPlayer.Name(player).Replace("_", " ")} says: {message}";
                 foreach (Player i in RAGE.Entities.Players.All)
                 {
                     if (i.Dimension == player.Dimension)
@@ -4313,7 +4313,7 @@ namespace RNC
                         {
                             foreach (Player f in lobby.Fugitives)
                             {
-                                f.SendChatMessage(Translate(f, "BANK_ROB_CASH_TAKEN", lobby.BankRobbery.HeistLeader.Name));
+                                f.SendChatMessage(Translate(f, "BANK_ROB_CASH_TAKEN", EPlayer.Name(lobby.BankRobbery.HeistLeader)));
                                 f.SendChatMessage(Translate(f, "BANK_ROB_ESCORT_1"));
                                 f.SendChatMessage(Translate(f, "BANK_ROB_ESCORT_2", BankRobberyData.HideoutNames[lobby.BankRobbery.Hideout]));
 
@@ -4375,7 +4375,7 @@ namespace RNC
                             foreach (Player f in lobby.Fugitives)
                             {
                                 f.TriggerEvent("playerCreateWaypoint", hp);
-                                f.SendChatMessage(Translate(f, "BANK_ROB_CAR_RADIO", lobby.BankRobbery.HeistLeader.Name));
+                                f.SendChatMessage(Translate(f, "BANK_ROB_CAR_RADIO", EPlayer.Name(lobby.BankRobbery.HeistLeader)));
                                 if (f.IsInVehicle && f.Vehicle.Occupants.Contains(lobby.BankRobbery.HeistLeader))
                                 {
                                     f.SendChatMessage(Translate(f, "BANK_ROB_CAR_1"));                               
@@ -5301,7 +5301,7 @@ namespace RNC
                 EPlayer.Error(player, "That player is not in your lobby!");
                 return;
             }
-            EPlayer.Notify(player, $"Kicked player <strong>{target.Name}</strong> from the lobby.", "green", "fa-success", false, 3000);
+            EPlayer.Notify(player, $"Kicked player <strong>{EPlayer.Name(target)}</strong> from the lobby.", "green", "fa-success", false, 3000);
 
             target.SetSharedData("InLobby", 1);
             EPlayer.Spawn(target, true);
@@ -6595,7 +6595,7 @@ namespace RNC
                 NAPI.Task.Run(() => Commands.cmd_switchseats(newDriver, player), 500 + newDriver.Ping);
 
                 player.SendChatMessage(Translate(player, "PLAYER_DRIVER_AFK"));
-                newDriver.SendChatMessage(Translate(newDriver, "DRIVER_AFK_NEW", player.Name));
+                newDriver.SendChatMessage(Translate(newDriver, "DRIVER_AFK_NEW", EPlayer.Name(player)));
             }
             catch { }
         }
@@ -7259,14 +7259,14 @@ namespace RNC
 
                     EPlayer.GrantXP(assist, 5);
                     EPlayer.GetAccount(assist).Arrests++;
-                    assist.SendNotification("~g~+5 XP for helping bust " + fugitive.Name);
+                    assist.SendNotification("~g~+5 XP for helping bust " + EPlayer.Name(fugitive));
                 }
 
                 EPlayer.GrantXP(cop, 7);
                 EPlayer.GetAccount(cop).Arrests++;
-                cop.SendNotification("~g~+7 XP for busting " + fugitive.Name);
+                cop.SendNotification("~g~+7 XP for busting " + EPlayer.Name(fugitive));
 
-                EPlayer.SendMessageInLobby(lobby.lobbyId, "LOBBY_FUGITIVE_BUSTED", fugitive.Name);
+                EPlayer.SendMessageInLobby(lobby.lobbyId, "LOBBY_FUGITIVE_BUSTED", EPlayer.Name(fugitive));
 
                 Events.OnPlayerDeath(fugitive, cop, 696989); // Reason 696989 = handcuffs/busted (fast respawn).
             }
@@ -7284,7 +7284,7 @@ namespace RNC
             
             //target.StopAnimation();
             RequestPlayAnimation(target, "amb@world_human_push_ups@male@exit", "exit", 0, 9);
-            NAPI.Util.ConsoleOutput("OnRevivePlayer " + player.Name + " " + target.Name);
+            NAPI.Util.ConsoleOutput("OnRevivePlayer " + EPlayer.Name(player) + " " + EPlayer.Name(target));
             NAPI.Task.Run(() =>
             {
                 try
@@ -7301,8 +7301,8 @@ namespace RNC
             target.SetSharedData("Wounded", 0);
             target.TriggerEvent("ResetWounded");
 
-            player.SendChatMessage(Translate(player, "REVIVED_PLAYER_REWARD", target.Name));
-            target.SendChatMessage(Translate(target, "REVIVED_BY_PLAYER", player.Name));
+            player.SendChatMessage(Translate(player, "REVIVED_PLAYER_REWARD", EPlayer.Name(target)));
+            target.SendChatMessage(Translate(target, "REVIVED_BY_PLAYER", EPlayer.Name(player)));
 
             EPlayer.GrantXP(player, 2);
             EPlayer.GivePoints(player, 1);
@@ -7336,8 +7336,8 @@ namespace RNC
             player.SetSharedData("ReviveTarget", target.Name);
             target.SetSharedData("BeingRevived", false);
 
-            player.SendChatMessage(Translate(player, "BEGIN_REVIVING", target.Name));
-            target.SendChatMessage(Translate(target, "BEGIN_GETTING_REVIVED", player.Name));
+            player.SendChatMessage(Translate(player, "BEGIN_REVIVING", EPlayer.Name(target)));
+            target.SendChatMessage(Translate(target, "BEGIN_GETTING_REVIVED", EPlayer.Name(player)));
 
             RequestPlayAnimation(player, "missheistfbi3b_ig8_2", "cpr_loop_paramedic", 1);
             player.TriggerEvent("BeginReviving");
@@ -7507,8 +7507,8 @@ namespace RNC
             if (target == null) return;
 
             player.TriggerEvent("BeginCuffing", target);
-            player.SendChatMessage(Translate(player, "HANDCUFF_BEGIN", target.Name));
-            EPlayer.Action(player, "ACTION_HANDCUFF", target.Name);
+            player.SendChatMessage(Translate(player, "HANDCUFF_BEGIN", EPlayer.Name(target)));
+            EPlayer.Action(player, "ACTION_HANDCUFF", EPlayer.Name(target));
 
             Events.RequestPlayAnimation(player, "mp_arresting", "a_uncuff", 50); // 50 = allow movement while anim
             target.SetSharedData("CuffedBy", player.Name);
@@ -7618,9 +7618,9 @@ namespace RNC
             Events.RequestClearAnimation(player);
             EPlayer.GrantXP(player, 5);
             player.SetSharedData("FugitiveChance", player.GetSharedData<float>("FugitiveChance") + (0.2 * (double)((double)EPlayer.GetAccount(player).DonatorLevel + 1.0)));
-            EPlayer.Action(player, $"has grabbed ahold of {target.Name} and slapped the handcuffs on their wrists.");
+            EPlayer.ActionEx(player, $"has grabbed ahold of {EPlayer.Name(target)} and slapped the handcuffs on their wrists.");
 
-            EPlayer.SendMessageInLobby(lobbye.lobbyId, "LOBBY_FUGITIVE_ARRESTED", player.Name, target.Name);
+            EPlayer.SendMessageInLobby(lobbye.lobbyId, "LOBBY_FUGITIVE_ARRESTED", EPlayer.Name(player), EPlayer.Name(target));
 
             EPlayer.UnlockAchievement(player, "first_arrest");
             EPlayer.TryAdvanceChallenge(player, Challenge.ChallengeType.Arrest, "N/A");

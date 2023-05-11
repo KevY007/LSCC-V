@@ -17,7 +17,6 @@ using Newtonsoft.Json.Converters;
 using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-//using GTANetworkMethods;
 
 namespace RNC
 {
@@ -3118,7 +3117,7 @@ namespace RNC
                     }
                     else
                     {
-                        player.SendChatMessage(Translate(player, "DERBY_WINNER", winner.Name, winXP));
+                        player.SendChatMessage(Translate(player, "DERBY_WINNER", EPlayer.Name(winner), winXP));
                     }
                 }
 
@@ -4058,7 +4057,7 @@ namespace RNC
 
                                                         PutInsideCar.Add(mem);
                                                         hasClanPartnering = true;
-                                                        mem.SendChatMessage(Translate(mem, "CLAN_PAIRING", player.Name));
+                                                        mem.SendChatMessage(Translate(mem, "CLAN_PAIRING", EPlayer.Name(player)));
 
                                                         seat++;
                                                     }
@@ -4091,7 +4090,7 @@ namespace RNC
                                                             }
 
                                                             PutInsideCar.Add(mem);
-                                                            mem.SendChatMessage(Translate(mem, "SQUAD_PAIRING", player.Name));
+                                                            mem.SendChatMessage(Translate(mem, "SQUAD_PAIRING", EPlayer.Name(player)));
 
                                                             seat++;
                                                         }
@@ -4748,7 +4747,7 @@ namespace RNC
                                                     else if (p == _brob.Sniper)
                                                     {
                                                         p.SendChatMessage(Translate(p, "SELECTED_AS_SNIPER"));
-                                                        p.SendChatMessage(Translate(p, "START_BROB_SNIPER_1", _brob.HeistLeader.Name));
+                                                        p.SendChatMessage(Translate(p, "START_BROB_SNIPER_1", EPlayer.Name(_brob.HeistLeader)));
                                                         p.SendChatMessage(Translate(p, "START_BROB_SNIPER_2"));
                                                         p.SendChatMessage(Translate(p, "START_BROB_SNIPER_3"));
                                                         p.SendChatMessage(Translate(p, "START_BROB_SNIPER_4"));
@@ -4759,7 +4758,7 @@ namespace RNC
                                                     }
                                                     else
                                                     {
-                                                        p.SendChatMessage(Translate(p, "START_BROB_NORMAL_1", _brob.HeistLeader.Name));
+                                                        p.SendChatMessage(Translate(p, "START_BROB_NORMAL_1", EPlayer.Name(_brob.HeistLeader)));
                                                         p.SendChatMessage(Translate(p, "START_BROB_NORMAL_2"));
                                                         p.SendChatMessage(Translate(p, "START_BROB_NORMAL_3"));
                                                         p.SendChatMessage(Translate(p, "START_BROB_NORMAL_4"));

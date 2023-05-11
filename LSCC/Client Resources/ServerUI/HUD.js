@@ -1585,8 +1585,14 @@ function updatePlayers()
         squad = -1;
 
         let nameToDisplay = sb.name;
-        if(sb.getVariable("FakeNameOn") === true && sb.getVariable("FakeName") && sb.getVariable("FakeName").length > 0)
-                        nameToDisplay = sb.getVariable("FakeName");
+        let pingToDisplay = sb.getVariable("Ping");
+        let levelToDisplay = sb.getVariable("Level");
+        if(sb.getVariable("FakeNameOn") === true && sb.getVariable("FakeName") && sb.getVariable("FakeName").length > 0){
+            nameToDisplay = sb.getVariable("FakeName");
+            pingToDisplay = sb.getVariable("FakeNamePing");
+            levelToDisplay = sb.getVariable("FakeNameLevel");
+        }
+        
 
         lobbyStr = sb.getVariable("InLobby");		
         squad = sb.getVariable("PlayerSquadID");	
@@ -1602,7 +1608,7 @@ function updatePlayers()
 
         updateString += `{lid: ${lobbyStr}, squad: ${squad},
         color: 'rgb(${colr}, ${colg}, ${colb})', 
-        name: '${nameToDisplay}', level: ${level}, ping: ${ping}, 
+        name: '${nameToDisplay}', level: ${levelToDisplay}, ping: ${pingToDisplay}, 
         showMute:true, muted: ${mutedTog.toString()}},`;
     });
 
