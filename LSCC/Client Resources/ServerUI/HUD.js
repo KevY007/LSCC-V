@@ -150,6 +150,54 @@ mp.keys.bind(
     }
 );
 
+var ScreenNotifications = [];
+mp.events.add("screenNotify", (text) => {
+    ScreenNotifications.push({
+        position:[0.5, 0.6],
+        alpha:0,
+        text:text,
+        scale:[0.42, 0.42],
+        created:Date.now()
+    });
+});
+mp.events.add('render', () => {
+    renderScreenNotifications();
+})
+function renderScreenNotifications(){
+    var notificationsToRemove = [];
+    for(let i = 0 ; i < ScreenNotifications.length ; i++){
+
+        mp.game.graphics.drawText(ScreenNotifications[i].text, ScreenNotifications[i].position, {
+            font:4, outline:true, centre:true, 
+            scale:ScreenNotifications[i].scale,
+            color:[255,255,255, ScreenNotifications[i].alpha]
+        });
+
+        const currentTime = Date.now();
+        const notificationLife = (currentTime - ScreenNotifications[i].created)
+        if(notificationLife < 255){
+            if(ScreenNotifications[i].alpha+10 < 255){
+                ScreenNotifications[i].alpha += 10;
+            }
+            else{
+                ScreenNotifications[i].alpha = 255;
+            }
+        }
+        else{
+            ScreenNotifications[i].position[1] -= 0.0002;
+
+            if(notificationLife > 800){
+                ScreenNotifications[i].alpha-=10;
+            }
+            if(ScreenNotifications[i].alpha <= 0){
+                notificationsToRemove.push(ScreenNotifications[i].created);
+            }
+        }
+    }
+    var remIndObjects = ScreenNotifications.filter(i => notificationsToRemove.includes(i.created));
+    ScreenNotifications = ScreenNotifications.filter(i => !remIndObjects.includes(i));
+}
+
 
 
 mp.events.add("actionMenu:addItem", (id, action, color, icon) => {

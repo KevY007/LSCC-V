@@ -959,6 +959,13 @@ namespace RNC
             });
         }
 
+        public static void ScreenNotify(Player player, string text)
+        {
+            if (player == null) return;
+
+            player.TriggerEvent("screenNotify", text);
+        }
+
         public static void ShowStats(Player target, Account acc)
         {
             if (!EPlayer.LoggedIn(target))
