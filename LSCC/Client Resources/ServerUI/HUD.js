@@ -153,7 +153,7 @@ mp.keys.bind(
 var ScreenNotifications = [];
 mp.events.add("screenNotify", (text) => {
     ScreenNotifications.push({
-        position:[0.5, 0.6],
+        position:[0.5, 0.6+(ScreenNotifications.length*0.03)],
         alpha:0,
         text:text,
         scale:[0.42, 0.42],

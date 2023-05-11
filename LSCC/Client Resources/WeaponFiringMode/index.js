@@ -99,8 +99,9 @@ mp.keys.bind(0x42, false, () => {
         mp.game.audio.playSoundFrontend(-1, "Faster_Click", "RESPAWN_ONLINE_SOUNDSET", true);
         weaponConfig[currentWeapon] = curFiringMode;
         
-        let notifyscoreboardstr = `toast('${Translate("FIRE_MODE")}', '${Translate("WEAPON_FIRE_MODE_SWITCH", [Constants.firingModeNames[curFiringMode]])}', 'nothing', 500, 2);`;
-        ServerUI.execute(notifyscoreboardstr);
+        //let notifyscoreboardstr = `toast('${Translate("FIRE_MODE")}', '${Translate("WEAPON_FIRE_MODE_SWITCH", [Constants.firingModeNames[curFiringMode]])}', 'nothing', 500, 2);`;
+        mp.events.callLocal("screenNotify", Translate("WEAPON_FIRE_MODE_SWITCH", [`~y~${Constants.firingModeNames[curFiringMode]}`])); 
+        //ServerUI.execute(notifyscoreboardstr);
     }
 });
 
