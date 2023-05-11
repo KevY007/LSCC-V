@@ -1036,6 +1036,8 @@ function getDrawablesListForMenus(mode, gender){
     });
 
     menuClothingArmor.ListChange.on((item, listIndex) => {
+        if(!ArmorItem || !ArmorTextureItem || !ArmorItem.SelectedItem || !ArmorItem.SelectedItem.DisplayText || !ArmorTextureItem.SelectedItem || !ArmorTextureItem.SelectedItem.DisplayText) return;
+
         let drawable = parseInt(ArmorItem.SelectedItem.DisplayText);
         let texture = parseInt(ArmorTextureItem.SelectedItem.DisplayText);
         switch (item) {
