@@ -2528,7 +2528,7 @@ namespace RNC
             new CarData(1, "FBI Granger", "fbi2", "package://Artwork/Vehicles/fbi2.png", "Slow", 10, 15);
             new CarData(1, "Police Buffalo A/C", "polbufac", "package://Artwork/Vehicles/polbufac.png", "Fast", 13, 20);
             new CarData(1, "Police Transporter", "policet", "package://Artwork/Vehicles/policet.png", "Snail", 15);
-            new CarData(1, "Police Alamo", "polalamo", "package://Artwork/Vehicles/polalamo.png", "Fast", 15, 15);
+            //new CarData(1, "Police Alamo", "polalamo", "package://Artwork/Vehicles/polalamo.png", "Fast", 15, 15);
             new CarData(1, "Unmarked Alamo", "umkalamo", "package://Artwork/Vehicles/umkalamo.png", "Fast", 15, 20);
             new CarData(1, "FBI Buffalo A/C", "fbibufac", "package://Artwork/Vehicles/fbibufac.png", "Fast", 17, 20);
             new CarData(1, "Police Chopper", "polmav", "package://Artwork/Vehicles/polmav.png", "N/A", 20, 20);
