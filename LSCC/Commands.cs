@@ -2812,6 +2812,70 @@ namespace RNC
             return;
         }
 
+        [Command("fakename", "!{#AFAFAF}[USAGE] fakename (option: toggle, name) (if 'name': the name)", Alias = "hidename")]
+        public static void cmd_fakename(Player player, string option, string name = "")
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 4) return;
+
+            if(option == "toggle")
+            {
+                string[] firstNames = new string[]{ "adolf", "Great", "notorious", "The", "juan", "real", "stay" };
+                string[] additions = new string[] { "fxked", "_realest", "69", "420", "XXX", "GANG", "01", "itor" }; 
+
+                bool isOn = player.GetSharedData<bool>("FakeNameOn");
+                player.SetSharedData("FakeNameOn", !isOn);
+
+                player.SendChatMessage($"!{{#FF6347}}[!] ~w~You have toggled fake name {(!isOn == true ? "~g~ON" : "~r~OFF")}~w~!");
+
+                if(!isOn == true)
+                {
+                    string fakename = (firstNames[new Random().Next(firstNames.Length)] + additions[new Random().Next(additions.Length)]);
+
+                    player.SendChatMessage($"!{{#FF6347}}[>] ~w~Your name name will now appear as: ~y~{fakename}~w~. Use ~y~/fakename name (new name) ~w~to change it.");
+                    player.SendChatMessage($"!{{#FF6347}}[>] ~w~Your level and ping will also appear as randomized. Admin and donator statuses have been hidden automatically.");
+                    player.SendChatMessage($"!{{#FF6347}}[>] ~r~Usage of this command is logged. Any misuse may result in an instant removal from the staff team!");
+
+                    player.SetSharedData("FakeName", fakename);
+                    player.SetSharedData("FakeNamePing", new Random().Next(100));
+                    player.SetSharedData("FakeNameLevel", new Random().Next(20));
+
+                    player.SetData("Anonymous", true);
+                    EPlayer.GetAccount(player).DonatorStatus = false;
+                }
+                else
+                {
+                    player.SetSharedData("FakeName", "");
+                    player.SetSharedData("FakeNamePing", 0);
+                    player.SetSharedData("FakeNameLevel", 0);
+                }
+            }
+            else if(option == "name")
+            {
+                if(name.Length < 3 || name.Length > 30)
+                {
+                    player.SendChatMessage($"!{{#FF6347}}[!] ~w~Fake name must be between 3 and 30 characters!");
+                    return;
+                }
+                if(name == "codename" || name == "RotX")
+                {
+                    player.SendChatMessage($"!{{#FF6347}}[!] ~w~Nice try.");
+                    return;
+                }
+
+                player.SetSharedData("FakeName", name);
+                player.SendChatMessage($"!{{#FF6347}}[>] ~w~Your name name will now appear as: ~y~{name}~w~.");
+            }
+            else player.SendChatMessage($"!{{#FF6347}}[!] ~w~Valid options are: toggle, name!");
+        }
+
+        [Command("coin", Alias = "flipcoin, coinflip")]
+        public static void cmd_coin(Player player)
+        {
+            bool sex = new Random().Next(10) > 4;
+            EPlayer.ActionEx(player, $"flips a coin that lands on {(sex ? "Heads" : "Tails")}");
+        }
+
         [Command("weaponeditor")]
         public static void cmd_weaponeditor(Player player)
         {

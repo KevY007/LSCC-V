@@ -1584,6 +1584,10 @@ function updatePlayers()
         level = 0;
         squad = -1;
 
+        let nameToDisplay = sb.name;
+        if(sb.getVariable("FakeNameOn") === true && sb.getVariable("FakeName") && sb.getVariable("FakeName").length > 0)
+                        nameToDisplay = sb.getVariable("FakeName");
+
         lobbyStr = sb.getVariable("InLobby");		
         squad = sb.getVariable("PlayerSquadID");	
 		if(sb.getVariable("Color_R") !== undefined) colr = sb.getVariable("Color_R");
@@ -1598,7 +1602,7 @@ function updatePlayers()
 
         updateString += `{lid: ${lobbyStr}, squad: ${squad},
         color: 'rgb(${colr}, ${colg}, ${colb})', 
-        name: '${sb.name}', level: ${level}, ping: ${ping}, 
+        name: '${nameToDisplay}', level: ${level}, ping: ${ping}, 
         showMute:true, muted: ${mutedTog.toString()}},`;
     });
 

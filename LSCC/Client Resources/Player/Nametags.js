@@ -267,10 +267,14 @@ mp.events.add('render', (nametags) => {
                         });
                     }
                         
+                    var nameToDisplay = player.name.replace('_');
+                    if(player.getVariable("FakeNameOn") === true && player.getVariable("FakeName") && player.getVariable("FakeName").length > 0)
+                        nameToDisplay = player.getVariable("FakeName");
+
                     if(player.getVariable("ShowDamaged") === false){
                         if(player.col)
                         {
-                            mp.game.graphics.drawText(player.name.replace('_', ' '), [x, y],
+                            mp.game.graphics.drawText(nameToDisplay, [x, y],
                             {
                             font: 4,
                             color: [player.col_r, player.col_g, player.col_b, player.col_a],
@@ -280,7 +284,7 @@ mp.events.add('render', (nametags) => {
                         }
                         else
                         {
-                            mp.game.graphics.drawText(player.name.replace('_', ' '), [x, y],
+                            mp.game.graphics.drawText(nameToDisplay, [x, y],
                             {
                             font: 4,
                             color: defaultcolor,
@@ -290,7 +294,7 @@ mp.events.add('render', (nametags) => {
                         }
                     }  
                     else{
-                        mp.game.graphics.drawText(player.name.replace('_', ' '), [x, y],
+                        mp.game.graphics.drawText(nameToDisplay, [x, y],
                         {
                         font: 4,
                         color: [248, 113, 113, 255],

@@ -690,6 +690,19 @@ namespace RNC
             player.TriggerEvent("UpdateMenuItem", ID, owned);
         }
 
+        public static string Name(Player player, bool override_anonymous = false)
+        {
+            if (override_anonymous) return player.Name;
+
+            if(player.GetSharedData<bool>("FakeNameOn") == true && 
+                player.GetSharedData<string>("FakeName").Length > 0 && 
+                EPlayer.GetAccount(player).Admin >= 4)
+            {
+                return player.GetSharedData<string>("FakeName");
+            }
+
+            return player.Name;
+        }
 
         public static void ResetPlayerData(Player player)
         {
@@ -710,6 +723,11 @@ namespace RNC
                 player.ResetData("LastPMFrom");
                 player.SetSharedData("LastVehicleExit", 0);
                 player.SetSharedData("Invincible", false);
+
+                player.SetSharedData("FakeNameOn", false);
+                player.SetSharedData("FakeName", "");
+                player.SetSharedData("FakeNamePing", 0);
+                player.SetSharedData("FakeNameLevel", 0);
 
                 player.SetSharedData("Bleeding_WasShot", false);
                 player.SetSharedData("AutoOOC", false);
