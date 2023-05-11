@@ -2327,7 +2327,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                 isAiming = true;
             }
 
-            if(!isAiming && !isCrouching){
+            if(!isAiming && !isCrouching && gunType !== "Handguns"){
                 shakeValue = shakeValue * 4;
             }
         }
