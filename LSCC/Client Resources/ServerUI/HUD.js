@@ -1980,7 +1980,7 @@ mp.events.add("render", () => {
                 let passengers = veh.getNumberOfPassengers();
                 if(veh.getPedInSeat(-1) != 0) passengers++;
 
-                let drawText = `~c~${vehName} (ID: ~w~${veh.remoteId}~c~) (~w~${passengers} Occupants~c~)\n~w~Speed: ~s~${(veh.getSpeed() * 3.6).toFixed(0)} ~w~/ ~s~${(mp.game.vehicle.getVehicleModelMaxSpeed(veh.model) * 3.6).toFixed(0)} ~w~KM/H`;
+                let drawText = `~c~${vehName} (ID: ~w~${veh.remoteId}~c~ | HANDLE: ~w~${veh.handle}~c~) (~w~${passengers} Occupants~c~)\n~w~Speed: ~s~${(veh.getSpeed() * 3.6).toFixed(0)} ~w~/ ~s~${(mp.game.vehicle.getVehicleModelMaxSpeed(veh.model) * 3.6).toFixed(0)} ~w~KM/H`;
 
                 let hp = ((veh.getHealth() / 1000) * 100).toFixed(0);
                 if(hp < 35)
