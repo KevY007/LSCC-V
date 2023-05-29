@@ -2538,7 +2538,7 @@ mp.events.add("setClearDamageNametag", () => {
 
 mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weapon, boneIndex, damage) => {
 
-    if(mp.players.local.getVariable("Invisible") === false && sourceEntity.type !== 'player'){
+    if(mp.players.local.getVariable("Invincible") === false && sourceEntity.type !== 'player'){
         mp.events.callRemote("SetIsDamaged");
     }
 
