@@ -682,11 +682,11 @@ namespace RNC
         public const int DefaultMaxInLobby = 30;
 
         // Connection Settings
-        public const string MySQL_Host = "194.163.144.228";
-        public const string MySQL_User = "dbmandelivery";
-        public const string MySQL_Password = "LLW5HUcpJQZ7g45PmR5rHovh7YUb89";
+        public const string MySQL_Host = "panel.gm.miami";
+        public const string MySQL_User = "rncMainUser";
+        public const string MySQL_Password = "4irnKD3cDCJ74cfnbdK2W9dM";
         public const string MySQL_Database = "racenchase";
-        public const string MySQL_Port = "3369";
+        public const string MySQL_Port = "50733";
         public const string DCBotToken = "NjAyNTQ1Mzc0MDY1OTgzNTgw.XtaCEQ.clpqVL5c0X_38xkT-mYTr4_N9a4";
 
         // Global Variables (changing accordingly)
@@ -4897,6 +4897,8 @@ namespace RNC
                                                 p.Health = 100;
                                                 p.Armor = 0;
 
+                                                EPlayer.Freeze(p, false);
+
                                                 if (p.GetData<int>("ChaseVehicleSeat") == 0)
                                                 {
                                                     Account _a = EPlayer.GetAccount(p);
@@ -5305,6 +5307,11 @@ namespace RNC
                                             p.SendNotification("~b~You may begin the chase now.");
                                             p.TriggerEvent("ToggleCanExitVehicle", true);
                                             EPlayer.TryAdvanceChallenge(p, Challenge.ChallengeType.CopchaseRounds, "N/A");
+
+                                            if(p.IsInVehicle && p.Vehicle != null)
+                                            {
+                                                p.Vehicle.Repair();
+                                            }
                                         }
                                     }
                                     foreach (Player p in lobby.Fugitives)
@@ -5314,6 +5321,11 @@ namespace RNC
                                             p.SendNotification("~y~You can now exit vehicles.");
                                             p.TriggerEvent("ToggleCanExitVehicle", true);
                                             EPlayer.TryAdvanceChallenge(p, Challenge.ChallengeType.CopchaseRounds, "N/A");
+
+                                            if (p.IsInVehicle && p.Vehicle != null)
+                                            {
+                                                p.Vehicle.Repair();
+                                            }
                                         }
                                     }
                                 }

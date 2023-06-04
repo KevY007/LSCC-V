@@ -1266,6 +1266,8 @@ function UpdateStatsVars(entity, all = true){
             if(ServerUI !== undefined && ServerUI != null){
 
                 ServerUI.execute(`gm.$refs.helpers.$refs.states.setUser(["stats"], {
+                    serverid: ${player.remoteId},
+                    id: ${player.getVariable("SQL_ID")},
                     name: "${player.name}",
                     level: ${player.getVariable("Level")},
                     fugitive: ${(player.getVariable("Team") == 0).toString()},
