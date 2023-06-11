@@ -3544,3 +3544,5 @@ var CommandsDataJSON = [
     "Parameters": []
   }
 ];
+
+exports = CommandsDataJSON;

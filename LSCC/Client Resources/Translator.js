@@ -3,6 +3,81 @@ const {Language:Spanish} = require('./Languages/Client/Game/Spanish');
 const {Language:French} = require('./Languages/Client/Game/French');
 const {Language:Vietnamese} = require('./Languages/Client/Game/Vietnamese');
 const {Language:Croatian} = require('./Languages/Client/Game/Croatian');
+var {
+    currentJailTime,
+    lastJailUpdate,
+    chaseRunning,
+    chaseTimeCur,
+    chaseTimeMax,
+    chaseMode,
+    collisionTime,
+    updateRate,
+    radioToggle,
+    carryTarget,
+    chatStatus,
+    chatStatusLate,
+    menuToggledLate,
+    lastChatToggle,
+    streetName,
+    zoneName,
+    showHud,
+    renderNametags,
+    currentMuteTime,
+    lastMuteUpdate,
+    lastFunc,
+    curMDCBind,
+    lastMDCBind,
+    curActionMenuBind,
+    lastActionMenuBind,
+    IsInTutorial,
+    BankRobberyOn,
+    ShowVehicleDL,
+    specState, 
+    lastGPSBind,
+    curGPSBind,
+    lastMapBind,
+    curMapBind,
+    specTarget,
+    isNoClip,
+    LastKeyPress,
+    AFKStage,
+    SecondsSinceLastKeyPress,
+    antiAFKActive,
+    showReticule,
+    showCustomCrosshair,
+    showCustomCrosshairInSniper,
+    alwaysShowCustomCrosshair,
+    customCrosshairOn,
+    ServerUI,
+    menuToggled,
+    scoreboardToggled,
+    scoreboardCursor,
+    StationPickerToggled,
+    MDC_DOM,
+    MDCActive,
+    isLockpicking,
+    isHotwiring,
+    HotwireDOM,
+    ClothingEditorDOM,
+    ClothingEditorActive,
+    ActionMenuActive,
+    VehicleSpawnerActive,
+    WeaponEditorActive,
+    FireModeDisplayText,
+    cuffTarget,
+    cuffInterval,
+    boneData,
+    weaponData,
+    loginSceneEntities,
+    chatStatusTimeout,
+    heliCam,
+    LogPlayerDamage,
+    ToggleMDC,
+    actionMenuClose,
+    actionMenuOpen,
+    traceLastFunc,
+    isHeliCamActive
+} = require('./globals');
 
 var CURRENT_LANGUAGE = 0;
 const VALID_LANGUAGES = [0,1,2,3,4];
@@ -49,7 +124,8 @@ function getLanguageObject(){
     return LANG;
 }
 function updateUILanguage(){
-    if(ServerUI === undefined) return;
+    if(!ServerUI) return;
+    if(ServerUI === undefined || ServerUI === null) return;
 
     switch(CURRENT_LANGUAGE){
         default: ServerUI.execute(`gm.$refs.helpers.setLocale("en")`); break;

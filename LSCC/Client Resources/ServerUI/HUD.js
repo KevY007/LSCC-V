@@ -1,4 +1,89 @@
-require('./ServerUI/CommandsList.js');
+var {
+    currentJailTime,
+    lastJailUpdate,
+    chaseRunning,
+    chaseTimeCur,
+    chaseTimeMax,
+    chaseMode,
+    collisionTime,
+    updateRate,
+    radioToggle,
+    carryTarget,
+    chatStatus,
+    chatStatusLate,
+    menuToggledLate,
+    lastChatToggle,
+    streetName,
+    zoneName,
+    showHud,
+    renderNametags,
+    UpdateStatsVars,
+    currentMuteTime,
+    lastMuteUpdate,
+    lastFunc,
+    curMDCBind,
+    lastMDCBind,
+    curActionMenuBind,
+    lastActionMenuBind,
+    IsInTutorial,
+    BankRobberyOn,
+    ShowVehicleDL,
+    specState, 
+    lastGPSBind,
+    curGPSBind,
+    lastMapBind,
+    curMapBind,
+    specTarget,
+    isNoClip,
+    LastKeyPress,
+    AFKStage,
+    SecondsSinceLastKeyPress,
+    antiAFKActive,
+    showReticule,
+    showCustomCrosshair,
+    showCustomCrosshairInSniper,
+    alwaysShowCustomCrosshair,
+    customCrosshairOn,
+    ServerUI,
+    menuToggled,
+    scoreboardToggled,
+    scoreboardCursor,
+    StationPickerToggled,
+    MDC_DOM,
+    MDCActive,
+    isLockpicking,
+    isHotwiring,
+    HotwireDOM,
+    ClothingEditorDOM,
+    ClothingEditorActive,
+    ActionMenuActive,
+    getClosestVehicle,
+    focusChat,
+    activateChat,
+    VehicleSpawnerActive,
+    WeaponEditorActive,
+    FireModeDisplayText,
+    cuffTarget,
+    cuffInterval,
+    boneData,
+    weaponData,
+    loginSceneEntities,
+    FPS,
+    FPS_Frames,
+    FPS_Calc,
+    precisionPositionerActive,
+    HideAllCrosshairs,
+    chatStatusTimeout,
+    heliCam,
+    LogPlayerDamage,
+    ToggleMDC,
+    actionMenuClose,
+    actionMenuOpen,
+    traceLastFunc,
+    isHeliCamActive
+} = require('./globals');
+  const {TranslateMessage: Translate} = require('./Translator');
+const CommandsDataJSON = require('./ServerUI/CommandsList.js');
 
 const Natives = {
     IS_RADAR_HIDDEN: "0x157F93B036700462",
@@ -201,6 +286,7 @@ function renderScreenNotifications(){
 
 
 mp.events.add("actionMenu:addItem", (id, action, color, icon) => {
+    if(!ServerUI) return;
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.items.push({
         id: ${id},
         name: "${action}",
@@ -209,6 +295,7 @@ mp.events.add("actionMenu:addItem", (id, action, color, icon) => {
     });`);
 });
 mp.events.add("actionMenu:removeItem", (id) => {
+    if(!ServerUI) return;
     ServerUI.execute(`
         if(gm.$refs.hud.$refs.base.$refs.actionMenu.items.find(i => i.id == ${id})){
             gm.$refs.hud.$refs.base.$refs.actionMenu.items.splice(gm.$refs.hud.$refs.base.$refs.actionMenu.items.indexOf(gm.$refs.hud.$refs.base.$refs.actionMenu.items.find(i => i.id == ${id})), 1);
@@ -216,10 +303,12 @@ mp.events.add("actionMenu:removeItem", (id) => {
     `);
 });
 mp.events.add("actionMenu:removeAllItems", () => {
+    if(!ServerUI) return;
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.items = [];`);
 });
 
 mp.events.add('actionMenu:close', () => {
+    if(!ServerUI) return;
     ActionMenuActive = false;
     ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.enabled = false;`);
     mp.gui.cursor.show(false, false);
@@ -228,6 +317,7 @@ mp.events.add('actionMenu:open', () => {
     if(chatStatus == true || isHeliCamActive() || menuToggled == true || MDCActive == true || scoreboardToggled == true
         || VehicleSpawnerActive == true || WeaponEditorActive == true || StationPickerToggled == true || isHotwiring == true || ClothingEditorActive == true) return;
 
+        if(!ServerUI) return;
     mp.game.invoke("0xFC695459D4D0E219", 0.5, 0.5); // SET CURSOR POSITION TO CENTER [x,y = 0.5,0.5]
     ActionMenuActive = true;
     mp.events.callLocal("actionMenu:removeAllItems");
@@ -242,6 +332,7 @@ mp.events.add('actionMenu:open', () => {
 let lastActionMenuClick = 0;
 
 mp.events.add('actionMenu:clickItem', (actionID) => {
+    if(!ServerUI) return;
     if(Date.now() - lastActionMenuClick < 100) return;
     lastActionMenuClick = Date.now();
 
@@ -665,66 +756,6 @@ mp.events.addCommand("timestamp", () => {
     mp.gui.chat.push(`!{white}Chat timestamps have been turned ${(mp.storage.data.chat.timestamp == true ? `!{green}ON` : `!{red}OFF`)}`);
 });
 
-function activateChat(toggle){
-    if(ServerUI == null) return;
-    if(menuToggled){
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggle(false);`);
-        return;
-    }
-
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggle(${toggle.toString()})`);
-};
-function focusChat(toggle){
-    if(ServerUI == null) return;
-
-    var channels = `gm.$refs.hud.$refs.base.$refs.chat.api.channels = [`;
-    channels += `
-        {name:"Local", value:"text"},
-        {name:"Global", value:"go"},
-        {name:"Lobby", value:"lg"},
-    `
-    if(mp.players.local.getVariable("ClanID") !== -1)
-        channels += `{name:"Clan", value:"c"},`
-
-    if(mp.players.local.getVariable("Admin") > 0)
-        channels += `{name:"Staff", value:"a"},`
-
-    channels += `]`;
-
-    ServerUI.execute(channels);
-
-
-    if(menuToggled){
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
-        //ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`);
-        return;
-    }
-    if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
-    (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
-    (ActionMenuActive !== undefined && ActionMenuActive == true) || 
-    (ClothingEditorActive !== undefined && ClothingEditorActive == true) ||
-    (StationPickerToggled !== undefined && StationPickerToggled == true) ||
-    (isHotwiring !== undefined && isHotwiring == true) || isHeliCamActive()){
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
-        //ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`);
-        return;
-    }
-    //ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = ${toggle.toString()}`);
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(${toggle.toString()});`);
-
-    // if(toggle){
-    //     if(mp.storage.data.menu.ActiveChatOpacity !== undefined){
-    //         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = ${mp.storage.data.menu.ActiveChatOpacity.toString()}`);
-    //     }
-    //     else ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = 1.0`);
-    // }
-    // else{
-    //     increaseChatOpacity(3000);
-    // }
-
-    mp.gui.cursor.show(toggle, toggle);
-    mp.events.callRemote("onFocusChat", toggle);
-}
 function pushMessageToChat(message){
     if(ServerUI == null){return;}
 /*

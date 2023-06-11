@@ -1,27 +1,75 @@
-function getClosestVehicle(position) {
-  try {
-    let closest = 50;
-    let closestVeh = null;
+var {
+  currentJailTime,
+  lastJailUpdate,
+  chaseRunning,
+  chaseTimeCur,
+  chaseTimeMax,
+  chaseMode,
+  collisionTime,
+  updateRate,
+  radioToggle,
+  carryTarget,
+  chatStatus,
+  chatStatusLate,
+  menuToggledLate,
+  lastChatToggle,
+  streetName,
+  zoneName,
+  showHud,
+  renderNametags,
+  currentMuteTime,
+  lastMuteUpdate,
+  lastFunc,
+  curMDCBind,
+  lastMDCBind,
+  curActionMenuBind,
+  lastActionMenuBind,
+  BankRobberyOn,
+  ShowVehicleDL,
+  specState,
+  specTarget,
+  isNoClip,
+  LastKeyPress,
+  AFKStage,
+  SecondsSinceLastKeyPress,
+  antiAFKActive,
+  showReticule,
+  showCustomCrosshair,
+  getClosestVehicle,
+  showCustomCrosshairInSniper,
+  alwaysShowCustomCrosshair,
+  customCrosshairOn,
+  ServerUI,
+  menuToggled,
+  scoreboardToggled,
+  scoreboardCursor,
+  StationPickerToggled,
+  MDC_DOM,
+  MDCActive,
+  isLockpicking,
+  isHotwiring,
+  HotwireDOM,
+  ClothingEditorDOM,
+  ClothingEditorActive,
+  ActionMenuActive,
+  VehicleSpawnerActive,
+  WeaponEditorActive,
+  FireModeDisplayText,
+  cuffTarget,
+  cuffInterval,
+  boneData,
+  weaponData,
+  loginSceneEntities,
+  chatStatusTimeout,
+  LogPlayerDamage,
+  ToggleMDC,
+  actionMenuClose,
+  actionMenuOpen,
+  traceLastFunc,
+  isHeliCamActive
+ } = require('./globals');
+const {TranslateMessage: Translate} = require('./Translator');
 
-    mp.vehicles.forEachInStreamRange((v) => {
-      let dist = mp.game.system.vdist(
-        position.x,
-        position.y,
-        position.z,
-        v.position.x,
-        v.position.y,
-        v.position.z
-      );
-
-      if (dist < closest) {
-        closest = dist;
-        closestVeh = v;
-      }
-    });
-
-    return { distance: closest, vehicle: closestVeh };
-  } catch (e) {}
-}
 
 // G to ENTER + SHIFT + G to OUTER ENT script from GTAWorld
 

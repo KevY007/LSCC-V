@@ -1,13 +1,86 @@
+var {
+    currentJailTime,
+    lastJailUpdate,
+    chaseRunning,
+    chaseTimeCur,
+    chaseTimeMax,
+    chaseMode,
+    collisionTime,
+    updateRate,
+    radioToggle,
+    carryTarget,
+    chatStatus,
+    chatStatusLate,
+    menuToggledLate,
+    lastChatToggle,
+    streetName,
+    zoneName,
+    showHud,
+    renderNametags,
+    currentMuteTime,
+    lastMuteUpdate,
+    lastFunc,
+    curMDCBind,
+    lastMDCBind,
+    curActionMenuBind,
+    lastActionMenuBind,
+    BankRobberyOn,
+    ShowVehicleDL,
+    specState,
+    specTarget,
+    isNoClip,
+    LastKeyPress,
+    AFKStage,
+    SecondsSinceLastKeyPress,
+    antiAFKActive,
+    showReticule,
+    showCustomCrosshair,
+    showCustomCrosshairInSniper,
+    alwaysShowCustomCrosshair,
+    customCrosshairOn,
+    ServerUI,
+    menuToggled,
+    scoreboardToggled,
+    scoreboardCursor,
+    StationPickerToggled,
+    MDC_DOM,
+    MDCActive,
+    isLockpicking,
+    isHotwiring,
+    HotwireDOM,
+    ClothingEditorDOM,
+    ClothingEditorActive,
+    ActionMenuActive,
+    VehicleSpawnerActive,
+    WeaponEditorActive,
+    FireModeDisplayText,
+    cuffTarget,
+    cuffInterval,
+    boneData,
+    weaponData,
+    loginSceneEntities,
+    chatStatusTimeout,
+    LogPlayerDamage,
+    ToggleMDC,
+    actionMenuClose,
+    actionMenuOpen,
+    traceLastFunc,
+    isHeliCamActive
+   } = require('./globals');
+  const {TranslateMessage: Translate} = require('./Translator');
 require("./ServerUI/Menu.js");
 
 mp.events.add("RequestLogsFromServer", (type, username) => {
+    if(!ServerUI) return;
     ServerUI.execute('gm.$refs.mainMenu.$refs.logsTab.isLoading = true;');
     mp.events.callRemote("ReqLogFromSrv", username, type);
 });
 mp.events.add("Menu_SetLogsTabLoading", (toggle) => {
+    if(!ServerUI) return;
     ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.isLoading = ${toggle};`);
 });
 mp.events.add("InitiateLogsTab", () => {
+    if(!ServerUI) return;
     ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.options = [
         { name: "Sessions", value: 2 },
         { name: "Admin", value: 1 },
@@ -19,6 +92,7 @@ mp.events.add("InitiateLogsTab", () => {
     ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.selectedOption = 3;`);
 });
 mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
+    if(!ServerUI) return;
 
     jsonLogs = jsonLogs.replaceAll("{", "[");
     jsonLogs = jsonLogs.replaceAll("}", "]");

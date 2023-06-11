@@ -1,4 +1,88 @@
-﻿"use strict"
+﻿var {
+    currentJailTime,
+    lastJailUpdate,
+    chaseRunning,
+    chaseTimeCur,
+    chaseTimeMax,
+    chaseMode,
+    collisionTime,
+    updateRate,
+    radioToggle,
+    carryTarget,
+    chatStatus,
+    chatStatusLate,
+    menuToggledLate,
+    lastChatToggle,
+    FPS,
+    FPS_Frames,
+    FPS_Calc,
+    precisionPositionerActive,
+    HideAllCrosshairs,
+    disableSprint,
+    streetName,
+    zoneName,
+    showHud,
+    renderNametags,
+    currentMuteTime,
+    lastMuteUpdate,
+    lastFunc,
+    curMDCBind,
+    lastMDCBind,
+    curActionMenuBind,
+    lastActionMenuBind,
+    IsInTutorial,
+    BankRobberyOn,
+    ShowVehicleDL,
+    specState, 
+    lastGPSBind,
+    curGPSBind,
+    lastMapBind,
+    curMapBind,
+    specTarget,
+    isNoClip,
+    LastKeyPress,
+    AFKStage,
+    SecondsSinceLastKeyPress,
+    antiAFKActive,
+    showReticule,
+    showCustomCrosshair,
+    showCustomCrosshairInSniper,
+    alwaysShowCustomCrosshair,
+    customCrosshairOn,
+    ServerUI,
+    menuToggled,
+    scoreboardToggled,
+    scoreboardCursor,
+    StationPickerToggled,
+    MDC_DOM,
+    MDCActive,
+    isLockpicking,
+    isHotwiring,
+    HotwireDOM,
+    ClothingEditorDOM,
+    ClothingEditorActive,
+    ServerSettings,
+    ActionMenuActive,
+    VehicleSpawnerActive,
+    WeaponEditorActive,
+    FireModeDisplayText,
+    cuffTarget,
+    cuffInterval,
+    boneData,
+    weaponData,
+    loginSceneEntities,
+    chatStatusTimeout,
+    heliCam,
+    LogPlayerDamage,
+    ToggleMDC,
+    actionMenuClose,
+    actionMenuOpen,
+    traceLastFunc,
+    isHeliCamActive,
+    UpdateStatsVars
+} = require('./globals');
+  const {TranslateMessage: Translate} = require('./Translator');
+  const CommandsDataJSON = require('./ServerUI/CommandsList.js');
 
 let camera = null;
 let camera_moveable = false;
@@ -91,13 +175,9 @@ var healthLoss = 0;
 const bones = [0, 10706, 11816, 14201, 18905, 23553, 24816, 24817, 24818, 28252, 31086, 36864, 39317, 40269, 45509, 51826, 52301, 57005, 57597, 58271, 61163, 63931, 64729];
 const boneDistanceThreshold = 1;
 
-var lastGPSBind = 0x5A;
-var curGPSBind = 0x5A;
 
-var lastMapBind = 0x50;
-var curMapBind = 0x50;
 
-var ServerSettings = [];
+
 var ShotStats = [];
 
 var AFOB_Enabled = false;
@@ -1256,57 +1336,7 @@ mp.events.add("TwoSecondsEvent", () => {
     }, 500);
 });
 
-function UpdateStatsVars(entity, all = true){
-    // yes im double checking the same shit cuz for some reason this shit decided to break for no reason
-    if(ServerUI == null || ServerUI == undefined || ServerUI == undefined || ServerUI == null) return;
-    entity = mp.players.local;
-    if(entity !== undefined){
-        if(mp.players.exists(entity))
-        {
-            if(ServerUI !== undefined && ServerUI != null){
 
-                ServerUI.execute(`gm.$refs.helpers.$refs.states.setUser(["stats"], {
-                    serverId: ${player.remoteId},
-                    id: ${player.getVariable("SQL_ID")},
-                    name: "${player.name}",
-                    level: ${player.getVariable("Level")},
-                    fugitive: ${(player.getVariable("Team") == 0).toString()},
-                    xp: ${player.getVariable("CurrentXP")},
-                    nextLevelXp: ${player.getVariable("NextLevelXP")},
-                    createdAt: "${player.getVariable("RegisterDate")}",
-                    points: ${player.getVariable("Points")},
-                    admin: ${player.getVariable("Admin")},
-                    donator: ${player.getVariable("Donator")},
-                    donatorPoints: ${player.getVariable("DonatorPoints")},
-                    api: "${player.getVariable("ScreenshotServerAPI")}",
-                    lobbyId: ${player.getVariable("InLobby")},
-                    teamId: ${player.getVariable("Team")},
-                    heading: ${player.heading},
-                    location:{
-                        x: ${player.position.x},
-                        y: ${player.position.y},
-                        z: ${player.position.z},
-                    }
-                })`);
-                ServerUI.execute(`gm.$refs.helpers.$refs.states.setUser(["clan"], {
-                    id: ${player.getVariable("ClanID")},
-                    tier: ${player.getVariable("ClanTier")}
-                })`);
-                
-                if(all === true){            
-                    if(CommandsDataJSON){
-                        let allowedCommands = CommandsDataJSON.filter(cmd => cmd.Admin <= mp.players.local.getVariable("Admin"));
-                        allowedCommands.sort(function(a, b){
-                            return a.CommandText.length - b.CommandText.length;
-                        });
-                        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.commands = ${JSON.stringify(allowedCommands)}`);
-                    }
-                }
-             
-            }
-        }
-    }
-}
 
 mp.events.addDataHandler('PlayerSquadID', function(entity, value, oldValue){
     entity.SquadID = value;
