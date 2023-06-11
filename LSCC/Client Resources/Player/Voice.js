@@ -72,8 +72,7 @@ var {
   const {TranslateMessage: Translate} = require('./Translator');
 var MaxVoiceRange = 50;
 mp.voiceChat.muted = true;
-var lastVoiceBind = 0x4E;
-var curVoiceBind = 0x4E;
+
 
 
 function DisableVoice()
