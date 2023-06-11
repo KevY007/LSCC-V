@@ -52,6 +52,7 @@ var {
     isHotwiring,
     HotwireDOM,
     ClothingEditorDOM,
+    calcDist,
     ClothingEditorActive,
     ActionMenuActive,
     disableSprint,
@@ -108,7 +109,7 @@ mp.events.add("StopPlayerActions", () => {
     actionTime = 0;
     maxActionTime = 0;
     actionInterval = null;
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
 })
 
 function PainkillerAction(){
@@ -134,7 +135,7 @@ function PainkillerAction(){
             mp.events.callRemote("OnPlayerActionTick");
             if(actionTime <= 0){
                 mp.events.callRemote("FinishPlayerAction", actionType);
-                ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
                 clearInterval(actionInterval);
             }
             else{
@@ -156,10 +157,10 @@ function PainkillerAction(){
 
 function initiateActionTimer(startTime){
     maxActionTime = startTime;
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.maxtime = ${startTime}`);
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0`);
-    //ServerUI.execute(`gm.$refs.actionbar.fugitive = ${(mp.players.local.getVariable("Team") == 0 ? true : false)}`);
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = true;`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.maxtime = ${startTime}`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0`);
+    //if(ServerUI) ServerUI.execute(`gm.$refs.actionbar.fugitive = ${(mp.players.local.getVariable("Team") == 0 ? true : false)}`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = true;`);
 }
 
 function MedkitAction(){
@@ -183,13 +184,13 @@ function MedkitAction(){
             if(actionTime <= 0){
                 mp.events.callRemote("clear_anim");
                 mp.events.callRemote("FinishPlayerAction", actionType);
-                ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
-                ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
+                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
                 clearInterval(actionInterval);
             }
             else{
                 actionTime--;           
-                ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = ${((maxActionTime - actionTime) == 0 ? 0 : (maxActionTime - actionTime))}`);
+                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = ${((maxActionTime - actionTime) == 0 ? 0 : (maxActionTime - actionTime))}`);
                 if(actionTime == 1){
                     mp.events.callRemote("play_anim", "amb@medic@standing@kneel@exit", "exit", 0, 8.0, 0.0, -1, 0.0, false, false, false);
                 }
@@ -438,15 +439,15 @@ mp.events.add("BeginReviving", () => {
         reviveTime--;
         if(reviveTime <= 0)
         {
-            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
-            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
+            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
             finishCuffing();
             mp.events.callRemote("FinishRevive", reviveTarget);
             clearInterval(reviveTimer);
             return;
         }
         else{
-            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = ${((maxActionTime - reviveTime) == 0 ? 0 : (maxActionTime - reviveTime))}`);
+            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = ${((maxActionTime - reviveTime) == 0 ? 0 : (maxActionTime - reviveTime))}`);
         }
     }, 1000);
 });
@@ -459,7 +460,7 @@ function stopReviving(reason){
     reviveTarget = null;
 
     mp.events.callRemote("StopReviving");
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
 
     switch(reason){
         case 1:{
@@ -536,12 +537,12 @@ mp.events.add("BeginCuffing", (target) => {
 
         cuffTimeLeft--;
         if(cuffTimeLeft <= 0){
-            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
-            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
+            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
             finishCuffing();
         }
         else{
-            ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = ${((maxActionTime - cuffTimeLeft) == 0 ? 0 : (maxActionTime - cuffTimeLeft))}`);
+            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = ${((maxActionTime - cuffTimeLeft) == 0 ? 0 : (maxActionTime - cuffTimeLeft))}`);
         }
     }, 1000);
 });
@@ -549,8 +550,8 @@ mp.events.add("BeginCuffing", (target) => {
 mp.events.add("forceStopCuffing", () => {
     stopCuffing(69);
     mp.events.callRemote("clear_anim");
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
     mp.events.callLocal("StopPlayerActions");
 });
 
@@ -563,7 +564,7 @@ function stopCuffing(reason){ // if unsuccessful / force stopped
     cuffInterval = null;
     cuffTarget = null;
 
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
 
     mp.events.callRemote("StopCuffing");
 
@@ -604,7 +605,7 @@ mp.events.add("startLockpicking", (donorLevel) => {
     }
     while(rangePos+rangeSize >= 180);
 
-    ServerUI.execute(`
+    if(ServerUI) ServerUI.execute(`
         gm.$refs.hud.$refs.base.$refs.quickAction.rangeLocation = ${rangePos};
         gm.$refs.hud.$refs.base.$refs.quickAction.range = ${rangeSize};
         
@@ -615,11 +616,11 @@ mp.events.add("startLockpicking", (donorLevel) => {
 // true = success ; false = fail
 mp.events.add("stopLockpicking", () => {
     isLockpicking = false;
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.quickAction.enabled = false;`);   
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.quickAction.enabled = false;`);   
 });
 mp.events.add("sendLockpickResult", (result) => {
     isLockpicking = false;
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.quickAction.enabled = false;`);   
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.quickAction.enabled = false;`);   
     mp.events.callRemote("onLockpickAttempt", result); 
 });
 mp.events.add("lockpick_vehicleAlarm", (veh, isLockpickPlayer, isSuccess) => {

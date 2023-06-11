@@ -14,6 +14,7 @@
     menuToggledLate,
     lastChatToggle,
     FPS,
+    AddCustomVehiclesToSpawner,
     FPS_Frames,
     FPS_Calc,
     precisionPositionerActive,
@@ -52,6 +53,7 @@
     ServerUI,
     menuToggled,
     scoreboardToggled,
+    calcDist,
     scoreboardCursor,
     StationPickerToggled,
     MDC_DOM,
@@ -67,6 +69,10 @@
     WeaponEditorActive,
     FireModeDisplayText,
     cuffTarget,
+    InitializeClothingEditorDOM,
+    InitializeMDC,
+    InitializeWeaponEditor,
+    InitializeHotwireDOM,
     cuffInterval,
     boneData,
     weaponData,
@@ -79,6 +85,7 @@
     actionMenuOpen,
     traceLastFunc,
     isHeliCamActive,
+    focusChat,
     UpdateStatsVars
 } = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
@@ -251,7 +258,7 @@ mp.events.add("ShowHandcuffTooltip", () => {
 
 mp.events.add('setPing', (pingtoset) => {
     ping = pingtoset;
-    ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.ping = ${ping}`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.ping = ${ping}`);
 })
 
 let lastWeapon = 2725352035;
@@ -673,7 +680,7 @@ mp.events.add("OneSecondEvent", () => {
         UpdateStatsVars(mp.players.local);
     }
     if(mp.storage.data.menu.monitoring == true){
-        ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.fps = ${FPS}`);
+        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.fps = ${FPS}`);
         mp.events.callRemote("RequestPlayerPing");
     }
 
@@ -744,16 +751,7 @@ mp.events.add("TwoSecondsEvent", () => {
 
 mp.events.add("ResetShotStats", ResetShotStats);
 
-function calcDist(v1, v2) {
-    return mp.game.system.vdist(
-        v1.x,
-        v1.y,
-        v1.z,
-        v2.x,
-        v2.y,
-        v2.z
-    );
-}
+
 
 function getPointToBoneOffset(aimX, aimY, aimZ, boneX, boneY, boneZ) {
     let xDif = (aimX - boneX) < 0 ? -(aimX - boneX) : aimX - boneX;
@@ -1950,9 +1948,9 @@ mp.events.add('render', () => {
 
                     if(ServerUI != null)
                     {
-                        ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = ${mp.storage.data.menu.gameProgress};`);
-                        ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Derby Time";`);
-                        ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${derbyTimeCur};`);
+                        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = ${mp.storage.data.menu.gameProgress};`);
+                        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Derby Time";`);
+                        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${derbyTimeCur};`);
                     }
 
                     if(derbyCounting)
@@ -2009,19 +2007,19 @@ mp.events.add('render', () => {
                     if(chaseTimeCur >= chaseTimeMax || chaseTimeCur <= -1)
                     {
                         chaseRunning = false;
-                        ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
+                        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
                     }
                     else {
-                        ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = ${mp.storage.data.menu.gameProgress};`);
+                        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = ${mp.storage.data.menu.gameProgress};`);
                         if(collisionTime > 0)
                         {
-                            ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Collisions";`);
-                            ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${collisionTime}`);
+                            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Collisions";`);
+                            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${collisionTime}`);
                         }
                         else 
                         {
-                            ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Time Left";`);
-                            ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${chaseTimeMax - chaseTimeCur}`);
+                            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Time Left";`);
+                            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${chaseTimeMax - chaseTimeCur}`);
                         }
                     }
                 }
@@ -2238,7 +2236,7 @@ mp.events.add("render", () => {
             {
                 currentRollCooldownTimestamp = (Date.now() + 1000);
                 rollShootCooldownActive = true;
-                ServerUI.execute(`toast('${Translate("SHOOTING_COOLDOWN")}', '', 'warning', 1000, 2);`);
+                if(ServerUI) ServerUI.execute(`toast('${Translate("SHOOTING_COOLDOWN")}', '', 'warning', 1000, 2);`);
             }
         }
     }
@@ -3755,7 +3753,7 @@ mp.events.add(
     },
 
     "HideChaseTimer": () => {
-        if(ServerUI != null) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
+        if(ServerUI != null) if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
         chaseRunning = false;
     },
 
@@ -3804,7 +3802,7 @@ mp.events.add(
 
     "InitChaseTimer": () => {
         
-        if(ServerUI != null) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
+        if(ServerUI != null) if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
 
         if(derbyText == null)
         {
@@ -3846,14 +3844,14 @@ mp.events.add(
             loginBrowser.active = false;
             */
             ServerUI = mp.browsers.new("package://ServerUI/index.html");
-            ServerUI.active = false;
+            if(ServerUI) ServerUI.active = false;
             LastKeyPress = Date.now();
             AFKStage = 0;
             antiAFKActive = false;
             mp.gui.chat.show(false);
             //mp.gui.chat.activate(false);
             setTimeout(() => {
-                ServerUI.markAsChat();
+                if(ServerUI) ServerUI.markAsChat();
             }, 250);
             setTimeout(() => {
                 if(mp.storage.data.language){
@@ -4178,28 +4176,28 @@ function setStorageDataVars(){
         mp.storage.data.chat.fontsizenew = 1.0;
     }
     if(mp.storage.data.chat.timestamp !== undefined){    
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.timestamps = ${mp.storage.data.chat.timestamp.toString()}`);
+        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.timestamps = ${mp.storage.data.chat.timestamp.toString()}`);
     }
     else{
         mp.storage.data.chat.timestamp = false;
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.timestamps = false;`);
+        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.timestamps = false;`);
     }
     if(mp.storage.data.menu.loadingscreens === undefined){
         mp.storage.data.menu.loadingscreens = true;
     }
     if(mp.storage.data.chat.pagesize !== undefined){    
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.pageSize = ${mp.storage.data.chat.pagesize}`);
+        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.pageSize = ${mp.storage.data.chat.pagesize}`);
     }
     else{
         mp.storage.data.chat.pagesize = 18;
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.pageSize = 18;`);
+        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.pageSize = 18;`);
     }
     if(mp.storage.data.chat.fontsizenew !== undefined){    
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.fontSize = ${mp.storage.data.chat.fontsizenew}`);
+        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.fontSize = ${mp.storage.data.chat.fontsizenew}`);
     }
     else{
         mp.storage.data.chat.fontsizenew = 1.0;
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.fontSize = 1.0;`);
+        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.fontSize = 1.0;`);
     }
     if(mp.storage.data.menu.Speedo == undefined){
         mp.storage.data.menu.Speedo = true;
@@ -4220,7 +4218,7 @@ function setStorageDataVars(){
     if(mp.storage.data.menu.ChatAccessibility == undefined){
         mp.storage.data.menu.ChatAccessibility = false;
     }
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.accessibilityMode = ${mp.storage.data.menu.ChatAccessibility.toString()}`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.accessibilityMode = ${mp.storage.data.menu.ChatAccessibility.toString()}`);
 
     if(mp.storage.data.menu.XMRAutoPlay == undefined){
         mp.storage.data.menu.XMRAutoPlay = true;
@@ -4246,7 +4244,7 @@ function setStorageDataVars(){
     if(mp.storage.data.menu.ShowVoiceActivity == undefined){
         mp.storage.data.menu.ShowVoiceActivity = true;
     }
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.enabled = ${mp.storage.data.menu.ShowVoiceActivity.toString()};`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.enabled = ${mp.storage.data.menu.ShowVoiceActivity.toString()};`);
 
     if(mp.storage.data.menu.InactiveChatOpacity == undefined){
         mp.storage.data.menu.InactiveChatOpacity = 0.5;
@@ -4274,12 +4272,12 @@ function setStorageDataVars(){
 
     if(mp.storage.data.menu.monitoring !== undefined){
         if(ServerUI != undefined && ServerUI != null)
-            ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.monitorEnabled = ${mp.storage.data.menu.monitoring}`);
+            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.monitorEnabled = ${mp.storage.data.menu.monitoring}`);
     }
     else{
         mp.storage.data.menu.monitoring = false;
         if(ServerUI != undefined && ServerUI != null)
-            ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.monitorEnabled = false;`);
+            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.monitorEnabled = false;`);
     }
 
     if(mp.storage.data.menu.VoiceMode !== undefined){
@@ -4292,10 +4290,10 @@ function setStorageDataVars(){
     }
 
     if(mp.storage.data.menu.tooltips !== undefined){
-        ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.enabled = ${mp.storage.data.menu.tooltips.toString()}`);
+        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.enabled = ${mp.storage.data.menu.tooltips.toString()}`);
     }
     else{
-        ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.enabled = true`);
+        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.enabled = true`);
         mp.storage.data.menu.tooltips = true;
     }
 

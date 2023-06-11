@@ -67,6 +67,7 @@
   weaponData,
   loginSceneEntities,
   chatStatusTimeout,
+  InitializeServerUI,
   heliCam,
   LogPlayerDamage,
   ToggleMDC,
@@ -323,26 +324,26 @@ mp.events.add('showLoginBrowser', (state) => {
     setTimeout(() => {
         if(ServerUI != null)
         {
-            if(!ServerUI.active) ServerUI.active = true;
-            ServerUI.execute(`gm.$refs.hud.enabled = false;`);
-            ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
-            ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
+            if(ServerUI.active) ServerUI.active = true;
+            if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = false;`);
+            if(ServerUI) ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
+            if(ServerUI) ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
             if(state){
-                ServerUI.execute(`gm.$refs.auth.startLoading(1);`); // initiate the fake loading screen to allow CEF sounds and shit duhh
+                if(ServerUI) ServerUI.execute(`gm.$refs.auth.startLoading(1);`); // initiate the fake loading screen to allow CEF sounds and shit duhh
                 toggleLoginScene(true);
                 mp.events.callRemote("requestQuickLoginForgotUsernameData"); // yes
-                ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.items = [];`);
+                if(ServerUI) ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.items = [];`);
                 mp.events.callLocal("actionMenu:removeAllItems");
             }
             else{
-                ServerUI.execute(`gm.$refs.auth.api.authSuccess = true;`);
-                ServerUI.execute(`gm.$refs.auth.stop();`);
+                if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.authSuccess = true;`);
+                if(ServerUI) ServerUI.execute(`gm.$refs.auth.stop();`);
                 setTimeout(() => {
                     if(!mp.players.local || !mp.players.exists(mp.players.local)) return;
 
-                    ServerUI.execute(`gm.$refs.auth.api.enabled = false;`);
+                    if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.enabled = false;`);
                     if(!IsInTutorial)
-                        ServerUI.execute(`gm.$refs.hud.enabled = true;`);
+                        if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = true;`);
                 }, 1000);
             }
             if(!IsInTutorial)
@@ -350,8 +351,8 @@ mp.events.add('showLoginBrowser', (state) => {
         }
         else{
             mp.events.callRemote("ServerConsoleOutput", `Attempted to show login browser to ${mp.players.local.name} while it's null! Trying again...`);
-            ServerUI = mp.browsers.new("package://ServerUI/index.html");
-            ServerUI.active = true;
+            InitializeServerUI();
+            if(ServerUI) ServerUI.active = true;
             setTimeout(() => {
                 mp.events.callLocal("showLoginBrowser", state);
             }, 1000);
@@ -362,32 +363,32 @@ mp.events.add('showLoginBrowser', (state) => {
 
 mp.events.add("login_ShowInvalidInfo", (toggle) => {
     if(ServerUI && ServerUI.active){
-        ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
+        if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
         mp.events.callLocal("HUDError", "The login credentials are invalid!");
         mp.gui.cursor.show(true, true);
-        //ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.login.loginError = ${toggle.toString()}`);
+        //if(ServerUI) ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.login.loginError = ${toggle.toString()}`);
     }
 });
 mp.events.add("login_ShowAccountExists", (toggle) => {
     if(ServerUI && ServerUI.active){
-        ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
+        if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
         mp.events.callLocal("HUDError", "That username is already taken!");
         mp.gui.cursor.show(true, true);
-        //ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.register.usernameAlreadyExists = ${toggle.toString()}`);
+        //if(ServerUI) ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.register.usernameAlreadyExists = ${toggle.toString()}`);
     }
 });
 mp.events.add("login_MaxAccountLimit", (toggle) => {
     if(ServerUI && ServerUI.active){
-        ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
+        if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
         mp.events.callLocal("HUDError", "You've reached the maximum accounts limit! (2 accounts)");
         mp.gui.cursor.show(true, true);
-        //ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.register.usernameAlreadyExists = ${toggle.toString()}`);
+        //if(ServerUI) ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.register.usernameAlreadyExists = ${toggle.toString()}`);
         // TO-DO: Add a message that max account limit has been reached!
     }
 });
 mp.events.add("login_ForceStopLoading", () => {
   if(ServerUI && ServerUI.active){
-    ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
     mp.gui.cursor.show(true, true);
   }
 });
@@ -435,7 +436,7 @@ mp.events.add('auth_register', (username, email, password, confirmPass) => {
   if(password === confirmPass)
     mp.events.callRemote('OnPlayerRegisterAttempt', email, username, password);
   else{
-    ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
     mp.events.callLocal("HUDError", "The passwords do not match!");
   }
 
@@ -448,18 +449,18 @@ mp.events.add('requestAutoLoginData', () => {
 mp.events.add('sendAutoLoginDataToBrowser', (data) => {
     setTimeout(() => {
         if(data.length > 2)
-            ServerUI.execute(`gm.$refs.auth.api.login.quickLogin.username = "${data}"`);
+            if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.login.quickLogin.username = "${data}"`);
     }, 500);
 });
 mp.events.add('sendForgotUsernameToBrowser', (data) => {
     setTimeout(() => {
-        ServerUI.execute(`gm.$refs.auth.api.login.possibleUsernames = ${data}`);
+        if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.login.possibleUsernames = ${data}`);
     }, 500);
 
 });
 
 mp.events.add('auth_quickLogin', (username) => {
-    ServerUI.execute(`gm.$refs.auth.api.isLoading = true;`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.isLoading = true;`);
     mp.events.callRemote("OnAutoLoginAttempt", username);
 });
 
@@ -476,6 +477,6 @@ mp.events.add("hideMDC", () => {
 });
 
 mp.events.add("login_StopMusic", () => {
-    ServerUI.execute(`gm.$refs.auth.$refs.panel.stop();`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.auth.$refs.panel.stop();`);
 });
 

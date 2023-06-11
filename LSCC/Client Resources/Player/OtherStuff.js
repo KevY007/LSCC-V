@@ -40,6 +40,7 @@ var {
   alwaysShowCustomCrosshair,
   customCrosshairOn,
   ServerUI,
+  calcDist,
   menuToggled,
   scoreboardToggled,
   scoreboardCursor,
@@ -723,7 +724,7 @@ function checkCamInAir() {
     gui = "true";
 
     if (ServerUI != null && ServerUI != undefined)
-      ServerUI.execute(`gm.$refs.hud.enabled = ${showHud};`);
+      if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = ${showHud};`);
   }
 }
 

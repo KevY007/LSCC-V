@@ -1,7 +1,7 @@
 let editorTeam = -1;
 
 mp.events.add("ClothingEditor:exit", (save) => {
-    ServerUI.execute(`gm.$refs.hud.enabled = ${mp.storage.data.menu.HUD.toString()};`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = ${mp.storage.data.menu.HUD.toString()};`);
     mp.gui.cursor.show(false, false);
     ClothingEditorDOM.active = false;
     ClothingEditorActive = false;
@@ -36,7 +36,7 @@ mp.events.add("ClothingEditor:show", (team, gender, clothingData, forceSet) => {
     let toSendStr = JSON.stringify(toSend);
 
     editorTeam = team;
-    ServerUI.execute(`gm.$refs.hud.enabled = false;`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = false;`);
     mp.gui.cursor.show(true, true);
     mp.game.invoke("0xFC695459D4D0E219", 0.5, 0.5); // SET CURSOR POSITION TO CENTER [x,y = 0.5,0.5]
 

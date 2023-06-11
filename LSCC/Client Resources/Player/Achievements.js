@@ -116,7 +116,7 @@ mp.events.add("addDailyChallenge", (id, desc, rXP, rPts, expireDate, completed, 
     DailyChallenges.push(c);
 });
 mp.events.add("clearDailyChallenges", () => {
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.$refs.challengesTab.categories = []`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.$refs.challengesTab.categories = []`);
     DailyChallenges = [];
 })
 
@@ -194,7 +194,7 @@ mp.events.add("addChallengesToMenu", (weekChallengeProgress, weekChallengeUnix) 
         json += chstr;
     }
     json += `]}]`;
-    ServerUI.execute(json);
+    if(ServerUI) ServerUI.execute(json);
 });
 mp.events.add("advanceChallenge", (arrayID, cht, chi, chp) => {
     
@@ -205,12 +205,12 @@ mp.events.add("advanceChallenge", (arrayID, cht, chi, chp) => {
 
         DailyChallenges.find(a => a.type == cht && a.item == chi).progress = chp;
         
-        ServerUI.execute(`if(gm.$refs.mainMenu.$refs.profileTab.$refs.challengesTab.categories[${arrayID}].challenges.find(chNig => chNig.description == "${chunlock.description}") != null){
+        if(ServerUI) ServerUI.execute(`if(gm.$refs.mainMenu.$refs.profileTab.$refs.challengesTab.categories[${arrayID}].challenges.find(chNig => chNig.description == "${chunlock.description}") != null){
             gm.$refs.mainMenu.$refs.profileTab.$refs.challengesTab.categories[${arrayID}].challenges.find(chNig => chNig.description == "${chunlock.description}").progress = ${chp};
         }`);
     }
     else{ // weekly
-        ServerUI.execute(`if(gm.$refs.mainMenu.$refs.profileTab.$refs.challengesTab.categories[${arrayID}].challenges.find(chNig => chNig.name == "Daily Challenge 7-day streak") != null){
+        if(ServerUI) ServerUI.execute(`if(gm.$refs.mainMenu.$refs.profileTab.$refs.challengesTab.categories[${arrayID}].challenges.find(chNig => chNig.name == "Daily Challenge 7-day streak") != null){
             gm.$refs.mainMenu.$refs.profileTab.$refs.challengesTab.categories[${arrayID}].challenges.find(chNig => chNig.name == "Daily Challenge 7-day streak").progress = ${chp};
         }`);
     }
@@ -233,8 +233,8 @@ mp.events.add("unlockChallenge", (cht, chi) => {
 
     if(ServerUI != null && ServerUI != undefined){
         
-        ServerUI.execute(`toast('', '${chunlock.description}', 'info', 3000);`);
-        //ServerUI.execute(`gm.sendAch("Challenge completed!", "${chunlock.description}", "${bgshit}", "${rewardstr}", 6000);`);
+        if(ServerUI) ServerUI.execute(`toast('', '${chunlock.description}', 'info', 3000);`);
+        //if(ServerUI) ServerUI.execute(`gm.sendAch("Challenge completed!", "${chunlock.description}", "${bgshit}", "${rewardstr}", 6000);`);
     }
     mp.game.audio.playSoundFrontend(-1, "PROPERTY_PURCHASE", "HUD_AWARDS", true);
 
@@ -244,8 +244,8 @@ mp.events.add("unlockChallenge", (cht, chi) => {
 mp.events.add("sendAchievementNotify", (title, description, background, reward, time, playSound) => {
     if(ServerUI != null && ServerUI != undefined){
         
-        ServerUI.execute(`toast('', '${title}', 'info', 3000);`);
-        //ServerUI.execute(`gm.sendAch("${title}", "${description}", "${background}", "${reward}", ${time});`);
+        if(ServerUI) ServerUI.execute(`toast('', '${title}', 'info', 3000);`);
+        //if(ServerUI) ServerUI.execute(`gm.sendAch("${title}", "${description}", "${background}", "${reward}", ${time});`);
     }    
     if(playSound){
         mp.game.audio.playSoundFrontend(-1, "PROPERTY_PURCHASE", "HUD_AWARDS", true);
@@ -267,14 +267,14 @@ mp.events.add("addAchievementsToMenu", () => {
         json += achstr;
     }
     json += "]";
-    ServerUI.execute(json);
+    if(ServerUI) ServerUI.execute(json);
 });
 mp.events.add("unlockAchievement", (achievementName) => {
     let achunlock = Achievements.find(a => a.name == achievementName);
     if(!achunlock) return;
 
     achunlock.unlocked = true;
-    ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.$refs.achievementsTab.achievements.find(a => a.name === "${achievementName}").unlocked = true`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.$refs.achievementsTab.achievements.find(a => a.name === "${achievementName}").unlocked = true`);
 
     let rewardstr = "";
     if(achunlock.rewardXP > 0) rewardstr += `+${achunlock.rewardXP} XP`;
@@ -284,8 +284,8 @@ mp.events.add("unlockAchievement", (achievementName) => {
     }
 
     if(ServerUI != null && ServerUI != undefined){
-        ServerUI.execute(`toast('', '${achunlock.name}', 'info', 3000);`);
-        //TO-DO LATER: ServerUI.execute(`gm.sendAch("${achunlock.name}", "${achunlock.description}", "${achunlock.background}", "${rewardstr}", 6000);`);
+        if(ServerUI) ServerUI.execute(`toast('', '${achunlock.name}', 'info', 3000);`);
+        //TO-DO LATER: if(ServerUI) ServerUI.execute(`gm.sendAch("${achunlock.name}", "${achunlock.description}", "${achunlock.background}", "${rewardstr}", 6000);`);
     }
     mp.game.audio.playSoundFrontend(-1, "PROPERTY_PURCHASE", "HUD_AWARDS", true);
 

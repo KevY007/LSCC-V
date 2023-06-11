@@ -154,7 +154,7 @@ mp.events.add("StartTutorial", () => {
             You will now be sent to the <strong>Character Creator</strong> to create your appearance. Have fun!"
         }
     ];
-    ServerUI.execute(`
+    if(ServerUI) ServerUI.execute(`
     gm.$refs.helpers.$refs.tutorial.pages = ${JSON.stringify(TutorialQuestions)};
     gm.$refs.helpers.$refs.tutorial.enabled = true;
     `);
@@ -200,5 +200,5 @@ mp.events.add("OnFinishTutorial", (results) => {
     mp.events.callLocal("login_StopMusic");
     mp.events.callRemote("Server_FinishTutorial", useVoice, langID);
     mp.gui.cursor.show(false, false);
-   // ServerUI.execute(`gm.$refs.hud.enabled = true;`);
+   // if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = true;`);
 });

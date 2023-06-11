@@ -94,7 +94,7 @@ let lastHeliCamUpdate = 0;
 
 mp.events.add("startHeliCam", () => {
     if(!mp.players.local.vehicle || !mp.players.local.isInAnyVehicle(false) || mp.players.local.vehicle.getClass() != 15 || heliCam !== null) return;
-    ServerUI.active = false;
+    if(ServerUI) ServerUI.active = false;
 
     HeliCamCEF = mp.browsers.new("package://HeliCam/index.html");
     HeliCamCEF.active = true;
@@ -158,7 +158,7 @@ mp.events.add("stopHeliCam", () => {
     if(heliCam == null) return;
 
     if(ServerUI)
-        ServerUI.active = true;
+        if(ServerUI) ServerUI.active = true;
 
     if(HeliCamCEF){
         HeliCamCEF.active = false;

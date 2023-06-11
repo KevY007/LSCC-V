@@ -85,10 +85,7 @@ const editorCoords = {
 };
 const localPlayer = mp.players.local;
 
-function InitializeWeaponEditor(){
-    WeaponEditorDOM = mp.browsers.new("package://weaponeditor/index.html");
-    WeaponEditorDOM.active = false;
-}
+
 
 function moveCam(x, y, z, rx, ry, rz, time, newviewangle){
     traceLastFunc(`[Players] Move Cam`);
@@ -115,7 +112,7 @@ mp.events.add("WeaponEditor:exit", () => {
     mp.events.callRemote("WeaponEditor:onExit");
 
     WeaponEditorDOM.active = false;
-    ServerUI.execute(`gm.$refs.hud.enabled = ${mp.storage.data.menu.HUD.toString()};`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = ${mp.storage.data.menu.HUD.toString()};`);
     mp.game.ui.displayRadar(true);
     mp.game.ui.displayHud(true);
     mp.players.local.clearTasksImmediately();
@@ -157,7 +154,7 @@ mp.events.add("WeaponEditor:playSound", (type) => {
 mp.events.add("WeaponEditor:show", () => {
     mp.events.callRemote("WeaponEditor:onOpen");
     WeaponEditorActive = true;
-    ServerUI.execute(`gm.$refs.hud.enabled = false;`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = false;`);
     mp.players.local.setAlpha(0);
     mp.players.local.freezePosition(true);
     mp.players.local.clearTasksImmediately();

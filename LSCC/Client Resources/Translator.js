@@ -95,7 +95,7 @@ mp.events.add("Translator:ChangeLanguage", (languageID, onJoin) => {
   
   if(onJoin === false){
     let notifyscoreboardstr = `toast('${Translate("CS_TEST", [mp.players.local.name])}', '', 'nothing', 6500, 2);`;
-    ServerUI.execute(notifyscoreboardstr);
+    if(ServerUI) ServerUI.execute(notifyscoreboardstr);
 
     mp.events.callLocal("ToggleTooltips", !mp.storage.data.menu.tooltips);
     setTimeout(() => {
@@ -128,12 +128,12 @@ function updateUILanguage(){
     if(ServerUI === undefined || ServerUI === null) return;
 
     switch(CURRENT_LANGUAGE){
-        default: ServerUI.execute(`gm.$refs.helpers.setLocale("en")`); break;
-        case 0: ServerUI.execute(`gm.$refs.helpers.setLocale("en")`); break;
-        case 1: ServerUI.execute(`gm.$refs.helpers.setLocale("es")`); break;
-        case 2: ServerUI.execute(`gm.$refs.helpers.setLocale("fr")`); break;
-        case 3: ServerUI.execute(`gm.$refs.helpers.setLocale("hr")`); break;
-        case 4: ServerUI.execute(`gm.$refs.helpers.setLocale("vi")`); break;
+        default: if(ServerUI) ServerUI.execute(`gm.$refs.helpers.setLocale("en")`); break;
+        case 0: if(ServerUI) ServerUI.execute(`gm.$refs.helpers.setLocale("en")`); break;
+        case 1: if(ServerUI) ServerUI.execute(`gm.$refs.helpers.setLocale("es")`); break;
+        case 2: if(ServerUI) ServerUI.execute(`gm.$refs.helpers.setLocale("fr")`); break;
+        case 3: if(ServerUI) ServerUI.execute(`gm.$refs.helpers.setLocale("hr")`); break;
+        case 4: if(ServerUI) ServerUI.execute(`gm.$refs.helpers.setLocale("vi")`); break;
     }
 }
 mp.events.add("Translator:UpdateNametagMessagesManual", () => {

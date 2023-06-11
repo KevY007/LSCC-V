@@ -117,14 +117,7 @@ mp.events.add("mdcRequestDeployStinger", (stingerID) => {
 });
 
 /* RAGE:MP STUFF */
-function InitializeMDC(){
-    MDC_DOM = mp.browsers.new("package://mdc_screen/index.html");
 
-    mp.events.callLocal("MDC:AddBlip", mp.players.local.remoteId, "police");
-
-    MDCActive = false;
-    MDC_DOM.active = false;
-}
 
 mp.events.add("OneSecondEvent", () => {
     if(mp.players.local.getVariable("Team") != 1) return;

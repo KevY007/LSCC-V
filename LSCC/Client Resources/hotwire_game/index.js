@@ -68,10 +68,7 @@ var {
     isHeliCamActive
    } = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
-function InitializeHotwireDOM(){
-    HotwireDOM = mp.browsers.new("package://hotwire_game/index.html");
-    HotwireDOM.active = false;
-}
+
 
 mp.events.add("StartHotwire", () => {
     HotwireDOM.execute(`generateHotwire();`); // restarts the minigame

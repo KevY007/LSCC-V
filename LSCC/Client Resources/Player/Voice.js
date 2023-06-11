@@ -65,7 +65,9 @@ var {
     actionMenuClose,
     actionMenuOpen,
     traceLastFunc,
-    isHeliCamActive
+    isHeliCamActive,
+    lastVoiceBind,
+    curVoiceBind
    } = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 var MaxVoiceRange = 50;
@@ -145,9 +147,9 @@ mp.events.addCommand("voicebind", function (bind) {
 
 mp.events.add("playerStopTalking", (player) => {
     if(!ServerUI) return;
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.removeVoice(${player.remoteId})`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.removeVoice(${player.remoteId})`);
 });
 mp.events.add("playerStartTalking", (player) => {
     if(!ServerUI) return;
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.addVoice(${player.remoteId}, "${player.name}")`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.addVoice(${player.remoteId}, "${player.name}")`);
 });

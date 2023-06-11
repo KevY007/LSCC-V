@@ -59,6 +59,7 @@ var {
     cuffTarget,
     cuffInterval,
     boneData,
+    calcDist,
     weaponData,
     loginSceneEntities,
     chatStatusTimeout,

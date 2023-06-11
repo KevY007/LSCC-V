@@ -1,3 +1,5 @@
+const CommandsDataJSON = require('./ServerUI/CommandsList');
+
 var currentJailTime = 0;
 var lastJailUpdate = 10;
 
@@ -28,6 +30,9 @@ var lastMDCBind = 0x4B;
 var curActionMenuBind = 0x59;
 var lastActionMenuBind = 0x59;
 
+var lastVoiceBind = 0x4E;
+var curVoiceBind = 0x4E;
+
 var BankRobberyOn = false;
 
 var ShowVehicleDL = false;
@@ -46,7 +51,16 @@ var showCustomCrosshairInSniper = false;
 var alwaysShowCustomCrosshair = false;
 var customCrosshairOn = false;
 
-var ServerUI = null;
+ServerUI = mp.browsers.new("package://ServerUI/index.html");
+function InitializeServerUI(){
+    if(ServerUI){
+        ServerUI.active = false;
+        ServerUI.destroy();
+        ServerUI = undefined;
+    }
+    ServerUI = mp.browsers.new("package://ServerUI/index.html");
+}
+
 var menuToggled = false;
 var scoreboardToggled = false;
 var scoreboardCursor = false;
@@ -126,7 +140,7 @@ function UpdateStatsVars(entity, all = true){
         {
             if(ServerUI !== undefined && ServerUI != null){
 
-                ServerUI.execute(`gm.$refs.helpers.$refs.states.setUser(["stats"], {
+                if(ServerUI) ServerUI.execute(`gm.$refs.helpers.$refs.states.setUser(["stats"], {
                     serverId: ${player.remoteId},
                     id: ${player.getVariable("SQL_ID")},
                     name: "${player.name}",
@@ -149,7 +163,7 @@ function UpdateStatsVars(entity, all = true){
                         z: ${player.position.z},
                     }
                 })`);
-                ServerUI.execute(`gm.$refs.helpers.$refs.states.setUser(["clan"], {
+                if(ServerUI) ServerUI.execute(`gm.$refs.helpers.$refs.states.setUser(["clan"], {
                     id: ${player.getVariable("ClanID")},
                     tier: ${player.getVariable("ClanTier")}
                 })`);
@@ -160,7 +174,7 @@ function UpdateStatsVars(entity, all = true){
                         allowedCommands.sort(function(a, b){
                             return a.CommandText.length - b.CommandText.length;
                         });
-                        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.commands = ${JSON.stringify(allowedCommands)}`);
+                        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.commands = ${JSON.stringify(allowedCommands)}`);
                     }
                 }
              
@@ -983,12 +997,39 @@ const boneData = [
 function activateChat(toggle){
     if(ServerUI == null) return;
     if(menuToggled){
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggle(false);`);
+        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggle(false);`);
         return;
     }
 
-    ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggle(${toggle.toString()})`);
+    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggle(${toggle.toString()})`);
 };
+function AddCustomVehiclesToSpawner(){
+    if(ServerUI != null){
+
+        let modelsList = ["lspdunm", "polbufac", "huntley2", "lspdvic", "prevolter", "m3e46", "pscout", "impala",
+        "shegrangerold", "shergauntlet", "polbisonf", "gresleyh", "tulip2", "golfmk6", "bcso2slick", "bcat", "police3slick",
+        "fibexecutioner", "police3umk"];
+
+        for(let i = 0 ; i < modelsList.length; i++){
+            if(ServerUI) ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.vehicles.push({
+                model: "${modelsList[i]}",
+                hash: "${modelsList[i]}",
+                type: 25,
+                image: "package://Artwork/Vehicles/${modelsList[i]}.png",
+            });`);
+        }
+    }
+}
+function calcDist(v1, v2) {
+    return mp.game.system.vdist(
+        v1.x,
+        v1.y,
+        v1.z,
+        v2.x,
+        v2.y,
+        v2.z
+    );
+}
 function focusChat(toggle){
     if(ServerUI == null) return;
 
@@ -1006,12 +1047,12 @@ function focusChat(toggle){
 
     channels += `]`;
 
-    ServerUI.execute(channels);
+    if(ServerUI) ServerUI.execute(channels);
 
 
     if(menuToggled){
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
-        //ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`);
+        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
+        //if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`);
         return;
     }
     if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
@@ -1020,18 +1061,18 @@ function focusChat(toggle){
     (ClothingEditorActive !== undefined && ClothingEditorActive == true) ||
     (StationPickerToggled !== undefined && StationPickerToggled == true) ||
     (isHotwiring !== undefined && isHotwiring == true) || isHeliCamActive()){
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
-        //ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`);
+        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
+        //if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`);
         return;
     }
-    //ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = ${toggle.toString()}`);
-        ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(${toggle.toString()});`);
+    //if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = ${toggle.toString()}`);
+        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(${toggle.toString()});`);
 
     // if(toggle){
     //     if(mp.storage.data.menu.ActiveChatOpacity !== undefined){
-    //         ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = ${mp.storage.data.menu.ActiveChatOpacity.toString()}`);
+    //         if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = ${mp.storage.data.menu.ActiveChatOpacity.toString()}`);
     //     }
-    //     else ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = 1.0`);
+    //     else if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = 1.0`);
     // }
     // else{
     //     increaseChatOpacity(3000);
@@ -1039,6 +1080,10 @@ function focusChat(toggle){
 
     mp.gui.cursor.show(toggle, toggle);
     mp.events.callRemote("onFocusChat", toggle);
+}
+function InitializeHotwireDOM(){
+    HotwireDOM = mp.browsers.new("package://hotwire_game/index.html");
+    HotwireDOM.active = false;
 }
 function getClosestVehicle(position) {
     try {
@@ -1065,6 +1110,25 @@ function getClosestVehicle(position) {
     } catch (e) {}
   }
   var ServerSettings = [];
+
+
+function InitializeMDC(){
+    MDC_DOM = mp.browsers.new("package://mdc_screen/index.html");
+
+    mp.events.callLocal("MDC:AddBlip", mp.players.local.remoteId, "police");
+
+    MDCActive = false;
+    MDC_DOM.active = false;
+}
+function InitializeWeaponEditor(){
+    WeaponEditorDOM = mp.browsers.new("package://weaponeditor/index.html");
+    WeaponEditorDOM.active = false;
+}
+function InitializeClothingEditorDOM(){
+    ClothingEditorDOM = mp.browsers.new("package://clothing_editor/index.html");
+    ClothingEditorDOM.active = false;
+    ClothingEditorActive = false;
+}
 exports = {
     currentJailTime,
     lastJailUpdate,
@@ -1082,6 +1146,8 @@ exports = {
     lastChatToggle,
     streetName,
     zoneName,
+    lastVoiceBind,
+    curVoiceBind,
     showHud,
     renderNametags,
     currentMuteTime,
@@ -1150,4 +1216,11 @@ exports = {
     UpdateStatsVars,
     focusChat,
     activateChat,
+    InitializeClothingEditorDOM,
+    InitializeMDC,
+    InitializeWeaponEditor,
+    InitializeHotwireDOM,
+    AddCustomVehiclesToSpawner,
+    calcDist,
+    InitializeServerUI,
 };
