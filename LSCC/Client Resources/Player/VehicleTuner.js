@@ -1,74 +1,4 @@
-var {
-    currentJailTime,
-    lastJailUpdate,
-    chaseRunning,
-    chaseTimeCur,
-    chaseTimeMax,
-    chaseMode,
-    collisionTime,
-    updateRate,
-    radioToggle,
-    carryTarget,
-    chatStatus,
-    chatStatusLate,
-    menuToggledLate,
-    lastChatToggle,
-    streetName,
-    zoneName,
-    showHud,
-    renderNametags,
-    currentMuteTime,
-    lastMuteUpdate,
-    lastFunc,
-    curMDCBind,
-    lastMDCBind,
-    curActionMenuBind,
-    lastActionMenuBind,
-    BankRobberyOn,
-    ShowVehicleDL,
-    specState,
-    specTarget,
-    isNoClip,
-    LastKeyPress,
-    AFKStage,
-    SecondsSinceLastKeyPress,
-    antiAFKActive,
-    showReticule,
-    showCustomCrosshair,
-    showCustomCrosshairInSniper,
-    alwaysShowCustomCrosshair,
-    customCrosshairOn,
-    ServerUI,
-    menuToggled,
-    scoreboardToggled,
-    scoreboardCursor,
-    StationPickerToggled,
-    MDC_DOM,
-    MDCActive,
-    isLockpicking,
-    focusChat,
-    activateChat,
-    isHotwiring,
-    HotwireDOM,
-    ClothingEditorDOM,
-    ClothingEditorActive,
-    ActionMenuActive,
-    VehicleSpawnerActive,
-    WeaponEditorActive,
-    FireModeDisplayText,
-    cuffTarget,
-    cuffInterval,
-    boneData,
-    weaponData,
-    loginSceneEntities,
-    chatStatusTimeout,
-    LogPlayerDamage,
-    ToggleMDC,
-    actionMenuClose,
-    actionMenuOpen,
-    traceLastFunc,
-    isHeliCamActive
-   } = require('./globals');
+var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 const NativeUI = require("nativeui");
 const Menu = NativeUI.Menu;
@@ -129,7 +59,7 @@ var vTuner_Exit = null;
 var vTuner_VehicleID = -1;
 var vTuner_OtherMods = {}; // FOR MODS THAT CAN'T BE .GETMOD() LIKE PLATE AND WINDOW TINT
 
-traceLastFunc("vTuner::Config()");
+global.traceLastFunc("vTuner::Config()");
 
 mp.events.add('entityStreamIn', (entity) => {
     if (vTuner_VehicleID != -1 && entity.type === 'vehicle' && entity.remoteId == vTuner_VehicleID) 
@@ -222,7 +152,7 @@ mp.events.add('OpenTuner', (vid) => {
         return;
     }
 
-    traceLastFunc("vTuner::Open()");
+    global.traceLastFunc("vTuner::Open()");
     for(let i = 0; i < vTuner_Items.length; i++)
     {
         vTuner_Main.RemoveItem(vTuner_Items[i]);
@@ -332,7 +262,7 @@ mp.events.add('OpenTuner', (vid) => {
     vTuner_Main.AddItem(vTuner_Exit);
     vTuner_Items.push(vTuner_Exit);
 
-    activateChat(false);
+    global.activateChat(false);
 
     vTuner_Main.Open();
     mp.events.callLocal("AddTooltip", "M1", "Switch camera", 0);
@@ -411,9 +341,9 @@ vTuner_Main.MenuClose.on(() => {
     vTuner_VehicleID = -1;
     vTuner_Buy = null;
     vTuner_Exit = null;
-    activateChat(true);
+    global.activateChat(true);
 
     mp.events.callRemote("OnTunerClose");
     mp.events.callLocal("RemoveTooltip", "M1");
 });
-traceLastFunc("vTuner::Init()");
+global.traceLastFunc("vTuner::Init()");

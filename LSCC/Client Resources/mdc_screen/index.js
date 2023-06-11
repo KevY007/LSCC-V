@@ -1,113 +1,45 @@
-var {
-    currentJailTime,
-    lastJailUpdate,
-    chaseRunning,
-    chaseTimeCur,
-    chaseTimeMax,
-    chaseMode,
-    collisionTime,
-    updateRate,
-    radioToggle,
-    carryTarget,
-    chatStatus,
-    chatStatusLate,
-    menuToggledLate,
-    lastChatToggle,
-    streetName,
-    zoneName,
-    showHud,
-    renderNametags,
-    currentMuteTime,
-    lastMuteUpdate,
-    lastFunc,
-    curMDCBind,
-    lastMDCBind,
-    curActionMenuBind,
-    lastActionMenuBind,
-    BankRobberyOn,
-    ShowVehicleDL,
-    specState,
-    specTarget,
-    isNoClip,
-    LastKeyPress,
-    AFKStage,
-    SecondsSinceLastKeyPress,
-    antiAFKActive,
-    showReticule,
-    showCustomCrosshair,
-    showCustomCrosshairInSniper,
-    alwaysShowCustomCrosshair,
-    customCrosshairOn,
-    ServerUI,
-    menuToggled,
-    scoreboardToggled,
-    scoreboardCursor,
-    StationPickerToggled,
-    MDC_DOM,
-    MDCActive,
-    isLockpicking,
-    isHotwiring,
-    HotwireDOM,
-    ClothingEditorDOM,
-    ClothingEditorActive,
-    ActionMenuActive,
-    VehicleSpawnerActive,
-    WeaponEditorActive,
-    FireModeDisplayText,
-    cuffTarget,
-    cuffInterval,
-    boneData,
-    weaponData,
-    loginSceneEntities,
-    chatStatusTimeout,
-    LogPlayerDamage,
-    ToggleMDC,
-    actionMenuClose,
-    actionMenuOpen,
-    traceLastFunc,
-    isHeliCamActive
-   } = require('./globals');
+var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 mp.events.add("MDC:AddBlip", (id, type) => {
-    if(MDC_DOM == null) return;
-    MDC_DOM.execute(`AddBlip(${id}, '${type}');`); 
+    if(global.MDC_DOM == null) return;
+    global.MDC_DOM.execute(`AddBlip(${id}, '${type}');`); 
 });
 mp.events.add("MDC:AddSpikeBlip", (id, stage) => {
-    if(MDC_DOM == null) return;
-    MDC_DOM.execute(`AddSpikeBlip(${id}, ${stage});`);
+    if(global.MDC_DOM == null) return;
+    global.MDC_DOM.execute(`AddSpikeBlip(${id}, ${stage});`);
 });
 mp.events.add("MDC:UpdateSpike", (id, stage) => {
-    if(MDC_DOM == null) return;
-    MDC_DOM.execute(`UpdateSpikeStage(${id}, ${stage});`);
+    if(global.MDC_DOM == null) return;
+    global.MDC_DOM.execute(`UpdateSpikeStage(${id}, ${stage});`);
 });
 mp.events.add("MDC:RemoveBlip", (id, type) => {
-    if(MDC_DOM == null) return;
-    MDC_DOM.execute(`RemoveBlip(${id}, '${type}');`);
+    if(global.MDC_DOM == null) return;
+    global.MDC_DOM.execute(`RemoveBlip(${id}, '${type}');`);
 });
 mp.events.add("MDC:RemoveBlipsOfType", (type) => {
-    if(MDC_DOM == null) return;
-    MDC_DOM.execute(`RemoveBlipsOfType('${type}');`);
+    if(global.MDC_DOM == null) return;
+    global.MDC_DOM.execute(`RemoveBlipsOfType('${type}');`);
 });
 mp.events.add("MDC:RemoveAllBlips", () => {
-    if(MDC_DOM == null) return;
-    MDC_DOM.execute(`RemoveAllBlips();`);
+    if(global.MDC_DOM == null) return;
+    global.MDC_DOM.execute(`RemoveAllBlips();`);
 });
 mp.events.add("MDC:UpdateBlip", (id, type, x, y) => {
-    if(MDC_DOM == null) return;
-    MDC_DOM.execute(`UpdateBlip(${id}, '${type}', ${x}, ${y});`);
+    if(global.MDC_DOM == null) return;
+    global.MDC_DOM.execute(`UpdateBlip(${id}, '${type}', ${x}, ${y});`);
 });
 mp.events.add("MDC:UpdateMiniscreen", (key, value) => {
-    if(MDC_DOM == null) return;
-    MDC_DOM.execute(`UpdateMiniscreenStatus('${key}', '${value}');`);
+    if(global.MDC_DOM == null) return;
+    global.MDC_DOM.execute(`UpdateMiniscreenStatus('${key}', '${value}');`);
 });
 
 mp.events.add("MDC:StingerFail", (message) => {
-    if(MDC_DOM == null) return;
-    MDC_DOM.execute(`SetStingerError('${message}');`); 
+    if(global.MDC_DOM == null) return;
+    global.MDC_DOM.execute(`SetStingerError('${message}');`); 
 });
 mp.events.add("MDC:StingerSuccess", (id, message) => {
-    if(MDC_DOM == null) return;
-    MDC_DOM.execute(`SetStingerSuccess(${id}, '${message}');`); 
+    if(global.MDC_DOM == null) return;
+    global.MDC_DOM.execute(`SetStingerSuccess(${id}, '${message}');`); 
 });
 
 

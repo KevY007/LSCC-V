@@ -1,77 +1,7 @@
 const TATTOO_DATA = require('./charcreator/tattoo/data.js');
 
 const NativeUI = require('./nativeui/index.js');
-var {
-    currentJailTime,
-    lastJailUpdate,
-    chaseRunning,
-    chaseTimeCur,
-    chaseTimeMax,
-    chaseMode,
-    collisionTime,
-    updateRate,
-    radioToggle,
-    carryTarget,
-    chatStatus,
-    chatStatusLate,
-    menuToggledLate,
-    lastChatToggle,
-    streetName,
-    zoneName,
-    showHud,
-    renderNametags,
-    currentMuteTime,
-    lastMuteUpdate,
-    lastFunc,
-    curMDCBind,
-    lastMDCBind,
-    curActionMenuBind,
-    lastActionMenuBind,
-    BankRobberyOn,
-    ShowVehicleDL,
-    specState,
-    specTarget,
-    isNoClip,
-    LastKeyPress,
-    AFKStage,
-    SecondsSinceLastKeyPress,
-    antiAFKActive,
-    showReticule,
-    showCustomCrosshair,
-    showCustomCrosshairInSniper,
-    alwaysShowCustomCrosshair,
-    customCrosshairOn,
-    ServerUI,
-    menuToggled,
-    scoreboardToggled,
-    scoreboardCursor,
-    StationPickerToggled,
-    MDC_DOM,
-    MDCActive,
-    isLockpicking,
-    isHotwiring,
-    HotwireDOM,
-    ClothingEditorDOM,
-    ClothingEditorActive,
-    ActionMenuActive,
-    VehicleSpawnerActive,
-    WeaponEditorActive,
-    FireModeDisplayText,
-    focusChat,
-    activateChat,
-    cuffTarget,
-    cuffInterval,
-    boneData,
-    weaponData,
-    loginSceneEntities,
-    chatStatusTimeout,
-    LogPlayerDamage,
-    ToggleMDC,
-    actionMenuClose,
-    actionMenuOpen,
-    traceLastFunc,
-    isHeliCamActive
-   } = require('./globals');
+var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 const Menu = NativeUI.Menu;
 const UIMenuItem = NativeUI.UIMenuItem;
@@ -96,7 +26,7 @@ var Gender = "M";
 var TattooList = [];
 
 mp.events.add("ShowTattooMenu", (gender) => {
-    activateChat(false);
+    global.activateChat(false);
     Gender = gender;
     TattooList = JSON.parse(player.getVariable("TattooList"));
 
@@ -225,7 +155,7 @@ TattooMenu.MenuClose.on(() => {
     TattooItems = [];
     CategoryPickerItem.Visible = false;
     TattooMenu.RemoveItem(CategoryPickerItem);
-    activateChat(true);
+    global.activateChat(true);
 
     mp.events.callRemote("SaveTattoos", JSON.stringify(TattooList));
 });

@@ -1,77 +1,8 @@
-var {
-    currentJailTime,
-    lastJailUpdate,
-    chaseRunning,
-    chaseTimeCur,
-    chaseTimeMax,
-    chaseMode,
-    collisionTime,
-    updateRate,
-    radioToggle,
-    carryTarget,
-    chatStatus,
-    chatStatusLate,
-    menuToggledLate,
-    lastChatToggle,
-    streetName,
-    zoneName,
-    showHud,
-    renderNametags,
-    currentMuteTime,
-    lastMuteUpdate,
-    lastFunc,
-    curMDCBind,
-    lastMDCBind,
-    curActionMenuBind,
-    lastActionMenuBind,
-    BankRobberyOn,
-    ShowVehicleDL,
-    specState,
-    specTarget,
-    isNoClip,
-    LastKeyPress,
-    AFKStage,
-    SecondsSinceLastKeyPress,
-    antiAFKActive,
-    showReticule,
-    showCustomCrosshair,
-    showCustomCrosshairInSniper,
-    alwaysShowCustomCrosshair,
-    customCrosshairOn,
-    ServerUI,
-    menuToggled,
-    scoreboardToggled,
-    scoreboardCursor,
-    StationPickerToggled,
-    MDC_DOM,
-    MDCActive,
-    isLockpicking,
-    isHotwiring,
-    HotwireDOM,
-    ClothingEditorDOM,
-    ClothingEditorActive,
-    ActionMenuActive,
-    VehicleSpawnerActive,
-    WeaponEditorActive,
-    FireModeDisplayText,
-    cuffTarget,
-    cuffInterval,
-    boneData,
-    weaponData,
-    loginSceneEntities,
-    chatStatusTimeout,
-    LogPlayerDamage,
-    ToggleMDC,
-    actionMenuClose,
-    actionMenuOpen,
-    IsInTutorial,
-    traceLastFunc,
-    isHeliCamActive
-   } = require('./globals');
+var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 mp.events.add("StartTutorial", () => {
-    if(ServerUI == null) return;
-    IsInTutorial = true;
+    if(global.ServerUI == null) return;
+    global.IsInTutorial = true;
 
     var TutorialQuestions = [
         {
@@ -154,7 +85,7 @@ mp.events.add("StartTutorial", () => {
             You will now be sent to the <strong>Character Creator</strong> to create your appearance. Have fun!"
         }
     ];
-    if(ServerUI) ServerUI.execute(`
+    if(global.ServerUI) global.ServerUI.execute(`
     gm.$refs.helpers.$refs.tutorial.pages = ${JSON.stringify(TutorialQuestions)};
     gm.$refs.helpers.$refs.tutorial.enabled = true;
     `);
@@ -184,7 +115,7 @@ mp.events.add("OnFinishTutorial", (results) => {
 
     mp.events.callRemote(results);
     let resobj = JSON.parse(results);
-    IsInTutorial = false;
+    global.IsInTutorial = false;
     let useVoice = resobj[1];
 
     let langID = 0;
@@ -200,5 +131,5 @@ mp.events.add("OnFinishTutorial", (results) => {
     mp.events.callLocal("login_StopMusic");
     mp.events.callRemote("Server_FinishTutorial", useVoice, langID);
     mp.gui.cursor.show(false, false);
-   // if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = true;`);
+   // if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = true;`);
 });

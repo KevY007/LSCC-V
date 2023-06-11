@@ -1,73 +1,4 @@
-var {
-    currentJailTime,
-    lastJailUpdate,
-    chaseRunning,
-    chaseTimeCur,
-    chaseTimeMax,
-    chaseMode,
-    collisionTime,
-    updateRate,
-    radioToggle,
-    carryTarget,
-    chatStatus,
-    chatStatusLate,
-    menuToggledLate,
-    lastChatToggle,
-    streetName,
-    zoneName,
-    showHud,
-    renderNametags,
-    currentMuteTime,
-    lastMuteUpdate,
-    lastFunc,
-    curMDCBind,
-    lastMDCBind,
-    curActionMenuBind,
-    lastActionMenuBind,
-    BankRobberyOn,
-    ShowVehicleDL,
-    specState,
-    specTarget,
-    isNoClip,
-    LastKeyPress,
-    AFKStage,
-    SecondsSinceLastKeyPress,
-    antiAFKActive,
-    showReticule,
-    showCustomCrosshair,
-    showCustomCrosshairInSniper,
-    alwaysShowCustomCrosshair,
-    customCrosshairOn,
-    ServerUI,
-    menuToggled,
-    scoreboardToggled,
-    scoreboardCursor,
-    StationPickerToggled,
-    MDC_DOM,
-    MDCActive,
-    isLockpicking,
-    isHotwiring,
-    HotwireDOM,
-    ClothingEditorDOM,
-    ClothingEditorActive,
-    ActionMenuActive,
-    VehicleSpawnerActive,
-    WeaponEditorActive,
-    FireModeDisplayText,
-    cuffTarget,
-    cuffInterval,
-    boneData,
-    weaponData,
-    loginSceneEntities,
-    ServerSettings,
-    chatStatusTimeout,
-    LogPlayerDamage,
-    ToggleMDC,
-    actionMenuClose,
-    actionMenuOpen,
-    traceLastFunc,
-    isHeliCamActive
-   } = require('./globals');
+var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 let isAimingLastReport = false;
 let cameraUpdateDisabled = false;
@@ -83,10 +14,10 @@ mp.events.add('render', () => {
             mp.events.callRemoteUnreliable("UpdateAimingState", isAimingLastReport);
         }
 
-        if(ServerSettings.CameraUpdateTime !== undefined && ServerSettings.CameraUpdateTime >= 10 
+        if(global.ServerSettings.CameraUpdateTime !== undefined && global.ServerSettings.CameraUpdateTime >= 10 
             && mp.players.local.getVariable("UpdateCameraData") == true)
         {
-            if(ServerSettings.CameraUpdateTime != 699 && Date.now() - lastUpdateTime >= ServerSettings.CameraUpdateTime)
+            if(global.ServerSettings.CameraUpdateTime != 699 && Date.now() - lastUpdateTime >= global.ServerSettings.CameraUpdateTime)
             {
                 let camera = mp.cameras.new("gameplay");
                 let direction = camera.getDirection();
@@ -99,7 +30,7 @@ mp.events.add('render', () => {
                 }
                 lastUpdateTime = Date.now();
             }
-            else if(ServerSettings.CameraUpdateTime == 699 && cameraUpdateDisabled == false)
+            else if(global.ServerSettings.CameraUpdateTime == 699 && cameraUpdateDisabled == false)
             {
                 mp.events.callRemoteUnreliable("UpdateCameraDir", -1.0, -1.0, -1.0);
                 cameraUpdateDisabled = true;

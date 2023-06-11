@@ -1,76 +1,6 @@
 const NativeUI = require("nativeui");
 const Data = require("charcreator/data");
-var {
-    currentJailTime,
-    lastJailUpdate,
-    chaseRunning,
-    chaseTimeCur,
-    chaseTimeMax,
-    chaseMode,
-    collisionTime,
-    updateRate,
-    radioToggle,
-    carryTarget,
-    chatStatus,
-    chatStatusLate,
-    menuToggledLate,
-    lastChatToggle,
-    streetName,
-    zoneName,
-    showHud,
-    renderNametags,
-    currentMuteTime,
-    lastMuteUpdate,
-    lastFunc,
-    curMDCBind,
-    lastMDCBind,
-    curActionMenuBind,
-    lastActionMenuBind,
-    BankRobberyOn,
-    ShowVehicleDL,
-    specState,
-    specTarget,
-    isNoClip,
-    LastKeyPress,
-    AFKStage,
-    SecondsSinceLastKeyPress,
-    antiAFKActive,
-    showReticule,
-    showCustomCrosshair,
-    showCustomCrosshairInSniper,
-    alwaysShowCustomCrosshair,
-    customCrosshairOn,
-    ServerUI,
-    menuToggled,
-    scoreboardToggled,
-    scoreboardCursor,
-    StationPickerToggled,
-    MDC_DOM,
-    MDCActive,
-    isLockpicking,
-    isHotwiring,
-    HotwireDOM,
-    ClothingEditorDOM,
-    ClothingEditorActive,
-    ActionMenuActive,
-    VehicleSpawnerActive,
-    WeaponEditorActive,
-    FireModeDisplayText,
-    cuffTarget,
-    cuffInterval,
-    boneData,
-    weaponData,
-    focusChat,
-    activateChat,
-    loginSceneEntities,
-    chatStatusTimeout,
-    LogPlayerDamage,
-    ToggleMDC,
-    actionMenuClose,
-    actionMenuOpen,
-    traceLastFunc,
-    isHeliCamActive
-   } = require('./globals');
+var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 const Menu = NativeUI.Menu;
 const UIMenuItem = NativeUI.UIMenuItem;
@@ -814,7 +744,7 @@ mp.events.add("toggleCreator", (active, charData, blockGenderChange) => {
         }
 
         creatorMainMenu.Visible = true;
-        activateChat(false);
+        global.activateChat(false);
         mp.game.ui.displayRadar(false);
         mp.game.ui.displayHud(false);
         localPlayer.clearTasksImmediately();
@@ -893,7 +823,7 @@ mp.events.add("toggleCreator", (active, charData, blockGenderChange) => {
         applyCreatorOutfit();
     } else {
         for (let i = 0; i < creatorMenus.length; i++) creatorMenus[i].Visible = false;
-        activateChat(true);
+        global.activateChat(true);
         mp.game.ui.displayRadar(true);
         mp.game.ui.displayHud(true);
         localPlayer.freezePosition(false);

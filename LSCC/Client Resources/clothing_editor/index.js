@@ -1,10 +1,10 @@
 let editorTeam = -1;
 
 mp.events.add("ClothingEditor:exit", (save) => {
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = ${mp.storage.data.menu.HUD.toString()};`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = ${mp.storage.data.menu.HUD.toString()};`);
     mp.gui.cursor.show(false, false);
-    ClothingEditorDOM.active = false;
-    ClothingEditorActive = false;
+    global.ClothingEditorDOM.active = false;
+    global.ClothingEditorActive = false;
 
     mp.events.callRemote("ClothingEditor:onExit", save, editorTeam);
 });
@@ -36,13 +36,13 @@ mp.events.add("ClothingEditor:show", (team, gender, clothingData, forceSet) => {
     let toSendStr = JSON.stringify(toSend);
 
     editorTeam = team;
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = false;`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = false;`);
     mp.gui.cursor.show(true, true);
     mp.game.invoke("0xFC695459D4D0E219", 0.5, 0.5); // SET CURSOR POSITION TO CENTER [x,y = 0.5,0.5]
 
-    ClothingEditorDOM.execute(`ShowClothingEditor(${team}, '${gender}', ${toSendStr}, ${forceSet.toString()});`);
-    ClothingEditorDOM.active = true;
-    ClothingEditorActive = true;
+    global.ClothingEditorDOM.execute(`ShowClothingEditor(${team}, '${gender}', ${toSendStr}, ${forceSet.toString()});`);
+    global.ClothingEditorDOM.active = true;
+    global.ClothingEditorActive = true;
     
 });
 mp.events.add("ClothingEditor:updateClothingManual", (componentIndex, drawable, texture) => {
@@ -87,17 +87,13 @@ mp.events.add("ClothingEditor:updateClothing", (clothingName, drawable, texture)
         }
     }
 });
-function InitializeClothingEditorDOM(){
-    ClothingEditorDOM = mp.browsers.new("package://clothing_editor/index.html");
-    ClothingEditorDOM.active = false;
-    ClothingEditorActive = false;
-}
+
 
 mp.keys.bind(0x20, true, function() {clothingEditor_CameraMovement(true); });
 mp.keys.bind(0x20, false, function() {clothingEditor_CameraMovement(false); });
 
 function clothingEditor_CameraMovement(toggle){
-    if(!ClothingEditorActive) return;
+    if(!global.ClothingEditorActive) return;
 
     if(toggle)
         mp.gui.cursor.show(false, false);

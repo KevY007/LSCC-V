@@ -1,72 +1,4 @@
-var {
-    currentJailTime,
-    lastJailUpdate,
-    chaseRunning,
-    chaseTimeCur,
-    chaseTimeMax,
-    chaseMode,
-    collisionTime,
-    updateRate,
-    radioToggle,
-    carryTarget,
-    chatStatus,
-    chatStatusLate,
-    menuToggledLate,
-    lastChatToggle,
-    streetName,
-    zoneName,
-    showHud,
-    renderNametags,
-    currentMuteTime,
-    lastMuteUpdate,
-    lastFunc,
-    curMDCBind,
-    lastMDCBind,
-    curActionMenuBind,
-    lastActionMenuBind,
-    BankRobberyOn,
-    ShowVehicleDL,
-    specState,
-    specTarget,
-    isNoClip,
-    LastKeyPress,
-    AFKStage,
-    SecondsSinceLastKeyPress,
-    antiAFKActive,
-    showReticule,
-    showCustomCrosshair,
-    showCustomCrosshairInSniper,
-    alwaysShowCustomCrosshair,
-    customCrosshairOn,
-    ServerUI,
-    menuToggled,
-    scoreboardToggled,
-    scoreboardCursor,
-    StationPickerToggled,
-    MDC_DOM,
-    MDCActive,
-    isLockpicking,
-    isHotwiring,
-    HotwireDOM,
-    ClothingEditorDOM,
-    ClothingEditorActive,
-    ActionMenuActive,
-    VehicleSpawnerActive,
-    WeaponEditorActive,
-    FireModeDisplayText,
-    cuffTarget,
-    cuffInterval,
-    boneData,
-    weaponData,
-    loginSceneEntities,
-    chatStatusTimeout,
-    LogPlayerDamage,
-    ToggleMDC,
-    actionMenuClose,
-    actionMenuOpen,
-    traceLastFunc,
-    isHeliCamActive
-   } = require('./globals');
+var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 const maxDistance = 25*25;
 const width = 0.03;
@@ -194,16 +126,16 @@ mp.events.add('render', (nametags) => {
     nametags.forEach(nametag => {
         let [player, x, y, distance] = nametag;
     
-        if((specState || isNoClip) || (isPlayerInLOS(player) == true && player.getAlpha() > 32) || mp.players.local.getVariable("NametagHack") == true) {	   
+        if((global.specState || global.isNoClip) || (isPlayerInLOS(player) == true && player.getAlpha() > 32) || mp.players.local.getVariable("NametagHack") == true) {	   
             
             let distWithAdjust = 0 + distance;
             let maxDistWithAdjust = 0 + maxDistance;
             
-            if(specState) {
+            if(global.specState) {
                 distWithAdjust -= 20;
                 maxDistWithAdjust += 20*20;
             } 
-            if(isNoClip) {
+            if(global.isNoClip) {
                 distWithAdjust -= 35;
                 maxDistWithAdjust = 35*35;
             }
@@ -213,7 +145,7 @@ mp.events.add('render', (nametags) => {
                 maxDistWithAdjust += 999999.9;
             }
             
-            if((distWithAdjust <= (maxDistWithAdjust)) || (specState || isNoClip) || mp.players.local.getVariable("NametagHack") == true)
+            if((distWithAdjust <= (maxDistWithAdjust)) || (global.specState || global.isNoClip) || mp.players.local.getVariable("NametagHack") == true)
             {
                 let scale = (distWithAdjust / (maxDistWithAdjust));
                 if(scale < NT_SCALE) scale = NT_SCALE;
@@ -224,8 +156,8 @@ mp.events.add('render', (nametags) => {
                 
                 y -= ((scale * (NT_MULTIPLIER   * (screenRes.y / 1080))) + NT_OFFSET);
 
-                if(renderNametags == true) {
-                    if(player.getVariable("Team") !== undefined && player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && !BankRobberyOn)
+                if(global.renderNametags == true) {
+                    if(player.getVariable("Team") !== undefined && player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && !global.BankRobberyOn)
                     {
                         mp.game.graphics.drawText(NAMETAG_MESSAGES.PLAYER_SHOT, [x, y - 0.02],
                         {
@@ -236,7 +168,7 @@ mp.events.add('render', (nametags) => {
                         });
                     }
 
-                    if(AFKStage > 0){
+                    if(global.AFKStage > 0){
                         var typingStr = `(( IDLE [${SecondsSinceLastKeyPress}s/1500s] ))`;
                         if(timerCount == 0) typingStr = `(( IDLE [${SecondsSinceLastKeyPress}s/1500s] ))`;
                         else if(timerCount == 1) typingStr = `( IDLE [${SecondsSinceLastKeyPress}s/1500s] )`;
@@ -393,7 +325,7 @@ mp.events.add('render', (nametags) => {
                     if(showHPStatus == 3)
                     {
                         if(player.getVariable("BustedProgress") !== undefined && player.getVariable("Team") != undefined && player.getVariable("Team") == 0 && 
-                            player.getVariable("BustedProgress") >= 0.0 && chaseRunning) // -1.0 is used if busted.
+                            player.getVariable("BustedProgress") >= 0.0 && global.chaseRunning) // -1.0 is used if busted.
                         {
                             health = player.getVariable("BustedProgress") / 100;
                             let y2 = y + 0.056;
@@ -409,7 +341,7 @@ mp.events.add('render', (nametags) => {
                 if(mp.game.player.isFreeAimingAtEntity(player.handle) && mp.players.local.weaponAmmo > 1 && 
                     mp.players.local.weapon != 2725352035 && mp.players.local.weapon != 0xA2719263) // 2725352035/hex = fist 
                 {
-                    if(mp.players.local.getVariable("HasShot") == false && mp.players.local.getVariable("Team") == 0 && player.getVariable("Team") == 1 && chaseRunning)
+                    if(mp.players.local.getVariable("HasShot") == false && mp.players.local.getVariable("Team") == 0 && player.getVariable("Team") == 1 && global.chaseRunning)
                     {
                         mp.events.callRemote("GivePlayerShotTag");
                     }
@@ -417,7 +349,7 @@ mp.events.add('render', (nametags) => {
             }
             else
             {
-                if(player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && renderNametags == true && chaseRunning && !BankRobberyOn)
+                if(player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && global.renderNametags == true && global.chaseRunning && !global.BankRobberyOn)
                 {
                     // They out of distance but still try?
                     mp.game.graphics.drawText(NAMETAG_MESSAGES.PLAYER_SHOT, [x, y],

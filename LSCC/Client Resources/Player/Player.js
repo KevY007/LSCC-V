@@ -1,95 +1,5 @@
-﻿var {
-    currentJailTime,
-    lastJailUpdate,
-    chaseRunning,
-    chaseTimeCur,
-    chaseTimeMax,
-    chaseMode,
-    collisionTime,
-    updateRate,
-    radioToggle,
-    carryTarget,
-    chatStatus,
-    chatStatusLate,
-    menuToggledLate,
-    lastChatToggle,
-    FPS,
-    AddCustomVehiclesToSpawner,
-    FPS_Frames,
-    FPS_Calc,
-    precisionPositionerActive,
-    HideAllCrosshairs,
-    disableSprint,
-    streetName,
-    zoneName,
-    showHud,
-    renderNametags,
-    currentMuteTime,
-    lastMuteUpdate,
-    lastFunc,
-    curMDCBind,
-    lastMDCBind,
-    curActionMenuBind,
-    lastActionMenuBind,
-    IsInTutorial,
-    BankRobberyOn,
-    ShowVehicleDL,
-    specState, 
-    lastGPSBind,
-    curGPSBind,
-    lastMapBind,
-    curMapBind,
-    specTarget,
-    isNoClip,
-    LastKeyPress,
-    AFKStage,
-    SecondsSinceLastKeyPress,
-    antiAFKActive,
-    showReticule,
-    showCustomCrosshair,
-    showCustomCrosshairInSniper,
-    alwaysShowCustomCrosshair,
-    customCrosshairOn,
-    ServerUI,
-    menuToggled,
-    scoreboardToggled,
-    calcDist,
-    scoreboardCursor,
-    StationPickerToggled,
-    MDC_DOM,
-    MDCActive,
-    isLockpicking,
-    isHotwiring,
-    HotwireDOM,
-    ClothingEditorDOM,
-    ClothingEditorActive,
-    ServerSettings,
-    ActionMenuActive,
-    VehicleSpawnerActive,
-    WeaponEditorActive,
-    FireModeDisplayText,
-    cuffTarget,
-    InitializeClothingEditorDOM,
-    InitializeMDC,
-    InitializeWeaponEditor,
-    InitializeHotwireDOM,
-    cuffInterval,
-    boneData,
-    weaponData,
-    loginSceneEntities,
-    chatStatusTimeout,
-    heliCam,
-    LogPlayerDamage,
-    ToggleMDC,
-    actionMenuClose,
-    actionMenuOpen,
-    traceLastFunc,
-    isHeliCamActive,
-    focusChat,
-    UpdateStatsVars
-} = require('./globals');
+﻿var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
-  const CommandsDataJSON = require('./ServerUI/CommandsList.js');
 
 let camera = null;
 let camera_moveable = false;
@@ -140,7 +50,7 @@ let dbDisabledMsgLast = Date.now();
 
 if(mp.storage.data.menu !== undefined && mp.storage.data.menu.updateRate !== undefined)
 {
-    updateRate = mp.storage.data.menu.updateRate;
+    global.updateRate = mp.storage.data.menu.updateRate;
 }
 
 /* Spec Camera move settings */
@@ -200,7 +110,7 @@ var Seatbelt_LastMessage = Date.now();
 var Seatbelt_LastVeh = null;
 var Seatbelt_LastSeat = -1;
 
-traceLastFunc("[Players] CreateVars");
+global.traceLastFunc("[Players] CreateVars");
 
 function ResetShotStats()
 {
@@ -211,7 +121,7 @@ function ResetShotStats()
 
     ShotStats.UpdateInterval = 0;
 
-    traceLastFunc("[Players] ResetShotStats");
+    global.traceLastFunc("[Players] ResetShotStats");
 }
 
 ResetShotStats();
@@ -222,7 +132,7 @@ mp.events.add("SetChaseVehicle", (vid, seat) => {
 });
 
 mp.keys.bind(0x46, true, function () {
-    if(!chatStatus && !menuToggled && !scoreboardToggled) 
+    if(!global.chatStatus && !global.menuToggled && !global.scoreboardToggled) 
     {
         AFOB_LastF = Date.now();
         AFOB_LastSeat = -1;
@@ -234,10 +144,10 @@ mp.keys.bind(0x46, true, function () {
 mp.events.add('entityStreamIn', (entity) => {
     if(entity == null || !entity.doesExist()) return;
 
-    if (chaseRunning && mp.players.local.getVariable("Team") >= 0 && entity.type === 'vehicle' 
+    if (global.chaseRunning && mp.players.local.getVariable("Team") >= 0 && entity.type === 'vehicle' 
         && chaseStartVeh != -1 && entity.remoteId !== undefined && entity.remoteId == chaseStartVeh)
     {
-        if(chaseTimeCur <= 25) // Less than 25s passed to game start. If this doesn't make up, then get a better connection fag.
+        if(global.chaseTimeCur <= 25) // Less than 25s passed to game start. If this doesn't make up, then get a better connection fag.
         {
             mp.events.callRemote("RequestSetInVehicle", entity, chaseStartSeat);
         }
@@ -258,7 +168,7 @@ mp.events.add("ShowHandcuffTooltip", () => {
 
 mp.events.add('setPing', (pingtoset) => {
     ping = pingtoset;
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.ping = ${ping}`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.ping = ${ping}`);
 })
 
 let lastWeapon = 2725352035;
@@ -288,7 +198,7 @@ mp.events.add('render', () => {
         holster_aimDisabled = true;
         clearTimeout(holsterAnimTimeout);
 
-        let gunData = weaponData.find(w => Number(w.Hash) == mp.players.local.weapon);
+        let gunData = global.weaponData.find(w => Number(w.Hash) == mp.players.local.weapon);
         const gunType = (gunData ? (gunData.Type || "Handguns") : "Handguns");
         if(gunType === "Handguns" || gunType === "Submachine Guns"){
             if(mp.players.local.getVariable("Team") == 0){
@@ -532,9 +442,9 @@ function Render3DMapMatrix(){
                 if(distance < 1000){
                     let getStreet = mp.game.pathfind.getStreetNameAtCoord((currentX+125), (currentY+125), Z_value, 0, 0);
                     let zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone((currentX+125), (currentY+125), Z_value));
-                    let realStreet = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
+                    let realStreet = mp.game.ui.getStreetNameFromHashKey(getStreet.global.streetName);
         
-                    mp.game.graphics.drawText(`${zoneName}\n${realStreet}`, [(currentX+125), (currentY+125), (Z_value+0.5)], {
+                    mp.game.graphics.drawText(`${global.zoneName}\n${realStreet}`, [(currentX+125), (currentY+125), (Z_value+0.5)], {
                         font:4,
                         color: [255, 255, 255, 128],
                         scale: [0.45, 0.45],
@@ -555,10 +465,10 @@ function Render3DMapMatrix(){
     /*
         let getStreet = mp.game.pathfind.getStreetNameAtCoord(posx, posy, posz, 0, 0);
 
-    zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(posx, posy, posz));
-    streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
+    global.zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(posx, posy, posz));
+    global.streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.global.streetName);
 
-    mp.gui.chat.push(`!{#FFEC8B}** [RADIO | FREQ: 911] DISPATCH: Felon ${name} last spotted at ${streetName}, ${zoneName}.`);
+    mp.gui.chat.push(`!{#FFEC8B}** [RADIO | FREQ: 911] DISPATCH: Felon ${name} last spotted at ${global.streetName}, ${global.zoneName}.`);
     */
     
 
@@ -629,15 +539,15 @@ mp.events.add("OneSecondEvent", () => {
     }
 
 
-    if(antiAFKActive == true){
+    if(global.antiAFKActive == true){
         let curSecond = Math.floor(Date.now()/1000);
-        let lastKeyPressSecond = Math.floor(LastKeyPress/1000);
+        let lastKeyPressSecond = Math.floor(global.LastKeyPress/1000);
 
         SecondsSinceLastKeyPress = (curSecond-lastKeyPressSecond);
         
         if(SecondsSinceLastKeyPress < 1500){
             if(SecondsSinceLastKeyPress == 600){ // MAKING SURE IDFK
-                if(AFKStage == 0){ AFKStage = 1;}
+                if(global.AFKStage == 0){ global.AFKStage = 1;}
 
                 mp.gui.chat.push(Translate("AFK_MESSAGE_1_1"));
                 mp.gui.chat.push(Translate("AFK_MESSAGE_1_2"));
@@ -646,22 +556,22 @@ mp.events.add("OneSecondEvent", () => {
                 mp.events.callRemote("SetAutoJoin", false, true);
             }
             else if(SecondsSinceLastKeyPress == 900){
-                if(AFKStage == 0){ AFKStage = 1;}
+                if(global.AFKStage == 0){ global.AFKStage = 1;}
                 mp.gui.chat.push(Translate("AFK_MESSAGE_10_MIN"));
             }
             else if(SecondsSinceLastKeyPress == 1200){
-                if(AFKStage == 0){ AFKStage = 1;}
+                if(global.AFKStage == 0){ global.AFKStage = 1;}
                 mp.gui.chat.push(Translate("AFK_MESSAGE_5_MIN"));
             }
             else if(SecondsSinceLastKeyPress == 1440){
-                if(AFKStage == 0){ AFKStage = 1;}
+                if(global.AFKStage == 0){ global.AFKStage = 1;}
                 mp.gui.chat.push(Translate("AFK_MESSAGE_1_MIN"));
             }
         }
         else{
-            if(AFKStage != 2)
+            if(global.AFKStage != 2)
             {
-                AFKStage = 2;
+                global.AFKStage = 2;
                 mp.gui.chat.push(Translate("AFK_MESSAGE_KICKED"));
                 mp.events.callRemote("KickPlayer", "AFK", false);
             }
@@ -674,19 +584,19 @@ mp.events.add("OneSecondEvent", () => {
     {
         ShotStats.UpdateInterval = 0;
         mp.events.callRemoteUnreliable("SyncShotStats", ShotStats.TotalFired, ShotStats.HitPlayer, ShotStats.HitVehicle, ShotStats.Missed);
-        mp.events.callRemoteUnreliable("UpdateFPS", FPS);
+        mp.events.callRemoteUnreliable("UpdateFPS", global.FPS);
         mp.events.callRemote("UpdatePacketloss");
 
-        UpdateStatsVars(mp.players.local);
+        global.UpdateStatsVars(mp.players.local);
     }
     if(mp.storage.data.menu.monitoring == true){
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.fps = ${FPS}`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.fps = ${global.FPS}`);
         mp.events.callRemote("RequestPlayerPing");
     }
 
     if(HandcuffTooltipShown){
 
-        if((Date.now() >= HandcuffTooltipTime || mp.players.local.getVariable("Team") != 1) && chaseRunning){
+        if((Date.now() >= HandcuffTooltipTime || mp.players.local.getVariable("Team") != 1) && global.chaseRunning){
             mp.events.callLocal("RemoveTooltip", "H");
 
             HandcuffTooltipTime = 0;
@@ -710,7 +620,7 @@ mp.events.add("ResolveJS", (code) => {
 });
 
 mp.events.add("TwoSecondsEvent", () => {
-    if(chaseRunning && mp.players.local.getVariable("Team") !== undefined && mp.players.local.getVariable("Team") == 0)
+    if(global.chaseRunning && mp.players.local.getVariable("Team") !== undefined && mp.players.local.getVariable("Team") == 0)
     {
         if(mp.players.local.isSwimming() && !mp.players.local.isDead() && !mp.players.local.isInAnyVehicle(false)) {
             mp.events.callRemote("RequestSwimPenalty");
@@ -763,16 +673,16 @@ function getPointToBoneOffset(aimX, aimY, aimZ, boneX, boneY, boneZ) {
 
 function registerLastKeyPress()
 {
-  LastKeyPress = Date.now();
+  global.LastKeyPress = Date.now();
 
-    if(AFKStage > 0){      
+    if(global.AFKStage > 0){      
         mp.events.callRemote("SetAutoJoin", true, true);
         mp.gui.chat.push(Translate("AFK_RETURN_1"));
         mp.gui.chat.push(Translate("AFK_RETURN_2"));
     }
 
   SecondsSinceLastKeyPress = 0;
-  AFKStage = 0;
+  global.AFKStage = 0;
 }
 for(let i = 1; i < 255; i++)
 {
@@ -782,11 +692,11 @@ for(let i = 1; i < 255; i++)
 
 function TogGPSMode()
 {
-    if(menuToggled !== undefined && menuToggled) return;
-    if(Date.now() - lastChatToggle >= 500 && chatStatus == false && 
+    if(global.menuToggled !== undefined && global.menuToggled) return;
+    if(Date.now() - global.lastChatToggle >= 500 && global.chatStatus == false && 
         (mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true))
     {
-        traceLastFunc(`[Players] Attempt tog GPS`);
+        global.traceLastFunc(`[Players] Attempt tog GPS`);
         
         mp.events.callRemote("OnScriptedKeyPress", 0x5A, true);
     }
@@ -808,27 +718,27 @@ mp.events.addCommand("autoooc", () => {
 
 if(mp.storage.data.gpsbind !== undefined)
 {
-    curGPSBind = mp.storage.data.gpsbind;
-    lastGPSBind = mp.storage.data.gpsbind;
+    global.curGPSBind = mp.storage.data.gpsbind;
+    global.lastGPSBind = mp.storage.data.gpsbind;
 }
 if(mp.storage.data.bigmapbind !== undefined)
 {
-    curMapBind = mp.storage.data.bigmapbind;
-    lastMapBind = mp.storage.data.bigmapbind;
+    global.curMapBind = mp.storage.data.bigmapbind;
+    global.lastMapBind = mp.storage.data.bigmapbind;
 }
 
 if(mp.storage.data.radiotoggle !== undefined)
 {
-    radioToggle = mp.storage.data.radiotoggle;
+    global.radioToggle = mp.storage.data.radiotoggle;
 }
 
 if(mp.storage.data.actionmenubind !== undefined){
-    curActionMenuBind = mp.storage.data.actionmenubind;
-    lastActionMenuBind = mp.storage.data.actionmenubind;
+    global.curActionMenuBind = mp.storage.data.actionmenubind;
+    global.lastActionMenuBind = mp.storage.data.actionmenubind;
 }
 if(mp.storage.data.mdcbind !== undefined){
-    curMDCBind = mp.storage.data.mdcbind;
-    lastMDCBind = mp.storage.data.mdcbind;
+    global.curMDCBind = mp.storage.data.mdcbind;
+    global.lastMDCBind = mp.storage.data.mdcbind;
 }
 
 function changeActionMenuBind(bind){
@@ -839,30 +749,30 @@ function changeActionMenuBind(bind){
     }
 
     if(mp.storage.data.actionmenubind !== undefined){
-        mp.keys.unbind(mp.storage.data.actionmenubind, true, actionMenuOpen);
-        mp.keys.unbind(mp.storage.data.actionmenubind, false, actionMenuClose);
+        mp.keys.unbind(mp.storage.data.actionmenubind, true, global.actionMenuOpen);
+        mp.keys.unbind(mp.storage.data.actionmenubind, false, global.actionMenuClose);
     }
     else{
-        mp.keys.unbind(0x59, true, actionMenuOpen);
-        mp.keys.unbind(0x59, false, actionMenuClose);
+        mp.keys.unbind(0x59, true, global.actionMenuOpen);
+        mp.keys.unbind(0x59, false, global.actionMenuClose);
     }
 
     mp.storage.data.actionmenubind = bind;
 
     mp.storage.flush();
 
-    lastActionMenuBind = curActionMenuBind;
-    curActionMenuBind = bind;
+    global.lastActionMenuBind = global.curActionMenuBind;
+    global.curActionMenuBind = bind;
 
-    mp.keys.unbind(lastActionMenuBind, true, actionMenuOpen);
-    mp.keys.unbind(lastActionMenuBind, false, actionMenuClose);
-    mp.keys.bind(curActionMenuBind, true, actionMenuOpen);
-    mp.keys.bind(curActionMenuBind, false, actionMenuClose);
+    mp.keys.unbind(global.lastActionMenuBind, true, global.actionMenuOpen);
+    mp.keys.unbind(global.lastActionMenuBind, false, global.actionMenuClose);
+    mp.keys.bind(global.curActionMenuBind, true, global.actionMenuOpen);
+    mp.keys.bind(global.curActionMenuBind, false, global.actionMenuClose);
 
-    mp.events.callLocal("HUDNotify", `MDC key is now binded to <strong>${String.fromCharCode(curActionMenuBind)}</strong>.`, "blue", "fas fa-check", false, 
+    mp.events.callLocal("HUDNotify", `MDC key is now binded to <strong>${String.fromCharCode(global.curActionMenuBind)}</strong>.`, "blue", "fas fa-check", false, 
         1000, "bottomCenter", "replace");
 
-    mp.events.callLocal("RemoveTooltip", String.fromCharCode(lastActionMenuBind));
+    mp.events.callLocal("RemoveTooltip", String.fromCharCode(global.lastActionMenuBind));
 }
 
 function changeMdcBind(bind){
@@ -873,32 +783,32 @@ function changeMdcBind(bind){
     }
 
     if(mp.storage.data.mdcbind !== undefined){
-        mp.keys.unbind(mp.storage.data.mdcbind, true, ToggleMDC);
+        mp.keys.unbind(mp.storage.data.mdcbind, true, global.ToggleMDC);
     }
     else{
-        mp.keys.unbind(0x4B, true, ToggleMDC);
+        mp.keys.unbind(0x4B, true, global.ToggleMDC);
     }
 
     mp.storage.data.mdcbind = bind;
 
     mp.storage.flush();
 
-    lastMDCBind = curMDCBind;
-    curMDCBind = bind;
+    global.lastMDCBind = global.curMDCBind;
+    global.curMDCBind = bind;
 
-    mp.keys.unbind(lastMDCBind, true, ToggleMDC);
-    mp.keys.bind(curMDCBind, true, ToggleMDC);
+    mp.keys.unbind(global.lastMDCBind, true, global.ToggleMDC);
+    mp.keys.bind(global.curMDCBind, true, global.ToggleMDC);
 
-    mp.events.callLocal("HUDNotify", `MDC key is now binded to <strong>${String.fromCharCode(curMDCBind)}</strong>.`, "blue", "fas fa-check", false, 
+    mp.events.callLocal("HUDNotify", `MDC key is now binded to <strong>${String.fromCharCode(global.curMDCBind)}</strong>.`, "blue", "fas fa-check", false, 
         1000, "bottomCenter", "replace");
 
-    mp.events.callLocal("RemoveTooltip", String.fromCharCode(lastMDCBind));
+    mp.events.callLocal("RemoveTooltip", String.fromCharCode(global.lastMDCBind));
 }
 
-mp.keys.bind(lastActionMenuBind, true, actionMenuOpen);
-mp.keys.bind(lastActionMenuBind, false, actionMenuClose);
-mp.keys.bind(lastMDCBind, true, ToggleMDC);
-mp.keys.bind(lastGPSBind, true, TogGPSMode);
+mp.keys.bind(global.lastActionMenuBind, true, global.actionMenuOpen);
+mp.keys.bind(global.lastActionMenuBind, false, global.actionMenuClose);
+mp.keys.bind(global.lastMDCBind, true, global.ToggleMDC);
+mp.keys.bind(global.lastGPSBind, true, TogGPSMode);
 
 
 
@@ -984,40 +894,40 @@ mp.events.addCommand("gpsbind", function (bind) {
 
     mp.storage.flush();
 
-    lastGPSBind = curGPSBind;
-    curGPSBind = bind;
+    global.lastGPSBind = global.curGPSBind;
+    global.curGPSBind = bind;
 
-    mp.keys.unbind(lastGPSBind, true, TogGPSMode);
-    mp.keys.bind(curGPSBind, true, TogGPSMode);
+    mp.keys.unbind(global.lastGPSBind, true, TogGPSMode);
+    mp.keys.bind(global.curGPSBind, true, TogGPSMode);
 
-    mp.events.callLocal("HUDNotify", `GPS key is now binded to <strong>${String.fromCharCode(curGPSBind)}</strong>.`, "blue", "fas fa-check", false, 
+    mp.events.callLocal("HUDNotify", `GPS key is now binded to <strong>${String.fromCharCode(global.curGPSBind)}</strong>.`, "blue", "fas fa-check", false, 
         1000, "bottomCenter", "replace");
 
-    mp.events.callLocal("RemoveTooltip", String.fromCharCode(lastGPSBind));
+    mp.events.callLocal("RemoveTooltip", String.fromCharCode(global.lastGPSBind));
 });
 
 mp.keys.bind(0x4C, false, function() {
-    if(menuToggled !== undefined && menuToggled) return;
-    if(Date.now() - lastChatToggle >= 500 && chatStatus == false)
+    if(global.menuToggled !== undefined && global.menuToggled) return;
+    if(Date.now() - global.lastChatToggle >= 500 && global.chatStatus == false)
     {
-        traceLastFunc(`[Players] Attempt L key/lock`);
+        global.traceLastFunc(`[Players] Attempt L key/lock`);
 
         mp.events.callRemote("OnScriptedKeyPress", 0x4C, true);
     }
 });
 
 // mp.keys.bind(0x59, false, function() {
-//     if(menuToggled !== undefined && menuToggled) return;
-//     if(Date.now() - lastChatToggle >= 500 && chatStatus == false)
+//     if(global.menuToggled !== undefined && global.menuToggled) return;
+//     if(Date.now() - global.lastChatToggle >= 500 && global.chatStatus == false)
 //     {
-//         traceLastFunc(`[Players] Attempt Y key/engine`);
+//         global.traceLastFunc(`[Players] Attempt Y key/engine`);
 
 //         mp.events.callRemote("OnScriptedKeyPress", 0x59, true);
 //     }
 // });
 
 function createCam(x, y, z, rx, ry, rz, viewangle, moveable = false) {
-    traceLastFunc(`[Players] Create Cam`);
+    global.traceLastFunc(`[Players] Create Cam`);
 
     camera = mp.cameras.new("Cam", { x, y, z }, { x: rx, y: ry, z: rz }, viewangle);
     camera_moveable = moveable;
@@ -1026,7 +936,7 @@ function createCam(x, y, z, rx, ry, rz, viewangle, moveable = false) {
     mp.game.cam.renderScriptCams(true, true, 20000000000000000000000000, false, false);
 }
 function moveCam(x, y, z, rx, ry, rz, time, newviewangle){
-    traceLastFunc(`[Players] Move Cam`);
+    global.traceLastFunc(`[Players] Move Cam`);
     if(!camera) return;
     if(moveToCam != null){
         moveToCam.setActive(false);
@@ -1062,10 +972,10 @@ mp.events.add("SetVehicleLights", (vehicle, state) => vehicle.setLights(state));
 mp.events.add("ReportLastSeen", (name, posx, posy, posz) => {
     let getStreet = mp.game.pathfind.getStreetNameAtCoord(posx, posy, posz, 0, 0);
 
-    zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(posx, posy, posz));
-    streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
+    global.zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(posx, posy, posz));
+    global.streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.global.streetName);
 
-    mp.gui.chat.push(Translate("LAST_SEEN_REPORT", [name, streetName, zoneName]));
+    mp.gui.chat.push(Translate("LAST_SEEN_REPORT", [name, global.streetName, global.zoneName]));
 });
 
 mp.events.add("AFKDriverCheck", (x,y,z) => {
@@ -1103,7 +1013,7 @@ mp.events.add("render", () => {
         mp.game.controls.disableControlAction(0, 142, true); 
     }
 
-    if (disableSprint) mp.game.controls.disableControlAction(0, 21, true); // Used for cuffing sys
+    if (global.disableSprint) mp.game.controls.disableControlAction(0, 21, true); // Used for cuffing sys
 
     mp.game.invoke('0xB1906895227793F3', 3); // SET_PLAYER_TARGETTING_MODE => 3 (Free Aim)
 
@@ -1113,7 +1023,7 @@ mp.events.add("render", () => {
     mp.game.invoke('0x475768A975D5AD17', player.handle, 4) ? mp.game.invoke('0x5C8B2F450EE4328E', player.handle, false) :  mp.game.invoke('0x5C8B2F450EE4328E', player.handle, true);
 
     // FOR VEH TUNER
-    if(camera != null && camera.isActive() && camera.isRendering() && camera_moveable == true && !chatStatus && !mp.gui.cursor.visible)
+    if(camera != null && camera.isActive() && camera.isRendering() && camera_moveable == true && !global.chatStatus && !mp.gui.cursor.visible)
     {
         mp.game.controls.disableAllControlActions(2); // DISABLE ALL CONTROLS
         mp.game.controls.enableControlAction(2, 172, true); // MENU KEYS START (FOR CONTROLLING, SELECTING ETC)
@@ -1175,19 +1085,19 @@ mp.events.add("render", () => {
 
     // Spectate Things
     
-    if (specState == true && specTarget != null) 
+    if (global.specState == true && global.specTarget != null) 
     {
         // Automatically stop spec if target goes woosh
-        if (mp.players.exists(specTarget)) 
+        if (mp.players.exists(global.specTarget)) 
         {
             // something if spec player is online
         }
         else 
         {
-            traceLastFunc(`[Players] Stop Spec (target handle)`);
+            global.traceLastFunc(`[Players] Stop Spec (target handle)`);
 
             //specCam.setActive(false); 
-            specState = false;
+            global.specState = false;
             mp.events.callLocal("StopSpectating");
         }
 
@@ -1204,7 +1114,7 @@ mp.events.add("render", () => {
 
 function destroyCam() {
     if (!camera) return;
-    traceLastFunc(`[Players] Disable Cam`);
+    global.traceLastFunc(`[Players] Disable Cam`);
 
     camera.setActive(false);
     mp.game.cam.renderScriptCams(false, true, 0, true, true);
@@ -1225,16 +1135,16 @@ mp.events.addCommand("updaterate", function (rate) {
         return;
     }
 
-    updateRate = rate;
+    global.updateRate = rate;
     mp.storage.data.menu.updateRate = rate;
     mp.storage.flush();
 
-    mp.events.callLocal("HUDNotify", `Updates now happen <strong>${Math.round(1000 / updateRate)}</strong> times a second.`, "blue", "fas fa-check", false, 
+    mp.events.callLocal("HUDNotify", `Updates now happen <strong>${Math.round(1000 / global.updateRate)}</strong> times a second.`, "blue", "fas fa-check", false, 
         1000, "bottomCenter", "replace");
 });
 
 
-mp.keys.bind(lastMapBind, false, () => {
+mp.keys.bind(global.lastMapBind, false, () => {
     ToggleBigMap(69);
 });
 
@@ -1261,16 +1171,16 @@ mp.events.addCommand("bigmapbind", function (bind) {
 
     mp.storage.flush();
 
-    lastMapBind = curMapBind;
-    curMapBind = bind;
+    global.lastMapBind = global.curMapBind;
+    global.curMapBind = bind;
 
-    mp.keys.unbind(lastMapBind, true, ToggleBigMap);
-    mp.keys.bind(curMapBind, true, ToggleBigMap);
+    mp.keys.unbind(global.lastMapBind, true, ToggleBigMap);
+    mp.keys.bind(global.curMapBind, true, ToggleBigMap);
 
-    mp.events.callLocal("HUDNotify", `Big Minimap key is now binded to <strong>${String.fromCharCode(curMapBind)}</strong>.`, "blue", "fas fa-check", false, 
+    mp.events.callLocal("HUDNotify", `Big Minimap key is now binded to <strong>${String.fromCharCode(global.curMapBind)}</strong>.`, "blue", "fas fa-check", false, 
         1000, "bottomCenter", "replace");
 
-    mp.events.callLocal("RemoveTooltip", String.fromCharCode(lastMapBind));
+    mp.events.callLocal("RemoveTooltip", String.fromCharCode(global.lastMapBind));
 });
 
 function ToggleBigMap(state){
@@ -1284,10 +1194,10 @@ function ToggleBigMap(state){
     else {
 
         if(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false) return;
-        if(Date.now() - lastChatToggle <= 500) return;
-        if(menuToggled !== undefined && menuToggled) return;
-        if(chatStatus && !scoreboardToggled) return;
-        if(menuToggled) return;
+        if(Date.now() - global.lastChatToggle <= 500) return;
+        if(global.menuToggled !== undefined && global.menuToggled) return;
+        if(global.chatStatus && !global.scoreboardToggled) return;
+        if(global.menuToggled) return;
 
         if(mp.storage.data.menu.alwaysExpandedMap == true)
         {
@@ -1319,18 +1229,18 @@ mp.events.addCommand("bigmap", function (state) {
     ToggleBigMap(state);
 });
 
-if(!radioToggle) mp.game.audio.setInitialPlayerStation('OFF');
+if(!global.radioToggle) mp.game.audio.setInitialPlayerStation('OFF');
 
-mp.events.add("CS_UpdateStatsVars", () => {
-    UpdateStatsVars(player);
+mp.events.add("CS_global.UpdateStatsVars", () => {
+    global.UpdateStatsVars(player);
 });
 
 mp.events.add("TwoSecondsEvent", () => {
-    if(ServerUI == null || ServerUI == undefined || ServerUI == undefined || ServerUI == null) return;
+    if(global.ServerUI == null || global.ServerUI == undefined || global.ServerUI == undefined || global.ServerUI == null) return;
 
     mp.events.callRemoteUnreliable("requestDonatorPointsVar");
     setTimeout(() => {
-        UpdateStatsVars(mp.players.local, false);
+        global.UpdateStatsVars(mp.players.local, false);
     }, 500);
 });
 
@@ -1340,7 +1250,7 @@ mp.events.addDataHandler('PlayerSquadID', function(entity, value, oldValue){
     entity.SquadID = value;
 
     setTimeout(() => {
-        UpdateStatsVars(entity);        
+        global.UpdateStatsVars(entity);        
     }, 500);
 });
 
@@ -1385,7 +1295,7 @@ mp.events.addDataHandler('Team', function (entity, value, oldValue)
         mp.game.invoke('0xF314CF4F0211894E', 116, r, g, b, 255); // Replace freemode colour
     }   
     setTimeout(() => {
-        UpdateStatsVars(entity);        
+        global.UpdateStatsVars(entity);        
     }, 500);
 });
 
@@ -1398,13 +1308,13 @@ mp.events.addDataHandler('InLobby', function (entity, value, oldValue)
 {
     entity.Lobby = value;   
     setTimeout(() => {
-        UpdateStatsVars(entity);        
+        global.UpdateStatsVars(entity);        
     }, 500);
 });
 mp.events.addDataHandler('Admin', function (entity, value, oldValue){
     entity.Admin = value;   
     setTimeout(() => {
-        UpdateStatsVars(entity);        
+        global.UpdateStatsVars(entity);        
     }, 500);
 })
 
@@ -1477,8 +1387,8 @@ mp.events.add("OneSecondEvent", () => {
 
 // mp.keys.bind(0x4A, false, () => {
 
-//     if (mp.players.local.isInAnyVehicle(false) && chatStatus == false && Date.now() - lastChatToggle >= 500 && 
-//         !menuToggled && !scoreboardToggled)
+//     if (mp.players.local.isInAnyVehicle(false) && global.chatStatus == false && Date.now() - global.lastChatToggle >= 500 && 
+//         !global.menuToggled && !global.scoreboardToggled)
 //     {
 //         if(mp.players.local.vehicle.getClass() != 8 && mp.players.local.vehicle.model != mp.game.joaat('policeb')) 
 //         { // NO BIKE FUCKERS ALLOWED CUZ YALL GOT "ANTI FALL OFF BIKE" SMH
@@ -1499,15 +1409,15 @@ mp.events.add("clearTaseAnims", (time) => {
 
 mp.events.add('render', () => {
 
-    FPS_Frames++;
-    if(Date.now() - FPS_Calc >= 1000)
+    global.FPS_Frames++;
+    if(Date.now() - global.FPS_Calc >= 1000)
     {
-        FPS = FPS_Frames;
-        FPS_Frames = 0;
-        FPS_Calc = Date.now();
+        global.FPS = global.FPS_Frames;
+        global.FPS_Frames = 0;
+        global.FPS_Calc = Date.now();
     }
 
-    if(radioToggle != undefined && radioToggle == false){
+    if(global.radioToggle != undefined && global.radioToggle == false){
         if(mp.players.local.vehicle != null && mp.players.local.isInAnyVehicle(false)){
             mp.game.invoke('0x1B9C0099CB942AC6', mp.players.local.vehicle.handle, 'OFF');
         }
@@ -1522,10 +1432,10 @@ mp.events.add('render', () => {
         }
     }
 
-    if(specState == true && specTarget != null){
-        if (mp.players.exists(specTarget)) 
+    if(global.specState == true && global.specTarget != null){
+        if (mp.players.exists(global.specTarget)) 
         {
-            mp.game.invoke("0x8BBACBF51DA047A8", specTarget.handle); //NETWORK_SET_IN_SPECTATOR_MODE
+            mp.game.invoke("0x8BBACBF51DA047A8", global.specTarget.handle); //NETWORK_SET_IN_SPECTATOR_MODE
         }
         else{
             mp.events.callLocal("StopSpectating");
@@ -1731,10 +1641,10 @@ mp.events.add('render', () => {
             climbTrigger = false;
         }*/
 
-        traceLastFunc(`[Players] render::Parachute_Dive_Check();`);
+        global.traceLastFunc(`[Players] render::Parachute_Dive_Check();`);
 
         if(player.doesExist()) {
-            if(Date.now() - updateChecker >= updateRate)
+            if(Date.now() - updateChecker >= global.updateRate)
             {
                 // output any debug/stuff per update rate so it doesnt spam for debugging purposes
             }
@@ -1742,12 +1652,12 @@ mp.events.add('render', () => {
             /*
             if(mp.game.invoke('0x7DCE8BDA0F1C1200', player.handle)) // Is Ped Parachute Free Falling?
             {
-                traceLastFunc(`[Players] Parachute_Open();`);
+                global.traceLastFunc(`[Players] Parachute_Open();`);
                 mp.game.invoke('0x16E42E800B472221', player.handle); // Force Open Parachute (( 1.1 Bug where you can't open ))
             }
             */
 
-            if(player.isInAnyVehicle(false) && chaseRunning)
+            if(player.isInAnyVehicle(false) && global.chaseRunning)
             {
                 if (player.seat !== undefined)
                 {
@@ -1805,14 +1715,14 @@ mp.events.add('render', () => {
         }
     }
 
-    if(Date.now() - updateChecker >= updateRate)
+    if(Date.now() - updateChecker >= global.updateRate)
     {
         mp.events.callLocal("UpdateRateEvent");
         updateChecker = Date.now();
 
         secondCounter++;
 
-        if(secondCounter >= Math.round(1000 / updateRate))
+        if(secondCounter >= Math.round(1000 / global.updateRate))
         {
             secondCounter = 0;
 
@@ -1833,42 +1743,42 @@ mp.events.add('render', () => {
                     }
                 }
 
-                traceLastFunc(`[Players] Update Counters/JailTime`);
+                global.traceLastFunc(`[Players] Update Counters/JailTime`);
 
                 if(mp.players.local.getVariable("JailTime") >= 1)
                 {
-                    if(currentJailTime > 0) currentJailTime--;
-                    lastJailUpdate--;
+                    if(global.currentJailTime > 0) global.currentJailTime--;
+                    global.lastJailUpdate--;
 
-                    if(lastJailUpdate <= 0 || currentJailTime <= 0) // add current too so it unmutes/jails the second it hits 0. aka requests update
+                    if(global.lastJailUpdate <= 0 || global.currentJailTime <= 0) // add current too so it unmutes/jails the second it hits 0. aka requests update
                     {
-                        mp.events.callRemote("RequestCounterUpdate", currentJailTime, 0);
-                        lastJailUpdate = 20;
+                        mp.events.callRemote("RequestCounterUpdate", global.currentJailTime, 0);
+                        global.lastJailUpdate = 20;
                     }
                 }
                 else {
-                    if(currentJailTime > 0) currentJailTime = 0;
+                    if(global.currentJailTime > 0) global.currentJailTime = 0;
                 }
 
                 if(mp.players.local.getVariable("MuteTime") >= 1)
                 {
-                    if(currentMuteTime > 0) currentMuteTime--;
-                    lastMuteUpdate--;
+                    if(global.currentMuteTime > 0) global.currentMuteTime--;
+                    global.lastMuteUpdate--;
 
-                    if(lastMuteUpdate <= 0 || currentMuteTime <= 0)
+                    if(global.lastMuteUpdate <= 0 || global.currentMuteTime <= 0)
                     {
-                        mp.events.callRemote("RequestCounterUpdate", currentMuteTime, 1);
-                        lastMuteUpdate = 20;
+                        mp.events.callRemote("RequestCounterUpdate", global.currentMuteTime, 1);
+                        global.lastMuteUpdate = 20;
                     }
                 }
                 else {
-                    if(currentMuteTime > 0) currentMuteTime = 0;
+                    if(global.currentMuteTime > 0) global.currentMuteTime = 0;
                 }
 
-                traceLastFunc(`[Players] Update Stream Data`);
+                global.traceLastFunc(`[Players] Update Stream Data`);
                 mp.events.callRemoteUnreliable("UpdateStreamData");
 
-                traceLastFunc(`[Players] Update VoiceData`);
+                global.traceLastFunc(`[Players] Update VoiceData`);
 
                 mp.players.forEach(target => {
                     target.voiceVolume = 0.0;
@@ -1883,7 +1793,7 @@ mp.events.add('render', () => {
                         }
                        
                         var localPos = mp.players.local.position;
-                        let dist = calcDist(playerPos, localPos);
+                        let dist = global.calcDist(playerPos, localPos);
                         
                         if(dist > MaxVoiceRange) 
                         {
@@ -1907,19 +1817,19 @@ mp.events.add('render', () => {
                     }
                 });
 
-                if (specState == true && specTarget !== null) {
+                if (global.specState == true && global.specTarget !== null) {
 
-                    if (mp.players.exists(specTarget)) 
+                    if (mp.players.exists(global.specTarget)) 
                     {
-                        var position = specTarget.position;
+                        var position = global.specTarget.position;
 
-                        if(calcDist(position, mp.players.local.position) >= 200.0 
-                        || (specTarget.handle !== 0) == false || specTarget.handle === null || 
-                            specTarget.handle === undefined)
+                        if(global.calcDist(position, mp.players.local.position) >= 200.0 
+                        || (global.specTarget.handle !== 0) == false || global.specTarget.handle === null || 
+                            global.specTarget.handle === undefined)
                         {
-                            position.x = specTarget.getVariable("UnstreamedX");
-                            position.y = specTarget.getVariable("UnstreamedY");
-                            position.z = specTarget.getVariable("UnstreamedZ");
+                            position.x = global.specTarget.getVariable("UnstreamedX");
+                            position.y = global.specTarget.getVariable("UnstreamedY");
+                            position.z = global.specTarget.getVariable("UnstreamedZ");
                         }
                         position.z -= 20;
 
@@ -1927,18 +1837,18 @@ mp.events.add('render', () => {
                     }
                     else 
                     {
-                        specState = false;
+                        global.specState = false;
                         mp.events.callLocal("StopSpectating");
                     }
                 }
 
-                traceLastFunc(`[Players] Update Derby Data`);
+                global.traceLastFunc(`[Players] Update Derby Data`);
 
                 if(mp.players.local.getVariable("InLobby") == -4)
                 {
                     derbyText.text = "N/A";
 
-                    if(showHud !== undefined && showHud == false)
+                    if(global.showHud !== undefined && global.showHud == false)
                     {
                         derbyText.visible = false;
                     }
@@ -1946,11 +1856,11 @@ mp.events.add('render', () => {
                         derbyText.visible = true;
                     }
 
-                    if(ServerUI != null)
+                    if(global.ServerUI != null)
                     {
-                        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = ${mp.storage.data.menu.gameProgress};`);
-                        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Derby Time";`);
-                        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${derbyTimeCur};`);
+                        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = ${mp.storage.data.menu.gameProgress};`);
+                        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Derby Time";`);
+                        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${derbyTimeCur};`);
                     }
 
                     if(derbyCounting)
@@ -1979,13 +1889,13 @@ mp.events.add('render', () => {
                     derbyText.visible = false;
                 }
 
-                traceLastFunc(`[Players] Update Chase Data1`);
+                global.traceLastFunc(`[Players] Update Chase Data1`);
 
-                if(ServerUI != null && chaseRunning == true)
+                if(global.ServerUI != null && global.chaseRunning == true)
                 {
-                    chaseTimeCur += 1;
+                    global.chaseTimeCur += 1;
 
-                    if(chaseTimeCur <= 0 && mp.players.local.getVariable("Team") >= 0)
+                    if(global.chaseTimeCur <= 0 && mp.players.local.getVariable("Team") >= 0)
                     {
                         mp.players.local.freezePosition(true);
 
@@ -1994,7 +1904,7 @@ mp.events.add('render', () => {
                             mp.players.local.vehicle.freezePosition(true);
                         }
                     }
-                    else if(chaseTimeCur == 1 && mp.players.local.getVariable("Team") == 0)
+                    else if(global.chaseTimeCur == 1 && mp.players.local.getVariable("Team") == 0)
                     {
                         mp.players.local.freezePosition(false);
 
@@ -2004,42 +1914,42 @@ mp.events.add('render', () => {
                         }
                     }
 
-                    if(chaseTimeCur >= chaseTimeMax || chaseTimeCur <= -1)
+                    if(global.chaseTimeCur >= global.chaseTimeMax || global.chaseTimeCur <= -1)
                     {
-                        chaseRunning = false;
-                        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
+                        global.chaseRunning = false;
+                        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
                     }
                     else {
-                        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = ${mp.storage.data.menu.gameProgress};`);
-                        if(collisionTime > 0)
+                        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = ${mp.storage.data.menu.gameProgress};`);
+                        if(global.collisionTime > 0)
                         {
-                            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Collisions";`);
-                            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${collisionTime}`);
+                            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Collisions";`);
+                            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${global.collisionTime}`);
                         }
                         else 
                         {
-                            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Time Left";`);
-                            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${chaseTimeMax - chaseTimeCur}`);
+                            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Time Left";`);
+                            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${global.chaseTimeMax - global.chaseTimeCur}`);
                         }
                     }
                 }
 
-                traceLastFunc(`[Players] Update Chase Data2`);
+                global.traceLastFunc(`[Players] Update Chase Data2`);
 
-                if(chaseRunning == true && ServerUI != null)
+                if(global.chaseRunning == true && global.ServerUI != null)
                 {
-                    if(collisionTime > 0)
+                    if(global.collisionTime > 0)
                     {
-                        collisionTime--;
+                        global.collisionTime--;
                     } 
                 }
 
-                traceLastFunc(`[Players] Update Chase Data3`);
-                traceLastFunc(`[Players] Update Chase Data Complete`);
+                global.traceLastFunc(`[Players] Update Chase Data3`);
+                global.traceLastFunc(`[Players] Update Chase Data Complete`);
             }
         }
 
-        traceLastFunc(`[Players] Blips Stage1`);
+        global.traceLastFunc(`[Players] Blips Stage1`);
 
         mp.blips.forEach(eblip => {
             var index = playerBlips.indexOf(eblip.id);
@@ -2051,7 +1961,7 @@ mp.events.add('render', () => {
 
         playerBlips = [];
 
-        traceLastFunc(`[Players] Blips Stage2`);
+        global.traceLastFunc(`[Players] Blips Stage2`);
 
         mp.players.forEach(target => {
 
@@ -2095,7 +2005,7 @@ mp.events.add('render', () => {
 
                     var position = target.position;
 
-                    if(calcDist(position, mp.players.local.position) >= 1000.0 
+                    if(global.calcDist(position, mp.players.local.position) >= 1000.0 
                     || (target.handle !== 0) == false || target.handle === null || 
                         target.handle === undefined || target.position == null || (target.position.x == 0.0 && target.position.z == 0.0))
                     {
@@ -2117,7 +2027,7 @@ mp.events.add('render', () => {
             }
         });
 
-        traceLastFunc(`[Players] Update Completed`);
+        global.traceLastFunc(`[Players] Update Completed`);
     }
 
     if(Date.now() - targetChecker >= 25 && player.getVariable("Team") !== undefined && player.getVariable("Team") != -1)
@@ -2152,7 +2062,7 @@ mp.events.add('render', () => {
 
                             if(vehicleOccupants == 0) clickDisable = false;
                         }
-                        else if(target.getVariable("Team") == 0 && player.getVariable("Team") == 1 && chaseRunning)
+                        else if(target.getVariable("Team") == 0 && player.getVariable("Team") == 1 && global.chaseRunning)
                         {
                             clickDisable = true; // Disable innocent car shots by default.
                             var vehicleOccupants = 0;
@@ -2192,7 +2102,7 @@ mp.events.add('render', () => {
                             }
 
                             if(player.getVariable("Team") == 1 && target.getVariable("Team") == 0 && 
-                                target.getVariable("HasShot") == false && chaseRunning) // Disable click for fugi with no tag
+                                target.getVariable("HasShot") == false && global.chaseRunning) // Disable click for fugi with no tag
                             {
                                 clickDisable = true;
 
@@ -2215,7 +2125,7 @@ mp.events.add('render', () => {
                                 {
                                     clickDisable = false; // Stun Gun allow if conditions down don't match.
 
-                                    //if(target.isInAnyVehicle(false) == true || calcDist(target.position, player.position) > 7.5) clickDisable = true;
+                                    //if(target.isInAnyVehicle(false) == true || global.calcDist(target.position, player.position) > 7.5) clickDisable = true;
                                 }
                             }
                         }
@@ -2236,7 +2146,7 @@ mp.events.add("render", () => {
             {
                 currentRollCooldownTimestamp = (Date.now() + 1000);
                 rollShootCooldownActive = true;
-                if(ServerUI) ServerUI.execute(`toast('${Translate("SHOOTING_COOLDOWN")}', '', 'warning', 1000, 2);`);
+                if(global.ServerUI) global.ServerUI.execute(`toast('${Translate("SHOOTING_COOLDOWN")}', '', 'warning', 1000, 2);`);
             }
         }
     }
@@ -2299,7 +2209,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
 
     ShotStats.TotalFired++;
 
-    let gunData = weaponData.find(w => Number(w.Hash) == mp.players.local.weapon);
+    let gunData = global.weaponData.find(w => Number(w.Hash) == mp.players.local.weapon);
     if(mp.players.local.vehicle == undefined && !mp.players.local.isInAnyVehicle(false))
     {
         const campos = mp.game.cam.getGameplayCamRot(0);
@@ -2436,7 +2346,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
 
                     if(breakShot) mp.game.graphics.notify("~r~Do not teamkill!");
                 }
-                else if(targetEntity.getVariable("Team") == 0 && player.getVariable("Team") == 1 && player.weapon != 911657153 && chaseRunning)
+                else if(targetEntity.getVariable("Team") == 0 && player.getVariable("Team") == 1 && player.weapon != 911657153 && global.chaseRunning)
                 {
                     breakShot = true; // Break innocent car shots by default.
 
@@ -2454,7 +2364,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                     if(breakShot) mp.game.graphics.notify("~r~Do not deathmatch!");
                 }
                 
-                if(targetEntity.getVariable("Team") == 0 && player.getVariable("Team") == 1 && player.weapon == 911657153 && chaseRunning)
+                if(targetEntity.getVariable("Team") == 0 && player.getVariable("Team") == 1 && player.weapon == 911657153 && global.chaseRunning)
                 {
                     breakShot = true;
                     mp.console.logInfo("Taser does not work for vehicles.");
@@ -2466,14 +2376,14 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         }
         if(targetEntity.type === 'player')
         {
-            if(chaseRunning)
+            if(global.chaseRunning)
             {
                 if(targetEntity.getVariable("Team") !== undefined && targetEntity.getVariable("HasShot") !== undefined)
                 {
                     if(targetEntity.getVariable("ClimbProtection") == true || player.getVariable("ClimbProtection") == true) return true;
                     
                     if(player.weapon == 911657153 && (targetEntity.isInAnyVehicle(false) == true || 
-                    calcDist(targetEntity.position, player.position) > 7.5)) {
+                    global.calcDist(targetEntity.position, player.position) > 7.5)) {
                         mp.game.graphics.notify("~r~Taser out of reach, get closer!");
                         return true; // Stun Gun no shot if more than 10 meters or target in car.
                     }
@@ -2485,7 +2395,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                         return true;
                     }
 
-                    if(player.weapon == 911657153 && (targetEntity.getVariable("HasShot") == true || chaseTimeCur < 60) && targetEntity.getVariable("Team") == 0)
+                    if(player.weapon == 911657153 && (targetEntity.getVariable("HasShot") == true || global.chaseTimeCur < 60) && targetEntity.getVariable("Team") == 0)
                     {
                         return true;
                     }
@@ -2502,7 +2412,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
                         return true;
                     }
                     if(player.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && targetEntity.getVariable("HasShot") == false && 
-                        player.weapon != 911657153 && chaseRunning) // Shot a fugitive that hasn't shot.
+                        player.weapon != 911657153 && global.chaseRunning) // Shot a fugitive that hasn't shot.
                     {
                         mp.events.callRemote("PlayerShotAtWrongPlayer", 1, targetEntity);
                         return true;
@@ -2526,7 +2436,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
             if (previousOffset < boneDistanceThreshold)
                 mp.events.callRemote('opsp', targetEntity, bone, mp.players.local.weapon);
 
-            if(targetEntity.getVariable("Team") != mp.players.local.getVariable("Team") && chaseRunning && mp.players.local.getVariable("Team") != -1)
+            if(targetEntity.getVariable("Team") != mp.players.local.getVariable("Team") && global.chaseRunning && mp.players.local.getVariable("Team") != -1)
             {
                 if(targetEntity.getVariable("Wounded") == 1)
                 {
@@ -2541,11 +2451,11 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         mp.events.callRemote("ShotListen_SendInfo", gunName, "nothing", shotListenData.playerHitsInRow);
     }
 
-    if(mp.players.local.getVariable("HasShot") == false && player.getVariable("Team") == 0 && chaseRunning)
+    if(mp.players.local.getVariable("HasShot") == false && player.getVariable("Team") == 0 && global.chaseRunning)
     {
         mp.events.callRemote("GivePlayerShotTag");
     }
-    if(chaseRunning && mp.players.local.Team == 0 || mp.players.local.Team == 1)
+    if(global.chaseRunning && mp.players.local.Team == 0 || mp.players.local.Team == 1)
         mp.events.callRemote("SetShotsFired", true);
 });
 
@@ -2590,14 +2500,14 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
     {
         if(sourceEntity !== null && sourceEntity !== undefined && sourceEntity.type === 'player')
         {
-            let gunData = weaponData.find(w => Number(w.Hash) == weapon);
+            let gunData = global.weaponData.find(w => Number(w.Hash) == weapon);
             if(gunData != undefined && (gunData.Type == "Assault Rifles" || gunData.Type == "Machine Guns")){
                 let nerfedDmg = (damage-10);
                 damage = nerfedDmg;
                 mp.game.weapon.setCurrentDamageEventAmount(nerfedDmg);
 
                 showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
-                ////LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
+                ////global.LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2610,7 +2520,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 
                 showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
 
-                ////LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
+                ////global.LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2627,7 +2537,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 
                     showDamageIndicatorOnPosition(75, targetEntity, boneIndex);
 
-                    ////LogPlayerDamage(targetEntity, weapon, 75, boneIndex);
+                    ////global.LogPlayerDamage(targetEntity, weapon, 75, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2638,7 +2548,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 
                     showDamageIndicatorOnPosition(50, targetEntity, boneIndex);
 
-                    ////LogPlayerDamage(targetEntity, weapon, 50, boneIndex);
+                    ////global.LogPlayerDamage(targetEntity, weapon, 50, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2649,7 +2559,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 
                     showDamageIndicatorOnPosition(25, targetEntity, boneIndex);
 
-                    ////LogPlayerDamage(targetEntity, weapon, 25, boneIndex);
+                    ////global.LogPlayerDamage(targetEntity, weapon, 25, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2666,7 +2576,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 
                     showDamageIndicatorOnPosition(10, targetEntity, boneIndex);
                 
-                    ////LogPlayerDamage(targetEntity, weapon, 10, boneIndex);
+                    ////global.LogPlayerDamage(targetEntity, weapon, 10, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2677,7 +2587,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 
                     showDamageIndicatorOnPosition(7, targetEntity, boneIndex);
                 
-                    ////LogPlayerDamage(targetEntity, weapon, 7, boneIndex);
+                    ////global.LogPlayerDamage(targetEntity, weapon, 7, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2686,7 +2596,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                 
-                    ////LogPlayerDamage(targetEntity, weapon, 0, boneIndex, "Target too far - no damage dealt.");
+                    ////global.LogPlayerDamage(targetEntity, weapon, 0, boneIndex, "Target too far - no damage dealt.");
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2703,7 +2613,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 
                     showDamageIndicatorOnPosition(37, targetEntity, boneIndex);
                 
-                    ////LogPlayerDamage(targetEntity, weapon, 37, boneIndex);
+                    ////global.LogPlayerDamage(targetEntity, weapon, 37, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2714,7 +2624,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 
                     showDamageIndicatorOnPosition(28, targetEntity, boneIndex);
                 
-                    ////LogPlayerDamage(targetEntity, weapon, 28, boneIndex);
+                    ////global.LogPlayerDamage(targetEntity, weapon, 28, boneIndex);
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2723,7 +2633,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                 
-                    ////LogPlayerDamage(targetEntity, weapon, 0, boneIndex, "Target too far - no damage dealt.");
+                    ////global.LogPlayerDamage(targetEntity, weapon, 0, boneIndex, "Target too far - no damage dealt.");
                 damage = 0;
                 mp.game.weapon.setCurrentDamageEventAmount(0);
                 mp.game.weapon.cancelCurrentDamageEvent();
@@ -2736,7 +2646,7 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
 
             if(BigInt(weapon) == BigInt(911657153) && BigInt(targetEntity.getVariable("LastVehEnterExit")) + BigInt(5000) >= BigInt(Date.now())) return true;
 
-            if(weapon == 911657153 && targetEntity.getVariable("HasShot") == true && targetEntity.getVariable("Team") == 0 && chaseRunning) return true;
+            if(weapon == 911657153 && targetEntity.getVariable("HasShot") == true && targetEntity.getVariable("Team") == 0 && global.chaseRunning) return true;
 
             if(sourceEntity.getVariable("Team") != -1 && player.getVariable("Team") != -1)
             {
@@ -2746,12 +2656,12 @@ mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weap
                 }
 
                 if(sourceEntity.getVariable("Team") == 1 && player.getVariable("Team") == 0 && 
-                    player.getVariable("HasShot") == false && weapon != 911657153 && chaseRunning) // Took damage from a cop and hasn't shot.
+                    player.getVariable("HasShot") == false && weapon != 911657153 && global.chaseRunning) // Took damage from a cop and hasn't shot.
                 {
                     return true;
                 }
 
-                if(chaseRunning)
+                if(global.chaseRunning)
                 {
                     let HP = mp.players.local.getHealth();
 
@@ -2853,7 +2763,7 @@ mp.events.add("ResetWounded", () => {
     mp.game.graphics.stopScreenEffect('DrugsDrivingIn');
     toggleCrawl(false);
 
-    if(chaseRunning && mp.players.local.getVariable("Team") >= 0) 
+    if(global.chaseRunning && mp.players.local.getVariable("Team") >= 0) 
     {
         mp.players.local.setInvincible(false);
         mp.events.callRemote("SetInvincible", false);
@@ -2871,7 +2781,7 @@ mp.events.add('setWounded', (state, idToPass) =>
 {
     // if its trying to set the same state but the state isnt 0 [revive or clearing vars]
     if (state == mp.players.local.getVariable("Wounded") && state != 0) return;
-    if (!chaseRunning && state != 0) return;
+    if (!global.chaseRunning && state != 0) return;
     // if the player is no longer in a team and it tries to set them wounded [but not 0]
     if ((mp.players.local.getVariable("Team") != 1 && mp.players.local.getVariable("Team") != 0) && state != 0) return;
     // if the player is already in crawl mode and it tries to set them to state 1 [ragdoll] return
@@ -2890,7 +2800,7 @@ mp.events.add('setWounded', (state, idToPass) =>
 
         woundedTimer = setInterval(() => {
 
-            if(!chaseRunning || mp.players.local.getVariable("Wounded") == 0 || mp.players.local.getVariable("Team") < 0) 
+            if(!global.chaseRunning || mp.players.local.getVariable("Wounded") == 0 || mp.players.local.getVariable("Team") < 0) 
             {
                 clearInterval(woundedTimer);
                 woundedTimer = null;
@@ -2916,7 +2826,7 @@ mp.events.add('setWounded', (state, idToPass) =>
             mp.players.local.setToRagdoll(4000, 4000 * 2, 0, true, true, true);
 
             setTimeout(() => {
-                if(chaseRunning && mp.players.local.getVariable("Team") >= 0 && mp.players.local.getVariable("Wounded") != 0 && !mp.players.local.isDead())
+                if(global.chaseRunning && mp.players.local.getVariable("Team") >= 0 && mp.players.local.getVariable("Wounded") != 0 && !mp.players.local.isDead())
                 {
                     mp.events.callLocal("setWounded", 2, -1);
                 }
@@ -2930,7 +2840,7 @@ mp.events.add('setWounded', (state, idToPass) =>
         mp.events.callRemote("SetInvincible", true);
         mp.game.player.setInvincible(true);
         setTimeout(() => {
-            if(chaseRunning && mp.players.local.getVariable("Team") >= 0 && mp.players.local.getVariable("Wounded") != 0 && !mp.players.local.isDead())
+            if(global.chaseRunning && mp.players.local.getVariable("Team") >= 0 && mp.players.local.getVariable("Wounded") != 0 && !mp.players.local.isDead())
             {
                 mp.events.callLocal("setWounded", 2, -1);
             }
@@ -2940,7 +2850,7 @@ mp.events.add('setWounded', (state, idToPass) =>
     }
     else if(state == 2) // As wounded player goes into wounded state
     {
-        if(mp.players.local.getVariable("Wounded") != 1 || !chaseRunning || mp.players.local.getVariable("Team") < 0 || mp.players.local.isDead()) return;
+        if(mp.players.local.getVariable("Wounded") != 1 || !global.chaseRunning || mp.players.local.getVariable("Team") < 0 || mp.players.local.isDead()) return;
         
         mp.players.local.setInvincible(false);
         mp.events.callRemote("SetInvincible", false);
@@ -2968,7 +2878,7 @@ function handleCrawlControls()
 {
     if(!mp.players.local) return;
     if (!mp.players.local.crawl) return;
-    if(chatStatus) return;
+    if(global.chatStatus) return;
     let dict = 'move_crawl';
     let rotation = mp.players.local.getRotation(2);
     mp.game.controls.disableControlAction(0, 32, true);
@@ -3122,12 +3032,12 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
 
             let DAMAGE_TO_DEAL = 0;
 
-            let gunData = weaponData.find(w => Number(w.Hash) == weapon);
+            let gunData = global.weaponData.find(w => Number(w.Hash) == weapon);
             if(gunData != undefined && (gunData.Type == "Assault Rifles" || gunData.Type == "Machine Guns")){
                 let nerfedDmg = (damage-10);
                 damage = nerfedDmg;
                 mp.game.weapon.setCurrentDamageEventAmount(nerfedDmg);
-                //LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
+                //global.LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
                 
                 //showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
 
@@ -3141,7 +3051,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 if(nerfedDmg <= 0) nerfedDmg = 1;
                 damage = nerfedDmg;
                 mp.game.weapon.setCurrentDamageEventAmount(nerfedDmg);
-                //LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
+                //global.LogPlayerDamage(targetEntity, weapon, nerfedDmg, boneIndex);
                 
                 //showDamageIndicatorOnPosition(nerfedDmg, targetEntity, boneIndex);
 
@@ -3159,7 +3069,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 if(distance < 9.0){
                     damage = 75;
                     mp.game.weapon.setCurrentDamageEventAmount(75);
-                    //LogPlayerDamage(targetEntity, weapon, 75, boneIndex);
+                    //global.LogPlayerDamage(targetEntity, weapon, 75, boneIndex);
                 
                     //showDamageIndicatorOnPosition(75, targetEntity, boneIndex);
 
@@ -3171,7 +3081,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 else if(distance >= 9.0 && distance < 18.0){
                     damage = 50;
                     mp.game.weapon.setCurrentDamageEventAmount(50);
-                    //LogPlayerDamage(targetEntity, weapon, 50, boneIndex);
+                    //global.LogPlayerDamage(targetEntity, weapon, 50, boneIndex);
                 
                     //showDamageIndicatorOnPosition(50, targetEntity, boneIndex);
 
@@ -3183,7 +3093,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 else{
                     damage = 25;
                     mp.game.weapon.setCurrentDamageEventAmount(25);
-                    //LogPlayerDamage(targetEntity, weapon, 25, boneIndex);
+                    //global.LogPlayerDamage(targetEntity, weapon, 25, boneIndex);
                 
                     //showDamageIndicatorOnPosition(25, targetEntity, boneIndex);
 
@@ -3201,7 +3111,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 if(distance < 9.2681523185659){
                     damage = 10;
                     mp.game.weapon.setCurrentDamageEventAmount(10);
-                    //LogPlayerDamage(targetEntity, weapon, 10, boneIndex);
+                    //global.LogPlayerDamage(targetEntity, weapon, 10, boneIndex);
                 
                     //showDamageIndicatorOnPosition(10, targetEntity, boneIndex);
                     DAMAGE_TO_DEAL = 10;
@@ -3212,7 +3122,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 else if(distance > 9.2681523185659 && distance < 19.267101852897){
                     damage = 7;
                     mp.game.weapon.setCurrentDamageEventAmount(7);
-                    //LogPlayerDamage(targetEntity, weapon, 7, boneIndex);
+                    //global.LogPlayerDamage(targetEntity, weapon, 7, boneIndex);
                 
                     //showDamageIndicatorOnPosition(7, targetEntity, boneIndex);
                     DAMAGE_TO_DEAL = 7;
@@ -3223,7 +3133,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 else{
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
-                    //LogPlayerDamage(targetEntity, weapon, 0, boneIndex);
+                    //global.LogPlayerDamage(targetEntity, weapon, 0, boneIndex);
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3237,7 +3147,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 if(distance < 9.2681523185659){
                     damage = 37;
                     mp.game.weapon.setCurrentDamageEventAmount(37);
-                    //LogPlayerDamage(targetEntity, weapon, 37, boneIndex);
+                    //global.LogPlayerDamage(targetEntity, weapon, 37, boneIndex);
                 
                     //showDamageIndicatorOnPosition(37, targetEntity, boneIndex);
                     DAMAGE_TO_DEAL = 37;
@@ -3248,7 +3158,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 else if(distance > 9.2681523185659 && distance < 19.267101852897){
                     damage = 28;
                     mp.game.weapon.setCurrentDamageEventAmount(28);
-                    //LogPlayerDamage(targetEntity, weapon, 28, boneIndex);
+                    //global.LogPlayerDamage(targetEntity, weapon, 28, boneIndex);
                 
                     //showDamageIndicatorOnPosition(28, targetEntity, boneIndex);
                     DAMAGE_TO_DEAL = 28;
@@ -3259,7 +3169,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                 else{
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
-                    //LogPlayerDamage(targetEntity, weapon, 0, boneIndex);
+                    //global.LogPlayerDamage(targetEntity, weapon, 0, boneIndex);
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3289,7 +3199,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     return true;
                 }
 
-                if(sourceEntity.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && chaseRunning)
+                if(sourceEntity.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && global.chaseRunning)
                 {
                     if(targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
                     {
@@ -3301,7 +3211,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                             return true; // cant damage dem at alll if thy havent shot unless taser
                         }
 
-                        if(chaseTimeCur < 60){                           
+                        if(global.chaseTimeCur < 60){                           
                             damage = 0;
                             mp.game.weapon.setCurrentDamageEventAmount(0);
                             mp.game.weapon.cancelCurrentDamageEvent();
@@ -3325,7 +3235,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                         }
 
                         if((targetEntity.isInAnyVehicle(false) == true || 
-                            calcDist(targetEntity.position, player.position) > 7.5)) {
+                            global.calcDist(targetEntity.position, player.position) > 7.5)) {
                             damage = 0;
                             mp.game.weapon.setCurrentDamageEventAmount(0);
                             mp.game.weapon.cancelCurrentDamageEvent();
@@ -3344,7 +3254,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     }
                 }
                 if(sourceEntity.getVariable("Team") == 0 && targetEntity.getVariable("Team") == 1 && sourceEntity.getVariable("HasShot") == false
-                    && isMeleeWeapon(weapon) && chaseRunning)
+                    && isMeleeWeapon(weapon) && global.chaseRunning)
                 {
                     mp.events.callRemote("GivePlayerShotTag");
                 }
@@ -3401,7 +3311,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
 
                     if(breakShot) mp.game.graphics.notify("~r~Do not teamkill!");
                 }
-                else if(targetEntity.getVariable("Team") == 0 && player.getVariable("Team") == 1 && weapon != 911657153 && chaseRunning)
+                else if(targetEntity.getVariable("Team") == 0 && player.getVariable("Team") == 1 && weapon != 911657153 && global.chaseRunning)
                 {
                     breakShot = true; // Break innocent car shots by default.
 
@@ -3563,18 +3473,18 @@ mp.events.add(
         Seatbelt_LastVeh = null;
         Seatbelt_LastSeat = -1;
     },
-    "SyncServerSettings": (onfootcollisions, cameraUpdateTime) => {
-        ServerSettings.OnfootCollisions = onfootcollisions;
-        ServerSettings.CameraUpdateTime = cameraUpdateTime;
+    "Syncglobal.ServerSettings": (onfootcollisions, cameraUpdateTime) => {
+        global.ServerSettings.OnfootCollisions = onfootcollisions;
+        global.ServerSettings.CameraUpdateTime = cameraUpdateTime;
     },
     "ToggleClientRadio": () => {
-        radioToggle = !radioToggle;
+        global.radioToggle = !global.radioToggle;
 
-        mp.storage.data.radiotoggle = radioToggle;
+        mp.storage.data.radiotoggle = global.radioToggle;
 
         mp.storage.flush();
 
-        if(!radioToggle) mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Vehicle radio toggled OFF.");
+        if(!global.radioToggle) mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Vehicle radio toggled OFF.");
         else mp.gui.chat.push("!{#FF6347}[!] !{#FFFFFF}Vehicle radio toggled ON.");
     },
     "SetInVehEx": (vehicle, vehseat) => {
@@ -3689,8 +3599,8 @@ mp.events.add(
     },
     "SpectatePlayer": (target) => {
      
-        specTarget = target;   
-        specState = true;
+        global.specTarget = target;   
+        global.specState = true;
     },
 
     "ShakeCam": (shakeType, amplit, time) => {
@@ -3709,8 +3619,8 @@ mp.events.add(
 
     "StopSpectating": () => {
         mp.game.invoke("0x423DE3854BB50894", false, mp.players.local.handle); //NETWORK_SET_IN_SPECTATOR_MODE
-        specTarget = null;
-        specState = false;
+        global.specTarget = null;
+        global.specState = false;
     },
 
     "setToRagdoll": (time1, time2, ragdollType, p4, p5, p6) => {
@@ -3718,12 +3628,12 @@ mp.events.add(
         player.setToRagdoll(time1, time2, ragdollType, p4, p5, p6);
     },
     "SetJailCounter": (time) => {
-        currentJailTime = time;
-        lastJailUpdate = 10;
+        global.currentJailTime = time;
+        global.lastJailUpdate = 10;
     },
     "SetMuteCounter": (time) => {
-        currentMuteTime = time;
-        lastMuteUpdate = 10;
+        global.currentMuteTime = time;
+        global.lastMuteUpdate = 10;
     },
 
     "SetActorInvulnerable": (toggle) => {
@@ -3741,11 +3651,11 @@ mp.events.add(
 
     "StartChaseTimer": (iTimeCur, iTimeMax, collisionDuration, mode) => {
 
-        chaseTimeCur = iTimeCur - 1;
-        chaseTimeMax = iTimeMax;
-        collisionTime = collisionDuration;
-        chaseRunning = true;
-        chaseMode = mode;
+        global.chaseTimeCur = iTimeCur - 1;
+        global.chaseTimeMax = iTimeMax;
+        global.collisionTime = collisionDuration;
+        global.chaseRunning = true;
+        global.chaseMode = mode;
     },
 
     "SendNotification": (title, text, attribute, duration) => {
@@ -3753,8 +3663,8 @@ mp.events.add(
     },
 
     "HideChaseTimer": () => {
-        if(ServerUI != null) if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
-        chaseRunning = false;
+        if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
+        global.chaseRunning = false;
     },
 
     "playerEnterVehicle": (vehicle, seat) => {
@@ -3763,7 +3673,7 @@ mp.events.add(
         mp.events.callRemote("UpdateLastVehEnterExit", Date.now());
         if(vehicle.Collisions == undefined || vehicle.Collisions == true) vehicle.setInvincible(false);
 
-        if(!radioToggle && seat == -1) mp.game.invoke('0x1B9C0099CB942AC6', vehicle.handle, 'OFF');
+        if(!global.radioToggle && seat == -1) mp.game.invoke('0x1B9C0099CB942AC6', vehicle.handle, 'OFF');
 
         if(mp.game.vehicle.isThisModelAHeli(vehicle.model) || mp.game.vehicle.isThisModelAPlane(vehicle.model)) {
             mp.events.callRemote("RequestParachute", vehicle);
@@ -3802,7 +3712,7 @@ mp.events.add(
 
     "InitChaseTimer": () => {
         
-        if(ServerUI != null) if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
+        if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
 
         if(derbyText == null)
         {
@@ -3843,15 +3753,15 @@ mp.events.add(
             loginBrowser = mp.browsers.new("package://LoginRegister/index.html"); // Right on connect so it doesn't overlay the notifications.
             loginBrowser.active = false;
             */
-            ServerUI = mp.browsers.new("package://ServerUI/index.html");
-            if(ServerUI) ServerUI.active = false;
-            LastKeyPress = Date.now();
-            AFKStage = 0;
-            antiAFKActive = false;
+            //global.ServerUI = mp.browsers.new("package://ServerUI/index.html");
+            if(global.ServerUI) global.ServerUI.active = false;
+            global.LastKeyPress = Date.now();
+            global.AFKStage = 0;
+            global.antiAFKActive = false;
             mp.gui.chat.show(false);
             //mp.gui.chat.activate(false);
             setTimeout(() => {
-                if(ServerUI) ServerUI.markAsChat();
+                if(global.ServerUI) global.ServerUI.markAsChat();
             }, 250);
             setTimeout(() => {
                 if(mp.storage.data.language){
@@ -3893,8 +3803,8 @@ mp.events.add(
 
 var precisionEditorKeys = {"W":false, "A":false, "S":false, "D":false, "E":false, "Q":false, "SHIFT":false, "CTRL":false};
 function precisionPositioner_handleInput(key, isDown){
-    if(!precisionPositionerActive) return; 
-    if(chatStatus) return;
+    if(!global.precisionPositionerActive) return; 
+    if(global.chatStatus) return;
 
     precisionEditorKeys = {...precisionEditorKeys, [key]:isDown};
 }
@@ -3917,7 +3827,7 @@ mp.keys.bind(0x11, true, () => {precisionPositioner_handleInput("CTRL", true)});
 mp.keys.bind(0x11, false, () => {precisionPositioner_handleInput("CTRL", false)});
 
 mp.keys.bind(0x46, false, () => {
-    if(precisionPositionerActive && !chatStatus){
+    if(global.precisionPositionerActive && !global.chatStatus){
         mp.events.callRemote("StopAnimPositioner");
     }
 });
@@ -3926,7 +3836,7 @@ var precisionPositioner_animData = {};
 mp.events.add("togglePrecisionPositioner", (toggle) => {
     mp.players.local.freezePosition(toggle);
     mp.players.local.setCollision(!toggle, !toggle);
-    precisionPositionerActive = toggle;
+    global.precisionPositionerActive = toggle;
 
     if(toggle && mp.players.local.getVariable("PlayedAnimation") !== "NULL"){
         const ANIMOBJECT = JSON.parse(mp.players.local.getVariable("PlayedAnimation"));
@@ -3937,7 +3847,7 @@ mp.events.add("togglePrecisionPositioner", (toggle) => {
 
 var wasKeyPressedLastFrame = false;
 mp.events.add('render', () => {
-    if(!precisionPositionerActive) return;
+    if(!global.precisionPositionerActive) return;
 
     mp.game.controls.disableControlAction(32, 21, true);
     mp.game.controls.disableControlAction(32, 22, true);
@@ -4020,25 +3930,25 @@ mp.events.add('render', () => {
 mp.events.add("OnPlayerLoginRegister", () => {
 
     setTimeout(() => {
-        focusChat(false);
+        global.focusChat(false);
     }, 300);
     setTimeout(() => {
         setStorageDataVars();
     }, 400);
     setTimeout(() => {
-        InitializeMDC();
+        global.InitializeMDC();
         mp.game.streaming.requestAnimDict("rcmjosh4");
     }, 500);
     setTimeout(() => {
-        InitializeWeaponEditor();
+        global.InitializeWeaponEditor();
         mp.game.streaming.requestAnimDict("reaction@intimidation@1h");
     }, 600);
     setTimeout(() => {
-        InitializeHotwireDOM();
-        AddCustomVehiclesToSpawner()
+        global.InitializeHotwireDOM();
+        global.AddCustomVehiclesToSpawner()
     }, 700);
     setTimeout(() => {
-        InitializeClothingEditorDOM();
+        global.InitializeClothingEditorDOM();
 
         if(mp.storage.data.menu !== undefined && mp.storage.data.menu.myweather !== undefined)
         {
@@ -4165,9 +4075,9 @@ function setStorageDataVars(){
 
     if(mp.storage.data.menu == undefined) mp.storage.data.menu = {};
 
-    LastKeyPress = Date.now();
-    AFKStage = 0;
-    antiAFKActive = true;
+    global.LastKeyPress = Date.now();
+    global.AFKStage = 0;
+    global.antiAFKActive = true;
 
     if(mp.storage.data.chat == undefined){
         mp.storage.data.chat = {};
@@ -4176,28 +4086,28 @@ function setStorageDataVars(){
         mp.storage.data.chat.fontsizenew = 1.0;
     }
     if(mp.storage.data.chat.timestamp !== undefined){    
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.timestamps = ${mp.storage.data.chat.timestamp.toString()}`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.timestamps = ${mp.storage.data.chat.timestamp.toString()}`);
     }
     else{
         mp.storage.data.chat.timestamp = false;
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.timestamps = false;`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.timestamps = false;`);
     }
     if(mp.storage.data.menu.loadingscreens === undefined){
         mp.storage.data.menu.loadingscreens = true;
     }
     if(mp.storage.data.chat.pagesize !== undefined){    
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.pageSize = ${mp.storage.data.chat.pagesize}`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.pageSize = ${mp.storage.data.chat.pagesize}`);
     }
     else{
         mp.storage.data.chat.pagesize = 18;
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.pageSize = 18;`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.pageSize = 18;`);
     }
     if(mp.storage.data.chat.fontsizenew !== undefined){    
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.fontSize = ${mp.storage.data.chat.fontsizenew}`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.fontSize = ${mp.storage.data.chat.fontsizenew}`);
     }
     else{
         mp.storage.data.chat.fontsizenew = 1.0;
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.fontSize = 1.0;`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.fontSize = 1.0;`);
     }
     if(mp.storage.data.menu.Speedo == undefined){
         mp.storage.data.menu.Speedo = true;
@@ -4218,7 +4128,7 @@ function setStorageDataVars(){
     if(mp.storage.data.menu.ChatAccessibility == undefined){
         mp.storage.data.menu.ChatAccessibility = false;
     }
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.accessibilityMode = ${mp.storage.data.menu.ChatAccessibility.toString()}`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.accessibilityMode = ${mp.storage.data.menu.ChatAccessibility.toString()}`);
 
     if(mp.storage.data.menu.XMRAutoPlay == undefined){
         mp.storage.data.menu.XMRAutoPlay = true;
@@ -4244,7 +4154,7 @@ function setStorageDataVars(){
     if(mp.storage.data.menu.ShowVoiceActivity == undefined){
         mp.storage.data.menu.ShowVoiceActivity = true;
     }
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.enabled = ${mp.storage.data.menu.ShowVoiceActivity.toString()};`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.enabled = ${mp.storage.data.menu.ShowVoiceActivity.toString()};`);
 
     if(mp.storage.data.menu.InactiveChatOpacity == undefined){
         mp.storage.data.menu.InactiveChatOpacity = 0.5;
@@ -4271,13 +4181,13 @@ function setStorageDataVars(){
     }
 
     if(mp.storage.data.menu.monitoring !== undefined){
-        if(ServerUI != undefined && ServerUI != null)
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.monitorEnabled = ${mp.storage.data.menu.monitoring}`);
+        if(global.ServerUI != undefined && global.ServerUI != null)
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.monitorEnabled = ${mp.storage.data.menu.monitoring}`);
     }
     else{
         mp.storage.data.menu.monitoring = false;
-        if(ServerUI != undefined && ServerUI != null)
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.monitorEnabled = false;`);
+        if(global.ServerUI != undefined && global.ServerUI != null)
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.monitorEnabled = false;`);
     }
 
     if(mp.storage.data.menu.VoiceMode !== undefined){
@@ -4290,10 +4200,10 @@ function setStorageDataVars(){
     }
 
     if(mp.storage.data.menu.tooltips !== undefined){
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.enabled = ${mp.storage.data.menu.tooltips.toString()}`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.enabled = ${mp.storage.data.menu.tooltips.toString()}`);
     }
     else{
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.enabled = true`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.enabled = true`);
         mp.storage.data.menu.tooltips = true;
     }
 

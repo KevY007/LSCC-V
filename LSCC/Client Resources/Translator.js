@@ -3,81 +3,7 @@ const {Language:Spanish} = require('./Languages/Client/Game/Spanish');
 const {Language:French} = require('./Languages/Client/Game/French');
 const {Language:Vietnamese} = require('./Languages/Client/Game/Vietnamese');
 const {Language:Croatian} = require('./Languages/Client/Game/Croatian');
-var {
-    currentJailTime,
-    lastJailUpdate,
-    chaseRunning,
-    chaseTimeCur,
-    chaseTimeMax,
-    chaseMode,
-    collisionTime,
-    updateRate,
-    radioToggle,
-    carryTarget,
-    chatStatus,
-    chatStatusLate,
-    menuToggledLate,
-    lastChatToggle,
-    streetName,
-    zoneName,
-    showHud,
-    renderNametags,
-    currentMuteTime,
-    lastMuteUpdate,
-    lastFunc,
-    curMDCBind,
-    lastMDCBind,
-    curActionMenuBind,
-    lastActionMenuBind,
-    IsInTutorial,
-    BankRobberyOn,
-    ShowVehicleDL,
-    specState, 
-    lastGPSBind,
-    curGPSBind,
-    lastMapBind,
-    curMapBind,
-    specTarget,
-    isNoClip,
-    LastKeyPress,
-    AFKStage,
-    SecondsSinceLastKeyPress,
-    antiAFKActive,
-    showReticule,
-    showCustomCrosshair,
-    showCustomCrosshairInSniper,
-    alwaysShowCustomCrosshair,
-    customCrosshairOn,
-    ServerUI,
-    menuToggled,
-    scoreboardToggled,
-    scoreboardCursor,
-    StationPickerToggled,
-    MDC_DOM,
-    MDCActive,
-    isLockpicking,
-    isHotwiring,
-    HotwireDOM,
-    ClothingEditorDOM,
-    ClothingEditorActive,
-    ActionMenuActive,
-    VehicleSpawnerActive,
-    WeaponEditorActive,
-    FireModeDisplayText,
-    cuffTarget,
-    cuffInterval,
-    boneData,
-    weaponData,
-    loginSceneEntities,
-    chatStatusTimeout,
-    heliCam,
-    LogPlayerDamage,
-    ToggleMDC,
-    actionMenuClose,
-    actionMenuOpen,
-    traceLastFunc,
-    isHeliCamActive
-} = require('./globals');
+var global = require('./globals');
 
 var CURRENT_LANGUAGE = 0;
 const VALID_LANGUAGES = [0,1,2,3,4];
@@ -95,7 +21,7 @@ mp.events.add("Translator:ChangeLanguage", (languageID, onJoin) => {
   
   if(onJoin === false){
     let notifyscoreboardstr = `toast('${Translate("CS_TEST", [mp.players.local.name])}', '', 'nothing', 6500, 2);`;
-    if(ServerUI) ServerUI.execute(notifyscoreboardstr);
+    if(global.ServerUI) global.ServerUI.execute(notifyscoreboardstr);
 
     mp.events.callLocal("ToggleTooltips", !mp.storage.data.menu.tooltips);
     setTimeout(() => {
@@ -124,16 +50,16 @@ function getLanguageObject(){
     return LANG;
 }
 function updateUILanguage(){
-    if(!ServerUI) return;
-    if(ServerUI === undefined || ServerUI === null) return;
+    if(!global.ServerUI) return;
+    if(global.ServerUI === undefined || global.ServerUI === null) return;
 
     switch(CURRENT_LANGUAGE){
-        default: if(ServerUI) ServerUI.execute(`gm.$refs.helpers.setLocale("en")`); break;
-        case 0: if(ServerUI) ServerUI.execute(`gm.$refs.helpers.setLocale("en")`); break;
-        case 1: if(ServerUI) ServerUI.execute(`gm.$refs.helpers.setLocale("es")`); break;
-        case 2: if(ServerUI) ServerUI.execute(`gm.$refs.helpers.setLocale("fr")`); break;
-        case 3: if(ServerUI) ServerUI.execute(`gm.$refs.helpers.setLocale("hr")`); break;
-        case 4: if(ServerUI) ServerUI.execute(`gm.$refs.helpers.setLocale("vi")`); break;
+        default: if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.setLocale("en")`); break;
+        case 0: if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.setLocale("en")`); break;
+        case 1: if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.setLocale("es")`); break;
+        case 2: if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.setLocale("fr")`); break;
+        case 3: if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.setLocale("hr")`); break;
+        case 4: if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.setLocale("vi")`); break;
     }
 }
 mp.events.add("Translator:UpdateNametagMessagesManual", () => {

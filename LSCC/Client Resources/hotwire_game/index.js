@@ -1,91 +1,23 @@
-var {
-    currentJailTime,
-    lastJailUpdate,
-    chaseRunning,
-    chaseTimeCur,
-    chaseTimeMax,
-    chaseMode,
-    collisionTime,
-    updateRate,
-    radioToggle,
-    carryTarget,
-    chatStatus,
-    chatStatusLate,
-    menuToggledLate,
-    lastChatToggle,
-    streetName,
-    zoneName,
-    showHud,
-    renderNametags,
-    currentMuteTime,
-    lastMuteUpdate,
-    lastFunc,
-    curMDCBind,
-    lastMDCBind,
-    curActionMenuBind,
-    lastActionMenuBind,
-    BankRobberyOn,
-    ShowVehicleDL,
-    specState,
-    specTarget,
-    isNoClip,
-    LastKeyPress,
-    AFKStage,
-    SecondsSinceLastKeyPress,
-    antiAFKActive,
-    showReticule,
-    showCustomCrosshair,
-    showCustomCrosshairInSniper,
-    alwaysShowCustomCrosshair,
-    customCrosshairOn,
-    ServerUI,
-    menuToggled,
-    scoreboardToggled,
-    scoreboardCursor,
-    StationPickerToggled,
-    MDC_DOM,
-    MDCActive,
-    isLockpicking,
-    isHotwiring,
-    HotwireDOM,
-    ClothingEditorDOM,
-    ClothingEditorActive,
-    ActionMenuActive,
-    VehicleSpawnerActive,
-    WeaponEditorActive,
-    FireModeDisplayText,
-    cuffTarget,
-    cuffInterval,
-    boneData,
-    weaponData,
-    loginSceneEntities,
-    chatStatusTimeout,
-    LogPlayerDamage,
-    ToggleMDC,
-    actionMenuClose,
-    actionMenuOpen,
-    traceLastFunc,
-    isHeliCamActive
-   } = require('./globals');
+var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 
 
 mp.events.add("StartHotwire", () => {
-    HotwireDOM.execute(`generateHotwire();`); // restarts the minigame
-    HotwireDOM.active = true;
-    isHotwiring = true;
+    global.HotwireDOM.execute(`generateHotwire();`); // restarts the minigame
+    global.HotwireDOM.active = true;
+    global.isHotwiring = true;
 });
 mp.events.add("StopHotwire", () => {
-    HotwireDOM.active = false;
-    isHotwiring = false;
+    global.HotwireDOM.active = false;
+    global.isHotwiring = false;
 });
 mp.events.add("CS_HotwireResult", (success) => {
-    if(!isHotwiring) return;
+    if(!global.isHotwiring) return;
 
-    isHotwiring = false;
+    global.isHotwiring = false;
     if(success){
         setTimeout(() => {
-            HotwireDOM.active = false; // to let the sound fully play
+            global.HotwireDOM.active = false; // to let the sound fully play
         }, 500);
     }
     mp.events.callRemote("OnHotwireResult", success);

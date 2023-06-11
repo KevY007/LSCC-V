@@ -1,77 +1,7 @@
 let actionInterval = null;
 let actionTime = 0;
 let actionType = "none";
-var {
-    currentJailTime,
-    lastJailUpdate,
-    chaseRunning,
-    chaseTimeCur,
-    chaseTimeMax,
-    chaseMode,
-    collisionTime,
-    updateRate,
-    radioToggle,
-    carryTarget,
-    chatStatus,
-    chatStatusLate,
-    menuToggledLate,
-    lastChatToggle,
-    streetName,
-    zoneName,
-    showHud,
-    renderNametags,
-    currentMuteTime,
-    lastMuteUpdate,
-    lastFunc,
-    curMDCBind,
-    lastMDCBind,
-    curActionMenuBind,
-    lastActionMenuBind,
-    BankRobberyOn,
-    ShowVehicleDL,
-    specState,
-    specTarget,
-    isNoClip,
-    LastKeyPress,
-    AFKStage,
-    SecondsSinceLastKeyPress,
-    antiAFKActive,
-    showReticule,
-    showCustomCrosshair,
-    showCustomCrosshairInSniper,
-    alwaysShowCustomCrosshair,
-    customCrosshairOn,
-    ServerUI,
-    menuToggled,
-    scoreboardToggled,
-    scoreboardCursor,
-    StationPickerToggled,
-    MDC_DOM,
-    MDCActive,
-    isLockpicking,
-    isHotwiring,
-    HotwireDOM,
-    ClothingEditorDOM,
-    calcDist,
-    ClothingEditorActive,
-    ActionMenuActive,
-    disableSprint,
-    VehicleSpawnerActive,
-    WeaponEditorActive,
-    FireModeDisplayText,
-    cuffTarget,
-    cuffInterval,
-    boneData,
-    weaponData,
-    loginSceneEntities,
-    chatStatusTimeout,
-    LogPlayerDamage,
-    ToggleMDC,
-    actionMenuClose,
-    actionMenuOpen,
-    traceLastFunc,
-    isHeliCamActive
-   } = require('./globals');
+var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 let maxActionTime = 0;
 
@@ -109,7 +39,7 @@ mp.events.add("StopPlayerActions", () => {
     actionTime = 0;
     maxActionTime = 0;
     actionInterval = null;
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
 })
 
 function PainkillerAction(){
@@ -135,7 +65,7 @@ function PainkillerAction(){
             mp.events.callRemote("OnPlayerActionTick");
             if(actionTime <= 0){
                 mp.events.callRemote("FinishPlayerAction", actionType);
-                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
                 clearInterval(actionInterval);
             }
             else{
@@ -157,10 +87,10 @@ function PainkillerAction(){
 
 function initiateActionTimer(startTime){
     maxActionTime = startTime;
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.maxtime = ${startTime}`);
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0`);
-    //if(ServerUI) ServerUI.execute(`gm.$refs.actionbar.fugitive = ${(mp.players.local.getVariable("Team") == 0 ? true : false)}`);
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = true;`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.maxtime = ${startTime}`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0`);
+    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.actionbar.fugitive = ${(mp.players.local.getVariable("Team") == 0 ? true : false)}`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = true;`);
 }
 
 function MedkitAction(){
@@ -184,13 +114,13 @@ function MedkitAction(){
             if(actionTime <= 0){
                 mp.events.callRemote("clear_anim");
                 mp.events.callRemote("FinishPlayerAction", actionType);
-                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
-                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
                 clearInterval(actionInterval);
             }
             else{
                 actionTime--;           
-                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = ${((maxActionTime - actionTime) == 0 ? 0 : (maxActionTime - actionTime))}`);
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = ${((maxActionTime - actionTime) == 0 ? 0 : (maxActionTime - actionTime))}`);
                 if(actionTime == 1){
                     mp.events.callRemote("play_anim", "amb@medic@standing@kneel@exit", "exit", 0, 8.0, 0.0, -1, 0.0, false, false, false);
                 }
@@ -208,7 +138,7 @@ let carry_lastWeaponCarried = undefined;
 
 function equipHandgun(){
     if(mp.players.local.getVariable("Handgun_Hash") !== undefined){
-        const gunData = weaponData.find(w => Number(w.Hash) == mp.players.local.getVariable("Handgun_Hash"));
+        const gunData = global.weaponData.find(w => Number(w.Hash) == mp.players.local.getVariable("Handgun_Hash"));
         if(gunData !== undefined && gunData.Type === "Handguns"){
             mp.game.invoke('0xADF692B254977C0C', mp.players.local.handle, (Number(gunData.Hash))>>0, true);
             isCurrentWeaponAllowedForCarry = true;
@@ -225,9 +155,9 @@ function equipHandgun(){
 }
 
 mp.events.add("render", () => {
-    if(carryTarget === undefined) return;
+    if(global.carryTarget === undefined) return;
 
-    if(carryTarget != -1){
+    if(global.carryTarget != -1){
         if(mp.players.local.weapon !== carry_lastWeaponCarried){
             isCurrentWeaponAllowedForCarry = false;
             carry_lastWeaponCarried = mp.players.local.weapon;
@@ -236,7 +166,7 @@ mp.events.add("render", () => {
         if(!isCurrentWeaponAllowedForCarry){
             let weaponHash = mp.players.local.weapon;
             if(weaponHash !== undefined){
-                const gunData = weaponData.find(w => Number(w.Hash) == weaponHash);
+                const gunData = global.weaponData.find(w => Number(w.Hash) == weaponHash);
                 if(gunData !== undefined){
                     if(gunData.Type === "Handguns" || gunData.Type === "Melee"){
                         isCurrentWeaponAllowedForCarry = true;
@@ -290,17 +220,17 @@ function disableControlsOnCarry(){
 function carryCheck(){
     if(mp.players.local.getVariable("Team") == -1 || mp.players.local.getVariable("Wounded") > 0) return;
     if(mp.players.local.isInAnyVehicle(false)) return;
-    if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
-        (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
-        (ActionMenuActive !== undefined && ActionMenuActive == true) ||
-        (ClothingEditorActive !== undefined && ClothingEditorActive == true) ||
-        (menuToggled !== undefined && menuToggled == true) ||
-        (chatStatus !== undefined && chatStatus == true) ||
-        (isHotwiring !== undefined && isHotwiring == true)){
+    if((global.VehicleSpawnerActive !== undefined && global.VehicleSpawnerActive == true) ||
+        (global.WeaponEditorActive !== undefined && global.WeaponEditorActive == true) ||
+        (global.ActionMenuActive !== undefined && global.ActionMenuActive == true) ||
+        (global.ClothingEditorActive !== undefined && global.ClothingEditorActive == true) ||
+        (global.menuToggled !== undefined && global.menuToggled == true) ||
+        (global.chatStatus !== undefined && global.chatStatus == true) ||
+        (global.isHotwiring !== undefined && global.isHotwiring == true)){
         return;
     }
-    carryTarget = mp.players.local.getVariable("CarryingPlayer");
-    if(carryTarget === -1){
+    global.carryTarget = mp.players.local.getVariable("CarryingPlayer");
+    if(global.carryTarget === -1){
         tryCarryPlayer();
     }
     else{
@@ -318,10 +248,10 @@ function tryCarryPlayer(){
                 {
                     if(pl.getVariable("BeingRevived") == false && pl.getVariable("CarriedBy") == -1)
                     {
-                        let distance = calcDist(mp.players.local.position, pl.position);
+                        let distance = global.calcDist(mp.players.local.position, pl.position);
                         if(distance < 5)
                         {
-                            carryTarget = pl;
+                            global.carryTarget = pl;
                             mp.game.player.setSprint(false);
                             mp.events.callRemote("RequestCarryPlayer", pl.remoteId);
                             return;
@@ -334,9 +264,9 @@ function tryCarryPlayer(){
 }
 mp.events.add("onStopCarryPlayer", () => {stopCarryPlayer();});
 function stopCarryPlayer(){
-    if(carryTarget.remoteId === mp.players.local.remoteId) return;
+    if(global.carryTarget.remoteId === mp.players.local.remoteId) return;
 
-    carryTarget = -1;
+    global.carryTarget = -1;
     mp.game.player.setSprint(true);
     isCurrentWeaponAllowedForCarry = false;
     carry_lastWeaponCarried = undefined;
@@ -380,7 +310,7 @@ function onHoldHkey()
                     {
                         if(pl.getVariable("BeingRevived") == false)
                         {
-                            let distance = calcDist(mp.players.local.position, pl.position);
+                            let distance = global.calcDist(mp.players.local.position, pl.position);
                             if(distance < 5)
                             {
                                 reviveTarget = pl;
@@ -403,13 +333,13 @@ function onHoldHkey()
 let isReviving = false;
 
 function canRevive(){
-    if(mp.players.local.getVariable("Team") == -1 || carryTarget !== -1 || mp.players.local.getVariable("Wounded") > 0 || chatStatus || menuToggled || scoreboardToggled || Date.now() - lastChatToggle <= 500) return false; 
+    if(mp.players.local.getVariable("Team") == -1 || global.carryTarget !== -1 || mp.players.local.getVariable("Wounded") > 0 || global.chatStatus || global.menuToggled || global.scoreboardToggled || Date.now() - global.lastChatToggle <= 500) return false; 
     return true;
 }
 mp.events.add("BeginReviving", () => {
     if(mp.players.local == null || !mp.players.exists(mp.players.local)) return;
     if(reviveTarget == null || !mp.players.exists(reviveTarget)) return;
-    if(carryTarget !== -1) return;
+    if(global.carryTarget !== -1) return;
     if(mp.players.local.getVariable("Wounded") > 0){
         return;
     }
@@ -439,15 +369,15 @@ mp.events.add("BeginReviving", () => {
         reviveTime--;
         if(reviveTime <= 0)
         {
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
             finishCuffing();
             mp.events.callRemote("FinishRevive", reviveTarget);
             clearInterval(reviveTimer);
             return;
         }
         else{
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = ${((maxActionTime - reviveTime) == 0 ? 0 : (maxActionTime - reviveTime))}`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = ${((maxActionTime - reviveTime) == 0 ? 0 : (maxActionTime - reviveTime))}`);
         }
     }, 1000);
 });
@@ -460,7 +390,7 @@ function stopReviving(reason){
     reviveTarget = null;
 
     mp.events.callRemote("StopReviving");
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
 
     switch(reason){
         case 1:{
@@ -482,11 +412,11 @@ function stopReviving(reason){
 // ------ CUFFING SYSTEM ------ //
 let isCuffing = false;
 let cuffTimeLeft = 5;
-cuffTarget = null;
-cuffInterval = null;
+global.cuffTarget = null;
+global.cuffInterval = null;
 
 function requestCuffTarget(){
-    if(mp.players.local.getVariable("Team") != 1 || chatStatus || menuToggled || scoreboardToggled || Date.now() - lastChatToggle <= 500) return;
+    if(mp.players.local.getVariable("Team") != 1 || global.chatStatus || global.menuToggled || global.scoreboardToggled || Date.now() - global.lastChatToggle <= 500) return;
 
     mp.events.callRemote("RequestCuffTarget");
 }
@@ -502,21 +432,21 @@ mp.events.add("BeginCuffing", (target) => {
     }
 
     isCuffing = true;
-    cuffTarget = target;
+    global.cuffTarget = target;
     cuffTimeLeft = 5;
-    disableSprint = true;
+    global.disableSprint = true;
 
     initiateActionTimer(cuffTimeLeft);
     
-    if(cuffInterval != null) clearInterval(cuffInterval);
+    if(global.cuffInterval != null) clearInterval(global.cuffInterval);
 
-    cuffInterval = setInterval(() => {
+    global.cuffInterval = setInterval(() => {
 
-        if(cuffTarget == null || !mp.players.exists(cuffTarget) || !mp.players.exists(mp.players.local)) {
+        if(global.cuffTarget == null || !mp.players.exists(global.cuffTarget) || !mp.players.exists(mp.players.local)) {
             stopCuffing(0);
             return;
         }
-        if(cuffTarget.getVariable("Team") != 0 || cuffTarget.isDead()){ 
+        if(global.cuffTarget.getVariable("Team") != 0 || global.cuffTarget.isDead()){ 
             stopCuffing(1);
             return;
         }
@@ -529,7 +459,7 @@ mp.events.add("BeginCuffing", (target) => {
             return;
         }
 
-        let distance = calcDist(mp.players.local.position, cuffTarget.position);
+        let distance = global.calcDist(mp.players.local.position, global.cuffTarget.position);
         if(distance > 4.0){
             stopCuffing(2);
             return;
@@ -537,12 +467,12 @@ mp.events.add("BeginCuffing", (target) => {
 
         cuffTimeLeft--;
         if(cuffTimeLeft <= 0){
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
             finishCuffing();
         }
         else{
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = ${((maxActionTime - cuffTimeLeft) == 0 ? 0 : (maxActionTime - cuffTimeLeft))}`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = ${((maxActionTime - cuffTimeLeft) == 0 ? 0 : (maxActionTime - cuffTimeLeft))}`);
         }
     }, 1000);
 });
@@ -550,21 +480,21 @@ mp.events.add("BeginCuffing", (target) => {
 mp.events.add("forceStopCuffing", () => {
     stopCuffing(69);
     mp.events.callRemote("clear_anim");
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
     mp.events.callLocal("StopPlayerActions");
 });
 
 function stopCuffing(reason){ // if unsuccessful / force stopped
 
-    disableSprint = false;
-    clearInterval(cuffInterval);
+    global.disableSprint = false;
+    clearInterval(global.cuffInterval);
     isCuffing = false;
     cuffTimeLeft = 5;
-    cuffInterval = null;
-    cuffTarget = null;
+    global.cuffInterval = null;
+    global.cuffTarget = null;
 
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
 
     mp.events.callRemote("StopCuffing");
 
@@ -581,22 +511,22 @@ function stopCuffing(reason){ // if unsuccessful / force stopped
     }
 }
 function finishCuffing(){ // if successful
-    clearInterval(cuffInterval);
+    clearInterval(global.cuffInterval);
 
-    disableSprint = false;
+    global.disableSprint = false;
     isCuffing = false;
     cuffTimeLeft = 5;
-    cuffInterval = null;
+    global.cuffInterval = null;
 
-    if(!mp.players.exists(cuffTarget) || !mp.players.exists(mp.players.local)) { cuffTarget = null; return;} // better safe than sorry :)
-    mp.events.callRemote("FinishCuffing", cuffTarget);
-    cuffTarget = null;
+    if(!mp.players.exists(global.cuffTarget) || !mp.players.exists(mp.players.local)) { global.cuffTarget = null; return;} // better safe than sorry :)
+    mp.events.callRemote("FinishCuffing", global.cuffTarget);
+    global.cuffTarget = null;
 }
 
 
 /* LOCKPICKING */
 mp.events.add("startLockpicking", (donorLevel) => {
-    isLockpicking = true;
+    global.isLockpicking = true;
     let rangeSize = 15;
     rangeSize += (donorLevel*8);
     let rangePos = 0;
@@ -605,7 +535,7 @@ mp.events.add("startLockpicking", (donorLevel) => {
     }
     while(rangePos+rangeSize >= 180);
 
-    if(ServerUI) ServerUI.execute(`
+    if(global.ServerUI) global.ServerUI.execute(`
         gm.$refs.hud.$refs.base.$refs.quickAction.rangeLocation = ${rangePos};
         gm.$refs.hud.$refs.base.$refs.quickAction.range = ${rangeSize};
         
@@ -615,12 +545,12 @@ mp.events.add("startLockpicking", (donorLevel) => {
 
 // true = success ; false = fail
 mp.events.add("stopLockpicking", () => {
-    isLockpicking = false;
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.quickAction.enabled = false;`);   
+    global.isLockpicking = false;
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.quickAction.enabled = false;`);   
 });
 mp.events.add("sendLockpickResult", (result) => {
-    isLockpicking = false;
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.quickAction.enabled = false;`);   
+    global.isLockpicking = false;
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.quickAction.enabled = false;`);   
     mp.events.callRemote("onLockpickAttempt", result); 
 });
 mp.events.add("lockpick_vehicleAlarm", (veh, isLockpickPlayer, isSuccess) => {

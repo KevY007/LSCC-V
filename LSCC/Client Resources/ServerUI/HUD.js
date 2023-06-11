@@ -1,92 +1,5 @@
-var {
-    currentJailTime,
-    lastJailUpdate,
-    chaseRunning,
-    chaseTimeCur,
-    chaseTimeMax,
-    chaseMode,
-    collisionTime,
-    updateRate,
-    radioToggle,
-    carryTarget,
-    chatStatus,
-    chatStatusLate,
-    menuToggledLate,
-    lastChatToggle,
-    streetName,
-    zoneName,
-    showHud,
-    renderNametags,
-    UpdateStatsVars,
-    currentMuteTime,
-    calcDist,
-    lastMuteUpdate,
-    lastFunc,
-    curMDCBind,
-    curVoiceBind,
-    lastVoiceBind,
-    lastMDCBind,
-    curActionMenuBind,
-    lastActionMenuBind,
-    IsInTutorial,
-    BankRobberyOn,
-    ShowVehicleDL,
-    specState, 
-    lastGPSBind,
-    curGPSBind,
-    lastMapBind,
-    curMapBind,
-    specTarget,
-    isNoClip,
-    LastKeyPress,
-    AFKStage,
-    SecondsSinceLastKeyPress,
-    antiAFKActive,
-    showReticule,
-    showCustomCrosshair,
-    showCustomCrosshairInSniper,
-    alwaysShowCustomCrosshair,
-    customCrosshairOn,
-    ServerUI,
-    menuToggled,
-    scoreboardToggled,
-    scoreboardCursor,
-    StationPickerToggled,
-    MDC_DOM,
-    MDCActive,
-    isLockpicking,
-    isHotwiring,
-    HotwireDOM,
-    ClothingEditorDOM,
-    ClothingEditorActive,
-    ActionMenuActive,
-    getClosestVehicle,
-    focusChat,
-    activateChat,
-    VehicleSpawnerActive,
-    WeaponEditorActive,
-    FireModeDisplayText,
-    cuffTarget,
-    cuffInterval,
-    boneData,
-    weaponData,
-    loginSceneEntities,
-    FPS,
-    FPS_Frames,
-    FPS_Calc,
-    precisionPositionerActive,
-    HideAllCrosshairs,
-    chatStatusTimeout,
-    heliCam,
-    LogPlayerDamage,
-    ToggleMDC,
-    actionMenuClose,
-    actionMenuOpen,
-    traceLastFunc,
-    isHeliCamActive
-} = require('./globals');
-  const {TranslateMessage: Translate} = require('./Translator');
-const CommandsDataJSON = require('./ServerUI/CommandsList.js');
+var global = require('./globals');
+const {TranslateMessage: Translate} = require('./Translator');
 
 const Natives = {
     IS_RADAR_HIDDEN: "0x157F93B036700462",
@@ -108,13 +21,13 @@ mp.events.add("removePlayerFromOnlineList", (name) => {
 });
 
 mp.events.add("chat_requestAutoCompletePlayers", (query) => {
-    if(!ServerUI) return;
+    if(!global.ServerUI) return;
 
     const players = OnlinePlayersJSON.filter(p => p.toLowerCase().startsWith(query.toLowerCase()));
     var playersToSet = players;
     if(playersToSet.length > 5) playersToSet = players.slice(0, 5);
 
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.autoCompletePlayers = ${JSON.stringify(playersToSet)}`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.autoCompletePlayers = ${JSON.stringify(playersToSet)}`);
 });
 
 var wasCustomCrosshairOn = false;
@@ -149,8 +62,8 @@ let speedoCur = 0.0;
 
 // Scoreboard
 let updater = null;
-scoreboardToggled = false;
-scoreboardCursor = false;
+global.scoreboardToggled = false;
+global.scoreboardCursor = false;
 let scoreboardBinded = false;
 
 // StackOverflow cause I'm too lazy to do this myself and don't wanna type getvariable etc etc every time
@@ -221,18 +134,18 @@ mp.keys.bind(
     0x76,
     false,
     () => {
-        if(menuToggled !== undefined && menuToggled) return;
-        if(!chatStatus && 
+        if(global.menuToggled !== undefined && global.menuToggled) return;
+        if(!global.chatStatus && 
             !(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false)) 
         {
 			if (mp.keys.isDown(16) === true) 
             { // Shift is pressed
                 mp.storage.data.menu.nametags = !mp.storage.data.menu.nametags;
-                renderNametags = mp.storage.data.menu.nametags;
+                global.renderNametags = mp.storage.data.menu.nametags;
             }
             else 
             {
-                mp.events.callLocal("ToggleHud", !showHud);
+                mp.events.callLocal("ToggleHud", !global.showHud);
             }
         }
     }
@@ -289,8 +202,8 @@ function renderScreenNotifications(){
 
 
 mp.events.add("actionMenu:addItem", (id, action, color, icon) => {
-    if(!ServerUI) return;
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.items.push({
+    if(!global.ServerUI) return;
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.items.push({
         id: ${id},
         name: "${action}",
         color: "${color}",
@@ -298,44 +211,44 @@ mp.events.add("actionMenu:addItem", (id, action, color, icon) => {
     });`);
 });
 mp.events.add("actionMenu:removeItem", (id) => {
-    if(!ServerUI) return;
-    if(ServerUI) ServerUI.execute(`
+    if(!global.ServerUI) return;
+    if(global.ServerUI) global.ServerUI.execute(`
         if(gm.$refs.hud.$refs.base.$refs.actionMenu.items.find(i => i.id == ${id})){
             gm.$refs.hud.$refs.base.$refs.actionMenu.items.splice(gm.$refs.hud.$refs.base.$refs.actionMenu.items.indexOf(gm.$refs.hud.$refs.base.$refs.actionMenu.items.find(i => i.id == ${id})), 1);
         }
     `);
 });
 mp.events.add("actionMenu:removeAllItems", () => {
-    if(!ServerUI) return;
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.items = [];`);
+    if(!global.ServerUI) return;
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.items = [];`);
 });
 
 mp.events.add('actionMenu:close', () => {
-    if(!ServerUI) return;
-    ActionMenuActive = false;
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.enabled = false;`);
+    if(!global.ServerUI) return;
+    global.ActionMenuActive = false;
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.enabled = false;`);
     mp.gui.cursor.show(false, false);
 });
 mp.events.add('actionMenu:open', () => {
-    if(chatStatus == true || isHeliCamActive() || menuToggled == true || MDCActive == true || scoreboardToggled == true
-        || VehicleSpawnerActive == true || WeaponEditorActive == true || StationPickerToggled == true || isHotwiring == true || ClothingEditorActive == true) return;
+    if(global.chatStatus == true || global.isHeliCamActive() || global.menuToggled == true || global.MDCActive == true || global.scoreboardToggled == true
+        || global.VehicleSpawnerActive == true || global.WeaponEditorActive == true || global.StationPickerToggled == true || global.isHotwiring == true || global.ClothingEditorActive == true) return;
 
-        if(!ServerUI) return;
+        if(!global.ServerUI) return;
     mp.game.invoke("0xFC695459D4D0E219", 0.5, 0.5); // SET CURSOR POSITION TO CENTER [x,y = 0.5,0.5]
-    ActionMenuActive = true;
+    global.ActionMenuActive = true;
     mp.events.callLocal("actionMenu:removeAllItems");
     actionMenu_lobbyCheck();
     actionMenu_vehicleCheck();
     actionMenu_teamCheck();
 
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.enabled = true;`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.enabled = true;`);
     mp.gui.cursor.show(true, true);
 });
 
 let lastActionMenuClick = 0;
 
 mp.events.add('actionMenu:clickItem', (actionID) => {
-    if(!ServerUI) return;
+    if(!global.ServerUI) return;
     if(Date.now() - lastActionMenuClick < 100) return;
     lastActionMenuClick = Date.now();
 
@@ -412,7 +325,7 @@ mp.events.add('actionMenu:clickItem', (actionID) => {
         }
         case 12: // Handcuff/revive message tip sends them to hold 'H'
         {
-            if(ServerUI) ServerUI.execute(`toast('${Translate("HOTKEY_HELP")}', '${Translate("MUST_HOLD_H")}', 'warning', 3000);`);
+            if(global.ServerUI) global.ServerUI.execute(`toast('${Translate("HOTKEY_HELP")}', '${Translate("MUST_HOLD_H")}', 'warning', 3000);`);
             break;
         }
         case 13: // Engine command
@@ -573,7 +486,7 @@ function actionMenu_vehicleCheck(){
 }
 
 mp.events.add('ToggleNametags', (state) => {
-    renderNametags = state;
+    global.renderNametags = state;
 });
 
 /*
@@ -592,28 +505,28 @@ function increaseChatOpacity(time = 4000){
     }
 
     if(mp.storage.data.menu.ActiveChatOpacity !== undefined){
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = ${mp.storage.data.menu.ActiveChatOpacity.toString()}`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = ${mp.storage.data.menu.ActiveChatOpacity.toString()}`);
     }
-    else if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = 1.0`);
+    else if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = 1.0`);
 
     // i know this is dumb but idk i cba to fix it it didnt work otherwise
     chatOpacityTimeout = setTimeout(() => {
-        if(!chatStatus && ServerUI != null && ServerUI.active == true){
+        if(!global.chatStatus && global.ServerUI != null && global.ServerUI.active == true){
             if(mp.storage.data.menu.showInactiveChat == undefined){
                 if(mp.storage.data.menu.InactiveChatOpacity == undefined){
-                    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = 0.5`);
+                    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = 0.5`);
                 }
-                else if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = ${mp.storage.data.menu.InactiveChatOpacity.toString()}`);
+                else if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = ${mp.storage.data.menu.InactiveChatOpacity.toString()}`);
             }
             else{
                 if(mp.storage.data.menu.showInactiveChat == false){
-                    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = 0.0`);
+                    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = 0.0`);
                 }
                 else{
                     if(mp.storage.data.menu.InactiveChatOpacity == undefined){
-                        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = 0.5`);
+                        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = 0.5`);
                     }
-                    else if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = ${mp.storage.data.menu.InactiveChatOpacity.toString()}`);                    
+                    else if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = ${mp.storage.data.menu.InactiveChatOpacity.toString()}`);                    
                 }
             }
         }
@@ -625,46 +538,46 @@ var adminVehSpawner = false;
 
 
 mp.events.add("vehicleSpawner:spawnVehicle", (modelname, col1, col2) => {
-    VehicleSpawnerActive = false;
-    if(ServerUI) ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.enabled = false;`);
+    global.VehicleSpawnerActive = false;
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.enabled = false;`);
     mp.events.callRemote("Spawner_SpawnVehicle", modelname, adminVehSpawner, col1, col2);
     mp.gui.cursor.show(false, false);
 });
 mp.events.add("spawner_close", () => {
-    VehicleSpawnerActive = false;
-    if(ServerUI) ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.enabled = false;`);
+    global.VehicleSpawnerActive = false;
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.enabled = false;`);
     mp.gui.cursor.show(false, false);
 });
 mp.events.add("OpenVehicleSpawner", (carname, admin) => {
-    VehicleSpawnerActive = true;
+    global.VehicleSpawnerActive = true;
     adminVehSpawner = admin;
-    if(ServerUI) ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.openSpawner('${carname}')`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.openSpawner('${carname}')`);
     mp.gui.cursor.show(true, true);
 });
 
 mp.events.add("weaponSpawner:giveWeapon", (weaponHash, ammo, targetName, attachments) => {
-    VehicleSpawnerActive = false;
+    global.VehicleSpawnerActive = false;
     mp.gui.cursor.show(false, false);
     
     mp.events.callRemote("WeaponSpawner_RequestGiveWeapon", weaponHash, ammo, targetName, attachments);
-    if(ServerUI) ServerUI.execute(`gm.$refs.menus.$refs.weaponSpawner.enabled = false;`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.menus.$refs.weaponSpawner.enabled = false;`);
 });
 mp.events.add("weaponSpawner:close", () => {
-    VehicleSpawnerActive = false;
+    global.VehicleSpawnerActive = false;
     mp.gui.cursor.show(false, false);
-    if(ServerUI) ServerUI.execute(`gm.$refs.menus.$refs.weaponSpawner.enabled = false;`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.menus.$refs.weaponSpawner.enabled = false;`);
 });
 mp.events.add("WeaponSpawner:show", (targetName, weaponName) => {
-    VehicleSpawnerActive = true;
-    if(ServerUI) ServerUI.execute(`gm.$refs.menus.$refs.weaponSpawner.openSpawner('${weaponName}', '${targetName}')`);
+    global.VehicleSpawnerActive = true;
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.menus.$refs.weaponSpawner.openSpawner('${weaponName}', '${targetName}')`);
     mp.gui.cursor.show(true, true);
 });
 
 mp.events.add("SendClanInvite", (clanName, clanID, senderName) => {
     mp.game.audio.playSoundFrontend(-1, "CHALLENGE_UNLOCKED",  "HUD_AWARDS", true);
-    if(ServerUI) ServerUI.execute(`clanInvite("Clan Invitation", "You have been invited to <strong>${clanName}</strong> by ${senderName}.", 20000, ${clanID});`);
+    if(global.ServerUI) global.ServerUI.execute(`clanInvite("Clan Invitation", "You have been invited to <strong>${clanName}</strong> by ${senderName}.", 20000, ${clanID});`);
     let notifyscoreboardstr = `toast('${Translate("SHOW_CURSOR")}', '${Translate("CLAN_INVITE_TIP")}', 'nothing', 6500, 2);`;
-    if(ServerUI) ServerUI.execute(notifyscoreboardstr);
+    if(global.ServerUI) global.ServerUI.execute(notifyscoreboardstr);
 });
 
 var IsInInfiniteLoading = true;
@@ -675,10 +588,10 @@ mp.events.add("startLoadingScreen", (time, message) => {
     }
 
     if(time == -1){
-        if(ServerUI) ServerUI.execute('gm.$refs.loadingScreen.show(true);');
+        if(global.ServerUI) global.ServerUI.execute('gm.$refs.loadingScreen.show(true);');
         if(message != "none")
-            if(ServerUI) ServerUI.execute(`gm.$refs.loadingScreen.loadingText = "${message}"`);
-        else if(ServerUI) ServerUI.execute(`gm.$refs.loadingScreen.loadingText = ""`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.loadingText = "${message}"`);
+        else if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.loadingText = ""`);
 
         IsInInfiniteLoading = true;
 
@@ -686,15 +599,15 @@ mp.events.add("startLoadingScreen", (time, message) => {
             if(mp.players.local != null && mp.players.exists(mp.players.local) && IsInInfiniteLoading == true){
                 CanSkipLoading = true;
                 let notifyscoreboardstr = `toast('${Translate("SKIP_LOADING")}', '${Translate("SKIP_LOADING_TIP")}', 'nothing', 10000, 2);`;
-                if(ServerUI) ServerUI.execute(notifyscoreboardstr);
+                if(global.ServerUI) global.ServerUI.execute(notifyscoreboardstr);
             }
         }, 10000);
     }
     else{
-        if(ServerUI) ServerUI.execute(`gm.$refs.loadingScreen.show(${time});`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.show(${time});`);
         if(message != "none")
-            if(ServerUI) ServerUI.execute(`gm.$refs.loadingScreen.loadingText = "${message}"`);
-        else if(ServerUI) ServerUI.execute(`gm.$refs.loadingScreen.loadingText = ""`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.loadingText = "${message}"`);
+        else if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.loadingText = ""`);
     }
 });
 mp.keys.bind(0x20, false, function() {
@@ -702,7 +615,7 @@ mp.keys.bind(0x20, false, function() {
         mp.events.callLocal("stopLoadingScreen");
 
         let notifyscoreboardstr = `toast('${Translate("SKIP_LOADING")}', '${Translate("SKIP_LOADING_TIP")}', 'nothing', 1, 2);`;
-        if(ServerUI) ServerUI.execute(notifyscoreboardstr);
+        if(global.ServerUI) global.ServerUI.execute(notifyscoreboardstr);
     }
 });
 mp.events.add("stopLoadingScreen", () => {
@@ -710,7 +623,7 @@ mp.events.add("stopLoadingScreen", () => {
         return;
     }
 
-    if(ServerUI) ServerUI.execute('gm.$refs.loadingScreen.hide();');
+    if(global.ServerUI) global.ServerUI.execute('gm.$refs.loadingScreen.hide();');
     IsInInfiniteLoading = false;
     CanSkipLoading = false;
 });
@@ -723,7 +636,7 @@ mp.events.addCommand("fontsize", (size) => {
     }
     mp.storage.data.chat.fontsizenew = size;
     mp.storage.flush();
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.fontSize = ${size}`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.fontSize = ${size}`);
 });
 mp.events.addCommand("pagesize", (size) => {
     
@@ -733,30 +646,30 @@ mp.events.addCommand("pagesize", (size) => {
     }
     mp.storage.data.chat.pagesize = size;
     mp.storage.flush();
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.pageSize = ${size}`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.pageSize = ${size}`);
 });
 mp.events.addCommand("timestamp", () => {
  
     mp.storage.data.chat.timestamp = !mp.storage.data.chat.timestamp;
     mp.storage.flush();
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.timestamps = ${mp.storage.data.chat.timestamp.toString()}`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.timestamps = ${mp.storage.data.chat.timestamp.toString()}`);
     mp.gui.chat.push(`!{white}Chat timestamps have been turned ${(mp.storage.data.chat.timestamp == true ? `!{green}ON` : `!{red}OFF`)}`);
 });
 
 function pushMessageToChat(message){
-    if(ServerUI == null){return;}
+    if(global.ServerUI == null){return;}
 /*
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.messages.push("${message}")`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.messages.push("${message}")`);
     increaseChatOpacity(4000);
 */
     mp.gui.chat.push(message);
 }
 function clearChat(){
-    if(ServerUI == null) return;
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.messages = [];`);
+    if(global.ServerUI == null) return;
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.messages = [];`);
 }
 
-//let api = {"chat:push": mp.gui.chat.push, "chat:clear": clearChat, "chat:activate": activateChat, "chat:show": focusChat}; 
+//let api = {"chat:push": mp.gui.chat.push, "chat:clear": clearChat, "chat:activate": global.activateChat, "chat:show": global.focusChat}; 
 
 mp.events.add("pushMsgToChat", (msg) => {
     mp.gui.chat.push(msg);
@@ -778,19 +691,19 @@ mp.events.add("chat:show", (toggle) => {
 
 mp.events.add("HideAllElementsExceptChat", (value) => {
     if(value == false){
-        if(ServerUI) ServerUI.execute(
+        if(global.ServerUI) global.ServerUI.execute(
         `
             gm.$refs.hud.$refs.topRight.$refs.info.enabled = false; 
             gm.$refs.hud.$refs.topRight.$refs.killFeed.enabled = false;
-            gm.$refs.hud.$refs.base.$refs.chat.api.toggle(${showHud.toString()});
+            gm.$refs.hud.$refs.base.$refs.chat.api.toggle(${global.showHud.toString()});
         `);
     }
     else{
-        if(ServerUI) ServerUI.execute(
+        if(global.ServerUI) global.ServerUI.execute(
             `
             gm.$refs.hud.$refs.topRight.$refs.info.enabled = ${mp.storage.data.menu.topRightInfo}; 
             gm.$refs.hud.$refs.topRight.$refs.killFeed.enabled = ${mp.storage.data.menu.killFeed};
-            gm.$refs.hud.$refs.base.$refs.chat.api.toggle(${showHud.toString()});
+            gm.$refs.hud.$refs.base.$refs.chat.api.toggle(${global.showHud.toString()});
             `);       
     }
 });
@@ -802,7 +715,7 @@ for(let fn in api)
 }
 */
 mp.events.add("onChatPressEnter", () => {
-    focusChat(false);
+    global.focusChat(false);
 	mp.events.call("onOpenChatbox", false);
 });
 
@@ -818,67 +731,67 @@ mp.events.add("InitiateCustomChat", () => {
 });
 
 mp.events.add("render", () => {
-    if(chatStatusLate){
+    if(global.chatStatusLate){
         mp.game.controls.disableControlAction(0, 200, true); // prevent menu from opening when pressing ESC for chat 
     }    
 });
 mp.keys.bind(0x1B, true, function() { // ESC key
-    if(chatStatus){
-        focusChat(false);
+    if(global.chatStatus){
+        global.focusChat(false);
         mp.events.call("onOpenChatbox", false);       
     }
 });
 mp.keys.bind(0x0D, true, function() { // Enter Key
-    if(chatStatus){
-        focusChat(false);
+    if(global.chatStatus){
+        global.focusChat(false);
         mp.events.call("onOpenChatbox", false);       
     }
 });
 
 mp.keys.bind(0x26, true, function() { // UP arrow
-    if(chatStatus && ServerUI){
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.historyUp();`);
+    if(global.chatStatus && global.ServerUI){
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.historyUp();`);
     }
 });
 mp.keys.bind(0x28, true, function() { // DOWN arrow
-    if(chatStatus && ServerUI){
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.historyDown();`);
+    if(global.chatStatus && global.ServerUI){
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.historyDown();`);
     }
 });
 
 mp.keys.bind(0x21, true, function() { // PAGE UP arrow
-    if(chatStatus && ServerUI){
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.channelUp();`);
+    if(global.chatStatus && global.ServerUI){
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.channelUp();`);
     }
 });
 mp.keys.bind(0x222, true, function() { // PAGE DOWN arrow
-    if(chatStatus && ServerUI){
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.channelDown();`);
+    if(global.chatStatus && global.ServerUI){
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.channelDown();`);
     }
 });
 
 mp.keys.bind(0xBF, true, function(){  // /? key
-    if(ServerUI == null) return;
-    if(menuToggled){
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
+    if(global.ServerUI == null) return;
+    if(global.menuToggled){
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
         return;
     }
     if(mp.storage.data.menu.HUD !== undefined && mp.storage.data.menu.HUD == false){
         return;
     }
-    if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
-    (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
-    (ClothingEditorActive !== undefined && ClothingEditorActive == true) ||
-    (ActionMenuActive !== undefined && ActionMenuActive == true) || 
-    (StationPickerToggled !== undefined && StationPickerToggled == true) ||
-    (isHotwiring !== undefined && isHotwiring == true) || isHeliCamActive()){
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
+    if((global.VehicleSpawnerActive !== undefined && global.VehicleSpawnerActive == true) ||
+    (global.WeaponEditorActive !== undefined && global.WeaponEditorActive == true) ||
+    (global.ClothingEditorActive !== undefined && global.ClothingEditorActive == true) ||
+    (global.ActionMenuActive !== undefined && global.ActionMenuActive == true) || 
+    (global.StationPickerToggled !== undefined && global.StationPickerToggled == true) ||
+    (global.isHotwiring !== undefined && global.isHotwiring == true) || global.isHeliCamActive()){
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
         return;
     }
-    if(!chatStatus)
+    if(!global.chatStatus)
     {
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.input = '/'`);
-        focusChat(true);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.input = '/'`);
+        global.focusChat(true);
         mp.events.call("onOpenChatbox", true);
 
         // The Anti-FUCK system: try to hide cursor instantly, but if it fails, hide it afterwards! :D very cool
@@ -895,26 +808,26 @@ mp.keys.bind(0xBF, true, function(){  // /? key
 });
 
 mp.keys.bind(0x54, true, function() { // T key
-    if(ServerUI == null) return;
-    if(menuToggled){
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
+    if(global.ServerUI == null) return;
+    if(global.menuToggled){
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
         return;
     }
     if(mp.storage.data.menu.HUD !== undefined && mp.storage.data.menu.HUD == false){
         return;
     }
-    if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
-    (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
-    (ClothingEditorActive !== undefined && ClothingEditorActive == true) ||
-    (ActionMenuActive !== undefined && ActionMenuActive == true) || 
-    (StationPickerToggled !== undefined && StationPickerToggled == true) ||
-    (isHotwiring !== undefined && isHotwiring == true) || isHeliCamActive()){
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
+    if((global.VehicleSpawnerActive !== undefined && global.VehicleSpawnerActive == true) ||
+    (global.WeaponEditorActive !== undefined && global.WeaponEditorActive == true) ||
+    (global.ClothingEditorActive !== undefined && global.ClothingEditorActive == true) ||
+    (global.ActionMenuActive !== undefined && global.ActionMenuActive == true) || 
+    (global.StationPickerToggled !== undefined && global.StationPickerToggled == true) ||
+    (global.isHotwiring !== undefined && global.isHotwiring == true) || global.isHeliCamActive()){
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
         return;
     }
-    if(!chatStatus)
+    if(!global.chatStatus)
     {
-        focusChat(true);
+        global.focusChat(true);
         mp.events.call("onOpenChatbox", true);
 
         // The Anti-FUCK system: try to hide cursor instantly, but if it fails, hide it afterwards! :D very cool
@@ -930,40 +843,40 @@ mp.keys.bind(0x54, true, function() { // T key
     }
 });
 mp.events.add("closeChat", () => {         
-    focusChat(false);
+    global.focusChat(false);
     mp.events.call("onOpenChatbox", false);  
 });
 mp.events.add("TogglePlayerChat", (toggle) => {
-    activateChat(toggle);
+    global.activateChat(toggle);
 });
 
 mp.events.add('RestartHUD', () => {
-    if(ServerUI !== null)
+    if(global.ServerUI !== null)
     {
-        if(ServerUI) ServerUI.destroy();
-        ServerUI = null;
+        if(global.ServerUI) global.ServerUI.destroy();
+        global.ServerUI = null;
     }
 
-    ServerUI = mp.browsers.new("package://ServerUI/index.html");
+    //global.ServerUI = mp.browsers.new("package://ServerUI/index.html");
     setTimeout(() => {
-        //if(ServerUI) ServerUI.markAsChat();
+        //if(global.ServerUI) global.ServerUI.markAsChat();
         //mp.gui.chat.activate(true);
         //mp.gui.chat.show(true);
-        // if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.commands = ${JSON.stringify(CommandsDataJSON)}`);
-        // if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`)
-        // if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings = {
+        // if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.commands = ${JSON.stringify(global.CommandsDataJSON)}`);
+        // if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`)
+        // if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings = {
         //     opacity: 1,
         //     autoScroll: true,
         // }`);
     }, 1000);
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = false;`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = false;`);
 });
 
 let createdTooltips = []; // to keep track of created tooltips / preventing duplicates
 
 mp.events.add('AddTooltip', (key, action, team) => {
     
-    if(ServerUI == null) return;
+    if(global.ServerUI == null) return;
     if(createdTooltips.indexOf(key) != -1) return;
     if(mp.storage.data.menu.tooltips !== true) return;
 
@@ -978,17 +891,17 @@ mp.events.add('AddTooltip', (key, action, team) => {
 
     createdTooltips.push(key);
 
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.push({
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.push({
         key: "${key}",
         action: "${action}",
         color: "${color}"
     })`);
 });
 mp.events.add('RemoveTooltip', (key) => {
-    if(ServerUI == null) return;
+    if(global.ServerUI == null) return;
     if(createdTooltips.indexOf(key) == -1) return;
 
-    if(ServerUI) ServerUI.execute(`if(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.indexOf(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.filter(function(el){return el.key == "${key}"})[0]) != -1){
+    if(global.ServerUI) global.ServerUI.execute(`if(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.indexOf(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.filter(function(el){return el.key == "${key}"})[0]) != -1){
         gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.splice(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.indexOf(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.filter(function(el){return el.key == "${key}"})[0]), 1);        
     }`);
     createdTooltips.splice(createdTooltips.indexOf(key), 1);
@@ -999,18 +912,18 @@ let keyTrunk = true; // true = key trunk, false = key seatbelt displayed
 mp.events.add('ToggleTooltips', (status) =>
 {
     mp.storage.data.menu.tooltips = status;
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.enabled = ${status.toString()}`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.enabled = ${status.toString()}`);
 
     if(status)
     {
         mp.events.callLocal("AddTooltip", "M", Translate("MENU"), -1);
-        mp.events.callLocal("AddTooltip", String.fromCharCode(curActionMenuBind), Translate("ACTION_MENU"), -1);
-        mp.events.callLocal("AddTooltip", String.fromCharCode(curVoiceBind), Translate("VOICE_CHAT"), -1);
+        mp.events.callLocal("AddTooltip", String.fromCharCode(global.curActionMenuBind), Translate("ACTION_MENU"), -1);
+        mp.events.callLocal("AddTooltip", String.fromCharCode(global.curVoiceBind), Translate("VOICE_CHAT"), -1);
     }
     else {
 
         createdTooltips.forEach(key => {
-            if(ServerUI) ServerUI.execute(`if(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.indexOf(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.filter(function(el){return el.key == "${key}"})[0]) != -1){
+            if(global.ServerUI) global.ServerUI.execute(`if(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.indexOf(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.filter(function(el){return el.key == "${key}"})[0]) != -1){
                 gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.splice(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.indexOf(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.filter(function(el){return el.key == "${key}"})[0]), 1);        
             }`);
         });
@@ -1024,24 +937,24 @@ var lastClosestVehBoneHandle = "";
 mp.events.add("TwoSecondsEvent", () => {
 
     if(mp.storage.data.menu.RealtimeSpeedo == false){
-        if (specState == true && specTarget != null && mp.players.exists(specTarget)) 
+        if (global.specState == true && global.specTarget != null && mp.players.exists(global.specTarget)) 
         {
-            if(specTarget.isInAnyVehicle(false) && specTarget.vehicle != undefined)
+            if(global.specTarget.isInAnyVehicle(false) && global.specTarget.vehicle != undefined)
             {
                 if(!speedo)
                 {
-                    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = true;`);
+                    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = true;`);
                     speedo = true;
                 }
-                if(speedoMax != ((mp.game.vehicle.getVehicleModelMaxSpeed(specTarget.vehicle.model) * 3.6) + 25).toFixed(0))
+                if(speedoMax != ((mp.game.vehicle.getVehicleModelMaxSpeed(global.specTarget.vehicle.model) * 3.6) + 25).toFixed(0))
                 {
-                    speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(specTarget.vehicle.model) * 3.6) + 25).toFixed(0);
-                    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.maxspeed = ${speedoMax};`);
+                    speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(global.specTarget.vehicle.model) * 3.6) + 25).toFixed(0);
+                    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.maxspeed = ${speedoMax};`);
                 }
-                if(speedoCur != (specTarget.vehicle.getSpeed() * 3.6).toFixed(0))
+                if(speedoCur != (global.specTarget.vehicle.getSpeed() * 3.6).toFixed(0))
                 {
-                    speedoCur = (specTarget.vehicle.getSpeed() * 3.6).toFixed(0);
-                    if(ServerUI) ServerUI.execute(`gm.$refs.BottomRight.$refs.speedo.speed = ${speedoCur};`);
+                    speedoCur = (global.specTarget.vehicle.getSpeed() * 3.6).toFixed(0);
+                    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.BottomRight.$refs.speedo.speed = ${speedoCur};`);
                 }
             }
             else if(speedo)
@@ -1049,7 +962,7 @@ mp.events.add("TwoSecondsEvent", () => {
                 speedo = false;
                 speedoMax = 0;
                 speedoCur = 0;
-                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = false;`);
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = false;`);
             }
         }
         else {
@@ -1057,18 +970,18 @@ mp.events.add("TwoSecondsEvent", () => {
             {
                 if(!speedo)
                 {
-                    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = true;`);
+                    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = true;`);
                     speedo = true;
                 }
                 if(speedoMax != ((mp.game.vehicle.getVehicleModelMaxSpeed(mp.players.local.vehicle.model) * 3.6) + 25).toFixed(0))
                 {
                     speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(mp.players.local.vehicle.model) * 3.6) + 25).toFixed(0);
-                    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.maxspeed = ${speedoMax};`);
+                    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.maxspeed = ${speedoMax};`);
                 }
                 if(speedoCur != (mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0))
                 {
                     speedoCur = (mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0);
-                    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.speed = ${speedoCur};`);
+                    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.speed = ${speedoCur};`);
                 }
             }
             else if(speedo)
@@ -1076,7 +989,7 @@ mp.events.add("TwoSecondsEvent", () => {
                 speedo = false;
                 speedoMax = 0;
                 speedoCur = 0;
-                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = false;`);
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = false;`);
             }
         }
     }
@@ -1098,19 +1011,19 @@ mp.events.add("TwoSecondsEvent", () => {
             if(createdTooltips.indexOf("L") != -1) mp.events.callLocal("RemoveTooltip", "L");
             if(createdTooltips.indexOf("B") != -1) mp.events.callLocal("RemoveTooltip", "B");     
         }
-        if(mp.players.local.getVariable("Team") == 1 && chaseRunning){
-            if(createdTooltips.indexOf(String.fromCharCode(curGPSBind)) == -1) 
+        if(mp.players.local.getVariable("Team") == 1 && global.chaseRunning){
+            if(createdTooltips.indexOf(String.fromCharCode(global.curGPSBind)) == -1) 
             {
-                mp.events.callLocal("AddTooltip", String.fromCharCode(curGPSBind), "GPS", 1);
+                mp.events.callLocal("AddTooltip", String.fromCharCode(global.curGPSBind), "GPS", 1);
             }
-            if(createdTooltips.indexOf(String.fromCharCode(curMDCBind)) == -1) 
+            if(createdTooltips.indexOf(String.fromCharCode(global.curMDCBind)) == -1) 
             {
-                mp.events.callLocal("AddTooltip", String.fromCharCode(curMDCBind), "MDC", 1);
+                mp.events.callLocal("AddTooltip", String.fromCharCode(global.curMDCBind), "MDC", 1);
             }
         }
         else{
-            if(createdTooltips.indexOf(String.fromCharCode(curGPSBind)) != -1) mp.events.callLocal("RemoveTooltip", String.fromCharCode(curGPSBind));
-            if(createdTooltips.indexOf(String.fromCharCode(curMDCBind)) != -1) mp.events.callLocal("RemoveTooltip", String.fromCharCode(curMDCBind));  
+            if(createdTooltips.indexOf(String.fromCharCode(global.curGPSBind)) != -1) mp.events.callLocal("RemoveTooltip", String.fromCharCode(global.curGPSBind));
+            if(createdTooltips.indexOf(String.fromCharCode(global.curMDCBind)) != -1) mp.events.callLocal("RemoveTooltip", String.fromCharCode(global.curMDCBind));  
         }
 
         if(!mp.players.local.isInAnyVehicle(false)) 
@@ -1121,7 +1034,7 @@ mp.events.add("TwoSecondsEvent", () => {
                 keyTrunk = true;
             }
 
-            let veh = getClosestVehicle(mp.players.local.position);
+            let veh = global.getClosestVehicle(mp.players.local.position);
 
             if(veh !== undefined && mp.vehicles.exists(veh.vehicle) && veh.vehicle.handle !== 0)
             {
@@ -1138,7 +1051,7 @@ mp.events.add("TwoSecondsEvent", () => {
                     if(bone != -1)
                     {
                         bonePos = veh.vehicle.getWorldPositionOfBone(bone);
-                        let dist = calcDist(mp.players.local.position, bonePos);
+                        let dist = global.calcDist(mp.players.local.position, bonePos);
                         if(dist < closestDist)
                         {
                             closestDist = dist;
@@ -1204,37 +1117,37 @@ mp.events.add("TwoSecondsEvent", () => {
 
     if(mp.storage.data.menu.HUD == false)
     {
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = false;`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = false;`);
     }
-    renderNametags = mp.storage.data.menu.nametags;
+    global.renderNametags = mp.storage.data.menu.nametags;
 });
 
 
 
 mp.events.add('browserDomReady', (browser) => {
-    if(ServerUI != null && browser == ServerUI)
+    if(global.ServerUI != null && browser == global.ServerUI)
     {
         // Set vars that aren't reset on login and shit. Basically init().
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.enabled = ${mp.storage.data.menu.topRightInfo}; gm.$refs.hud.$refs.topRight.$refs.killFeed.enabled = ${mp.storage.data.menu.killFeed};`);
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.enabled = true;`);
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items = [];`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.enabled = ${mp.storage.data.menu.topRightInfo}; gm.$refs.hud.$refs.topRight.$refs.killFeed.enabled = ${mp.storage.data.menu.killFeed};`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.enabled = true;`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items = [];`);
 
         // Initialize miniHUD
         miniHUDVars["bottom"] = ((resolution.y - (getMinimapAnchor().bottomY * resolution.y)) + 0);
         miniHUDVars["left"] = ((getMinimapAnchor().rightX * resolution.x) + 10) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0);
 
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.left = "${miniHUDVars["left"]}px";`);
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.bottom = "${miniHUDVars["bottom"]}px";`);  
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.left = "${miniHUDVars["left"]}px";`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.bottom = "${miniHUDVars["bottom"]}px";`);  
 
         // SPECTATE VARS
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({ 
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({ 
             name: "ping",
             icon: "fa-stopwatch",
             init: "0 ms",
             color: "#fbbf24"
         });`);
 
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({ 
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({ 
             name: "packetloss",
             icon: "fa-minus",
             init: "0.0%",
@@ -1242,110 +1155,110 @@ mp.events.add('browserDomReady', (browser) => {
         });`);
         //
         
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
             name: "jail",
             icon: "fa-ban",
             init: "N/A",
             color: "#fb7185"
         });`);
 
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
             name: "visible",
             icon: "fa-globe",
             init: "Visible",
             color: "#60a5fa"
         });`);
 
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
             name: "voice",
             icon: "fa-microphone",
             init: "Standby",
             color: "#818cf8"
         });`);
 
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
             name: "direction",
             icon: "fa-compass",
             init: "N/A",
             color: "#a3e635"
         });`);
 
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
             name: "street",
             icon: "fa-location-dot",
             init: "N/A",
             color: "#4ade80"
         });`);
 
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
             name: "zone",
             icon: "fa-location-crosshairs",
             init: "N/A",
             color: "#34d399"
         });`);
 
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.jail[0].show = ${miniHUDVars["jailed"]};`);
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.visible[0].show = false;`);
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.ping[0].show = false;`);
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.packetloss[0].show = false;`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.jail[0].show = ${miniHUDVars["jailed"]};`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.visible[0].show = false;`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.ping[0].show = false;`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.packetloss[0].show = false;`);
 
         mp.events.callLocal("ToggleTooltips", mp.storage.data.menu.tooltips);
 
         if(mp.storage.data.menu.HUD == false)
         {
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = false`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = false`);
         }
     }
 });
 
 mp.events.add('ToggleHud', (toggle) => {
-    showHud = toggle;
+    global.showHud = toggle;
     
-    if(ServerUI != null)
+    if(global.ServerUI != null)
     {
         if(mp.storage.data.menu.HUD == false)
         {
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = false`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = false`);
             mp.storage.data.menu.HUD = false;
         }
 
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = ${toggle};`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = ${toggle};`);
         mp.storage.data.menu.HUD = toggle;
     }
 
-    activateChat(showHud);
-    mp.game.ui.displayRadar(showHud);
+    global.activateChat(global.showHud);
+    mp.game.ui.displayRadar(global.showHud);
 });
 
 mp.keys.bind(0x75, false, () => {
-    showReticule = !showReticule;
+    global.showReticule = !global.showReticule;
 });
 
 mp.keys.bind(0x74, false, () => {
-    if(menuToggled !== undefined && menuToggled) return;
-    if(scoreboardToggled == true) return;
-    if(Date.now() - lastChatToggle >= 500 && chatStatus == false && 
+    if(global.menuToggled !== undefined && global.menuToggled) return;
+    if(global.scoreboardToggled == true) return;
+    if(Date.now() - global.lastChatToggle >= 500 && global.chatStatus == false && 
         (mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true))
     {
-        traceLastFunc(`[Players] Attempt tog /DL`);
+        global.traceLastFunc(`[Players] Attempt tog /DL`);
         
         mp.events.callRemote("OnScriptedKeyPress", 0x74, true);
     }
 });
 
 mp.events.add('ResetKillFeed', () => {
-    if(ServerUI != null)
+    if(global.ServerUI != null)
     {
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.killFeed.killFeed = [];`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.killFeed.killFeed = [];`);
     }
 });
 
 mp.events.add("pushToKillFeed", (killer, killerColor, weapon, victim, victimColor) => {
-    if(ServerUI != null) if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.killFeed.add('${killer}', '${killerColor}', '${weapon}', '${victim}', '${victimColor}');`)
+    if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.killFeed.add('${killer}', '${killerColor}', '${weapon}', '${victim}', '${victimColor}');`)
 });
 
 mp.events.add("pushToKillFeed2", (victim, color, cause) => {
-    if(ServerUI != null) if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.killFeed.add("${victim}", "${color}", "${cause}");`)
+    if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.killFeed.add("${victim}", "${color}", "${cause}");`)
 });
 
 mp.events.add("UpdateRateEvent", () => {
@@ -1360,18 +1273,18 @@ mp.events.add("UpdateRateEvent", () => {
         const position = mp.players.local.position;
         let getStreet = mp.game.pathfind.getStreetNameAtCoord(position.x, position.y, position.z, 0, 0);
 
-        zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(position.x, position.y, position.z));
-        streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
+        global.zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(position.x, position.y, position.z));
+        global.streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.global.streetName);
         */
-        zoneName = mp.game.hud.getCurrentAreaNameString();
-        streetName = mp.game.hud.getCurrentStreetNameString();
-        if(streetName.length <= 0) streetName = zoneName;
+        global.zoneName = mp.game.hud.getCurrentAreaNameString();
+        global.streetName = mp.game.hud.getCurrentStreetNameString();
+        if(global.streetName.length <= 0) global.streetName = global.zoneName;
     }
     
-    if(ServerUI != null && (!(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false || mp.players.local.getVariable("InLobby") === undefined)))
+    if(global.ServerUI != null && (!(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false || mp.players.local.getVariable("InLobby") === undefined)))
     {
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.points = ${mp.players.local.getVariable("Points")};`);
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.donatorPoints = ${mp.players.local.getVariable("DonatorPoints")};`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.points = ${mp.players.local.getVariable("Points")};`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.donatorPoints = ${mp.players.local.getVariable("DonatorPoints")};`);
         
         let lobbyStr = "";
         
@@ -1389,7 +1302,7 @@ mp.events.add("UpdateRateEvent", () => {
         if(mp.players.local.getVariable("InLobby") == -5) lobbyStr = "Customizer";
         if(mp.players.local.getVariable("InLobby") > -1) lobbyStr = mp.players.local.getVariable("InLobby").toString();
         
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.lobbyId = "${lobbyStr}";`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.lobbyId = "${lobbyStr}";`);
 
         let camera = mp.cameras.new("gameplay");
         let cameraDirection = camera.getDirection();
@@ -1436,135 +1349,135 @@ mp.events.add("UpdateRateEvent", () => {
             voiceString = mp.voiceChat.muted ? "Standby (Squad)" : "Speaking (Squad)";
         }
 
-        if(currentMuteTime >= 1)
+        if(global.currentMuteTime >= 1)
         {
-            voiceString = `Muted for ${TimeFormat(currentMuteTime)}`;
+            voiceString = `Muted for ${TimeFormat(global.currentMuteTime)}`;
         }
 
         let jailString = "N/A";
-        if(currentJailTime >= 1)
+        if(global.currentJailTime >= 1)
         {
-            jailString = `Jailed for ${TimeFormat(currentJailTime)}`;
+            jailString = `Jailed for ${TimeFormat(global.currentJailTime)}`;
         }
 
         if(mp.players.local.getVariable("VisibleBlip") != miniHUDVars["visible"])
         {
             miniHUDVars["visible"] = mp.players.local.getVariable("VisibleBlip");
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.visible[0].show = ${miniHUDVars["visible"]};`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.visible[0].show = ${miniHUDVars["visible"]};`);
         }
         if(voiceString != miniHUDVars["voice"])
         {
             miniHUDVars["voice"] = voiceString;
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.voice[0].value = "${miniHUDVars["voice"]}";`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.voice[0].value = "${miniHUDVars["voice"]}";`);
         }
         if(dirtext != miniHUDVars["direction"])
         {
             miniHUDVars["direction"] = dirtext;
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.direction[0].value = "${miniHUDVars["direction"]}";`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.direction[0].value = "${miniHUDVars["direction"]}";`);
         }
-        if(streetName != miniHUDVars["street"])
+        if(global.streetName != miniHUDVars["street"])
         {
-            miniHUDVars["street"] = streetName;
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.street[0].value = "${miniHUDVars["street"]}";`);
+            miniHUDVars["street"] = global.streetName;
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.street[0].value = "${miniHUDVars["street"]}";`);
         }
-        if(zoneName != miniHUDVars["zone"])
+        if(global.zoneName != miniHUDVars["zone"])
         {
-            miniHUDVars["zone"] = zoneName;
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.zone[0].value = "${miniHUDVars["zone"]}";`);
+            miniHUDVars["zone"] = global.zoneName;
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.zone[0].value = "${miniHUDVars["zone"]}";`);
         }
 
-        if(currentJailTime >= 1)
+        if(global.currentJailTime >= 1)
         {
             if(miniHUDVars["jailed"] != true)
             {
                 miniHUDVars["jailed"] = true;
-                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.jail[0].show = ${miniHUDVars["jailed"]};`);
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.jail[0].show = ${miniHUDVars["jailed"]};`);
             }
             miniHUDVars["jail"] = jailString;
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.jail[0].value = "${miniHUDVars["jail"]}";`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.jail[0].value = "${miniHUDVars["jail"]}";`);
         }
         else if(miniHUDVars["jailed"] == true)
         {
             miniHUDVars["jailed"] = false;
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.jail[0].show = ${miniHUDVars["jailed"]};`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.jail[0].show = ${miniHUDVars["jailed"]};`);
         }
 
-        if (specState == true && specTarget != null && mp.players.exists(specTarget)) 
+        if (global.specState == true && global.specTarget != null && mp.players.exists(global.specTarget)) 
         {
             if(miniHUDVars["spec"] == false)
             {
                 miniHUDVars["spec"] = true;
-                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.ping[0].show = true;`);
-                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.packetloss[0].show = true;`);
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.ping[0].show = true;`);
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.packetloss[0].show = true;`);
 
-                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.direction[0].show = false;`);
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.direction[0].show = false;`);
             }
         
-            if(miniHUDVars["packetloss"] != specTarget.getVariable("Packetloss").toFixed(2))
+            if(miniHUDVars["packetloss"] != global.specTarget.getVariable("Packetloss").toFixed(2))
             {
-                miniHUDVars["packetloss"] = specTarget.getVariable("Packetloss").toFixed(2);
-                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.packetloss[0].value = "${miniHUDVars["packetloss"]}%"`);
+                miniHUDVars["packetloss"] = global.specTarget.getVariable("Packetloss").toFixed(2);
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.packetloss[0].value = "${miniHUDVars["packetloss"]}%"`);
             }
-            if(miniHUDVars["ping"] != specTarget.getVariable("Ping"))
+            if(miniHUDVars["ping"] != global.specTarget.getVariable("Ping"))
             {
-                miniHUDVars["ping"] = specTarget.getVariable("Ping");
-                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.ping[0].value = "${miniHUDVars["ping"]} ms"`);
+                miniHUDVars["ping"] = global.specTarget.getVariable("Ping");
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.ping[0].value = "${miniHUDVars["ping"]} ms"`);
             }
         }
         else if(miniHUDVars["spec"] == true) 
         {
             miniHUDVars["spec"] = false;
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.ping[0].show = false;`);
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.packetloss[0].show = false;`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.ping[0].show = false;`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.packetloss[0].show = false;`);
 
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.direction[0].show = true;`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.direction[0].show = true;`);
         }
     }
 });
 
 function ToggleScoreboard()
 {
-    if (ServerUI == null) return;
+    if (global.ServerUI == null) return;
 
-    if(scoreboardToggled)
+    if(global.scoreboardToggled)
     {
-        scoreboardToggled = false;
+        global.scoreboardToggled = false;
 
         if(updater != null) clearInterval(updater);
         updater = null;
 
         mp.events.call("TogglePlayerChat", true);
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.disableInput = true;`);
-		// if(ServerUI) ServerUI.execute(`gm.$refs.scoreboard.setPlayers([]);`);
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.enabled = false;`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.disableInput = true;`);
+		// if(global.ServerUI) global.ServerUI.execute(`gm.$refs.scoreboard.setPlayers([]);`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.enabled = false;`);
 
-        if(scoreboardCursor)
+        if(global.scoreboardCursor)
         {
-            scoreboardCursor = false;
+            global.scoreboardCursor = false;
             mp.gui.cursor.show(false, false);
         }
     }
     else
     {
-        scoreboardToggled = true;
+        global.scoreboardToggled = true;
         mp.events.call("TogglePlayerChat", false);
 
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.enabled = true;`);
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.disableInput = true;`);
-		// if(ServerUI) ServerUI.execute(`gm.$refs.scoreboard.setPlayers([]);`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.enabled = true;`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.disableInput = true;`);
+		// if(global.ServerUI) global.ServerUI.execute(`gm.$refs.scoreboard.setPlayers([]);`);
 
         let notifyscoreboardstr = `toast('${Translate("SHOW_CURSOR")}', '${Translate("SCOREBOARD_TIP")}', 'nothing', 6500, 2);`;
-        if(ServerUI) ServerUI.execute(notifyscoreboardstr);
+        if(global.ServerUI) global.ServerUI.execute(notifyscoreboardstr);
 
         updatePlayers();
 
         updater = setInterval(function()
         {
-            if(chatStatus && scoreboardToggled)
+            if(global.chatStatus && global.scoreboardToggled)
             {
                 ToggleScoreboard();
             }
-            else if(!chatStatus && scoreboardToggled)
+            else if(!global.chatStatus && global.scoreboardToggled)
             {
                 updatePlayers();
             }
@@ -1581,7 +1494,7 @@ mp.events.add("scoreboard:clickAction", (actionID, playerName) => {
 function updatePlayers()
 {
     if(mp.players.local !== undefined && mp.players.exists(mp.players.local))
-        UpdateStatsVars(mp.players.local);
+        global.UpdateStatsVars(mp.players.local);
 
     let updateString = `gm.$refs.hud.$refs.base.$refs.scoreboard.setPlayers([`;
 
@@ -1632,7 +1545,7 @@ function updatePlayers()
 
     updateString += `]);`;
 
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.$refs.global.actions = [
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.$refs.global.actions = [
         {
             id: 1,
             name: "Mute",
@@ -1643,7 +1556,7 @@ function updatePlayers()
             showKey: "showMute",
         },
     ]`);
-    if(ServerUI != null) if(ServerUI) ServerUI.execute(updateString);
+    if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(updateString);
     return;
 }
 
@@ -1651,27 +1564,27 @@ mp.keys.bind(
     0x1B,
     false,
     () => {
-        if(ServerUI != null && scoreboardToggled) ToggleScoreboard();
+        if(global.ServerUI != null && global.scoreboardToggled) ToggleScoreboard();
     }
 );
 
 let cursorF2toggled = false;
 mp.keys.bind(0x71, false, function () {
-    if(scoreboardToggled)
+    if(global.scoreboardToggled)
     {
-        if(scoreboardCursor)
+        if(global.scoreboardCursor)
         {
-            scoreboardCursor = false;
+            global.scoreboardCursor = false;
             mp.gui.cursor.show(false, false);
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.disableInput = true;`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.disableInput = true;`);
             
             if(!scoreboardBinded) mp.events.callLocal('ScoreboardToggleTyping', false);
         }
         else
         {
-            scoreboardCursor = true;
+            global.scoreboardCursor = true;
             mp.gui.cursor.show(true, true);
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.disableInput = false;`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.disableInput = false;`);
 
             //if(scoreboardBinded) mp.events.callLocal('ScoreboardToggleTyping', true);
         }
@@ -1690,8 +1603,8 @@ mp.keys.bind(0x71, false, function () {
 });
 
 mp.events.add("OneSecondEvent", () => {
-    if(menuToggled == true || VehicleSpawnerActive == true || WeaponEditorActive == true || ClothingEditorActive == true 
-    || ActionMenuActive == true || StationPickerToggled == true){
+    if(global.menuToggled == true || global.VehicleSpawnerActive == true || global.WeaponEditorActive == true || global.ClothingEditorActive == true 
+    || global.ActionMenuActive == true || global.StationPickerToggled == true){
         mp.gui.cursor.show(true, true);
     }
 });
@@ -1699,10 +1612,10 @@ mp.events.add("OneSecondEvent", () => {
 function ScoreboardKeyTrigger()
 {
     if(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false) return;
-    if(Date.now() - lastChatToggle <= 500) return;
-    if(menuToggled !== undefined && menuToggled) return;
-    if(chatStatus && !scoreboardToggled) return;
-    if(menuToggled) return;
+    if(Date.now() - global.lastChatToggle <= 500) return;
+    if(global.menuToggled !== undefined && global.menuToggled) return;
+    if(global.chatStatus && !global.scoreboardToggled) return;
+    if(global.menuToggled) return;
 
     ToggleScoreboard();
 }
@@ -1725,7 +1638,7 @@ mp.events.add('ScoreboardToggleTyping', (state) => {
 mp.events.callLocal('ScoreboardToggleTyping', false);
 
 mp.events.add("HUDError", (msg, icon) => {
-    if(!showHud && mp.players.local.getVariable("pLogged") == true) return;
+    if(!global.showHud && mp.players.local.getVariable("pLogged") == true) return;
 
     /*
 	let insertString = `iziToast.show({
@@ -1737,11 +1650,11 @@ mp.events.add("HUDError", (msg, icon) => {
 	});`;
     */
     let insertString = `toast(null, \`${msg}\`, 'error', 5000);`;
-    if(ServerUI != null) if(ServerUI) ServerUI.execute(insertString);
+    if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(insertString);
 });
 
 mp.events.add("HUDNotify", (msg, type, icon, close, timeout, orientation, displaymode) => {
-    if(!showHud && mp.players.local.getVariable("pLogged") == true) return;
+    if(!global.showHud && mp.players.local.getVariable("pLogged") == true) return;
     
     let displayModeNumber = 0;
     if(displaymode == "replace") displayModeNumber = 2;
@@ -1758,11 +1671,11 @@ mp.events.add("HUDNotify", (msg, type, icon, close, timeout, orientation, displa
     insertString += "});";
     */
     let insertString = `toast(null, \`${msg}\`, '${type}', ${timeout}, ${displayModeNumber});`;
-    if(ServerUI != null) if(ServerUI) ServerUI.execute(insertString);
+    if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(insertString);
 });
 // bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter, center
 mp.events.add("HUDNotify2", (title, msg, orientation, displaymode) => {
-    if(!showHud && mp.players.local.getVariable("pLogged") == true) return;
+    if(!global.showHud && mp.players.local.getVariable("pLogged") == true) return;
     
     /*
     let insertString = `iziToast.show({`;
@@ -1773,7 +1686,7 @@ mp.events.add("HUDNotify2", (title, msg, orientation, displaymode) => {
     insertString += "});";
     */
     let insertString = `toast(\`${title}\`, \`${msg}\`, 'nothing', 5000, 2);`;
-    if(ServerUI != null) if(ServerUI) ServerUI.execute(insertString);
+    if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(insertString);
 });
 
 
@@ -1819,9 +1732,9 @@ mp.events.add("render", () => {
     mp.game.ui.displayAmmoThisFrame(false); // HIDE AMMO
 
     if(mp.players.local.weapon != 2725352035){
-        if(ServerUI != null){
-        let wepData = weaponData.find(w => w.Hash == mp.players.local.weapon);
-        if(!wepData) wepData = weaponData.find(w => w.Hash == (mp.players.local.weapon-4294967296));
+        if(global.ServerUI != null){
+        let wepData = global.weaponData.find(w => w.Hash == mp.players.local.weapon);
+        if(!wepData) wepData = global.weaponData.find(w => w.Hash == (mp.players.local.weapon-4294967296));
         
         if(!wepData){
             wepData = {Name:"Undefined Weapon", ImageSrc:"https://assets.gm.miami/gtav/weapons/Baseball-bat-icon.png"};
@@ -1832,52 +1745,52 @@ mp.events.add("render", () => {
         let ammoWeapon  = mp.players.local.getWeaponAmmo(weapon_hash); // returns ur wep ammo
         let clipSize = mp.game.weapon.getWeaponClipSize(weapon_hash);
 
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.equippedWeapon = {
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.equippedWeapon = {
             name: "${wepData.Name}",
             ammo: ${ammoClip},
             maxAmmo: ${ammoWeapon + (clipSize-ammoClip)},
             image: "${wepData.ImageSrc}",
-            mode: "${FireModeDisplayText}"
+            mode: "${global.FireModeDisplayText}"
           }`);
         }
     }
     else{
-        if(ServerUI != null){
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.equippedWeapon = null;`);
+        if(global.ServerUI != null){
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.equippedWeapon = null;`);
         }
     }
 
-    if(showCustomCrosshair){
-        if(alwaysShowCustomCrosshair == true){
-            if(!customCrosshairOn){
+    if(global.showCustomCrosshair){
+        if(global.alwaysShowCustomCrosshair == true){
+            if(!global.customCrosshairOn){
                 if(!mp.game.player.isFreeAiming()){         
-                    if(!menuToggled)                     
+                    if(!global.menuToggled)                     
                     {
-                        customCrosshairOn = true;
+                        global.customCrosshairOn = true;
                     }
                 }
                 else{
                     if(isHoldingSniper()){
-                        if(showCustomCrosshairInSniper){
-                            customCrosshairOn = true;                           
+                        if(global.showCustomCrosshairInSniper){
+                            global.customCrosshairOn = true;                           
                         }
                         else{
-                            customCrosshairOn = false;                           
+                            global.customCrosshairOn = false;                           
                         }
                     }
                     else{
-                        customCrosshairOn = true;
+                        global.customCrosshairOn = true;
                     }
                 }
             }
             else{
                 if(mp.game.player.isFreeAiming()){                              
                     if(isHoldingSniper()){
-                        if(showCustomCrosshairInSniper){
-                            customCrosshairOn = true;                          
+                        if(global.showCustomCrosshairInSniper){
+                            global.customCrosshairOn = true;                          
                         }
                         else{
-                            customCrosshairOn = false;                            
+                            global.customCrosshairOn = false;                            
                         }
                     }
                 }               
@@ -1885,53 +1798,53 @@ mp.events.add("render", () => {
         }
         else{
             if(mp.game.invoke('0x68EDDA28A5976D07') == 1){
-                if(!customCrosshairOn){
+                if(!global.customCrosshairOn){
                     if(!mp.game.player.isFreeAiming()){                              
-                        customCrosshairOn = true;
+                        global.customCrosshairOn = true;
                     }
                     else{
                         if(isHoldingSniper()){
-                            if(showCustomCrosshairInSniper){
-                                customCrosshairOn = true;                          
+                            if(global.showCustomCrosshairInSniper){
+                                global.customCrosshairOn = true;                          
                             }
                             else{
-                                customCrosshairOn = false;                                  
+                                global.customCrosshairOn = false;                                  
                             }
                         }
                         else{
-                            customCrosshairOn = true;
+                            global.customCrosshairOn = true;
                         }
                     }
                 }
             }
             else{
-                if(customCrosshairOn){
-                    customCrosshairOn = false;
+                if(global.customCrosshairOn){
+                    global.customCrosshairOn = false;
                 }
             }   
         }
     }
 
-    if(!HideAllCrosshairs.AntiPeek){
-        if(!showReticule)
+    if(!global.HideAllCrosshairs.AntiPeek){
+        if(!global.showReticule)
         {
             mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
-            customCrosshairOn = false;
+            global.customCrosshairOn = false;
         }
-        if(isLockpicking == true || ActionMenuActive == true){
+        if(global.isLockpicking == true || global.ActionMenuActive == true){
             mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
-            customCrosshairOn = false;
+            global.customCrosshairOn = false;
         }
-        if(customCrosshairOn == true){
+        if(global.customCrosshairOn == true){
             if(!wasCustomCrosshairOn){
-                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);
                 wasCustomCrosshairOn = true;
             }
             mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
         }
         else{
             if(wasCustomCrosshairOn == true){
-                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);
                 wasCustomCrosshairOn = false;
             }
         }
@@ -1939,56 +1852,56 @@ mp.events.add("render", () => {
     else{
         mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
         if(wasCustomCrosshairOn == true){
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);
             wasCustomCrosshairOn = false;
-            customCrosshairOn = false;
+            global.customCrosshairOn = false;
         }
     }
  
 
     if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
     {       
-        if ((resolution.x != mp.game.graphics.getScreenActiveResolution(0,0).x || miniHUDVars["left"] != (((getMinimapAnchor().rightX * resolution.x) + 10)) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0)) && ServerUI != null)
+        if ((resolution.x != mp.game.graphics.getScreenActiveResolution(0,0).x || miniHUDVars["left"] != (((getMinimapAnchor().rightX * resolution.x) + 10)) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0)) && global.ServerUI != null)
         {
             resolution = mp.game.graphics.getScreenActiveResolution(0,0);
             
             miniHUDVars["bottom"] = ((resolution.y - (getMinimapAnchor().bottomY * resolution.y)) + 0);
             miniHUDVars["left"] = ((getMinimapAnchor().rightX * resolution.x) + 10) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0);
 
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.left = "${miniHUDVars["left"]}px";`);
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.miniHud.bottom = "${miniHUDVars["bottom"]}px";`);  
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.left = "${miniHUDVars["left"]}px";`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.bottom = "${miniHUDVars["bottom"]}px";`);  
         }
         // if (mp.storage.data.menu.alwaysExpandedMap == true)
         // {
         //     mp.game.ui.setRadarBigmapEnabled(true, false);
         // }
         
-        if (specState == true && specTarget != null && mp.players.exists(specTarget)) 
+        if (global.specState == true && global.specTarget != null && mp.players.exists(global.specTarget)) 
         {
-            if((mp.players.local.getHealth() != specTarget.getHealth() || mp.players.local.getArmour() != specTarget.getArmour()) && 
+            if((mp.players.local.getHealth() != global.specTarget.getHealth() || mp.players.local.getArmour() != global.specTarget.getArmour()) && 
                 Date.now() - lastSpecHPChange >= 500)
             {
-                mp.events.callRemote("SpectateChangeHPAR", specTarget.getHealth(), specTarget.getArmour());
+                mp.events.callRemote("SpectateChangeHPAR", global.specTarget.getHealth(), global.specTarget.getArmour());
                 lastSpecHPChange = Date.now();
             }
 
-            if(specTarget.isInAnyVehicle(false))
+            if(global.specTarget.isInAnyVehicle(false))
             {
                 if(!speedo)
                 {
-                    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = true;`);
+                    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = true;`);
                     speedo = true;
                 }
                 if(mp.storage.data.menu.RealtimeSpeedo == true){
-                    if(speedoMax != ((mp.game.vehicle.getVehicleModelMaxSpeed(specTarget.vehicle.model) * 3.6) + 25).toFixed(0))
+                    if(speedoMax != ((mp.game.vehicle.getVehicleModelMaxSpeed(global.specTarget.vehicle.model) * 3.6) + 25).toFixed(0))
                     {
-                        speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(specTarget.vehicle.model) * 3.6) + 25).toFixed(0);
-                        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.maxspeed = ${speedoMax};`);
+                        speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(global.specTarget.vehicle.model) * 3.6) + 25).toFixed(0);
+                        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.maxspeed = ${speedoMax};`);
                     }
-                    if(speedoCur != (specTarget.vehicle.getSpeed() * 3.6).toFixed(0))
+                    if(speedoCur != (global.specTarget.vehicle.getSpeed() * 3.6).toFixed(0))
                     {
-                        speedoCur = (specTarget.vehicle.getSpeed() * 3.6).toFixed(0);
-                        if(ServerUI) ServerUI.execute(`gm.$refs.BottomRight.$refs.speedo.speed = ${speedoCur};`);
+                        speedoCur = (global.specTarget.vehicle.getSpeed() * 3.6).toFixed(0);
+                        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.BottomRight.$refs.speedo.speed = ${speedoCur};`);
                     }
                 }
          
@@ -1998,7 +1911,7 @@ mp.events.add("render", () => {
                 speedo = false;
                 speedoMax = 0;
                 speedoCur = 0;
-                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = false;`);
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = false;`);
             }
         }
         else {
@@ -2006,19 +1919,19 @@ mp.events.add("render", () => {
             {
                 if(!speedo && mp.storage.data.menu.Speedo == true)
                 {
-                    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = true;`);
+                    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = true;`);
                     speedo = true;
                 }
                 if(mp.storage.data.menu.RealtimeSpeedo == true){
                     if(speedoMax != ((mp.game.vehicle.getVehicleModelMaxSpeed(mp.players.local.vehicle.model) * 3.6) + 25).toFixed(0))
                     {
                         speedoMax = ((mp.game.vehicle.getVehicleModelMaxSpeed(mp.players.local.vehicle.model) * 3.6) + 25).toFixed(0);
-                        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.maxspeed = ${speedoMax};`);
+                        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.maxspeed = ${speedoMax};`);
                     }
                     if(speedoCur != (mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0))
                     {
                         speedoCur = (mp.players.local.vehicle.getSpeed() * 3.6).toFixed(0);
-                        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.speed = ${speedoCur};`);
+                        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.speed = ${speedoCur};`);
                     }
                 }
             }
@@ -2027,7 +1940,7 @@ mp.events.add("render", () => {
                 speedo = false;
                 speedoMax = 0;
                 speedoCur = 0;
-                if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = false;`);
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = false;`);
             }
         }
     }
@@ -2049,7 +1962,7 @@ mp.events.add("render", () => {
         
         mp.vehicles.streamed.forEach(veh => {
 
-            let dist = calcDist(veh.position, position);
+            let dist = global.calcDist(veh.position, position);
             if(isVehicleInLOS(veh, position) && dist <= 32.0)
             {
                 let vehName = mp.game.ui.getLabelText(mp.game.vehicle.getDisplayNameFromVehicleModel(veh.model));

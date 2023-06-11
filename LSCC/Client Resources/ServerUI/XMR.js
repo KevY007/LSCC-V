@@ -11,8 +11,8 @@ mp.events.add("XMR_LoadRecentStations", (stationData) => {
         category:station.CategoryID
     }));
 
-    if(ServerUI){
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.recentStations = ${JSON.stringify(data)}`);
+    if(global.ServerUI){
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.recentStations = ${JSON.stringify(data)}`);
     }
 });
 
@@ -33,50 +33,50 @@ mp.events.add("XMR_SetStationList", (stationData, categoryData) => {
     }));
     cData.unshift({value:-1, label:"All"});
 
-    if(ServerUI){
-        if(ServerUI) ServerUI.execute(`gm.$refs.menus.$refs.radioSelector.categories = ${JSON.stringify(cData)}`);
-        if(ServerUI) ServerUI.execute(`gm.$refs.menus.$refs.radioSelector.radios = ${JSON.stringify(data)}`);
-        //if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.recentStations = ${JSON.stringify(data)}`);
+    if(global.ServerUI){
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.menus.$refs.radioSelector.categories = ${JSON.stringify(cData)}`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.menus.$refs.radioSelector.radios = ${JSON.stringify(data)}`);
+        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.recentStations = ${JSON.stringify(data)}`);
     }
 });
 
 mp.events.add("StationPicker_Toggle", (toggle) => {
     return;
-    if(!ServerUI) return;
+    if(!global.ServerUI) return;
 
-    StationPickerToggled = toggle;
+    global.StationPickerToggled = toggle;
     mp.gui.cursor.show(toggle, toggle);
     mp.game.invoke("0xFC695459D4D0E219", 0.5, 0.5);
-    if(ServerUI) ServerUI.execute(`gm.$refs.menus.$refs.radioSelector.enabled = ${toggle}`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.menus.$refs.radioSelector.enabled = ${toggle}`);
 });
 
 mp.events.add("XMR_Toggle", (toggle) => {
     return;
-    if(!ServerUI) return;
+    if(!global.ServerUI) return;
 
     RadioToggled = toggle;
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.enabled = ${toggle.toString()}`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.enabled = ${toggle.toString()}`);
 
     if(mp.players.local.vehicle != undefined && mp.players.local.isInAnyVehicle(false)){
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.recentStationsEnabled = ${(mp.players.local.seat === -1).toString()};`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.recentStationsEnabled = ${(mp.players.local.seat === -1).toString()};`);
     }
     if(toggle){
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = false;`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = false;`);
     }
     else{
         if(mp.storage.data.menu.Speedo == true && mp.players.local.isInAnyVehicle(true))
         {
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = true;`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = true;`);
         }
     }
 });
 mp.events.add("XMR_ToggleOpposite", () => {
     return;
     RadioToggled = !RadioToggled;
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.enabled = ${RadioToggled.toString()}`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.enabled = ${RadioToggled.toString()}`);
 
     if(mp.players.local.vehicle != undefined && mp.players.local.isInAnyVehicle(false)){
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.recentStationsEnabled = ${(mp.players.local.seat === -1).toString()};`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.recentStationsEnabled = ${(mp.players.local.seat === -1).toString()};`);
     }
 });
 
@@ -113,30 +113,30 @@ mp.events.add("radiopicker_close", () => {
 
 mp.events.add("XMR_StopStationForPlayer", () => {
     return;
-    if(!ServerUI) return;
+    if(!global.ServerUI) return;
 
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.stop();`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.stop();`);
     mp.events.callLocal("XMR_Toggle", false);
     mp.events.callLocal("StationPicker_Toggle", false);
 });
 mp.events.add("XMR_PlayStationForPlayer", (id, name, stream, icon) => {
     return;
-    if(!ServerUI) return;
+    if(!global.ServerUI) return;
 
     mp.events.callLocal("AddRecentStation", id);
     mp.events.callLocal("XMR_Toggle", true);
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.currentStation = {
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.currentStation = {
         name:'${name}',
         cover:'${icon}'
     }`);
 
     if(mp.storage.data.radio !== undefined && mp.storage.data.radio.volume !== undefined)
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.setVolumeServer(${mp.storage.data.radio.volume})`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.setVolumeServer(${mp.storage.data.radio.volume})`);
     else{
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.setVolumeServer(0.1)`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.setVolumeServer(0.1)`);
     }
     
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.play('${stream}')`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.radio.play('${stream}')`);
 });
 
 mp.events.add("playerLeaveVehicle", (vehicle, seat) => {

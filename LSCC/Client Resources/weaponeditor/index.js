@@ -1,78 +1,4 @@
-var {
-  currentJailTime,
-  lastJailUpdate,
-  chaseRunning,
-  chaseTimeCur,
-  chaseTimeMax,
-  chaseMode,
-  collisionTime,
-  updateRate,
-  radioToggle,
-  carryTarget,
-  chatStatus,
-  chatStatusLate,
-  menuToggledLate,
-  lastChatToggle,
-  streetName,
-  zoneName,
-  showHud,
-  renderNametags,
-  currentMuteTime,
-  lastMuteUpdate,
-  lastFunc,
-  curMDCBind,
-  lastMDCBind,
-  curActionMenuBind,
-  lastActionMenuBind,
-  IsInTutorial,
-  BankRobberyOn,
-  ShowVehicleDL,
-  specState, 
-  lastGPSBind,
-  curGPSBind,
-  lastMapBind,
-  curMapBind,
-  specTarget,
-  isNoClip,
-  LastKeyPress,
-  AFKStage,
-  SecondsSinceLastKeyPress,
-  antiAFKActive,
-  showReticule,
-  showCustomCrosshair,
-  showCustomCrosshairInSniper,
-  alwaysShowCustomCrosshair,
-  customCrosshairOn,
-  ServerUI,
-  menuToggled,
-  scoreboardToggled,
-  scoreboardCursor,
-  StationPickerToggled,
-  MDC_DOM,
-  MDCActive,
-  isLockpicking,
-  isHotwiring,
-  HotwireDOM,
-  ClothingEditorDOM,
-  ClothingEditorActive,
-  ActionMenuActive,
-  VehicleSpawnerActive,
-  WeaponEditorActive,
-  FireModeDisplayText,
-  cuffTarget,
-  cuffInterval,
-  boneData,
-  weaponData,
-  loginSceneEntities,
-  chatStatusTimeout,
-  heliCam,
-  LogPlayerDamage,
-  ToggleMDC,
-  actionMenuClose,
-  actionMenuOpen,
-  traceLastFunc,
-  isHeliCamActive
-} = require('./globals');
+var global = require('./globals');
 const {TranslateMessage: Translate} = require('./Translator');
 var WeaponEditorDOM;
 var WeaponEditorCamera;
@@ -88,7 +14,7 @@ const localPlayer = mp.players.local;
 
 
 function moveCam(x, y, z, rx, ry, rz, time, newviewangle){
-    traceLastFunc(`[Players] Move Cam`);
+    global.traceLastFunc(`[Players] Move Cam`);
     if(!WeaponEditorCamera) return;
     if(editor_MoveFromCam != null){
         editor_MoveFromCam.setActive(false);
@@ -107,12 +33,12 @@ function moveCam(x, y, z, rx, ry, rz, time, newviewangle){
 }
 
 mp.events.add("WeaponEditor:exit", () => {
-    WeaponEditorActive = false;
+    global.WeaponEditorActive = false;
     WeaponEditorDOM.execute(`resetWeaponEditor();`);
     mp.events.callRemote("WeaponEditor:onExit");
 
     WeaponEditorDOM.active = false;
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = ${mp.storage.data.menu.HUD.toString()};`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = ${mp.storage.data.menu.HUD.toString()};`);
     mp.game.ui.displayRadar(true);
     mp.game.ui.displayHud(true);
     mp.players.local.clearTasksImmediately();
@@ -153,8 +79,8 @@ mp.events.add("WeaponEditor:playSound", (type) => {
 
 mp.events.add("WeaponEditor:show", () => {
     mp.events.callRemote("WeaponEditor:onOpen");
-    WeaponEditorActive = true;
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = false;`);
+    global.WeaponEditorActive = true;
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = false;`);
     mp.players.local.setAlpha(0);
     mp.players.local.freezePosition(true);
     mp.players.local.clearTasksImmediately();

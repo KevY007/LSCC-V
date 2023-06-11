@@ -1,78 +1,4 @@
-var {
-    currentJailTime,
-    lastJailUpdate,
-    chaseRunning,
-    chaseTimeCur,
-    chaseTimeMax,
-    chaseMode,
-    collisionTime,
-    updateRate,
-    radioToggle,
-    carryTarget,
-    chatStatus,
-    chatStatusLate,
-    menuToggledLate,
-    lastChatToggle,
-    streetName,
-    zoneName,
-    showHud,
-    renderNametags,
-    currentMuteTime,
-    lastMuteUpdate,
-    lastFunc,
-    curMDCBind,
-    lastMDCBind,
-    curActionMenuBind,
-    lastActionMenuBind,
-    IsInTutorial,
-    BankRobberyOn,
-    ShowVehicleDL,
-    specState, 
-    lastGPSBind,
-    curGPSBind,
-    lastMapBind,
-    curMapBind,
-    specTarget,
-    isNoClip,
-    LastKeyPress,
-    AFKStage,
-    SecondsSinceLastKeyPress,
-    antiAFKActive,
-    showReticule,
-    showCustomCrosshair,
-    showCustomCrosshairInSniper,
-    alwaysShowCustomCrosshair,
-    customCrosshairOn,
-    ServerUI,
-    menuToggled,
-    scoreboardToggled,
-    scoreboardCursor,
-    StationPickerToggled,
-    MDC_DOM,
-    MDCActive,
-    isLockpicking,
-    isHotwiring,
-    HotwireDOM,
-    ClothingEditorDOM,
-    ClothingEditorActive,
-    ActionMenuActive,
-    VehicleSpawnerActive,
-    WeaponEditorActive,
-    FireModeDisplayText,
-    cuffTarget,
-    cuffInterval,
-    boneData,
-    weaponData,
-    loginSceneEntities,
-    chatStatusTimeout,
-    heliCam,
-    LogPlayerDamage,
-    ToggleMDC,
-    actionMenuClose,
-    actionMenuOpen,
-    traceLastFunc,
-    isHeliCamActive
-} = require('./globals');
+var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 /* Camera settings */
 const mouseSensitivity = 4;
@@ -93,8 +19,8 @@ let focusedPlayer = null;
 let lastHeliCamUpdate = 0;
 
 mp.events.add("startHeliCam", () => {
-    if(!mp.players.local.vehicle || !mp.players.local.isInAnyVehicle(false) || mp.players.local.vehicle.getClass() != 15 || heliCam !== null) return;
-    if(ServerUI) ServerUI.active = false;
+    if(!mp.players.local.vehicle || !mp.players.local.isInAnyVehicle(false) || mp.players.local.vehicle.getClass() != 15 || global.heliCam !== null) return;
+    if(global.ServerUI) global.ServerUI.active = false;
 
     HeliCamCEF = mp.browsers.new("package://HeliCam/index.html");
     HeliCamCEF.active = true;
@@ -103,11 +29,11 @@ mp.events.add("startHeliCam", () => {
     LightToggled = true;
     CurrentView = 1;
 
-    heliCam = mp.cameras.new('default', mp.players.local.position, new mp.Vector3(0,0,0), 40);
+    global.heliCam = mp.cameras.new('default', mp.players.local.position, new mp.Vector3(0,0,0), 40);
 
-    heliCam.attachTo(mp.players.local.vehicle.handle, 0, 0, -2.0, false);
-    heliCam.setActive(true);
-    heliCam.setFov(maxZoom);
+    global.heliCam.attachTo(mp.players.local.vehicle.handle, 0, 0, -2.0, false);
+    global.heliCam.setActive(true);
+    global.heliCam.setFov(maxZoom);
 
     mp.game.cam.renderScriptCams(true, false, 0, true, false);
     mp.events.callRemote("HeliCam_OnStart");
@@ -119,12 +45,12 @@ mp.events.add("startHeliCam", () => {
     displayLostSignal = false;
 });
 mp.keys.bind(0x11, false, () => {
-	if (heliCam === null && heliCam.isActive() && heliCam.isRendering()) return;
+	if (global.heliCam === null && global.heliCam.isActive() && global.heliCam.isRendering()) return;
 
     mp.events.callLocal("stopHeliCam");
 });
 mp.keys.bind(0x4C, false, () => {
-	if (heliCam === null && heliCam.isActive() && heliCam.isRendering()) return;
+	if (global.heliCam === null && global.heliCam.isActive() && global.heliCam.isRendering()) return;
 
     LightToggled = !LightToggled;
     mp.events.callRemote("HeliCam_ToggleLight", LightToggled);
@@ -132,7 +58,7 @@ mp.keys.bind(0x4C, false, () => {
     HeliCamCEF.execute(`ToggleLight(${LightToggled})`);
 });
 mp.keys.bind(0x4B, false, () => {
-	if (heliCam === null && heliCam.isActive() && heliCam.isRendering()) return;
+	if (global.heliCam === null && global.heliCam.isActive() && global.heliCam.isRendering()) return;
 
     CurrentView++;
     if(CurrentView > 3) CurrentView = 1;
@@ -155,10 +81,10 @@ mp.keys.bind(0x4B, false, () => {
     HeliCamCEF.execute(`SetView(${CurrentView})`);
 });
 mp.events.add("stopHeliCam", () => {
-    if(heliCam == null) return;
+    if(global.heliCam == null) return;
 
-    if(ServerUI)
-        if(ServerUI) ServerUI.active = true;
+    if(global.ServerUI)
+        if(global.ServerUI) global.ServerUI.active = true;
 
     if(HeliCamCEF){
         HeliCamCEF.active = false;
@@ -168,9 +94,9 @@ mp.events.add("stopHeliCam", () => {
     mp.events.callRemote("HeliCam_OnStop");
 
     mp.game.cam.renderScriptCams(false, false, 0, true, false);
-    heliCam.setActive(false);
-    heliCam.destroy();
-    heliCam = null;    
+    global.heliCam.setActive(false);
+    global.heliCam.destroy();
+    global.heliCam = null;    
     mp.game.ui.displayRadar(true);
 
     playerTarget = null;
@@ -185,12 +111,12 @@ mp.events.add("stopHeliCam", () => {
 // Check if camera is pointing at vehicle
 mp.events.add("getPointingAt", (distance) => {pointingAt(distance)});
 function pointingAt(distance) {
-	if (heliCam === null && heliCam.isActive() && heliCam.isRendering()) return;
+	if (global.heliCam === null && global.heliCam.isActive() && global.heliCam.isRendering()) return;
     if(focusedPlayer !== null || focusedVehicle !== null) return;
 
-    let ccposition = heliCam.getCoord(); // grab the position of the gameplay camera as Vector3
+    let ccposition = global.heliCam.getCoord(); // grab the position of the gameplay camera as Vector3
 
-    let ccdirection = heliCam.getDirection(); // get the forwarding vector of the direction you aim with the gameplay camera as Vector3
+    let ccdirection = global.heliCam.getDirection(); // get the forwarding vector of the direction you aim with the gameplay camera as Vector3
 
     let farAway =  new mp.Vector3((ccdirection.x * distance) + (ccposition.x), (ccdirection.y * distance) + (ccposition.y), (ccdirection.z * distance) + (ccposition.z)); 
 
@@ -207,7 +133,7 @@ function pointingAt(distance) {
 // });
 
 mp.events.add('click', (x, y, upOrDown, leftOrRight, relativeX, relativeY, worldPosition, hitEntity) => {
-	if (heliCam === null || !heliCam.isActive() || !heliCam.isRendering()) return;
+	if (global.heliCam === null || !global.heliCam.isActive() || !global.heliCam.isRendering()) return;
     displayLostSignal = false;
 
     if(upOrDown == "down" && leftOrRight == "left"){
@@ -217,7 +143,7 @@ mp.events.add('click', (x, y, upOrDown, leftOrRight, relativeX, relativeY, world
             const veh = Object.values(mp.vehicles).find(v => v.handle === targetVehicleHandle);
             if(veh == undefined) return;
     
-            heliCam.pointAt(veh.handle, 0, 0, 0, true);
+            global.heliCam.pointAt(veh.handle, 0, 0, 0, true);
             focusedVehicle = veh;
     
             HeliCamCEF.execute(`ToggleFocusPanel(true);`);
@@ -227,7 +153,7 @@ mp.events.add('click', (x, y, upOrDown, leftOrRight, relativeX, relativeY, world
         else if(playerTarget){
             focusedPlayer = playerTarget;
 
-            heliCam.pointAt(focusedPlayer.handle, 0, 0, 0, true);
+            global.heliCam.pointAt(focusedPlayer.handle, 0, 0, 0, true);
             HeliCamCEF.execute(`SetCrosshair('lock')`);
             UpdateHeliCamPlayerCEF(focusedPlayer);
             HeliCamCEF.execute(`TogglePlayerFocusPanel(true);`);
@@ -238,7 +164,7 @@ mp.events.add('click', (x, y, upOrDown, leftOrRight, relativeX, relativeY, world
 
         HeliCamCEF.execute(`ToggleFocusPanel(false);`);
         HeliCamCEF.execute(`TogglePlayerFocusPanel(false);`);
-        heliCam.stopPointing();
+        global.heliCam.stopPointing();
         focusedVehicle = null;
         focusedPlayer = null;
         targetVehicleHandle = null;
@@ -257,7 +183,7 @@ function UpdateHeliCamCEF_Zoom(zoom){
 }
 
 mp.events.add("playerLeaveVehicle", (vehicle, seat) => {
-	if (heliCam === null || !heliCam.isActive() || !heliCam.isRendering()) return;
+	if (global.heliCam === null || !global.heliCam.isActive() || !global.heliCam.isRendering()) return;
 
     mp.events.callLocal("stopHeliCam");    
 });
@@ -269,13 +195,13 @@ function UpdateHeliCamCEF(vehicle){
 //
      const getStreet = mp.game.pathfind.getStreetNameAtCoord(vehicle.position.x, vehicle.position.y, vehicle.position.z, 0, 0);
      const zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(vehicle.position.x, vehicle.position.y, vehicle.position.z));
-     const streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
+     const streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.global.streetName);
 //
 //
      //const fuelStr = fuel ? `${Math.floor(fuel)}%` : `∞`;
      const speedStr = speed ? `${speed}KM/H` : `0KM/H`;
      //const nameStr = name;
-     const locStr = `${streetName}, ${zoneName}`;
+     const locStr = `${global.streetName}, ${global.zoneName}`;
      const name = mp.game.vehicle.getDisplayNameFromVehicleModel(vehicle.model).toUpperCase();
 
         let passengerCnt = 0;
@@ -297,7 +223,7 @@ mp.events.add('entityStreamOut', (entity) => {
     if(focusedPlayer === entity || focusedVehicle === entity){
         HeliCamCEF.execute(`ToggleFocusPanel(false);`);
         HeliCamCEF.execute(`TogglePlayerFocusPanel(false);`);
-        heliCam.stopPointing();
+        global.heliCam.stopPointing();
         focusedVehicle = null;
         focusedPlayer = null;
         HeliCamCEF.execute(`SetCrosshair('crosshair')`);
@@ -310,7 +236,7 @@ mp.events.add('entityStreamOut', (entity) => {
 });
 
 mp.events.add('render', () => {
-	if (heliCam === null || !heliCam.isActive() || !heliCam.isRendering()) return;
+	if (global.heliCam === null || !global.heliCam.isActive() || !global.heliCam.isRendering()) return;
 
     if(displayLostSignal === true){
         mp.game.graphics.drawText("SIGNAL LOST", [0.5, 0.6], {
@@ -443,7 +369,7 @@ function convertZoomToPercentage(value){
 }
 // Camera Movement
 mp.events.add('render', () => {
-	if (heliCam !== null && heliCam.isActive() && heliCam.isRendering()) {
+	if (global.heliCam !== null && global.heliCam.isActive() && global.heliCam.isRendering()) {
         mp.game.controls.disableAllControlActions(2);
 
         let x = (mp.game.controls.getDisabledControlNormal(7, 1) * mouseSensitivity);
@@ -451,34 +377,34 @@ mp.events.add('render', () => {
         let zoomIn = (mp.game.controls.getDisabledControlNormal(2, 40) * zoomSpeed);
         let zoomOut = (mp.game.controls.getDisabledControlNormal(2, 41) * zoomSpeed);
 
-        let currentRot = heliCam.getRot(2);
+        let currentRot = global.heliCam.getRot(2);
 
         currentRot = new mp.Vector3(currentRot.x - y, 0, currentRot.z - x);
 
-        heliCam.setRot(currentRot.x, currentRot.y, currentRot.z, 2);
+        global.heliCam.setRot(currentRot.x, currentRot.y, currentRot.z, 2);
 
         if (zoomIn > 0)
         {
-            let currentFov = heliCam.getFov();
+            let currentFov = global.heliCam.getFov();
             currentFov -= zoomIn;
             if (currentFov < minZoom)
                 currentFov = minZoom;
-            heliCam.setFov(currentFov);
+            global.heliCam.setFov(currentFov);
 
             UpdateHeliCamCEF_Zoom(currentFov);
         } else if (zoomOut > 0)
         {
-            let currentFov = heliCam.getFov();
+            let currentFov = global.heliCam.getFov();
             currentFov += zoomOut;
             if (currentFov > maxZoom)
                 currentFov = maxZoom;
-            heliCam.setFov(currentFov);
+            global.heliCam.setFov(currentFov);
 
             UpdateHeliCamCEF_Zoom(currentFov);
         }
         
-        const forward = heliCam.getDirection();
-        const position = heliCam.getCoord();
+        const forward = global.heliCam.getDirection();
+        const position = global.heliCam.getCoord();
         if(LightToggled){
             mp.game.graphics.drawSpotLightWithShadow(position.x, position.y, position.z, forward.x, forward.y, forward.z, 255, 255, 255, 500, 3, 1, 12, 1, 0);
             mp.game.graphics.drawLightWithRange(position.x, position.y, position.z, 255, 255, 255, 1, 10);   

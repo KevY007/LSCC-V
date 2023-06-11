@@ -3,75 +3,7 @@ var currentVehicleFuel = 0.0;
 var wasInVehicle = false;
 var vehicleRemoteID = -1;
 var fuelFrameCount = 0;
-var {
-    currentJailTime,
-    lastJailUpdate,
-    chaseRunning,
-    chaseTimeCur,
-    chaseTimeMax,
-    chaseMode,
-    collisionTime,
-    updateRate,
-    radioToggle,
-    carryTarget,
-    chatStatus,
-    chatStatusLate,
-    menuToggledLate,
-    lastChatToggle,
-    streetName,
-    zoneName,
-    showHud,
-    renderNametags,
-    currentMuteTime,
-    lastMuteUpdate,
-    lastFunc,
-    curMDCBind,
-    lastMDCBind,
-    curActionMenuBind,
-    lastActionMenuBind,
-    BankRobberyOn,
-    ShowVehicleDL,
-    specState,
-    specTarget,
-    isNoClip,
-    LastKeyPress,
-    AFKStage,
-    SecondsSinceLastKeyPress,
-    antiAFKActive,
-    showReticule,
-    showCustomCrosshair,
-    showCustomCrosshairInSniper,
-    alwaysShowCustomCrosshair,
-    customCrosshairOn,
-    ServerUI,
-    menuToggled,
-    scoreboardToggled,
-    scoreboardCursor,
-    StationPickerToggled,
-    MDC_DOM,
-    MDCActive,
-    isLockpicking,
-    isHotwiring,
-    HotwireDOM,
-    ClothingEditorDOM,
-    ClothingEditorActive,
-    ActionMenuActive,
-    VehicleSpawnerActive,
-    WeaponEditorActive,
-    FireModeDisplayText,
-    cuffTarget,
-    cuffInterval,
-    boneData,
-    weaponData,
-    loginSceneEntities,
-    chatStatusTimeout,
-    LogPlayerDamage,
-    ToggleMDC,
-    actionMenuClose,
-    actionMenuOpen,
-    traceLastFunc,
-    isHeliCamActive
-   } = require('./globals');
+var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 mp.events.add('render', () => {
     fuelFrameCount++;
@@ -83,8 +15,8 @@ mp.events.add('render', () => {
                 currentVehicleFuel = vehicle.getVariable("Fuel");  // fuel is set e.g. when it reaches 0, or the player exits vehicle
                 vehicleRemoteID = vehicle.remoteId;
 
-                if(ServerUI){
-                    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.fuelStatus.enabled = true;`);
+                if(global.ServerUI){
+                    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.fuelStatus.enabled = true;`);
                 }
            }
 
@@ -102,7 +34,7 @@ function HandleFuel(){
     if(!mp.players.exists(mp.players.local) || !mp.players.local.vehicle || player.seat != -1 || player.getVariable("Team") != 0){
         wasInVehicle = false;
         fuelFrameCount = 0;
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.fuelStatus.enabled = false;`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.fuelStatus.enabled = false;`);
         mp.events.callRemote("UpdateVehicleFuel", currentVehicleFuel, vehicleRemoteID);
         return;
     }
@@ -130,7 +62,7 @@ function HandleFuel(){
 	var fuelToSubstract = (Math.pow(currentVehicleSpeed, 2)/100000)*distanceEffect;
     currentVehicleFuel -= fuelToSubstract;
 
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.fuelStatus.fuel = ${currentVehicleFuel};`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.fuelStatus.fuel = ${currentVehicleFuel};`);
 
     if(currentVehicleFuel <= 0.0){
         currentVehicleFuel = 0.0;

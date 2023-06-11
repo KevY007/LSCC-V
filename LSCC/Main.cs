@@ -2955,7 +2955,7 @@ namespace RNC
                                                                 {
                                                                     Commands.cmd_specoff(player);
                                                                 }
-                                                                if (player.GetSharedData<bool>("WeaponEditorActive"))
+                                                                if (player.GetSharedData<bool>("global.WeaponEditorActive"))
                                                                 {
                                                                     player.TriggerEvent("WeaponEditor:exit");
                                                                 }
@@ -3495,7 +3495,7 @@ namespace RNC
                     a.GetData<int>("EditingClothing") == -1 &&
                     a.GetSharedData<int>("InDM") == -1 &&
                     a.GetSharedData<int>("InLobby") >= 0 &&
-                    !a.GetSharedData<bool>("WeaponEditorActive")).OrderBy(c => Guid.NewGuid()).ToList();
+                    !a.GetSharedData<bool>("global.WeaponEditorActive")).OrderBy(c => Guid.NewGuid()).ToList();
                     pCount = lobbyPlayers.Count;
                     if (pCount < 2) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Total players less than two, failed to start"); return; }
 

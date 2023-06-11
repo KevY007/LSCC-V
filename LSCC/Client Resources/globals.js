@@ -1,123 +1,17 @@
+
 const CommandsDataJSON = require('./ServerUI/CommandsList');
 
-var currentJailTime = 0;
-var lastJailUpdate = 10;
-
-var chaseRunning = false;
-var chaseTimeCur = 0;
-var chaseTimeMax = 390;
-var chaseMode = 0; // 0= STANDARD | 1= BUSTED | and others as in SCRIPT
-var collisionTime = -1;
-var updateRate = 200;
-
-var radioToggle = 0;
-var carryTarget = -1;
-
-var chatStatus = false;
-var chatStatusLate = false;
-var menuToggledLate = false;
-var lastChatToggle = Date.now();
-var streetName = null;
-var zoneName = null;
-var showHud = true;
-var renderNametags = true;
-var currentMuteTime = 0;
-var lastMuteUpdate = 10;
-var lastFunc = "Init";
-
-var curMDCBind = 0x4B;
-var lastMDCBind = 0x4B;
-var curActionMenuBind = 0x59;
-var lastActionMenuBind = 0x59;
-
-var lastVoiceBind = 0x4E;
-var curVoiceBind = 0x4E;
-
-var BankRobberyOn = false;
-
-var ShowVehicleDL = false;
-var specState = false;
-var specTarget = null;
-var isNoClip = false;
-
-var LastKeyPress = 0;
-var AFKStage = 0;
-var SecondsSinceLastKeyPress = 0; // using this for nametags
-var antiAFKActive = false;
-
-var showReticule = true;
-var showCustomCrosshair = false;
-var showCustomCrosshairInSniper = false;
-var alwaysShowCustomCrosshair = false;
-var customCrosshairOn = false;
-
-ServerUI = mp.browsers.new("package://ServerUI/index.html");
-function InitializeServerUI(){
-    if(ServerUI){
-        ServerUI.active = false;
-        ServerUI.destroy();
-        ServerUI = undefined;
-    }
-    ServerUI = mp.browsers.new("package://ServerUI/index.html");
-}
-
-var menuToggled = false;
-var scoreboardToggled = false;
-var scoreboardCursor = false;
-
-var StationPickerToggled = false;
-
-var MDC_DOM = null;
-var MDCActive = false;
-var isLockpicking = false;
-
-var isHotwiring = false;
-var HotwireDOM = false;
-
-var ClothingEditorDOM = null;
-var ClothingEditorActive = false;
-
-var ActionMenuActive = false;
-var VehicleSpawnerActive = false;
-var WeaponEditorActive = false;
-
-var FireModeDisplayText = "";
-
-var cuffTarget = null;
-var cuffInterval = null;
-
-var lastGPSBind = 0x5A;
-var curGPSBind = 0x5A;
-
-var lastMapBind = 0x50;
-var curMapBind = 0x50;
-
 /* Camera object */
-let heliCam = null;
 function isHeliCamActive(){
-	if (heliCam === null || !heliCam.isActive() || !heliCam.isRendering()) return false;
+	if (global.heliCam === null || !global.heliCam.isActive() || !global.heliCam.isRendering()) return false;
   return true;
 }
-
-var IsInTutorial = false;
-
-var disableSprint = false;
-
-var FPS = 0; // This is the actual fps.
-var FPS_Frames = 0;
-var FPS_Calc = Date.now();
-
-var precisionPositionerActive = false;
-
-var HideAllCrosshairs = {AntiPeek:false};
 
 function traceLastFunc(iStr)
 {
     mp.storage.data.lastFn = iStr;
     mp.storage.flush();
 }
-var loginSceneEntities = [];
-let chatStatusTimeout = null;
 
 // When 'E' key is held down, open the menu
 function actionMenuOpen(){
@@ -125,22 +19,22 @@ function actionMenuOpen(){
 }
 // When 'E' key is let go, close the menu - toggleable though.
 function actionMenuClose(){
-    if(chatStatus == true || menuToggled == true || MDCActive == true || scoreboardToggled == true
-        || VehicleSpawnerActive == true || WeaponEditorActive == true || isHotwiring == true || ClothingEditorActive == true) return;
+    if(global.chatStatus == true || global.menuToggled == true || global.MDCActive == true || global.scoreboardToggled == true
+        || global.VehicleSpawnerActive == true || global.WeaponEditorActive == true || global.isHotwiring == true || global.ClothingEditorActive == true) return;
 
     mp.events.callLocal("actionMenu:close"); 
 }
 function UpdateStatsVars(entity, all = true){
     // yes im double checking the same shit cuz for some reason this shit decided to break for no reason
-    if(ServerUI == null || ServerUI == undefined || ServerUI == undefined || ServerUI == null) return;
+    if(global.ServerUI == null || global.ServerUI == undefined || global.ServerUI == undefined || global.ServerUI == null) return;
     entity = mp.players.local;
     const player = mp.players.local;
     if(entity !== undefined){
         if(mp.players.exists(entity))
         {
-            if(ServerUI !== undefined && ServerUI != null){
+            if(global.ServerUI !== undefined && global.ServerUI != null){
 
-                if(ServerUI) ServerUI.execute(`gm.$refs.helpers.$refs.states.setUser(["stats"], {
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.$refs.states.setUser(["stats"], {
                     serverId: ${player.remoteId},
                     id: ${player.getVariable("SQL_ID")},
                     name: "${player.name}",
@@ -163,18 +57,18 @@ function UpdateStatsVars(entity, all = true){
                         z: ${player.position.z},
                     }
                 })`);
-                if(ServerUI) ServerUI.execute(`gm.$refs.helpers.$refs.states.setUser(["clan"], {
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.$refs.states.setUser(["clan"], {
                     id: ${player.getVariable("ClanID")},
                     tier: ${player.getVariable("ClanTier")}
                 })`);
                 
                 if(all === true){            
-                    if(CommandsDataJSON){
-                        let allowedCommands = CommandsDataJSON.filter(cmd => cmd.Admin <= mp.players.local.getVariable("Admin"));
+                    if(global.CommandsDataJSON){
+                        let allowedCommands = global.CommandsDataJSON.filter(cmd => cmd.Admin <= mp.players.local.getVariable("Admin"));
                         allowedCommands.sort(function(a, b){
                             return a.CommandText.length - b.CommandText.length;
                         });
-                        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.commands = ${JSON.stringify(allowedCommands)}`);
+                        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.commands = ${JSON.stringify(allowedCommands)}`);
                     }
                 }
              
@@ -184,16 +78,16 @@ function UpdateStatsVars(entity, all = true){
 }
 function ToggleMDC(){
     if(mp.players.local.getVariable("Team") != 1 || mp.players.local.getVariable("Wounded") > 0) return;
-    if(menuToggled == true || chatStatus == true || isHeliCamActive() || ActionMenuActive == true || isHotwiring == true || ClothingEditorActive == true) return;
+    if(global.menuToggled == true || global.chatStatus == true || global.isHeliCamActive() || global.ActionMenuActive == true || global.isHotwiring == true || global.ClothingEditorActive == true) return;
 
-    if(scoreboardToggled)
+    if(global.scoreboardToggled)
     {
         ToggleScoreboard();
     }
-    MDCActive = !MDCActive;
-    MDC_DOM.active = MDCActive;
+    global.MDCActive = !global.MDCActive;
+    global.MDC_DOM.active = global.MDCActive;
 
-    if(MDCActive){
+    if(global.MDCActive){
         mp.events.callLocal("MDC:UpdateMiniscreen", "name", mp.players.local.name);
     }
 }
@@ -202,12 +96,12 @@ function LogPlayerDamage(targetEntity, weaponHash, damage, bodypartIndex, extraN
     const targetSQLID = targetEntity.getVariable("SQL_ID");
     if(!targetSQLID) return;
   
-    let gunData = weaponData.find(w => Number(w.Hash) == weaponHash);
+    let gunData = global.weaponData.find(w => Number(w.Hash) == weaponHash);
     if(!gunData) gunData = {Name:"Unknown"}
   
     const damagedHP = (mp.players.local.getHealth() - damage);
   
-    let bodypartData = boneData.find(b => b.index === bodypartIndex);
+    let bodypartData = global.boneData.find(b => b.index === bodypartIndex);
     if(!bodypartData) bodypartData = {name:`Unknown`}
   
     let notes = extraNotes;
@@ -995,23 +889,23 @@ const boneData = [
 
     
 function activateChat(toggle){
-    if(ServerUI == null) return;
-    if(menuToggled){
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggle(false);`);
+    if(global.ServerUI == null) return;
+    if(global.menuToggled){
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggle(false);`);
         return;
     }
 
-    if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggle(${toggle.toString()})`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggle(${toggle.toString()})`);
 };
 function AddCustomVehiclesToSpawner(){
-    if(ServerUI != null){
+    if(global.ServerUI != null){
 
         let modelsList = ["lspdunm", "polbufac", "huntley2", "lspdvic", "prevolter", "m3e46", "pscout", "impala",
         "shegrangerold", "shergauntlet", "polbisonf", "gresleyh", "tulip2", "golfmk6", "bcso2slick", "bcat", "police3slick",
         "fibexecutioner", "police3umk"];
 
         for(let i = 0 ; i < modelsList.length; i++){
-            if(ServerUI) ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.vehicles.push({
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.vehicles.push({
                 model: "${modelsList[i]}",
                 hash: "${modelsList[i]}",
                 type: 25,
@@ -1031,7 +925,7 @@ function calcDist(v1, v2) {
     );
 }
 function focusChat(toggle){
-    if(ServerUI == null) return;
+    if(global.ServerUI == null) return;
 
     var channels = `gm.$refs.hud.$refs.base.$refs.chat.api.channels = [`;
     channels += `
@@ -1047,32 +941,32 @@ function focusChat(toggle){
 
     channels += `]`;
 
-    if(ServerUI) ServerUI.execute(channels);
+    if(global.ServerUI) global.ServerUI.execute(channels);
 
 
-    if(menuToggled){
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
-        //if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`);
+    if(global.menuToggled){
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
+        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`);
         return;
     }
-    if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
-    (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
-    (ActionMenuActive !== undefined && ActionMenuActive == true) || 
-    (ClothingEditorActive !== undefined && ClothingEditorActive == true) ||
-    (StationPickerToggled !== undefined && StationPickerToggled == true) ||
-    (isHotwiring !== undefined && isHotwiring == true) || isHeliCamActive()){
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
-        //if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`);
+    if((global.VehicleSpawnerActive !== undefined && global.VehicleSpawnerActive == true) ||
+    (global.WeaponEditorActive !== undefined && global.WeaponEditorActive == true) ||
+    (global.ActionMenuActive !== undefined && global.ActionMenuActive == true) || 
+    (global.ClothingEditorActive !== undefined && global.ClothingEditorActive == true) ||
+    (global.StationPickerToggled !== undefined && global.StationPickerToggled == true) ||
+    (global.isHotwiring !== undefined && global.isHotwiring == true) || global.isHeliCamActive()){
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
+        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`);
         return;
     }
-    //if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = ${toggle.toString()}`);
-        if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(${toggle.toString()});`);
+    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = ${toggle.toString()}`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(${toggle.toString()});`);
 
     // if(toggle){
     //     if(mp.storage.data.menu.ActiveChatOpacity !== undefined){
-    //         if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = ${mp.storage.data.menu.ActiveChatOpacity.toString()}`);
+    //         if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = ${mp.storage.data.menu.ActiveChatOpacity.toString()}`);
     //     }
-    //     else if(ServerUI) ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = 1.0`);
+    //     else if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = 1.0`);
     // }
     // else{
     //     increaseChatOpacity(3000);
@@ -1082,8 +976,8 @@ function focusChat(toggle){
     mp.events.callRemote("onFocusChat", toggle);
 }
 function InitializeHotwireDOM(){
-    HotwireDOM = mp.browsers.new("package://hotwire_game/index.html");
-    HotwireDOM.active = false;
+    global.HotwireDOM = mp.browsers.new("package://hotwire_game/index.html");
+    global.HotwireDOM.active = false;
 }
 function getClosestVehicle(position) {
     try {
@@ -1109,118 +1003,142 @@ function getClosestVehicle(position) {
       return { distance: closest, vehicle: closestVeh };
     } catch (e) {}
   }
-  var ServerSettings = [];
 
 
 function InitializeMDC(){
-    MDC_DOM = mp.browsers.new("package://mdc_screen/index.html");
+    global.MDC_DOM = mp.browsers.new("package://mdc_screen/index.html");
 
     mp.events.callLocal("MDC:AddBlip", mp.players.local.remoteId, "police");
 
-    MDCActive = false;
-    MDC_DOM.active = false;
+    global.MDCActive = false;
+    global.MDC_DOM.active = false;
 }
 function InitializeWeaponEditor(){
     WeaponEditorDOM = mp.browsers.new("package://weaponeditor/index.html");
     WeaponEditorDOM.active = false;
 }
 function InitializeClothingEditorDOM(){
-    ClothingEditorDOM = mp.browsers.new("package://clothing_editor/index.html");
-    ClothingEditorDOM.active = false;
-    ClothingEditorActive = false;
+    global.ClothingEditorDOM = mp.browsers.new("package://clothing_editor/index.html");
+    global.ClothingEditorDOM.active = false;
+    global.ClothingEditorActive = false;
 }
-exports = {
-    currentJailTime,
-    lastJailUpdate,
-    chaseRunning,
-    chaseTimeCur,
-    chaseTimeMax,
-    chaseMode,
-    collisionTime,
-    updateRate,
-    radioToggle,
-    carryTarget,
-    chatStatus,
-    chatStatusLate,
-    menuToggledLate,
-    lastChatToggle,
-    streetName,
-    zoneName,
-    lastVoiceBind,
-    curVoiceBind,
-    showHud,
-    renderNametags,
-    currentMuteTime,
-    lastMuteUpdate,
-    lastFunc,
-    curMDCBind,
-    lastMDCBind,
-    curActionMenuBind,
-    lastActionMenuBind,
-    IsInTutorial,
-    BankRobberyOn,
-    ShowVehicleDL,
-    specState, 
-    lastGPSBind,
-    curGPSBind,
-    lastMapBind,
-    curMapBind,
-    specTarget,
-    disableSprint,
-    isNoClip,
-    LastKeyPress,
-    AFKStage,
-    SecondsSinceLastKeyPress,
-    antiAFKActive,
-    showReticule,
-    showCustomCrosshair,
-    showCustomCrosshairInSniper,
-    alwaysShowCustomCrosshair,
-    customCrosshairOn,
-    ServerUI,
-    menuToggled,
-    scoreboardToggled,
-    scoreboardCursor,
-    StationPickerToggled,
-    MDC_DOM,
-    MDCActive,
-    isLockpicking,
-    isHotwiring,
-    HotwireDOM,
-    ClothingEditorDOM,
-    ClothingEditorActive,
-    ActionMenuActive,
-    VehicleSpawnerActive,
-    WeaponEditorActive,
-    FireModeDisplayText,
-    cuffTarget,
-    cuffInterval,
-    boneData,
-    weaponData,
-    loginSceneEntities,
-    chatStatusTimeout,
-    heliCam,
-    FPS,
-    FPS_Frames,
-    FPS_Calc,
-    precisionPositionerActive,
-    HideAllCrosshairs,
-    ServerSettings,
-    getClosestVehicle,
-    LogPlayerDamage,
-    ToggleMDC,
-    actionMenuClose,
-    actionMenuOpen,
-    traceLastFunc,
-    isHeliCamActive,
-    UpdateStatsVars,
-    focusChat,
-    activateChat,
-    InitializeClothingEditorDOM,
-    InitializeMDC,
-    InitializeWeaponEditor,
-    InitializeHotwireDOM,
-    AddCustomVehiclesToSpawner,
-    calcDist,
-    InitializeServerUI,
+
+let ServerUI = null;
+function InitializeServerUI(){
+  if(ServerUI) return ServerUI;
+
+  ServerUI = mp.browsers.new("package://ServerUI/index.html");
+  return ServerUI;
+}
+
+let global = {
+  currentJailTime: 0,
+  lastJailUpdate: 10,
+
+  chaseRunning: false,
+  chaseTimeCur: 0,
+  chaseTimeMax: 390,
+  chaseMode: 0, // 0= STANDARD | 1= BUSTED | and others as in SCRIPT
+  collisionTime: -1,
+  updateRate: 200,
+
+  radioToggle: 0,
+  carryTarget: -1,
+
+  chatStatus: false,
+  chatStatusLate: false,
+  menuToggledLate: false,
+  lastChatToggle: Date.now(),
+  streetName: null,
+  zoneName: null,
+  showHud: true,
+  renderNametags: true,
+  currentMuteTime: 0,
+  lastMuteUpdate: 10,
+  lastFunc: "Init",
+
+  curMDCBind: 0x4B,
+  lastMDCBind: 0x4B,
+  curActionMenuBind: 0x59,
+  lastActionMenuBind: 0x59,
+
+  lastVoiceBind: 0x4E,
+  curVoiceBind: 0x4E,
+
+  BankRobberyOn: false,
+
+  ShowVehicleDL: false,
+  specState: false,
+  specTarget: null,
+  isNoClip: false,
+
+  heliCam:null,
+
+  IsInTutorial:false,
+  disableSprint:false,
+  FPS:0, // This is the actual fps
+  FPS_Frames:0,
+  FPS_Calc:Date.now(),
+  precisionPositionerActive:false,
+  HideAllCrosshairs:{AntiPeek:false},
+  loginSceneEntities:[],
+  chatStatusTimeout:null,
+
+  ServerSettings:[],
+
+  LastKeyPress: 0,
+  AFKStage: 0,
+  SecondsSinceLastKeyPress: 0, // using this for nametags
+  antiAFKActive: false,
+
+  showReticule: true,
+  showCustomCrosshair: false,
+  showCustomCrosshairInSniper: false,
+  alwaysShowCustomCrosshair: false,
+  customCrosshairOn: false,
+
+  menuToggled:false,
+  scoreboardToggled:false,
+  scoreboardCursor:false,
+  StationPickerToggled:false,
+  MDC_DOM:null,
+  MDCActive:false,
+  isLockpicking:false,
+  isHotwiring:false,
+  HotwireDOM:false,
+  ClothingEditorDOM:null,
+  ClothingEditorActive:false,
+  ActionMenuActive:false,
+  VehicleSpawnerActive:false,
+  WeaponEditorActive:false,
+  FireModeDisplayText:"",
+  cuffTarget:null,
+  cuffInterval:null,
+  lastGPSBind:0x5A,
+  curGPSBind:0x5A,
+  lastMapBind:0x50,
+  curMapBind:0x50,
+
+  CommandsDataJSON,
+  weaponData,
+  boneData,
+  ServerUI:ServerUI,
+  getClosestVehicle,
+  LogPlayerDamage,
+  ToggleMDC,
+  actionMenuClose,
+  actionMenuOpen,
+  traceLastFunc,
+  isHeliCamActive,
+  UpdateStatsVars,
+  focusChat,
+  activateChat,
+  InitializeClothingEditorDOM,
+  InitializeMDC,
+  InitializeWeaponEditor,
+  InitializeHotwireDOM,
+  AddCustomVehiclesToSpawner,
+  calcDist,
+  InitializeServerUI,
 };
+exports = global;

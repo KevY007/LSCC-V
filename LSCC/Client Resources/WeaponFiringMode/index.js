@@ -1,73 +1,5 @@
 let Constants = require("./WeaponFiringMode/constants.js");
-var {
-    currentJailTime,
-    lastJailUpdate,
-    chaseRunning,
-    chaseTimeCur,
-    chaseTimeMax,
-    chaseMode,
-    collisionTime,
-    updateRate,
-    radioToggle,
-    carryTarget,
-    chatStatus,
-    chatStatusLate,
-    menuToggledLate,
-    lastChatToggle,
-    streetName,
-    zoneName,
-    showHud,
-    renderNametags,
-    currentMuteTime,
-    lastMuteUpdate,
-    lastFunc,
-    curMDCBind,
-    lastMDCBind,
-    curActionMenuBind,
-    lastActionMenuBind,
-    BankRobberyOn,
-    ShowVehicleDL,
-    specState,
-    specTarget,
-    isNoClip,
-    LastKeyPress,
-    AFKStage,
-    SecondsSinceLastKeyPress,
-    antiAFKActive,
-    showReticule,
-    showCustomCrosshair,
-    showCustomCrosshairInSniper,
-    alwaysShowCustomCrosshair,
-    customCrosshairOn,
-    ServerUI,
-    menuToggled,
-    scoreboardToggled,
-    scoreboardCursor,
-    StationPickerToggled,
-    MDC_DOM,
-    MDCActive,
-    isLockpicking,
-    isHotwiring,
-    HotwireDOM,
-    ClothingEditorDOM,
-    ClothingEditorActive,
-    ActionMenuActive,
-    VehicleSpawnerActive,
-    WeaponEditorActive,
-    FireModeDisplayText,
-    cuffTarget,
-    cuffInterval,
-    boneData,
-    weaponData,
-    loginSceneEntities,
-    chatStatusTimeout,
-    LogPlayerDamage,
-    ToggleMDC,
-    actionMenuClose,
-    actionMenuOpen,
-    traceLastFunc,
-    isHeliCamActive
-   } = require('./globals');
+var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 
 let lockedData = {}
@@ -124,23 +56,23 @@ mp.events.add("OneSecondEvent", () => {
     if (ignoreCurrentWeapon) return;
 
     if (Constants.isBoltAction(currentWeapon))
-        FireModeDisplayText = "BOLT";
+        global.FireModeDisplayText = "BOLT";
     else if(Constants.isPumpAction(currentWeapon))
-        FireModeDisplayText = "PUMP";
+        global.FireModeDisplayText = "PUMP";
     else
-        FireModeDisplayText = Constants.firingModeNames[curFiringMode];
+        global.FireModeDisplayText = Constants.firingModeNames[curFiringMode];
 });
 
 mp.keys.bind(0x42, false, () => {
-    if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
-        (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
-        (ActionMenuActive !== undefined && ActionMenuActive == true) ||
-        (ClothingEditorActive !== undefined && ClothingEditorActive == true) ||
-        (isHotwiring !== undefined && isHotwiring == true) ||
-        (menuToggled !== undefined && menuToggled == true)){
+    if((global.VehicleSpawnerActive !== undefined && global.VehicleSpawnerActive == true) ||
+        (global.WeaponEditorActive !== undefined && global.WeaponEditorActive == true) ||
+        (global.ActionMenuActive !== undefined && global.ActionMenuActive == true) ||
+        (global.ClothingEditorActive !== undefined && global.ClothingEditorActive == true) ||
+        (global.isHotwiring !== undefined && global.isHotwiring == true) ||
+        (global.menuToggled !== undefined && global.menuToggled == true)){
         return;
     }
-    if(Date.now() - lastChatToggle < 500 || chatStatus == true){
+    if(Date.now() - global.lastChatToggle < 500 || global.chatStatus == true){
         return;
     }
     
@@ -171,7 +103,7 @@ mp.keys.bind(0x42, false, () => {
         
         //let notifyscoreboardstr = `toast('${Translate("FIRE_MODE")}', '${Translate("WEAPON_FIRE_MODE_SWITCH", [Constants.firingModeNames[curFiringMode]])}', 'nothing', 500, 2);`;
         mp.events.callLocal("screenNotify", Translate("WEAPON_FIRE_MODE_SWITCH", [`~y~${Constants.firingModeNames[curFiringMode]}`])); 
-        //if(ServerUI) ServerUI.execute(notifyscoreboardstr);
+        //if(global.ServerUI) global.ServerUI.execute(notifyscoreboardstr);
     }
 });
 

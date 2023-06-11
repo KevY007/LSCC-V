@@ -1,74 +1,4 @@
-var {
-  currentJailTime,
-  lastJailUpdate,
-  chaseRunning,
-  chaseTimeCur,
-  chaseTimeMax,
-  chaseMode,
-  collisionTime,
-  updateRate,
-  radioToggle,
-  carryTarget,
-  chatStatus,
-  chatStatusLate,
-  menuToggledLate,
-  lastChatToggle,
-  streetName,
-  zoneName,
-  showHud,
-  renderNametags,
-  currentMuteTime,
-  lastMuteUpdate,
-  lastFunc,
-  curMDCBind,
-  lastMDCBind,
-  curActionMenuBind,
-  lastActionMenuBind,
-  BankRobberyOn,
-  ShowVehicleDL,
-  specState,
-  specTarget,
-  isNoClip,
-  LastKeyPress,
-  AFKStage,
-  SecondsSinceLastKeyPress,
-  antiAFKActive,
-  showReticule,
-  showCustomCrosshair,
-  getClosestVehicle,
-  showCustomCrosshairInSniper,
-  alwaysShowCustomCrosshair,
-  customCrosshairOn,
-  ServerUI,
-  calcDist,
-  menuToggled,
-  scoreboardToggled,
-  scoreboardCursor,
-  StationPickerToggled,
-  MDC_DOM,
-  MDCActive,
-  isLockpicking,
-  isHotwiring,
-  HotwireDOM,
-  ClothingEditorDOM,
-  ClothingEditorActive,
-  ActionMenuActive,
-  VehicleSpawnerActive,
-  WeaponEditorActive,
-  FireModeDisplayText,
-  cuffTarget,
-  cuffInterval,
-  boneData,
-  weaponData,
-  loginSceneEntities,
-  chatStatusTimeout,
-  LogPlayerDamage,
-  ToggleMDC,
-  actionMenuClose,
-  actionMenuOpen,
-  traceLastFunc,
-  isHeliCamActive
- } = require('./globals');
+var global = require('./globals');
 const {TranslateMessage: Translate} = require('./Translator');
 
 
@@ -79,14 +9,14 @@ mp.keys.bind(71, false, () => {
   if (
     mp.players.local.vehicle === null &&
     !mp.gui.cursor.visible &&
-    !chatStatus &&
-    Date.now() - lastChatToggle >= 500 &&
-    !menuToggled &&
-    !scoreboardToggled
+    !global.chatStatus &&
+    Date.now() - global.lastChatToggle >= 500 &&
+    !global.menuToggled &&
+    !global.scoreboardToggled
   ) {
     const driverSeatId = -1; // CHANGE THIS AS THE DRIVER INDEX CHANGES
     const playerPos = mp.players.local.position;
-    let closestVeh = getClosestVehicle(playerPos);
+    let closestVeh = global.getClosestVehicle(playerPos);
 
     if (closestVeh.distance > 5) {
       return;
@@ -213,7 +143,7 @@ mp.keys.bind(71, false, () => {
       calculatedDistance =
         seatRearPosition === null
           ? null
-          : calcDist(playerPos, seatRearPosition);
+          : global.calcDist(playerPos, seatRearPosition);
       seatIndex = seatRear === -1 ? seatIndex : seatIndex + 1;
       if (
         calculatedDistance !== null &&
@@ -228,7 +158,7 @@ mp.keys.bind(71, false, () => {
       calculatedDistance =
         seatFrontPassengerPosition === null
           ? null
-          : calcDist(playerPos, seatFrontPassengerPosition);
+          : global.calcDist(playerPos, seatFrontPassengerPosition);
       seatIndex = seatFrontPassenger === -1 ? seatIndex : seatIndex + 1;
       if (
         calculatedDistance !== null &&
@@ -242,7 +172,7 @@ mp.keys.bind(71, false, () => {
       calculatedDistance =
         seatRearDriverPosition === null
           ? null
-          : calcDist(playerPos, seatRearDriverPosition);
+          : global.calcDist(playerPos, seatRearDriverPosition);
       seatIndex = seatRearDriver === -1 ? seatIndex : seatIndex + 1;
       if (
         calculatedDistance !== null &&
@@ -256,7 +186,7 @@ mp.keys.bind(71, false, () => {
       calculatedDistance =
         seatRearPassengerPosition === null
           ? null
-          : calcDist(playerPos, seatRearPassengerPosition);
+          : global.calcDist(playerPos, seatRearPassengerPosition);
       seatIndex = seatRearPassenger === -1 ? seatIndex : seatIndex + 1;
       if (
         calculatedDistance !== null &&
@@ -271,7 +201,7 @@ mp.keys.bind(71, false, () => {
       calculatedDistance =
         seatRearDriver1Position === null
           ? null
-          : calcDist(playerPos, seatRearDriver1Position);
+          : global.calcDist(playerPos, seatRearDriver1Position);
       seatIndex = seatRearDriver1 === -1 ? seatIndex : seatIndex + 1; // 3
 
       if (!vehicle.isSeatFree(seatIndex - 2) || mp.keys.isDown(16)) {
@@ -289,7 +219,7 @@ mp.keys.bind(71, false, () => {
       calculatedDistance =
         seatRearPassenger1Position === null
           ? null
-          : calcDist(playerPos, seatRearPassenger1Position);
+          : global.calcDist(playerPos, seatRearPassenger1Position);
       seatIndex = seatRearPassenger1 === -1 ? seatIndex : seatIndex + 1; // 4
       if (!vehicle.isSeatFree(seatIndex - 2) || mp.keys.isDown(16)) {
         if (
@@ -306,7 +236,7 @@ mp.keys.bind(71, false, () => {
       calculatedDistance =
         seatRearDriver2Position === null
           ? null
-          : calcDist(playerPos, seatRearDriver2Position);
+          : global.calcDist(playerPos, seatRearDriver2Position);
       seatIndex = seatRearDriver2 === -1 ? seatIndex : seatIndex + 1; // 5
       if (!vehicle.isSeatFree(seatIndex - 4) || mp.keys.isDown(16)) {
         if (
@@ -323,7 +253,7 @@ mp.keys.bind(71, false, () => {
       calculatedDistance =
         seatRearPassenger2Position === null
           ? null
-          : calcDist(playerPos, seatRearPassenger2Position);
+          : global.calcDist(playerPos, seatRearPassenger2Position);
       seatIndex = seatRearPassenger2 === -1 ? seatIndex : seatIndex + 1; // 6
       if (!vehicle.isSeatFree(seatIndex - 4) || mp.keys.isDown(16)) {
         if (
@@ -339,7 +269,7 @@ mp.keys.bind(71, false, () => {
       calculatedDistance =
         seatRearDriver3Position === null
           ? null
-          : calcDist(playerPos, seatRearDriver3Position);
+          : global.calcDist(playerPos, seatRearDriver3Position);
       seatIndex = seatRearDriver3 === -1 ? seatIndex : seatIndex + 1;
 
       if (
@@ -354,7 +284,7 @@ mp.keys.bind(71, false, () => {
       calculatedDistance =
         seatRearPassenger3Position === null
           ? null
-          : calcDist(playerPos, seatRearPassenger3Position);
+          : global.calcDist(playerPos, seatRearPassenger3Position);
       seatIndex = seatRearPassenger3 === -1 ? seatIndex : seatIndex + 1;
 
       if (
@@ -369,7 +299,7 @@ mp.keys.bind(71, false, () => {
       calculatedDistance =
         seatRearDriver4Position === null
           ? null
-          : calcDist(playerPos, seatRearDriver4Position);
+          : global.calcDist(playerPos, seatRearDriver4Position);
       seatIndex = seatRearDriver4 === -1 ? seatIndex : seatIndex + 1;
 
       if (
@@ -384,7 +314,7 @@ mp.keys.bind(71, false, () => {
       calculatedDistance =
         seatRearPassenger4Position === null
           ? null
-          : calcDist(playerPos, seatRearPassenger4Position);
+          : global.calcDist(playerPos, seatRearPassenger4Position);
       seatIndex = seatRearPassenger4 === -1 ? seatIndex : seatIndex + 1;
 
       if (
@@ -399,7 +329,7 @@ mp.keys.bind(71, false, () => {
       calculatedDistance =
         seatRearDriver5Position === null
           ? null
-          : calcDist(playerPos, seatRearDriver5Position);
+          : global.calcDist(playerPos, seatRearDriver5Position);
       seatIndex = seatRearDriver5 === -1 ? seatIndex : seatIndex + 1;
 
       if (
@@ -414,7 +344,7 @@ mp.keys.bind(71, false, () => {
       calculatedDistance =
         seatRearPassenger5Position === null
           ? null
-          : calcDist(playerPos, seatRearPassenger5Position);
+          : global.calcDist(playerPos, seatRearPassenger5Position);
       seatIndex = seatRearPassenger5 === -1 ? seatIndex : seatIndex + 1;
 
       if (
@@ -429,7 +359,7 @@ mp.keys.bind(71, false, () => {
       calculatedDistance =
         seatRearDriver6Position === null
           ? null
-          : calcDist(playerPos, seatRearDriver6Position);
+          : global.calcDist(playerPos, seatRearDriver6Position);
       seatIndex = seatRearDriver6 === -1 ? seatIndex : seatIndex + 1;
 
       if (
@@ -444,7 +374,7 @@ mp.keys.bind(71, false, () => {
       calculatedDistance =
         seatRearPassenger6Position === null
           ? null
-          : calcDist(playerPos, seatRearPassenger6Position);
+          : global.calcDist(playerPos, seatRearPassenger6Position);
       seatIndex = seatRearPassenger6 === -1 ? seatIndex : seatIndex + 1;
 
       if (
@@ -459,7 +389,7 @@ mp.keys.bind(71, false, () => {
       calculatedDistance =
         seatRearDriver7Position === null
           ? null
-          : calcDist(playerPos, seatRearDriver7Position);
+          : global.calcDist(playerPos, seatRearDriver7Position);
       seatIndex = seatRearDriver7 === -1 ? seatIndex : seatIndex + 1;
 
       if (
@@ -474,7 +404,7 @@ mp.keys.bind(71, false, () => {
       calculatedDistance =
         seatRearPassenger7Position === null
           ? null
-          : calcDist(playerPos, seatRearPassenger7Position);
+          : global.calcDist(playerPos, seatRearPassenger7Position);
       seatIndex = seatRearPassenger7 === -1 ? seatIndex : seatIndex + 1;
 
       if (
@@ -571,9 +501,9 @@ var verySlowMult = 0.05;
 var localPlayer = mp.players.local;
 
 mp.events.add("ForceNoclip", (OnOrOff) => {
-  isNoClip = OnOrOff;
-  mp.game.ui.displayRadar(!isNoClip);
-  if (isNoClip) {
+  global.isNoClip = OnOrOff;
+  mp.game.ui.displayRadar(!global.isNoClip);
+  if (global.isNoClip) {
     startNoClip();
   } else {
     stopNoClip();
@@ -598,7 +528,7 @@ mp.events.addCommand("noclip_vsm", function (rate) {
 });
 
 mp.events.add("ToggleNoclip", () => {
-  mp.events.callLocal("ForceNoclip", !isNoClip);
+  mp.events.callLocal("ForceNoclip", !global.isNoClip);
 });
 
 function startNoClip() {
@@ -715,7 +645,7 @@ let canManuallyResetCamera = false;
 function checkCamInAir() {
   if (mp.game.invoke(Natives.IS_PLAYER_SWITCH_IN_PROGRESS)) {
     mp.events.callLocal("HideAllElementsExceptChat", false); // hide elements
-    focusChat(chatStatus);
+    global.focusChat(global.chatStatus);
     setTimeout(() => {
       checkCamInAir();
     }, 400);
@@ -723,8 +653,8 @@ function checkCamInAir() {
     mp.events.callLocal("HideAllElementsExceptChat", true); // show em
     gui = "true";
 
-    if (ServerUI != null && ServerUI != undefined)
-      if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = ${showHud};`);
+    if (global.ServerUI != null && global.ServerUI != undefined)
+      if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = ${global.showHud};`);
   }
 }
 
@@ -976,13 +906,13 @@ mp.keys.bind(0x4a, false, () => {
   if (
     !mp.players.local.isInAnyVehicle(false) &&
     operationType == 0 &&
-    chatStatus == false &&
-    Date.now() - lastChatToggle >= 500 &&
-    !menuToggled &&
-    !scoreboardToggled &&
+    global.chatStatus == false &&
+    Date.now() - global.lastChatToggle >= 500 &&
+    !global.menuToggled &&
+    !global.scoreboardToggled &&
     !mp.players.local.isRagdoll()
   ) {
-    let veh = getClosestVehicle(mp.players.local.position);
+    let veh = global.getClosestVehicle(mp.players.local.position);
 
     if (veh === undefined) return;
 
@@ -1014,7 +944,7 @@ mp.keys.bind(0x4a, false, () => {
     sidebones.forEach((side) => {
       let bone = veh.vehicle.getBoneIndexByName(side);
       if (bone != -1) {
-        let dist = calcDist(
+        let dist = global.calcDist(
           mp.players.local.position,
           veh.vehicle.getWorldPositionOfBone(bone)
         );

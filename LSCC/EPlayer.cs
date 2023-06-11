@@ -745,7 +745,7 @@ namespace RNC
                 player.ResetData("LockpickTarget");
                 player.SetSharedData("PlacingStingers", false);
 
-                player.SetSharedData("WeaponEditorActive", false);
+                player.SetSharedData("global.WeaponEditorActive", false);
                 player.SetData<bool>("ShotsFired", false);
 
                 player.ResetData("DragoutVehicle");
@@ -2568,7 +2568,7 @@ namespace RNC
 
         public static void UpdateUIVars(Player player)
         {
-            player.TriggerEvent("CS_UpdateStatsVars");
+            player.TriggerEvent("CS_global.UpdateStatsVars");
         }
 
         public static void Notify(Player player, string title, string message, string alignment = "", string displaymode = "")

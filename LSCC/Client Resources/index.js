@@ -1,81 +1,4 @@
-﻿var {
-  currentJailTime,
-  lastJailUpdate,
-  chaseRunning,
-  chaseTimeCur,
-  chaseTimeMax,
-  chaseMode,
-  collisionTime,
-  updateRate,
-  radioToggle,
-  carryTarget,
-  chatStatus,
-  chatStatusLate,
-  menuToggledLate,
-  lastChatToggle,
-  streetName,
-  zoneName,
-  showHud,
-  renderNametags,
-  currentMuteTime,
-  lastMuteUpdate,
-  lastFunc,
-  curMDCBind,
-  lastMDCBind,
-  curActionMenuBind,
-  lastActionMenuBind,
-  IsInTutorial,
-  BankRobberyOn,
-  ShowVehicleDL,
-  specState, 
-  lastGPSBind,
-  curGPSBind,
-  lastMapBind,
-  curMapBind,
-  specTarget,
-  isNoClip,
-  LastKeyPress,
-  AFKStage,
-  SecondsSinceLastKeyPress,
-  antiAFKActive,
-  showReticule,
-  showCustomCrosshair,
-  showCustomCrosshairInSniper,
-  alwaysShowCustomCrosshair,
-  customCrosshairOn,
-  ServerUI,
-  menuToggled,
-  scoreboardToggled,
-  scoreboardCursor,
-  StationPickerToggled,
-  MDC_DOM,
-  MDCActive,
-  isLockpicking,
-  isHotwiring,
-  HotwireDOM,
-  ClothingEditorDOM,
-  ClothingEditorActive,
-  ActionMenuActive,
-  VehicleSpawnerActive,
-  WeaponEditorActive,
-  focusChat,
-  activateChat,
-  FireModeDisplayText,
-  cuffTarget,
-  cuffInterval,
-  boneData,
-  weaponData,
-  loginSceneEntities,
-  chatStatusTimeout,
-  InitializeServerUI,
-  heliCam,
-  LogPlayerDamage,
-  ToggleMDC,
-  actionMenuClose,
-  actionMenuOpen,
-  traceLastFunc,
-  isHeliCamActive
-} = require('./globals');
+﻿var global = require('./globals');
 const {TranslateMessage: Translate} = require('./Translator');
 mp.players.local.Team = -1;
 mp.game.vehicle.defaultEngineBehaviour = false;
@@ -89,7 +12,7 @@ mp.players.local.setRagdollFlag(2);
 
 
 
-traceLastFunc("Main::LoadIPLs()");
+global.traceLastFunc("Main::LoadIPLs()");
 // where IPL names name of your .ymap file in dlc -> mapping.rpf
 if(!mp.game.streaming.isIplActive("blockheisttunnel") || !mp.game.streaming.isIplActive("derby") || 
     !mp.game.streaming.isIplActive("floydsapt") || !mp.game.streaming.isIplActive("whbig") || 
@@ -101,7 +24,7 @@ if(!mp.game.streaming.isIplActive("blockheisttunnel") || !mp.game.streaming.isIp
 
 mp.players.local.position = new mp.Vector3(-1018.55300000, -2731.95600000, 15.70000000);
 
-traceLastFunc("RequireInit");
+global.traceLastFunc("RequireInit");
 require('mp-commands');
 require('./ServerUI/CommandsList.js');
 require("./nativeui/index.js");
@@ -167,7 +90,7 @@ mp.events.add("react_new", () => {
   ReactDOM = mp.browsers.new("package://react_test/index.html");
 });
 
-traceLastFunc("Main::Init()");
+global.traceLastFunc("Main::Init()");
 
 async function toggleLoginScene(toggle){
     if(toggle){
@@ -180,42 +103,42 @@ async function toggleLoginScene(toggle){
   
         /* CREATING THE PEDS */
         setTimeout(() => {
-          loginSceneEntities[0] = mp.peds.new(
+          global.loginSceneEntities[0] = mp.peds.new(
             mp.game.joaat('a_m_y_gay_01'),
             new mp.Vector3(2055.6335, 2963.446, -67.70754),
             -125.94715,
             mp.players.local.dimension
           );
 
-          loginSceneEntities[1] = mp.peds.new(
+          global.loginSceneEntities[1] = mp.peds.new(
             mp.game.joaat('ig_kaylee'),
             new mp.Vector3(2057.192, 2961.257, -67.811966),
             52.981815,
             mp.players.local.dimension
           );
 
-          loginSceneEntities[2] = mp.peds.new(
+          global.loginSceneEntities[2] = mp.peds.new(
             mp.game.joaat('a_m_y_vindouche_01'),
             new mp.Vector3(2058.2307, 2962.797, -67.82209),
             67.54069,
             mp.players.local.dimension
           );
 
-          loginSceneEntities[3] = mp.peds.new(
+          global.loginSceneEntities[3] = mp.peds.new(
             mp.game.joaat('s_m_y_dealer_01'),
             new mp.Vector3(2056.2158, 2966.3682, -67.30179),
             144.91861,
             mp.players.local.dimension
           );
 
-          loginSceneEntities[4] = mp.peds.new(
+          global.loginSceneEntities[4] = mp.peds.new(
             mp.game.joaat('g_m_m_chicold_01'),
             new mp.Vector3(2052.9705, 2961.859, -67.30187),
             -36.38813,
             mp.players.local.dimension
           );
 
-          loginSceneEntities[5] = mp.peds.new(
+          global.loginSceneEntities[5] = mp.peds.new(
             mp.game.joaat('a_m_m_farmer_01'),
             new mp.Vector3(2057.881, 2961.7786, -67.30188),
             52.57501,
@@ -223,35 +146,35 @@ async function toggleLoginScene(toggle){
           );
 
           // Room 2
-          loginSceneEntities[6] = mp.peds.new(
+          global.loginSceneEntities[6] = mp.peds.new(
             mp.game.joaat('csb_prolsec'),
             new mp.Vector3(2063.319, 2966.2705, -67.30189),
             48.209084,
             mp.players.local.dimension
           );
 
-          loginSceneEntities[7] = mp.peds.new(
+          global.loginSceneEntities[7] = mp.peds.new(
             mp.game.joaat('s_m_y_swat_01'),
             new mp.Vector3(2059.623, 2971.459, -67.30181),
             -160.187,
             mp.players.local.dimension
           );
 
-          loginSceneEntities[8] = mp.peds.new(
+          global.loginSceneEntities[8] = mp.peds.new(
             mp.game.joaat('s_m_y_swat_01'),
             new mp.Vector3(2058.6614, 2970.3154, -67.30181),
             -129.64273,
             mp.players.local.dimension
           );
 
-          loginSceneEntities[9] = mp.peds.new(
+          global.loginSceneEntities[9] = mp.peds.new(
             mp.game.joaat('s_m_y_swat_01'),
             new mp.Vector3(2057.7458, 2969.198, -67.30181),
             -116.9288,
             mp.players.local.dimension
           );
 
-          loginSceneEntities[10] = mp.peds.new(
+          global.loginSceneEntities[10] = mp.peds.new(
             mp.game.joaat('s_m_y_swat_01'),
             new mp.Vector3(2057.7458, 2967.9717, -67.30181),
             -93.87298,
@@ -267,19 +190,19 @@ async function toggleLoginScene(toggle){
     }
     else{
         mp.game.audio.stopAudioScene("CHARACTER_CHANGE_IN_SKY_SCENE");
-        for(let i = 0 ; i < loginSceneEntities.length ; i++){
-            loginSceneEntities[i].destroy();
+        for(let i = 0 ; i < global.loginSceneEntities.length ; i++){
+            global.loginSceneEntities[i].destroy();
         }
-        loginSceneEntities = [];
+        global.loginSceneEntities = [];
     }
 }
 mp.events.add('entityStreamIn', (entity) => {
-  if(!loginSceneEntities.includes(entity)) return;
+  if(!global.loginSceneEntities.includes(entity)) return;
 
   entity.freezePosition(true);
   entity.setCollision(false, false);
 
-  const idx = loginSceneEntities.indexOf(entity);
+  const idx = global.loginSceneEntities.indexOf(entity);
   switch(idx){
     case 0:
       entity.taskPlayAnim('amb@prop_human_seat_bar@male@elbows_on_bar@idle_a', 'idle_a', 8.0, 1.0, -1, 1, 1.0, false, false, false);
@@ -322,37 +245,39 @@ mp.events.add("DestroyLoginScene", () => toggleLoginScene(false));
 
 mp.events.add('showLoginBrowser', (state) => {
     setTimeout(() => {
-        if(ServerUI != null)
-        {
-            if(ServerUI.active) ServerUI.active = true;
-            if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = false;`);
-            if(ServerUI) ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
-            if(ServerUI) ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
+        if(global.ServerUI != null)
+        {      
+            if(global.ServerUI.active) global.ServerUI.active = true;
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = false;`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
             if(state){
-                if(ServerUI) ServerUI.execute(`gm.$refs.auth.startLoading(1);`); // initiate the fake loading screen to allow CEF sounds and shit duhh
+                if(global.ServerUI){
+                  global.ServerUI.execute(`gm.$refs.auth.startLoading(1);`); // initiate the fake loading screen to allow CEF sounds and shit duhh
+                }
                 toggleLoginScene(true);
                 mp.events.callRemote("requestQuickLoginForgotUsernameData"); // yes
-                if(ServerUI) ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.items = [];`);
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.items = [];`);
                 mp.events.callLocal("actionMenu:removeAllItems");
             }
             else{
-                if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.authSuccess = true;`);
-                if(ServerUI) ServerUI.execute(`gm.$refs.auth.stop();`);
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.authSuccess = true;`);
+                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.stop();`);
                 setTimeout(() => {
                     if(!mp.players.local || !mp.players.exists(mp.players.local)) return;
 
-                    if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.enabled = false;`);
-                    if(!IsInTutorial)
-                        if(ServerUI) ServerUI.execute(`gm.$refs.hud.enabled = true;`);
+                    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.enabled = false;`);
+                    if(!global.IsInTutorial)
+                        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = true;`);
                 }, 1000);
             }
-            if(!IsInTutorial)
+            if(!global.IsInTutorial)
                 mp.gui.cursor.show(state, state);
         }
         else{
             mp.events.callRemote("ServerConsoleOutput", `Attempted to show login browser to ${mp.players.local.name} while it's null! Trying again...`);
-            InitializeServerUI();
-            if(ServerUI) ServerUI.active = true;
+            global.ServerUI = global.InitializeServerUI();
+            if(global.ServerUI) global.ServerUI.active = true;
             setTimeout(() => {
                 mp.events.callLocal("showLoginBrowser", state);
             }, 1000);
@@ -362,33 +287,33 @@ mp.events.add('showLoginBrowser', (state) => {
 });
 
 mp.events.add("login_ShowInvalidInfo", (toggle) => {
-    if(ServerUI && ServerUI.active){
-        if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
+    if(global.ServerUI && global.ServerUI.active){
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
         mp.events.callLocal("HUDError", "The login credentials are invalid!");
         mp.gui.cursor.show(true, true);
-        //if(ServerUI) ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.login.loginError = ${toggle.toString()}`);
+        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.login.loginError = ${toggle.toString()}`);
     }
 });
 mp.events.add("login_ShowAccountExists", (toggle) => {
-    if(ServerUI && ServerUI.active){
-        if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
+    if(global.ServerUI && global.ServerUI.active){
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
         mp.events.callLocal("HUDError", "That username is already taken!");
         mp.gui.cursor.show(true, true);
-        //if(ServerUI) ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.register.usernameAlreadyExists = ${toggle.toString()}`);
+        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.register.usernameAlreadyExists = ${toggle.toString()}`);
     }
 });
 mp.events.add("login_MaxAccountLimit", (toggle) => {
-    if(ServerUI && ServerUI.active){
-        if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
+    if(global.ServerUI && global.ServerUI.active){
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
         mp.events.callLocal("HUDError", "You've reached the maximum accounts limit! (2 accounts)");
         mp.gui.cursor.show(true, true);
-        //if(ServerUI) ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.register.usernameAlreadyExists = ${toggle.toString()}`);
+        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.register.usernameAlreadyExists = ${toggle.toString()}`);
         // TO-DO: Add a message that max account limit has been reached!
     }
 });
 mp.events.add("login_ForceStopLoading", () => {
-  if(ServerUI && ServerUI.active){
-    if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
+  if(global.ServerUI && global.ServerUI.active){
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
     mp.gui.cursor.show(true, true);
   }
 });
@@ -397,30 +322,30 @@ mp.events.add("browser_ServerConsole", (msg) => mp.events.callRemote("ServerCons
 
 mp.events.add("onOpenChatbox", (toggle) =>
 {
-    if((VehicleSpawnerActive !== undefined && VehicleSpawnerActive == true) ||
-    (WeaponEditorActive !== undefined && WeaponEditorActive == true) ||
-    (ActionMenuActive !== undefined && ActionMenuActive == true)){
+    if((global.VehicleSpawnerActive !== undefined && global.VehicleSpawnerActive == true) ||
+    (global.WeaponEditorActive !== undefined && global.WeaponEditorActive == true) ||
+    (global.ActionMenuActive !== undefined && global.ActionMenuActive == true)){
         return;
     }
     if(mp.players.local.getVariable("pLogged") == undefined || mp.players.local.getVariable("pLogged") == false && toggle)
     {
-        activateChat(false);
+        global.activateChat(false);
         return;
     }
-    clearTimeout(chatStatusTimeout);
-    chatStatus = toggle;
-    lastChatToggle = Date.now();
-    focusChat(toggle);
+    clearTimeout(global.chatStatusTimeout);
+    global.chatStatus = toggle;
+    global.lastChatToggle = Date.now();
+    global.focusChat(toggle);
     mp.events.callRemote("UpdateChatState", toggle);
-    traceLastFunc(`[Players] ChatBox Toggled ${toggle}`);
+    global.traceLastFunc(`[Players] ChatBox Toggled ${toggle}`);
 
     mp.gui.cursor.show(toggle, false);
     if(toggle == true){
-        chatStatusLate = true;
+        global.chatStatusLate = true;
     }
     else{
-        chatStatusTimeout = setTimeout(() =>{
-            chatStatusLate = false;
+        global.chatStatusTimeout = setTimeout(() =>{
+            global.chatStatusLate = false;
         }, 500);
     }
 
@@ -436,7 +361,7 @@ mp.events.add('auth_register', (username, email, password, confirmPass) => {
   if(password === confirmPass)
     mp.events.callRemote('OnPlayerRegisterAttempt', email, username, password);
   else{
-    if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
     mp.events.callLocal("HUDError", "The passwords do not match!");
   }
 
@@ -449,18 +374,18 @@ mp.events.add('requestAutoLoginData', () => {
 mp.events.add('sendAutoLoginDataToBrowser', (data) => {
     setTimeout(() => {
         if(data.length > 2)
-            if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.login.quickLogin.username = "${data}"`);
+            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.login.quickLogin.username = "${data}"`);
     }, 500);
 });
 mp.events.add('sendForgotUsernameToBrowser', (data) => {
     setTimeout(() => {
-        if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.login.possibleUsernames = ${data}`);
+        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.login.possibleUsernames = ${data}`);
     }, 500);
 
 });
 
 mp.events.add('auth_quickLogin', (username) => {
-    if(ServerUI) ServerUI.execute(`gm.$refs.auth.api.isLoading = true;`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.isLoading = true;`);
     mp.events.callRemote("OnAutoLoginAttempt", username);
 });
 
@@ -471,12 +396,12 @@ mp.events.add('requestForgotUsernameServer', () => {
 
 
 mp.events.add("hideMDC", () => {
-    if(MDC_DOM == null) return;
-    MDCActive = false;
-    MDC_DOM.active = false;
+    if(global.MDC_DOM == null) return;
+    global.MDCActive = false;
+    global.MDC_DOM.active = false;
 });
 
 mp.events.add("login_StopMusic", () => {
-    if(ServerUI) ServerUI.execute(`gm.$refs.auth.$refs.panel.stop();`);
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.$refs.panel.stop();`);
 });
 

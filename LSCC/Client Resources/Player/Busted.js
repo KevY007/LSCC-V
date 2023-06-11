@@ -1,75 +1,6 @@
 let lastBustProgressTime = Date.now();
 let bustProgressCEF = null;
-var {
-    currentJailTime,
-    lastJailUpdate,
-    chaseRunning,
-    chaseTimeCur,
-    chaseTimeMax,
-    chaseMode,
-    collisionTime,
-    updateRate,
-    radioToggle,
-    carryTarget,
-    chatStatus,
-    chatStatusLate,
-    menuToggledLate,
-    lastChatToggle,
-    streetName,
-    zoneName,
-    showHud,
-    renderNametags,
-    currentMuteTime,
-    lastMuteUpdate,
-    lastFunc,
-    curMDCBind,
-    lastMDCBind,
-    curActionMenuBind,
-    lastActionMenuBind,
-    BankRobberyOn,
-    ShowVehicleDL,
-    specState,
-    specTarget,
-    isNoClip,
-    LastKeyPress,
-    AFKStage,
-    SecondsSinceLastKeyPress,
-    antiAFKActive,
-    showReticule,
-    showCustomCrosshair,
-    showCustomCrosshairInSniper,
-    alwaysShowCustomCrosshair,
-    customCrosshairOn,
-    ServerUI,
-    menuToggled,
-    scoreboardToggled,
-    scoreboardCursor,
-    StationPickerToggled,
-    MDC_DOM,
-    MDCActive,
-    isLockpicking,
-    isHotwiring,
-    HotwireDOM,
-    ClothingEditorDOM,
-    ClothingEditorActive,
-    ActionMenuActive,
-    VehicleSpawnerActive,
-    WeaponEditorActive,
-    FireModeDisplayText,
-    cuffTarget,
-    cuffInterval,
-    boneData,
-    calcDist,
-    weaponData,
-    loginSceneEntities,
-    chatStatusTimeout,
-    LogPlayerDamage,
-    ToggleMDC,
-    actionMenuClose,
-    actionMenuOpen,
-    traceLastFunc,
-    isHeliCamActive
-   } = require('./globals');
+var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 mp.events.add("InitChaseTimer", () => {
     if(bustProgressCEF == null) {
@@ -81,7 +12,7 @@ mp.events.add('browserDomReady', (ebrowser) => {
     if(bustProgressCEF != null && bustProgressCEF === ebrowser)
     {
         if(mp.players.local.getVariable("BustedProgress") !== undefined && mp.players.local.getVariable("BustedProgress") > 0 && 
-            chaseMode == 1 && mp.players.local.getVariable("Team") !== undefined && mp.players.local.getVariable("Team") == 0)
+            global.chaseMode == 1 && mp.players.local.getVariable("Team") !== undefined && mp.players.local.getVariable("Team") == 0)
         {
             bustProgressCEF.active = true;
             bustProgressCEF.execute(`setProgress(${mp.players.local.getVariable("BustedProgress")});`);
@@ -98,7 +29,7 @@ mp.events.addDataHandler('BustedProgress', function (entity, value, oldValue)
     if(entity == mp.players.local && bustProgressCEF != null) {
 
         if(mp.players.local.getVariable("BustedProgress") !== undefined && mp.players.local.getVariable("BustedProgress") > 0 && 
-            chaseMode == 1 && mp.players.local.getVariable("Team") !== undefined && mp.players.local.getVariable("Team") == 0)
+            global.chaseMode == 1 && mp.players.local.getVariable("Team") !== undefined && mp.players.local.getVariable("Team") == 0)
         {
             if(!bustProgressCEF.active) bustProgressCEF.active = true;
             bustProgressCEF.execute(`setProgress(${value});`);
@@ -113,10 +44,10 @@ mp.events.addDataHandler('BustedProgress', function (entity, value, oldValue)
 });
 
 mp.events.add('render', () => {
-    if(chaseMode == 1 && mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true &&
+    if(global.chaseMode == 1 && mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true &&
         mp.players.local.getVariable("Team") !== undefined)
     {
-        if(Date.now() - lastBustProgressTime >= 100 && collisionTime <= 0) // 100ms passed & unlocked
+        if(Date.now() - lastBustProgressTime >= 100 && global.collisionTime <= 0) // 100ms passed & unlocked
         {
             lastBustProgressTime = Date.now();
             
@@ -129,8 +60,8 @@ mp.events.add('render', () => {
                         let bustDist = 3.5;
                         if(target.isInAnyVehicle(false)) bustDist = 7.5;
 
-                        if(calcDist(target.position, mp.players.local.position) <= bustDist) {
-                            mp.events.callRemoteUnreliable("BustProgress", target, calcDist(target.position, mp.players.local.position));
+                        if(global.calcDist(target.position, mp.players.local.position) <= bustDist) {
+                            mp.events.callRemoteUnreliable("BustProgress", target, global.calcDist(target.position, mp.players.local.position));
                             progressed = true;
                         }
                     }
@@ -146,13 +77,13 @@ mp.events.add('render', () => {
                         let bustDist = 5.0;
                         if(mp.players.local.isInAnyVehicle(false)) bustDist = 10.0;
 
-                        if(calcDist(target.position, mp.players.local.position) <= bustDist) {
+                        if(global.calcDist(target.position, mp.players.local.position) <= bustDist) {
                             canProceed = false;
                         }
 
-                        if(calcDist(target.position, mp.players.local.position) < closestDist)
+                        if(global.calcDist(target.position, mp.players.local.position) < closestDist)
                         {
-                            closestDist = calcDist(target.position, mp.players.local.position);
+                            closestDist = global.calcDist(target.position, mp.players.local.position);
                         }
                     }
                 });
@@ -171,7 +102,7 @@ mp.events.add('TwoSecondEvent', () => {
 
         if(bustProgressCEF.active == true && 
             mp.players.local.getVariable("BustedProgress") !== undefined && mp.players.local.getVariable("BustedProgress") > 0 && 
-            chaseMode == 1 && mp.players.local.getVariable("Team") !== undefined && mp.players.local.getVariable("Team") == 0)
+            global.chaseMode == 1 && mp.players.local.getVariable("Team") !== undefined && mp.players.local.getVariable("Team") == 0)
         {
             bustProgressCEF.execute(`setProgress(${value});`);
         }

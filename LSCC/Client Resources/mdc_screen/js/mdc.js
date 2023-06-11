@@ -535,11 +535,11 @@ var Stingers = [
     }
 ];
 
-function AddStinger(id, areaName, streetName){
+function AddStinger(id, areaName, global.streetName){
     Stingers.push({
         id: id,
         area: areaName,
-        street: streetName
+        street: global.streetName
     });
 }
 function RemoveStinger(id){

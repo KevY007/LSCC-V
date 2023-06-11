@@ -9,77 +9,7 @@ const Point = NativeUI.Point;
 const ItemsCollection = NativeUI.ItemsCollection;
 const Color = NativeUI.Color;
 const ListItem = NativeUI.ListItem;
-var {
-    currentJailTime,
-    lastJailUpdate,
-    chaseRunning,
-    chaseTimeCur,
-    chaseTimeMax,
-    chaseMode,
-    collisionTime,
-    updateRate,
-    radioToggle,
-    carryTarget,
-    chatStatus,
-    chatStatusLate,
-    menuToggledLate,
-    lastChatToggle,
-    streetName,
-    zoneName,
-    showHud,
-    renderNametags,
-    currentMuteTime,
-    lastMuteUpdate,
-    lastFunc,
-    curMDCBind,
-    lastMDCBind,
-    curActionMenuBind,
-    lastActionMenuBind,
-    BankRobberyOn,
-    ShowVehicleDL,
-    specState,
-    specTarget,
-    isNoClip,
-    LastKeyPress,
-    AFKStage,
-    SecondsSinceLastKeyPress,
-    antiAFKActive,
-    showReticule,
-    showCustomCrosshair,
-    showCustomCrosshairInSniper,
-    alwaysShowCustomCrosshair,
-    customCrosshairOn,
-    ServerUI,
-    menuToggled,
-    scoreboardToggled,
-    scoreboardCursor,
-    StationPickerToggled,
-    MDC_DOM,
-    MDCActive,
-    isLockpicking,
-    isHotwiring,
-    HotwireDOM,
-    ClothingEditorDOM,
-    ClothingEditorActive,
-    ActionMenuActive,
-    VehicleSpawnerActive,
-    WeaponEditorActive,
-    FireModeDisplayText,
-    cuffTarget,
-    cuffInterval,
-    boneData,
-    weaponData,
-    loginSceneEntities,
-    chatStatusTimeout,
-    LogPlayerDamage,
-    focusChat,
-    activateChat,
-    ToggleMDC,
-    actionMenuClose,
-    actionMenuOpen,
-    traceLastFunc,
-    isHeliCamActive
-   } = require('./globals');
+var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 var ClothesMenuMode = -1;
 /*
@@ -1172,7 +1102,7 @@ mp.events.add("ShowClothesMenu", (mode, genderChar) =>
             menuClothing.AddItem(menuClothingExit);
         }
         
-        activateChat(false);
+        global.activateChat(false);
         mp.gui.cursor.visible = false;
     }
 });
@@ -1180,7 +1110,7 @@ mp.events.add("ShowClothesMenu", (mode, genderChar) =>
 menuClothing.MenuClose.on(() => {
     menuClothing.RemoveItem(menuClothingExit);
     menuClothingExit = null;
-    activateChat(true);
+    global.activateChat(true);
     mp.gui.cursor.visible = false;
 
     mp.events.callRemote("CloseDonatorClothesMenu");

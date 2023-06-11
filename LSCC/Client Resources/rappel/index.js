@@ -50,7 +50,7 @@ function rappelPlayer(warningLevel)
 /*
 mp.events.add('OneSecondEvent', () => {
     
-    if(mp.storage.data.menu.tooltips == true && ServerUI != null)
+    if(mp.storage.data.menu.tooltips == true && global.ServerUI != null)
     {
         
         if(mp.players.local.vehicle)
@@ -75,10 +75,10 @@ mp.events.add('OneSecondEvent', () => {
 
 mp.keys.bind(0x55, false, function() {
     if(mp.players.local.LoggedIn === undefined || mp.players.local.LoggedIn == false) return;
-    if(Date.now() - lastChatToggle <= 500) return;
-    if(menuToggled !== undefined && menuToggled) return;
-    if(chatStatus && !scoreboardToggled) return;
-    if(menuToggled) return;
+    if(Date.now() - global.lastChatToggle <= 500) return;
+    if(global.menuToggled !== undefined && global.menuToggled) return;
+    if(global.chatStatus && !global.scoreboardToggled) return;
+    if(global.menuToggled) return;
 
     rappelPlayer(2);
 });

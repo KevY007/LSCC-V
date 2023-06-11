@@ -1,77 +1,4 @@
-var {
-    currentJailTime,
-    lastJailUpdate,
-    chaseRunning,
-    chaseTimeCur,
-    chaseTimeMax,
-    chaseMode,
-    collisionTime,
-    updateRate,
-    radioToggle,
-    carryTarget,
-    chatStatus,
-    chatStatusLate,
-    menuToggledLate,
-    lastChatToggle,
-    streetName,
-    zoneName,
-    showHud,
-    renderNametags,
-    currentMuteTime,
-    lastMuteUpdate,
-    lastFunc,
-    curMDCBind,
-    lastMDCBind,
-    curActionMenuBind,
-    lastActionMenuBind,
-    BankRobberyOn,
-    ShowVehicleDL,
-    specState,
-    specTarget,
-    isNoClip,
-    LastKeyPress,
-    AFKStage,
-    SecondsSinceLastKeyPress,
-    HideAllCrosshairs,
-    antiAFKActive,
-    showReticule,
-    showCustomCrosshair,
-    showCustomCrosshairInSniper,
-    alwaysShowCustomCrosshair,
-    customCrosshairOn,
-    ServerUI,
-    menuToggled,
-    scoreboardToggled,
-    scoreboardCursor,
-    StationPickerToggled,
-    MDC_DOM,
-    MDCActive,
-    isLockpicking,
-    isHotwiring,
-    HotwireDOM,
-    ClothingEditorDOM,
-    ClothingEditorActive,
-    ActionMenuActive,
-    VehicleSpawnerActive,
-    FPS,
-    FPS_Frames,
-    FPS_Calc,
-    precisionPositionerActive,
-    WeaponEditorActive,
-    FireModeDisplayText,
-    cuffTarget,
-    cuffInterval,
-    boneData,
-    weaponData,
-    loginSceneEntities,
-    chatStatusTimeout,
-    LogPlayerDamage,
-    ToggleMDC,
-    actionMenuClose,
-    actionMenuOpen,
-    traceLastFunc,
-    isHeliCamActive
-   } = require('./globals');
+var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 function RayCastGamePlayWeapon(weapon, distance, flag){
     let cameraRotation = mp.cameras.new('gameplay').getRot(2);
@@ -104,17 +31,17 @@ function RayCastGamePlayWeapon(weapon, distance, flag){
 mp.events.add('render', () => {
     if(mp.players.local.getVariable("Team") != 0 && mp.players.local.getVariable("Team") != 1) return;
     if(mp.players.local.weapon === 2725352035){
-        HideAllCrosshairs.AntiPeek = false;
+        global.HideAllCrosshairs.AntiPeek = false;
         return;
     }
     if(mp.game.invoke('0x68EDDA28A5976D07') !== 1 && !mp.game.player.isFreeAiming()){
-        HideAllCrosshairs.AntiPeek = false;
+        global.HideAllCrosshairs.AntiPeek = false;
         return;
     }
 
     const weaponEntityIndex = mp.game.invoke('0x3B390A939AF0B5FC', mp.players.local.handle);
     if(weaponEntityIndex === undefined || weaponEntityIndex === 0){
-        HideAllCrosshairs.AntiPeek = false;
+        global.HideAllCrosshairs.AntiPeek = false;
         return;
     }
     let weapCoord = mp.players.local.getWorldPositionOfBone(mp.players.local.getBoneIndexByName("BONETAG_R_HAND"));   
@@ -122,13 +49,13 @@ mp.events.add('render', () => {
     const weaponRaycast = RayCastGamePlayWeapon(weaponEntityIndex, 8.0, 1);
 
     if(!weaponRaycast){
-        HideAllCrosshairs.AntiPeek = false;
+        global.HideAllCrosshairs.AntiPeek = false;
         return;
     }
     const entityRaycast1 = mp.raycasting.testPointToPoint(weapCoord, weaponRaycast.position, mp.players.local, 4);
     const entityRaycast2 = mp.raycasting.testPointToPoint(weapCoord, weaponRaycast.position, mp.players.local, 8);
     if((entityRaycast1 && entityRaycast1.entity.type === 'player') || (entityRaycast2 && entityRaycast2.entity.type === 'player')){
-        HideAllCrosshairs.AntiPeek = false;
+        global.HideAllCrosshairs.AntiPeek = false;
         return;
     }
 
@@ -139,7 +66,7 @@ mp.events.add('render', () => {
         scale:[0.42, 0.39]
     });
 
-    HideAllCrosshairs.AntiPeek = true;
+    global.HideAllCrosshairs.AntiPeek = true;
     mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
     // Disable shooting
     mp.game.controls.disableControlAction(32, 24, true);

@@ -1061,7 +1061,7 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            player.SetSharedData("WeaponEditorActive", true);
+            player.SetSharedData("global.WeaponEditorActive", true);
         }
 
         [RemoteEvent("WeaponEditor:onExit")]
@@ -1071,7 +1071,7 @@ namespace RNC
 
             //player.SetSharedData("InWeaponEditor", false);
             EPlayer.Spawn(player);
-            player.SetSharedData("WeaponEditorActive", false);
+            player.SetSharedData("global.WeaponEditorActive", false);
         }
 
         [RemoteEvent("WeaponEditor:onRequestRemoveAttachment")]
