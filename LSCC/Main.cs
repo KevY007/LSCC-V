@@ -459,7 +459,7 @@ namespace RNC
 
         public DynSet()
         {
-            this.WeaponDataURL = "https://gist.githubusercontent.com/root-cause/3f29d38179b12245a003fb4fff615335/raw/5bca267fb5ad72acae1525772e883337df4518c6/v2699%2520Weapon%2520Data.json";
+            this.WeaponDataURL = "https://gist.githubusercontent.com/root-cause/3f29d38179b12245a003fb4fff615335/raw/5713349a648f7fde716fea1b089635ab39a56019/v2944%2520Weapon%2520Data.json";
             this.DerbyVehicle = "brioso";
             this.OnfootCollision = true;
             this.AntiFallOffBike = true;
@@ -1768,7 +1768,8 @@ namespace RNC
 	        {615608432, "Molotov"},
             {3520460075, "Service Rifle"},
             {94989220, "Combat Shotgun"},
-            {741814745, "Sticky Bomb"},
+			{350597077, "Tactical SMG"},
+			{741814745, "Sticky Bomb"},
 	        {2874559379, "Proximity Mine"},
 	        {126349499, "Snowball"},
 	        {3125143736, "Pipe Bomb"},
@@ -2383,7 +2384,7 @@ namespace RNC
                 .Add(WeaponHash.Snspistol_mk2, "https://assets.gm.miami/gtav/weapons/Sns-pistol-mk2-icon.png", "SNS Pistol Mk2", 30);
 
             new LoadoutData(1, "SWAT", 20, 50)
-                .Add(WeaponHash.Microsmg, "https://assets.gm.miami/gtav/weapons/Micro-smg-icon.png", "Micro SMG", 60)
+                .Add(WeaponHash.Microsmg, "https://i.imgur.com/rbqgDgt.png", "Tactical SMG", 60)
                 .Add(WeaponHash.Pumpshotgun, "https://assets.gm.miami/gtav/weapons/Pump-shotgun-icon.png", "Pump Shotgun", 15)
                 .Add(WeaponHash.Bzgas, "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png", "BZ Gas", 2)
                 .Add(WeaponHash.Combatpistol, "https://assets.gm.miami/gtav/weapons/Combat-pistol-icon.png", "Combat Pistol", 30);

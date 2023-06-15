@@ -1014,7 +1014,7 @@ mp.events.add("MenuChangeSettings", (id, value) =>
     }
     else if(id == 24)
     {
-        changeMDCBind(value);
+        changeMdcBind(value);
     }
     else if(id == 25){
         mp.storage.data.menu.Speedo = value;
@@ -1057,6 +1057,70 @@ mp.events.add("MenuChangeSettings", (id, value) =>
 
     mp.storage.flush();
 });
+
+
+function changeActionMenuBind(bind){
+    bind = Number(bind);
+
+    if (!Number.isInteger(bind)) {
+        return;
+    }
+
+    if(mp.storage.data.actionmenubind !== undefined){
+        mp.keys.unbind(mp.storage.data.actionmenubind, true, global.actionMenuOpen);
+        mp.keys.unbind(mp.storage.data.actionmenubind, false, global.actionMenuClose);
+    }
+    else{
+        mp.keys.unbind(0x59, true, global.actionMenuOpen);
+        mp.keys.unbind(0x59, false, global.actionMenuClose);
+    }
+
+    mp.storage.data.actionmenubind = bind;
+
+    mp.storage.flush();
+
+    global.lastActionMenuBind = global.curActionMenuBind;
+    global.curActionMenuBind = bind;
+
+    mp.keys.unbind(global.lastActionMenuBind, true, global.actionMenuOpen);
+    mp.keys.unbind(global.lastActionMenuBind, false, global.actionMenuClose);
+    mp.keys.bind(global.curActionMenuBind, true, global.actionMenuOpen);
+    mp.keys.bind(global.curActionMenuBind, false, global.actionMenuClose);
+
+    mp.events.callLocal("HUDNotify", `MDC key is now binded to <strong>${String.fromCharCode(global.curActionMenuBind)}</strong>.`, "blue", "fas fa-check", false, 
+        1000, "bottomCenter", "replace");
+
+    mp.events.callLocal("RemoveTooltip", String.fromCharCode(global.lastActionMenuBind));
+}
+function changeMdcBind(bind){
+    bind = Number(bind);
+
+    if (!Number.isInteger(bind)) {
+        return;
+    }
+
+    if(mp.storage.data.mdcbind !== undefined){
+        mp.keys.unbind(mp.storage.data.mdcbind, true, global.ToggleMDC);
+    }
+    else{
+        mp.keys.unbind(0x4B, true, global.ToggleMDC);
+    }
+
+    mp.storage.data.mdcbind = bind;
+
+    mp.storage.flush();
+
+    global.lastMDCBind = global.curMDCBind;
+    global.curMDCBind = bind;
+
+    mp.keys.unbind(global.lastMDCBind, true, global.ToggleMDC);
+    mp.keys.bind(global.curMDCBind, true, global.ToggleMDC);
+
+    mp.events.callLocal("HUDNotify", `MDC key is now binded to <strong>${String.fromCharCode(global.curMDCBind)}</strong>.`, "blue", "fas fa-check", false, 
+        1000, "bottomCenter", "replace");
+
+    mp.events.callLocal("RemoveTooltip", String.fromCharCode(global.lastMDCBind));
+}
 
 mp.events.add("Menu_UpdateLevelXP", (first_time = false) => {
     setTimeout(() => {

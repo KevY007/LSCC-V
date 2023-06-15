@@ -442,7 +442,7 @@ function Render3DMapMatrix(){
                 if(distance < 1000){
                     let getStreet = mp.game.pathfind.getStreetNameAtCoord((currentX+125), (currentY+125), Z_value, 0, 0);
                     let zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone((currentX+125), (currentY+125), Z_value));
-                    let realStreet = mp.game.ui.getStreetNameFromHashKey(getStreet.global.streetName);
+                    let realStreet = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
         
                     mp.game.graphics.drawText(`${global.zoneName}\n${realStreet}`, [(currentX+125), (currentY+125), (Z_value+0.5)], {
                         font:4,
@@ -466,7 +466,7 @@ function Render3DMapMatrix(){
         let getStreet = mp.game.pathfind.getStreetNameAtCoord(posx, posy, posz, 0, 0);
 
     global.zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(posx, posy, posz));
-    global.streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.global.streetName);
+    global.streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
 
     mp.gui.chat.push(`!{#FFEC8B}** [RADIO | FREQ: 911] DISPATCH: Felon ${name} last spotted at ${global.streetName}, ${global.zoneName}.`);
     */
@@ -741,69 +741,7 @@ if(mp.storage.data.mdcbind !== undefined){
     global.lastMDCBind = mp.storage.data.mdcbind;
 }
 
-function changeActionMenuBind(bind){
-    bind = Number(bind);
 
-    if (!Number.isInteger(bind)) {
-        return;
-    }
-
-    if(mp.storage.data.actionmenubind !== undefined){
-        mp.keys.unbind(mp.storage.data.actionmenubind, true, global.actionMenuOpen);
-        mp.keys.unbind(mp.storage.data.actionmenubind, false, global.actionMenuClose);
-    }
-    else{
-        mp.keys.unbind(0x59, true, global.actionMenuOpen);
-        mp.keys.unbind(0x59, false, global.actionMenuClose);
-    }
-
-    mp.storage.data.actionmenubind = bind;
-
-    mp.storage.flush();
-
-    global.lastActionMenuBind = global.curActionMenuBind;
-    global.curActionMenuBind = bind;
-
-    mp.keys.unbind(global.lastActionMenuBind, true, global.actionMenuOpen);
-    mp.keys.unbind(global.lastActionMenuBind, false, global.actionMenuClose);
-    mp.keys.bind(global.curActionMenuBind, true, global.actionMenuOpen);
-    mp.keys.bind(global.curActionMenuBind, false, global.actionMenuClose);
-
-    mp.events.callLocal("HUDNotify", `MDC key is now binded to <strong>${String.fromCharCode(global.curActionMenuBind)}</strong>.`, "blue", "fas fa-check", false, 
-        1000, "bottomCenter", "replace");
-
-    mp.events.callLocal("RemoveTooltip", String.fromCharCode(global.lastActionMenuBind));
-}
-
-function changeMdcBind(bind){
-    bind = Number(bind);
-
-    if (!Number.isInteger(bind)) {
-        return;
-    }
-
-    if(mp.storage.data.mdcbind !== undefined){
-        mp.keys.unbind(mp.storage.data.mdcbind, true, global.ToggleMDC);
-    }
-    else{
-        mp.keys.unbind(0x4B, true, global.ToggleMDC);
-    }
-
-    mp.storage.data.mdcbind = bind;
-
-    mp.storage.flush();
-
-    global.lastMDCBind = global.curMDCBind;
-    global.curMDCBind = bind;
-
-    mp.keys.unbind(global.lastMDCBind, true, global.ToggleMDC);
-    mp.keys.bind(global.curMDCBind, true, global.ToggleMDC);
-
-    mp.events.callLocal("HUDNotify", `MDC key is now binded to <strong>${String.fromCharCode(global.curMDCBind)}</strong>.`, "blue", "fas fa-check", false, 
-        1000, "bottomCenter", "replace");
-
-    mp.events.callLocal("RemoveTooltip", String.fromCharCode(global.lastMDCBind));
-}
 
 mp.keys.bind(global.lastActionMenuBind, true, global.actionMenuOpen);
 mp.keys.bind(global.lastActionMenuBind, false, global.actionMenuClose);
@@ -973,7 +911,7 @@ mp.events.add("ReportLastSeen", (name, posx, posy, posz) => {
     let getStreet = mp.game.pathfind.getStreetNameAtCoord(posx, posy, posz, 0, 0);
 
     global.zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(posx, posy, posz));
-    global.streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.global.streetName);
+    global.streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
 
     mp.gui.chat.push(Translate("LAST_SEEN_REPORT", [name, global.streetName, global.zoneName]));
 });

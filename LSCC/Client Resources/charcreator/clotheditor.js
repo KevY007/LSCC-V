@@ -563,53 +563,75 @@ function getDrawablesListForMenus(mode, gender){
         let BagsTextureLimite = player.getNumberOfTextureVariations(5, player.getDrawableVariation(5));;
         for (i = 0; i < BagsTextureLimite + 1; i++) BagsTextureArray.push(i.toString());
 
-        ArmorDrawable = [-1];
+        ArmorDrawable = [-1, 0];
     
-        ArmorTextureArray = [0];
+        ArmorTextureArray = [0, 1];
     }
     else{
         if(mode === 1){
             if(gender === 'M'){
+
+                const Offsets = { // Clothing ID offsets for when Rockstar decides to fuck up and add new clothes
+                    Jacket:53,
+                    Shirt:0,
+                    Pants:17,
+                    Shoes:9,
+                    Accessories:8,
+                    Bags:0,
+                    Armor:0
+                }
+
                 JacketsDrawable = [];
-                for(let i = 446 ; i <= 499 ; i++) JacketsDrawable.push(i.toString());
+                for(let i = 446 ; i <= 499 ; i++) JacketsDrawable.push((i+Offsets.Jacket).toString());
 
                 ShirtsDrawable = ['15'];
-                for(let i = 199 ; i <= 244 ; i++) ShirtsDrawable.push(i.toString());
+                for(let i = 199 ; i <= 244 ; i++) ShirtsDrawable.push((i+Offsets.Shirt).toString());
 
                 PantsDrawable = [];
-                for(let i = 163 ; i <= 175 ; i++) PantsDrawable.push(i.toString());
+                for(let i = 163 ; i <= 175 ; i++) PantsDrawable.push((i+Offsets.Pants).toString());
 
                 ShoesDrawable = ['126', '127', '24', '25'];
 
                 AccessoriesDrawable = ['0'];  
-                for(let i = 167 ; i <= 184 ; i++) AccessoriesDrawable.push(i.toString());
+                for(let i = 167 ; i <= 184 ; i++) AccessoriesDrawable.push((i+Offsets.Accessories).toString());
     
                 BagsDrawable = ['0'];
-                for(let i = 111 ; i <= 145 ; i++) BagsDrawable.push(i.toString());
+                for(let i = 111 ; i <= 145 ; i++) BagsDrawable.push((i+Offsets.Bags).toString());
 
                 ArmorDrawable = ['0'];
-                for(let i = 62 ; i <= 82 ; i++) ArmorDrawable.push(i.toString());
+                for(let i = 62 ; i <= 82 ; i++) ArmorDrawable.push((i+Offsets.Armor).toString());
             }
             else if(gender === 'F'){
+
+                const Offsets = { // Clothing ID offsets for when Rockstar decides to fuck up and add new clothes
+                    Jacket:61,
+                    Shirt:0,
+                    Pants:0,
+                    Shoes:12,
+                    Accessories:9,
+                    Bags:0,
+                    Armor:0
+                }
+
                 JacketsDrawable = [];
-                for(let i = 474 ; i <= 522 ; i++) JacketsDrawable.push(i.toString());
+                for(let i = 474 ; i <= 522 ; i++) JacketsDrawable.push((i+Offsets.Jacket).toString());
 
                 ShirtsDrawable = ['15'];
-                for(let i = 238 ; i <= 279 ; i++) ShirtsDrawable.push(i.toString());
+                for(let i = 238 ; i <= 279 ; i++) ShirtsDrawable.push((i+Offsets.Shirt).toString());
 
                 PantsDrawable = [];
-                for(let i = 171 ; i <= 176 ; i++) PantsDrawable.push(i.toString());
+                for(let i = 171 ; i <= 176 ; i++) PantsDrawable.push((i+Offsets.Pants).toString());
 
                 ShoesDrawable = ['25', '27'];
 
                 AccessoriesDrawable = ['0'];  
-                for(let i = 136 ; i <= 147 ; i++) AccessoriesDrawable.push(i.toString());
+                for(let i = 136 ; i <= 147 ; i++) AccessoriesDrawable.push((i+Offsets.Accessories).toString());
     
                 BagsDrawable = ['0'];
-                for(let i = 111 ; i <= 141 ; i++) BagsDrawable.push(i.toString());
+                for(let i = 111 ; i <= 141 ; i++) BagsDrawable.push((i+Offsets.Bags).toString());
 
                 ArmorDrawable = ['0'];
-                for(let i = 57 ; i <= 81 ; i++) ArmorDrawable.push(i.toString());
+                for(let i = 57 ; i <= 81 ; i++) ArmorDrawable.push((i+Offsets.Armor).toString());
             }
     
             let numJacketsInstalled = 0; // EXTRA INSTALLED THROUGH ADOON PACK THAT APPEAR AT LAST.
@@ -1039,8 +1061,8 @@ function getDrawablesListForMenus(mode, gender){
     menuClothingArmor.ListChange.on((item, listIndex) => {
         if(!ArmorItem || !ArmorTextureItem || !ArmorItem.SelectedItem || !ArmorItem.SelectedItem.DisplayText || !ArmorTextureItem.SelectedItem || !ArmorTextureItem.SelectedItem.DisplayText) return;
 
-        let drawable = parseInt(ArmorItem.SelectedItem.DisplayText);
-        let texture = parseInt(ArmorTextureItem.SelectedItem.DisplayText);
+        let drawable = parseInt((ArmorItem.SelectedItem.DisplayText ? ArmorItem.SelectedItem.DisplayText : "-1"));
+        let texture = parseInt((ArmorTextureItem.SelectedItem.DisplayText ? ArmorTextureItem.SelectedItem.DisplayText : "0"));
         switch (item) {
             case ArmorItem:
                 mp.events.callRemote('RequestSetClothes', 9, drawable, 0);

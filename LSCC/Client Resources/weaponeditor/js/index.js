@@ -39,7 +39,7 @@ function showCategories(){
     InfoText.innerHTML = "Select a category"
 
     ItemsHolder.innerHTML = "";
-    for(let i = 0 ; i < global.weaponData.length ; i++){
+    for(let i = 0 ; i < weaponData.length ; i++){
         let type = weaponData[i].Type;
         if(blockedCategories.includes(type)) continue;
         if(document.getElementById(`category_${type}`) == undefined){
@@ -97,7 +97,7 @@ function openCategory(type, sound=true){
 
     ItemsHolder.innerHTML = "";
 
-    global.weaponData.filter(w => w.Type == type).forEach((weapon) => {   
+    weaponData.filter(w => w.Type == type).forEach((weapon) => {   
         let element = `
             <div class="weapon-item" id="weapon_${weapon.Name}" onclick="openWeapon('${weapon.Name}')">
                 <img style="height:48px; width:auto;" src="${weapon.ImageSrc}"/>
@@ -129,7 +129,7 @@ function openWeapon(name, sound=true){
             </div>
         </div>
     `;
-    let weapon = global.weaponData.find(w => w.Name == name);
+    let weapon = weaponData.find(w => w.Name == name);
     CurrentWeapon = weapon;
     CurrentAttachment = undefined;
     document.getElementById("option-button").style.display = "none";

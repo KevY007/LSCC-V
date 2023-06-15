@@ -21,6 +21,13 @@ const weaponData = [
     "Hash": "0xF9E6AA4B"
   },
   {
+    "id": "weapon_tacticalsmg",
+    "Name": "Tactical SMG",
+    "Type": "Submachine Guns",
+    "ImageSrc:": "https://i.imgur.com/rbqgDgt.png",
+    "Hash": "0x14E5AFD5"
+  },
+  {
     "id": "weapon_crowbar",
     "Name": "Crowbar",
     "Type": "Melee",

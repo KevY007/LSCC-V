@@ -1,3 +1,4 @@
+var global = require('./globals');
 let editorTeam = -1;
 
 mp.events.add("ClothingEditor:exit", (save) => {

@@ -1,6 +1,6 @@
 var global = require('./globals');
 const {TranslateMessage: Translate} = require('./Translator');
-var WeaponEditorDOM;
+
 var WeaponEditorCamera;
 
 var editor_MoveFromCam;
@@ -34,10 +34,10 @@ function moveCam(x, y, z, rx, ry, rz, time, newviewangle){
 
 mp.events.add("WeaponEditor:exit", () => {
     global.WeaponEditorActive = false;
-    WeaponEditorDOM.execute(`resetWeaponEditor();`);
+    global.WeaponEditorDOM.execute(`resetWeaponEditor();`);
     mp.events.callRemote("WeaponEditor:onExit");
 
-    WeaponEditorDOM.active = false;
+    global.WeaponEditorDOM.active = false;
     if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = ${mp.storage.data.menu.HUD.toString()};`);
     mp.game.ui.displayRadar(true);
     mp.game.ui.displayHud(true);
@@ -92,7 +92,7 @@ mp.events.add("WeaponEditor:show", () => {
     WeaponEditorCamera.setActive(true);
     mp.game.cam.renderScriptCams(true, false, 0, true, false);
 
-    WeaponEditorDOM.active = true;
+    global.WeaponEditorDOM.active = true;
     mp.gui.cursor.show(true, true);
 
     mp.players.local.taskPlayAnim("weapons@pistol@stealth", "aim_med_loop", 10.0, 1.0, -1, 1, 1.0, false, false, false); 
@@ -160,7 +160,7 @@ mp.events.add("WeaponEditor:sendComponentList", (data) => {
       mp.players.local.taskPlayAnim("weapons@pistol@stealth", "aim_med_loop", 10.0, 1.0, -1, 1, 1.0, false, false, false); 
       mp.game.invoke('0xADF692B254977C0C', mp.players.local.handle, (hash)>>0, true);
     }, 500);
-    WeaponEditorDOM.execute(`setComponentList(${data})`);
+    global.WeaponEditorDOM.execute(`setComponentList(${data})`);
 });
 mp.events.add("WeaponEditor:requestAttachmentPurchase", (comphash, price) => {
     mp.events.callRemote("WeaponEditor:onRequestPurchaseAttachment", comphash, price);
@@ -169,8 +169,8 @@ mp.events.add("WeaponEditor:requestAttachmentRemove", (comphash, price) => {
   mp.events.callRemote("WeaponEditor:onRequestRemoveAttachment", comphash, price);
 });
 mp.events.add("WeaponEditor:sendPurchaseResponse", (comphash) => {
-    WeaponEditorDOM.execute(`setAttachmentPurchased('${comphash}', true)`);
+    global.WeaponEditorDOM.execute(`setAttachmentPurchased('${comphash}', true)`);
 });
 mp.events.add("WeaponEditor:sendRemoveResponse", (comphash) => {  
-  WeaponEditorDOM.execute(`setAttachmentPurchased('${comphash}', false)`);
+  global.WeaponEditorDOM.execute(`setAttachmentPurchased('${comphash}', false)`);
 });

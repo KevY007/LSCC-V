@@ -431,6 +431,13 @@ const boneData = [
         "Hash": "0x13532244"
       },
       {
+        "id": "weapon_tacticalsmg",
+        "Name": "Tactical SMG",
+        "Type": "Submachine Guns",
+        "ImageSrc:": "https://i.imgur.com/rbqgDgt.png",
+        "Hash": "0x14E5AFD5"
+      },
+      {
         "id": "weapon_smg",
         "Name": "SMG",
         "Type": "Submachine Guns",
@@ -1014,8 +1021,8 @@ function InitializeMDC(){
     global.MDC_DOM.active = false;
 }
 function InitializeWeaponEditor(){
-    WeaponEditorDOM = mp.browsers.new("package://weaponeditor/index.html");
-    WeaponEditorDOM.active = false;
+    global.WeaponEditorDOM = mp.browsers.new("package://weaponeditor/index.html");
+    global.WeaponEditorDOM.active = false;
 }
 function InitializeClothingEditorDOM(){
     global.ClothingEditorDOM = mp.browsers.new("package://clothing_editor/index.html");
@@ -1029,6 +1036,20 @@ function InitializeServerUI(){
 
   ServerUI = mp.browsers.new("package://ServerUI/index.html");
   return ServerUI;
+}
+
+// Check if holding sniper for the crosshair
+let sniperHashes = [3342088282, 1785463520, 205991906, 177293209, 100416529];
+function isHoldingSniper() {
+  let returnValue = false;
+  if (mp.players.local != undefined && mp.players.exists(mp.players.local)) {
+    if (mp.players.local.weapon != undefined) {
+      if (sniperHashes.includes(mp.players.local.weapon)) {
+        returnValue = true;
+      }
+    }
+  }
+  return returnValue;
 }
 
 let global = {
@@ -1056,6 +1077,8 @@ let global = {
   currentMuteTime: 0,
   lastMuteUpdate: 10,
   lastFunc: "Init",
+
+  WeaponEditorDOM:null,
 
   curMDCBind: 0x4B,
   lastMDCBind: 0x4B,
@@ -1140,5 +1163,6 @@ let global = {
   AddCustomVehiclesToSpawner,
   calcDist,
   InitializeServerUI,
+  isHoldingSniper,
 };
 exports = global;

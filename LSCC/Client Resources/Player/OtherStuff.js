@@ -797,20 +797,6 @@ mp.events.add("render", () => {
   }
 });
 
-// Check if holding sniper for the crosshair
-let sniperHashes = [3342088282, 1785463520, 205991906, 177293209, 100416529];
-function isHoldingSniper() {
-  let returnValue = false;
-  if (mp.players.local != undefined && mp.players.exists(mp.players.local)) {
-    if (mp.players.local.weapon != undefined) {
-      if (sniperHashes.includes(mp.players.local.weapon)) {
-        returnValue = true;
-      }
-    }
-  }
-  return returnValue;
-}
-
 // Screenshotter
 
 let ssViewCEF = null;

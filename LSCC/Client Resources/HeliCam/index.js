@@ -195,7 +195,7 @@ function UpdateHeliCamCEF(vehicle){
 //
      const getStreet = mp.game.pathfind.getStreetNameAtCoord(vehicle.position.x, vehicle.position.y, vehicle.position.z, 0, 0);
      const zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(vehicle.position.x, vehicle.position.y, vehicle.position.z));
-     const streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.global.streetName);
+     const streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
 //
 //
      //const fuelStr = fuel ? `${Math.floor(fuel)}%` : `∞`;

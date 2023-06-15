@@ -1274,7 +1274,7 @@ mp.events.add("UpdateRateEvent", () => {
         let getStreet = mp.game.pathfind.getStreetNameAtCoord(position.x, position.y, position.z, 0, 0);
 
         global.zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(position.x, position.y, position.z));
-        global.streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.global.streetName);
+        global.streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
         */
         global.zoneName = mp.game.hud.getCurrentAreaNameString();
         global.streetName = mp.game.hud.getCurrentStreetNameString();
@@ -1722,7 +1722,7 @@ function isVehicleInLOS(target, startpos) {
 }
 
 mp.events.add("render", () => {
-    
+
     mp.game.ui.hideHudComponentThisFrame(7); // area name
     mp.game.ui.hideHudComponentThisFrame(9); // street name
     mp.game.ui.hideHudComponentThisFrame(6); // vehicle name
@@ -1770,7 +1770,7 @@ mp.events.add("render", () => {
                     }
                 }
                 else{
-                    if(isHoldingSniper()){
+                    if(global.isHoldingSniper()){
                         if(global.showCustomCrosshairInSniper){
                             global.customCrosshairOn = true;                           
                         }
@@ -1785,7 +1785,7 @@ mp.events.add("render", () => {
             }
             else{
                 if(mp.game.player.isFreeAiming()){                              
-                    if(isHoldingSniper()){
+                    if(global.isHoldingSniper()){
                         if(global.showCustomCrosshairInSniper){
                             global.customCrosshairOn = true;                          
                         }
@@ -1803,7 +1803,7 @@ mp.events.add("render", () => {
                         global.customCrosshairOn = true;
                     }
                     else{
-                        if(isHoldingSniper()){
+                        if(global.isHoldingSniper()){
                             if(global.showCustomCrosshairInSniper){
                                 global.customCrosshairOn = true;                          
                             }
