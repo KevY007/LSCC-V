@@ -2384,7 +2384,7 @@ namespace RNC
                 .Add(WeaponHash.Snspistol_mk2, "https://assets.gm.miami/gtav/weapons/Sns-pistol-mk2-icon.png", "SNS Pistol Mk2", 30);
 
             new LoadoutData(1, "SWAT", 20, 50)
-                .Add(WeaponHash.Microsmg, "https://i.imgur.com/rbqgDgt.png", "Tactical SMG", 60)
+                .Add((WeaponHash)350597077, "https://i.imgur.com/rbqgDgt.png", "Tactical SMG", 60)
                 .Add(WeaponHash.Pumpshotgun, "https://assets.gm.miami/gtav/weapons/Pump-shotgun-icon.png", "Pump Shotgun", 15)
                 .Add(WeaponHash.Bzgas, "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png", "BZ Gas", 2)
                 .Add(WeaponHash.Combatpistol, "https://assets.gm.miami/gtav/weapons/Combat-pistol-icon.png", "Combat Pistol", 30);

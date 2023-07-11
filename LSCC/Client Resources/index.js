@@ -248,25 +248,26 @@ mp.events.add('showLoginBrowser', (state) => {
         if(global.ServerUI != null)
         {      
             if(global.ServerUI.active) global.ServerUI.active = true;
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = false;`);
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
+            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = false;`);
+            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
+            if(global.ServerUI) global.ServerUI.call(`mainmenu_toggle`, false);
             if(state){
-                if(global.ServerUI){
+                /*if(global.ServerUI){
                   global.ServerUI.execute(`gm.$refs.auth.startLoading(1);`); // initiate the fake loading screen to allow CEF sounds and shit duhh
-                }
+                }*/
+                if(global.ServerUI) global.ServerUI.call(`auth_toggle`, true);
                 toggleLoginScene(true);
                 mp.events.callRemote("requestQuickLoginForgotUsernameData"); // yes
-                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.items = [];`);
+                //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.items = [];`);
                 mp.events.callLocal("actionMenu:removeAllItems");
             }
             else{
-                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.authSuccess = true;`);
-                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.stop();`);
+                //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.authSuccess = true;`);
+                //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.stop();`);
                 setTimeout(() => {
                     if(!mp.players.local || !mp.players.exists(mp.players.local)) return;
 
-                    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.enabled = false;`);
+                    if(global.ServerUI) global.ServerUI.call(`auth_toggle`, false);
                     if(!global.IsInTutorial)
                         if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = true;`);
                 }, 1000);
@@ -374,12 +375,12 @@ mp.events.add('requestAutoLoginData', () => {
 mp.events.add('sendAutoLoginDataToBrowser', (data) => {
     setTimeout(() => {
         if(data.length > 2)
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.login.quickLogin.username = "${data}"`);
+            if(global.ServerUI) global.ServerUI.call(`auth_quick_login_set`, data);
     }, 500);
 });
 mp.events.add('sendForgotUsernameToBrowser', (data) => {
     setTimeout(() => {
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.login.possibleUsernames = ${data}`);
+        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.login.possibleUsernames = ${data}`);
     }, 500);
 
 });

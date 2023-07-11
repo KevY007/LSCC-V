@@ -34,6 +34,34 @@ function UpdateStatsVars(entity, all = true){
         {
             if(global.ServerUI !== undefined && global.ServerUI != null){
 
+              global.ServerUI.call("set_user", {
+                serverId: player.remoteId,
+                id: player.getVariable("SQL_ID"),
+                name: player.name,
+                level: player.getVariable("Level"),
+                fugitive: (player.getVariable("Team") == 0).toString(),
+                xp: player.getVariable("CurrentXP"),
+                nextLevelXp: player.getVariable("NextLevelXP"),
+                createdAt: player.getVariable("RegisterDate"),
+                points: player.getVariable("Points"),
+                admin: player.getVariable("Admin"),
+                donator: player.getVariable("Donator"),
+                donatorPoints: player.getVariable("DonatorPoints"),
+                api: player.getVariable("ScreenshotServerAPI"),
+                lobbyId: player.getVariable("InLobby"),
+                teamId: player.getVariable("Team"),
+                heading: player.heading,
+                location:{
+                    x: player.position.x,
+                    y: player.position.y,
+                    z: player.position.z,
+                },
+                clan:{
+                  id: player.getVariable("ClanID"),
+                  tier: player.getVariable("ClanTier")
+                }
+              })
+              /*
                 if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.$refs.states.setUser(["stats"], {
                     serverId: ${player.remoteId},
                     id: ${player.getVariable("SQL_ID")},
@@ -61,6 +89,7 @@ function UpdateStatsVars(entity, all = true){
                     id: ${player.getVariable("ClanID")},
                     tier: ${player.getVariable("ClanTier")}
                 })`);
+                */
                 
                 if(all === true){            
                     if(global.CommandsDataJSON){
@@ -434,7 +463,7 @@ const boneData = [
         "id": "weapon_tacticalsmg",
         "Name": "Tactical SMG",
         "Type": "Submachine Guns",
-        "ImageSrc:": "https://i.imgur.com/rbqgDgt.png",
+        "ImageSrc": "https://i.imgur.com/rbqgDgt.png",
         "Hash": "0x14E5AFD5"
       },
       {

@@ -24,7 +24,7 @@ const weaponData = [
     "id": "weapon_tacticalsmg",
     "Name": "Tactical SMG",
     "Type": "Submachine Guns",
-    "ImageSrc:": "https://i.imgur.com/rbqgDgt.png",
+    "ImageSrc": "https://i.imgur.com/rbqgDgt.png",
     "Hash": "0x14E5AFD5"
   },
   {
