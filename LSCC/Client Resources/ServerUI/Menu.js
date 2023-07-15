@@ -532,9 +532,10 @@ mp.events.add("MenuToggleTyping", (state) => {
     }
 });
 function updateMenuSettingsTab(){
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.categories = [
+    if(global.ServerUI) global.ServerUI.call(`mainmenu_settings_set`, [
         {
             name: "Game",
+            icon: "fa-duotone fa-gamepad-modern",
             settings:[
                 {
                     id: 29,
@@ -677,6 +678,7 @@ function updateMenuSettingsTab(){
         },
         {
             name: "Keybinds",
+            icon: "fa-duotone fa-keyboard",
             settings: [
                 {
                     id: 7,
@@ -717,6 +719,7 @@ function updateMenuSettingsTab(){
         },
         {
             name: "Display",
+            icon: "fa-duotone fa-tv",
             settings: [
                 {
                     id: 9,
@@ -789,15 +792,15 @@ function updateMenuSettingsTab(){
                     description: "How fast should blips & UI segments update.",
                     options: [
                       {
-                        name: "Slow",
+                        label: "Slow",
                         value: "1000",
                       },
                       {
-                        name: "Normal",
+                        label: "Normal",
                         value: "200",
                       },
                       {
-                        name: "Fast",
+                        label: "Fast",
                         value: "10",
                       },
                     ]
@@ -813,6 +816,7 @@ function updateMenuSettingsTab(){
         },
         {
             name: "Chat",
+            icon: "fa-duotone fa-messages",
             settings: [
                 {
                     id: 13,
@@ -863,8 +867,18 @@ function updateMenuSettingsTab(){
                 },
             ]
         }
-    ]`);
+    ]);
 
+    if(global.ServerUI){
+        global.ServerUI.call("mainmenu_setting_value_set", 1, mp.storage.data.menu.HUD);
+        global.ServerUI.call("mainmenu_setting_value_set", 2, mp.storage.data.menu.killFeed);
+        global.ServerUI.call("mainmenu_setting_value_set", 3, mp.storage.data.menu.gameProgress);
+        global.ServerUI.call("mainmenu_setting_value_set", 4, mp.storage.data.menu.alwaysExpandedMap);
+        global.ServerUI.call("mainmenu_setting_value_set", 5, mp.storage.data.menu.tooltips);
+        global.ServerUI.call("mainmenu_setting_value_set", 6, mp.storage.data.menu.updateRate);
+        global.ServerUI.call("mainmenu_setting_value_set", 7, String.fromCharCode(global.curVoiceBind));
+    }
+/*
     if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.tri[0].value = ${mp.storage.data.menu.topRightInfo}`);
     if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.gp[0].value = ${mp.storage.data.menu.gameProgress};`);
     if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.tooltips[0].value = ${mp.storage.data.menu.tooltips};`);
@@ -896,10 +910,12 @@ function updateMenuSettingsTab(){
     if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.voicemode[0].value = "${menuSetting_getOptionNameFromValue("voicemode", mp.storage.data.menu.VoiceMode)}";`);
     
     if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.chataccessibility[0].value = ${mp.storage.data.menu.ChatAccessibility.toString()};`);
+*/
 }
 // ID 69420 ==> Custom Crosshair Toggle | ID 69421 ==> Always On Crosshair |  ID 69422 ==> Sniper Custom or Default crosshair
 mp.events.add("MenuChangeSettings", (id, value) => 
 {
+    mp.events.callRemote("ServerConsoleOutput", `Setting change: ${id} value is ${value}`);
     if(id == 1)
     {
         mp.storage.data.menu.topRightInfo = value;
