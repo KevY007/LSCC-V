@@ -5881,19 +5881,19 @@ namespace RNC
 
                 string requirements = "[";
                 if (car.LevelRequired > 0)
-                    requirements += $"{{text:\"Level {car.LevelRequired}\", meets:{(_a.Level >= car.LevelRequired).ToString().ToLower()}}},";
+                    requirements += $"{{\"text\":\"Level {car.LevelRequired}\", \"meets\":{(_a.Level >= car.LevelRequired).ToString().ToLower()}}},";
 
                 if (car.PointsRequired > 0)
-                    requirements += $"{{text:\"{car.PointsRequired} Points\", meets:{(_a.Points >= car.PointsRequired).ToString().ToLower()}}},";
+                    requirements += $"{{\"text\":\"{car.PointsRequired} Points\", \"meets\":{(_a.Points >= car.PointsRequired).ToString().ToLower()}}},";
 
                 if (car.DonatorPointsRequired > 0)
-                    requirements += $"{{text:\"{car.DonatorPointsRequired} Donator Points\", meets:{(_a.DonatorPoints >= car.DonatorPointsRequired).ToString().ToLower()}}},";
+                    requirements += $"{{\"text\":\"{car.DonatorPointsRequired} Donator Points\", \"meets\":{(_a.DonatorPoints >= car.DonatorPointsRequired).ToString().ToLower()}}},";
 
                 if (car.DonatorLevelRequired > 0)
-                    requirements += $"{{text:\"{EPlayer.GetDonatorLevelName(car.DonatorLevelRequired)}\", meets:{(_a.DonatorLevel >= car.DonatorLevelRequired).ToString().ToLower()}}},";
+                    requirements += $"{{\"text\":\"{EPlayer.GetDonatorLevelName(car.DonatorLevelRequired)}\", \"meets\":{(_a.DonatorLevel >= car.DonatorLevelRequired).ToString().ToLower()}}},";
 
                 if (requirements.Length < 2)
-                    requirements = "[{text:\"Free\", meets:true}";
+                    requirements = "[{\"text\":\"Free\", \"meets\":true}";
 
                 requirements += "]";
 
@@ -6054,28 +6054,28 @@ namespace RNC
             List<object[]> loadoutItems = new List<object[]>();
             foreach (var loadout in Settings.Loadouts)
             {
-                string weaponString = "\"weapons\": [";
+                string weaponString = "[";
 
                 foreach (var weapon in loadout.Weapons)
                 {
-                    weaponString += "{name: \"" + (string)weapon[2] + "\", img: \"" + (string)weapon[1] + "\", ammo: " + (int)weapon[3] + ",},";
+                    weaponString += "{\"name\": \"" + (string)weapon[2] + "\", \"img\": \"" + (string)weapon[1] + "\", \"ammo\": " + (int)weapon[3] + ",},";
                 }
 
-                weaponString += "],";
+                weaponString += "]";
 
-                string requirements = "\"requirements\":[";
+                string requirements = "[";
                 if (loadout.LevelRequired > 0)
-                    requirements += $"{{text:\"Level {loadout.LevelRequired}\", meets:{(acc.Level >= loadout.LevelRequired).ToString().ToLower()}}},";
+                    requirements += $"{{\"text\":\"Level {loadout.LevelRequired}\", \"meets\":{(acc.Level >= loadout.LevelRequired).ToString().ToLower()}}},";
                 if (loadout.PointsRequired > 0)
-                    requirements += $"{{text:\"{loadout.PointsRequired} Points\", meets:{(acc.Points >= loadout.PointsRequired).ToString().ToLower()}}},";
+                    requirements += $"{{\"text\":\"{loadout.PointsRequired} Points\", \"meets\":{(acc.Points >= loadout.PointsRequired).ToString().ToLower()}}},";
                 if (loadout.DonatorPointsRequired > 0)
-                    requirements += $"{{text:\"{loadout.DonatorPointsRequired} Donator Points\", meets:{(acc.DonatorPoints >= loadout.DonatorPointsRequired).ToString().ToLower()}}},";
+                    requirements += $"{{\"text\":\"{loadout.DonatorPointsRequired} Donator Points\", \"meets\":{(acc.DonatorPoints >= loadout.DonatorPointsRequired).ToString().ToLower()}}},";
                 if (loadout.DonatorLevelRequired > 0)
-                    requirements += $"{{text:\"{EPlayer.GetDonatorLevelName(loadout.DonatorLevelRequired)}\", meets:{(acc.DonatorLevel >= loadout.DonatorLevelRequired).ToString().ToLower()}}},";
-                if (requirements == "\"requirements\":[")
-                    requirements = "\"requirements\":[{text:\"Free\", meets:true}";
+                    requirements += $"{{\"text\":\"{EPlayer.GetDonatorLevelName(loadout.DonatorLevelRequired)}\", \"meets\":{(acc.DonatorLevel >= loadout.DonatorLevelRequired).ToString().ToLower()}}},";
+                if (requirements == "[")
+                    requirements = "[{\"text\":\"Free\", \"meets\":true}";
 
-                requirements += "],";
+                requirements += "]";
 
                 bool hasOwnedLoadout = await EPlayer.HasOwnedLoadout(acc, loadout.Name, loadout.Team);
                 loadoutItems.Add(new object[]
@@ -6101,7 +6101,7 @@ namespace RNC
                 case "play":
                     UpdatePlayRoomData(player);
                     break;
-                case "store":
+                case "inventory":
                     Task.Run(async () =>
                     {
                         List<object[]> loadoutData = await Menu_LoadoutData(acc);
@@ -6114,6 +6114,7 @@ namespace RNC
                         });
                     });
                     break;
+                    /*
                 case "inventory":
                     Task.Run(async () =>
                     {
@@ -6127,6 +6128,7 @@ namespace RNC
                         });
                     });
                     break;
+                    */
                 case "profile":
                     player.TriggerEvent("addAchievementsToMenu");
                     break;

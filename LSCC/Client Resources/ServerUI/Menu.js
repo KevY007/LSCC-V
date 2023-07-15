@@ -1373,29 +1373,6 @@ mp.events.add("updateMenuPrivateLobby", (id, name, password, type, playerCount, 
 });
 
 // --------------------
-mp.events.add("UpdateMenuOwnedVehicles", (vehicles, currentCopCar, currentFugiCar) => {
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.vehicles = [];`);
-    // Vehicle Data
-    // Model, Name, Background, Energy, Price, Locked
-    let menuItems = JSON.parse(vehicles);
-    for(let i = 0; i < menuItems.length; i++)
-    {
-        let insertString = `gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.vehicles.push({`;
-        insertString += `"id": ${i}, `;
-        insertString += `"teamId": ${menuItems[i][0]}, `;
-        insertString += `"model": "${menuItems[i][1]}", `;
-        insertString += `"name": "${menuItems[i][2]}", `;
-        insertString += `"image": "${menuItems[i][3]}", `;
-        //insertString += `"locked": ${menuItems[i][4]}, `;
-        insertString += `"speed": "${(menuItems[i][2] !== "Random" ? menuItems[i][5] : "Random")}", `;
-        if(menuItems[i][6].length > 1) insertString += `"requirements": ${menuItems[i][6]},`;
-        insertString += "});";
-
-        if(global.ServerUI) global.ServerUI.execute(insertString);
-    }    
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.selectedVehiclePolice = "${currentCopCar}"`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.selectedVehicleFugitive = "${currentFugiCar}"`);
-});
 mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) => {
     if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.vehiclesTab.vehicles = [];`);
     //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.vehiclesTab.$refs.police.selectedModel = "${currentCopCar}";`);
@@ -1404,51 +1381,31 @@ mp.events.add("UpdateMenuVehicles", (vehicles, currentCopCar, currentFugiCar) =>
     // Vehicle Data
     // Model, Name, Background, Energy, Price, Locked
     let menuItems = JSON.parse(vehicles);
+    let vehicle_items = [];
     for(let i = 0; i < menuItems.length; i++)
     {
-        if(menuItems[i][2] == "Random") continue;
+        //if(menuItems[i][2] == "Random") continue;
 
-        // menuItems[i][0] = team ID | 0 fugitive | 1 cop
-        // menuItems[i][4] = locked true/false | false = owner
-        let insertString = `gm.$refs.mainMenu.$refs.storeTab.$refs.vehiclesTab.vehicles.push({`;
-        insertString += `"id": ${i}, `;
-        insertString += `"teamId": ${menuItems[i][0]}, `;
-        insertString += `"model": "${menuItems[i][1]}", `;
-        insertString += `"name": "${menuItems[i][2]}", `;
-        insertString += `"image": "${menuItems[i][3]}", `;
-        //insertString += `"locked": ${menuItems[i][4]}, `;
-        insertString += `"speed": "${(menuItems[i][2] !== "Random" ? menuItems[i][5] : "Random")}", `;
-        if(menuItems[i][6].length > 1) insertString += `"requirements": ${menuItems[i][6]},`;
-        insertString += "});";
-   
-        if(global.ServerUI) global.ServerUI.execute(insertString);
+        eval(`var requirements_json = ${menuItems[i][6]}`);
+
+        vehicle_items.push({
+            id:i,
+            teamId:menuItems[i][0],
+            model:menuItems[i][1],
+            name:menuItems[i][2],
+            image:menuItems[i][3],
+            owned:!menuItems[i][4], // menuItems[i][4] = "locked" | locked = !owned
+            speed:(menuItems[i][2] !== "Random" ? menuItems[i][5] : "Random"),
+            requirements:requirements_json
+        });        
     }    
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.vehiclesTab.selectedVehiclePolice = "${currentCopCar}"`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.vehiclesTab.selectedVehicleFugitive = "${currentFugiCar}"`);
-});
-mp.events.add("UpdateMenuOwnedLoadouts", (loadouts, currentCopLoadout, currentFugiLoadout) => {
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.loadouts = [];`);
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.$refs.police.selectedLoadout = "${(currentCopLoadout == "?" ? "Default" : currentCopLoadout)}";`);
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.$refs.fugitive.selectedLoadout = "${(currentFugiLoadout == "?" ? "Default" : currentFugiLoadout)}";`);
+    if(global.ServerUI){
+        global.ServerUI.call("mainmenu_inventory_vehicles_set", vehicle_items);   
+        global.ServerUI.call("mainmenu_inventory_current_vehicles_set", currentCopCar, currentFugiCar);
 
-    // Loadout Data
-    // Name, Locked, Background, Requirements, Weapons
-    let menuItems = JSON.parse(loadouts);
-    for(let i = 0; i < menuItems.length; i++)
-    {
-        let insertString = `gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.loadouts.push({`;
-            
-        insertString += `"teamId": ${menuItems[i][0]}, `;
-        insertString += `"name": "${menuItems[i][1]}", `;
-        insertString += `"background": "${menuItems[i][2]}", `;
-        //insertString += `"locked": ${menuItems[i][3]}, `;
-        insertString +=  menuItems[i][4];
-        insertString +=  menuItems[i][5];
-        insertString += "});";
-        if(global.ServerUI) global.ServerUI.execute(insertString);
     }
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.selectedLoadoutPolice = "${currentCopLoadout}"`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.selectedLoadoutFugitive = "${currentFugiLoadout}"`);
+
+   
 });
 mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoadout) => {
     if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.loadouts = [];`);
@@ -1458,26 +1415,31 @@ mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoa
     // Loadout Data
     // Name, Locked, Background, Requirements, Weapons
     let menuItems = JSON.parse(loadouts);
+    let loadout_items = [];
     for(let i = 0; i < menuItems.length; i++)
     {
-        if(menuItems[i][1] == "Default") continue;
 
-        let insertString = "";
+        eval(`var requirements_json_loadout = ${menuItems[i][4]}`);
+        eval(`var weapons_json_loadout = ${menuItems[i][5]}`);
 
-        insertString = `gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.loadouts.push({`;
-        
-        insertString += `"teamId": ${menuItems[i][0]}, `;
-        insertString += `"name": "${menuItems[i][1]}", `;
-        insertString += `"background": "${menuItems[i][2]}", `;
-        //insertString += `"locked": ${menuItems[i][3]}, `;
-        insertString +=  menuItems[i][4];
-        insertString +=  menuItems[i][5];
-        insertString += "});";
-        if(global.ServerUI) global.ServerUI.execute(insertString);
+        loadout_items.push({
+            teamId: menuItems[i][0],
+            name: menuItems[i][1],
+            background: menuItems[i][2],
+            owned:!menuItems[i][3],
+            requirements:requirements_json_loadout,
+            weapons:weapons_json_loadout
+        });
 
     }
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.selectedLoadoutPolice = "${currentCopLoadout}"`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.selectedLoadoutFugitive = "${currentFugiLoadout}"`);
+    if(global.ServerUI){
+
+        let copLoadout = currentCopLoadout === '?' ? "Default" : currentCopLoadout;
+        let fugiLoadout = currentFugiLoadout === '?' ? "Default" : currentFugiLoadout;
+
+        global.ServerUI.call("mainmenu_inventory_loadouts_set", loadout_items);
+        global.ServerUI.call("mainmenu_inventory_current_loadouts_set", copLoadout, fugiLoadout);
+    }
 });
 
 mp.events.add("UpdateMenuPlayRooms", (lobbies, minigames, currentMinigame) => {
