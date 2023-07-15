@@ -1515,6 +1515,7 @@ mp.events.add("UpdateMenuPlayRooms", (lobbies, minigames, currentMinigame) => {
     for(let i = 0; i < menuItems.length; i++)
     {
         let roomType = minigameNameToID(menuItems[i][5]);
+        if(roomType == -1) continue;
 
         play_rooms.push({
             id: (menuItems[i][0]+69420),
