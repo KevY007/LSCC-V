@@ -1480,32 +1480,135 @@ mp.events.add("UpdateMenuLoadouts", (loadouts, currentCopLoadout, currentFugiLoa
     if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.selectedLoadoutFugitive = "${currentFugiLoadout}"`);
 });
 
+mp.events.add("UpdateMenuPlayRooms", (lobbies, minigames, currentMinigame) => {
+    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.rooms = [];`);
+
+    // Lobby Data
+    // ID, Name, Background, Gamemode, Password, Players, MaxPlayers, Description
+    let menuItems = JSON.parse(lobbies);
+    let play_rooms = [];
+    for(let i = 0; i < menuItems.length; i++)
+    {
+        let ownerName = "null";
+        if(menuItems[i][8].length > 0) ownerName = `"${menuItems[i][8]}"`
+
+        let roomType = 0;
+        switch(menuItems[i][3]){
+            case "Standard": roomType = 0; break;
+            case "Busted": roomType = 1; break;
+            default: roomType = 0;
+        }
+
+        play_rooms.push({
+            id: menuItems[i][0],
+            name: menuItems[i][1],
+            image: menuItems[i][2],
+            type: roomType,
+            password:(menuItems[i][4].length > 1 ? menuItems[i][4] : ""),
+            players:menuItems[i][5],
+            maxplayers:menuItems[i][6],
+            joinFunction:"PutPlayerInLobby",
+            owner:(ownerName === "null" ? "" : ownerName)
+        });
+    }
+    menuItems = JSON.parse(minigames);
+    for(let i = 0; i < menuItems.length; i++)
+    {
+        let roomType = minigameNameToID(menuItems[i][5]);
+
+        play_rooms.push({
+            id: (menuItems[i][0]+69420),
+            name:menuItems[i][1],
+            image: menuItems[i][2],
+            players: menuItems[i][3],
+            maxplayers: menuItems[i][4],
+            type: roomType,
+            joinFunction:"RequestJoinMinigame",
+            description:menuItems[i][6]
+        });
+    }
+    play_rooms.push({
+        id: 6969,
+        type: 4,
+        name: "Freeroam",
+        image:
+        "package://Artwork/Freeroam.png",
+        players: menuItems[0][3],
+        maxplayers: 1000,
+        joinFunction: "RequestJoinMinigame",
+    });
+    play_rooms.push({
+        id: 6970,
+        type: 3,
+        name: "Derby",
+        image:
+        "package://Artwork/Derby.jpg",
+        players: menuItems[1][3],
+        maxplayers: 20,
+        joinFunction: "RequestJoinMinigame",
+    });
+
+    var current_room = -1;
+    if(currentMinigame !== -1){
+        if(currentMinigame !== -3 && currentMinigame !== -4){
+            current_room = (currentMinigame + 69420);
+        }
+        else{
+            if(currentMinigame === -3)
+                current_room = 6969;
+
+            if(currentMinigame === -4)
+                current_room = 6970;
+        }
+    }
+    else{
+        current_room = currentMinigame;
+    }
+    if(global.ServerUI) global.ServerUI.call('mainmenu_play_rooms_set', play_rooms);
+    if(global.ServerUI) global.ServerUI.call('mainmenu_play_rooms_current_room_set', current_room);
+    
+});
+
 mp.events.add("UpdateMenuLobbies", (lobbies, currentLobby) => {
     if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.rooms = [];`);
 
     // Lobby Data
     // ID, Name, Background, Gamemode, Password, Players, MaxPlayers, Description
     let menuItems = JSON.parse(lobbies);
+    let play_rooms = [];
     for(let i = 0; i < menuItems.length; i++)
     {
         let ownerName = "null";
         if(menuItems[i][8].length > 0) ownerName = `"${menuItems[i][8]}"`
 
-        let insertString = `gm.$refs.mainMenu.$refs.playTab.rooms.push({`;
-        insertString += `"id": ${menuItems[i][0]}, `;
-        insertString += `"name": "${menuItems[i][1]}", `;
-        insertString += `"image": "${menuItems[i][2]}", `;
-        insertString += `"type": ${(menuItems[i][3] === "Standard" ? 0 : 1)}, `;
-        if(menuItems[i][4].length > 1) insertString += `"password": "${menuItems[i][4]}", `;
-        insertString += `"players": ${menuItems[i][5]}, `;
-        insertString += `"maxplayers": ${menuItems[i][6]},`;
-        insertString += `"joinFunction":"PutPlayerInLobby",`,
-        insertString += `"owner":${ownerName}`;
-        //if(menuItems[i][7].length > 1) insertString += `, "description": "${menuItems[i][7]}"`;
-        insertString += "});";
+        play_rooms.push({
+            id: menuItems[i][0],
+            name: menuItems[i][1],
+            image: menuItems[i][2],
+            type: (menuItems[i][3] === "Standard" ? 0 : 1),
+            password:(menuItems[i][4].length > 1 ? menuItems[i][4] : ""),
+            players:menuItems[i][5],
+            maxplayers:menuItems[i][6],
+            joinFunction:"PutPlayerInLobby",
+            owner:(ownerName === "null" ? "" : ownerName)
+        });
 
-        if(global.ServerUI) global.ServerUI.execute(insertString);
+        // let insertString = `gm.$refs.mainMenu.$refs.playTab.rooms.push({`;
+        // insertString += `"id": ${menuItems[i][0]}, `;
+        // insertString += `"name": "${menuItems[i][1]}", `;
+        // insertString += `"image": "${menuItems[i][2]}", `;
+        // insertString += `"type": ${(menuItems[i][3] === "Standard" ? 0 : 1)}, `;
+        // if(menuItems[i][4].length > 1) insertString += `"password": "${menuItems[i][4]}", `;
+        // insertString += `"players": ${menuItems[i][5]}, `;
+        // insertString += `"maxplayers": ${menuItems[i][6]},`;
+        // insertString += `"joinFunction":"PutPlayerInLobby",`,
+        // insertString += `"owner":${ownerName}`;
+        // //if(menuItems[i][7].length > 1) insertString += `, "description": "${menuItems[i][7]}"`;
+        // insertString += "});";
+
+        //if(global.ServerUI) global.ServerUI.execute(insertString);
     }
+    if(global.ServerUI) global.ServerUI.call('mainmenu_play_rooms_set', play_rooms);
     
     if(currentLobby >= 1)
         if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.currentRoom = ${currentLobby};`);

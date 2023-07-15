@@ -4883,8 +4883,26 @@ namespace RNC
                     Commands.cmd_switchlobby(player, $"{lobbyID}");
             }
 
-            player.TriggerEvent("UpdateMenuLobbies", NAPI.Util.ToJson(Menu_LobbiesData(player)), player.GetSharedData<int>("InLobby"));
-            player.TriggerEvent("UpdateMenuMinigames", NAPI.Util.ToJson(Menu_MinigamesData(player)), (player.GetSharedData<int>("InLobby") < 0) ? player.GetSharedData<int>("InLobby") : player.GetSharedData<int>("InDM"));
+            UpdatePlayRoomData(player);
+        }
+
+        public void UpdatePlayRoomData(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            int roomNumber = -1;
+            if (player.GetSharedData<int>("InLobby") < 0)
+            {
+                roomNumber = player.GetSharedData<int>("InLobby");
+            }
+            else
+            {
+                if (player.GetSharedData<int>("InDM") > -1)
+                    roomNumber = player.GetSharedData<int>("InDM");
+                else
+                    roomNumber = player.GetSharedData<int>("InLobby");
+            }
+            player.TriggerEvent("UpdateMenuPlayRooms", NAPI.Util.ToJson(Menu_LobbiesData(player)), NAPI.Util.ToJson(Menu_MinigamesData(player)), roomNumber);
         }
 
         [RemoteEvent("Server_RequestLogDamage")]
@@ -4965,8 +4983,8 @@ namespace RNC
                 Commands.cmd_dm(player, dmID);
             }
 
-            player.TriggerEvent("UpdateMenuLobbies", NAPI.Util.ToJson(Menu_LobbiesData(player)), player.GetSharedData<int>("InLobby"));
-            player.TriggerEvent("UpdateMenuMinigames", NAPI.Util.ToJson(Menu_MinigamesData(player)), (player.GetSharedData<int>("InLobby") < 0) ? player.GetSharedData<int>("InLobby") : player.GetSharedData<int>("InDM"));
+
+            UpdatePlayRoomData(player);
             player.SetData<long>("LastLobbySwitch", Environment.TickCount64);
         }
         
@@ -6081,8 +6099,7 @@ namespace RNC
             switch (tab)
             {
                 case "play":
-                    player.TriggerEvent("UpdateMenuLobbies", NAPI.Util.ToJson(Menu_LobbiesData(player)), player.GetSharedData<int>("InLobby"));
-                    player.TriggerEvent("UpdateMenuMinigames", NAPI.Util.ToJson(Menu_MinigamesData(player)), (player.GetSharedData<int>("InLobby") < 0) ? player.GetSharedData<int>("InLobby") : player.GetSharedData<int>("InDM"));
+                    UpdatePlayRoomData(player);
                     break;
                 case "store":
                     Task.Run(async () =>
