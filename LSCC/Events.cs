@@ -2588,25 +2588,29 @@ namespace RNC
                         if (player.HasData("FreeroamVehicles"))
                         {
                             freeroamVehs = player.GetData<List<Vehicle>>("FreeroamVehicles");
-
-                            for (int i = freeroamVehs.Count - 1; i >= 0; i--)
+                            if(freeroamVehs != null)
                             {
-                                if (!freeroamVehs[i].IsNull && freeroamVehs[i] != null)
+                                for (int i = freeroamVehs.Count - 1; i >= 0; i--)
                                 {
-                                    freeroamVehs[i].Delete();
-                                    freeroamVehs.RemoveAt(i);
+                                    if (!freeroamVehs[i].IsNull && freeroamVehs[i] != null)
+                                    {
+                                        freeroamVehs[i].Delete();
+                                        freeroamVehs.RemoveAt(i);
+                                    }
                                 }
+
+                                if (freeroamVehs.Count > 0)
+                                {
+                                    for (int i = 0; i < freeroamVehs.Count; i++)
+                                    {
+                                        freeroamVehs.RemoveAt(i);
+                                    }
+                                }
+
+                                freeroamVehs.Clear();
                             }
 
-                            if (freeroamVehs.Count > 0)
-                            {
-                                for (int i = 0; i < freeroamVehs.Count; i++)
-                                {
-                                    freeroamVehs.RemoveAt(i);
-                                }
-                            }
-
-                            freeroamVehs.Clear();
+                            
                         }
                         switch (type)
                         {

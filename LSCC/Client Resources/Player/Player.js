@@ -1323,6 +1323,27 @@ mp.events.add("OneSecondEvent", () => {
     }
 });
 
+var driveby_vehicle = undefined;
+mp.events.add("car_window_test", (offsetX, offsetY, offsetZ, rotX, rotY, rotZ) => {
+    if(!mp.players.local.vehicle) {mp.gui.chat.push("Not in car."); return;};
+    driveby_vehicle = mp.players.local.vehicle;
+    var windowIndex = driveby_vehicle.getBoneIndexByName('window_rf');
+    mp.players.local.taskLeaveVehicle(driveby_vehicle.handle, 16);
+    setTimeout(() => {
+        mp.players.local.attachTo(driveby_vehicle.handle, windowIndex, offsetX, offsetY, offsetZ, rotX, rotY, rotZ, false, true, false, true, 0, false);
+        mp.players.local.setRotation(rotX, rotY, rotZ, 2, true);
+    }, 10);
+});
+mp.events.add("car_window_end", () => {
+    if(!driveby_vehicle) return;
+
+    mp.players.local.detach(true, true);
+    setTimeout(() => {
+        mp.players.local.taskEnterVehicle(driveby_vehicle.handle, 0, -1, 2.0, 16, 0);
+        driveby_vehicle = undefined;
+    }, 10);
+});
+
 // mp.keys.bind(0x4A, false, () => {
 
 //     if (mp.players.local.isInAnyVehicle(false) && global.chatStatus == false && Date.now() - global.lastChatToggle >= 500 && 
