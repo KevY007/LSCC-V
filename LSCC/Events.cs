@@ -7381,7 +7381,7 @@ namespace RNC
             KDR = (double)acc.Kills / (double)acc.Deaths;
             try
             {
-                bool discordLinked = !EPlayer.GetAccount(player).DiscordID.Equals("n/a");
+                bool discordLinked = (EPlayer.GetAccount(player).DiscordID != null && !EPlayer.GetAccount(player).DiscordID.Equals("n/a"));
 
                 player.TriggerEvent("UpdateMenuStatsTab", acc.Email, EPlayer.GetAdminLevelName(acc.Admin, false), acc.Points, acc.DonatorPoints, EPlayer.GetDonatorLevelName(acc.DonatorLevel, false), acc.DerbyWins,
                     acc.Escapes, acc.Arrests, acc.Kills, acc.Deaths, KDR, (acc.MinutesPlayed / 60.0).ToString("N3"), acc.Warns, discordLinked);
