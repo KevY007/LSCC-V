@@ -250,7 +250,8 @@ mp.events.add('showLoginBrowser', (state) => {
             if(global.ServerUI.active) global.ServerUI.active = true;
             //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = false;`);
             //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
-            if(global.ServerUI) global.ServerUI.call(`mainmenu_toggle`, false);
+            //if(global.ServerUI) global.ServerUI.call(`mainmenu_toggle`, false);
+            if(global.ServerUI) global.ServerUI.call(`mainmenu_toggle`, false); 
             if(state){
                 /*if(global.ServerUI){
                   global.ServerUI.execute(`gm.$refs.auth.startLoading(1);`); // initiate the fake loading screen to allow CEF sounds and shit duhh
