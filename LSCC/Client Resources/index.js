@@ -253,9 +253,6 @@ mp.events.add('showLoginBrowser', (state) => {
             //if(global.ServerUI) global.ServerUI.call(`mainmenu_toggle`, false);
             if(global.ServerUI) global.ServerUI.call(`mainmenu_toggle`, false); 
             if(state){
-                /*if(global.ServerUI){
-                  global.ServerUI.execute(`gm.$refs.auth.startLoading(1);`); // initiate the fake loading screen to allow CEF sounds and shit duhh
-                }*/
                 if(global.ServerUI) global.ServerUI.call(`auth_toggle`, true);
                 toggleLoginScene(true);
                 mp.events.callRemote("requestQuickLoginForgotUsernameData"); // yes

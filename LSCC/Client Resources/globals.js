@@ -1064,6 +1064,8 @@ function InitializeServerUI(){
   if(ServerUI) return ServerUI;
 
   ServerUI = mp.browsers.new("package://ServerUI/index.html");
+  
+  if(ServerUI) ServerUI.call('loadingscreen_start', 1000);
   return ServerUI;
 }
 

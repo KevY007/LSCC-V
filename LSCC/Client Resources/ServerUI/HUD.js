@@ -588,10 +588,10 @@ mp.events.add("startLoadingScreen", (time, message) => {
     }
 
     if(time == -1){
-        if(global.ServerUI) global.ServerUI.execute('gm.$refs.loadingScreen.show(true);');
-        if(message != "none")
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.loadingText = "${message}"`);
-        else if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.loadingText = ""`);
+        if(global.ServerUI) global.ServerUI.call('loadingscreen_start', 999999999);
+        //if(message != "none")
+        //    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.loadingText = "${message}"`);
+        //else if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.loadingText = ""`);
 
         IsInInfiniteLoading = true;
 
@@ -604,10 +604,10 @@ mp.events.add("startLoadingScreen", (time, message) => {
         }, 10000);
     }
     else{
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.show(${time});`);
-        if(message != "none")
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.loadingText = "${message}"`);
-        else if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.loadingText = ""`);
+        if(global.ServerUI) global.ServerUI.call('loadingscreen_start', time);
+        //if(message != "none")
+        //    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.loadingText = "${message}"`);
+        //else if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.loadingText = ""`);
     }
 });
 mp.keys.bind(0x20, false, function() {
