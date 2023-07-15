@@ -319,78 +319,78 @@ function menuSetting_getOptionNameFromValue(type, value){
 mp.events.add("UpdateMenuStatsTab", (email, admin, points, dpoints, dlevel, derbywins, escapes, arrests,
                                      kills, deaths, kdr, playtime, warns, discordlinked) => {
 
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.$refs.statsTab.stats = [
+    if(global.ServerUI) global.ServerUI.call(`mainmenu_profile_stats_set`, [
             {
                 icon: "fa-mailbox",
                 title: "E-Mail",
-                value: "${email}",
+                value: `${email}`,
             },
             {
                 icon: "fa-shield-quartered",
                 title: "Admin",
-                value: "${admin}",
+                value: `${admin}`,
             },
             {
                 icon: "fa-coins",
                 title: "Points",
-                value: "${points}",
+                value: `${points}`,
             },
             {
                 icon: "fa-treasure-chest",
                 title: "Donator Points",
-                value: "${dpoints}",
+                value: `${dpoints}`,
             },
             {
                 icon: "fa-gem",
                 title: "Donator Level",
-                value: "${dlevel}",
+                value: `${dlevel}`,
             },
             {
                 icon: "fa-truck-monster",
                 title: "Derby Wins",
-                value: "${derbywins}",
+                value: `${derbywins}`,
             },
             {
                 icon: "fa-person-to-portal",
                 title: "Escapes",
-                value: "${escapes}",
+                value: `${escapes}`,
             },
             {
                 icon: "fa-handcuffs",
                 title: "Arrests",
-                value: "${arrests}",
+                value: `${arrests}`,
             },
             {
                 icon: "fa-crosshairs",
                 title: "Kills",
-                value: "${kills}",
+                value: `${kills}`,
             },
             {
                 icon: "fa-skull",
                 title: "Deaths",
-                value: "${deaths}",
+                value: `${deaths}`,
             },
             {
                 icon: "fa-scale-unbalanced",
                 title: "K/D Ratio",
-                value: "${kdr}",
+                value: `${kdr.toFixed(2)}`,
             },
             {
                 icon: "fa-clock",
                 title: "Play Time",
-                value: "${playtime} hours",
+                value: `${playtime} hours`,
             },
             {
                 icon: "fa-triangle-exclamation",
                 title: "Warns",
-                value: "${warns}",
+                value: `${warns}`,
             },
             {
                 icon: "fa-clouds",
                 title: "Discord",
-                value: "${(discordlinked == true ? "Your account is verified." : "Your account isn't verified! (/verify)")}",
-            },
-        ]`);
+                value: `${(discordlinked == true ? "Your account is verified." : "Your account isn't verified! (/verify)")}`,
+            }
+        ]);
 
     // `gm.$refs.mainMenu.$refs.profileTab.$refs.statsTab.stats = {
     //     {
@@ -539,7 +539,7 @@ function updateMenuSettingsTab(){
             settings:[
                 {
                     id: 29,
-                    type: 4,
+                    type: 2,
                     name: "serverlanguage",
                     label: "Language",
                     description: "Changes the language in which *most* server messages are displayed. Want to help with translations? Join our Discord for more info.",
@@ -564,7 +564,7 @@ function updateMenuSettingsTab(){
                 },
                 {
                     id: 12,
-                    type: 4,
+                    type: 2,
                     name: "myweather",
                     label: "Weather",
                     description: "Changes the weather displayed only on your screen.",
@@ -834,7 +834,7 @@ function updateMenuSettingsTab(){
                 },
                 {
                     id: 17,
-                    type: 4,
+                    type: 2,
                     name: "voicemode",
                     label: "Voice Mode",
                     description: "Sets the voice channel in which you speak. (SHORTCUT: N+TAB)",
@@ -870,50 +870,47 @@ function updateMenuSettingsTab(){
     ]);
 
     if(global.ServerUI){
-        global.ServerUI.call("mainmenu_setting_value_set", 1, mp.storage.data.menu.HUD);
+        global.ServerUI.call("mainmenu_setting_value_set", 1, mp.storage.data.menu.topRightInfo);
         global.ServerUI.call("mainmenu_setting_value_set", 2, mp.storage.data.menu.killFeed);
         global.ServerUI.call("mainmenu_setting_value_set", 3, mp.storage.data.menu.gameProgress);
         global.ServerUI.call("mainmenu_setting_value_set", 4, mp.storage.data.menu.alwaysExpandedMap);
         global.ServerUI.call("mainmenu_setting_value_set", 5, mp.storage.data.menu.tooltips);
-        global.ServerUI.call("mainmenu_setting_value_set", 6, mp.storage.data.menu.updateRate);
+        global.ServerUI.call("mainmenu_setting_value_set", 6, mp.storage.data.menu.updateRate.toString());
         global.ServerUI.call("mainmenu_setting_value_set", 7, String.fromCharCode(global.curVoiceBind));
+        global.ServerUI.call("mainmenu_setting_value_set", 8, String.fromCharCode(global.curGPSBind));
+        global.ServerUI.call("mainmenu_setting_value_set", 9, mp.storage.data.menu.HUD);
+        global.ServerUI.call("mainmenu_setting_value_set", 10, mp.storage.data.menu.nametags);
+        global.ServerUI.call("mainmenu_setting_value_set", 11, String.fromCharCode(global.curMapBind));
+        global.ServerUI.call("mainmenu_setting_value_set", 12, mp.storage.data.menu.myweather.toString());
+        global.ServerUI.call("mainmenu_setting_value_set", 13, mp.storage.data.menu.autoOOC);
+        global.ServerUI.call("mainmenu_setting_value_set", 14, mp.storage.data.menu.AutoJoin);
+        global.ServerUI.call("mainmenu_setting_value_set", 15, mp.storage.data.menu.EventMusic);
+        global.ServerUI.call("mainmenu_setting_value_set", 16, mp.storage.data.menu.monitoring);
+        global.ServerUI.call("mainmenu_setting_value_set", 17, mp.storage.data.menu.VoiceMode.toString());
+        global.ServerUI.call("mainmenu_setting_value_set", 18, mp.storage.data.menu.ActiveChatOpacity);
+        global.ServerUI.call("mainmenu_setting_value_set", 19, mp.storage.data.menu.InactiveChatOpacity);
+        global.ServerUI.call("mainmenu_setting_value_set", 20, mp.storage.data.menu.ShowInactiveChat);
+        global.ServerUI.call("mainmenu_setting_value_set", 21, mp.storage.data.menu.AutoLogin);
+        global.ServerUI.call("mainmenu_setting_value_set", 22, mp.storage.data.menu.RealtimeSpeedo);
+        global.ServerUI.call("mainmenu_setting_value_set", 23, String.fromCharCode(global.curActionMenuBind));
+        global.ServerUI.call("mainmenu_setting_value_set", 24, String.fromCharCode(global.curMDCBind));
+        global.ServerUI.call("mainmenu_setting_value_set", 25, mp.storage.data.menu.Speedo);
+        global.ServerUI.call("mainmenu_setting_value_set", 26, mp.storage.data.radiotoggle);
+        global.ServerUI.call("mainmenu_setting_value_set", 27, mp.storage.data.menu.loadingscreens);
+        global.ServerUI.call("mainmenu_setting_value_set", 28, mp.storage.data.menu.SnowEnabled);
+        global.ServerUI.call("mainmenu_setting_value_set", 29, mp.storage.data.language.toString());
+        global.ServerUI.call("mainmenu_setting_value_set", 30, mp.storage.data.menu.XMRAutoPlay);
+        global.ServerUI.call("mainmenu_setting_value_set", 31, mp.storage.data.menu.ShowVoiceActivity);
+        global.ServerUI.call("mainmenu_setting_value_set", 32, mp.storage.data.menu.ChatAccessibility);
+        global.ServerUI.call("mainmenu_setting_value_set", 33, mp.storage.data.menu.ShowDamageIndicator);
+
+        global.ServerUI.call("mainmenu_setting_value_set", 69420, global.showCustomCrosshair);
+        global.ServerUI.call("mainmenu_setting_value_set", 69421, global.alwaysShowCustomCrosshair);
+        global.ServerUI.call("mainmenu_setting_value_set", 69422, global.showCustomCrosshairInSniper);
     }
-/*
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.tri[0].value = ${mp.storage.data.menu.topRightInfo}`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.gp[0].value = ${mp.storage.data.menu.gameProgress};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.tooltips[0].value = ${mp.storage.data.menu.tooltips};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.kf[0].value = ${mp.storage.data.menu.killFeed};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.nametags[0].value = ${mp.storage.data.menu.nametags};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.hud[0].value = ${mp.storage.data.menu.HUD};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.bigmap[0].value = ${mp.storage.data.menu.alwaysExpandedMap};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.updr[0].value = ${mp.storage.data.menu.updateRate};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.togspeedo[0].value = ${mp.storage.data.menu.Speedo};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.monitor[0].value = ${mp.storage.data.menu.monitoring};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Display[0].$refs.damageindicator[0].value = ${mp.storage.data.menu.ShowDamageIndicator};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.vcbind[0].value = "${String.fromCharCode(global.curVoiceBind)}";`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.gpsbind[0].value = "${String.fromCharCode(global.curGPSBind)}";`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.bigmapbind[0].value = "${String.fromCharCode(global.curMapBind)}";`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.actionmenubind[0].value = "${String.fromCharCode(global.curActionMenuBind)}";`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Keybinds[0].$refs.mdcbind[0].value = "${String.fromCharCode(global.curMDCBind)}";`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.serverlanguage[0].value = "${menuSetting_getOptionNameFromValue("language", mp.storage.data.language)}";`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.myweather[0].value = "${menuSetting_getOptionNameFromValue("weather", mp.storage.data.menu.myweather)}";`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autojoinopt[0].value = ${mp.storage.data.menu.AutoJoin};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.eventmusic[0].value = ${mp.storage.data.menu.EventMusic};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autologintog[0].value = ${mp.storage.data.menu.AutoLogin};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.realtimespeedo[0].value = ${mp.storage.data.menu.RealtimeSpeedo};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.carradio[0].value = ${mp.storage.data.radiotoggle};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.loadingscreens[0].value = ${mp.storage.data.menu.loadingscreens};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.enablesnow[0].value = ${mp.storage.data.menu.SnowEnabled};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Game[0].$refs.autoplayradio[0].value = ${mp.storage.data.menu.XMRAutoPlay};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.oocauto[0].value = ${mp.storage.data.menu.OOCauto};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.showvoice[0].value = ${mp.storage.data.menu.ShowVoiceActivity};`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.voicemode[0].value = "${menuSetting_getOptionNameFromValue("voicemode", mp.storage.data.menu.VoiceMode)}";`);
-    
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.$refs.Chat[0].$refs.chataccessibility[0].value = ${mp.storage.data.menu.ChatAccessibility.toString()};`);
-*/
 }
 // ID 69420 ==> Custom Crosshair Toggle | ID 69421 ==> Always On Crosshair |  ID 69422 ==> Sniper Custom or Default crosshair
-mp.events.add("MenuChangeSettings", (id, value) => 
+mp.events.add("mainmenu_setting_change", (id, value) => 
 {
     mp.events.callRemote("ServerConsoleOutput", `Setting change: ${id} value is ${value}`);
     if(id == 1)
@@ -1528,21 +1525,19 @@ mp.events.add("UpdateMenuPlayRooms", (lobbies, minigames, currentMinigame) => {
     });
 
     var current_room = -1;
-    if(currentMinigame !== -1){
-        if(currentMinigame !== -3 && currentMinigame !== -4){
-            current_room = (currentMinigame + 69420);
-        }
-        else{
-            if(currentMinigame === -3)
-                current_room = 6969;
 
-            if(currentMinigame === -4)
-                current_room = 6970;
-        }
+    if(mp.players.local.getVariable("InLobby") >= 0){
+        if(mp.players.local.getVariable("InDM") > -1)
+            current_room = (mp.players.local.getVariable("InDM")+69420);
+        else current_room = mp.players.local.getVariable("InLobby");
     }
     else{
-        current_room = currentMinigame;
+        if(mp.players.local.getVariable("InLobby") === -3)
+            current_room = 6969;
+        else if(mp.players.local.getVariable("InLobby") === -4)
+            current_room = 6970;
     }
+
     if(global.ServerUI) global.ServerUI.call('mainmenu_play_rooms_set', play_rooms);
     if(global.ServerUI) global.ServerUI.call('mainmenu_play_rooms_current_room_set', current_room);
     
