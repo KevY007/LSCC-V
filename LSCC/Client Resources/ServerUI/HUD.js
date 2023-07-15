@@ -1649,8 +1649,9 @@ mp.events.add("HUDError", (msg, icon) => {
 		close: true		
 	});`;
     */
-    let insertString = `toast(null, \`${msg}\`, 'error', 5000);`;
-    if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(insertString);
+    //let insertString = `toast(null, \`${msg}\`, 'error', 5000);`;
+    //if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(insertString);   
+    if(global.ServerUI) global.ServerUI.call('notification_send', msg, "error", 5000);
 });
 
 mp.events.add("HUDNotify", (msg, type, icon, close, timeout, orientation, displaymode) => {
@@ -1670,8 +1671,9 @@ mp.events.add("HUDNotify", (msg, type, icon, close, timeout, orientation, displa
     if(displaymode.length > 1) insertString += `displayMode: \`${displaymode}\`, `;
     insertString += "});";
     */
-    let insertString = `toast(null, \`${msg}\`, '${type}', ${timeout}, ${displayModeNumber});`;
-    if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(insertString);
+    //let insertString = `toast(null, \`${msg}\`, '${type}', ${timeout}, ${displayModeNumber});`;
+    //if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(insertString);
+    if(global.ServerUI) global.ServerUI.call('notification_send', msg, type, timeout);
 });
 // bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter, center
 mp.events.add("HUDNotify2", (title, msg, orientation, displaymode) => {
@@ -1685,8 +1687,10 @@ mp.events.add("HUDNotify2", (title, msg, orientation, displaymode) => {
     if(displaymode.length > 1) insertString += `displayMode: \`${displaymode}\`, `;
     insertString += "});";
     */
-    let insertString = `toast(\`${title}\`, \`${msg}\`, 'nothing', 5000, 2);`;
-    if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(insertString);
+    //let insertString = `toast(\`${title}\`, \`${msg}\`, 'nothing', 5000, 2);`;
+    //if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(insertString);
+    
+    if(global.ServerUI) global.ServerUI.call('notification_send', msg, "info", 4000);
 });
 
 
