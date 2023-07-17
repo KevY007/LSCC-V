@@ -3315,24 +3315,6 @@ namespace RNC
             player.SetSharedData("PlayerWeather", weatherid);
         }
 
-        [RemoteEvent("Scoreboard_OnAction")]
-        public static void OnScoreboardAction(Player player, int action, string targetName)
-        {
-            Player target = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
-            if(target == null)
-            {
-                EPlayer.Error(player, Translate(player, "ERROR_NO_LONGER_CONNECTED"));
-                return;
-            }
-            switch (action)
-            {
-                case 1:
-                    {
-                        Commands.cmd_vblock(player, target);
-                        break;
-                    }
-            }
-        }
 
         [RemoteEvent("Server_FinishTutorial")]
         public static void OnFinishTutorial(Player player, bool useVoice, int languageID)
@@ -4132,6 +4114,63 @@ namespace RNC
                     EPlayer.Save(player, false);
                 }
             }
+        }
+
+        [RemoteEvent("Menu_OnToggleVoiceBlock")]
+        public static void OnScoreboardAction(Player player, string targetName)
+        {
+            Player target = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+            if (target == null)
+            {
+                EPlayer.Error(player, Translate(player, "ERROR_NO_LONGER_CONNECTED"));
+                return;
+            }
+            Commands.cmd_vblock(player, target);
+        }
+        [RemoteEvent("Menu_OnPunishPlayer")]
+        public static void OnMenuPunishPlayer(Player player, string username, int type, string reason, int durationMinutes)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 1) return;
+
+            Player target = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.ToLower() == username.ToLower());
+            if (target == null)
+            {
+                EPlayer.Error(player, Translate(player, "ERROR_NO_LONGER_CONNECTED_LOGGED"));
+                return;
+            }
+            switch (type)
+            {
+                case 1:
+                    Commands.cmd_mute(player, target, durationMinutes, reason);
+                    break;
+                case 2:
+                    Commands.cmd_kick(player, target, reason);
+                    break;
+                case 3:
+                    Commands.cmd_ban(player, target, reason);
+                    break;
+                case 4:
+                    Commands.cmd_warn(player, target, reason);
+                    break;
+                case 5:
+                    Commands.cmd_jail(player, target, durationMinutes, reason);
+                    break;
+            }
+        }
+
+        [RemoteEvent("Menu_OnSpectatePlayer")]
+        public static void OnMenuSpecPlayer(Player player, string username)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Player target = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.ToLower() == username.ToLower());
+            if(target == null)
+            {
+                EPlayer.Error(player, Translate(player, "ERROR_NO_LONGER_CONNECTED_LOGGED"));
+                return;
+            }
+            Commands.cmd_spec(player, target);
         }
 
         [RemoteEvent("StopAnimPositioner")]

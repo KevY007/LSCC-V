@@ -6412,7 +6412,7 @@ namespace RNC
         }
 
         [Command("ban", "!{#AFAFAF}[USAGE] ban (name) (reason)", GreedyArg = true)]
-        public void cmd_ban(Player player, Player target, string reason)
+        public static void cmd_ban(Player player, Player target, string reason)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -10969,7 +10969,7 @@ namespace RNC
             }
         }
         [Command("kick", "!{#AFAFAF}[USAGE] kick (target) (reason)", GreedyArg = true)]
-        public void cmd_kick(Player player, Player target, string reason)
+        public static void cmd_kick(Player player, Player target, string reason)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -11070,7 +11070,7 @@ namespace RNC
         }
 
         [Command("jail", "!{#AFAFAF}[USAGE] jail (target) (minutes) (reason)", GreedyArg = true)]
-        public void cmd_jail(Player player, Player target, int mins, string reason)
+        public static void cmd_jail(Player player, Player target, int mins, string reason)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -11190,7 +11190,7 @@ namespace RNC
         }
 
         [Command("warn", "!{#AFAFAF}[USAGE] warn (target) (reason)", GreedyArg = true)]
-        public void cmd_warn(Player player, Player target, string reason)
+        public static void cmd_warn(Player player, Player target, string reason)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -11245,7 +11245,7 @@ namespace RNC
         }
 
         [Command("mute", "!{#AFAFAF}[USAGE] mute (target) (mins) (reason)", GreedyArg = true)]
-        public void cmd_mute(Player player, Player target, int mins, string reason)
+        public static void cmd_mute(Player player, Player target, int mins, string reason)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -12041,7 +12041,7 @@ namespace RNC
         }
 
         [Command("spec", "!{#AFAFAF}[USAGE] spec (target)", GreedyArg = true)]
-        public void cmd_spec(Player player, Player target)
+        public static void cmd_spec(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player))
                 return;

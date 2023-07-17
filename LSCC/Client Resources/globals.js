@@ -34,6 +34,12 @@ function UpdateStatsVars(entity, all = true){
         {
             if(global.ServerUI !== undefined && global.ServerUI != null){
 
+              let muted_players = [];
+              mp.players.forEach(pl => {
+                if(mp.players.local.getVariable(`VoiceMute${pl.name}`) && mp.players.local.getVariable(`VoiceMute${pl.name}`) == true)
+                  muted_players.push(pl.name);
+              });
+
               global.ServerUI.call("set_user", {
                 serverId: player.remoteId,
                 id: player.getVariable("SQL_ID"),
@@ -51,6 +57,7 @@ function UpdateStatsVars(entity, all = true){
                 lobbyId: player.getVariable("InLobby"),
                 teamId: player.getVariable("Team"),
                 heading: player.heading,
+                voiceMutedPlayers:muted_players,
                 location:{
                     x: player.position.x,
                     y: player.position.y,

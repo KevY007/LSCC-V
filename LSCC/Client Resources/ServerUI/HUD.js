@@ -1435,6 +1435,36 @@ mp.events.add("UpdateRateEvent", () => {
     }
 });
 
+mp.events.add('click', (x, y, upOrDown, leftOrRight, relativeX, relativeY, worldPosition, hitEntity) => {
+    if(global.scoreboardToggled && leftOrRight === 'right' && upOrDown === 'down')
+    {
+        if(!global.scoreboardCursor){
+            global.scoreboardCursor = true;    
+            mp.game.invoke("0xFC695459D4D0E219", 0.5, 0.5); // SET CURSOR POSITION TO CENTER [x,y = 0.5,0.5]
+        }
+        mp.gui.cursor.show(true, true);
+    }
+});
+mp.events.add("player_voice_mute_toggle", (username) => {
+    mp.events.callRemote("Menu_OnToggleVoiceBlock", username);
+    global.UpdateStatsVars(mp.players.local, false);
+});
+mp.events.add("menu_punishments_punish", (username, punishmentType, reason, durationMinutes) => {
+    mp.events.callRemote("Menu_OnPunishPlayer", username, punishmentType, reason, durationMinutes);
+});
+mp.events.add("spectate_player", (username) => {
+    mp.events.callRemote("Menu_OnSpectatePlayer", username);
+});
+mp.events.add("menu_scoreboard_closed", () => {
+    global.scoreboardCursor = false;
+    mp.gui.cursor.show(false, false);
+    global.scoreboardToggled = false;
+
+    if(updater != null) clearInterval(updater);
+    updater = null;
+    mp.events.call("TogglePlayerChat", true);
+
+});
 function ToggleScoreboard()
 {
     if (global.ServerUI == null) return;
@@ -1447,9 +1477,9 @@ function ToggleScoreboard()
         updater = null;
 
         mp.events.call("TogglePlayerChat", true);
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.disableInput = true;`);
+        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.disableInput = true;`);
 		// if(global.ServerUI) global.ServerUI.execute(`gm.$refs.scoreboard.setPlayers([]);`);
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.enabled = false;`);
+        if(global.ServerUI) global.ServerUI.call('menu_scoreboard_toggle', false);
 
         if(global.scoreboardCursor)
         {
@@ -1462,8 +1492,8 @@ function ToggleScoreboard()
         global.scoreboardToggled = true;
         mp.events.call("TogglePlayerChat", false);
 
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.enabled = true;`);
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.disableInput = true;`);
+        if(global.ServerUI) global.ServerUI.call('menu_scoreboard_toggle', true);
+        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.disableInput = true;`);
 		// if(global.ServerUI) global.ServerUI.execute(`gm.$refs.scoreboard.setPlayers([]);`);
 
         let notifyscoreboardstr = `toast('${Translate("SHOW_CURSOR")}', '${Translate("SCOREBOARD_TIP")}', 'nothing', 6500, 2);`;
@@ -1486,17 +1516,10 @@ function ToggleScoreboard()
     return;
 }
 
-mp.events.add("scoreboard:clickAction", (actionID, playerName) => {
-    mp.events.callRemote("ServerConsoleOutput", `scoreboard action ${actionID} on player ${playerName}`);
-    mp.events.callRemote("Scoreboard_OnAction", actionID, playerName);
-});
-
 function updatePlayers()
 {
     if(mp.players.local !== undefined && mp.players.exists(mp.players.local))
         global.UpdateStatsVars(mp.players.local);
-
-    let updateString = `gm.$refs.hud.$refs.base.$refs.scoreboard.setPlayers([`;
 
     let lobbyStr = '0';
 	let colr = 255;
@@ -1506,6 +1529,7 @@ function updatePlayers()
 	let level = 0;
     let squad = -1;
 	
+    let scoreboard_players = [];
     mp.players.forEach(sb => {
         lobbyStr = "-";
         colr = 255;
@@ -1537,26 +1561,37 @@ function updatePlayers()
         let mutedTog = mp.players.local.getVariable(mutedVar);
         if(mutedTog == undefined) mutedTog = false;
 
-        updateString += `{lid: ${lobbyStr}, squad: ${squad},
-        color: 'rgb(${colr}, ${colg}, ${colb})', 
-        name: '${nameToDisplay}', level: ${levelToDisplay}, ping: ${pingToDisplay}, 
-        showMute:true, muted: ${mutedTog.toString()}},`;
+        let roomTeam = -1;
+        if(sb.getVariable("Team") > -1) roomTeam = sb.getVariable("Team");
+        if(sb.getVariable("InDM") > -1) roomTeam = -2;
+
+        scoreboard_players.push({
+            id:sb.remoteId,
+            donator:sb.getVariable("Donator"),
+            roomId:sb.getVariable("InLobby"),
+            username:nameToDisplay,
+            level:levelToDisplay,
+            ping:pingToDisplay,
+            roomTeam:roomTeam
+        });
     });
 
-    updateString += `]);`;
+    
+    if(global.ServerUI){
+        global.ServerUI.call('menu_scoreboard_players_set', scoreboard_players);
+    }
 
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.$refs.global.actions = [
-        {
-            id: 1,
-            name: "Mute",
-            icon: "fa-volume-xmark",
-            disabledName: "Unmute",
-            disabledIcon: "fa-volume",
-            disableKey: "muted",
-            showKey: "showMute",
-        },
-    ]`);
-    if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(updateString);
+    // if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.scoreboard.$refs.global.actions = [
+    //     {
+    //         id: 1,
+    //         name: "Mute",
+    //         icon: "fa-volume-xmark",
+    //         disabledName: "Unmute",
+    //         disabledIcon: "fa-volume",
+    //         disableKey: "muted",
+    //         showKey: "showMute",
+    //     },
+    // ]`);
     return;
 }
 
