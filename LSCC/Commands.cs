@@ -25,6 +25,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
+
             if (EPlayer.GetAccount(player).Admin < 4)
             {
                 player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
@@ -3879,7 +3880,7 @@ namespace RNC
             return;
         }
 
-        [Command("voiceblock", "!{#AFAFAF}[USAGE] voiceblock (target)", GreedyArg = true)]
+        [Command("voiceblock", "!{#AFAFAF}[USAGE] voiceblock (target) test", GreedyArg = true)]
         public static void cmd_vblock(Player player, Player target)
         {
             if (!player.HasSharedData($"VoiceMute{target.Name}"))
@@ -6344,11 +6345,18 @@ namespace RNC
             return;
         }
 
-        [Command("oban", "!{#AFAFAF}[USAGE] oban (target name) (reason)", GreedyArg = true)]
-        public void cmd_oban(Player player, string name, string reason)
+        [Command("oban", "!{#AFAFAF}[USAGE] oban (target name) (minutes) (reason)", GreedyArg = true)]
+        public void cmd_oban(Player player, string name, int minutes, string reason)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
+
+
+            if (minutes <= 0)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Minutes must be greater than 0.");
+                return;
+            }
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
@@ -6400,7 +6408,8 @@ namespace RNC
                         Admin = pName,
                         DateTime = DateTime.Now,
                         AccountSQLID = tpAcc.SQL_ID,
-                        HWID = tpAcc.LastHWID
+                        HWID = tpAcc.LastHWID,
+                        BannedUntil = DateTime.Now.AddMinutes(minutes)
                     };
                     await context.Bans.AddAsync(_new);
                     await context.SaveChangesAsync();
@@ -6411,11 +6420,17 @@ namespace RNC
             return;
         }
 
-        [Command("ban", "!{#AFAFAF}[USAGE] ban (name) (reason)", GreedyArg = true)]
-        public static void cmd_ban(Player player, Player target, string reason)
+        [Command("ban", "!{#AFAFAF}[USAGE] ban (name) (minutes) (reason)", GreedyArg = true)]
+        public static void cmd_ban(Player player, Player target, int minutes, string reason)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
+
+            if (minutes <= 0)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Minutes argument must be 1 or higher. 💀");
+                return;
+            }
 
             if (EPlayer.GetAccount(player).Admin < 2)
             {
@@ -6451,7 +6466,8 @@ namespace RNC
                 Admin = player.Name,
                 DateTime = DateTime.Now,
                 AccountSQLID = EPlayer.LoggedIn(target) ? EPlayer.GetAccount(target).SQL_ID : -1,
-                HWID = target.Serial
+                HWID = target.Serial,
+                BannedUntil = DateTime.Now.AddMinutes(minutes)
             };
             Task.Run(async () =>
             {

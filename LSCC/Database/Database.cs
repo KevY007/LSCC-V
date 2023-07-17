@@ -77,6 +77,7 @@ namespace RNC
         public string Reason { get; set; }
         public string Admin { get; set; }
         public DateTime DateTime { get; set; }
+        public DateTime BannedUntil { get; set; }
     }
 
     public class Clan
