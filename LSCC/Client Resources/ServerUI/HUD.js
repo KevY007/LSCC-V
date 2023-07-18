@@ -1465,6 +1465,7 @@ mp.events.add("menu_scoreboard_closed", () => {
     mp.events.call("TogglePlayerChat", true);
 
 });
+mp.events.add('toggle_cursor', (toggle) => { mp.gui.cursor.show(toggle, toggle) });
 function ToggleScoreboard()
 {
     if (global.ServerUI == null) return;
