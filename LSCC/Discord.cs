@@ -1363,8 +1363,7 @@ namespace RNC
                                     Admin = "[DC] " + context.Author.Username,
                                     DateTime = DateTime.Now,
                                     AccountSQLID = EPlayer.LoggedIn(target) ? EPlayer.GetAccount(target).SQL_ID : -1,
-                                    HWID = target.Serial,
-                                    BannedUntil = DateTime.Now, //kasnije dodat
+                                    HWID = target.Serial
                                 };
                                 Task.Run(async () =>
                                 {
@@ -1459,8 +1458,7 @@ namespace RNC
                                             Admin = context.Author.Username,
                                             DateTime = DateTime.Now,
                                             AccountSQLID = target.SQL_ID,
-                                            HWID = target.LastHWID,
-                                            BannedUntil = DateTime.Now, //kasnije dodat
+                                            HWID = target.LastHWID
                                         };
                                         await dbcontext.Bans.AddAsync(_new);
 

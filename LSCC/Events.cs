@@ -120,19 +120,6 @@ namespace RNC
 
                     if (ban != null)
                     {
-
-                        if (ban.BannedUntil <= DateTime.Now)
-                        {
-                            context.Bans.Remove(ban);
-                            await context.SaveChangesAsync();
-
-                            string autoUnbanMessage = $"You have been automatically unbanned from the server. If you repeat same offenses, or break the rules again, you will be banned again. Please read the rules at rnc.onl/rules";
-                            player.SendChatMessage(autoUnbanMessage);
-                            EPlayer.Notify(player, autoUnbanMessage, "red", "fas fa-ban", true, 30000);
-                            EPlayer.SendMessageToAllAdmins($"{player.Name}'s was auto unbanned since their ban time has passed please keep and eye on them.");
-                            return;
-                        }
-
                         NAPI.Util.ConsoleOutput($"Found a ban through IP: ${pAddress}, RID: ${pSCID}, HWID: {pSerial}");
                         Account evadeAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == ban.AccountSQLID);
                         string evadeAccountName = evadeAcc.Username;
@@ -140,15 +127,15 @@ namespace RNC
                         {
                             EPlayer.SetDiscordStatus(player, "Gazing at the 'BANNED' screen.");
 
-                            string banDateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                            string banMessage = $"You are banned from the server. Please appeal on our discord server at rnc.onl/discord Your ban ID is {ban.SQL_ID}, You are banned until {ban.BannedUntil.ToString(banDateTimeFormat)}.";
+                            player.SendChatMessage($"!{{#FF6347}}[BANNED] You are not allowed to play on this server, Ban ID: {ban.SQL_ID}");
 
-                            player.SendChatMessage(banMessage);
-                            EPlayer.Notify(player, banMessage, "red", "fas fa-ban", true, 30000);
+                            player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+
+                            EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Your ban ID is {ban.SQL_ID}.</p>", "red", "fas fa-ban", true, 30000);
 
 
-                            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {player.Name} for ban evading as {evadeAccountName}. Banned until {ban.BannedUntil.ToString(banDateTimeFormat)}");
-                            NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking {player.Name} as they're banned. (BANID: {ban.SQL_ID} ACCOUNTID: {ban.AccountSQLID} BANNED UNTIL: {ban.BannedUntil.ToString(banDateTimeFormat)})");
+                            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {player.Name} for ban evading as {evadeAccountName}.");
+                            NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking {player.Name} as they're banned. (BANID: {ban.SQL_ID} ACCOUNTID: {ban.AccountSQLID})");
 
                             player.SetData("Kicked", true);
                             NAPI.Task.Run(() => { try { player.Kick(); } catch { } }, 1000);
@@ -4161,7 +4148,7 @@ namespace RNC
                     Commands.cmd_kick(player, target, reason);
                     break;
                 case 3:
-                    Commands.cmd_ban(player, target, durationMinutes, reason);
+                    Commands.cmd_ban(player, target, reason);
                     break;
                 case 4:
                     Commands.cmd_warn(player, target, reason);
