@@ -2589,6 +2589,8 @@ namespace RNC
                         {
                             freeroamVehs = player.GetData<List<Vehicle>>("FreeroamVehicles");
 
+                            if (freeroamVehs == null || freeroamVehs.Count <= 0) return;
+
                             for (int i = 0; i < freeroamVehs.Count; i++)
                             {
                                 if (!freeroamVehs[i].IsNull && freeroamVehs[i] != null)
