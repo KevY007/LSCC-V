@@ -506,94 +506,97 @@ namespace RNC
                     // first ID is the bot, rest are codename rotx kevy
                     if (context.Author.Id != 922461597866295397 && context.Author.Id != 367360197900894209 && context.Author.Id != 253938879554387969
                         && context.Author.Id != 319893828142366720) return;
+
                     string[] args = context.Content.Split(' ');
-                    if (args.Count() >= 3)
+
+                    if (args.Count() < 3)
                     {
-                        using (MainDatabase dbcontext = ContextFactory.CreateContext())
+                        await context.Channel.SendMessageAsync("USAGE: !linkaccount (username) (discord id)");
+                        return;
+                    }
+
+                    using (MainDatabase dbcontext = ContextFactory.CreateContext())
+                    {
+                        string inputAccountUsername = args[1];
+                        string inputDiscordId = args[2];
+                        Account account = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(inputAccountUsername, StringComparison.OrdinalIgnoreCase));
+
+                        if (account == null)
                         {
-                            string vName = args[1];
-                            string vID = args[2];
-                            Account _acc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(vName, StringComparison.OrdinalIgnoreCase));
-                            Account _check = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync<Account>(a => a.DiscordID == vID);
+                            await context.Channel.SendMessageAsync($"**[!]** Account with that username does not exist in the database.");
+                            return;
+                        };
 
-                            if (_acc == null) return;
-                            DiscordData _d = new DiscordData();
+                        Account accountLinkedToDiscord = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.DiscordID == inputDiscordId);
+                        if (accountLinkedToDiscord != null)
+                        {
+                            await context.Channel.SendMessageAsync($"**[!]** Account with that Discord ID is already linked to {accountLinkedToDiscord.Username}.");
+                            return;
+                        }
 
-                            bool giveDiscordPerks = false;
-                            if (_d.UsedDiscordPerks == false) giveDiscordPerks = true;
+                        account.DiscordID = inputDiscordId;
+                        account.UsedDiscordPerks = true;
+                        await dbcontext.SaveChangesAsync();
 
-                            if (!_d.DiscordID.Equals("n/a")) return; // if already verified just in case to return
 
-                            //if (!_d.DiscordCode.Equals(vCode)) return;
-
-                            if (_check != null) return;
-
-                            _d.DiscordID = vID;
-                            _d.LeftDiscord = false;
-                            _d.UsedDiscordPerks = true;
-                            string verificationData = NAPI.Util.ToJson(_d);
-
-                            lock (RAGE.Entities.Players)
+                        lock (RAGE.Entities.Players)
+                        {
+                            NAPI.Task.Run(() =>
                             {
-                                NAPI.Task.Run(() =>
+                                try
                                 {
-                                    try
+
+                                    Player player = Settings.LoggedInPlayers.FirstOrDefault<Player>(p => p.Name.Equals(inputAccountUsername, StringComparison.OrdinalIgnoreCase));
+
+                                    // if not online
+                                    if (player == null)
                                     {
+                                        context.Channel.SendMessageAsync($"**[!]** {account.Username} is not online, but their account has been linked to <@{inputDiscordId}>.");
+                                        return;
+                                    }
+                                    else
+                                    {
+                                        EPlayer.GetAccount(player).DiscordID = inputDiscordId;
+                                        EPlayer.GetAccount(player).UsedDiscordPerks = true;
+                                        EPlayer.Save(player, true);
 
-                                        Player _p = Settings.LoggedInPlayers.FirstOrDefault<Player>(p => p.Name.Equals(vName, StringComparison.OrdinalIgnoreCase));
-                                        if (_p == null) return; // if the player is not online or logged in
+                                        player.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
 
-                                        if(giveDiscordPerks == true)
+                                        if (account.UsedDiscordPerks == false)
                                         {
-                                            _p.SendChatMessage(Translator.Translate(_p, "VERIFIED_MSG_1"));
-                                            _p.SendChatMessage(Translator.Translate(_p, "VERIFIED_MSG_1"));
-                                            _p.SendChatMessage(Translator.Translate(_p, "VERIFIED_MSG_1"));
-                                            _p.SendChatMessage(Translator.Translate(_p, "VERIFIED_MSG_1"));
-                            
+                                            player.SendChatMessage(Translator.Translate(player, "VERIFIED_MSG_1"));
 
-                                            EPlayer.GrantXP(_p, 10);
-                                            EPlayer.GivePoints(_p, 13);
+                                            EPlayer.GrantXP(player, 10);
+                                            EPlayer.GivePoints(player, 13);
+
                                             Task.Run(async () =>
                                             {
-                                                await EPlayer.UnlockLoadout(_acc, _p, "Negotiator", 0);
-                                                await EPlayer.UnlockLoadout(_acc, _p, "Negotiator", 1);
-                                                await EPlayer.UnlockVehicle(_acc, _p, "superd", 0);
+                                                await EPlayer.UnlockLoadout(account, player, "Negotiator", 0);
+                                                await EPlayer.UnlockLoadout(account, player, "Negotiator", 1);
+                                                await EPlayer.UnlockVehicle(account, player, "superd", 0);
 
                                                 NAPI.Task.Run(() =>
                                                 {
-                                                    _p.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
-
-                                                    EPlayer.UnlockAchievement(_p, "discord_verify");
-
-                                                    EPlayer.GetAccount(_p).DiscordID = vID;
-                                                    EPlayer.GetAccount(_p).UsedDiscordPerks = true;
-                                                    EPlayer.Save(_p, true);
+                                                    EPlayer.UnlockAchievement(player, "discord_verify");
                                                 });
-                                                await context.DeleteAsync();
                                             });
                                         }
                                         else
                                         {
-                                            _p.TriggerEvent("PlayMissionComplete", "FRANKLIN_BIG_01");
-                                            EPlayer.GetAccount(_p).DiscordID = vID;
-                                            EPlayer.GetAccount(_p).UsedDiscordPerks = true;
-                                            EPlayer.Save(_p, true);
-                                            _p.SendChatMessage(Translator.Translate(_p, "VERIFIED_OLD_MSG_1"));
-                                            _p.SendChatMessage(Translator.Translate(_p, "VERIFIED_OLD_MSG_2"));
 
-                                            Task.Run(async () => await context.DeleteAsync());
+                                            player.SendChatMessage(Translator.Translate(player, "VERIFIED_OLD_MSG_1"));
+                                            player.SendChatMessage(Translator.Translate(player, "VERIFIED_OLD_MSG_2"));
                                         }
 
-
+                                        Task.Run(async () => await context.DeleteAsync());
+                                        context.Channel.SendMessageAsync($"**[!]** {account.Username} is online, and their account has been linked to <@{inputDiscordId}>.");
                                         return;
                                     }
-                                    catch { }
-                                }, 50);
-                            }
+                                }
+                                catch { }
+                            }, 50);
                         }
-
                     }
-                    else return;
                 }
                 if (context.Content.StartsWith("!unverify"))
                 {
