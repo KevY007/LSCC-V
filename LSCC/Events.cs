@@ -2589,7 +2589,7 @@ namespace RNC
                         {
                             freeroamVehs = player.GetData<List<Vehicle>>("FreeroamVehicles");
 
-                            for (int i = freeroamVehs.Count - 1; i >= 0; i--)
+                            for (int i = 0; i < freeroamVehs.Count; i++)
                             {
                                 if (!freeroamVehs[i].IsNull && freeroamVehs[i] != null)
                                 {
@@ -2597,16 +2597,6 @@ namespace RNC
                                     freeroamVehs.RemoveAt(i);
                                 }
                             }
-
-                            if (freeroamVehs.Count > 0)
-                            {
-                                for (int i = 0; i < freeroamVehs.Count; i++)
-                                {
-                                    freeroamVehs.RemoveAt(i);
-                                }
-                            }
-
-                            freeroamVehs.Clear();
                         }
                         switch (type)
                         {
