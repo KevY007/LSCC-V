@@ -39,24 +39,10 @@ namespace RNC
 
         public class getAccount : WebSocketBehavior
         {
-            protected override async void OnMessage(MessageEventArgs e)
+            protected override async void OnMessage(MessageEventArgs message)
             {
-                Console.WriteLine("[Websocket] Message received: " + e.Data);
 
-                        private class InputAccount
-            {
-                public string Username { get; }
-            }
-
-            InputAccount testParse = parseJson<InputAccount>(e.Data);
-                if (testParse == null)
-                {
-                    Send("Invalid format!");
-                    return;
-                }
-
-                // Check if input is valid
-                if (testParse.Username == null)
+                if (message.Data == null || message.Data.Length < 1 || message.Data.Length > 128)
                 {
                     Send("Invalid input!");
                     return;
@@ -64,13 +50,14 @@ namespace RNC
 
                 using (MainDatabase dbcontext = ContextFactory.CreateContext())
                 {
-                    Account account = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(testParse.Username, StringComparison.OrdinalIgnoreCase));
+                    Account account = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(message.Data, StringComparison.OrdinalIgnoreCase));
 
                     if (account == null)
                     {
                         Send("Account not found!");
                         return;
                     }
+
                     Send($"Username: {account.Username} | Level: {account.Level}");
                 }
             }
@@ -78,12 +65,12 @@ namespace RNC
 
         public static void Start()
         {
-            WebSocketServer wssv = new WebSocketServer("ws://127.0.0.1:11082");
+            WebSocketServer webSocketServer = new WebSocketServer("ws://127.0.0.1:11082");
 
             // Services
-            wssv.AddWebSocketService<getAccount>("/getAccount");
+            webSocketServer.AddWebSocketService<getAccount>("/getAccount");
 
-            wssv.Start();
+            webSocketServer.Start();
             Console.WriteLine("[Websocket] Websocket started on port: 11082");
         }
     }
