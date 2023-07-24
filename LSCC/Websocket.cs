@@ -14,10 +14,6 @@ namespace RNC
 {
     internal class Websocket : Script
     {
-        public class InputAccount
-        {
-            public string Username { get; set; }
-        }
 
         public static async Task<Account> getAccountByUsername(string username)
         {
@@ -29,15 +25,15 @@ namespace RNC
             }
         }
 
-        public static object parseJson(string jsonString)
+        public static T parseJson<T>(string jsonString)
         {
             try
-           {
-                return JsonConvert.DeserializeObject<InputAccount>(jsonString);
+            {
+                return JsonConvert.DeserializeObject<T>(jsonString);
             }
             catch
             {
-                return null;
+                return default(T);
             }
         }
 
@@ -47,7 +43,12 @@ namespace RNC
             {
                 Console.WriteLine("[Websocket] Message received: " + e.Data);
 
-                InputAccount testParse = parseJson(e.Data) as InputAccount;
+                        private class InputAccount
+            {
+                public string Username { get; }
+            }
+
+            InputAccount testParse = parseJson<InputAccount>(e.Data);
                 if (testParse == null)
                 {
                     Send("Invalid format!");
