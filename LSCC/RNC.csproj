@@ -61,6 +61,7 @@
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.2" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql.Design" Version="1.1.2" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="WebSocketSharpFork" Version="1.0.4" />
   </ItemGroup>
 
   <ItemGroup>
