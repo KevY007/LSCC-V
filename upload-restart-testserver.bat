@@ -33,7 +33,7 @@ set "UPLOAD_ROUTE=%UPLOAD_ROUTE:"=%"
 
 REM Check if the extracted URL is empty
 if not defined UPLOAD_ROUTE (
-    echo attributes.url not found in the JSON response.
+    echo Could not extract the URL from the response.
     pause
 )
 
