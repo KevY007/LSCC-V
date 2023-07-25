@@ -7,59 +7,48 @@ using WebSocketSharp.Server;
 using WebSocketSharp;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using static RNC.Websocket;
 using System.Threading.Tasks;
+using static RNC.Functions;
 
 namespace RNC
 {
     internal class Websocket : Script
     {
-
-        public static async Task<Account> getAccountByUsername(string username)
+        public class Request
         {
-            using (MainDatabase dbcontext = ContextFactory.CreateContext())
-            {
-                Account account = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
-
-                return account;
-            }
+            public string path { get; set; }
         }
 
-        public static T parseJson<T>(string jsonString)
+        public class GetPlayersData : Request
         {
-            try
-            {
-                return JsonConvert.DeserializeObject<T>(jsonString);
-            }
-            catch
-            {
-                return default(T);
-            }
+            public string? name { get; set; }
+            public int? level { get; set; }
+        }
+        private static string getPlayers(GetPlayersData req)
+        {
+            Console.WriteLine($"[Websocket] getPlayers called name: {req.name} | level: {req.level} | next level: {req.level + 1}");
+            return "Pass!";
         }
 
-        public class getAccount : WebSocketBehavior
+        public class Default : WebSocketBehavior
         {
-            protected override async void OnMessage(MessageEventArgs message)
+            protected override void OnMessage(MessageEventArgs messageEvent)
             {
+                Request req = parseJson<Request>(messageEvent.Data);
+                if (req == null || req.path == null) return;
 
-                if (message.Data == null || message.Data.Length < 1 || message.Data.Length > 128)
+                switch (req.path)
                 {
-                    Send("Invalid input!");
-                    return;
+                    case "getPlayers":
+                        Send(getPlayers(parseJson<GetPlayersData>(messageEvent.Data)));
+                        break;
+
+                    case "getPlayer":
+                        Send("Test player");
+                        break;
+
                 }
 
-                using (MainDatabase dbcontext = ContextFactory.CreateContext())
-                {
-                    Account account = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(message.Data, StringComparison.OrdinalIgnoreCase));
-
-                    if (account == null)
-                    {
-                        Send("Account not found!");
-                        return;
-                    }
-
-                    Send($"Username: {account.Username} | Level: {account.Level}");
-                }
             }
         }
 
@@ -68,7 +57,7 @@ namespace RNC
             WebSocketServer webSocketServer = new WebSocketServer("ws://127.0.0.1:11082");
 
             // Services
-            webSocketServer.AddWebSocketService<getAccount>("/getAccount");
+            webSocketServer.AddWebSocketService<Default>("/");
 
             webSocketServer.Start();
             Console.WriteLine("[Websocket] Websocket started on port: 11082");
