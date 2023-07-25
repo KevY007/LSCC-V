@@ -2563,7 +2563,7 @@ namespace RNC
                 }
             }
 
-            Discord.SendTextChannel("staff-bot", $"(ADM) |** {message}**");
+            //Discord.SendTextChannel("staff-bot", $"(ADM) |** {message}**");
         }
 
         public static void UpdateUIVars(Player player)

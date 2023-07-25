@@ -6566,7 +6566,7 @@ namespace RNC
 
             NAPI.Util.ConsoleOutput($"{player.Name} created lobby ID {newLobby.lobbyId}");
             player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have created a new lobby with ID " + newLobby.lobbyId + ", /setlobbypassword to lock it.");
-            Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} created lobby {newLobby.lobbyId}.**");
+            //Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} created lobby {newLobby.lobbyId}.**");
 
             return;
         }
@@ -6600,7 +6600,7 @@ namespace RNC
 
             NAPI.Util.ConsoleOutput($"{player.Name} deleted lobby ID {lobbyid}");
 
-            Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} deleted lobby {lobbyid}.**");
+            //Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} deleted lobby {lobbyid}.**");
 
             RAGE.Entities.Players.All.ForEach((Player pl) =>
             {
@@ -6637,7 +6637,7 @@ namespace RNC
 
             NAPI.Util.ConsoleOutput($"{player.Name} set lobby ID {newLobby.lobbyId} password to {newLobby.Password}");
             player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set password for lobby ID " + lobbyid + " to " + newLobby.Password);
-            Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s password to {newLobby.Password}.**");
+            //Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s password to {newLobby.Password}.**");
             
             return;
         }
@@ -6664,14 +6664,14 @@ namespace RNC
                 newLobby.gameMode = GameModes.STANDARD;
                 NAPI.Util.ConsoleOutput($"{player.Name} set lobby ID {newLobby.lobbyId} mode to STANDARD.");
                 player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set mode for lobby ID " + lobbyid + " to STANDARD.");
-                Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s mode to STANDARD.**");
+                //Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s mode to STANDARD.**");
             }
             else if (mode.Equals("busted", StringComparison.OrdinalIgnoreCase))
             {
                 newLobby.gameMode = GameModes.BUSTED;
                 NAPI.Util.ConsoleOutput($"{player.Name} set lobby ID {newLobby.lobbyId} mode to BUSTED.");
                 player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set mode for lobby ID " + lobbyid + " to BUSTED.");
-                Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s mode to BUSTED.**");
+                //Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s mode to BUSTED.**");
             }
             else { player.SendChatMessage("!{#999999}Proper usage: /lobbymode <lobby id> <mode: 'standard', 'busted'>"); return; }
 
@@ -6701,7 +6701,7 @@ namespace RNC
 
             NAPI.Util.ConsoleOutput($"{player.Name} set lobby ID {newLobby.lobbyId} percentage to {newLobby.FugitivePercent}");
             player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set fugitive percentage for lobby ID " + lobbyid + " to " + newLobby.FugitivePercent);
-            Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s fugitive percentage to {newLobby.FugitivePercent}.**");
+            //Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s fugitive percentage to {newLobby.FugitivePercent}.**");
 
             return;
         }
@@ -6742,7 +6742,7 @@ namespace RNC
 
                 NAPI.Util.ConsoleOutput($"{player.Name} disabled lobby ID {newLobby.lobbyId}.");
                 player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have disabled lobby ID " + lobbyid + ".");
-                Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} disabled lobby {lobbyid}.**");
+                //Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} disabled lobby {lobbyid}.**");
             }
             else
             {
@@ -6750,7 +6750,7 @@ namespace RNC
 
                 NAPI.Util.ConsoleOutput($"{player.Name} enabled lobby ID {newLobby.lobbyId}.");
                 player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have enabled lobby ID " + lobbyid + ".");
-                Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} disabled {lobbyid}.**");
+                //Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} disabled {lobbyid}.**");
             }
 
             return;
@@ -6801,7 +6801,7 @@ namespace RNC
                         {
                             NAPI.Util.ConsoleOutput($"{player.Name} enabled map {mapBruh.Name} ID {mapBruh.SQL_ID}.");
                             RAGE.Entities.Players.All.ForEach((Player p) => p.SendChatMessage(Translate(p, "ADMIN_ENABLED_MAP", EPlayer.GetAdminName(player), mapBruh.Name)));
-                            Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} enabled map {mapBruh.Name}.**");
+                            //Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} enabled map {mapBruh.Name}.**");
                         });
 
                     }
@@ -6811,7 +6811,7 @@ namespace RNC
                         {
                             NAPI.Util.ConsoleOutput($"{player.Name} disabled map {mapBruh.Name} ID {mapBruh.SQL_ID}.");
                             RAGE.Entities.Players.All.ForEach((Player p) => p.SendChatMessage(Translate(p, "ADMIN_DISABLED_MAP", EPlayer.GetAdminName(player), mapBruh.Name)));
-                            Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} disabled map {mapBruh.Name}.**");
+                            //Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} disabled map {mapBruh.Name}.**");
                         });
 
                     }
@@ -10545,7 +10545,7 @@ namespace RNC
                     pl.SendChatMessage($"!{{#AFAFAF}}(( [GOOC] {EPlayer.GetPrefix(player, true)}~w~ {EPlayer.Name(player)}: {text} !{{#AFAFAF}}))");
             });
 
-            Discord.SendTextChannel("staff-bot", $"**(GOOC) | {EPlayer.GetPrefix(player, false)} {player.Name}**: {text}");
+            //Discord.SendTextChannel("staff-bot", $"**(GOOC) | {EPlayer.GetPrefix(player, false)} {player.Name}**: {text}");
         }
 
         [Command("text", GreedyArg = true)]
@@ -10614,7 +10614,7 @@ namespace RNC
                 });
             }
 
-            //Discord.SendTextChannel("staff-bot", $"**() | {EPlayer.GetPrefix(player, false)} {player.Name}**: {text}");
+            ////Discord.SendTextChannel("staff-bot", $"**() | {EPlayer.GetPrefix(player, false)} {player.Name}**: {text}");
         }
 
 
@@ -10639,7 +10639,7 @@ namespace RNC
             }
 
 
-            Discord.SendTextChannel("staff-bot", $"**(Lobby {player.GetSharedData<int>("InLobby")}) | {player.Name}**: {text}");
+            //Discord.SendTextChannel("staff-bot", $"**(Lobby {player.GetSharedData<int>("InLobby")}) | {player.Name}**: {text}");
         }
 
         [Command("ann", "!{#AFAFAF}[USAGE] ann (text)", Alias = "announce", GreedyArg = true)]
@@ -10661,7 +10661,7 @@ namespace RNC
             EPlayer.SendMessageToAllEx($"(( {EPlayer.GetAdminLevelName(EPlayer.GetAccount(player).Admin, true)}!{{#FFFFFF}} {EPlayer.Name(player)}: ))");
             EPlayer.SendMessageToAllEx("(( " + text + "!{#FFFFFF} ))");
 
-            Discord.SendTextChannel("staff-bot", $"**(ANNOUNCEMENT) | {player.Name}**: {text}");
+            //Discord.SendTextChannel("staff-bot", $"**(ANNOUNCEMENT) | {player.Name}**: {text}");
         }
 
         [Command("anonymous", Alias = "vanish")]

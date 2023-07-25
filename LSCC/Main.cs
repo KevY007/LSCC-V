@@ -199,7 +199,7 @@ namespace RNC
         public List<Lobby_StingerData> Stingers { get; set; }
 
         public List<Blip> ParkedVehicleBlips { get; set; }
-        
+
         public List<Player> BannedPlayers { get; set; }
 
         public LobbyData()
@@ -402,9 +402,9 @@ namespace RNC
             this.Image = image;
             this.Info = info;
 
-            if(model != "?")
+            if (model != "?")
                 Challenge.CopchaseVehicles.Add(name); // adding this model to the list of possible vehicles for a copchase challenge
-            
+
             Settings.Cars.Add(this);
         }
     };
@@ -533,7 +533,7 @@ namespace RNC
             }
         }
 
-        public static BR_FugitiveVehicleData[] FugitiveVehicleData = 
+        public static BR_FugitiveVehicleData[] FugitiveVehicleData =
         {
             new BR_FugitiveVehicleData(new Vector3(300.0705f, 262.5568f, 105.376785f), -105.05242f, "burrito3"),
             new BR_FugitiveVehicleData(new Vector3(294.0118f, 264.40457f, 105.40566f), -110.0321f, "burrito3"),
@@ -666,7 +666,7 @@ namespace RNC
                         EPlayer.UnlockAchievement(player, "discord_verify");
                     }
                 });
-          
+
             });
 
         }
@@ -723,7 +723,7 @@ namespace RNC
 
 
         public static class Timers
-        { 
+        {
             public static long GameUpdate_Tick { get; set; }
             public static long TimeUpdate_Tick { get; set; }
         }
@@ -796,19 +796,19 @@ namespace RNC
         public static Vector3[] LobbySpawns = new Vector3[]
         {
             new Vector3(2069.2861f, 2995.4106f, -67.70157f),
-            new Vector3(2054.4092f, 2974.1233f, -67.30131f), 
-            new Vector3(2022.6499f, 3020.7466f, -72.69173f), 
-            new Vector3(2042.7986f, 3011.162f, -72.701996f), 
+            new Vector3(2054.4092f, 2974.1233f, -67.30131f),
+            new Vector3(2022.6499f, 3020.7466f, -72.69173f),
+            new Vector3(2042.7986f, 3011.162f, -72.701996f),
             new Vector3(2058.3594f, 2992.1797f, -72.70203f),
             new Vector3(2051.1077f, 2970.5386f, -61.90173f),
             new Vector3(2069.274f, 2996.021f, -63.501797f),
-            new Vector3(2066.6445f, 2986.484f, -62.50187f), 
-            new Vector3(2060.0073f, 2993.4216f, -62.501953f), 
-            new Vector3(2046.1349f, 2936.4468f, -61.90174f), 
-            new Vector3(2089.6162f, 2928.3945f, -61.9019f), 
+            new Vector3(2066.6445f, 2986.484f, -62.50187f),
+            new Vector3(2060.0073f, 2993.4216f, -62.501953f),
+            new Vector3(2046.1349f, 2936.4468f, -61.90174f),
+            new Vector3(2089.6162f, 2928.3945f, -61.9019f),
             new Vector3(2116.1406f, 2924.1868f, -61.9019f),
             new Vector3(2091.659f, 2944.1787f, -61.901913f),
-            new Vector3(2054.5134f, 2953.5405f, -61.89666f), 
+            new Vector3(2054.5134f, 2953.5405f, -61.89666f),
             new Vector3(2042.21f, 2962.7363f, -65.50202f),
             new Vector3(2112.1326f, 2944.9526f, -65.50179f)
         };
@@ -1019,7 +1019,7 @@ namespace RNC
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
                     List<DailyChallenge> serverChallenges = await context.DailyChallenges.AsQueryable().ToListAsync();
-                    
+
                     if (!areChallengesUpToDate)
                     {
                         NAPI.Util.ConsoleOutput($"Challenges are not up to date for account {acc.Username}!");
@@ -1280,7 +1280,7 @@ namespace RNC
 
                                 }
                             });
-                            
+
                         });
                         NAPI.Task.Run(() =>
                         {
@@ -1469,7 +1469,7 @@ namespace RNC
                 {
                     foreach (Player pl in Settings.LoggedInPlayers)
                     {
-                        AddChallengesForPlayer(pl, cdList);                     
+                        AddChallengesForPlayer(pl, cdList);
                     }
                 });
                 //await context.SaveChangesAsync();
@@ -1496,7 +1496,7 @@ namespace RNC
 
         public static bool BlacklistedClothing(int slot, int drawable)
         {
-            if(slot == 0) // Hats
+            if (slot == 0) // Hats
             {
                 if ((drawable >= 16 && drawable <= 18) || drawable == 39 || (drawable >= 47 && drawable <= 53) ||
                        drawable == 38 || (drawable >= 66 && drawable <= 75) || (drawable >= 77 && drawable <= 82) ||
@@ -1681,237 +1681,237 @@ namespace RNC
         public static IDictionary<long, string> WeaponReasons = new Dictionary<long, string>()
         {
             {2460120199, "Antique Cavalry Dagger"},
-	        {2508868239, "Baseball Bat"},
-	        {4192643659, "Bottle"},
-	        {2227010557, "Crowbar"},
-	        {2725352035, "Fist"},
-	        {2343591895, "Flashlight"},
-	        {1141786504, "Golf Club"},
-	        {1317494643, "Hammer"},
-	        {4191993645, "Hatchet"},
-	        {3638508604, "Knuckle"},
-	        {2578778090, "Knife"},
-	        {3713923289, "Machete"},
-	        {3756226112, "Switchblade"},
-	        {1737195953, "Nightstick"},
-	        {419712736, "Pipe Wrench"},
-	        {3441901897, "Battle Axe"},
-	        {2484171525, "Pool Cue"},
-	        {940833800, "Stone Hatchet"},
-	        {453432689, "Pistol"},
-	        {3219281620, "Pistol MK2"},
-	        {1593441988, "Combat Pistol"},
-	        {584646201, "AP Pistol"},
-	        {911657153, "Stun Gun"},
-	        {2578377531, "Pistol .50"},
-	        {3218215474, "SNS Pistol"},
-	        {2285322324, "SNS Pistol MK2"},
-	        {3523564046, "Heavy Pistol"},
+            {2508868239, "Baseball Bat"},
+            {4192643659, "Bottle"},
+            {2227010557, "Crowbar"},
+            {2725352035, "Fist"},
+            {2343591895, "Flashlight"},
+            {1141786504, "Golf Club"},
+            {1317494643, "Hammer"},
+            {4191993645, "Hatchet"},
+            {3638508604, "Knuckle"},
+            {2578778090, "Knife"},
+            {3713923289, "Machete"},
+            {3756226112, "Switchblade"},
+            {1737195953, "Nightstick"},
+            {419712736, "Pipe Wrench"},
+            {3441901897, "Battle Axe"},
+            {2484171525, "Pool Cue"},
+            {940833800, "Stone Hatchet"},
+            {453432689, "Pistol"},
+            {3219281620, "Pistol MK2"},
+            {1593441988, "Combat Pistol"},
+            {584646201, "AP Pistol"},
+            {911657153, "Stun Gun"},
+            {2578377531, "Pistol .50"},
+            {3218215474, "SNS Pistol"},
+            {2285322324, "SNS Pistol MK2"},
+            {3523564046, "Heavy Pistol"},
             {2636060646, "Military Rifle"},
             {3347935668, "Heavy Rifle"},
             {137902532, "Vintage Pistol"},
-	        {1198879012, "Flare Gun"},
-	        {3696079510, "Marksman Pistol"},
-	        {3249783761, "Heavy Revolver"},
-	        {3415619887, "Heavy Revolver MK2"},
-	        {2548703416, "Double Action"},
-	        {2939590305, "Up-n-Atomizer"},
-	        {324215364, "Micro SMG"},
-	        {736523883, "SMG"},
-	        {2024373456, "SMG MK2"},
-	        {4024951519, "Assault SMG"},
-	        {171789620, "Combat PDW"},
-	        {3675956304, "Machine Pistol"},
-	        {3173288789, "Mini SMG"},
-	        {1198256469, "Unholy Hellbringer"},
-	        {487013001, "Pump Shotgun"},
-	        {1432025498, "Pump Shotgun MK2"},
-	        {2017895192, "Sawed-Off Shotgun"},
-	        {3800352039, "Assault Shotgun"},
-	        {2640438543, "Bullpup Shotgun"},
-	        {2828843422, "Musket"},
-	        {984333226, "Heavy Shotgun"},
-	        {4019527611, "Double Barrel Shotgun"},
-	        {317205821, "Sweeper Shotgun"},
-	        {3220176749, "Assault Rifle"},
-	        {961495388, "Assault Rifle MK2"},
-	        {2210333304, "Carbine Rifle"},
-	        {4208062921, "Carbine Rifle MK2"},
-	        {2937143193, "Advanced Rifle"},
-	        {3231910285, "Special Carbine"},
-	        {2526821735, "Special Carbine MK2"},
-	        {2132975508, "Bullpup Rifle"},
-	        {2228681469, "Bullpup Rifle MK2"},
-	        {1649403952, "Compact Rifle"},
-	        {2634544996, "MG"},
-	        {2144741730, "Combat MG"},
-	        {3686625920, "Combat MG MK2"},
-	        {1627465347, "Gusenberg Sweeper"},
-	        {100416529, "Sniper Rifle"},
-	        {205991906, "Heavy Sniper"},
-	        {177293209, "Heavy Sniper MK2"},
-	        {3342088282, "Marksman Rifle"},
-	        {1785463520, "Marksman Rifle MK2"},
-	        {2982836145, "RPG"},
-	        {2726580491, "Grenade Launcher"},
-	        {1305664598, "Smoke Grenade Launcher"},
-	        {1119849093, "Minigun"},
-	        {2138347493, "Firework Launcher"},
-	        {1834241177, "Railgun"},
-	        {1672152130, "Homing Launcher"},
-	        {125959754, "Compact Grenade Launcher"},
-	        {3056410471, "Ray Minigun"},
-	        {2481070269, "Grenade"},
-	        {2694266206, "BZ Gas"},
-	        {4256991824, "Smoke Grenade"},
-	        {1233104067, "Flare"},
-	        {615608432, "Molotov"},
+            {1198879012, "Flare Gun"},
+            {3696079510, "Marksman Pistol"},
+            {3249783761, "Heavy Revolver"},
+            {3415619887, "Heavy Revolver MK2"},
+            {2548703416, "Double Action"},
+            {2939590305, "Up-n-Atomizer"},
+            {324215364, "Micro SMG"},
+            {736523883, "SMG"},
+            {2024373456, "SMG MK2"},
+            {4024951519, "Assault SMG"},
+            {171789620, "Combat PDW"},
+            {3675956304, "Machine Pistol"},
+            {3173288789, "Mini SMG"},
+            {1198256469, "Unholy Hellbringer"},
+            {487013001, "Pump Shotgun"},
+            {1432025498, "Pump Shotgun MK2"},
+            {2017895192, "Sawed-Off Shotgun"},
+            {3800352039, "Assault Shotgun"},
+            {2640438543, "Bullpup Shotgun"},
+            {2828843422, "Musket"},
+            {984333226, "Heavy Shotgun"},
+            {4019527611, "Double Barrel Shotgun"},
+            {317205821, "Sweeper Shotgun"},
+            {3220176749, "Assault Rifle"},
+            {961495388, "Assault Rifle MK2"},
+            {2210333304, "Carbine Rifle"},
+            {4208062921, "Carbine Rifle MK2"},
+            {2937143193, "Advanced Rifle"},
+            {3231910285, "Special Carbine"},
+            {2526821735, "Special Carbine MK2"},
+            {2132975508, "Bullpup Rifle"},
+            {2228681469, "Bullpup Rifle MK2"},
+            {1649403952, "Compact Rifle"},
+            {2634544996, "MG"},
+            {2144741730, "Combat MG"},
+            {3686625920, "Combat MG MK2"},
+            {1627465347, "Gusenberg Sweeper"},
+            {100416529, "Sniper Rifle"},
+            {205991906, "Heavy Sniper"},
+            {177293209, "Heavy Sniper MK2"},
+            {3342088282, "Marksman Rifle"},
+            {1785463520, "Marksman Rifle MK2"},
+            {2982836145, "RPG"},
+            {2726580491, "Grenade Launcher"},
+            {1305664598, "Smoke Grenade Launcher"},
+            {1119849093, "Minigun"},
+            {2138347493, "Firework Launcher"},
+            {1834241177, "Railgun"},
+            {1672152130, "Homing Launcher"},
+            {125959754, "Compact Grenade Launcher"},
+            {3056410471, "Ray Minigun"},
+            {2481070269, "Grenade"},
+            {2694266206, "BZ Gas"},
+            {4256991824, "Smoke Grenade"},
+            {1233104067, "Flare"},
+            {615608432, "Molotov"},
             {3520460075, "Service Rifle"},
             {94989220, "Combat Shotgun"},
-			{350597077, "Tactical SMG"},
-			{741814745, "Sticky Bomb"},
-	        {2874559379, "Proximity Mine"},
-	        {126349499, "Snowball"},
-	        {3125143736, "Pipe Bomb"},
-	        {600439132, "Baseball"},
-	        {883325847, "Jerry Can"},
-	        {101631238, "Fire Extinguisher"},
-	        {4222310262, "Parachute"},
-	        {2461879995, "Electric Fence"},
-	        {3425972830, "Hit by Water Cannon"},
-	        {133987706, "Rammed by Car"},
-	        {2741846334, "Run Over by Car"},
-	        {3452007600, "Fall"},
-	        {4194021054, "Animal"},
-	        {324506233, "Airstrike Rocket"},
-	        {2339582971, "Bleeding"},
-	        {2294779575, "Briefcase"},
-	        {28811031, "Briefcase 02"},
-	        {148160082, "Cougar"},
-	        {1223143800, "Barbed Wire"},
-	        {4284007675, "Drowning"},
-	        {1936677264, "Drowning In Vehicle"},
-	        {539292904, "Explosion"},
-	        {910830060, "Exhaustion"},
-	        {3750660587, "Fire"},
-	        {341774354, "Heli Crash"},
-	        {3204302209, "Vehicle Rocket"},
-	        {2282558706, "Vehicle Akula Barrage"},
-	        {431576697, "Vehicle Akula Minigun"},
-	        {2092838988, "Vehicle Akula Missile"},
-	        {476907586, "Vehicle Akula Turret Dual"},
-	        {3048454573, "Vehicle Akula Turret Single"},
-	        {328167896, "Vehicle APC Cannon"},
-	        {190244068, "Vehicle APC MG"},
-	        {1151689097, "Vehicle APC Missile"},
-	        {3293463361, "Vehicle Ardent MG"},
-	        {2556895291, "Vehicle Avenger Cannon"},
-	        {2756453005, "Vehicle Barrage Rear GL"},
-	        {1200179045, "Vehicle Barrage Rear MG"},
-	        {525623141, "Vehicle Barrage Rear Minigun"},
-	        {4148791700, "Vehicle Barrage Top MG"},
-	        {1000258817, "Vehicle Barrage Top Minigun"},
-	        {3628350041, "Vehicle Bombushka Cannon"},
-	        {741027160, "Vehicle Bombushka Dual MG"},
-	        {3959029566, "Vehicle Cannon Blazer"},
-	        {1817275304, "Vehicle Caracara MG"},
-	        {1338760315, "Vehicle Caracara Minigun"},
-	        {2722615358, "Vehicle Cherno Missile"},
-	        {3936892403, "Vehicle Comet MG"},
-	        {2600428406, "Vehicle Deluxo MG"},
-	        {3036244276, "Vehicle Deluxo Missile"},
-	        {1595421922, "Vehicle Dogfighter MG"},
-	        {3393648765, "Vehicle Dogfighter Missile"},
-	        {2700898573, "Vehicle Dune Grenade Launcher"},
-	        {3507816399, "Vehicle Dune MG"},
-	        {1416047217, "Vehicle Dune Minigun"},
-	        {1566990507, "Vehicle Enemy Laser"},
-	        {1987049393, "Vehicle Hacker Missile"},
-	        {2011877270, "Vehicle Hacker Missile Homing"},
-	        {1331922171, "Vehicle Halftrack Dual MG"},
-	        {1226518132, "Vehicle Halftrack Quad MG"},
-	        {855547631, "Vehicle Havok Minigun"},
-	        {785467445, "Vehicle Hunter Barrage"},
-	        {704686874, "Vehicle Hunter Cannon"},
-	        {1119518887, "Vehicle Hunter MG"},
-	        {153396725, "Vehicle Hunter Missile"},
-	        {2861067768, "Vehicle Insurgent Minigun"},
-	        {507170720, "Vehicle Khanjali Cannon"},
-	        {2206953837, "Vehicle Khanjali Cannon Heavy"},
-	        {394659298, "Vehicle Khanjali GL"},
-	        {711953949, "Vehicle Khanjali MG"},
-	        {3754621092, "Vehicle Menacer MG"},
-	        {3303022956, "Vehicle Microlight MG"},
-	        {3846072740, "Vehicle Mobileops Cannon"},
-	        {3857952303, "Vehicle Mogul Dual Nose"},
-	        {3123149825, "Vehicle Mogul Dual Turret"},
-	        {4128808778, "Vehicle Mogul Nose"},
-	        {3808236382, "Vehicle Mogul Turret"},
-	        {2220197671, "Vehicle Mule4 MG"},
-	        {1198717003, "Vehicle Mule4 Missile"},
-	        {3708963429, "Vehicle Mule4 Turret GL"},
-	        {2786772340, "Vehicle Nightshark MG"},
-	        {1097917585, "Vehicle Nose Turret Valkyrie"},
-	        {3643944669, "Vehicle Oppressor MG"},
-	        {2344076862, "Vehicle Oppressor Missile"},
-	        {3595383913, "Vehicle Oppressor2 Cannon"},
-	        {3796180438, "Vehicle Oppressor2 MG"},
-	        {1966766321, "Vehicle Oppressor2 Missile"},
-	        {3473446624, "Vehicle Plane Rocket"},
-	        {1186503822, "Vehicle Player Buzzard"},
-	        {3800181289, "Vehicle Player Lazer"},
-	        {1638077257, "Vehicle Player Savage"},
-	        {2456521956, "Vehicle Pounder2 Barrage"},
-	        {2467888918, "Vehicle Pounder2 GL"},
-	        {2263283790, "Vehicle Pounder2 Mini"},
-	        {162065050, "Vehicle Pounder2 Missile"},
-	        {3530961278, "Vehicle Radar"},
-	        {3177079402, "Vehicle Revolter MG"},
-	        {3878337474, "Vehicle Rogue Cannon"},
-	        {158495693, "Vehicle Rogue MG"},
-	        {1820910717, "Vehicle Rogue Missile"},
-	        {50118905, "Vehicle Ruiner Bullet"},
-	        {84788907, "Vehicle Ruiner Rocket"},
-	        {3946965070, "Vehicle Savestra MG"},
-	        {231629074, "Vehicle Scramjet MG"},
-	        {3169388763, "Vehicle Scramjet Missile"},
-	        {1371067624, "Vehicle Seabreeze MG"},
-	        {3450622333, "Vehicle Searchlight"},
-	        {4171469727, "Vehicle Space Rocket"},
-	        {3355244860, "Vehicle Speedo4 MG"},
-	        {3595964737, "Vehicle Speedo4 Turret MG"},
-	        {2667462330, "Vehicle Speedo4 Turret Mini"},
-	        {968648323, "Vehicle Strikeforce Barrage"},
-	        {955522731, "Vehicle Strikeforce Cannon"},
-	        {519052682, "Vehicle Strikeforce Missile"},
-	        {1176362416, "Vehicle Subcar MG"},
-	        {3565779982, "Vehicle Subcar Missile"},
-	        {3884172218, "Vehicle Subcar Torpedo"},
-	        {1744687076, "Vehicle Tampa Dual Minigun"},
-	        {3670375085, "Vehicle Tampa Fixed Minigun"},
-	        {2656583842, "Vehicle Tampa Missile"},
-	        {1015268368, "Vehicle Tampa Mortar"},
-	        {1945616459, "Vehicle Tank"},
-	        {3683206664, "Vehicle Technical Minigun"},
-	        {1697521053, "Vehicle Thruster MG"},
-	        {1177935125, "Vehicle Thruster Missile"},
-	        {2156678476, "Vehicle Trailer Dualaa"},
-	        {341154295, "Vehicle Trailer Missile"},
-	        {1192341548, "Vehicle Trailer Quad MG"},
-	        {2966510603, "Vehicle Tula Dual MG"},
-	        {1217122433, "Vehicle Tula MG"},
-	        {376489128, "Vehicle Tula Minigun"},
-	        {1100844565, "Vehicle Tula Nose MG"},
-	        {3041872152, "Vehicle Turret Boxville"},
-	        {1155224728, "Vehicle Turret Insurgent"},
-	        {729375873, "Vehicle Turret Limo"},
-	        {2144528907, "Vehicle Turret Technical"},
-	        {2756787765, "Vehicle Turret Valkyrie"},
-	        {4094131943, "Vehicle Vigilante MG"},
-	        {1347266149, "Vehicle Vigilante Missile"},
-	        {2275421702, "Vehicle Viseris MG"},
-	        {1150790720, "Vehicle Volatol Dual MG"},
-	        {1741783703, "Vehicle Water Cannon"}
+            {350597077, "Tactical SMG"},
+            {741814745, "Sticky Bomb"},
+            {2874559379, "Proximity Mine"},
+            {126349499, "Snowball"},
+            {3125143736, "Pipe Bomb"},
+            {600439132, "Baseball"},
+            {883325847, "Jerry Can"},
+            {101631238, "Fire Extinguisher"},
+            {4222310262, "Parachute"},
+            {2461879995, "Electric Fence"},
+            {3425972830, "Hit by Water Cannon"},
+            {133987706, "Rammed by Car"},
+            {2741846334, "Run Over by Car"},
+            {3452007600, "Fall"},
+            {4194021054, "Animal"},
+            {324506233, "Airstrike Rocket"},
+            {2339582971, "Bleeding"},
+            {2294779575, "Briefcase"},
+            {28811031, "Briefcase 02"},
+            {148160082, "Cougar"},
+            {1223143800, "Barbed Wire"},
+            {4284007675, "Drowning"},
+            {1936677264, "Drowning In Vehicle"},
+            {539292904, "Explosion"},
+            {910830060, "Exhaustion"},
+            {3750660587, "Fire"},
+            {341774354, "Heli Crash"},
+            {3204302209, "Vehicle Rocket"},
+            {2282558706, "Vehicle Akula Barrage"},
+            {431576697, "Vehicle Akula Minigun"},
+            {2092838988, "Vehicle Akula Missile"},
+            {476907586, "Vehicle Akula Turret Dual"},
+            {3048454573, "Vehicle Akula Turret Single"},
+            {328167896, "Vehicle APC Cannon"},
+            {190244068, "Vehicle APC MG"},
+            {1151689097, "Vehicle APC Missile"},
+            {3293463361, "Vehicle Ardent MG"},
+            {2556895291, "Vehicle Avenger Cannon"},
+            {2756453005, "Vehicle Barrage Rear GL"},
+            {1200179045, "Vehicle Barrage Rear MG"},
+            {525623141, "Vehicle Barrage Rear Minigun"},
+            {4148791700, "Vehicle Barrage Top MG"},
+            {1000258817, "Vehicle Barrage Top Minigun"},
+            {3628350041, "Vehicle Bombushka Cannon"},
+            {741027160, "Vehicle Bombushka Dual MG"},
+            {3959029566, "Vehicle Cannon Blazer"},
+            {1817275304, "Vehicle Caracara MG"},
+            {1338760315, "Vehicle Caracara Minigun"},
+            {2722615358, "Vehicle Cherno Missile"},
+            {3936892403, "Vehicle Comet MG"},
+            {2600428406, "Vehicle Deluxo MG"},
+            {3036244276, "Vehicle Deluxo Missile"},
+            {1595421922, "Vehicle Dogfighter MG"},
+            {3393648765, "Vehicle Dogfighter Missile"},
+            {2700898573, "Vehicle Dune Grenade Launcher"},
+            {3507816399, "Vehicle Dune MG"},
+            {1416047217, "Vehicle Dune Minigun"},
+            {1566990507, "Vehicle Enemy Laser"},
+            {1987049393, "Vehicle Hacker Missile"},
+            {2011877270, "Vehicle Hacker Missile Homing"},
+            {1331922171, "Vehicle Halftrack Dual MG"},
+            {1226518132, "Vehicle Halftrack Quad MG"},
+            {855547631, "Vehicle Havok Minigun"},
+            {785467445, "Vehicle Hunter Barrage"},
+            {704686874, "Vehicle Hunter Cannon"},
+            {1119518887, "Vehicle Hunter MG"},
+            {153396725, "Vehicle Hunter Missile"},
+            {2861067768, "Vehicle Insurgent Minigun"},
+            {507170720, "Vehicle Khanjali Cannon"},
+            {2206953837, "Vehicle Khanjali Cannon Heavy"},
+            {394659298, "Vehicle Khanjali GL"},
+            {711953949, "Vehicle Khanjali MG"},
+            {3754621092, "Vehicle Menacer MG"},
+            {3303022956, "Vehicle Microlight MG"},
+            {3846072740, "Vehicle Mobileops Cannon"},
+            {3857952303, "Vehicle Mogul Dual Nose"},
+            {3123149825, "Vehicle Mogul Dual Turret"},
+            {4128808778, "Vehicle Mogul Nose"},
+            {3808236382, "Vehicle Mogul Turret"},
+            {2220197671, "Vehicle Mule4 MG"},
+            {1198717003, "Vehicle Mule4 Missile"},
+            {3708963429, "Vehicle Mule4 Turret GL"},
+            {2786772340, "Vehicle Nightshark MG"},
+            {1097917585, "Vehicle Nose Turret Valkyrie"},
+            {3643944669, "Vehicle Oppressor MG"},
+            {2344076862, "Vehicle Oppressor Missile"},
+            {3595383913, "Vehicle Oppressor2 Cannon"},
+            {3796180438, "Vehicle Oppressor2 MG"},
+            {1966766321, "Vehicle Oppressor2 Missile"},
+            {3473446624, "Vehicle Plane Rocket"},
+            {1186503822, "Vehicle Player Buzzard"},
+            {3800181289, "Vehicle Player Lazer"},
+            {1638077257, "Vehicle Player Savage"},
+            {2456521956, "Vehicle Pounder2 Barrage"},
+            {2467888918, "Vehicle Pounder2 GL"},
+            {2263283790, "Vehicle Pounder2 Mini"},
+            {162065050, "Vehicle Pounder2 Missile"},
+            {3530961278, "Vehicle Radar"},
+            {3177079402, "Vehicle Revolter MG"},
+            {3878337474, "Vehicle Rogue Cannon"},
+            {158495693, "Vehicle Rogue MG"},
+            {1820910717, "Vehicle Rogue Missile"},
+            {50118905, "Vehicle Ruiner Bullet"},
+            {84788907, "Vehicle Ruiner Rocket"},
+            {3946965070, "Vehicle Savestra MG"},
+            {231629074, "Vehicle Scramjet MG"},
+            {3169388763, "Vehicle Scramjet Missile"},
+            {1371067624, "Vehicle Seabreeze MG"},
+            {3450622333, "Vehicle Searchlight"},
+            {4171469727, "Vehicle Space Rocket"},
+            {3355244860, "Vehicle Speedo4 MG"},
+            {3595964737, "Vehicle Speedo4 Turret MG"},
+            {2667462330, "Vehicle Speedo4 Turret Mini"},
+            {968648323, "Vehicle Strikeforce Barrage"},
+            {955522731, "Vehicle Strikeforce Cannon"},
+            {519052682, "Vehicle Strikeforce Missile"},
+            {1176362416, "Vehicle Subcar MG"},
+            {3565779982, "Vehicle Subcar Missile"},
+            {3884172218, "Vehicle Subcar Torpedo"},
+            {1744687076, "Vehicle Tampa Dual Minigun"},
+            {3670375085, "Vehicle Tampa Fixed Minigun"},
+            {2656583842, "Vehicle Tampa Missile"},
+            {1015268368, "Vehicle Tampa Mortar"},
+            {1945616459, "Vehicle Tank"},
+            {3683206664, "Vehicle Technical Minigun"},
+            {1697521053, "Vehicle Thruster MG"},
+            {1177935125, "Vehicle Thruster Missile"},
+            {2156678476, "Vehicle Trailer Dualaa"},
+            {341154295, "Vehicle Trailer Missile"},
+            {1192341548, "Vehicle Trailer Quad MG"},
+            {2966510603, "Vehicle Tula Dual MG"},
+            {1217122433, "Vehicle Tula MG"},
+            {376489128, "Vehicle Tula Minigun"},
+            {1100844565, "Vehicle Tula Nose MG"},
+            {3041872152, "Vehicle Turret Boxville"},
+            {1155224728, "Vehicle Turret Insurgent"},
+            {729375873, "Vehicle Turret Limo"},
+            {2144528907, "Vehicle Turret Technical"},
+            {2756787765, "Vehicle Turret Valkyrie"},
+            {4094131943, "Vehicle Vigilante MG"},
+            {1347266149, "Vehicle Vigilante Missile"},
+            {2275421702, "Vehicle Viseris MG"},
+            {1150790720, "Vehicle Volatol Dual MG"},
+            {1741783703, "Vehicle Water Cannon"}
         };
 
         public static string WeatherToForecast(int weatherid)
@@ -1958,18 +1958,18 @@ namespace RNC
         public static string ConvertGameStatus(int status, bool colored = false)
         {
             string ret = "Waiting";
-			if(colored) ret = "!{#BD3831}" + ret;
+            if (colored) ret = "!{#BD3831}" + ret;
             switch (status)
             {
                 case 0:
                     break;
                 case 1:
                     ret = "Running";
-					if(colored) ret = "!{#28993E}" + ret;
+                    if (colored) ret = "!{#28993E}" + ret;
                     break;
                 case 2:
                     ret = "Starting";
-					if(colored) ret = "!{#00FF33}" + ret;
+                    if (colored) ret = "!{#00FF33}" + ret;
                     break;
             }
             return ret;
@@ -1978,16 +1978,16 @@ namespace RNC
         public static string ConvertGameMode(object mode, bool colored = false)
         {
             string ret = "Unknown";
-			if(colored) ret = "!{#FF0000}" + ret;
+            if (colored) ret = "!{#FF0000}" + ret;
             switch (mode)
             {
                 case GameModes.STANDARD:
                     ret = "Standard";
-					if(colored) ret = "!{#FFFFFF}" + ret;
+                    if (colored) ret = "!{#FFFFFF}" + ret;
                     break;
                 case GameModes.BUSTED:
                     ret = "Busted";
-					if(colored) ret = "!{#3569DB}" + ret;
+                    if (colored) ret = "!{#3569DB}" + ret;
                     break;
                 case GameModes.BANKROBBERY:
                     ret = "Bank Robbery";
@@ -2045,7 +2045,8 @@ namespace RNC
         {
             ContextFactory.SaveDB();
 
-            RAGE.Entities.Players.All.ForEach((Player p) => {
+            RAGE.Entities.Players.All.ForEach((Player p) =>
+            {
                 p.SendChatMessage("!{#FFFFFF}(( !{#FF6347}Server is stopping... !{#FFFFFF}))");
                 p.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
@@ -2138,7 +2139,7 @@ namespace RNC
                         }
                     }
                     catch { NAPI.Util.ConsoleOutput("(RnC | STARTUP) Failed to clear old weapondata.json, permission problem?"); }
-                    
+
                     try
                     {
                         File.Move("racenchase/weapondata.json.tmp", "racenchase/weapondata.json");
@@ -2370,7 +2371,7 @@ namespace RNC
                 .Add(WeaponHash.Bullpupshotgun, "https://assets.gm.miami/gtav/weapons/Bullpup-shotgun-icon.png", "Bullpup Shotgun", 28)
                 .Add(WeaponHash.Bzgas, "https://assets.gm.miami/gtav/weapons/Tear-gas-icon.png", "BZ Gas", 2)
                 .Add(WeaponHash.Pistol50, "https://assets.gm.miami/gtav/weapons/Pistol.50-icon.png", "Pistol .50", 40);
-            
+
             new LoadoutData(1, "CIA", 15, 30)
                 .Add(WeaponHash.Heavyshotgun, "https://assets.gm.miami/gtav/weapons/Heavy-shotgun-icon.png", "Heavy Shotgun", 20)
                 .Add(WeaponHash.Assaultsmg, "https://assets.gm.miami/gtav/weapons/Assault-smg-icon.png", "Assault SMG", 80)
@@ -2422,7 +2423,7 @@ namespace RNC
                 .Add((WeaponHash)1, "package://Artwork/Weapons/Armour.png", "Full Armour", 100)
                 .Add(WeaponHash.Heavypistol, "https://assets.gm.miami/gtav/weapons/Heavy-pistol-icon.png", "Heavy Pistol", 40);
 
-       
+
 
             //
 
@@ -2598,13 +2599,13 @@ namespace RNC
             if (Settings.Dynamics.Discord)
             {
                 NAPI.Util.ConsoleOutput("(RnC | STARTUP) Loading discord plugin.");
-                Discord.Main();
 
-                long tick = Environment.TickCount64 + 5000;
-                while (tick > Environment.TickCount64)
+                DiscordBot discordBot = new DiscordBot();
+                Task.Run(async () =>
                 {
+                    await discordBot.Start();
+                });
 
-                }
             }
             else NAPI.Util.ConsoleOutput("(RnC | OPT) Discord Bot is disabled, live commands and statuses not updated!");
 
@@ -2673,7 +2674,7 @@ namespace RNC
                             Settings.Timers.TimeUpdate_Tick = Environment.TickCount64 + 1000;
                         });
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         NAPI.Util.ConsoleOutput("GAY " + ex.ToString());
                     }
@@ -2685,7 +2686,7 @@ namespace RNC
         [ServerEvent(Event.Update)]
         public void OnUpdate()
         {
-            if(Environment.TickCount64 - Settings.Timers.GameUpdate_Tick >= 1000)
+            if (Environment.TickCount64 - Settings.Timers.GameUpdate_Tick >= 1000)
             {
                 GameUpdate();
                 Settings.Timers.GameUpdate_Tick = Environment.TickCount64;
@@ -2705,7 +2706,7 @@ namespace RNC
             {
                 LobbyData lobby = Settings.Lobbies.Find(l => l.lobbyId == lobbyid);
                 if (lobby != null)
-                { 
+                {
                     lock (lobby)
                     {
                         foreach (Player player in Settings.LoggedInPlayers)
@@ -2748,20 +2749,20 @@ namespace RNC
         {
             // UNUSED: Codes are generated on purchase.
             return;
-                /* ---Donation Types/Values---
-                    0 - Rank Budle ( To je ono kad mu s rankom da i namechangeve i sve kaj treba ko noramlan rank kad kupe_ 
-                    -- 0 - Bronze i0
-                    -- 1 - Silver i1
-                    -- 2 - Gold i2
-                    1 - Rank (Samo rank bez cjelog bundla)
-                    -- 0 - Bronze i3
-                    -- 1 - Silver i4
-                    -- 2 - Gold i5
-                    2 - DiamondPoints
-                    -- broj pointova kolko za dat i6
-                    3 - Namechanges
-                    -- broj namechangeva i7
-                 */
+            /* ---Donation Types/Values---
+                0 - Rank Budle ( To je ono kad mu s rankom da i namechangeve i sve kaj treba ko noramlan rank kad kupe_ 
+                -- 0 - Bronze i0
+                -- 1 - Silver i1
+                -- 2 - Gold i2
+                1 - Rank (Samo rank bez cjelog bundla)
+                -- 0 - Bronze i3
+                -- 1 - Silver i4
+                -- 2 - Gold i5
+                2 - DiamondPoints
+                -- broj pointova kolko za dat i6
+                3 - Namechanges
+                -- broj namechangeva i7
+             */
         }
 
         public void TimeUpdate()
@@ -2787,7 +2788,7 @@ namespace RNC
                                 {
                                     EPlayer.SendMessageToAll("NEW_CHALLENGES");
                                 });
-                                
+
                                 await context.Accounts.AsQueryable().ForEachAsync(acc =>
                                 {
                                     acc.CompletedDailyChallenge = false;
@@ -2805,7 +2806,7 @@ namespace RNC
                             });
                         }
                     });
-                    
+
                 }
 
                 if (Environment.TickCount64 - Settings.LastMessageTick > 90000)
@@ -2948,7 +2949,7 @@ namespace RNC
                                                     {
                                                         if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetSharedData<bool>("AutoJoin") == true)
                                                         {
-                                                            if(player.GetSharedData<int>("InLobby") < 0 || player.GetSharedData<int>("InDM") != -1)
+                                                            if (player.GetSharedData<int>("InLobby") < 0 || player.GetSharedData<int>("InDM") != -1)
                                                             {
                                                                 player.TriggerEvent("PlaySoundFrontend", "10s", "MP_MISSION_COUNTDOWN_SOUNDSET");
                                                                 EPlayer.Notify(player, Translate(player, "ROUND_STARTING_GO_LOBBY"), "orange", "fas fa-hourglass-start", false, 10000, "topCenter");
@@ -3026,7 +3027,7 @@ namespace RNC
                                         }
 
                                         int woundedCops = lobby.Cops.Where(c => c.GetSharedData<int>("Wounded") > 0).ToList().Count;
-                                        if(woundedCops >= lobby.Cops.Count)
+                                        if (woundedCops >= lobby.Cops.Count)
                                         {
                                             StopGame(lobby.lobbyId, 2);
                                         }
@@ -3036,13 +3037,13 @@ namespace RNC
                                             StopGame(lobby.lobbyId, 3);
                                         }
 
-                                        if(lobby.Fugitives.Count > 0)
+                                        if (lobby.Fugitives.Count > 0)
                                         {
                                             List<Player> driverFugis = lobby.Fugitives.Where(f => f.IsInVehicle && f.VehicleSeat == 0).ToList();
                                             if (driverFugis.Count <= 0) { driverFugis.Add(lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)]); }
 
                                             List<KeyValuePair<double, double>> fugiPoses = new List<KeyValuePair<double, double>>();
-                                            foreach(Player fugitive in lobby.Fugitives)
+                                            foreach (Player fugitive in lobby.Fugitives)
                                             {
                                                 fugiPoses.Add(new KeyValuePair<double, double>(fugitive.Position.X, fugitive.Position.Y));
                                             }
@@ -3050,7 +3051,7 @@ namespace RNC
                                             foreach (Player cop in lobby.Cops)
                                             {
                                                 cop.TriggerEvent("PoliceHeliCam_ClearFugitives");
-                                                foreach(KeyValuePair<double, double> pos in fugiPoses)
+                                                foreach (KeyValuePair<double, double> pos in fugiPoses)
                                                 {
                                                     cop.TriggerEvent("PoliceHeliCam_AddFugitivePosition", pos.Key, pos.Value);
                                                 }
@@ -3073,19 +3074,19 @@ namespace RNC
                     }
                 }
 
-                if (Discord._client != null && Settings.Dynamics.Discord && (int)Discord._client.ConnectionState == 2)
-                {
-                    System.Threading.Tasks.Task.Run(() =>
-                    {
-                        // Update discord bot status
-                        if (Environment.TickCount64 - Settings.LastCountUpdate >= 60000)
-                        {
-                            Settings.LastCountUpdate = Environment.TickCount64;
-                            Discord._client.SetGameAsync($"{RAGE.Entities.Players.Count} Players & {Settings.Lobbies.Where(l => l.gameStatus == 1).Count()} Chases");
-                            //NAPI.Util.ConsoleOutput("Updated the DISCORD counts.");
-                        }
-                    });
-                }
+                //if (Discord._client != null && Settings.Dynamics.Discord && (int)Discord._client.ConnectionState == 2)
+                //{
+                //    System.Threading.Tasks.Task.Run(() =>
+                //    {
+                //        // Update discord bot status
+                //        if (Environment.TickCount64 - Settings.LastCountUpdate >= 60000)
+                //        {
+                //            Settings.LastCountUpdate = Environment.TickCount64;
+                //            Discord._client.SetGameAsync($"{RAGE.Entities.Players.Count} Players & {Settings.Lobbies.Where(l => l.gameStatus == 1).Count()} Chases");
+                //            //NAPI.Util.ConsoleOutput("Updated the DISCORD counts.");
+                //        }
+                //    });
+                //}
             }
             catch (Exception ex)
             {
@@ -3103,9 +3104,9 @@ namespace RNC
                 int lastBigTime = 0;
                 int winXP = derbyPlayers * 2;
 
-                foreach(Player player in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
+                foreach (Player player in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
                 {
-                    if(player.GetSharedData<int>("DerbyTime") > lastBigTime)
+                    if (player.GetSharedData<int>("DerbyTime") > lastBigTime)
                     {
                         lastBigTime = player.GetSharedData<int>("DerbyTime");
                         winner = player;
@@ -3129,7 +3130,7 @@ namespace RNC
                 {
                     EPlayer.GetAccount(winner).DerbyWins++;
                     EPlayer.GrantXP(winner, winXP);
-					Discord.SendTextChannel("staff-bot", $"**(Derby) | Winner: {winner.Name} | XP Gained: {winXP} | Participants: {Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count()}**");
+                    ////Discord.SendTextChannel("staff-bot", $"**(Derby) | Winner: {winner.Name} | XP Gained: {winXP} | Participants: {Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count()}**");
 
                     winner.SetSharedData("FugitiveChance", winner.GetSharedData<float>("FugitiveChance") + 5 + (double)((double)EPlayer.GetAccount(winner).DonatorLevel / 2.0));
 
@@ -3147,7 +3148,7 @@ namespace RNC
             LobbyData lobby = Settings.Lobbies.Find(l => l.lobbyId == lobbyid);
             Stinger.ClearStingers(lobby);
 
-            foreach(Blip blip in lobby.ParkedVehicleBlips)
+            foreach (Blip blip in lobby.ParkedVehicleBlips)
             {
                 blip.Delete();
             }
@@ -3160,13 +3161,13 @@ namespace RNC
                 {
                     case 0:
                         EPlayer.SendMessageToAll("GAME_STOP_ADMIN", lobbyid);
-                        Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Stopped by an admin.**");
+                        //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Stopped by an admin.**");
                         break;
                     case 1: // time run out | fugi escape shit
                         if (lobby.gameMode != GameModes.BANKROBBERY)
                         {
                             EPlayer.SendMessageToAll("GAME_STOP_FUGITIVE_ESCAPE", lobbyid);
-                            Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives have escaped.**");
+                            //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives have escaped.**");
                             winnerTeam = 0;
                             foreach (Player i in lobby.Fugitives)
                             {
@@ -3186,7 +3187,7 @@ namespace RNC
                             {
                                 winnerTeam = 1;
                                 EPlayer.SendMessageToAll("GAME_STOP_FUGITIVE_BANKROB_FAIL", lobbyid);
-                                Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives didn't manage to rob the bank in time.**");
+                                //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives didn't manage to rob the bank in time.**");
 
                                 foreach (Player i in lobby.Cops)
                                 {
@@ -3202,7 +3203,7 @@ namespace RNC
                         break;
                     case 2:
                         EPlayer.SendMessageToAll("GAME_STOP_COPS_DEAD", lobbyid);
-                        Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | All cops have been eliminated.**");
+                        //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | All cops have been eliminated.**");
 
                         if (lobby.gameMode != GameModes.BANKROBBERY)
                         {
@@ -3239,7 +3240,7 @@ namespace RNC
                         break;
                     case 3:
                         EPlayer.SendMessageToAll("GAME_STOP_FUGITIVES_DEAD", lobbyid);
-                        Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Police has neutralized all fugitives.**");
+                        //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Police has neutralized all fugitives.**");
 
                         if (lobby.gameMode != GameModes.BANKROBBERY)
                         {
@@ -3255,7 +3256,7 @@ namespace RNC
                         }
                         else
                         {
-                            if(lobby.gameMode == GameModes.BANKROBBERY)
+                            if (lobby.gameMode == GameModes.BANKROBBERY)
                             {
                                 winnerTeam = 1;
                                 foreach (Player i in lobby.Cops)
@@ -3271,11 +3272,11 @@ namespace RNC
                         break;
                     case 4:
                         EPlayer.SendMessageToAll("GAME_STOP_NO_PLAYERS", lobbyid);
-                        Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Game was ended due to lack of players.**");
+                        //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Game was ended due to lack of players.**");
                         break;
                     case 5: // event cop win
                         EPlayer.SendMessageToAll("GAME_STOP_BANKROB_NO_LEADER", lobbyid);
-                        Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | No one was left to replace the heist leader.**");
+                        //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | No one was left to replace the heist leader.**");
                         winnerTeam = 1;
                         foreach (Player i in lobby.Cops)
                         {
@@ -3291,7 +3292,7 @@ namespace RNC
                         {
                             winnerTeam = 0;
                             EPlayer.SendMessageToAll("GAME_STOP_BANKROB_FUGI_WIN", lobbyid);
-                            Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives successfully delivered the money to their hideout.**");
+                            //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives successfully delivered the money to their hideout.**");
                             foreach (Player i in lobby.Fugitives)
                             {
                                 // Reward
@@ -3312,7 +3313,7 @@ namespace RNC
 
                 lobby.FirstKill = new KeyValuePair<Player, Player>(null, null);
 
-                if(winnerTeam == 0 && lobby.Fugitives.Where(c => c.GetSharedData<int>("Wounded") == 0).ToList().Count == 1)
+                if (winnerTeam == 0 && lobby.Fugitives.Where(c => c.GetSharedData<int>("Wounded") == 0).ToList().Count == 1)
                 {
                     Player last = lobby.Fugitives.FirstOrDefault(c => c.GetSharedData<int>("Wounded") == 0);
                     if (last != null)
@@ -3359,7 +3360,7 @@ namespace RNC
                     {
                         EPlayer.TryAdvanceChallenge(i, Challenge.ChallengeType.Win, "fugitive");
 
-                        if(lobby.gameMode != GameModes.BANKROBBERY && reason == 1)
+                        if (lobby.gameMode != GameModes.BANKROBBERY && reason == 1)
                         {
                             EPlayer.TryAdvanceChallenge(i, Challenge.ChallengeType.Win, "first_escape");
                         }
@@ -3371,8 +3372,8 @@ namespace RNC
                         {
                             EPlayer.UnlockAchievement(i, "no_shooting_win");
                         }
-                    } 
-                    if(lobby.gameMode == GameModes.BUSTED && winnerTeam == 0 && reason == 1 && lobby.Fugitives.Contains(i))
+                    }
+                    if (lobby.gameMode == GameModes.BUSTED && winnerTeam == 0 && reason == 1 && lobby.Fugitives.Contains(i))
                     {
                         EPlayer.UnlockAchievement(i, "first_busted");
                     }
@@ -3381,7 +3382,7 @@ namespace RNC
 
                     if (i.HasSharedData("Wounded"))
                     {
-                        if(i.GetSharedData<int>("Wounded") == 2)
+                        if (i.GetSharedData<int>("Wounded") == 2)
                         {
                             Events.RequestClearAnimation(i);
                             i.StopAnimation();
@@ -3424,7 +3425,7 @@ namespace RNC
                     }
                 }
 
-                if(lobby.Vehicles.Count > 0)
+                if (lobby.Vehicles.Count > 0)
                 {
                     for (int i = 0; i < lobby.Vehicles.Count; i++)
                     {
@@ -3454,7 +3455,7 @@ namespace RNC
                 lobby.Vehicles.Clear();
                 lobby.Drops.Clear();
 
-                if(lobby.gameMode == GameModes.BANKROBBERY)
+                if (lobby.gameMode == GameModes.BANKROBBERY)
                 {
                     lobby.gameMode = GameModes.STANDARD;
                     lobby.BankRobbery = new BankRobberyData();
@@ -3491,10 +3492,10 @@ namespace RNC
                     lobby.GameProgress = 0;
 
                     // DECIDING WHO GETS PUT IN COPCHASE LOBBY AND WHO DOESN'T!
-                    List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && 
-                    !EPlayer.IsAFK(a) && 
-                    !a.HasData("Spectating") && 
-                    a.GetSharedData<bool>("AutoJoin") == true && 
+                    List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid &&
+                    !EPlayer.IsAFK(a) &&
+                    !a.HasData("Spectating") &&
+                    a.GetSharedData<bool>("AutoJoin") == true &&
                     !a.Dead &&
                     a.GetData<int>("EditingClothing") == -1 &&
                     a.GetSharedData<int>("InDM") == -1 &&
@@ -3504,10 +3505,10 @@ namespace RNC
                     if (pCount < 2) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Total players less than two, failed to start"); return; }
 
                     decimal perc = (decimal)0;
-                    if(lobby.gameMode != GameModes.BANKROBBERY) perc = (decimal)pCount * ((decimal)lobby.FugitivePercent / (decimal)100);
+                    if (lobby.gameMode != GameModes.BANKROBBERY) perc = (decimal)pCount * ((decimal)lobby.FugitivePercent / (decimal)100);
                     else
                     {
-                        if(lobby.gameMode == GameModes.BANKROBBERY) perc = (decimal)pCount * ((decimal)55.0 / (decimal)100);
+                        if (lobby.gameMode == GameModes.BANKROBBERY) perc = (decimal)pCount * ((decimal)55.0 / (decimal)100);
                     }
 
                     int fugitives = (int)Decimal.Round(perc);
@@ -3519,7 +3520,7 @@ namespace RNC
                     List<Player> bannedCCplayers = new List<Player>();
                     foreach (Player player in lobbyPlayers)
                     {
-                        if(EPlayer.GetAccount(player).CopchaseBanTime > 0)
+                        if (EPlayer.GetAccount(player).CopchaseBanTime > 0)
                         {
                             long secs = EPlayer.GetAccount(player).CopchaseBanTime - DateTimeOffset.Now.ToUnixTimeSeconds();
                             if (secs > 0)
@@ -3563,29 +3564,35 @@ namespace RNC
                             {
                                 if (lobby.gameMode != GameModes.BANKROBBERY)
                                 {
-                                    if (await context.Maps.AsQueryable().CountAsync() < 1) { NAPI.Task.Run(() => { 
+                                    if (await context.Maps.AsQueryable().CountAsync() < 1)
+                                    {
+                                        NAPI.Task.Run(() =>
+                                        {
                                             NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has no maps added, failed to start");
                                             foreach (Player pl in lobbyPlayers)
                                             {
                                                 pl.TriggerEvent("stopLoadingScreen");
                                             }
-                                        });        
-                                        return; 
+                                        });
+                                        return;
                                     }
                                     crashcheck = 2;
 
                                     List<Map> mapList = await context.Maps.AsQueryable().Where(a => a.Enabled == true).ToListAsync();
                                     crashcheck = 3;
 
-                                    if (mapList.Count < 1) { NAPI.Task.Run(() => { 
-                                        NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has maps but none of them were enabled! Failed to start.");
-                                        foreach (Player pl in lobbyPlayers)
+                                    if (mapList.Count < 1)
+                                    {
+                                        NAPI.Task.Run(() =>
                                         {
-                                            pl.TriggerEvent("stopLoadingScreen");
-                                        }
+                                            NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Server has maps but none of them were enabled! Failed to start.");
+                                            foreach (Player pl in lobbyPlayers)
+                                            {
+                                                pl.TriggerEvent("stopLoadingScreen");
+                                            }
                                         });
-                                                            
-                                        return; 
+
+                                        return;
                                     }
                                     crashcheck = 4;
 
@@ -3593,12 +3600,17 @@ namespace RNC
                                     if (lobby.NextMapID != -1) map = mapList.Find(a => a.SQL_ID == lobby.NextMapID);
                                     lobby.NextMapID = -1;
 
-                                    if (map == null) { NAPI.Task.Run(() => {
-                                        foreach (Player pl in lobbyPlayers)
+                                    if (map == null)
+                                    {
+                                        NAPI.Task.Run(() =>
                                         {
-                                            pl.TriggerEvent("stopLoadingScreen");
-                                        }
-                                         NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Next (force-set) MapID == null; Failed to start!"); }); return; }
+                                            foreach (Player pl in lobbyPlayers)
+                                            {
+                                                pl.TriggerEvent("stopLoadingScreen");
+                                            }
+                                            NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Next (force-set) MapID == null; Failed to start!");
+                                        }); return;
+                                    }
                                     crashcheck = 5;
 
                                     int spawnsCount = await context.MapSpawns.AsQueryable().CountAsync(a => a.mapID == map.SQL_ID);
@@ -3812,7 +3824,7 @@ namespace RNC
                                 {
                                     foreach (Player player in lobby.Cops.OrderBy(x => Guid.NewGuid()))
                                     {
-                          
+
                                         spawnLoc = null;
                                         Account pAcc = EPlayer.GetAccount(player);
 
@@ -3928,7 +3940,7 @@ namespace RNC
                                                 // incrementing times this police vehicle was used
                                                 Task.Run(async () =>
                                                 {
-                                                    using(MainDatabase context = ContextFactory.CreateContext())
+                                                    using (MainDatabase context = ContextFactory.CreateContext())
                                                     {
                                                         if (await EPlayer.HasOwnedVehicle(pAcc, carName, 1))
                                                         {
@@ -3950,9 +3962,9 @@ namespace RNC
                                                             }
                                                         }
                                                     }
-                                                    
+
                                                 });
-                                                
+
 
                                             }
 
@@ -4033,7 +4045,7 @@ namespace RNC
                                             if (overridemaxseats != 0) maxseats = overridemaxseats;
 
                                             bool hasClanPartnering = false;
-                                            if(player.HasSharedData("ClanID") && player.GetSharedData<int>("ClanID") != -1 
+                                            if (player.HasSharedData("ClanID") && player.GetSharedData<int>("ClanID") != -1
                                             && player.HasSharedData("ClanPartnering") && player.GetSharedData<bool>("ClanPartnering") == true)
                                             {
                                                 int clanSQLID = player.GetSharedData<int>("ClanID");
@@ -4305,7 +4317,7 @@ namespace RNC
                                         else
                                         {
                                             carName = EPlayer.GetAccount(_tempPlayer).CarFugitive;
-                            
+
                                             Account pAcc = EPlayer.GetAccount(_tempPlayer);
                                             // incrementing times this police vehicle was used
                                             Task.Run(async () =>
@@ -4379,7 +4391,7 @@ namespace RNC
                                                 }
                                             }
                                         });
-                                        
+
 
                                         pVehicle.Position = vecSpawn;
                                         pVehicle.SetData("SpawnA", spawnLoc.spawnA);
@@ -4567,18 +4579,18 @@ namespace RNC
                                 if (lobby.gameMode == GameModes.STANDARD)
                                 {
                                     lobby.NextEventCounter--;
-                                    Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Standard Copchase has been started! Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
+                                    //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Standard Copchase has been started! Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
 
                                     if (lobby.NextEventCounter == 0)
                                         EPlayer.SendMessageToAll("BANK_ROB_NOTIFY_LOBBY", lobby.lobbyId);
                                 }
                                 else if (lobby.gameMode == GameModes.BUSTED)
                                 {
-                                    Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase in BUSTED! mode has been started! Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
+                                    //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase in BUSTED! mode has been started! Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
                                 }
                                 else if (lobby.gameMode == GameModes.BANKROBBERY)
                                 {
-                                    Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase in Bank Robbery event has been started! Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
+                                    //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase in Bank Robbery event has been started! Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
                                     lobby.BankRobbery.State = 0;
                                 }
 
@@ -4601,9 +4613,9 @@ namespace RNC
 
                                 lobby.gameStatus = 1;
                                 NAPI.Util.ConsoleOutput($"[Lobby {lobbyid}] Mode {ConvertGameMode(lobby.gameMode)} has been started with {lobby.Cops.Count} cops & {lobby.Fugitives.Count} fugitives on map {(map == null ? "EVENT" : map.Name)}.");
-                            });                       
+                            });
                         });
-                        
+
                     }
                     catch (Exception ex)
                     {
@@ -4627,16 +4639,16 @@ namespace RNC
         {
             try
             {
-                    if (Environment.TickCount64 - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
-                    {
-                        //Settings.DerbyTimeLeft--;
-                        Settings.LastDerbyTick = Environment.TickCount64;
+                if (Environment.TickCount64 - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
+                {
+                    //Settings.DerbyTimeLeft--;
+                    Settings.LastDerbyTick = Environment.TickCount64;
 
-                        if (Settings.DerbyTimeLeft <= 0)
-                        {
-                            Main.CheckDerbyWinner();
-                        }
+                    if (Settings.DerbyTimeLeft <= 0)
+                    {
+                        Main.CheckDerbyWinner();
                     }
+                }
 
                 lock (Settings.Lobbies)
                 {
@@ -4755,7 +4767,7 @@ namespace RNC
                                                         p.SendChatMessage(Translate(p, "START_BROB_SNIPER_2"));
                                                         p.SendChatMessage(Translate(p, "START_BROB_SNIPER_3"));
                                                         p.SendChatMessage(Translate(p, "START_BROB_SNIPER_4"));
-                                               
+
 
                                                         p.Position = BankRobberyData.SniperPos;
                                                         p.Heading = BankRobberyData.SniperHeading;
@@ -4857,7 +4869,7 @@ namespace RNC
 
                                                 p.SetIntoVehicle(p.GetData<Vehicle>("ChaseVehicle"), p.GetData<int>("ChaseVehicleSeat"));
 
-                                               // p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
+                                                // p.TriggerEvent("ChangeVehicleHeading", p.GetData<Vehicle>("ChaseVehicle").GetData<float>("SpawnA"));
                                                 //EPlayer.Freeze(p, true);
 
                                                 p.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
@@ -5312,7 +5324,7 @@ namespace RNC
                                             p.TriggerEvent("ToggleCanExitVehicle", true);
                                             EPlayer.TryAdvanceChallenge(p, Challenge.ChallengeType.CopchaseRounds, "N/A");
 
-                                            if(p.IsInVehicle && p.Vehicle != null)
+                                            if (p.IsInVehicle && p.Vehicle != null)
                                             {
                                                 p.Vehicle.Repair();
                                             }

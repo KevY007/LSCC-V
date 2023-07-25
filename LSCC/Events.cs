@@ -87,7 +87,7 @@ namespace RNC
         [RemoteEvent("playerReadyCon")]
         public void OnPlayerConnected(Player player)
         {
-            Discord.SendTextChannel("staff-bot", $"**{player.Name} has joined the server.** *(Total online: {RAGE.Entities.Players.Count})*");
+            //Discord.SendTextChannel("staff-bot", $"**{player.Name} has joined the server.** *(Total online: {RAGE.Entities.Players.Count})*");
 
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has joined the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
@@ -2635,7 +2635,7 @@ namespace RNC
                     Settings.LoggedInPlayers.Remove(player);
                     EPlayer.ResetPlayerData(player);
 
-                    Discord.SendTextChannel("staff-bot", $"**{player.Name} has left the server.** *(Total online: {RAGE.Entities.Players.Count - 1})*");
+                    //Discord.SendTextChannel("staff-bot", $"**{player.Name} has left the server.** *(Total online: {RAGE.Entities.Players.Count - 1})*");
                 }
             }
             catch (Exception ex)
@@ -3481,7 +3481,7 @@ namespace RNC
             player.SetSharedData("SQL_ID", acc.SQL_ID);
             player.SetSharedData("EntAlpha", 255);
             player.SetData("PlaytimeTick", Environment.TickCount64);
-            Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in as {acc.Username}.*");
+            //Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in as {acc.Username}.*");
 
             NAPI.Util.ConsoleOutput($"[Login] {player.Name} has logged in as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
@@ -4595,7 +4595,7 @@ namespace RNC
             player.SetSharedData("SQL_ID", acc.SQL_ID);
             player.SetSharedData("EntAlpha", 255);
             player.SetData("PlaytimeTick", Environment.TickCount64);
-            Discord.SendTextChannel("staff-bot", $"*{player.Name} has registered.*");
+            //Discord.SendTextChannel("staff-bot", $"*{player.Name} has registered.*");
 
             EPlayer.SetDiscordStatus(player, $"Registering as {acc.Username}");
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has registered as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
