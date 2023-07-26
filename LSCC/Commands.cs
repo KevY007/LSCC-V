@@ -884,7 +884,7 @@ namespace RNC
         }
 
         [Command("vehdbg")]
-        public void cmd_vehdbg(Player player, string carname, int col1 = -1, int col2 = -1)
+        public static void cmd_vehdbg(Player player, string carname, int col1 = -1, int col2 = -1)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -3329,7 +3329,7 @@ namespace RNC
         */
 
         [Command("givegundbg")]
-        public void cmd_givegundbg(Player player, Int64 hash, int ammo = 500)
+        public static void cmd_givegundbg(Player player, Int64 hash, int ammo = 500)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
@@ -3344,7 +3344,7 @@ namespace RNC
         }
 
         [Command("givegun", "!{#AFAFAF}[USAGE] givegun (optional: target) (optional: weapon name)", GreedyArg = true)]
-        public void cmd_givegun(Player player, Player target = null, string weaponName = "")
+        public static void cmd_givegun(Player player, Player target = null, string weaponName = "")
         {
             if (!EPlayer.LoggedIn(player))
                 return;

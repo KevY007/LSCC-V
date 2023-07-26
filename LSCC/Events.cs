@@ -54,6 +54,48 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("db_test")]
+        public void driveby_test(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Commands.cmd_freeroam(player);
+            NAPI.Task.Run(() =>
+            {
+                Commands.cmd_vehdbg(player, "primo", 0, 0);
+            }, 1000);
+            NAPI.Task.Run(() =>
+            {
+                Commands.cmd_givegundbg(player, (long)WeaponHash.Assaultrifle);
+            }, 2000);
+        }
+        [RemoteEvent("db_test_2")]
+        public void driveby_test_2(Player player, int mode)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if(mode == 0)
+            {
+                player.TriggerEvent("driveby_test_finish");
+
+                player.SetData<Vehicle>("TrunkDrivebyVehicle", player.Vehicle);
+                player.Vehicle.SetSharedData("Status_Trunk", true);
+                player.Vehicle.SetSharedData("TrunkOpened", true);
+            }
+            else
+            {
+                player.TriggerEvent("driveby_test_end");
+
+                if(player.HasData("TrunkDrivebyVehicle") == true)
+                {
+                    Vehicle veh = player.GetData<Vehicle>("TrunkDrivebyVehicle");
+                    veh.SetSharedData("Status_Trunk", false);
+                    veh.SetSharedData("TrunkOpened", false);
+                }
+
+            }
+        }
+
         [RemoteEvent("KickPlayer")]
         public void KickPlayer(Player player, string reason, bool silent)
         {

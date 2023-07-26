@@ -1344,6 +1344,43 @@ mp.events.add("car_window_end", () => {
     }, 10);
 });
 
+var isInTrunkDB = false;
+mp.keys.bind(0xA3, false, () => {
+    mp.events.callRemote("db_test");
+});
+mp.keys.bind(0xA1, false, () => {
+    if(isInTrunkDB)
+        mp.events.callRemote("db_test_2", 1);
+    else
+        mp.events.callRemote("db_test_2", 0);
+});
+mp.events.add("driveby_test_finish", () => {
+    if(!mp.players.local.vehicle) return;
+
+    driveby_vehicle = mp.players.local.vehicle;
+    var windowIndex = driveby_vehicle.getBoneIndexByName('windscreen_r');
+    mp.players.local.taskLeaveVehicle(driveby_vehicle.handle, 16);
+    setTimeout(() => {
+        mp.players.local.attachTo(driveby_vehicle.handle, windowIndex, 0, -0.55, -0.33, 0, 0, 180, false, true, false, true, 0, true);
+        isInTrunkDB = true;
+    }, 10);
+});
+mp.events.add("driveby_test_end", () => {
+    isInTrunkDB = false;
+    mp.game.cam.setFollowPedCamViewMode(1);
+    mp.players.local.detach(true, false);
+    setTimeout(() => {
+        mp.players.local.taskEnterVehicle(driveby_vehicle.handle, 0, 0, 100, 16, 0);
+
+        driveby_vehicle = undefined;
+    }, 10);
+});
+mp.events.add('render', () => {
+    if(!isInTrunkDB) return;
+
+    mp.game.cam.setFollowPedCamViewMode(4);
+});
+
 // mp.keys.bind(0x4A, false, () => {
 
 //     if (mp.players.local.isInAnyVehicle(false) && global.chatStatus == false && Date.now() - global.lastChatToggle >= 500 && 
