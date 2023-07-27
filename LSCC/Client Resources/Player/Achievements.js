@@ -94,39 +94,43 @@ let weekChalUnix = 0;
 mp.events.add("addChallengesToMenu", (weekChallengeProgress, weekChallengeUnix) => {
     let json = `gm.$refs.mainMenu.$refs.profileTab.$refs.challengesTab.categories = [`;
     let chstr = "";   
-    weekChalProg = weekChallengeProgress;
-    weekChalUnix = weekChallengeUnix;
-    json += `
-        {
-            name: "Weekly",
-            timeLeft: ${weekChallengeUnix},
-            challenges: 
-            [
-                {
-                    name: "7-day Streak",
-                    description: 'Complete at least one daily challenge per day for 7 days in a row.',
-                    progress: ${weekChallengeProgress},
-                    goal: 7,
-                    background: "package://Artwork/Achievements/reach_level_100.png"
-                }
-            ]
-       },
-       {
-           name: "Daily",
-           timeLeft: ${(DailyChallenges[i] != undefined ? DailyChallenges[i].expireDate : 999999999)},
-           challenges: [`
+    weekChalProg = Number(weekChallengeProgress);
+    weekChalUnix = Number(weekChallengeUnix);
+
+    var daily_challenges = [];
     for(let i = 0 ; i < DailyChallenges.length; i++){
-        chstr = `{
+
+        daily_challenges.push({
             name: "",
-            description: '${DailyChallenges[i].description}',
-            progress: ${DailyChallenges[i].progress},
-            goal: ${DailyChallenges[i].target},
-            background: "${getchalbackgroundpic(DailyChallenges[i].type)}"
-        },`;
-        json += chstr;
+            description: DailyChallenges[i].description,
+            progress: DailyChallenges[i].progress,
+            goal: DailyChallenges[i].target,
+            background: getchalbackgroundpic(DailyChallenges[i].type)
+        });
     }
-    json += `]}]`;
-    if(global.ServerUI) global.ServerUI.execute(json);
+    var challenges_object = [];
+    challenges_object.push({
+        name: "Weekly",
+        timeLeft: Number(weekChallengeUnix),
+        challenges: 
+        [
+            {
+                name: "7-day Streak",
+                description: 'Complete at least one daily challenge per day for 7 days in a row.',
+                progress: weekChallengeProgress,
+                goal: 7,
+                background: "package://Artwork/Achievements/reach_level_100.png"
+            }
+        ]
+    },
+    {
+        name: "Daily",
+        timeLeft: Number((DailyChallenges[i] != undefined ? DailyChallenges[i].expireDate : 999999999)),
+        challenges:daily_challenges
+    }
+    );
+
+    if(global.ServerUI) global.ServerUI.call('mainmenu_profile_challenges_set', challenges_object);
 });
 mp.events.add("advanceChallenge", (arrayID, cht, chi, chp) => {
     
@@ -187,19 +191,18 @@ mp.events.add("sendAchievementNotify", (title, description, background, reward, 
 
 
 mp.events.add("addAchievementsToMenu", () => {
-    let json = `gm.$refs.mainMenu.$refs.profileTab.$refs.achievementsTab.achievements = [`;
-    let achstr = "";
+
+    var achievements_object = [];
     for(let i = 0 ; i < Achievements.length; i++){
-        achstr = `{
-            "name":"${Achievements[i].name}", 
-            "description":'${Achievements[i].description}', 
-            "unlocked":${Achievements[i].unlocked},
-            "background":"${Achievements[i].background}"
-        },`;
-        json += achstr;
+
+        achievements_object.push({
+            "name":Achievements[i].name, 
+            "description":Achievements[i].description, 
+            "unlocked":Achievements[i].unlocked,
+            "background":Achievements[i].background
+        });
     }
-    json += "]";
-    if(global.ServerUI) global.ServerUI.execute(json);
+    if(global.ServerUI) global.ServerUI.call('mainmenu_profile_achievements_set', achievements_object);
 });
 mp.events.add("unlockAchievement", (achievementName) => {
     let achunlock = Achievements.find(a => a.name == achievementName);
