@@ -1361,9 +1361,22 @@ mp.events.add("driveby_test_finish", () => {
     var windowIndex = driveby_vehicle.getBoneIndexByName('windscreen_r');
     mp.players.local.taskLeaveVehicle(driveby_vehicle.handle, 16);
     setTimeout(() => {
-        mp.players.local.attachTo(driveby_vehicle.handle, windowIndex, 0, -0.55, -0.33, 0, 0, 180, false, true, false, true, 0, true);
+        mp.players.local.attachTo(driveby_vehicle.handle, windowIndex, 0, -0.55, -0.42, 0, 0, 180, false, true, false, true, 0, true);
         isInTrunkDB = true;
+        mp.events.callRemote("db_sync", true, driveby_vehicle.remoteId, windowIndex);
+        mp.events.callRemote('ServerConsoleOutput', `[${mp.players.local.name}] Attaching ${mp.players.local.name} to car ${driveby_vehicle.remoteId} index ${windowIndex}`);
     }, 10);
+
+    setTimeout(() => {
+        if(!isInTrunkDB) return;
+        mp.players.local.attachTo(driveby_vehicle.handle, windowIndex, 0, -0.55, -0.42, 0, 0, 180, false, true, false, true, 0, true);
+        mp.events.callRemote('ServerConsoleOutput', `[${mp.players.local.name}] Attaching v2 ${mp.players.local.name} to car ${driveby_vehicle.remoteId} index ${windowIndex}`);
+    }, 150);
+    setTimeout(() => {
+        if(!isInTrunkDB) return;
+        mp.players.local.attachTo(driveby_vehicle.handle, windowIndex, 0, -0.55, -0.42, 0, 0, 180, false, true, false, true, 0, true);
+        mp.events.callRemote('ServerConsoleOutput', `[${mp.players.local.name}] Attaching v3 ${mp.players.local.name} to car ${driveby_vehicle.remoteId} index ${windowIndex}`);
+    }, 1000);
 });
 mp.events.add("driveby_test_end", () => {
     isInTrunkDB = false;
@@ -1371,9 +1384,34 @@ mp.events.add("driveby_test_end", () => {
     mp.players.local.detach(true, false);
     setTimeout(() => {
         mp.players.local.taskEnterVehicle(driveby_vehicle.handle, 0, 0, 100, 16, 0);
-
         driveby_vehicle = undefined;
+        mp.events.callRemote("db_sync", false, 0, 0);
     }, 10);
+});
+mp.events.add('driveby_sync_attach', (attach, target, car_id) => {
+    if(!attach){
+        target.detach(true, false);
+        return;
+    }
+
+    var target_veh = null;
+    mp.vehicles.forEach(veh => {
+        if(veh.remoteId === car_id){
+            target_veh = veh;
+        }
+    });
+    if(!target_veh){
+        mp.events.callRemote('ServerConsoleOutput', `${mp.players.local.name} - not found target veh with id ${car_id}`);
+    }
+    var windowIndex = target_veh.getBoneIndexByName('windscreen_r');
+    setTimeout(() => {
+        target.attachTo(target_veh.handle, windowIndex, 0, -0.55, -0.42, 0, 0, 180, false, true, false, true, 0, true);
+        mp.events.callRemote('ServerConsoleOutput', `[${mp.players.local.name}] Syncing ${target.name} attach to car ${car_id} index ${windowIndex}`);
+    }, 50);
+    setTimeout(() => {
+        target.attachTo(target_veh.handle, windowIndex, 0, -0.55, -0.42, 0, 0, 180, false, true, false, true, 0, true);
+        mp.events.callRemote('ServerConsoleOutput', `[${mp.players.local.name}] Syncing v2 ${target.name} attach to car ${car_id} index ${windowIndex}`);
+    }, 1000);
 });
 mp.events.add('render', () => {
     if(!isInTrunkDB) return;

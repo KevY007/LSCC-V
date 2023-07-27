@@ -51,9 +51,9 @@ mp.events.addDataHandler('Status_Trunk', function (entity, value, oldValue)
     if (entity.type === 'vehicle') 
     {
         if (value == true){
-            entity.setDoorOpen(5, false, true);
-            entity.setDoorOpen(6, false, true);
-            entity.setDoorOpen(7, false, true);
+            entity.setDoorOpen(5, true, true);
+            entity.setDoorOpen(6, true, true);
+            entity.setDoorOpen(7, true, true);
         } else {
             entity.setDoorShut(5, true);
             entity.setDoorShut(6, true);

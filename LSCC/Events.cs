@@ -66,8 +66,20 @@ namespace RNC
             }, 1000);
             NAPI.Task.Run(() =>
             {
-                Commands.cmd_givegundbg(player, (long)WeaponHash.Assaultrifle);
+                player.GiveWeapon(WeaponHash.Assaultrifle, 500);
+                player.GiveWeapon(WeaponHash.Autoshotgun, 500);
             }, 2000);
+        }
+
+        [RemoteEvent("db_sync")]
+        public void db_sync(Player player, bool attach, int remoteCarID)
+        {
+            NAPI.Util.ConsoleOutput($"Syncing {player.Name} trunk sync for others | attach: {attach.ToString()} | carid {remoteCarID}");
+            NAPI.Pools.GetAllPlayers().ForEach(pl =>
+            {
+                if(pl != player)
+                    pl.TriggerEvent("driveby_sync_attach", attach, player, remoteCarID);
+            });
         }
         [RemoteEvent("db_test_2")]
         public void driveby_test_2(Player player, int mode)
@@ -81,6 +93,7 @@ namespace RNC
                 player.SetData<Vehicle>("TrunkDrivebyVehicle", player.Vehicle);
                 player.Vehicle.SetSharedData("Status_Trunk", true);
                 player.Vehicle.SetSharedData("TrunkOpened", true);
+                player.SetClothes(4, -1, -1);
             }
             else
             {
