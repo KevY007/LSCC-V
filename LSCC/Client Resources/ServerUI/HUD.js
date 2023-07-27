@@ -1129,79 +1129,81 @@ mp.events.add('browserDomReady', (browser) => {
     {
         // Set vars that aren't reset on login and shit. Basically init().
         if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.enabled = ${mp.storage.data.menu.topRightInfo}; gm.$refs.hud.$refs.topRight.$refs.killFeed.enabled = ${mp.storage.data.menu.killFeed};`);
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.enabled = true;`);
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items = [];`);
+        if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", true);
+        if(global.ServerUI) global.ServerUI.call("hud_minilist_items_set", []);
 
         // Initialize miniHUD
         miniHUDVars["bottom"] = ((resolution.y - (getMinimapAnchor().bottomY * resolution.y)) + 0);
         miniHUDVars["left"] = ((getMinimapAnchor().rightX * resolution.x) + 10) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0);
 
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.left = "${miniHUDVars["left"]}px";`);
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.bottom = "${miniHUDVars["bottom"]}px";`);  
+        if(global.ServerUI) global.ServerUI.call("hud_minilist_position_set", `${miniHUDVars["left"]}px`, `${miniHUDVars["bottom"]}px`);
 
-        // SPECTATE VARS
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({ 
+        var miniHUD_items = [];
+        miniHUD_items.push({ 
+            id:1,
+            enabled:false,
             name: "ping",
             icon: "fa-stopwatch",
-            init: "0 ms",
+            value: "0 ms",
             color: "#fbbf24"
-        });`);
-
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({ 
+        });
+        miniHUD_items.push({ 
+            id:2,
+            enabled:false,
             name: "packetloss",
             icon: "fa-minus",
-            init: "0.0%",
+            value: "0.0%",
             color: "#fb923c"
-        });`);
-        //
-        
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
+        });
+        miniHUD_items.push({ 
+            id:3,
+            enabled:miniHUDVars["jailed"],
             name: "jail",
             icon: "fa-ban",
-            init: "N/A",
+            value: "N/A",
             color: "#fb7185"
-        });`);
-
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
+        });
+        miniHUD_items.push({ 
+            id:4,
+            enabled:false,
             name: "visible",
             icon: "fa-globe",
-            init: "Visible",
+            value: "Visible",
             color: "#60a5fa"
-        });`);
-
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
+        });
+        miniHUD_items.push({ 
+            id:5,
+            enabled:true,
             name: "voice",
             icon: "fa-microphone",
-            init: "Standby",
+            value: "Standby",
             color: "#818cf8"
-        });`);
-
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
+        });
+        miniHUD_items.push({ 
+            id:6,
+            enabled:true,
             name: "direction",
             icon: "fa-compass",
-            init: "N/A",
+            value: "N/A",
             color: "#a3e635"
-        });`);
-
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
+        });
+        miniHUD_items.push({ 
+            id:7,
+            enabled:true,
             name: "street",
             icon: "fa-location-dot",
-            init: "N/A",
+            value: "N/A",
             color: "#4ade80"
-        });`);
-
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.items.push({
+        });
+        miniHUD_items.push({ 
+            id:8,
+            enabled:true,
             name: "zone",
             icon: "fa-location-crosshairs",
-            init: "N/A",
+            value: "N/A",
             color: "#34d399"
-        });`);
-
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.jail[0].show = ${miniHUDVars["jailed"]};`);
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.visible[0].show = false;`);
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.ping[0].show = false;`);
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.packetloss[0].show = false;`);
-
+        });
+        global.ServerUI.call('hud_minilist_items_set', miniHUD_items);
         mp.events.callLocal("ToggleTooltips", mp.storage.data.menu.tooltips);
 
         if(mp.storage.data.menu.HUD == false)
@@ -1363,27 +1365,27 @@ mp.events.add("UpdateRateEvent", () => {
         if(mp.players.local.getVariable("VisibleBlip") != miniHUDVars["visible"])
         {
             miniHUDVars["visible"] = mp.players.local.getVariable("VisibleBlip");
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.visible[0].show = ${miniHUDVars["visible"]};`);
+            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 4, miniHUDVars["visible"]);
         }
         if(voiceString != miniHUDVars["voice"])
         {
             miniHUDVars["voice"] = voiceString;
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.voice[0].value = "${miniHUDVars["voice"]}";`);
+            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 5, miniHUDVars["voice"]);
         }
         if(dirtext != miniHUDVars["direction"])
         {
             miniHUDVars["direction"] = dirtext;
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.direction[0].value = "${miniHUDVars["direction"]}";`);
+            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 6, miniHUDVars["direction"]);
         }
         if(global.streetName != miniHUDVars["street"])
         {
             miniHUDVars["street"] = global.streetName;
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.street[0].value = "${miniHUDVars["street"]}";`);
+            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 7, miniHUDVars["street"]);
         }
         if(global.zoneName != miniHUDVars["zone"])
         {
             miniHUDVars["zone"] = global.zoneName;
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.zone[0].value = "${miniHUDVars["zone"]}";`);
+            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 8, miniHUDVars["zone"]);
         }
 
         if(global.currentJailTime >= 1)
@@ -1391,15 +1393,15 @@ mp.events.add("UpdateRateEvent", () => {
             if(miniHUDVars["jailed"] != true)
             {
                 miniHUDVars["jailed"] = true;
-                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.jail[0].show = ${miniHUDVars["jailed"]};`);
+                if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 3, miniHUDVars["jailed"]);
             }
             miniHUDVars["jail"] = jailString;
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.jail[0].value = "${miniHUDVars["jail"]}";`);
+            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 3, miniHUDVars["jail"]);
         }
         else if(miniHUDVars["jailed"] == true)
         {
             miniHUDVars["jailed"] = false;
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.jail[0].show = ${miniHUDVars["jailed"]};`);
+            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 3, miniHUDVars["visible"]);
         }
 
         if (global.specState == true && global.specTarget != null && mp.players.exists(global.specTarget)) 
@@ -1407,30 +1409,30 @@ mp.events.add("UpdateRateEvent", () => {
             if(miniHUDVars["spec"] == false)
             {
                 miniHUDVars["spec"] = true;
-                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.ping[0].show = true;`);
-                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.packetloss[0].show = true;`);
+                if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 1, true);
+                if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 2, true);
 
-                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.direction[0].show = false;`);
+                if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 6, false);
             }
         
             if(miniHUDVars["packetloss"] != global.specTarget.getVariable("Packetloss").toFixed(2))
             {
                 miniHUDVars["packetloss"] = global.specTarget.getVariable("Packetloss").toFixed(2);
-                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.packetloss[0].value = "${miniHUDVars["packetloss"]}%"`);
+                if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 2, `${miniHUDVars["packetloss"]}%`);
             }
             if(miniHUDVars["ping"] != global.specTarget.getVariable("Ping"))
             {
                 miniHUDVars["ping"] = global.specTarget.getVariable("Ping");
-                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.ping[0].value = "${miniHUDVars["ping"]} ms"`);
+                if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 1, `${miniHUDVars["ping"]}ms`);
             }
         }
         else if(miniHUDVars["spec"] == true) 
         {
             miniHUDVars["spec"] = false;
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.ping[0].show = false;`);
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.packetloss[0].show = false;`);
+            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 1, false);
+            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 2, false);
 
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.$refs.direction[0].show = true;`);
+            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 6, true);
         }
     }
 });
@@ -1908,8 +1910,9 @@ mp.events.add("render", () => {
             miniHUDVars["bottom"] = ((resolution.y - (getMinimapAnchor().bottomY * resolution.y)) + 0);
             miniHUDVars["left"] = ((getMinimapAnchor().rightX * resolution.x) + 10) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0);
 
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.left = "${miniHUDVars["left"]}px";`);
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.bottom = "${miniHUDVars["bottom"]}px";`);  
+            if(global.ServerUI) global.ServerUI.call("hud_minilist_position_set", `${miniHUDVars["left"]}px`, `${miniHUDVars["bottom"]}px`);
+            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.left = "${miniHUDVars["left"]}px";`);
+            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.bottom = "${miniHUDVars["bottom"]}px";`);  
         }
         // if (mp.storage.data.menu.alwaysExpandedMap == true)
         // {
