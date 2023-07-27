@@ -1345,15 +1345,16 @@ mp.events.add("menu_store_redeem_result", (success, message) => {
 });
 
 mp.events.add("privateRoom_create", (name, pass, type, maxPlayers, maxPing) => {
+    mp.events.callRemote('ServerConsoleOutput', `Created private room ${name}`);
     mp.events.callRemote("Menu_OnLobbyCreate", name, pass, type, maxPlayers, maxPing);
 });
 mp.events.add("privateRoom_updateSettings", (roomJSON) => {
     const roomData = JSON.parse(roomJSON);
-
-    mp.gui.chat.push(`name ${roomData.name} pass ${roomData.password} type ${roomData.type} maxPl ${roomData.maxPlayers} maxPi ${roomData.maxPing}`);
+    mp.events.callRemote('ServerConsoleOutput', `Updated private room`);
     mp.events.callRemote("Menu_OnLobbyEdit", roomData.name, roomData.password, roomData.type, roomData.maxPlayers, roomData.maxPing);
 });
 mp.events.add("privateRoom_delete", (id) => {
+    mp.events.callRemote('ServerConsoleOutput', `Deleted private room`);
     mp.events.callRemote("Menu_OnLobbyDelete", id);
 });
 mp.events.add("privateRoom_kickPlayer", (id) => {
@@ -1367,22 +1368,24 @@ mp.events.add("privateRoom_unbanPlayer", (id) => {
     mp.events.callRemote("Menu_OnLobbyUnbanPlayer", id);
 });
 mp.events.add("removePrivateLobby", () => {
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.privateRoom = undefined;`);
+    mp.events.callRemote('ServerConsoleOutput', `Removed private room.`);
+    if(global.ServerUI) global.ServerUI.call('mainmenu_play_custom_room_set', undefined);
 })
 mp.events.add("updateMenuPrivateLobby", (id, name, password, type, playerCount, maxPlayers, maxPing, ownerName, playerList, bannedPlayersList) => {
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.privateRoom = {
-        id:${id},
-        name:"${name}",
-        password:"${password}",
-        type:${type},
-        players:${playerCount},
-        maxPlayers:${maxPlayers},
-        maxPing:${maxPing},
-        owner:"${ownerName}",
-        playerList:${playerList},
-        bannedPlayers:${bannedPlayersList},
+    mp.events.callRemote('ServerConsoleOutput', `Updated private room in menu: ${name} | ${id} | ${ownerName}`);
+    if(global.ServerUI) global.ServerUI.call('mainmenu_play_custom_room_set', {
+        id:id,
+        name:name,
+        password:password,
+        type:type,
+        players:playerCount,
+        maxPlayers:maxPlayers,
+        maxPing:maxPing,
+        owner:ownerName,
+        playerList:playerList,
+        bannedPlayers:bannedPlayersList,
         image:"https://i.pinimg.com/originals/54/28/fa/5428faf1395c1f9c90fbefc71d88b88b.jpg"
-    }`);
+    });
 });
 
 // --------------------
