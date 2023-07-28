@@ -1053,7 +1053,7 @@ mp.events.add("mainmenu_setting_change", (id, value) =>
     }
     else if(id == 31){
         mp.storage.data.menu.ShowVoiceActivity = value;
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.enabled = ${value.toString()};`);
+        if(global.ServerUI) global.ServerUI.call('hud_voiceactivity_toggle', value.toString());
     }
     else if(id == 32){
         mp.storage.data.menu.ChatAccessibility = value;

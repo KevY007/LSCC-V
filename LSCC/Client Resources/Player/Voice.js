@@ -76,9 +76,16 @@ mp.events.addCommand("voicebind", function (bind) {
 
 mp.events.add("playerStopTalking", (player) => {
     if(!global.ServerUI) return;
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.removeVoice(${player.remoteId})`);
+
+    if(global.ServerUI) global.ServerUI.call('hud_voiceactivity_voice_remove', player.remoteId);
 });
 mp.events.add("playerStartTalking", (player) => {
     if(!global.ServerUI) return;
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.addVoice(${player.remoteId}, "${player.name}")`);
+
+    const vec1 = mp.players.local.position;
+    const vec2 = player.position;
+
+    const distance = vec1.subtract(vec2).length();
+
+    if(global.ServerUI) global.ServerUI.call('hud_voiceactivity_voice_add', player.remoteId, player.name, distance.toFixed(0));
 });

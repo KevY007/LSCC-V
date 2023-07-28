@@ -4188,7 +4188,7 @@ function setStorageDataVars(){
     if(mp.storage.data.menu.ShowVoiceActivity == undefined){
         mp.storage.data.menu.ShowVoiceActivity = true;
     }
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.voiceActivity.enabled = ${mp.storage.data.menu.ShowVoiceActivity.toString()};`);
+    if(global.ServerUI) global.ServerUI.call('hud_voiceactivity_toggle', mp.storage.data.menu.ShowVoiceActivity.toString());
 
     if(mp.storage.data.menu.InactiveChatOpacity == undefined){
         mp.storage.data.menu.InactiveChatOpacity = 0.5;
