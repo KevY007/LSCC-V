@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography.X509Certificates;
 
 namespace RNC
 {
@@ -618,12 +619,20 @@ namespace RNC
         }
         #endregion
 
-        public static void Menu_AddItems(Player player)
+        class MenuItemObject
+        {
+            public ItemData itemData { get; set; }
+            public int owned { get; set; }
+            public int max { get; set; }
+        }
+        public static void Menu_UpdateAllItems(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
             Account acc = EPlayer.GetAccount(player);
-            foreach(ItemData item in ItemData.Items)
+
+            List<MenuItemObject> itemsArray = new List<MenuItemObject>();
+            foreach (ItemData item in ItemData.Items)
             {
                 int owned = 0;
                 int max = 0;
@@ -636,44 +645,15 @@ namespace RNC
                         else if (EPlayer.GetAccount(player).DonatorLevel == 3) max = 15;
                         owned = acc.Medkits;
                         break;
-                    case "painkiller": owned = acc.Painkillers;
-                        max = 4;
-                        if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 6;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 2) max = 10;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 3) max = 15;
-                        break;
-                    case "lockpick": owned = acc.Lockpicks;
-                        max = 10;
-                        if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 2) max = 20;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 3) max = 25;
-                        break;
-                }
-
-                player.TriggerEvent("AddMenuItem", item.Name, item.Type, owned, item.Price, item.Description, max, item.ID, item.Image);
-            }
-        }
-
-        public static void UpdateMaxMenuItems(Player player)
-        {
-            foreach (ItemData item in ItemData.Items)
-            {
-                int max = 0;
-                switch (item.Type)
-                {
-                    case "medkit":
-                        max = 4;
-                        if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 6;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 2) max = 10;
-                        else if (EPlayer.GetAccount(player).DonatorLevel == 3) max = 15;
-                        break;
                     case "painkiller":
+                        owned = acc.Painkillers;
                         max = 4;
                         if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 6;
                         else if (EPlayer.GetAccount(player).DonatorLevel == 2) max = 10;
                         else if (EPlayer.GetAccount(player).DonatorLevel == 3) max = 15;
                         break;
                     case "lockpick":
+                        owned = acc.Lockpicks;
                         max = 10;
                         if (EPlayer.GetAccount(player).DonatorLevel == 1) max = 15;
                         else if (EPlayer.GetAccount(player).DonatorLevel == 2) max = 20;
@@ -681,13 +661,37 @@ namespace RNC
                         break;
                 }
 
-                player.TriggerEvent("UpdateMaxMenuItem", item.ID, max);
+                MenuItemObject itemObject = new MenuItemObject()
+                {
+                    itemData = item,
+                    max = max,
+                    owned = owned
+                };
+                itemsArray.Add(itemObject);
             }
+            string itemsArrayJson = JsonConvert.SerializeObject(itemsArray, Newtonsoft.Json.Formatting.Indented);
+            player.TriggerEvent("UpdateMenuItemsTab", itemsArrayJson);
+        }
+
+        public static void Menu_AddItems(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Menu_UpdateAllItems(player);
+        }
+
+        public static void UpdateMaxMenuItems(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Menu_UpdateAllItems(player);    
         }
 
         public static void Menu_UpdateItem(Player player, int ID, int owned)
         {
-            player.TriggerEvent("UpdateMenuItem", ID, owned);
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Menu_UpdateAllItems(player);
         }
 
         public static string Name(Player player, bool override_anonymous = false)

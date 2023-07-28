@@ -277,8 +277,9 @@ namespace RNC
         public string Type { get; set; }
         public int Price { get; set; }
         public string Description { get; set; }
+        public int TeamID { get; set; }
 
-        public ItemData(int ID, string name, string type, int price, string description, string image)
+        public ItemData(int ID, string name, string type, int price, string description, string image, int teamID = -1)
         {
             this.ID = ID;
             Name = name;
@@ -286,6 +287,7 @@ namespace RNC
             Price = price;
             Description = description;
             Image = image;
+            TeamID = teamID;
 
             Items.Add(this);
         }

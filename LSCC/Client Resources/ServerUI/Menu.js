@@ -1258,6 +1258,30 @@ mp.events.add("UpdateMenuMinigames", (arenas, currentMinigame) => {
     }
 });
 
+mp.events.add("UpdateMenuItemsTab", (itemsData) => {
+    mp.events.callRemote('ServerConsoleOutput', itemsData);
+    const itemDataJSON = JSON.parse(itemsData);
+
+    var items_array = [];
+    for(let i = 0; i < itemDataJSON.length ; i++){
+        const item = itemDataJSON[i];
+        // {itemData, owned, max}
+
+        var itemObjectToAdd = {
+            name:item.itemData.Name,
+            description:item.itemData.Description,
+            owned:item.owned,
+            max:item.max,
+            cost:item.itemData.Price,
+            price:item.itemData.Price,
+            teamId:item.itemData.TeamID
+        }
+        items_array.push(itemObjectToAdd);
+    }
+
+    if(global.ServerUI) global.ServerUI.call('mainmenu_inventory_items_set', items_array);
+});
+
 mp.events.add("AddMenuItem", (name, type, owned, price, description, max, id, image) => {
     if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.itemsTab.items.push({
         id: ${id},
