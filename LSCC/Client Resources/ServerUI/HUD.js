@@ -1879,14 +1879,14 @@ mp.events.add("render", () => {
         }
         if(global.customCrosshairOn == true){
             if(!wasCustomCrosshairOn){
-                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = true;`);
+                if(global.ServerUI) global.ServerUI.call('crosshair_toggle', true);
                 wasCustomCrosshairOn = true;
             }
             mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
         }
         else{
             if(wasCustomCrosshairOn == true){
-                if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);
+                if(global.ServerUI) global.ServerUI.call('crosshair_toggle', false);
                 wasCustomCrosshairOn = false;
             }
         }
@@ -1894,7 +1894,7 @@ mp.events.add("render", () => {
     else{
         mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
         if(wasCustomCrosshairOn == true){
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.crosshair.enabled = false;`);
+            if(global.ServerUI) global.ServerUI.call('crosshair_toggle', false);
             wasCustomCrosshairOn = false;
             global.customCrosshairOn = false;
         }

@@ -71,7 +71,9 @@ mp.events.add("setSelectedProfile", (profileID, settings) => {
 mp.events.add("saveCrosshairProfiles", (profileData) => {
     mp.events.callRemote("Crosshair_SaveProfiles", profileData);
 
-    let prData = JSON.parse(profileData);
+    eval(`var realProfileData = ${profileData}`);
+
+    let prData = JSON.parse(realProfileData);
     if(prData != undefined){
         let currentProfile = undefined;
         for(let i = 0 ; i < prData.length; i++){
@@ -90,9 +92,12 @@ mp.events.add("saveCrosshairProfiles", (profileData) => {
 });
 
 mp.events.add("LoadCrosshairProfiles", (profileData, activeProfile) => {
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.$refs.states.setCrosshair('profiles', ${profileData});`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.$refs.states.setCrosshair('selectedProfile', '${activeProfile}');`);
+    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.$refs.states.setCrosshair('profiles', ${profileData});`);
+    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.$refs.states.setCrosshair('selectedProfile', '${activeProfile}');`);
 
+    eval(`var realProfileData = ${profileData}`);
+    eval(`var realActiveProfile = ${activeProfile}`);
+    if(global.ServerUI) global.ServerUI.call('mainmenu_settings_crosshair_set', realProfileData, realActiveProfile);
     ActiveCrosshairProfileUUID = activeProfile;
 });
 
@@ -474,6 +479,8 @@ function ToggleMenu()
         global.activateChat(!global.menuToggled);
         mp.events.callRemote("RequestStatsForStatsTab");
         global.UpdateStatsVars(mp.players.local);
+
+        if(global.ServerUI) global.ServerUI.call('mainmenu_settings_crosshair_request_save');
 
         if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.privateRoom = undefined;`);
 
@@ -1259,7 +1266,6 @@ mp.events.add("UpdateMenuMinigames", (arenas, currentMinigame) => {
 });
 
 mp.events.add("UpdateMenuItemsTab", (itemsData) => {
-    mp.events.callRemote('ServerConsoleOutput', itemsData);
     const itemDataJSON = JSON.parse(itemsData);
 
     var items_array = [];
