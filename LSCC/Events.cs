@@ -6205,6 +6205,7 @@ namespace RNC
                         {
                             player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(vehData), EPlayer.GetAccount(player).CarCop, EPlayer.GetAccount(player).CarFugitive);
                             player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(loadoutData), EPlayer.GetAccount(player).LoadoutCop, EPlayer.GetAccount(player).LoadoutFugitive);
+                            EPlayer.Menu_UpdateAllItems(player);
                         });
                     });
                     break;
@@ -7562,6 +7563,7 @@ namespace RNC
                         break;
                     }
             }
+            EPlayer.Menu_UpdateAllItems(player);
             EPlayer.Notify(player, Translate(player, "ITEM_PURCHASE", item.Name, price), "green", "fas fa-check", false, 3000, "bottomCenter", "replace");
             return;
         }

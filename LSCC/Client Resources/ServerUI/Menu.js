@@ -919,7 +919,6 @@ function updateMenuSettingsTab(){
 // ID 69420 ==> Custom Crosshair Toggle | ID 69421 ==> Always On Crosshair |  ID 69422 ==> Sniper Custom or Default crosshair
 mp.events.add("mainmenu_setting_change", (id, value) => 
 {
-    mp.events.callRemote("ServerConsoleOutput", `Setting change: ${id} value is ${value}`);
     if(id == 1)
     {
         mp.storage.data.menu.topRightInfo = value;
@@ -1274,18 +1273,17 @@ mp.events.add("UpdateMenuItemsTab", (itemsData) => {
         // {itemData, owned, max}
 
         var itemObjectToAdd = {
-            id:i,
+            id:item.itemData.ID,
             name:item.itemData.Name,
             description:item.itemData.Description,
             owned:item.owned,
             max:item.max,
-            cost:item.itemData.Price,
-            price:item.itemData.Price,
+            cost:Number(item.itemData.Price),
+            price:Number(item.itemData.Price),
             teamId:item.itemData.TeamID
         }
         items_array.push(itemObjectToAdd);
     }
-
     if(global.ServerUI) global.ServerUI.call('mainmenu_inventory_items_set', items_array);
 });
 
@@ -1352,7 +1350,7 @@ mp.events.add("menu_buyNamechange", (id) => {
 mp.events.add("menu_buyRank", (id) => {
     mp.events.callRemote("Menu_OnBuyRank", id);
 });
-mp.events.add("menu_buyItem", (id) => {
+mp.events.add("mainmenu_inventory_items_item_buy", (id) => {
     mp.events.callRemote("Menu_RequestBuyItem", id);
 });
 mp.events.add("MenuCustomizeLoadout", () => {
@@ -1376,12 +1374,10 @@ mp.events.add("menu_store_redeem_result", (success, message) => {
 });
 
 mp.events.add("mainmenu_play_custom_room_create", (name, pass, type, maxPlayers, maxPing) => {
-    mp.events.callRemote('ServerConsoleOutput', `Created private room ${name}`);
     mp.events.callRemote("Menu_OnLobbyCreate", name, pass, type, maxPlayers, maxPing);
 });
 mp.events.add("mainmenu_play_custom_room_settings_update", (roomJSON) => {
     const roomData = JSON.parse(roomJSON);
-    mp.events.callRemote('ServerConsoleOutput', `Updated private room`);
     mp.events.callRemote("Menu_OnLobbyEdit", roomData.name, roomData.password, roomData.type, roomData.maxPlayers, roomData.maxPing);
 });
 mp.events.add("privateRoom_delete", (id) => {
@@ -1418,7 +1414,6 @@ mp.events.add("updateMenuPrivateLobby", (id, name, password, type, playerCount, 
         bannedPlayers:banned_player_list,
         image:"https://i.pinimg.com/originals/54/28/fa/5428faf1395c1f9c90fbefc71d88b88b.jpg"
     });
-    mp.events.callRemote('ServerConsoleOutput', `Updated private room in menu: ${name} | ${id} | ${ownerName} | ${JSON.stringify(player_list)}`);
 });
 
 // --------------------
