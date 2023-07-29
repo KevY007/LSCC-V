@@ -1274,6 +1274,7 @@ mp.events.add("UpdateMenuItemsTab", (itemsData) => {
         // {itemData, owned, max}
 
         var itemObjectToAdd = {
+            id:i,
             name:item.itemData.Name,
             description:item.itemData.Description,
             owned:item.owned,
