@@ -5447,7 +5447,7 @@ namespace RNC
         }
 
         [Command("report", "!{#AFAFAF}[USAGE] report (target) (desc)", GreedyArg = true)]
-        public void cmd_report(Player player, Player target, string description)
+        public static void cmd_report(Player player, Player target, string description)
         {
             if (Settings.Requests.Count(r => r.Reported == target && r.Reporter == player) > 0)
             {

@@ -6185,6 +6185,18 @@ namespace RNC
             return loadoutItems;
         }
 
+        [RemoteEvent("Menu_ReportPlayer")]
+        public void OnMenuReportPlayer(Player player, string target, string reason)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            NAPI.Util.ConsoleOutput($"{player.Name} is reporting {target} [unfound yet] for {reason}");
+            Player targetPlayer = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name == target);
+            if (targetPlayer == null) return;
+
+            NAPI.Util.ConsoleOutput($"{player.Name} is reporting {targetPlayer.Name} for {reason}");
+            Commands.cmd_report(player, targetPlayer, reason);
+        }
+
         [RemoteEvent("Menu_RequestTabData")]
         public void OnPlayerRequestMenuTabData(Player player, string tab)
         {

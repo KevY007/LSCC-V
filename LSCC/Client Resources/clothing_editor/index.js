@@ -2,7 +2,7 @@ var global = require('./globals');
 let editorTeam = -1;
 
 mp.events.add("ClothingEditor:exit", (save) => {
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = ${mp.storage.data.menu.HUD.toString()};`);
+    if(global.ServerUI) global.ServerUI.call('hud_toggle', mp.storage.data.menu.HUD);
     mp.gui.cursor.show(false, false);
     global.ClothingEditorDOM.active = false;
     global.ClothingEditorActive = false;
@@ -37,7 +37,7 @@ mp.events.add("ClothingEditor:show", (team, gender, clothingData, forceSet) => {
     let toSendStr = JSON.stringify(toSend);
 
     editorTeam = team;
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = false;`);
+    if(global.ServerUI) global.ServerUI.call('hud_toggle', false);
     mp.gui.cursor.show(true, true);
     mp.game.invoke("0xFC695459D4D0E219", 0.5, 0.5); // SET CURSOR POSITION TO CENTER [x,y = 0.5,0.5]
 

@@ -588,7 +588,7 @@ mp.events.add("startLoadingScreen", (time, message) => {
     }
 
     if(time == -1){
-        if(global.ServerUI) global.ServerUI.call('loadingscreen_start', 999999999);
+        if(global.ServerUI) global.ServerUI.call('loadingscreen_start', 5000);
         //if(message != "none")
         //    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.loadingText = "${message}"`);
         //else if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.loadingText = ""`);
@@ -869,7 +869,7 @@ mp.events.add('RestartHUD', () => {
         //     autoScroll: true,
         // }`);
     }, 1000);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = false;`);
+    if(global.ServerUI) global.ServerUI.call('hud_toggle', false);
 });
 
 let createdTooltips = []; // to keep track of created tooltips / preventing duplicates
@@ -1117,7 +1117,7 @@ mp.events.add("TwoSecondsEvent", () => {
 
     if(mp.storage.data.menu.HUD == false)
     {
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = false;`);
+        if(global.ServerUI) global.ServerUI.call('hud_toggle', false);
     }
     global.renderNametags = mp.storage.data.menu.nametags;
 });
@@ -1130,6 +1130,7 @@ mp.events.add('browserDomReady', (browser) => {
         // Set vars that aren't reset on login and shit. Basically init().
         if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.enabled = ${mp.storage.data.menu.topRightInfo}; gm.$refs.hud.$refs.topRight.$refs.killFeed.enabled = ${mp.storage.data.menu.killFeed};`);
         if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", true);
+        if(global.ServerUI) global.ServerUI.call('hud_minilist', true);
         if(global.ServerUI) global.ServerUI.call("hud_minilist_items_set", []);
 
         // Initialize miniHUD
@@ -1205,11 +1206,23 @@ mp.events.add('browserDomReady', (browser) => {
         });
         global.ServerUI.call('hud_minilist_items_set', miniHUD_items);
         mp.events.callLocal("ToggleTooltips", mp.storage.data.menu.tooltips);
+        if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", true);
+        if(global.ServerUI) global.ServerUI.call('hud_minilist', true);
 
         if(mp.storage.data.menu.HUD == false)
         {
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = false`);
+            if(global.ServerUI) global.ServerUI.call('hud_toggle', false);
         }
+    }
+});
+
+mp.events.add("TwoSecondsEvent", () => {
+    if(mp.storage.data.menu.HUD !== undefined){
+        mp.events.callRemote(`ServerConsoleOutput`, `[${mp.players.local.name}] HUD is toggled: ${mp.storage.data.menu.HUD.toString()}`);
+        //if(global.ServerUI) global.ServerUI.call('hud_toggle', true);
+    }
+    else{
+        mp.events.callRemote(`ServerConsoleOutput`, `[${mp.players.local.name}] HUD does not exist in storage.`);
     }
 });
 
@@ -1220,11 +1233,11 @@ mp.events.add('ToggleHud', (toggle) => {
     {
         if(mp.storage.data.menu.HUD == false)
         {
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = false`);
+            if(global.ServerUI) global.ServerUI.call('hud_toggle', false);
             mp.storage.data.menu.HUD = false;
         }
 
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = ${toggle};`);
+        if(global.ServerUI) global.ServerUI.call('hud_toggle', toggle);
         mp.storage.data.menu.HUD = toggle;
     }
 

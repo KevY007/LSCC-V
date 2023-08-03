@@ -654,7 +654,7 @@ function checkCamInAir() {
     gui = "true";
 
     if (global.ServerUI != null && global.ServerUI != undefined)
-      if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = ${global.showHud};`);
+    if(global.ServerUI) global.ServerUI.call('hud_toggle', global.showHud);
   }
 }
 

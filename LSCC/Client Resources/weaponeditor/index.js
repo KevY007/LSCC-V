@@ -38,7 +38,7 @@ mp.events.add("WeaponEditor:exit", () => {
     mp.events.callRemote("WeaponEditor:onExit");
 
     global.WeaponEditorDOM.active = false;
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = ${mp.storage.data.menu.HUD.toString()};`);
+    if(global.ServerUI) global.ServerUI.call('hud_toggle', mp.storage.data.menu.HUD);
     mp.game.ui.displayRadar(true);
     mp.game.ui.displayHud(true);
     mp.players.local.clearTasksImmediately();
@@ -80,7 +80,7 @@ mp.events.add("WeaponEditor:playSound", (type) => {
 mp.events.add("WeaponEditor:show", () => {
     mp.events.callRemote("WeaponEditor:onOpen");
     global.WeaponEditorActive = true;
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = false;`);
+    if(global.ServerUI) global.ServerUI.call('hud_toggle', false);
     mp.players.local.setAlpha(0);
     mp.players.local.freezePosition(true);
     mp.players.local.clearTasksImmediately();

@@ -69,6 +69,8 @@ mp.events.add("setSelectedProfile", (profileID, settings) => {
     mp.events.callRemote("Crosshair_SetProfile", profileID);
 });
 mp.events.add("saveCrosshairProfiles", (profileData) => {
+    mp.events.callRemote("ServerConsoleOutput" ,profileData);
+    return;
     mp.events.callRemote("Crosshair_SaveProfiles", profileData);
 
     eval(`var realProfileData = ${profileData}`);
@@ -473,7 +475,7 @@ function ToggleMenu()
         if(global.ServerUI) global.ServerUI.execute(`gm._pStores.globals.isMainMenuOpen = ${global.menuToggled};`);
         if(global.ServerUI) global.ServerUI.call(`mainmenu_toggle`, global.menuToggled);
         
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = ${global.menuToggled ? 'false' : mp.storage.data.menu.HUD.toString()};`);
+        if(global.ServerUI) global.ServerUI.call('hud_toggle', (global.menuToggled ? false : mp.storage.data.menu.HUD));
         mp.events.callRemote("OnToggleMenu", global.menuToggled);
         mp.gui.cursor.show(global.menuToggled, global.menuToggled);
         global.activateChat(!global.menuToggled);
@@ -916,6 +918,11 @@ function updateMenuSettingsTab(){
         global.ServerUI.call("mainmenu_setting_value_set", 69422, global.showCustomCrosshairInSniper);
     }
 }
+
+mp.events.add("report_player", (username, reason) => {
+    mp.events.callRemote("Menu_ReportPlayer", username, reason);
+});
+
 // ID 69420 ==> Custom Crosshair Toggle | ID 69421 ==> Always On Crosshair |  ID 69422 ==> Sniper Custom or Default crosshair
 mp.events.add("mainmenu_setting_change", (id, value) => 
 {
@@ -926,7 +933,7 @@ mp.events.add("mainmenu_setting_change", (id, value) =>
     else if(id == 9)
     {
         mp.storage.data.menu.HUD = value;
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = ${value.toString()}`);
+        if(global.ServerUI) global.ServerUI.call('hud_toggle', value);
     }
     else if(id == 10)
     {

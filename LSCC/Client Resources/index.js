@@ -248,9 +248,7 @@ mp.events.add('showLoginBrowser', (state) => {
         if(global.ServerUI != null)
         {      
             if(global.ServerUI.active) global.ServerUI.active = true;
-            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = false;`);
-            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
-            //if(global.ServerUI) global.ServerUI.call(`mainmenu_toggle`, false);
+            if(global.ServerUI) global.ServerUI.call('hud_toggle', false);
             if(global.ServerUI) global.ServerUI.call(`mainmenu_toggle`, false); 
             if(state){
                 if(global.ServerUI) global.ServerUI.call(`auth_toggle`, true);
@@ -266,8 +264,11 @@ mp.events.add('showLoginBrowser', (state) => {
                     if(!mp.players.local || !mp.players.exists(mp.players.local)) return;
 
                     if(global.ServerUI) global.ServerUI.call(`auth_toggle`, false);
-                    if(!global.IsInTutorial)
-                        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = true;`);
+                    if(!global.IsInTutorial){
+                        if(global.ServerUI) global.ServerUI.call('hud_toggle', true);
+                        if(global.ServerUI) global.ServerUI.call('hud_minilist', true);
+                        if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", true);
+                    }
                 }, 1000);
             }
             if(!global.IsInTutorial)

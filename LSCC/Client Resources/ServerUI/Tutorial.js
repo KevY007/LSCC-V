@@ -131,5 +131,4 @@ mp.events.add("OnFinishTutorial", (results) => {
     mp.events.callLocal("login_StopMusic");
     mp.events.callRemote("Server_FinishTutorial", useVoice, langID);
     mp.gui.cursor.show(false, false);
-   // if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.enabled = true;`);
 });
