@@ -1216,16 +1216,6 @@ mp.events.add('browserDomReady', (browser) => {
     }
 });
 
-mp.events.add("TwoSecondsEvent", () => {
-    if(mp.storage.data.menu.HUD !== undefined){
-        mp.events.callRemote(`ServerConsoleOutput`, `[${mp.players.local.name}] HUD is toggled: ${mp.storage.data.menu.HUD.toString()}`);
-        //if(global.ServerUI) global.ServerUI.call('hud_toggle', true);
-    }
-    else{
-        mp.events.callRemote(`ServerConsoleOutput`, `[${mp.players.local.name}] HUD does not exist in storage.`);
-    }
-});
-
 mp.events.add('ToggleHud', (toggle) => {
     global.showHud = toggle;
     

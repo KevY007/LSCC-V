@@ -938,6 +938,7 @@ function activateChat(toggle){
         return;
     }
 
+    mp.gui.chat.activate(toggle);
     if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggle(${toggle.toString()})`);
 };
 function AddCustomVehiclesToSpawner(){

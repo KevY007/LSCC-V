@@ -87,5 +87,5 @@ mp.events.add("playerStartTalking", (player) => {
 
     const distance = vec1.subtract(vec2).length();
 
-    if(global.ServerUI) global.ServerUI.call('hud_voiceactivity_voice_add', player.remoteId, player.name, distance.toFixed(0));
+    if(global.ServerUI) global.ServerUI.call('hud_voiceactivity_voice_add', player.remoteId, player.getVariable("Team"), player.name, distance.toFixed(0), player.getVariable("Donator"));
 });
