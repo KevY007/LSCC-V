@@ -2490,6 +2490,11 @@ namespace RNC
         [ServerEvent(Event.PlayerDisconnected)]
         public void OnPlayerDisconnected(Player player, DisconnectionType type, string reason)
         {
+            if (!EPlayer.LoggedIn(player))
+            {
+                NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has left the server in Login Screen. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
+                return;
+            }
             try
             {
                 Logs.LogSession(player);
