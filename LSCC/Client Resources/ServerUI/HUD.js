@@ -750,23 +750,23 @@ mp.keys.bind(0x0D, true, function() { // Enter Key
 
 mp.keys.bind(0x26, true, function() { // UP arrow
     if(global.chatStatus && global.ServerUI){
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.historyUp();`);
+        if(global.ServerUI) global.ServerUI.call("hud_chat_history_up");
     }
 });
 mp.keys.bind(0x28, true, function() { // DOWN arrow
     if(global.chatStatus && global.ServerUI){
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.historyDown();`);
+        if(global.ServerUI) global.ServerUI.call("hud_chat_history_down");
     }
 });
 
 mp.keys.bind(0x21, true, function() { // PAGE UP arrow
     if(global.chatStatus && global.ServerUI){
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.channelUp();`);
+        if(global.ServerUI) global.ServerUI.call("hud_chat_channel_up");
     }
 });
 mp.keys.bind(0x222, true, function() { // PAGE DOWN arrow
     if(global.chatStatus && global.ServerUI){
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.channelDown();`);
+        if(global.ServerUI) global.ServerUI.call("hud_chat_channel_down");
     }
 });
 

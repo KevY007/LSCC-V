@@ -984,7 +984,7 @@ function focusChat(toggle){
         channelsObject.push({name:"Clan", value:"c"});
 
     if(mp.players.local.getVariable("Admin") > 0)
-        channelsObject.push({name:"Staff", value:"a"});
+        channelsObject.push({name:"Staff Chat", value:"a"});
 
 
     if(global.ServerUI) global.ServerUI.call('hud_chat_channels_set', channelsObject);
