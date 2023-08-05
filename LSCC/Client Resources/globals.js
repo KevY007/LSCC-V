@@ -104,7 +104,7 @@ function UpdateStatsVars(entity, all = true){
                         allowedCommands.sort(function(a, b){
                             return a.CommandText.length - b.CommandText.length;
                         });
-                        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.commands = ${JSON.stringify(allowedCommands)}`);
+                        if(global.ServerUI) global.ServerUI.call('hud_chat_commands_set', allowedCommands);
                     }
                 }
              
@@ -938,8 +938,9 @@ function activateChat(toggle){
         return;
     }
 
-    mp.gui.chat.activate(toggle);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggle(${toggle.toString()})`);
+    global.ServerUI.call('chat:show', toggle);
+    mp.gui.chat.show(toggle);
+    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggle(${toggle.toString()})`);
 };
 function AddCustomVehiclesToSpawner(){
     if(global.ServerUI != null){
@@ -968,43 +969,46 @@ function calcDist(v1, v2) {
         v2.z
     );
 }
+
+
 function focusChat(toggle){
     if(global.ServerUI == null) return;
 
-    var channels = `gm.$refs.hud.$refs.base.$refs.chat.api.channels = [`;
-    channels += `
-        {name:"Local", value:"text"},
-        {name:"Global", value:"go"},
-        {name:"Lobby", value:"lg"},
-    `
+    var channelsObject = [
+      {name:"Local", value:"text"},
+      {name:"Global", value:"go"},
+      {name:"Lobby", value:"lg"},
+    ];
+
     if(mp.players.local.getVariable("ClanID") !== -1)
-        channels += `{name:"Clan", value:"c"},`
+        channelsObject.push({name:"Clan", value:"c"});
 
     if(mp.players.local.getVariable("Admin") > 0)
-        channels += `{name:"Staff", value:"a"},`
-
-    channels += `]`;
-
-    if(global.ServerUI) global.ServerUI.execute(channels);
+        channelsObject.push({name:"Staff", value:"a"});
 
 
-    if(global.menuToggled){
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
+    if(global.ServerUI) global.ServerUI.call('hud_chat_channels_set', channelsObject);
+
+    if(global.menuToggled && toggle === true){
+        focusChat(false);
         //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`);
         return;
     }
-    if((global.VehicleSpawnerActive !== undefined && global.VehicleSpawnerActive == true) ||
-    (global.WeaponEditorActive !== undefined && global.WeaponEditorActive == true) ||
-    (global.ActionMenuActive !== undefined && global.ActionMenuActive == true) || 
-    (global.ClothingEditorActive !== undefined && global.ClothingEditorActive == true) ||
-    (global.StationPickerToggled !== undefined && global.StationPickerToggled == true) ||
-    (global.isHotwiring !== undefined && global.isHotwiring == true) || global.isHeliCamActive()){
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
-        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`);
-        return;
+    if(toggle === true){
+      if((global.VehicleSpawnerActive !== undefined && global.VehicleSpawnerActive == true) ||
+      (global.WeaponEditorActive !== undefined && global.WeaponEditorActive == true) ||
+      (global.ActionMenuActive !== undefined && global.ActionMenuActive == true) || 
+      (global.ClothingEditorActive !== undefined && global.ClothingEditorActive == true) ||
+      (global.StationPickerToggled !== undefined && global.StationPickerToggled == true) ||
+      (global.isHotwiring !== undefined && global.isHotwiring == true) || global.isHeliCamActive()){
+          focusChat(false);
+          //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`);
+          return;
+      }
     }
+
     //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = ${toggle.toString()}`);
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(${toggle.toString()});`);
+    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(${toggle.toString()});`);
 
     // if(toggle){
     //     if(mp.storage.data.menu.ActiveChatOpacity !== undefined){
@@ -1016,7 +1020,9 @@ function focusChat(toggle){
     //     increaseChatOpacity(3000);
     // }
 
-    mp.gui.cursor.show(toggle, toggle);
+    //global.ServerUI.call('chat:activate', toggle);
+    //global.ServerUI.call('chat:show', toggle);
+    global.ServerUI.call('chat:activate', toggle); // this opens the chatbox, not mp.gui.chat.activate
     mp.events.callRemote("onFocusChat", toggle);
 }
 function InitializeHotwireDOM(){

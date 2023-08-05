@@ -675,19 +675,19 @@ mp.events.add("pushMsgToChat", (msg) => {
     mp.gui.chat.push(msg);
 })
 
-mp.events.add("chat:push", (msg) => {
-    mp.gui.chat.push(msg);
-});
+// mp.events.add("chat:push", (msg) => {
+//     mp.gui.chat.push(msg);
+// });
 
-mp.events.add("chat:clear", (msg) => {
-    clearChat();
-});
-mp.events.add("chat:activate", (toggle) => {
-    mp.gui.chat.activate(toggle);
-});
-mp.events.add("chat:show", (toggle) => {
-    mp.gui.chat.show(toggle);
-});
+// mp.events.add("chat:clear", (msg) => {
+//     clearChat();
+// });
+// mp.events.add("chat:activate", (toggle) => {
+//     mp.gui.chat.activate(toggle);
+// });
+// mp.events.add("chat:show", (toggle) => {
+//     mp.gui.chat.show(toggle);
+// });
 
 mp.events.add("HideAllElementsExceptChat", (value) => {
     if(value == false){
@@ -790,7 +790,7 @@ mp.keys.bind(0xBF, true, function(){  // /? key
     }
     if(!global.chatStatus)
     {
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.input = '/'`);
+        if(global.ServerUI) global.ServerUI.call("hud_chat_input_set", '/');
         global.focusChat(true);
         mp.events.call("onOpenChatbox", true);
 
@@ -805,6 +805,14 @@ mp.keys.bind(0xBF, true, function(){  // /? key
             mp.gui.cursor.show(true, false);
         }, 50);
     }
+});
+
+mp.events.add("chat:sendCustomMessage", (channel, badges, username, text) => {
+
+    eval(`var badgesOBJ = ${badges}`);
+    eval(`var channelsOBJ = ${channel}`);
+
+    if(global.ServerUI) global.ServerUI.call('hud_chat_message_player_send', channelsOBJ, badgesOBJ, username, text);
 });
 
 mp.keys.bind(0x54, true, function() { // T key

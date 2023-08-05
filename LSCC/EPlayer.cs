@@ -1127,6 +1127,26 @@ namespace RNC
             }
         }
 
+        public static void SendPlayerMessage(Player target, Player messageFrom, string channel, string channelValue, string message)
+        {
+            string badgesObject = "[";
+            if (messageFrom.Name.ToLower() == "codename" || messageFrom.Name.ToLower() == "rotx")
+                badgesObject += $"{{\"type\":3, \"id\":1}},";
+
+            if(EPlayer.GetAccount(messageFrom).DonatorLevel > 0 && EPlayer.GetAccount(messageFrom).DonatorStatus == true)
+                badgesObject += $"{{\"type\":1, \"id\":{EPlayer.GetAccount(messageFrom).DonatorLevel}}},";
+
+
+            if (EPlayer.GetAccount(messageFrom).Admin > 0 && messageFrom.GetData<bool>("Anonymous") == false)
+                badgesObject += $"{{\"type\":2, \"id\":{EPlayer.GetAccount(messageFrom).Admin}}},";
+
+            badgesObject += "]";
+
+            target.TriggerEvent("chat:sendCustomMessage", $"{{\"name\":\"{channel}\", \"value\":\"{channelValue}\"}}",
+                                badgesObject, 
+                                messageFrom.Name, message);
+        }
+
         public static string GetPrefix(Player player, bool color = true)
         {
             if (player.GetSharedData<bool>("FakeNameOn")) return "~w~Player";

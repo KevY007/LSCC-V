@@ -269,6 +269,7 @@ mp.events.add('showLoginBrowser', (state) => {
                         if(global.ServerUI) global.ServerUI.call('hud_minilist', true);
                         if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", true);
                     }
+                    if(global.ServerUI) global.ServerUI.markAsChat();
                 }, 1000);
             }
             if(!global.IsInTutorial)
