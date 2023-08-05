@@ -87,7 +87,7 @@ namespace RNC
         public int Namechanges { get; set; }
         public int ClanID { get; set; }
         public int ClanTier { get; set; }
-        public int SelectedBadgeID { get; set; }
+        public string SelectedBadgeData { get; set; }
 
         public string TattooList { get; set; }
 

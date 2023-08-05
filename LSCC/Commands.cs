@@ -2816,6 +2816,7 @@ namespace RNC
                     EPlayer.GetAccount(player).DonatorStatus = false;
 
                     Logs.LogAdmin(player, $"Turned on FAKE NAME MODE - name given: {fakename}");
+                    EPlayer.UpdatePlayerBadges(player);
                 }
                 else
                 {
@@ -2823,6 +2824,7 @@ namespace RNC
                     player.SetSharedData("FakeNamePing", 0);
                     player.SetSharedData("FakeNameLevel", 0);
                     Logs.LogAdmin(player, $"Turned off FAKE NAME MODE");
+                    EPlayer.UpdatePlayerBadges(player);
                 }
             }
             else if(option == "name")
@@ -7139,6 +7141,7 @@ namespace RNC
             EPlayer.GetAccount(player).DonatorStatus = !EPlayer.GetAccount(player).DonatorStatus;
             EPlayer.Save(player);
 
+            EPlayer.UpdatePlayerBadges(player);
             player.SendChatMessage(Translate(player, "DONATOR_STATUS_TOGGLED", (EPlayer.GetAccount(player).DonatorStatus == true ? Translate(player, "ENABLED") : Translate(player, "DISABLED"))));
         }
 
@@ -10693,6 +10696,7 @@ namespace RNC
             }
             else EPlayer.SendMessageToAllAdmins($"!{{#33C446}}[AdmCmd] {player.Name} has turned off anonymous/vanish mode.");
 
+            EPlayer.UpdatePlayerBadges(player);
             return;
         }
 

@@ -54,6 +54,7 @@ namespace RNC
             }
         }
 
+        /*
         [RemoteEvent("db_test")]
         public void driveby_test(Player player)
         {
@@ -107,7 +108,7 @@ namespace RNC
                 }
 
             }
-        }
+        }*/
 
         [RemoteEvent("KickPlayer")]
         public void KickPlayer(Player player, string reason, bool silent)
@@ -6953,7 +6954,7 @@ namespace RNC
                                     CrosshairProfiles = "[]",
                                     ActiveCrosshairProfile = "{}",
                                     TattooList = "[]",
-                                    SelectedBadgeID = -1,
+                                    SelectedBadgeData = "{id:0, name:\"\"}",
                                 };
                                 AccountManager.Add(_new);
                                 OnPlayerRegister(player, _new);

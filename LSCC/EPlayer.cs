@@ -2588,28 +2588,31 @@ namespace RNC
             string badgeDataJSON = JsonConvert.SerializeObject(GetPlayerBadges(player));
             player.SetSharedData("BadgeData", badgeDataJSON);
         }
-        public static List<int> GetPlayerBadges(Player player)
+        
+        public static List<Main.SelectedBadgeData> GetPlayerBadges(Player player)
         {
-            List<int> toReturn = new List<int>();
+            List<Main.SelectedBadgeData> toReturn = new List<Main.SelectedBadgeData>();
 
             Account acc = EPlayer.GetAccount(player);
 
             if (acc.Admin > 0 && player.GetData<bool>("Anonymous") == false)
             {
                 int badgeID = Main.GetBadgeID("Admin", acc.Admin);
+                string badgeName = EPlayer.GetAdminLevelName(acc.Admin, false);
                 if (badgeID != -1)
-                    toReturn.Add(badgeID);
+                    toReturn.Add(new Main.SelectedBadgeData(badgeID, badgeName));
             }
             if (acc.DonatorLevel > 0 && acc.DonatorStatus == true)
             {
                 int badgeID = Main.GetBadgeID("Donator", acc.DonatorLevel);
-                if(badgeID != -1)
-                    toReturn.Add(badgeID);
+                string badgeName = EPlayer.GetDonatorLevelName(acc.DonatorLevel, false);
+                if (badgeID != -1)
+                    toReturn.Add(new Main.SelectedBadgeData(badgeID, badgeName));
             }
-         
 
-            if (acc.SelectedBadgeID > 0)
-                toReturn.Add(acc.SelectedBadgeID);
+            Main.SelectedBadgeData _bd = JsonConvert.DeserializeObject<Main.SelectedBadgeData>(acc.SelectedBadgeData);
+            if (_bd.id > 0)
+                toReturn.Add(_bd);
 
             return toReturn;
         }

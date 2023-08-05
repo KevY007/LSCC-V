@@ -1579,10 +1579,11 @@ function updatePlayers()
         if(sb.getVariable("Team") > -1) roomTeam = sb.getVariable("Team");
         if(sb.getVariable("InDM") > -1) roomTeam = -2;
 
+
         scoreboard_players.push({
             id:sb.remoteId,
             donator:sb.getVariable("Donator"),
-            badges:sb.getVariable("BadgeData"),
+            badges:JSON.parse(sb.getVariable("BadgeData")),
             roomId:sb.getVariable("InLobby"),
             username:nameToDisplay,
             level:levelToDisplay,

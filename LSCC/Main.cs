@@ -1712,6 +1712,16 @@ namespace RNC
             if (_d != null) return _d.SQL_ID;
             else return -1;
         }
+        public class SelectedBadgeData
+        {
+            public int id;
+            public string name;
+            public SelectedBadgeData(int id, string name)
+            {
+                this.id = id;
+                this.name = name;
+            }
+        }
 
         public static IDictionary<long, string> WeaponReasons = new Dictionary<long, string>()
         {
