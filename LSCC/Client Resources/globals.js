@@ -1079,6 +1079,7 @@ function InitializeServerUI(){
 
   ServerUI = mp.browsers.new("package://ServerUI/index.html");
   
+  if(ServerUI) ServerUI.call('hud_toggle', false);
   if(ServerUI) ServerUI.call('loadingscreen_start', 1000);
   return ServerUI;
 }

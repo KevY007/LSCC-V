@@ -20,14 +20,14 @@ mp.events.add("removePlayerFromOnlineList", (name) => {
     OnlinePlayersJSON.splice(idx, 1);
 });
 
-mp.events.add("chat_requestAutoCompletePlayers", (query) => {
+mp.events.add("hud_chat_request_auto_complete_players", (query) => {
     if(!global.ServerUI) return;
 
     const players = OnlinePlayersJSON.filter(p => p.toLowerCase().startsWith(query.toLowerCase()));
     var playersToSet = players;
     if(playersToSet.length > 5) playersToSet = players.slice(0, 5);
 
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.autoCompletePlayers = ${JSON.stringify(playersToSet)}`);
+    if(global.ServerUI) global.ServerUI.call('hud_chat_auto_complete_players_set', playersToSet);
 });
 
 var wasCustomCrosshairOn = false;
@@ -589,22 +589,36 @@ mp.events.add("startLoadingScreen", (time, message) => {
 
     if(time == -1){
         if(global.ServerUI) global.ServerUI.call('loadingscreen_start', 5000);
+        if(global.ServerUI) global.ServerUI.call('hud_toggle', false);
+        setTimeout(() => {
+            if(mp.players.local != null && mp.players.exists(mp.players.local))
+            {
+                if(global.ServerUI) global.ServerUI.call('hud_toggle', true);
+            }
+        }, 5100);
         //if(message != "none")
         //    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.loadingText = "${message}"`);
         //else if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.loadingText = ""`);
 
-        IsInInfiniteLoading = true;
+        // IsInInfiniteLoading = true;
 
-        setTimeout(() => {
-            if(mp.players.local != null && mp.players.exists(mp.players.local) && IsInInfiniteLoading == true){
-                CanSkipLoading = true;
-                let notifyscoreboardstr = `toast('${Translate("SKIP_LOADING")}', '${Translate("SKIP_LOADING_TIP")}', 'nothing', 10000, 2);`;
-                if(global.ServerUI) global.ServerUI.execute(notifyscoreboardstr);
-            }
-        }, 10000);
+        // setTimeout(() => {
+        //     if(mp.players.local != null && mp.players.exists(mp.players.local) && IsInInfiniteLoading == true){
+        //         CanSkipLoading = true;
+        //         let notifyscoreboardstr = `toast('${Translate("SKIP_LOADING")}', '${Translate("SKIP_LOADING_TIP")}', 'nothing', 10000, 2);`;
+        //         if(global.ServerUI) global.ServerUI.execute(notifyscoreboardstr);
+        //     }
+        // }, 10000);
     }
     else{
         if(global.ServerUI) global.ServerUI.call('loadingscreen_start', time);
+        if(global.ServerUI) global.ServerUI.call('hud_toggle', false);
+        setTimeout(() => {
+            if(mp.players.local != null && mp.players.exists(mp.players.local))
+            {
+                if(global.ServerUI) global.ServerUI.call('hud_toggle', true);
+            }
+        }, time+100);
         //if(message != "none")
         //    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.loadingText = "${message}"`);
         //else if(global.ServerUI) global.ServerUI.execute(`gm.$refs.loadingScreen.loadingText = ""`);
@@ -1145,6 +1159,12 @@ mp.events.add('browserDomReady', (browser) => {
         miniHUDVars["bottom"] = ((resolution.y - (getMinimapAnchor().bottomY * resolution.y)) + 0);
         miniHUDVars["left"] = ((getMinimapAnchor().rightX * resolution.x) + 10) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0);
 
+        if(resolution.x > 3820){
+            miniHUDVars["left"] = miniHUDVars["left"]-296;
+        }
+        if(resolution.y > 2140){
+            miniHUDVars["bottom"] = miniHUDVars["bottom"]-15;
+        }
         if(global.ServerUI) global.ServerUI.call("hud_minilist_position_set", `${miniHUDVars["left"]}px`, `${miniHUDVars["bottom"]}px`);
 
         var miniHUD_items = [];
@@ -1922,6 +1942,13 @@ mp.events.add("render", () => {
             
             miniHUDVars["bottom"] = ((resolution.y - (getMinimapAnchor().bottomY * resolution.y)) + 0);
             miniHUDVars["left"] = ((getMinimapAnchor().rightX * resolution.x) + 10) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0);
+            
+            if(resolution.x > 3820){
+                miniHUDVars["left"] = miniHUDVars["left"]-296;
+            }
+            if(resolution.y > 2140){
+                miniHUDVars["bottom"] = miniHUDVars["bottom"]-15;
+            }
 
             if(global.ServerUI) global.ServerUI.call("hud_minilist_position_set", `${miniHUDVars["left"]}px`, `${miniHUDVars["bottom"]}px`);
             //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.miniHud.left = "${miniHUDVars["left"]}px";`);
