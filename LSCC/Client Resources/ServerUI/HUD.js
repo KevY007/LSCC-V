@@ -23,9 +23,11 @@ mp.events.add("removePlayerFromOnlineList", (name) => {
 mp.events.add("hud_chat_request_auto_complete_players", (query) => {
     if(!global.ServerUI) return;
 
-    const players = OnlinePlayersJSON.filter(p => p.toLowerCase().startsWith(query.toLowerCase()));
+    const players = mp.players.toArray().filter(p => p.name.toLowerCase().startsWith(query.toLowerCase())).map(pl => {
+        return pl.name;
+    });
     var playersToSet = players;
-    if(playersToSet.length > 5) playersToSet = players.slice(0, 5);
+    if(playersToSet.length > 5) playersToSet = players.slice(0, 3);
 
     if(global.ServerUI) global.ServerUI.call('hud_chat_auto_complete_players_set', playersToSet);
 });

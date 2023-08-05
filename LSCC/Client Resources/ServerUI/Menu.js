@@ -109,7 +109,6 @@ mp.events.add("clearMenuClansVariable", () => {
     MenuClans = [];
 });
 mp.events.add("Menu_FinishAddingClans", () => {
-    mp.events.callRemote('ServerConsoleOutput', JSON.stringify(MenuClans));
     if(global.ServerUI) global.ServerUI.call('mainmenu_clan_search_clans_set', MenuClans);
 });
 mp.events.add("Menu_AddClan", (clanID, cname, tag, desc, banner, isOpen, players, maxPlayers, kills, deaths, wins, ownerName) => {
@@ -207,6 +206,16 @@ mp.events.add("Menu_UpdateClanSetting", (type, value) => {
             break;
         }
     }
+});
+
+mp.events.add("Menu_SetClanMembers", (membersData) => {
+    var membersDataJSON = JSON.parse(membersData);
+    for(let i = 0 ; i < membersDataJSON.length ; i++){
+        let isOnline = (mp.players.toArray().find(p => p.name.toLowerCase() === membersDataJSON[i].name.toLowerCase()) !== undefined);
+        membersDataJSON[i].online = isOnline;
+    }
+    mp.events.callRemote('ServerConsoleOutput', JSON.stringify(membersDataJSON));
+    if(global.ServerUI) global.ServerUI.call('mainmenu_my_clan_members_set', membersDataJSON);
 });
 
 mp.events.add("Menu_AddClanMember", (memberID, memberName, memberTier, memberLevel, isOnline) => {

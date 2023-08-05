@@ -1666,7 +1666,7 @@ namespace RNC
 
                         foreach (Player clanMember in Settings.LoggedInPlayers.Where(m => EPlayer.GetAccount(m).ClanID == pClanID))
                         {
-                            clanMember.TriggerEvent("Menu_UpdateClanMember", targetSQLID, targetname, tier, targetlevel);
+                            OnRequestUpdateClanMembers(clanMember);
                         }
 
                         Player target = Settings.LoggedInPlayers.FirstOrDefault(t => EPlayer.GetAccount(t).SQL_ID == tAcc.SQL_ID);
@@ -1739,7 +1739,7 @@ namespace RNC
 
                         foreach (Player clanMember in Settings.LoggedInPlayers.Where(m => EPlayer.GetAccount(m).ClanID == pClanID))
                         {
-                            clanMember.TriggerEvent("Menu_RemoveClanMember", targetSQLID);
+                            OnRequestUpdateClanMembers(clanMember);
                         }
 
                         player.TriggerEvent("UpdateMenuClanTab");
@@ -2087,6 +2087,60 @@ namespace RNC
             });
         }
 
+
+        public class MenuClanMember
+        {
+            public int id;
+            public string name;
+            public int level;
+            public int tier;
+            public bool online;
+        }
+        [RemoteEvent("Menu_RequestUpdateMyClanMembers")]
+        public static void OnRequestUpdateClanMembers(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            int ClanID = EPlayer.GetAccount(player).ClanID;
+            if (ClanID == -1) return;
+            Task.Run(async () =>
+            {
+                using(MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Clan check = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == ClanID);
+                    if(check == null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Error(player, Translate(player, "ERROR_CLAN_NOT_EXISTS"));
+                        });
+                        await NAPI.Task.WaitForMainThread();
+                        return;
+                    }
+
+                    List<Account> clanMembers = await context.Accounts.AsQueryable().Where(a => a.ClanID == check.SQL_ID).ToListAsync();
+                    List<MenuClanMember> clanMemberArray = new List<MenuClanMember>();
+                    foreach (Account account in clanMembers) 
+                    {
+                        clanMemberArray.Add(new MenuClanMember()
+                        {
+                            id = account.SQL_ID,
+                            name = account.Username,
+                            level = account.Level,
+                            tier = account.ClanTier,
+                            online = false
+                        });
+                    }
+                    NAPI.Task.Run(() =>
+                    {
+                        string jsonMembers = JsonConvert.SerializeObject(clanMemberArray);
+                        player.TriggerEvent("Menu_SetClanMembers", jsonMembers);
+                    });
+                    await NAPI.Task.WaitForMainThread();
+                }
+            });
+        }
+
         [RemoteEvent("OnRequestCreateClan")]
         public void OnRequestCreateClan(Player player, string clanname, string tag, string desc)
         {
@@ -2228,8 +2282,7 @@ namespace RNC
                         player.SendChatMessage(Translate(player, "CREATED_CLAN_4"));
                         player.SendChatMessage(Translate(player, "CREATED_CLAN_5"));
 
-                        player.TriggerEvent("Menu_ClearClanMembers");
-                        player.TriggerEvent("Menu_AddClanMember", acc.SQL_ID, acc.Username, 0, acc.Level, true);
+                        OnRequestUpdateClanMembers(player);
                         player.TriggerEvent("Menu_UpdateClanStats", 0, 0, 0);
                         player.TriggerEvent("UpdateMenuClanTab");
 
@@ -5238,15 +5291,7 @@ namespace RNC
                             player.SetSharedData("ClanTag", (playerClan.ForceTag == true ? playerClan.Tag : ""));
 
 
-                            player.TriggerEvent("Menu_ClearClanMembers");
-                            foreach (Account accnt in clanAccounts)
-                            {
-                                bool isOnline = false;
-                                Player _check = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.Equals(accnt.Username, StringComparison.OrdinalIgnoreCase));
-                                if (_check != null) isOnline = true;
-
-                                player.TriggerEvent("Menu_AddClanMember", accnt.SQL_ID, accnt.Username, accnt.ClanTier, accnt.Level, isOnline);
-                            }
+                            OnRequestUpdateClanMembers(player);
                             player.TriggerEvent("Menu_UpdateClanStats", playerClan.WeekKills, playerClan.TotalKills, playerClan.WeekWins);
 
                             EPlayer.UpdateUIVars(player);

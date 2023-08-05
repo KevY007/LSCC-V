@@ -970,10 +970,19 @@ function calcDist(v1, v2) {
     );
 }
 
+let emojiPickerOpen = false;
+mp.keys.bind(0x74, true, () => { // F5 to open emoji picker in chat
+  if(global.chatStatus){
+    emojiPickerOpen = !emojiPickerOpen;
+    global.ServerUI.call('hud_chat_emoji_picker_toggle', emojiPickerOpen);
+  }
+});
+
 
 function focusChat(toggle){
     if(global.ServerUI == null) return;
 
+    emojiPickerOpen = false;
     var channelsObject = [
       {name:"Local", value:"text"},
       {name:"Global", value:"go"},
