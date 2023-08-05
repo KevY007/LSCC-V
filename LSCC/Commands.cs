@@ -1,6 +1,7 @@
 ﻿using GTANetworkAPI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -2782,6 +2783,223 @@ namespace RNC
 
             EPlayer.Save(target);
             return;
+        }
+
+        [Command("badges")]
+        public static void cmd_badges(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 6) return;
+
+            Task.Run(async () =>
+            {
+                using(MainDatabase context = ContextFactory.CreateContext())
+                {
+                    await context.Badges.AsQueryable().ForEachAsync(async badge =>
+                    {
+                        int ID = badge.SQL_ID;
+                        string Name = badge.Name;
+                        NAPI.Task.Run(() =>
+                        {
+                            player.SendChatMessage($"!{{#FFFF00}}ID: ~w~{ID} !{{#FF0000}}| !{{#FFFF00}}Name: ~w~{Name}");
+                        });
+                        await NAPI.Task.WaitForMainThread();
+                    });
+                }
+            });
+        }
+
+        [Command("mybadges")]
+        public static void cmd_mybadges(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            int accountID = EPlayer.GetAccount(player).SQL_ID;
+
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    IQueryable<OwnedBadgeData> ownedBadges = context.OwnedBadges.AsQueryable().Where(b => b.AccountID == accountID);
+                    if(await ownedBadges.CountAsync() == 0)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.SendChatMessage("!{#FF6347}[!] ~w~You don't have any special badges!");
+                        });
+                        await NAPI.Task.WaitForMainThread();
+                        return;
+                    }
+                    await ownedBadges.ForEachAsync(async owned =>
+                    {
+                        using(MainDatabase context2 = ContextFactory.CreateContext())
+                        {
+                            Badge badge = await context2.Badges.AsQueryable().FirstOrDefaultAsync(b => b.SQL_ID == owned.BadgeID);
+                            if(badge != null)
+                            {
+                                int ID = badge.SQL_ID;
+                                string Name = badge.Name;
+                                NAPI.Task.Run(() =>
+                                {
+                                    player.SendChatMessage($"!{{#FFFF00}}ID: ~w~{ID} !{{#FF0000}}| !{{#FFFF00}}Name: ~w~{Name}");
+                                });
+                                await NAPI.Task.WaitForMainThread();
+                            }
+                        }
+                    });
+                }
+            });
+        }
+        [Command("setprimarybadge", "!{#AFAFAF}[USAGE] setprimarybadge (badge ID - use /mybadges to check)")]
+        public static void cmd_setprimarybadge(Player player, int badgeID)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            int accountID = EPlayer.GetAccount(player).SQL_ID;
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    OwnedBadgeData checkOwned = await context.OwnedBadges.AsQueryable().FirstOrDefaultAsync(b => b.BadgeID == badgeID && b.AccountID == accountID);
+                    if(checkOwned == null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.SendChatMessage("!{#FF6347}[!] ~w~You don't have a badge with that ID! Check ~y~/mybadges~w~.");
+                        });
+                        await NAPI.Task.WaitForMainThread();
+                        return;
+                    }
+                    Badge badge = await context.Badges.AsQueryable().FirstOrDefaultAsync(b => b.SQL_ID == checkOwned.BadgeID);
+                    if (badge == null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.SendChatMessage("!{#FF6347}[!] ~w~That badge no longer exists on the server! Report this to the developers.");
+                        });
+                        await NAPI.Task.WaitForMainThread();
+                        return;
+                    }
+
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.GetAccount(player).SelectedBadgeData = JsonConvert.SerializeObject(new Main.SelectedBadgeData(badge.SQL_ID, badge.Name));
+                        EPlayer.Save(player, false);
+                        player.SendChatMessage($"~g~You've set your primary badge to ~y~{badge.Name}~g~!");
+                        EPlayer.UpdatePlayerBadges(player);
+                    });
+
+                }
+            });
+        }
+
+        [Command("removebadge", "!{#AFAFAF}[USAGE] removebadge (target) (badge ID)", Alias = "revokebadge")]
+        public static void cmd_removebadge(Player player, Player target, int badgeID)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 6) return;
+            int accountID = EPlayer.GetAccount(target).SQL_ID;
+
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Badge check = await context.Badges.AsQueryable().FirstOrDefaultAsync(b => b.SQL_ID == badgeID);
+                    if (check == null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.SendChatMessage("!{#FF6347}[!] ~w~Badge does not exist!");
+                        });
+                        await NAPI.Task.WaitForMainThread();
+                        return;
+                    }
+                    OwnedBadgeData ownedCheck = await context.OwnedBadges.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == accountID
+                                                                                                            && o.BadgeID == badgeID);
+                    if (ownedCheck == null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.SendChatMessage("!{#FF6347}[!] ~w~Target doesn't have that badge.");
+                        });
+                        await NAPI.Task.WaitForMainThread();
+                        return;
+                    }
+
+                    context.OwnedBadges.Remove(ownedCheck);
+                    await context.SaveChangesAsync();
+                    NAPI.Task.Run(() =>
+                    {
+                        Main.SelectedBadgeData _selected = JsonConvert.DeserializeObject<Main.SelectedBadgeData>(EPlayer.GetAccount(target).SelectedBadgeData);
+                        if(_selected != null && _selected.id == badgeID)
+                        {
+                            EPlayer.GetAccount(target).SelectedBadgeData = JsonConvert.SerializeObject(new Main.SelectedBadgeData(0, ""));
+                            EPlayer.Save(target, false);
+                        }
+
+                        target.SendChatMessage($"~r~An administrator has revoked the badge ~y~{check.Name}~r~ from your account!");
+                        player.SendChatMessage($"~g~Successfully removed badge ~y~{check.Name} ~g~from {target.Name}!");
+                        EPlayer.UpdatePlayerBadges(player);
+                    });
+
+
+                }
+            });
+        }
+
+        [Command("givebadge", "!{#AFAFAF}[USAGE] givebadge (target) (badge ID)")]
+        public static void cmd_givebadge(Player player, Player target, int badgeID)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 6) return;
+
+            int accountID = EPlayer.GetAccount(target).SQL_ID;
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Badge check = await context.Badges.AsQueryable().FirstOrDefaultAsync(b => b.SQL_ID == badgeID);
+                    if(check == null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.SendChatMessage("!{#FF6347}[!] ~w~Badge does not exist!");
+                        });
+                        await NAPI.Task.WaitForMainThread();
+                        return;
+                    }
+                    OwnedBadgeData ownedCheck = await context.OwnedBadges.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == accountID
+                                                                                                            && o.BadgeID == badgeID);
+                    if(ownedCheck != null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.SendChatMessage("!{#FF6347}[!] ~w~Target already has that badge! Use ~y~/removebadge ~w~to revoke it.");
+                        });
+                        await NAPI.Task.WaitForMainThread();
+                        return;
+                    }
+
+                    OwnedBadgeData _new = new OwnedBadgeData()
+                    {
+                        BadgeID = badgeID,
+                        AccountID = accountID,
+                        AcquireDate = DateTime.Now
+                    };
+                    await context.OwnedBadges.AddAsync(_new);
+                    await context.SaveChangesAsync();
+
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.GetAccount(target).SelectedBadgeData = JsonConvert.SerializeObject(new Main.SelectedBadgeData(check.SQL_ID, check.Name));
+                        EPlayer.Save(target, false);
+
+                        player.SendChatMessage($"~g~Successfully given badge ~y~{check.Name} ~g~to {target.Name}!");
+                        target.SendChatMessage($"~g~An administrator has given you a badge: ~y~{check.Name}~g~. It has been set as your primary.");
+                        Logs.LogAdmin(player, $"Gave {target.Name} badge {check.Name}!");
+
+                        EPlayer.UpdatePlayerBadges(target);
+                    });
+                }
+            });
         }
 
         [Command("fakename", "!{#AFAFAF}[USAGE] fakename (option: toggle, name) (if 'name': the name)", Alias = "hidename")]
