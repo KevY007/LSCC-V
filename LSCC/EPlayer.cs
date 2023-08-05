@@ -1126,7 +1126,13 @@ namespace RNC
                 }
             }
         }
+        public static void SendCustomMessage(Player target, string channel, string channelValue, string message)
+        {
 
+            target.TriggerEvent("chat:sendCustomMessage", $"{{\"name\":\"{channel}\", \"value\":\"{channelValue}\"}}",
+                                "[]",
+                                "", message);
+        }
         public static void SendPlayerMessage(Player target, Player messageFrom, string channel, string channelValue, string message)
         {
             string badgesObject = "[";
@@ -2573,8 +2579,8 @@ namespace RNC
                 }
             }
         }
-        
-        public static void SendMessageToAllAdmins(string message)
+
+        public static void SendPlayerMessageToAllAdmins(Player from, string message)
         {
             Account acc;
 
@@ -2583,12 +2589,35 @@ namespace RNC
                 if (EPlayer.LoggedIn(i))
                 {
                     acc = i.GetData<Account>("AccountHandle");
-                    if (acc.Admin > 0) i.SendChatMessage($"[A] {message}");
+                    if (acc.Admin > 0) EPlayer.SendPlayerMessage(i, from, "Staff Chat", "a", message);
+                }
+            }
+        }
+        
+        public static void SendMessageToAllAdmins(string message)
+        {
+            string messageFormatted = message.Replace("!{#FF6347}", "", StringComparison.OrdinalIgnoreCase);
+            messageFormatted = messageFormatted.Replace("!{#FFFFFF}", "", StringComparison.OrdinalIgnoreCase);
+            messageFormatted = messageFormatted.Replace("!{#DBCE40}", "", StringComparison.OrdinalIgnoreCase);
+            messageFormatted = messageFormatted.Replace("!{#1E9913}", "", StringComparison.OrdinalIgnoreCase);
+            messageFormatted = messageFormatted.Replace("!{#33C446}", "", StringComparison.OrdinalIgnoreCase);
+            messageFormatted = messageFormatted.Replace("[AdmCmd]", "", StringComparison.OrdinalIgnoreCase);
+
+            Account acc;
+
+            foreach (Player i in RAGE.Entities.Players.All)
+            {
+                if (EPlayer.LoggedIn(i))
+                {
+                    acc = i.GetData<Account>("AccountHandle");
+                    if (acc.Admin > 0) i.SendChatMessage($"!{{#FF6347}}[AdmCmd] !{{#DB8840}}{messageFormatted}");
+                    //if (acc.Admin > 0) i.SendChatMessage($"[A] {message}");
                 }
             }
 
             //Discord.SendTextChannel("staff-bot", $"(ADM) |** {message}**");
         }
+
 
         public static void UpdateUIVars(Player player)
         {

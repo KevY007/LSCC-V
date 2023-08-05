@@ -3279,9 +3279,9 @@ namespace RNC
                 {
                     if (i.Dimension == player.Dimension)
                     {
-                        if (i.Position.DistanceTo(player.Position) <= 10.0) i.SendChatMessage($"!{{#D4D4D4}}{chatStr}");
-                        if (i.Position.DistanceTo(player.Position) > 10.0 && i.Position.DistanceTo(player.Position) <= 15.0) i.SendChatMessage($"!{{#B5B5B5}}{chatStr}");
-                        if (i.Position.DistanceTo(player.Position) > 15.0 && i.Position.DistanceTo(player.Position) <= 20.0) i.SendChatMessage($"!{{#999999}}{chatStr}");
+                        if (i.Position.DistanceTo(player.Position) <= 10.0) EPlayer.SendPlayerMessage(i, player, "Local", "text", $"!{{#D4D4D4}}{chatStr}");
+                        if (i.Position.DistanceTo(player.Position) > 10.0 && i.Position.DistanceTo(player.Position) <= 15.0) EPlayer.SendPlayerMessage(i, player, "Local", "text", $"!{{#B5B5B5}}{chatStr}");
+                        if (i.Position.DistanceTo(player.Position) > 15.0 && i.Position.DistanceTo(player.Position) <= 20.0) EPlayer.SendPlayerMessage(i, player, "Local", "text", $"!{{#999999}}{chatStr}");
                     }
                 }
             }

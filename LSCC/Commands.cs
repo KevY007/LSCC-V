@@ -10269,10 +10269,12 @@ namespace RNC
             
             if (player.GetSharedData<bool>("FakeNameOn"))
             {
-                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[A] {EPlayer.Name(player)} ({player.Name}):  {text}");
+                EPlayer.SendPlayerMessageToAllAdmins(player, text);
+                //EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[A] {EPlayer.Name(player)} ({player.Name}):  {text}");
             }
             else
-                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[A] {player.Name}:  {text}");
+                EPlayer.SendPlayerMessageToAllAdmins(player, text);
+            //EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[A] {player.Name}:  {text}");
         }
 
         [Command("looc", "!{#AFAFAF}[USAGE] looc (text)", Alias = "b", GreedyArg = true)]
@@ -10542,7 +10544,9 @@ namespace RNC
             Settings.LoggedInPlayers.ForEach(pl =>
             {
                 if (pl.GetData<bool>("OOCState") == true)
-                    pl.SendChatMessage($"!{{#AFAFAF}}(( [GOOC] {EPlayer.GetPrefix(player, true)}~w~ {EPlayer.Name(player)}: {text} !{{#AFAFAF}}))");
+                    EPlayer.SendPlayerMessage(pl, player, "Global", "go", text);
+
+                    //pl.SendChatMessage($"!{{#AFAFAF}}(( [GOOC] {EPlayer.GetPrefix(player, true)}~w~ {EPlayer.Name(player)}: {text} !{{#AFAFAF}}))");
             });
 
             //Discord.SendTextChannel("staff-bot", $"**(GOOC) | {EPlayer.GetPrefix(player, false)} {player.Name}**: {text}");
@@ -10610,7 +10614,9 @@ namespace RNC
                 Settings.LoggedInPlayers.ForEach(pl =>
                 {
                     if (pl.GetData<bool>("OOCState") == true && EPlayer.GetAccount(pl).Language == languageID)
-                        pl.SendChatMessage($"(( [~g~{languageName}~w~] {EPlayer.GetPrefix(player, true)}~w~ {EPlayer.Name(player)}: {text} ~w~))");
+                        EPlayer.SendPlayerMessage(pl, player, "OOC", "o", text);
+
+                    //pl.SendChatMessage($"(( [~g~{languageName}~w~] {EPlayer.GetPrefix(player, true)}~w~ {EPlayer.Name(player)}: {text} ~w~))");
                 });
             }
 
@@ -10635,7 +10641,8 @@ namespace RNC
 
             foreach (Player pl in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")))
             {
-                pl.SendChatMessage($"(( [LOBBY] {EPlayer.GetPrefix(player)} ~w~{EPlayer.Name(player)}: {text} ~w~))");
+                EPlayer.SendPlayerMessage(pl, player, "Lobby", "lo", text);
+                //pl.SendChatMessage($"(( [LOBBY] {EPlayer.GetPrefix(player)} ~w~{EPlayer.Name(player)}: {text} ~w~))");
             }
 
 
