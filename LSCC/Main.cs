@@ -1680,6 +1680,39 @@ namespace RNC
             }
             return seats;
         }
+
+        public class StaticBadgeData
+        {
+            public int SQL_ID { get; set; }
+            public string Type { get; set; }
+            public int Value { get; set; }
+            public StaticBadgeData(int id, string type, int value)
+            {
+                SQL_ID = id;
+                Type = type;
+                Value = value;
+            }
+        }
+        // For determining which badge to fetch based on player's Admin and Donator level.
+        public static StaticBadgeData[] StaticBadges = new StaticBadgeData[]
+        {
+            new StaticBadgeData(1, "Admin", 6),
+            new StaticBadgeData(2, "Admin", 5),
+            new StaticBadgeData(3, "Admin", 4),
+            new StaticBadgeData(4, "Admin", 3),
+            new StaticBadgeData(5, "Admin", 2),
+            new StaticBadgeData(6, "Admin", 1),
+            new StaticBadgeData(7, "Donator", 1),
+            new StaticBadgeData(8, "Donator", 2),
+            new StaticBadgeData(9, "Donator", 3),
+        };
+        public static int GetBadgeID(string type, int level)
+        {
+            StaticBadgeData _d = StaticBadges.FirstOrDefault(b => b.Type == type && b.Value == level);
+            if (_d != null) return _d.SQL_ID;
+            else return -1;
+        }
+
         public static IDictionary<long, string> WeaponReasons = new Dictionary<long, string>()
         {
             {2460120199, "Antique Cavalry Dagger"},

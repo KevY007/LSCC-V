@@ -728,6 +728,8 @@ namespace RNC
                 player.SetSharedData("LastVehicleExit", 0);
                 player.SetSharedData("Invincible", false);
 
+                player.SetSharedData("BadgeData", "[]");
+
                 player.SetSharedData("FakeNameOn", false);
                 player.SetSharedData("FakeName", "");
                 player.SetSharedData("FakeNamePing", 0);
@@ -1135,21 +1137,8 @@ namespace RNC
         }
         public static void SendPlayerMessage(Player target, Player messageFrom, string channel, string channelValue, string message)
         {
-            string badgesObject = "[";
-            if (messageFrom.Name.ToLower() == "codename" || messageFrom.Name.ToLower() == "rotx")
-                badgesObject += $"{{\"type\":3, \"id\":1}},";
-
-            if(EPlayer.GetAccount(messageFrom).DonatorLevel > 0 && EPlayer.GetAccount(messageFrom).DonatorStatus == true)
-                badgesObject += $"{{\"type\":1, \"id\":{EPlayer.GetAccount(messageFrom).DonatorLevel}}},";
-
-
-            if (EPlayer.GetAccount(messageFrom).Admin > 0 && messageFrom.GetData<bool>("Anonymous") == false)
-                badgesObject += $"{{\"type\":2, \"id\":{EPlayer.GetAccount(messageFrom).Admin}}},";
-
-            badgesObject += "]";
-
             target.TriggerEvent("chat:sendCustomMessage", $"{{\"name\":\"{channel}\", \"value\":\"{channelValue}\"}}",
-                                badgesObject, 
+                                messageFrom.GetSharedData<string>("BadgeData"), 
                                 messageFrom.Name, message);
         }
 
@@ -2592,6 +2581,37 @@ namespace RNC
                     if (acc.Admin > 0) EPlayer.SendPlayerMessage(i, from, "Staff Chat", "a", message);
                 }
             }
+        }
+
+        public static void UpdatePlayerBadges(Player player)
+        {
+            string badgeDataJSON = JsonConvert.SerializeObject(GetPlayerBadges(player));
+            player.SetSharedData("BadgeData", badgeDataJSON);
+        }
+        public static List<int> GetPlayerBadges(Player player)
+        {
+            List<int> toReturn = new List<int>();
+
+            Account acc = EPlayer.GetAccount(player);
+
+            if (acc.Admin > 0 && player.GetData<bool>("Anonymous") == false)
+            {
+                int badgeID = Main.GetBadgeID("Admin", acc.Admin);
+                if (badgeID != -1)
+                    toReturn.Add(badgeID);
+            }
+            if (acc.DonatorLevel > 0 && acc.DonatorStatus == true)
+            {
+                int badgeID = Main.GetBadgeID("Donator", acc.DonatorLevel);
+                if(badgeID != -1)
+                    toReturn.Add(badgeID);
+            }
+         
+
+            if (acc.SelectedBadgeID > 0)
+                toReturn.Add(acc.SelectedBadgeID);
+
+            return toReturn;
         }
         
         public static void SendMessageToAllAdmins(string message)

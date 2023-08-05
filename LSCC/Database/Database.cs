@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Design;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -225,6 +226,27 @@ namespace RNC
         public long[] Components;
     }
 
+    public class Badge
+    {
+        [Column("id")]
+        [Key]
+        public int SQL_ID { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
+    }
+    public class OwnedBadgeData
+    {
+        [Column("id")]
+        [Key]
+        public int SQL_ID { get; set; }
+        [Column("accountId")]
+        public int AccountID { get; set; }
+        [Column("badgeId")]
+        public int BadgeID { get; set; }
+        [Column("acquireDate")]
+        public DateTime AcquireDate { get; set; } = DateTime.Now;
+    }
+
     public class DM_WeaponSets
     {
         public DM_WeaponData[] Weapons;
@@ -262,6 +284,9 @@ namespace RNC
         public DbSet<CustomDMArenaSpawns> CustomArenas_Spawns { get; set; }
         public DbSet<RadioStation> RadioStations { get; set; }
         public DbSet<RadioCategory> RadioCategories { get; set; }
+
+        public DbSet<Badge> Badges { get; set; }
+        public DbSet<OwnedBadgeData> OwnedBadges { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

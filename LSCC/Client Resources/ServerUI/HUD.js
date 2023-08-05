@@ -1582,6 +1582,7 @@ function updatePlayers()
         scoreboard_players.push({
             id:sb.remoteId,
             donator:sb.getVariable("Donator"),
+            badges:sb.getVariable("BadgeData"),
             roomId:sb.getVariable("InLobby"),
             username:nameToDisplay,
             level:levelToDisplay,

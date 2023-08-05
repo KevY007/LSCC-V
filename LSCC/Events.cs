@@ -3642,6 +3642,8 @@ namespace RNC
                     player.SetSharedData("NextLevelXP", EPlayer.GetMaxLevelXP(acc.Level));
                     player.TriggerEvent("Menu_UpdateLevelXP", true);
                     player.TriggerEvent("InitiateLogsTab");
+
+                    EPlayer.UpdatePlayerBadges(player);
                 });
                 await NAPI.Task.WaitForMainThread();
 
@@ -4666,6 +4668,8 @@ namespace RNC
 
             player.SetSharedData("Donator", acc.DonatorLevel);
 
+            EPlayer.UpdatePlayerBadges(player);
+
             player.Name = acc.Username;
             player.SetSharedData("Admin", 0);
             player.SetSharedData("PlayerSquadID", -1);
@@ -5607,6 +5611,8 @@ namespace RNC
                     });
 
                     EPlayer.UpdateMaxMenuItems(player);
+
+                    EPlayer.UpdatePlayerBadges(player);
                     break;
                 case 2:
                     //acc.DonatorPoints += 350;
@@ -5620,6 +5626,8 @@ namespace RNC
                     });
 
                     EPlayer.UpdateMaxMenuItems(player);
+
+                    EPlayer.UpdatePlayerBadges(player);
                     break;
                 case 3:
                     //acc.DonatorPoints += 500;
@@ -5633,6 +5641,8 @@ namespace RNC
                     });
 
                     EPlayer.UpdateMaxMenuItems(player);
+
+                    EPlayer.UpdatePlayerBadges(player);
                     break;
             }
             EPlayer.Save(player, false);
@@ -5744,6 +5754,8 @@ namespace RNC
                                         });
 
                                         EPlayer.UpdateMaxMenuItems(player);
+
+                                        EPlayer.UpdatePlayerBadges(player);
                                         break;
                                     case 1:
                                         //acc.DonatorPoints += 350;
@@ -5757,6 +5769,8 @@ namespace RNC
                                         });
 
                                         EPlayer.UpdateMaxMenuItems(player);
+
+                                        EPlayer.UpdatePlayerBadges(player);
                                         break;
                                     case 2:
                                         //acc.DonatorPoints += 500;
@@ -5770,6 +5784,8 @@ namespace RNC
                                         });
 
                                         EPlayer.UpdateMaxMenuItems(player);
+
+                                        EPlayer.UpdatePlayerBadges(player);
                                         break;
                                 }
                                 break;
@@ -5786,6 +5802,8 @@ namespace RNC
                                         });
 
                                         EPlayer.UpdateMaxMenuItems(player);
+
+                                        EPlayer.UpdatePlayerBadges(player);
                                         break;
                                     case 1:
                                         acc.DonatorLevel = 2;
@@ -5797,6 +5815,8 @@ namespace RNC
                                         });
 
                                         EPlayer.UpdateMaxMenuItems(player);
+
+                                        EPlayer.UpdatePlayerBadges(player);
                                         break;
                                     case 2:
                                         acc.DonatorLevel = 3;
@@ -5808,6 +5828,8 @@ namespace RNC
                                         });
 
                                         EPlayer.UpdateMaxMenuItems(player);
+
+                                        EPlayer.UpdatePlayerBadges(player);
                                         break;
                                 }
                                 break;
@@ -6930,7 +6952,8 @@ namespace RNC
                                     ClanID = -1,
                                     CrosshairProfiles = "[]",
                                     ActiveCrosshairProfile = "{}",
-                                    TattooList = "[]"
+                                    TattooList = "[]",
+                                    SelectedBadgeID = -1,
                                 };
                                 AccountManager.Add(_new);
                                 OnPlayerRegister(player, _new);

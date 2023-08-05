@@ -9845,6 +9845,8 @@ namespace RNC
             player.SendChatMessage($"!{{#00FF33}}You have set {target.Name}'s admin level to {EPlayer.GetAdminLevelName(level, true)} ({level})");
             target.SendChatMessage($"!{{#00FF33}}{EPlayer.Name(player)} has set your admin level to {EPlayer.GetAdminLevelName(level, true)} ({level})");
             EPlayer.Save(target);
+
+            EPlayer.UpdatePlayerBadges(target);
         }
 
         [Command("osetadmin", "!{#AFAFAF}[USAGE] osetadmin (target) (level)")]
@@ -10109,6 +10111,7 @@ namespace RNC
             EPlayer.Save(target);
 
             EPlayer.UpdateMaxMenuItems(target);
+            EPlayer.UpdatePlayerBadges(target);
         }
 
         [Command("osetdonator", "!{#AFAFAF}[USAGE] osetdonator (target) (level)")]
