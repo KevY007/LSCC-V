@@ -5279,6 +5279,7 @@ namespace RNC
         public void OnMenuRequestClansList(Player player)
         {
             if (player == null) return;
+            player.TriggerEvent("clearMenuClansVariable");
             Task.Run(async () =>
             {
                 using(MainDatabase context = ContextFactory.CreateContext())
@@ -5312,6 +5313,10 @@ namespace RNC
                             });
                             await NAPI.Task.WaitForMainThread();
                         }
+                    });
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("Menu_FinishAddingClans");
                     });
                 }
             });

@@ -103,25 +103,33 @@ mp.events.add("LoadCrosshairProfiles", (profileData, activeProfile) => {
     ActiveCrosshairProfileUUID = activeProfile;
 });
 
+var MenuClans = [];
+mp.events.add("clearMenuClansVariable", () => {
+    mp.events.callRemote('ServerConsoleOutput', 'Cleared menu clans variable, setting new clans.');
+    MenuClans = [];
+});
+mp.events.add("Menu_FinishAddingClans", () => {
+    mp.events.callRemote('ServerConsoleOutput', JSON.stringify(MenuClans));
+    if(global.ServerUI) global.ServerUI.call('mainmenu_clan_search_clans_set', MenuClans);
+});
 mp.events.add("Menu_AddClan", (clanID, cname, tag, desc, banner, isOpen, players, maxPlayers, kills, deaths, wins, ownerName) => {
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.clansList.clans.push(
-        {
-            id: ${clanID},
-            name: "${cname}",
-            tag: "${tag}",
-            description: "${desc}",
-            banner:
-              "${banner == "default" ? "https://www.igta5.com/images/official-artwork-blitz-play.jpg" : banner}",
-            open: ${isOpen.toString()},
-            players: ${players},
-            maxplayers: ${maxPlayers},
-            owner: "${ownerName}",
-            stats: {
-              kills: ${kills},
-              deaths: ${deaths},
-              wins: ${wins},
-            },
-        });`);
+    MenuClans.push({
+        id: clanID,
+        name: cname,
+        tag: tag,
+        description: desc,
+        banner:
+          (banner == "default" ? "https://www.igta5.com/images/official-artwork-blitz-play.jpg" : banner),
+        open: isOpen,
+        players: players,
+        maxplayers: maxPlayers,
+        owner: ownerName,
+        stats: {
+          kills: kills,
+          deaths: deaths,
+          wins: wins,
+        },
+    });
 });
 mp.events.add("joinClan", (clanSQLID) => {
     mp.events.callRemote("Clan_OnRequestJoinClan", clanSQLID);
@@ -421,7 +429,7 @@ settings
 mp.events.add("menu_tabData", (tab) => {
     // store inventory play wiki settings profile clans
     switch(tab){
-        case "clans":
+        case "clan":
             if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.clansList.clans = [];`);
             if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.name = "${mp.players.local.getVariable("ClanName")}"`);
             if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.createdAt = "${mp.players.local.getVariable("ClanCreated")}"`);
