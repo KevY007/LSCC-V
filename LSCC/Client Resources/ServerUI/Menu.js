@@ -129,22 +129,28 @@ mp.events.add("Menu_AddClan", (clanID, cname, tag, desc, banner, isOpen, players
           wins: wins,
         },
     });
+    mp.events.callRemote('ServerConsoleOutput', `Menu_AddClan: Added ${clanID} - ${cname}`);
 });
-mp.events.add("joinClan", (clanSQLID) => {
+
+mp.events.add('mainmenu_clan_my_clan_delete', () => {
+    mp.events.callRemote("Clan_OnRequestDelete");
+});
+
+mp.events.add("mainmenu_clan_search_join", (clanSQLID) => {
     mp.events.callRemote("Clan_OnRequestJoinClan", clanSQLID);
 });
-mp.events.add("kickClanMember", (memberSQLID) => {
+mp.events.add("mainmenu_clan_my_clan_members_kick", (memberSQLID) => {
     mp.events.callRemote("Clan_OnRequestKickPlayer", memberSQLID);
 });
-mp.events.add("setClanRank", (memberSQLID, tier) => {
+mp.events.add("mainmenu_clan_my_clan_members_change_rank", (memberSQLID, tier) => {
     mp.events.callRemote("Clan_OnRequestChangeTier", memberSQLID, tier);
 });
 
-mp.events.add("invitePlayerToClan", (playerName) => {
+mp.events.add("mainmenu_clan_my_clan_members_invite", (playerName) => {
     mp.events.callRemote("Clan_OnRequestInvitePlayer", playerName);
 });
 
-mp.events.add("requestLeaveClan", () => {
+mp.events.add("mainmenu_clan_my_clan_leave", () => {
     mp.events.callRemote("OnRequestLeaveClan");
 });
 /*
@@ -157,7 +163,7 @@ mp.events.add("requestLeaveClan", () => {
     [3] => Copchase Partnering
     (VALUES) => true/false
 */
-mp.events.add("changeClanSettings", (settingID, value) => {
+mp.events.add("mainmenu_clan_my_clan_setting_update", (settingID, value) => {
     let numValue = Number(value); // be careful in the future if a setting isn't bool nor number
 
     mp.events.callRemote("Clan_OnRequestChangeSetting", settingID, numValue);
@@ -211,8 +217,12 @@ mp.events.add("Menu_UpdateClanSetting", (type, value) => {
 mp.events.add("Menu_SetClanMembers", (membersData) => {
     var membersDataJSON = JSON.parse(membersData);
     for(let i = 0 ; i < membersDataJSON.length ; i++){
-        let isOnline = (mp.players.toArray().find(p => p.name.toLowerCase() === membersDataJSON[i].name.toLowerCase()) !== undefined);
+        let clanPlayer = mp.players.toArray().find(p => p.name.toLowerCase() === membersDataJSON[i].name.toLowerCase());
+        let isOnline = (clanPlayer !== undefined);
+        
         membersDataJSON[i].online = isOnline;
+        if(isOnline)
+            membersDataJSON[i].badges = JSON.parse(clanPlayer.getVariable("BadgeData"));
     }
     mp.events.callRemote('ServerConsoleOutput', JSON.stringify(membersDataJSON));
     if(global.ServerUI) global.ServerUI.call('mainmenu_my_clan_members_set', membersDataJSON);
@@ -238,26 +248,26 @@ mp.events.add("Menu_DisableClanCreatorLoading", () => {
 });
 
 mp.events.add("Menu_UpdateClanStats", (weekKills, totalKills, weekWins) => {
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.statsTab.stats = [
+    if(global.ServerUI) global.ServerUI.call('mainmenu_clan_my_clan_stats_set',[
         {
             icon: "fa-crosshairs",
             title: "Week Kills",
-            value: ${weekKills}
+            value: weekKills
         },
         {
             icon: "fa-skull",
             title: "Total Kills",
-            value: ${totalKills}
+            value: totalKills
         },
         {
             icon: "fa-trophy",
             title: "COTW Wins",
-            value: ${weekWins}
+            value: weekWins
         }
-    ]`);
+    ]);
 });
 
-mp.events.add("createClan", (cname, tag, desc) => {
+mp.events.add("mainmenu_clan_create", (cname, tag, desc) => {
     mp.events.callRemote("OnRequestCreateClan", cname, tag, desc);
 });
 mp.events.add("UpdateMenuClanTab", () => {

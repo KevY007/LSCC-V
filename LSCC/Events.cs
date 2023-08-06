@@ -1761,6 +1761,97 @@ namespace RNC
             });
         }
 
+        [RemoteEvent("Clan_OnRequestDelete")]
+        public void OnRequestDeleteClan(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            Account acc = EPlayer.GetAccount(player);
+            if (acc.ClanID == -1 || acc.ClanTier == -1)
+            {
+                return;
+            }
+            int myTier = acc.ClanTier;
+            int clanToSee = acc.ClanID;
+            if(myTier != 0)
+            {
+                EPlayer.Error(player, Translate(player, "ERROR_CLAN_NO_AUTHORITY_SETTINGS"));
+                return;
+            }
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    bool isClanDisbanded = false;
+
+                    Clan clan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == acc.ClanID);
+                    if (clan != null)
+                    {
+                        context.Clans.Remove(clan);
+                        isClanDisbanded = true;
+                        await context.SaveChangesAsync();
+                    }
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.Notify(player, "Clan Deleted", "You successfully deleted your clan!");
+                    });
+                    Account accnt = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == acc.SQL_ID);
+                    accnt.ClanID = -1;
+                    accnt.ClanTier = -1;
+                    acc.ClanID = -1;
+                    acc.ClanTier = -1;
+
+                    if (isClanDisbanded)
+                    {
+                        await context.Accounts.AsQueryable().Where(a => a.ClanID == clanToSee).ForEachAsync(a =>
+                        {
+                            a.ClanID = -1;
+                            a.ClanTier = -1;
+                        });
+                    }
+
+
+                    await context.SaveChangesAsync();
+                    NAPI.Task.Run(() =>
+                    {
+                        player.SetSharedData("ClanID", -1);
+                        player.SetSharedData("ClanTier", -1);
+                        player.SetSharedData("ClanName", "N/A");
+                        player.SetSharedData("ClanCreated", "N/A");
+                        player.SetSharedData("ClanPartnering", false);
+                        player.SetSharedData("ClanTag", "");
+                        EPlayer.GetAccount(player).ClanID = -1;
+                        EPlayer.GetAccount(player).ClanTier = -1;
+                        EPlayer.Save(player, false);
+
+                        player.TriggerEvent("UpdateMenuClanTab");
+
+                        EPlayer.UpdateUIVars(player);
+
+                        foreach (Player clanMember in Settings.LoggedInPlayers.Where(pl => pl.HasSharedData("ClanID") && pl.GetSharedData<int>("ClanID") == clanToSee))
+                        {
+                            clanMember.SetSharedData("ClanID", -1);
+                            clanMember.SetSharedData("ClanTier", -1);
+                            clanMember.SetSharedData("ClanName", "N/A");
+                            clanMember.SetSharedData("ClanCreated", "N/A");
+                            clanMember.SetSharedData("ClanPartnering", false);
+                            clanMember.SetSharedData("ClanTag", "");
+                            EPlayer.GetAccount(clanMember).ClanID = -1;
+                            EPlayer.GetAccount(clanMember).ClanTier = -1;
+                            EPlayer.Save(clanMember, false);
+                            EPlayer.Notify(clanMember, Translate(clanMember, "CLAN_DISBANDED", EPlayer.Name(player)), "yellow", "", false, 3000);
+
+                            clanMember.TriggerEvent("UpdateMenuClanTab");
+
+                            EPlayer.UpdateUIVars(clanMember);
+                        }
+
+                    });
+                }
+            });
+        }
+
         [RemoteEvent("OnRequestLeaveClan")]
         public void OnRequestLeaveClan(Player player)
         {
@@ -1768,7 +1859,6 @@ namespace RNC
                 return;
 
             Account acc = EPlayer.GetAccount(player);
-            NAPI.Util.ConsoleOutput($"Player is {acc.Username} {player.Name} | tier {acc.ClanTier} for iD {acc.ClanID}");
             if (acc.ClanID == -1 || acc.ClanTier == -1)
             {
                 return;
