@@ -546,21 +546,21 @@ var adminVehSpawner = false;
 
 
 
-mp.events.add("vehicleSpawner:spawnVehicle", (modelname, col1, col2) => {
+mp.events.add("vehicle_spawn", (modelname/*, col1, col2*/) => {
     global.VehicleSpawnerActive = false;
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.enabled = false;`);
-    mp.events.callRemote("Spawner_SpawnVehicle", modelname, adminVehSpawner, col1, col2);
+    if(global.ServerUI) global.ServerUI.call("menu_vehicle_spawner_toggle", false);
+    mp.events.callRemote("Spawner_SpawnVehicle", modelname, adminVehSpawner, -1, -1);
     mp.gui.cursor.show(false, false);
 });
 mp.events.add("spawner_close", () => {
     global.VehicleSpawnerActive = false;
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.enabled = false;`);
+    if(global.ServerUI) global.ServerUI.call("menu_vehicle_spawner_toggle", false);
     mp.gui.cursor.show(false, false);
 });
 mp.events.add("OpenVehicleSpawner", (carname, admin) => {
     global.VehicleSpawnerActive = true;
     adminVehSpawner = admin;
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.openSpawner('${carname}')`);
+    if(global.ServerUI) global.ServerUI.call("menu_vehicle_spawner_toggle", true);
     mp.gui.cursor.show(true, true);
 });
 
