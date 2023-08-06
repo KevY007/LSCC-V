@@ -202,33 +202,40 @@ function renderScreenNotifications(){
 }
 
 
-
+var ActionMenuItems = [];
+function updateActionMenuItemsCEF(){
+    if(global.ServerUI) global.ServerUI.call("menu_actionwheel_actions_set", ActionMenuItems);
+}
 mp.events.add("actionMenu:addItem", (id, action, color, icon) => {
     if(!global.ServerUI) return;
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.items.push({
-        id: ${id},
-        name: "${action}",
-        color: "${color}",
-        icon: "${icon}"
-    });`);
+
+    ActionMenuItems.push({
+        id: id,
+        name: action,
+        label: action,
+        //color: color,
+        icon: icon
+    });
+    updateActionMenuItemsCEF();
 });
 mp.events.add("actionMenu:removeItem", (id) => {
     if(!global.ServerUI) return;
-    if(global.ServerUI) global.ServerUI.execute(`
-        if(gm.$refs.hud.$refs.base.$refs.actionMenu.items.find(i => i.id == ${id})){
-            gm.$refs.hud.$refs.base.$refs.actionMenu.items.splice(gm.$refs.hud.$refs.base.$refs.actionMenu.items.indexOf(gm.$refs.hud.$refs.base.$refs.actionMenu.items.find(i => i.id == ${id})), 1);
-        }
-    `);
+    
+    if(ActionMenuItems.find(a => a.id === id) !== undefined){
+        ActionMenuItems.splice(ActionMenuItems.findIndex(a => a.id === id), 1);
+    }
+    updateActionMenuItemsCEF();
 });
 mp.events.add("actionMenu:removeAllItems", () => {
     if(!global.ServerUI) return;
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.items = [];`);
+    ActionMenuItems = [];
+    updateActionMenuItemsCEF();
 });
 
 mp.events.add('actionMenu:close', () => {
     if(!global.ServerUI) return;
     global.ActionMenuActive = false;
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.enabled = false;`);
+    if(global.ServerUI) global.ServerUI.call("menu_actionwheel_toggle", false);
     mp.gui.cursor.show(false, false);
 });
 mp.events.add('actionMenu:open', () => {
@@ -243,13 +250,13 @@ mp.events.add('actionMenu:open', () => {
     actionMenu_vehicleCheck();
     actionMenu_teamCheck();
 
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionMenu.enabled = true;`);
+    if(global.ServerUI) global.ServerUI.call("menu_actionwheel_toggle", true);
     mp.gui.cursor.show(true, true);
 });
 
 let lastActionMenuClick = 0;
 
-mp.events.add('actionMenu:clickItem', (actionID) => {
+mp.events.add('menu_actionwheel_action_click', (actionID) => {
     if(!global.ServerUI) return;
     if(Date.now() - lastActionMenuClick < 100) return;
     lastActionMenuClick = Date.now();
