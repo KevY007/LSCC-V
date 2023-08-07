@@ -571,6 +571,7 @@ mp.events.add("weapon_give", (weaponHash, ammo, targetName, attachments) => {
     let real_ammo = (ammo ? ammo : 9999);
     let real_attachments = (attachments !== undefined ? attachments : false);
 
+    mp.events.callRemote('ServerConsoleOutput', `weapon spawner giving gun to ${targetName}`);
     mp.events.callRemote("WeaponSpawner_RequestGiveWeapon", weaponHash, real_ammo, targetName, real_attachments);
     if(global.ServerUI) global.ServerUI.call('menu_weapon_spawner_toggle', false, "");
 });
@@ -581,7 +582,8 @@ mp.events.add("menu_weapon_spawner_close", () => {
 });
 mp.events.add("WeaponSpawner:show", (targetName, weaponName) => {
     global.VehicleSpawnerActive = true;
-    if(global.ServerUI) global.ServerUI.call('menu_weapon_spawner_toggle', true, weaponName);
+    mp.events.callRemote('ServerConsoleOutput', `weapon spawner on for ${weaponName} and target ${targetName}`);
+    if(global.ServerUI) global.ServerUI.call('menu_weapon_spawner_toggle', true, weaponName, targetName);
     mp.gui.cursor.show(true, true);
 });
 
