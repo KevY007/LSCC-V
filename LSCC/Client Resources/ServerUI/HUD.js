@@ -552,7 +552,7 @@ mp.events.add("vehicle_spawn", (modelname/*, col1, col2*/) => {
     mp.events.callRemote("Spawner_SpawnVehicle", modelname, adminVehSpawner, -1, -1);
     mp.gui.cursor.show(false, false);
 });
-mp.events.add("spawner_close", () => {
+mp.events.add("menu_vehicle_spawner_close", () => {
     global.VehicleSpawnerActive = false;
     if(global.ServerUI) global.ServerUI.call("menu_vehicle_spawner_toggle", false);
     mp.gui.cursor.show(false, false);
@@ -560,25 +560,28 @@ mp.events.add("spawner_close", () => {
 mp.events.add("OpenVehicleSpawner", (carname, admin) => {
     global.VehicleSpawnerActive = true;
     adminVehSpawner = admin;
-    if(global.ServerUI) global.ServerUI.call("menu_vehicle_spawner_toggle", true);
+    if(global.ServerUI) global.ServerUI.call("menu_vehicle_spawner_toggle", true, (carname.length > 1 ? carname : null));
     mp.gui.cursor.show(true, true);
 });
 
-mp.events.add("weaponSpawner:giveWeapon", (weaponHash, ammo, targetName, attachments) => {
+mp.events.add("weapon_give", (weaponHash, ammo, targetName, attachments) => {
     global.VehicleSpawnerActive = false;
     mp.gui.cursor.show(false, false);
-    
-    mp.events.callRemote("WeaponSpawner_RequestGiveWeapon", weaponHash, ammo, targetName, attachments);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.menus.$refs.weaponSpawner.enabled = false;`);
+
+    let real_ammo = (ammo ? ammo : 9999);
+    let real_attachments = (attachments !== undefined ? attachments : false);
+
+    mp.events.callRemote("WeaponSpawner_RequestGiveWeapon", weaponHash, real_ammo, targetName, real_attachments);
+    if(global.ServerUI) global.ServerUI.call('menu_weapon_spawner_toggle', false, "");
 });
-mp.events.add("weaponSpawner:close", () => {
+mp.events.add("menu_weapon_spawner_close", () => {
     global.VehicleSpawnerActive = false;
     mp.gui.cursor.show(false, false);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.menus.$refs.weaponSpawner.enabled = false;`);
+    if(global.ServerUI) global.ServerUI.call('menu_weapon_spawner_toggle', false, "");
 });
 mp.events.add("WeaponSpawner:show", (targetName, weaponName) => {
     global.VehicleSpawnerActive = true;
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.menus.$refs.weaponSpawner.openSpawner('${weaponName}', '${targetName}')`);
+    if(global.ServerUI) global.ServerUI.call('menu_weapon_spawner_toggle', true, weaponName);
     mp.gui.cursor.show(true, true);
 });
 
@@ -1159,6 +1162,17 @@ mp.events.add('browserDomReady', (browser) => {
     if(global.ServerUI != null && browser == global.ServerUI)
     {
         // Set vars that aren't reset on login and shit. Basically init().
+        const weaponDataForSpawner = global.weaponData.map(w => {
+            return {
+                id:w.id,
+                name:w.Name,
+                image:w.ImageSrc,
+                hash:w.Hash,
+                type:w.Type              
+            };
+        });
+        if(global.ServerUI) global.ServerUI.call("menu_weapon_spawner_weapons_set", weaponDataForSpawner);
+
         if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.enabled = ${mp.storage.data.menu.topRightInfo}; gm.$refs.hud.$refs.topRight.$refs.killFeed.enabled = ${mp.storage.data.menu.killFeed};`);
         if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", true);
         if(global.ServerUI) global.ServerUI.call('hud_minilist', true);
