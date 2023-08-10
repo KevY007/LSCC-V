@@ -916,6 +916,10 @@ mp.events.add('AddTooltip', (key, action, team) => {
     if(createdTooltips.indexOf(key) != -1) return;
     if(mp.storage.data.menu.tooltips !== true) return;
 
+    createdTooltips.push(key);
+    global.ServerUI.call('hud_keybind_tips_add', action, key);
+
+    /*
     let color = "#383838FF";
     switch(team){
         case 0: color = "#ffae00ff";
@@ -932,14 +936,16 @@ mp.events.add('AddTooltip', (key, action, team) => {
         action: "${action}",
         color: "${color}"
     })`);
+    */
 });
 mp.events.add('RemoveTooltip', (key) => {
     if(global.ServerUI == null) return;
     if(createdTooltips.indexOf(key) == -1) return;
 
-    if(global.ServerUI) global.ServerUI.execute(`if(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.indexOf(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.filter(function(el){return el.key == "${key}"})[0]) != -1){
-        gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.splice(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.indexOf(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.filter(function(el){return el.key == "${key}"})[0]), 1);        
-    }`);
+    // if(global.ServerUI) global.ServerUI.execute(`if(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.indexOf(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.filter(function(el){return el.key == "${key}"})[0]) != -1){
+    //     gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.splice(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.indexOf(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.filter(function(el){return el.key == "${key}"})[0]), 1);        
+    // }`);
+    global.ServerUI.call('hud_keybind_tips_remove', key);
     createdTooltips.splice(createdTooltips.indexOf(key), 1);
 });
 
@@ -948,7 +954,8 @@ let keyTrunk = true; // true = key trunk, false = key seatbelt displayed
 mp.events.add('ToggleTooltips', (status) =>
 {
     mp.storage.data.menu.tooltips = status;
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.enabled = ${status.toString()}`);
+    if(global.ServerUI) global.ServerUI.call('hud_keybind_tips_toggle', status);
+    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.enabled = ${status.toString()}`);
 
     if(status)
     {
@@ -959,9 +966,11 @@ mp.events.add('ToggleTooltips', (status) =>
     else {
 
         createdTooltips.forEach(key => {
-            if(global.ServerUI) global.ServerUI.execute(`if(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.indexOf(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.filter(function(el){return el.key == "${key}"})[0]) != -1){
-                gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.splice(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.indexOf(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.filter(function(el){return el.key == "${key}"})[0]), 1);        
-            }`);
+            mp.events.callLocal("RemoveTooltip", key);
+
+            // if(global.ServerUI) global.ServerUI.execute(`if(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.indexOf(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.filter(function(el){return el.key == "${key}"})[0]) != -1){
+            //     gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.splice(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.indexOf(gm.$refs.hud.$refs.topRight.$refs.tooltips.tips.filter(function(el){return el.key == "${key}"})[0]), 1);        
+            // }`);
         });
 
         createdTooltips = [];
@@ -1173,7 +1182,7 @@ mp.events.add('browserDomReady', (browser) => {
                 type:w.Type              
             };
         });
-        if(global.ServerUI) global.ServerUI.call("menu_weapon_spawner_weapons_set", weaponDataForSpawner);
+        if(global.ServerUI) global.ServerUI.call("set_weapons", weaponDataForSpawner);
 
         if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.enabled = ${mp.storage.data.menu.topRightInfo}; gm.$refs.hud.$refs.topRight.$refs.killFeed.enabled = ${mp.storage.data.menu.killFeed};`);
         if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", true);
