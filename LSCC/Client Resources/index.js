@@ -252,6 +252,8 @@ mp.events.add('showLoginBrowser', (state) => {
             if(global.ServerUI) global.ServerUI.call(`mainmenu_toggle`, false); 
             if(state){
                 if(global.ServerUI) global.ServerUI.call(`auth_toggle`, true);
+                global.isLoginScreenActive = true;
+                global.ServerUI.call('auth_quick_login_toggle', false);
                 toggleLoginScene(true);
                 mp.events.callRemote("requestQuickLoginForgotUsernameData"); // yes
                 //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.items = [];`);
@@ -264,6 +266,7 @@ mp.events.add('showLoginBrowser', (state) => {
                     if(!mp.players.local || !mp.players.exists(mp.players.local)) return;
 
                     if(global.ServerUI) global.ServerUI.call(`auth_toggle`, false);
+                    global.isLoginScreenActive = false;
                     if(!global.IsInTutorial){
                         if(global.ServerUI) global.ServerUI.call('hud_toggle', true);
                         if(global.ServerUI) global.ServerUI.call('hud_minilist', true);
@@ -372,10 +375,14 @@ mp.events.add('requestAutoLoginData', () => {
     mp.events.callRemote("OnRequestAutoLoginData");
 });
 
+var quickLoginUsername = "";
 mp.events.add('sendAutoLoginDataToBrowser', (data) => {
     setTimeout(() => {
-        if(data.length > 2)
-            if(global.ServerUI) global.ServerUI.call(`auth_quick_login_set`, data);
+        if(data.length > 2){
+            //if(global.ServerUI) global.ServerUI.call(`auth_quick_login_set`, data);
+            quickLoginUsername = data;
+            global.ServerUI.call('auth_quick_login_toggle', true);
+        }
     }, 500);
 });
 mp.events.add('sendForgotUsernameToBrowser', (data) => {
@@ -385,9 +392,9 @@ mp.events.add('sendForgotUsernameToBrowser', (data) => {
 
 });
 
-mp.events.add('auth_quickLogin', (username) => {
+mp.events.add('auth_quick_login', () => {
     if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.isLoading = true;`);
-    mp.events.callRemote("OnAutoLoginAttempt", username);
+    mp.events.callRemote("OnAutoLoginAttempt", quickLoginUsername);
 });
 
 mp.events.add('requestForgotUsernameServer', () => {

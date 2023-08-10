@@ -445,7 +445,7 @@ wiki
 settings
 */
 
-mp.events.add("menu_tabData", (tab) => {
+mp.events.add("mainmenu_tab_request_data", (tab) => {
     // store inventory play wiki settings profile clans
     switch(tab){
         case "clan":
@@ -1105,7 +1105,7 @@ mp.events.add("mainmenu_setting_change", (id, value) =>
 
     if(global.ServerUI != null)
     {
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.enabled = ${mp.storage.data.menu.topRightInfo}; gm.killFeed = ${mp.storage.data.menu.killFeed};`);
+        global.ServerUI.call('hud_info_toggle', mp.storage.data.menu.topRightInfo);
     }
 
     mp.storage.flush();

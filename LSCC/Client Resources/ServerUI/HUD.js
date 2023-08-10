@@ -845,6 +845,7 @@ mp.events.add("chat:sendCustomMessage", (channel, badges, username, text) => {
 
 mp.keys.bind(0x54, true, function() { // T key
     if(global.ServerUI == null) return;
+    if(global.isLoginScreenActive === true) return;
     if(global.menuToggled){
         if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(false);`);
         return;
@@ -1186,7 +1187,8 @@ mp.events.add('browserDomReady', (browser) => {
 
         if(global.ServerUI) global.ServerUI.call('hud_info_killfeed_toggle', mp.storage.data.menu.killFeed);
 
-        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.enabled = ${mp.storage.data.menu.topRightInfo}; gm.$refs.hud.$refs.topRight.$refs.killFeed.enabled = ${mp.storage.data.menu.killFeed};`);
+        global.ServerUI.call('hud_info_toggle', mp.storage.data.menu.topRightInfo);
+        global.ServerUI.call('hud_info_killfeed_toggle', mp.storage.data.menu.killFeed);
         if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", true);
         if(global.ServerUI) global.ServerUI.call('hud_minilist', true);
         if(global.ServerUI) global.ServerUI.call("hud_minilist_items_set", []);
@@ -1322,27 +1324,19 @@ mp.events.add('ResetKillFeed', () => {
     }
 });
 
-mp.events.add("pushToKillFeed", (killer, killerColor, weapon, victim, victimColor) => {
-    let killFeedObject = {
-        killerName:killer,
-        killerColor:killerColor,
-        weaponHash:weapon,
-        victimName:victim,
-        victimColor:victimColor
-    }
-    if(global.ServerUI) global.ServerUI.call('hud_info_killfeed_kill_add', killFeedObject);
+mp.events.add("pushToKillFeed", (killer, killerColor, text, victim, victimColor, weaponHash) => {
 
+    let hash = "0";
+    let wData = global.weaponData.find(w => Number(w.Hash) === (weaponHash>>>0));
+    if(wData) hash = wData.Hash;
 
+    if(global.ServerUI) global.ServerUI.call('hud_info_killfeed_kill_add', killer, killerColor, hash, text, victim, victimColor);
     //if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.killFeed.add('${killer}', '${killerColor}', '${weapon}', '${victim}', '${victimColor}');`)
 });
 
 mp.events.add("pushToKillFeed2", (victim, color, cause) => {
-    let killFeedObject = {
-        text:cause,
-        victimName:victim,
-        victimColor:color
-    }
-    if(global.ServerUI) global.ServerUI.call('hud_info_killfeed_kill_add', killFeedObject);
+
+    if(global.ServerUI) global.ServerUI.call('hud_info_killfeed_kill_add', null, null, null, cause, victim, color);
 
     //if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.killFeed.add("${victim}", "${color}", "${cause}");`)
 });

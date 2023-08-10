@@ -53,6 +53,7 @@ function UpdateStatsVars(entity, all = true){
                 admin: player.getVariable("Admin"),
                 donator: player.getVariable("Donator"),
                 donatorPoints: player.getVariable("DonatorPoints"),
+                diamondPoints: player.getVariable("DonatorPoints"),
                 api: player.getVariable("ScreenshotServerAPI"),
                 lobbyId: player.getVariable("InLobby"),
                 teamId: player.getVariable("Team"),
@@ -1110,6 +1111,8 @@ function isHoldingSniper() {
 let global = {
   currentJailTime: 0,
   lastJailUpdate: 10,
+
+  isLoginScreenActive:false,
 
   chaseRunning: false,
   chaseTimeCur: 0,
