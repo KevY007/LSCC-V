@@ -970,7 +970,7 @@ mp.events.add("mainmenu_setting_change", (id, value) =>
     else if(id == 2)
     {
         mp.storage.data.menu.killFeed = value;
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.killFeed.enabled = ${value.toString()}`);
+        if(global.ServerUI) global.ServerUI.call('hud_info_killfeed_toggle', value);
     }
     else if(id == 3)
     {

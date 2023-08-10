@@ -1184,7 +1184,9 @@ mp.events.add('browserDomReady', (browser) => {
         });
         if(global.ServerUI) global.ServerUI.call("set_weapons", weaponDataForSpawner);
 
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.enabled = ${mp.storage.data.menu.topRightInfo}; gm.$refs.hud.$refs.topRight.$refs.killFeed.enabled = ${mp.storage.data.menu.killFeed};`);
+        if(global.ServerUI) global.ServerUI.call('hud_info_killfeed_toggle', mp.storage.data.menu.killFeed);
+
+        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.enabled = ${mp.storage.data.menu.topRightInfo}; gm.$refs.hud.$refs.topRight.$refs.killFeed.enabled = ${mp.storage.data.menu.killFeed};`);
         if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", true);
         if(global.ServerUI) global.ServerUI.call('hud_minilist', true);
         if(global.ServerUI) global.ServerUI.call("hud_minilist_items_set", []);
@@ -1316,16 +1318,33 @@ mp.keys.bind(0x74, false, () => {
 mp.events.add('ResetKillFeed', () => {
     if(global.ServerUI != null)
     {
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.killFeed.killFeed = [];`);
+        if(global.ServerUI) global.ServerUI.call('hud_info_killfeed_clear');
     }
 });
 
 mp.events.add("pushToKillFeed", (killer, killerColor, weapon, victim, victimColor) => {
-    if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.killFeed.add('${killer}', '${killerColor}', '${weapon}', '${victim}', '${victimColor}');`)
+    let killFeedObject = {
+        killerName:killer,
+        killerColor:killerColor,
+        weaponHash:weapon,
+        victimName:victim,
+        victimColor:victimColor
+    }
+    if(global.ServerUI) global.ServerUI.call('hud_info_killfeed_kill_add', killFeedObject);
+
+
+    //if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.killFeed.add('${killer}', '${killerColor}', '${weapon}', '${victim}', '${victimColor}');`)
 });
 
 mp.events.add("pushToKillFeed2", (victim, color, cause) => {
-    if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.killFeed.add("${victim}", "${color}", "${cause}");`)
+    let killFeedObject = {
+        text:cause,
+        victimName:victim,
+        victimColor:color
+    }
+    if(global.ServerUI) global.ServerUI.call('hud_info_killfeed_kill_add', killFeedObject);
+
+    //if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.killFeed.add("${victim}", "${color}", "${cause}");`)
 });
 
 mp.events.add("UpdateRateEvent", () => {
