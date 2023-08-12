@@ -2,6 +2,30 @@ var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 require("./ServerUI/Menu.js");
 
+let currentDialogID = "";
+var testArray = [];
+mp.events.add("logstest", () => {
+    for(let i = 0 ; i < 200 ; i++)
+        testArray.push(i);
+});
+mp.events.add("openLogsDialog", (dialogId, username) => {
+    if(!global.ServerUI) return;
+    currentDialogID = dialogId;
+    global.ServerUI.call('dialog_logs_open', dialogId, username);
+    global.ServerUI.call(`dialog_logs_total_set_${currentDialogID}`, testArray.length);
+    mp.events.callRemote('ServerConsoleOutput', `opened logs dialog for ${dialogId} and ${username}`);
+
+});
+mp.events.add("dialog_logs_request_page", (dialogId, username, first, rows) => {
+    mp.events.callRemote('ServerConsoleOutput', `Trying to get logs for ${dialogId} from ${first} and ${rows} rows!`);
+    var logsToShow = [];
+    for(let i = first ; i < first+rows ; i++){
+        logsToShow.push(testArray[i]);
+    }
+    mp.events.callRemote('ServerConsoleOutput', `${JSON.stringify(logsToShow)}`);
+    global.ServerUI.call(`dialog_logs_add_${dialogId}`, logsToShow);
+});
+
 mp.events.add("RequestLogsFromServer", (type, username) => {
     if(!global.ServerUI) return;
     if(global.ServerUI) global.ServerUI.execute('gm.$refs.mainMenu.$refs.logsTab.isLoading = true;');
