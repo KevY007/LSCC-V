@@ -5666,7 +5666,13 @@ namespace RNC
             return;
         }
 
-        [Command("report", "!{#AFAFAF}[USAGE] report (target) (desc)", GreedyArg = true)]
+        [Command("report")]
+        public static void cmd_report(Player player)
+        {
+            player.TriggerEvent("openReportDialog");
+        }
+
+        [Command("report2", "!{#AFAFAF}[USAGE] report (target) (desc)", GreedyArg = true)]
         public static void cmd_report(Player player, Player target, string description)
         {
             if (Settings.Requests.Count(r => r.Reported == target && r.Reporter == player) > 0)

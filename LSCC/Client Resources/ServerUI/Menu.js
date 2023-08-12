@@ -946,6 +946,10 @@ function updateMenuSettingsTab(){
     }
 }
 
+mp.events.add("openReportDialog", () => {
+    mp.events.callRemote("dialog_report_open");
+});
+
 mp.events.add("report_player", (username, reason) => {
     mp.events.callRemote("Menu_ReportPlayer", username, reason);
 });
