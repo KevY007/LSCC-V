@@ -5391,7 +5391,7 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
-                            if(EPlayer.GetAccount(player).ClanID != -1 || player.GetSharedData<int>("ClanID") != -1)
+                            if (EPlayer.GetAccount(player).ClanID != -1 || player.GetSharedData<int>("ClanID") != -1)
                             {
                                 EPlayer.Error(player, Translate(player, "SERVER_CANT_FIND_CLAN", player.GetSharedData<string>("ClanName")));
                                 player.SetSharedData("ClanID", -1);
@@ -5403,9 +5403,58 @@ namespace RNC
                                 EPlayer.GetAccount(player).ClanID = -1;
                                 EPlayer.GetAccount(player).ClanTier = -1;
                                 EPlayer.UpdateUIVars(player);
-                            }                    
+                            }
                         });
                     }
+                }
+            });
+        }
+
+        [RemoteEvent("Menu_OnRequestClansPage")]
+        public void OnMenuRequestClansPage(Player player, int first, int rows)
+        {
+            if (player == null) return;
+            if (!player.HasSharedData("Menu_LastClanPageID")) player.SetSharedData("Menu_LastClanPageID", 0);
+
+            player.TriggerEvent("clearMenuClansVariable");
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    await context.Clans.AsQueryable().Skip((first-1)*rows).Take(rows).ForEachAsync(async clan =>
+                    {
+                        int clanID = clan.SQL_ID;
+                        string clanName = clan.Name;
+                        string tag = clan.Tag;
+                        string desc = clan.Description;
+                        string banner = "default"; // to add
+                        bool isOpen = (clan.ClanAccess == 1);
+                        int maxPlayers = 20; // to add
+                        int players = context.Accounts.AsQueryable().Count(a => a.ClanID == clan.SQL_ID);
+                        int totalKills = clan.TotalKills;
+                        int totalDeaths = clan.WeekKills; // temp
+                        int COTW_Wins = clan.WeekWins;
+
+                        using (MainDatabase context2 = ContextFactory.CreateContext())
+                        {
+                            Account clanOwner = await context2.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.ClanID == clan.SQL_ID && a.ClanTier == 0);
+                            string ownerName = $"BUGGED CLAN, REPORT TO DEV: {clan.SQL_ID}";
+                            if (clanOwner != null)
+                                ownerName = $"{clanOwner.Username} [DBID: {clanOwner.SQL_ID}]";
+
+                            NAPI.Task.Run(() =>
+                            {
+                                player.TriggerEvent("Menu_AddClan", clanID, clanName, tag, desc, banner, isOpen, players,
+                                                                    maxPlayers, totalKills, totalDeaths, COTW_Wins, ownerName);
+
+                            });
+                            await NAPI.Task.WaitForMainThread();
+                        }
+                    });
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("Menu_FinishAddingClans");
+                    });
                 }
             });
         }

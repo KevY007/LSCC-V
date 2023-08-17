@@ -736,6 +736,7 @@ namespace RNC
                 player.SetSharedData("FakeNameLevel", 0);
 
                 player.SetSharedData("Bleeding_WasShot", false);
+                player.SetSharedData("Menu_LastClanPageID", 0);
                 player.SetSharedData("AutoOOC", false);
 
                 player.SetSharedData("TaseProtection", false);
@@ -1253,15 +1254,15 @@ namespace RNC
             });
         }
 
-        public async static Task<bool> HasUnlockedAchievement(Account account, string achievement)
+        public async static Task<UnlockedAchievement> HasUnlockedAchievement(Account account, string achievement)
         {
-            if (account == null) return false;
+            if (account == null) return null;
 
             using (MainDatabase context = ContextFactory.CreateContext())
             {
                 UnlockedAchievement a = await context.UnlockedAchievements.AsQueryable().FirstOrDefaultAsync(u => u.AccountID == account.SQL_ID && u.Achievement.Equals(achievement, StringComparison.OrdinalIgnoreCase));
-                if (a == null) return false;
-                else return true;
+                if (a == null) return null;
+                else return a;
             }
         } 
         public static void UnlockAchievement(Player player, string achievement)
@@ -1272,7 +1273,7 @@ namespace RNC
                 Account acc = EPlayer.GetAccount(player);
                 Task.Run(async () =>
                 {
-                    if (await HasUnlockedAchievement(acc, achievement)) return;
+                    if (await HasUnlockedAchievement(acc, achievement) != null) return;
                     Achievement achdata = Settings.Achievements.FirstOrDefault(a => a.Code == achievement);
                     if (achdata == null) return;
 
@@ -1308,7 +1309,7 @@ namespace RNC
 
                         if (achievement != "all_achievements")
                         {
-                            bool hasUnlockedAllAchievements = await HasUnlockedAchievement(acc, "all_achievements");
+                            bool hasUnlockedAllAchievements = (await HasUnlockedAchievement(acc, "all_achievements") != null);
                             if (!hasUnlockedAllAchievements)
                             {
                                 // checking if all achievements are unlocked: is the count of player's unlocked achievements higher or equal than server achievement count?

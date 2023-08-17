@@ -652,11 +652,15 @@ namespace RNC
             {
                 foreach (Achievement a in Settings.Achievements)
                 {
-                    bool hasUnlocked = await EPlayer.HasUnlockedAchievement(acc, a.Code);
+                    UnlockedAchievement hasUnlocked = await EPlayer.HasUnlockedAchievement(acc, a.Code);
                     NAPI.Task.Run(() =>
                     {
-                        player.TriggerEvent("addAchievement", a.ID, a.Name, a.Description, a.RewardXP, a.RewardPoints,
-                        hasUnlocked, a.Background);
+                        if(hasUnlocked != null)
+                            player.TriggerEvent("addAchievement", a.ID, a.Name, a.Description, a.RewardXP, a.RewardPoints,
+                            true, a.Background, hasUnlocked.Time);
+                        else
+                            player.TriggerEvent("addAchievement", a.ID, a.Name, a.Description, a.RewardXP, a.RewardPoints,
+                            false, a.Background, null);
                     });
                 }
                 NAPI.Task.Run(() =>

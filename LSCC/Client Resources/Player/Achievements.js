@@ -1,7 +1,7 @@
 var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 class Achievement{
-    constructor(ID, name, description, rewardXP, rewardPoints, unlocked, background){
+    constructor(ID, name, description, rewardXP, rewardPoints, unlocked, background, time){
         this.ID = ID;
         this.name = name;
         this.description = description;
@@ -9,6 +9,7 @@ class Achievement{
         this.rewardPoints = rewardPoints;
         this.unlocked = unlocked;
         this.background = background;
+        this.time = time;
     }
 }
 class DailyChallenge{
@@ -39,8 +40,8 @@ let Achievements = [];
 let DailyChallenges = [];
 //let WeeklyChallenges = [];
 
-mp.events.add("addAchievement", (id, name, desc, rXP, rPts, isUnlocked, bg) => {
-    let a = new Achievement(id, name, desc, rXP, rPts, isUnlocked, bg);
+mp.events.add("addAchievement", (id, name, desc, rXP, rPts, isUnlocked, bg, time) => {
+    let a = new Achievement(id, name, desc, rXP, rPts, isUnlocked, bg, (isUnlocked ? time : undefined));
     Achievements.push(a);
 });
 mp.events.add("addDailyChallenge", (id, desc, rXP, rPts, expireDate, completed, target, progress, type, item) => {
@@ -111,7 +112,7 @@ mp.events.add("addChallengesToMenu", (weekChallengeProgress, weekChallengeUnix) 
     var challenges_object = [];
     challenges_object.push({
         name: "Weekly",
-        timeLeft: Number(weekChallengeUnix),
+        expires: Number(weekChallengeUnix),
         challenges: 
         [
             {
@@ -125,7 +126,7 @@ mp.events.add("addChallengesToMenu", (weekChallengeProgress, weekChallengeUnix) 
     },
     {
         name: "Daily",
-        timeLeft: Number((DailyChallenges[i] != undefined ? DailyChallenges[i].expireDate : 999999999)),
+        expires: Number((DailyChallenges[i] != undefined ? DailyChallenges[i].expireDate : 999999999)),
         challenges:daily_challenges
     }
     );
@@ -199,7 +200,8 @@ mp.events.add("addAchievementsToMenu", () => {
             "name":Achievements[i].name, 
             "description":Achievements[i].description, 
             "unlocked":Achievements[i].unlocked,
-            "background":Achievements[i].background
+            "background":Achievements[i].background,
+            "unlockDate":Achievements[i].time
         });
     }
     if(global.ServerUI) global.ServerUI.call('mainmenu_profile_achievements_set', achievements_object);

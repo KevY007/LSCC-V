@@ -109,7 +109,7 @@ mp.events.add("clearMenuClansVariable", () => {
     MenuClans = [];
 });
 mp.events.add("Menu_FinishAddingClans", () => {
-    if(global.ServerUI) global.ServerUI.call('mainmenu_clan_search_clans_set', MenuClans);
+    if(global.ServerUI) global.ServerUI.call('mainmenu_clan_list_clans_set', MenuClans);
 });
 mp.events.add("Menu_AddClan", (clanID, cname, tag, desc, banner, isOpen, players, maxPlayers, kills, deaths, wins, ownerName) => {
     MenuClans.push({
@@ -130,6 +130,9 @@ mp.events.add("Menu_AddClan", (clanID, cname, tag, desc, banner, isOpen, players
         },
     });
     mp.events.callRemote('ServerConsoleOutput', `Menu_AddClan: Added ${clanID} - ${cname}`);
+});
+mp.events.add("mainmenu_clan_list_request_page", (first, rows) => {
+    mp.events.callRemote("Menu_OnRequestClansPage", first, rows);
 });
 
 mp.events.add('mainmenu_clan_my_clan_delete', () => {
@@ -356,72 +359,72 @@ mp.events.add("UpdateMenuStatsTab", (email, admin, points, dpoints, dlevel, derb
     if(global.ServerUI) global.ServerUI.call(`mainmenu_profile_stats_set`, [
             {
                 icon: "fa-mailbox",
-                title: "E-Mail",
+                name: "E-Mail",
                 value: `${email}`,
             },
             {
                 icon: "fa-shield-quartered",
-                title: "Admin",
+                name: "Admin",
                 value: `${admin}`,
             },
             {
                 icon: "fa-coins",
-                title: "Points",
+                name: "Points",
                 value: `${points}`,
             },
             {
                 icon: "fa-treasure-chest",
-                title: "Donator Points",
+                name: "Donator Points",
                 value: `${dpoints}`,
             },
             {
                 icon: "fa-gem",
-                title: "Donator Level",
+                name: "Donator Level",
                 value: `${dlevel}`,
             },
             {
                 icon: "fa-truck-monster",
-                title: "Derby Wins",
+                name: "Derby Wins",
                 value: `${derbywins}`,
             },
             {
                 icon: "fa-person-to-portal",
-                title: "Escapes",
+                name: "Escapes",
                 value: `${escapes}`,
             },
             {
                 icon: "fa-handcuffs",
-                title: "Arrests",
+                name: "Arrests",
                 value: `${arrests}`,
             },
             {
                 icon: "fa-crosshairs",
-                title: "Kills",
+                name: "Kills",
                 value: `${kills}`,
             },
             {
                 icon: "fa-skull",
-                title: "Deaths",
+                name: "Deaths",
                 value: `${deaths}`,
             },
             {
                 icon: "fa-scale-unbalanced",
-                title: "K/D Ratio",
+                name: "K/D Ratio",
                 value: `${kdr.toFixed(2)}`,
             },
             {
                 icon: "fa-clock",
-                title: "Play Time",
+                name: "Play Time",
                 value: `${playtime} hours`,
             },
             {
                 icon: "fa-triangle-exclamation",
-                title: "Warns",
+                name: "Warns",
                 value: `${warns}`,
             },
             {
                 icon: "fa-clouds",
-                title: "Discord",
+                name: "Discord",
                 value: `${(discordlinked == true ? "Your account is verified." : "Your account isn't verified! (/verify)")}`,
             }
         ]);
@@ -453,7 +456,8 @@ mp.events.add("mainmenu_tab_request_data", (tab) => {
             if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.name = "${mp.players.local.getVariable("ClanName")}"`);
             if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.createdAt = "${mp.players.local.getVariable("ClanCreated")}"`);
 
-            mp.events.callRemote("Menu_RequestClansList");
+            //mp.events.callRemote("Menu_RequestClansList");
+            mp.events.callRemote("Menu_OnRequestClansPage", 1, 10);
             mp.events.callRemote("Menu_InitializeMyClanTab");
             break;
         case "play":
