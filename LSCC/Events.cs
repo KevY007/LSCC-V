@@ -5421,7 +5421,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    await context.Clans.AsQueryable().Skip((first-1)*rows).Take(rows).ForEachAsync(async clan =>
+                    await context.Clans.AsQueryable().Skip(first*rows).Take(rows).ForEachAsync(async clan =>
                     {
                         int clanID = clan.SQL_ID;
                         string clanName = clan.Name;
