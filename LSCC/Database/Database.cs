@@ -233,6 +233,8 @@ namespace RNC
         public int SQL_ID { get; set; }
         [Column("name")]
         public string Name { get; set; }
+        [Column("image")]
+        public string Image { get; set; }
     }
     public class OwnedBadgeData
     {

@@ -251,7 +251,7 @@ mp.events.add("Menu_DisableClanCreatorLoading", () => {
 });
 
 mp.events.add("Menu_UpdateClanStats", (weekKills, totalKills, weekWins) => {
-    if(global.ServerUI) global.ServerUI.call('mainmenu_clan_my_clan_stats_set',[
+    if(global.ServerUI) global.ServerUI.call('mainmenu_my_clan_stats_set',[
         {
             icon: "fa-crosshairs",
             title: "Week Kills",
@@ -457,7 +457,7 @@ mp.events.add("mainmenu_tab_request_data", (tab) => {
             if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.createdAt = "${mp.players.local.getVariable("ClanCreated")}"`);
 
             //mp.events.callRemote("Menu_RequestClansList");
-            mp.events.callRemote("Menu_OnRequestClansPage", 1, 10);
+            mp.events.callRemote("Menu_OnRequestClansPage", 0, 20);
             mp.events.callRemote("Menu_InitializeMyClanTab");
             break;
         case "play":

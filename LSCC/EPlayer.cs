@@ -2598,17 +2598,21 @@ namespace RNC
 
             if (acc.Admin > 0 && player.GetData<bool>("Anonymous") == false)
             {
-                int badgeID = Main.GetBadgeID("Admin", acc.Admin);
-                string badgeName = EPlayer.GetAdminLevelName(acc.Admin, false);
-                if (badgeID != -1)
-                    toReturn.Add(new Main.SelectedBadgeData(badgeID, badgeName));
+                Main.StaticBadgeData _b = Main.GetStaticBadgeData("Admin", acc.Admin);
+                if(_b != null)
+                {
+                    string badgeName = EPlayer.GetAdminLevelName(acc.Admin, false);
+                    toReturn.Add(new Main.SelectedBadgeData(_b.SQL_ID, badgeName, _b.Image));
+                }
             }
             if (acc.DonatorLevel > 0 && acc.DonatorStatus == true)
             {
-                int badgeID = Main.GetBadgeID("Donator", acc.DonatorLevel);
-                string badgeName = EPlayer.GetDonatorLevelName(acc.DonatorLevel, false);
-                if (badgeID != -1)
-                    toReturn.Add(new Main.SelectedBadgeData(badgeID, badgeName));
+                Main.StaticBadgeData _b = Main.GetStaticBadgeData("Donator", acc.DonatorLevel);
+                if (_b != null)
+                {
+                    string badgeName = EPlayer.GetDonatorLevelName(acc.DonatorLevel, false);
+                    toReturn.Add(new Main.SelectedBadgeData(_b.SQL_ID, badgeName, _b.Image));
+                }
             }
 
             Main.SelectedBadgeData _bd = JsonConvert.DeserializeObject<Main.SelectedBadgeData>(acc.SelectedBadgeData);

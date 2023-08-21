@@ -2881,7 +2881,7 @@ namespace RNC
 
                     NAPI.Task.Run(() =>
                     {
-                        EPlayer.GetAccount(player).SelectedBadgeData = JsonConvert.SerializeObject(new Main.SelectedBadgeData(badge.SQL_ID, badge.Name));
+                        EPlayer.GetAccount(player).SelectedBadgeData = JsonConvert.SerializeObject(new Main.SelectedBadgeData(badge.SQL_ID, badge.Name, badge.Image));
                         EPlayer.Save(player, false);
                         player.SendChatMessage($"~g~You've set your primary badge to ~y~{badge.Name}~g~!");
                         EPlayer.UpdatePlayerBadges(player);
@@ -2931,7 +2931,7 @@ namespace RNC
                         Main.SelectedBadgeData _selected = JsonConvert.DeserializeObject<Main.SelectedBadgeData>(EPlayer.GetAccount(target).SelectedBadgeData);
                         if(_selected != null && _selected.id == badgeID)
                         {
-                            EPlayer.GetAccount(target).SelectedBadgeData = JsonConvert.SerializeObject(new Main.SelectedBadgeData(0, ""));
+                            EPlayer.GetAccount(target).SelectedBadgeData = JsonConvert.SerializeObject(new Main.SelectedBadgeData(0, "", "player.png"));
                             EPlayer.Save(target, false);
                         }
 
@@ -2989,7 +2989,7 @@ namespace RNC
 
                     NAPI.Task.Run(() =>
                     {
-                        EPlayer.GetAccount(target).SelectedBadgeData = JsonConvert.SerializeObject(new Main.SelectedBadgeData(check.SQL_ID, check.Name));
+                        EPlayer.GetAccount(target).SelectedBadgeData = JsonConvert.SerializeObject(new Main.SelectedBadgeData(check.SQL_ID, check.Name, check.Image));
                         EPlayer.Save(target, false);
 
                         player.SendChatMessage($"~g~Successfully given badge ~y~{check.Name} ~g~to {target.Name}!");

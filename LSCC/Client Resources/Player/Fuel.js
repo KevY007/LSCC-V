@@ -62,7 +62,7 @@ function HandleFuel(){
 	var fuelToSubstract = (Math.pow(currentVehicleSpeed, 2)/100000)*distanceEffect;
     currentVehicleFuel -= fuelToSubstract;
 
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.fuelStatus.fuel = ${currentVehicleFuel};`);
+    if(global.ServerUI) global.ServerUI.call('hud_vehicle_fuel_set', currentVehicleFuel);
 
     if(currentVehicleFuel <= 0.0){
         currentVehicleFuel = 0.0;

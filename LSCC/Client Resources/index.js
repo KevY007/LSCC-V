@@ -355,9 +355,14 @@ mp.events.add("onOpenChatbox", (toggle) =>
 
 });
 
-mp.events.add('auth_login', (username, password) => {
-
+mp.events.add("auth_reset_password", (code, newPassword) => {
+  // Code here
+});
+mp.events.add('auth_login', (username, password, rememberMe) => {
     mp.events.callRemote('OnPlayerLoginAttempt', username, password);
+
+    mp.storage.data.menu.rememberMe = rememberMe;
+    mp.storage.flush();
 });
 
 mp.events.add('auth_register', (username, email, password, confirmPass) => {

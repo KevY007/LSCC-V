@@ -1690,40 +1690,43 @@ namespace RNC
             public int SQL_ID { get; set; }
             public string Type { get; set; }
             public int Value { get; set; }
-            public StaticBadgeData(int id, string type, int value)
+            public string Image { get; set; }
+            public StaticBadgeData(int id, string type, int value, string image)
             {
                 SQL_ID = id;
                 Type = type;
                 Value = value;
+                Image = image;
             }
         }
         // For determining which badge to fetch based on player's Admin and Donator level.
         public static StaticBadgeData[] StaticBadges = new StaticBadgeData[]
         {
-            new StaticBadgeData(1, "Admin", 6),
-            new StaticBadgeData(2, "Admin", 5),
-            new StaticBadgeData(3, "Admin", 4),
-            new StaticBadgeData(4, "Admin", 3),
-            new StaticBadgeData(5, "Admin", 2),
-            new StaticBadgeData(6, "Admin", 1),
-            new StaticBadgeData(7, "Donator", 1),
-            new StaticBadgeData(8, "Donator", 2),
-            new StaticBadgeData(9, "Donator", 3),
+            new StaticBadgeData(1, "Admin", 6, "management.png"),
+            new StaticBadgeData(2, "Admin", 5, "lead-admin.png"),
+            new StaticBadgeData(3, "Admin", 4, "senior-admin.png"),
+            new StaticBadgeData(4, "Admin", 3, "general-admin.png"),
+            new StaticBadgeData(5, "Admin", 2, "trial-admin.png"),
+            new StaticBadgeData(6, "Admin", 1, "moderator.png"),
+            new StaticBadgeData(7, "Donator", 1, "bronze-donator.png"),
+            new StaticBadgeData(8, "Donator", 2, "silver-donator.png"),
+            new StaticBadgeData(9, "Donator", 3, "gold-donator.png"),
         };
-        public static int GetBadgeID(string type, int level)
+        public static StaticBadgeData GetStaticBadgeData(string type, int level)
         {
             StaticBadgeData _d = StaticBadges.FirstOrDefault(b => b.Type == type && b.Value == level);
-            if (_d != null) return _d.SQL_ID;
-            else return -1;
+            return _d;
         }
         public class SelectedBadgeData
         {
             public int id;
             public string name;
-            public SelectedBadgeData(int id, string name)
+            public string image;
+            public SelectedBadgeData(int id, string name, string image)
             {
                 this.id = id;
                 this.name = name;
+                this.image = image;
             }
         }
 

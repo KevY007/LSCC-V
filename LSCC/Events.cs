@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Runtime.ConstrainedExecution;
+using System.Security.Claims;
 
 namespace RNC
 {
@@ -5414,14 +5415,17 @@ namespace RNC
         public void OnMenuRequestClansPage(Player player, int first, int rows)
         {
             if (player == null) return;
-            if (!player.HasSharedData("Menu_LastClanPageID")) player.SetSharedData("Menu_LastClanPageID", 0);
-
+            NAPI.Util.ConsoleOutput($"Requesting Clans Page: {first} and {rows} rows.");
             player.TriggerEvent("clearMenuClansVariable");
             Task.Run(async () =>
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    await context.Clans.AsQueryable().Skip(first*rows).Take(rows).ForEachAsync(async clan =>
+                    NAPI.Task.Run(() =>
+                    {
+                        NAPI.Util.ConsoleOutput($"Skipping first ${first} clans and taking {rows}!");
+                    });
+                    await context.Clans.AsQueryable().Skip(first).Take(rows).ForEachAsync(async clan =>
                     {
                         int clanID = clan.SQL_ID;
                         string clanName = clan.Name;
@@ -5434,6 +5438,10 @@ namespace RNC
                         int totalKills = clan.TotalKills;
                         int totalDeaths = clan.WeekKills; // temp
                         int COTW_Wins = clan.WeekWins;
+                        NAPI.Task.Run(() =>
+                        {
+                            NAPI.Util.ConsoleOutput($"Now on clan: {clanID} - {clanName}");
+                        });
 
                         using (MainDatabase context2 = ContextFactory.CreateContext())
                         {
