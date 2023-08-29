@@ -254,17 +254,17 @@ mp.events.add("Menu_UpdateClanStats", (weekKills, totalKills, weekWins) => {
     if(global.ServerUI) global.ServerUI.call('mainmenu_my_clan_stats_set',[
         {
             icon: "fa-crosshairs",
-            title: "Week Kills",
+            name: "Week Kills",
             value: weekKills
         },
         {
             icon: "fa-skull",
-            title: "Total Kills",
+            name: "Total Kills",
             value: totalKills
         },
         {
             icon: "fa-trophy",
-            title: "COTW Wins",
+            name: "COTW Wins",
             value: weekWins
         }
     ]);

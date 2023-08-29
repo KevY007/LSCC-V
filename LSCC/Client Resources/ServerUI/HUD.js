@@ -587,11 +587,14 @@ mp.events.add("WeaponSpawner:show", (targetName, weaponName) => {
     mp.gui.cursor.show(true, true);
 });
 
+// mp.events.add("HUDNotify", (msg, type, icon, close, timeout, orientation, displaymode) => {
 mp.events.add("SendClanInvite", (clanName, clanID, senderName) => {
     mp.game.audio.playSoundFrontend(-1, "CHALLENGE_UNLOCKED",  "HUD_AWARDS", true);
-    if(global.ServerUI) global.ServerUI.execute(`clanInvite("Clan Invitation", "You have been invited to <strong>${clanName}</strong> by ${senderName}.", 20000, ${clanID});`);
-    let notifyscoreboardstr = `toast('${Translate("SHOW_CURSOR")}', '${Translate("CLAN_INVITE_TIP")}', 'nothing', 6500, 2);`;
-    if(global.ServerUI) global.ServerUI.execute(notifyscoreboardstr);
+    if(global.ServerUI) global.ServerUI.call('notification_send', Translate("CLAN_INVITE_TIP"), 'nothing', 6500);
+    if(global.ServerUI) global.ServerUI.call("clan_invite_send", clanID, clanName, senderName);
+});
+mp.events.add("clan_invite_accept", (clanSQLID) => {
+    mp.events.callRemote("Clan_OnRequestJoinClan", clanSQLID);
 });
 
 var IsInInfiniteLoading = true;

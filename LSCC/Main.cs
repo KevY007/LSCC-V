@@ -17,6 +17,7 @@ using Newtonsoft.Json.Converters;
 using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using BCrypt.Net;
 
 namespace RNC
 {
