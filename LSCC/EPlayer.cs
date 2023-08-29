@@ -1254,6 +1254,17 @@ namespace RNC
             });
         }
 
+        public async static Task<List<UnlockedAchievement>> GetUnlockedAchievements(Account account)
+        {
+            if (account == null) return null;
+
+            using(MainDatabase context = ContextFactory.CreateContext())
+            {
+                List<UnlockedAchievement> achievements = await context.UnlockedAchievements.AsQueryable().Where(a => a.AccountID == account.SQL_ID).ToListAsync();
+                return achievements;
+            }
+        }
+
         public async static Task<UnlockedAchievement> HasUnlockedAchievement(Account account, string achievement)
         {
             if (account == null) return null;

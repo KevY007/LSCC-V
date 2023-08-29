@@ -106,13 +106,13 @@ mp.events.add("addChallengesToMenu", (weekChallengeProgress, weekChallengeUnix) 
             description: DailyChallenges[i].description,
             progress: DailyChallenges[i].progress,
             goal: DailyChallenges[i].target,
-            background: getchalbackgroundpic(DailyChallenges[i].type)
+            //background: getchalbackgroundpic(DailyChallenges[i].type)
         });
     }
     var challenges_object = [];
     challenges_object.push({
         name: "Weekly",
-        expires: Number(weekChallengeUnix),
+        expires: Number(new Date(Number(Date.now())+Number(weekChallengeUnix))),
         challenges: 
         [
             {
@@ -120,17 +120,17 @@ mp.events.add("addChallengesToMenu", (weekChallengeProgress, weekChallengeUnix) 
                 description: 'Complete at least one daily challenge per day for 7 days in a row.',
                 progress: weekChallengeProgress,
                 goal: 7,
-                background: "package://Artwork/Achievements/reach_level_100.png"
+                //background: "package://Artwork/Achievements/reach_level_100.png"
             }
         ]
     },
     {
         name: "Daily",
-        expires: Number((DailyChallenges[i] != undefined ? DailyChallenges[i].expireDate : 999999999)),
+        expires: Number(new Date(Number(Date.now()) + (DailyChallenges[i] != undefined ? Number(DailyChallenges[i].expireDate) : 3600))),
         challenges:daily_challenges
     }
     );
-
+    mp.events.callRemote('ServerConsoleOutput', JSON.stringify(challenges_object));
     if(global.ServerUI) global.ServerUI.call('mainmenu_profile_challenges_set', challenges_object);
 });
 mp.events.add("advanceChallenge", (arrayID, cht, chi, chp) => {
@@ -196,14 +196,18 @@ mp.events.add("addAchievementsToMenu", () => {
     var achievements_object = [];
     for(let i = 0 ; i < Achievements.length; i++){
 
-        achievements_object.push({
+        var achObject = {
             "name":Achievements[i].name, 
             "description":Achievements[i].description, 
             "unlocked":Achievements[i].unlocked,
             "background":Achievements[i].background,
-            "unlockDate":Achievements[i].time
-        });
+        };
+        if(Achievements[i].time){
+            achObject.unlockDate = Achievements[i].time;
+        }
+        achievements_object.push(achObject);
     }
+    mp.events.callRemote("ServerConsoleOutput", JSON.stringify(achievements_object));
     if(global.ServerUI) global.ServerUI.call('mainmenu_profile_achievements_set', achievements_object);
 });
 mp.events.add("unlockAchievement", (achievementName) => {
@@ -226,4 +230,12 @@ mp.events.add("unlockAchievement", (achievementName) => {
     }
     mp.game.audio.playSoundFrontend(-1, "PROPERTY_PURCHASE", "HUD_AWARDS", true);
 
+});
+
+mp.events.add("updateAllAchievements", (unlockedAchievementsData) => {
+
+    const real_achievements = JSON.parse(unlockedAchievementsData).map(ach => {
+        return {...ach, unlockDate:Number(ach.unlockDate)};
+    });
+    if(global.ServerUI) global.ServerUI.call('mainmenu_profile_achievements_set', real_achievements);
 });

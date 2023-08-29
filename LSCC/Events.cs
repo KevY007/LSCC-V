@@ -3936,7 +3936,6 @@ namespace RNC
                     player.TriggerEvent("LoadCrosshairProfiles", acc.CrosshairProfiles, acc.ActiveCrosshairProfile);
 
                     EPlayer.Menu_AddItems(player);
-                    Achievement.LoadAchievementsForPlayer(player);
                     Challenge.AddChallengesForPlayer(player);
 
                     foreach(Player pl in Settings.LoggedInPlayers)
@@ -4881,7 +4880,6 @@ namespace RNC
             player.TriggerEvent("StartTutorial");
 
             EPlayer.Menu_AddItems(player);
-            Achievement.LoadAchievementsForPlayer(player);
             Challenge.AddChallengesForPlayer(player);
         }
 
@@ -6462,9 +6460,48 @@ namespace RNC
                     break;
                     */
                 case "profile":
-                    player.TriggerEvent("addAchievementsToMenu");
+                    OnRequestUpdateUnlockedAchievements(player);
                     break;
             }
+        }
+
+        public class MenuAchievementObject
+        {
+            public string name;
+            public string description;
+            public bool unlocked;
+            public string background;
+            public string unlockDate;
+        }
+        [RemoteEvent("UpdateUnlockedAchievements")]
+        public static void OnRequestUpdateUnlockedAchievements(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            Account acc = EPlayer.GetAccount(player);
+            Task.Run(async () =>
+            {
+                List<UnlockedAchievement> unlockedAchievements = await EPlayer.GetUnlockedAchievements(acc);
+                List<MenuAchievementObject> menuAchievements = new List<MenuAchievementObject>();
+                foreach(Achievement ach in Settings.Achievements)
+                {
+                    UnlockedAchievement unlockedCheck = unlockedAchievements.FirstOrDefault(a => a.Achievement == ach.Code);
+
+                    MenuAchievementObject menuAchievement = new MenuAchievementObject()
+                    {
+                        name = ach.Name,
+                        description = ach.Description,
+                        unlocked = (unlockedCheck == null ? false : true),
+                        background = ach.Background,
+                        unlockDate = (unlockedCheck == null ? null : new DateTimeOffset(unlockedCheck.Time).ToUnixTimeMilliseconds().ToString())
+                    };
+                    menuAchievements.Add(menuAchievement);
+                }
+                string achievementDataJSON = Newtonsoft.Json.JsonConvert.SerializeObject(menuAchievements);
+                NAPI.Task.Run(() =>
+                {
+                    player.TriggerEvent("updateAllAchievements", achievementDataJSON);
+                });
+            });
         }
 
         [RemoteEvent("OnToggleMenu")]

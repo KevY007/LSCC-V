@@ -646,37 +646,6 @@ namespace RNC
 
             Settings.Achievements.Add(this);
         }
-        public static void LoadAchievementsForPlayer(Player player)
-        {
-            Account acc = EPlayer.GetAccount(player);
-            Task.Run(async () =>
-            {
-                foreach (Achievement a in Settings.Achievements)
-                {
-                    UnlockedAchievement hasUnlocked = await EPlayer.HasUnlockedAchievement(acc, a.Code);
-                    NAPI.Task.Run(() =>
-                    {
-                        if(hasUnlocked != null)
-                            player.TriggerEvent("addAchievement", a.ID, a.Name, a.Description, a.RewardXP, a.RewardPoints,
-                            true, a.Background, hasUnlocked.Time);
-                        else
-                            player.TriggerEvent("addAchievement", a.ID, a.Name, a.Description, a.RewardXP, a.RewardPoints,
-                            false, a.Background, null);
-                    });
-                }
-                NAPI.Task.Run(() =>
-                {
-                    player.TriggerEvent("addAchievementsToMenu");
-
-                    if (EPlayer.GetAccount(player).DiscordID != "n/a")
-                    {
-                        EPlayer.UnlockAchievement(player, "discord_verify");
-                    }
-                });
-
-            });
-
-        }
     }
 
 
