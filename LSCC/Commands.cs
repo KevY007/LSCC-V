@@ -499,7 +499,22 @@ namespace RNC
                 }
             });
         }
-        */        
+        */
+
+        [Command("logout", Alias = "reconnect")]
+        public static void cmd_logout(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            player.TriggerEvent("auth_reset_rememberMe");
+            player.SendChatMessage("!{#ff6347}[!] ~w~You are being logged out and reconnected.");
+            NAPI.Task.Run(() =>
+            {
+                if (player == null) return;
+                player.SendChatMessage("!{#ff6347}[!] ~g~See you soon!");
+                player.KickSilent("Logged out");
+            }, 500);
+        }
 
         [Command("engine")]
         public static void cmd_engine(Player player)

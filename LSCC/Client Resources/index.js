@@ -255,7 +255,11 @@ mp.events.add('showLoginBrowser', (state) => {
                 global.isLoginScreenActive = true;
                 global.ServerUI.call('auth_quick_login_toggle', false);
                 toggleLoginScene(true);
-                mp.events.callRemote("requestQuickLoginForgotUsernameData"); // yes
+
+                if(mp.storage.data.menu.rememberMe !== undefined && mp.storage.data.menu.rememberMe === true){
+                  mp.events.callRemote("requestQuickLoginForgotUsernameData"); // If 'Remember Me' is checked, auto-login the user.
+                }
+
                 //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.items = [];`);
                 mp.events.callLocal("actionMenu:removeAllItems");
             }
@@ -324,6 +328,11 @@ mp.events.add("login_ForceStopLoading", () => {
 
 mp.events.add("browser_ServerConsole", (msg) => mp.events.callRemote("ServerConsoleOutput", msg));
 
+mp.events.add("auth_reset_rememberMe", () => {
+  mp.storage.data.menu.rememberMe = false;
+  mp.storage.flush();
+});
+
 mp.events.add("onOpenChatbox", (toggle) =>
 {
     if((global.VehicleSpawnerActive !== undefined && global.VehicleSpawnerActive == true) ||
@@ -382,7 +391,11 @@ mp.events.add('requestAutoLoginData', () => {
 
 var quickLoginUsername = "";
 mp.events.add('sendAutoLoginDataToBrowser', (data) => {
+    if(mp.storage.data.menu.rememberMe == undefined || mp.storage.data.menu.rememberMe === false) return;
+
     setTimeout(() => {
+        if(mp.storage.data.menu.rememberMe == undefined || mp.storage.data.menu.rememberMe === false) return;
+
         if(data.length > 2){
             //if(global.ServerUI) global.ServerUI.call(`auth_quick_login_set`, data);
             quickLoginUsername = data;
@@ -398,6 +411,8 @@ mp.events.add('sendForgotUsernameToBrowser', (data) => {
 });
 
 mp.events.add('auth_quick_login', () => {
+    if(mp.storage.data.menu.rememberMe == undefined || mp.storage.data.menu.rememberMe === false) return;
+    
     if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.isLoading = true;`);
     mp.events.callRemote("OnAutoLoginAttempt", quickLoginUsername);
 });
