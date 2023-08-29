@@ -4692,7 +4692,7 @@ namespace RNC
         {
             try
             {
-                if (Environment.TickCount64 - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
+                if (Environment.TickCount64 - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.HasSharedData("InLobby") && a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
                 {
                     //Settings.DerbyTimeLeft--;
                     Settings.LastDerbyTick = Environment.TickCount64;
