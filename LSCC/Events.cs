@@ -3677,10 +3677,72 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("OnForceChangePassword")]
+        public static void OnPlayerForceChangePassword(Player player, string newPassword)
+        {
+            if (!player.HasData("ForceChangePassword_Account"))
+            {
+                player.KickSilent();
+                return;
+            }
+            if(newPassword.Length < 8 || newPassword.Length > 32)
+            {
+                EPlayer.Error(player, "Password must be between 8 and 32 characters long!");
+                player.TriggerEvent("showPasswordChangeDialog", "We've upgraded your account security! " +
+                "As a result of this change, you have to choose a new password. ");
+                return;
+            }
+            Account acc = player.GetData<Account>("ForceChangePassword_Account");
+            string salt = AccountManager.GenSalt();
+            string password = AccountManager.Crypt(newPassword, salt);
+            Task.Run(async () =>
+            {
+                using(MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account _target = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == acc.SQL_ID);
+                    if(_target != null)
+                    {
+                        _target.Password = password;
+                        _target.Salt = salt;
+                    }
+
+                    await context.SaveChangesAsync();
+
+                    NAPI.Task.Run(() =>
+                    {
+                        OnPlayerLogin(player, _target);
+                        //player.TriggerEvent("showPasswordChangeDisclaimer");
+                        //NAPI.Task.Run(() =>
+                        //{
+                        //    if(player != null)
+                        //        player.KickSilent("Password changed.");
+                        //}, 1000);
+                    });
+                    await NAPI.Task.WaitForMainThread();
+                }
+            });
+        }
+
         public static void OnPlayerLogin(Player player, Account acc)
         {
             if (EPlayer.LoggedIn(player)) return;
             if (player.HasData("Kicked")) return;
+
+            if(acc.Password.Length < 1)
+            {
+                player.SetData<Account>("ForceChangePassword_Account", acc);
+                player.TriggerEvent("showLoginBrowser", false);
+                player.TriggerEvent("showPasswordChangeDialog", "We've upgraded your account security! " +
+                    "As a result of this change, you have to choose a new password. ");
+                return;
+            }
+            if (acc.ForcePasswordChange == true)
+            {
+                player.SetData<Account>("ForceChangePassword_Account", acc);
+                player.TriggerEvent("showLoginBrowser", false);
+                player.TriggerEvent("showPasswordChangeDialog", "Please choose a new, secure password for your account.");
+                return;
+            }
 
             player.SetData<long>("JoinTimeUnix", DateTimeOffset.Now.ToUnixTimeSeconds());
             player.SetSharedData("SQL_ID", acc.SQL_ID);
@@ -7128,6 +7190,8 @@ namespace RNC
                                     Email = email,
                                     Password = newPass,
                                     OldPassword = "",
+                                    OldSalt = "",
+                                    ForcePasswordChange = false,
                                     Salt = salt,
                                     Username = username,
                                     DiscordCode = _discordData.DiscordCode,

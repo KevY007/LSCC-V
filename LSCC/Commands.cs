@@ -6281,6 +6281,7 @@ namespace RNC
                     string password = AccountManager.Crypt(newpass, salt);
                     tpAcc.Salt = salt;
                     tpAcc.Password = password;
+                    tpAcc.ForcePasswordChange = true;
                     await context.SaveChangesAsync();
 
                     changepass_SuccessTask(player, tpAcc, name, newpass);

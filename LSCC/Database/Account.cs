@@ -31,6 +31,7 @@ namespace RNC
 
         public string Password { get; set; }
         public string Salt { get; set; }
+        public bool ForcePasswordChange { get; set; }
 
         public string DiscordID { get; set; }
         public string DiscordCode { get; set; }

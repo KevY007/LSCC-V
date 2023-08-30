@@ -171,19 +171,17 @@ mp.events.add('showLoginBrowser', (state) => {
             else{
                 //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.authSuccess = true;`);
                 //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.stop();`);
-                setTimeout(() => {
-                    if(!mp.players.local || !mp.players.exists(mp.players.local)) return;
-                    mp.game.graphics.transitionFromBlurred(1000);
+                if(!mp.players.local || !mp.players.exists(mp.players.local)) return;
+                mp.game.graphics.transitionFromBlurred(1000);
 
-                    if(global.ServerUI) global.ServerUI.call(`auth_toggle`, false);
-                    global.isLoginScreenActive = false;
-                    if(!global.IsInTutorial){
-                        if(global.ServerUI) global.ServerUI.call('hud_toggle', true);
-                        if(global.ServerUI) global.ServerUI.call('hud_minilist', true);
-                        if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", true);
-                    }
-                    if(global.ServerUI) global.ServerUI.markAsChat();
-                }, 1000);
+                if(global.ServerUI) global.ServerUI.call(`auth_toggle`, false);
+                global.isLoginScreenActive = false;
+                if(!global.IsInTutorial){
+                    if(global.ServerUI) global.ServerUI.call('hud_toggle', true);
+                    if(global.ServerUI) global.ServerUI.call('hud_minilist', true);
+                    if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", true);
+                }
+                if(global.ServerUI) global.ServerUI.markAsChat();
             }
             if(!global.IsInTutorial)
                 mp.gui.cursor.show(state, state);
@@ -339,3 +337,45 @@ mp.events.add("login_StopMusic", () => {
     if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.$refs.panel.stop();`);
 });
 
+var passwordChangeDialogInterval = null;
+
+mp.events.add("showPasswordChangeDialog", (reason) => {
+  passwordChangeDialogInterval = setInterval(() => {
+    if(global.ServerUI) global.ServerUI.call('hud_toggle', false);
+    if(global.ServerUI) global.ServerUI.call('hud_minilist', false);
+    if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", false);
+    mp.gui.cursor.show(true, true);
+  }, 100);
+
+
+  if(global.ServerUI) global.ServerUI.call('dialog_force_password_change_open', reason);
+});
+mp.events.add('force_password_change_submit', (newPassword) => {
+  clearInterval(passwordChangeDialogInterval);
+  mp.events.callRemote("OnForceChangePassword", newPassword);
+});
+mp.events.add("showPasswordChangeDisclaimer", () => {
+  var reconnectingState = '.';
+  setInterval(() => {
+    switch (reconnectingState) {
+      case '.':
+        reconnectingState = '..';
+        break;
+      case '..':
+        reconnectingState = '...';
+        break;
+      default:
+        reconnectingState = '.';
+        break;
+    }
+  }, 500);
+  mp.events.add('render', () => {
+    mp.game.graphics.drawText(`~g~Password changed successfully!\n~y~Reconnecting${reconnectingState}`, [0.5, 0.5], {
+      font:0,
+      centre:true,
+      scale:[0.7, 0.7],
+      outline:true,
+      color:[0, 255, 0, 255]
+    });
+  });
+});
