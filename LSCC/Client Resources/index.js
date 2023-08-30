@@ -94,106 +94,8 @@ global.traceLastFunc("Main::Init()");
 
 async function toggleLoginScene(toggle){
     if(toggle){
-
-        mp.game.streaming.requestAnimDict("amb@prop_human_seat_bar@male@elbows_on_bar@idle_a");
-        mp.game.streaming.requestAnimDict("amb@prop_human_seat_chair@female@arms_folded@idle_a");
-        mp.game.streaming.requestAnimDict("amb@prop_human_seat_chair@male@elbows_on_knees@idle_b");
-        mp.game.streaming.requestAnimDict("anim@amb@casino@brawl@fights@argue@");
-        mp.game.streaming.requestAnimDict("anim@heists@ornate_bank@chat_manager");
-  
-        /* CREATING THE PEDS */
-        setTimeout(() => {
-          global.loginSceneEntities[0] = mp.peds.new(
-            mp.game.joaat('a_m_y_gay_01'),
-            new mp.Vector3(2055.6335, 2963.446, -67.70754),
-            -125.94715,
-            mp.players.local.dimension
-          );
-
-          global.loginSceneEntities[1] = mp.peds.new(
-            mp.game.joaat('ig_kaylee'),
-            new mp.Vector3(2057.192, 2961.257, -67.811966),
-            52.981815,
-            mp.players.local.dimension
-          );
-
-          global.loginSceneEntities[2] = mp.peds.new(
-            mp.game.joaat('a_m_y_vindouche_01'),
-            new mp.Vector3(2058.2307, 2962.797, -67.82209),
-            67.54069,
-            mp.players.local.dimension
-          );
-
-          global.loginSceneEntities[3] = mp.peds.new(
-            mp.game.joaat('s_m_y_dealer_01'),
-            new mp.Vector3(2056.2158, 2966.3682, -67.30179),
-            144.91861,
-            mp.players.local.dimension
-          );
-
-          global.loginSceneEntities[4] = mp.peds.new(
-            mp.game.joaat('g_m_m_chicold_01'),
-            new mp.Vector3(2052.9705, 2961.859, -67.30187),
-            -36.38813,
-            mp.players.local.dimension
-          );
-
-          global.loginSceneEntities[5] = mp.peds.new(
-            mp.game.joaat('a_m_m_farmer_01'),
-            new mp.Vector3(2057.881, 2961.7786, -67.30188),
-            52.57501,
-            mp.players.local.dimension
-          );
-
-          // Room 2
-          global.loginSceneEntities[6] = mp.peds.new(
-            mp.game.joaat('csb_prolsec'),
-            new mp.Vector3(2063.319, 2966.2705, -67.30189),
-            48.209084,
-            mp.players.local.dimension
-          );
-
-          global.loginSceneEntities[7] = mp.peds.new(
-            mp.game.joaat('s_m_y_swat_01'),
-            new mp.Vector3(2059.623, 2971.459, -67.30181),
-            -160.187,
-            mp.players.local.dimension
-          );
-
-          global.loginSceneEntities[8] = mp.peds.new(
-            mp.game.joaat('s_m_y_swat_01'),
-            new mp.Vector3(2058.6614, 2970.3154, -67.30181),
-            -129.64273,
-            mp.players.local.dimension
-          );
-
-          global.loginSceneEntities[9] = mp.peds.new(
-            mp.game.joaat('s_m_y_swat_01'),
-            new mp.Vector3(2057.7458, 2969.198, -67.30181),
-            -116.9288,
-            mp.players.local.dimension
-          );
-
-          global.loginSceneEntities[10] = mp.peds.new(
-            mp.game.joaat('s_m_y_swat_01'),
-            new mp.Vector3(2057.7458, 2967.9717, -67.30181),
-            -93.87298,
-            mp.players.local.dimension
-          );
-
-        }, 100);
-
-        /* GENERAL STUFF - TIME OF DAY, ANIM DICTS... */
-        mp.game.audio.startAudioScene("CHARACTER_CHANGE_IN_SKY_SCENE");
-        mp.game.time.setClockTime(21, 0, 0);
-        mp.game.gameplay.setWeatherTypeNow('CLEAR');
-    }
-    else{
-        mp.game.audio.stopAudioScene("CHARACTER_CHANGE_IN_SKY_SCENE");
-        for(let i = 0 ; i < global.loginSceneEntities.length ; i++){
-            global.loginSceneEntities[i].destroy();
-        }
-        global.loginSceneEntities = [];
+      mp.game.time.setClockTime(20, 30, 0);
+      mp.game.gameplay.setWeatherTypeNow('EXTRASUNNY');
     }
 }
 mp.events.add('entityStreamIn', (entity) => {
@@ -251,6 +153,9 @@ mp.events.add('showLoginBrowser', (state) => {
             if(global.ServerUI) global.ServerUI.call('hud_toggle', false);
             if(global.ServerUI) global.ServerUI.call(`mainmenu_toggle`, false); 
             if(state){
+                mp.game.graphics.transitionToBlurred(1000);
+                mp.players.local.freezePosition(true);
+
                 if(global.ServerUI) global.ServerUI.call(`auth_toggle`, true);
                 global.isLoginScreenActive = true;
                 global.ServerUI.call('auth_quick_login_toggle', false);
@@ -268,6 +173,7 @@ mp.events.add('showLoginBrowser', (state) => {
                 //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.stop();`);
                 setTimeout(() => {
                     if(!mp.players.local || !mp.players.exists(mp.players.local)) return;
+                    mp.game.graphics.transitionFromBlurred(1000);
 
                     if(global.ServerUI) global.ServerUI.call(`auth_toggle`, false);
                     global.isLoginScreenActive = false;
