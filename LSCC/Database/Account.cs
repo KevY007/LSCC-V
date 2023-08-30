@@ -25,8 +25,13 @@ namespace RNC
 
         public string Email { get; set; }
         public string Username { get; set; }
+
+        public string OldPassword { get; set; }
+        public string OldSalt { get; set; }
+
         public string Password { get; set; }
         public string Salt { get; set; }
+
         public string DiscordID { get; set; }
         public string DiscordCode { get; set; }
         public bool UsedDiscordPerks { get; set; }
@@ -136,14 +141,22 @@ namespace RNC
 
     public static class AccountManager
     {
-        public static string GenSalt()
+        public static string OldGenSalt()
         {
             return Crypter.Sha256.GenerateSalt();
         }
-
-        public static string Crypt(string pass, string salt)
+        public static string OldCrypt(string pass, string salt)
         {
             return Crypter.Sha256.Crypt(pass, salt);
+        }
+
+        public static string GenSalt()
+        {
+            return BCrypt.Net.BCrypt.GenerateSalt();
+        }
+        public static string Crypt(string pass, string salt)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(pass, salt);
         }
 
         public async static Task<bool> RecoverAccount(Account acc)
@@ -223,22 +236,43 @@ namespace RNC
             });
 
         }
-        public static bool Login(Account _target, string password, bool _crypted = false)
+        public static bool Login(Account _target, string password, bool _crypted = false, bool _useOldPassword = false)
         {
-            foreach(Player player in Settings.LoggedInPlayers)
+            if (_useOldPassword)
             {
-                if (EPlayer.GetAccount(player) != null && EPlayer.GetAccount(player).SQL_ID == _target.SQL_ID) return false; // Return FALSE if another PLAYER is online from SAME ACC.
+                foreach (Player player in Settings.LoggedInPlayers)
+                {
+                    if (EPlayer.GetAccount(player) != null && EPlayer.GetAccount(player).SQL_ID == _target.SQL_ID) return false; // Return FALSE if another PLAYER is online from SAME ACC.
+                }
+
+                if (_target.Suspended == 1 && _target.Admin < 4) return false;
+
+                string crypted = password;
+                if (!_crypted) crypted = OldCrypt(password, _target.OldSalt);
+                if (MatchPass(crypted, _target.OldPassword))
+                {
+                    return true;
+                }
+                return false;
+            }
+            else
+            {
+                foreach (Player player in Settings.LoggedInPlayers)
+                {
+                    if (EPlayer.GetAccount(player) != null && EPlayer.GetAccount(player).SQL_ID == _target.SQL_ID) return false; // Return FALSE if another PLAYER is online from SAME ACC.
+                }
+
+                if (_target.Suspended == 1 && _target.Admin < 4) return false;
+
+                string crypted = password;
+                if (!_crypted) crypted = Crypt(password, _target.Salt);
+                if (MatchPass(crypted, _target.Password))
+                {
+                    return true;
+                }
+                return false;
             }
 
-            if (_target.Suspended == 1 && _target.Admin < 4) return false;
-
-            string crypted = password;
-            if (!_crypted) crypted = Crypt(password, _target.Salt);
-            if(MatchPass(crypted, _target.Password))
-            {
-                return true;
-            }
-            return false;
         }
     }
 }

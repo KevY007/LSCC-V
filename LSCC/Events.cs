@@ -4967,9 +4967,11 @@ namespace RNC
                             Account acc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
                             if (acc != null)
                             {
+                                bool useOldPassword = false;
+                                if (acc.Password == "") useOldPassword = true;
                                 NAPI.Task.Run(() =>
                                 {
-                                    if (AccountManager.Login(acc, password))
+                                    if (AccountManager.Login(acc, password, false, useOldPassword))
                                     {
                                         OnPlayerLogin(player, acc);
                                         return;
@@ -5021,9 +5023,11 @@ namespace RNC
                             Account acc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
                             if (acc != null)
                             {
+                                bool useOldPassword = false;
+                                if (acc.Password == "") useOldPassword = true;
                                 NAPI.Task.Run(() =>
                                 {
-                                    if (AccountManager.Login(acc, password))
+                                    if (AccountManager.Login(acc, password, false, true))
                                     {
                                         OnPlayerLogin(player, acc);
                                         return;
@@ -7123,6 +7127,7 @@ namespace RNC
                                 {
                                     Email = email,
                                     Password = newPass,
+                                    OldPassword = "",
                                     Salt = salt,
                                     Username = username,
                                     DiscordCode = _discordData.DiscordCode,

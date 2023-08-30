@@ -132,3 +132,16 @@ mp.events.add("OnFinishTutorial", (results) => {
     mp.events.callRemote("Server_FinishTutorial", useVoice, langID);
     mp.gui.cursor.show(false, false);
 });
+
+
+/*
+Camera X Y Z:
+1290.44897
+478.5669
+171.23333
+
+Rotation XYZ:
+38.715
+0
+-139.536
+*/
