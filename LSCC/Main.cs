@@ -2622,10 +2622,9 @@ namespace RNC
             {
                 NAPI.Util.ConsoleOutput("(RnC | STARTUP) Loading discord plugin.");
 
-                DiscordBot discordBot = new DiscordBot();
                 Task.Run(async () =>
                 {
-                    await discordBot.Start();
+                    await DiscordBot.Start();
                 });
 
             }

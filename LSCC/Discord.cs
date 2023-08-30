@@ -6,18 +6,18 @@ using System.Threading.Tasks;
 
 namespace RNC
 {
-    internal class DiscordBot : Script
+    public class DiscordBot : Script
     {
-        private Task Log(LogMessage msg)
+        private static Task Log(LogMessage msg)
         {
             Console.WriteLine(msg.ToString());
             return Task.CompletedTask;
         }
 
-        private DiscordSocketClient client;
-        private ulong gameChatChannelId = 717768143140814928;
+        private static DiscordSocketClient client;
+        private static ulong gameChatChannelId = 717768143140814928;
 
-        public async Task Start()
+        public static async Task Start()
         {
             client = new DiscordSocketClient();
             //client.Log += Log;
@@ -31,7 +31,7 @@ namespace RNC
                 await SendAlert("Server started.");
             };
         }
-        public async Task SendMessage(string message)
+        public static async Task SendMessage(string message)
         {
             var channel = client.GetChannel(gameChatChannelId) as IMessageChannel;
             if (channel == null)
@@ -41,7 +41,7 @@ namespace RNC
             }
             await channel.SendMessageAsync(message);
         }
-        public async Task SendAlert(string message, string type = "info")
+        public static async Task SendAlert(string message, string type = "info")
         {
             var channel = client.GetChannel(gameChatChannelId) as IMessageChannel;
             if (channel == null)
