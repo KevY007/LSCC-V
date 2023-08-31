@@ -117,7 +117,7 @@ namespace RNC
             if (player.HasData("Kicked")) return;
 
             player.SetData("Kicked", true);
-            NAPI.Task.Run(() => 
+            NAPI.Task.Run(() =>
             {
                 try
                 {
@@ -136,7 +136,7 @@ namespace RNC
                         player.Kick(reason);
                     }
                 }
-                catch { } 
+                catch { }
             }, 1000);
             return;
         }
@@ -201,7 +201,7 @@ namespace RNC
                     }
                 }
             });
-            
+
         }
 
         [RemoteEvent("UpdateAimingState")]
@@ -268,7 +268,7 @@ namespace RNC
 
                             foreach (var flashlights in allFlashlights)
                             {
-                                if(comps.Contains(new KeyValuePair<long, long>(Convert.ToInt64(newWeapon), flashlights.Key)))
+                                if (comps.Contains(new KeyValuePair<long, long>(Convert.ToInt64(newWeapon), flashlights.Key)))
                                 {
                                     player.SetSharedData("FlashlightEquipped", true);
                                     break;
@@ -301,7 +301,7 @@ namespace RNC
         [RemoteEvent("WoundedTimerTick")]
         public void OnWoundedTimerTick(Player player, int time)
         {
-            if(time == 0)
+            if (time == 0)
             {
                 player.Health = 0;
                 player.SendChatMessage(Translator.Translate(player, "SUCCUMB_TO_INJURIES"));
@@ -313,7 +313,7 @@ namespace RNC
         {
             try
             {
-                if(player == null)
+                if (player == null)
                 {
                     NAPI.Util.ConsoleOutput("OnPlayerWounded - player object was null!? (" + state + ", kID: " + killerID + ")");
                     return;
@@ -325,7 +325,7 @@ namespace RNC
                 if (player.GetSharedData<int>("Team") >= 0 && player.GetSharedData<int>("Wounded") == 1 && state == 0) return;
                 // if it tries to set them wounded but they arent in a team
                 if ((player.GetSharedData<int>("Team") != 0 && player.GetSharedData<int>("Team") != 1) && state != 0) return;
-                if(player.Dead) return;
+                if (player.Dead) return;
 
                 // if it tries to set them back to ragdoll state when they're already in crawl/wounded state
                 if (player.GetSharedData<int>("Wounded") == 2 && state == 1) return;
@@ -456,7 +456,7 @@ namespace RNC
 
                                     EPlayer.GetAccount(player).Deaths++;
 
-                                    if (EPlayer.GetAccount(player).ClanID != -1) 
+                                    if (EPlayer.GetAccount(player).ClanID != -1)
                                     {
                                         Task.Run(async () =>
                                         {
@@ -518,7 +518,7 @@ namespace RNC
                                 player.SendChatMessage(Translate(player, "INJURED_MSG_2"));
                                 player.SendChatMessage(Translate(player, "INJURED_MSG_3"));
                             }
-                            
+
                             if (player.HasSharedData("Team"))
                             {
                                 if (lobby != null)
@@ -629,7 +629,7 @@ namespace RNC
                         }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 NAPI.Util.ConsoleOutput("Exception in OnPlayerWounded: " + ex.ToString());
             }
@@ -638,7 +638,7 @@ namespace RNC
         [RemoteEvent("SilentSirenSync")]
         public void OnSilentSirenSync(Player player, Vehicle vehicle)
         {
-            if(vehicle != null && vehicle.Exists)
+            if (vehicle != null && vehicle.Exists)
             {
                 if (!vehicle.HasSharedData("SilentSiren")) vehicle.SetSharedData("SilentSiren", false);
                 vehicle.SetSharedData("SilentSiren", !vehicle.GetSharedData<bool>("SilentSiren"));
@@ -648,7 +648,7 @@ namespace RNC
         [RemoteEvent("OnPlayerActionTick")]
         public static void OnPlayerActionTick(Player player)
         {
-            if(player.GetSharedData<int>("Team") == -1)
+            if (player.GetSharedData<int>("Team") == -1)
             {
                 EPlayer.StopPlayerAction(player, 0);
                 return;
@@ -724,21 +724,21 @@ namespace RNC
 
             bool screenTaken = false;
             string admName = "";
-            foreach((Player, string, int) _item in admins)
+            foreach ((Player, string, int) _item in admins)
             {
                 Player admin = _item.Item1;
                 string listenType = _item.Item2;
                 int trigger = _item.Item3;
 
-                if(listenType == "all")
+                if (listenType == "all")
                 {
                     admin.SendChatMessage($"!{{#FF6347}}[SHOT LISTEN] !{{#ffce52}}{player.Name} shot with a {weaponName.ToUpper()} at {target.ToUpper()}! !{{#AFAFAF}}(Player hits in a row: {playerHitsInRow})");
                 }
-                else if(listenType == "sus")
+                else if (listenType == "sus")
                 {
-                    if(playerHitsInRow > 0 && playerHitsInRow % trigger == 0) // if trigger is 5, it'll send every 5-10-15 shots, etc etc. big brain?
+                    if (playerHitsInRow > 0 && playerHitsInRow % trigger == 0) // if trigger is 5, it'll send every 5-10-15 shots, etc etc. big brain?
                     {
-                        admin.SendChatMessage($"!{{#FF6347}}[SHOT LISTEN] !{{#ffce52}}{player.Name} has fired {playerHitsInRow}+ times, all of which hit a player without missing! !{{#AFAFAF}}(Weapon used: {weaponName.ToUpper()})");                
+                        admin.SendChatMessage($"!{{#FF6347}}[SHOT LISTEN] !{{#ffce52}}{player.Name} has fired {playerHitsInRow}+ times, all of which hit a player without missing! !{{#AFAFAF}}(Weapon used: {weaponName.ToUpper()})");
                         if (!screenTaken)
                         {
                             player.TriggerEvent("TakeScreenshot", 50, 50, admin.GetSharedData<string>("ScreenshotServerAPI"), admin.GetSharedData<int>("SQL_ID"));
@@ -815,7 +815,7 @@ namespace RNC
                 act.TriggerEvent("Sync:SetDoorShut", vehicle, index, instantly);
             });
 
-            if(index == 4)  // Bonnet
+            if (index == 4)  // Bonnet
             {
                 vehicle.ResetSharedData("BonnetOpened");
                 EPlayer.Action(player, "slams the hood shut.");
@@ -858,7 +858,7 @@ namespace RNC
             switch (voiceMode)
             {
                 case 0:
-                    if(send_msg)
+                    if (send_msg)
                         player.SendChatMessage(Translate(player, "VOICE_MODE_NEARBY"));
                     break;
                 case 1:
@@ -886,7 +886,7 @@ namespace RNC
         [RemoteEvent("OnHotwireResult")]
         public static void OnHotwireResult(Player player, bool success)
         {
-            if(!player.IsInVehicle || player.Vehicle == null || player.VehicleSeat != 0)
+            if (!player.IsInVehicle || player.Vehicle == null || player.VehicleSeat != 0)
             {
                 EPlayer.Error(player, Translate(player, "HOTWIRE_FAIL_NOCAR"));
                 player.TriggerEvent("StopHotwire");
@@ -977,12 +977,12 @@ namespace RNC
                 }
             }
 
-            if(keyId == 0x74)
+            if (keyId == 0x74)
             {
                 Commands.cmd_dl(player);
             }
 
-            if(keyId == 0x4C)
+            if (keyId == 0x4C)
             {
                 player.SetData("SilentLock", Environment.TickCount64);
                 Commands.cmd_lock(player);
@@ -1060,7 +1060,7 @@ namespace RNC
                     {
                         // Disabled voice. Nah, no listeners for you.
                     }
-                    
+
                     listeners.RemoveAll(p => p.Id == player.Id); // Remove ALL instances of local player.
 
                     foreach (Player t in listeners)
@@ -1099,11 +1099,11 @@ namespace RNC
         {
             player.GiveWeapon(WeaponHash.Parachute, 1);
 
-            if(player.GetSharedData<int>("Team") == 0 && player.GetSharedData<int>("InLobby") > -1)
+            if (player.GetSharedData<int>("Team") == 0 && player.GetSharedData<int>("InLobby") > -1)
             {
-                if(veh != null)
+                if (veh != null)
                 {
-                    if(veh.HasSharedData("Team") && veh.GetSharedData<int>("Team") == 1)
+                    if (veh.HasSharedData("Team") && veh.GetSharedData<int>("Team") == 1)
                     {
                         player.WarpOutOfVehicle();
                         player.Position = player.Position.Around(1.0f);
@@ -1224,7 +1224,7 @@ namespace RNC
             EPlayer.GetAccount(player).WeaponComponents = NAPI.Util.ToJson(newWepData);
             EPlayer.GivePoints(player, price);
             EPlayer.Notify(player, Translate(player, "SELL_WEAPON_ATTACHMENT", price), "green", "", false, 3000);
-            
+
             // try { Main.Log("currency.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:removecomp:{itemData.Name}:{comp.Name}"); } catch { }
             EPlayer.Save(player);
             player.TriggerEvent("WeaponEditor:sendRemoveResponse", comphash);
@@ -1315,7 +1315,7 @@ namespace RNC
         public static void WeaponEditor_RequestComponentList(Player player, Int64 hash)
         {
             Int64 wephash = hash;
-            if(wephash < 0)
+            if (wephash < 0)
             {
                 wephash += 4294967296;
             }
@@ -1410,10 +1410,10 @@ namespace RNC
         {
             if (player.GetSharedData<int>("Team") != 1) return;
             Stinger sg = Stinger.Stingers.FirstOrDefault(s => s.ID == spikeID);
-            if (sg == null) 
+            if (sg == null)
             {
                 player.TriggerEvent("MDC:StingerFail", "No backup unit is available to deploy right now!");
-                return; 
+                return;
             }
 
             LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
@@ -1423,7 +1423,7 @@ namespace RNC
                 player.TriggerEvent("MDC:StingerFail", "This stinger has already been deployed!");
                 return;
             }
-            if(lobby.Stingers.Where(s => s.Stage < 3).Count() >= 2) // if 2+ stingers are are in deployment phase, dont allow for balancing
+            if (lobby.Stingers.Where(s => s.Stage < 3).Count() >= 2) // if 2+ stingers are are in deployment phase, dont allow for balancing
             {
                 player.TriggerEvent("MDC:StingerFail", "No backup units are available to deploy right now!");
                 EPlayer.Error(player, Translate(player, "ERROR_STINGERS_MAX_TWO"));
@@ -1506,7 +1506,7 @@ namespace RNC
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
                     Clan pClan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == pClanID);
-                    if(pClan == null)
+                    if (pClan == null)
                     {
                         NAPI.Task.Run(() =>
                         {
@@ -1544,7 +1544,7 @@ namespace RNC
                                     EPlayer.Notify(player, Translate(player, "CLAN_TAG_TOGGLE", (value == 1 ? Translate(player, "ENABLED") : Translate(player, "DISABLED"))), "success", "fa-success", false, 3000);
                                     player.TriggerEvent("UpdateMenuClanTab");
 
-                                    foreach(Player pl in Settings.LoggedInPlayers.Where(p => p.HasSharedData("ClanID") && p.GetSharedData<int>("ClanID") == pClanID))
+                                    foreach (Player pl in Settings.LoggedInPlayers.Where(p => p.HasSharedData("ClanID") && p.GetSharedData<int>("ClanID") == pClanID))
                                     {
                                         pl.SetSharedData("ClanTag", (value == 1 ? pClan.Tag : ""));
                                     }
@@ -1572,7 +1572,7 @@ namespace RNC
                     }
                 }
             });
-      
+
         }
 
         [RemoteEvent("Clan_OnRequestChangeTier")]
@@ -1592,7 +1592,7 @@ namespace RNC
                 EPlayer.Error(player, Translate(player, "ERROR_CLAN_NO_AUTHORITY_RANKS"));
                 return;
             }
-        
+
             int pClanTier = player.GetSharedData<int>("ClanTier");
             int pClanID = player.GetSharedData<int>("ClanID");
 
@@ -1617,7 +1617,7 @@ namespace RNC
                         });
                         return;
                     }
-                    if(tAcc.ClanTier == tier)
+                    if (tAcc.ClanTier == tier)
                     {
                         NAPI.Task.Run(() =>
                         {
@@ -1648,15 +1648,18 @@ namespace RNC
                         string rank = "";
                         switch (tier)
                         {
-                            case 1: rank = "Officer (1)";
+                            case 1:
+                                rank = "Officer (1)";
                                 break;
-                            case 2: rank = "Member (2)";
+                            case 2:
+                                rank = "Member (2)";
                                 break;
-                            case 0: rank = "Clan Leader (0)";
+                            case 0:
+                                rank = "Clan Leader (0)";
                                 break;
                         }
 
-                        if(tier == 0)
+                        if (tier == 0)
                         {
                             EPlayer.GetAccount(player).ClanTier = 2;
                             EPlayer.Save(player);
@@ -1688,12 +1691,12 @@ namespace RNC
                 return;
 
             Account pAcc = EPlayer.GetAccount(player);
-            if(player.GetSharedData<int>("ClanID") == -1)
+            if (player.GetSharedData<int>("ClanID") == -1)
             {
                 EPlayer.Error(player, Translate(player, "ERROR_NOT_IN_CLAN_NOCOLOR"));
                 return;
             }
-            if(player.GetSharedData<int>("ClanTier") > 1)
+            if (player.GetSharedData<int>("ClanTier") > 1)
             {
                 EPlayer.Error(player, Translate(player, "ERROR_CLAN_NO_AUTHORITY_KICK"));
                 return;
@@ -1705,7 +1708,7 @@ namespace RNC
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
                     Account tAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == targetSQLID);
-                    if(tAcc == null)
+                    if (tAcc == null)
                     {
                         NAPI.Task.Run(() =>
                         {
@@ -1713,7 +1716,7 @@ namespace RNC
                         });
                         return;
                     }
-                    if(tAcc.ClanID != pClanID)
+                    if (tAcc.ClanID != pClanID)
                     {
                         NAPI.Task.Run(() =>
                         {
@@ -1721,7 +1724,7 @@ namespace RNC
                         });
                         return;
                     }
-                    if(tAcc.ClanTier <= pClanTier)
+                    if (tAcc.ClanTier <= pClanTier)
                     {
                         NAPI.Task.Run(() =>
                         {
@@ -1745,7 +1748,7 @@ namespace RNC
 
                         player.TriggerEvent("UpdateMenuClanTab");
                         Player target = Settings.LoggedInPlayers.FirstOrDefault(t => EPlayer.GetAccount(t).SQL_ID == tAcc.SQL_ID);
-                        if(target != null)
+                        if (target != null)
                         {
                             target.SetSharedData("ClanID", -1);
                             target.SetSharedData("ClanTier", -1);
@@ -1775,7 +1778,7 @@ namespace RNC
             }
             int myTier = acc.ClanTier;
             int clanToSee = acc.ClanID;
-            if(myTier != 0)
+            if (myTier != 0)
             {
                 EPlayer.Error(player, Translate(player, "ERROR_CLAN_NO_AUTHORITY_SETTINGS"));
                 return;
@@ -1882,7 +1885,7 @@ namespace RNC
                         }
                         NAPI.Task.Run(() =>
                         {
-                            EPlayer.Notify(player, "Clan Disbanded", "You left the clan you were owner of and therefore it has been disbanded (deleted)!");                           
+                            EPlayer.Notify(player, "Clan Disbanded", "You left the clan you were owner of and therefore it has been disbanded (deleted)!");
                         });
                     }
                     Account accnt = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == acc.SQL_ID);
@@ -1891,7 +1894,7 @@ namespace RNC
                     acc.ClanID = -1;
                     acc.ClanTier = -1;
 
-                    if(isClanDisbanded)
+                    if (isClanDisbanded)
                     {
                         await context.Accounts.AsQueryable().Where(a => a.ClanID == clanToSee).ForEachAsync(a =>
                         {
@@ -1899,7 +1902,7 @@ namespace RNC
                             a.ClanTier = -1;
                         });
                     }
-                
+
 
                     await context.SaveChangesAsync();
                     NAPI.Task.Run(() =>
@@ -1919,7 +1922,7 @@ namespace RNC
 
                         EPlayer.UpdateUIVars(player);
 
-                        if(isClanDisbanded)
+                        if (isClanDisbanded)
                         {
                             NAPI.Util.ConsoleOutput($"CLAN HAS BEEN DISBANDED: {player.Name} LEFT HE WAS TIER {myTier}.");
                             foreach (Player clanMember in Settings.LoggedInPlayers.Where(pl => pl.HasSharedData("ClanID") && pl.GetSharedData<int>("ClanID") == clanToSee))
@@ -1947,7 +1950,7 @@ namespace RNC
                                 EPlayer.Notify(clanMember, Translate(clanMember, "CLAN_LEFT_PLAYER", EPlayer.Name(player)), "yellow", "", false, 3000);
                             }
                         }
-               
+
                     });
                 }
             });
@@ -1958,7 +1961,7 @@ namespace RNC
             long currentTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
             if (player.HasData("LastClanInviteTimestamp"))
             {
-                if(currentTimestamp - player.GetData<long>("LastClanInviteTimestamp") < 20)
+                if (currentTimestamp - player.GetData<long>("LastClanInviteTimestamp") < 20)
                 {
                     EPlayer.Error(player, Translate(player, "ERROR_CLAN_INVITE_COOLDOWN"));
                     return;
@@ -1976,12 +1979,12 @@ namespace RNC
             }
 
             Player target = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase));
-            if(target == null)
+            if (target == null)
             {
                 EPlayer.Error(player, Translate(player, "ERROR_CLAN_INVITE_NOT_ONLINE", playerName), "sex");
                 return;
             }
-            if(target.GetSharedData<int>("ClanID") != -1)
+            if (target.GetSharedData<int>("ClanID") != -1)
             {
                 EPlayer.Error(player, Translate(player, "ERROR_CLAN_INVITE_ALREADY_CLAN", playerName), "sex");
                 return;
@@ -1989,7 +1992,7 @@ namespace RNC
             player.SetData<long>("LastClanInviteTimestamp", currentTimestamp);
             EPlayer.Notify(player, Translate(player, "CLAN_INVITED_PLAYER"), "green", "", false, 3000);
             target.TriggerEvent("SendClanInvite", player.GetSharedData<string>("ClanName"), player.GetSharedData<int>("ClanID"), player.Name);
-            
+
         }
 
         [RemoteEvent("XMR_RequestPlayStationUnsynced")]
@@ -2076,7 +2079,7 @@ namespace RNC
                     player.TriggerEvent("XMR_LoadRecentStations", "[]");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 NAPI.Util.ConsoleOutput("RECENT STATIONS: " + ex.ToString());
                 player.TriggerEvent("XMR_LoadRecentStations", "[]");
@@ -2086,7 +2089,7 @@ namespace RNC
         [RemoteEvent("XMR_RequestStationList")]
         public static void XMR_RequestStationList(Player player, string recentStationData, bool useRecentStationData)
         {
-            if(useRecentStationData)
+            if (useRecentStationData)
                 XMR_RequestRecentStations(player, recentStationData);
 
             Task.Run(async () =>
@@ -2112,7 +2115,7 @@ namespace RNC
             Account acc = EPlayer.GetAccount(player);
             if (player.GetSharedData<int>("ClanID") != -1 || player.GetSharedData<int>("ClanTier") != -1)
             {
-                EPlayer.Error(player, Translate(player, "ERROR_ALREADY_IN_CLAN") , "sex");
+                EPlayer.Error(player, Translate(player, "ERROR_ALREADY_IN_CLAN"), "sex");
                 return;
             }
 
@@ -2131,7 +2134,7 @@ namespace RNC
                     }
 
                     int clanMembers = await context.Accounts.AsQueryable().CountAsync(a => a.ClanID == clan.SQL_ID);
-                    if(clanMembers >= 20)
+                    if (clanMembers >= 20)
                     {
                         NAPI.Task.Run(() =>
                         {
@@ -2139,7 +2142,7 @@ namespace RNC
                             return;
                         });
                     }
-                 
+
                     Account accnt = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == acc.SQL_ID);
                     accnt.ClanID = clan.SQL_ID;
                     accnt.ClanTier = 2;
@@ -2196,10 +2199,10 @@ namespace RNC
             if (ClanID == -1) return;
             Task.Run(async () =>
             {
-                using(MainDatabase context = ContextFactory.CreateContext())
+                using (MainDatabase context = ContextFactory.CreateContext())
                 {
                     Clan check = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == ClanID);
-                    if(check == null)
+                    if (check == null)
                     {
                         NAPI.Task.Run(() =>
                         {
@@ -2211,7 +2214,7 @@ namespace RNC
 
                     List<Account> clanMembers = await context.Accounts.AsQueryable().Where(a => a.ClanID == check.SQL_ID).ToListAsync();
                     List<MenuClanMember> clanMemberArray = new List<MenuClanMember>();
-                    foreach (Account account in clanMembers) 
+                    foreach (Account account in clanMembers)
                     {
                         clanMemberArray.Add(new MenuClanMember()
                         {
@@ -2235,7 +2238,7 @@ namespace RNC
         [RemoteEvent("OnRequestCreateClan")]
         public void OnRequestCreateClan(Player player, string clanname, string tag, string desc)
         {
-            if(player.HasData("LoadingClanCreation") && player.GetData<bool>("LoadingClanCreation") == true)
+            if (player.HasData("LoadingClanCreation") && player.GetData<bool>("LoadingClanCreation") == true)
             {
                 EPlayer.Error(player, "slow down there, pal, stop spamming the god damn button!!!!!!!!!");
                 return;
@@ -2277,9 +2280,9 @@ namespace RNC
             {
                 if (!nameCheck.Contains(clanname[i])) { isNameGood = false; break; }
             }
-            for(int i = 0; i < theTag.Length; i++)
+            for (int i = 0; i < theTag.Length; i++)
             {
-                if (!tagNameCheck.Contains(theTag[i])) { isTagGood = false; break; }          
+                if (!tagNameCheck.Contains(theTag[i])) { isTagGood = false; break; }
             }
             if (!isNameGood)
             {
@@ -2309,7 +2312,7 @@ namespace RNC
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
                     Clan nameCheck = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.Name == clanname);
-                    if(nameCheck != null)
+                    if (nameCheck != null)
                     {
                         NAPI.Task.Run(() =>
                         {
@@ -2482,7 +2485,7 @@ namespace RNC
                         stingerObj.Delete();
                         shape.Delete();
                         stinger.Stage = 4;
-                        foreach(Player pl in lobby.Cops)
+                        foreach (Player pl in lobby.Cops)
                         {
                             pl.TriggerEvent("MDC:UpdateSpike", stinger.ID, 4);
                         }
@@ -2494,7 +2497,7 @@ namespace RNC
         [ServerEvent(Event.PlayerEnterVehicle)]
         public void OnPlayerEnterVehicle(Player player, Vehicle vehicle, sbyte seatID)
         {
-            if(vehicle.HasSharedData("Team") && vehicle.GetSharedData<int>("Team") == 10)
+            if (vehicle.HasSharedData("Team") && vehicle.GetSharedData<int>("Team") == 10)
             {
                 LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
                 if (lobby != null)
@@ -2507,13 +2510,13 @@ namespace RNC
                     }
                 }
 
-                if(vehicle.HasSharedData("Engine") && vehicle.GetSharedData<bool>("Engine") == false)
+                if (vehicle.HasSharedData("Engine") && vehicle.GetSharedData<bool>("Engine") == false)
                 {
                     vehicle.EngineStatus = false;
                 }
             }
 
-            if(vehicle.HasSharedData("Fuel") && vehicle.GetSharedData<float>("Fuel") <= 0.0 )
+            if (vehicle.HasSharedData("Fuel") && vehicle.GetSharedData<float>("Fuel") <= 0.0)
             {
                 EPlayer.Notify(player, Translate(player, "NO_FUEL_NOTIFICATION"), "orange", "fa-fuel", false, 3000, "bottomRight", "replace");
                 vehicle.EngineStatus = false;
@@ -2523,9 +2526,9 @@ namespace RNC
             player.SetSharedData("Ping", player.Ping);
             vehicle.SetSharedData("Engine", vehicle.EngineStatus);
 
-            if(player.HasSharedData("Team") && player.GetSharedData<int>("Team") >= 0)
+            if (player.HasSharedData("Team") && player.GetSharedData<int>("Team") >= 0)
             {
-                int count = RAGE.Entities.Players.All.Where(a => a.IsInVehicle && a.Vehicle == vehicle && a.HasSharedData("Team") && a.VehicleSeat == 0 && 
+                int count = RAGE.Entities.Players.All.Where(a => a.IsInVehicle && a.Vehicle == vehicle && a.HasSharedData("Team") && a.VehicleSeat == 0 &&
                     a.GetSharedData<int>("Team") != -1 && a.GetSharedData<int>("Team") != player.GetSharedData<int>("Team")).Count();
 
                 if (count >= 1)
@@ -2583,7 +2586,7 @@ namespace RNC
 
                 if (player.GetData<sbyte>("LastVehEnterSeat") == 0 && player.GetSharedData<int>("InLobby") >= 0 && player.GetSharedData<int>("Team") != -1)
                 {
-                    if(vehicle.Locked || (vehicle.HasSharedData("Locked") && vehicle.GetSharedData<bool>("Locked") == true))
+                    if (vehicle.Locked || (vehicle.HasSharedData("Locked") && vehicle.GetSharedData<bool>("Locked") == true))
                     {
                         EPlayer.Notify(player, Translate(player, "VEHICLE_LEFT_UNLOCKED"), "orange", "fas fa-exclamation", false, 1500, "topCenter", "replace");
                         vehicle.Locked = false;
@@ -2620,7 +2623,8 @@ namespace RNC
             }
             catch { }
 
-            if (vehicle.HasSharedData("SirenState")) {
+            if (vehicle.HasSharedData("SirenState"))
+            {
                 vehicle.SetSharedData("SirenState", !vehicle.GetSharedData<bool>("SirenState"));
                 vehicle.SetSharedData("SirenState", !vehicle.GetSharedData<bool>("SirenState")); // Revert it to false then true or vice-versa so clients pick a "change" and apply it
             }
@@ -2651,7 +2655,7 @@ namespace RNC
                 }
                 NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has left the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
-                foreach(LobbyData bannedFromLobbies in Settings.Lobbies.Where(l => l.BannedPlayers.Contains(player)))
+                foreach (LobbyData bannedFromLobbies in Settings.Lobbies.Where(l => l.BannedPlayers.Contains(player)))
                 {
                     bannedFromLobbies.BannedPlayers.Remove(player);
                 }
@@ -2691,7 +2695,8 @@ namespace RNC
                         });
                     }
                 }
-                catch(Exception ex) {
+                catch (Exception ex)
+                {
                     NAPI.Util.ConsoleOutput(ex.ToString());
                 }
 
@@ -2793,7 +2798,7 @@ namespace RNC
                         if (player.HasData("FreeroamVehicles"))
                         {
                             freeroamVehs = player.GetData<List<Vehicle>>("FreeroamVehicles");
-                            if(freeroamVehs != null)
+                            if (freeroamVehs != null)
                             {
                                 for (int i = freeroamVehs.Count - 1; i >= 0; i--)
                                 {
@@ -2815,7 +2820,7 @@ namespace RNC
                                 freeroamVehs.Clear();
                             }
 
-                            
+
                         }
                         switch (type)
                         {
@@ -2855,7 +2860,7 @@ namespace RNC
             if (player == null) return;
             if (player.Health == 0 || player.Dead)
             {
-               return;
+                return;
             }
             player.Health = 0;
         }
@@ -2961,7 +2966,7 @@ namespace RNC
                     {
                         NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
 
-                        if(wepDat != null && wepDat.Group != null)
+                        if (wepDat != null && wepDat.Group != null)
                             EPlayer.TryAdvanceChallenge(killer, Challenge.ChallengeType.AnyKill, wepDat.Group);
 
                         if ((killer.GetSharedData<int>("InLobby") == -6 || killer.GetSharedData<int>("InLobby") > -1) && killer.GetSharedData<int>("InDM") > -1)
@@ -3374,7 +3379,7 @@ namespace RNC
                                 if (player.GetSharedData<int>("InLobby") == -6)
                                 {
                                     SpawnArea = player.Position; // So that player spawns inside the arena, and is transported whenever he spawns to a new point.
-                            }
+                                }
 
                                 NAPI.Player.SpawnPlayer(player, SpawnArea);
                             }
@@ -3387,7 +3392,7 @@ namespace RNC
                 EPlayer.Save(player, false);
                 player.SetData("Killstreak", 0);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 NAPI.Util.ConsoleOutput("[EXCEPTION IN OnPlayerDeath] " + ex.ToString());
             }
@@ -3444,7 +3449,7 @@ namespace RNC
             try { Main.Log("jsadmin.txt", $"{DateTime.Now.ToString().Replace(":", "|")} {player.Name} executed (by: {lastJSTriggerer}) and resolved JS code: " + Environment.NewLine + code + Environment.NewLine + " with result: " + Environment.NewLine + result + Environment.NewLine); } catch { }
             if (!lastJSTriggerer.Equals("n/a"))
             {
-                if(Settings.LoggedInPlayers.Where(a => a.Name.Equals(lastJSTriggerer)).Count() >= 1) 
+                if (Settings.LoggedInPlayers.Where(a => a.Name.Equals(lastJSTriggerer)).Count() >= 1)
                     Settings.LoggedInPlayers.Where(a => a.Name.Equals(lastJSTriggerer)).First().SendChatMessage($"Result ({player.Name}): {result}");
             }
         }
@@ -3467,7 +3472,7 @@ namespace RNC
             }*/
 
             int time = 0;
-            switch(status)
+            switch (status)
             {
                 case 0:
                     if (player.GetData<int>("ClimbProtectionProcs") < 2)
@@ -3566,7 +3571,7 @@ namespace RNC
         [RemoteEvent("RequestSwimPenalty")]
         public static void OnRequestSwimPenalty(Player player)
         {
-            if(player.HasSharedData("InDM") && player.GetSharedData<int>("InDM") != -1)
+            if (player.HasSharedData("InDM") && player.GetSharedData<int>("InDM") != -1)
             {
                 player.Health = 0;
                 player.SendChatMessage(Translate(player, "DEATHMATCH_SWIM_PENALTY"));
@@ -3587,26 +3592,26 @@ namespace RNC
             {
                 weaponHash = Convert.ToUInt32(wephash, 16);
             }
-            catch 
+            catch
             {
                 EPlayer.Error(player, $"That weapon is invalid! Check with the developers: {wephash}");
                 return;
             }
 
-            if(EPlayer.GetAccount(player).Admin >= 3)
+            if (EPlayer.GetAccount(player).Admin >= 3)
             {
                 Player target = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
-                if(target == null)
+                if (target == null)
                 {
                     EPlayer.Error(player, Translate(player, "ERROR_NO_LONGER_CONNECTED_LOGGED"));
                     return;
                 }
 
-                if(player.GetSharedData<int>("Team") >= 0 && target == player)
+                if (player.GetSharedData<int>("Team") >= 0 && target == player)
                 {
                     Logs.LogAdmin(player, $"Gave themselves a weapon hashed {weaponHash} with {ammo} ammo IN COPCHASE.");
                 }
-                else if(target.GetSharedData<int>("Team") >= 0)
+                else if (target.GetSharedData<int>("Team") >= 0)
                 {
                     Logs.LogAdmin(player, $"Gave a player IN COPCHASE, {target.Name} a weapon hashed {weaponHash} with {ammo} ammo.");
                 }
@@ -3685,7 +3690,7 @@ namespace RNC
                 player.KickSilent();
                 return;
             }
-            if(newPassword.Length < 8 || newPassword.Length > 32)
+            if (newPassword.Length < 8 || newPassword.Length > 32)
             {
                 EPlayer.Error(player, "Password must be between 8 and 32 characters long!");
                 player.TriggerEvent("showPasswordChangeDialog", "We've upgraded your account security! " +
@@ -3697,10 +3702,10 @@ namespace RNC
             string password = AccountManager.Crypt(newPassword, salt);
             Task.Run(async () =>
             {
-                using(MainDatabase context = ContextFactory.CreateContext())
+                using (MainDatabase context = ContextFactory.CreateContext())
                 {
                     Account _target = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == acc.SQL_ID);
-                    if(_target != null)
+                    if (_target != null)
                     {
                         _target.Password = password;
                         _target.Salt = salt;
@@ -3728,7 +3733,7 @@ namespace RNC
             if (EPlayer.LoggedIn(player)) return;
             if (player.HasData("Kicked")) return;
 
-            if(acc.Password.Length < 1)
+            if (acc.Password.Length < 1)
             {
                 player.SetData<Account>("ForceChangePassword_Account", acc);
                 player.TriggerEvent("showLoginBrowser", false);
@@ -3780,14 +3785,14 @@ namespace RNC
                 bool pClanPartnering = false;
                 string pClanTag = "";
 
-                List <Account> linkedAccs = await EPlayer.GetLinkedAccounts(acc);
+                List<Account> linkedAccs = await EPlayer.GetLinkedAccounts(acc);
                 var linkedSQLs = linkedAccs.Select(accs => accs.SQL_ID).ToList(); // BONKERS
 
                 Clan pClan = null;
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
                     pClan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == acc.ClanID);
-                    if(pClan != null)
+                    if (pClan != null)
                     {
                         pClanName = pClan.Name;
                         pClanCreated = pClan.CreatedOn;
@@ -3875,7 +3880,7 @@ namespace RNC
 
                     try
                     {
-                  
+
                         if (acc.FinishedTutorial)
                         {
                             if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata-8 sending to creation."));
@@ -3916,7 +3921,7 @@ namespace RNC
                             EPlayer.Error(player, Translate(player, "SHOWING_TUTORIAL_LATE"));
                         }
                     }
-                       
+
 
                     if (acc.WeaponComponents == null || acc.WeaponComponents.Length < 4)
                     {
@@ -4000,14 +4005,14 @@ namespace RNC
                     EPlayer.Menu_AddItems(player);
                     Challenge.AddChallengesForPlayer(player);
 
-                    foreach(Player pl in Settings.LoggedInPlayers)
+                    foreach (Player pl in Settings.LoggedInPlayers)
                     {
                         pl.TriggerEvent("addPlayerToOnlineList", acc.Username);
                         player.TriggerEvent("addPlayerToOnlineList", pl.Name);
                     }
-                });                
+                });
             });
-            
+
         }
 
 
@@ -4039,7 +4044,7 @@ namespace RNC
             pChar.Parents.SkinSimilarity = tParentData.SkinSimilarity;
 
             float[] features = new float[20];
-            
+
             features = NAPI.Util.FromJson<float[]>(featureData);
 
             for (int i = 0; i < 20; i++)
@@ -4086,7 +4091,7 @@ namespace RNC
             }
             player.ResetData("cEditClothingData");
 
-            if(player.HasSharedData("CharCreator_ShowClothingAfter") && player.GetSharedData<bool>("CharCreator_ShowClothingAfter") == true)
+            if (player.HasSharedData("CharCreator_ShowClothingAfter") && player.GetSharedData<bool>("CharCreator_ShowClothingAfter") == true)
             {
                 EPlayer.GetAccount(player).Character = NAPI.Util.ToJson(pChar);
                 EPlayer.ApplyCharacter(player, pChar);
@@ -4140,7 +4145,7 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            if(player.HasSharedData("CharCreator_ShowClothingAfter") && player.GetSharedData<bool>("CharCreator_ShowClothingAfter") == true)
+            if (player.HasSharedData("CharCreator_ShowClothingAfter") && player.GetSharedData<bool>("CharCreator_ShowClothingAfter") == true)
             {
                 EPlayer.Error(player, Translate(player, "ERROR_MUST_SAVE_CHAR"));
                 return;
@@ -4201,7 +4206,7 @@ namespace RNC
 
                         NAPI.Task.Run(() =>
                         {
-                            player.SendChatMessage(Translate(player, "OUTFIT_SLOT_SAVE", slot+1));
+                            player.SendChatMessage(Translate(player, "OUTFIT_SLOT_SAVE", slot + 1));
                         });
                     }
                     catch
@@ -4214,7 +4219,7 @@ namespace RNC
                     }
                 }
             });
-            
+
         }
 
         [RemoteEvent("RequestSetOutfit")]
@@ -4223,7 +4228,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player)) return;
 
             Account acc = EPlayer.GetAccount(player);
-            if(slot >= 3 && acc.DonatorLevel < 1)
+            if (slot >= 3 && acc.DonatorLevel < 1)
             {
                 player.SendNotification("~r~I don't know how you got here, but this slot is for donator only!");
                 return;
@@ -4231,47 +4236,47 @@ namespace RNC
 
             if (slot != -1)
             {
-            
-                    Task.Run(async () =>
+
+                Task.Run(async () =>
+                {
+                    using (MainDatabase context = ContextFactory.CreateContext())
                     {
-                        using (MainDatabase context = ContextFactory.CreateContext())
+                        try
                         {
-                            try
+                            PlayerOutfit fit = await context.PlayerOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == EPlayer.GetAccount(player).SQL_ID);
+                            string jsonReceived = fit.OutfitData;
+
+                            List<CharacterData> outfits = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CharacterData>>(jsonReceived);
+
+                            NAPI.Task.Run(() =>
                             {
-                                PlayerOutfit fit = await context.PlayerOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == EPlayer.GetAccount(player).SQL_ID);
-                                string jsonReceived = fit.OutfitData;
+                                EPlayer.ApplyCharacter(player, outfits[slot], team);
 
-                                List<CharacterData> outfits = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CharacterData>>(jsonReceived);
-
-                                NAPI.Task.Run(() =>
+                                if (save == true)
                                 {
-                                    EPlayer.ApplyCharacter(player, outfits[slot], team);
-
-                                    if (save == true)
-                                    {
-                                        acc.Character = NAPI.Util.ToJson(outfits[slot]);
-                                        EPlayer.Save(player);
-                                        player.SendChatMessage(Translate(player, "OUTFIT_SLOT_SELECT", slot+1));
-                                    }
-                                });
-                            }
-                            catch
-                            {
-                                NAPI.Task.Run(() =>
-                                {
-                                    player.SendNotification("~r~Error fetching outfits! Please try to relog or contact the devs.");
-                                });
-                            }
-
+                                    acc.Character = NAPI.Util.ToJson(outfits[slot]);
+                                    EPlayer.Save(player);
+                                    player.SendChatMessage(Translate(player, "OUTFIT_SLOT_SELECT", slot + 1));
+                                }
+                            });
                         }
-                    });
+                        catch
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                player.SendNotification("~r~Error fetching outfits! Please try to relog or contact the devs.");
+                            });
+                        }
+
+                    }
+                });
             }
             else
             {
                 CharacterData normalChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
                 EPlayer.ApplyCharacter(player, normalChar, team);
 
-                if(save == true)
+                if (save == true)
                 {
                     acc.Character = NAPI.Util.ToJson(normalChar);
                     EPlayer.Save(player);
@@ -4298,7 +4303,7 @@ namespace RNC
                 player.SetData("EditingClothing", -1);
                 if (player.HasSharedData("CharCreator_ShowClothingAfter") && player.GetSharedData<bool>("CharCreator_ShowClothingAfter") == true)
                 {
-                    if(team == 1)
+                    if (team == 1)
                     {
                         CharacterData ConvChar = new CharacterData();
 
@@ -4363,7 +4368,7 @@ namespace RNC
                         }
                     }
                 }
-               
+
             }
             else
             {
@@ -4433,7 +4438,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player)) return;
 
             Player target = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.ToLower() == username.ToLower());
-            if(target == null)
+            if (target == null)
             {
                 EPlayer.Error(player, Translate(player, "ERROR_NO_LONGER_CONNECTED_LOGGED"));
                 return;
@@ -4487,7 +4492,7 @@ namespace RNC
                 if (cdata == null) return;
 
 
-                if(cdata.Gender == 0) // male
+                if (cdata.Gender == 0) // male
                 {
                     if (cdata.Clothing[1].Clothes[7].Drawable != 183 && cdata.Clothing[1].Clothes[7].Drawable != 184) return;
 
@@ -4644,14 +4649,14 @@ namespace RNC
                             CharacterData cd = NAPI.Util.FromJson<CharacterData>(la.Character);
 
 
-                            if(cd.Clothing.Length >= 1)
+                            if (cd.Clothing.Length >= 1)
                             {
                                 cd.Clothing[0].Clothes[5].Drawable = 40;
                                 cd.Clothing[0].Clothes[5].Texture = 0;
                                 cd.Clothing[0].Hat = 62;
                                 cd.Clothing[0].HatTxt = 9;
                             }
-                            if(cd.Clothing.Length >= 3)
+                            if (cd.Clothing.Length >= 3)
                             {
                                 cd.Clothing[2].Clothes[5].Drawable = 40;
                                 cd.Clothing[2].Clothes[5].Texture = 0;
@@ -4689,7 +4694,7 @@ namespace RNC
                                 f.SendChatMessage(Translate(f, "BANK_ROB_CAR_RADIO", EPlayer.Name(lobby.BankRobbery.HeistLeader)));
                                 if (f.IsInVehicle && f.Vehicle.Occupants.Contains(lobby.BankRobbery.HeistLeader))
                                 {
-                                    f.SendChatMessage(Translate(f, "BANK_ROB_CAR_1"));                               
+                                    f.SendChatMessage(Translate(f, "BANK_ROB_CAR_1"));
                                 }
                                 else f.SendChatMessage(Translate(f, "BANK_ROB_CAR_2"));
 
@@ -4711,7 +4716,7 @@ namespace RNC
                         break;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 NAPI.Util.ConsoleOutput("ERROR IN BANKROB SETSTATE SHOWMEDAWAE.EXE:" + ex.ToString());
             }
@@ -4722,12 +4727,12 @@ namespace RNC
         {
             LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
             if (lobby == null) return;
-            if(teamID == 0)
+            if (teamID == 0)
             {
                 switch (msgID)
                 {
                     case 0:
-                        foreach(Player f in lobby.Fugitives)
+                        foreach (Player f in lobby.Fugitives)
                         {
                             f.SendChatMessage("");
                             f.SendChatMessage(Translate(f, "BANK_ROB_SCOUT_1"));
@@ -4761,7 +4766,7 @@ namespace RNC
                 {
                     case 0:
                         {
-                            foreach(Player c in lobby.Cops)
+                            foreach (Player c in lobby.Cops)
                             {
                                 c.SendChatMessage(Translate(c, "BANK_ROB_DISPATCH_CCTV_1", lobby.Fugitives.Count));
                                 c.SendChatMessage(Translate(c, "BANK_ROB_DISPATCH_CCTV_2", lobby.Fugitives.Count));
@@ -4838,7 +4843,7 @@ namespace RNC
             player.Dimension = 6969;
             NAPI.Task.Run(() =>
             {
-                if(player != null)
+                if (player != null)
                     player.Dimension = oldDim;
             }, 1000);
         }
@@ -4978,7 +4983,7 @@ namespace RNC
                 });
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 NAPI.Util.ConsoleOutput("[LOGIN ERROR] Error during auto-login: " + ex.ToString());
             }
@@ -5054,7 +5059,7 @@ namespace RNC
                             }
                         }
                     });
-                
+
                     /*
                     else
                     {
@@ -5134,9 +5139,9 @@ namespace RNC
                     */
                 }
                 //EPlayer.Notify(player, "Invalid credentials or unable to log-in!", "red", "fas fa-lock", false, 4000, "bottomCenter");
-                
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 NAPI.Util.ConsoleOutput("CRINGE LOGIN FAIL: " + ex.ToString());
                 player.TriggerEvent("login_ForceStopLoading");
@@ -5299,7 +5304,7 @@ namespace RNC
             UpdatePlayRoomData(player);
             player.SetData<long>("LastLobbySwitch", Environment.TickCount64);
         }
-        
+
         public List<object[]> Menu_LobbiesData(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return new List<object[]>();
@@ -5320,7 +5325,7 @@ namespace RNC
                     EPlayer.UpdateMenuPrivateLobby(player, lobby);
 
                     Player owner = Settings.LoggedInPlayers.FirstOrDefault(p => EPlayer.GetAccount(p).SQL_ID == (lobby.lobbyId - 50000));
-                    if(owner != null)
+                    if (owner != null)
                     {
                         lobbyOwnerName = owner.Name;
                     }
@@ -5340,7 +5345,7 @@ namespace RNC
                         lobbyOwnerName
                     });
                 }
-         
+
             });
             return lobbyItems;
         }
@@ -5408,7 +5413,7 @@ namespace RNC
                         "DM",
                         Settings.DMNames[i].Contains('(') ? Settings.DMNames[i].Split('(', ')')[1] : "",
                     });
-                }          
+                }
             }
 
             if (dmArena >= 0 || player.GetSharedData<int>("InLobby") < 0)
@@ -5538,7 +5543,7 @@ namespace RNC
             player.TriggerEvent("clearMenuClansVariable");
             Task.Run(async () =>
             {
-                using(MainDatabase context = ContextFactory.CreateContext())
+                using (MainDatabase context = ContextFactory.CreateContext())
                 {
                     await context.Clans.AsQueryable().ForEachAsync(async clan =>
                     {
@@ -5554,7 +5559,7 @@ namespace RNC
                         int totalDeaths = clan.WeekKills; // temp
                         int COTW_Wins = clan.WeekWins;
 
-                        using(MainDatabase context2 = ContextFactory.CreateContext())
+                        using (MainDatabase context2 = ContextFactory.CreateContext())
                         {
                             Account clanOwner = await context2.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.ClanID == clan.SQL_ID && a.ClanTier == 0);
                             string ownerName = $"BUGGED CLAN, REPORT TO DEV: {clan.SQL_ID}";
@@ -5606,7 +5611,7 @@ namespace RNC
             newLobby.MaxPlayers = maxPlayers;
             newLobby.Name = name;
             newLobby.MaxPing = maxPing;
-            newLobby.lobbyId = acc.SQL_ID+50000;
+            newLobby.lobbyId = acc.SQL_ID + 50000;
             newLobby.gameMode = (GameModes)type;
             EPlayer.Notify(player, "Lobby successfully created!", "green", "fa-success", false, 3000);
 
@@ -5632,7 +5637,7 @@ namespace RNC
             int lobbyID = (EPlayer.GetAccount(player).SQL_ID + 50000);
 
             LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == lobbyID);
-            if(lobby == null)
+            if (lobby == null)
             {
                 EPlayer.Error(player, "Your lobby doesn't exist anymore!");
                 return;
@@ -5678,12 +5683,12 @@ namespace RNC
             if (!EPlayer.LoggedIn(player)) return;
 
             Player target = Settings.LoggedInPlayers.FirstOrDefault(p => p.Id == playerId);
-            if(target == null)
+            if (target == null)
             {
                 EPlayer.Error(player, Translate(player, "ERROR_NO_LONGER_CONNECTED_LOGGED"));
                 return;
             }
-            if(target.GetSharedData<int>("InLobby") != EPlayer.GetAccount(player).SQL_ID + 50000)
+            if (target.GetSharedData<int>("InLobby") != EPlayer.GetAccount(player).SQL_ID + 50000)
             {
                 EPlayer.Error(player, "That player is not in your lobby!");
                 return;
@@ -5711,7 +5716,7 @@ namespace RNC
                 return;
             }
 
-            LobbyData target = Settings.Lobbies.FirstOrDefault(l => l.PlayerCreated && l.lobbyId == (acc.SQL_ID+50000) && l.LobbyOwnerSQLID == acc.SQL_ID);
+            LobbyData target = Settings.Lobbies.FirstOrDefault(l => l.PlayerCreated && l.lobbyId == (acc.SQL_ID + 50000) && l.LobbyOwnerSQLID == acc.SQL_ID);
             if (target == null)
             {
                 EPlayer.Error(player, "That lobby does not exist OR you don't have permission to delete it!");
@@ -5749,12 +5754,12 @@ namespace RNC
             }
 
             LobbyData target = Settings.Lobbies.FirstOrDefault(l => l.PlayerCreated && l.lobbyId == lobbyId && l.LobbyOwnerSQLID == acc.SQL_ID);
-            if(target == null)
+            if (target == null)
             {
                 EPlayer.Error(player, "That lobby does not exist OR you don't have permission to delete it!");
                 return;
             }
-            if(target.gameStatus == 1)
+            if (target.gameStatus == 1)
             {
                 EPlayer.Error(player, "There's currently a game running in that lobby!");
                 return;
@@ -5798,7 +5803,7 @@ namespace RNC
             Account _a = EPlayer.GetAccount(player);
             Task.Run(async () =>
             {
-                if(await EPlayer.HasOwnedVehicle(_a, model, teamID))
+                if (await EPlayer.HasOwnedVehicle(_a, model, teamID))
                 {
                     NAPI.Task.Run(() =>
                     {
@@ -5846,7 +5851,7 @@ namespace RNC
                     donoLevel = 3;
                     break;
             }
-            if(EPlayer.GetAccount(player).DonatorPoints < packagePrice)
+            if (EPlayer.GetAccount(player).DonatorPoints < packagePrice)
             {
                 EPlayer.Error(player, "You don't have enough Diamond Points for this!");
                 return;
@@ -5936,7 +5941,7 @@ namespace RNC
                     break;
             }
 
-            if(EPlayer.GetAccount(player).DonatorPoints < packagePrice)
+            if (EPlayer.GetAccount(player).DonatorPoints < packagePrice)
             {
                 EPlayer.Error(player, Translate(player, "ERROR_NOT_ENOUGH_POINTS", EPlayer.GetAccount(player).DonatorPoints - packagePrice));
                 return;
@@ -6126,7 +6131,7 @@ namespace RNC
         [RemoteEvent("MenuSelectedVehicle")]
         public void OnMenuVehicleSelect(Player player, string model, int team)
         {
-            if(Settings.Cars.Where(a => a.Model.Equals(model, StringComparison.OrdinalIgnoreCase) && a.Team == team).Count() == 0 || team > 1 || team < 0)
+            if (Settings.Cars.Where(a => a.Model.Equals(model, StringComparison.OrdinalIgnoreCase) && a.Team == team).Count() == 0 || team > 1 || team < 0)
             {
                 EPlayer.Notify(player, "An unknown error has occured. Bad juju?!", "red", "fas fa-ban", false, 2000, "bottomCenter", "replace");
                 return;
@@ -6211,7 +6216,7 @@ namespace RNC
 
                 }
             });
-            
+
             return;
         }
 
@@ -6310,7 +6315,7 @@ namespace RNC
             Account acc = EPlayer.GetAccount(player);
             LoadoutData loadout = Settings.Loadouts.ToList().Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && a.Team == team);
 
-            if(loadout.Name == "Negotiator")
+            if (loadout.Name == "Negotiator")
             {
                 if (EPlayer.GetAccount(player).DiscordID == "n/a")
                 {
@@ -6387,7 +6392,7 @@ namespace RNC
                     });
                 }
             });
-            
+
             return;
         }
         public async Task<List<object[]>> Menu_OwnedLoadoutData(Account acc)
@@ -6510,21 +6515,21 @@ namespace RNC
                         });
                     });
                     break;
-                    /*
-                case "inventory":
-                    Task.Run(async () =>
-                    {
-                        List<object[]> loadoutData = await Menu_OwnedLoadoutData(acc);
-                        List<object[]> vehData = await Menu_OwnedVehicleData(acc);
+                /*
+            case "inventory":
+                Task.Run(async () =>
+                {
+                    List<object[]> loadoutData = await Menu_OwnedLoadoutData(acc);
+                    List<object[]> vehData = await Menu_OwnedVehicleData(acc);
 
-                        NAPI.Task.Run(() =>
-                        {
-                            player.TriggerEvent("UpdateMenuOwnedVehicles", NAPI.Util.ToJson(vehData), EPlayer.GetAccount(player).CarCop, EPlayer.GetAccount(player).CarFugitive);
-                            player.TriggerEvent("UpdateMenuOwnedLoadouts", NAPI.Util.ToJson(loadoutData), EPlayer.GetAccount(player).LoadoutCop, EPlayer.GetAccount(player).LoadoutFugitive);
-                        });
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("UpdateMenuOwnedVehicles", NAPI.Util.ToJson(vehData), EPlayer.GetAccount(player).CarCop, EPlayer.GetAccount(player).CarFugitive);
+                        player.TriggerEvent("UpdateMenuOwnedLoadouts", NAPI.Util.ToJson(loadoutData), EPlayer.GetAccount(player).LoadoutCop, EPlayer.GetAccount(player).LoadoutFugitive);
                     });
-                    break;
-                    */
+                });
+                break;
+                */
                 case "profile":
                     OnRequestUpdateUnlockedAchievements(player);
                     break;
@@ -6548,7 +6553,7 @@ namespace RNC
             {
                 List<UnlockedAchievement> unlockedAchievements = await EPlayer.GetUnlockedAchievements(acc);
                 List<MenuAchievementObject> menuAchievements = new List<MenuAchievementObject>();
-                foreach(Achievement ach in Settings.Achievements)
+                foreach (Achievement ach in Settings.Achievements)
                 {
                     UnlockedAchievement unlockedCheck = unlockedAchievements.FirstOrDefault(a => a.Achievement == ach.Code);
 
@@ -6575,7 +6580,7 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
             Account acc = EPlayer.GetAccount(player);
-            if(status == true) // OPEN: Update lobby data and everything else.
+            if (status == true) // OPEN: Update lobby data and everything else.
             {
             }
             else // CLOSE: Anything you want when menu gets closed.
@@ -6649,7 +6654,7 @@ namespace RNC
             {
                 if (player.GetSharedData<int>("Team") != 0) return;
 
-                player.SetSharedData("TaseProtection", true); 
+                player.SetSharedData("TaseProtection", true);
                 EPlayer.Notify(player, Translate(player, "TASE_PROTECTION"), "yellow", "fas fa-hourglass", false, 5000, "topCenter", "replace");
             }
             else
@@ -6667,14 +6672,14 @@ namespace RNC
 
             if (player.GetSharedData<int>("Team") == 0 && player.GetSharedData<int>("InLobby") > 0)
             {
-				if(player.IsInVehicle && player.Vehicle.HasSharedData("Team") && player.Vehicle.GetSharedData<int>("Team") == 1)
-				{
+                if (player.IsInVehicle && player.Vehicle.HasSharedData("Team") && player.Vehicle.GetSharedData<int>("Team") == 1)
+                {
                     player.SetSharedData("VisibleBlip", true);
                 }
-				if(player.GetSharedData<bool>("HasShot") == true)
-				{
-					player.SetSharedData("VisibleBlip", true);
-				}
+                if (player.GetSharedData<bool>("HasShot") == true)
+                {
+                    player.SetSharedData("VisibleBlip", true);
+                }
             }
 
             player.SetSharedData("UnstreamedX", player.Position.X);
@@ -6832,7 +6837,8 @@ namespace RNC
         public static void UpdateVehicleFuel(Player player, float fuel, ushort vehicle_id = 65535)
         {
             Vehicle vehicle = null;
-            if(vehicle_id == 65535) {
+            if (vehicle_id == 65535)
+            {
                 if (!player.IsInVehicle) return;
                 vehicle = player.Vehicle;
             }
@@ -6845,7 +6851,7 @@ namespace RNC
 
             vehicle.SetSharedData("Fuel", fuel);
 
-            if(fuel <= 0.0)
+            if (fuel <= 0.0)
             {
                 vehicle.EngineStatus = false;
                 vehicle.SetSharedData("Engine", false);
@@ -6859,29 +6865,6 @@ namespace RNC
         {
             try
             {
-                if (new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() >= Settings.Dynamics.NextMonthUnix)
-                {
-                    Task.Run(async () =>
-                    {
-                        using (MainDatabase context = ContextFactory.CreateContext())
-                        {
-                            List<Logs_Session> seslog = await context.Logs_Session.AsQueryable().ToListAsync();
-                            context.Logs_Session.RemoveRange(seslog);
-                            List<Logs_Admin> adlog = await context.Logs_Admin.AsQueryable().ToListAsync();
-                            context.Logs_Admin.RemoveRange(adlog);
-
-
-                            await context.SaveChangesAsync();
-                            NAPI.Task.Run(() =>
-                            {
-                                Settings.Dynamics.NextMonthUnix = new DateTimeOffset(DateTime.Now).AddMonths(1).ToUnixTimeSeconds();
-                                NAPI.Util.ConsoleOutput("[1 MONTH] Server logs [Admin, Session] have been cleared!");
-                                Main.SaveDynamicSettings();
-                            });
-                        }
-                    });
-                    
-                }
                 if (new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() >= Settings.Dynamics.NextWeekUnix)
                 {
                     // CHECKING FOR CLAN OF THE WEEK, RESETTING ALL CLANS' WEEKLY KILLS
@@ -6891,7 +6874,7 @@ namespace RNC
                         {
                             int mostKill = await context.Clans.AsQueryable().MaxAsync(c => c.WeekKills);
                             Clan mostKills = null;
-                            if(mostKill > 0)
+                            if (mostKill > 0)
                             {
                                 mostKills = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.WeekKills == mostKill);
                             }
@@ -6963,7 +6946,7 @@ namespace RNC
                             });
                         }
                     });
-          
+
                     Settings.Dynamics.NextWeekUnix = new DateTimeOffset(DateTime.Now).AddDays(7).ToUnixTimeSeconds();
 
                     foreach (Player pl in NAPI.Pools.GetAllPlayers())
@@ -7014,26 +6997,26 @@ namespace RNC
             else
                 EPlayer.Notify(player, Translate(player, "AUTO_LOGIN_OFF"), "red", "fa-solid fa-user-xmark", true, 4000);
 
-                /*
-                Task.Run(async () =>
+            /*
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    using (MainDatabase context = ContextFactory.CreateContext())
-                    {
-                        Account acc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(player.Name, StringComparison.OrdinalIgnoreCase));
-                        if (acc == null) return;
-                        acc.AutoLogin = toggle;
+                    Account acc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(player.Name, StringComparison.OrdinalIgnoreCase));
+                    if (acc == null) return;
+                    acc.AutoLogin = toggle;
 
-                        NAPI.Task.Run(() =>
-                        {
-                            if (toggle)
-                                EPlayer.Notify(player, "You turned Auto Login on! You will no longer need to enter your login info on this account.", "green", "fa-solid fa-user-check", true, 4000);
-                            else
-                                EPlayer.Notify(player, "You turned Auto Login off! You will now have to enter your login info when you connect.", "red", "fa-solid fa-user-xmark", true, 4000);
-                        });
-                    }
-                });
-                */
-            }
+                    NAPI.Task.Run(() =>
+                    {
+                        if (toggle)
+                            EPlayer.Notify(player, "You turned Auto Login on! You will no longer need to enter your login info on this account.", "green", "fa-solid fa-user-check", true, 4000);
+                        else
+                            EPlayer.Notify(player, "You turned Auto Login off! You will now have to enter your login info when you connect.", "red", "fa-solid fa-user-xmark", true, 4000);
+                    });
+                }
+            });
+            */
+        }
 
         [RemoteEvent("ReplaceAFKDriver")]
         public static void ReplaceAFKDriver(Player player)
@@ -7153,7 +7136,7 @@ namespace RNC
                         if (await context.Accounts.AsQueryable().CountAsync(a => a.RegisterHWID.Equals(pSerial) || a.RegisterRID == pSCID) >= 2)
                         {
                             NAPI.Util.ConsoleOutput($"(RnC | REGISTER) {username} attempted to register, they have 2 or more accounts already!");
-                        
+
                             reachedAccountLimit = true;
                             return;
                         }
@@ -7306,7 +7289,7 @@ namespace RNC
 
             if (player.HasData("ViewingLoadoutSelector") && player.GetData<bool>("ViewingLoadoutSelector") == true)
             {
-                if(team == 0)
+                if (team == 0)
                 {
                     if (ldname.StartsWith("default", StringComparison.OrdinalIgnoreCase))
                     {
@@ -7331,7 +7314,7 @@ namespace RNC
                     EPlayer.GetAccount(player).LoadoutFugitive = loadout.Name;
                     player.SendChatMessage(Translate(player, "FUGI_LOADOUT", loadout.Name));
                 }
-                else if(team == 1)
+                else if (team == 1)
                 {
                     if (ldname.StartsWith("default", StringComparison.OrdinalIgnoreCase))
                     {
@@ -7433,7 +7416,7 @@ namespace RNC
 
             int playerTeam = player.GetSharedData<int>("Team");
             int targetTeam = target.GetSharedData<int>("Team");
-            if(targetTeam != -1)
+            if (targetTeam != -1)
             {
                 if (playerTeam == targetTeam) return;
                 if (targetTeam == 0 && playerTeam == 1 && target.GetSharedData<bool>("HasShot") == false) return;
@@ -7467,7 +7450,7 @@ namespace RNC
                 ARtoset = 0;
                 HPtoset = targetHealth - diff;
             }
-            if(damageToDeal > 0)
+            if (damageToDeal > 0)
                 SetIsPlayerDamaged(target);
 
             player.TriggerEvent("showDamageIndicatorOnPosition", damageToDeal, target, boneIndex, armorStatus);
@@ -7477,7 +7460,7 @@ namespace RNC
             {
                 HPtoset = 0;
 
-                if(targetTeam != -1 && target.GetSharedData<int>("Wounded") == 0)
+                if (targetTeam != -1 && target.GetSharedData<int>("Wounded") == 0)
                 {
                     //OnPlayerWounded(target, 1, player.Id);
                     target.TriggerEvent("setWounded", 1, player.Id);
@@ -7597,7 +7580,7 @@ namespace RNC
             }
 
 
-            if(target.GetSharedData<int>("Team") >= 0 && target.GetSharedData<int>("Wounded") == 1)
+            if (target.GetSharedData<int>("Team") >= 0 && target.GetSharedData<int>("Wounded") == 1)
             {
                 target.Health = 100;
             }
@@ -7606,7 +7589,7 @@ namespace RNC
                 target.SetSharedData("Bleeding_WasShot", true);
                 target.TriggerEvent("Bleeding_RequestShot");
 
-                if(target.GetSharedData<int>("Wounded") == 2)
+                if (target.GetSharedData<int>("Wounded") == 2)
                 {
                     target.Health = 0;
                 }
@@ -7638,7 +7621,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player)) return;
             if (player.GetSharedData<int>("InLobby") != -4) return;
 
-            if(Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() < 2)
+            if (Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count() < 2)
             {
                 player.SetSharedData("DerbyTime", 0);
             }
@@ -7647,7 +7630,7 @@ namespace RNC
                 int highestDerbyTime = 0;
                 foreach (Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
                 {
-                    if(p.GetSharedData<int>("DerbyTime") > highestDerbyTime) highestDerbyTime = p.GetSharedData<int>("DerbyTime");
+                    if (p.GetSharedData<int>("DerbyTime") > highestDerbyTime) highestDerbyTime = p.GetSharedData<int>("DerbyTime");
                 }
                 Settings.DerbyTimeLeft = 180 - highestDerbyTime;
             }
@@ -7743,7 +7726,7 @@ namespace RNC
 
             target.Health = 50;
             target.SendChatMessage(Translate(target, "REVIVED_MSG"));
-            
+
             //target.StopAnimation();
             RequestPlayAnimation(target, "amb@world_human_push_ups@male@exit", "exit", 0, 9);
             NAPI.Util.ConsoleOutput("OnRevivePlayer " + EPlayer.Name(player) + " " + EPlayer.Name(target));
@@ -7781,7 +7764,7 @@ namespace RNC
         public void OnAssignReviveTarget(Player player, int remoteId)
         {
             Player target = RAGE.Entities.Players.All.Find(p => p.Id == remoteId);
-            if(target == null)
+            if (target == null)
             {
                 return;
             }
@@ -7825,7 +7808,7 @@ namespace RNC
                 player.TriggerEvent("UpdateMenuStatsTab", acc.Email, EPlayer.GetAdminLevelName(acc.Admin, false), acc.Points, acc.DonatorPoints, EPlayer.GetDonatorLevelName(acc.DonatorLevel, false), acc.DerbyWins,
                     acc.Escapes, acc.Arrests, acc.Kills, acc.Deaths, KDR, (acc.MinutesPlayed / 60.0).ToString("N3"), acc.Warns, discordLinked);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 player.TriggerEvent("UpdateMenuStatsTab", acc.Email, EPlayer.GetAdminLevelName(acc.Admin, false), acc.Points, acc.DonatorPoints, EPlayer.GetDonatorLevelName(acc.DonatorLevel, false), acc.DerbyWins,
                     acc.Escapes, acc.Arrests, acc.Kills, acc.Deaths, KDR, (acc.MinutesPlayed / 60.0).ToString("N3"), acc.Warns, false);
@@ -7839,7 +7822,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player)) return;
 
             ItemData item = ItemData.Items.FirstOrDefault(i => i.ID == ID);
-            if(item == null)
+            if (item == null)
             {
                 EPlayer.Error(player, $"Invalid item: <strong>{ID}</strong>! Report this to the devs.");
                 return;
@@ -7869,7 +7852,7 @@ namespace RNC
 
                         EPlayer.GetAccount(player).Medkits++;
                         EPlayer.Save(player, false);
-                        player.TriggerEvent("UpdateMenuItem", ID, EPlayer.GetAccount(player).Medkits);                   
+                        player.TriggerEvent("UpdateMenuItem", ID, EPlayer.GetAccount(player).Medkits);
                         break;
                     }
                 case "Painkiller":
@@ -7903,7 +7886,7 @@ namespace RNC
 
                         EPlayer.GetAccount(player).Lockpicks++;
                         EPlayer.Save(player, false);
-                        player.TriggerEvent("UpdateMenuItem", ID, EPlayer.GetAccount(player).Lockpicks);              
+                        player.TriggerEvent("UpdateMenuItem", ID, EPlayer.GetAccount(player).Lockpicks);
                         break;
                     }
             }
@@ -7922,19 +7905,20 @@ namespace RNC
                 player.SendChatMessage(Translate(player, "LOCKPICK_FAIL_NO_CAR"));
                 return;
             }
-            if(veh.Locked == false || veh.GetSharedData<bool>("Locked") == false)
+            if (veh.Locked == false || veh.GetSharedData<bool>("Locked") == false)
             {
                 player.SendChatMessage(Translate(player, "LOCKPICK_FAIL_NOT_LOCKED"));
                 return;
             }
 
             LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
-            foreach (Player playa in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId)){
+            foreach (Player playa in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
+            {
                 playa.TriggerEvent("lockpick_vehicleAlarm", veh, (playa.Id == player.Id), result);
             }
             veh.EngineStatus = false;
             veh.SetSharedData("Engine", false);
-            if(result == true)
+            if (result == true)
             {
                 veh.Locked = false;
                 veh.SetSharedData("Locked", false);
@@ -8016,7 +8000,7 @@ namespace RNC
             if (identifier != -1)
             {
                 Player admin = Settings.LoggedInPlayers.Find(a => a.GetSharedData<int>("SQL_ID") == identifier);
-                if(admin != null)
+                if (admin != null)
                 {
                     if (result == 1)
                     {
@@ -8027,7 +8011,7 @@ namespace RNC
                     else
                     {
                         admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}The screenshot of !{#FF6347}" + player.Name + "'s !{#FFFFFF}game has failed to upload.");
-                        if(data != "0")
+                        if (data != "0")
                             admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Error Details: " + data);
                         else admin.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Error Details: Screenshot server cannot be reached!");
                     }
@@ -8096,7 +8080,7 @@ namespace RNC
             EPlayer.GetAccount(player).Arrests++;
             EPlayer.GivePoints(player, 5);
 
-            if(EPlayer.GetAccount(player).Arrests >= 100)
+            if (EPlayer.GetAccount(player).Arrests >= 100)
             {
                 EPlayer.UnlockAchievement(player, "100_arrests");
             }
@@ -8128,7 +8112,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(fugitive)) return;
 
             if (fugitive.GetSharedData<float>("BustedProgress") == -1.0) return;
-            
+
             LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == fugitive.GetSharedData<int>("InLobby"));
             if (lobby == null) return;
 
@@ -8235,11 +8219,12 @@ namespace RNC
             {
                 veh.WheelColor = mod;
             }
-            else if(slot == 56)
+            else if (slot == 56)
             {
                 veh.WheelType = mod;
             }
-            else {
+            else
+            {
                 if (mod == -1) veh.SetMod(slot, -1);
                 else veh.SetMod(slot, mod);
             }
@@ -8305,7 +8290,7 @@ namespace RNC
             {
                 player.TriggerEvent("UpdateTunerPrice", $"Buy: {((items != 0) ? ($"{items * 10} Donator Points") : ("N/A"))}", $"{(items == 0 ? "No" : items.ToString())} components changed.", 235, 205, 12);
             }
-            else player.TriggerEvent("UpdateTunerPrice", $"Buy: {((items != 0) ? ($"{items * 50} Points") : ("N/A") )}", $"{(items == 0 ? "No" : items.ToString())} components changed.", 220, 10, 10);
+            else player.TriggerEvent("UpdateTunerPrice", $"Buy: {((items != 0) ? ($"{items * 50} Points") : ("N/A"))}", $"{(items == 0 ? "No" : items.ToString())} components changed.", 220, 10, 10);
         }
 
         [RemoteEvent("RequestSaveVehicleMod")]
@@ -8340,7 +8325,7 @@ namespace RNC
                                     EPlayer.Notify(player, Translate(player, "REMOVE_COMPONENTS_WARNING"), "red", "fas fa-exclamation", false, 2500, "topCenter", "replace");
                                     return;
                                 }
-                            });                
+                            });
                             context.PlayerTunings.Remove(tuning);
                         }
                     }
@@ -8437,7 +8422,7 @@ namespace RNC
                                 NAPI.Task.Run(() =>
                                 {
                                     EPlayer.Notify(player, Translate(player, "TUNING_SAVED"), "green", "fas fa-check", false, 2500, "topCenter");
-                                });                           
+                                });
                                 tuning.PrimaryColor = priCol;
                                 tuning.SecondaryColor = secCol;
                                 tuning.PearlescentColor = pearlCol;
@@ -8454,7 +8439,7 @@ namespace RNC
                     await context.SaveChangesAsync();
                 }
             });
-            
+
         }
 
         [ServerEvent(Event.PlayerSpawn)]
@@ -8475,7 +8460,7 @@ namespace RNC
                 player.TriggerEvent("ApplyTattoos", player.GetSharedData<string>("TattooList"));
             }
 
-            if(player.GetSharedData<string>("PlayedAnimation") != "NULL")
+            if (player.GetSharedData<string>("PlayedAnimation") != "NULL")
             {
                 OnStopAnimPositioner(player);
             }
@@ -8491,7 +8476,7 @@ namespace RNC
             player.ResetSharedData("UpdateCameraData");
             player.SetSharedData("Collisions", true); // Reset collision from chase.
             player.SetSharedData("ClimbProtection", false);
-            player.SetData("LastClimbProtection", Environment.TickCount64-30000);
+            player.SetData("LastClimbProtection", Environment.TickCount64 - 30000);
             player.SetData("ClimbProtectionProcs", 0);
             player.ResetData("DraggingOut");
 
@@ -8606,7 +8591,7 @@ namespace RNC
                 player.SetSharedData("VisibleBlip", false);
 
                 if (player.GetSharedData<int>("InDM") == -1) player.TriggerEvent("SetActorInvulnerable", true);
-          
+
                 player.TriggerEvent("ToggleAFOB", false, 0);
                 player.TriggerEvent("showHPBars", 0); // Never show HP Bars.
 
@@ -8620,7 +8605,7 @@ namespace RNC
 
                     Settings.FreeroamSpawns.ForEach(spawn =>
                     {
-                        if(spawn.ID == player.GetData<uint>("FreeroamWorld"))
+                        if (spawn.ID == player.GetData<uint>("FreeroamWorld"))
                         {
                             spawnCoords = spawn;
                         }
@@ -8750,7 +8735,7 @@ namespace RNC
                         }
                     }
 
-                    
+
                     int arenaID = player.GetSharedData<int>("InDM");
                     /*
                     if (arenaID > -1 && lobby != null && lobby.gameStatus == 2)
