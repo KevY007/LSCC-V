@@ -123,15 +123,15 @@ namespace RNC
             if (guild == null) return;
 
             // Commands
-            commands.Add(new CommandDefinition(new SlashCommandBuilder().WithName("ping").WithDescription("Ping the server").Build(), PingCommandHandler));
+            commands.Add(new CommandDefinition(new SlashCommandBuilder().WithName("players").WithDescription("View online players.").Build(), PlayersCommandHandler));
 
             await guild.BulkOverwriteApplicationCommandAsync(commands.Select(cmd => cmd.Meta).ToArray());
         }
 
         // Commands
-        private static async Task PingCommandHandler(SocketSlashCommand command)
+        private static async Task PlayersCommandHandler(SocketSlashCommand command)
         {
-            await command.RespondAsync("Pong!");
+            await command.RespondAsync($"Players: {RAGE.Entities.Players.Count}");
         }
     }
     class CommandDefinition
