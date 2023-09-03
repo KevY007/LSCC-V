@@ -2693,6 +2693,7 @@ namespace RNC
 
                             Settings.Timers.GameUpdate_Tick = Environment.TickCount64 + 1000;
                             Settings.Timers.TimeUpdate_Tick = Environment.TickCount64 + 1000;
+
                         });
                     }
                     catch (Exception ex)
