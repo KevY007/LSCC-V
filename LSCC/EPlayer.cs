@@ -449,6 +449,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player)) return;
 
             player.SetSharedData("CharCreator_ShowClothingAfter", showClothingAfter);
+
             player.TriggerEvent("DestroyPlayerCamera");
             player.SetData("Creator_Using", true);
 
@@ -1892,6 +1893,151 @@ namespace RNC
             }
             return false;
         }
+        public static CharacterData ResetAllPlayerClothing(Player player, CharacterData characterData)
+        {
+            EPlayer.Notify(player, "You can use <strong>/clothing</strong> to edit your character's clothing!", "blue", "", false, 7500);
+            CharacterData ConvChar = characterData;
+            try
+            {
+                for (int arrayID = 0; arrayID < 4; arrayID++)
+                {
+                    for (int i = 0; i <= 11; i++)
+                    {
+                        if (i == 0 || i == 2) continue;
+
+                        ConvChar.Clothing[arrayID].Clothes[i].Drawable = -1;
+                        ConvChar.Clothing[arrayID].Clothes[i].Texture = 0;
+                    }
+                    switch (arrayID)
+                    {
+                        case 0:
+                            ConvChar.Clothing[arrayID].Clothes[8].Drawable = 15;
+                            ConvChar.Clothing[arrayID].Clothes[8].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[3].Drawable = 0;
+                            ConvChar.Clothing[arrayID].Clothes[3].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[11].Drawable = 0;
+                            ConvChar.Clothing[arrayID].Clothes[11].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[4].Drawable = 0;
+                            ConvChar.Clothing[arrayID].Clothes[4].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[6].Drawable = 1;
+                            ConvChar.Clothing[arrayID].Clothes[6].Texture = 0;
+                            
+                            break;
+                        case 1:
+                            ConvChar.Clothing[arrayID].Clothes[8].Drawable = 15;
+                            ConvChar.Clothing[arrayID].Clothes[8].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[3].Drawable = 0;
+                            ConvChar.Clothing[arrayID].Clothes[3].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[11].Drawable = 55;
+                            ConvChar.Clothing[arrayID].Clothes[11].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[4].Drawable = 35;
+                            ConvChar.Clothing[arrayID].Clothes[4].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[6].Drawable = 25;
+                            ConvChar.Clothing[arrayID].Clothes[6].Texture = 0;
+                            break;
+                        case 2:
+                            ConvChar.Clothing[arrayID].Clothes[8].Drawable = 15;
+                            ConvChar.Clothing[arrayID].Clothes[8].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[3].Drawable = 0;
+                            ConvChar.Clothing[arrayID].Clothes[3].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[11].Drawable = 0;
+                            ConvChar.Clothing[arrayID].Clothes[11].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[4].Drawable = 0;
+                            ConvChar.Clothing[arrayID].Clothes[4].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[6].Drawable = 1;
+                            ConvChar.Clothing[arrayID].Clothes[6].Texture = 0;
+                            
+                            break;
+                        case 3:
+                            ConvChar.Clothing[arrayID].Clothes[8].Drawable = 15;
+                            ConvChar.Clothing[arrayID].Clothes[8].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[3].Drawable = 0;
+                            ConvChar.Clothing[arrayID].Clothes[3].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[11].Drawable = 48;
+                            ConvChar.Clothing[arrayID].Clothes[11].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[4].Drawable = 34;
+                            ConvChar.Clothing[arrayID].Clothes[4].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[6].Drawable = 25;
+                            ConvChar.Clothing[arrayID].Clothes[6].Texture = 0;
+                            break;
+                    }
+                }
+                return ConvChar;
+            }
+            catch
+            {
+                EPlayer.ShowCharCreator(player, null, true);
+                return null;
+            }
+        }
+        public static CharacterData ResetAllPlayerClothing(Player player)
+        {
+            try
+            {
+                CharacterData ConvChar = new CharacterData();
+                ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
+
+                for(int arrayID = 0; arrayID < 4; arrayID++)
+                {
+                    for (int i = 0; i <= 11; i++)
+                    {
+                        if (i == 0 || i == 2) continue;
+
+                        ConvChar.Clothing[arrayID].Clothes[i].Drawable = -1;
+                        ConvChar.Clothing[arrayID].Clothes[i].Texture = 0;
+                    }
+                    switch (arrayID)
+                    {
+                        case 0:
+                            ConvChar.Clothing[arrayID].Clothes[3].Drawable = 0;
+                            ConvChar.Clothing[arrayID].Clothes[3].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[11].Drawable = 55;
+                            ConvChar.Clothing[arrayID].Clothes[11].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[4].Drawable = 126;
+                            ConvChar.Clothing[arrayID].Clothes[4].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[6].Drawable = 25;
+                            ConvChar.Clothing[arrayID].Clothes[6].Texture = 0;
+                            break;
+                        case 1:
+                            ConvChar.Clothing[arrayID].Clothes[3].Drawable = 0;
+                            ConvChar.Clothing[arrayID].Clothes[3].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[11].Drawable = 0;
+                            ConvChar.Clothing[arrayID].Clothes[11].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[4].Drawable = 0;
+                            ConvChar.Clothing[arrayID].Clothes[4].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[6].Drawable = 1;
+                            ConvChar.Clothing[arrayID].Clothes[6].Texture = 0;
+                            break;
+                        case 2:
+                            ConvChar.Clothing[arrayID].Clothes[3].Drawable = 0;
+                            ConvChar.Clothing[arrayID].Clothes[3].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[11].Drawable = 48;
+                            ConvChar.Clothing[arrayID].Clothes[11].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[4].Drawable = 135;
+                            ConvChar.Clothing[arrayID].Clothes[4].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[6].Drawable = 25;
+                            ConvChar.Clothing[arrayID].Clothes[6].Texture = 0;
+                            break;
+                        case 3:
+                            ConvChar.Clothing[arrayID].Clothes[3].Drawable = 0;
+                            ConvChar.Clothing[arrayID].Clothes[3].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[11].Drawable = 0;
+                            ConvChar.Clothing[arrayID].Clothes[11].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[4].Drawable = 0;
+                            ConvChar.Clothing[arrayID].Clothes[4].Texture = 0;
+                            ConvChar.Clothing[arrayID].Clothes[6].Drawable = 1;
+                            ConvChar.Clothing[arrayID].Clothes[6].Texture = 0;
+                            break;
+                    }
+                }
+                return ConvChar;
+            }
+            catch
+            {
+                EPlayer.ShowCharCreator(player, null, true);
+                return null;
+            }
+        }
 
         public static void LoginCameraSetup(Player player)
         {
@@ -2464,7 +2610,11 @@ namespace RNC
 
                     EPlayer.ApplyCharacter(player, ConvChar, EPlayer.GetAccount(player).LobbyClothing);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    NAPI.Util.ConsoleOutput($"Failed to set character data on Spawn!");
+                    NAPI.Util.ConsoleOutput($"{ex.ToString()}");
+                }
 
                 Vector3 SpawnArea = Settings.LobbySpawns.OrderBy(c => Guid.NewGuid()).First();
 

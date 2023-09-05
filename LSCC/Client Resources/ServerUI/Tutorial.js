@@ -4,6 +4,7 @@ mp.events.add("StartTutorial", () => {
     if(global.ServerUI == null) return;
     global.IsInTutorial = true;
 
+    /*
     var TutorialQuestions = [
         {
             type: 1,
@@ -104,6 +105,11 @@ mp.events.add("StartTutorial", () => {
     pos.x += 20;
     pos.y += 20;
     mp.players.local.position = pos;
+    */
+
+    setTimeout(() => {
+        mp.events.callLocal('OnFinishTutorial', '[null, true, "English"]');
+    }, 100);
 });
 // Results come in an array where INDEXES are in ORDER of QUESTIONS SET IN THE FIRST ARRAY [StartTutorial]
 /* Values: [true, 3, ....]... [
@@ -136,12 +142,12 @@ mp.events.add("OnFinishTutorial", (results) => {
 
 /*
 Camera X Y Z:
-1290.44897
-478.5669
-171.23333
+977.969
+701.1895
+200
 
 Rotation XYZ:
-38.715
+-8.83
 0
--139.536
+144.452
 */

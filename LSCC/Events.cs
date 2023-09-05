@@ -3531,6 +3531,9 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
+            EPlayer.GetAccount(player).FinishedTutorial = true;
+            EPlayer.Save(player, false);
+
             int voiceMode = (useVoice ? 0 : 4);
             OnSetVoiceMode(player, voiceMode, false);
             player.TriggerEvent("setVoiceModeMenu", voiceMode);
@@ -3549,13 +3552,12 @@ namespace RNC
                 ConvChar.Clothing[2] = new ClothingData(0, 1); // Fugitive FEMALE
                 ConvChar.Clothing[3] = new ClothingData(1, 1); // Cop FEMALE
 
-
                 player.SetData("cEditClothingData", ConvChar.Clothing);
                 EPlayer.ShowCharCreator(player, ConvChar, true);
             }
             catch { EPlayer.ShowCharCreator(player, null, true); }
 
-        }
+        }        
 
         [RemoteEvent("SpectateChangeHPAR")]
         public static void SpectateHPARChange(Player player, int health, int armour)
@@ -4093,35 +4095,58 @@ namespace RNC
 
             if (player.HasSharedData("CharCreator_ShowClothingAfter") && player.GetSharedData<bool>("CharCreator_ShowClothingAfter") == true)
             {
-                EPlayer.GetAccount(player).Character = NAPI.Util.ToJson(pChar);
-                EPlayer.ApplyCharacter(player, pChar);
-                EPlayer.Save(player);
+                //EPlayer.GetAccount(player).Character = NAPI.Util.ToJson(pChar);
+                //EPlayer.ApplyCharacter(player, pChar);
+                //EPlayer.Save(player);
+                //
+                //player.SetData("Creator_Using", false);
+                //
+                //EPlayer.Notify(player, "Character Creation - Clothing", "You will now have to edit the clothing for each team.");
+                //
+                //try
+                //{
+                //    EPlayer.ApplyCharacter(player, pChar, 1);
+                //}
+                //catch { return; }
+                //player.SetData<CharacterData>("CharacterBeforeEdit", pChar);
+                //player.SetData("EditingClothing", 1);
+                //player.SetData("LastEditedClothingTeam", 1);
+                //int genderr = Convert.ToInt32(pChar.Gender);
+                //string genderChar = "M";
+                //if (genderr == 1) genderChar = "F";
+                //
+                //int clothingDataID = (gender == 1 ? 3 : 1);
+                //string clothingInfo = NAPI.Util.ToJson(pChar.Clothing[clothingDataID]);
+                //player.TriggerEvent("creator_SetClothingPhase");
+                //player.TriggerEvent("ClothingEditor:show", 1, genderChar, clothingInfo, true);
+
+                CharacterData fullChar = EPlayer.ResetAllPlayerClothing(player, pChar);
+
+                EPlayer.GetAccount(player).Character = NAPI.Util.ToJson(fullChar);
+
+                EPlayer.ApplyCharacter(player, fullChar);
 
                 player.SetData("Creator_Using", false);
+                player.TriggerEvent("toggleCreator", false);
 
-                EPlayer.Notify(player, "Character Creation - Clothing", "You will now have to edit the clothing for each team.");
+                EPlayer.Save(player);
 
-                try
+                EPlayer.Spawn(player);
+
+                //player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You can edit your character's clothing with /char clothing.");
+
+                if (EPlayer.GetAccount(player).Level == 1 && EPlayer.GetAccount(player).XP < 2)
                 {
-                    EPlayer.ApplyCharacter(player, pChar, 1);
+                    player.SendChatMessage(Translate(player, "REGISTER_GET_STARTED"));
+                    EPlayer.Notify(player, Translate(player, "DISCORD_VERIFY_NOTIF"), "blue", "fas fa-exclamation-circle", false, 15000, "topCenter");
                 }
-                catch { return; }
-                player.SetData<CharacterData>("CharacterBeforeEdit", pChar);
-                player.SetData("EditingClothing", 1);
-                player.SetData("LastEditedClothingTeam", 1);
-                int genderr = Convert.ToInt32(pChar.Gender);
-                string genderChar = "M";
-                if (genderr == 1) genderChar = "F";
-
-                int clothingDataID = (gender == 1 ? 3 : 1);
-                string clothingInfo = NAPI.Util.ToJson(pChar.Clothing[clothingDataID]);
-                player.TriggerEvent("creator_SetClothingPhase");
-                player.TriggerEvent("ClothingEditor:show", 1, genderChar, clothingInfo, true);
             }
             else
             {
                 EPlayer.GetAccount(player).Character = NAPI.Util.ToJson(pChar);
                 EPlayer.ApplyCharacter(player, pChar);
+
+                NAPI.Util.ConsoleOutput(EPlayer.GetAccount(player).Character);
 
                 player.SetData("Creator_Using", false);
                 player.TriggerEvent("toggleCreator", false);
@@ -5094,7 +5119,7 @@ namespace RNC
                                 if (acc.Password == "") useOldPassword = true;
                                 NAPI.Task.Run(() =>
                                 {
-                                    if (AccountManager.Login(acc, password, false, true))
+                                    if (AccountManager.Login(acc, password, false, useOldPassword))
                                     {
                                         OnPlayerLogin(player, acc);
                                         return;
