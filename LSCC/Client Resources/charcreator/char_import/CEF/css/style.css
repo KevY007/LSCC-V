@@ -1,0 +1,172 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Roboto+Condensed:wght@300;400&family=Roboto:wght@300;400;500&display=swap');
+
+body{
+    overflow: hidden;
+    height:100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.panel{
+    width:700px;
+    height:500px;
+    border: 2px solid black;
+    border-radius: 12px;
+    background-color: #121212;
+
+    position: relative;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+.panel-header{
+    position: absolute;
+    top:0px;
+
+    text-align: center;
+    width:100%;
+    border-bottom: 1px solid #323232;
+}
+.panel-header > h2{
+    margin:10px;
+    color:#A8A9A9;
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+}
+
+.panel-body{
+    width:650px;
+    height:350px;
+    position: relative;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+.panel-body > textarea{
+    width:100%;
+    height:100%;
+    background: transparent;
+    border-radius: 12px;
+    resize:none;
+    outline: 0px;
+    border:1px solid #505050;
+    transition: 100ms;
+    color:white;
+    font-family: 'Inter', sans-serif;
+
+    padding:10px;
+}
+.panel-body > textarea::placeholder{
+    color:#A8A9A9;
+    font-family: 'Inter', sans-serif;
+    font-size:16px;
+}
+.panel-body > textarea:hover{
+    border:2px solid #A0A0A0;
+}
+.panel-body > textarea:focus{
+    border: 3px solid #66B0FF;
+}
+.panel-body > textarea:focus ~ .floating-label, input:not(:focus):valid ~ .floating-label, 
+.panel-body > textarea:focus ~ .floating-label-top, input:not(:focus):valid ~ .floating-label-top{
+    top: -22px;
+    left: 10px;
+    font-size: 14px;
+    opacity: 1;
+    color:#66B0FF;
+    padding-right:4px;
+    padding-left:4px;
+}
+.floating-label-top{
+    font-family: 'Inter', sans-serif;
+    background-color: #121212;
+    color:#A8A9A9;
+    position: absolute;
+    pointer-events: none;
+    transition: 0.2s ease all;
+
+    top: -22px;
+    left: 10px;
+    font-size: 14px;
+    opacity: 1;
+    padding-right:4px;
+    padding-left:4px;    
+}
+.floating-label {
+    font-family: 'Inter', sans-serif;
+    background-color: #121212;
+    color:#A8A9A9;
+    position: absolute;
+    pointer-events: none;
+    left: 20px;
+    top: 0px;
+    transition: 0.2s ease all;
+  }
+
+.panel-footer{
+    position: absolute;
+    bottom:0px;
+    width:100%;
+    height:50px;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+
+    border-top: 1px solid #323232;
+}
+.panel-footer > button{
+    font-family: 'Inter', sans-serif;
+    font-size:16px;
+    height:32px;
+    border:0px;
+    margin:5px;
+    border-radius: 12px;
+    outline: 0px;
+}
+.button-male{
+    background-color: #60A5FA;
+    transition: 200ms;
+}
+.button-male:hover{
+    background-color: #4d88d1;
+    cursor:pointer;
+}
+.button-female{
+    background-color: #fa60de;
+    transition: 200ms;
+}
+.button-female:hover{
+    background-color: #e359ca;
+    cursor:pointer;
+}
+.button-cancel{
+    background-color: white;
+    transition: 200ms;
+}
+.button-cancel:hover{
+    background-color: #dedfe0;
+    cursor:pointer;
+}
+
+
+::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #393939;
+    cursor: pointer;
+    border-radius: 12px;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }

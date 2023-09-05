@@ -52,6 +52,7 @@ require("./charcreator/outfitslots.js");
 require("./charcreator/clotheditor.js");
 require("./charcreator/tattoo/data.js");
 require("./charcreator/tattoo/menu.js");
+require("./charcreator/char_import/character_import.js");
 require('./mdc_screen/index.js');
 require('./hotwire_game/index.js');
 require('./weaponeditor/index.js');

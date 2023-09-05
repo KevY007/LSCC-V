@@ -1109,6 +1109,7 @@ let global = {
   lastFunc: "Init",
 
   WeaponEditorDOM:null,
+  CharacterImportCEF:null,
 
   curMDCBind: 0x4B,
   lastMDCBind: 0x4B,
