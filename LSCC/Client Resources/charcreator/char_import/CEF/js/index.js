@@ -38,7 +38,7 @@ function updateFloatingLabelStyle(){
     }
 }
 function onButtonPress(type){
-    if(type === 3){
+    if(type === 2){
         mp.trigger('character_import_close');
         return;
     }
@@ -53,6 +53,7 @@ function onButtonPress(type){
             mp.trigger('character_import_data', (type == 0 ? 'M' : 'F'), 'There was an error parsing the file (invalid XML)!');
         }
         else{
+            console.log(JSONObject);
             mp.trigger('character_import_data', (type == 0 ? 'M' : 'F'), fixedJsonResult);
         }
     }
