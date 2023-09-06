@@ -1166,3 +1166,16 @@ mp.keys.bind(0x4a, false, () => {
     }
   }
 });
+
+mp.events.add('request_version_check', () => {
+  if(mp.storage.data.version){
+    mp.events.callRemote('send_version_check', mp.storage.data.version);
+  }
+  else{
+    mp.events.callRemote('send_version_check', '0');
+  }
+});
+mp.events.add('set_version_check', (version) => {
+  mp.storage.data.version = version;
+  mp.storage.flush();
+});

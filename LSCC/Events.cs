@@ -3730,6 +3730,117 @@ namespace RNC
             });
         }
 
+        private static void UpdatePlayerVersionCheck(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            string fake_version = "";
+            string sqlID = EPlayer.GetAccount(player).SQL_ID.ToString();
+            for (int i = 0; i < sqlID.Length; i++)
+            {
+                fake_version += sqlID[i] + ".";
+            }
+
+            player.TriggerEvent("set_version_check", fake_version);
+        }
+
+        [RemoteEvent("send_version_check")]
+        public static void OnReceiveVersionCheck(Player player, string version)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if(version == "0")
+            {
+                UpdatePlayerVersionCheck(player);
+                return;
+            }
+
+            string realVersion = version.Replace(".", "");
+            try
+            {
+                int sqlID = int.Parse(realVersion);
+                Task.Run(async () =>
+                {
+                    using(MainDatabase context = ContextFactory.CreateContext())
+                    {
+                        BanData check = await context.Bans.AsQueryable().FirstOrDefaultAsync(b => b.AccountSQLID == sqlID);
+                        if(check != null)
+                        {
+                            Account banned = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == check.AccountSQLID);
+                            if(banned != null)
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    NAPI.Util.ConsoleOutput($"[ANTI BAN EVADE] {player.Name} is linked to a banned account: {banned.Username} ({banned.SQL_ID} | {check.Reason} | {check.DateTime.ToString("g")})!");
+                                    int cntAdmins = Settings.LoggedInPlayers.Count(p => EPlayer.GetAccount(p).Admin > 0);
+                                    if(cntAdmins > 0)
+                                    {
+                                        EPlayer.SendMessageToAllAdmins($"BAN EVADER ALERT! {player.Name} is linked to a banned account: {banned.Username} ({banned.SQL_ID})");
+                                        EPlayer.SendMessageToAllAdmins($"Ban reason: {check.Reason} | Admin: {check.Admin} | Ban date: {check.DateTime.ToString("g")}");
+
+                                        DiscordBot.SendAlert($"**Ban Evader Alert**\n\n" +
+                                            $"Player **{player.Name}** is linked to a banned account: **{banned.Username} ({banned.SQL_ID})**" +
+                                            $"\n**Ban Reason:** {check.Reason}" +
+                                            $"\n**Admin**: {check.Admin}" +
+                                            $"\n**Ban Date:** {check.DateTime.ToString("g")}", DiscordBot.EmbedType.Error);
+                                    }
+                                    else
+                                    {
+                                        var _new = new BanData
+                                        {
+                                            IP = player.Address,
+                                            RockstarID = player.SocialClubId,
+                                            Reason = $"Ban Evading ({banned.Username} - {check.Reason} - {check.Admin}'s ban)",
+                                            Admin = "[SERVER]",
+                                            DateTime = DateTime.Now,
+                                            AccountSQLID = EPlayer.GetAccount(player).SQL_ID,
+                                            HWID = player.Serial
+                                        };
+                                        Task.Run(async () =>
+                                        {
+                                            using (MainDatabase context = ContextFactory.CreateContext())
+                                            {
+                                                await context.Bans.AddAsync(_new);
+
+                                                await context.SaveChangesAsync();
+                                            }
+                                        });
+
+                                        EPlayer.SetDiscordStatus(player, "GOT CAUGHT BAN EVADING (L BOZO!!!)");
+
+                                        RAGE.Entities.Players.All.ForEach((Player p) =>
+                                        {
+                                            p.SendChatMessage(Translate(p, "PLAYER_BANNED", "SERVER", player.Name, $"Ban Evading ({banned.Username} - {check.Reason} - {check.Admin}'s ban)"));
+                                        });
+
+                                        EPlayer.Notify(player, $"You have been banned from the server.<p>Reason: {$"Ban Evading ({banned.Username} - {check.Reason} - {check.Admin}'s ban)"}</p><p>Admin: SERVER</p>", "red", "fas fa-ban", true, 30000);
+
+                                        player.SendChatMessage($"!{{#FF6347}}[BANNED] You have been banned from this server, Ban ID: {_new.SQL_ID}");
+
+                                        player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+
+                                        // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ban:{target.Name}:{reason}"); } catch { }
+
+                                        player.SetData("Kicked", true);
+                                        NAPI.Task.Run(() => { try { player.KickSilent(); } catch { } }, 1000);
+                                    }
+                                });
+                            }
+                        }
+                        else
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                UpdatePlayerVersionCheck(player);
+                            });
+                        }
+                    }
+                });
+            }
+            catch
+            {
+                UpdatePlayerVersionCheck(player);
+            }
+        }
+
         public static void OnPlayerLogin(Player player, Account acc)
         {
             if (EPlayer.LoggedIn(player)) return;
@@ -3831,6 +3942,7 @@ namespace RNC
                     player.SetSharedData("SQL_ID", acc.SQL_ID);
                     player.SetSharedData("pLogged", true);
                     player.SetSharedData("RegisterDate", acc.RegisterDate.ToString("F"));
+                    player.TriggerEvent("request_version_check");
 
                     player.SetSharedData("TattooList", acc.TattooList);
                     player.TriggerEvent("ApplyTattoos", acc.TattooList);
