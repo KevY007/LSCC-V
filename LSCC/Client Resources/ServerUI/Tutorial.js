@@ -2,8 +2,10 @@ var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 mp.events.add("StartTutorial", () => {
     if(global.ServerUI == null) return;
-    global.IsInTutorial = true;
     setTimeout(() => {
+        if(global.ServerUI) global.ServerUI.call(`auth_toggle`, true);
+        if(global.ServerUI) global.ServerUI.call(`hud_toggle`, false);
+        global.IsInTutorial = true;
         var TutorialQuestions = [
             {
                 // type: 1,
@@ -13,22 +15,28 @@ mp.events.add("StartTutorial", () => {
                 get started with your optimal settings."
             },
             {
-                type: 1,
+                setting:{
+                    type: 1,
+                    label:"Voice Chat",
+                    value:true
+                },
                 title: "Voice Chat",
                 subtitle:"",
                 description: "Race 'N' Chase has a voice chat with multiple modes, main one being the Proximity voice chat.\
                 \nIf you enable it, you'll be able to talk with and hear other players, however if you disable it, you won't hear them \
                 nor be able to talk with them.\nText-based chat exists.",
-                value: true
             },
             {
-                type: 2,
                 title: "Language",
                 subtitle:"",
                 description: "The main language on Race 'N' Chase is ENGLISH, however we have a special chat for various languages where players \
                 can communicate in their own language. Select your language here:",
-                options: ["English/None", "Spanish/Español", "French/Français", "Vietnamese/Tiếng Việt"],
-                value: "English/None"
+                setting:{
+                    type: 2,
+                    label:"Language",
+                    options: ["English/None", "Spanish/Español", "French/Français", "Vietnamese/Tiếng Việt"],                   
+                    value: "English/None"
+                }
             },
             {
                 // type: 1,
@@ -101,7 +109,7 @@ mp.events.add("StartTutorial", () => {
         // gm.$refs.helpers.$refs.tutorial.enabled = true;
         // `);
         if(global.ServerUI) global.ServerUI.call('auth_tutorial_start', TutorialQuestions);
-    
+        
         setTimeout(() => {
             mp.gui.cursor.show(true, true);
         }, 100);
@@ -111,13 +119,15 @@ mp.events.add("StartTutorial", () => {
         setTimeout(() => {
             mp.gui.cursor.show(true, true);
         }, 1000);
-    
+
         let pos = mp.players.local.position;
         pos.x += 20;
         pos.y += 20;
         mp.players.local.position = pos;
-    }, 1001);
+    }, 1002);
     
+
+
     
     
 
@@ -133,6 +143,8 @@ mp.events.add("StartTutorial", () => {
 ]*/
 mp.events.add("auth_tutorial_finish", (results) => {
 
+    if(global.ServerUI) global.ServerUI.call(`auth_toggle`, false);
+    if(global.ServerUI) global.ServerUI.call(`hud_toggle`, false);
     mp.events.callRemote(results);
     let resobj = JSON.parse(results);
     global.IsInTutorial = false;
