@@ -102,7 +102,8 @@ mp.keys.bind(0x42, false, () => {
         weaponConfig[currentWeapon] = curFiringMode;
         
         //let notifyscoreboardstr = `toast('${Translate("FIRE_MODE")}', '${Translate("WEAPON_FIRE_MODE_SWITCH", [Constants.firingModeNames[curFiringMode]])}', 'nothing', 500, 2);`;
-        mp.events.callLocal("screenNotify", Translate("WEAPON_FIRE_MODE_SWITCH", [`~y~${Constants.firingModeNames[curFiringMode]}`])); 
+        //mp.events.callLocal("screenNotify", Translate("WEAPON_FIRE_MODE_SWITCH", [`~y~${Constants.firingModeNames[curFiringMode]}`])); 
+        mp.events.callLocal("screenNotify", Translate("WEAPON_FIRE_MODE_SWITCH", [`${Constants.firingModeNames[curFiringMode]}`]), 'warning', 'center'); 
         //if(global.ServerUI) global.ServerUI.execute(notifyscoreboardstr);
     }
 });

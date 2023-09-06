@@ -985,11 +985,11 @@ namespace RNC
             });
         }
 
-        public static void ScreenNotify(Player player, string text)
+        public static void ScreenNotify(Player player, string text, string type, string position = "center")
         {
             if (player == null) return;
 
-            player.TriggerEvent("screenNotify", text);
+            player.TriggerEvent("screenNotify", text, type, position);
         }
 
         public static void ShowStats(Player target, Account acc)
@@ -2150,8 +2150,8 @@ namespace RNC
             NAPI.Task.Run(() =>
             {
                 if (points > 0)
-                    EPlayer.ScreenNotify(player, $"~g~+{points} Points");
-                else EPlayer.ScreenNotify(player, $"~r~{points} Points");
+                    EPlayer.ScreenNotify(player, $"+{points} Points", "success", "bottom-center");
+                else EPlayer.ScreenNotify(player, $"{points} Points", "error", "bottom-center");
                 EPlayer.GetAccount(player).Points += points;
                 player.SetSharedData("Points", EPlayer.GetAccount(player).Points);
                 EPlayer.Save(player);
@@ -2363,8 +2363,8 @@ namespace RNC
                 if (!EPlayer.LoggedIn(player)) return;
 
                 if(xp > 0)
-                    EPlayer.ScreenNotify(player, $"~g~+{xp} XP");
-                else EPlayer.ScreenNotify(player, $"~r~{xp} XP");
+                    EPlayer.ScreenNotify(player, $"+{xp} XP", "success", "bottom-center");
+                else EPlayer.ScreenNotify(player, $"{xp} XP", "error", "bottom-center");
 
                 Account acc = EPlayer.GetAccount(player);
                 acc.XP += xp;

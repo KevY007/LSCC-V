@@ -412,8 +412,8 @@ namespace RNC
             targetVeh.SetSharedData("Locked", targetVeh.Locked);
 
             if (targetVeh.Locked)
-                EPlayer.ScreenNotify(player, $"~r~Vehicle locked");
-            else EPlayer.ScreenNotify(player, $"~g~Vehicle unlocked");
+                EPlayer.ScreenNotify(player, $"Vehicle locked", "error");
+            else EPlayer.ScreenNotify(player, $"Vehicle unlocked", "success");
 
             player.TriggerEvent("PlaySoundFrontend", "COMPUTERS_MOUSE_CLICK", "");
 

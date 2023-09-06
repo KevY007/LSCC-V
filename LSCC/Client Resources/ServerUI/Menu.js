@@ -88,6 +88,13 @@ mp.events.add("mainmenu_settings_crosshair_save", (profileData, selectedProfile)
             global.alwaysShowCustomCrosshair = currentProfile.settings.alwaysOn;
             global.showCustomCrosshairInSniper = currentProfile.settings.onSnipers;
             global.showCustomCrosshair = currentProfile.settings.enabled;
+
+            if(global.showCustomCrosshair === false){
+                global.alwaysShowCustomCrosshair = false;
+                global.showCustomCrosshairInSniper = false;
+                global.customCrosshairOn = false;
+                if(global.ServerUI) global.ServerUI.call('crosshair_toggle', false);
+            }
         }
     }
     mp.events.callRemote("Crosshair_SetProfile", selectedProfile);
