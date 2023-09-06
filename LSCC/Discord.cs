@@ -131,7 +131,80 @@ namespace RNC
         // Commands
         private static async Task PlayersCommandHandler(SocketSlashCommand command)
         {
-            await command.RespondAsync($"Players: {RAGE.Entities.Players.Count}");
+            NAPI.Task.Run(() =>
+            {
+                List<EmbedBuilder> playerListEmbeds = new List<EmbedBuilder>();
+
+                EmbedBuilder embed = new EmbedBuilder();
+                embed.Title = $"Online Players: {RAGE.Entities.Players.Count}";
+                embed.Description = "**Lobby/Mode | Level**";
+                embed.Color = new Discord.Color(100, 0, 200);
+                embed.ThumbnailUrl = "https://media.discordapp.net/attachments/747725642350723172/1149001447946604625/logo.webp";
+
+                playerListEmbeds.Add(embed);
+
+                int count = 0;
+                lock (RAGE.Entities.Players)
+                {
+                    foreach (Player player in RAGE.Entities.Players.All)
+                    {
+                        if (count >= 6)
+                        {
+                            count = 0;
+                            EmbedBuilder newEmbed = new EmbedBuilder();
+                            newEmbed.Color = new Discord.Color(100, 0, 200);
+                            playerListEmbeds.Add(newEmbed);
+                        }
+                        if(!player.HasSharedData("InLobby") || !player.HasSharedData("Team") || !player.HasSharedData("InDM") || !player.HasSharedData("Level"))
+                        {
+                            playerListEmbeds[playerListEmbeds.Count - 1].AddField(player.Name, "Connecting/Logging in...");
+                        }
+                        else
+                        {
+                            int lobbyID = player.GetSharedData<int>("InLobby");
+                            int teamID = player.GetSharedData<int>("Team");
+                            int dmID = player.GetSharedData<int>("InDM");
+                            string modeDisplay = $"Lobby {lobbyID}";
+                            if (lobbyID > 0 && teamID != -1) modeDisplay = $"Copchase ({lobbyID})";
+                            else if (lobbyID > 0 && dmID != -1) modeDisplay = $"Deathmatch ({lobbyID})";
+                            else
+                            {
+                                switch (lobbyID)
+                                {
+                                    case -1:
+                                        modeDisplay = "Logging in";
+                                        break;
+                                    case -2:
+                                        modeDisplay = "Admin Jail";
+                                        break;
+                                    case -3:
+                                        modeDisplay = "Freeroam";
+                                        break;
+                                    case -4:
+                                        modeDisplay = "Derby";
+                                        break;
+                                    case -5:
+                                        modeDisplay = "Character Creator";
+                                        break;
+                                }
+                            }
+                            playerListEmbeds[playerListEmbeds.Count - 1].AddField(player.Name, $"{modeDisplay} | Level {player.GetSharedData<int>("Level")}", true);
+                        }
+
+                        count++;
+                    }
+                }       
+                Task.Run(async () =>
+                {
+                    foreach (EmbedBuilder e in playerListEmbeds)
+                    {
+                        await command.Channel.SendMessageAsync("", false, e.Build());
+                    }
+                    await command.RespondAsync("Online player list.");
+                });
+               
+            });
+            
         }
     }
     class CommandDefinition
