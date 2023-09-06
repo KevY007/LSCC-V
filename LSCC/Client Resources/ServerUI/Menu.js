@@ -68,14 +68,13 @@ mp.events.add("setSelectedProfile", (profileID, settings) => {
 
     mp.events.callRemote("Crosshair_SetProfile", profileID);
 });
-mp.events.add("saveCrosshairProfiles", (profileData) => {
-    mp.events.callRemote("ServerConsoleOutput" ,profileData);
-    return;
+mp.events.add("mainmenu_settings_crosshair_save", (profileData, selectedProfile) => {
+    mp.events.callRemote("ServerConsoleOutput" , `SAVING CROSSHAIR DATA: ${JSON.stringify(profileData)}`);
     mp.events.callRemote("Crosshair_SaveProfiles", profileData);
 
     eval(`var realProfileData = ${profileData}`);
 
-    let prData = JSON.parse(realProfileData);
+    let prData = realProfileData;
     if(prData != undefined){
         let currentProfile = undefined;
         for(let i = 0 ; i < prData.length; i++){
@@ -91,6 +90,7 @@ mp.events.add("saveCrosshairProfiles", (profileData) => {
             global.showCustomCrosshair = currentProfile.settings.enabled;
         }
     }
+    mp.events.callRemote("Crosshair_SetProfile", selectedProfile);
 });
 
 mp.events.add("LoadCrosshairProfiles", (profileData, activeProfile) => {
@@ -98,9 +98,16 @@ mp.events.add("LoadCrosshairProfiles", (profileData, activeProfile) => {
     //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.$refs.states.setCrosshair('selectedProfile', '${activeProfile}');`);
 
     eval(`var realProfileData = ${profileData}`);
-    eval(`var realActiveProfile = ${activeProfile}`);
+    eval(`var realActiveProfile = '${activeProfile}'`);
+
+    if(realProfileData === undefined) realProfileData = [];
+    if(realActiveProfile === undefined) realActiveProfile = 'Profile 1';
+
     if(global.ServerUI) global.ServerUI.call('mainmenu_settings_crosshair_set', realProfileData, realActiveProfile);
     ActiveCrosshairProfileUUID = activeProfile;
+
+    mp.events.callRemote('ServerConsoleOutput', `PROFILE DATA: ${JSON.stringify(realProfileData)}`);
+    mp.events.callRemote('ServerConsoleOutput', `ACTIVE PROFILE: ${realActiveProfile}`);
 });
 
 var MenuClans = [];
@@ -513,7 +520,12 @@ function ToggleMenu()
         mp.events.callRemote("RequestStatsForStatsTab");
         global.UpdateStatsVars(mp.players.local);
 
-        if(global.ServerUI) global.ServerUI.call('mainmenu_settings_crosshair_request_save');
+        if(!global.menuToggled){
+            if(global.ServerUI) global.ServerUI.call('mainmenu_settings_crosshair_request_save');
+        }
+        else{
+            mp.events.callRemote('RequestCrosshairProfiles');
+        }
 
         if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.privateRoom = undefined;`);
 

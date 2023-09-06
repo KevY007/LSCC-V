@@ -7283,6 +7283,15 @@ namespace RNC
             });
         }
 
+        [RemoteEvent("RequestCrosshairProfiles")]
+        public void OnRequestCrosshairpRofiles(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            player.TriggerEvent("LoadCrosshairProfiles", EPlayer.GetAccount(player).CrosshairProfiles, 
+                                                         EPlayer.GetAccount(player).ActiveCrosshairProfile);
+        }
+
         [RemoteEvent("Crosshair_SetProfile")]
         public void OnSetCrosshairProfile(Player player, string profileID)
         {
