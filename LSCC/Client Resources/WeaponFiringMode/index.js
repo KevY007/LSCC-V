@@ -103,7 +103,7 @@ mp.keys.bind(0x42, false, () => {
         
         //let notifyscoreboardstr = `toast('${Translate("FIRE_MODE")}', '${Translate("WEAPON_FIRE_MODE_SWITCH", [Constants.firingModeNames[curFiringMode]])}', 'nothing', 500, 2);`;
         //mp.events.callLocal("screenNotify", Translate("WEAPON_FIRE_MODE_SWITCH", [`~y~${Constants.firingModeNames[curFiringMode]}`])); 
-        mp.events.callLocal("screenNotify", Translate("WEAPON_FIRE_MODE_SWITCH", [`${Constants.firingModeNames[curFiringMode]}`]), 'warning', 'center'); 
+        global.ServerUI.call("hud_weapon_fire_mode_switch", Translate("WEAPON_FIRE_MODE_SWITCH", [`${Constants.firingModeNames[curFiringMode]}`])); 
         //if(global.ServerUI) global.ServerUI.execute(notifyscoreboardstr);
     }
 });

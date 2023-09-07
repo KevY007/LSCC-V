@@ -38,7 +38,7 @@
   "ENGINE": "Engine",
   "HOTWIRE": "Hotwire",
   "FIRE_MODE": "Fire Mode",
-  "WEAPON_FIRE_MODE_SWITCH": "Weapon firing mode switched to: <strong>{FIRE MODE}</strong>",
+  "WEAPON_FIRE_MODE_SWITCH": "Weapon Firing Mode: <strong>{FIRE MODE}</strong>",
   "SILENT_SIREN": "Silent Siren",
   "TRUNK": "Trunk",
   "BONNET": "Bonnet",
