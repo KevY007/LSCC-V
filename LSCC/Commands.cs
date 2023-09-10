@@ -1010,7 +1010,7 @@ namespace RNC
                 return;
             }
 
-            if (weatherid < 0 || weatherid > 9)
+            if (weatherid < 0 || weatherid > 14)
             {
                 player.SendChatMessage(Translate(player, "ERROR_INVALID_WEATHER_SET"));
                 return;
