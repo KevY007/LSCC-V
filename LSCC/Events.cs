@@ -1472,10 +1472,10 @@ namespace RNC
                         return;
                     }
                     int cAccess = pClan.ClanAccess;
-                    bool cForceTag = pClan.ForceTag;
-                    bool cPartnering = pClan.CopchasePartnering;
                     NAPI.Task.Run(() =>
                     {
+                        bool cForceTag = EPlayer.GetAccount(player).ClanTag;
+                        bool cPartnering = EPlayer.GetAccount(player).ClanPartnering;
                         string accStr = "Invite-Only";
                         if (cAccess == 1) accStr = "Public";
                         player.TriggerEvent("Menu_InitClanSettings", accStr, cPartnering, cForceTag);
@@ -1487,14 +1487,17 @@ namespace RNC
         [RemoteEvent("Clan_OnRequestChangeSetting")]
         public void Clan_OnRequestChangeSetting(Player player, int settingID, int value)
         {
+            NAPI.Util.ConsoleOutput($"{player.Name} changed {settingID} to {value}!");
             Account pAcc = EPlayer.GetAccount(player);
             if (player.GetSharedData<int>("ClanID") == -1)
             {
+                NAPI.Util.ConsoleOutput("No Clan!");
                 EPlayer.Error(player, Translate(player, "ERROR_NOT_IN_CLAN_NOCOLOR"));
                 return;
             }
-            if (player.GetSharedData<int>("ClanTier") > 0)
+            if (settingID == 1 && player.GetSharedData<int>("ClanTier") > 0)
             {
+                NAPI.Util.ConsoleOutput("No Authority!");
                 EPlayer.Error(player, Translate(player, "ERROR_CLAN_NO_AUTHORITY"));
                 return;
             }
@@ -1534,38 +1537,38 @@ namespace RNC
                             }
                         case 2: // Clan Tag
                             {
-                                pClan.ForceTag = (value == 1);
                                 string theTag = pClan.Tag;
                                 await context.SaveChangesAsync();
                                 NAPI.Task.Run(() =>
                                 {
+                                    EPlayer.GetAccount(player).ClanTag = (value == 1);
+                                    EPlayer.Save(player, false);
+
                                     player.TriggerEvent("Menu_UpdateClanSetting", "forcetag", (value == 1));
 
                                     EPlayer.Notify(player, Translate(player, "CLAN_TAG_TOGGLE", (value == 1 ? Translate(player, "ENABLED") : Translate(player, "DISABLED"))), "success", "fa-success", false, 3000);
                                     player.TriggerEvent("UpdateMenuClanTab");
 
-                                    foreach (Player pl in Settings.LoggedInPlayers.Where(p => p.HasSharedData("ClanID") && p.GetSharedData<int>("ClanID") == pClanID))
-                                    {
-                                        pl.SetSharedData("ClanTag", (value == 1 ? pClan.Tag : ""));
-                                    }
+                                    player.SetSharedData("ClanTag", (value == 1 ? theTag : ""));
+                                    
 
                                 });
                                 break;
                             }
                         case 3: // Copchase Partnering
                             {
-                                pClan.CopchasePartnering = (value == 1);
                                 await context.SaveChangesAsync();
                                 NAPI.Task.Run(() =>
                                 {
+                                    EPlayer.GetAccount(player).ClanPartnering = (value == 1);
+                                    EPlayer.Save(player, false);
+
                                     player.TriggerEvent("Menu_UpdateClanSetting", "partnering", (value == 1));
                                     EPlayer.Notify(player, Translate(player, "CLAN_PAIR_TOGGLE", (value == 1 ? Translate(player, "ENABLED") : Translate(player, "DISABLED"))), "success", "fa-success", false, 3000);
                                     player.TriggerEvent("UpdateMenuClanTab");
 
-                                    foreach (Player pl in Settings.LoggedInPlayers.Where(p => p.HasSharedData("ClanID") && p.GetSharedData<int>("ClanID") == pClanID))
-                                    {
-                                        pl.SetSharedData("ClanPartnering", (value == 1));
-                                    }
+                                    player.SetSharedData("ClanPartnering", (value == 1));
+                                    
                                 });
                                 break;
                             }
@@ -2152,11 +2155,11 @@ namespace RNC
                     int clanID = clan.SQL_ID;
                     string cName = clan.Name;
                     string cCreated = clan.CreatedOn;
-                    bool partner = clan.CopchasePartnering;
-                    string tag = (clan.ForceTag == true ? clan.Tag : "");
                     await context.SaveChangesAsync();
                     NAPI.Task.Run(() =>
                     {
+                        bool partner = EPlayer.GetAccount(player).ClanPartnering;
+                        string tag = (EPlayer.GetAccount(player).ClanTag == true ? clan.Tag : "");
                         player.SetSharedData("ClanID", clanID);
                         player.SetSharedData("ClanTier", 2);
                         player.SetSharedData("ClanName", cName);
@@ -2340,9 +2343,7 @@ namespace RNC
                         Description = realDesc,
                         Tag = theTag,
                         CreatedOn = DateTime.Now.ToString("F"),
-                        ClanAccess = 0,
-                        ForceTag = true,
-                        CopchasePartnering = true
+                        ClanAccess = 0
                     };
 
                     await context.Clans.AddAsync(clan);
@@ -2359,13 +2360,13 @@ namespace RNC
                     EPlayer.GivePoints(player, -300);
                     EPlayer.Save(player, false);
                     int cID = thaClan.SQL_ID;
-                    bool partnering = thaClan.CopchasePartnering;
                     string cTag = thaClan.Tag;
                     NAPI.Task.Run(() =>
                     {
+                        bool partnering = EPlayer.GetAccount(player).ClanPartnering;
                         player.SetSharedData("ClanID", cID);
-                        player.SetSharedData("ClanPartnering", true);
-                        player.SetSharedData("ClanTag", cTag);
+                        player.SetSharedData("ClanPartnering", partnering);
+                        player.SetSharedData("ClanTag", (EPlayer.GetAccount(player).ClanPartnering ? tag : ""));
                         player.SetSharedData("ClanTier", 0);
                         player.SetSharedData("ClanName", clanname);
                         player.SetSharedData("ClanCreated", DateTime.Now.ToString("F"));
@@ -3909,8 +3910,6 @@ namespace RNC
                     {
                         pClanName = pClan.Name;
                         pClanCreated = pClan.CreatedOn;
-                        pClanPartnering = pClan.CopchasePartnering;
-                        pClanTag = (pClan.ForceTag == true ? pClan.Tag : "");
                     }
 
                     if (linkedSQLs.Intersect(context.Bans.AsQueryable().Select(bans => bans.AccountSQLID)).Any())
@@ -3936,6 +3935,8 @@ namespace RNC
                 }
                 NAPI.Task.Run(() =>
                 {
+                    pClanTag = (EPlayer.GetAccount(player).ClanTag == true ? pClan.Tag : "");
+                    pClanPartnering = EPlayer.GetAccount(player).ClanPartnering;
                     player.Name = acc.Username;
                     player.SetData("LoggedIn", true);
                     player.SetData("AccountHandle", acc);
@@ -5584,8 +5585,8 @@ namespace RNC
                             player.SetSharedData("ClanTier", acc.ClanTier);
                             player.SetSharedData("ClanName", playerClan.Name);
                             player.SetSharedData("ClanCreated", playerClan.CreatedOn);
-                            player.SetSharedData("ClanPartnering", playerClan.CopchasePartnering);
-                            player.SetSharedData("ClanTag", (playerClan.ForceTag == true ? playerClan.Tag : ""));
+                            player.SetSharedData("ClanPartnering", EPlayer.GetAccount(player).ClanPartnering);
+                            player.SetSharedData("ClanTag", (EPlayer.GetAccount(player).ClanTag == true ? playerClan.Tag : ""));
 
 
                             OnRequestUpdateClanMembers(player);

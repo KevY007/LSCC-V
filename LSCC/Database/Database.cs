@@ -93,8 +93,6 @@ namespace RNC
         public string CreatedOn { get; set; }
 
         public int ClanAccess { get; set; } // 0 - Invite-only ; 1 - Public
-        public bool ForceTag { get; set; }
-        public bool CopchasePartnering { get; set; }
     }
 
     public class DailyChallenge

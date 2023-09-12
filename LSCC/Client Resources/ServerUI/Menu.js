@@ -77,10 +77,6 @@ mp.events.add("setSelectedProfile", (profileID, settings) => {
 mp.events.add(
   "mainmenu_settings_crosshair_save",
   (profileData, selectedProfile) => {
-    mp.events.callRemote(
-      "ServerConsoleOutput",
-      `SAVING CROSSHAIR DATA: ${JSON.stringify(profileData)}`
-    );
     mp.events.callRemote("Crosshair_SaveProfiles", profileData);
 
     eval(`var realProfileData = ${profileData}`);
@@ -129,22 +125,10 @@ mp.events.add("LoadCrosshairProfiles", (profileData, activeProfile) => {
     );
   ActiveCrosshairProfileUUID = activeProfile;
 
-  mp.events.callRemote(
-    "ServerConsoleOutput",
-    `PROFILE DATA: ${JSON.stringify(realProfileData)}`
-  );
-  mp.events.callRemote(
-    "ServerConsoleOutput",
-    `ACTIVE PROFILE: ${realActiveProfile}`
-  );
 });
 
 var MenuClans = [];
 mp.events.add("clearMenuClansVariable", () => {
-  mp.events.callRemote(
-    "ServerConsoleOutput",
-    "Cleared menu clans variable, setting new clans."
-  );
   MenuClans = [];
 });
 mp.events.add("Menu_FinishAddingClans", () => {
@@ -186,10 +170,6 @@ mp.events.add(
         wins: wins,
       },
     });
-    mp.events.callRemote(
-      "ServerConsoleOutput",
-      `Menu_AddClan: Added ${clanID} - ${cname}`
-    );
   }
 );
 mp.events.add("mainmenu_clan_list_request_page", (first, rows) => {
@@ -315,7 +295,6 @@ mp.events.add("Menu_SetClanMembers", (membersData) => {
         clanPlayer.getVariable("BadgeData")
       );
   }
-  mp.events.callRemote("ServerConsoleOutput", JSON.stringify(membersDataJSON));
   if (global.ServerUI)
     global.ServerUI.call("mainmenu_my_clan_members_set", membersDataJSON);
 });
@@ -1764,7 +1743,6 @@ mp.events.add("mainmenu_play_custom_room_settings_update", (roomJSON) => {
   );
 });
 mp.events.add("privateRoom_delete", (id) => {
-  mp.events.callRemote("ServerConsoleOutput", `Deleted private room`);
   mp.events.callRemote("Menu_OnLobbyDelete", id);
 });
 mp.events.add("privateRoom_kickPlayer", (id) => {
@@ -1778,7 +1756,6 @@ mp.events.add("privateRoom_unbanPlayer", (id) => {
   mp.events.callRemote("Menu_OnLobbyUnbanPlayer", id);
 });
 mp.events.add("removePrivateLobby", () => {
-  mp.events.callRemote("ServerConsoleOutput", `Removed private room.`);
   if (global.ServerUI)
     global.ServerUI.call("mainmenu_play_custom_room_set", undefined);
 });

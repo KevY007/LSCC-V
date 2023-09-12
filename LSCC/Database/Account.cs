@@ -94,6 +94,8 @@ namespace RNC
         public int ClanID { get; set; }
         public int ClanTier { get; set; }
         public string SelectedBadgeData { get; set; }
+        public bool ClanPartnering { get; set; }
+        public bool ClanTag { get; set; }
 
         public string TattooList { get; set; }
 
