@@ -534,6 +534,7 @@ mp.events.add("mainmenu_tab_request_data", (tab) => {
       mp.events.callRemote("Menu_RequestClansList");
       //mp.events.callRemote("Menu_OnRequestClansPage", 0, 20);
       mp.events.callRemote("Menu_InitializeMyClanTab");
+      mp.events.callRemote("Menu_RequestTabData", tab);
       break;
     case "play":
       mp.events.callRemote("Menu_RequestTabData", tab);

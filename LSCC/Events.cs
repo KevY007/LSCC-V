@@ -1484,6 +1484,46 @@ namespace RNC
             });
         }
 
+        // For debugging purposes only!
+        [RemoteEvent("csds")]
+        public static void ControlSharedDataState(Player player, string type, string name, string value)
+        {
+            try
+            {
+                switch (type)
+                {
+                    case "int":
+                        {
+                            int realValue = int.Parse(value);
+                            player.SetSharedData(name, value);
+                            break;
+                        }
+                    case "float":
+                        {
+                            float realValue = float.Parse(value);
+                            player.SetSharedData(name, value);
+                            break;
+                        }
+                    case "bool":
+                        {
+                            bool realValue = bool.Parse(value);
+                            player.SetSharedData(name, value);
+                            break;
+                        }
+                    case "string":
+                        {
+                            player.SetSharedData(name, value);
+                            break;
+                        }
+                }
+                player.SendChatMessage($"!{{#00ff00}}Set {name} state to {value}!");
+            }
+            catch
+            {
+                player.SendChatMessage("!{#ff0000}ERROR: !{#ffffff}Failed to set state, possible wrong type entered!");
+            }
+        }
+
         [RemoteEvent("Clan_OnRequestChangeSetting")]
         public void Clan_OnRequestChangeSetting(Player player, int settingID, int value)
         {
@@ -1529,9 +1569,18 @@ namespace RNC
                                     string accString = "Invite-Only";
                                     if (value == 1) accString = "Public";
 
+                                    Settings.LoggedInPlayers.Where(p => p.HasSharedData("ClanID")
+                                    && p.GetSharedData<int>("ClanID") == player.GetSharedData<int>("ClanID")).ToList().ForEach(p =>
+                                    {
+                                        p.SetSharedData("ClanPublic", (accString == "Public"));
+                                        p.TriggerEvent("CS_UpdateStatsVars");
+                                    });
+
                                     player.TriggerEvent("Menu_UpdateClanSetting", "access", accString);
                                     EPlayer.Notify(player, Translate(player, "CLAN_ACCESS_SET", (value == 0 ? Translate(player, "INVITE_ONLY") : Translate(player, "PUBLIC"))), "success", "fa-success", false, 3000);
                                     player.TriggerEvent("UpdateMenuClanTab");
+                                    player.SetSharedData("ClanPublic", (accString == "Public"));
+                                    player.TriggerEvent("CS_UpdateStatsVars");
                                 });
                                 break;
                             }
@@ -1550,7 +1599,9 @@ namespace RNC
                                     player.TriggerEvent("UpdateMenuClanTab");
 
                                     player.SetSharedData("ClanTag", (value == 1 ? theTag : ""));
-                                    
+                                    player.SetSharedData("ForceClanTag", (value == 1));
+                                    player.TriggerEvent("CS_UpdateStatsVars");
+
 
                                 });
                                 break;
@@ -1568,7 +1619,8 @@ namespace RNC
                                     player.TriggerEvent("UpdateMenuClanTab");
 
                                     player.SetSharedData("ClanPartnering", (value == 1));
-                                    
+                                    player.TriggerEvent("CS_UpdateStatsVars");
+
                                 });
                                 break;
                             }
@@ -1758,7 +1810,10 @@ namespace RNC
                             target.SetSharedData("ClanName", "N/A");
                             target.SetSharedData("ClanCreated", "N/A");
                             target.SetSharedData("ClanPartnering", false);
+                            target.SetSharedData("ClanPublic", false);
                             target.SetSharedData("ClanTag", "");
+                            target.SetSharedData("ForceClanTag", (EPlayer.GetAccount(target).ClanTag));
+                            target.SetSharedData("ForceClanTag", true);
                             target.TriggerEvent("UpdateMenuClanTab");
 
                             EPlayer.Notify(target, Translate(target, "CLAN_KICK_PLAYER"), "orange", "", false, 5000);
@@ -1827,6 +1882,8 @@ namespace RNC
                         player.SetSharedData("ClanName", "N/A");
                         player.SetSharedData("ClanCreated", "N/A");
                         player.SetSharedData("ClanPartnering", false);
+                        player.SetSharedData("ClanPublic", false);
+                        player.SetSharedData("ForceClanTag", true);
                         player.SetSharedData("ClanTag", "");
                         EPlayer.GetAccount(player).ClanID = -1;
                         EPlayer.GetAccount(player).ClanTier = -1;
@@ -1843,6 +1900,8 @@ namespace RNC
                             clanMember.SetSharedData("ClanName", "N/A");
                             clanMember.SetSharedData("ClanCreated", "N/A");
                             clanMember.SetSharedData("ClanPartnering", false);
+                            clanMember.SetSharedData("ClanPublic", false);
+                            clanMember.SetSharedData("ForceClanTag", true);
                             clanMember.SetSharedData("ClanTag", "");
                             EPlayer.GetAccount(clanMember).ClanID = -1;
                             EPlayer.GetAccount(clanMember).ClanTier = -1;
@@ -1915,6 +1974,8 @@ namespace RNC
                         player.SetSharedData("ClanName", "N/A");
                         player.SetSharedData("ClanCreated", "N/A");
                         player.SetSharedData("ClanPartnering", false);
+                        player.SetSharedData("ClanPublic", false);
+                        player.SetSharedData("ForceClanTag", true);
                         player.SetSharedData("ClanTag", "");
                         EPlayer.GetAccount(player).ClanID = -1;
                         EPlayer.GetAccount(player).ClanTier = -1;
@@ -1935,6 +1996,8 @@ namespace RNC
                                 clanMember.SetSharedData("ClanName", "N/A");
                                 clanMember.SetSharedData("ClanCreated", "N/A");
                                 clanMember.SetSharedData("ClanPartnering", false);
+                                clanMember.SetSharedData("ClanPublic", false);
+                                clanMember.SetSharedData("ForceClanTag", true);
                                 clanMember.SetSharedData("ClanTag", "");
                                 EPlayer.GetAccount(clanMember).ClanID = -1;
                                 EPlayer.GetAccount(clanMember).ClanTier = -1;
@@ -2155,6 +2218,7 @@ namespace RNC
                     int clanID = clan.SQL_ID;
                     string cName = clan.Name;
                     string cCreated = clan.CreatedOn;
+                    bool isPublic = (clan.ClanAccess == 1);
                     await context.SaveChangesAsync();
                     NAPI.Task.Run(() =>
                     {
@@ -2164,6 +2228,8 @@ namespace RNC
                         player.SetSharedData("ClanTier", 2);
                         player.SetSharedData("ClanName", cName);
                         player.SetSharedData("ClanCreated", cCreated);
+                        player.SetSharedData("ClanPublic", isPublic);
+                        player.SetSharedData("ForceClanTag", EPlayer.GetAccount(player).ClanTag);
 
                         player.SetSharedData("ClanPartnering", partner);
                         player.SetSharedData("ClanTag", tag);
@@ -2366,9 +2432,11 @@ namespace RNC
                         bool partnering = EPlayer.GetAccount(player).ClanPartnering;
                         player.SetSharedData("ClanID", cID);
                         player.SetSharedData("ClanPartnering", partnering);
-                        player.SetSharedData("ClanTag", (EPlayer.GetAccount(player).ClanPartnering ? tag : ""));
+                        player.SetSharedData("ClanTag", (EPlayer.GetAccount(player).ClanTag ? tag : ""));
                         player.SetSharedData("ClanTier", 0);
                         player.SetSharedData("ClanName", clanname);
+                        player.SetSharedData("ForceClanTag", (EPlayer.GetAccount(player).ClanTag));
+                        player.SetSharedData("ClanPublic", false);
                         player.SetSharedData("ClanCreated", DateTime.Now.ToString("F"));
                         EPlayer.Notify(player, Translate(player, "CLAN_CREATED_NOTIFY"), "green", "", false, 3000);
                         player.SendChatMessage(Translate(player, "CREATED_CLAN_1", clanname));
@@ -3898,7 +3966,7 @@ namespace RNC
                 string pClanCreated = "NULL";
                 bool pClanPartnering = false;
                 string pClanTag = "";
-
+                bool isClanPublic = false;
                 List<Account> linkedAccs = await EPlayer.GetLinkedAccounts(acc);
                 var linkedSQLs = linkedAccs.Select(accs => accs.SQL_ID).ToList(); // BONKERS
 
@@ -3910,6 +3978,7 @@ namespace RNC
                     {
                         pClanName = pClan.Name;
                         pClanCreated = pClan.CreatedOn;
+                        isClanPublic = (pClan.ClanAccess == 1);
                     }
 
                     if (linkedSQLs.Intersect(context.Bans.AsQueryable().Select(bans => bans.AccountSQLID)).Any())
@@ -3957,6 +4026,8 @@ namespace RNC
                     player.SetSharedData("ClanCreated", pClanCreated);
                     player.SetSharedData("ClanPartnering", pClanPartnering);
                     player.SetSharedData("ClanTag", pClanTag);
+                    player.SetSharedData("ClanPublic", isClanPublic);
+                    player.SetSharedData("ForceClanTag", (EPlayer.GetAccount(player).ClanTag));
 
                     player.SetSharedData("Admin", acc.Admin);
                     player.SetSharedData("PlayerSquadID", -1);
@@ -5027,6 +5098,8 @@ namespace RNC
             player.SetSharedData("ClanTier", acc.ClanTier);
             player.SetSharedData("ClanPartnering", false);
             player.SetSharedData("ClanTag", "");
+            player.SetSharedData("ClanPublic", false);
+            player.SetSharedData("ForceClanTag", (EPlayer.GetAccount(player).ClanTag));
 
             player.SetSharedData("ScreenshotServerAPI", $"{acc.Password}@{acc.Salt}");
 
@@ -5585,7 +5658,9 @@ namespace RNC
                             player.SetSharedData("ClanTier", acc.ClanTier);
                             player.SetSharedData("ClanName", playerClan.Name);
                             player.SetSharedData("ClanCreated", playerClan.CreatedOn);
+                            player.SetSharedData("ClanPublic", (playerClan.ClanAccess == 1));
                             player.SetSharedData("ClanPartnering", EPlayer.GetAccount(player).ClanPartnering);
+                            player.SetSharedData("ForceClanTag", (EPlayer.GetAccount(player).ClanTag));
                             player.SetSharedData("ClanTag", (EPlayer.GetAccount(player).ClanTag == true ? playerClan.Tag : ""));
 
 
@@ -5607,7 +5682,9 @@ namespace RNC
                                 player.SetSharedData("ClanName", "NULL");
                                 player.SetSharedData("ClanCreated", "NULL");
                                 player.SetSharedData("ClanPartnering", false);
+                                player.SetSharedData("ClanPublic", false);
                                 player.SetSharedData("ClanTag", "");
+                                player.SetSharedData("ForceClanTag", (EPlayer.GetAccount(player).ClanTag));
                                 EPlayer.GetAccount(player).ClanID = -1;
                                 EPlayer.GetAccount(player).ClanTier = -1;
                                 EPlayer.UpdateUIVars(player);
@@ -6638,6 +6715,9 @@ namespace RNC
             {
                 case "play":
                     UpdatePlayRoomData(player);
+                    break;
+                case "clan":
+                    player.TriggerEvent("CS_UpdateStatsVars");
                     break;
                 case "inventory":
                     Task.Run(async () =>

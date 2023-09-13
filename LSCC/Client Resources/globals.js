@@ -40,7 +40,7 @@ function UpdateStatsVars(entity, all = true){
                   muted_players.push(pl.name);
               });
 
-              global.ServerUI.call("set_user", {
+              const user_object = {
                 serverId: player.remoteId,
                 id: player.getVariable("SQL_ID"),
                 name: player.name,
@@ -66,9 +66,17 @@ function UpdateStatsVars(entity, all = true){
                 },
                 clan:{
                   id: player.getVariable("ClanID"),
-                  tier: player.getVariable("ClanTier")
+                  tier: player.getVariable("ClanTier"),
+                  name:player.getVariable("ClanName"),
+                  createdAt:player.getVariable("ClanCreated"),
+                  tagEnabled:player.getVariable("ForceClanTag"),
+                  tag:player.getVariable("ClanTag"),
+                  copchasePartnering:(player.getVariable("ClanPartnering")),
+                  public:player.getVariable("ClanPublic") // Public value 1 == public | 0 == invite-only
                 }
-              })
+              };
+              global.ServerUI.call("set_user", user_object);
+
               
                 
                 if(all === true){            

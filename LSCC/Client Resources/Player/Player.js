@@ -1169,7 +1169,7 @@ mp.events.addCommand("bigmap", function (state) {
 
 if(!global.radioToggle) mp.game.audio.setInitialPlayerStation('OFF');
 
-mp.events.add("CS_global.UpdateStatsVars", () => {
+mp.events.add("CS_UpdateStatsVars", () => {
     global.UpdateStatsVars(player);
 });
 

@@ -763,6 +763,8 @@ namespace RNC
                 player.SetSharedData("CurrentXP", 0);
                 player.SetSharedData("NextLevelXP", 0);
 
+                player.SetSharedData("ClanPublic", false);
+
                 player.SetData<string>("BankRobberyUnit", "fib");
                 player.SetSharedData("HeistLeader", false);
 
