@@ -2208,6 +2208,8 @@ namespace RNC
                             EPlayer.Error(player, Translate(player, "ERROR_CLAN_FULL", 20));
                             return;
                         });
+                        await NAPI.Task.WaitForMainThread();
+                        return;
                     }
 
                     Account accnt = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == acc.SQL_ID);
