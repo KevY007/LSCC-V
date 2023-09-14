@@ -231,6 +231,16 @@ mp.events.add("login_ForceStopLoading", () => {
   }
 });
 
+mp.events.add('auth_reset_password', (code, newPassword) => {
+  mp.events.callRemote('RequestResetPassword', code, newPassword);
+});
+mp.events.add("PasswordResetResult", (result) => {
+  if(result === 0)
+    global.ServerUI.call('auth_reset_password_invalid_code');
+  else
+    global.ServerUI.call('auth_reset_password_success');
+});
+
 mp.events.add("browser_ServerConsole", (msg) => mp.events.callRemote("ServerConsoleOutput", msg));
 
 mp.events.add("auth_reset_rememberMe", () => {

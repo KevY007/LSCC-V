@@ -142,6 +142,18 @@ namespace RNC
         public int WheelColor { get; set; }
         public string Mods { get; set; }
     }
+    public class PasswordResetRequest
+    {
+        [Column("id")]
+        [Key]
+        public int SQL_ID { get; set; }
+        [Column("accountId")]
+        public int AccountID { get; set; }
+        [Column("code")]
+        public string Code { get; set; }
+        [Column("createdAt")]
+        public DateTime CreatedAt { get; set; }
+    }
     public class RedeemableCode
     {
         [Key]
@@ -284,6 +296,7 @@ namespace RNC
         public DbSet<CustomDMArenaSpawns> CustomArenas_Spawns { get; set; }
         public DbSet<RadioStation> RadioStations { get; set; }
         public DbSet<RadioCategory> RadioCategories { get; set; }
+        public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
 
         public DbSet<Badge> Badges { get; set; }
         public DbSet<OwnedBadgeData> OwnedBadges { get; set; }

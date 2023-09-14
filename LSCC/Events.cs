@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Security.Claims;
+using System.Diagnostics;
 
 namespace RNC
 {
@@ -4199,6 +4200,51 @@ namespace RNC
                 });
             });
 
+        }
+
+        [RemoteEvent("RequestResetPassword")]
+        public static void OnRequestResetPassword(Player player, string code, string newPassword)
+        {
+            Task.Run(async () =>
+            {
+                using(MainDatabase context = ContextFactory.CreateContext())
+                {
+                    PasswordResetRequest request = await context.PasswordResetRequests.AsQueryable()
+                                                         .FirstOrDefaultAsync(p => p.Code == code);
+                    if (request == null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("PasswordResetResult", 0);
+                        });
+                    }
+                    else
+                    {
+                        Account account = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == request.AccountID);
+                        if(account != null)
+                        {
+                            string salt = AccountManager.GenSalt();
+                            string password = AccountManager.Crypt(newPassword, salt);
+                            account.Salt = salt;
+                            account.Password = password;
+                            await context.SaveChangesAsync();
+
+                            NAPI.Task.Run(() =>
+                            {
+                                player.TriggerEvent("PasswordResetResult", 1);
+                            });
+                        }
+                        else
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                EPlayer.Error(player, $"FATAL: Account does not exist! Contact the developers with this code: {request.AccountID}");
+                                player.TriggerEvent("PasswordResetResult", 0);
+                            });
+                        }
+                    }
+                }
+            });
         }
 
 
