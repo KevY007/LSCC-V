@@ -1145,6 +1145,12 @@ namespace RNC
                                 messageFrom.GetSharedData<string>("BadgeData"), 
                                 messageFrom.Name, message);
         }
+        public static void SendPlayerMessage(Player target, string messageFromName, string channel, string channelValue, string message, string badges = "[]")
+        {
+            target.TriggerEvent("chat:sendCustomMessage", $"{{\"name\":\"{channel}\", \"value\":\"{channelValue}\"}}",
+                                badges,
+                                messageFromName, message);
+        }
 
         public static string GetPrefix(Player player, bool color = true)
         {
@@ -2733,6 +2739,19 @@ namespace RNC
             }
         }
 
+        public static void SendPlayerMessageToAllAdmins(string from, string message, string badges = "[]")
+        {
+            Account acc;
+
+            foreach (Player i in RAGE.Entities.Players.All)
+            {
+                if (EPlayer.LoggedIn(i))
+                {
+                    acc = i.GetData<Account>("AccountHandle");
+                    if (acc.Admin > 0) EPlayer.SendPlayerMessage(i, from, "Staff Chat", "a", message, badges);
+                }
+            }
+        }
         public static void SendPlayerMessageToAllAdmins(Player from, string message)
         {
             Account acc;

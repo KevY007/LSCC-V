@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace RNC
 {
@@ -129,6 +130,10 @@ namespace RNC
                 .WithName("players")
                 .WithDescription("View online players.")
                 .Build(), PlayersCommandHandler));
+            commands.Add(new CommandDefinition(new SlashCommandBuilder()
+                .WithName("admins")
+                .WithDescription("View online admins.")
+                .Build(), AdminsCommandHandler));
 
             commands.Add(new CommandDefinition(new SlashCommandBuilder()
                 .WithName("jail")
@@ -177,6 +182,23 @@ namespace RNC
                 .AddOption("reason", ApplicationCommandOptionType.String, "Kick reason", isRequired: true)
                 .Build(), KickCommandHandler));
 
+            commands.Add(new CommandDefinition(new SlashCommandBuilder()
+                 .WithName("o")
+                 .WithDescription("Broadcasts a message to Global OOC chat (for all players)")
+                 .AddOption("message", ApplicationCommandOptionType.String, "Message to send", isRequired: true)
+                 .Build(), OOCCommandHandler));
+            commands.Add(new CommandDefinition(new SlashCommandBuilder()
+                 .WithName("a")
+                 .WithDescription("Broadcasts a message to Admin chat")
+                 .AddOption("message", ApplicationCommandOptionType.String, "Message to send", isRequired: true)
+                 .Build(), AdminChatCommandHandler));
+            commands.Add(new CommandDefinition(new SlashCommandBuilder()
+                 .WithName("pm")
+                 .WithDescription("Sends a Private Message to a specific player")
+                 .AddOption("recipient", ApplicationCommandOptionType.String, "Message recipient", isRequired: true)
+                 .AddOption("message", ApplicationCommandOptionType.String, "Message to send", isRequired: true)
+                 .Build(), PMCommandHandler));
+
             await guild.BulkOverwriteApplicationCommandAsync(commands.Select(cmd => cmd.Meta).ToArray());
         }
 
@@ -199,6 +221,51 @@ namespace RNC
             await command.RespondAsync(null, new Embed[] { embed.Build() }, false, false);
         }
 
+        private static async Task PMCommandHandler(SocketSlashCommand command)
+        {
+            string recipient = command.Data.Options.ElementAt(0).Value.ToString();
+            string message = command.Data.Options.ElementAt(1).Value.ToString();
+
+            NAPI.Task.Run(() =>
+            {
+                Player target = RAGE.Entities.Players.All.FirstOrDefault(p => p.Name.Equals(recipient, StringComparison.OrdinalIgnoreCase));
+                if(target == null)
+                {
+                    command.RespondAsync("**[!]** That player is not connected!");
+                    return;
+                }
+                target.SendChatMessage(Translator.Translate(target, "PRIVATE_MESSAGE_RECEIVED", $"@{command.User.Username}", message));
+                command.RespondAsync($"**Private Message sent to {recipient}:** `@{command.User.Username}: {message}`");
+            });
+            await NAPI.Task.WaitForMainThread();
+        }
+        private static async Task OOCCommandHandler(SocketSlashCommand command)
+        {
+            string message = command.Data.Options.ElementAt(0).Value.ToString();
+            NAPI.Task.Run(() =>
+            {
+                RAGE.Entities.Players.All.ForEach(pl =>
+                {
+                    if (pl.HasData("OOCState") && pl.GetData<bool>("OOCState") == true)
+                    {
+                        EPlayer.SendPlayerMessage(pl, $"@{command.User.Username}", "Global", "go", message, "[{ \"id\":12, \"name\":\"Discord\", \"image\":\"discord.png\"}]");
+                    }
+                });
+            });
+            await NAPI.Task.WaitForMainThread();
+            await command.RespondAsync($"**Message sent:** `@{command.User.Username}: {message}`");
+
+        }
+        private static async Task AdminChatCommandHandler(SocketSlashCommand command)
+        {
+            string message = command.Data.Options.ElementAt(0).Value.ToString();
+            NAPI.Task.Run(() =>
+            {
+                EPlayer.SendPlayerMessageToAllAdmins($"@{command.User.Username}", message, "[{ \"id\":12, \"name\":\"Discord\", \"image\":\"discord.png\"}]");
+            });
+            await NAPI.Task.WaitForMainThread();
+            await command.RespondAsync($"**Message sent to admins:** `@{command.User.Username}: {message}`");
+        }
         private static async Task KickCommandHandler(SocketSlashCommand command)
         {
             string targetName = command.Data.Options.ElementAt(0).Value.ToString();
@@ -825,15 +892,97 @@ namespace RNC
                 }       
                 Task.Run(async () =>
                 {
+                    List<Embed> embedList = new List<Embed>();
                     foreach (EmbedBuilder e in playerListEmbeds)
                     {
-                        await command.Channel.SendMessageAsync("", false, e.Build());
+                        embedList.Add(e.Build());
                     }
-                    await command.RespondAsync("Online player list.");
+                    Embed[] embeds = embedList.ToArray();
+                    await command.RespondAsync(null, embeds);
                 });
-               
             });
-            
+            await NAPI.Task.WaitForMainThread();
+
+        }
+        private static async Task AdminsCommandHandler(SocketSlashCommand command)
+        {
+            NAPI.Task.Run(() =>
+            {
+                List<EmbedBuilder> playerListEmbeds = new List<EmbedBuilder>();
+
+                EmbedBuilder embed = new EmbedBuilder();
+                embed.Title = $"Online Admins";
+                embed.Description = "**Lobby/Mode | Admin Level**";
+                embed.Color = new Discord.Color(100, 0, 200);
+                embed.ThumbnailUrl = "https://media.discordapp.net/attachments/747725642350723172/1149001447946604625/logo.webp";
+
+                playerListEmbeds.Add(embed);
+
+                int count = 0;
+                lock (RAGE.Entities.Players)
+                {
+                    foreach (Player player in RAGE.Entities.Players.All.Where(p => p.HasSharedData("Admin") && p.GetSharedData<int>("Admin") > 0))
+                    {
+                        if (count >= 6)
+                        {
+                            count = 0;
+                            EmbedBuilder newEmbed = new EmbedBuilder();
+                            newEmbed.Color = new Discord.Color(100, 0, 200);
+                            playerListEmbeds.Add(newEmbed);
+                        }
+                        if (!player.HasSharedData("InLobby") || !player.HasSharedData("Admin") || !player.HasSharedData("Team") || !player.HasSharedData("InDM") || !player.HasSharedData("Level"))
+                        {
+                            playerListEmbeds[playerListEmbeds.Count - 1].AddField(player.Name, "Connecting/Logging in...");
+                        }
+                        else
+                        {
+                            int lobbyID = player.GetSharedData<int>("InLobby");
+                            int teamID = player.GetSharedData<int>("Team");
+                            int dmID = player.GetSharedData<int>("InDM");
+                            string modeDisplay = $"Lobby {lobbyID}";
+                            if (lobbyID > 0 && teamID != -1) modeDisplay = $"Copchase ({lobbyID})";
+                            else if (lobbyID > 0 && dmID != -1) modeDisplay = $"Deathmatch ({lobbyID})";
+                            else
+                            {
+                                switch (lobbyID)
+                                {
+                                    case -1:
+                                        modeDisplay = "Logging in";
+                                        break;
+                                    case -2:
+                                        modeDisplay = "Admin Jail";
+                                        break;
+                                    case -3:
+                                        modeDisplay = "Freeroam";
+                                        break;
+                                    case -4:
+                                        modeDisplay = "Derby";
+                                        break;
+                                    case -5:
+                                        modeDisplay = "Character Creator";
+                                        break;
+                                }
+                            }
+                            playerListEmbeds[playerListEmbeds.Count - 1].AddField(player.Name, $"{modeDisplay} | Admin Level {player.GetSharedData<int>("Admin")}", true);
+                        }
+
+                        count++;
+                    }
+                }
+                Task.Run(async () =>
+                {
+                    List<Embed> embedList = new List<Embed>();
+                    foreach (EmbedBuilder e in playerListEmbeds)
+                    {
+                        embedList.Add(e.Build());
+                    }
+                    Embed[] embeds = embedList.ToArray();
+                    await command.RespondAsync(null, embeds);
+                });
+
+            });
+            await NAPI.Task.WaitForMainThread();
+
         }
 
         public async static Task<int> GetIngameSQLID(SocketUser user)
