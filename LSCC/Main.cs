@@ -771,22 +771,14 @@ namespace RNC
 
         public static Vector3[] LobbySpawns = new Vector3[]
         {
-            new Vector3(2069.2861f, 2995.4106f, -67.70157f),
-            new Vector3(2054.4092f, 2974.1233f, -67.30131f),
-            new Vector3(2022.6499f, 3020.7466f, -72.69173f),
-            new Vector3(2042.7986f, 3011.162f, -72.701996f),
-            new Vector3(2058.3594f, 2992.1797f, -72.70203f),
-            new Vector3(2051.1077f, 2970.5386f, -61.90173f),
-            new Vector3(2069.274f, 2996.021f, -63.501797f),
-            new Vector3(2066.6445f, 2986.484f, -62.50187f),
-            new Vector3(2060.0073f, 2993.4216f, -62.501953f),
-            new Vector3(2046.1349f, 2936.4468f, -61.90174f),
-            new Vector3(2089.6162f, 2928.3945f, -61.9019f),
-            new Vector3(2116.1406f, 2924.1868f, -61.9019f),
-            new Vector3(2091.659f, 2944.1787f, -61.901913f),
-            new Vector3(2054.5134f, 2953.5405f, -61.89666f),
-            new Vector3(2042.21f, 2962.7363f, -65.50202f),
-            new Vector3(2112.1326f, 2944.9526f, -65.50179f)
+            new Vector3(435.16357f, -983.11615f, 30.689608f),
+            new Vector3(441.00525f, -976.70306f, 30.689604f),
+            new Vector3(447.96674f, -987.3671f, 30.689596f),
+            new Vector3(451.5091f, -982.6244f, 30.689596f),
+            new Vector3(459.29898f, -985.8472f, 30.689606f),
+            new Vector3(439.45166f, -994.0734f, 30.689585f),
+            new Vector3(452.88248f, -985.1788f, 26.67423f),
+            new Vector3(461.93222f, -990.7201f, 24.91487f),
         };
 
         public static object[] VectorJail = { new Vector3(2061.5889f, 2967.7412f, -67.30185f), 53f };
