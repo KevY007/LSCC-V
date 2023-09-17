@@ -149,6 +149,11 @@ namespace RNC
                 .AddOption("username", ApplicationCommandOptionType.String, "User to ban", isRequired: true)
                 .AddOption("reason", ApplicationCommandOptionType.String, "Ban reason", isRequired: true)
                 .Build(), BanCommandHandler));
+            commands.Add(new CommandDefinition(new SlashCommandBuilder()
+                 .WithName("unban")
+                 .WithDescription("Unban a player")
+                 .AddOption("username", ApplicationCommandOptionType.String, "User to unban", isRequired: true)
+                 .Build(), UnbanCommandHandler));
 
             await guild.BulkOverwriteApplicationCommandAsync(commands.Select(cmd => cmd.Meta).ToArray());
         }
@@ -332,6 +337,51 @@ namespace RNC
                     }
                     
                 }, 10);
+            }
+        }
+        private static async Task UnbanCommandHandler(SocketSlashCommand command)
+        {
+            string target = command.Data.Options.ElementAt(0).Value.ToString();
+            int aLevel = GetIngameAdminLevel(command.User);
+            if (aLevel < 2)
+            {
+                await command.RespondAsync("You are not authorized to use this!");
+                return;
+            }
+            using (MainDatabase dbcontext = ContextFactory.CreateContext())
+            {
+                Account tpAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(target, StringComparison.OrdinalIgnoreCase) == true);
+                BanData ban = null;
+
+                if (tpAcc != null)
+                {
+                    ban = await dbcontext.Bans.AsQueryable().FirstOrDefaultAsync(a => a.AccountSQLID == tpAcc.SQL_ID);
+                }
+                if (ban == null)
+                {
+                    await command.RespondAsync("**There is no ban with that name!**");
+                    return;
+                }
+
+                string username = "Unregistered Ban";
+                if (ban.AccountSQLID != -1)
+                {
+                    Account pAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(acc => acc.SQL_ID == ban.AccountSQLID);
+                    if (pAcc != null)
+                    {
+                        username = pAcc.Username;
+                    }
+                }
+                dbcontext.Bans.Remove(ban);
+                await dbcontext.SaveChangesAsync();
+                await command.RespondAsync($"<@{command.User.Id}>, you successfully unbanned {tpAcc.Username}!");
+                lock (RAGE.Entities.Players)
+                {
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}[DC] {command.User.Username} has unbanned {username}.");
+                    }, 10);
+                }
             }
         }
         private static async Task UnjailCommandHandler(SocketSlashCommand command)
