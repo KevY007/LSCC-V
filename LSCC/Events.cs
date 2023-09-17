@@ -3497,11 +3497,16 @@ namespace RNC
             if (player.GetSharedData<bool>("AutoOOC") == false)
             {
                 string chatStr = $"{EPlayer.Name(player).Replace("_", " ")} says: {message}";
+
+                string messageFixed = message.Trim();
+                if (!char.IsUpper(messageFixed[0])) messageFixed = (char.ToUpper(messageFixed[0]) + messageFixed.Substring(1));
+                if (!messageFixed.EndsWith(".") && !messageFixed.EndsWith("!") && !messageFixed.EndsWith("?")) messageFixed += ".";
+
                 foreach (Player i in RAGE.Entities.Players.All)
                 {
                     if (i.Dimension == player.Dimension)
                     {
-                        if (i.Position.DistanceTo(player.Position) <= 20.0) EPlayer.SendPlayerMessage(i, player, "Local", "text", $"{chatStr}");
+                        if (i.Position.DistanceTo(player.Position) <= 20.0) EPlayer.SendPlayerMessage(i, player, "Local", "text", messageFixed);
 
                         //if (i.Position.DistanceTo(player.Position) <= 10.0) EPlayer.SendPlayerMessage(i, player, "Local", "text", $"!{{#D4D4D4}}{chatStr}");
                         //if (i.Position.DistanceTo(player.Position) > 10.0 && i.Position.DistanceTo(player.Position) <= 15.0) EPlayer.SendPlayerMessage(i, player, "Local", "text", $"!{{#B5B5B5}}{chatStr}");

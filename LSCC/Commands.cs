@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
+using System.ServiceModel.Channels;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -10561,8 +10562,10 @@ namespace RNC
                 player.SendChatMessage(Translate(player, "ERROR_MUTED", EPlayer.GetAccount(player).MuteReason, EPlayer.GetAccount(player).MuteTime));
                 return;
             }
-
-            string chatStr = $"[LOW] {EPlayer.Name(player).Replace("_", " ")} says: {text}";
+            string messageFixed = text.Trim();
+            if (!char.IsUpper(messageFixed[0])) messageFixed = (char.ToUpper(messageFixed[0]) + messageFixed.Substring(1));
+            if (!messageFixed.EndsWith(".") && !messageFixed.EndsWith("!") && !messageFixed.EndsWith("?")) messageFixed += ".";
+            string chatStr = $"[LOW] {EPlayer.Name(player).Replace("_", " ")} says: {messageFixed}";
             foreach (Player i in Settings.LoggedInPlayers)
             {
                 if (i.Dimension == player.Dimension)
@@ -10590,9 +10593,12 @@ namespace RNC
                 return;
             }
 
+            string messageFixed = text.Trim();
+            if (!char.IsUpper(messageFixed[0])) messageFixed = (char.ToUpper(messageFixed[0]) + messageFixed.Substring(1));
+            if (!messageFixed.EndsWith(".") && !messageFixed.EndsWith("!") && !messageFixed.EndsWith("?")) messageFixed += ".";
             foreach (Player i in Settings.LoggedInPlayers.Where(a => a.IsInVehicle && a.Vehicle == player.Vehicle))
             {
-                i.SendChatMessage(Translate(i, "CAR_WHISPER", EPlayer.Name(player), text));
+                i.SendChatMessage(Translate(i, "CAR_WHISPER", EPlayer.Name(player), messageFixed));
             }
             return;
         }
@@ -10609,13 +10615,15 @@ namespace RNC
                 return;
             }
 
+            string messageFixed = text.Trim();
+            if (!char.IsUpper(messageFixed[0])) messageFixed = (char.ToUpper(messageFixed[0]) + messageFixed.Substring(1));
             foreach (Player i in RAGE.Entities.Players.All)
             {
                 if (i.Dimension == player.Dimension)
                 {
-                    if (i.Position.DistanceTo(player.Position) <= 20.0) i.SendChatMessage($"!{{#D4D4D4}}{Translate(i, "SHOUTING", EPlayer.Name(player), text)}");
-                    if (i.Position.DistanceTo(player.Position) > 20.0 && i.Position.DistanceTo(player.Position) <= 30.0) i.SendChatMessage($"!{{#B5B5B5}}{Translate(i, "SHOUTING", EPlayer.Name(player), text)}");
-                    if (i.Position.DistanceTo(player.Position) > 30.0 && i.Position.DistanceTo(player.Position) <= 50.0) i.SendChatMessage($"!{{#999999}}{Translate(i, "SHOUTING", EPlayer.Name(player), text)}");
+                    if (i.Position.DistanceTo(player.Position) <= 20.0) i.SendChatMessage($"!{{#D4D4D4}}{Translate(i, "SHOUTING", EPlayer.Name(player), messageFixed)}");
+                    if (i.Position.DistanceTo(player.Position) > 20.0 && i.Position.DistanceTo(player.Position) <= 30.0) i.SendChatMessage($"!{{#B5B5B5}}{Translate(i, "SHOUTING", EPlayer.Name(player), messageFixed)}");
+                    if (i.Position.DistanceTo(player.Position) > 30.0 && i.Position.DistanceTo(player.Position) <= 50.0) i.SendChatMessage($"!{{#999999}}{Translate(i, "SHOUTING", EPlayer.Name(player), messageFixed)}");
                 }
             }
             return;
@@ -10650,8 +10658,10 @@ namespace RNC
                 player.SendChatMessage(Translate(player, "ERROR_NOT_COP_CAR"));
                 return;
             }
-
-           string chatStr = $"!{{#FFFF00}}** [MEGAPHONE] {EPlayer.Name(player).Replace("_", " ")}: {text}";
+            string messageFixed = text.Trim();
+            if (!char.IsUpper(messageFixed[0])) messageFixed = (char.ToUpper(messageFixed[0]) + messageFixed.Substring(1));
+            if (!messageFixed.EndsWith(".") && !messageFixed.EndsWith("!") && !messageFixed.EndsWith("?")) messageFixed += ".";
+            string chatStr = $"!{{#FFFF00}}** [MEGAPHONE] {EPlayer.Name(player).Replace("_", " ")}: {messageFixed}";
 
             foreach (Player i in RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension 
                 && a.Position.DistanceTo(player.Position) < 150.0))
@@ -10687,7 +10697,10 @@ namespace RNC
 
             if (lobby.Cops.Contains(player))
             {
-                string chatStr = $"!{{#FFEC8B}}** [RADIO | FREQ: 911] {EPlayer.Name(player).Replace("_", " ")}: {text}";
+                string messageFixed = text.Trim();
+                if (!char.IsUpper(messageFixed[0])) messageFixed = (char.ToUpper(messageFixed[0]) + messageFixed.Substring(1));
+                if (!messageFixed.EndsWith(".") && !messageFixed.EndsWith("!") && !messageFixed.EndsWith("?")) messageFixed += ".";
+                string chatStr = $"!{{#FFEC8B}}** [RADIO | FREQ: 911] {EPlayer.Name(player).Replace("_", " ")}: {messageFixed}";
 
                 foreach (Player i in lobby.Cops)
                 {
@@ -10696,7 +10709,10 @@ namespace RNC
             }
             else if (lobby.Fugitives.Contains(player))
             {
-                string chatStr = $"!{{#FFEC8B}}** [WT | FREQ: {lobby.lobbyId + 8346}] {EPlayer.Name(player).Replace("_", " ")}: {text}";
+                string messageFixed = text.Trim();
+                if (!char.IsUpper(messageFixed[0])) messageFixed = (char.ToUpper(messageFixed[0]) + messageFixed.Substring(1));
+                if (!messageFixed.EndsWith(".") && !messageFixed.EndsWith("!") && !messageFixed.EndsWith("?")) messageFixed += ".";
+                string chatStr = $"!{{#FFEC8B}}** [WT | FREQ: {lobby.lobbyId + 8346}] {EPlayer.Name(player).Replace("_", " ")}: {messageFixed}";
 
                 foreach (Player i in lobby.Fugitives)
                 {
