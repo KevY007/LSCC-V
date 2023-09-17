@@ -541,6 +541,9 @@ mp.events.add("mainmenu_tab_request_data", (tab) => {
       break;
     case "profile":
       mp.events.callRemote("Menu_RequestTabData", tab);
+      setTimeout(() => {
+        mp.events.callLocal("addChallengesToMenu");
+      }, 250);
       break;
     case "inventory":
       mp.events.callRemote("Menu_RequestTabData", tab);
