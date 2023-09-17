@@ -4,6 +4,7 @@ using GTANetworkAPI;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -144,6 +145,20 @@ namespace RNC
                  .Build(), UnjailCommandHandler));
 
             commands.Add(new CommandDefinition(new SlashCommandBuilder()
+                   .WithName("mute")
+                   .WithDescription("Mute a player (works for offline players too)")
+                   .AddOption("username", ApplicationCommandOptionType.String, "User to mute", isRequired: true)
+                   .AddOption("time", ApplicationCommandOptionType.Integer, "Mute duration (in minutes)", isRequired: true)
+                   .AddOption("reason", ApplicationCommandOptionType.String, "Mute reason", isRequired: true)
+                   .Build(), MuteCommandHandler));
+
+            commands.Add(new CommandDefinition(new SlashCommandBuilder()
+                 .WithName("unmute")
+                 .WithDescription("Unmute a player (works for offline players too)")
+                 .AddOption("username", ApplicationCommandOptionType.String, "User to unmute", isRequired: true)
+                 .Build(), UnmuteCommandHandler));
+
+            commands.Add(new CommandDefinition(new SlashCommandBuilder()
                 .WithName("ban")
                 .WithDescription("Perma-ban a player (works for offline players too)")
                 .AddOption("username", ApplicationCommandOptionType.String, "User to ban", isRequired: true)
@@ -176,6 +191,152 @@ namespace RNC
             await command.RespondAsync(null, new Embed[] { embed.Build() }, false, false);
         }
 
+        private static async Task UnmuteCommandHandler(SocketSlashCommand command)
+        {
+            string name = command.Data.Options.ElementAt(0).Value.ToString();
+            int admID = await GetIngameSQLID(command.User);
+            if (admID == -1)
+            {
+                await command.RespondAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
+                return;
+            }
+
+            lock (RAGE.Entities.Players)
+            {
+                NAPI.Task.Run(() =>
+                {
+                    Player target = RAGE.Entities.Players.All.FirstOrDefault(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+                    if (target != null)
+                    {
+                        Account acc = EPlayer.GetAccount(target);
+                        if (acc.MuteTime == 0) { command.RespondAsync("**[!]** Target is not muted."); return; }
+
+                        //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unmute:{target.Name}"); } catch { }
+                        Logs.LogAdmin(admID, $"Unmuted {target.Name}.");
+                        acc.MuteTime = 0;
+                        target.SetSharedData("MuteTime", 0);
+
+                        EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] [DC] {command.User.Username} has unmuted {target.Name}.");
+
+                        command.RespondAsync($":white_check_mark: **Successfully unmuted {name}!**");
+                    }
+                    else
+                    {
+                        Task.Run(async () =>
+                        {
+                            using (MainDatabase dbcontext = ContextFactory.CreateContext())
+                            {
+                                Account tpAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+
+                                if (tpAcc == null)
+                                {
+                                    await command.RespondAsync("**[!]** There's no account with that name.");
+                                    return;
+                                }
+
+                                //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ounmute:{tpAcc.Username}"); } catch { }
+                                Logs.LogAdmin(admID, $"Unmuted offline player {tpAcc.Username}.");
+                                tpAcc.MuteTime = 0;
+
+                                await dbcontext.SaveChangesAsync();
+
+                                await command.RespondAsync($":white_check_mark: **Successfully offline-unmuted {name}!**");
+                            }
+                        });
+
+                    }
+
+                }, 10);
+            }
+        }
+        private static async Task MuteCommandHandler(SocketSlashCommand command)
+        {
+            string targetName = command.Data.Options.ElementAt(0).Value.ToString();
+            int mins = Convert.ToInt32(command.Data.Options.ElementAt(1).Value);
+            string reason = command.Data.Options.ElementAt(2).Value.ToString();
+
+            if (mins < 1)
+            {
+                await command.RespondAsync("**[!]** Mute time must be at least 1 minute! *Use /unmute to unmute a player.*");
+                return;
+            }
+
+            int admID = await GetIngameSQLID(command.User);
+            lock (RAGE.Entities.Players)
+            {
+                NAPI.Task.Run(() =>
+                {
+                    if (admID == -1)
+                    {
+                        command.RespondAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
+                        return;
+                    }
+                    int aLevel = GetIngameAdminLevel(command.User);
+
+                    Player target = RAGE.Entities.Players.All.FirstOrDefault(p => p.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+                    if (target != null)
+                    {
+                        Account tAcc = EPlayer.GetAccount(target);
+                        if (tAcc.Admin >= aLevel)
+                        {
+                            command.RespondAsync("**[!]** Target is a higher or equal admin level than you!");
+                            return;
+                        }
+
+                        tAcc.MuteReason = reason;
+                        tAcc.MuteTime = tAcc.MuteTime + (mins * 60);
+
+                        RAGE.Entities.Players.All.ForEach((Player playa) =>
+                        {
+                            playa.SendChatMessage(Translator.Translate(playa, "MUTED_MSG", command.User.Username, target.Name, mins, reason));
+                        });
+                        Logs.LogAdmin(admID, $"Muted player {target.Name} for {mins} minutes, reason: {reason}.");
+                        Logs.AddToAdminRecord(tAcc.SQL_ID, admID, "Mute", reason, mins + " minutes.");
+
+                        target.SendChatMessage(Translator.Translate(target, "MUTED_PLAYER_MSG", mins, reason));
+                        target.SetSharedData("MuteTime", tAcc.MuteTime);
+                        target.TriggerEvent("SetMuteCounter", tAcc.MuteTime);
+
+                        PunishmentResponse(command, "Mute", ("Player", targetName), ("Reason", reason), ("Duration", $"{mins} minutes"));
+                    }
+                    else
+                    {
+                        Task.Run(async () =>
+                        {
+                            using (MainDatabase dbcontext = ContextFactory.CreateContext())
+                            {
+                                Account tpAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+                                if (tpAcc == null)
+                                {
+                                    await command.RespondAsync("**[!]** That player does not exist in the database!");
+                                    return;
+                                }
+
+                                Logs.LogAdmin(admID, $"Offline-muted {tpAcc.Username} for {mins} minutes, reason: {reason}");
+                                Logs.AddToAdminRecord(tpAcc.SQL_ID, admID, "Mute", "(OFF) " + reason, mins + " minutes.");
+
+                                tpAcc.MuteReason = reason;
+                                tpAcc.MuteTime = tpAcc.MuteTime + (mins * 60);
+
+                                await dbcontext.SaveChangesAsync();
+
+                                NAPI.Task.Run(() =>
+                                {
+                                    RAGE.Entities.Players.All.ForEach((Player playa) =>
+                                    {
+                                        playa.SendChatMessage(Translator.Translate(playa, "MUTED_MSG", command.User.Username, tpAcc.Username, mins, reason));
+                                    });
+                                });
+
+                                PunishmentResponse(command, "Mute", ("Player", tpAcc.Username), ("Reason", reason), ("Duration", $"{mins} minutes"));
+                            }
+                        });
+
+                    }
+
+                }, 10);
+            }
+        }
         private static async Task BanCommandHandler(SocketSlashCommand command)
         {
             string name = command.Data.Options.ElementAt(0).Value.ToString();
