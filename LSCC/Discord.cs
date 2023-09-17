@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using GTANetworkAPI;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -123,12 +124,174 @@ namespace RNC
             if (guild == null) return;
 
             // Commands
-            commands.Add(new CommandDefinition(new SlashCommandBuilder().WithName("players").WithDescription("View online players.").Build(), PlayersCommandHandler));
+            commands.Add(new CommandDefinition(new SlashCommandBuilder()
+                .WithName("players")
+                .WithDescription("View online players.")
+                .Build(), PlayersCommandHandler));
+
+            commands.Add(new CommandDefinition(new SlashCommandBuilder()
+                .WithName("jail")
+                .WithDescription("Admin-Jail a player")
+                .AddOption("username", ApplicationCommandOptionType.String, "User to admin-jail", isRequired:true)
+                .AddOption("time", ApplicationCommandOptionType.Integer, "Jail duration (in minutes)", isRequired:true)
+                .AddOption("reason", ApplicationCommandOptionType.String, "Jail reason", isRequired:true)
+                .Build(), JailCommandHandler));
+
+            commands.Add(new CommandDefinition(new SlashCommandBuilder()
+                 .WithName("unjail")
+                 .WithDescription("Admin-Jail a player")
+                 .AddOption("username", ApplicationCommandOptionType.String, "User to admin-jail", isRequired: true)
+                 .Build(), UnjailCommandHandler));
 
             await guild.BulkOverwriteApplicationCommandAsync(commands.Select(cmd => cmd.Meta).ToArray());
         }
 
         // Commands
+        private static async Task UnjailCommandHandler(SocketSlashCommand command)
+        {
+            string name = command.Data.Options.ElementAt(0).Value.ToString();
+            int admID = await GetIngameSQLID(command.User);
+            lock (RAGE.Entities.Players)
+            {
+                NAPI.Task.Run(() =>
+                {
+                    if (admID == -1)
+                    {
+                        command.RespondAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
+                        return;
+                    }
+
+                    Player target = RAGE.Entities.Players.All.FirstOrDefault(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+                    if (target != null)
+                    {
+                        Account acc = EPlayer.GetAccount(target);
+                        if (acc.JailTime == 0) { command.RespondAsync("[!] Target is not jailed."); return; }
+
+                        Logs.LogAdmin(admID, $"Unjailed player {target.Name} who had {acc.JailTime} seconds remaining in jail.");
+                        acc.JailTime = 0;
+                        target.SetSharedData("JailTime", 0);
+                        EPlayer.Freeze(target, false);
+
+                        //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:unjail:{target.Name}"); } catch { }             
+                        EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] [DC] {command.User.Username} has unjailed {target.Name}.");
+                        EPlayer.Spawn(target);
+
+                        command.RespondAsync($":white_check_mark: **Successfully unjailed {name}!**");
+                    }
+                    else
+                    {
+                        Task.Run(async () =>
+                        {
+                            using (MainDatabase dbcontext = ContextFactory.CreateContext())
+                            {
+                                Account tpAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+
+                                if ((tpAcc != null) == false)
+                                {
+                                    await command.RespondAsync("[!] There's no account with that name.");
+                                    return;
+                                }
+
+                                //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ounjail:{tpAcc.Username}"); } catch { }
+                                Logs.LogAdmin(admID, $"Unjailed offline player {tpAcc.Username} who had {tpAcc.JailTime} seconds remaining in jail.");
+                                tpAcc.JailTime = 0;
+
+                                await dbcontext.SaveChangesAsync();
+
+                                NAPI.Task.Run(() =>
+                                {
+                                    EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] [DC] {command.User.Username} has offline unjailed {tpAcc.Username}.");
+                                });
+
+                                await command.RespondAsync($":white_check_mark: **Successfully offline-unjailed {name}!**");
+                            }
+                        });
+
+                    }
+                }, 10);
+            }
+        }
+        private static async Task JailCommandHandler(SocketSlashCommand command)
+        {
+            string targetName = command.Data.Options.ElementAt(0).Value.ToString();
+            int mins = Convert.ToInt32(command.Data.Options.ElementAt(1).Value);
+            string reason = command.Data.Options.ElementAt(2).Value.ToString();
+
+            if (mins < 1)
+            {
+                await command.RespondAsync("**[!]** Jail time must be at least 1 minute! *Use /unjail to unjail a player.*");
+                return;
+            }
+
+            int admID = await GetIngameSQLID(command.User);
+            lock (RAGE.Entities.Players)
+            {
+                NAPI.Task.Run(() =>
+                {
+                    if (admID == -1)
+                    {
+                        command.RespondAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this! **(/link)**");
+                        return;
+                    }
+                    int aLevel = GetIngameAdminLevel(command.User);
+
+                    Player target = RAGE.Entities.Players.All.FirstOrDefault(p => p.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+                    if (target != null)
+                    {
+                        Account tAcc = EPlayer.GetAccount(target);
+                        if (tAcc.Admin >= aLevel)
+                        {
+                            command.RespondAsync("**[!]** Target is a higher or equal admin level than you!");
+                            return;
+                        }
+
+                        RAGE.Entities.Players.All.ForEach((Player playa) =>
+                        {
+                            playa.SendChatMessage(Translator.Translate(playa, "JAILED_MSG", command.User.Username, target.Name, mins, reason));
+                        });
+                        Logs.LogAdmin(admID, $"Jailed player {target.Name} for {mins} minutes, reason: {reason}.");
+                        EPlayer.Jail(target, mins, reason);
+                        Logs.AddToAdminRecord(tAcc.SQL_ID, admID, "Jail", reason, mins + " minutes.");
+
+                        command.RespondAsync($":white_check_mark: **Successfully jailed {targetName} for {reason}!**");
+                    }
+                    else
+                    {
+                        Task.Run(async () =>
+                        {
+                            using (MainDatabase dbcontext = ContextFactory.CreateContext())
+                            {
+                                Account tpAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+                                if (tpAcc == null)
+                                {
+                                    await command.RespondAsync("**[!]** That player does not exist in the database!");
+                                    return;
+                                }
+
+                                Logs.LogAdmin(admID, $"Offline-jailed {tpAcc.Username} for {mins} minutes, reason: {reason}");
+                                Logs.AddToAdminRecord(tpAcc.SQL_ID, admID, "Jail", "(OFF) " + reason, mins + " minutes.");
+
+                                tpAcc.JailReason = reason;
+                                tpAcc.JailTime = tpAcc.JailTime + (mins * 60);
+
+                                await dbcontext.SaveChangesAsync();
+
+                                NAPI.Task.Run(() =>
+                                {
+                                    RAGE.Entities.Players.All.ForEach((Player playa) =>
+                                    {
+                                        playa.SendChatMessage(Translator.Translate(playa, "JAILED_MSG", command.User.Username, tpAcc.Username, mins, reason));
+                                    });
+                                });
+
+                                await command.RespondAsync($":white_check_mark: **Successfully offline-jailed {targetName} for {reason}!**");
+                            }
+                        });
+
+                    }
+                }, 10);
+            }
+        }
         private static async Task PlayersCommandHandler(SocketSlashCommand command)
         {
             NAPI.Task.Run(() =>
@@ -205,6 +368,79 @@ namespace RNC
                
             });
             
+        }
+
+        public async static Task<int> GetIngameSQLID(SocketUser user)
+        {
+            if (user == null)
+            {
+                NAPI.Task.Run(() => { NAPI.Util.ConsoleOutput($"[DISCORD] Attempted to get SQLID - User was null!"); });
+                return -1;
+            }
+            if (user.Id == 922461597866295397 || user.Id == 1027945798069133443)
+            {
+                return 1; // if GM bot return KevY's ID, cba to make a new account for the bot now
+            }
+
+            using (MainDatabase context = ContextFactory.CreateContext())
+            {
+                Account _a = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.DiscordID == user.Id.ToString());
+                if (_a == null) return -1;
+                return _a.SQL_ID;
+            }
+        }
+
+        public static int GetIngameAdminLevel(SocketUser user)
+        {
+            if (user == null)
+            {
+                NAPI.Task.Run(() => { NAPI.Util.ConsoleOutput($"[DISCORD] Attempted to get SQLID - User was null!"); });
+                return 0;
+            }
+            if (user.Id == 922461597866295397 || user.Id == 1027945798069133443) // if GM bot
+            {
+                return 6;
+            }
+
+            SocketGuildUser realUser = user as SocketGuildUser;
+
+            int level = 0;
+            var role = (realUser as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 714822199881760798); // mod
+            if (realUser.Roles.Contains(role))
+            {
+                level = 1;
+            }
+            role = (realUser as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 714821592701599814); // trial
+            if (realUser.Roles.Contains(role))
+            {
+                level = 2;
+            }
+            role = (realUser as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 800001726043127848); // general
+            if (realUser.Roles.Contains(role))
+            {
+                level = 3;
+            }
+            role = (realUser as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 713734312335376465); // senior
+            if (realUser.Roles.Contains(role))
+            {
+                level = 4;
+            }
+            role = (realUser as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 886616979912421387); // lead
+            if (realUser.Roles.Contains(role))
+            {
+                level = 5;
+            }
+            role = (realUser as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 777641183512887316); // owner/management
+            if (realUser.Roles.Contains(role))
+            {
+                level = 6;
+            }
+            role = (realUser as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 713798856680276079); // owner/management
+            if (realUser.Roles.Contains(role))
+            {
+                level = 6;
+            }
+            return level;
         }
     }
     class CommandDefinition

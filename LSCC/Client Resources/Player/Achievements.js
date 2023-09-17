@@ -130,7 +130,7 @@ mp.events.add("addChallengesToMenu", (weekChallengeProgress, weekChallengeUnix) 
         challenges:daily_challenges
     }
     );
-    mp.events.callRemote('ServerConsoleOutput', JSON.stringify(challenges_object));
+    mp.events.callRemote('ServerConsoleOutput', "[CHALLENGES]: " + JSON.stringify(challenges_object));
     if(global.ServerUI) global.ServerUI.call('mainmenu_profile_challenges_set', challenges_object);
 });
 mp.events.add("advanceChallenge", (arrayID, cht, chi, chp) => {
