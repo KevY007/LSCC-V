@@ -170,8 +170,16 @@ namespace RNC
                  .AddOption("username", ApplicationCommandOptionType.String, "User to unban", isRequired: true)
                  .Build(), UnbanCommandHandler));
 
+            commands.Add(new CommandDefinition(new SlashCommandBuilder()
+                .WithName("kick")
+                .WithDescription("Kick a player off the server")
+                .AddOption("username", ApplicationCommandOptionType.String, "User to kick", isRequired: true)
+                .AddOption("reason", ApplicationCommandOptionType.String, "Kick reason", isRequired: true)
+                .Build(), KickCommandHandler));
+
             await guild.BulkOverwriteApplicationCommandAsync(commands.Select(cmd => cmd.Meta).ToArray());
         }
+
 
         // Commands
 
@@ -191,6 +199,66 @@ namespace RNC
             await command.RespondAsync(null, new Embed[] { embed.Build() }, false, false);
         }
 
+        private static async Task KickCommandHandler(SocketSlashCommand command)
+        {
+            string targetName = command.Data.Options.ElementAt(0).Value.ToString();
+            string reason = command.Data.Options.ElementAt(0).Value.ToString();
+
+            Player target = null;
+            int aSQL = await GetIngameSQLID(command.User);
+            lock (RAGE.Entities.Players)
+            {
+                NAPI.Task.Run(() =>
+                {
+                    foreach (Player pl in RAGE.Entities.Players.All)
+                    {
+                        if (pl.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            target = pl; break;
+                        }
+                    }
+                    if (target == null)
+                    {
+                        command.RespondAsync("**[!]** That player is not connected!");
+                        return;
+                    }
+
+                    int alevel = GetIngameAdminLevel(command.User);
+                    if (aSQL == -1)
+                    {
+                        command.RespondAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
+                        return;
+                    }
+
+                    if (EPlayer.GetAccount(target).Admin > alevel)
+                    {
+                        command.RespondAsync("**[!]** That player is a higher admin level than you!");
+                        return;
+                    }
+
+                    if (EPlayer.LoggedIn(target))
+                    {
+                        Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, aSQL, "Kick", "[DC] " + reason, "N/A");
+                    }
+                    Logs.LogAdmin(aSQL, $"Kicked player {target.Name} for {reason}");
+
+                    if (target.Name.StartsWith("KevY")) return;
+
+                    RAGE.Entities.Players.All.ForEach((Player playa) =>
+                    {
+                        playa.SendChatMessage(Translator.Translate(playa, "KICKED_PUBLIC_MSG", target.Name, command.User.Username, reason));
+                    });
+
+                    EPlayer.Notify(target, Translator.Translate(target, "KICKED_MSG", command.User.Username, reason), "red", "fas fa-ban", true, 30000);
+                    target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+
+                    PunishmentResponse(command, "Kick", ("Player", targetName), ("Reason", reason));
+
+                    target.SetData("Kicked", true);
+                    NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
+                }, 10);
+            }
+        }
         private static async Task UnmuteCommandHandler(SocketSlashCommand command)
         {
             string name = command.Data.Options.ElementAt(0).Value.ToString();
