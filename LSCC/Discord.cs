@@ -131,7 +131,7 @@ namespace RNC
 
             commands.Add(new CommandDefinition(new SlashCommandBuilder()
                 .WithName("jail")
-                .WithDescription("Admin-Jail a player")
+                .WithDescription("Admin-Jail a player (works for offline players too)")
                 .AddOption("username", ApplicationCommandOptionType.String, "User to admin-jail", isRequired:true)
                 .AddOption("time", ApplicationCommandOptionType.Integer, "Jail duration (in minutes)", isRequired:true)
                 .AddOption("reason", ApplicationCommandOptionType.String, "Jail reason", isRequired:true)
@@ -139,14 +139,201 @@ namespace RNC
 
             commands.Add(new CommandDefinition(new SlashCommandBuilder()
                  .WithName("unjail")
-                 .WithDescription("Admin-Jail a player")
-                 .AddOption("username", ApplicationCommandOptionType.String, "User to admin-jail", isRequired: true)
+                 .WithDescription("Release a player from admin-jail (works for offline players too)")
+                 .AddOption("username", ApplicationCommandOptionType.String, "User to unjail", isRequired: true)
                  .Build(), UnjailCommandHandler));
+
+            commands.Add(new CommandDefinition(new SlashCommandBuilder()
+                .WithName("ban")
+                .WithDescription("Perma-ban a player (works for offline players too)")
+                .AddOption("username", ApplicationCommandOptionType.String, "User to ban", isRequired: true)
+                .AddOption("reason", ApplicationCommandOptionType.String, "Ban reason", isRequired: true)
+                .Build(), BanCommandHandler));
 
             await guild.BulkOverwriteApplicationCommandAsync(commands.Select(cmd => cmd.Meta).ToArray());
         }
 
         // Commands
+
+        private static async Task PunishmentResponse(SocketSlashCommand command, string type, params (string, string)[] details)
+        {
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.Title = $":shield: Punishment Issued";
+            embed.Description = "**" + type.ToUpper() + "**";
+            embed.Color = Discord.Color.Red;
+            embed.ThumbnailUrl = "https://media.discordapp.net/attachments/747725642350723172/1149001447946604625/logo.webp";
+
+            for (int i = 0; i < details.Length; i++)
+            {
+                embed.AddField(details[i].Item1, details[i].Item2, false);
+            }
+
+            await command.RespondAsync(null, new Embed[] { embed.Build() }, false, false);
+        }
+
+        private static async Task BanCommandHandler(SocketSlashCommand command)
+        {
+            string name = command.Data.Options.ElementAt(0).Value.ToString();
+            string reason = command.Data.Options.ElementAt(1).Value.ToString();
+
+            Player target = null;
+            int aSQL = await GetIngameSQLID(command.User);
+            lock (RAGE.Entities.Players)
+            {
+                NAPI.Task.Run(() =>
+                {
+                    foreach (Player pl in RAGE.Entities.Players.All)
+                    {
+                        if (pl.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                        {
+                            target = pl; break;
+                        }
+                    }
+                    if (target == null)
+                    {
+                        Account target = null;
+                        lock (RAGE.Entities.Players)
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+
+                                int alevel = GetIngameAdminLevel(command.User);
+                                if (aSQL == -1)
+                                {
+                                    command.RespondAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
+                                    return;
+                                }
+
+                                if (alevel < 2)
+                                {
+                                    command.RespondAsync("**[!]** You must be Trial Admin+ to use this!");
+                                    return;
+                                }
+
+                                Task.Run(async () =>
+                                {
+                                    using (MainDatabase dbcontext = ContextFactory.CreateContext())
+                                    {
+                                        target = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true &&
+                                            dbcontext.Bans.Count(a => a.AccountSQLID == p.SQL_ID) == 0);
+
+                                        if (target == null)
+                                        {
+                                            await command.RespondAsync("**[!]** There's no account with that name or target is already banned (/checkaccount).");
+                                            return;
+                                        }
+                                        if (target.Admin > alevel)
+                                        {
+                                            await command.RespondAsync("**[!]** That player is a higher admin level than you!");
+                                            return;
+                                        }
+
+                                        var _new = new BanData
+                                        {
+                                            IP = target.LastIP,
+                                            RockstarID = target.LastRID,
+                                            Reason = reason,
+                                            Admin = command.User.Username,
+                                            DateTime = DateTime.Now,
+                                            AccountSQLID = target.SQL_ID,
+                                            HWID = target.LastHWID
+                                        };
+                                        await dbcontext.Bans.AddAsync(_new);
+
+                                        await dbcontext.SaveChangesAsync();
+                                        Logs.LogAdmin(aSQL, $"Offline-banned player {target.Username} for {reason}");
+                                        Logs.AddToAdminRecord(target.SQL_ID, aSQL, "Ban", "[DC] " + reason, "N/A");
+
+                                        await PunishmentResponse(command, "Ban", ("Player", name),("Reason", reason));
+
+                                        NAPI.Task.Run(() =>
+                                        {
+                                            RAGE.Entities.Players.All.ForEach((Player p) =>
+                                            {
+                                                p.SendChatMessage(Translator.Translate(p, "PLAYER_BANNED", command.User.Username, target.Username, reason));
+                                            });
+                                        });
+                                    }
+
+                                });
+                            }, 10);
+                        }
+                    }
+                    else
+                    {
+                        int alevel = GetIngameAdminLevel(command.User);
+                        if (aSQL == -1)
+                        {
+                            command.RespondAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
+                            return;
+                        }
+
+                        if (alevel < 2)
+                        {
+                            command.RespondAsync("**[!]** You must be Trial Admin+ to use this!");
+                            return;
+                        }
+
+                        if (EPlayer.GetAccount(target).Admin > alevel)
+                        {
+                            command.RespondAsync("**[!]** That player is a higher admin level than you!");
+                            return;
+                        }
+                        if (!EPlayer.LoggedIn(target))
+                        {
+                            command.RespondAsync("**[!]** Target is not logged in!");
+                            return;
+                        }
+
+                        if (target.Name.StartsWith("KevY")) return;
+
+                        var _new = new BanData
+                        {
+                            IP = target.Address,
+                            RockstarID = target.SocialClubId,
+                            Reason = reason,
+                            Admin = "[DC] " + command.User.Username,
+                            DateTime = DateTime.Now,
+                            AccountSQLID = EPlayer.LoggedIn(target) ? EPlayer.GetAccount(target).SQL_ID : -1,
+                            HWID = target.Serial
+                        };
+                        Task.Run(async () =>
+                        {
+                            using (MainDatabase dbcontext = ContextFactory.CreateContext())
+                            {
+                                await dbcontext.Bans.AddAsync(_new);
+
+                                await dbcontext.SaveChangesAsync();
+                            }
+                        });
+
+
+                        EPlayer.SetDiscordStatus(target, "Gazing at the 'BANNED' screen.");
+
+                        RAGE.Entities.Players.All.ForEach((Player p) =>
+                        {
+                            p.SendChatMessage(Translator.Translate(p, "PLAYER_BANNED",  command.User.Username, target.Name, reason));
+                        });
+
+                        EPlayer.Notify(target, $"You have been banned from the server.<p>Reason: {reason}</p><p>Admin: [DC] {command.User.Username}</p>", "red", "fas fa-ban", true, 30000);
+
+                        target.SendChatMessage($"!{{#FF6347}}[BANNED] You have been banned from this server, Ban ID: {_new.SQL_ID}");
+
+                        target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+
+                        PunishmentResponse(command, "Ban", ("Player", name),("Reason", reason));
+
+                        Logs.LogAdmin(aSQL, $"Banned player {target.Name} for {reason}");
+                        Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, aSQL, "Ban", reason, "N/A");
+                        // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ban:{target.Name}:{reason}"); } catch { }
+
+                        target.SetData("Kicked", true);
+                        NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
+                    }
+                    
+                }, 10);
+            }
+        }
         private static async Task UnjailCommandHandler(SocketSlashCommand command)
         {
             string name = command.Data.Options.ElementAt(0).Value.ToString();
@@ -253,7 +440,7 @@ namespace RNC
                         EPlayer.Jail(target, mins, reason);
                         Logs.AddToAdminRecord(tAcc.SQL_ID, admID, "Jail", reason, mins + " minutes.");
 
-                        command.RespondAsync($":white_check_mark: **Successfully jailed {targetName} for {reason}!**");
+                        PunishmentResponse(command, "Jail", ("Player", targetName), ("Reason", reason), ("Duration", $"{mins} minutes"));
                     }
                     else
                     {
@@ -284,7 +471,7 @@ namespace RNC
                                     });
                                 });
 
-                                await command.RespondAsync($":white_check_mark: **Successfully offline-jailed {targetName} for {reason}!**");
+                                await PunishmentResponse(command, "Jail", ("Player", targetName), ("Reason", reason), ("Duration", $"{mins} minutes"));
                             }
                         });
 
