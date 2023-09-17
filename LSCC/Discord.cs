@@ -234,6 +234,11 @@ namespace RNC
                     command.RespondAsync("**[!]** That player is not connected!");
                     return;
                 }
+                if (!EPlayer.LoggedIn(target))
+                {
+                    command.RespondAsync("**[!]** That player is not logged in!");
+                    return;
+                }
                 target.SendChatMessage(Translator.Translate(target, "PRIVATE_MESSAGE_RECEIVED", $"@{command.User.Username}", message));
                 command.RespondAsync($"**Private Message sent to {recipient}:** `@{command.User.Username}: {message}`");
             });
