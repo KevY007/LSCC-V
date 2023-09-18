@@ -2552,7 +2552,7 @@ namespace RNC
             new CarData(1, "Unmarked Charger", "lspdunm", "package://Artwork/Vehicles/lspdunm.png", "Fast+", 25, 40);
             new CarData(1, "Sheriff Gauntlet 2", "polgauntletr", "package://Artwork/Vehicles/polgauntletr.png", "Fast", 25, 45);
             new CarData(1, "FIB Executioner", "fibexecutioner", "package://Artwork/Vehicles/fibexecutioner.png", "Average", 25, 50);
-            new CarData(1, "Sheriff Torrence", "poltorencer", "package://Artwork/Vehicles/poltorencer.png", "Fast", 28, 40);
+            //new CarData(1, "Sheriff Torrence", "poltorencer", "package://Artwork/Vehicles/poltorencer.png", "Fast", 28, 40);
             new CarData(1, "Police Buffalo SX", "buffalosxpol", "package://Artwork/Vehicles/buffalosxpol.png", "Fast+", 30, 50);
             new CarData(1, "Chevrolet Caprice PPV", "bcso2slick", "package://Artwork/Vehicles/bcso2slick.png", "Fast", 30, 65);
             new CarData(1, "Torrence Interceptor", "intcept", "package://Artwork/Vehicles/intcept.png", "Fast+", 30, 65);
