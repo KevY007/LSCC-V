@@ -453,11 +453,6 @@ function ToggleMenu() {
 
     global.menuToggled = !global.menuToggled;
 
-    //if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(`gm.miniHud = ${!global.menuToggled};`);
-    if (global.ServerUI)
-      global.ServerUI.execute(
-        `gm._pStores.globals.isMainMenuOpen = ${global.menuToggled};`
-      );
     if (global.ServerUI)
       global.ServerUI.call(`mainmenu_toggle`, global.menuToggled);
 

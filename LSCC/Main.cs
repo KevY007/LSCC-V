@@ -2938,10 +2938,14 @@ namespace RNC
                                             {
                                                 lock (player)
                                                 {
-                                                    if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetSharedData<int>("InDM") == -1 && player.GetSharedData<bool>("AutoJoin") == true && !EPlayer.IsAFK(player))
+                                                    if(player != null)
                                                     {
-                                                        pCount++;
+                                                        if (player.HasSharedData("InLobby") && player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetSharedData<int>("InDM") == -1 && player.GetSharedData<bool>("AutoJoin") == true && !EPlayer.IsAFK(player))
+                                                        {
+                                                            pCount++;
+                                                        }
                                                     }
+                                                 
                                                 }
                                             }
 
