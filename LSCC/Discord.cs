@@ -206,6 +206,13 @@ namespace RNC
                  .AddOption("password", ApplicationCommandOptionType.String, "Temporary password", isRequired: true)
                  .Build(), ChangePasswordCommandHandler));
 
+            commands.Add(new CommandDefinition(new SlashCommandBuilder()
+                 .WithName("setstaff")
+                 .WithDescription("Sets a player's staff level | Senior Admins can set 0-3 [General Admin]")
+                 .AddOption("target", ApplicationCommandOptionType.String, "Who's staff level to change", isRequired: true)
+                 .AddOption("level", ApplicationCommandOptionType.Integer, "Staff level", isRequired: true)
+                 .Build(), SetStaffCommandHandler));
+
             await guild.BulkOverwriteApplicationCommandAsync(commands.Select(cmd => cmd.Meta).ToArray());
         }
 
@@ -228,6 +235,93 @@ namespace RNC
             await command.RespondAsync(null, new Embed[] { embed.Build() }, false, false);
         }
 
+        private static async Task SetStaffCommandHandler(SocketSlashCommand command)
+        {
+            string targetName = command.Data.Options.ElementAt(0).Value.ToString();
+            int level = (int)command.Data.Options.ElementAt(1).Value;
+            int aLevel = GetIngameAdminLevel(command.User);
+            if (aLevel < 4)
+            {
+                await command.RespondAsync("**You are not authorized to use this command!**");
+                return;
+            }
+            else if (aLevel >= 4 && aLevel < 6)
+            {
+                if (level > 3 || level < 0)
+                {
+                    await command.RespondAsync("**You can only set admin levels 0-3 [General Admin]**");
+                    return;
+                }
+            }
+            else
+            {
+                if (level > 6 || level < 0)
+                {
+                    await command.RespondAsync("**You can only set admin levels 0-6 [Management]**");
+                    return;
+                }
+            }
+
+            lock (RAGE.Entities.Players)
+            {
+                NAPI.Task.Run(() =>
+                {
+                    int aSQL = GetIngameAdminLevel(command.User);
+                    if (aSQL == -1)
+                    {
+                        command.RespondAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
+                        command.RespondAsync("**HINT:** /link");
+                        return;
+                    }
+
+                    // if he is in-game
+                    if (RAGE.Entities.Players.All.Where(p => p.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase)).Count() > 0)
+                    {
+                        Player target = RAGE.Entities.Players.All.FirstOrDefault(p => p.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+                        if (target == null) return; // doesnt hurt to have extra security :)
+                        Account targetAcc = EPlayer.GetAccount(target);
+
+                        if (targetAcc.Admin == 6 || targetAcc.Admin >= aLevel)
+                        {
+                            command.RespondAsync("**[!]** That player is a higher/equal admin level than you!");
+                            return;
+                        }
+
+                        Logs.LogAdmin(aSQL, $"Set {target.Name}'s admin level to {EPlayer.GetAdminLevelName(level)}.");
+                        target.SetSharedData("Admin", level);
+                        targetAcc.Admin = level;
+                        EPlayer.Save(target, false);
+                        target.SendChatMessage($"~g~Your admin level has been set to ~y~{level}~g~ by [DC] {command.User.Username}!");
+                        command.RespondAsync($"[ADMSET] <@{command.User.Id}> , you successfully set **{target.Name}'s** admin level to **{level}**!");
+                        return;
+                    }
+                    else
+                    {
+                        Task.Run(async () =>
+                        {
+                            using (MainDatabase dbcontext = ContextFactory.CreateContext())
+                            {
+                                Account targetAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(t => t.Username.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+                                if (targetAcc == null)
+                                {
+                                    await command.RespondAsync("**[!]** A player with that username could not be found!");
+                                    return;
+                                }
+                                if (targetAcc.Admin == 6 || targetAcc.Admin >= aLevel)
+                                {
+                                    await command.RespondAsync("**[!]** That player is a higher/equal admin level than you!");
+                                    return;
+                                }
+                                targetAcc.Admin = level;
+                                await dbcontext.SaveChangesAsync();
+                                Logs.LogAdmin(aSQL, $"Set {targetAcc.Username}'s admin level to {EPlayer.GetAdminLevelName(level)}.");
+                                await command.RespondAsync($"[ADMSET] <@{command.User.Id}> , you successfully set **{targetAcc.Username}'s** admin level to **{level}**!");
+                            }
+                        });
+                    }
+                });
+            }
+        }
         private static async Task ChangePasswordCommandHandler(SocketSlashCommand command)
         {
 
@@ -341,6 +435,7 @@ namespace RNC
             await NAPI.Task.WaitForMainThread();
             await command.RespondAsync($"**Message sent to admins:** `@{command.User.Username}: {message}`");
         }
+
         private static async Task KickCommandHandler(SocketSlashCommand command)
         {
             string targetName = command.Data.Options.ElementAt(0).Value.ToString();
@@ -900,6 +995,7 @@ namespace RNC
                 }, 10);
             }
         }
+
         private static async Task PlayersCommandHandler(SocketSlashCommand command)
         {
             NAPI.Task.Run(() =>
